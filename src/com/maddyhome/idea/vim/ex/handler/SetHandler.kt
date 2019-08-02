@@ -25,12 +25,11 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
-import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.OptionsManager
 
-class SetHandler : CommandHandler(
-  commands("se[t]"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
-), VimScriptCommandHandler {
+class SetHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
+  override val names = commands("se[t]")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
     parseOptionLine(editor, cmd, true)
@@ -40,5 +39,5 @@ class SetHandler : CommandHandler(
   }
 
   private fun parseOptionLine(editor: Editor?, cmd: ExCommand, failOnBad: Boolean) =
-    Options.getInstance().parseOptionLine(editor, cmd.argument, failOnBad)
+    OptionsManager.parseOptionLine(editor, cmd.argument, failOnBad)
 }

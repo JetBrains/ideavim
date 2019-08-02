@@ -16,23 +16,102 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@file:Suppress("RemoveCurlyBracesFromTemplate")
+
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertDeletePreviousWordActionTest : VimTestCase() {
-    // VIM-1655
-    fun `test deleted word is not yanked`() {
-        doTest(parseKeys("yiw", "3wea", "<C-W>", "<ESC>p"), """
-            A Discovery
-
+  // VIM-1655
+  fun `test deleted word is not yanked`() {
+    doTest(parseKeys("yiw", "3wea", "<C-W>", "<ESC>p"), """
             I found ${c}it in a legendary land
         """.trimIndent(), """
-            A Discovery
-
             I found it in a i${c}t land
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+  }
+
+  fun `test word removed`() {
+    doTest(parseKeys("i", "<C-W>"), """
+            I found${c} it in a legendary land
+        """.trimIndent(), """
+            I ${c} it in a legendary land
+        """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  fun `test non alpha chars`() {
+    doTest(parseKeys("i", "<C-W>", "<C-W>", "<C-W>", "<C-W>"), """
+            I found (it)${c} in a legendary land
+        """.trimIndent(), """
+            I ${c} in a legendary land
+        """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  fun `test indents and spaces`() {
+    doTest(parseKeys("i", "<C-W>", "<C-W>", "<C-W>", "<C-W>"), """
+            A Discovery
+            
+                 I${c} found it in a legendary land
+        """.trimIndent(), """
+            A Discovery${c} found it in a legendary land
+        """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  @VimBehaviorDiffers("""
+            If (found) {
+               if (it) {
+                  legendary
+               }
+            ${c}
+  """)
+  fun `test delete starting from the line end`() {
+    doTest(parseKeys("i", "<C-W>"), """
+            If (found) {
+               if (it) {
+                  legendary
+               }
+            }${c}
+        """.trimIndent(), """
+            If (found) {
+               if (it) {
+                  legendary
+               ${c}
+        """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  // VIM-569 |a| |i_CTRL-W|
+  fun `test delete previous word dot eol`() {
+    doTest(parseKeys("a", "<C-W>"),
+      "this is a sentence<caret>.\n", "this is a sentence<caret>\n", CommandState.Mode.INSERT,
+      CommandState.SubMode.NONE)
+  }
+
+  // VIM-569 |a| |i_CTRL-W|
+  fun `test delete previous word last after whitespace`() {
+    doTest(parseKeys("A", "<C-W>"),
+      "<caret>this is a sentence\n", "this is a <caret>\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  // VIM-513 |A| |i_CTRL-W|
+  fun `test delete previous word eol`() {
+    doTest(parseKeys("A", "<C-W>"),
+      "<caret>\$variable\n", "$<caret>\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  // VIM-112 |i| |i_CTRL-W|
+  fun `test insert delete previous word`() {
+    typeTextInFile(parseKeys("i", "one two three", "<C-W>"),
+      "hello\n" + "<caret>\n")
+    myFixture.checkResult("hello\n" + "one two \n")
+  }
+
+  fun `test insert delete previous word action`() {
+    typeTextInFile(parseKeys("i", "<C-W>", "<ESC>"),
+      "one tw<caret>o three<caret> four   <caret>\n")
+    myFixture.checkResult("one<caret> o<caret> <caret> \n")
+  }
 }

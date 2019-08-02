@@ -121,7 +121,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(parseKeys("g<A-n>", "<A-n>".repeat(before.count { it == '\n' } - 1)))
 
-      val after = """${s}Int$se
+    val after = """${s}Int$se
       |Integer
       |${s}Int$se
       |${s}Int${se}eger
@@ -133,7 +133,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   }
 
   fun testSelectSubstring() {
-      val before = """q${c}we
+    val before = """q${c}we
       |asdqweasd
       |qwe
       |asd
@@ -142,7 +142,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(parseKeys("g<A-n>".repeat(3)))
 
-      val after = """${s}qwe$se
+    val after = """${s}qwe$se
       |asd${s}qwe${se}asd
       |${s}qwe$se
       |asd
@@ -151,7 +151,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   }
 
   fun testSelectSingleOccurrence() {
-      val before = """q${c}we
+    val before = """q${c}we
       |asd
       |zxc
       |cvb
@@ -162,7 +162,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(parseKeys("<A-n>".repeat(4)))
 
-      val after = """${s}qwe$se
+    val after = """${s}qwe$se
       |asd
       |zxc
       |cvb
@@ -196,7 +196,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(parseKeys("<Plug>AllWholeOccurrences"))
 
-      val after = """${s}qwe$se
+    val after = """${s}qwe$se
       |asd
       |${s}qwe$se
       |asd
@@ -217,7 +217,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     configureByText(before)
 
     typeText(parseKeys("<Plug>AllOccurrences"))
-      val after = """${s}Int$se
+    val after = """${s}Int$se
       |${s}Int${se}eger
       |${s}Int$se
       |${s}Int${se}eger
@@ -243,19 +243,19 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(parseKeys("<Plug>AllOccurrences"))
 
-      val after = before.replace("z${c}xc", "${s}zxc$se")
+    val after = before.replace("z${c}xc", "${s}zxc$se")
     myFixture.checkResult(after)
   }
 
   fun testRemoveSelectionVisualMode() {
-      val before = """q${s}we
+    val before = """q${s}we
       |dsgkldfjs ldfl gkjsdsl kj
       |dsfg dhjs${se}dafkljgh
       |dfkjsg
     """.trimMargin()
     val editor = configureByText(before)
     CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER,
-                                               MappingMode.VISUAL)
+      MappingMode.VISUAL)
 
     typeText(parseKeys("<A-p>"))
     myFixture.checkResult(before)
@@ -270,7 +270,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(parseKeys("g<A-n>", "<A-n>".repeat(2), "<A-p>"))
 
-      val after = """${s}Int$se
+    val after = """${s}Int$se
       |kek${s}Int${se}eger
       |lolInteger
     """.trimMargin()
@@ -278,7 +278,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   }
 
   fun testRemoveOccurrence() {
-      val before = """private i${c}nt a = 0;
+    val before = """private i${c}nt a = 0;
       |private int b = 1;
       |private int c = 2;
       |private int d = 3;
@@ -288,7 +288,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   }
 
   fun testSkipOccurrence() {
-      val before = """pr${c}ivate int a = 0;
+    val before = """pr${c}ivate int a = 0;
       |private int b = 1;
       |private int c = 2;
     """.trimMargin()
@@ -305,7 +305,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   }
 
   fun testSkipAndThenSelectAllOccurrences() {
-      val before = """pr${c}ivate int a = 0;
+    val before = """pr${c}ivate int a = 0;
       |private int b = 1;
       |private int c = 2;
     """.trimMargin()
@@ -313,7 +313,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(parseKeys("<A-n>", "<A-x>", "<A-n>".repeat(3)))
 
-      val after = """${s}private$se int a = 0;
+    val after = """${s}private$se int a = 0;
       |${s}private$se int b = 1;
       |${s}private$se int c = 2;
     """.trimMargin()
@@ -404,7 +404,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
     typeText(parseKeys("<A-n>".repeat(2)))
 
-      val after = """${s}qwe$se
+    val after = """${s}qwe$se
       |asd
       |${s}qwe$se
       |asd
@@ -415,7 +415,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
 
   fun testSkipSelectionSubstring() {
-      val before = """qw${c}e
+    val before = """qw${c}e
       |asdqweasd
       |ads
       |asdqweasd
@@ -435,14 +435,14 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   }
 
   fun testSkipSelectionVisualMode() {
-      val before = """q${s}we
+    val before = """q${s}we
       |dsgkldfjs ldfl gkjsdsl kj
       |dsfg dhjs${se}dafkljgh
       |dfkjsg
     """.trimMargin()
     val editor = configureByText(before)
     CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER,
-                                               MappingMode.VISUAL)
+      MappingMode.VISUAL)
 
     typeText(parseKeys("<A-x>"))
     assertMode(CommandState.Mode.VISUAL)
@@ -450,21 +450,21 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   }
 
   fun testAddSelectionVisualMode() {
-      val before = """jdfsg sdf${c}dfkgjhfkgkldfjsg
+    val before = """jdfsg sdf${c}dfkgjhfkgkldfjsg
       |dfkjghdfsgs
       |dflsgsdfgh
     """.trimMargin()
     configureByText(before)
 
     typeText(parseKeys("vjl", "<A-n>"))
-      val after = """jdfsg sdf${c}dfkgjhfkgkldfjsg
+    val after = """jdfsg sdf${c}dfkgjhfkgkldfjsg
                         |dfkjghdfs${c}gs
                         |dflsgsdfgh""".trimMargin()
     myFixture.checkResult(after)
   }
 
   fun testNextOccurrenceIgnorecase() {
-      val before = """fun getCellType(${c}pos: VisualPosition): CellType {
+    val before = """fun getCellType(${c}pos: VisualPosition): CellType {
     if (pos in snakeCells) {
       return CellType.SNAKE
     }
@@ -479,7 +479,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(commandToKeys("set ignorecase"))
     typeText(parseKeys("g<A-n><A-n><A-n>"))
-      val after = """fun getCellType(${s}pos$se: Visual${s}Pos${se}ition): CellType {
+    val after = """fun getCellType(${s}pos$se: Visual${s}Pos${se}ition): CellType {
     if (${s}pos$se in snakeCells) {
       return CellType.SNAKE
     }
@@ -491,5 +491,22 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     }
     }"""
     myFixture.checkResult(after)
+  }
+
+  fun `test with tabs`() {
+    val before = dotToTab("""
+      I found it in a legendary land
+      ...${c}all rocks and lavender and tufted grass,
+      ...all it was settled on some sodden sand
+      ...all by the torrent of a mountain pass
+    """.trimIndent())
+    val keys = parseKeys("vll", "<A-N>", "<A-N>")
+    val after = dotToTab("""
+      I found it in a legendary land
+      ...${s}al${c}l${se} rocks and lavender and tufted grass,
+      ...${s}al${c}l${se} it was settled on some sodden sand
+      ...${s}al${c}l${se} by the torrent of a mountain pass
+    """.trimIndent())
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 }

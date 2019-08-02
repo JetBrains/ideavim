@@ -23,16 +23,15 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.*
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
 import com.maddyhome.idea.vim.helper.StringHelper
 
 /**
  * @author smartbomb
  */
-class ActionListHandler : CommandHandler(
-  commands("actionlist"),
-  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
-) {
+class ActionListHandler : CommandHandler.SingleExecution() {
+  override val names: Array<CommandName> = commands("actionlist")
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val lineSeparator = "\n"
     val searchPattern = cmd.argument.trim().toLowerCase().split("*")

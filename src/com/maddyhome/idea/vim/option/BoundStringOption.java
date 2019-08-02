@@ -27,6 +27,7 @@ public class BoundStringOption extends StringOption {
     this.values = values;
   }
 
+  @Override
   public boolean set(String val) {
     if (isValid(val)) {
       return super.set(val);
@@ -35,6 +36,7 @@ public class BoundStringOption extends StringOption {
     return false;
   }
 
+  @Override
   public boolean append(String val) {
     if (isValid(val) && getValue().length() == 0) {
       return super.set(val);
@@ -43,6 +45,7 @@ public class BoundStringOption extends StringOption {
     return false;
   }
 
+  @Override
   public boolean prepend(String val) {
     if (isValid(val) && getValue().length() == 0) {
       return super.set(val);
@@ -51,6 +54,7 @@ public class BoundStringOption extends StringOption {
     return false;
   }
 
+  @Override
   public boolean remove(@NotNull String val) {
     if (getValue().equals(val)) {
       return super.remove(val);

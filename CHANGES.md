@@ -18,8 +18,24 @@ usual beta standards.
 
 To Be Released
 --------------
+_Available since 0.52.1 EAP:_
+* [VIM-1711](https://youtrack.jetbrains.com/issue/VIM-1711) Search is not triggered during surround action
+* [VIM-1712](https://youtrack.jetbrains.com/issue/VIM-1712) Fix `Y` command for visual mode
+* [VIM-1713](https://youtrack.jetbrains.com/issue/VIM-1713) Surround in visual mode put caret in corrent position
+* [VIM-1732](https://youtrack.jetbrains.com/issue/VIM-1732) Fix SO after enabling vim mode
+* [VIM-1710](https://youtrack.jetbrains.com/issue/VIM-1710) Fix opening empty file with "relative number" enabled
+* [VIM-1725](https://youtrack.jetbrains.com/issue/VIM-1725) Fix problems with Japanese language
+* [VIM-1648](https://youtrack.jetbrains.com/issue/VIM-1648) Fix exception while substitute with conformation
 
-* Introduce [Select Mode](https://vimhelp.org/visual.txt.html#Select-mode).  
+_Not released yet:_
+
+...
+
+
+0.52, 2019-07-23
+--------------
+
+* Introduce [Select Mode](https://vimhelp.org/visual.txt.html#Select-mode).
 
 
 * Fixed `:only` command
@@ -87,6 +103,28 @@ To Be Released
   selection when clipboard is used
 * [VIM-714](https://youtrack.jetbrains.com/issue/VIM-714) Fixed problems with caret position by vertical movement
 * [VIM-635](https://youtrack.jetbrains.com/issue/VIM-635) Supported `gn` commands
+* [VIM-1535](https://youtrack.jetbrains.com/issue/VIM-1535) Use same text attributes and highlight layer as IntelliJ's own Find command
+* [VIM-1413](https://youtrack.jetbrains.com/issue/VIM-1413) Fix `smartcase` option being ignored in incremental search
+* Fix incremental search not matching with trailing options, e.g. `/Foo/+1`
+* Move the current line as well as scrolling during incremental search
+* [VIM-128](https://youtrack.jetbrains.com/issue/VIM-128) Fix `:substitute` not respecting `ignorecase` and `smartcase` options
+* Fix next/previous search commands not respecting `smartcase` override
+* Search highlights are updated when `ignorecase`, `smartcase` and `hlsearch` options are updated, and when plugin is disabled
+* Incremental search highlights all matches in file, not just first
+* Added incremental search highlights for `:substitute` command
+* Fix exception when trying to highlight last CR in file
+* Improve behavior of `<BS>` in command line entry
+* [VIM-1626](https://youtrack.jetbrains.com/issue/VIM-1626) Add `ideajoin` option
+* [VIM-959](https://youtrack.jetbrains.com/issue/VIM-959) Add `ideamarks` option
+* [VIM-608](https://youtrack.jetbrains.com/issue/VIM-608) Automatic upload files on explicit save
+* [VIM-1548](https://youtrack.jetbrains.com/issue/VIM-1548) Respect editor settings about tabs and spaces
+* [VIM-1682](https://youtrack.jetbrains.com/issue/VIM-1682) Fix backward search with OR
+* [VIM-752](https://youtrack.jetbrains.com/issue/VIM-752) Enter finishes template in normal mode
+* [VIM-1668](https://youtrack.jetbrains.com/issue/VIM-1668) Fix smart step into
+* [VIM-1697](https://youtrack.jetbrains.com/issue/VIM-1697) Fix wrong search with tab characters
+* [VIM-1700](https://youtrack.jetbrains.com/issue/VIM-1700) Fix wrong search with tab characters
+* [VIM-1698](https://youtrack.jetbrains.com/issue/VIM-1698) Paste doesn't clear clipboard
+* [VIM-1359](https://youtrack.jetbrains.com/issue/VIM-1359) Fix behavior of i_CTRL-W action
 
 0.51, 2019-02-12
 ----------------
@@ -530,7 +568,7 @@ Bug fixes:
 * VIM-312 Fixed range and caret position after `dw` on the last single-word
   line, `w` command argument for the last word in file
 * Fixed `w` motion at the last word
-* VIM-85 Bug fix for gi behaviour
+* VIM-85 Bug fix for gi behavior
 * Always move cursor at the beginning of the deleted range
 * VIM-275 Fixed edge cases for `i{` motion
 * VIM-314 Made `i{` motion characterwise, not linewise/characterwise in visual

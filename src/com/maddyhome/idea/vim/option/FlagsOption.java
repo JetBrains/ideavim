@@ -41,6 +41,7 @@ public class FlagsOption extends BoundListOption {
    *
    * @return The list of flags
    */
+  @Override
   @NotNull
   public String getValue() {
     StringBuilder res = new StringBuilder();

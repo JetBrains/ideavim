@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.ui;
 
 import com.intellij.util.Processor;
 import com.maddyhome.idea.vim.helper.StringHelper;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -30,6 +31,7 @@ import java.awt.event.KeyEvent;
  * @author dhleong
  */
 public final class ModalEntry {
+  @Contract(pure = true)
   private ModalEntry() {}
 
   /**

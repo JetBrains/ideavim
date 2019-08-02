@@ -37,10 +37,10 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
+import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
@@ -152,7 +152,7 @@ public class FileGroup {
     if (project != null) {
       final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
       final EditorWindow window = fileEditorManager.getCurrentWindow();
-      final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
+      final VirtualFile virtualFile = EditorHelper.getVirtualFile(editor);
 
       if (virtualFile != null) {
         window.closeFile(virtualFile);
@@ -163,15 +163,15 @@ public class FileGroup {
   /**
    * Saves specific file in the project.
    */
-  public void saveFile(@NotNull Editor editor) {
-    FileDocumentManager.getInstance().saveDocument(editor.getDocument());
+  public void saveFile(DataContext context) {
+    KeyHandler.executeAction("SaveDocument", context);
   }
 
   /**
    * Saves all files in the project.
    */
-  public void saveFiles() {
-    FileDocumentManager.getInstance().saveAllDocuments();
+  public void saveFiles(DataContext context) {
+    KeyHandler.executeAction("SaveAll", context);
   }
 
   /**
@@ -234,7 +234,10 @@ public class FileGroup {
     FileEditor[] feditors = fMgr.openFile(file, true);
     if (feditors.length > 0) {
       if (feditors[0] instanceof TextEditor) {
-        return ((TextEditor)feditors[0]).getEditor();
+        Editor editor = ((TextEditor) feditors[0]).getEditor();
+        if (!editor.isDisposed()) {
+          return editor;
+        }
       }
     }
 
@@ -243,7 +246,9 @@ public class FileGroup {
 
   public void displayAsciiInfo(@NotNull Editor editor) {
     int offset = editor.getCaretModel().getOffset();
-    char ch = editor.getDocument().getCharsSequence().charAt(offset);
+    CharSequence charsSequence = editor.getDocument().getCharsSequence();
+    if (charsSequence.length() == 0 || offset >= charsSequence.length()) return;
+    char ch = charsSequence.charAt(offset);
 
     VimPlugin.showMessage("<" +
                           StringHelper.toKeyNotation(KeyStroke.getKeyStroke(ch)) +
@@ -348,7 +353,7 @@ public class FileGroup {
 
   public void displayFileInfo(@NotNull Editor editor, boolean fullPath) {
     StringBuilder msg = new StringBuilder();
-    VirtualFile vf = EditorData.getVirtualFile(editor);
+    VirtualFile vf = EditorHelper.getVirtualFile(editor);
     if (vf != null) {
       msg.append('"');
       if (fullPath) {
@@ -404,20 +409,18 @@ public class FileGroup {
   @NotNull private static final Logger logger = Logger.getInstance(FileGroup.class.getName());
 
   /**
-   * This class listens for editor tab changes so any insert/replace modes that need to be reset can be.
+   * This method listens for editor tab changes so any insert/replace modes that need to be reset can be.
    */
-  public static class SelectionCheck implements FileEditorManagerListener {
-    public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-      // The user has changed the editor they are working with - exit insert/replace mode, and complete any
-      // appropriate repeat
-      if (event.getOldFile() != null) {
-        lastSelections.put(event.getManager(), event.getOldFile());
-        String disposableKey = FileGroup.disposableKey + event.getManager().hashCode();
-        if (Disposer.get(disposableKey) == null) {
-          Disposer.register(event.getManager().getProject(), () -> {
-            lastSelections.remove(event.getManager());
-          }, disposableKey);
-        }
+  public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
+    // The user has changed the editor they are working with - exit insert/replace mode, and complete any
+    // appropriate repeat
+    if (event.getOldFile() != null) {
+      lastSelections.put(event.getManager(), event.getOldFile());
+      String disposableKey = FileGroup.disposableKey + event.getManager().hashCode();
+      if (Disposer.get(disposableKey) == null) {
+        Disposer.register(event.getManager().getProject(), () -> {
+          lastSelections.remove(event.getManager());
+        }, disposableKey);
       }
     }
   }

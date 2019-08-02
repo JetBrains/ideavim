@@ -113,6 +113,7 @@ public class Register {
   }
 
   public static class KeySorter implements Comparator<Register> {
+    @Override
     public int compare(@NotNull Register o1, @NotNull Register o2) {
       return Character.compare(o1.name, o2.name);
     }

@@ -23,18 +23,12 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.commands
-import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.handler.CaretOrder
+import com.maddyhome.idea.vim.ex.*
 
-class JoinLinesHandler : CommandHandler(
-  commands("j[oin]"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE),
-  true, CaretOrder.DECREASING_OFFSET
-) {
+class JoinLinesHandler : CommandHandler.ForEachCaret() {
+  override val names: Array<CommandName> = commands("j[oin]")
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
+
   override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
     val arg = cmd.argument
     val spaces = arg.isEmpty() || arg[0] != '!'

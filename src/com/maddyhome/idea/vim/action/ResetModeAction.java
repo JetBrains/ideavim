@@ -20,23 +20,46 @@ package com.maddyhome.idea.vim.action;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
+import com.maddyhome.idea.vim.helper.HelperKt;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
 
-// TODO: Cannot find the corresponding Vim command. Remove it?
-public class ResetModeAction extends EditorAction {
-  public ResetModeAction() {
-    super(new EditorActionHandlerBase() {
+
+public class ResetModeAction extends VimCommandAction {
+  @NotNull
+  @Override
+  protected VimActionHandler makeActionHandler() {
+    return new VimActionHandler.SingleExecution() {
       @Override
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        KeyHandler.getInstance().fullReset(InjectedLanguageUtil.getTopLevelEditor(editor));
+      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+        KeyHandler.getInstance().fullReset(HelperKt.getTopLevelEditor(editor));
         return true;
       }
-    });
+    };
+  }
+
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.NO;
+  }
+
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("<C-\\><C-N>");
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.RESET;
   }
 }

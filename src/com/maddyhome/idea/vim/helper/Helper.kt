@@ -18,17 +18,15 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.codeInsight.template.TemplateManager
+import com.intellij.injected.editor.EditorWindow
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.util.Key
-import com.intellij.openapi.util.UserDataHolder
 import java.util.*
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
 
 /**
  * This annotation is created for test functions (methods).
- * It means that original vim behaviour has small differences from behaviour of IdeaVim.
+ * It means that original vim behavior has small differences from behavior of IdeaVim.
  * [shouldBeFixed] flag indicates whether the given functionality should be fixed
  *   or the given behavior is normal for IdeaVim and should be leaved as is.
  *
@@ -44,69 +42,49 @@ import kotlin.reflect.KProperty
  *    Hello3
  *
  * Why this annotation exists?
- * After creating some functionality you can understand that IdeaVim has a bit different behaviour, but you
+ * After creating some functionality you can understand that IdeaVim has a bit different behavior, but you
  *   cannot fix it right now because of any reasons (bugs in IDE,
  *   the impossibility of this functionality in IDEA (*[shouldBeFixed] == false*), leak of time for fixing).
  *   In that case, you should NOT remove the corresponding test or leave it without any marks that this test
- *   not fully convenient with vim, but leave the test with IdeaVim's behaviour and put this annotation
+ *   not fully convenient with vim, but leave the test with IdeaVim's behavior and put this annotation
  *   with description of how original vim works.
  *
- * Note that using this annotation should be avoided as much as possible and behaviour of IdeaVim should be as close
+ * Note that using this annotation should be avoided as much as possible and behavior of IdeaVim should be as close
  *   to vim as possible.
  */
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.FUNCTION)
-annotation class VimBehaviourDiffers(
+annotation class VimBehaviorDiffers(
   val originalVimAfter: String = "",
   val description: String = "",
   val shouldBeFixed: Boolean = true
 )
 
 /**
- * Function for delegated properties.
- * The property will be saved to caret if this caret is not primary
- *   and to caret and editor otherwise.
- * In case of primary caret getter uses value stored in caret. If it's null, then the value from editor
- * Has nullable type.
+ * [VimFunctionMark] and [VimTestFunction] are the simple annotations that simplify to bind test
+ *   and functions that are used in that test, but aren't targets of this test
+ *
+ *   E.g. if you test `n` command and you want to use next command sequence `*n` you can put this test in
+ *     SearchAgainNextActionTest test class (because main test target is `n` command) and annotate this function
+ *     with @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction") to mark that
+ *     this test also uses `*` command.
+ *
+ * [VimFunctionMark] should annotate some method or class and provide and unique label for it
+ * [VimTestFunction] provides marks that point to commands that are tested with this function. Full class name or values
+ *   of [VimFunctionMark] can be used as marks.
+ *
+ * These annotations doesn't affect code behavior, but created only for development purposes
  */
-fun <T> userDataCaretToEditor(): ReadWriteProperty<Caret, T?> = object : UserDataReadWriteProperty<Caret, T?>() {
-  override fun getValue(thisRef: Caret, property: KProperty<*>): T? {
-    return if (thisRef == thisRef.editor.caretModel.primaryCaret) {
-      thisRef.getUserData(getKey(property)) ?: thisRef.editor.getUserData(getKey(property))
-    } else {
-      thisRef.getUserData(getKey(property))
-    }
-  }
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
+annotation class VimFunctionMark(val value: String)
 
-  override fun setValue(thisRef: Caret, property: KProperty<*>, value: T?) {
-    if (thisRef == thisRef.editor.caretModel.primaryCaret) {
-      thisRef.editor.putUserData(getKey(property), value)
-    }
-    thisRef.putUserData(getKey(property), value)
-  }
-}
-
-/**
- * Function for delegated properties.
- * The property will be delegated to UserData and has non-nullable type.
- * [default] action will be executed if UserData doesn't have this property now.
- *   The result of [default] will be put to user data and returned.
- */
-fun <T> userDataOr(default: UserDataHolder.() -> T): ReadWriteProperty<UserDataHolder, T> = object : UserDataReadWriteProperty<UserDataHolder, T>() {
-  override fun getValue(thisRef: UserDataHolder, property: KProperty<*>): T {
-    return thisRef.getUserData(getKey(property)) ?: run<ReadWriteProperty<UserDataHolder, T>, T> {
-      val defaultValue = thisRef.default()
-      thisRef.putUserData(getKey(property), defaultValue)
-      defaultValue
-    }
-  }
-
-  override fun setValue(thisRef: UserDataHolder, property: KProperty<*>, value: T) {
-    thisRef.putUserData(getKey(property), value)
-  }
-}
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.FUNCTION)
+annotation class VimTestFunction(vararg val value: String)
 
 fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
+
 inline fun <reified T : Enum<T>> noneOfEnum(): EnumSet<T> = EnumSet.noneOf(T::class.java)
 inline fun <reified T : Enum<T>> enumSetOf(vararg value: T): EnumSet<T> = when (value.size) {
   0 -> noneOfEnum()
@@ -122,12 +100,44 @@ inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
   }
 }
 
-private abstract class UserDataReadWriteProperty<in R, T> : ReadWriteProperty<R, T> {
-  private var key: Key<T>? = null
-  protected fun getKey(property: KProperty<*>): Key<T> {
-    if (key == null) {
-      key = Key.create(property.name + " by userData()")
-    }
-    return key as Key<T>
-  }
+fun Editor.getTopLevelEditor() = if (this is EditorWindow) this.delegate else this
+
+fun Editor.isTemplateActive(): Boolean {
+  val project = this.project ?: return false
+  return TemplateManager.getInstance(project).getActiveTemplate(this) != null
+}
+
+
+/**
+ * This annotations marks if annotated function required read or write lock
+ */
+@Target
+annotation class RWLockLabel {
+  /**
+   * [Readonly] annotation means that annotated function should be called from read action
+   * This annotation is only a marker and doesn't enable r/w lock automatically
+   */
+  @Target(AnnotationTarget.FUNCTION)
+  annotation class Readonly
+
+  /**
+   * [Writable] annotation means that annotated function should be called from write action
+   * This annotation is only a marker and doesn't enable r/w lock automatically
+   */
+  @Target(AnnotationTarget.FUNCTION)
+  annotation class Writable
+
+  /**
+   * [SelfSynchronized] annotation means that annotated function handles read/write lock by itself
+   * This annotation is only a marker and doesn't enable r/w lock automatically
+   */
+  @Target(AnnotationTarget.FUNCTION)
+  annotation class SelfSynchronized
+
+  /**
+   * [NoLockRequired] annotation means that annotated function doesn't require any lock
+   * This annotation is only a marker and doesn't enable r/w lock automatically
+   */
+  @Target(AnnotationTarget.FUNCTION)
+  annotation class NoLockRequired
 }

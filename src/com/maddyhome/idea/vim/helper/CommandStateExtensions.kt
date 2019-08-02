@@ -5,13 +5,17 @@ package com.maddyhome.idea.vim.helper
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.command.CommandState
 
-/**
- * @author Alex Plate
- */
-
-private val modesWithEndAllowed = setOf(CommandState.Mode.INSERT, CommandState.Mode.REPEAT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT)
 val CommandState.Mode.isEndAllowed
-  get() = this in modesWithEndAllowed
+  get() = when (this) {
+    CommandState.Mode.INSERT, CommandState.Mode.REPEAT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
+    CommandState.Mode.COMMAND, CommandState.Mode.EX_ENTRY, CommandState.Mode.REPLACE -> false
+  }
+
+val CommandState.Mode.hasVisualSelection
+  get() = when (this) {
+    CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
+    CommandState.Mode.REPLACE, CommandState.Mode.EX_ENTRY, CommandState.Mode.COMMAND, CommandState.Mode.INSERT, CommandState.Mode.REPEAT -> false
+  }
 
 val Editor.mode
   get() = CommandState.getInstance(this).mode

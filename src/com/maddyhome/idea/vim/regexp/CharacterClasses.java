@@ -73,7 +73,7 @@ public final class CharacterClasses {
     boolean res = false;
     switch (mask) {
       case RI_DIGIT:
-        res = isDigit(ch);
+        res = Character.isDigit(ch);
         break;
       case RI_HEX:
         res = isHex(ch);
@@ -102,10 +102,6 @@ public final class CharacterClasses {
     }
 
     return (res == (test > 0));
-  }
-
-  public static boolean isDigit(char ch) {
-    return Character.isDigit(ch);
   }
 
   public static boolean isHex(char ch) {

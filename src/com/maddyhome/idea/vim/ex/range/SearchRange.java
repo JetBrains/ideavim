@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.ex.range;
 
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
@@ -95,11 +94,11 @@ public class SearchRange extends AbstractRange {
    * Gets the line number specified by this range without regard to any offset.
    *
    * @param editor   The editor to get the line for
-   * @param context  The data context
    * @param lastZero True if last line was set to start of file
    * @return The zero based line number, -1 if the text was not found
    */
-  protected int getRangeLine(@NotNull Editor editor, DataContext context, boolean lastZero) {
+  @Override
+  protected int getRangeLine(@NotNull Editor editor, boolean lastZero) {
     // Each subsequent pattern is searched for starting in the line after the previous search match
     int line = editor.getCaretModel().getLogicalPosition().line;
     int pos = -1;
@@ -131,7 +130,7 @@ public class SearchRange extends AbstractRange {
   }
 
   @Override
-  protected int getRangeLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+  protected int getRangeLine(@NotNull Editor editor, @NotNull Caret caret,
                              boolean lastZero) {
     int line = caret.getLogicalPosition().line;
     int offset = -1;

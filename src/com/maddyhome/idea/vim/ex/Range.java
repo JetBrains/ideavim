@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.ex;
 
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import org.jetbrains.annotations.NotNull;
@@ -31,13 +30,12 @@ public interface Range {
    * Get the line number this range represents
    *
    * @param editor   The editor to get the line for
-   * @param context  The data context
    * @param lastZero True if the last line set represents before the start of the false
    * @return The zero based logical line in the editor that the range represents
    */
-  int getLine(Editor editor, DataContext context, boolean lastZero);
+  int getLine(Editor editor, boolean lastZero);
 
-  int getLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, boolean lastZero);
+  int getLine(@NotNull Editor editor, @NotNull Caret caret, boolean lastZero);
 
   /**
    * Should the cursor be moved to this range's line?

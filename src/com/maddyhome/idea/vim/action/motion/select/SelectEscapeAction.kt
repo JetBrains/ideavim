@@ -24,12 +24,12 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import javax.swing.KeyStroke
 
 class SelectEscapeAction : VimCommandAction() {
-  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       val blockMode = editor.inBlockSubMode
       VimPlugin.getVisualMotion().exitSelectMode(editor, true)

@@ -25,8 +25,8 @@ import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.group.ChangeGroup
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.group.visual.updateCaretState
+import com.maddyhome.idea.vim.handler.VimActionHandler
 import javax.swing.KeyStroke
 
 /**
@@ -34,7 +34,7 @@ import javax.swing.KeyStroke
  */
 
 class SelectToggleVisualMode : VimCommandAction() {
-  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       val commandState = CommandState.getInstance(editor)
       val subMode = commandState.subMode
@@ -59,7 +59,7 @@ class SelectToggleVisualMode : VimCommandAction() {
           }
         }
       }
-      ChangeGroup.resetCursor(editor, mode == CommandState.Mode.VISUAL)
+      updateCaretState(editor)
       return true
     }
   }

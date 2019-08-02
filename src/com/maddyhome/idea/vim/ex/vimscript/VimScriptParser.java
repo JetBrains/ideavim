@@ -61,6 +61,27 @@ public class VimScriptParser {
     return null;
   }
 
+  @Nullable
+  public static File findOrCreateIdeaVimRc() {
+    final File found = findIdeaVimRc();
+    if (found != null) return found;
+
+    final String homeDirName = System.getProperty("user.home");
+    if (homeDirName != null) {
+      for (String fileName : VIMRC_FILES) {
+        try {
+          final File file = new File(homeDirName, fileName);
+          //noinspection ResultOfMethodCallIgnored
+          file.createNewFile();
+          return file;
+        } catch (IOException ignored) {
+          // Try to create one of two files
+        }
+      }
+    }
+    return null;
+  }
+
   public static void executeFile(@NotNull File file) {
     final String data;
     try {

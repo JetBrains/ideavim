@@ -22,27 +22,48 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
+import com.maddyhome.idea.vim.action.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.command.CommandFlags;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+
 
 public class MotionBigWordEndLeftAction extends MotionEditorAction {
-  public MotionBigWordEndLeftAction() {
-    super(new Handler());
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.NVO;
   }
 
-  private static class Handler extends MotionActionHandler.ForEachCaret {
-    public Handler() {
-      super();
-    }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("gE");
+  }
 
-    @Override
-    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                         int rawCount, @Nullable Argument argument) {
-      return VimPlugin.getMotion().moveCaretToNextWordEnd(editor, caret, -count, true);
-    }
+  @NotNull
+  @Override
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE);
+  }
+
+  @NotNull
+  @Override
+  public MotionActionHandler makeActionHandler() {
+    return new MotionActionHandler.ForEachCaret() {
+      @Override
+      public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                           int rawCount, @Nullable Argument argument) {
+        return VimPlugin.getMotion().moveCaretToNextWordEnd(editor, caret, -count, true);
+      }
+    };
   }
 }

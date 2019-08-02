@@ -42,6 +42,7 @@ public class StringOption extends TextOption {
    *
    * @return The option's value
    */
+  @Override
   public String getValue() {
     return value;
   }
@@ -52,6 +53,7 @@ public class StringOption extends TextOption {
    * @param val The new value
    * @return True
    */
+  @Override
   public boolean set(String val) {
     value = val;
     fireOptionChangeEvent();
@@ -65,6 +67,7 @@ public class StringOption extends TextOption {
    * @param val The string to append
    * @return True
    */
+  @Override
   public boolean append(String val) {
     value += val;
     fireOptionChangeEvent();
@@ -78,6 +81,7 @@ public class StringOption extends TextOption {
    * @param val The string to prepend
    * @return True
    */
+  @Override
   public boolean prepend(String val) {
     value = val + value;
     fireOptionChangeEvent();
@@ -91,6 +95,7 @@ public class StringOption extends TextOption {
    * @param val The substring to remove from the current value
    * @return True if the substring was removed, false if the value is not a substring of the current value
    */
+  @Override
   public boolean remove(@NotNull String val) {
     int pos = value.indexOf(val);
     if (pos != -1) {
@@ -108,6 +113,7 @@ public class StringOption extends TextOption {
    *
    * @return True if equal to default, false if not.
    */
+  @Override
   public boolean isDefault() {
     return dflt.equals(value);
   }
@@ -115,6 +121,7 @@ public class StringOption extends TextOption {
   /**
    * Sets the option to its default value.
    */
+  @Override
   public void resetDefault() {
     if (!dflt.equals(value)) {
       value = dflt;

@@ -18,26 +18,29 @@
 
 package com.maddyhome.idea.vim.listener
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.openapi.editor.event.*
 import com.intellij.openapi.editor.ex.DocumentEx
 import com.intellij.openapi.editor.impl.EditorComponentImpl
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent
+import com.intellij.openapi.fileEditor.FileEditorManagerListener
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.VimTypedActionHandler
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.ExOutputModel
-import com.maddyhome.idea.vim.group.ChangeGroup
-import com.maddyhome.idea.vim.group.visual.VisualMotionGroup
+import com.maddyhome.idea.vim.group.*
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.inInsertMode
-import com.maddyhome.idea.vim.helper.inSelectMode
-import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.helper.subMode
-import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.ExEntryPanel
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -111,20 +114,124 @@ object VimListenerManager {
 
   val logger = Logger.getInstance(VimListenerManager::class.java)
 
-  fun addEditorListeners(editor: Editor) {
-    val eventFacade = EventFacade.getInstance()
-    eventFacade.addEditorMouseListener(editor, EditorMouseHandler)
-    eventFacade.addEditorMouseMotionListener(editor, EditorMouseHandler)
-    eventFacade.addEditorSelectionListener(editor, EditorSelectionHandler)
-    eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener)
+  fun turnOn() {
+    GlobalListeners.enable()
+    ProjectListeners.addAll()
+    EditorListeners.addAll()
   }
 
-  fun removeEditorListeners(editor: Editor) {
-    val eventFacade = EventFacade.getInstance()
-    eventFacade.removeEditorMouseListener(editor, EditorMouseHandler)
-    eventFacade.removeEditorMouseMotionListener(editor, EditorMouseHandler)
-    eventFacade.removeEditorSelectionListener(editor, EditorSelectionHandler)
-    eventFacade.removeComponentMouseListener(editor.contentComponent, ComponentMouseListener)
+  fun turnOff() {
+    GlobalListeners.disable()
+    ProjectListeners.removeAll()
+    EditorListeners.removeAll()
+  }
+
+  object GlobalListeners {
+    @JvmStatic
+    fun enable() {
+      val typedAction = EditorActionManager.getInstance().typedAction
+      if (typedAction.rawHandler !is VimTypedActionHandler) {
+        // Actually this if should always be true, but just as protection
+        EventFacade.getInstance().setupTypedActionHandler(VimTypedActionHandler(typedAction.rawHandler))
+      }
+
+      OptionsManager.number.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
+      OptionsManager.relativenumber.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
+
+      EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, ApplicationManager.getApplication())
+    }
+
+    fun disable() {
+      EventFacade.getInstance().restoreTypedActionHandler()
+
+      OptionsManager.number.removeOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
+      OptionsManager.relativenumber.removeOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
+
+      EventFacade.getInstance().removeEditorFactoryListener(VimEditorFactoryListener)
+    }
+  }
+
+  object ProjectListeners {
+    fun add(project: Project) {
+      val eventFacade = EventFacade.getInstance()
+      eventFacade.connectBookmarkListener(project, MarkGroup.MarkListener())
+      eventFacade.connectFileEditorManagerListener(project, VimFileEditorManagerListener)
+      IdeaSpecifics.addIdeaSpecificsListeners(project)
+    }
+
+    fun removeAll() {
+      // Project listeners are self-disposable, so there is no need to unregister them on project close
+      EventFacade.getInstance().disableBusConnection()
+      ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }.forEach { IdeaSpecifics.removeIdeaSpecificsListeners(it) }
+    }
+
+    fun addAll() {
+      ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }.forEach { add(it) }
+    }
+  }
+
+  object EditorListeners {
+    fun addAll() {
+      val editors = EditorFactory.getInstance().allEditors
+      for (editor in editors) {
+        if (!editor.vimMotionGroup) {
+          add(editor)
+          editor.vimMotionGroup = true
+        }
+      }
+    }
+
+    fun removeAll() {
+      val editors = EditorFactory.getInstance().allEditors
+      for (editor in editors) {
+        if (editor.vimMotionGroup) {
+          remove(editor)
+          editor.vimMotionGroup = false
+        }
+      }
+    }
+
+    @JvmStatic
+    fun add(editor: Editor) {
+      val eventFacade = EventFacade.getInstance()
+      eventFacade.addEditorMouseListener(editor, EditorMouseHandler)
+      eventFacade.addEditorMouseMotionListener(editor, EditorMouseHandler)
+      eventFacade.addEditorSelectionListener(editor, EditorSelectionHandler)
+      eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener)
+    }
+
+    @JvmStatic
+    fun remove(editor: Editor) {
+      val eventFacade = EventFacade.getInstance()
+      eventFacade.removeEditorMouseListener(editor, EditorMouseHandler)
+      eventFacade.removeEditorMouseMotionListener(editor, EditorMouseHandler)
+      eventFacade.removeEditorSelectionListener(editor, EditorSelectionHandler)
+      eventFacade.removeComponentMouseListener(editor.contentComponent, ComponentMouseListener)
+    }
+  }
+
+  private object VimFileEditorManagerListener : FileEditorManagerListener {
+    override fun selectionChanged(event: FileEditorManagerEvent) {
+      MotionGroup.fileEditorManagerSelectionChangedCallback(event)
+      FileGroup.fileEditorManagerSelectionChangedCallback(event)
+      SearchGroup.fileEditorManagerSelectionChangedCallback(event)
+    }
+  }
+
+  private object VimEditorFactoryListener : EditorFactoryListener {
+    override fun editorCreated(event: EditorFactoryEvent) {
+      VimPlugin.getEditor().editorCreated(event)
+      VimPlugin.getMotion().editorCreated(event)
+      VimPlugin.getChange().editorCreated(event)
+      VimPlugin.statisticReport()
+    }
+
+    override fun editorReleased(event: EditorFactoryEvent) {
+      VimPlugin.getEditor().editorReleased(event)
+      VimPlugin.getMotion().editorReleased(event)
+      VimPlugin.getChange().editorReleased(event)
+      VimPlugin.getMark().editorReleased(event)
+    }
   }
 
   private object EditorSelectionHandler : SelectionListener {
@@ -138,8 +245,8 @@ object VimListenerManager {
       val document = editor.document
 
       if (SelectionVimListenerSuppressor.isNotLocked) {
-        logger.debug("Adjust non vim selection change")
-        VimPlugin.getVisualMotion().controlNonVimSelectionChange(editor, !editor.settings.isBlockCursor)
+        logger.info("Adjust non vim selection change")
+        VimPlugin.getVisualMotion().controlNonVimSelectionChange(editor)
       }
 
       if (myMakingChanges || document is DocumentEx && document.isInEventsHandling) {
@@ -164,34 +271,40 @@ object VimListenerManager {
 
   private object EditorMouseHandler : EditorMouseListener, EditorMouseMotionListener {
     private var mouseDragging = false
-    private var isBlockCaret = true
 
     override fun mouseDragged(e: EditorMouseEvent) {
       if (!mouseDragging) {
         logger.debug("Mouse dragging")
         SelectionVimListenerSuppressor.lock()
         mouseDragging = true
-        isBlockCaret = e.editor.settings.isBlockCursor
-        ChangeGroup.resetCursor(e.editor, true)
+        val caret = e.editor.caretModel.primaryCaret
+        if (onLineEnd(caret)) {
+          // UX protection for case when user performs a small dragging while putting caret on line end
+          caret.removeSelection()
+          ChangeGroup.resetCaret(e.editor, true)
+        }
+      }
+      if (mouseDragging && e.editor.caretModel.primaryCaret.hasSelection()) {
+        ChangeGroup.resetCaret(e.editor, true)
       }
     }
 
+    private fun onLineEnd(caret: Caret): Boolean {
+      val editor = caret.editor
+      val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+      val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
+      return caret.offset == lineEnd && lineEnd != lineStart && caret.offset - 1 == caret.selectionStart && caret.offset == caret.selectionEnd
+    }
+
     override fun mouseReleased(event: EditorMouseEvent) {
-      VisualMotionGroup.modeBeforeEnteringNonVimVisual = null
       if (mouseDragging) {
         logger.debug("Release mouse after dragging")
         val editor = event.editor
         val caret = editor.caretModel.primaryCaret
-        val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
-        val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
         SelectionVimListenerSuppressor.use {
-          if (caret.offset == lineEnd && lineEnd != lineStart && caret.offset - 1 == caret.selectionStart && caret.offset == caret.selectionEnd) {
-            // UX protection for case when user performs a small dragging while putting caret on line end
-            caret.removeSelection()
-            caret.moveToOffset(caret.offset - 1)
-          }
-          VimPlugin.getVisualMotion().controlNonVimSelectionChange(editor, !isBlockCaret, VimListenerManager.SelectionSource.MOUSE)
-          moveCaretOneCharLeftFromSelectionEnd(editor)
+          val predictedMode = VimPlugin.getVisualMotion().predictMode(editor, VimListenerManager.SelectionSource.MOUSE)
+          VimPlugin.getVisualMotion().controlNonVimSelectionChange(editor, VimListenerManager.SelectionSource.MOUSE)
+          moveCaretOneCharLeftFromSelectionEnd(editor, predictedMode)
           caret.vimLastColumn = editor.caretModel.visualPosition.column
         }
 
@@ -200,14 +313,13 @@ object VimListenerManager {
     }
 
     override fun mouseClicked(event: EditorMouseEvent) {
-      if (!VimPlugin.isEnabled()) return
       logger.debug("Mouse clicked")
 
       if (event.area == EditorMouseEventArea.EDITING_AREA) {
         VimPlugin.getMotion()
         val editor = event.editor
         if (ExEntryPanel.getInstance().isActive) {
-          VimPlugin.getProcess().cancelExEntry(editor, ExEntryPanel.getInstance().entry.context)
+          VimPlugin.getProcess().cancelExEntry(editor, false)
         }
 
         ExOutputModel.getInstance(editor).clear()
@@ -231,7 +343,7 @@ object VimListenerManager {
         event.mouseEvent.button != MouseEvent.BUTTON3) {
         VimPlugin.getMotion()
         if (ExEntryPanel.getInstance().isActive) {
-          VimPlugin.getProcess().cancelExEntry(event.editor, ExEntryPanel.getInstance().entry.context)
+          VimPlugin.getProcess().cancelExEntry(event.editor, false)
         }
 
         ExOutputModel.getInstance(event.editor).clear()
@@ -239,12 +351,13 @@ object VimListenerManager {
     }
   }
 
-  private object ComponentMouseListener: MouseAdapter() {
+  private object ComponentMouseListener : MouseAdapter() {
     override fun mousePressed(e: MouseEvent?) {
       val editor = (e?.component as? EditorComponentImpl)?.editor ?: return
+      val predictedMode = VimPlugin.getVisualMotion().predictMode(editor, VimListenerManager.SelectionSource.MOUSE)
       when (e.clickCount) {
         1 -> {
-          if (!editor.inInsertMode) {
+          if (!predictedMode.isEndAllowed) {
             editor.caretModel.runForEachCaret { caret ->
               val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
               val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
@@ -254,7 +367,7 @@ object VimListenerManager {
             }
           }
         }
-        2 -> moveCaretOneCharLeftFromSelectionEnd(editor)
+        2 -> moveCaretOneCharLeftFromSelectionEnd(editor, predictedMode)
       }
     }
   }

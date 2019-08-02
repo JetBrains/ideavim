@@ -48,5 +48,18 @@ public abstract class ParentNode implements Node {
     return children.get(key);
   }
 
-  @NotNull protected final HashMap<Object, Node> children = new HashMap<Object, Node>();
+  /**
+   * Returns the child node associated with the supplied key. The key must be the same as used in {@link #addChild}
+   * If this is BranchNode and no such child is found but there is an argument node, the argument node is returned.
+   *
+   * @param key The key used to find the child
+   * @return The child mapped to key or null if no such mapping found
+   */
+  @Nullable
+  public Node getChildOrArgument(@NotNull Object key) {
+    return children.get(key);
+  }
+
+
+  @NotNull protected final HashMap<Object, Node> children = new HashMap<>();
 }

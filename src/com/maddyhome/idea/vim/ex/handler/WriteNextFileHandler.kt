@@ -26,14 +26,13 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
-class WriteNextFileHandler : CommandHandler(
-  commands("wn[ext]"),
-  flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL)
-) {
+class WriteNextFileHandler : CommandHandler.SingleExecution() {
+  override val names = commands("wn[ext]")
+  override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val count = cmd.getCount(editor, context, 1, true)
 
-    VimPlugin.getFile().saveFile(editor)
+    VimPlugin.getFile().saveFile(context)
     VimPlugin.getMark().saveJumpLocation(editor)
     VimPlugin.getFile().selectNextFile(count, context)
 

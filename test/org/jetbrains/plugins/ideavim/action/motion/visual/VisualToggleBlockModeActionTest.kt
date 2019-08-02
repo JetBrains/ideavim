@@ -22,13 +22,13 @@ package org.jetbrains.plugins.ideavim.action.motion.visual
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VisualToggleBlockModeActionTest : VimTestCase() {
-    fun `test enter visual with count`() {
-        doTest(parseKeys("1<C-V>"),
-                """
+  fun `test enter visual with count`() {
+    doTest(parseKeys("1<C-V>"),
+      """
                     A Discovery
 
                     I ${c}found it in a legendary land
@@ -36,7 +36,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                     A Discovery
 
                     I ${s}${c}f${se}ound it in a legendary land
@@ -44,12 +44,12 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
-    }
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+  }
 
-    fun `test enter visual with five count`() {
-        doTest(parseKeys("5<C-V>"),
-                """
+  fun `test enter visual with five count`() {
+    doTest(parseKeys("5<C-V>"),
+      """
                     A Discovery
 
                     I ${c}found it in a legendary land
@@ -57,7 +57,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                     A Discovery
 
                     I ${s}foun${c}d${se} it in a legendary land
@@ -65,12 +65,12 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
-    }
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+  }
 
-    fun `test enter visual with 100 count`() {
-        doTest(parseKeys("100<C-V>"),
-                """
+  fun `test enter visual with 100 count`() {
+    doTest(parseKeys("100<C-V>"),
+      """
                     A Discovery
 
                     I ${c}found it in a legendary land
@@ -78,7 +78,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                     A Discovery
 
                     I ${s}found it in a legendary land${c}${se}
@@ -86,11 +86,11 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
-    }
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+  }
 
-    fun `test selectmode option`() {
-        configureByText("""
+  fun `test selectmode option`() {
+    configureByText("""
                     A Discovery
 
                     I${c} found it in a legendary land
@@ -98,8 +98,8 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand[long line]
                     hard by the torrent of a mountain pass.
         """.trimIndent())
-        Options.getInstance().getListOption(Options.SELECTMODE)!!.set("cmd")
-        typeText(parseKeys("<C-V>"))
-        assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_BLOCK)
-    }
+    OptionsManager.selectmode.set("cmd")
+    typeText(parseKeys("<C-V>"))
+    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_BLOCK)
+  }
 }

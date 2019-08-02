@@ -33,7 +33,9 @@ import javax.swing.KeyStroke
 /**
  * @author vlan
  */
-class MapHandler : CommandHandler(COMMAND_NAMES, flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)), VimScriptCommandHandler {
+class MapHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
+  override val names: Array<CommandName> = COMMAND_NAMES
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

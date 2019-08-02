@@ -23,39 +23,39 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VisualBlockAppendActionTest : VimTestCase() {
-    fun `test visual block append`() {
-        val before = """
+  fun `test visual block append`() {
+    val before = """
             ${c}int a;
             int b;
             int c;
             """.trimIndent()
-        typeTextInFile(parseKeys("<C-V>", "2j", "e", "A", " const", "<Esc>"), before)
-        val after = """
+    typeTextInFile(parseKeys("<C-V>", "2j", "e", "A", " const", "<Esc>"), before)
+    val after = """
             int const a;
             int const b;
             int const c;
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    fun `test visual block append with dollar motion`() {
-        val before = """
+  fun `test visual block append with dollar motion`() {
+    val before = """
             ${c}int a;
             private String b;
             int c;
             """.trimIndent()
-        typeTextInFile(parseKeys("<C-V>", "2j", "$", "A", " // My variables", "<Esc>"), before)
-        val after = """
+    typeTextInFile(parseKeys("<C-V>", "2j", "$", "A", " // My variables", "<Esc>"), before)
+    val after = """
             int a; // My variables
             private String b; // My variables
             int c; // My variables
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    fun `test append in non block mode`() {
-        doTest(parseKeys("vwAHello<esc>"),
-                """
+  fun `test append in non block mode`() {
+    doTest(parseKeys("vwAHello<esc>"),
+      """
                 ${c}A Discovery
 
                 ${c}I found it in a legendary land
@@ -63,7 +63,7 @@ class VisualBlockAppendActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                """
+      """
                 A DiscoveryHell${c}o
 
                 I found it in a legendary landHell${c}o
@@ -71,8 +71,8 @@ class VisualBlockAppendActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-        assertMode(CommandState.Mode.COMMAND)
-    }
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+    assertMode(CommandState.Mode.COMMAND)
+  }
 }

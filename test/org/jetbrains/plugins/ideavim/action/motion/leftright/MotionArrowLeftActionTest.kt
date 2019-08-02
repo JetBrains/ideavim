@@ -22,17 +22,18 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.Options
-import org.jetbrains.plugins.ideavim.VimListConfig
-import org.jetbrains.plugins.ideavim.VimListOptionDefault
-import org.jetbrains.plugins.ideavim.VimListOptionTestCase
-import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
+import com.maddyhome.idea.vim.option.KeyModelOptionData
+import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
 
-class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
-    @VimListOptionDefault
-    fun `test visual default options`() {
-        doTest(parseKeys("v", "<Left>"),
-                """
+class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
+  @VimOptionDefaultAll
+  fun `test visual default options`() {
+    doTest(parseKeys("v", "<Left>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -40,7 +41,7 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I${s}${c} f${se}ound it in a legendary land
@@ -48,13 +49,13 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
-    }
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopsel"]))
-    fun `test visual stopsel`() {
-        doTest(parseKeys("v", "<Left>"),
-                """
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopsel]))
+  fun `test visual stopsel`() {
+    doTest(parseKeys("v", "<Left>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -62,7 +63,7 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I${c} found it in a legendary land
@@ -70,13 +71,13 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopselect"]))
-    fun `test visual stopselect`() {
-        doTest(parseKeys("v", "<Left>"),
-                """
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
+  fun `test visual stopselect`() {
+    doTest(parseKeys("v", "<Left>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -84,7 +85,7 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I${s}${c} f${se}ound it in a legendary land
@@ -92,13 +93,13 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
-    }
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopvisual"]))
-    fun `test visual stopvisual`() {
-        doTest(parseKeys("v", "<Left>"),
-                """
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
+  fun `test visual stopvisual`() {
+    doTest(parseKeys("v", "<Left>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -106,7 +107,7 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I${c} found it in a legendary land
@@ -114,13 +115,13 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopvisual"]))
-    fun `test visual stopvisual multicaret`() {
-        doTest(parseKeys("v", "<Left>"),
-                """
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
+  fun `test visual stopvisual multicaret`() {
+    doTest(parseKeys("v", "<Left>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -128,7 +129,7 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I${c} found it in a legendary land
@@ -136,6 +137,6 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 }

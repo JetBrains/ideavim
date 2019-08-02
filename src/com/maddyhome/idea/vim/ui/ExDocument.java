@@ -66,6 +66,7 @@ public class ExDocument extends DefaultStyledDocument {
    *                              position within the document
    * @see Document#insertString
    */
+  @Override
   public void insertString(int offs, @NotNull String str, AttributeSet a) throws BadLocationException {
 
     addInputMethodAttributes(a);

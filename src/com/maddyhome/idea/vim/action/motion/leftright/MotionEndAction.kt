@@ -22,7 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.action.MotionEditorAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -34,12 +34,11 @@ import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.option.BoundStringOption
-import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.OptionsManager
 import java.util.*
 import javax.swing.KeyStroke
 
-class MotionEndAction : VimCommandAction() {
+class MotionEndAction : MotionEditorAction() {
   override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
     override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
                         rawCount: Int, argument: Argument?): Int {
@@ -47,7 +46,7 @@ class MotionEndAction : VimCommandAction() {
       if (editor.inInsertMode) {
         allow = true
       } else if (editor.inVisualMode || editor.inSelectMode) {
-        val opt = Options.getInstance().getOption("selection") as BoundStringOption
+        val opt = OptionsManager.selection
         if (opt.value != "old") {
           allow = true
         }
@@ -65,11 +64,9 @@ class MotionEndAction : VimCommandAction() {
     }
   }
 
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVOS
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<End>")
-
-  override val type: Command.Type = Command.Type.MOTION
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
 }

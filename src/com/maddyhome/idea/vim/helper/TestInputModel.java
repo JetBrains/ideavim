@@ -35,10 +35,10 @@ public class TestInputModel {
   private TestInputModel() {}
 
   public static TestInputModel getInstance(@NotNull Editor editor) {
-    TestInputModel model = EditorData.getTestInputModel(editor);
+    TestInputModel model = UserDataManager.getVimTestInputModel(editor);
     if (model == null) {
       model = new TestInputModel();
-      EditorData.setTestInputModel(editor, model);
+      UserDataManager.setVimTestInputModel(editor, model);
     }
     return model;
   }

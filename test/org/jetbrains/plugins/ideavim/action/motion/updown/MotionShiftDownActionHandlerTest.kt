@@ -22,18 +22,21 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.Options
-import org.jetbrains.plugins.ideavim.VimListConfig
-import org.jetbrains.plugins.ideavim.VimListOptionTestCase
-import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
+import com.maddyhome.idea.vim.option.KeyModelOptionData
+import com.maddyhome.idea.vim.option.SelectModeOptionData
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
 
-class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL, Options.SELECTMODE) {
-    @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["startsel"]),
-            VimListConfig(Options.SELECTMODE, []))
-    fun `test visual down`() {
-        doTest(parseKeys("<S-Down>"),
-                """
+class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.name, SelectModeOptionData.name) {
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test visual down`() {
+    doTest(parseKeys("<S-Down>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -41,7 +44,7 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I ${s}found it in a legendary land
@@ -49,16 +52,17 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
-        )
-    }
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
+  }
 
-    @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["startsel"]),
-            VimListConfig(Options.SELECTMODE, []))
-    fun `test visual down twice`() {
-        doTest(parseKeys("<S-Down><S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test visual down twice`() {
+    doTest(parseKeys("<S-Down><S-Down>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -66,7 +70,7 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I ${s}found it in a legendary land
@@ -74,16 +78,17 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 wh${c}e${se}re it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
-        )
-    }
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
+  }
 
-    @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["startsel"]),
-            VimListConfig(Options.SELECTMODE, []))
-    fun `test save column`() {
-        doTest(parseKeys("<S-Down><S-Down><S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test save column`() {
+    doTest(parseKeys("<S-Down><S-Down><S-Down>"),
+      """
                 A Discovery
 
                 I found it in a legendary land[additional chars${c}]
@@ -91,7 +96,7 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.[additional chars]
                 """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I found it in a legendary land[additional chars${s}]
@@ -99,16 +104,17 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.[additio${c}n${se}al chars]
                 """.trimIndent(),
-                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
-        )
-    }
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
+  }
 
-    @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["startsel"]),
-            VimListConfig(Options.SELECTMODE, ["key"]))
-    fun `test select down`() {
-        doTest(parseKeys("<S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
+  )
+  fun `test select down`() {
+    doTest(parseKeys("<S-Down>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -116,7 +122,7 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I ${s}found it in a legendary land
@@ -124,16 +130,17 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER
-        )
-    }
+      CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER
+    )
+  }
 
-    @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["startsel"]),
-            VimListConfig(Options.SELECTMODE, ["key"]))
-    fun `test select down twice`() {
-        doTest(parseKeys("<S-Down><S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
+  )
+  fun `test select down twice`() {
+    doTest(parseKeys("<S-Down><S-Down>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -141,7 +148,7 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I ${s}found it in a legendary land
@@ -149,14 +156,17 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 wh${c}${se}ere it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER
-        )
-    }
+      CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER
+    )
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["continueselect"]), VimListConfig(Options.SELECTMODE, []))
-    fun `test char select simple move`() {
-        doTest(parseKeys("gh", "<S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test char select simple move`() {
+    doTest(parseKeys("gh", "<S-Down>"),
+      """
                 A Discovery
 
                 ${c}I found it in a legendary land
@@ -164,7 +174,7 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 ${s}I found it in a legendary land
@@ -172,14 +182,17 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_CHARACTER)
-    }
+      CommandState.Mode.SELECT,
+      CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["continueselect"]), VimListConfig(Options.SELECTMODE, []))
-    fun `test char select move to empty line`() {
-        doTest(parseKeys("gh", "<S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test char select move to empty line`() {
+    doTest(parseKeys("gh", "<S-Down>"),
+      """
                 A ${c}Discovery
 
                 I found it in a legendary land
@@ -187,7 +200,7 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                """
+      """
                 A ${s}Discovery
                 $c$se
                 I found it in a legendary land
@@ -195,14 +208,17 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_CHARACTER)
-    }
+      CommandState.Mode.SELECT,
+      CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["continueselect"]), VimListConfig(Options.SELECTMODE, []))
-    fun `test char select move from empty line`() {
-        doTest(parseKeys("gh", "<S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test char select move from empty line`() {
+    doTest(parseKeys("gh", "<S-Down>"),
+      """
                 A Discovery
                 $c
                 I found it in a legendary land
@@ -210,7 +226,7 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                """
+      """
                 A Discovery
                 $s
                 $c${se}I found it in a legendary land
@@ -218,56 +234,65 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_CHARACTER)
-    }
+      CommandState.Mode.SELECT,
+      CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["continueselect"]), VimListConfig(Options.SELECTMODE, []))
-    fun `test char select move to file end`() {
-        doTest(parseKeys("gh", "<S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test char select move to file end`() {
+    doTest(parseKeys("gh", "<S-Down>"),
+      """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard ${c}by the torrent of a mountain pass.""".trimIndent(),
-                """
+      """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard ${s}b$c${se}y the torrent of a mountain pass.""".trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_CHARACTER)
-    }
+      CommandState.Mode.SELECT,
+      CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["continueselect"]), VimListConfig(Options.SELECTMODE, []))
-    fun `test char select move multicaret`() {
-        doTest(parseKeys("gh", "<S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test char select move multicaret`() {
+    doTest(parseKeys("gh", "<S-Down>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard ${c}by the torrent of a mountain pass.""".trimIndent(),
-                """
+      """
                 A Discovery
 
                 I ${s}found it in a legendary land
                 all$c$se rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard ${s}b$c${se}y the torrent of a mountain pass.""".trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_CHARACTER)
-    }
+      CommandState.Mode.SELECT,
+      CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["continueselect"]), VimListConfig(Options.SELECTMODE, []))
-    fun `test line select simple move`() {
-        doTest(parseKeys("gH", "<S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test line select simple move`() {
+    doTest(parseKeys("gH", "<S-Down>"),
+      """
                 A Discovery
 
                 ${c}I found it in a legendary land
@@ -275,7 +300,7 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 ${s}I found it in a legendary land
@@ -283,14 +308,17 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 ${se}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_LINE)
-    }
+      CommandState.Mode.SELECT,
+      CommandState.SubMode.VISUAL_LINE)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["continueselect"]), VimListConfig(Options.SELECTMODE, []))
-    fun `test line select to empty line`() {
-        doTest(parseKeys("gH", "<S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test line select to empty line`() {
+    doTest(parseKeys("gH", "<S-Down>"),
+      """
                 A ${c}Discovery
 
                 I found it in a legendary land
@@ -298,7 +326,7 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                """
+      """
                 ${s}A Discovery
                 $c
                 ${se}I found it in a legendary land
@@ -306,14 +334,17 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_LINE)
-    }
+      CommandState.Mode.SELECT,
+      CommandState.SubMode.VISUAL_LINE)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["continueselect"]), VimListConfig(Options.SELECTMODE, []))
-    fun `test line select from empty line`() {
-        doTest(parseKeys("gH", "<S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test line select from empty line`() {
+    doTest(parseKeys("gH", "<S-Down>"),
+      """
                 A Discovery
                 $c
                 I found it in a legendary land
@@ -321,7 +352,7 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                """
+      """
                 A Discovery
                 $s
                 ${c}I found it in a legendary land
@@ -329,133 +360,151 @@ class MotionShiftDownActionHandlerTest : VimListOptionTestCase(Options.KEYMODEL,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_LINE)
-    }
+      CommandState.Mode.SELECT,
+      CommandState.SubMode.VISUAL_LINE)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["continueselect"]), VimListConfig(Options.SELECTMODE, []))
-    fun `test line select to file end`() {
-        doTest(parseKeys("gH", "<S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test line select to file end`() {
+    doTest(parseKeys("gH", "<S-Down>"),
+      """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the ${c}torrent of a mountain pass.""".trimIndent(),
-                """
+      """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 ${s}hard by the ${c}torrent of a mountain pass.$se""".trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_LINE)
-    }
+      CommandState.Mode.SELECT,
+      CommandState.SubMode.VISUAL_LINE)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["continueselect"]), VimListConfig(Options.SELECTMODE, []))
-    fun `test line select multicaret`() {
-        doTest(parseKeys("gH", "<S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test line select multicaret`() {
+    doTest(parseKeys("gH", "<S-Down>"),
+      """
                 A Discovery
 
                 I found ${c}it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the ${c}torrent of a mountain pass.""".trimIndent(),
-                """
+      """
                 A Discovery
 
                 ${s}I found it in a legendary land
                 all rock${c}s and lavender and tufted grass,
                 ${se}where it was settled on some sodden sand
                 ${s}hard by the ${c}torrent of a mountain pass.$se""".trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_LINE)
-    }
+      CommandState.Mode.SELECT,
+      CommandState.SubMode.VISUAL_LINE)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["continueselect"]), VimListConfig(Options.SELECTMODE, []))
-    fun `test block select simple move`() {
-        doTest(parseKeys("g<C-H>", "<S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test block select simple move`() {
+    doTest(parseKeys("g<C-H>", "<S-Down>"),
+      """
                 A Discovery
 
                 I found ${c}it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.""".trimIndent(),
-                """
+      """
                 A Discovery
 
                 I found ${s}i$c${se}t in a legendary land
                 all rock${s}s$c$se and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.""".trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_BLOCK)
-    }
+      CommandState.Mode.SELECT,
+      CommandState.SubMode.VISUAL_BLOCK)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["continueselect"]), VimListConfig(Options.SELECTMODE, []))
-    fun `test block select to empty line`() {
-        doTest(parseKeys("g<C-H>", "<S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test block select to empty line`() {
+    doTest(parseKeys("g<C-H>", "<S-Down>"),
+      """
                 A ${c}Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.""".trimIndent(),
-                """
+      """
                 ${s}A ${se}Discovery
                 $c
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.""".trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_BLOCK)
-    }
+      CommandState.Mode.SELECT,
+      CommandState.SubMode.VISUAL_BLOCK)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["continueselect"]), VimListConfig(Options.SELECTMODE, []))
-    fun `test block select from empty line`() {
-        doTest(parseKeys("g<C-H>", "<S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test block select from empty line`() {
+    doTest(parseKeys("g<C-H>", "<S-Down>"),
+      """
                 A Discovery
                 $c
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.""".trimIndent(),
-                """
+      """
                 A Discovery
                 $s$c$se
                 $s$c${se}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.""".trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_BLOCK)
-    }
+      CommandState.Mode.SELECT,
+      CommandState.SubMode.VISUAL_BLOCK)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["continueselect"]), VimListConfig(Options.SELECTMODE, []))
-    fun `test block select to file end`() {
-        doTest(parseKeys("g<C-H>", "<S-Down>"),
-                """
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
+  fun `test block select to file end`() {
+    doTest(parseKeys("g<C-H>", "<S-Down>"),
+      """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the ${c}torrent of a mountain pass.""".trimIndent(),
-                """
+      """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the ${s}t$c${se}orrent of a mountain pass.""".trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_BLOCK)
-    }
+      CommandState.Mode.SELECT,
+      CommandState.SubMode.VISUAL_BLOCK)
+  }
 }

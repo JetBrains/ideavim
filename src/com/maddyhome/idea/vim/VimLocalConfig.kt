@@ -37,7 +37,7 @@ class VimLocalConfig : PersistentStateComponent<Element> {
     val element = Element("ideavim-local")
 
     val state = Element("state")
-    state.setAttribute("version", Integer.toString(STATE_VERSION))
+    state.setAttribute("version", STATE_VERSION.toString())
     element.addContent(state)
 
     VimPlugin.getMark().saveData(element)

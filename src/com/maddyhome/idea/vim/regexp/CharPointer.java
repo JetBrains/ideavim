@@ -22,22 +22,25 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.CharBuffer;
+import java.util.Objects;
 
 
 public class CharPointer {
-  public static final CharPointer INIT = new CharPointer();
+  @NotNull private CharSequence seq;
+  private int pointer;
+  private boolean readonly;
 
-  public CharPointer(@Nullable String text) {
+  public CharPointer(@NotNull String text) {
     seq = text;
     readonly = true;
   }
 
-  public CharPointer(@Nullable CharBuffer text) {
+  public CharPointer(@NotNull CharBuffer text) {
     seq = text;
     readonly = true;
   }
 
-  public CharPointer(@Nullable StringBuffer text) {
+  public CharPointer(@NotNull StringBuffer text) {
     seq = text;
     readonly = false;
   }
@@ -48,18 +51,8 @@ public class CharPointer {
     pointer = ptr.pointer + offset;
   }
 
-  private CharPointer() {
-    seq = null;
-    pointer = -1;
-    readonly = true;
-  }
-
   public int pointer() {
     return pointer;
-  }
-
-  public boolean isInit() {
-    return seq == null && pointer == -1;
   }
 
   @NotNull
@@ -69,10 +62,6 @@ public class CharPointer {
 
   @NotNull
   public CharPointer set(char ch, int offset) {
-    if (seq == null) {
-      return this;
-    }
-
     if (readonly) {
       throw new IllegalStateException("readonly string");
     }
@@ -140,31 +129,20 @@ public class CharPointer {
 
   @NotNull
   public CharPointer ref(int offset) {
-    if (this.equals(INIT)) {
-      return INIT;
-    }
-
     return new CharPointer(this, offset);
   }
 
   @NotNull
   public String substring(int len) {
-    if (end()) {
-      return "";
-    }
-    else {
-      int start = pointer;
-      int end = normalize(pointer + len);
-      int slen = seq.length();
-      //return seq.subSequence(start, end - start).toString();
-      return CharBuffer.wrap(seq, start, end).toString();
-    }
+    if (end()) return "";
+
+    int start = pointer;
+    int end = normalize(pointer + len);
+    return CharBuffer.wrap(seq, start, end).toString();
   }
 
   public int strlen() {
-    if (end()) {
-      return 0;
-    }
+    if (end()) return 0;
 
     for (int i = pointer; i < seq.length(); i++) {
       if (seq.charAt(i) == '\u0000') {
@@ -176,11 +154,8 @@ public class CharPointer {
   }
 
   public int strncmp(@NotNull String str, int len) {
-    if (end()) {
-      return -1;
-    }
+    if (end()) return -1;
 
-    //String s = seq.subSequence(pointer, normalize(pointer + len)).toString();
     String s = CharBuffer.wrap(seq, pointer, normalize(pointer + len)).toString();
 
     if (len > str.length()) {
@@ -190,13 +165,9 @@ public class CharPointer {
     return s.compareTo(str.substring(0, len));
   }
 
-  public int strncmp(@NotNull CharPointer str, int len) {
-    if (end()) {
-      return -1;
-    }
+  public int strncmp(@NotNull CharPointer str, int len, boolean ignoreCase) {
+    if (end()) return -1;
 
-    //CharSequence cs1 = seq.subSequence(pointer, normalize(pointer + len));
-    //CharSequence cs2 = str.seq.subSequence(str.pointer, str.normalize(str.pointer + len));
     CharSequence cs1 = CharBuffer.wrap(seq, pointer, normalize(pointer + len));
     CharSequence cs2 = CharBuffer.wrap(str.seq, str.pointer, str.normalize(str.pointer + len));
 
@@ -209,69 +180,17 @@ public class CharPointer {
       char c1 = cs1.charAt(i);
       char c2 = cs2.charAt(i);
 
-      if (c1 != c2) {
-        return 1;
-      }
+      final boolean notEqual = ignoreCase ? Character.toLowerCase(c1) != Character.toLowerCase(c2) &&
+                                            Character.toUpperCase(c1) != Character.toUpperCase(c2) : c1 != c2;
+      if (notEqual) return 1;
     }
 
     return 0;
-
-    /*
-    int slen = str.strlen();
-    if (len > slen)
-    {
-        len = slen;
-    }
-
-    String s = seq.subSequence(pointer, normalize(pointer + len)).toString();
-
-    return s.compareTo(str.substring(len));
-    */
-  }
-
-  public int strnicmp(@NotNull CharPointer str, int len) {
-    if (end()) {
-      return -1;
-    }
-
-    //CharSequence cs1 = seq.subSequence(pointer, normalize(pointer + len));
-    //CharSequence cs2 = str.seq.subSequence(str.pointer, str.normalize(str.pointer + len));
-    CharSequence cs1 = CharBuffer.wrap(seq, pointer, normalize(pointer + len));
-    CharSequence cs2 = CharBuffer.wrap(str.seq, str.pointer, str.normalize(str.pointer + len));
-
-    int l = cs1.length();
-    if (l != cs2.length()) {
-      return 1;
-    }
-
-    for (int i = 0; i < l; i++) {
-      char c1 = cs1.charAt(i);
-      char c2 = cs2.charAt(i);
-
-      if (Character.toLowerCase(c1) != Character.toLowerCase(c2) &&
-          Character.toUpperCase(c1) != Character.toUpperCase(c2)) {
-        return 1;
-      }
-    }
-
-    return 0;
-
-    /* was 2,407ms
-    int slen = str.strlen();
-    if (len > slen)
-    {
-        len = slen;
-    }
-
-    String s = seq.subSequence(pointer, normalize(pointer + len)).toString();
-
-    return s.compareToIgnoreCase(str.substring(len));
-    */
   }
 
   @Nullable
   public CharPointer strchr(char c) {
-    if (seq == null || end()) {
+    if (end()) {
       return null;
     }
 
@@ -291,7 +210,7 @@ public class CharPointer {
 
   @Nullable
   public CharPointer istrchr(char c) {
-    if (seq == null || end()) {
+    if (end()) {
       return null;
     }
 
@@ -321,11 +240,11 @@ public class CharPointer {
   }
 
   public boolean end(int offset) {
-    return seq == null || pointer + offset >= seq.length();
+    return pointer + offset >= seq.length();
   }
 
   public int OP() {
-    return (int)charAt();
+    return charAt();
   }
 
   @NotNull
@@ -334,36 +253,53 @@ public class CharPointer {
   }
 
   public int NEXT() {
-//    #define NEXT(p)         (((*((p) + 1) & 0377) << 8) + (*((p) + 2) & 0377))
     return ((((int)seq.charAt(pointer + 1) & 0xff) << 8) + ((int)seq.charAt(pointer + 2) & 0xff));
   }
 
   public int OPERAND_MIN() {
-//    #define OPERAND_MIN(p)  (((long)(p)[3] << 24) + ((long)(p)[4] << 16) \
-//    + ((long)(p)[5] << 8) + (long)(p)[6])
-    return (((int)seq.charAt(pointer + 3) << 24) + ((int)seq.charAt(pointer + 4) << 16) +
-            ((int)seq.charAt(pointer + 5) << 8) + ((int)seq.charAt(pointer + 6)));
+    return (((int)seq.charAt(pointer + 3) << 24) +
+            ((int)seq.charAt(pointer + 4) << 16) +
+            ((int)seq.charAt(pointer + 5) << 8) +
+            ((int)seq.charAt(pointer + 6)));
   }
 
   public int OPERAND_MAX() {
-    return (((int)seq.charAt(pointer + 7) << 24) + ((int)seq.charAt(pointer + 8) << 16) +
-            ((int)seq.charAt(pointer + 9) << 8) + ((int)seq.charAt(pointer + 10)));
+    return (((int)seq.charAt(pointer + 7) << 24) +
+            ((int)seq.charAt(pointer + 8) << 16) +
+            ((int)seq.charAt(pointer + 9) << 8) +
+            ((int)seq.charAt(pointer + 10)));
   }
 
   public char OPERAND_CMP() {
-//    #define OPERAND_CMP(p)  (p)[7]
     return seq.charAt(pointer + 7);
   }
 
   public boolean equals(Object obj) {
     if (obj instanceof CharPointer) {
       CharPointer ptr = (CharPointer)obj;
-      if (ptr.seq == seq && ptr.pointer == pointer) {
-        return true;
-      }
+      return ptr.seq == seq && ptr.pointer == pointer;
     }
 
     return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(seq, pointer);
+  }
+
+  public void skipWhitespaces() {
+    while (CharacterClasses.isWhite(charAt())) inc();
+  }
+
+  public int getDigits() {
+    int res = 0;
+    while (Character.isDigit(charAt())) {
+      res = res * 10 + (charAt() - '0');
+      inc();
+    }
+
+    return res;
   }
 
   private int normalize(int pos) {
@@ -374,8 +310,4 @@ public class CharPointer {
   public String toString() {
     return substring(strlen());
   }
-
-  @Nullable private CharSequence seq;
-  private int pointer;
-  private boolean readonly = true;
 }

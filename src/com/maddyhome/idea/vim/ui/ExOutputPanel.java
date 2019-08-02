@@ -26,10 +26,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.UiHelper;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.helper.UserDataManager;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,6 +74,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     myText.setEditable(false);
 
     myAdapter = new ComponentAdapter() {
+      @Override
       public void componentResized(ComponentEvent e) {
         positionPanel();
       }
@@ -94,10 +95,10 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
 
   @NotNull
   public static ExOutputPanel getInstance(@NotNull Editor editor) {
-    ExOutputPanel panel = EditorData.getMorePanel(editor);
+    ExOutputPanel panel = UserDataManager.getVimMorePanel(editor);
     if (panel == null) {
       panel = new ExOutputPanel(editor);
-      EditorData.setMorePanel(editor, panel);
+      UserDataManager.setVimMorePanel(editor, panel);
     }
     return panel;
   }
@@ -269,8 +270,8 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     int count = countLines(myText.getText());
     int visLines = getSize().height / myLineHeight - 1;
     int lines = Math.min(count, visLines);
-    setSize(getSize().width, lines * myLineHeight + myLabel.getPreferredSize().height +
-                             getBorder().getBorderInsets(this).top * 2);
+    setSize(getSize().width,
+            lines * myLineHeight + myLabel.getPreferredSize().height + getBorder().getBorderInsets(this).top * 2);
 
     int height = getSize().height;
     Rectangle bounds = scroll.getBounds();
@@ -282,7 +283,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     setBounds(bounds);
 
     myScrollPane.getVerticalScrollBar().setValue(0);
-    if (!Options.getInstance().isSet("more")) {
+    if (!OptionsManager.INSTANCE.getMore().isSet()) {
       // FIX
       scrollOffset(100000);
     }
@@ -296,18 +297,16 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
   }
 
   private void close(@Nullable final KeyEvent e) {
-    ApplicationManager.getApplication().invokeLater(new Runnable() {
-      public void run() {
-        deactivate(true);
+    ApplicationManager.getApplication().invokeLater(() -> {
+      deactivate(true);
 
-        final Project project = myEditor.getProject();
+      final Project project = myEditor.getProject();
 
-        if (project != null && e != null && e.getKeyChar() != '\n') {
-          final KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
-          final List<KeyStroke> keys = new ArrayList<KeyStroke>(1);
-          keys.add(key);
-          VimPlugin.getMacro().playbackKeys(myEditor, new EditorDataContext(myEditor), project, keys, 0, 0, 1);
-        }
+      if (project != null && e != null && e.getKeyChar() != '\n') {
+        final KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
+        final List<KeyStroke> keys = new ArrayList<>(1);
+        keys.add(key);
+        VimPlugin.getMacro().playbackKeys(myEditor, new EditorDataContext(myEditor), project, keys, 0, 0, 1);
       }
     });
   }
@@ -322,6 +321,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     /**
      * Invoked when a key has been pressed.
      */
+    @Override
     public void keyTyped(@NotNull KeyEvent e) {
       if (myExOutputPanel.myAtEnd) {
         myExOutputPanel.close(e);

@@ -19,168 +19,259 @@
 package org.jetbrains.plugins.ideavim.ex.handler
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import org.jetbrains.plugins.ideavim.VimTestCase
+import com.maddyhome.idea.vim.option.IgnoreCaseOptionsData
+import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.option.SmartCaseOptionsData
+import org.jetbrains.plugins.ideavim.VimOptionDefault
+import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 /**
  * @author Alex Plate
  */
-class SubstituteHandlerTest : VimTestCase() {
-    fun `test one letter`() {
-        doTest("s/a/b/",
-                """a${c}baba
+class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, IgnoreCaseOptionsData.name) {
+  @VimOptionDefaultAll
+  fun `test one letter`() {
+    doTest("s/a/b/",
+      """a${c}baba
                  |ab
                """.trimMargin(),
-                """bbaba
+      """bbaba
                  |ab
                """.trimMargin()
-        )
-    }
+    )
+  }
 
-    fun `test one letter multi per line`() {
-        doTest("s/a/b/g",
-                """a${c}baba
+  @VimOptionDefaultAll
+  fun `test one letter multi per line`() {
+    doTest("s/a/b/g",
+      """a${c}baba
                  |ab
                """.trimMargin(),
-                """bbbbb
+      """bbbbb
                  |ab
                """.trimMargin()
-        )
-    }
+    )
+  }
 
-    fun `test one letter multi per line whole file`() {
-        doTest("%s/a/b/g",
-                """a${c}baba
+  @VimOptionDefaultAll
+  fun `test one letter multi per line whole file`() {
+    doTest("%s/a/b/g",
+      """a${c}baba
                  |ab
                """.trimMargin(),
-                """bbbbb
+      """bbbbb
                  |bb
                """.trimMargin()
-        )
-    }
+    )
+  }
 
-    // VIM-146
-    fun `test eoLto quote`() {
-        doTest("s/$/'/g",
-                """${c}one
+  // VIM-146
+  @VimOptionDefaultAll
+  fun `test eoLto quote`() {
+    doTest("s/$/'/g",
+      """${c}one
                   |two
                """.trimMargin(),
-                """one'
+      """one'
                   |two
                """.trimMargin()
-        )
-    }
+    )
+  }
 
-    fun `test soLto quote`() {
-        doTest("s/^/'/g",
-                """${c}one
+  @VimOptionDefaultAll
+  fun `test soLto quote`() {
+    doTest("s/^/'/g",
+      """${c}one
                   |two
                """.trimMargin(),
-                """'one
+      """'one
                   |two
                """.trimMargin()
-        )
-    }
+    )
+  }
 
-    fun `test dot to nul`() {
-        doTest("s/\\./\\n/g",
-                "${c}one.two.three\n",
-                "one\u0000two\u0000three\n")
-    }
+  @VimOptionDefaultAll
+  fun `test dot to nul`() {
+    doTest("s/\\./\\n/g",
+      "${c}one.two.three\n",
+      "one\u0000two\u0000three\n")
+  }
 
-    // VIM-528
-    fun `test groups`() {
-        doTest("s/\\(a\\|b\\)/z\\1/g",
-                "${c}abcdefg",
-                "zazbcdefg")
-    }
+  // VIM-528
+  @VimOptionDefaultAll
+  fun `test groups`() {
+    doTest("s/\\(a\\|b\\)/z\\1/g",
+      "${c}abcdefg",
+      "zazbcdefg")
+  }
 
-    fun `test to nl`() {
-        doTest("s/\\./\\r/g",
-                "${c}one.two.three\n",
-                "one\ntwo\nthree\n")
-    }
+  @VimOptionDefaultAll
+  fun `test to nl`() {
+    doTest("s/\\./\\r/g",
+      "${c}one.two.three\n",
+      "one\ntwo\nthree\n")
+  }
 
-    // VIM-289
-    fun `test dot to nlDot`() {
-        doTest("s/\\./\\r\\./g",
-                "${c}one.two.three\n",
-                "one\n.two\n.three\n")
-    }
+  // VIM-289
+  @VimOptionDefaultAll
+  fun `test dot to nlDot`() {
+    doTest("s/\\./\\r\\./g",
+      "${c}one.two.three\n",
+      "one\n.two\n.three\n")
+  }
 
-    // VIM-702
-    fun `test end of line to nl`() {
-        doTest("%s/$/\\r/g",
-                "${c}one\ntwo\nthree\n",
-                "one\n\ntwo\n\nthree\n\n")
-    }
+  // VIM-702
+  @VimOptionDefaultAll
+  fun `test end of line to nl`() {
+    doTest("%s/$/\\r/g",
+      "${c}one\ntwo\nthree\n",
+      "one\n\ntwo\n\nthree\n\n")
+  }
 
-    // VIM-702
-    fun `test start of line to nl`() {
-        doTest("%s/^/\\r/g",
-                "${c}one\ntwo\nthree\n",
-                "\none\n\ntwo\n\nthree\n")
-    }
+  // VIM-702
+  @VimOptionDefaultAll
+  fun `test start of line to nl`() {
+    doTest("%s/^/\\r/g",
+      "${c}one\ntwo\nthree\n",
+      "\none\n\ntwo\n\nthree\n")
+  }
 
-    // VIM-864
-    fun `test visual substitute doesnt change visual marks`() {
-        myFixture.configureByText("a.java", "foo\nbar\nbaz\n")
-        typeText(parseKeys("V", "j", ":'<,'>s/foo/fuu/<Enter>", "gv", "~"))
-        myFixture.checkResult("FUU\nBAR\nbaz\n")
-    }
+  @VimOptionTestConfiguration(VimTestOption(IgnoreCaseOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
+  @VimOptionDefault(SmartCaseOptionsData.name)
+  fun `test ignorecase option`() {
+    doTest("%s/foo/bar/g",
+      "foo Foo foo\nFoo FOO foo",
+      "bar bar bar\nbar bar bar")
+  }
 
-    fun `test offset range`() {
-        doTest(".,+2s/a/b/g",
-                "aaa\naa${c}a\naaa\naaa\naaa\n",
-                "aaa\nbbb\nbbb\nbbb\naaa\n")
-    }
+  @VimOptionDefaultAll
+  fun `test smartcase option`() {
+    OptionsManager.smartcase.set()
 
-    fun `test multiple carets`() {
-        val before = """public class C {
+    // smartcase does nothing if ignorecase is not set
+    doTest("%s/foo/bar/g",
+      "foo Foo foo\nFoo FOO foo",
+      "bar Foo bar\nFoo FOO bar")
+    doTest("%s/Foo/bar/g",
+      "foo Foo foo\nFoo FOO foo",
+      "foo bar foo\nbar FOO foo")
+
+    OptionsManager.ignorecase.set()
+    doTest("%s/foo/bar/g",
+      "foo Foo foo\nFoo FOO foo",
+      "bar bar bar\nbar bar bar")
+    doTest("%s/Foo/bar/g",
+      "foo Foo foo\nFoo FOO foo",
+      "foo bar foo\nbar FOO foo")
+  }
+
+  @VimOptionDefaultAll
+  fun `test force ignore case flag`() {
+    doTest("%s/foo/bar/gi",
+      "foo Foo foo\nFoo FOO foo",
+      "bar bar bar\nbar bar bar")
+
+    OptionsManager.ignorecase.set()
+    doTest("%s/foo/bar/gi",
+      "foo Foo foo\nFoo FOO foo",
+      "bar bar bar\nbar bar bar")
+
+    OptionsManager.smartcase.set()
+    doTest("%s/foo/bar/gi",
+      "foo Foo foo\nFoo FOO foo",
+      "bar bar bar\nbar bar bar")
+  }
+
+  @VimOptionDefaultAll
+  fun `test force match case flag`() {
+    doTest("%s/foo/bar/gI",
+      "foo Foo foo\nFoo FOO foo",
+      "bar Foo bar\nFoo FOO bar")
+
+    OptionsManager.ignorecase.set()
+    doTest("%s/foo/bar/gI",
+      "foo Foo foo\nFoo FOO foo",
+      "bar Foo bar\nFoo FOO bar")
+
+    OptionsManager.smartcase.set()
+    doTest("%s/Foo/bar/gI",
+      "foo Foo foo\nFoo FOO foo",
+      "foo bar foo\nbar FOO foo")
+  }
+
+  // VIM-864
+  @VimOptionDefaultAll
+  fun `test visual substitute doesnt change visual marks`() {
+    myFixture.configureByText("a.java", "foo\nbar\nbaz\n")
+    typeText(parseKeys("V", "j", ":'<,'>s/foo/fuu/<Enter>", "gv", "~"))
+    myFixture.checkResult("FUU\nBAR\nbaz\n")
+  }
+
+  @VimOptionDefaultAll
+  fun `test offset range`() {
+    doTest(".,+2s/a/b/g",
+      "aaa\naa${c}a\naaa\naaa\naaa\n",
+      "aaa\nbbb\nbbb\nbbb\naaa\n")
+  }
+
+  @VimOptionDefaultAll
+  fun `test multiple carets`() {
+    val before = """public class C {
       |  Stri${c}ng a;
       |$c  String b;
       |  Stri${c}ng c;
       |  String d;
       |}
     """.trimMargin()
-        configureByJavaText(before)
+    configureByJavaText(before)
 
-        typeText(commandToKeys("s/String/Integer"))
+    typeText(commandToKeys("s/String/Integer"))
 
-        val after = """public class C {
+    val after = """public class C {
       |  ${c}Integer a;
       |  ${c}Integer b;
       |  ${c}Integer c;
       |  String d;
       |}
     """.trimMargin()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    fun `test multiple carets substitute all occurrences`() {
-        val before = """public class C {
+  @VimOptionDefaultAll
+  fun `test multiple carets substitute all occurrences`() {
+    val before = """public class C {
       |  Stri${c}ng a; String e;
       |$c  String b;
       |  Stri${c}ng c; String f;
       |  String d;
       |}
     """.trimMargin()
-        configureByJavaText(before)
+    configureByJavaText(before)
 
-        typeText(commandToKeys("s/String/Integer/g"))
+    typeText(commandToKeys("s/String/Integer/g"))
 
-        val after = """public class C {
+    val after = """public class C {
       |  ${c}Integer a; Integer e;
       |  ${c}Integer b;
       |  ${c}Integer c; Integer f;
       |  String d;
       |}
     """.trimMargin()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    private fun doTest(command: String, before: String, after: String) {
-        myFixture.configureByText("a.java", before)
-        typeText(commandToKeys(command))
-        myFixture.checkResult(after)
-    }
+  @VimOptionDefaultAll
+  fun `test with tabs`() {
+    doTest("s/foo/bar", "\tfoo", "\tbar")
+  }
+
+  private fun doTest(command: String, before: String, after: String) {
+    myFixture.configureByText("a.java", before)
+    typeText(commandToKeys(command))
+    myFixture.checkResult(after)
+  }
 }

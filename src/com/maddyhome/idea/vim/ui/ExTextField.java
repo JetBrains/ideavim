@@ -60,7 +60,7 @@ public class ExTextField extends JTextField {
       @Override
       public void mouseClicked(MouseEvent e) {
         // If we're in the middle of an action (e.g. entering a register to paste, or inserting a digraph), cancel it if
-        // the mouse is clicked anywhere. Vim's behaviour is to use the mouse click as an event, which can lead to
+        // the mouse is clicked anywhere. Vim's behavior is to use the mouse click as an event, which can lead to
         // something like : !%!C, which I don't believe is documented, or useful
         if (currentAction != null) {
           clearCurrentAction();
@@ -77,6 +77,8 @@ public class ExTextField extends JTextField {
 
   void deactivate() {
     clearCurrentAction();
+    editor = null;
+    context = null;
   }
 
   @Override
@@ -110,7 +112,7 @@ public class ExTextField extends JTextField {
 
     setInputMap(WHEN_FOCUSED, new InputMap());
     Keymap map = addKeymap("ex", getKeymap());
-    loadKeymap(map, ExKeyBindings.getBindings(), actions);
+    loadKeymap(map, ExKeyBindings.INSTANCE.getBindings(), actions);
     map.setDefaultAction(new ExEditorKit.DefaultExKeyHandler());
     setKeymap(map);
   }
@@ -133,8 +135,13 @@ public class ExTextField extends JTextField {
     }
   }
 
+  /**
+   * Stores the current text for use in filtering history. Required for scrolling through multiple history entries
+   *
+   * Called whenever the text is changed, either by typing, or by special characters altering the text (e.g. Delete)
+   */
   void saveLastEntry() {
-    lastEntry = getText();
+    lastEntry = super.getText();
   }
 
   void selectHistory(boolean isUp, boolean filter) {
@@ -185,13 +192,32 @@ public class ExTextField extends JTextField {
     super.setText(string);
   }
 
+  @Override
   public void setText(String string) {
     super.setText(string);
 
     saveLastEntry();
   }
 
-  void setEditor(Editor editor, DataContext context) {
+  /**
+   * @deprecated Use getActualText()
+   * Using this method can include prompt characters used when entering digraphs or register text
+   */
+  @Override
+  @Deprecated
+  public String getText() {
+    return super.getText();
+  }
+
+  @Nullable
+  String getActualText() {
+    if (actualText != null) {
+      return actualText;
+    }
+    return super.getText();
+  }
+
+  void setEditor(@NotNull Editor editor, DataContext context) {
     this.editor = editor;
     this.context = context;
     String disposeKey = vimExTextFieldDisposeKey + editor.hashCode();
@@ -245,6 +271,7 @@ public class ExTextField extends JTextField {
     }
   }
 
+  @Override
   protected void processKeyEvent(KeyEvent e) {
     if (logger.isDebugEnabled()) logger.debug("key=" + e);
     super.processKeyEvent(e);
@@ -257,6 +284,7 @@ public class ExTextField extends JTextField {
    *
    * @return the default model implementation
    */
+  @Override
   @NotNull
   protected Document createDefaultModel() {
     return new ExDocument();
@@ -279,7 +307,7 @@ public class ExTextField extends JTextField {
    */
   void cancel() {
     clearCurrentAction();
-    VimPlugin.getProcess().cancelExEntry(editor, context);
+    VimPlugin.getProcess().cancelExEntry(editor, true);
   }
 
   void setCurrentAction(@NotNull ExEditorKit.MultiStepAction action, char pendingIndicator) {
@@ -296,10 +324,10 @@ public class ExTextField extends JTextField {
   }
 
   void setCurrentActionPromptCharacter(char promptCharacter) {
-    final String text = removePromptCharacter();
+    actualText = removePromptCharacter();
     this.currentActionPromptCharacter = promptCharacter;
     currentActionPromptCharacterOffset = currentActionPromptCharacterOffset == -1 ? getCaretPosition() : currentActionPromptCharacterOffset;
-    StringBuilder sb = new StringBuilder(text);
+    StringBuilder sb = new StringBuilder(actualText);
     sb.insert(currentActionPromptCharacterOffset, currentActionPromptCharacter);
     updateText(sb.toString());
     setCaretPosition(currentActionPromptCharacterOffset);
@@ -312,12 +340,13 @@ public class ExTextField extends JTextField {
     setCaretPosition(min(offset, text.length()));
     currentActionPromptCharacter = '\0';
     currentActionPromptCharacterOffset = -1;
+    actualText = null;
   }
 
   private String removePromptCharacter() {
     return currentActionPromptCharacterOffset == -1
-      ? getText()
-      : StringsKt.removeRange(getText(), currentActionPromptCharacterOffset, currentActionPromptCharacterOffset + 1).toString();
+      ? super.getText()
+      : StringsKt.removeRange(super.getText(), currentActionPromptCharacterOffset, currentActionPromptCharacterOffset + 1).toString();
   }
 
   @Nullable
@@ -340,7 +369,8 @@ public class ExTextField extends JTextField {
   }
 
   private void resetCaret() {
-    if (getCaretPosition() == getText().length() || currentActionPromptCharacterOffset == getText().length() - 1) {
+    if (!(getCaret() instanceof CommandLineCaret)) return;
+    if (getCaretPosition() == super.getText().length() || currentActionPromptCharacterOffset == super.getText().length() - 1) {
       setNormalModeCaret();
     }
     else {
@@ -469,6 +499,7 @@ public class ExTextField extends JTextField {
       }
     }
 
+    @Override
     protected synchronized void damage(Rectangle r) {
       if (r != null) {
         JTextComponent component = getComponent();
@@ -518,6 +549,7 @@ public class ExTextField extends JTextField {
   private DataContext context;
   private CommandLineCaret caret;
   private String lastEntry;
+  private String actualText;
   private List<HistoryGroup.HistoryEntry> history;
   private int histIndex = 0;
   @Nullable private ExEditorKit.MultiStepAction currentAction;

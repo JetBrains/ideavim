@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.extension;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Ref;
-import com.intellij.util.Processor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.MappingMode;
@@ -98,12 +97,9 @@ public class VimExtensionFacade {
     }
     else {
       final Ref<KeyStroke> ref = Ref.create();
-      ModalEntry.activate(new Processor<KeyStroke>() {
-        @Override
-        public boolean process(KeyStroke stroke) {
-          ref.set(stroke);
-          return false;
-        }
+      ModalEntry.activate(stroke -> {
+        ref.set(stroke);
+        return false;
       });
       key = ref.get();
     }
@@ -131,23 +127,20 @@ public class VimExtensionFacade {
     else {
       final Ref<String> text = Ref.create("");
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for input()
-      final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
+      final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
       exEntryPanel.activate(editor, new EditorDataContext(editor), prompt.isEmpty() ? " " : prompt, "", 1);
-      ModalEntry.activate(new Processor<KeyStroke>() {
-        @Override
-        public boolean process(KeyStroke key) {
-          if (StringHelper.isCloseKeyStroke(key)) {
-            exEntryPanel.deactivate(true);
-            return false;
-          }
-          else if (key.getKeyCode() == KeyEvent.VK_ENTER) {
-            text.set(exEntryPanel.getText());
-            exEntryPanel.deactivate(true);
-            return false;
-          } else {
-            exEntryPanel.handleKey(key);
-            return true;
-          }
+      ModalEntry.activate(key -> {
+        if (StringHelper.isCloseKeyStroke(key)) {
+          exEntryPanel.deactivate(true);
+          return false;
+        }
+        else if (key.getKeyCode() == KeyEvent.VK_ENTER) {
+          text.set(exEntryPanel.getText());
+          exEntryPanel.deactivate(true);
+          return false;
+        } else {
+          exEntryPanel.handleKey(key);
+          return true;
         }
       });
       return text.get();
@@ -170,6 +163,6 @@ public class VimExtensionFacade {
    * Set the current contents of the given register
    */
   public static void setRegister(char register, @Nullable List<KeyStroke> keys) {
-    VimPlugin.getRegister().setKeys(register, keys != null ? keys : Collections.<KeyStroke>emptyList());
+    VimPlugin.getRegister().setKeys(register, keys != null ? keys : Collections.emptyList());
   }
 }

@@ -18,9 +18,9 @@
 
 package com.maddyhome.idea.vim.ex.vimscript;
 
-import com.intellij.util.containers.hash.HashMap;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,7 +29,7 @@ import java.util.Map;
 public class VimScriptGlobalEnvironment {
   private static final VimScriptGlobalEnvironment ourInstance = new VimScriptGlobalEnvironment();
 
-  private final Map<String, Object> myVariables = new HashMap<String, Object>();
+  private final Map<String, Object> myVariables = new HashMap<>();
 
   private VimScriptGlobalEnvironment() {}
 

@@ -31,8 +31,8 @@ import java.util.*;
  * @author vlan
  */
 public class KeyMapping implements Iterable<List<KeyStroke>> {
-  @NotNull private final Map<ImmutableList<KeyStroke>, MappingInfo> myKeys = new HashMap<ImmutableList<KeyStroke>, MappingInfo>();
-  @NotNull private final Map<ImmutableList<KeyStroke>, Integer> myPrefixes = new HashMap<ImmutableList<KeyStroke>, Integer>();
+  @NotNull private final Map<ImmutableList<KeyStroke>, MappingInfo> myKeys = new HashMap<>();
+  @NotNull private final Map<ImmutableList<KeyStroke>, Integer> myPrefixes = new HashMap<>();
 
   @NotNull
   @Override
@@ -49,7 +49,7 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
                   @Nullable List<KeyStroke> toKeys, @Nullable VimExtensionHandler extensionHandler, boolean recursive) {
     myKeys.put(ImmutableList.copyOf(fromKeys),
                new MappingInfo(mappingModes, fromKeys, toKeys, extensionHandler, recursive));
-    List<KeyStroke> prefix = new ArrayList<KeyStroke>();
+    List<KeyStroke> prefix = new ArrayList<>();
     final int prefixLength = fromKeys.size() - 1;
     for (int i = 0; i < prefixLength; i++) {
       prefix.add(fromKeys.get(i));
@@ -59,7 +59,7 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
 
   public void delete(@NotNull List<KeyStroke> keys) {
     myKeys.remove(ImmutableList.copyOf(keys));
-    List<KeyStroke> prefix = new ArrayList<KeyStroke>();
+    List<KeyStroke> prefix = new ArrayList<>();
     final int prefixLength = keys.size() - 1;
     for (int i = 0; i < prefixLength; i++) {
       prefix.add(keys.get(i));

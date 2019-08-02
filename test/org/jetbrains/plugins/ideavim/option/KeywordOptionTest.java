@@ -21,7 +21,7 @@ package org.jetbrains.plugins.ideavim.option;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
 import com.maddyhome.idea.vim.option.KeywordOption;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import java.util.ArrayList;
@@ -31,13 +31,14 @@ public class KeywordOptionTest extends VimTestCase {
 
   private KeywordOption option;
 
+  @Override
   public void setUp() throws Exception {
     super.setUp();
-    option = (KeywordOption)Options.getInstance().getOption("iskeyword");
+    option = OptionsManager.INSTANCE.getIskeyword();
   }
 
   private void setKeyword(String val) {
-    Options.getInstance().parseOptionLine(myFixture.getEditor(), "iskeyword" + val, false);
+    OptionsManager.INSTANCE.parseOptionLine(myFixture.getEditor(), "iskeyword" + val, false);
   }
 
   private void assertIsKeyword(char c){

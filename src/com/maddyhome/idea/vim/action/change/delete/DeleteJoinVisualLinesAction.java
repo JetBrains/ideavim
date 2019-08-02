@@ -21,20 +21,23 @@ package com.maddyhome.idea.vim.action.change.delete;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
+import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -44,16 +47,31 @@ final public class DeleteJoinVisualLinesAction extends VimCommandAction {
   @Contract(" -> new")
   @NotNull
   @Override
-  final protected EditorActionHandler makeActionHandler() {
-    return new VisualOperatorActionHandler.ForEachCaret() {
+  final protected VimActionHandler makeActionHandler() {
+    return new VisualOperatorActionHandler.SingleExecution() {
       @Override
-      protected boolean executeAction(@NotNull Editor editor,
-                                      @NotNull Caret caret,
-                                      @NotNull DataContext context,
-                                      @NotNull Command cmd,
-                                      @NotNull VimSelection range) {
-        return !editor.isOneLineMode() &&
-               VimPlugin.getChange().deleteJoinRange(editor, caret, range.toVimTextRange(true).normalize(), false);
+      public boolean executeForAllCarets(@NotNull Editor editor,
+                                         @NotNull DataContext context,
+                                         @NotNull Command cmd,
+                                         @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
+        if (editor.isOneLineMode()) return false;
+
+        if (OptionsManager.INSTANCE.getIdeajoin().isSet()) {
+          VimPlugin.getChange().joinViaIdeaBySelections(editor, context, caretsAndSelections);
+          return true;
+        }
+
+        Ref<Boolean> res = Ref.create(true);
+        editor.getCaretModel().runForEachCaret(caret -> {
+          if (!caret.isValid()) return;
+          final VimSelection range = caretsAndSelections.get(caret);
+          if (range == null) return;
+
+          if (!VimPlugin.getChange().deleteJoinRange(editor, caret, range.toVimTextRange(true).normalize(), false)) {
+            res.set(false);
+          }
+        }, true);
+        return res.get();
       }
     };
   }

@@ -25,8 +25,6 @@ import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.handler.CaretOrder
-import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.inVisualMode
@@ -36,16 +34,23 @@ import java.util.*
 /**
  * Base class for all Ex command handlers.
  */
-abstract class CommandHandler {
+sealed class CommandHandler {
 
-  val names: Array<CommandName>?
-  val argFlags: CommandHandlerFlags
-  private val optFlags: EnumSet<CommandFlags>
+  abstract val names: Array<CommandName>
+  abstract val argFlags: CommandHandlerFlags
+  protected open val optFlags: EnumSet<CommandFlags> = noneOfEnum()
 
-  private val runForEachCaret: Boolean
-  private val caretOrder: CaretOrder
+  abstract class ForEachCaret : CommandHandler() {
+    abstract fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean
+  }
 
-  class CommandHandlerFlags(val rangeFlag: RangeFlag, val argumentFlag: ArgumentFlag, val flags: Set<Flag>)
+  abstract class SingleExecution : CommandHandler() {
+    abstract fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean
+  }
+
+  fun register() {
+    CommandParser.getInstance().addHandler(this)
+  }
 
   enum class RangeFlag {
     /**
@@ -82,9 +87,7 @@ abstract class CommandHandler {
     ARGUMENT_FORBIDDEN
   }
 
-  enum class Flag {
-    DONT_REOPEN,
-
+  enum class Access {
     /**
      * Indicates that this is a command that modifies the editor
      */
@@ -93,6 +96,13 @@ abstract class CommandHandler {
      * Indicates that this command does not modify the editor
      */
     READ_ONLY,
+    /**
+     * Indicates that this command handles writability by itself
+     */
+    SELF_SYNCHRONIZED
+  }
+
+  enum class Flag {
     DONT_SAVE_LAST,
 
     /**
@@ -102,39 +112,6 @@ abstract class CommandHandler {
      *   With this flag visual mode will not be exited while command execution.
      */
     SAVE_VISUAL
-  }
-
-  /**
-   * Create the handler
-   *
-   * [names] A list of names this command answers to
-   * [argFlags] - Range and Arguments commands
-   */
-  constructor(
-    names: Array<CommandName>?,
-    argFlags: CommandHandlerFlags,
-    runForEachCaret: Boolean = false,
-    caretOrder: CaretOrder = CaretOrder.DECREASING_OFFSET,
-    optFlags: EnumSet<CommandFlags> = noneOfEnum()
-  ) {
-    this.names = names
-    this.argFlags = argFlags
-    this.optFlags = optFlags
-
-    this.runForEachCaret = runForEachCaret
-    this.caretOrder = caretOrder
-
-    @Suppress("LeakingThis")
-    CommandParser.getInstance().addHandler(this)
-  }
-
-  constructor(argFlags: CommandHandlerFlags, optFlags: EnumSet<CommandFlags>, runForEachCaret: Boolean, caretOrder: CaretOrder) {
-    this.names = null
-    this.argFlags = argFlags
-    this.optFlags = optFlags
-
-    this.runForEachCaret = runForEachCaret
-    this.caretOrder = caretOrder
   }
 
   /**
@@ -181,30 +158,20 @@ abstract class CommandHandler {
 
     val res = Ref.create(true)
     try {
-      if (runForEachCaret) {
-        editor.caretModel.runForEachCaret({ caret ->
-          var i = 0
-          while (i < count && res.get()) {
-            try {
+      when (this) {
+        is ForEachCaret -> {
+          editor.caretModel.runForEachCaret({ caret ->
+            var i = 0
+            while (i++ < count && res.get()) {
               res.set(execute(editor, caret, context, cmd))
-            } catch (e: ExecuteMethodNotOverriddenException) {
-              res.set(false)
-              return@runForEachCaret
             }
-
-            i++
-          }
-        }, caretOrder == CaretOrder.DECREASING_OFFSET)
-      } else {
-        var i = 0
-        while (i < count && res.get()) {
-          try {
+          }, true)
+        }
+        is SingleExecution -> {
+          var i = 0
+          while (i++ < count && res.get()) {
             res.set(execute(editor, context, cmd))
-          } catch (e: ExecuteMethodNotOverriddenException) {
-            return false
           }
-
-          i++
         }
       }
 
@@ -218,25 +185,11 @@ abstract class CommandHandler {
       return false
     }
   }
-
-  /**
-   * Performs the action of the handler.
-   *
-   * @param editor  The editor to perform the action in.
-   * @param context The data context
-   * @param cmd     The complete Ex command including range, command, and arguments
-   * @return True if able to perform the command, false if not
-   * @throws ExException if the range or arguments are invalid for the command
-   */
-  @Throws(ExException::class, ExecuteMethodNotOverriddenException::class)
-  open fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-    if (!runForEachCaret) throw ExecuteMethodNotOverriddenException(this.javaClass)
-    return execute(editor, editor.caretModel.primaryCaret, context, cmd)
-  }
-
-  @Throws(ExException::class, ExecuteMethodNotOverriddenException::class)
-  open fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
-    if (runForEachCaret) throw ExecuteMethodNotOverriddenException(this.javaClass)
-    return execute(editor, context, cmd)
-  }
 }
+
+data class CommandHandlerFlags(
+  val rangeFlag: CommandHandler.RangeFlag,
+  val argumentFlag: CommandHandler.ArgumentFlag,
+  val access: CommandHandler.Access,
+  val flags: Set<CommandHandler.Flag>
+)

@@ -20,25 +20,57 @@ package com.maddyhome.idea.vim.action.ex;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.command.CommandFlags;
+import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Called by KeyHandler to process the contents of the ex entry panel
  * <p>
  * The mapping for this action means that the ex command is executed as a write action
  */
-public class ProcessExEntryAction extends EditorAction {
-  public ProcessExEntryAction() {
-    super(new Handler());
+public class ProcessExEntryAction extends VimCommandAction {
+  @NotNull
+  @Override
+  protected VimActionHandler makeActionHandler() {
+    return new VimActionHandler.SingleExecution() {
+      @Override
+      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+        return VimPlugin.getProcess().processExEntry(editor, context);
+      }
+    };
   }
 
-  private static class Handler extends EditorActionHandlerBase {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      return VimPlugin.getProcess().processExEntry(editor, context);
-    }
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.C;
+  }
+
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("<CR>", "<C-M>", String.valueOf((char)0x0a), String.valueOf((char)0x0d));
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.OTHER_SELF_SYNCHRONIZED;
+  }
+
+  @NotNull
+  @Override
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_COMPLETE_EX);
   }
 }

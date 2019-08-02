@@ -22,14 +22,15 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.waitAndAssertMode
 
 /**
  * @author Alex Plate
  */
 class DeleteVisualActionTest : VimTestCase() {
-    fun `test delete block SE direction`() {
-        val keys = parseKeys("<C-V>e2j", "d")
-        val before = """
+  fun `test delete block SE direction`() {
+    val keys = parseKeys("<C-V>e2j", "d")
+    val before = """
             A Discovery
 
             I |${c}found| it in a legendary land
@@ -37,7 +38,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             I |$c| it in a legendary land
@@ -45,12 +46,12 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test delete block SW direction`() {
-        val keys = parseKeys("<C-V>b2j", "d")
-        val before = """
+  fun `test delete block SW direction`() {
+    val keys = parseKeys("<C-V>b2j", "d")
+    val before = """
             A Discovery
 
             I |foun${c}d| it in a legendary land
@@ -58,7 +59,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             I |$c| it in a legendary land
@@ -66,12 +67,12 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test delete block NW direction`() {
-        val keys = parseKeys("<C-V>b2k", "d")
-        val before = """
+  fun `test delete block NW direction`() {
+    val keys = parseKeys("<C-V>b2k", "d")
+    val before = """
             A Discovery
 
             I |found| it in a legendary land
@@ -79,7 +80,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh|ere ${c}i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             I |$c| it in a legendary land
@@ -87,12 +88,12 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test delete block NE direction`() {
-        val keys = parseKeys("<C-V>2e2k", "d")
-        val before = """
+  fun `test delete block NE direction`() {
+    val keys = parseKeys("<C-V>2e2k", "d")
+    val before = """
             A Discovery
 
             I |found| it in a legendary land
@@ -100,7 +101,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh|${c}ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             I |$c| it in a legendary land
@@ -108,13 +109,13 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test delete after extend selection`() {
-        // This test emulates deletion after structural selection
-        // In short, when caret is not on the selection end
-        configureByText("""
+  fun `test delete after extend selection`() {
+    // This test emulates deletion after structural selection
+    // In short, when caret is not on the selection end
+    configureByText("""
             A Discovery
 
             ${s}I found it in a legendary land
@@ -122,19 +123,20 @@ class DeleteVisualActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${se}hard by the torrent of a mountain pass.
         """.trimIndent())
-        VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        typeText(parseKeys("d"))
-        myFixture.checkResult("""
+    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    typeText(parseKeys("d"))
+    myFixture.checkResult("""
             A Discovery
 
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test delete with dollar motion`() {
-        val keys = parseKeys("<C-V>3j$", "d")
-        val before = """
+  fun `test delete with dollar motion`() {
+    val keys = parseKeys("<C-V>3j$", "d")
+    val before = """
             A Discovery
 
             I |${c}found it in a legendary land
@@ -142,7 +144,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh|ere it was settled on some sodden sand
             ha|rd by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             I |
@@ -150,6 +152,6 @@ class DeleteVisualActionTest : VimTestCase() {
             wh|
             ha|
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 }

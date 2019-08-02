@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.ex.range;
 
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.Range;
@@ -107,6 +106,7 @@ public abstract class AbstractRange implements Range {
    *
    * @return True if cursor should move, false if not
    */
+  @Override
   public boolean isMove() {
     return move;
   }
@@ -115,20 +115,21 @@ public abstract class AbstractRange implements Range {
    * Gets the line number (0 based) specificied by this range. Includes the offset.
    *
    * @param editor   The editor to get the line for
-   * @param context  The data context
    * @param lastZero True if last line was set to start of file
    * @return The zero based line number, -1 if unable to get the line number
    */
-  public int getLine(Editor editor, DataContext context, boolean lastZero) {
-    int line = getRangeLine(editor, context, lastZero);
+  @Override
+  public int getLine(Editor editor, boolean lastZero) {
+    int line = getRangeLine(editor, lastZero);
 
     return line + offset;
   }
 
-  public int getLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, boolean lastZero) {
-    if (offset == 0) return getRangeLine(editor, context, lastZero);
+  @Override
+  public int getLine(@NotNull Editor editor, @NotNull Caret caret, boolean lastZero) {
+    if (offset == 0) return getRangeLine(editor, lastZero);
 
-    return getRangeLine(editor, caret, context, lastZero) + offset;
+    return getRangeLine(editor, caret, lastZero) + offset;
   }
 
   @NotNull
@@ -140,13 +141,12 @@ public abstract class AbstractRange implements Range {
    * Gets the line number specified by this range without regard to any offset.
    *
    * @param editor   The editor to get the line for
-   * @param context  The data context
    * @param lastZero True if last line was set to start of file
    * @return The zero based line number, -1 if inable to get the line number
    */
-  protected abstract int getRangeLine(Editor editor, DataContext context, boolean lastZero);
+  protected abstract int getRangeLine(Editor editor, boolean lastZero);
 
-  protected abstract int getRangeLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+  protected abstract int getRangeLine(@NotNull Editor editor, @NotNull Caret caret,
                                       boolean lastZero);
 
   protected final int offset;

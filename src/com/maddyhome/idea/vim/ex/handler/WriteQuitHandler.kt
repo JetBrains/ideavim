@@ -22,17 +22,15 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
-class WriteQuitHandler : CommandHandler(
-  commands("wq", "exi[t]", "x[it]"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
-) {
+class WriteQuitHandler : CommandHandler.SingleExecution() {
+  override val names = commands("wq", "exi[t]", "x[it]")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-    VimPlugin.getFile().saveFile(editor)
+    VimPlugin.getFile().saveFile(context)
     VimPlugin.getFile().closeFile(editor, context)
 
     return true

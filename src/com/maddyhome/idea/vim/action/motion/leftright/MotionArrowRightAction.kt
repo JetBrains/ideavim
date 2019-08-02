@@ -22,9 +22,8 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.action.MotionEditorAction
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
@@ -34,7 +33,7 @@ import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-class MotionArrowRightAction : VimCommandAction() {
+class MotionArrowRightAction : MotionEditorAction() {
   override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
     override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
       return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, count, false)
@@ -43,9 +42,10 @@ class MotionArrowRightAction : VimCommandAction() {
 
   override val mappingModes: MutableSet<MappingMode> = MappingMode.NVO
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Right>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0)))
-
-  override val type: Command.Type = Command.Type.MOTION
+  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
+    parseKeys("<Right>"),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0))
+  )
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
 }

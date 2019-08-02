@@ -24,9 +24,11 @@ import com.intellij.ide.CopyPasteManagerEx
 import com.intellij.ide.PasteProvider
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.*
 import com.intellij.openapi.ide.CopyPasteManager
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
@@ -35,11 +37,12 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.VimSelection
-import com.maddyhome.idea.vim.handler.CaretOrder.DECREASING_OFFSET
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.ClipboardOptionsData
+import com.maddyhome.idea.vim.option.OptionsManager
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.min
 
 /**
@@ -111,7 +114,9 @@ class PutGroup {
       if (!caret.isValid) return@forEach
       val range = selection.toVimTextRange(false).normalize()
 
-      VimPlugin.getChange().deleteRange(editor, caret, range, selection.type, false)
+      ApplicationManager.getApplication().runWriteAction {
+        VimPlugin.getChange().deleteRange(editor, caret, range, selection.type, false)
+      }
       caret.moveToOffset(range.startOffset)
     }
   }
@@ -135,7 +140,7 @@ class PutGroup {
 
   private fun putTextAndSetCaretPosition(editor: Editor, context: DataContext, text: ProcessedTextData, data: PutData, additionalData: Map<String, Any>) {
     val subMode = data.visualSelection?.typeInEditor?.toSubMode() ?: CommandState.SubMode.NONE
-    if (Options.getInstance().getListOption(Options.CLIPBOARD)!!.contains(Options.IDEAPUT)) {
+    if (ClipboardOptionsData.ideaput in OptionsManager.clipboard) {
       val idePasteProvider = getProviderForPasteViaIde(context, text.typeInRegister, data)
       if (idePasteProvider != null) {
         logger.debug("Perform put via idea paste")
@@ -144,13 +149,16 @@ class PutGroup {
       }
     }
 
+    notifyAboutIdeaPut(editor.project)
     logger.debug("Perform put via plugin")
     val myCarets = if (data.visualSelection != null) {
       data.visualSelection.caretsAndSelections.keys.sortedByDescending { it.logicalPosition }
     } else {
-      EditorHelper.getOrderedCaretsList(editor, DECREASING_OFFSET)
+      EditorHelper.getOrderedCaretsList(editor)
     }
-    myCarets.forEach { caret -> putForCaret(editor, caret, data, additionalData, context, text) }
+    ApplicationManager.getApplication().runWriteAction {
+      myCarets.forEach { caret -> putForCaret(editor, caret, data, additionalData, context, text) }
+    }
   }
 
   private fun putForCaret(editor: Editor, caret: Caret, data: PutData, additionalData: Map<String, Any>, context: DataContext, text: ProcessedTextData) {
@@ -167,10 +175,11 @@ class PutGroup {
   }
 
   private fun prepareDocumentAndGetStartOffsets(editor: Editor, caret: Caret, typeInRegister: SelectionType, data: PutData, additionalData: Map<String, Any>): List<Int> {
+    val application = ApplicationManager.getApplication()
     if (data.visualSelection != null) {
       return when {
         data.visualSelection.typeInEditor == SelectionType.CHARACTER_WISE && typeInRegister == SelectionType.LINE_WISE -> {
-          editor.document.insertString(caret.offset, "\n")
+          application.runWriteAction { editor.document.insertString(caret.offset, "\n") }
           listOf(caret.offset + 1)
         }
         data.visualSelection.typeInEditor == SelectionType.BLOCK_WISE -> {
@@ -183,7 +192,7 @@ class PutGroup {
               data.insertTextBeforeCaret -> listOf(EditorHelper.getLineStartOffset(editor, line))
               else -> {
                 val pos = EditorHelper.getLineEndOffset(editor, line, true)
-                editor.document.insertString(pos, "\n")
+                application.runWriteAction { editor.document.insertString(pos, "\n") }
                 listOf(pos + 1)
               }
             }
@@ -207,9 +216,8 @@ class PutGroup {
       when (typeInRegister) {
         SelectionType.LINE_WISE -> {
           startOffset = min(editor.document.textLength, VimPlugin.getMotion().moveCaretToLineEnd(editor, line, true) + 1)
-          if (startOffset > 0 && startOffset == editor.document.textLength &&
-            editor.document.charsSequence[startOffset - 1] != '\n') {
-            editor.document.insertString(startOffset, "\n")
+          if (startOffset > 0 && startOffset == editor.document.textLength && editor.document.charsSequence[startOffset - 1] != '\n') {
+            application.runWriteAction { editor.document.insertString(startOffset, "\n") }
             startOffset++
           }
         }
@@ -236,18 +244,23 @@ class PutGroup {
 
   private fun putTextViaIde(pasteProvider: PasteProvider, editor: Editor, context: DataContext, text: ProcessedTextData, subMode: CommandState.SubMode, data: PutData, additionalData: Map<String, Any>) {
     val carets: MutableMap<Caret, RangeMarker> = mutableMapOf()
-    EditorHelper.getOrderedCaretsList(editor, DECREASING_OFFSET).forEach { caret ->
+    EditorHelper.getOrderedCaretsList(editor).forEach { caret ->
       val startOffset = prepareDocumentAndGetStartOffsets(editor, caret, text.typeInRegister, data, additionalData).first()
       val pointMarker = editor.document.createRangeMarker(startOffset, startOffset)
       caret.moveToOffset(startOffset)
       carets[caret] = pointMarker
     }
 
+    val sizeBeforeInsert = CopyPasteManager.getInstance().allContents.size
     val origContent: TextBlockTransferable = setClipboardText(text.text, text.transferableData)
+    val sizeAfterInsert = CopyPasteManager.getInstance().allContents.size
     try {
       pasteProvider.performPaste(context)
     } finally {
-      (CopyPasteManager.getInstance() as? CopyPasteManagerEx)?.run { removeContent(origContent) }
+      if (sizeBeforeInsert != sizeAfterInsert) {
+        // Sometimes inserted text replaces existing one. E.g. on insert with + or * register
+        (CopyPasteManager.getInstance() as? CopyPasteManagerEx)?.run { removeContent(origContent) }
+      }
     }
 
     carets.forEach { (caret, point) ->
@@ -417,7 +430,7 @@ class PutGroup {
       }
       "postEndOffset" -> MotionGroup.moveCaret(editor, caret, endOffset + 1)
       "preLineEndOfEndOffset" -> {
-        val pos = Math.min(endOffset, EditorHelper.getLineEndForOffset(editor, endOffset - 1) - 1)
+        val pos = min(endOffset, EditorHelper.getLineEndForOffset(editor, endOffset - 1) - 1)
         MotionGroup.moveCaret(editor, caret, pos)
       }
     }
@@ -438,9 +451,19 @@ class PutGroup {
     var maxLen = 0
     while (tokenizer.hasMoreTokens()) {
       val s = tokenizer.nextToken()
-      maxLen = Math.max(s.length, maxLen)
+      maxLen = max(s.length, maxLen)
     }
     return maxLen
+  }
+
+  private fun notifyAboutIdeaPut(project: Project?) {
+    if (VimPlugin.getVimState().isIdeaPutNotified
+      || ClipboardOptionsData.ideaput in OptionsManager.clipboard
+      || ClipboardOptionsData.ideaputDisabled) return
+
+    VimPlugin.getVimState().isIdeaPutNotified = true
+
+    VimPlugin.getNotifications(project).notifyAboutIdeaPut()
   }
 
   companion object {

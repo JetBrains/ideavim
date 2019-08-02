@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.ex;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.ui.ExOutputPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,10 +38,10 @@ public class ExOutputModel {
 
   @NotNull
   public static ExOutputModel getInstance(@NotNull Editor editor) {
-    ExOutputModel model = EditorData.getExOutputModel(editor);
+    ExOutputModel model = UserDataManager.getVimExOutput(editor);
     if (model == null) {
       model = new ExOutputModel(editor);
-      EditorData.setExOutputModel(editor, model);
+      UserDataManager.setVimExOutput(editor, model);
     }
     return model;
   }

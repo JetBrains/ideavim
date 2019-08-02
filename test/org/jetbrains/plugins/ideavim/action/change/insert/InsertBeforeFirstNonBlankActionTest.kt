@@ -23,9 +23,9 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertBeforeFirstNonBlankActionTest : VimTestCase() {
-    fun `test insert multiple carets`() {
-        doTest(parseKeys("IHello<esc>"),
-                """
+  fun `test insert multiple carets`() {
+    doTest(parseKeys("IHello<esc>"),
+      """
                 ${c}A Discovery
 
                 ${c}I found it in a legendary land
@@ -33,7 +33,7 @@ class InsertBeforeFirstNonBlankActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                """
+      """
                 Hell${c}oA Discovery
 
                 Hell${c}oI found it in a legendary land
@@ -41,8 +41,8 @@ class InsertBeforeFirstNonBlankActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-        assertMode(CommandState.Mode.COMMAND)
-    }
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+    assertMode(CommandState.Mode.COMMAND)
+  }
 }

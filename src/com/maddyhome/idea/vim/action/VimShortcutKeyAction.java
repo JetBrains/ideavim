@@ -20,35 +20,29 @@ package com.maddyhome.idea.vim.action;
 
 import com.google.common.collect.ImmutableSet;
 import com.intellij.codeInsight.lookup.LookupManager;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationListener;
-import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
-import com.intellij.openapi.keymap.KeymapUtil;
-import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Key;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.CommandStateHelper;
-import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import com.maddyhome.idea.vim.option.ListOption;
-import com.maddyhome.idea.vim.option.Options;
-import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import one.util.streamex.StreamEx;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -101,9 +95,9 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     if (editor != null && keyStroke != null) {
       final ShortcutOwner owner = VimPlugin.getKey().getSavedShortcutConflicts().get(keyStroke);
       if (owner == ShortcutOwner.UNDEFINED) {
-        notifyAboutShortcutConflict(keyStroke);
+        VimPlugin.getNotifications(editor.getProject()).notifyAboutShortcutConflict(keyStroke);
       }
-      // Should we use InjectedLanguageUtil.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
+      // Should we use HelperKt.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
       try {
         KeyHandler.getInstance().handleKey(editor, keyStroke, new EditorDataContext(editor));
       }
@@ -127,82 +121,57 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     return ourInstance;
   }
 
-  private void notifyAboutShortcutConflict(@NotNull final KeyStroke keyStroke) {
-    VimPlugin.getKey().getSavedShortcutConflicts().put(keyStroke, ShortcutOwner.VIM);
-    final String message = String.format(
-      "Using the <b>%s</b> shortcut for Vim emulation.<br/>" +
-      "You can redefine it as an <a href='#ide'>IDE shortcut</a> or " +
-      "configure its handler in <a href='#settings'>Vim Emulation</a> settings.",
-      KeymapUtil.getShortcutText(new KeyboardShortcut(keyStroke, null)));
-    final NotificationListener listener = new NotificationListener.Adapter() {
-      @Override
-      protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
-        final String description = e.getDescription();
-        if ("#ide".equals(description)) {
-          VimPlugin.getKey().getSavedShortcutConflicts().put(keyStroke, ShortcutOwner.IDE);
-          notification.expire();
+  private boolean isEnabled(@NotNull AnActionEvent e) {
+    if (!VimPlugin.isEnabled()) return false;
+
+    final Editor editor = getEditor(e);
+    final KeyStroke keyStroke = getKeyStroke(e);
+    if (editor != null && keyStroke != null) {
+      // Workaround for smart step into
+      final Key<?> SMART_STEP_INPLACE_DATA = Key.findKeyByName("SMART_STEP_INPLACE_DATA");
+      if (SMART_STEP_INPLACE_DATA != null && editor.getUserData(SMART_STEP_INPLACE_DATA) != null) return false;
+
+      final int keyCode = keyStroke.getKeyCode();
+      if (LookupManager.getActiveLookup(editor) != null && !passCommandToVimWithLookup(keyStroke)) {
+        return isEnabledForLookup(keyStroke);
+      }
+      if (keyCode == VK_ESCAPE) {
+        return isEnabledForEscape(editor);
+      }
+      if (CommandStateHelper.inInsertMode(editor)) {
+        // XXX: <Tab> won't be recorded in macros
+        if (keyCode == VK_TAB) {
+          VimPlugin.getChange().tabAction = true;
+          return false;
         }
-        else if ("#settings".equals(description)) {
-          ShowSettingsUtil.getInstance().editConfigurable((Project)null, new VimEmulationConfigurable());
+        // Debug watch, Python console, etc.
+        if (NON_FILE_EDITOR_KEYS.contains(keyStroke) && !EditorHelper.isFileEditor(editor)) {
+          return false;
         }
       }
-    };
-    final Notification notification = new Notification(VimPlugin.IDEAVIM_NOTIFICATION_ID,
-                                                       VimPlugin.IDEAVIM_NOTIFICATION_TITLE,
-                                                       message,
-                                                       NotificationType.INFORMATION,
-                                                       listener);
-    notification.notify(null);
-  }
-
-  private boolean isEnabled(@NotNull AnActionEvent e) {
-    if (VimPlugin.isEnabled()) {
-      final Editor editor = getEditor(e);
-      final KeyStroke keyStroke = getKeyStroke(e);
-      if (editor != null && keyStroke != null) {
-        final int keyCode = keyStroke.getKeyCode();
-        if (LookupManager.getActiveLookup(editor) != null && !passCommandToVimWithLookup(keyStroke)) {
-          return isEnabledForLookup(keyStroke);
+      if (VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
+        return true;
+      }
+      final Map<KeyStroke, ShortcutOwner> savedShortcutConflicts = VimPlugin.getKey().getSavedShortcutConflicts();
+      final ShortcutOwner owner = savedShortcutConflicts.get(keyStroke);
+      if (owner == ShortcutOwner.VIM) {
+        return true;
+      }
+      else if (owner == ShortcutOwner.IDE) {
+        return !isShortcutConflict(keyStroke);
+      }
+      else {
+        if (isShortcutConflict(keyStroke)) {
+          savedShortcutConflicts.put(keyStroke, ShortcutOwner.UNDEFINED);
         }
-        if (keyCode == VK_ESCAPE) {
-          return isEnabledForEscape(editor);
-        }
-        if (CommandStateHelper.inInsertMode(editor)) {
-          // XXX: <Tab> won't be recorded in macros
-          if (keyCode == VK_TAB) {
-            VimPlugin.getChange().tabAction = true;
-            return false;
-          }
-          // Debug watch, Python console, etc.
-          if (NON_FILE_EDITOR_KEYS.contains(keyStroke) && !EditorData.isFileEditor(editor)) {
-            return false;
-          }
-        }
-        if (VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
-          return true;
-        }
-        final Map<KeyStroke, ShortcutOwner> savedShortcutConflicts = VimPlugin.getKey().getSavedShortcutConflicts();
-        final ShortcutOwner owner = savedShortcutConflicts.get(keyStroke);
-        if (owner == ShortcutOwner.VIM) {
-          return true;
-        }
-        else if (owner == ShortcutOwner.IDE) {
-          return !isShortcutConflict(keyStroke);
-        }
-        else {
-          if (isShortcutConflict(keyStroke)) {
-            savedShortcutConflicts.put(keyStroke, ShortcutOwner.UNDEFINED);
-          }
-          return true;
-        }
+        return true;
       }
     }
     return false;
   }
 
   private boolean passCommandToVimWithLookup(@NotNull KeyStroke keyStroke) {
-    final ListOption popupActions = Options.getInstance().getListOption(Options.LOOKUPACTIONS);
-    if (popupActions == null) return false;
+    final ListOption popupActions = OptionsManager.INSTANCE.getLookupActions();
     final List<String> values = popupActions.values();
     if (values == null) return false;
 
@@ -216,7 +185,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
 
   private boolean isEnabledForEscape(@NotNull Editor editor) {
     final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
-    return isPrimaryEditor(editor) || (EditorData.isFileEditor(editor) && mode != CommandState.Mode.COMMAND);
+    return isPrimaryEditor(editor) || (EditorHelper.isFileEditor(editor) && mode != CommandState.Mode.COMMAND);
   }
 
   /**
@@ -250,7 +219,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
 
   @NotNull
   private static List<KeyStroke> getKeyStrokes(int keyCode, @NotNull int... modifiers) {
-    final List<KeyStroke> keyStrokes = new ArrayList<KeyStroke>();
+    final List<KeyStroke> keyStrokes = new ArrayList<>();
     for (int modifier : modifiers) {
       keyStrokes.add(KeyStroke.getKeyStroke(keyCode, modifier));
     }

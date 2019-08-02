@@ -27,19 +27,19 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.vimForEachCaret
-import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.OptionsManager
 import java.util.*
 import javax.swing.KeyStroke
 
 
 class VisualToggleLineModeAction : VimCommandAction() {
-  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-      val listOption = Options.getInstance().getListOption(Options.SELECTMODE)
-      return if (listOption != null && "cmd" in listOption) {
+      val listOption = OptionsManager.selectmode
+      return if ("cmd" in listOption) {
         VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE).also {
           editor.vimForEachCaret { it.vimSetSelection(it.offset) }
         }

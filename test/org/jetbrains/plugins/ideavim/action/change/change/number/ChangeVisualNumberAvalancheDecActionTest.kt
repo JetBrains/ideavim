@@ -26,35 +26,35 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  * @author Alex Plate
  */
 class ChangeVisualNumberAvalancheDecActionTest : VimTestCase() {
-    fun `test dec visual avalanche`() {
-        doTest(parseKeys("VGg<C-X>"),
-                """
+  fun `test dec visual avalanche`() {
+    doTest(parseKeys("VGg<C-X>"),
+      """
                     ${c}number 2
                     number 3
                     number 4
                     """.trimIndent(),
-                """
+      """
                     ${c}number 1
                     number 1
                     number 1
                     """.trimIndent(),
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-    }
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
 
-    fun `test dec visual avalanche multiple times`() {
-        doTest(parseKeys("VG2g<C-X>"),
-                """
+  fun `test dec visual avalanche multiple times`() {
+    doTest(parseKeys("VG2g<C-X>"),
+      """
                     ${c}number 3
                     number 5
                     number 7
                     """.trimIndent(),
-                """
+      """
                     ${c}number 1
                     number 1
                     number 1
                     """.trimIndent(),
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-    }
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
 }

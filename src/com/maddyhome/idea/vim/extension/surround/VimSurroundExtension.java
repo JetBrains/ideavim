@@ -35,8 +35,7 @@ import com.maddyhome.idea.vim.extension.VimNonDisposableExtension;
 import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.key.OperatorFunction;
-import com.maddyhome.idea.vim.option.ListOption;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.ClipboardOptionsData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -221,12 +220,9 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     }
 
     private static void perform(@NotNull String sequence, @NotNull Editor editor) {
-      ListOption options = Options.getInstance().getListOption(Options.CLIPBOARD);
-      if (options == null) options = ListOption.empty;
-      final boolean containedBefore = options.contains(Options.IDEAPUT);
-      options.remove(Options.IDEAPUT);
-      executeNormal(parseKeys("\"" + REGISTER + sequence), editor);
-      if (containedBefore) options.append(Options.IDEAPUT);
+      try (ClipboardOptionsData.IdeaputDisabler ignored = new ClipboardOptionsData.IdeaputDisabler()) {
+        executeNormal(parseKeys("\"" + REGISTER + sequence), editor);
+      }
     }
 
     private static void pasteSurround(@NotNull List<KeyStroke> innerValue, @NotNull Editor editor) {

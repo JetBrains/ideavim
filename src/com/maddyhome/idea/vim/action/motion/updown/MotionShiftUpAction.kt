@@ -26,11 +26,9 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
+import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.isEndAllowed
-import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
-import com.maddyhome.idea.vim.helper.vimLastColumn
 import javax.swing.KeyStroke
 
 /**
@@ -38,17 +36,14 @@ import javax.swing.KeyStroke
  */
 
 class MotionShiftUpAction : VimCommandAction() {
-  override fun makeActionHandler() = object : ShiftedArrowKeyHandler() {
+  override fun makeActionHandler(): VimActionHandler = object : ShiftedArrowKeyHandler() {
     override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
       editor.vimForEachCaret { caret ->
         val vertical = VimPlugin.getMotion().moveCaretVertical(editor, caret, -cmd.count)
-        val col = caret.vimLastColumn
+        val col = EditorHelper.prepareLastColumn(editor, caret)
         MotionGroup.moveCaret(editor, caret, vertical)
 
-        val pos = caret.visualPosition
-        val lastColumn = EditorHelper.lastColumnForLine(editor, pos.line, editor.mode.isEndAllowed)
-        val targetColumn = if (pos.column != lastColumn) pos.column else col
-        caret.vimLastColumn = targetColumn
+        EditorHelper.updateLastColumn(editor, caret, col)
       }
     }
 

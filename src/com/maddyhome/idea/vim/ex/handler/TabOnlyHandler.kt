@@ -26,10 +26,9 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
-class TabOnlyHandler : CommandHandler(
-  commands("tabo[nly]"),
-  flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_FORBIDDEN)
-) {
+class TabOnlyHandler : CommandHandler.SingleExecution() {
+  override val names = commands("tabo[nly]")
+  override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     VimPlugin.getWindow().closeAllExceptCurrentTab(context)
     return true

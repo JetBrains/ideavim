@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.helper.VimTestFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
@@ -1345,12 +1346,6 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("on<caret>e two th<caret>ree");
   }
 
-  public void testInsertDeletePreviousWordAction() {
-    typeTextInFile(parseKeys("i", "<C-W>", "<ESC>"),
-                   "one tw<caret>o three<caret> four   <caret>\n");
-    myFixture.checkResult("one<caret> o<caret> <caret> \n");
-  }
-
   public void testInsertEnterAction() {
     typeTextInFile(parseKeys("i", "<C-M>", "<ESC>"),
                    "one<caret>two<caret>three<caret>four\n");
@@ -1534,6 +1529,7 @@ public class MultipleCaretsTest extends VimTestCase {
                     " hdfsgj sdfklgj<caret>\n");
   }
 
+  @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction")
   public void testSearchWholeWordForwardAction() {
     typeTextInFile(parseKeys("2*"),
             "q<caret>we as<caret>d zxc qwe asd zxc qwe asd zxc qwe asd zxc qwe asd zxc ");

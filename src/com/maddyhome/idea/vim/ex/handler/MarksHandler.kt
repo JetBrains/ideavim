@@ -22,12 +22,13 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.*
-import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 
-class MarksHandler : CommandHandler(commands("marks"), flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)) {
+class MarksHandler : CommandHandler.SingleExecution() {
+  override val names: Array<CommandName> = commands("marks")
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
 
@@ -46,7 +47,7 @@ class MarksHandler : CommandHandler(commands("marks"), flags(RangeFlag.RANGE_OPT
       text.append(num.padStart(3))
 
       text.append(" ")
-      val vf = EditorData.getVirtualFile(editor)
+      val vf = EditorHelper.getVirtualFile(editor)
       if (vf != null && vf.path == mark.filename) {
         text.append(toKeyNotation(stringToKeys(EditorHelper.getLineText(editor, mark.logicalLine).trim())))
       } else {

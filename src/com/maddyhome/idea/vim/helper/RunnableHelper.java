@@ -36,14 +36,14 @@ public class RunnableHelper {
 
   public static void runReadCommand(@Nullable Project project, @NotNull Runnable cmd, @Nullable String name, @Nullable Object groupId) {
     if (logger.isDebugEnabled()) {
-      logger.debug("read command " + cmd);
+      logger.debug("Run read command: " + name);
     }
     CommandProcessor.getInstance().executeCommand(project, new ReadAction(cmd), name, groupId);
   }
 
   public static void runWriteCommand(@Nullable Project project, @NotNull Runnable cmd, @Nullable String name, @Nullable Object groupId) {
     if (logger.isDebugEnabled()) {
-      logger.debug("write command " + cmd);
+      logger.debug("Run write command " + name);
     }
     CommandProcessor.getInstance().executeCommand(project, new WriteAction(cmd), name, groupId);
   }
@@ -55,6 +55,7 @@ public class RunnableHelper {
       this.cmd = cmd;
     }
 
+    @Override
     public void run() {
       ApplicationManager.getApplication().runReadAction(cmd);
     }
@@ -67,6 +68,7 @@ public class RunnableHelper {
       this.cmd = cmd;
     }
 
+    @Override
     public void run() {
       ApplicationManager.getApplication().runWriteAction(cmd);
     }

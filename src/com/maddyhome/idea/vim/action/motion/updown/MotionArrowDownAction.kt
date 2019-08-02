@@ -22,7 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.action.MotionEditorAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -31,14 +31,11 @@ import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.helper.isEndAllowed
-import com.maddyhome.idea.vim.helper.mode
-import com.maddyhome.idea.vim.helper.vimLastColumn
 import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-class MotionArrowDownAction : VimCommandAction() {
+class MotionArrowDownAction : MotionEditorAction() {
   override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
     private var col: Int = 0
 
@@ -47,22 +44,18 @@ class MotionArrowDownAction : VimCommandAction() {
     }
 
     override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
-      col = caret.vimLastColumn
+      col = EditorHelper.prepareLastColumn(editor, caret)
       return true
     }
 
     override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-      val pos = caret.visualPosition
-      val lastColumn = EditorHelper.lastColumnForLine(editor, pos.line, editor.mode.isEndAllowed)
-      caret.vimLastColumn = if (pos.column != lastColumn) pos.column else col
+      EditorHelper.updateLastColumn(editor, caret, col)
     }
   }
 
   override val mappingModes: Set<MappingMode> = MappingMode.NVOS
 
   override val keyStrokesSet: Set<MutableList<KeyStroke>> = setOf(parseKeys("<Down>"), mutableListOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0)))
-
-  override val type: Command.Type = Command.Type.MOTION
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
 }

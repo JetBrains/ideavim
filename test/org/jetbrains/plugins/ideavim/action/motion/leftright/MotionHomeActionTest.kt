@@ -22,18 +22,19 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.Options
-import com.maddyhome.idea.vim.option.Options.KEYMODEL
-import org.jetbrains.plugins.ideavim.VimListConfig
-import org.jetbrains.plugins.ideavim.VimListOptionDefault
-import org.jetbrains.plugins.ideavim.VimListOptionTestCase
-import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
+import com.maddyhome.idea.vim.option.KeyModelOptionData
+import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
 
-class MotionHomeActionTest : VimListOptionTestCase(KEYMODEL) {
-    @VimListOptionDefault
-    fun `test motion home`() {
-        val keys = parseKeys("<Home>")
-        val before = """
+class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
+  @VimOptionDefaultAll
+  fun `test motion home`() {
+    val keys = parseKeys("<Home>")
+    val before = """
             A Discovery
 
             I found it in a ${c}legendary land
@@ -41,7 +42,7 @@ class MotionHomeActionTest : VimListOptionTestCase(KEYMODEL) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             ${c}I found it in a legendary land
@@ -49,18 +50,18 @@ class MotionHomeActionTest : VimListOptionTestCase(KEYMODEL) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    @VimListOptionDefault
-    fun `test default stop select`() {
-        assertTrue(Options.getInstance().getListOption(KEYMODEL)!!.contains("stopselect"))
-    }
+  @VimOptionDefaultAll
+  fun `test default stop select`() {
+    assertTrue(KeyModelOptionData.stopselect in OptionsManager.keymodel)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, []))
-    fun `test continue visual`() {
-        val keys = parseKeys("v", "<Home>")
-        val before = """
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []))
+  fun `test continue visual`() {
+    val keys = parseKeys("v", "<Home>")
+    val before = """
             A Discovery
 
             I found it in a ${c}legendary land
@@ -68,7 +69,7 @@ class MotionHomeActionTest : VimListOptionTestCase(KEYMODEL) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             ${s}${c}I found it in a l${se}egendary land
@@ -76,13 +77,13 @@ class MotionHomeActionTest : VimListOptionTestCase(KEYMODEL) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
-    }
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, []))
-    fun `test continue select`() {
-        val keys = parseKeys("gh", "<Home>")
-        val before = """
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []))
+  fun `test continue select`() {
+    val keys = parseKeys("gh", "<Home>")
+    val before = """
             A Discovery
 
             I found it in a ${c}legendary land
@@ -90,7 +91,7 @@ class MotionHomeActionTest : VimListOptionTestCase(KEYMODEL) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             ${s}${c}I found it in a ${se}legendary land
@@ -98,13 +99,13 @@ class MotionHomeActionTest : VimListOptionTestCase(KEYMODEL) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
-    }
+    doTest(keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, ["stopvisual"]))
-    fun `test exit visual`() {
-        val keys = parseKeys("v", "<Home>")
-        val before = """
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
+  fun `test exit visual`() {
+    val keys = parseKeys("v", "<Home>")
+    val before = """
             A Discovery
 
             I found it in a ${c}legendary land
@@ -112,7 +113,7 @@ class MotionHomeActionTest : VimListOptionTestCase(KEYMODEL) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             ${c}I found it in a legendary land
@@ -120,13 +121,13 @@ class MotionHomeActionTest : VimListOptionTestCase(KEYMODEL) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, ["stopselect"]))
-    fun `test exit select`() {
-        val keys = parseKeys("gh", "<Home>")
-        val before = """
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
+  fun `test exit select`() {
+    val keys = parseKeys("gh", "<Home>")
+    val before = """
             A Discovery
 
             I found it in a ${c}legendary land
@@ -134,7 +135,7 @@ class MotionHomeActionTest : VimListOptionTestCase(KEYMODEL) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             ${c}I found it in a legendary land
@@ -142,6 +143,6 @@ class MotionHomeActionTest : VimListOptionTestCase(KEYMODEL) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 }

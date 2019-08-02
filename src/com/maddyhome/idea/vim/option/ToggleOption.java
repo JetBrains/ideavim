@@ -68,6 +68,10 @@ public class ToggleOption extends Option {
     update(!value);
   }
 
+  public boolean isSet() {
+    return value;
+  }
+
   /**
    * Helper to set the value only it is changing and notify listeners
    *
@@ -106,6 +110,7 @@ public class ToggleOption extends Option {
    *
    * @return True if equal to default, false if not.
    */
+  @Override
   public boolean isDefault() {
     return value == dflt;
   }
@@ -113,6 +118,7 @@ public class ToggleOption extends Option {
   /**
    * Sets the option to its default value.
    */
+  @Override
   public void resetDefault() {
     value = dflt;
   }

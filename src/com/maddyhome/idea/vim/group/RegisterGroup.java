@@ -52,7 +52,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.option.ListOption;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
 import kotlin.Pair;
 import org.jdom.Element;
@@ -86,7 +86,7 @@ public class RegisterGroup {
   @Nullable private List<KeyStroke> recordList = null;
 
   public RegisterGroup() {
-    final ListOption clipboardOption = Options.getInstance().getListOption(Options.CLIPBOARD);
+    final ListOption clipboardOption = OptionsManager.INSTANCE.getClipboard();
     if (clipboardOption != null) {
       clipboardOption.addOptionChangeListener(event -> {
         if (clipboardOption.contains("unnamed")) {
@@ -133,7 +133,7 @@ public class RegisterGroup {
    */
   public void resetRegister() {
     lastRegister = defaultRegister;
-    logger.debug("register reset");
+    logger.debug("Last register reset to default register");
   }
 
   public void resetRegisters() {
@@ -275,8 +275,9 @@ public class RegisterGroup {
     if (project == null) return text;
 
     final PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
+    if (file == null) return text;
     String rawText = TextBlockTransferable.convertLineSeparators(text, "\n", transferableDatas);
-    String escapedText = null;
+    String escapedText;
     for (CopyPastePreProcessor processor : CopyPastePreProcessor.EP_NAME.getExtensionList()) {
       escapedText = processor.preprocessOnCopy(file, textRange.getStartOffsets(), textRange.getEndOffsets(), rawText);
       if (escapedText != null) {

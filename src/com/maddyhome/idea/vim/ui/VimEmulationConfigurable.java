@@ -26,6 +26,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.openapi.ui.StripeTable;
 import com.intellij.ui.IdeBorderFactory;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -39,8 +40,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * @author vlan
@@ -94,7 +95,7 @@ public class VimEmulationConfigurable implements Configurable {
       myShortcutConflictsTable = new VimShortcutConflictsTable(model);
       setLayout(new BorderLayout());
       final JScrollPane scrollPane = new JBScrollPane(myShortcutConflictsTable);
-      scrollPane.setBorder(new LineBorder(UIUtil.getBorderColor()));
+      scrollPane.setBorder(new LineBorder(JBColor.border()));
       final JPanel conflictsPanel = new JPanel(new BorderLayout());
       final String title = String.format("Shortcut Conflicts for Active Keymap");
       conflictsPanel.setBorder(IdeBorderFactory.createTitledBorder(title, false));
@@ -161,8 +162,82 @@ public class VimEmulationConfigurable implements Configurable {
       }
     }
 
+    private enum Column {
+      KEYSTROKE(0, "Shortcut"),
+      IDE_ACTION(1, "IDE Action"),
+      OWNER(2, "Handler");
+
+      @NotNull private static final Map<Integer, Column> ourMembers = new HashMap<>();
+
+      static {
+        for (Column column : values()) {
+          ourMembers.put(column.myIndex, column);
+        }
+      }
+
+      private final int myIndex;
+      @NotNull private final String myTitle;
+
+      Column(int index, @NotNull String title) {
+        myIndex = index;
+        myTitle = title;
+      }
+
+      @Nullable
+      public static Column fromIndex(int index) {
+        return ourMembers.get(index);
+      }
+
+      public int getIndex() {
+        return myIndex;
+      }
+
+      @NotNull
+      public String getTitle() {
+        return myTitle;
+      }
+    }
+
+    private static final class Row implements Comparable<Row> {
+      @NotNull private final KeyStroke myKeyStroke;
+      @NotNull private final AnAction myAction;
+      @NotNull private ShortcutOwner myOwner;
+
+      private Row(@NotNull KeyStroke keyStroke, @NotNull AnAction action, @NotNull ShortcutOwner owner) {
+        myKeyStroke = keyStroke;
+        myAction = action;
+        myOwner = owner;
+      }
+
+      @NotNull
+      public KeyStroke getKeyStroke() {
+        return myKeyStroke;
+      }
+
+      @NotNull
+      public AnAction getAction() {
+        return myAction;
+      }
+
+      @NotNull
+      public ShortcutOwner getOwner() {
+        return myOwner;
+      }
+
+      @Override
+      public int compareTo(@NotNull Row row) {
+        final KeyStroke otherKeyStroke = row.getKeyStroke();
+        final int keyCodeDiff = myKeyStroke.getKeyCode() - otherKeyStroke.getKeyCode();
+        return keyCodeDiff != 0 ? keyCodeDiff : myKeyStroke.getModifiers() - otherKeyStroke.getModifiers();
+      }
+
+      public void setOwner(@NotNull ShortcutOwner owner) {
+        myOwner = owner;
+      }
+    }
+
     private static final class Model extends AbstractTableModel {
-      @NotNull private final List<Row> myRows = new ArrayList<Row>();
+      @NotNull private final List<Row> myRows = new ArrayList<>();
 
       public Model() {
         reset();
@@ -239,85 +314,11 @@ public class VimEmulationConfigurable implements Configurable {
 
       @NotNull
       private Map<KeyStroke, ShortcutOwner> getCurrentData() {
-        final Map<KeyStroke, ShortcutOwner> result = new HashMap<KeyStroke, ShortcutOwner>();
+        final Map<KeyStroke, ShortcutOwner> result = new HashMap<>();
         for (Row row : myRows) {
           result.put(row.getKeyStroke(), row.getOwner());
         }
         return result;
-      }
-    }
-
-    private static final class Row implements Comparable<Row> {
-      @NotNull private final KeyStroke myKeyStroke;
-      @NotNull private final AnAction myAction;
-      @NotNull private ShortcutOwner myOwner;
-
-      private Row(@NotNull KeyStroke keyStroke, @NotNull AnAction action, @NotNull ShortcutOwner owner) {
-        myKeyStroke = keyStroke;
-        myAction = action;
-        myOwner = owner;
-      }
-
-      @NotNull
-      public KeyStroke getKeyStroke() {
-        return myKeyStroke;
-      }
-
-      @NotNull
-      public AnAction getAction() {
-        return myAction;
-      }
-
-      @NotNull
-      public ShortcutOwner getOwner() {
-        return myOwner;
-      }
-
-      @Override
-      public int compareTo(@NotNull Row row) {
-        final KeyStroke otherKeyStroke = row.getKeyStroke();
-        final int keyCodeDiff = myKeyStroke.getKeyCode() - otherKeyStroke.getKeyCode();
-        return keyCodeDiff != 0 ? keyCodeDiff : myKeyStroke.getModifiers() - otherKeyStroke.getModifiers();
-      }
-
-      public void setOwner(@NotNull ShortcutOwner owner) {
-        myOwner = owner;
-      }
-    }
-
-    private static enum Column {
-      KEYSTROKE(0, "Shortcut"),
-      IDE_ACTION(1, "IDE Action"),
-      OWNER(2, "Handler");
-
-      @NotNull private static final Map<Integer, Column> ourMembers = new HashMap<Integer, Column>();
-
-      static {
-        for (Column column : values()) {
-          ourMembers.put(column.myIndex, column);
-        }
-      }
-
-      private final int myIndex;
-      @NotNull private final String myTitle;
-
-      Column(int index, @NotNull String title) {
-        myIndex = index;
-        myTitle = title;
-      }
-
-      @Nullable
-      public static Column fromIndex(int index) {
-        return ourMembers.get(index);
-      }
-
-      public int getIndex() {
-        return myIndex;
-      }
-
-      @NotNull
-      public String getTitle() {
-        return myTitle;
       }
     }
   }

@@ -24,7 +24,7 @@ package org.jetbrains.plugins.ideavim.action.copy
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.Test
@@ -50,86 +50,86 @@ import org.junit.Test
  */
 class PutVisualTextActionTest : VimTestCase() {
 
-    // ----- Case 1: Copied | Characterwise | --- pasted | Characterwise | ---| small p |--------------------
+  // ----- Case 1: Copied | Characterwise | --- pasted | Characterwise | ---| small p |--------------------
 
-    @Test
-    fun `test put visual line without copy`() {
-        val before = """
+  @Test
+  fun `test put visual line without copy`() {
+    val before = """
             ${c}I found it in a legendary land
             all rocks and lavender and tufted grass,
         """.trimIndent()
-        configureByText(before)
-        typeText(parseKeys("V", "p"))
-        val after = """
+    configureByText(before)
+    typeText(parseKeys("V", "p"))
+    val after = """
             ${c}all rocks and lavender and tufted grass,
         """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text without copy`() {
-        val before = "${c}I found it in a legendary land"
-        configureByText(before)
-        typeText(parseKeys("ve", "p"))
-        val after = "$c it in a legendary land"
-        myFixture.checkResult(after)
-    }
+  @Test
+  fun `test put visual text without copy`() {
+    val before = "${c}I found it in a legendary land"
+    configureByText(before)
+    typeText(parseKeys("ve", "p"))
+    val after = "$c it in a legendary land"
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text`() {
-        val before = "${c}I found it in a legendary land"
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("ve", "p"))
-        val after = "legendar${c}y it in a legendary land"
-        myFixture.checkResult(after)
-    }
+  @Test
+  fun `test put visual text`() {
+    val before = "${c}I found it in a legendary land"
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    typeText(parseKeys("ve", "p"))
+    val after = "legendar${c}y it in a legendary land"
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text twice`() {
-        val before = "${c}I found it in a legendary land"
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("v2e", "2p"))
-        val after = "legendarylegendar${c}y in a legendary land"
-        myFixture.checkResult(after)
-    }
+  @Test
+  fun `test put visual text twice`() {
+    val before = "${c}I found it in a legendary land"
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    typeText(parseKeys("v2e", "2p"))
+    val after = "legendarylegendar${c}y in a legendary land"
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text full line`() {
-        val before = "${c}I found it in a legendary land"
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("v$", "2p"))
-        val after = "legendarylegendar${c}y"
-        myFixture.checkResult(after)
-    }
+  @Test
+  fun `test put visual text full line`() {
+    val before = "${c}I found it in a legendary land"
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    typeText(parseKeys("v$", "2p"))
+    val after = "legendarylegendar${c}y"
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text multicaret`() {
-        val before = "${c}I found ${c}it in a ${c}legendary land"
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("ve", "p"))
-        val after = "legendar${c}y legendar${c}y in a legendar${c}y land"
-        myFixture.checkResult(after)
-    }
+  @Test
+  fun `test put visual text multicaret`() {
+    val before = "${c}I found ${c}it in a ${c}legendary land"
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    typeText(parseKeys("ve", "p"))
+    val after = "legendar${c}y legendar${c}y in a legendar${c}y land"
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text another direction`() {
-        val before = "I foun${c}d it in a legendary land"
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("vb", "p"))
-        val after = "I legendar${c}y it in a legendary land"
-        myFixture.checkResult(after)
-    }
+  @Test
+  fun `test put visual text another direction`() {
+    val before = "I foun${c}d it in a legendary land"
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    typeText(parseKeys("vb", "p"))
+    val after = "I legendar${c}y it in a legendary land"
+    myFixture.checkResult(after)
+  }
 
-    // ----- Case 2: Copied | Linewise | --- pasted | Characterwise | ---| small p |--------------------
+  // ----- Case 2: Copied | Linewise | --- pasted | Characterwise | ---| small p |--------------------
 
-    @Test
-    fun `test put visual text linewise`() {
-        val before = """
+  @Test
+  fun `test put visual text linewise`() {
+    val before = """
             A Discovery
 
             ${c}I found it in a legendary land
@@ -137,10 +137,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("ve", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("ve", "p"))
+    val after = """
             A Discovery
 
 
@@ -150,12 +150,12 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text linewise in middle`() {
-        val before = """
+  @Test
+  fun `test put visual text linewise in middle`() {
+    val before = """
             A Discovery
 
             I found$c it in a legendary land
@@ -163,10 +163,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("ve", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("ve", "p"))
+    val after = """
             A Discovery
 
             I found
@@ -176,12 +176,12 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text linewise last line`() {
-        val before = """
+  @Test
+  fun `test put visual text linewise last line`() {
+    val before = """
             A Discovery
 
             I found it in a legendary land
@@ -189,10 +189,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${c}hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("ve", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("ve", "p"))
+    val after = """
             A Discovery
 
             I found it in a legendary land
@@ -202,12 +202,12 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
              by the torrent of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text linewise last line full line`() {
-        val before = """
+  @Test
+  fun `test put visual text linewise last line full line`() {
+    val before = """
             A Discovery
 
             I found it in a legendary land
@@ -215,10 +215,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${c}hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("v$", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("v$", "p"))
+    val after = """
             A Discovery
 
             I found it in a legendary land
@@ -228,12 +228,12 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
 
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text linewise multicaret`() {
-        val before = """
+  @Test
+  fun `test put visual text linewise multicaret`() {
+    val before = """
             A Discovery
 
             ${c}I found it in a legendary land
@@ -241,10 +241,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${c}hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("ve", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("ve", "p"))
+    val after = """
             A Discovery
 
 
@@ -258,12 +258,12 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
              by the torrent of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text linewise multicaret on same line`() {
-        val before = """
+  @Test
+  fun `test put visual text linewise multicaret on same line`() {
+    val before = """
             A Discovery
 
             I found it in a legendary land
@@ -271,10 +271,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${c}hard by the$c torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("ve", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("ve", "p"))
+    val after = """
             A Discovery
 
             I found it in a legendary land
@@ -286,12 +286,12 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
              of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text linewise multicaret on same line twice`() {
-        val before = """
+  @Test
+  fun `test put visual text linewise multicaret on same line twice`() {
+    val before = """
             A Discovery
 
             I found it in a legendary land
@@ -299,10 +299,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${c}hard by the$c torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("ve", "2p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("ve", "2p"))
+    val after = """
             A Discovery
 
             I found it in a legendary land
@@ -316,14 +316,14 @@ class PutVisualTextActionTest : VimTestCase() {
             A Discovery
              of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    // ----- Case 3: Copied | Blockwise | --- pasted | Characterwise | ---| small p |--------------------
+  // ----- Case 3: Copied | Blockwise | --- pasted | Characterwise | ---| small p |--------------------
 
-    @Test
-    fun `test put visual text blockwise`() {
-        val before = """
+  @Test
+  fun `test put visual text blockwise`() {
+    val before = """
             A Discovery
 
             I |found| it in a legendary land
@@ -336,10 +336,10 @@ class PutVisualTextActionTest : VimTestCase() {
             akin to moonlight, tempering its blue,
             the dingy underside, the checquered fringe.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
-        typeText(parseKeys("ve", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    typeText(parseKeys("ve", "p"))
+    val after = """
             A Discovery
 
             I |found| it in a legendary land
@@ -352,12 +352,12 @@ class PutVisualTextActionTest : VimTestCase() {
             akin|ere i| to moonlight, tempering its blue,
             the dingy underside, the checquered fringe.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text blockwise on last line`() {
-        val before = """
+  @Test
+  fun `test put visual text blockwise on last line`() {
+    val before = """
             A Discovery
 
             I |found| it in a legendary land
@@ -370,10 +370,10 @@ class PutVisualTextActionTest : VimTestCase() {
             akin to moonlight, tempering its blue,
             the dingy ${c}underside, the checquered fringe.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
-        typeText(parseKeys("ve", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    typeText(parseKeys("ve", "p"))
+    val after = """
             A Discovery
 
             I |found| it in a legendary land
@@ -388,12 +388,12 @@ class PutVisualTextActionTest : VimTestCase() {
                       |l roc|
                       |ere i|
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text blockwise on last line twice`() {
-        val before = """
+  @Test
+  fun `test put visual text blockwise on last line twice`() {
+    val before = """
             A Discovery
 
             I |found| it in a legendary land
@@ -406,10 +406,10 @@ class PutVisualTextActionTest : VimTestCase() {
             akin to moonlight, tempering its blue,
             the dingy ${c}underside, the checquered fringe.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
-        typeText(parseKeys("ve", "2p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    typeText(parseKeys("ve", "2p"))
+    val after = """
             A Discovery
 
             I |found| it in a legendary land
@@ -424,12 +424,12 @@ class PutVisualTextActionTest : VimTestCase() {
                       |l roc||l roc|
                       |ere i||ere i|
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text blockwise multicaret`() {
-        val before = """
+  @Test
+  fun `test put visual text blockwise multicaret`() {
+    val before = """
             A Discovery
 
             I |found| it in a ${c}legendary land
@@ -442,10 +442,10 @@ class PutVisualTextActionTest : VimTestCase() {
             akin to moonlight, tempering its blue,
             the dingy ${c}underside, the checquered fringe.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
-        typeText(parseKeys("ve", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    typeText(parseKeys("ve", "p"))
+    val after = """
             A Discovery
 
             I |found| it in a $c|found| land
@@ -460,14 +460,14 @@ class PutVisualTextActionTest : VimTestCase() {
                       |l roc|
                       |ere i|
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    // ----- Case 4: Copied | Characterwise | --- pasted | Linewise | ---| small p |--------------------
+  // ----- Case 4: Copied | Characterwise | --- pasted | Linewise | ---| small p |--------------------
 
-    @Test
-    fun `test put visual text character to line`() {
-        val before = """
+  @Test
+  fun `test put visual text character to line`() {
+    val before = """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -475,10 +475,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("V", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    typeText(parseKeys("V", "p"))
+    val after = """
             A Discovery
 
             ${c}Discovery
@@ -486,12 +486,12 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text character to line twice`() {
-        val before = """
+  @Test
+  fun `test put visual text character to line twice`() {
+    val before = """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -499,10 +499,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("V", "2p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    typeText(parseKeys("V", "2p"))
+    val after = """
             A Discovery
 
             ${c}Discovery
@@ -511,10 +511,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I found it in a legendary land
@@ -522,9 +522,9 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${c}Discovery
     """)
-    @Test
-    fun `test put visual text character to last line`() {
-        val before = """
+  @Test
+  fun `test put visual text character to last line`() {
+    val before = """
             A Discovery
 
             I found it in a legendary land
@@ -532,10 +532,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by ${c}the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("V", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    typeText(parseKeys("V", "p"))
+    val after = """
             A Discovery
 
             I found it in a legendary land
@@ -544,10 +544,10 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}Discovery
 
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             ${c}Discovery
@@ -555,9 +555,9 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${c}Discovery
     """)
-    @Test
-    fun `test put visual text character to line multicaret`() {
-        val before = """
+  @Test
+  fun `test put visual text character to line multicaret`() {
+    val before = """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -565,10 +565,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the ${c}torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("V", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    typeText(parseKeys("V", "p"))
+    val after = """
             A Discovery
 
             ${c}Discovery
@@ -577,10 +577,10 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}Discovery
 
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             ${c}Discovery
@@ -588,9 +588,9 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${c}Discovery
     """)
-    @Test
-    fun `test put visual text character to line multicaret on same line`() {
-        val before = """
+  @Test
+  fun `test put visual text character to line multicaret on same line`() {
+    val before = """
             A Discovery
 
             I found ${c}it in a ${c}legendary land
@@ -598,10 +598,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the ${c}torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("V", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    typeText(parseKeys("V", "p"))
+    val after = """
             A Discovery
 
             ${c}Discovery
@@ -610,14 +610,14 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}Discovery
 
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    // ----- Case 5: Copied | Linewise | --- pasted | Linewise | ---| small p |--------------------
+  // ----- Case 5: Copied | Linewise | --- pasted | Linewise | ---| small p |--------------------
 
-    @Test
-    fun `test put visual text line to line`() {
-        val before = """
+  @Test
+  fun `test put visual text line to line`() {
+    val before = """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -625,10 +625,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("V", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("V", "p"))
+    val after = """
             A Discovery
 
             ${c}A Discovery
@@ -636,12 +636,12 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text line to line twice`() {
-        val before = """
+  @Test
+  fun `test put visual text line to line twice`() {
+    val before = """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -649,10 +649,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("V", "2p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("V", "2p"))
+    val after = """
             A Discovery
 
             ${c}A Discovery
@@ -661,10 +661,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I found it in a legendary land
@@ -672,9 +672,9 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${c}A Discovery
     """)
-    @Test
-    fun `test put visual text line to last line`() {
-        val before = """
+  @Test
+  fun `test put visual text line to last line`() {
+    val before = """
             A Discovery
 
             I found it in a legendary land
@@ -682,10 +682,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the ${c}torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("V", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("V", "p"))
+    val after = """
             A Discovery
 
             I found it in a legendary land
@@ -694,10 +694,10 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
 
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             ${c}A Discovery
@@ -705,9 +705,9 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${c}A Discovery
     """)
-    @Test
-    fun `test put visual text line to line multicaret`() {
-        val before = """
+  @Test
+  fun `test put visual text line to line multicaret`() {
+    val before = """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -715,10 +715,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the ${c}torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("V", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("V", "p"))
+    val after = """
             A Discovery
 
             ${c}A Discovery
@@ -727,10 +727,10 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
 
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             ${c}A Discovery
@@ -738,9 +738,9 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${c}A Discovery
     """)
-    @Test
-    fun `test put visual text line to line multicaret on same line`() {
-        val before = """
+  @Test
+  fun `test put visual text line to line multicaret on same line`() {
+    val before = """
             A Discovery
 
             I found ${c}it in a ${c}legendary land
@@ -748,10 +748,10 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the ${c}torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("V", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("V", "p"))
+    val after = """
             A Discovery
 
             ${c}A Discovery
@@ -760,15 +760,15 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
 
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    // ----- Case 6: Copied | Blockwise | --- pasted | Linewise | ---| small p |--------------------
+  // ----- Case 6: Copied | Blockwise | --- pasted | Linewise | ---| small p |--------------------
 
 
-    @Test
-    fun `test put visual text blockwise to line`() {
-        val before = """
+  @Test
+  fun `test put visual text blockwise to line`() {
+    val before = """
             A Discovery
 
             I |found| it in a legendary land
@@ -781,10 +781,10 @@ class PutVisualTextActionTest : VimTestCase() {
             akin to moonlight, tempering its blue,
             the dingy underside, the checquered fringe.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
-        typeText(parseKeys("V", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    typeText(parseKeys("V", "p"))
+    val after = """
             A Discovery
 
             I |found| it in a legendary land
@@ -799,10 +799,10 @@ class PutVisualTextActionTest : VimTestCase() {
             akin to moonlight, tempering its blue,
             the dingy underside, the checquered fringe.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I |found| it in a legendary land
@@ -817,9 +817,9 @@ class PutVisualTextActionTest : VimTestCase() {
             |l roc|
             |ere i|
     """)
-    @Test
-    fun `test put visual text blockwise on last line to line`() {
-        val before = """
+  @Test
+  fun `test put visual text blockwise on last line to line`() {
+    val before = """
             A Discovery
 
             I |found| it in a legendary land
@@ -832,10 +832,10 @@ class PutVisualTextActionTest : VimTestCase() {
             akin to moonlight, tempering its blue,
             the dingy ${c}underside, the checquered fringe.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
-        typeText(parseKeys("V", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    typeText(parseKeys("V", "p"))
+    val after = """
             A Discovery
 
             I |found| it in a legendary land
@@ -854,10 +854,10 @@ class PutVisualTextActionTest : VimTestCase() {
 
 
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I |found| it in a legendary land
@@ -875,9 +875,9 @@ class PutVisualTextActionTest : VimTestCase() {
             |l roc|
             |ere i|
     """)
-    @Test
-    fun `test put visual text blockwise on last line twice to line`() {
-        val before = """
+  @Test
+  fun `test put visual text blockwise on last line twice to line`() {
+    val before = """
             A Discovery
 
             I |found| it in a legendary land
@@ -890,10 +890,10 @@ class PutVisualTextActionTest : VimTestCase() {
             akin to moonlight, tempering its blue,
             the dingy ${c}underside, the checquered fringe.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
-        typeText(parseKeys("V", "2p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    typeText(parseKeys("V", "2p"))
+    val after = """
             A Discovery
 
             I |found| it in a legendary land
@@ -912,10 +912,10 @@ class PutVisualTextActionTest : VimTestCase() {
 
 
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             $c|found|
@@ -932,9 +932,9 @@ class PutVisualTextActionTest : VimTestCase() {
             |l roc|
             |ere i|
     """)
-    @Test
-    fun `test put visual text blockwise multicaret to line`() {
-        val before = """
+  @Test
+  fun `test put visual text blockwise multicaret to line`() {
+    val before = """
             A Discovery
 
             I |found| it in a ${c}legendary land
@@ -947,10 +947,10 @@ class PutVisualTextActionTest : VimTestCase() {
             akin to moonlight, tempering its blue,
             the dingy ${c}underside, the checquered fringe.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
-        typeText(parseKeys("V", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    typeText(parseKeys("V", "p"))
+    val after = """
             A Discovery
 
             $c|found|
@@ -971,29 +971,29 @@ class PutVisualTextActionTest : VimTestCase() {
 
 
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    // ----- Case 7: Copied | Characterwise | --- pasted | Blockwise | ---| small p |--------------------
+  // ----- Case 7: Copied | Characterwise | --- pasted | Blockwise | ---| small p |--------------------
 
-    @Test
-    fun `test put visual block without copy`() {
-        val before = """
+  @Test
+  fun `test put visual block without copy`() {
+    val before = """
             I $c|found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
         """.trimIndent()
-        configureByText(before)
-        typeText(parseKeys("<C-V>2ej", "p"))
-        val after = """
+    configureByText(before)
+    typeText(parseKeys("<C-V>2ej", "p"))
+    val after = """
             I  it in a legendary land
             alks and lavender and tufted grass,
         """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text character to block`() {
-        val before = """
+  @Test
+  fun `test put visual text character to block`() {
+    val before = """
             A Discovery
 
             I $c|found| it in a legendary land
@@ -1001,10 +1001,10 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("<C-V>2e2j", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    typeText(parseKeys("<C-V>2e2j", "p"))
+    val after = """
             A Discovery
 
             I Discover${c}y it in a legendary land
@@ -1012,12 +1012,12 @@ class PutVisualTextActionTest : VimTestCase() {
             whDiscoveryt was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text character to block motion up`() {
-        val before = """
+  @Test
+  fun `test put visual text character to block motion up`() {
+    val before = """
             A Discovery
 
             I |found| it in a legendary land
@@ -1025,10 +1025,10 @@ class PutVisualTextActionTest : VimTestCase() {
             wh$c|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("<C-V>3e2k", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    typeText(parseKeys("<C-V>3e2k", "p"))
+    val after = """
             A Discovery
 
             I Discover${c}y it in a legendary land
@@ -1036,12 +1036,12 @@ class PutVisualTextActionTest : VimTestCase() {
             whDiscoveryt was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text character to block twice`() {
-        val before = """
+  @Test
+  fun `test put visual text character to block twice`() {
+    val before = """
             A Discovery
 
             I $c|found| it in a legendary land
@@ -1049,10 +1049,10 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("<C-V>2e2j", "2p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    typeText(parseKeys("<C-V>2e2j", "2p"))
+    val after = """
             A Discovery
 
             I DiscoveryDiscover${c}y it in a legendary land
@@ -1060,12 +1060,12 @@ class PutVisualTextActionTest : VimTestCase() {
             whDiscoveryDiscoveryt was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text character to block with dollar motion`() {
-        val before = """
+  @Test
+  fun `test put visual text character to block with dollar motion`() {
+    val before = """
             A Discovery
 
             I $c|found it in a legendary land
@@ -1073,10 +1073,10 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere it was settled on some sodden sand
             ha|rd by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("<C-V>3j$", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+    typeText(parseKeys("<C-V>3j$", "p"))
+    val after = """
             A Discovery
 
             I Discover${c}y
@@ -1084,12 +1084,12 @@ class PutVisualTextActionTest : VimTestCase() {
             whDiscovery
             haDiscovery
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    // ----- Case 8: Copied | Linewise | --- pasted | Blockwise | ---| small p |--------------------
+  // ----- Case 8: Copied | Linewise | --- pasted | Blockwise | ---| small p |--------------------
 
-    @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I  it in a legendary land
@@ -1098,9 +1098,9 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
             hard by the torrent of a mountain pass.
     """)
-    @Test
-    fun `test put visual text line to block`() {
-        val before = """
+  @Test
+  fun `test put visual text line to block`() {
+    val before = """
             A Discovery
 
             I $c|found| it in a legendary land
@@ -1108,10 +1108,10 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("<C-V>2e2j", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("<C-V>2e2j", "p"))
+    val after = """
             A Discovery
 
             I  it in a legendary land
@@ -1121,12 +1121,12 @@ class PutVisualTextActionTest : VimTestCase() {
 
             hard by the torrent of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text line to block before caret`() {
-        val before = """
+  @Test
+  fun `test put visual text line to block before caret`() {
+    val before = """
             A Discovery
 
             I $c|found| it in a legendary land
@@ -1134,10 +1134,10 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("<C-V>2e2j", "P"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("<C-V>2e2j", "P"))
+    val after = """
             A Discovery
 
             ${c}A Discovery
@@ -1146,10 +1146,10 @@ class PutVisualTextActionTest : VimTestCase() {
             wht was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I  it in a legendary land
@@ -1159,9 +1159,9 @@ class PutVisualTextActionTest : VimTestCase() {
             A Discovery
             hard by the torrent of a mountain pass.
             """)
-    @Test
-    fun `test put visual text line to block twice`() {
-        val before = """
+  @Test
+  fun `test put visual text line to block twice`() {
+    val before = """
             A Discovery
 
             I $c|found| it in a legendary land
@@ -1169,10 +1169,10 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("<C-V>2e2j", "2p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("<C-V>2e2j", "2p"))
+    val after = """
             A Discovery
 
             I  it in a legendary land
@@ -1183,10 +1183,10 @@ class PutVisualTextActionTest : VimTestCase() {
 
             hard by the torrent of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I  it in a legendary land
@@ -1195,9 +1195,9 @@ class PutVisualTextActionTest : VimTestCase() {
             ha the torrent of a mountain pass.
             ${c}A Discovery
     """)
-    @Test
-    fun `test put visual text line to block till end`() {
-        val before = """
+  @Test
+  fun `test put visual text line to block till end`() {
+    val before = """
             A Discovery
 
             I $c|found| it in a legendary land
@@ -1205,10 +1205,10 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             ha|rd by| the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("<C-V>2e3j", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("<C-V>2e3j", "p"))
+    val after = """
             A Discovery
 
             I  it in a legendary land
@@ -1218,10 +1218,10 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
 
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I
@@ -1230,9 +1230,9 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
             hard by the torrent of a mountain pass.
     """)
-    @Test
-    fun `test put visual text line to block with dollar motion`() {
-        val before = """
+  @Test
+  fun `test put visual text line to block with dollar motion`() {
+    val before = """
             A Discovery
 
             I${c}| found it in a legendary land
@@ -1240,10 +1240,10 @@ class PutVisualTextActionTest : VimTestCase() {
             w|here it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-        typeText(parseKeys("<C-V>2j$", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+    typeText(parseKeys("<C-V>2j$", "p"))
+    val after = """
             A Discovery
 
             I
@@ -1253,14 +1253,14 @@ class PutVisualTextActionTest : VimTestCase() {
 
             hard by the torrent of a mountain pass.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    // ----- Case 9: Copied | Blockwise | --- pasted | Blockwise | ---| small p |--------------------
+  // ----- Case 9: Copied | Blockwise | --- pasted | Blockwise | ---| small p |--------------------
 
-    @Test
-    fun `test put visual text blockwise to block`() {
-        val before = """
+  @Test
+  fun `test put visual text blockwise to block`() {
+    val before = """
             A Discovery
 
             I |found| it in a legendary land
@@ -1273,10 +1273,10 @@ class PutVisualTextActionTest : VimTestCase() {
             akin| to moon|light, tempering its blue,
             the dingy underside, the checquered fringe.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
-        typeText(parseKeys("<C-V>2e2j", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    typeText(parseKeys("<C-V>2e2j", "p"))
+    val after = """
             A Discovery
 
             I |found| it in a legendary land
@@ -1289,12 +1289,12 @@ class PutVisualTextActionTest : VimTestCase() {
             akin|ere i|light, tempering its blue,
             the dingy underside, the checquered fringe.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text blockwise to longer block`() {
-        val before = """
+  @Test
+  fun `test put visual text blockwise to longer block`() {
+    val before = """
             A Discovery
 
             I |found| it in a legendary land
@@ -1307,10 +1307,10 @@ class PutVisualTextActionTest : VimTestCase() {
             akin| to moon|light, tempering its blue,
             the |dingy un|derside, the checquered fringe.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
-        typeText(parseKeys("<C-V>2e3j", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    typeText(parseKeys("<C-V>2e3j", "p"))
+    val after = """
             A Discovery
 
             I |found| it in a legendary land
@@ -1323,12 +1323,12 @@ class PutVisualTextActionTest : VimTestCase() {
             akin|ere i|light, tempering its blue,
             the derside, the checquered fringe.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text blockwise to shorter block`() {
-        val before = """
+  @Test
+  fun `test put visual text blockwise to shorter block`() {
+    val before = """
             A Discovery
 
             I |found| it in a legendary land
@@ -1341,10 +1341,10 @@ class PutVisualTextActionTest : VimTestCase() {
             akin to moonlight, tempering its blue,
             the dingy underside, the checquered fringe.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
-        typeText(parseKeys("<C-V>2ej", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    typeText(parseKeys("<C-V>2ej", "p"))
+    val after = """
             A Discovery
 
             I |found| it in a legendary land
@@ -1357,12 +1357,12 @@ class PutVisualTextActionTest : VimTestCase() {
             akin|ere i| to moonlight, tempering its blue,
             the dingy underside, the checquered fringe.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text blockwise to shorter block on line end`() {
-        val before = """
+  @Test
+  fun `test put visual text blockwise to shorter block on line end`() {
+    val before = """
             A Discovery
 
             I |found| it in a legendary land
@@ -1375,10 +1375,10 @@ class PutVisualTextActionTest : VimTestCase() {
             akin to $c|moonlight|, tempering its blue,
             the ding|y undersi|de, the checquered fringe.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
-        typeText(parseKeys("<C-V>elj", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    typeText(parseKeys("<C-V>elj", "p"))
+    val after = """
             A Discovery
 
             I |found| it in a legendary land
@@ -1392,12 +1392,12 @@ class PutVisualTextActionTest : VimTestCase() {
             the ding|l roc|de, the checquered fringe.
                     |ere i|
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    @Test
-    fun `test put visual text blockwise to block with dollar motion`() {
-        val before = """
+  @Test
+  fun `test put visual text blockwise to block with dollar motion`() {
+    val before = """
             A Discovery
 
             I |found| it in a legendary land
@@ -1410,10 +1410,10 @@ class PutVisualTextActionTest : VimTestCase() {
             akin| to moonlight, tempering its blue,
             the dingy underside, the checquered fringe.
         """.trimIndent()
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
-        typeText(parseKeys("<C-V>2j$", "p"))
-        val after = """
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+    typeText(parseKeys("<C-V>2j$", "p"))
+    val after = """
             A Discovery
 
             I |found| it in a legendary land
@@ -1426,7 +1426,7 @@ class PutVisualTextActionTest : VimTestCase() {
             akin|ere i|
             the dingy underside, the checquered fringe.
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
 }

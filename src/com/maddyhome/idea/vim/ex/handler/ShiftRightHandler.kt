@@ -23,18 +23,12 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.commands
-import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.handler.CaretOrder
+import com.maddyhome.idea.vim.ex.*
 
-class ShiftRightHandler : CommandHandler(
-  commands(">[${">".repeat(31)}]"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE),
-  true, CaretOrder.DECREASING_OFFSET
-) {
+class ShiftRightHandler : CommandHandler.ForEachCaret() {
+  override val names: Array<CommandName> = commands(">[${">".repeat(31)}]")
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
+
   override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
     val range = cmd.getTextRange(editor, caret, context, true)
     val endOffsets = range.endOffsets.map { it - 1 }.toIntArray()

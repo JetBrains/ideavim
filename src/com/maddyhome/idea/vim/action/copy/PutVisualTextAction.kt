@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
@@ -37,7 +38,7 @@ import javax.swing.KeyStroke
  * @author vlan
  */
 class PutVisualTextAction : VimCommandAction() {
-  override fun makeActionHandler() = object : VisualOperatorActionHandler.SingleExecution() {
+  override fun makeActionHandler(): VimActionHandler = object : VisualOperatorActionHandler.SingleExecution() {
     override fun executeForAllCarets(editor: Editor,
                                      context: DataContext,
                                      cmd: Command,
@@ -58,7 +59,7 @@ class PutVisualTextAction : VimCommandAction() {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("p", "P")
 
-  override val type: Command.Type = Command.Type.PASTE
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 }

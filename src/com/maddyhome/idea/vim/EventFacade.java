@@ -21,6 +21,9 @@ package com.maddyhome.idea.vim;
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.codeInsight.template.TemplateManager;
 import com.intellij.codeInsight.template.TemplateManagerListener;
+import com.intellij.find.FindManager;
+import com.intellij.find.FindModelListener;
+import com.intellij.ide.bookmarks.BookmarksListener;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.ShortcutSet;
@@ -34,8 +37,7 @@ import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.project.ProjectManagerListener;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,6 +46,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author vlan
@@ -52,6 +56,7 @@ public class EventFacade {
   @NotNull private static final EventFacade ourInstance = new EventFacade();
 
   @Nullable private TypedActionHandler myOriginalTypedActionHandler;
+  private Map<Project, MessageBusConnection> connections = new HashMap<>();
 
   private EventFacade() {
   }
@@ -61,13 +66,10 @@ public class EventFacade {
     return ourInstance;
   }
 
-  public void addProjectManagerListener(@NotNull ProjectManagerListener listener) {
-    ProjectManager.getInstance().addProjectManagerListener(listener);
-  }
-
-  public void setupTypedActionHandler(@NotNull TypedActionHandler handler) {
+  public void setupTypedActionHandler(@NotNull VimTypedActionHandler handler) {
     final TypedAction typedAction = getTypedAction();
     myOriginalTypedActionHandler = typedAction.getRawHandler();
+
     typedAction.setupRawHandler(handler);
   }
 
@@ -91,19 +93,29 @@ public class EventFacade {
     action.unregisterCustomShortcutSet(component);
   }
 
-  public void addFileEditorManagerListener(@NotNull Project project, @NotNull FileEditorManagerListener listener) {
-    final MessageBusConnection connection = project.getMessageBus().connect();
+  public void connectFileEditorManagerListener(@NotNull Project project, @NotNull FileEditorManagerListener listener) {
+    final MessageBusConnection connection = getConnection(project);
     connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, listener);
   }
 
-  public void addAnActionListener(@NotNull Project project, @NotNull AnActionListener listener) {
-    final MessageBusConnection connection = project.getMessageBus().connect();
+  public void connectAnActionListener(@NotNull Project project, @NotNull AnActionListener listener) {
+    final MessageBusConnection connection = getConnection(project);
     connection.subscribe(AnActionListener.TOPIC, listener);
   }
 
-  public void addTemplateStartedListener(@NotNull Project project, @NotNull TemplateManagerListener listener) {
-    final MessageBusConnection connection = project.getMessageBus().connect();
+  public void connectTemplateStartedListener(@NotNull Project project, @NotNull TemplateManagerListener listener) {
+    final MessageBusConnection connection = getConnection(project);
     connection.subscribe(TemplateManager.TEMPLATE_STARTED_TOPIC, listener);
+  }
+
+  public void connectBookmarkListener(@NotNull Project project, @NotNull BookmarksListener bookmarksListener) {
+    final MessageBusConnection connection = getConnection(project);
+    connection.subscribe(BookmarksListener.TOPIC, bookmarksListener);
+  }
+
+  public void connectFindModelListener(@NotNull Project project, @NotNull FindModelListener findModelListener) {
+    final MessageBusConnection connection = getConnection(project);
+    connection.subscribe(FindManager.FIND_MODEL_TOPIC, findModelListener);
   }
 
   public void addDocumentListener(@NotNull Document document, @NotNull DocumentListener listener) {
@@ -116,6 +128,12 @@ public class EventFacade {
 
   public void addEditorFactoryListener(@NotNull EditorFactoryListener listener, @NotNull Disposable parentDisposable) {
     EditorFactory.getInstance().addEditorFactoryListener(listener, parentDisposable);
+  }
+
+  public void removeEditorFactoryListener(@NotNull EditorFactoryListener listener) {
+    // Listener is removed not only if application is disposed
+    //noinspection deprecation
+    EditorFactory.getInstance().removeEditorFactoryListener(listener);
   }
 
   public void addEditorMouseListener(@NotNull Editor editor, @NotNull EditorMouseListener listener) {
@@ -152,6 +170,27 @@ public class EventFacade {
 
   public void registerLookupListener(@NotNull Project project, @NotNull PropertyChangeListener propertyChangeListener) {
     LookupManager.getInstance(project).addPropertyChangeListener(propertyChangeListener, project);
+  }
+
+  public void removeLookupListener(@NotNull Project project, @NotNull PropertyChangeListener propertyChangeListener) {
+    LookupManager.getInstance(project).removePropertyChangeListener(propertyChangeListener);
+  }
+
+  public void disableBusConnection() {
+    connections.values().forEach(MessageBusConnection::disconnect);
+    connections.clear();
+  }
+
+  private MessageBusConnection getConnection(Project project) {
+    if (!connections.containsKey(project)) {
+      final MessageBusConnection connection = project.getMessageBus().connect();
+      connections.put(project, connection);
+      Disposer.register(project, () -> {
+        connection.disconnect();
+        connections.remove(project);
+      });
+    }
+    return connections.get(project);
   }
 
   @NotNull

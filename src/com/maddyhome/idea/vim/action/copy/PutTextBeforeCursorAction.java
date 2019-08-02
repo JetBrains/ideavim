@@ -20,19 +20,45 @@ package com.maddyhome.idea.vim.action.copy;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.group.copy.PutData;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
 
-public class PutTextBeforeCursorAction extends EditorAction {
-  public PutTextBeforeCursorAction() {
-    super(new ChangeEditorActionHandler() {
+public class PutTextBeforeCursorAction extends VimCommandAction {
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
+  }
+
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("P");
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.OTHER_SELF_SYNCHRONIZED;
+  }
+
+  @NotNull
+  @Override
+  protected VimActionHandler makeActionHandler() {
+    return new ChangeEditorActionHandler.SingleExecution() {
       @Override
       public boolean execute(@NotNull Editor editor,
                              @NotNull DataContext context,
@@ -42,10 +68,11 @@ public class PutTextBeforeCursorAction extends EditorAction {
         final Register lastRegister = VimPlugin.getRegister().getLastRegister();
 
         final PutData.TextData textData =
-          lastRegister != null ? new PutData.TextData(lastRegister.getText(), lastRegister.getType(), lastRegister.getTransferableData()) : null;
+          lastRegister != null ? new PutData.TextData(lastRegister.getText(), lastRegister.getType(),
+                                                      lastRegister.getTransferableData()) : null;
         final PutData putData = new PutData(textData, null, count, true, true, false, -1);
         return VimPlugin.getPut().putText(editor, context, putData);
       }
-    });
+    };
   }
 }

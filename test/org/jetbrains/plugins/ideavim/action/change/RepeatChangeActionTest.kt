@@ -20,13 +20,13 @@ package org.jetbrains.plugins.ideavim.action.change
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class RepeatChangeActionTest : VimTestCase() {
-    fun `test simple repeat`() {
-        val keys = parseKeys("v2erXj^", ".")
-        val before = """
+  fun `test simple repeat`() {
+    val keys = parseKeys("v2erXj^", ".")
+    val before = """
                 A Discovery
 
                 ${c}I found it in a legendary land
@@ -34,7 +34,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-        val after = """
+    val after = """
                 A Discovery
 
                 XXXXXXXXXX in a legendary land
@@ -42,12 +42,12 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test simple repeat with dollar motion`() {
-        val keys = parseKeys("v\$rXj^", ".")
-        val before = """
+  fun `test simple repeat with dollar motion`() {
+    val keys = parseKeys("v\$rXj^", ".")
+    val before = """
                 A Discovery
 
                 ${c}I found it in a legendary land
@@ -55,7 +55,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-        val after = """
+    val after = """
                 A Discovery
 
                 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -63,12 +63,12 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test repeat to line end`() {
-        val keys = parseKeys("v2erXj\$b", ".")
-        val before = """
+  fun `test repeat to line end`() {
+    val keys = parseKeys("v2erXj\$b", ".")
+    val before = """
                 A Discovery
 
                 ${c}I found it in a legendary land
@@ -76,7 +76,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-        val after = """
+    val after = """
                 A Discovery
 
                 XXXXXXXXXX in a legendary land
@@ -84,12 +84,12 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test repeat multiline`() {
-        val keys = parseKeys("vjlrXj", ".")
-        val before = """
+  fun `test repeat multiline`() {
+    val keys = parseKeys("vjlrXj", ".")
+    val before = """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -97,7 +97,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-        val after = """
+    val after = """
                 A Discovery
 
                 I XXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -105,12 +105,12 @@ class RepeatChangeActionTest : VimTestCase() {
                 whe${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 XXXX by the torrent of a mountain pass.
                     """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test count doesn't affect repeat`() {
-        val keys = parseKeys("v2erXj^", "10.")
-        val before = """
+  fun `test count doesn't affect repeat`() {
+    val keys = parseKeys("v2erXj^", "10.")
+    val before = """
                 A Discovery
 
                 ${c}I found it in a legendary land
@@ -118,7 +118,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-        val after = """
+    val after = """
                 A Discovery
 
                 XXXXXXXXXX in a legendary land
@@ -126,12 +126,12 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test multicaret`() {
-        val keys = parseKeys("v2erXj^", ".")
-        val before = """
+  fun `test multicaret`() {
+    val keys = parseKeys("v2erXj^", ".")
+    val before = """
                 A Discovery
 
                 ${c}I found it in a legendary land
@@ -139,7 +139,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where ${c}it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-        val after = """
+    val after = """
                 A Discovery
 
                 XXXXXXXXXX in a legendary land
@@ -147,12 +147,12 @@ class RepeatChangeActionTest : VimTestCase() {
                 where XXXXXX settled on some sodden sand
                 ${c}XXXXXXy the torrent of a mountain pass.
                     """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test line motion`() {
-        val keys = parseKeys("VrXj^", ".")
-        val before = """
+  fun `test line motion`() {
+    val keys = parseKeys("VrXj^", ".")
+    val before = """
                 A Discovery
 
                 ${c}I found it in a legendary land
@@ -160,7 +160,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-        val after = """
+    val after = """
                 A Discovery
 
                 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -168,31 +168,31 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test line motion to end`() {
-        val keys = parseKeys("VjrX2j^", ".")
-        val before = """
+  fun `test line motion to end`() {
+    val keys = parseKeys("VjrX2j^", ".")
+    val before = """
                 A Discovery
 
                 ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.""".trimIndent()
-        val after = """
+    val after = """
                 A Discovery
 
                 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 where it was settled on some sodden sand
                 ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX""".trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test line motion shift`() {
-        val keys = parseKeys("V3j<", ".")
-        val before = """
+  fun `test line motion shift`() {
+    val keys = parseKeys("V3j<", ".")
+    val before = """
                 |A Discovery
                 |
                 |        ${c}I found it in a legendary land
@@ -200,7 +200,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 |        where it was settled on some sodden sand
                 |        hard by the torrent of a mountain pass.
                 """.trimMargin()
-        val after = """
+    val after = """
                 |A Discovery
                 |
                 |${c}I found it in a legendary land
@@ -208,12 +208,12 @@ class RepeatChangeActionTest : VimTestCase() {
                 |where it was settled on some sodden sand
                 |hard by the torrent of a mountain pass.
                 """.trimMargin()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test block motion`() {
-        val keys = parseKeys("<C-V>jerXll", ".")
-        val before = """
+  fun `test block motion`() {
+    val keys = parseKeys("<C-V>jerXll", ".")
+    val before = """
                 A Discovery
 
                 ${c}I found it in a legendary land
@@ -221,7 +221,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent()
-        val after = """
+    val after = """
                 A Discovery
 
                 XXXound it in a legendary land
@@ -229,10 +229,10 @@ class RepeatChangeActionTest : VimTestCase() {
                 wherXXXt was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    @VimBehaviourDiffers("""
+  @VimBehaviorDiffers("""
                 A Discovery
 
                 XXXXXnd it in a legendary land
@@ -241,9 +241,9 @@ class RepeatChangeActionTest : VimTestCase() {
                 hard ${c}XXXXXe torrent of a mountain pass.
 
     """)
-    fun `test block motion to end`() {
-        val keys = parseKeys("<C-V>jjerXjl", ".")
-        val before = """
+  fun `test block motion to end`() {
+    val keys = parseKeys("<C-V>jjerXjl", ".")
+    val before = """
                 A Discovery
 
                 ${c}I found it in a legendary land
@@ -252,7 +252,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
 
                 """.trimIndent()
-        val after = """
+    val after = """
                 A Discovery
 
                 XXXXXnd it in a legendary land
@@ -261,12 +261,12 @@ class RepeatChangeActionTest : VimTestCase() {
                 XXXXX${c}Xy the torrent of a mountain pass.
 
                 """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test block with dollar motion`() {
-        val keys = parseKeys("<C-V>j\$rXj^", ".")
-        val before = """
+  fun `test block with dollar motion`() {
+    val keys = parseKeys("<C-V>j\$rXj^", ".")
+    val before = """
                 A Discovery
 
                 ${c}I found it in a legendary land[additional characters]
@@ -274,7 +274,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand[additional characters]
                 hard by the torrent of a mountain pass.
                 """.trimIndent()
-        val after = """
+    val after = """
                 A Discovery
 
                 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -282,6 +282,6 @@ class RepeatChangeActionTest : VimTestCase() {
                 ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 }

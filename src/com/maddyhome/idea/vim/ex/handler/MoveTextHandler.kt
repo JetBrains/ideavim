@@ -25,21 +25,19 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.*
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
 import com.maddyhome.idea.vim.group.copy.PutData
-import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import java.util.*
+import kotlin.math.min
 
-class MoveTextHandler : CommandHandler(
-  commands("m[ove]"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, WRITABLE)
-) {
+class MoveTextHandler : CommandHandler.SingleExecution() {
+  override val names = commands("m[ove]")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
   @Throws(ExException::class)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-    val carets = EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET)
+    val carets = EditorHelper.getOrderedCaretsList(editor)
     val caretModel = editor.caretModel
     val caretCount = caretModel.caretCount
 
@@ -53,7 +51,7 @@ class MoveTextHandler : CommandHandler(
       val range = cmd.getTextRange(editor, caret, context, false)
       val lineRange = cmd.getLineRange(editor, caret, context)
 
-      line = Math.min(line, normalizeLine(editor, caret, context, command, lineRange))
+      line = min(line, normalizeLine(editor, caret, context, command, lineRange))
       texts.add(EditorHelper.getText(editor, range.startOffset, range.endOffset))
 
       if (lastRange == null || lastRange.startOffset != range.startOffset && lastRange.endOffset != range.endOffset) {
@@ -76,7 +74,7 @@ class MoveTextHandler : CommandHandler(
     return true
   }
 
-  @Throws(InvalidRangeException::class)
+  @Throws
   private fun normalizeLine(editor: Editor, caret: Caret, context: DataContext,
                             command: ExCommand, lineRange: LineRange): Int {
     var line = command.ranges.getFirstLine(editor, caret, context)

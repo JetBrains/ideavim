@@ -22,16 +22,9 @@ import com.intellij.openapi.editor.*
 import com.intellij.openapi.editor.colors.EditorColors
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.inSelectMode
-import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.helper.mode
-import com.maddyhome.idea.vim.helper.sort
-import com.maddyhome.idea.vim.helper.subMode
-import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.helper.*
 
 /**
  * @author Alex Plate
@@ -135,7 +128,8 @@ val Caret.vimLeadSelectionOffset: Int
  *
  * Secondary carets became invisible colour in visual block mode
  */
-fun updateCaretColours(editor: Editor) {
+fun updateCaretState(editor: Editor) {
+  // Update colour
   if (editor.inBlockSubMode) {
     editor.caretModel.allCarets.forEach {
       if (it != editor.caretModel.primaryCaret) {
@@ -148,6 +142,13 @@ fun updateCaretColours(editor: Editor) {
     }
   } else {
     editor.caretModel.allCarets.forEach { it.visualAttributes = CaretVisualAttributes.DEFAULT }
+  }
+
+  // Update shape
+  when (editor.mode) {
+    CommandState.Mode.COMMAND, CommandState.Mode.VISUAL, CommandState.Mode.REPLACE -> ChangeGroup.resetCaret(editor, false)
+    CommandState.Mode.SELECT, CommandState.Mode.INSERT -> ChangeGroup.resetCaret(editor, true)
+    CommandState.Mode.REPEAT, CommandState.Mode.EX_ENTRY -> Unit
   }
 }
 
@@ -187,8 +188,17 @@ fun toNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.M
     else -> sort(start, end)
   }
 
-fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor) {
-  if (!editor.inVisualMode) return
+fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: CommandState.Mode) {
+  if (predictedMode != CommandState.Mode.VISUAL) {
+    if (!predictedMode.isEndAllowed) {
+      editor.caretModel.allCarets.forEach { caret ->
+        val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+        val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
+        if (caret.offset == lineEnd && lineEnd != lineStart) caret.moveToOffset(caret.offset - 1)
+      }
+    }
+    return
+  }
   editor.caretModel.allCarets.forEach { caret ->
     if (caret.hasSelection() && caret.selectionEnd == caret.offset) {
       if (caret.selectionEnd <= 0) return@forEach
@@ -252,5 +262,5 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
     }
     else -> Unit
   }
-  updateCaretColours(editor)
+  updateCaretState(editor)
 }
