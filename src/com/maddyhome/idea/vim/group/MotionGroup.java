@@ -1301,9 +1301,7 @@ public class MotionGroup {
   }
 
   public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
-    if (ExEntryPanel.getInstance().isActive()) {
-      ExEntryPanel.getInstance().deactivate(false);
-    }
+    ExEntryPanel.deactivateAll();
     final FileEditor fileEditor = event.getOldEditor();
     if (fileEditor instanceof TextEditor) {
       final Editor editor = ((TextEditor)fileEditor).getEditor();

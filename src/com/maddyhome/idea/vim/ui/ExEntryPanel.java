@@ -52,6 +52,7 @@ import java.awt.event.ComponentListener;
  * This is used to enter ex commands such as searches and "colon" commands
  */
 public class ExEntryPanel extends JPanel implements LafManagerListener {
+  private static ExEntryPanel instance;
   private static ExEntryPanel instanceWithoutShortcuts;
 
   private ExEntryPanel(boolean enableShortcuts) {
@@ -72,6 +73,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     add(entry);
 
     if (enableShortcuts) {
+      // This does not need to be unregistered, it's registered as a custom UI property on this
       new ExShortcutKeyAction(this).registerCustomShortcutSet();
     }
 
@@ -86,6 +88,25 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     }
 
     return instance;
+  }
+
+  public static ExEntryPanel getInstanceWithoutShortcuts() {
+    if (instanceWithoutShortcuts == null) {
+      instanceWithoutShortcuts = new ExEntryPanel(false);
+    }
+
+    return instanceWithoutShortcuts;
+  }
+
+  public static void fullReset() {
+    if (instance != null) {
+      instance.reset();
+      instance = null;
+    }
+    if (instanceWithoutShortcuts != null) {
+      instanceWithoutShortcuts.reset();
+      instanceWithoutShortcuts = null;
+    }
   }
 
   /**
@@ -128,6 +149,68 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       entry.requestFocusInWindow();
     }
     active = true;
+  }
+
+  public static void deactivateAll() {
+    if (instance != null && instance.active) {
+      instance.deactivate(false);
+    }
+    if (instanceWithoutShortcuts != null && instanceWithoutShortcuts.active) {
+      instanceWithoutShortcuts.deactivate(false);
+    }
+  }
+
+  public void deactivate(boolean refocusOwningEditor) {
+    deactivate(refocusOwningEditor, false);
+  }
+
+  /**
+   * Turns off the ex entry field and optionally puts the focus back to the original component
+   */
+  public void deactivate(boolean refocusOwningEditor, boolean scrollToOldPosition) {
+    logger.info("Deactivate ex entry panel");
+    if (!active) return;
+    active = false;
+
+    try {
+      // incsearch won't change in the lifetime of this activation
+      if (isIncSearchEnabled()) {
+        entry.getDocument().removeDocumentListener(incSearchDocumentListener);
+        final Editor editor = entry.getEditor();
+        if (!editor.isDisposed() && scrollToOldPosition) {
+          editor.getScrollingModel().scrollVertically(verticalOffset);
+          editor.getScrollingModel().scrollHorizontally(horizontalOffset);
+        }
+        // This is somewhat inefficient. We've done the search, highlighted everything and now (if we hit <Enter>),
+        // we're removing all the highlights to invoke the search action, to search and highlight everything again. On the plus
+        // side, it clears up the current item highlight
+        VimPlugin.getSearch().resetIncsearchHighlights();
+      }
+
+      entry.deactivate();
+    }
+    finally {
+
+      // Make sure we hide the UI, especially if something goes wrong
+      if (!ApplicationManager.getApplication().isUnitTestMode()) {
+        if (refocusOwningEditor && parent != null) {
+          UiHelper.requestFocus(parent);
+        }
+
+        oldGlass.removeComponentListener(resizePanelListener);
+        oldGlass.setVisible(false);
+        oldGlass.remove(this);
+        oldGlass.setOpaque(wasOpaque);
+        oldGlass.setLayout(oldLayout);
+      }
+
+      parent = null;
+    }
+  }
+
+  private void reset() {
+    deactivate(false);
+    LafManager.getInstance().removeLafManagerListener(this);
   }
 
   @NotNull private final DocumentListener incSearchDocumentListener = new DocumentAdapter() {
@@ -333,56 +416,5 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     }
   };
 
-  public void deactivate(boolean refocusOwningEditor) {
-    deactivate(refocusOwningEditor, false);
-  }
-  /**
-   * Turns off the ex entry field and optionally puts the focus back to the original component
-   */
-  public void deactivate(boolean refocusOwningEditor, boolean scrollToOldPosition) {
-    logger.info("Deactivate ex entry panel");
-    if (!active) return;
-    active = false;
-
-    // incsearch won't change in the lifetime of this activation
-    if (isIncSearchEnabled()) {
-      entry.getDocument().removeDocumentListener(incSearchDocumentListener);
-      final Editor editor = entry.getEditor();
-      if (!editor.isDisposed() && scrollToOldPosition) {
-        editor.getScrollingModel().scrollVertically(verticalOffset);
-        editor.getScrollingModel().scrollHorizontally(horizontalOffset);
-      }
-      // This is somewhat inefficient. We've done the search, highlighted everything and now (if we hit <Enter>), we're
-      // removing all the highlights to invoke the search action, to search and highlight everything again. On the plus
-      // side, it clears up the current item highlight
-      VimPlugin.getSearch().resetIncsearchHighlights();
-    }
-
-    entry.deactivate();
-
-    if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      if (refocusOwningEditor && parent != null) {
-        UiHelper.requestFocus(parent);
-      }
-
-      oldGlass.removeComponentListener(resizePanelListener);
-      oldGlass.setVisible(false);
-      oldGlass.remove(this);
-      oldGlass.setOpaque(wasOpaque);
-      oldGlass.setLayout(oldLayout);
-    }
-
-    parent = null;
-  }
-
-  private static ExEntryPanel instance;
-
-  public static ExEntryPanel getInstanceWithoutShortcuts() {
-    if (instanceWithoutShortcuts == null) {
-      instanceWithoutShortcuts = new ExEntryPanel(false);
-    }
-
-    return instanceWithoutShortcuts;
-  }
   private static final Logger logger = Logger.getInstance(ExEntryPanel.class.getName());
 }

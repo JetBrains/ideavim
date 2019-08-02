@@ -102,7 +102,7 @@ public class ExTextField extends JTextField {
 
     setBorder(null);
 
-    // Do not override getActions() method, because it is has side effect: propogates these actions to defaults.
+    // Do not override getActions() method, because it is has side effect: propagates these actions to defaults.
     final Action[] actions = ExEditorKit.getInstance().getActions();
     final ActionMap actionMap = getActionMap();
     for (Action a : actions) {
@@ -369,7 +369,6 @@ public class ExTextField extends JTextField {
   }
 
   private void resetCaret() {
-    if (!(getCaret() instanceof CommandLineCaret)) return;
     if (getCaretPosition() == super.getText().length() || currentActionPromptCharacterOffset == super.getText().length() - 1) {
       setNormalModeCaret();
     }

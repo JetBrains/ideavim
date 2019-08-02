@@ -54,6 +54,7 @@ import com.maddyhome.idea.vim.helper.DocumentManager;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -464,6 +465,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     getEditor().turnOff();
     getSearch().turnOff();
     VimListenerManager.INSTANCE.turnOff();
+    ExEntryPanel.fullReset();
   }
 
   private void updateState() {
