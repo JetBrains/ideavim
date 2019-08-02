@@ -367,6 +367,7 @@ public class ExTextField extends JTextField {
   }
 
   private void resetCaret() {
+    if (!(getCaret() instanceof CommandLineCaret)) return;
     if (getCaretPosition() == super.getText().length() || currentActionPromptCharacterOffset == super.getText().length() - 1) {
       setNormalModeCaret();
     }
