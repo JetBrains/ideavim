@@ -154,7 +154,7 @@ public class FileGroup {
       final EditorWindow window = fileEditorManager.getCurrentWindow();
       final VirtualFile virtualFile = EditorHelper.getVirtualFile(editor);
 
-      if (virtualFile != null) {
+      if (virtualFile != null && window != null) {
         window.closeFile(virtualFile);
       }
     }
