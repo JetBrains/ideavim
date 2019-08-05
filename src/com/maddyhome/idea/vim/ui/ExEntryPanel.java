@@ -24,14 +24,13 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.ScrollType;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.LineRange;
-import com.maddyhome.idea.vim.ex.Ranges;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.regexp.CharPointer;
@@ -178,12 +177,12 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
         entry.getDocument().removeDocumentListener(incSearchDocumentListener);
         final Editor editor = entry.getEditor();
         if (!editor.isDisposed() && scrollToOldPosition) {
-          editor.getScrollingModel().scrollVertically(verticalOffset);
-          editor.getScrollingModel().scrollHorizontally(horizontalOffset);
+          editor.getScrollingModel().scroll(horizontalOffset, verticalOffset);
         }
+
         // This is somewhat inefficient. We've done the search, highlighted everything and now (if we hit <Enter>),
-        // we're removing all the highlights to invoke the search action, to search and highlight everything again. On the plus
-        // side, it clears up the current item highlight
+        // we're removing all the highlights to invoke the search action, to search and highlight everything again. On
+        // the plus side, it clears up the current item highlight
         VimPlugin.getSearch().resetIncsearchHighlights();
       }
 
@@ -238,8 +237,6 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
           VimPlugin.getSearch().resetIncsearchHighlights();
           return;
         }
-        final Ranges ranges = command.getRanges();
-        ranges.setDefaultLine(CharacterPosition.Companion.fromOffset(editor, caretOffset).line);
         searchRange = command.getLineRange(editor);
       }
 
@@ -256,7 +253,13 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
         }
 
         VimPlugin.getEditor().closeEditorSearchSession(editor);
-        VimPlugin.getSearch().updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
+        final int matchOffset = VimPlugin.getSearch().updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
+        if (matchOffset != -1) {
+          editor.getScrollingModel().scrollTo(editor.offsetToLogicalPosition(matchOffset), ScrollType.CENTER);
+        }
+        else {
+          editor.getScrollingModel().scroll(horizontalOffset, verticalOffset);
+        }
       }
     }
 
