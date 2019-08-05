@@ -49,7 +49,7 @@ private const val DELETABLE_MARKS = DELETABLE_FILE_MARKS + DELETABLE_GLOBAL_MARK
  */
 class DeleteMarksHandler : CommandHandler.SingleExecution() {
   override val names = commands("delm[arks]")
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED)
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val processedArg = cmd.argument
