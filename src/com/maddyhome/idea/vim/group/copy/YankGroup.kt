@@ -46,6 +46,8 @@ class YankGroup {
     val motion = argument.motion ?: return false
 
     val caretModel = editor.caretModel
+    if (caretModel.caretCount <= 0) return false
+
     val ranges = ArrayList<Pair<Int, Int>>(caretModel.caretCount)
     val startOffsets = HashMap<Caret, Int>(caretModel.caretCount)
     for (caret in caretModel.allCarets) {
