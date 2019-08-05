@@ -1111,7 +1111,8 @@ public class SearchHelper {
     int stop = EditorHelper.getLineEndOffset(editor, caret.getLogicalPosition().line, true);
 
     int pos = caret.getOffset();
-    if (chars.length() <= pos) return null;
+    // Technically the first condition is covered by the second one, but let it be
+    if (chars.length() == 0 || chars.length() <= pos) return null;
 
     int start = pos;
     CharacterHelper.CharacterType[] types = new CharacterHelper.CharacterType[]{CharacterHelper.CharacterType.KEYWORD,
