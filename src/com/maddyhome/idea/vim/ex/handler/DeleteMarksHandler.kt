@@ -25,10 +25,8 @@ import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
-import kotlin.math.max
 
 
 private val VIML_COMMENT = Regex("(?<!\\\\)\".*")
@@ -46,6 +44,9 @@ private const val DELETABLE_FILE_MARKS = ".^[]\"$ALPHA_LOWER"
 private const val DELETABLE_GLOBAL_MARKS = "$NUMERICAL$ALPHA_UPPER"
 private const val DELETABLE_MARKS = DELETABLE_FILE_MARKS + DELETABLE_GLOBAL_MARKS
 
+/**
+ * @author Jørgen Granseth
+ */
 class DeleteMarksHandler : CommandHandler.SingleExecution() {
   override val names = commands("delm[arks]")
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED)
@@ -60,27 +61,26 @@ class DeleteMarksHandler : CommandHandler.SingleExecution() {
       .replaceRanges(ALPHA_UPPER)
       .replaceRanges(NUMERICAL)
 
-    processedArg.indexOfFirst { !(" $DELETABLE_MARKS".contains(it)) }
-      .let { index ->
-        if (index != -1) {
-          val invalidIndex = max(0, if (processedArg[index] == '-') index - 1 else index)
+    processedArg.indexOfFirst { it !in " $DELETABLE_MARKS" }.let { index ->
+      if (index != -1) {
+        val invalidIndex = if (processedArg[index] == '-') (index - 1).coerceAtLeast(0) else index
 
-          VimPlugin.showMessage(MessageHelper.message(Msg.E475, processedArg.substring(invalidIndex)))
-          return false
-        }
+        VimPlugin.showMessage(MessageHelper.message(Msg.E475, processedArg.substring(invalidIndex)))
+        return false
       }
+    }
 
-    processedArg
-      .forEach { character -> deleteMark(VimPlugin.getMark(), editor, character) }
+    processedArg.forEach { character -> deleteMark(editor, character) }
 
     return true
   }
 }
 
-private fun deleteMark(marks: MarkGroup, editor: Editor, character: Char) {
+private fun deleteMark(editor: Editor, character: Char) {
   if (character != ' ') {
-    marks.getMark(editor, character)
-      ?.let { mark -> marks.removeMark(character, mark, editor) }
+    val markGroup = VimPlugin.getMark()
+    val mark = markGroup.getMark(editor, character) ?: return
+    markGroup.removeMark(character, mark, editor)
   }
 }
 
