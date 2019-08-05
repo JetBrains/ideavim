@@ -179,7 +179,7 @@ class VisualMotionGroup {
       }
     } else {
       val templateActive = editor.isTemplateActive()
-      if (templateActive && editor.mode == CommandState.Mode.COMMAND) {
+      if (templateActive && editor.mode == CommandState.Mode.COMMAND || editor.mode == CommandState.Mode.INSERT) {
         return CommandState.Mode.INSERT
       }
       return CommandState.Mode.COMMAND
