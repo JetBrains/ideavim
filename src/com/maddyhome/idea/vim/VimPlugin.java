@@ -343,6 +343,8 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
     ApplicationManager.getApplication().invokeLater(this::updateState);
 
+    getEditor().turnOn();
+    getSearch().turnOn();
     VimListenerManager.INSTANCE.turnOn();
 
     // Register vim actions in command mode
