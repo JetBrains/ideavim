@@ -29,7 +29,9 @@ _Available since 0.52.1 EAP:_
 
 _Not released yet:_
 
-...
+* [VIM-1736](https://youtrack.jetbrains.com/issue/VIM-1736) Fix `` for ex panel
+* [VIM-1739](https://youtrack.jetbrains.com/issue/VIM-1739) Fix full-width characters for ex panel
+
 
 
 0.52, 2019-07-23
