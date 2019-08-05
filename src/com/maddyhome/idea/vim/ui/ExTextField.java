@@ -48,7 +48,9 @@ import static java.lang.Math.min;
 public class ExTextField extends JTextField {
 
   ExTextField() {
-    CommandLineCaret caret = new CommandLineCaret();
+    // We need to store this in a field, because we can't trust getCaret(), as it will return an instance of
+    // ComposedTextCaret when working with dead keys or input methods
+    caret = new CommandLineCaret();
     caret.setBlinkRate(getCaret().getBlinkRate());
     setCaret(caret);
     setNormalModeCaret();
@@ -100,7 +102,7 @@ public class ExTextField extends JTextField {
 
     setBorder(null);
 
-    // Do not override getActions() method, because it is has side effect: propogates these actions to defaults.
+    // Do not override getActions() method, because it is has side effect: propagates these actions to defaults.
     final Action[] actions = ExEditorKit.getInstance().getActions();
     final ActionMap actionMap = getActionMap();
     for (Action a : actions) {
@@ -367,7 +369,6 @@ public class ExTextField extends JTextField {
   }
 
   private void resetCaret() {
-    if (!(getCaret() instanceof CommandLineCaret)) return;
     if (getCaretPosition() == super.getText().length() || currentActionPromptCharacterOffset == super.getText().length() - 1) {
       setNormalModeCaret();
     }
@@ -389,17 +390,14 @@ public class ExTextField extends JTextField {
   // see :help 'guicursor'
   // Note that we can't easily support guicursor because we don't have arbitrary control over the IntelliJ editor caret
   private void setNormalModeCaret() {
-    CommandLineCaret caret = (CommandLineCaret) getCaret();
     caret.setBlockMode();
   }
 
   private void setInsertModeCaret() {
-    CommandLineCaret caret = (CommandLineCaret) getCaret();
     caret.setMode(CommandLineCaret.CaretMode.VER, 25);
   }
 
   private void setReplaceModeCaret() {
-    CommandLineCaret caret = (CommandLineCaret) getCaret();
     caret.setMode(CommandLineCaret.CaretMode.HOR, 20);
   }
 
@@ -548,6 +546,7 @@ public class ExTextField extends JTextField {
 
   private Editor editor;
   private DataContext context;
+  private CommandLineCaret caret;
   private String lastEntry;
   private String actualText;
   private List<HistoryGroup.HistoryEntry> history;

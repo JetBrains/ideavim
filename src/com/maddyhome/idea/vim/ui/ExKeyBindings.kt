@@ -27,14 +27,13 @@ object ExKeyBindings {
   // TODO - add the following keys:
   // Ctrl-\ Ctrl-N - abort
 
-  // Note that escape will cancel a pending insert digraph/register before cancelling
-  // Cancel immediately cancels entry
-  // These appear to be non-Vim shortcuts
   val bindings: Array<KeyBinding> by lazy {
     arrayOf(
+      // Escape will cancel a pending insert digraph/register before cancelling
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), ExEditorKit.EscapeChar),
-
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_OPEN_BRACKET, KeyEvent.CTRL_MASK), ExEditorKit.EscapeChar),
+
+      // Cancel entry, ignoring any pending actions such as digraph/registry entry
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK), ExEditorKit.CancelEntry),
 
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), ExEditorKit.CompleteEntry),
@@ -80,6 +79,8 @@ object ExKeyBindings {
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK), ExEditorKit.StartDigraph),
 
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK), ExEditorKit.InsertRegister),
+
+      // These appear to be non-Vim shortcuts
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_MASK), ExEditorKit.pasteAction),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, KeyEvent.SHIFT_MASK), ExEditorKit.pasteAction)
     )
