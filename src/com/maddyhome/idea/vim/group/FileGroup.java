@@ -220,7 +220,7 @@ public class FileGroup {
     if (project == null) return;
     FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
     VirtualFile vf = lastSelections.get(fem);
-    if (vf != null) {
+    if (vf != null && vf.isValid()) {
       fem.openFile(vf, true);
     }
     else {
