@@ -25,6 +25,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
@@ -100,6 +101,10 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       // Should we use HelperKt.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
       try {
         KeyHandler.getInstance().handleKey(editor, keyStroke, new EditorDataContext(editor));
+      }
+      catch (ProcessCanceledException ignored) {
+        // Control-flow exceptions (like ProcessCanceledException) should never be logged
+        // See {@link com.intellij.openapi.diagnostic.Logger.checkException}
       }
       catch (Throwable throwable) {
         ourLogger.error(throwable);
