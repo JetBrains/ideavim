@@ -137,6 +137,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
 
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       JRootPane root = SwingUtilities.getRootPane(parent);
+      if (root == null) return;
       oldGlass = (JComponent)root.getGlassPane();
       oldLayout = oldGlass.getLayout();
       wasOpaque = oldGlass.isOpaque();
