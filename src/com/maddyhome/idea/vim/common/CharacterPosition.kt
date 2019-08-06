@@ -27,12 +27,11 @@ class CharacterPosition(line: Int, col: Int) : LogicalPosition(line, col) {
   fun toOffset(editor: Editor) = getLineStartOffset(editor, line) + column
 
   companion object {
-    fun fromOffset(editor: Editor, offset: Int): CharacterPosition =
-      editor.offsetToLogicalPosition(offset).let { CharacterPosition(it.line, it.column) }
-
-    @JvmStatic
-    fun charOffsetOnLineToColumn(editor: Editor, line: Int, offset: Int): Int {
-      return editor.offsetToLogicalPosition(getLineStartOffset(editor, line) + offset).column
+    fun fromOffset(editor: Editor, offset: Int): CharacterPosition {
+      // logical position "expands" tabs
+      val logicalPosition = editor.offsetToLogicalPosition(offset)
+      val lineStartOffset = getLineStartOffset(editor, logicalPosition.line)
+      return CharacterPosition(logicalPosition.line, offset - lineStartOffset)
     }
   }
 }

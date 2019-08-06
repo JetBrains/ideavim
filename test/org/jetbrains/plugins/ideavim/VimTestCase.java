@@ -199,6 +199,9 @@ public abstract class VimTestCase extends UsefulTestCase {
 
   public void assertOffset(int... expectedOffsets) {
     final List<Caret> carets = myFixture.getEditor().getCaretModel().getAllCarets();
+    if (expectedOffsets.length == 2 && carets.size() == 1) {
+      assertEquals("Wrong amount of carets. Did you mean to use assertPosition?", expectedOffsets.length, carets.size());
+    }
     assertEquals("Wrong amount of carets", expectedOffsets.length, carets.size());
     for (int i = 0; i < expectedOffsets.length; i++) {
       assertEquals(expectedOffsets[i], carets.get(i).getOffset());

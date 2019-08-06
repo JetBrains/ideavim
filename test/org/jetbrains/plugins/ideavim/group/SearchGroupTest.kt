@@ -160,6 +160,41 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(8)
   }
 
+  fun `test reverse search e+2 motion offset finds next match when starting on matching offset`() {
+    typeTextInFile(parseKeys("?", "two?e+2", "<Enter>"),
+      "one two three one two ${c}three")
+    assertOffset(8)
+  }
+
+  fun `test search e+10 motion offset at end of file`() {
+    typeTextInFile(parseKeys("/", "in/e+10", "<Enter>"),
+      """I found it in a legendary land
+        |${c}all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin())
+    assertPosition(3, 38)
+  }
+
+  fun `test search e+10 motion offset wraps at end of file`() {
+    typeTextInFile(parseKeys("/", "in/e+10", "<Enter>", "n"),
+      """I found it in a legendary land
+        |${c}all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin())
+    // "in" at (0, 11) plus 10 offset from end
+    assertOffset(22)
+  }
+
+  fun `test search e+10 motion offset wraps at exactly end of file`() {
+    typeTextInFile(parseKeys("/", "ass./e+10", "<Enter>", "n"),
+      """I found it in a legendary land
+        |all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |${c}hard by the torrent of a mountain pass.""".trimMargin())
+    // "ass," at (1, 36) plus 10 offset from end
+    assertPosition(2, 8)
+  }
+
   // |/pattern/s|
   fun `test search s motion offset`() {
     typeTextInFile(parseKeys("/", "two/s", "<Enter>"),
@@ -174,11 +209,42 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(2)
   }
 
+  fun `test search s-2 motion offset finds next match when starting on matching offset`() {
+    typeTextInFile(parseKeys("/", "two/s-2", "<Enter>"),
+      "on${c}e two three one two three")
+    assertOffset(16)
+  }
+
+  fun `test reverse search s-20 motion offset at beginning of file`() {
+    typeTextInFile(parseKeys("?", "it?s-20", "<Enter>"),
+      """I found it in a legendary land
+        |${c}all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin())
+    assertOffset(0)
+  }
+
+  fun `test reverse search s-20 motion offset wraps at beginning of file`() {
+    typeTextInFile(parseKeys("?", "it?s-20", "<Enter>", "N"),
+      """I found it in a legendary land
+        |${c}all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin())
+    // "it" at (2,5) minus 20 characters
+    assertPosition(1, 27)
+  }
+
   // |/pattern/s|
   fun `test search s+1 motion offset`() {
     typeTextInFile(parseKeys("/", "two/s+1", "<Enter>"),
       "${c}one two three")
     assertOffset(5)
+  }
+
+  fun `test reverse search s+2 motion offset finds next match when starting at matching offset`() {
+    typeTextInFile(parseKeys("?", "two?s+2", "<Enter>"),
+      "one two three one tw${c}o three")
+    assertOffset(6)
   }
 
   // |/pattern/b|

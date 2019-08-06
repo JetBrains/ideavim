@@ -324,7 +324,15 @@ public class SearchGroup {
   private int searchNextWithDirection(@NotNull Editor editor, @NotNull Caret caret, int count, int dir) {
     resetShowSearchHighlight();
     updateSearchHighlights();
-    return findItOffset(editor, caret.getOffset(), count, dir);
+    final int startOffset = caret.getOffset();
+    int offset = findItOffset(editor, startOffset, count, dir);
+    if (offset == startOffset) {
+      /* Avoid getting stuck on the current cursor position, which can
+       * happen when an offset is given and the cursor is on the last char
+       * in the buffer: Repeat with count + 1. */
+      offset = findItOffset(editor, startOffset, count + 1, dir);
+    }
+    return offset;
   }
 
   private void resetShowSearchHighlight() {
@@ -394,8 +402,11 @@ public class SearchGroup {
         else if (!showHighlights && initialOffset != -1) {
           // Incremental search always highlights current match. We know it's incsearch if we have a valid initial offset
           final boolean wrap = OptionsManager.INSTANCE.getWrapscan().isSet();
-          final TextRange result = findIt(editor, pattern, initialOffset, 1,
-            forwards ? DIR_FORWARDS : DIR_BACKWARDS, shouldIgnoreSmartCase, wrap, false, true);
+          final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE);
+          if (wrap) searchOptions.add(SearchOptions.WRAP);
+          if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE);
+          if (!forwards) searchOptions.add(SearchOptions.BACKWARDS);
+          final TextRange result = findIt(editor, pattern, initialOffset, 1, searchOptions);
           if (result != null && pattern != null) {
             currentMatchOffset = result.getStartOffset();
             final List<TextRange> results = Collections.singletonList(result);
@@ -486,7 +497,8 @@ public class SearchGroup {
   @Nullable
   private TextRange findNextSearchForGn(@NotNull Editor editor, int count, boolean forwards) {
     if (forwards) {
-      return findIt(editor, lastSearch, editor.getCaretModel().getOffset(), count, DIR_FORWARDS, false, true, false, true);
+      final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE);
+      return findIt(editor, lastSearch, editor.getCaretModel().getOffset(), count, searchOptions);
     } else {
       return searchBackward(editor, editor.getCaretModel().getOffset(), count);
     }
@@ -502,11 +514,13 @@ public class SearchGroup {
   @Nullable
   private TextRange searchBackward(@NotNull Editor editor, int offset, int count) {
     // Backward search returns wrongs end offset for some cases. That's why we should perform additional forward search
-    final TextRange foundBackward = findIt(editor, lastSearch, offset, count, DIR_BACKWARDS, false, true, false, true);
+    final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE, SearchOptions.BACKWARDS);
+    final TextRange foundBackward = findIt(editor, lastSearch, offset, count, searchOptions);
     if (foundBackward == null) return null;
     int startOffset = foundBackward.getStartOffset() - 1;
     if (startOffset < 0) startOffset = EditorHelper.getFileSize(editor);
-    return findIt(editor, lastSearch, startOffset, 1, DIR_FORWARDS, false, true, false, true);
+    searchOptions.remove(SearchOptions.BACKWARDS);
+    return findIt(editor, lastSearch, startOffset, 1, searchOptions);
   }
 
   private static int distance(@NotNull TextRange range, int pos, boolean forwards, int size) {
@@ -519,19 +533,18 @@ public class SearchGroup {
     }
   }
 
-  @SuppressWarnings("SameParameterValue")
-  @Nullable
-  private static TextRange findIt(@NotNull Editor editor, @Nullable String pattern, int startOffset, int count, int dir,
-                                 boolean ignoreSmartCase, boolean wrap, boolean showMessages, boolean wholeFile) {
+  private static TextRange findIt(@NotNull Editor editor, @Nullable String pattern, int startOffset, int count, EnumSet<SearchOptions> searchOptions) {
     if (pattern == null || pattern.length() == 0) {
       logger.warn("Pattern is null or empty. Cannot perform search");
       return null;
     }
 
+    int dir = searchOptions.contains(SearchOptions.BACKWARDS) ? DIR_BACKWARDS : DIR_FORWARDS;
+
     //RE sp;
     RegExp sp;
     RegExp.regmmatch_T regmatch = new RegExp.regmmatch_T();
-    regmatch.rmm_ic = shouldIgnoreCase(pattern, ignoreSmartCase);
+    regmatch.rmm_ic = shouldIgnoreCase(pattern, searchOptions.contains(SearchOptions.IGNORE_SMARTCASE));
     sp = new RegExp();
     regmatch.regprog = sp.vim_regcomp(pattern, 1);
     if (regmatch.regprog == null) {
@@ -559,16 +572,16 @@ public class SearchGroup {
     //RegExp.regmmatch_T regmatch;
     CharPointer ptr;
     int matchcol;
-    int startcol;
+    RegExp.lpos_T matchpos;
     RegExp.lpos_T endpos = new RegExp.lpos_T();
     int loop;
     RegExp.lpos_T start_pos;
     boolean at_first_line;
-    int extra_col = 1;
+    int extra_col = dir == DIR_FORWARDS ? 1 : 0;
     boolean match_ok;
     long nmatched;
     //int         submatch = 0;
-    int first_lnum;
+    boolean first_match = true;
 
     int lineCount = EditorHelper.getLineCount(editor);
     int startLine = 0;
@@ -598,7 +611,7 @@ public class SearchGroup {
 
       int lcount = EditorHelper.getLineCount(editor);
       for (loop = 0; loop <= 1; ++loop)   /* loop twice if 'wrapscan' set */ {
-        if (!wholeFile) {
+        if (!searchOptions.contains(SearchOptions.WHOLE_FILE)) {
           startLine = lnum;
           endLine = lnum + 1;
         }
@@ -606,14 +619,13 @@ public class SearchGroup {
           /*
           * Look for a match somewhere in the line.
           */
-          first_lnum = lnum;
           nmatched = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, 0);
           if (nmatched > 0) {
             /* match may actually be in another line when using \zs */
-            lnum += regmatch.startpos[0].lnum;
-            ptr = new CharPointer(EditorHelper.getLineBuffer(editor, lnum));
-            startcol = regmatch.startpos[0].col;
+            matchpos = new RegExp.lpos_T(regmatch.startpos[0]);
             endpos = new RegExp.lpos_T(regmatch.endpos[0]);
+
+            ptr = new CharPointer(EditorHelper.getLineBuffer(editor, lnum + matchpos.lnum));
 
             /*
             * Forward search in the first line: match should be after
@@ -627,16 +639,19 @@ public class SearchGroup {
               * one back afterwards, compare with that position,
               * otherwise "/$" will get stuck on end of line.
               */
-              while ((startcol - (startcol == ptr.strlen() ? 1 : 0)) < (start_pos.col + extra_col)) {
+              while (matchpos.lnum == 0
+                && (searchOptions.contains(SearchOptions.WANT_ENDPOS) && first_match
+                  ? (nmatched == 1 && endpos.col - 1 < start_pos.col + extra_col)
+                  : (matchpos.col - (ptr.charAt(matchpos.col) == '\u0000' ? 1 : 0) < start_pos.col + extra_col))) {
                 if (nmatched > 1) {
                   /* end is in next line, thus no match in
-               * this line */
+                   * this line */
                   match_ok = false;
                   break;
                 }
                 matchcol = endpos.col;
                 /* for empty match: advance one char */
-                if (matchcol == startcol && ptr.charAt(matchcol) != '\u0000') {
+                if (matchcol == matchpos.col && ptr.charAt(matchcol) != '\u0000') {
                   ++matchcol;
                 }
                 if (ptr.charAt(matchcol) == '\u0000' ||
@@ -644,11 +659,11 @@ public class SearchGroup {
                   match_ok = false;
                   break;
                 }
-                startcol = regmatch.startpos[0].col;
+                matchpos = new RegExp.lpos_T(regmatch.startpos[0]);
                 endpos = new RegExp.lpos_T(regmatch.endpos[0]);
 
                 /* Need to get the line pointer again, a
-        * multi-line search may have made it invalid. */
+                 * multi-line search may have made it invalid. */
                 ptr = new CharPointer(EditorHelper.getLineBuffer(editor, lnum));
               }
               if (!match_ok) {
@@ -664,12 +679,15 @@ public class SearchGroup {
               * relative to the end of the match.
               */
               match_ok = false;
-              for (; ; ) {
-                if (!at_first_line || (CharacterPosition.charOffsetOnLineToColumn(editor, lnum, regmatch.startpos[0].col + extra_col) <= start_pos.col)) {
+              for (;;) {
+                if (loop != 0 ||
+                  (searchOptions.contains(SearchOptions.WANT_ENDPOS)
+                    ? (lnum + regmatch.endpos[0].lnum < start_pos.lnum || (lnum + regmatch.endpos[0].lnum == start_pos.lnum && regmatch.endpos[0].col - 1 < start_pos.col + extra_col))
+                    : (lnum + regmatch.startpos[0].lnum < start_pos.lnum || (lnum + regmatch.startpos[0].lnum == start_pos.lnum && regmatch.startpos[0].col < start_pos.col + extra_col)))) {
                   /* Remember this position, we use it if it's
-           * the last match in the line. */
+                   * the last match in the line. */
                   match_ok = true;
-                  startcol = regmatch.startpos[0].col;
+                  matchpos = new RegExp.lpos_T(regmatch.startpos[0]);
                   endpos = new RegExp.lpos_T(regmatch.endpos[0]);
                 }
                 else {
@@ -688,17 +706,17 @@ public class SearchGroup {
                 }
                 matchcol = endpos.col;
                 /* for empty match: advance one char */
-                if (matchcol == startcol && ptr.charAt(matchcol) != '\u0000') {
+                if (matchcol == matchpos.col && ptr.charAt(matchcol) != '\u0000') {
                   ++matchcol;
                 }
                 if (ptr.charAt(matchcol) == '\u0000' ||
-                    (nmatched = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, matchcol)) == 0) {
+                    (nmatched = sp.vim_regexec_multi(regmatch, editor, lcount, lnum + matchpos.lnum, matchcol)) == 0) {
                   break;
                 }
 
                 /* Need to get the line pointer again, a
-        * multi-line search may have made it invalid. */
-                ptr = new CharPointer(EditorHelper.getLineBuffer(editor, lnum));
+                 * multi-line search may have made it invalid. */
+                ptr = new CharPointer(EditorHelper.getLineBuffer(editor, lnum + matchpos.lnum));
               }
 
               /*
@@ -710,10 +728,11 @@ public class SearchGroup {
               }
             }
 
-            pos.lnum = lnum;
-            pos.col = startcol;
-            endpos.lnum += first_lnum;
+            pos.lnum = lnum + matchpos.lnum;
+            pos.col = matchpos.col;
+            endpos.lnum = lnum + endpos.lnum;
             found = 1;
+            first_match = false;
 
             /* Set variables used for 'incsearch' highlighting. */
             //search_match_lines = endpos.lnum - (lnum - first_lnum);
@@ -734,7 +753,7 @@ public class SearchGroup {
         * stop the search if wrapscan isn't set, after an interrupt and
         * after a match
         */
-        if (!wrap || found != 0) {
+        if (!searchOptions.contains(SearchOptions.WRAP) || found != 0) {
           break;
         }
 
@@ -763,8 +782,8 @@ public class SearchGroup {
 
     if (found == 0)             /* did not find it */ {
       //if ((options & SEARCH_MSG) == SEARCH_MSG)
-      if (showMessages) {
-        if (wrap) {
+      if (searchOptions.contains(SearchOptions.SHOW_MESSAGES)) {
+        if (searchOptions.contains(SearchOptions.WRAP)) {
           VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
         }
         else if (lnum <= 0) {
@@ -803,68 +822,87 @@ public class SearchGroup {
   private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir) {
     boolean wrap = OptionsManager.INSTANCE.getWrapscan().isSet();
     logger.info("Perform search. Direction: " + dir + " wrap: " + wrap);
-    TextRange range = findIt(editor, lastSearch, startOffset, count, dir, lastIgnoreSmartCase, wrap, true, true);
-    if (range == null) {
-      logger.warn("No range is found");
-      return -1;
-    }
+
+    int offset = 0;
+    boolean offsetIsLineOffset = false;
+    boolean hasEndOffset = false;
 
     ParsePosition pp = new ParsePosition(0);
-    int res = range.getStartOffset();
 
     if (lastOffset == null) {
       logger.warn("Last offset is null. Cannot perform search");
       return -1;
     }
 
-    if (lastOffset.length() == 0) {
-      return range.getStartOffset();
-    }
-    else if (Character.isDigit(lastOffset.charAt(0)) || lastOffset.charAt(0) == '+' || lastOffset.charAt(0) == '-') {
-      int lineOffset = 0;
-      if (lastOffset.equals("+")) {
-        lineOffset = 1;
-      }
-      else if (lastOffset.equals("-")) {
-        lineOffset = -1;
-      }
-      else {
-        if (lastOffset.charAt(0) == '+') {
-          lastOffset = lastOffset.substring(1);
-        }
-        NumberFormat nf = NumberFormat.getIntegerInstance();
-        pp = new ParsePosition(0);
-        Number num = nf.parse(lastOffset, pp);
-        if (num != null) {
-          lineOffset = num.intValue();
-        }
-      }
+    if (lastOffset.length() > 0) {
+      if (Character.isDigit(lastOffset.charAt(0)) || lastOffset.charAt(0) == '+' || lastOffset.charAt(0) == '-') {
+        offsetIsLineOffset = true;
 
+        if (lastOffset.equals("+")) {
+          offset = 1;
+        } else if (lastOffset.equals("-")) {
+          offset = -1;
+        } else {
+          if (lastOffset.charAt(0) == '+') {
+            lastOffset = lastOffset.substring(1);
+          }
+          NumberFormat nf = NumberFormat.getIntegerInstance();
+          pp = new ParsePosition(0);
+          Number num = nf.parse(lastOffset, pp);
+          if (num != null) {
+            offset = num.intValue();
+          }
+        }
+      } else if ("ebs".indexOf(lastOffset.charAt(0)) != -1) {
+        if (lastOffset.length() >= 2) {
+          if ("+-".indexOf(lastOffset.charAt(1)) != -1) {
+            offset = 1;
+          }
+          NumberFormat nf = NumberFormat.getIntegerInstance();
+          pp = new ParsePosition(lastOffset.charAt(1) == '+' ? 2 : 1);
+          Number num = nf.parse(lastOffset, pp);
+          if (num != null) {
+            offset = num.intValue();
+          }
+        }
+
+        hasEndOffset = lastOffset.charAt(0) == 'e';
+      }
+    }
+
+    /*
+     * If there is a character offset, subtract it from the current
+     * position, so we don't get stuck at "?pat?e+2" or "/pat/s-2".
+     * Skip this if pos.col is near MAXCOL (closed fold).
+     * This is not done for a line offset, because then we would not be vi
+     * compatible.
+     */
+    if (!offsetIsLineOffset && offset != 0) {
+      startOffset = Math.max(0, Math.min(startOffset - offset, EditorHelper.getFileSize(editor) - 1));
+    }
+
+    EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.SHOW_MESSAGES, SearchOptions.WHOLE_FILE);
+    if (dir == DIR_BACKWARDS) searchOptions.add(SearchOptions.BACKWARDS);
+    if (lastIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE);
+    if (wrap) searchOptions.add(SearchOptions.WRAP);
+    if (hasEndOffset) searchOptions.add(SearchOptions.WANT_ENDPOS);
+    TextRange range = findIt(editor, lastSearch, startOffset, count, searchOptions);
+    if (range == null) {
+      logger.warn("No range is found");
+      return -1;
+    }
+
+    int res = range.getStartOffset();
+
+    if (offsetIsLineOffset) {
       int line = editor.offsetToLogicalPosition(range.getStartOffset()).line;
-      int newLine = EditorHelper.normalizeLine(editor, line + lineOffset);
+      int newLine = EditorHelper.normalizeLine(editor, line + offset);
 
       res = VimPlugin.getMotion().moveCaretToLineStart(editor, newLine);
     }
-    else if ("ebs".indexOf(lastOffset.charAt(0)) != -1) {
-      int charOffset = 0;
-      if (lastOffset.length() >= 2) {
-        if ("+-".indexOf(lastOffset.charAt(1)) != -1) {
-          charOffset = 1;
-        }
-        NumberFormat nf = NumberFormat.getIntegerInstance();
-        pp = new ParsePosition(lastOffset.charAt(1) == '+' ? 2 : 1);
-        Number num = nf.parse(lastOffset, pp);
-        if (num != null) {
-          charOffset = num.intValue();
-        }
-      }
-
-      int base = range.getStartOffset();
-      if (lastOffset.charAt(0) == 'e') {
-        base = range.getEndOffset() - 1;
-      }
-
-      res = Math.max(0, Math.min(base + charOffset, EditorHelper.getFileSize(editor) - 1));
+    else if (hasEndOffset || offset != 0) {
+      int base = hasEndOffset ? range.getEndOffset() - 1 : range.getStartOffset();
+      res = Math.max(0, Math.min(base + offset, EditorHelper.getFileSize(editor) - 1));
     }
 
     int ppos = pp.getIndex();
@@ -1405,6 +1443,15 @@ public class SearchGroup {
     SKIP,
     QUIT,
     SUBSTITUTE_ALL,
+  }
+
+  private enum SearchOptions {
+    BACKWARDS,
+    WANT_ENDPOS,
+    WRAP,
+    SHOW_MESSAGES,
+    WHOLE_FILE,
+    IGNORE_SMARTCASE,
   }
 
   @Nullable private String lastSearch;
