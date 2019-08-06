@@ -39,17 +39,13 @@ import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
-import one.util.streamex.StreamEx;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static java.awt.event.KeyEvent.*;
 
@@ -200,7 +196,8 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     final Project project = editor.getProject();
     if (project == null) return false;
     final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
-    return StreamEx.of(fileEditorManager.getAllEditors())
+    if (fileEditorManager == null) return false;
+    return Arrays.stream(fileEditorManager.getAllEditors())
       .anyMatch(fileEditor -> editor.equals(EditorUtil.getEditorEx(fileEditor)));
   }
 
