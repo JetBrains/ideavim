@@ -389,7 +389,7 @@ public class SearchGroup {
           removeSearchHighlight(editor);
         }
 
-        if (shouldAddSearchHighlight(editor, pattern, showHighlights)) {
+        if (shouldAddAllSearchHighlights(editor, pattern, showHighlights)) {
           final int startLine = searchRange == null ? 0 : searchRange.getStartLine();
           final int endLine = searchRange == null ? -1 : searchRange.getEndLine();
           List<TextRange> results = findAll(editor, pattern, startLine, endLine, shouldIgnoreCase(pattern, shouldIgnoreSmartCase));
@@ -399,8 +399,7 @@ public class SearchGroup {
           }
           UserDataManager.setVimLastSearch(editor, pattern);
         }
-        else if (!showHighlights && initialOffset != -1) {
-          // Incremental search always highlights current match. We know it's incsearch if we have a valid initial offset
+        else if (shouldAddCurrentMatchSearchHighlight(showHighlights, initialOffset)) {
           final boolean wrap = OptionsManager.INSTANCE.getWrapscan().isSet();
           final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE);
           if (wrap) searchOptions.add(SearchOptions.WRAP);
@@ -411,6 +410,12 @@ public class SearchGroup {
             currentMatchOffset = result.getStartOffset();
             final List<TextRange> results = Collections.singletonList(result);
             highlightSearchResults(editor, pattern, results, currentMatchOffset);
+          }
+        }
+        else if (isIncrementalSearchHighlights(initialOffset)) {
+          final Integer offset = UserDataManager.getVimIncsearchCurrentMatchOffset(editor);
+          if (offset != null) {
+            currentMatchOffset = offset;
           }
         }
       }
@@ -431,8 +436,23 @@ public class SearchGroup {
    * Add search highlights if hlSearch is true and the pattern is changed
    */
   @Contract("_, _, false -> false; _, null, true -> false")
-  private boolean shouldAddSearchHighlight(@NotNull Editor editor, @Nullable String newPattern, boolean hlSearch) {
+  private boolean shouldAddAllSearchHighlights(@NotNull Editor editor, @Nullable String newPattern, boolean hlSearch) {
     return hlSearch && newPattern != null && !newPattern.equals(UserDataManager.getVimLastSearch(editor)) && !Objects.equals(newPattern, "");
+  }
+
+  /**
+   * Add search highlight for current match if hlsearch is false and we're performing incsearch highlights
+   */
+  @Contract(value = "true, _ -> false", pure = true)
+  private boolean shouldAddCurrentMatchSearchHighlight(boolean hlSearch, int initialOffset) {
+    return !hlSearch && isIncrementalSearchHighlights(initialOffset);
+  }
+
+  /**
+   * initialOffset is only valid if we're highlighting incsearch
+   */
+  private boolean isIncrementalSearchHighlights(int initialOffset) {
+    return initialOffset != -1;
   }
 
   private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
@@ -817,6 +837,8 @@ public class SearchGroup {
       final RangeHighlighter highlighter = highlightMatch(editor, range.getStartOffset(), range.getEndOffset(), current, pattern);
       highlighters.add(highlighter);
     }
+
+    UserDataManager.setVimIncsearchCurrentMatchOffset(editor, currentMatchOffset);
   }
 
   private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir) {
@@ -1382,6 +1404,7 @@ public class SearchGroup {
   /**
    * Updates search highlights when the selected editor changes
    */
+  @SuppressWarnings("unused")
   public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
     VimPlugin.getSearch().updateSearchHighlights();
   }

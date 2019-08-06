@@ -80,6 +80,7 @@ fun unInitializeEditor(editor: Editor) {
 
 var Editor.vimLastSearch: String? by userData()
 var Editor.vimLastHighlighters: Collection<RangeHighlighter>? by userData()
+var Editor.vimIncsearchCurrentMatchOffset: Int? by userData()
 /***
  * @see :help visualmode()
  */
