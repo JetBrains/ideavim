@@ -786,6 +786,31 @@ class SearchGroupTest : VimTestCase() {
            |hard by the torrent of a mountain pass.""".trimMargin())
   }
 
+  fun `test nohlsearch correctly resets incsearch highlights after deleting last occurrence`() {
+    // Crazy edge case bug. With incsearch enabled, search for something with only one occurrence, delete it, call
+    // :nohlsearch, undo and search next - highlights don't work any more
+    setHighlightSearch()
+    setIncrementalSearch()
+    configureByText(
+      """I found it in a legendary land
+        |${c}all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin())
+
+    val pattern = "lavender"
+    enterSearch(pattern)
+    typeText(parseKeys("dd"))
+    enterCommand("nohlsearch")
+    typeText(parseKeys("u"))
+    typeText(parseKeys("n"))
+
+    assertSearchHighlights(pattern,
+      """I found it in a legendary land
+        |all rocks and «lavender» and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin())
+  }
+
   fun `test nohlsearch option hides search highlights`() {
     setHighlightSearch()
     configureByText(

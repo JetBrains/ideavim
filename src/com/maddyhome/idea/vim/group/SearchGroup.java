@@ -1319,6 +1319,8 @@ public class SearchGroup {
   }
 
   private static void removeSearchHighlight(@NotNull Editor editor) {
+    UserDataManager.setVimLastSearch(editor, null);
+
     Collection<RangeHighlighter> ehl = UserDataManager.getVimLastHighlighters(editor);
     if (ehl == null) {
       return;
@@ -1331,7 +1333,6 @@ public class SearchGroup {
     ehl.clear();
 
     UserDataManager.setVimLastHighlighters(editor, null);
-    UserDataManager.setVimLastSearch(editor, null);
   }
 
   public void saveData(@NotNull Element element) {

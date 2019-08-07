@@ -180,9 +180,14 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
           editor.getScrollingModel().scroll(horizontalOffset, verticalOffset);
         }
 
-        // This is somewhat inefficient. We've done the search, highlighted everything and now (if we hit <Enter>),
-        // we're removing all the highlights to invoke the search action, to search and highlight everything again. On
-        // the plus side, it clears up the current item highlight
+        // TODO: Reduce the amount of unnecessary work here
+        // If incsearch and hlsearch are enabled, and if this is a search panel, we'll have all of the results correctly
+        // highlighted. But because we don't know why we're being closed, and what handler is being called next, we need
+        // to reset state. This will remove all highlights and reset back to the last accepted search results. This is
+        // fine for <Esc>. But if we hit <Enter>, the search handler will remove the highlights again, perform the same
+        // search that we did for incsearch and add highlights back. The `:nohlsearch` command, even if bound to a
+        // shortcut, is still processed by the ex entry panel, so deactivating will force update remove, search and add
+        // of the current search results before the `NoHLSearchHandler` will remove all highlights again
         VimPlugin.getSearch().resetIncsearchHighlights();
       }
 
