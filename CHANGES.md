@@ -16,28 +16,23 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-To Be Released
+0.53, 2019-08-07
 --------------
-_Available since 0.52.1 EAP:_
 * [VIM-1711](https://youtrack.jetbrains.com/issue/VIM-1711) Search is not triggered during surround action
 * [VIM-1712](https://youtrack.jetbrains.com/issue/VIM-1712) Fix `Y` command for visual mode
-* [VIM-1713](https://youtrack.jetbrains.com/issue/VIM-1713) Surround in visual mode put caret in corrent position
+* [VIM-1713](https://youtrack.jetbrains.com/issue/VIM-1713) Surround in visual mode put caret in correct position
 * [VIM-1732](https://youtrack.jetbrains.com/issue/VIM-1732) Fix SO after enabling vim mode
 * [VIM-1710](https://youtrack.jetbrains.com/issue/VIM-1710) Fix opening empty file with "relative number" enabled
 * [VIM-1725](https://youtrack.jetbrains.com/issue/VIM-1725) Fix problems with Japanese language
 * [VIM-1648](https://youtrack.jetbrains.com/issue/VIM-1648) Fix exception while substitute with conformation
-
-_Not released yet:_
-
 * [VIM-1736](https://youtrack.jetbrains.com/issue/VIM-1736) Fix `` for ex panel
 * [VIM-1739](https://youtrack.jetbrains.com/issue/VIM-1739) Fix full-width characters for ex panel
-
 
 
 0.52, 2019-07-23
 --------------
 
-* Introduce [Select Mode](https://vimhelp.org/visual.txt.html#Select-mode).
+* Introduce [Select Mode](https://github.com/JetBrains/ideavim/wiki/Select-mode).
 
 
 * Fixed `:only` command
