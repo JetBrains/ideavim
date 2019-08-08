@@ -30,6 +30,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
+import com.intellij.util.Processor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.SelectionType;
@@ -50,6 +51,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.awt.*;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
@@ -163,34 +165,40 @@ public class SearchGroup {
   @NotNull
   private static ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match) {
     final Ref<ReplaceConfirmationChoice> result = Ref.create(ReplaceConfirmationChoice.QUIT);
-    // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
-    final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
-    exEntryPanel.activate(editor, new EditorDataContext(editor), "Replace with " + match + " (y/n/a/q/l)?", "", 1);
-    ModalEntry.activate(key -> {
+    final Processor<KeyStroke> keyStrokeProcessor = key -> {
       final ReplaceConfirmationChoice choice;
       final char c = key.getKeyChar();
       if (StringHelper.isCloseKeyStroke(key) || c == 'q') {
         choice = ReplaceConfirmationChoice.QUIT;
-      }
-      else if (c == 'y') {
+      } else if (c == 'y') {
         choice = ReplaceConfirmationChoice.SUBSTITUTE_THIS;
-      }
-      else if (c == 'l') {
+      } else if (c == 'l') {
         choice = ReplaceConfirmationChoice.SUBSTITUTE_LAST;
-      }
-      else if (c == 'n') {
+      } else if (c == 'n') {
         choice = ReplaceConfirmationChoice.SKIP;
-      }
-      else if (c == 'a') {
+      } else if (c == 'a') {
         choice = ReplaceConfirmationChoice.SUBSTITUTE_ALL;
-      }
-      else {
+      } else {
         return true;
       }
       result.set(choice);
-      exEntryPanel.deactivate(true);
       return false;
-    });
+    };
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      final TestInputModel inputModel = TestInputModel.getInstance(editor);
+      for (KeyStroke key = inputModel.nextKeyStroke(); key != null; key = inputModel.nextKeyStroke()) {
+        if (!keyStrokeProcessor.process(key)) {
+          break;
+        }
+      }
+    }
+    else {
+      // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
+      final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
+      exEntryPanel.activate(editor, new EditorDataContext(editor), "Replace with " + match + " (y/n/a/q/l)?", "", 1);
+      ModalEntry.activate(keyStrokeProcessor);
+      exEntryPanel.deactivate(true, false);
+    }
     return result.get();
   }
 
@@ -1221,7 +1229,7 @@ public class SearchGroup {
           if (do_ask) {
             RangeHighlighter hl = highlightConfirm(editor, startoff, endoff);
             MotionGroup.scrollPositionIntoView(editor, editor.offsetToVisualPosition(startoff), true);
-            MotionGroup.moveCaret(editor, caret, start);
+            MotionGroup.moveCaret(editor, caret, startoff);
             final ReplaceConfirmationChoice choice = confirmChoice(editor, match);
             editor.getMarkupModel().removeHighlighter(hl);
             switch (choice) {
@@ -1280,9 +1288,10 @@ public class SearchGroup {
     }
 
     if (lastMatch != -1) {
-      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor,
-                                                                                                 editor.offsetToLogicalPosition(
-                                                                                                     lastMatch).line));
+      if (!got_quit) {
+        MotionGroup.moveCaret(editor, caret,
+          VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, editor.offsetToLogicalPosition(lastMatch).line));
+      }
     }
     else {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));

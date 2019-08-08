@@ -28,6 +28,7 @@ import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 import org.jetbrains.plugins.ideavim.VimTestOptionType
+import javax.swing.KeyStroke
 
 /**
  * @author Alex Plate
@@ -269,9 +270,97 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     doTest("s/foo/bar", "\tfoo", "\tbar")
   }
 
+  @VimOptionDefaultAll
+  fun `test confirm all replaces all in range`() {
+    // Make sure the "a" is added as part of the same parseKeys as the <Enter>, as it needs to be available while the
+    // <Enter> is processed
+    doTest(parseKeys(":", ".,\$s/and/AND/gc", "<Enter>", "a"),
+      """I found it in a legendary land
+        |${c}all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin(),
+      """I found it in a legendary land
+        |all rocks AND lavender AND tufted grass,
+        |${c}where it was settled on some sodden sAND
+        |hard by the torrent of a mountain pass.""".trimMargin())
+  }
+
+  @VimOptionDefaultAll
+  fun `test confirm all replaces all in rest of range`() {
+    // Make sure the "a" is added as part of the same parseKeys as the <Enter>, as it needs to be available while the
+    // <Enter> is processed
+    doTest(parseKeys(":", "%s/and/AND/gc", "<Enter>", "n", "n", "a"),
+      """I found it in a legendary land
+        |${c}all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin(),
+      """I found it in a legendary land
+        |all rocks and lavender AND tufted grass,
+        |${c}where it was settled on some sodden sAND
+        |hard by the torrent of a mountain pass.""".trimMargin())
+  }
+
+  @VimOptionDefaultAll
+  fun `test confirm options`() {
+    // Make sure the "a" is added as part of the same parseKeys as the <Enter>, as it needs to be available while the
+    // <Enter> is processed
+    doTest(parseKeys(":", "%s/and/AND/gc", "<Enter>", "y", "n", "l"),
+      """I found it in a legendary land
+        |${c}all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin(),
+      """I found it in a legendary lAND
+        |${c}all rocks and lavender AND tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin())
+  }
+
+  @VimOptionDefaultAll
+  fun `test confirm options with quit`() {
+    // Make sure the "a" is added as part of the same parseKeys as the <Enter>, as it needs to be available while the
+    // <Enter> is processed
+    doTest(parseKeys(":", "%s/and/AND/gc", "<Enter>", "y", "n", "q"),
+      """I found it in a legendary land
+        |${c}all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin(),
+      """I found it in a legendary lAND
+        |all rocks and lavender ${c}and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin())
+  }
+
+  @VimOptionDefaultAll
+  fun `test confirm moves caret to first match`() {
+    configureByText(
+      """I found it in a legendary land
+        |${c}all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin())
+
+    typeText(parseKeys(":", "%s/and/or/gc", "<Enter>"))
+    assertPosition(0, 27)
+  }
+
+  @VimOptionDefaultAll
+  fun `test confirm moves caret to next match`() {
+    configureByText(
+      """I found it in a legendary land
+        |${c}all rocks and lavender and tufted grass,
+        |where it was settled on some sodden sand
+        |hard by the torrent of a mountain pass.""".trimMargin())
+
+    typeText(parseKeys(":", "%s/and/or/gc", "<Enter>", "n"))
+    assertPosition(1, 10)
+  }
+
   private fun doTest(command: String, before: String, after: String) {
+    doTest(commandToKeys(command), before, after)
+  }
+
+  private fun doTest(keys: List<KeyStroke>, before: String, after: String) {
     myFixture.configureByText("a.java", before)
-    typeText(commandToKeys(command))
+    typeText(keys)
     myFixture.checkResult(after)
   }
 }
