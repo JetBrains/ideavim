@@ -831,4 +831,11 @@ public class EditorHelper {
     final VirtualFile virtualFile = getVirtualFile(editor);
     return virtualFile != null && !(virtualFile instanceof LightVirtualFile);
   }
+
+  /**
+   * Checks if the editor is a diff window
+   */
+  public static boolean isDiffEditor(@NotNull Editor editor) {
+    return editor.getEditorKind() == EditorKind.DIFF;
+  }
 }
