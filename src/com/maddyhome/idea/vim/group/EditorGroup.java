@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.OptionChangeEvent;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import gnu.trove.TIntFunction;
 import kotlin.text.StringsKt;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
@@ -125,11 +126,10 @@ public class EditorGroup {
   }
 
   private static void updateLineNumbers(@NotNull final Editor editor, final boolean requiresRepaint) {
-    final boolean relativeLineNumber = OptionsManager.INSTANCE.getRelativenumber().isSet();
+    final boolean relativeNumber = OptionsManager.INSTANCE.getRelativenumber().isSet();
     final boolean number = OptionsManager.INSTANCE.getNumber().isSet();
 
-    final boolean showBuiltinEditorLineNumbers = (UserDataManager.getVimLineNumbersInitialState(editor) || number)
-      && !relativeLineNumber;
+    final boolean showBuiltinEditorLineNumbers = shouldShowBuiltinLineNumbers(editor, number, relativeNumber);
 
     final EditorSettings settings = editor.getSettings();
     if (settings.isLineNumbersShown() ^ showBuiltinEditorLineNumbers) {
@@ -141,7 +141,7 @@ public class EditorGroup {
       });
     }
 
-    if (relativeLineNumber) {
+    if (relativeNumber) {
       if (!hasRelativeLineNumbersInstalled(editor)) {
         installRelativeLineNumbers(editor);
       }
@@ -154,26 +154,51 @@ public class EditorGroup {
     }
   }
 
+  private static boolean shouldShowBuiltinLineNumbers(@NotNull final Editor editor, boolean number, boolean relativeNumber) {
+    final boolean initialState = UserDataManager.getVimLineNumbersInitialState(editor);
+
+    // Builtin relative line numbers requires EditorGutterComponentEx#setLineNumberConvertor. If we don't have that,
+    // fall back to the text annotation provider, which replaces the builtin line numbers
+    // AFAICT, this will always be true, but I can't guarantee it
+    if (editor.getGutter() instanceof EditorGutterComponentEx) {
+      return initialState || number || relativeNumber;
+    }
+
+    return (initialState || number) && !relativeNumber;
+  }
+
   private static void setBuiltinLineNumbers(@NotNull final Editor editor, boolean show) {
     editor.getSettings().setLineNumbersShown(show);
   }
 
   private static boolean hasRelativeLineNumbersInstalled(@NotNull final Editor editor) {
-    return UserDataManager.getVimHasLineNumberGutterProvider(editor);
+    return UserDataManager.getVimHasRelativeLineNumbersInstalled(editor);
   }
 
   private static void installRelativeLineNumbers(@NotNull final Editor editor) {
     if (!hasRelativeLineNumbersInstalled(editor)) {
-      editor.getGutter().registerTextAnnotation(new RelativeLineNumberGutterProvider(editor));
-      UserDataManager.setVimHasLineNumberGutterProvider(editor, true);
+      final EditorGutter gutter = editor.getGutter();
+      if (gutter instanceof EditorGutterComponentEx) {
+        ((EditorGutterComponentEx) gutter).setLineNumberConvertor(new RelativeLineNumberConverter(editor));
+      }
+      else {
+        gutter.registerTextAnnotation(new RelativeLineNumberGutterProvider(editor));
+      }
+      UserDataManager.setVimHasRelativeLineNumbersInstalled(editor, true);
     }
   }
 
   private static void removeRelativeLineNumbers(@NotNull final Editor editor) {
     if (hasRelativeLineNumbersInstalled(editor)) {
-      // TODO: When we move up to 192, we can close just our provider
-      editor.getGutter().closeAllAnnotations();
-      UserDataManager.setVimHasLineNumberGutterProvider(editor, false);
+      final EditorGutter gutter = editor.getGutter();
+      if (gutter instanceof EditorGutterComponentEx) {
+        ((EditorGutterComponentEx) gutter).setLineNumberConvertor(null);
+      }
+      else {
+        // TODO: 192 gives us an API to close just one annotation provider
+        gutter.closeAllAnnotations();
+      }
+      UserDataManager.setVimHasRelativeLineNumbersInstalled(editor, false);
     }
   }
 
@@ -303,6 +328,35 @@ public class EditorGroup {
     }
   }
 
+  private static class RelativeLineNumberConverter implements TIntFunction {
+    @NotNull
+    private final Editor editor;
+
+    @Contract(pure = true)
+    RelativeLineNumberConverter(@NotNull final Editor editor) {
+      this.editor = editor;
+    }
+
+    @Override
+    public int execute(int line) {
+      final boolean number = OptionsManager.INSTANCE.getNumber().isSet();
+      final int caretLine = editor.getCaretModel().getLogicalPosition().line;
+
+      if (number && line == caretLine) {
+        return line;
+      }
+      else {
+        return getRelativeLineNumber(line, editor, caretLine);
+      }
+    }
+
+    private int getRelativeLineNumber(int line, @NotNull Editor editor, int caretLine) {
+      final int visualLine = EditorHelper.logicalLineToVisualLine(editor, line);
+      final int currentVisualLine = EditorHelper.logicalLineToVisualLine(editor, caretLine);
+      return Math.abs(currentVisualLine - visualLine) - 1;
+    }
+  }
+
   private static class RelativeLineNumberGutterProvider implements TextAnnotationGutterProvider {
     @NotNull
     private final Editor editor;
@@ -372,7 +426,7 @@ public class EditorGroup {
 
     @Override
     public void gutterClosed() {
-      UserDataManager.setVimHasLineNumberGutterProvider(this.editor, false);
+      UserDataManager.setVimHasRelativeLineNumbersInstalled(this.editor, false);
     }
   }
 }
