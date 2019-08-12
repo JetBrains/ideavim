@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.group.MarkGroup.*
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 
@@ -35,14 +36,6 @@ private val ARGUMENT_DELETE_ALL_FILE_MARKS = Regex("^!$")
 
 private const val ESCAPED_QUOTE = "\\\""
 private const val UNESCAPED_QUOTE = "\""
-
-private const val ALPHA_LOWER = "abcdefghijklmnopqrstuvwxyz"
-private const val ALPHA_UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-private const val NUMERICAL = "0123456789"
-
-private const val DELETABLE_FILE_MARKS = ".^[]\"$ALPHA_LOWER"
-private const val DELETABLE_GLOBAL_MARKS = "$NUMERICAL$ALPHA_UPPER"
-private const val DELETABLE_MARKS = DELETABLE_FILE_MARKS + DELETABLE_GLOBAL_MARKS
 
 /**
  * @author Jørgen Granseth
@@ -56,12 +49,12 @@ class DeleteMarksHandler : CommandHandler.SingleExecution() {
       .replace(VIML_COMMENT, "")
       .replace(ESCAPED_QUOTE, UNESCAPED_QUOTE)
       .replace(TRAILING_SPACES, "")
-      .replace(ARGUMENT_DELETE_ALL_FILE_MARKS, DELETABLE_FILE_MARKS)
-      .replaceRanges(ALPHA_LOWER)
-      .replaceRanges(ALPHA_UPPER)
-      .replaceRanges(NUMERICAL)
+      .replace(ARGUMENT_DELETE_ALL_FILE_MARKS, DEL_FILE_MARKS)
+      .replaceRanges(WR_REGULAR_FILE_MARKS)
+      .replaceRanges(WR_GLOBAL_MARKS)
+      .replaceRanges(RO_GLOBAL_MARKS)
 
-    processedArg.indexOfFirst { it !in " $DELETABLE_MARKS" }.let { index ->
+    processedArg.indexOfFirst { it !in " $DEL_MARKS" }.let { index ->
       if (index != -1) {
         val invalidIndex = if (processedArg[index] == '-') (index - 1).coerceAtLeast(0) else index
 
