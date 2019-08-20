@@ -1,12 +1,12 @@
 <div>
-  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20183&guest=1">
-    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20183)/statusIcon.svg?guest=1"/>
+  <a href="https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20183&guest=1">
+    <img src="https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20183)/statusIcon.svg?guest=1"/>
   </a>
   <span>2018.3 Tests</span>
 </div>
 <div>
-  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20191&guest=1">
-    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20191)/statusIcon.svg?guest=1"/>
+  <a href="https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20191&guest=1">
+    <img src="https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20191)/statusIcon.svg?guest=1"/>
   </a>
   <span>2019.1 Tests</span>
 </div>
@@ -18,8 +18,8 @@ In order to contribute to IdeaVim, you should have some understanding of Java or
 
 See also these docs on the IntelliJ API:
 
-* [IntelliJ architectural overview](http://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview)
-* [IntelliJ plugin development resources](http://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment)
+* [IntelliJ architectural overview](https://www.jetbrains.org/intellij/sdk/docs/platform/fundamentals.html)
+* [IntelliJ plugin development resources](https://www.jetbrains.org/intellij/sdk/docs/welcome.html)
 
 You can start by:
 
@@ -85,7 +85,7 @@ in the issue tracker.
        GNU General Public License for more details.
        
        You should have received a copy of the GNU General Public License
-       along with this program. If not, see <http://www.gnu.org/licenses/>.
+       along with this program. If not, see <https://www.gnu.org/licenses/>.
        
 3. Go to `Preferences | Editor | Copyright`, click the "+" button.  
        Scope: Copyright scope  

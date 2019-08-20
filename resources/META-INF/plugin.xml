@@ -1,4 +1,4 @@
-<idea-plugin url="http://plugins.jetbrains.com/plugin/164">
+<idea-plugin url="https://plugins.jetbrains.com/plugin/164">
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
@@ -22,7 +22,7 @@
       <p>See also:</p>
       <ul>
         <li><a href="https://github.com/JetBrains/ideavim">GitHub repository</a>: documentation and contributing</li>
-        <li><a href="http://youtrack.jetbrains.com/issues/VIM">Issue tracker</a>: feature requests and bug reports</li>
+        <li><a href="https://youtrack.jetbrains.com/issues/VIM">Issue tracker</a>: feature requests and bug reports</li>
       </ul>
     ]]></description>
   <version>SNAPSHOT</version>

@@ -3,20 +3,20 @@ IdeaVim
 
 <div>
   <a href="https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub">
-    <img src="http://jb.gg/badges/official.svg" alt="official JetBrains project"/>
+    <img src="https://jb.gg/badges/official.svg" alt="official JetBrains project"/>
   </a>
 </div>
 
 <div>
-  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_Deploy&guest=1">
-    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_Deploy)/statusIcon.svg?guest=1"/>
+  <a href="https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_Deploy&guest=1">
+    <img src="https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_Deploy)/statusIcon.svg?guest=1"/>
   </a>
   <span>Stable</span>
 </div>
 
 <div>
-  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_Build&guest=1">
-    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_Build)/statusIcon.svg?guest=1"/>
+  <a href="https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_Build&guest=1">
+    <img src="https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_Build)/statusIcon.svg?guest=1"/>
   </a>
   <span>EAP</span>
 </div>
@@ -28,11 +28,11 @@ RubyMine, AppCode, DataGrip, GoLand, Rider, Cursive, and Android Studio.
 
 Resources:
 
-* [Plugin homepage](http://plugins.jetbrains.com/plugin/164)
+* [Plugin homepage](https://plugins.jetbrains.com/plugin/164-ideavim)
 * [Changelog](CHANGES.md)
-* [Bug tracker](http://youtrack.jetbrains.com/issues/VIM)
-* [Continuous integration builds](http://teamcity.jetbrains.com/project.html?projectId=IdeaVim&guest=1)
-* [@IdeaVim](http://twitter.com/ideavim) in Twitter
+* [Bug tracker](https://youtrack.jetbrains.com/issues/VIM)
+* [Continuous integration builds](https://teamcity.jetbrains.com/project.html?projectId=IdeaVim&guest=1)
+* [@IdeaVim](https://twitter.com/ideavim) in Twitter
 
 
 Installation
@@ -70,8 +70,8 @@ Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
 You can always leave your feedback with:
-* [@IdeaVim](http://twitter.com/ideavim) in Twitter
-* [Bug tracker](http://youtrack.jetbrains.com/issues/VIM)
+* [@IdeaVim](https://twitter.com/ideavim) in Twitter
+* [Bug tracker](https://youtrack.jetbrains.com/issues/VIM)
 
 
 Summary of Supported Vim Features
@@ -111,7 +111,7 @@ Not supported (yet):
 See also:
 
 * [The list of all supported commands](src/com/maddyhome/idea/vim/package-info.java)
-* [Top features and bugs](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+sort+by%3A+votes)
+* [Top features and bugs](https://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+sort+by%3A+votes)
 
 
 Files
@@ -125,7 +125,7 @@ You can read your ~/.vimrc file from ~/.ideavimrc with this command:
     source ~/.vimrc
 
 Note, that IdeaVim currently parses ~/.ideavimrc file via simple pattern matching.
-See [VIM-669](http://youtrack.jetbrains.com/issue/VIM-669) for proper parsing
+See [VIM-669](https://youtrack.jetbrains.com/issue/VIM-669) for proper parsing
 of VimL files.
 
 Also note that if you have overridden the `user.home` JVM option, this
@@ -164,7 +164,7 @@ The IdeaVim plugin uses the undo/redo functionality of the IntelliJ Platform,
 so the behavior of the `u` and `<C-R>` commands may differ from the original
 Vim. Vim compatibility of undo/redo may be improved in future releases.
 
-See also [unresolved undo issues](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+u).
+See also [unresolved undo issues](https://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+u).
 
 ### Escape
 
@@ -174,7 +174,7 @@ should use `<C-c>` or `<C-[>` instead. In some dialog windows, the normal mode i
 switched by default. The usage of the Vim emulator in dialog windows is an area for
 improvement.
 
-See also [unresolved escape issues](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+i_Esc).
+See also [unresolved escape issues](https://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+i_Esc).
 
 ### Executing IDE Actions
 

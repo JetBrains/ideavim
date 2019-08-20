@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 package com.maddyhome.idea.vim.group;
 
@@ -1728,7 +1728,7 @@ public class ChangeGroup {
   private boolean deleteText(@NotNull final Editor editor,
                              @NotNull final TextRange range,
                              @Nullable SelectionType type) {
-    // Fix for http://youtrack.jetbrains.net/issue/VIM-35
+    // Fix for https://youtrack.jetbrains.net/issue/VIM-35
     if (!range.normalize(EditorHelper.getFileSize(editor, true))) {
       return false;
     }
