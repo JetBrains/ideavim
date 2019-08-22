@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.helper;
@@ -34,6 +34,7 @@ public class EditorDataContext implements DataContext {
    * @param dataId the data identifier for which the value is requested.
    * @return the value, or null if no value is available in the current context for this identifier.
    */
+  @Override
   public Object getData(String dataId) {
     if (PlatformDataKeys.EDITOR.getName().equals(dataId)) {
       return editor;
@@ -42,7 +43,7 @@ public class EditorDataContext implements DataContext {
       return editor.getProject();
     }
     else if (PlatformDataKeys.VIRTUAL_FILE.getName().equals(dataId)) {
-      return EditorData.getVirtualFile(editor);
+      return EditorHelper.getVirtualFile(editor);
     }
 
     return null;

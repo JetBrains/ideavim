@@ -13,12 +13,11 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.range;
 
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -59,11 +58,11 @@ public class LineNumberRange extends AbstractRange {
    * Gets the line number specified by this range without regard to any offset.
    *
    * @param editor   The editor to get the line for
-   * @param context  The data context
    * @param lastZero True if last line was set to start of file
    * @return The zero based line number, -1 for start of file
    */
-  protected int getRangeLine(@NotNull Editor editor, DataContext context, boolean lastZero) {
+  @Override
+  protected int getRangeLine(@NotNull Editor editor, boolean lastZero) {
     if (line == CURRENT_LINE) {
       line = editor.getCaretModel().getLogicalPosition().line;
     }
@@ -74,7 +73,8 @@ public class LineNumberRange extends AbstractRange {
     return line;
   }
 
-  protected int getRangeLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+  @Override
+  protected int getRangeLine(@NotNull Editor editor, @NotNull Caret caret,
                              boolean lastZero) {
     if (line == LAST_LINE) line = EditorHelper.getLineCount(editor) - 1;
     else line = caret.getLogicalPosition().line;

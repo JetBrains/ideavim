@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.handler
@@ -23,27 +23,25 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.commands
-import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.handler.CaretOrder
+import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-class GotoCharacterHandler : CommandHandler(commands("go[to]"),
-        flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, RANGE_IS_COUNT),
-        EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), true, CaretOrder.DECREASING_OFFSET
-) {
-    override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
-        val count = cmd.getCount(editor, caret, context, 1, true)
-        if (count <= 0) return false
+class GotoCharacterHandler : CommandHandler.ForEachCaret() {
+  override val names: Array<CommandName> = commands("go[to]")
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val optFlags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
 
-        val offset = VimPlugin.getMotion().moveCaretToNthCharacter(editor, count - 1)
-        if (offset == -1) return false
+  override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
+    val count = cmd.getCount(editor, caret, context, 1, true)
+    if (count <= 0) return false
 
-        MotionGroup.moveCaret(editor, caret, offset)
+    val offset = VimPlugin.getMotion().moveCaretToNthCharacter(editor, count - 1)
+    if (offset == -1) return false
 
-        return true
-    }
+    MotionGroup.moveCaret(editor, caret, offset)
+
+    return true
+  }
 }

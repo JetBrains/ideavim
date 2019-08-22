@@ -13,13 +13,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.helper;
 
-import com.maddyhome.idea.vim.option.KeywordOption;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -66,7 +65,7 @@ public class CharacterHelper {
     else if (isHalfWidthKatakanaLetter(ch)) {
       return CharacterType.HALF_WIDTH_KATAKANA;
     }
-    else if (punctuationAsLetters || ((KeywordOption)Options.getInstance().getOption("iskeyword")).isKeyword(ch)) {
+    else if (punctuationAsLetters || OptionsManager.INSTANCE.getIskeyword().isKeyword(ch)) {
       return CharacterType.KEYWORD;
     }
     else {

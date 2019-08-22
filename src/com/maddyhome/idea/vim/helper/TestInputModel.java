@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.helper;
@@ -35,10 +35,10 @@ public class TestInputModel {
   private TestInputModel() {}
 
   public static TestInputModel getInstance(@NotNull Editor editor) {
-    TestInputModel model = EditorData.getTestInputModel(editor);
+    TestInputModel model = UserDataManager.getVimTestInputModel(editor);
     if (model == null) {
       model = new TestInputModel();
-      EditorData.setTestInputModel(editor, model);
+      UserDataManager.setVimTestInputModel(editor, model);
     }
     return model;
   }

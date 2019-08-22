@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.handler
@@ -26,18 +26,17 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
-class SubstituteHandler : CommandHandler(
-        commands("s[ubstitute]", "&", "~"),
-        flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, WRITABLE)
-) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        var result = true
-        for (caret in editor.caretModel.allCarets) {
-            val lineRange = cmd.getLineRange(editor, caret, context)
-            if (!VimPlugin.getSearch().searchAndReplace(editor, caret, lineRange, cmd.command, cmd.argument)) {
-                result = false
-            }
-        }
-        return result
+class SubstituteHandler : CommandHandler.SingleExecution() {
+  override val names = commands("s[ubstitute]", "&", "~")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    var result = true
+    for (caret in editor.caretModel.allCarets) {
+      val lineRange = cmd.getLineRange(editor, caret, context)
+      if (!VimPlugin.getSearch().searchAndReplace(editor, caret, lineRange, cmd.command, cmd.argument)) {
+        result = false
+      }
     }
+    return result
+  }
 }

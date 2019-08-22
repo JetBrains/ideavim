@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.handler
@@ -24,34 +24,34 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 
 /**
  * @author vlan
  */
-class HelpHandler : CommandHandler(
-        commands("h[elp]"),
-        CommandHandler.ARGUMENT_OPTIONAL
-) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        BrowserUtil.browse(helpTopicUrl(cmd.argument))
-        return true
-    }
+class HelpHandler : CommandHandler.SingleExecution() {
+  override val names = commands("h[elp]")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    BrowserUtil.browse(helpTopicUrl(cmd.argument))
+    return true
+  }
 
-    private fun helpTopicUrl(topic: String): String {
-        if (topic.isBlank()) return HELP_ROOT_URL
+  private fun helpTopicUrl(topic: String): String {
+    if (topic.isBlank()) return HELP_ROOT_URL
 
-        return try {
-            String.format("%s?docs=help&search=%s", HELP_QUERY_URL, URLEncoder.encode(topic, "UTF-8"))
-        } catch (e: UnsupportedEncodingException) {
-            HELP_ROOT_URL
-        }
+    return try {
+      String.format("%s?docs=help&search=%s", HELP_QUERY_URL, URLEncoder.encode(topic, "UTF-8"))
+    } catch (e: UnsupportedEncodingException) {
+      HELP_ROOT_URL
     }
+  }
 
-    companion object {
-        private const val HELP_BASE_URL = "http://vimdoc.sourceforge.net"
-        private const val HELP_ROOT_URL = "$HELP_BASE_URL/htmldoc/"
-        private const val HELP_QUERY_URL = "$HELP_BASE_URL/search.php"
-    }
+  companion object {
+    private const val HELP_BASE_URL = "http://vimdoc.sourceforge.net"
+    private const val HELP_ROOT_URL = "$HELP_BASE_URL/htmldoc/"
+    private const val HELP_QUERY_URL = "$HELP_BASE_URL/search.php"
+  }
 }

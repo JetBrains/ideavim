@@ -13,13 +13,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 package com.maddyhome.idea.vim.ex;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.util.ThrowableComputable;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
@@ -40,11 +42,70 @@ import java.util.regex.Pattern;
  * executes Ex commands entered by the user.
  */
 public class CommandParser {
-  public static final int RES_EMPTY = 1;
-  public static final int RES_ERROR = 1;
-  public static final int RES_READONLY = 1;
-  public static final int RES_DONT_REOPEN = 4;
-  public static final Pattern TRIM_WHITESPACE = Pattern.compile("[ \\t]*(.*)[ \\t\\n\\r]+", Pattern.DOTALL);
+  private static final int MAX_RECURSION = 100;
+  private static final Pattern TRIM_WHITESPACE = Pattern.compile("[ \\t]*(.*)[ \\t\\n\\r]+", Pattern.DOTALL);
+  private final CommandHandler[] myHandlers = new CommandHandler[] {
+    new ActionListHandler(),
+    new AsciiHandler(),
+    new CmdFilterHandler(),
+    new CmdHandler(),
+    new CmdClearHandler(),
+    new CopyTextHandler(),
+    new DelCmdHandler(),
+    new DeleteLinesHandler(),
+    new DigraphHandler(),
+    new DumpLineHandler(),
+    new EditFileHandler(),
+    new ActionHandler(),
+    new EchoHandler(),
+    new ExitHandler(),
+    new FindClassHandler(),
+    new FindFileHandler(),
+    new FindSymbolHandler(),
+    new GotoCharacterHandler(),
+    //new GotoLineHandler(); - not needed here
+    new HelpHandler(),
+    new HistoryHandler(),
+    new JoinLinesHandler(),
+    new JumpsHandler(),
+    new LetHandler(),
+    new MapHandler(),
+    new MarkHandler(),
+    new MarksHandler(),
+    new MoveTextHandler(),
+    new NextFileHandler(),
+    new NoHLSearchHandler(),
+    new OnlyHandler(),
+    new PreviousFileHandler(),
+    new PromptFindHandler(),
+    new PromptReplaceHandler(),
+    new PutLinesHandler(),
+    new QuitHandler(),
+    new RedoHandler(),
+    new RegistersHandler(),
+    new RepeatHandler(),
+    new SelectFileHandler(),
+    new SelectFirstFileHandler(),
+    new SelectLastFileHandler(),
+    new SetHandler(),
+    new ShiftLeftHandler(),
+    new ShiftRightHandler(),
+    new SourceHandler(),
+    new SortHandler(),
+    new SplitHandler(),
+    new SubstituteHandler(),
+    new UndoHandler(),
+    new WriteAllHandler(),
+    new WriteHandler(),
+    new WriteNextFileHandler(),
+    new WritePreviousFileHandler(),
+    new WriteQuitHandler(),
+    new YankLinesHandler(),
+    new ShellHandler(),
+    new NextTabHandler(),
+    new PreviousTabHandler(),
+    new TabOnlyHandler()
+};
 
   /**
    * There is only one parser.
@@ -70,62 +131,9 @@ public class CommandParser {
   public void registerHandlers() {
     if (registered) return;
 
-    new ActionListHandler();
-    new AsciiHandler();
-    new CmdFilterHandler();
-    new CopyTextHandler();
-    new DeleteLinesHandler();
-    new DigraphHandler();
-    new DumpLineHandler();
-    new EditFileHandler();
-    new ActionHandler();
-    new EchoHandler();
-    new ExitHandler();
-    new FindClassHandler();
-    new FindFileHandler();
-    new FindSymbolHandler();
-    new GotoCharacterHandler();
-    //new GotoLineHandler(); - not needed here
-    new HelpHandler();
-    new HistoryHandler();
-    new JoinLinesHandler();
-    new JumpsHandler();
-    new LetHandler();
-    new MapHandler();
-    new MarkHandler();
-    new MarksHandler();
-    new MoveTextHandler();
-    new NextFileHandler();
-    new NoHLSearchHandler();
-    new OnlyHandler();
-    new PreviousFileHandler();
-    new PromptFindHandler();
-    new PromptReplaceHandler();
-    new PutLinesHandler();
-    new QuitHandler();
-    new RedoHandler();
-    new RegistersHandler();
-    new RepeatHandler();
-    new SelectFileHandler();
-    new SelectFirstFileHandler();
-    new SelectLastFileHandler();
-    new SetHandler();
-    new ShiftLeftHandler();
-    new ShiftRightHandler();
-    new SourceHandler();
-    new SortHandler();
-    new SplitHandler();
-    new SubstituteHandler();
-    new UndoHandler();
-    new WriteAllHandler();
-    new WriteHandler();
-    new WriteNextFileHandler();
-    new WritePreviousFileHandler();
-    new WriteQuitHandler();
-    new YankLinesHandler();
-    new ShellHandler();
-    new NextTabHandler();
-    new PreviousTabHandler();
+    for (CommandHandler handler : myHandlers) {
+      handler.register();
+    }
 
     registered = true;
     //logger.debug("root=" + root);
@@ -159,19 +167,47 @@ public class CommandParser {
    * @param context The data context
    * @param cmd     The text entered by the user
    * @param count   The count entered before the colon
-   * @return A bitwise collection of flags, if any, from the result of running the command.
    * @throws ExException if any part of the command is invalid or unknown
    */
-  public int processCommand(@NotNull Editor editor, @NotNull DataContext context, @NotNull String cmd,
+  public void processCommand(@NotNull Editor editor, @NotNull DataContext context, @NotNull String cmd,
                             int count) throws ExException {
+    processCommand(editor, context, cmd, count, MAX_RECURSION);
+  }
+
+  private void processCommand(@NotNull Editor editor, @NotNull DataContext context, @NotNull String cmd,
+                             int count, int aliasCountdown) throws ExException {
     // Nothing entered
     int result = 0;
     if (cmd.length() == 0) {
-      return result | RES_EMPTY;
+      logger.warn("CMD is empty");
+      return;
     }
 
-    // Save the command history
-    VimPlugin.getHistory().addEntry(HistoryGroup.COMMAND, cmd);
+    // Only save the command to the history if it is at the top of the stack.
+    // We don't want to save the aliases that will be executed, only the actual
+    // user input.
+    if (aliasCountdown == MAX_RECURSION) {
+      // Save the command history
+      VimPlugin.getHistory().addEntry(HistoryGroup.COMMAND, cmd);
+    }
+
+    // If there is a command alias for the entered text, then process the alias and return that
+    // instead of the original command.
+    if (VimPlugin.getCommand().isAlias(cmd)) {
+      if (aliasCountdown > 0) {
+        String commandAlias = VimPlugin.getCommand().getAliasCommand(cmd, count);
+        if (commandAlias.isEmpty()) {
+          logger.warn("Command alias is empty");
+          return;
+        }
+        processCommand(editor, context, commandAlias, count, aliasCountdown - 1);
+      } else {
+        VimPlugin.showMessage("Recursion detected, maximum alias depth reached.");
+        VimPlugin.indicateError();
+        logger.warn("Recursion detected, maximum alias depth reached. ");
+      }
+      return;
+    }
 
     // Parse the command
     final ExCommand command = parse(cmd);
@@ -182,23 +218,33 @@ public class CommandParser {
       throw new InvalidCommandException(message, cmd);
     }
 
-    if ((handler.getArgFlags() & CommandHandler.WRITABLE) > 0 && !editor.getDocument().isWritable()) {
+    if (handler.getArgFlags().getAccess() == CommandHandler.Access.WRITABLE && !editor.getDocument().isWritable()) {
       VimPlugin.indicateError();
-      return result | RES_READONLY;
+      logger.info("Trying to modify readonly document");
+      return;
     }
 
     // Run the command
-    boolean ok = handler.process(editor, context, command, count);
-    if (ok && (handler.getArgFlags() & CommandHandler.DONT_SAVE_LAST) == 0) {
-      VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
-                                                                  SelectionType.CHARACTER_WISE, ':', false);
-    }
 
-    if ((handler.getArgFlags() & CommandHandler.DONT_REOPEN) != 0) {
-      result |= RES_DONT_REOPEN;
-    }
+    ThrowableComputable<Object, ExException> runCommand = () -> {
+      boolean ok = handler.process(editor, context, command, count);
+      if (ok && !handler.getArgFlags().getFlags().contains(CommandHandler.Flag.DONT_SAVE_LAST)) {
+        VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
+                                                  SelectionType.CHARACTER_WISE, ':', false);
+      }
+      return null;
+    };
 
-    return result;
+    switch (handler.getArgFlags().getAccess()) {
+      case WRITABLE:
+        ApplicationManager.getApplication().runWriteAction(runCommand);
+        break;
+      case READ_ONLY:
+        ApplicationManager.getApplication().runReadAction(runCommand);
+        break;
+      case SELF_SYNCHRONIZED:
+        runCommand.compute();
+    }
   }
 
   @Nullable
@@ -232,7 +278,7 @@ public class CommandParser {
     if (logger.isDebugEnabled()) {
       logger.debug("processing `" + cmd + "'");
     }
-    int state = STATE_START;
+    State state = State.START;
     Ranges ranges = new Ranges(); // The list of ranges
     StringBuilder command = new StringBuilder(); // The command
     StringBuilder argument = new StringBuilder(); // The command's argument(s)
@@ -252,19 +298,19 @@ public class CommandParser {
       char ch = (i == cmd.length() ? '\n' : cmd.charAt(i));
       while (reprocess) {
         switch (state) {
-          case STATE_START: // Very start of the entered text
+          case START: // Very start of the entered text
             if (Character.isLetter(ch) || "~<>@=#*&!".indexOf(ch) >= 0) {
-              state = STATE_COMMAND;
+              state = State.COMMAND;
             }
             else if (ch == ' ') {
-              state = STATE_START;
+              state = State.START;
               reprocess = false;
             }
             else {
-              state = STATE_RANGE;
+              state = State.RANGE;
             }
             break;
-          case STATE_COMMAND: // Reading the actual command name
+          case COMMAND: // Reading the actual command name
             // For commands that start with a non-letter, treat other non-letter characters as part of
             // the argument except for !, <, or >
             if (Character.isLetter(ch) ||
@@ -274,44 +320,44 @@ public class CommandParser {
               command.append(ch);
               reprocess = false;
               if (!Character.isLetter(ch) && "<>".indexOf(ch) < 0) {
-                state = STATE_CMD_ARG;
+                state = State.CMD_ARG;
               }
             }
             else {
-              state = STATE_CMD_ARG;
+              state = State.CMD_ARG;
             }
             break;
-          case STATE_CMD_ARG: // Reading the command's argument
+          case CMD_ARG: // Reading the command's argument
             argument.append(ch);
             reprocess = false;
             break;
-          case STATE_RANGE: // Starting a new range
+          case RANGE: // Starting a new range
             location = new StringBuffer();
             offsetTotal = 0;
             offsetNumber = 0;
             move = false;
             if (ch >= '0' && ch <= '9') {
-              state = STATE_RANGE_LINE;
+              state = State.RANGE_LINE;
             }
             else if (ch == '.') {
-              state = STATE_RANGE_CURRENT;
+              state = State.RANGE_CURRENT;
             }
             else if (ch == '$') {
-              state = STATE_RANGE_LAST;
+              state = State.RANGE_LAST;
             }
             else if (ch == '%') {
-              state = STATE_RANGE_ALL;
+              state = State.RANGE_ALL;
             }
             else if (ch == '\'') {
-              state = STATE_RANGE_MARK;
+              state = State.RANGE_MARK;
             }
             else if (ch == '+' || ch == '-') {
               location.append('.');
-              state = STATE_RANGE_OFFSET;
+              state = State.RANGE_OFFSET;
             }
             else if (ch == '\\') {
               location.append(ch);
-              state = STATE_RANGE_SHORT_PATTERN;
+              state = State.RANGE_SHORT_PATTERN;
               reprocess = false;
             }
             else if (ch == '/' || ch == '?') {
@@ -319,32 +365,32 @@ public class CommandParser {
               patternType = ch;
               backCount = 0;
               inBrackets = false;
-              state = STATE_RANGE_PATTERN;
+              state = State.RANGE_PATTERN;
               reprocess = false;
             }
             else {
               error = MessageHelper.message(Msg.e_badrange, Character.toString(ch));
-              state = STATE_ERROR;
+              state = State.ERROR;
               reprocess = false;
             }
             break;
-          case STATE_RANGE_SHORT_PATTERN: // Handle \/, \?, and \& patterns
+          case RANGE_SHORT_PATTERN: // Handle \/, \?, and \& patterns
             if (ch == '/' || ch == '?' || ch == '&') {
               location.append(ch);
-              state = STATE_RANGE_PATTERN_MAYBE_DONE;
+              state = State.RANGE_PATTERN_MAYBE_DONE;
               reprocess = false;
             }
             else {
               error = MessageHelper.message(Msg.e_backslash);
-              state = STATE_ERROR;
+              state = State.ERROR;
               reprocess = false;
             }
             break;
-          case STATE_RANGE_PATTERN: // Reading a pattern range
+          case RANGE_PATTERN: // Reading a pattern range
             // No trailing / or ? required if there is no command so look for newline to tell us we are done
             if (ch == '\n') {
               location.append(patternType);
-              state = STATE_RANGE_MAYBE_DONE;
+              state = State.RANGE_MAYBE_DONE;
             }
             else {
               // We need to skip over [ ] ranges. The ] is valid right after the [ or [^
@@ -364,7 +410,7 @@ public class CommandParser {
               // and it is not preceded by an even number of backslashes
               else if (ch == patternType && !inBrackets &&
                        (location.charAt(location.length() - 2) != '\\' || backCount % 2 == 0)) {
-                state = STATE_RANGE_PATTERN_MAYBE_DONE;
+                state = State.RANGE_PATTERN_MAYBE_DONE;
               }
 
               // No more backslashes
@@ -375,7 +421,7 @@ public class CommandParser {
               reprocess = false;
             }
             break;
-          case STATE_RANGE_PATTERN_MAYBE_DONE: // Check to see if there is another immediate pattern
+          case RANGE_PATTERN_MAYBE_DONE: // Check to see if there is another immediate pattern
             if (ch == '/' || ch == '?') {
               // Use a special character to separate pattern for later, easier, parsing
               location.append('\u0000');
@@ -383,90 +429,90 @@ public class CommandParser {
               patternType = ch;
               backCount = 0;
               inBrackets = false;
-              state = STATE_RANGE_PATTERN;
+              state = State.RANGE_PATTERN;
               reprocess = false;
             }
             else {
-              state = STATE_RANGE_MAYBE_DONE;
+              state = State.RANGE_MAYBE_DONE;
             }
             break;
-          case STATE_RANGE_LINE: // Explicit line number
+          case RANGE_LINE: // Explicit line number
             if (ch >= '0' && ch <= '9') {
               location.append(ch);
-              state = STATE_RANGE_MAYBE_DONE;
+              state = State.RANGE_MAYBE_DONE;
               reprocess = false;
             }
             else {
-              state = STATE_RANGE_MAYBE_DONE;
+              state = State.RANGE_MAYBE_DONE;
             }
             break;
-          case STATE_RANGE_CURRENT: // Current line - .
+          case RANGE_CURRENT: // Current line - .
             location.append(ch);
-            state = STATE_RANGE_MAYBE_DONE;
+            state = State.RANGE_MAYBE_DONE;
             reprocess = false;
             break;
-          case STATE_RANGE_LAST: // Last line - $
+          case RANGE_LAST: // Last line - $
             location.append(ch);
-            state = STATE_RANGE_MAYBE_DONE;
+            state = State.RANGE_MAYBE_DONE;
             reprocess = false;
             break;
-          case STATE_RANGE_ALL: // All lines - %
+          case RANGE_ALL: // All lines - %
             location.append(ch);
-            state = STATE_RANGE_MAYBE_DONE;
+            state = State.RANGE_MAYBE_DONE;
             reprocess = false;
             break;
-          case STATE_RANGE_MARK: // Mark line - 'x
+          case RANGE_MARK: // Mark line - 'x
             location.append(ch);
-            state = STATE_RANGE_MARK_CHAR;
+            state = State.RANGE_MARK_CHAR;
             reprocess = false;
             break;
-          case STATE_RANGE_MARK_CHAR: // Actual mark
+          case RANGE_MARK_CHAR: // Actual mark
             location.append(ch);
-            state = STATE_RANGE_MAYBE_DONE;
+            state = State.RANGE_MAYBE_DONE;
             reprocess = false;
             break;
-          case STATE_RANGE_DONE: // We have hit the end of a range - process it
+          case RANGE_DONE: // We have hit the end of a range - process it
             Range[] range = AbstractRange.createRange(location.toString(), offsetTotal, move);
             if (range == null) {
               error = MessageHelper.message(Msg.e_badrange, Character.toString(ch));
-              state = STATE_ERROR;
+              state = State.ERROR;
               reprocess = false;
               break;
             }
             ranges.addRange(range);
             // Could there be more ranges - nope - at end, start command
             if (ch == ':' || ch == '\n') {
-              state = STATE_COMMAND;
+              state = State.COMMAND;
               reprocess = false;
             }
             // Start of command
             else if (Character.isLetter(ch) || "~<>@=#*&!".indexOf(ch) >= 0 || ch == ' ') {
-              state = STATE_START;
+              state = State.START;
             }
             // We have another range
             else {
-              state = STATE_RANGE;
+              state = State.RANGE;
             }
             break;
-          case STATE_RANGE_MAYBE_DONE: // Are we done with the current range?
+          case RANGE_MAYBE_DONE: // Are we done with the current range?
             // The range has an offset after it
             if (ch == '+' || ch == '-') {
-              state = STATE_RANGE_OFFSET;
+              state = State.RANGE_OFFSET;
             }
             // End of the range - we found a separator
             else if (ch == ',' || ch == ';') {
-              state = STATE_RANGE_SEPARATOR;
+              state = State.RANGE_SEPARATOR;
             }
             // Part of a line number
             else if (ch >= '0' && ch <= '9') {
-              state = STATE_RANGE_LINE;
+              state = State.RANGE_LINE;
             }
             // No more range
             else {
-              state = STATE_RANGE_DONE;
+              state = State.RANGE_DONE;
             }
             break;
-          case STATE_RANGE_OFFSET: // Offset after a range
+          case RANGE_OFFSET: // Offset after a range
             // Figure out the sign of the offset and reset the offset value
             offsetNumber = 0;
             if (ch == '+') {
@@ -475,20 +521,20 @@ public class CommandParser {
             else if (ch == '-') {
               offsetSign = -1;
             }
-            state = STATE_RANGE_OFFSET_MAYBE_DONE;
+            state = State.RANGE_OFFSET_MAYBE_DONE;
             reprocess = false;
             break;
-          case STATE_RANGE_OFFSET_MAYBE_DONE: // Are we done with the offset?
+          case RANGE_OFFSET_MAYBE_DONE: // Are we done with the offset?
             // We found an offset value
             if (ch >= '0' && ch <= '9') {
-              state = STATE_RANGE_OFFSET_NUM;
+              state = State.RANGE_OFFSET_NUM;
             }
             // Yes, offset done
             else {
-              state = STATE_RANGE_OFFSET_DONE;
+              state = State.RANGE_OFFSET_DONE;
             }
             break;
-          case STATE_RANGE_OFFSET_DONE: // At the end of a range offset
+          case RANGE_OFFSET_DONE: // At the end of a range offset
             // No number implies a one
             if (offsetNumber == 0) {
               offsetNumber = 1;
@@ -498,43 +544,45 @@ public class CommandParser {
 
             // Another offset
             if (ch == '+' || ch == '-') {
-              state = STATE_RANGE_OFFSET;
+              state = State.RANGE_OFFSET;
             }
             // No more offsets for this range
             else {
-              state = STATE_RANGE_MAYBE_DONE;
+              state = State.RANGE_MAYBE_DONE;
             }
             break;
-          case STATE_RANGE_OFFSET_NUM: // An offset number
+          case RANGE_OFFSET_NUM: // An offset number
             // Update the value of the current offset
             if (ch >= '0' && ch <= '9') {
               offsetNumber = offsetNumber * 10 + (ch - '0');
-              state = STATE_RANGE_OFFSET_MAYBE_DONE;
+              state = State.RANGE_OFFSET_MAYBE_DONE;
               reprocess = false;
             }
             // Found the start of a new offset
             else if (ch == '+' || ch == '-') {
-              state = STATE_RANGE_OFFSET_DONE;
+              state = State.RANGE_OFFSET_DONE;
             }
             else {
-              state = STATE_RANGE_OFFSET_MAYBE_DONE;
+              state = State.RANGE_OFFSET_MAYBE_DONE;
             }
             break;
-          case STATE_RANGE_SEPARATOR: // Found a range separator
+          case RANGE_SEPARATOR: // Found a range separator
             if (ch == ',') {
               move = false;
             }
             else if (ch == ';') {
               move = true;
             }
-            state = STATE_RANGE_DONE;
+            state = State.RANGE_DONE;
             reprocess = false;
+            break;
+          case ERROR:
             break;
         }
       }
 
       // Oops - bad command string
-      if (state == STATE_ERROR) {
+      if (state == State.ERROR) {
         throw new InvalidCommandException(error, cmd);
       }
     }
@@ -560,11 +608,7 @@ public class CommandParser {
    */
   public void addHandler(@NotNull CommandHandler handler) {
     // Iterator through each command name alias
-    CommandName[] names = handler.getNames();
-    if (names == null) {
-      return;
-    }
-    for (CommandName name : names) {
+    for (CommandName name : handler.getNames()) {
       CommandNode node = root;
       String text = name.getRequired();
       // Build a tree for each character in the required portion of the command name
@@ -608,27 +652,29 @@ public class CommandParser {
 
   private static CommandParser ourInstance;
 
-  private static final int STATE_START = 1;
-  private static final int STATE_COMMAND = 10;
-  private static final int STATE_CMD_ARG = 11;
-  private static final int STATE_RANGE = 20;
-  private static final int STATE_RANGE_LINE = 21;
-  private static final int STATE_RANGE_CURRENT = 22;
-  private static final int STATE_RANGE_LAST = 23;
-  private static final int STATE_RANGE_MARK = 24;
-  private static final int STATE_RANGE_MARK_CHAR = 25;
-  private static final int STATE_RANGE_ALL = 26;
-  private static final int STATE_RANGE_PATTERN = 27;
-  private static final int STATE_RANGE_SHORT_PATTERN = 28;
-  private static final int STATE_RANGE_PATTERN_MAYBE_DONE = 29;
-  private static final int STATE_RANGE_OFFSET = 30;
-  private static final int STATE_RANGE_OFFSET_NUM = 31;
-  private static final int STATE_RANGE_OFFSET_DONE = 32;
-  private static final int STATE_RANGE_OFFSET_MAYBE_DONE = 33;
-  private static final int STATE_RANGE_SEPARATOR = 40;
-  private static final int STATE_RANGE_MAYBE_DONE = 50;
-  private static final int STATE_RANGE_DONE = 51;
-  private static final int STATE_ERROR = 99;
+  private enum State {
+    START,
+    COMMAND,
+    CMD_ARG,
+    RANGE,
+    RANGE_LINE,
+    RANGE_CURRENT,
+    RANGE_LAST,
+    RANGE_MARK,
+    RANGE_MARK_CHAR,
+    RANGE_ALL,
+    RANGE_PATTERN,
+    RANGE_SHORT_PATTERN,
+    RANGE_PATTERN_MAYBE_DONE,
+    RANGE_OFFSET,
+    RANGE_OFFSET_NUM,
+    RANGE_OFFSET_DONE,
+    RANGE_OFFSET_MAYBE_DONE,
+    RANGE_SEPARATOR,
+    RANGE_MAYBE_DONE,
+    RANGE_DONE,
+    ERROR
+  }
 
   private static final Logger logger = Logger.getInstance(CommandParser.class.getName());
 }

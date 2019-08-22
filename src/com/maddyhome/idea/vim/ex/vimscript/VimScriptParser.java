@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.vimscript;
@@ -55,6 +55,27 @@ public class VimScriptParser {
         final File file = new File(homeDirName, fileName);
         if (file.exists()) {
           return file;
+        }
+      }
+    }
+    return null;
+  }
+
+  @Nullable
+  public static File findOrCreateIdeaVimRc() {
+    final File found = findIdeaVimRc();
+    if (found != null) return found;
+
+    final String homeDirName = System.getProperty("user.home");
+    if (homeDirName != null) {
+      for (String fileName : VIMRC_FILES) {
+        try {
+          final File file = new File(homeDirName, fileName);
+          //noinspection ResultOfMethodCallIgnored
+          file.createNewFile();
+          return file;
+        } catch (IOException ignored) {
+          // Try to create one of two files
         }
       }
     }

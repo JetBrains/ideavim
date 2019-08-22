@@ -13,13 +13,14 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ui;
 
 import com.intellij.util.Processor;
 import com.maddyhome.idea.vim.helper.StringHelper;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -30,6 +31,7 @@ import java.awt.event.KeyEvent;
  * @author dhleong
  */
 public final class ModalEntry {
+  @Contract(pure = true)
   private ModalEntry() {}
 
   /**

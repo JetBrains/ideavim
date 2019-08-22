@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.helper;
@@ -26,6 +26,7 @@ public interface Msg {
   String e_norange = "e_norange";
   String e_rangereq = "e_rangereq";
   String e_argreq = "e_argreq";
+  String e_argforb = "e_argforb";
   String e_noprev = "e_noprev";
   String e_nopresub = "e_nopresub";
   String E191 = "E191";

@@ -13,13 +13,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.common;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Please prefer {@link com.maddyhome.idea.vim.group.visual.VimSelection} for visual selection
+ */
 public class TextRange {
   public TextRange(int start, int end) {
     this(new int[]{start}, new int[]{end});
@@ -79,15 +82,15 @@ public class TextRange {
   }
 
   private void normalizeIndex(final int index) {
-    if (index< size() && ends[index] < starts[index]) {
+    if (index < size() && ends[index] < starts[index]) {
       int t = starts[index];
-      starts[0] = ends[index];
+      starts[index] = ends[index];
       ends[index] = t;
     }
   }
 
   public boolean normalize(final int fileSize) {
-    for (int i=0;i<size();i++) {
+    for (int i = 0; i < size(); i++) {
       normalizeIndex(i);
       starts[i] = Math.max(0, Math.min(starts[i], fileSize));
       if (starts[i] == fileSize) {
@@ -96,6 +99,13 @@ public class TextRange {
       ends[i] = Math.max(0, Math.min(ends[i], fileSize));
     }
     return true;
+  }
+
+  public boolean contains(final int offset) {
+    if (isMultiple()) {
+      return false;
+    }
+    return this.getStartOffset() <= offset && offset < this.getEndOffset();
   }
 
   @NotNull

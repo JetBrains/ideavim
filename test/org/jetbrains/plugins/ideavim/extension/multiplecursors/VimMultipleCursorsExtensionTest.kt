@@ -1,3 +1,21 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2019 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package org.jetbrains.plugins.ideavim.extension.multiplecursors
 
 import com.maddyhome.idea.vim.command.CommandState
@@ -17,13 +35,13 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   public ChangeLineAction() {
     super(new ChangeEditorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
       @Override
-      public boolean execute(@Not<caret>Null Editor editor,
-                             @NotNull Caret caret,
+      public boolean execute(@Not${c}Null Editor editor,
+                             @NotNull Caret c,
                              @NotNull DataContext context,
                              int count,
                              int rawCount,
                              @NotNull Argument argument) {
-        return VimPlugin.getChange().changeLine(editor, caret, count);
+        return VimPlugin.getChange().changeLine(editor, c, count);
       }
     });
   }
@@ -36,13 +54,13 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   public ChangeLineAction() {
     super(new ChangeEditorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
       @Override
-      public boolean execute(@<selection>NotNull</selection> Editor editor,
-                             @<selection>NotNull</selection> Caret caret,
-                             @<selection>NotNull</selection> DataContext context,
+      public boolean execute(@${s}NotNull$se Editor editor,
+                             @${s}NotNull$se Caret c,
+                             @${s}NotNull$se DataContext context,
                              int count,
                              int rawCount,
                              @NotNull Argument argument) {
-        return VimPlugin.getChange().changeLine(editor, caret, count);
+        return VimPlugin.getChange().changeLine(editor, c, count);
       }
     });
   }
@@ -56,13 +74,13 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   public ChangeLineAction() {
     super(new ChangeEditorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
       @Override
-      public boolean execute(@Not<caret>Null Editor editor,
-                             @NotNull Caret caret,
+      public boolean execute(@Not${c}Null Editor editor,
+                             @NotNull Caret c,
                              @NotNull DataContext context,
                              int count,
                              int rawCount,
                              @NotNull Argument argument) {
-        return VimPlugin.getChange().changeLine(editor, caret, count);
+        return VimPlugin.getChange().changeLine(editor, c, count);
       }
     });
   }
@@ -75,13 +93,13 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   public ChangeLineAction() {
     super(new ChangeEditorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
       @Override
-      public boolean execute(@<selection>NotNull</selection> Editor editor,
-                             @<selection>NotNull</selection> Caret caret,
-                             @<selection>NotNull</selection> DataContext context,
+      public boolean execute(@${s}NotNull$se Editor editor,
+                             @${s}NotNull$se Caret c,
+                             @${s}NotNull$se DataContext context,
                              int count,
                              int rawCount,
-                             @<selection>NotNull</selection> Argument argument) {
-        return VimPlugin.getChange().changeLine(editor, caret, count);
+                             @${s}NotNull$se Argument argument) {
+        return VimPlugin.getChange().changeLine(editor, c, count);
       }
     });
   }
@@ -93,7 +111,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   fun testNotWholeOccurrence() {
     val before = """Int
       |Integer
-      |I<caret>nt
+      |I${c}nt
       |Integer
       |Integer
       |Int
@@ -103,19 +121,19 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(parseKeys("g<A-n>", "<A-n>".repeat(before.count { it == '\n' } - 1)))
 
-    val after = """<selection>Int</selection>
+    val after = """${s}Int$se
       |Integer
-      |<selection>Int</selection>
-      |<selection>Int</selection>eger
-      |<selection>Int</selection>eger
-      |<selection>Int</selection>
-      |<selection>Int</selection>ger
+      |${s}Int$se
+      |${s}Int${se}eger
+      |${s}Int${se}eger
+      |${s}Int$se
+      |${s}Int${se}ger
     """.trimMargin()
     myFixture.checkResult(after)
   }
 
   fun testSelectSubstring() {
-    val before = """q<caret>we
+    val before = """q${c}we
       |asdqweasd
       |qwe
       |asd
@@ -124,16 +142,16 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(parseKeys("g<A-n>".repeat(3)))
 
-    val after = """<selection>qwe</selection>
-      |asd<selection>qwe</selection>asd
-      |<selection>qwe</selection>
+    val after = """${s}qwe$se
+      |asd${s}qwe${se}asd
+      |${s}qwe$se
       |asd
     """.trimMargin()
     myFixture.checkResult(after)
   }
 
   fun testSelectSingleOccurrence() {
-    val before = """q<caret>we
+    val before = """q${c}we
       |asd
       |zxc
       |cvb
@@ -144,7 +162,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(parseKeys("<A-n>".repeat(4)))
 
-    val after = """<selection>qwe</selection>
+    val after = """${s}qwe$se
       |asd
       |zxc
       |cvb
@@ -156,10 +174,10 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
   fun testSelectionWithMultipleCarets() {
     val before = """qwe
-      |sdfgdfs<caret>fdasfg
-      |<caret>dfkjsghdfs
+      |sdfgdfs${c}fdasfg
+      |${c}dfkjsghdfs
       |gkj dhfs
-      |dfsgdf<caret>dfkgh dfs
+      |dfsgdf${c}dfkgh dfs
     """.trimMargin()
     configureByText(before)
 
@@ -170,7 +188,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   fun testSelectAll() {
     val before = """qwe
       |asd
-      |q<caret>we
+      |q${c}we
       |asd
       |qwe
     """.trimMargin()
@@ -178,11 +196,11 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(parseKeys("<Plug>AllWholeOccurrences"))
 
-    val after = """<selection>qwe</selection>
+    val after = """${s}qwe$se
       |asd
-      |<selection>qwe</selection>
+      |${s}qwe$se
       |asd
-      |<selection>qwe</selection>
+      |${s}qwe$se
     """.trimMargin()
     myFixture.checkResult(after)
   }
@@ -190,7 +208,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   fun testSelectAllNotWhole() {
     val before = """Int
       |Integer
-      |I<caret>nt
+      |I${c}nt
       |Integer
       |Integer
       |Int
@@ -199,13 +217,13 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     configureByText(before)
 
     typeText(parseKeys("<Plug>AllOccurrences"))
-    val after = """<selection>Int</selection>
-      |<selection>Int</selection>eger
-      |<selection>Int</selection>
-      |<selection>Int</selection>eger
-      |<selection>Int</selection>eger
-      |<selection>Int</selection>
-      |<selection>Int</selection>ger
+    val after = """${s}Int$se
+      |${s}Int${se}eger
+      |${s}Int$se
+      |${s}Int${se}eger
+      |${s}Int${se}eger
+      |${s}Int$se
+      |${s}Int${se}ger
     """.trimMargin()
     myFixture.checkResult(after)
   }
@@ -213,7 +231,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   fun testSelectAllSingleOccurrence() {
     val before = """qwe
       |asd
-      |z<caret>xc
+      |z${c}xc
       |adgf
       |dfgh
       |awe
@@ -225,19 +243,19 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(parseKeys("<Plug>AllOccurrences"))
 
-    val after = before.replace("z<caret>xc", "<selection>zxc</selection>")
+    val after = before.replace("z${c}xc", "${s}zxc$se")
     myFixture.checkResult(after)
   }
 
   fun testRemoveSelectionVisualMode() {
-    val before = """q<selection>we
+    val before = """q${s}we
       |dsgkldfjs ldfl gkjsdsl kj
-      |dsfg dhjs</selection>dafkljgh
+      |dsfg dhjs${se}dafkljgh
       |dfkjsg
     """.trimMargin()
     val editor = configureByText(before)
     CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER,
-                                               MappingMode.VISUAL)
+      MappingMode.VISUAL)
 
     typeText(parseKeys("<A-p>"))
     myFixture.checkResult(before)
@@ -252,15 +270,15 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(parseKeys("g<A-n>", "<A-n>".repeat(2), "<A-p>"))
 
-    val after = """<selection>Int</selection>
-      |kek<selection>Int</selection>eger
+    val after = """${s}Int$se
+      |kek${s}Int${se}eger
       |lolInteger
     """.trimMargin()
     myFixture.checkResult(after)
   }
 
   fun testRemoveOccurrence() {
-    val before = """private i<caret>nt a = 0;
+    val before = """private i${c}nt a = 0;
       |private int b = 1;
       |private int c = 2;
       |private int d = 3;
@@ -270,7 +288,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   }
 
   fun testSkipOccurrence() {
-    val before = """pr<caret>ivate int a = 0;
+    val before = """pr${c}ivate int a = 0;
       |private int b = 1;
       |private int c = 2;
     """.trimMargin()
@@ -279,15 +297,15 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     typeText(parseKeys("<A-n>", "<A-x>", "<A-n>"))
 
     val after = """private int a = 0;
-      |<selection>private</selection> int b = 1;
-      |<selection>private</selection> int c = 2;
+      |${s}private$se int b = 1;
+      |${s}private$se int c = 2;
     """.trimMargin()
 
     myFixture.checkResult(after)
   }
 
   fun testSkipAndThenSelectAllOccurrences() {
-    val before = """pr<caret>ivate int a = 0;
+    val before = """pr${c}ivate int a = 0;
       |private int b = 1;
       |private int c = 2;
     """.trimMargin()
@@ -295,9 +313,9 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(parseKeys("<A-n>", "<A-x>", "<A-n>".repeat(3)))
 
-    val after = """<selection>private</selection> int a = 0;
-      |<selection>private</selection> int b = 1;
-      |<selection>private</selection> int c = 2;
+    val after = """${s}private$se int a = 0;
+      |${s}private$se int b = 1;
+      |${s}private$se int c = 2;
     """.trimMargin()
 
     myFixture.checkResult(after)
@@ -306,7 +324,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   fun testSeveralActions() {
     val before = """public class Main {
       |  public static void main(String[] args) {
-      |    f<caret>inal Integer a = 0;
+      |    f${c}inal Integer a = 0;
       |    final Integer b = 1;
       |    final Integer c = 2;
       |    final Integer d = 3;
@@ -323,11 +341,11 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     val after = """public class Main {
       |  public static void main(String[] args) {
       |    final Integer a = 0;
-      |    <selection>final</selection> Integer b = 1;
-      |    <selection>final</selection> Integer c = 2;
-      |    <selection>final</selection> Integer d = 3;
+      |    ${s}final$se Integer b = 1;
+      |    ${s}final$se Integer c = 2;
+      |    ${s}final$se Integer d = 3;
       |    final Integer e = 5;
-      |    <selection>final</selection> Integer f = 6;
+      |    ${s}final$se Integer f = 6;
       |    final Integer g = 7;
       |  }
       |}
@@ -339,11 +357,11 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     val afterEscape = """public class Main {
       |  public static void main(String[] args) {
       |    final Integer a = 0;
-      |    fina<caret>l Integer b = 1;
-      |    fina<caret>l Integer c = 2;
-      |    fina<caret>l Integer d = 3;
+      |    fina${c}l Integer b = 1;
+      |    fina${c}l Integer c = 2;
+      |    fina${c}l Integer d = 3;
       |    final Integer e = 5;
-      |    fina<caret>l Integer f = 6;
+      |    fina${c}l Integer f = 6;
       |    final Integer g = 7;
       |  }
       |}
@@ -386,9 +404,9 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
     typeText(parseKeys("<A-n>".repeat(2)))
 
-    val after = """<selection>qwe</selection>
+    val after = """${s}qwe$se
       |asd
-      |<selection>qwe</selection>
+      |${s}qwe$se
       |asd
       |qwe
     """.trimMargin()
@@ -397,7 +415,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
 
   fun testSkipSelectionSubstring() {
-    val before = """qw<caret>e
+    val before = """qw${c}e
       |asdqweasd
       |ads
       |asdqweasd
@@ -408,23 +426,23 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     typeText(parseKeys("g<A-n>", "<A-x>", "<A-n>".repeat(2)))
 
     val after = """qwe
-      |asd<selection>qwe</selection>asd
+      |asd${s}qwe${se}asd
       |ads
-      |asd<selection>qwe</selection>asd
-      |<selection>qwe</selection>
+      |asd${s}qwe${se}asd
+      |${s}qwe$se
     """.trimMargin()
     myFixture.checkResult(after)
   }
 
   fun testSkipSelectionVisualMode() {
-    val before = """q<selection>we
+    val before = """q${s}we
       |dsgkldfjs ldfl gkjsdsl kj
-      |dsfg dhjs</selection>dafkljgh
+      |dsfg dhjs${se}dafkljgh
       |dfkjsg
     """.trimMargin()
     val editor = configureByText(before)
     CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER,
-                                               MappingMode.VISUAL)
+      MappingMode.VISUAL)
 
     typeText(parseKeys("<A-x>"))
     assertMode(CommandState.Mode.VISUAL)
@@ -432,21 +450,21 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   }
 
   fun testAddSelectionVisualMode() {
-    val before = """jdfsg sdf<caret>dfkgjhfkgkldfjsg
+    val before = """jdfsg sdf${c}dfkgjhfkgkldfjsg
       |dfkjghdfsgs
       |dflsgsdfgh
     """.trimMargin()
     configureByText(before)
 
     typeText(parseKeys("vjl", "<A-n>"))
-    val after = """jdfsg sdf<caret>dfkgjhfkgkldfjsg
-                        |dfkjghdfs<caret>gs
+    val after = """jdfsg sdf${c}dfkgjhfkgkldfjsg
+                        |dfkjghdfs${c}gs
                         |dflsgsdfgh""".trimMargin()
     myFixture.checkResult(after)
   }
 
   fun testNextOccurrenceIgnorecase() {
-    val before = """fun getCellType(<caret>pos: VisualPosition): CellType {
+    val before = """fun getCellType(${c}pos: VisualPosition): CellType {
     if (pos in snakeCells) {
       return CellType.SNAKE
     }
@@ -461,8 +479,8 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(commandToKeys("set ignorecase"))
     typeText(parseKeys("g<A-n><A-n><A-n>"))
-    val after = """fun getCellType(<selection>pos</selection>: Visual<selection>Pos</selection>ition): CellType {
-    if (<selection>pos</selection> in snakeCells) {
+    val after = """fun getCellType(${s}pos$se: Visual${s}Pos${se}ition): CellType {
+    if (${s}pos$se in snakeCells) {
       return CellType.SNAKE
     }
     val char = getCharAt(pos)
@@ -473,5 +491,22 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     }
     }"""
     myFixture.checkResult(after)
+  }
+
+  fun `test with tabs`() {
+    val before = dotToTab("""
+      I found it in a legendary land
+      ...${c}all rocks and lavender and tufted grass,
+      ...all it was settled on some sodden sand
+      ...all by the torrent of a mountain pass
+    """.trimIndent())
+    val keys = parseKeys("vll", "<A-N>", "<A-N>")
+    val after = dotToTab("""
+      I found it in a legendary land
+      ...${s}al${c}l${se} rocks and lavender and tufted grass,
+      ...${s}al${c}l${se} it was settled on some sodden sand
+      ...${s}al${c}l${se} by the torrent of a mountain pass
+    """.trimIndent())
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 }

@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.helper;
@@ -61,8 +61,7 @@ public class DocumentManager {
   }
 
 
-  @NotNull private final HashSet<DocumentListener> docListeners = new HashSet<DocumentListener>();
-
-  private static final Key<String> LISTENER_MARKER = new Key<String>("listenerMarker");
+  private static final Key<String> LISTENER_MARKER = new Key<>("listenerMarker");
+  @NotNull private final HashSet<DocumentListener> docListeners = new HashSet<>();
   @NotNull private static final DocumentManager instance = new DocumentManager();
 }

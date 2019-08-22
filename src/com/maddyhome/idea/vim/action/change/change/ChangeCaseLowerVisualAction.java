@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.action.change.change;
@@ -21,16 +21,17 @@ package com.maddyhome.idea.vim.action.change.change;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.CaretOrder;
+import com.maddyhome.idea.vim.group.visual.VimSelection;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
+import com.maddyhome.idea.vim.helper.HelperKt;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -41,38 +42,48 @@ import java.util.Set;
 /**
  * @author vlan
  */
-public class ChangeCaseLowerVisualAction extends VimCommandAction {
-  public ChangeCaseLowerVisualAction() {
-    super(new VisualOperatorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
-      @Override
-      protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                                @NotNull Command cmd, @NotNull TextRange range) {
-        final Editor topLevelEditor = InjectedLanguageUtil.getTopLevelEditor(editor);
-        return VimPlugin.getChange().changeCaseRange(topLevelEditor, caret, range, CharacterHelper.CASE_LOWER);
-      }
-    });
-  }
-
+final public class ChangeCaseLowerVisualAction extends VimCommandAction {
+  @Contract(" -> new")
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
+  final protected VimActionHandler makeActionHandler() {
+    return new VisualOperatorActionHandler.ForEachCaret() {
+      @Override
+      public boolean executeAction(@NotNull Editor editor,
+                                      @NotNull Caret caret,
+                                      @NotNull DataContext context,
+                                      @NotNull Command cmd,
+                                      @NotNull VimSelection range) {
+        final Editor topLevelEditor = HelperKt.getTopLevelEditor(editor);
+        return VimPlugin.getChange()
+          .changeCaseRange(topLevelEditor, caret, range.toVimTextRange(false), CharacterHelper.CASE_LOWER);
+      }
+    };
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Set<MappingMode> getMappingModes() {
     return MappingMode.V;
   }
 
   @NotNull
   @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("u");
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.CHANGE;
   }
 
   @NotNull
   @Override
-  public Command.Type getType() {
-    return Command.Type.CHANGE;
-  }
-
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
+  final public EnumSet<CommandFlags> getFlags() {
     return EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL);
   }
 }

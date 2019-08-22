@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.handler
@@ -23,29 +23,25 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.commands
-import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.handler.CaretOrder
+import com.maddyhome.idea.vim.ex.*
 
-class DeleteLinesHandler : CommandHandler(commands("d[elete]"),
-        flags(CommandHandler.RANGE_OPTIONAL, CommandHandler.ARGUMENT_OPTIONAL, CommandHandler.WRITABLE),
-        true, CaretOrder.DECREASING_OFFSET
-) {
-    override fun execute(editor: Editor, caret: Caret, context: DataContext,
-                         cmd: ExCommand): Boolean {
-        val argument = cmd.argument
-        val register = if (argument.isNotEmpty() && !argument[0].isDigit()) {
-            cmd.argument = argument.substring(1)
-            argument[0]
-        } else {
-            VimPlugin.getRegister().defaultRegister
-        }
+class DeleteLinesHandler : CommandHandler.ForEachCaret() {
+  override val names: Array<CommandName> = commands("d[elete]")
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
-        if (!VimPlugin.getRegister().selectRegister(register)) return false
-
-        val textRange = cmd.getTextRange(editor, caret, context, true)
-        return VimPlugin.getChange().deleteRange(editor, caret, textRange, SelectionType.LINE_WISE, false)
+  override fun execute(editor: Editor, caret: Caret, context: DataContext,
+                       cmd: ExCommand): Boolean {
+    val argument = cmd.argument
+    val register = if (argument.isNotEmpty() && !argument[0].isDigit()) {
+      cmd.argument = argument.substring(1)
+      argument[0]
+    } else {
+      VimPlugin.getRegister().defaultRegister
     }
+
+    if (!VimPlugin.getRegister().selectRegister(register)) return false
+
+    val textRange = cmd.getTextRange(editor, caret, context, true)
+    return VimPlugin.getChange().deleteRange(editor, caret, textRange, SelectionType.LINE_WISE, false)
+  }
 }

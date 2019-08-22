@@ -5,9 +5,10 @@ The original author:
 
 * [Rick Maddy](mailto:rmaddy@maddyhome.com)
 
-The current maintainer:
+The current maintainers:
 
 * [Andrey Vlasovskikh](mailto:andrey.vlasovskikh@gmail.com)
+* [Alex Plate](mailto:alexpl292@gmail.com)
 
 Previous maintainers:
 
@@ -36,7 +37,7 @@ Contributors:
 * [Jackson Popkin](mailto:jackson@donorschoose.org)
 * [Teruo Kunihiro](mailto:yuyuyu1999@gmail.com)
 * [Liubov Paina](mailto:lubashka.994@mail.ru)
-* [Daniel Leong](mailto:falcone88@gmail.com)
+* [Daniel Leong](mailto:me@dhleong.net)
 * [Aleksey Lagoshin](mailto:aleksey@pri-num.com)
 * [Paulo Bu](mailto:pbu_98@yahoo.com)
 * [Giorgos Gaganis](mailto:gaganis@yahoo.com)
@@ -60,6 +61,19 @@ Contributors:
 * [Andrei Gasparovici](mailto:andreigasparovici1@gmail.com)
 * [dos65](mailto:qtankle@gmail.com)
 * [Tony Arra](mailto:ttonyarra@gmail.com)
+* [Brad Ziolko](mailto:bradziolko@gmail.com)
+* [sumoooru2](mailto:sumoooru2@gmail.com)
+* [gecko655](mailto:aqwsedrft1234@yahoo.co.jp)
+* [Daniele Megna](mailto:megna.dany@gmail.com)
+* [Andrew Potter](mailto:apottere@gmail.com)
+* [Romain Gautier](mailto:romain.gautier@nimamoh.net)
+* [Elliot Courant](mailto:elliot.courant@wheniwork.com)
+* [Simon Rainer](mailto:simon.rainer@fau.de)
+* [Michael Ziwisky](mailto:mziwisky@instructure.com)
+* [Pierce Corcoran](mailto:pierce@plasticcow.com)
+* [Jonatan Tierno](mailto:jonatantierno@gmail.com)
+* [Brendan Annable](mailto:brendan@annable.me)
+* [Naveen Kumar Molleti](mailto:nerd.naveen@gmail.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.

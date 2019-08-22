@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.action.motion.visual;
@@ -24,7 +24,8 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -34,30 +35,37 @@ import java.util.Set;
 /**
  * @author vlan
  */
-public class VisualSwapSelectionsAction extends VimCommandAction {
-  public VisualSwapSelectionsAction() {
-    super(new EditorActionHandlerBase() {
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        return VimPlugin.getMotion().swapVisualSelections(editor);
-      }
-    });
-  }
-
+final public class VisualSwapSelectionsAction extends VimCommandAction {
+  @Contract(" -> new")
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
+  final protected VimActionHandler makeActionHandler() {
+    return new VimActionHandler.SingleExecution() {
+      // FIXME: 2019-03-05 Make it multicaret
+      @Override
+      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+        return VimPlugin.getVisualMotion().swapVisualSelections(editor);
+      }
+    };
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Set<MappingMode> getMappingModes() {
     return MappingMode.V;
   }
 
   @NotNull
   @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("gv");
   }
 
+  @Contract(pure = true)
   @NotNull
   @Override
-  public Command.Type getType() {
+  final public Command.Type getType() {
     return Command.Type.OTHER_READONLY;
   }
 }

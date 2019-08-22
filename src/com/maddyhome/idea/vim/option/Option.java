@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.option;
@@ -104,6 +104,7 @@ public abstract class Option {
    * Helper method used to sort lists of options by their name
    */
   static class NameSorter<V> implements Comparator<V> {
+    @Override
     public int compare(@NotNull V o1, @NotNull V o2) {
       return ((Option)o1).name.compareTo(((Option)o2).name);
     }
@@ -111,5 +112,5 @@ public abstract class Option {
 
   protected final String name;
   protected final String abbrev;
-  @NotNull protected final List<OptionChangeListener> listeners = new ArrayList<OptionChangeListener>();
+  @NotNull protected final List<OptionChangeListener> listeners = new ArrayList<>();
 }

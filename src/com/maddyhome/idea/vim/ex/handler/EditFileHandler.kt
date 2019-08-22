@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.handler
@@ -29,27 +29,26 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.EditorDataContext
 
-class EditFileHandler : CommandHandler(
-        commands("bro[wse]", "e[dit]"),
-        flags(CommandHandler.RANGE_FORBIDDEN, CommandHandler.ARGUMENT_OPTIONAL, CommandHandler.DONT_REOPEN)
-) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val arg = cmd.argument
-        if (arg == "#") {
-            VimPlugin.getMark().saveJumpLocation(editor)
-            VimPlugin.getFile().selectPreviousTab(context)
-            return true
-        } else if (arg.isNotEmpty()) {
-            val res = VimPlugin.getFile().openFile(arg, context)
-            if (res) {
-                VimPlugin.getMark().saveJumpLocation(editor)
-            }
-            return res
-        }
-
-        // Don't open a choose file dialog under a write action
-        ApplicationManager.getApplication().invokeLater { KeyHandler.executeAction("OpenFile", EditorDataContext(editor)) }
-
-        return true
+class EditFileHandler : CommandHandler.SingleExecution() {
+  override val names = commands("bro[wse]", "e[dit]")
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val arg = cmd.argument
+    if (arg == "#") {
+      VimPlugin.getMark().saveJumpLocation(editor)
+      VimPlugin.getFile().selectPreviousTab(context)
+      return true
+    } else if (arg.isNotEmpty()) {
+      val res = VimPlugin.getFile().openFile(arg, context)
+      if (res) {
+        VimPlugin.getMark().saveJumpLocation(editor)
+      }
+      return res
     }
+
+    // Don't open a choose file dialog under a write action
+    ApplicationManager.getApplication().invokeLater { KeyHandler.executeAction("OpenFile", EditorDataContext(editor)) }
+
+    return true
+  }
 }

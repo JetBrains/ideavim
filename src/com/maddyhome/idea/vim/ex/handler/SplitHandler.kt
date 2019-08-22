@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.handler
@@ -26,17 +26,16 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
-class SplitHandler : CommandHandler(
-        commands("vs[plit]", "sp[lit]"),
-        flags(RANGE_FORBIDDEN, ARGUMENT_OPTIONAL, DONT_REOPEN)
-) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        if (cmd.command.startsWith("v")) {
-            VimPlugin.getWindow().splitWindowVertical(context, cmd.argument)
-        } else {
-            VimPlugin.getWindow().splitWindowHorizontal(context, cmd.argument)
-        }
-
-        return true
+class SplitHandler : CommandHandler.SingleExecution() {
+  override val names = commands("vs[plit]", "sp[lit]")
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    if (cmd.command.startsWith("v")) {
+      VimPlugin.getWindow().splitWindowVertical(context, cmd.argument)
+    } else {
+      VimPlugin.getWindow().splitWindowHorizontal(context, cmd.argument)
     }
+
+    return true
+  }
 }

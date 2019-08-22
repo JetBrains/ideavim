@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.handler
@@ -22,19 +22,19 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandler.ArgumentFlag.ARGUMENT_OPTIONAL
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
-class SelectFirstFileHandler : CommandHandler(
-        commands("fir[st]", "rew[ind]"),
-        flags(CommandHandler.ARGUMENT_OPTIONAL, CommandHandler.DONT_REOPEN)
-) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val res = VimPlugin.getFile().selectFile(0, context)
-        if (res) {
-            VimPlugin.getMark().saveJumpLocation(editor)
-        }
-        return res
+class SelectFirstFileHandler : CommandHandler.SingleExecution() {
+  override val names = commands("fir[st]", "rew[ind]")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val res = VimPlugin.getFile().selectFile(0, context)
+    if (res) {
+      VimPlugin.getMark().saveJumpLocation(editor)
     }
+    return res
+  }
 }

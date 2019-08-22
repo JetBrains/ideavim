@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.option;
@@ -24,16 +24,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- *
- */
+
 public class BoundListOption extends ListOption {
   BoundListOption(String name, String abbrev, String[] dflt, String[] values) {
     super(name, abbrev, dflt, null);
 
-    this.values = new ArrayList<String>(Arrays.asList(values));
+    this.values = new ArrayList<>(Arrays.asList(values));
   }
 
+  @Override
   public boolean set(String val) {
     List<String> vals = parseVals(val);
     if (vals != null && values.containsAll(vals)) {
@@ -43,6 +42,7 @@ public class BoundListOption extends ListOption {
     return true;
   }
 
+  @Override
   public boolean append(String val) {
     List<String> vals = parseVals(val);
     if (vals != null && values.containsAll(vals)) {
@@ -52,6 +52,7 @@ public class BoundListOption extends ListOption {
     return true;
   }
 
+  @Override
   public boolean prepend(String val) {
     List<String> vals = parseVals(val);
     if (vals != null && values.containsAll(vals)) {
@@ -61,6 +62,7 @@ public class BoundListOption extends ListOption {
     return true;
   }
 
+  @Override
   public boolean remove(String val) {
     List<String> vals = parseVals(val);
     if (vals != null && values.containsAll(vals)) {

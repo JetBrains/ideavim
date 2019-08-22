@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.common;
@@ -57,9 +57,7 @@ public class Mark extends FileLocation {
 
   public boolean equals(@Nullable Object object) {
     if (object instanceof Mark) {
-      if (((Mark)object).key == key) {
-        return true;
-      }
+      return ((Mark)object).key == key;
     }
 
     return false;
@@ -71,6 +69,7 @@ public class Mark extends FileLocation {
   }
 
   public static class KeySorter<V> implements Comparator<V> {
+    @Override
     public int compare(V o1, V o2) {
       Mark a = (Mark)o1;
       Mark b = (Mark)o2;

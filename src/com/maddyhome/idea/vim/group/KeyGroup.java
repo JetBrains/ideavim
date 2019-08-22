@@ -13,15 +13,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.group;
 
 import com.google.common.collect.ImmutableList;
+import com.intellij.codeInsight.lookup.impl.LookupImpl;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.actionSystem.ex.ActionUtil;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.keymap.Keymap;
@@ -29,7 +31,7 @@ import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
+import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
@@ -40,6 +42,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.Shortcut;
 import com.maddyhome.idea.vim.key.*;
+import kotlin.text.StringsKt;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,7 +53,6 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.*;
 
-import static com.maddyhome.idea.vim.helper.StringHelper.leftJustify;
 import static com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation;
 
 /**
@@ -68,13 +70,18 @@ public class KeyGroup {
   @NotNull private final Map<MappingMode, KeyMapping> keyMappings = new HashMap<>();
   @Nullable private OperatorFunction operatorFunction = null;
 
-  public void registerRequiredShortcutKeys(@NotNull Editor editor) {
-    final Set<KeyStroke> requiredKeys = VimPlugin.getKey().requiredShortcutKeys;
+  void registerRequiredShortcutKeys(@NotNull Editor editor) {
     EventFacade.getInstance().registerCustomShortcutSet(VimShortcutKeyAction.getInstance(),
-                                                        toShortcutSet(requiredKeys), editor.getComponent());
+                                                        toShortcutSet(requiredShortcutKeys), editor.getComponent());
   }
 
-  public void unregisterShortcutKeys(@NotNull Editor editor) {
+  public void registerShortcutsForLookup(@NotNull LookupImpl lookup) {
+    EventFacade.getInstance()
+      .registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(requiredShortcutKeys),
+                                 lookup.getComponent(), lookup);
+  }
+
+  void unregisterShortcutKeys(@NotNull Editor editor) {
     EventFacade.getInstance().unregisterCustomShortcutSet(VimShortcutKeyAction.getInstance(), editor.getComponent());
   }
 
@@ -82,9 +89,9 @@ public class KeyGroup {
     final List<MappingInfo> rows = getKeyMappingRows(modes);
     final StringBuilder builder = new StringBuilder();
     for (MappingInfo row : rows) {
-      builder.append(leftJustify(getModesStringCode(row.getMappingModes()), 2, ' '));
+      builder.append(StringsKt.padEnd(getModesStringCode(row.getMappingModes()), 2, ' '));
       builder.append(" ");
-      builder.append(leftJustify(toKeyNotation(row.getFromKeys()), 11, ' '));
+      builder.append(StringsKt.padEnd(toKeyNotation(row.getFromKeys()), 11, ' '));
       builder.append(" ");
       builder.append(row.isRecursive() ? " " : "*");
       builder.append(" ");
@@ -247,107 +254,65 @@ public class KeyGroup {
     return res;
   }
 
-  public void registerCommandAction(@NotNull VimCommandAction commandAction, @NotNull String actionId) {
+  /**
+   * Registers a shortcut that is handled by KeyHandler#handleKey directly, rather than by an action
+   *
+   * <p>
+   * Digraphs are handled directly by KeyHandler#handleKey instead of via an action, but we need to still make sure the
+   * shortcuts are registered, or the key handler won't see them
+   * </p>
+   * @param shortcut The shortcut to register
+   */
+  public void registerShortcutWithoutAction(Shortcut shortcut) {
+    registerRequiredShortcut(shortcut);
+  }
+
+  public void registerCommandAction(@NotNull VimCommandActionBase commandAction, @NotNull String actionId) {
     final List<Shortcut> shortcuts = new ArrayList<>();
     for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
-      shortcuts.add(new Shortcut(keyStrokes.toArray(new KeyStroke[keyStrokes.size()])));
+      shortcuts.add(new Shortcut(keyStrokes.toArray(new KeyStroke[0])));
     }
-    //noinspection deprecation
     registerAction(commandAction.getMappingModes(), actionId, commandAction.getType(), commandAction.getFlags(),
-                   shortcuts.toArray(new Shortcut[shortcuts.size()]), commandAction.getArgumentType());
+                   shortcuts.toArray(new Shortcut[0]), commandAction.getArgumentType());
   }
 
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, Shortcut shortcut) {
-    //noinspection deprecation
-    registerAction(mappingModes, actName, cmdType, new Shortcut[]{shortcut});
+    registerAction(mappingModes, actName, cmdType, EnumSet.noneOf(CommandFlags.class), new Shortcut[]{shortcut});
   }
 
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
-  public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, Shortcut shortcut) {
-    //noinspection deprecation
-    registerAction(mappingModes, actName, cmdType, cmdFlags, new Shortcut[]{shortcut});
-  }
-
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
-  public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, Shortcut shortcut,
-                             @NotNull Argument.Type argType) {
-    //noinspection deprecation
-    registerAction(mappingModes, actName, cmdType, new Shortcut[]{shortcut}, argType);
-  }
-
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
-  public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, Shortcut shortcut,
-                             @NotNull Argument.Type argType) {
-    //noinspection deprecation
-    registerAction(mappingModes, actName, cmdType, cmdFlags, new Shortcut[]{shortcut}, argType);
-  }
-
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
-  public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, @NotNull Shortcut[] shortcuts) {
-    //noinspection deprecation
-    registerAction(mappingModes, actName, cmdType, EnumSet.noneOf(CommandFlags.class), shortcuts);
-  }
-
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
-  public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, @NotNull Shortcut[] shortcuts,
-                             @NotNull Argument.Type argType) {
-    //noinspection deprecation
-    registerAction(mappingModes, actName, cmdType, EnumSet.noneOf(CommandFlags.class), shortcuts, argType);
-  }
-
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, @NotNull Shortcut[] shortcuts) {
-    //noinspection deprecation
     registerAction(mappingModes, actName, cmdType, cmdFlags, shortcuts, Argument.Type.NONE);
   }
 
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
-  public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, @NotNull Shortcut[] shortcuts,
-                             @NotNull Argument.Type argType) {
+  private void registerAction(@NotNull Set<MappingMode> mappingModes,
+                              @NotNull String actName,
+                              @NotNull Command.Type cmdType,
+                              EnumSet<CommandFlags> cmdFlags,
+                              @NotNull Shortcut[] shortcuts,
+                              @NotNull Argument.Type argType) {
     for (Shortcut shortcut : shortcuts) {
-      final KeyStroke[] keys = shortcut.getKeys();
-      for (KeyStroke key : keys) {
-        if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
-          requiredShortcutKeys.add(key);
-        }
-      }
-      //noinspection deprecation
+      final KeyStroke[] keys = registerRequiredShortcut(shortcut);
       registerAction(mappingModes, actName, cmdType, cmdFlags, keys, argType);
     }
   }
 
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
+  private KeyStroke[] registerRequiredShortcut(@NotNull Shortcut shortcut) {
+    final KeyStroke[] keys = shortcut.getKeys();
+    for (KeyStroke key : keys) {
+      if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
+        requiredShortcutKeys.add(key);
+      }
+    }
+    return keys;
+  }
+
   private void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, @NotNull KeyStroke[] keys,
                               @NotNull Argument.Type argType) {
     for (MappingMode mappingMode : mappingModes) {
+      if (ApplicationManager.getApplication().isUnitTestMode()) {
+        identityChecker = new HashMap<>();
+        checkIdentity(mappingMode, actName, keys);
+      }
       Node node = getKeyRoot(mappingMode);
       final int len = keys.length;
       // Add a child for each keystroke in the shortcut for this action
@@ -360,13 +325,21 @@ public class KeyGroup {
     }
   }
 
+  private void checkIdentity(MappingMode mappingMode, String actName, KeyStroke[] keys) {
+    Set<List<KeyStroke>> keySets = identityChecker.computeIfAbsent(mappingMode, k -> new HashSet<>());
+    if (keySets.contains(Arrays.asList(keys))) throw new RuntimeException("This keymap already exists: " + mappingMode + " keys: " + Arrays.asList(keys) + " action:" + actName);
+    keySets.add(Arrays.asList(keys));
+  }
+
+  private Map<MappingMode, Set<List<KeyStroke>>> identityChecker;
+
   @NotNull
   private Node addNode(@NotNull ParentNode base, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, @NotNull KeyStroke key,
                        @NotNull Argument.Type argType, boolean last) {
     // Lets get the actual action for the supplied action name
     ActionManager aMgr = ActionManager.getInstance();
     AnAction action = aMgr.getAction(actName);
-    assert action != null;
+    assert action != null : actName + " is null";
 
     Node node = base.getChild(key);
     // Is this the first time we have seen this character at this point in the tree?
@@ -387,6 +360,12 @@ public class KeyGroup {
     if (last && node instanceof BranchNode && argType != Argument.Type.NONE) {
       ArgumentNode arg = new ArgumentNode(actName, action, cmdType, argType, cmdFlags);
       ((BranchNode)node).addChild(arg, BranchNode.ARGUMENT);
+    }
+
+    if (base instanceof BranchNode) {
+      // All flags of a child should be added to parent
+      // Otherwise set of this flags will differ for different initialization orders
+      ((BranchNode)base).getFlags().addAll(cmdFlags);
     }
 
     return node;

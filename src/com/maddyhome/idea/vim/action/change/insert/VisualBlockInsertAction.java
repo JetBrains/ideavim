@@ -13,64 +13,83 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.action.change.insert;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.command.SelectionType;
+import com.maddyhome.idea.vim.group.visual.VimSelection;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * @author vlan
  */
-public class VisualBlockInsertAction extends VimCommandAction {
-  public VisualBlockInsertAction() {
-    super(new VisualOperatorActionHandler() {
-      @Override
-      protected boolean execute(@NotNull Editor editor,
-                                @NotNull DataContext context,
-                                @NotNull Command cmd,
-                                @NotNull TextRange range) {
-        if (editor.isOneLineMode()) return false;
-        return VimPlugin.getChange().blockInsert(editor, context, range, false);
-      }
-    });
-  }
-
+final public class VisualBlockInsertAction extends VimCommandAction {
+  @Contract(" -> new")
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
+  final protected VimActionHandler makeActionHandler() {
+    return new VisualOperatorActionHandler.SingleExecution() {
+      @Override
+      final public boolean executeForAllCarets(@NotNull Editor editor,
+                                         @NotNull DataContext context,
+                                         @NotNull Command cmd,
+                                         @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
+        if (editor.isOneLineMode()) return false;
+        VimSelection vimSelection = caretsAndSelections.values().stream().findFirst().orElse(null);
+        if (vimSelection == null) return false;
+        if (vimSelection.getType() == SelectionType.BLOCK_WISE) {
+          return VimPlugin.getChange().blockInsert(editor, context, vimSelection.toVimTextRange(false), false);
+        }
+        else {
+          VimPlugin.getChange().insertBeforeFirstNonBlank(editor, context);
+          return true;
+        }
+      }
+    };
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Set<MappingMode> getMappingModes() {
     return MappingMode.V;
   }
 
   @NotNull
   @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("I");
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.INSERT;
   }
 
   @NotNull
   @Override
-  public Command.Type getType() {
-    return Command.Type.INSERT;
-  }
-
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
+  final public EnumSet<CommandFlags> getFlags() {
     return EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO, CommandFlags.FLAG_EXIT_VISUAL);
   }
 }

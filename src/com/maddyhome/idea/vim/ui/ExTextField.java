@@ -13,33 +13,34 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ui;
 
-import com.intellij.ide.ui.LafManager;
-import com.intellij.ide.ui.LafManagerListener;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.colors.EditorColorsManager;
-import com.intellij.openapi.editor.colors.EditorFontType;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.HistoryGroup;
+import kotlin.text.StringsKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.TestOnly;
 
 import javax.swing.*;
-import javax.swing.text.Document;
-import javax.swing.text.Keymap;
+import javax.swing.plaf.basic.BasicTextFieldUI;
+import javax.swing.text.*;
 import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.util.Date;
 import java.util.List;
+
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 /**
  * Provides a custom keymap for the text field. The keymap is the VIM Ex command keymapping
@@ -47,22 +48,39 @@ import java.util.List;
 public class ExTextField extends JTextField {
 
   ExTextField() {
-    addFocusListener(new FocusListener() {
-      @Override
-      public void focusGained(FocusEvent e) {
-        setCaretPosition(getText().length());
-      }
+    // We need to store this in a field, because we can't trust getCaret(), as it will return an instance of
+    // ComposedTextCaret when working with dead keys or input methods
+    caret = new CommandLineCaret();
+    caret.setBlinkRate(getCaret().getBlinkRate());
+    setCaret(caret);
+    setNormalModeCaret();
 
+    addCaretListener(e -> resetCaret());
+    addMouseListener(new MouseAdapter() {
       @Override
-      public void focusLost(FocusEvent e) {
+      public void mouseClicked(MouseEvent e) {
+        // If we're in the middle of an action (e.g. entering a register to paste, or inserting a digraph), cancel it if
+        // the mouse is clicked anywhere. Vim's behavior is to use the mouse click as an event, which can lead to
+        // something like : !%!C, which I don't believe is documented, or useful
+        if (currentAction != null) {
+          clearCurrentAction();
+        }
+        super.mouseClicked(e);
       }
     });
   }
 
-  // Minimize margins and insets. These get added to the default margins in the UI class that we can't override.
-  // (I.e. DarculaTextFieldUI#getDefaultMargins, MacIntelliJTextFieldUI#getDefaultMargin, WinIntelliJTextFieldUI#getDefaultMargin)
-  // This is an attempt to mitigate the gap in ExEntryPanel between the label (':', '/', '?') and the text field.
-  // See VIM-1485
+  void reset() {
+    clearCurrentAction();
+    setInsertMode();
+  }
+
+  void deactivate() {
+    clearCurrentAction();
+    editor = null;
+    context = null;
+  }
+
   @Override
   public Insets getMargin() {
     return JBUI.emptyInsets();
@@ -76,14 +94,15 @@ public class ExTextField extends JTextField {
   // Called when the LAF is changed, but only if the control is visible
   @Override
   public void updateUI() {
-    super.updateUI();
-
-    Font font = EditorColorsManager.getInstance().getGlobalScheme().getFont(EditorFontType.PLAIN);
-    setFont(font);
+    // Override the default look and feel specific UI so we can have a completely borderless and margin-less text field.
+    // (See TextFieldWithPopupHandlerUI#getDefaultMargins and derived classes). This allows us to draw the text field
+    // directly next to the label
+    setUI(new BasicTextFieldUI());
+    invalidate();
 
     setBorder(null);
 
-    // Do not override getActions() method, because it is has side effect: propogates these actions to defaults.
+    // Do not override getActions() method, because it is has side effect: propagates these actions to defaults.
     final Action[] actions = ExEditorKit.getInstance().getActions();
     final ActionMap actionMap = getActionMap();
     for (Action a : actions) {
@@ -93,12 +112,12 @@ public class ExTextField extends JTextField {
 
     setInputMap(WHEN_FOCUSED, new InputMap());
     Keymap map = addKeymap("ex", getKeymap());
-    loadKeymap(map, ExKeyBindings.getBindings(), actions);
+    loadKeymap(map, ExKeyBindings.INSTANCE.getBindings(), actions);
     map.setDefaultAction(new ExEditorKit.DefaultExKeyHandler());
     setKeymap(map);
   }
 
-  public void setType(@NotNull String type) {
+  void setType(@NotNull String type) {
     String hkey = null;
     switch (type.charAt(0)) {
       case '/':
@@ -116,11 +135,16 @@ public class ExTextField extends JTextField {
     }
   }
 
-  public void saveLastEntry() {
-    lastEntry = getText();
+  /**
+   * Stores the current text for use in filtering history. Required for scrolling through multiple history entries
+   *
+   * Called whenever the text is changed, either by typing, or by special characters altering the text (e.g. Delete)
+   */
+  void saveLastEntry() {
+    lastEntry = super.getText();
   }
 
-  public void selectHistory(boolean isUp, boolean filter) {
+  void selectHistory(boolean isUp, boolean filter) {
     int dir = isUp ? -1 : 1;
     if (histIndex + dir < 0 || histIndex + dir > history.size()) {
       VimPlugin.indicateError();
@@ -164,9 +188,46 @@ public class ExTextField extends JTextField {
     }
   }
 
-  void setEditor(Editor editor, DataContext context) {
+  private void updateText(String string) {
+    super.setText(string);
+  }
+
+  @Override
+  public void setText(String string) {
+    super.setText(string);
+
+    saveLastEntry();
+  }
+
+  /**
+   * @deprecated Use getActualText()
+   * Using this method can include prompt characters used when entering digraphs or register text
+   */
+  @Override
+  @Deprecated
+  public String getText() {
+    return super.getText();
+  }
+
+  @Nullable
+  String getActualText() {
+    if (actualText != null) {
+      return actualText;
+    }
+    return super.getText();
+  }
+
+  void setEditor(@NotNull Editor editor, DataContext context) {
     this.editor = editor;
     this.context = context;
+    String disposeKey = vimExTextFieldDisposeKey + editor.hashCode();
+    Project project = editor.getProject();
+    if (Disposer.get(disposeKey) == null && project != null) {
+      Disposer.register(project, () -> {
+        this.editor = null;
+        this.context = null;
+      }, disposeKey);
+    }
   }
 
   public Editor getEditor() {
@@ -189,23 +250,28 @@ public class ExTextField extends JTextField {
         c = Character.toChars(codePoint)[0];
       }
     }
-    KeyEvent event = new KeyEvent(this, keyChar != KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_TYPED :
-                                        (stroke.isOnKeyRelease() ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED),
-                                  (new Date()).getTime(), modifiers, keyCode, c);
 
-    super.processKeyEvent(event);
+    // Make sure the current action sees any subsequent keystrokes, and they're not processed by Swing's action system.
+    // Note that this will only handle simple characters and any control characters that are already registered against
+    // ExShortcutKeyAction - any other control characters will can be "stolen" by other IDE actions.
+    // If we need to capture ANY subsequent keystroke (e.g. for ^V<Tab>, or to stop the Swing standard <C-A> going to
+    // start of line), we should replace ExShortcutAction with a dispatcher registered with IdeEventQueue#addDispatcher.
+    // This gets called for ALL events, before the IDE starts to process key events for the action system. We can add a
+    // dispatcher that checks that the plugin is enabled, checks that the component with the focus is ExTextField,
+    // dispatch to ExEntryPanel#handleKey and if it's processed, mark the event as consumed.
+    if (currentAction != null) {
+      currentAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "" + c, modifiers));
+    }
+    else {
+      KeyEvent event = new KeyEvent(this, keyChar != KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_TYPED :
+        (stroke.isOnKeyRelease() ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED),
+        (new Date()).getTime(), modifiers, keyCode, c);
+
+      super.processKeyEvent(event);
+    }
   }
 
-  public void updateText(String string) {
-    super.setText(string);
-  }
-
-  public void setText(String string) {
-    super.setText(string);
-
-    saveLastEntry();
-  }
-
+  @Override
   protected void processKeyEvent(KeyEvent e) {
     if (logger.isDebugEnabled()) logger.debug("key=" + e);
     super.processKeyEvent(e);
@@ -218,174 +284,277 @@ public class ExTextField extends JTextField {
    *
    * @return the default model implementation
    */
+  @Override
   @NotNull
   protected Document createDefaultModel() {
     return new ExDocument();
   }
 
-  public void escape() {
+  /**
+   * Cancels current action, if there is one. If not, cancels entry.
+   */
+  void escape() {
     if (currentAction != null) {
-      currentAction = null;
+      clearCurrentAction();
     }
     else {
-      VimPlugin.getProcess().cancelExEntry(editor, context);
+      cancel();
     }
   }
 
-  public void setCurrentAction(@Nullable Action action) {
+  /**
+   * Cancels entry, including any current action.
+   */
+  void cancel() {
+    clearCurrentAction();
+    VimPlugin.getProcess().cancelExEntry(editor, true);
+  }
+
+  void setCurrentAction(@NotNull ExEditorKit.MultiStepAction action, char pendingIndicator) {
     this.currentAction = action;
+    setCurrentActionPromptCharacter(pendingIndicator);
+  }
+
+  void clearCurrentAction() {
+    if (currentAction != null) {
+      currentAction.reset();
+    }
+    currentAction = null;
+    clearCurrentActionPromptCharacter();
+  }
+
+  void setCurrentActionPromptCharacter(char promptCharacter) {
+    actualText = removePromptCharacter();
+    this.currentActionPromptCharacter = promptCharacter;
+    currentActionPromptCharacterOffset = currentActionPromptCharacterOffset == -1 ? getCaretPosition() : currentActionPromptCharacterOffset;
+    StringBuilder sb = new StringBuilder(actualText);
+    sb.insert(currentActionPromptCharacterOffset, currentActionPromptCharacter);
+    updateText(sb.toString());
+    setCaretPosition(currentActionPromptCharacterOffset);
+  }
+
+  private void clearCurrentActionPromptCharacter() {
+    final int offset = getCaretPosition();
+    final String text = removePromptCharacter();
+    updateText(text);
+    setCaretPosition(min(offset, text.length()));
+    currentActionPromptCharacter = '\0';
+    currentActionPromptCharacterOffset = -1;
+    actualText = null;
+  }
+
+  private String removePromptCharacter() {
+    return currentActionPromptCharacterOffset == -1
+      ? super.getText()
+      : StringsKt.removeRange(super.getText(), currentActionPromptCharacterOffset, currentActionPromptCharacterOffset + 1).toString();
   }
 
   @Nullable
-  public Action getCurrentAction() {
+  Action getCurrentAction() {
     return currentAction;
   }
 
-  public void toggleInsertReplace() {
+  private void setInsertMode() {
+    ExDocument doc = (ExDocument)getDocument();
+    if (doc.isOverwrite()) {
+      doc.toggleInsertReplace();
+    }
+    resetCaret();
+  }
+
+  void toggleInsertReplace() {
     ExDocument doc = (ExDocument)getDocument();
     doc.toggleInsertReplace();
-
-    /*
-    Caret caret;
-    int width;
-    if (doc.isOverwrite())
-    {
-        caret = blockCaret;
-        width = 8;
-    }
-    else
-    {
-        caret = origCaret;
-        width = 1;
-    }
-
-    setCaret(caret);
-    putClientProperty("caretWidth", new Integer(width));
-    */
+    resetCaret();
   }
 
-  /*
-  private static class BlockCaret extends DefaultCaret
-  {
-      public void paint(Graphics g)
-      {
-          if(!isVisible())
-              return;
-
-          try
-          {
-              Rectangle rectangle;
-              TextUI textui = getComponent().getUI();
-              rectangle = textui.modelToView(getComponent(), getDot(), Position.Bias.Forward);
-              if (rectangle == null || rectangle.width == 0 && rectangle.height == 0)
-              {
-                  return;
-              }
-              if (width > 0 && height > 0 && !_contains(rectangle.x, rectangle.y, rectangle.width, rectangle.height))
-              {
-                  Rectangle rectangle1 = g.getClipBounds();
-                  if (rectangle1 != null && !rectangle1.contains(this))
-                  {
-                      repaint();
-                  }
-                  damage(rectangle);
-              }
-              g.setColor(getComponent().getCaretColor());
-              int i = 8;
-              //rectangle.x -= i >> 1;
-              g.fillRect(rectangle.x, rectangle.y, i, rectangle.height - 1);
-              Document document = getComponent().getDocument();
-              if (document instanceof AbstractDocument)
-              {
-                  Element element = ((AbstractDocument)document).getBidiRootElement();
-                  if (element != null && element.getElementCount() > 1)
-                  {
-                      int[] flagXPoints = new int[3];
-                      int[] flagYPoints = new int[3];
-                      flagXPoints[0] = rectangle.x + i;
-                      flagYPoints[0] = rectangle.y;
-                      flagXPoints[1] = flagXPoints[0];
-                      flagYPoints[1] = flagYPoints[0] + 4;
-                      flagXPoints[2] = flagXPoints[0] + 4;
-                      flagYPoints[2] = flagYPoints[0];
-                      g.fillPolygon(flagXPoints, flagYPoints, 3);
-                  }
-              }
-          }
-          catch (BadLocationException badlocationexception)
-          {
-              // ignore
-          }
+  private void resetCaret() {
+    if (getCaretPosition() == super.getText().length() || currentActionPromptCharacterOffset == super.getText().length() - 1) {
+      setNormalModeCaret();
+    }
+    else {
+      ExDocument doc = (ExDocument)getDocument();
+      if (doc.isOverwrite()) {
+        setReplaceModeCaret();
       }
-
-      private boolean _contains(int i, int j, int k, int l)
-      {
-          int i1 = width;
-          int j1 = height;
-          if ((i1 | j1 | k | l) < 0)
-          {
-              return false;
-          }
-          int k1 = x;
-          int l1 = y;
-          if (i < k1 || j < l1)
-          {
-              return false;
-          }
-          if (k > 0)
-          {
-              i1 += k1;
-              k += i;
-              if (k <= i)
-              {
-                  if (i1 >= k1 || k > i1)
-                  {
-                      return false;
-                  }
-              }
-              else if (i1 >= k1 && k > i1)
-              {
-                  return false;
-              }
-          }
-          else if (k1 + i1 < i)
-          {
-              return false;
-          }
-          if (l > 0)
-          {
-              j1 += l1;
-              l += j;
-              if (l <= j)
-              {
-                  if (j1 >= l1 || l > j1)
-                  {
-                      return false;
-                  }
-              }
-              else if (j1 >= l1 && l > j1)
-              {
-                  return false;
-              }
-          }
-          else if (l1 + j1 < j)
-          {
-              return false;
-          }
-          return true;
+      else {
+        setInsertModeCaret();
       }
+    }
   }
-  */
+
+  // The default cursor shapes for command line are:
+  // 'c' command-line normal is block
+  // 'ci' command-line insert is ver25
+  // 'cr' command-line replace is hor20
+  // see :help 'guicursor'
+  // Note that we can't easily support guicursor because we don't have arbitrary control over the IntelliJ editor caret
+  private void setNormalModeCaret() {
+    caret.setBlockMode();
+  }
+
+  private void setInsertModeCaret() {
+    caret.setMode(CommandLineCaret.CaretMode.VER, 25);
+  }
+
+  private void setReplaceModeCaret() {
+    caret.setMode(CommandLineCaret.CaretMode.HOR, 20);
+  }
+
+  private static class CommandLineCaret extends DefaultCaret {
+
+    private CaretMode mode;
+    private int blockPercentage = 100;
+    private int lastBlinkRate = 0;
+    private boolean hasFocus;
+
+    public enum CaretMode {
+      BLOCK,
+      VER,
+      HOR
+    }
+
+    void setBlockMode() {
+      setMode(CaretMode.BLOCK, 100);
+    }
+
+    void setMode(CaretMode mode, int blockPercentage) {
+      if (this.mode == mode && this.blockPercentage == blockPercentage) {
+        return;
+      }
+
+      // Hide the current caret and redraw without it. Then make the new caret visible, but only if it was already
+      // (logically) visible/active. Always making it visible can start the flasher timer unnecessarily.
+      final boolean active = isActive();
+      if (isVisible()) {
+        setVisible(false);
+      }
+      this.mode = mode;
+      this.blockPercentage = blockPercentage;
+      if (active) {
+        setVisible(true);
+      }
+    }
+
+    private void updateDamage() {
+      try {
+        Rectangle r = getComponent().getUI().modelToView(getComponent(), getDot(), getDotBias());
+        damage(r);
+      }
+      catch(BadLocationException e) {
+        // ignore
+      }
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) {
+      if (lastBlinkRate != 0) {
+        setBlinkRate(lastBlinkRate);
+        lastBlinkRate = 0;
+      }
+      super.focusGained(e);
+      updateDamage();
+      hasFocus = true;
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+      hasFocus = false;
+      lastBlinkRate = getBlinkRate();
+      setBlinkRate(0);
+      // We might be losing focus while the cursor is flashing, and is currently not visible
+      setVisible(true);
+      updateDamage();
+    }
+
+    @Override
+    public void paint(Graphics g) {
+      if (!isVisible()) return;
+
+      try {
+        final JTextComponent component = getComponent();
+        final Color color = g.getColor();
+
+        g.setColor(component.getBackground());
+        g.setXORMode(component.getCaretColor());
+
+        // We have to use the deprecated version because we still support 1.8
+        final Rectangle r = component.getUI().modelToView(component, getDot(), getDotBias());
+        FontMetrics fm = g.getFontMetrics();
+        final int boundsHeight = fm.getHeight();
+        if (!hasFocus) {
+          r.setBounds(r.x, r.y, getCaretWidth(fm, 100), boundsHeight);
+          g.drawRect(r.x, r.y, r.width, r.height);
+        }
+        else {
+          r.setBounds(r.x, r.y, getCaretWidth(fm, blockPercentage), getBlockHeight(boundsHeight));
+          g.fillRect(r.x, r.y + boundsHeight - r.height, r.width, r.height);
+        }
+        g.setPaintMode();
+        g.setColor(color);
+      }
+      catch (BadLocationException e) {
+        // ignore
+      }
+    }
+
+    @Override
+    protected synchronized void damage(Rectangle r) {
+      if (r != null) {
+        JTextComponent component = getComponent();
+        Font font = component.getFont();
+        FontMetrics fm = component.getFontMetrics(font);
+        final int blockHeight = fm.getHeight();
+        if (!hasFocus) {
+          width = this.getCaretWidth(fm, 100);
+          height = blockHeight;
+        }
+        else {
+          width = this.getCaretWidth(fm, blockPercentage);
+          height = getBlockHeight(blockHeight);
+        }
+        x = r.x;
+        y = r.y + blockHeight - height;
+        repaint();
+      }
+    }
+
+    private int getCaretWidth(FontMetrics fm, int widthPercentage) {
+      if (mode == CaretMode.VER) {
+        // Don't show a proportional width of a proportional font
+        final int fullWidth = fm.charWidth('o');
+        return max(1, fullWidth * widthPercentage / 100);
+      }
+
+      final char c = ((ExDocument)getComponent().getDocument()).getCharacter(getComponent().getCaretPosition());
+      return fm.charWidth(c);
+    }
+
+    private int getBlockHeight(int fullHeight) {
+      if (mode == CaretMode.HOR) {
+        return max(1, fullHeight * blockPercentage / 100);
+      }
+      return fullHeight;
+    }
+  }
+
+  @TestOnly
+  public String getCaretShape() {
+    CommandLineCaret caret = (CommandLineCaret) getCaret();
+    return String.format("%s %d", caret.mode, caret.blockPercentage);
+  }
 
   private Editor editor;
   private DataContext context;
+  private CommandLineCaret caret;
   private String lastEntry;
+  private String actualText;
   private List<HistoryGroup.HistoryEntry> history;
   private int histIndex = 0;
-  @Nullable private Action currentAction;
-  // TODO - support block cursor for overwrite mode
-  //private Caret origCaret;
-  //private Caret blockCaret;
+  @Nullable private ExEditorKit.MultiStepAction currentAction;
+  private char currentActionPromptCharacter;
+  private int currentActionPromptCharacterOffset = -1;
 
+  private static final String vimExTextFieldDisposeKey = "vimExTextFieldDisposeKey";
   private static final Logger logger = Logger.getInstance(ExTextField.class.getName());
 }

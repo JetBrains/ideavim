@@ -13,11 +13,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.common;
 
+import com.intellij.codeInsight.editorActions.TextBlockTransferableData;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -35,17 +37,19 @@ public class Register {
   private char name;
   @NotNull private final SelectionType type;
   @NotNull private final List<KeyStroke> keys;
-
-  public Register(char name, @NotNull SelectionType type, @NotNull String text) {
-    this.name = name;
-    this.type = type;
-    this.keys = StringHelper.stringToKeys(text);
-  }
+  @NotNull private List<? extends TextBlockTransferableData> transferableData = new ArrayList<>();
 
   public Register(char name, @NotNull SelectionType type, @NotNull List<KeyStroke> keys) {
     this.name = name;
     this.type = type;
     this.keys = keys;
+  }
+
+  public Register(char name, @NotNull SelectionType type, @NotNull String text, @NotNull List<? extends TextBlockTransferableData> transferableData) {
+    this.name = name;
+    this.type = type;
+    this.keys = StringHelper.stringToKeys(text);
+    this.transferableData = transferableData;
   }
 
   public void rename(char name) {
@@ -57,6 +61,11 @@ public class Register {
    */
   public char getName() {
     return name;
+  }
+
+  @NotNull
+  public List<? extends TextBlockTransferableData> getTransferableData() {
+    return transferableData;
   }
 
   /**
@@ -94,19 +103,19 @@ public class Register {
   /**
    * Append the supplied text to any existing text.
    */
-  public void addText(@NotNull String text) {
+  public void addTextAndResetTransferableData(@NotNull String text) {
     addKeys(StringHelper.stringToKeys(text));
+    transferableData.clear();
   }
 
   public void addKeys(@NotNull List<KeyStroke> keys) {
     this.keys.addAll(keys);
   }
 
-  public static class KeySorter<V> implements Comparator<V> {
-    public int compare(V o1, V o2) {
-      Register a = (Register)o1;
-      Register b = (Register)o2;
-      return Character.compare(a.name, b.name);
+  public static class KeySorter implements Comparator<Register> {
+    @Override
+    public int compare(@NotNull Register o1, @NotNull Register o2) {
+      return Character.compare(o1.name, o2.name);
     }
   }
 }

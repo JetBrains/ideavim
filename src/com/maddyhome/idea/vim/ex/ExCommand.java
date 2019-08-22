@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex;
@@ -22,16 +22,9 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.CaretOrder;
-import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 
-/**
- *
- */
 public class ExCommand {
   public ExCommand(@NotNull Ranges ranges, @NotNull String command, @NotNull String argument) {
     this.ranges = ranges;
@@ -39,22 +32,12 @@ public class ExCommand {
     this.command = command;
   }
 
-  public int getLine(@NotNull Editor editor, DataContext context) {
-    return ranges.getLine(editor, context);
+  public int getLine(@NotNull Editor editor) {
+    return ranges.getLine(editor);
   }
 
   public int getLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
     return ranges.getLine(editor, caret, context);
-  }
-
-  public List<Integer> getOrderedLines(@NotNull Editor editor, @NotNull DataContext context,
-                                       @NotNull CaretOrder caretOrder) {
-    final ArrayList<Integer> lines = new ArrayList<>(editor.getCaretModel().getCaretCount());
-    for (Caret caret : EditorHelper.getOrderedCaretsList(editor, caretOrder)) {
-      final int line = getLine(editor, caret, context);
-      lines.add(line);
-    }
-    return lines;
   }
 
   public int getCount(@NotNull Editor editor, DataContext context, int defaultCount, boolean checkCount) {
@@ -79,8 +62,8 @@ public class ExCommand {
   }
 
   @NotNull
-  public LineRange getLineRange(@NotNull Editor editor, DataContext context) {
-    return ranges.getLineRange(editor, context, -1);
+  public LineRange getLineRange(@NotNull Editor editor) {
+    return ranges.getLineRange(editor, -1);
   }
 
   public LineRange getLineRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {

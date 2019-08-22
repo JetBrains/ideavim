@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.handler
@@ -22,32 +22,20 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.commands
-import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.handler.CaretOrder
-import com.maddyhome.idea.vim.helper.CaretData
+import com.maddyhome.idea.vim.ex.*
 
-class JoinLinesHandler : CommandHandler(
-        commands("j[oin]"),
-        flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, WRITABLE),
-        true, CaretOrder.DECREASING_OFFSET
-) {
-    override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
-        val arg = cmd.argument
-        val spaces = arg.isEmpty() || arg[0] != '!'
+class JoinLinesHandler : CommandHandler.ForEachCaret() {
+  override val names: Array<CommandName> = commands("j[oin]")
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
-        val textRange = if (CommandState.getInstance(editor).mode != CommandState.Mode.VISUAL)
-            cmd.getTextRange(editor, caret, context, true)
-        else
-            CaretData.getVisualTextRange(caret)
+  override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
+    val arg = cmd.argument
+    val spaces = arg.isEmpty() || arg[0] != '!'
 
-        textRange ?: return false
+    val textRange = cmd.getTextRange(editor, caret, context, true) ?: return false
 
-        return VimPlugin.getChange().deleteJoinRange(editor, caret, TextRange(textRange.startOffset,
-                textRange.endOffset - 1), spaces)
-    }
+    return VimPlugin.getChange().deleteJoinRange(editor, caret, TextRange(textRange.startOffset,
+      textRange.endOffset - 1), spaces)
+  }
 }

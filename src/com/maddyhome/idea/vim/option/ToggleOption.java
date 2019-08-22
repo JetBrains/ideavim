@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.option;
@@ -68,6 +68,10 @@ public class ToggleOption extends Option {
     update(!value);
   }
 
+  public boolean isSet() {
+    return value;
+  }
+
   /**
    * Helper to set the value only it is changing and notify listeners
    *
@@ -106,6 +110,7 @@ public class ToggleOption extends Option {
    *
    * @return True if equal to default, false if not.
    */
+  @Override
   public boolean isDefault() {
     return value == dflt;
   }
@@ -113,6 +118,7 @@ public class ToggleOption extends Option {
   /**
    * Sets the option to its default value.
    */
+  @Override
   public void resetDefault() {
     value = dflt;
   }

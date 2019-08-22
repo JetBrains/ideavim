@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.option;
@@ -58,6 +58,7 @@ public class NumberOption extends TextOption {
    *
    * @return The option's value
    */
+  @Override
   public String getValue() {
     return Integer.toString(value);
   }
@@ -90,6 +91,7 @@ public class NumberOption extends TextOption {
    * @param val The new value
    * @return True if the string can be converted to a number and it is in range. False if not.
    */
+  @Override
   public boolean set(String val) {
     Integer num = asNumber(val);
     if (num == null) {
@@ -115,6 +117,7 @@ public class NumberOption extends TextOption {
    * @param val The new value
    * @return True if the string can be converted to a number and the result is in range. False if not.
    */
+  @Override
   public boolean append(String val) {
     Integer num = asNumber(val);
     if (num == null) {
@@ -140,6 +143,7 @@ public class NumberOption extends TextOption {
    * @param val The new value
    * @return True if the string can be converted to a number and the result is in range. False if not.
    */
+  @Override
   public boolean prepend(String val) {
     Integer num = asNumber(val);
     if (num == null) {
@@ -165,6 +169,7 @@ public class NumberOption extends TextOption {
    * @param val The new value
    * @return True if the string can be converted to a number and the result is in range. False if not.
    */
+  @Override
   public boolean remove(String val) {
     Integer num = asNumber(val);
     if (num == null) {
@@ -186,6 +191,7 @@ public class NumberOption extends TextOption {
    *
    * @return True if equal to default, false if not.
    */
+  @Override
   public boolean isDefault() {
     return value == dflt;
   }
@@ -193,6 +199,7 @@ public class NumberOption extends TextOption {
   /**
    * Sets the option to its default value.
    */
+  @Override
   public void resetDefault() {
     if (dflt != value) {
       value = dflt;

@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex;
@@ -75,11 +75,10 @@ public class Ranges {
    * Gets the line of the last range specified in the range list
    *
    * @param editor  The editor to get the line for
-   * @param context The data context
    * @return The line number represented by the range
    */
-  public int getLine(@NotNull Editor editor, DataContext context) {
-    processRange(editor, context);
+  public int getLine(@NotNull Editor editor) {
+    processRange(editor);
 
     return endLine;
   }
@@ -93,11 +92,10 @@ public class Ranges {
    * Gets the start line number the range represents
    *
    * @param editor  The editor to get the line number for
-   * @param context The data context
    * @return The starting line number
    */
-  public int getFirstLine(@NotNull Editor editor, DataContext context) {
-    processRange(editor, context);
+  public int getFirstLine(@NotNull Editor editor) {
+    processRange(editor);
 
     return startLine;
   }
@@ -118,7 +116,7 @@ public class Ranges {
    */
   public int getCount(@NotNull Editor editor, DataContext context, int count) {
     if (count == -1) {
-      return getLine(editor, context);
+      return getLine(editor);
     }
     else {
       return count;
@@ -135,13 +133,12 @@ public class Ranges {
    * count-1 lines. If no count is given (-1), the range is the range given by the user.
    *
    * @param editor  The editor to get the range for
-   * @param context The data context
    * @param count   The count given at the end of the command or -1 if no such count
    * @return The line range
    */
   @NotNull
-  public LineRange getLineRange(@NotNull Editor editor, DataContext context, int count) {
-    processRange(editor, context);
+  public LineRange getLineRange(@NotNull Editor editor, int count) {
+    processRange(editor);
     int end;
     int start;
     if (count == -1) {
@@ -174,7 +171,7 @@ public class Ranges {
    */
   @NotNull
   public TextRange getTextRange(@NotNull Editor editor, DataContext context, int count) {
-    LineRange lr = getLineRange(editor, context, count);
+    LineRange lr = getLineRange(editor, count);
     int start = EditorHelper.getLineStartOffset(editor, lr.getStartLine());
     int end = EditorHelper.getLineEndOffset(editor, lr.getEndLine(), true) + 1;
 
@@ -226,9 +223,8 @@ public class Ranges {
    * Processes the list of ranges and calculates the start and end lines of the range
    *
    * @param editor  The editor to get the lines for
-   * @param context The data context
    */
-  private void processRange(@NotNull Editor editor, DataContext context) {
+  private void processRange(@NotNull Editor editor) {
     // Already done
     if (done) return;
 
@@ -239,10 +235,10 @@ public class Ranges {
     // Now process each range, moving the cursor if appropriate
     for (Range range : ranges) {
       startLine = endLine;
-      endLine = range.getLine(editor, context, lastZero);
+      endLine = range.getLine(editor, lastZero);
       if (range.isMove()) {
         MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(),
-                              VimPlugin.getMotion().moveCaretToLine(editor, endLine));
+                              VimPlugin.getMotion().moveCaretToLine(editor, endLine, editor.getCaretModel().getPrimaryCaret()));
       }
       // Did that last range represent the start of the file?
       lastZero = (endLine < 0);
@@ -263,9 +259,9 @@ public class Ranges {
     boolean lastZero = false;
     for (Range range : ranges) {
       startLine = endLine;
-      endLine = range.getLine(editor, caret, context, lastZero);
+      endLine = range.getLine(editor, caret, lastZero);
 
-      if (range.isMove()) MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLine(editor, endLine));
+      if (range.isMove()) MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLine(editor, endLine, editor.getCaretModel().getPrimaryCaret()));
 
       lastZero = endLine < 0;
       ++count;

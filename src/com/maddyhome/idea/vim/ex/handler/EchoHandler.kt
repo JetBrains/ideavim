@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.handler
@@ -27,19 +27,17 @@ import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 /**
  * @author vlan
  */
-class EchoHandler : CommandHandler(
-        commands("ec[ho]"),
-        flags(CommandHandler.RANGE_FORBIDDEN, CommandHandler.ARGUMENT_OPTIONAL)
-) {
+class EchoHandler : CommandHandler.SingleExecution() {
+  override val names = commands("ec[ho]")
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-    override fun execute(editor: Editor, context: DataContext,
-                         cmd: ExCommand): Boolean {
-        val env = VimScriptGlobalEnvironment.getInstance()
-        val globals = env.variables
-        val value = VimScriptParser.evaluate(cmd.argument, globals)
-        val text = VimScriptParser.expressionToString(value) + "\n"
-        ExOutputModel.getInstance(editor).output(text)
-        return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val env = VimScriptGlobalEnvironment.getInstance()
+    val globals = env.variables
+    val value = VimScriptParser.evaluate(cmd.argument, globals)
+    val text = VimScriptParser.expressionToString(value) + "\n"
+    ExOutputModel.getInstance(editor).output(text)
+    return true
+  }
 }
 

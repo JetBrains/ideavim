@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.handler
@@ -25,19 +25,22 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
 
-class DigraphHandler : CommandHandler(commands("dig[raphs]"), CommandHandler.ARGUMENT_OPTIONAL) {
+class DigraphHandler : CommandHandler.SingleExecution() {
+  override val names = commands("dig[raphs]")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val arg = cmd.argument
-        if (logger.isDebugEnabled) {
-            logger.debug("arg=$arg")
-        }
-
-        return VimPlugin.getDigraph().parseCommandLine(editor, arg)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val arg = cmd.argument
+    if (logger.isDebugEnabled) {
+      logger.debug("arg=$arg")
     }
 
-    companion object {
-        private val logger = Logger.getInstance(DigraphHandler::class.java.name)
-    }
+    return VimPlugin.getDigraph().parseCommandLine(editor, arg)
+  }
+
+  companion object {
+    private val logger = Logger.getInstance(DigraphHandler::class.java.name)
+  }
 }

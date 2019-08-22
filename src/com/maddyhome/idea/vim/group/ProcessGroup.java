@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.group;
@@ -25,8 +25,8 @@ import com.intellij.util.text.CharSequenceReader;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.CommandFlags;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandParser;
@@ -40,9 +40,7 @@ import javax.swing.*;
 import java.io.*;
 import java.util.EnumSet;
 
-/**
- *
- */
+
 public class ProcessGroup {
   public ProcessGroup() {
   }
@@ -64,7 +62,7 @@ public class ProcessGroup {
     panel.activate(editor, context, label, initText, count);
   }
 
-  public String endSearchCommand(@NotNull final Editor editor, @NotNull DataContext context) {
+  public String endSearchCommand(@NotNull final Editor editor) {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true);
 
@@ -73,10 +71,8 @@ public class ProcessGroup {
   }
 
   public void startExCommand(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
-    if (editor.isOneLineMode()) // Don't allow ex commands in one line editors
-    {
-      return;
-    }
+    // Don't allow ex commands in one line editors
+    if (editor.isOneLineMode()) return;
 
     String initText = getRange(editor, cmd);
     CommandState.getInstance(editor).pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
@@ -90,7 +86,7 @@ public class ProcessGroup {
 
     ExEntryPanel panel = ExEntryPanel.getInstance();
     if (panel.isActive()) {
-      UiHelper.requestFocus(panel);
+      UiHelper.requestFocus(panel.getEntry());
       panel.handleKey(stroke);
 
       return true;
@@ -106,7 +102,6 @@ public class ProcessGroup {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true);
     boolean res = true;
-    int flags;
     try {
       CommandState.getInstance(editor).popState();
       logger.debug("processing command");
@@ -114,11 +109,7 @@ public class ProcessGroup {
       record(editor, text);
       if (logger.isDebugEnabled()) logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
       if (panel.getLabel().equals(":")) {
-        flags = CommandParser.getInstance().processCommand(editor, context, text, 1);
-        if (logger.isDebugEnabled()) logger.debug("flags=" + flags);
-        if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-          VimPlugin.getMotion().exitVisual(editor);
-        }
+        CommandParser.getInstance().processCommand(editor, context, text, 1);
       }
       else {
         int pos = VimPlugin.getSearch().search(editor, text, panel.getCount(),
@@ -144,13 +135,11 @@ public class ProcessGroup {
     return res;
   }
 
-  public boolean cancelExEntry(@NotNull final Editor editor, @NotNull final DataContext context) {
+  public void cancelExEntry(@NotNull final Editor editor, boolean scrollToOldPosition) {
     CommandState.getInstance(editor).popState();
     KeyHandler.getInstance().reset(editor);
     ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.deactivate(true);
-
-    return true;
+    panel.deactivate(true, scrollToOldPosition);
   }
 
   private void record(Editor editor, @NotNull String text) {

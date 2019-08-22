@@ -13,19 +13,20 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.action.motion.visual;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
-import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
+import com.maddyhome.idea.vim.helper.HelperKt;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -35,30 +36,37 @@ import java.util.Set;
 /**
  * @author vlan
  */
-public class VisualExitModeAction extends VimCommandAction {
-  public VisualExitModeAction() {
-    super(new EditorActionHandler() {
-      public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-        VimPlugin.getMotion().processEscape(InjectedLanguageUtil.getTopLevelEditor(editor));
-      }
-    });
-  }
-
+final public class VisualExitModeAction extends VimCommandAction {
+  @Contract(" -> new")
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
+  final protected VimActionHandler makeActionHandler() {
+    return new VimActionHandler.SingleExecution() {
+      @Override
+      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+        VimPlugin.getVisualMotion().exitVisual(HelperKt.getTopLevelEditor(editor));
+        return true;
+      }
+    };
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Set<MappingMode> getMappingModes() {
     return MappingMode.V;
   }
 
   @NotNull
   @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("<Esc>", "<C-[>", "<C-C>", "<C-\\><C-N>");
   }
 
+  @Contract(pure = true)
   @NotNull
   @Override
-  public Command.Type getType() {
+  final public Command.Type getType() {
     return Command.Type.OTHER_READONLY;
   }
 }

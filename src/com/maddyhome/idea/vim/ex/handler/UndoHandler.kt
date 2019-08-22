@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.handler
@@ -26,9 +26,8 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.UndoRedoHelper
 
-class UndoHandler : CommandHandler(
-        commands("u[ndo]"),
-        flags(CommandHandler.RANGE_FORBIDDEN, CommandHandler.ARGUMENT_FORBIDDEN, CommandHandler.WRITABLE)
-) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) = UndoRedoHelper.undo(context)
+class UndoHandler : CommandHandler.SingleExecution() {
+  override val names = commands("u[ndo]")
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.WRITABLE)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) = UndoRedoHelper.undo(context)
 }

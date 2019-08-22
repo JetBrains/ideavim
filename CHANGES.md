@@ -16,8 +16,24 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-To Be Released
+0.53, 2019-08-07
 --------------
+* [VIM-1711](https://youtrack.jetbrains.com/issue/VIM-1711) Search is not triggered during surround action
+* [VIM-1712](https://youtrack.jetbrains.com/issue/VIM-1712) Fix `Y` command for visual mode
+* [VIM-1713](https://youtrack.jetbrains.com/issue/VIM-1713) Surround in visual mode put caret in correct position
+* [VIM-1732](https://youtrack.jetbrains.com/issue/VIM-1732) Fix SO after enabling vim mode
+* [VIM-1710](https://youtrack.jetbrains.com/issue/VIM-1710) Fix opening empty file with "relative number" enabled
+* [VIM-1725](https://youtrack.jetbrains.com/issue/VIM-1725) Fix problems with Japanese language
+* [VIM-1648](https://youtrack.jetbrains.com/issue/VIM-1648) Fix exception while substitute with conformation
+* [VIM-1736](https://youtrack.jetbrains.com/issue/VIM-1736) Fix `` for ex panel
+* [VIM-1739](https://youtrack.jetbrains.com/issue/VIM-1739) Fix full-width characters for ex panel
+
+
+0.52, 2019-07-23
+--------------
+
+* Introduce [Select Mode](https://github.com/JetBrains/ideavim/wiki/Select-mode).
+
 
 * Fixed `:only` command
 * [VIM-1586](https://youtrack.jetbrains.com/issue/VIM-1586) Support `:shell` command
@@ -28,7 +44,84 @@ To Be Released
 * [VIM-1303](https://youtrack.jetbrains.com/issue/VIM-1303) Fixed "Changing color schemes doesn't change find input"
 * [VIM-944](https://youtrack.jetbrains.com/issue/VIM-944) Fixed navigation with keypad arrows
 * [VIM-1569](https://youtrack.jetbrains.com/issue/VIM-1569) Fixed surround plugin bug by `S<tag attr="attr">`
-
+* [VIM-1012](https://youtrack.jetbrains.com/issue/VIM-1012) Fixed wrong tab selection after`:q`
+* [VIM-1245](https://youtrack.jetbrains.com/issue/VIM-1245) Clear switcher list after`:q`
+* [VIM-1425](https://youtrack.jetbrains.com/issue/VIM-1425) Correct `%` command
+* [VIM-1521](https://youtrack.jetbrains.com/issue/VIM-1521) Support `commentary` extension
+* [VIM-907](https://youtrack.jetbrains.com/issue/VIM-907) Fix `va(` command
+* [VIM-1067](https://youtrack.jetbrains.com/issue/VIM-1067) Fix repeating of `A` command
+* [VIM-1615](https://youtrack.jetbrains.com/issue/VIM-1615) Fix `set so=999` command and line "bouncing" with inlays
+* [VIM-1630](https://youtrack.jetbrains.com/issue/VIM-1630) Support `:tabonly` command
+* [VIM-607](https://youtrack.jetbrains.com/issue/VIM-607) Fix memory leaks
+* [VIM-1546](https://youtrack.jetbrains.com/issue/VIM-1546) Storing TAB key as input
+* [VIM-1231](https://youtrack.jetbrains.com/issue/VIM-1231) Get indent from PsiFile
+* [VIM-1633](https://youtrack.jetbrains.com/issue/VIM-1633) Fixed sequential text object commands in visual mode
+* [VIM-1105](https://youtrack.jetbrains.com/issue/VIM-1105) Added the `:command` command
+* [VIM-1090](https://youtrack.jetbrains.com/issue/VIM-1090) Fixed tag motion with duplicate tags
+* [VIM-1644](https://youtrack.jetbrains.com/issue/VIM-1644) Fixed repeat with visual mode
+* Fixed invoking IDE actions instead of command line actions with same shortcuts
+* [VIM-1550](https://youtrack.jetbrains.com/issue/VIM-1550) Fixed leaving command line mode on backspace
+* Fix insert position of `<C-R>` in ex commands
+* Command line editing caret shape and insert digraph/register feedback
+* [VIM-1419](https://youtrack.jetbrains.com/issue/VIM-1419),
+  [VIM-1493](https://youtrack.jetbrains.com/issue/VIM-1493) Correctly set focus when handling cmode mapping
+* Fix incorrect handling of subsequent key strokes after ex command line loses focus
+* [VIM-1240](https://youtrack.jetbrains.com/issue/VIM-1240) Improve UI of ex command line and output panel
+* [VIM-1485](https://youtrack.jetbrains.com/issue/VIM-1485) Remove incorrect gap between ex command line label and text
+* [VIM-1496](https://youtrack.jetbrains.com/issue/VIM-1496) Fix focus for Recent Files action
+* [VIM-1275](https://youtrack.jetbrains.com/issue/VIM-1275) "Change In Brackets" for string
+* [VIM-941](https://youtrack.jetbrains.com/issue/VIM-941) Fix tab for visual block mode
+* [VIM-1002](https://youtrack.jetbrains.com/issue/VIM-1002) Fix dot command for tab
+* [VIM-1426](https://youtrack.jetbrains.com/issue/VIM-1426) Correct `%` command
+* [VIM-1655](https://youtrack.jetbrains.com/issue/VIM-1655) Deleted word should is not yanked with Ctrl-W in insert mode
+* [VIM-1031](https://youtrack.jetbrains.com/issue/VIM-1031),
+  [VIM-1389](https://youtrack.jetbrains.com/issue/VIM-1389),
+  [VIM-1666](https://youtrack.jetbrains.com/issue/VIM-1666) Fix `<BS>` for digraphs
+* [VIM-1628](https://youtrack.jetbrains.com/issue/VIM-1628) Fix dead keys for JBR11
+* [VIM-1061](https://youtrack.jetbrains.com/issue/VIM-1061) Fix `^K` for digraphs
+* [VIM-437](https://youtrack.jetbrains.com/issue/VIM-437) Support `keymode` option
+* [VIM-274](https://youtrack.jetbrains.com/issue/VIM-274) Enter select mode for refactoring
+* [VIM-510](https://youtrack.jetbrains.com/issue/VIM-510) Support `Extend Selection` for visual mode
+* [VIM-606](https://youtrack.jetbrains.com/issue/VIM-606) Fix select text with mouse in insert mode
+* [VIM-800](https://youtrack.jetbrains.com/issue/VIM-800) Fix surround with live template
+* [VIM-1013](https://youtrack.jetbrains.com/issue/VIM-1013) Fix reformat code on selection
+* [VIM-1214](https://youtrack.jetbrains.com/issue/VIM-1214) Fix insert text to empty row
+* [VIM-1452](https://youtrack.jetbrains.com/issue/VIM-1452) Fix reselect visual block
+* [VIM-1497](https://youtrack.jetbrains.com/issue/VIM-1497) Fix rename variable action
+* [VIM-1541](https://youtrack.jetbrains.com/issue/VIM-1541) Fix visual block mode problems
+* [VIM-1619](https://youtrack.jetbrains.com/issue/VIM-1619) Extract method for visual mode
+* [VIM-1616](https://youtrack.jetbrains.com/issue/VIM-1616) `I` with multicaret works correctly
+* [VIM-1631](https://youtrack.jetbrains.com/issue/VIM-1631) Fix visual block for tab character
+* [VIM-1649](https://youtrack.jetbrains.com/issue/VIM-1649) Type variable for surround live template
+* [VIM-1654](https://youtrack.jetbrains.com/issue/VIM-1654) Fix NPE while indent in visual block mode
+* [VIM-1657](https://youtrack.jetbrains.com/issue/VIM-1657) Fix vim repeat in visual block
+* [VIM-1659](https://youtrack.jetbrains.com/issue/VIM-1658) Fix selection on empty line
+* [VIM-1473](https://youtrack.jetbrains.com/issue/VIM-1473) Yanked lines are not handled as block
+  selection when clipboard is used
+* [VIM-714](https://youtrack.jetbrains.com/issue/VIM-714) Fixed problems with caret position by vertical movement
+* [VIM-635](https://youtrack.jetbrains.com/issue/VIM-635) Supported `gn` commands
+* [VIM-1535](https://youtrack.jetbrains.com/issue/VIM-1535) Use same text attributes and highlight layer as IntelliJ's own Find command
+* [VIM-1413](https://youtrack.jetbrains.com/issue/VIM-1413) Fix `smartcase` option being ignored in incremental search
+* Fix incremental search not matching with trailing options, e.g. `/Foo/+1`
+* Move the current line as well as scrolling during incremental search
+* [VIM-128](https://youtrack.jetbrains.com/issue/VIM-128) Fix `:substitute` not respecting `ignorecase` and `smartcase` options
+* Fix next/previous search commands not respecting `smartcase` override
+* Search highlights are updated when `ignorecase`, `smartcase` and `hlsearch` options are updated, and when plugin is disabled
+* Incremental search highlights all matches in file, not just first
+* Added incremental search highlights for `:substitute` command
+* Fix exception when trying to highlight last CR in file
+* Improve behavior of `<BS>` in command line entry
+* [VIM-1626](https://youtrack.jetbrains.com/issue/VIM-1626) Add `ideajoin` option
+* [VIM-959](https://youtrack.jetbrains.com/issue/VIM-959) Add `ideamarks` option
+* [VIM-608](https://youtrack.jetbrains.com/issue/VIM-608) Automatic upload files on explicit save
+* [VIM-1548](https://youtrack.jetbrains.com/issue/VIM-1548) Respect editor settings about tabs and spaces
+* [VIM-1682](https://youtrack.jetbrains.com/issue/VIM-1682) Fix backward search with OR
+* [VIM-752](https://youtrack.jetbrains.com/issue/VIM-752) Enter finishes template in normal mode
+* [VIM-1668](https://youtrack.jetbrains.com/issue/VIM-1668) Fix smart step into
+* [VIM-1697](https://youtrack.jetbrains.com/issue/VIM-1697) Fix wrong search with tab characters
+* [VIM-1700](https://youtrack.jetbrains.com/issue/VIM-1700) Fix wrong search with tab characters
+* [VIM-1698](https://youtrack.jetbrains.com/issue/VIM-1698) Paste doesn't clear clipboard
+* [VIM-1359](https://youtrack.jetbrains.com/issue/VIM-1359) Fix behavior of i_CTRL-W action
 
 0.51, 2019-02-12
 ----------------
@@ -472,7 +565,7 @@ Bug fixes:
 * VIM-312 Fixed range and caret position after `dw` on the last single-word
   line, `w` command argument for the last word in file
 * Fixed `w` motion at the last word
-* VIM-85 Bug fix for gi behaviour
+* VIM-85 Bug fix for gi behavior
 * Always move cursor at the beginning of the deleted range
 * VIM-275 Fixed edge cases for `i{` motion
 * VIM-314 Made `i{` motion characterwise, not linewise/characterwise in visual

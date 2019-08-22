@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.option;
@@ -30,27 +30,14 @@ import java.util.StringTokenizer;
  * This is an option that accepts an arbitrary list of values
  */
 public class ListOption extends TextOption {
-  /**
-   * Creates the option
-   *
-   * @param name    The name of the option
-   * @param abbrev  The short name
-   * @param dflt    The option's default values
-   * @param pattern A regular expression that is used to validate new values. null if no check needed
-   */
-  ListOption(String name, String abbrev, String[] dflt, String pattern) {
-    super(name, abbrev);
-
-    this.dflt = new ArrayList<String>(Arrays.asList(dflt));
-    this.value = new ArrayList<String>(this.dflt);
-    this.pattern = pattern;
-  }
+  @NotNull public final static ListOption empty = new ListOption("", "", new String[0], "");
 
   /**
    * Gets the value of the option as a comma separated list of values
    *
    * @return The option's value
    */
+  @Override
   @NotNull
   public String getValue() {
     StringBuffer res = new StringBuffer();
@@ -98,6 +85,7 @@ public class ListOption extends TextOption {
    * @param val A comma separated list of values
    * @return True if all the supplied values were correct, false if not
    */
+  @Override
   public boolean set(String val) {
     return set(parseVals(val));
   }
@@ -109,6 +97,7 @@ public class ListOption extends TextOption {
    * @param val A comma separated list of values
    * @return True if all the supplied values were correct, false if not
    */
+  @Override
   public boolean append(String val) {
     return append(parseVals(val));
   }
@@ -120,6 +109,7 @@ public class ListOption extends TextOption {
    * @param val A comma separated list of values
    * @return True if all the supplied values were correct, false if not
    */
+  @Override
   public boolean prepend(String val) {
     return prepend(parseVals(val));
   }
@@ -131,6 +121,7 @@ public class ListOption extends TextOption {
    * @param val A comma separated list of values
    * @return True if all the supplied values were correct, false if not
    */
+  @Override
   public boolean remove(String val) {
     return remove(parseVals(val));
   }
@@ -179,9 +170,35 @@ public class ListOption extends TextOption {
     return true;
   }
 
+  /**
+   * Creates the option
+   *
+   * @param name    The name of the option
+   * @param abbrev  The short name
+   * @param dflt    The option's default values
+   * @param pattern A regular expression that is used to validate new values. null if no check needed
+   */
+  ListOption(String name, String abbrev, String[] dflt, String pattern) {
+    super(name, abbrev);
+
+    this.dflt = new ArrayList<>(Arrays.asList(dflt));
+    this.value = new ArrayList<>(this.dflt);
+    this.pattern = pattern;
+  }
+
+  /**
+   * Checks to see if the current value of the option matches the default value
+   *
+   * @return True if equal to default, false if not
+   */
+  @Override
+  public boolean isDefault() {
+    return dflt.equals(value);
+  }
+
   @Nullable
   protected List<String> parseVals(String val) {
-    List<String> res = new ArrayList<String>();
+    List<String> res = new ArrayList<>();
     StringTokenizer tokenizer = new StringTokenizer(val, ",");
     while (tokenizer.hasMoreTokens()) {
       String token = tokenizer.nextToken().trim();
@@ -197,25 +214,6 @@ public class ListOption extends TextOption {
   }
 
   /**
-   * Checks to see if the current value of the option matches the default value
-   *
-   * @return True if equal to default, false if not
-   */
-  public boolean isDefault() {
-    return dflt.equals(value);
-  }
-
-  /**
-   * Resets the option to its default value
-   */
-  public void resetDefault() {
-    if (!dflt.equals(value)) {
-      value = new ArrayList<String>(dflt);
-      fireOptionChangeEvent();
-    }
-  }
-
-  /**
    * Gets the string representation appropriate for output to :set all
    *
    * @return The option as a string {name}={value list}
@@ -228,4 +226,15 @@ public class ListOption extends TextOption {
   @NotNull protected final List<String> dflt;
   @Nullable protected List<String> value;
   protected final String pattern;
+
+  /**
+   * Resets the option to its default value
+   */
+  @Override
+  public void resetDefault() {
+    if (!dflt.equals(value)) {
+      value = new ArrayList<>(dflt);
+      fireOptionChangeEvent();
+    }
+  }
 }

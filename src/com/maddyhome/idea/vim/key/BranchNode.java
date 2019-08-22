@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.key;
@@ -45,7 +45,7 @@ public class BranchNode extends ParentNode {
 
   public BranchNode(KeyStroke key, EnumSet<CommandFlags> flags) {
     this.key = key;
-    this.flags = flags;
+    this.flags = EnumSet.copyOf(flags);
   }
 
   /**
@@ -55,8 +55,9 @@ public class BranchNode extends ParentNode {
    * @param key The key used to find the child
    * @return The child mapped to key or an argument node or null if no such mapping found
    */
+  @Override
   @Nullable
-  public Node getChild(@NotNull Object key) {
+  public Node getChildOrArgument(@NotNull Object key) {
     Node res = super.getChild(key);
     if (res == null) {
       res = children.get(ARGUMENT);

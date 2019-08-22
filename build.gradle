@@ -9,7 +9,7 @@ buildscript {
 }
 
 plugins {
-  id 'org.jetbrains.intellij' version '0.3.12'
+  id 'org.jetbrains.intellij' version '0.4.9'
 }
 
 apply plugin: 'java'
@@ -37,11 +37,16 @@ intellij {
   downloadSources Boolean.valueOf(downloadIdeaSources)
   instrumentCode Boolean.valueOf(instrumentPluginCode)
   intellijRepo = "https://www.jetbrains.com/intellij-repository"
+  if (!Boolean.valueOf(legacyNoJavaPlugin)) {
+    // Since 192 version of IJ java plugin should be defined separately
+    // Set `legacyNoJavaPlugin` to true if you are going to run tests under idea version < 192
+    plugins = ['java']
+  }
 
   publishPlugin {
     channels publishChannels.split(',')
     username publishUsername
-    password publishPassword
+    token publishToken
   }
 }
 
@@ -51,4 +56,22 @@ repositories {
 
 dependencies {
   compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+  compile "org.jetbrains:annotations:17.0.0"
+}
+
+tasks.register("slackEapNotification") {
+  doLast {
+    if (!slackUrl) return
+    def post = new URL(slackUrl).openConnection()
+    def message = "{\"text\":\"New EAP released: $version\"}"
+    post.setRequestMethod("POST")
+    post.setDoOutput(true)
+    post.setRequestProperty("Content-Type", "application/json")
+    post.getOutputStream().write(message.getBytes("UTF-8"))
+    def postRC = post.getResponseCode()
+    println(postRC)
+    if(postRC.equals(200)) {
+      println(post.getInputStream().getText())
+    }
+  }
 }

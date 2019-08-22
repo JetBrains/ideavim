@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.handler
@@ -26,10 +26,9 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
-class PromptReplaceHandler : CommandHandler(
-        commands("promptr[epl]"),
-        flags(ARGUMENT_OPTIONAL, RANGE_FORBIDDEN)
-) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
-            KeyHandler.executeAction("Replace", context)
+class PromptReplaceHandler : CommandHandler.SingleExecution() {
+  override val names = commands("promptr[epl]")
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
+    KeyHandler.executeAction("Replace", context)
 }

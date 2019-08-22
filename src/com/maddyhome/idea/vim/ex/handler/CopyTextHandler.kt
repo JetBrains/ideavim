@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.handler
@@ -21,29 +21,28 @@ package com.maddyhome.idea.vim.ex.handler
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.*
-import com.maddyhome.idea.vim.handler.CaretOrder
+import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.helper.EditorHelper
 
-class CopyTextHandler : CommandHandler(
-        commands("co[py]", "t"),
-        flags(RANGE_OPTIONAL, ARGUMENT_REQUIRED, WRITABLE)
-) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val carets = EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET)
-        for (caret in carets) {
-            val range = cmd.getTextRange(editor, caret, context, false)
-            val text = EditorHelper.getText(editor, range.startOffset, range.endOffset)
+class CopyTextHandler : CommandHandler.SingleExecution() {
+  override val names = commands("co[py]", "t")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val carets = EditorHelper.getOrderedCaretsList(editor)
+    for (caret in carets) {
+      val range = cmd.getTextRange(editor, caret, context, false)
+      val text = EditorHelper.getText(editor, range.startOffset, range.endOffset)
 
-            val arg = CommandParser.getInstance().parse(cmd.argument)
-            val line = arg.ranges.getFirstLine(editor, caret, context)
-            val offset = VimPlugin.getMotion().moveCaretToLineStart(editor, line + 1)
+      val arg = CommandParser.getInstance().parse(cmd.argument)
+      val line = arg.ranges.getFirstLine(editor, caret, context)
 
-            VimPlugin.getCopy().putText(editor, caret, context, text, SelectionType.LINE_WISE, CommandState.SubMode.NONE,
-                    offset, 1, true, false)
-        }
-        return true
+      val transferableData = VimPlugin.getRegister().getTransferableData(editor, range, text)
+      val textData = PutData.TextData(text, SelectionType.LINE_WISE, transferableData)
+      val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, _indent = true, caretAfterInsertedText = false, putToLine = line)
+      VimPlugin.getPut().putTextForCaret(editor, caret, context, putData)
     }
+    return true
+  }
 }

@@ -13,33 +13,67 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.action.copy;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.group.copy.PutData;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
-public class PutTextAfterCursorActionMoveCursor extends EditorAction {
-  public PutTextAfterCursorActionMoveCursor() {
-    super(new ChangeEditorActionHandler() {
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
+
+
+public class PutTextAfterCursorActionMoveCursor extends VimCommandAction {
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
+  }
+
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("gp");
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.OTHER_SELF_SYNCHRONIZED;
+  }
+
+  @NotNull
+  @Override
+  protected VimActionHandler makeActionHandler() {
+    return new ChangeEditorActionHandler.SingleExecution() {
       @Override
       public boolean execute(@NotNull Editor editor,
                              @NotNull DataContext context,
                              int count,
                              int rawCount,
                              @Nullable Argument argument) {
-        return VimPlugin.getCopy().putText(editor, context, count, true, true, false);
+        final Register lastRegister = VimPlugin.getRegister().getLastRegister();
+
+        final PutData.TextData textData =
+          lastRegister != null ? new PutData.TextData(lastRegister.getText(), lastRegister.getType(),
+                                                      lastRegister.getTransferableData()) : null;
+        final PutData putData = new PutData(textData, null, count, false, true, true, -1);
+        return VimPlugin.getPut().putText(editor, context, putData);
       }
-    });
+    };
   }
 }

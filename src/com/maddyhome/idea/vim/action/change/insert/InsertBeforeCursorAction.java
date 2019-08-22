@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.action.change.insert;
@@ -27,6 +27,8 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,37 +37,44 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-public class InsertBeforeCursorAction extends VimCommandAction {
-  public InsertBeforeCursorAction() {
-    super(new ChangeEditorActionHandler() {
-      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
-                             @Nullable Argument argument) {
+final public class InsertBeforeCursorAction extends VimCommandAction {
+  @Contract(" -> new")
+  @NotNull
+  @Override
+  final protected VimActionHandler makeActionHandler() {
+    return new ChangeEditorActionHandler.SingleExecution() {
+      @Override
+      final public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
+                                   @Nullable Argument argument) {
         VimPlugin.getChange().insertBeforeCursor(editor, context);
         return true;
       }
-    });
+    };
   }
 
+  @Contract(pure = true)
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
+  final public Set<MappingMode> getMappingModes() {
     return MappingMode.N;
   }
 
   @NotNull
   @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("i", "<Insert>");
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.INSERT;
   }
 
   @NotNull
   @Override
-  public Command.Type getType() {
-    return Command.Type.INSERT;
-  }
-
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
+  final public EnumSet<CommandFlags> getFlags() {
     return EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO);
   }
 }

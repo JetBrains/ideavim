@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.handler
@@ -23,21 +23,21 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
-import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.OptionsManager
 
-class SetHandler : CommandHandler(
-        commands("se[t]"),
-        CommandHandler.ARGUMENT_OPTIONAL
-), VimScriptCommandHandler {
+class SetHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
+  override val names = commands("se[t]")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
-            parseOptionLine(editor, cmd, true)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
+    parseOptionLine(editor, cmd, true)
 
-    override fun execute(cmd: ExCommand) {
-        parseOptionLine(null, cmd, false)
-    }
+  override fun execute(cmd: ExCommand) {
+    parseOptionLine(null, cmd, false)
+  }
 
-    private fun parseOptionLine(editor: Editor?, cmd: ExCommand, failOnBad: Boolean) =
-            Options.getInstance().parseOptionLine(editor, cmd.argument, failOnBad)
+  private fun parseOptionLine(editor: Editor?, cmd: ExCommand, failOnBad: Boolean) =
+    OptionsManager.parseOptionLine(editor, cmd.argument, failOnBad)
 }

@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.extension.surround;
@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.extension.VimNonDisposableExtension;
 import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.key.OperatorFunction;
+import com.maddyhome.idea.vim.option.ClipboardOptionsData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,7 +44,8 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -148,11 +150,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
   private static class VSurroundHandler implements VimExtensionHandler {
     @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      final TextRange visualRange = VimPlugin.getMark().getVisualSelectionMarks(editor);
-      if (visualRange == null) {
-        return;
-      }
-
+      int selectionStart = editor.getCaretModel().getPrimaryCaret().getSelectionStart();
       // NB: Operator ignores SelectionType anyway
       if (!new Operator().apply(editor, context, SelectionType.CHARACTER_WISE)) {
         return;
@@ -161,7 +159,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       WriteAction.run(() -> {
         // Leave visual mode
         executeNormal(parseKeys("<Esc>"), editor);
-        editor.getCaretModel().moveToOffset(visualRange.getStartOffset());
+        editor.getCaretModel().moveToOffset(selectionStart);
       });
     }
 
@@ -197,6 +195,8 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       List<KeyStroke> innerValue = getRegister(REGISTER);
       if (innerValue == null) {
         innerValue = new ArrayList<>();
+      } else {
+        innerValue = new ArrayList<>(innerValue);
       }
 
       // Delete the surrounding
@@ -222,7 +222,9 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     }
 
     private static void perform(@NotNull String sequence, @NotNull Editor editor) {
-      executeNormal(parseKeys("\"" + REGISTER + sequence), editor);
+      try (ClipboardOptionsData.IdeaputDisabler ignored = new ClipboardOptionsData.IdeaputDisabler()) {
+        executeNormal(parseKeys("\"" + REGISTER + sequence), editor);
+      }
     }
 
     private static void pasteSurround(@NotNull List<KeyStroke> innerValue, @NotNull Editor editor) {
@@ -302,10 +304,9 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
         case COMMAND:
           return VimPlugin.getMark().getChangeMarks(editor);
         case VISUAL:
-          final TextRange visualRange = VimPlugin.getMark().getVisualSelectionMarks(editor);
-          if (visualRange == null) return null;
-          final int exclusiveEnd = EditorHelper.normalizeOffset(editor, visualRange.getEndOffset() + 1);
-          return new TextRange(visualRange.getStartOffset(), exclusiveEnd);
+          int selectionStart = editor.getCaretModel().getPrimaryCaret().getSelectionStart();
+          int selectionEnd = editor.getCaretModel().getPrimaryCaret().getSelectionEnd();
+          return new TextRange(selectionStart, selectionEnd);
         default:
           return null;
       }

@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.handler
@@ -31,27 +31,26 @@ import java.io.File
 /**
  * @author vlan
  */
-class SourceHandler : CommandHandler(
-        commands("so[urce]"),
-        flags(CommandHandler.RANGE_FORBIDDEN, CommandHandler.ARGUMENT_REQUIRED)
-), VimScriptCommandHandler {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        execute(cmd)
-        return true
-    }
+class SourceHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
+  override val names = commands("so[urce]")
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    execute(cmd)
+    return true
+  }
 
-    override fun execute(cmd: ExCommand) {
-        val path = expandUser(cmd.argument.trim())
-        VimScriptParser.executeFile(File(path))
-    }
+  override fun execute(cmd: ExCommand) {
+    val path = expandUser(cmd.argument.trim())
+    VimScriptParser.executeFile(File(path))
+  }
 
-    private fun expandUser(path: String): String {
-        if (path.startsWith("~")) {
-            val home = System.getProperty("user.home")
-            if (home != null) {
-                return home + path.substring(1)
-            }
-        }
-        return path
+  private fun expandUser(path: String): String {
+    if (path.startsWith("~")) {
+      val home = System.getProperty("user.home")
+      if (home != null) {
+        return home + path.substring(1)
+      }
     }
+    return path
+  }
 }

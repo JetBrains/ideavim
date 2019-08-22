@@ -13,19 +13,23 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex
 
 data class CommandName(val required: String, val optional: String = "")
 
-private val commandPattern: Regex = "^([^\\[]+)(?:\\[([^]]+)])?\$".toRegex()
 fun commands(vararg commands: String) = commands.map { command ->
-    commandPattern.matchEntire(command)?.groupValues?.let { CommandName(it[1], it[2]) }
-            ?: throw RuntimeException("$command is invalid!")
+  commandPattern.matchEntire(command)?.groupValues?.let { CommandName(it[1], it[2]) }
+    ?: throw RuntimeException("$command is invalid!")
 }.toTypedArray()
 
-fun flags(vararg flags: Int): Int {
-    return flags.reduce { acc, i -> acc or i }
-}
+fun flags(
+  rangeFlag: CommandHandler.RangeFlag,
+  argumentFlag: CommandHandler.ArgumentFlag,
+  access: CommandHandler.Access,
+  vararg flags: CommandHandler.Flag
+) = CommandHandlerFlags(rangeFlag, argumentFlag, access, flags.toSet())
+
+private val commandPattern: Regex = "^([^\\[]+)(?:\\[([^]]+)])?\$".toRegex()

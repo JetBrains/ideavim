@@ -13,16 +13,26 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ui;
 
-import org.jetbrains.annotations.Nullable;
+import com.intellij.codeInsight.editorActions.CopyPastePostProcessor;
+import com.intellij.codeInsight.editorActions.TextBlockTransferable;
+import com.intellij.codeInsight.editorActions.TextBlockTransferableData;
+import com.intellij.openapi.editor.RawText;
+import kotlin.Pair;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.awt.datatransfer.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is a utility class for working with the system clipboard
@@ -33,29 +43,33 @@ public class ClipboardHandler {
    *
    * @return The clipboard string or null if data isn't plain text
    */
-  @Nullable
-  public static String getClipboardText() {
+  @NotNull
+  public static Pair<String, List<TextBlockTransferableData>> getClipboardTextAndTransferableData() {
     String res = null;
+    List<TextBlockTransferableData> transferableData = new ArrayList<>();
     try {
       Clipboard board = Toolkit.getDefaultToolkit().getSystemClipboard();
       Transferable trans = board.getContents(null);
       Object data = trans.getTransferData(DataFlavor.stringFlavor);
 
-      if (data != null) {
-        res = data.toString();
-      }
+      res = data.toString();
+      transferableData = collectTransferableData(trans);
     }
-    catch (HeadlessException e) {
-      // ignore
-    }
-    catch (UnsupportedFlavorException e) {
-      // ignore
-    }
-    catch (IOException e) {
-      // ignore
+    catch (HeadlessException | UnsupportedFlavorException | IOException ignored) {
     }
 
-    return res;
+    return new Pair<>(res, transferableData);
+  }
+
+  private static List<TextBlockTransferableData> collectTransferableData(Transferable transferable) {
+    List<TextBlockTransferableData> allValues = new ArrayList<>();
+    for (CopyPastePostProcessor<? extends TextBlockTransferableData> processor : CopyPastePostProcessor.EP_NAME.getExtensionList()) {
+      List<? extends TextBlockTransferableData> data = processor.extractTransferableData(transferable);
+      if (!data.isEmpty()) {
+        allValues.addAll(data);
+      }
+    }
+    return allValues;
   }
 
   /**
@@ -63,14 +77,14 @@ public class ClipboardHandler {
    *
    * @param text The text to add to the clipboard
    */
-  public static void setClipboardText(String text) {
+  public static void setClipboardText(String text, List<TextBlockTransferableData> transferableData, String rawText) {
     try {
+      final String s = TextBlockTransferable.convertLineSeparators(text, "\n", transferableData);
+      TextBlockTransferable content = new TextBlockTransferable(s, transferableData, new RawText(rawText));
       Clipboard board = Toolkit.getDefaultToolkit().getSystemClipboard();
-      StringSelection data = new StringSelection(text);
-      board.setContents(data, null);
+      board.setContents(content, null);
     }
-    catch (HeadlessException e) {
-      // ignore
+    catch (HeadlessException ignored) {
     }
   }
 }
