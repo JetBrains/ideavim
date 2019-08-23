@@ -28,7 +28,7 @@
   <version>SNAPSHOT</version>
   <vendor>JetBrains</vendor>
 
-  <idea-version since-build="183.2940.10"/>
+  <idea-version since-build="183.4284.148"/>
 
   <!-- Mark the plugin as compatible with RubyMine and other products based on the IntelliJ platform -->
   <depends>com.intellij.modules.lang</depends>

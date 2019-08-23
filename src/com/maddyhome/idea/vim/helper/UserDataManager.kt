@@ -88,7 +88,8 @@ var Editor.vimCommandState: CommandState? by userData()
 var Editor.vimChangeGroup: Boolean by userDataOr { false }
 var Editor.vimMotionGroup: Boolean by userDataOr { false }
 var Editor.vimEditorGroup: Boolean by userDataOr { false }
-var Editor.vimLineNumbersShown: Boolean by userDataOr { false }
+var Editor.vimLineNumbersInitialState: Boolean by userDataOr { false }
+var Editor.vimHasRelativeLineNumbersInstalled: Boolean by userDataOr { false }
 var Editor.vimMorePanel: ExOutputPanel? by userData()
 var Editor.vimExOutput: ExOutputModel? by userData()
 var Editor.vimTestInputModel: TestInputModel? by userData()
