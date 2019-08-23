@@ -195,7 +195,7 @@ public class EditorGroup {
         ((EditorGutterComponentEx) gutter).setLineNumberConvertor(null);
       }
       else {
-        // TODO: 192 gives us an API to close just one annotation provider
+        // TODO:[VERSION UPDATE] 192 gives us an API to close just one annotation provider
         gutter.closeAllAnnotations();
       }
       UserDataManager.setVimHasRelativeLineNumbersInstalled(editor, false);
