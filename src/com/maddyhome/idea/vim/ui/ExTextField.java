@@ -473,10 +473,7 @@ public class ExTextField extends JTextField {
 
       try {
         final JTextComponent component = getComponent();
-        final Color color = g.getColor();
-
-        g.setColor(component.getBackground());
-        g.setXORMode(component.getCaretColor());
+        g.setColor(component.getCaretColor());
 
         // We have to use the deprecated version because we still support 1.8
         final Rectangle r = component.getUI().modelToView(component, getDot(), getDotBias());
@@ -490,8 +487,6 @@ public class ExTextField extends JTextField {
           r.setBounds(r.x, r.y, getCaretWidth(fm, blockPercentage), getBlockHeight(boundsHeight));
           g.fillRect(r.x, r.y + boundsHeight - r.height, r.width, r.height);
         }
-        g.setPaintMode();
-        g.setColor(color);
       }
       catch (BadLocationException e) {
         // ignore
