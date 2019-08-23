@@ -58,7 +58,7 @@ public class MotionJumpPreviousAction extends MotionEditorAction {
                            int count,
                            int rawCount,
                            @Nullable Argument argument) {
-        return VimPlugin.getMotion().moveCaretToJump(editor, caret, -count);
+        return VimPlugin.getMotion().moveCaretToJump(editor, -count);
       }
     };
   }
