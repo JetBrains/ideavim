@@ -75,6 +75,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     .put(']', Pair.create("[", "]"))
     .put('a', Pair.create("<", ">"))
     .put('>', Pair.create("<", ">"))
+    .put('s', Pair.create(" ", ""))
     .build();
 
   @NotNull
@@ -126,8 +127,34 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
   }
 
   @Nullable
+  private static Pair<String, String> inputFunctionName(
+    @NotNull Editor editor,
+    boolean withInternalSpaces
+  ) {
+    final String functionNameInput = inputString(editor, "function: ");
+
+    if (functionNameInput.isEmpty()) {
+      return null;
+    }
+
+    return withInternalSpaces
+      ? Pair.create(functionNameInput + "( ", " )")
+      : Pair.create(functionNameInput + "(", ")");
+  }
+
+  @Nullable
   private static Pair<String, String> getOrInputPair(char c, @NotNull Editor editor) {
-    return c == '<' || c == 't' ? inputTagPair(editor) : getSurroundPair(c);
+    switch (c) {
+      case '<':
+      case 't':
+        return inputTagPair(editor);
+      case 'f':
+        return inputFunctionName(editor, false);
+      case 'F':
+        return inputFunctionName(editor, true);
+      default:
+        return getSurroundPair(c);
+    }
   }
 
   private static char getChar(@NotNull Editor editor) {

@@ -102,6 +102,32 @@ class VimSurroundExtensionTest : VimTestCase() {
     myFixture.checkResult("<div class = \"container\"><p>Hello</p></div>")
   }
 
+  fun testSurroundFunctionName() {
+    configureByText("foo = b${c}ar")
+    typeText(parseKeys("ysiwfbaz"))
+    myFixture.checkResult("foo = ${c}baz(bar)")
+  }
+
+  fun testSurroundFunctionNameDoesNothingIfInputIsEmpty() {
+    // The cursor does not move. This is different from Vim
+    // where the cursor moves to the beginning of the text object.
+    configureByText("foo = b${c}ar")
+    typeText(parseKeys("ysiwf"))
+    myFixture.checkResult("foo = b${c}ar")
+  }
+
+  fun testSurroundFunctionNameWithInnerSpacing() {
+    configureByText("foo = b${c}ar")
+    typeText(parseKeys("ysiwFbaz"))
+    myFixture.checkResult("foo = ${c}baz( bar )")
+  }
+
+  fun testSurroundSpace() {
+    configureByText("foo(b${c}ar)")
+    typeText(parseKeys("csbs"))
+    myFixture.checkResult("foo${c} bar")
+  }
+
   /* visual surround */
 
   fun testVisualSurroundWordParens() {
