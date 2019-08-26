@@ -53,6 +53,7 @@ public class CommandParser {
     new CopyTextHandler(),
     new DelCmdHandler(),
     new DeleteLinesHandler(),
+    new DeleteMarksHandler(),
     new DigraphHandler(),
     new DumpLineHandler(),
     new EditFileHandler(),

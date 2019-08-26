@@ -71,4 +71,5 @@ public interface Msg {
   String e_patnotf2 = "e_patnotf2";
   String unkopt = "unkopt";
   String e_invarg = "e_invarg";
+  String E475 = "E475";
 }
