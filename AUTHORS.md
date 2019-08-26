@@ -259,6 +259,10 @@ Contributors:
   [![icon][github]](https://github.com/NOLFXceptMe)
   &nbsp;
   Naveen Kumar Molleti
+* [![icon][mail]](mailto:jorgen.granseth@bekk.no)
+  [![icon][github]](https://github.com/jorgengranseth)
+  &nbsp;
+  Jørgen Granseth
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.

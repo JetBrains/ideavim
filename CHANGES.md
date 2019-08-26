@@ -21,6 +21,7 @@ To be released
 * [VIM-1766](https://youtrack.jetbrains.com/issue/VIM-1766) Fix disappearing caret in ex entry on Linux
 * [VIM-1032](https://youtrack.jetbrains.com/issue/VIM-1032) Annotations work well with relative line numbers enabled
 * [VIM-1762](https://youtrack.jetbrains.com/issue/VIM-1762) Relative line numbers respect line number theme
+* [VIM-1762](https://youtrack.jetbrains.com/issue/VIM-1762) Relative line numbers respect line number theme
 
 0.53, 2019-08-07
 --------------
@@ -32,7 +33,7 @@ To be released
 * [VIM-1725](https://youtrack.jetbrains.com/issue/VIM-1725) Fix problems with Japanese language
 * [VIM-1648](https://youtrack.jetbrains.com/issue/VIM-1648) Fix exception while substitute with conformation
 * [VIM-1736](https://youtrack.jetbrains.com/issue/VIM-1736) Fix `` for ex panel
-* [VIM-1739](https://youtrack.jetbrains.com/issue/VIM-1739) Fix full-width characters for ex panel
+* [VIM-1720](https://youtrack.jetbrains.com/issue/VIM-1720) Add `:delmarks` command
 
 
 0.52, 2019-07-23
