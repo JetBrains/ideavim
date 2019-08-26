@@ -3,15 +3,7 @@
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
       <ul>
-        <li>Support select mode</li>
-        <li>Integration with templates & in-line refactorings using Select mode</li>
-        <li>Support "Extend selection" action in visual mode</li>
-        <li>Commentary extension</li>
-        <li>Add options to integrate paste/join/marks with the IDE</li>
-        <li>Support 'gn' commands</li>
-        <li>Support :command command</li>
-        <li>Support :shell command</li>
-        <li>Support :tabnext and :tabprevious commands</li>
+        <li>Support surrounding with a function name</li>
         <li>Various bug fixes</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
