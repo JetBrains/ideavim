@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.VimTypedActionHandler
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.*
+import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.*
@@ -276,6 +277,7 @@ object VimListenerManager {
       if (!mouseDragging) {
         logger.debug("Mouse dragging")
         SelectionVimListenerSuppressor.lock()
+        VimVisualTimer.swingTimer?.stop()
         mouseDragging = true
         val caret = e.editor.caretModel.primaryCaret
         if (onLineEnd(caret)) {
