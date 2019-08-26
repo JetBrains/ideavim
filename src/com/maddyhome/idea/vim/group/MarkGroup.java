@@ -331,6 +331,9 @@ public class MarkGroup {
       fmarks.remove(ch);
     }
     else if (GLOBAL_MARKS.indexOf(ch) >= 0) {
+      // Global marks are added to global and file marks
+      HashMap fmarks = getFileMarks(mark.getFilename());
+      fmarks.remove(ch);
       globalMarks.remove(ch);
       removeSystemMark(ch, editor);
     }
