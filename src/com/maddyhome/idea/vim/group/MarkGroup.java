@@ -799,25 +799,36 @@ public class MarkGroup {
 
   public static final String WR_GLOBAL_MARKS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   public static final String WR_REGULAR_FILE_MARKS = "abcdefghijklmnopqrstuvwxyz";
+  /** Marks: abcdefghijklmnopqrstuvwxyz' */
   private static final String WR_FILE_MARKS = WR_REGULAR_FILE_MARKS + "'";
 
   public static final String RO_GLOBAL_MARKS = "0123456789";
   private static final String RO_FILE_MARKS = ".[]<>^{}()";
 
   private static final String DEL_CONTEXT_FILE_MARKS = ".^[]\"";
+  /** Marks: .^[]"abcdefghijklmnopqrstuvwxyz */
   public static final String DEL_FILE_MARKS = DEL_CONTEXT_FILE_MARKS + WR_REGULAR_FILE_MARKS;
+  /** Marks: 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*/
   private static final String DEL_GLOBAL_MARKS = RO_GLOBAL_MARKS + WR_GLOBAL_MARKS;
+  /** Marks: .^[]"abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ  */
   public static final String DEL_MARKS = DEL_FILE_MARKS + DEL_GLOBAL_MARKS;
 
+  /** Marks: abcdefghijklmnopqrstuvwxyz'.^[]" */
   private static final String SAVE_FILE_MARKS = WR_FILE_MARKS + DEL_CONTEXT_FILE_MARKS;
 
+  /** Marks: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 */
   private static final String GLOBAL_MARKS = WR_GLOBAL_MARKS + RO_GLOBAL_MARKS;
+  /** Marks: abcdefghijklmnopqrstuvwxyz'[]<>^{}() */
   private static final String FILE_MARKS = WR_FILE_MARKS + RO_FILE_MARKS;
 
+  /** Marks: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' */
   private static final String WRITE_MARKS = WR_GLOBAL_MARKS + WR_FILE_MARKS;
+  /** Marks: 0123456789.[]<>^{}() */
   private static final String READONLY_MARKS = RO_GLOBAL_MARKS + RO_FILE_MARKS;
 
+  /** Marks: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' */
   private static final String VALID_SET_MARKS = WRITE_MARKS;
+  /** Marks: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'0123456789.[]<>^{}() */
   private static final String VALID_GET_MARKS = WRITE_MARKS + READONLY_MARKS;
 
   private static final Logger logger = Logger.getInstance(MarkGroup.class.getName());
