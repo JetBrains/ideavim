@@ -19,6 +19,7 @@ package com.maddyhome.idea.vim;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
+import com.intellij.openapi.application.ApplicationManager;
 import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
@@ -35,8 +36,17 @@ class RegisterActions {
    * Register all the key/action mappings for the plugin.
    */
   static void registerActions() {
-    registerVimCommandActions();
-    registerSystemMappings();
+    Runnable setup = () -> {
+      registerVimCommandActions();
+      registerSystemMappings();
+      VimPlugin.Initialization.actionsInitialized();
+    };
+
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      setup.run();
+    } else {
+      ApplicationManager.getApplication().executeOnPooledThread(setup);
+    }
   }
 
   private static void registerVimCommandActions() {

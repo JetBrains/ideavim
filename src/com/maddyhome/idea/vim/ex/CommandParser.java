@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.helper.Msg;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -130,14 +131,21 @@ public class CommandParser {
    * Registers all the supported Ex commands
    */
   public void registerHandlers() {
-    if (registered) return;
+    if (registered.getAndSet(true)) return;
 
-    for (CommandHandler handler : myHandlers) {
-      handler.register();
+    Runnable setup = () -> {
+      for (CommandHandler handler : myHandlers) {
+        handler.register();
+      }
+
+      VimPlugin.Initialization.commandsInitialized();
+    };
+
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      setup.run();
+    } else {
+      ApplicationManager.getApplication().executeOnPooledThread(setup);
     }
-
-    registered = true;
-    //logger.debug("root=" + root);
   }
 
   /**
@@ -649,7 +657,7 @@ public class CommandParser {
   }
 
   @NotNull private final CommandNode root = new CommandNode();
-  private boolean registered = false;
+  private AtomicBoolean registered = new AtomicBoolean(false);
 
   private static CommandParser ourInstance;
 

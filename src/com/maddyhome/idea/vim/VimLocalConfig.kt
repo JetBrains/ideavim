@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim
 
 import com.intellij.configurationStore.APP_CONFIG
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.State
@@ -48,9 +49,17 @@ class VimLocalConfig : PersistentStateComponent<Element> {
   }
 
   override fun loadState(state: Element) {
-    VimPlugin.getMark().readData(state)
-    VimPlugin.getRegister().readData(state)
-    VimPlugin.getSearch().readData(state)
-    VimPlugin.getHistory().readData(state)
+    val setup = {
+      VimPlugin.getMark().readData(state)
+      VimPlugin.getRegister().readData(state)
+      VimPlugin.getSearch().readData(state)
+      VimPlugin.getHistory().readData(state)
+    }
+
+    if (ApplicationManager.getApplication().isUnitTestMode) {
+      setup()
+    } else {
+      ApplicationManager.getApplication().executeOnPooledThread(setup)
+    }
   }
 }

@@ -148,6 +148,8 @@ public class KeyHandler {
                         @NotNull KeyStroke key,
                         @NotNull DataContext context,
                         boolean allowKeyMappings) {
+    if (VimPlugin.Initialization.notInitialized()) return;
+
     VimPlugin.clearError();
     // All the editor actions should be performed with top level editor!!!
     // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors

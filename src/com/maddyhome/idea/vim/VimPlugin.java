@@ -67,6 +67,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This plugin attempts to emulate the key binding and general functionality of Vim and gVim. See the supplied
@@ -444,6 +445,24 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     }
   }
 
+  public static class Initialization {
+    private static final AtomicBoolean initializedActions = new AtomicBoolean(false);
+    private static final AtomicBoolean initializedCommands = new AtomicBoolean(false);
+
+    public static boolean notInitialized() {
+      return !(initializedActions.get() &&
+               initializedCommands.get());
+    }
+
+    public static void actionsInitialized() {
+      initializedActions.set(true);
+    }
+
+    public static void commandsInitialized() {
+      initializedCommands.set(true);
+    }
+  }
+
   @NotNull
   private static VimPlugin getInstance() {
     return (VimPlugin)ApplicationManager.getApplication().getComponent(IDEAVIM_COMPONENT_NAME);
@@ -514,27 +533,35 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   public void loadState(@NotNull final Element element) {
     LOG.debug("Loading state");
 
-    // Restore whether the plugin is enabled or not
-    Element state = element.getChild("state");
-    if (state != null) {
-      try {
-        previousStateVersion = Integer.parseInt(state.getAttributeValue("version"));
+    Runnable setup = () -> {
+      // Restore whether the plugin is enabled or not
+      Element state = element.getChild("state");
+      if (state != null) {
+        try {
+          previousStateVersion = Integer.parseInt(state.getAttributeValue("version"));
+        }
+        catch (NumberFormatException ignored) {
+        }
+        enabled = Boolean.parseBoolean(state.getAttributeValue("enabled"));
+        previousKeyMap = state.getAttributeValue("keymap");
       }
-      catch (NumberFormatException ignored) {
-      }
-      enabled = Boolean.parseBoolean(state.getAttributeValue("enabled"));
-      previousKeyMap = state.getAttributeValue("keymap");
-    }
 
-    if (previousStateVersion > 0 && previousStateVersion < 5) {
-      // Migrate settings from 4 to 5 version
-      mark.readData(element);
-      register.readData(element);
-      search.readData(element);
-      history.readData(element);
+      if (previousStateVersion > 0 && previousStateVersion < 5) {
+        // Migrate settings from 4 to 5 version
+        mark.readData(element);
+        register.readData(element);
+        search.readData(element);
+        history.readData(element);
+      }
+      key.readData(element);
+      editor.readData(element);
+      this.state.readData(element);
+    };
+
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      setup.run();
+    } else {
+      ApplicationManager.getApplication().executeOnPooledThread(setup);
     }
-    key.readData(element);
-    editor.readData(element);
-    this.state.readData(element);
   }
 }
