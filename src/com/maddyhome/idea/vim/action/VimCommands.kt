@@ -63,6 +63,7 @@ import javax.swing.KeyStroke
 sealed class VimCommandActionBase : EditorAction(null) {
 
   var id = ""
+  var text = ""
 
   init {
     @Suppress("LeakingThis")

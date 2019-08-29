@@ -18,32 +18,39 @@
 
 package com.maddyhome.idea.vim;
 
+import com.intellij.ide.DataManager;
 import com.intellij.ide.IdeEventQueue;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.ActionPlan;
+import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.action.MotionEditorAction;
 import com.maddyhome.idea.vim.action.TextObjectAction;
+import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
+
+import static com.intellij.openapi.actionSystem.CommonDataKeys.*;
+import static com.intellij.openapi.actionSystem.PlatformDataKeys.PROJECT_FILE_DIRECTORY;
 
 /**
  * This handlers every keystroke that the user can argType except those that are still valid hotkeys for various Idea
@@ -101,7 +108,8 @@ public class KeyHandler {
     // Is the template presentation sufficient?
     // What are the modifiers? Is zero OK?
     final AnActionEvent event =
-      new AnActionEvent(null, context, ActionPlaces.ACTION_SEARCH, action.getTemplatePresentation(), ActionManager.getInstance(), 0);
+      new AnActionEvent(null, context, ActionPlaces.ACTION_SEARCH, action.getTemplatePresentation(),
+                        ActionManager.getInstance(), 0);
     action.update(event);
     if (event.getPresentation().isEnabled()) {
       action.actionPerformed(event);
@@ -284,8 +292,8 @@ public class KeyHandler {
       RegisterGroup register = VimPlugin.getRegister();
       if (register.getCurrentRegister() == register.getDefaultRegister()) {
         if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
-          CommandProcessor.getInstance().executeCommand(editor.getProject(),
-                                                        () -> KeyHandler.executeAction("EditorEscape", context), "", null);
+          CommandProcessor.getInstance()
+            .executeCommand(editor.getProject(), () -> KeyHandler.executeAction("EditorEscape", context), "", null);
         }
         VimPlugin.indicateError();
       }
@@ -529,8 +537,9 @@ public class KeyHandler {
 
     if (ApplicationManager.getApplication().isDispatchThread()) {
       Runnable action = new ActionRunner(editor, context, cmd, key);
-      String name = cmd.getAction().getTemplatePresentation().getText();
-      name = name != null ? "Vim " + name : "";
+      VimCommandActionBase cmdAction = cmd.getAction();
+      String name = cmdAction == null ? "" : cmdAction.getText();
+
       if (type.isWrite()) {
         RunnableHelper.runWriteCommand(project, action, name, action);
       }
@@ -721,11 +730,56 @@ public class KeyHandler {
     VimPlugin.getRegister().resetRegister();
   }
 
+  // This method is copied from com.intellij.openapi.editor.actionSystem.EditorAction.getProjectAwareDataContext
+  @NotNull
+  private static DataContext getProjectAwareDataContext(@NotNull final Editor editor, @NotNull final DataContext original) {
+    if (PROJECT.getData(original) == editor.getProject()) {
+      return new DialogAwareDataContext(original);
+    }
+
+    return dataId -> {
+      if (PROJECT.is(dataId)) {
+        final Project project = editor.getProject();
+        if (project != null) {
+          return project;
+        }
+      }
+      return original.getData(dataId);
+    };
+
+  }
+
+  // This class is copied from com.intellij.openapi.editor.actionSystem.DialogAwareDataContext.DialogAwareDataContext
+  private final static class DialogAwareDataContext implements DataContext {
+    private static final DataKey[] keys = {PROJECT, PROJECT_FILE_DIRECTORY, EDITOR, VIRTUAL_FILE, PSI_FILE};
+    private final Map<String, Object> values = new HashMap<>();
+
+    DialogAwareDataContext(DataContext context) {
+      for (DataKey key : keys) {
+        values.put(key.getName(), key.getData(context));
+      }
+    }
+
+    @Nullable
+    @Override
+    public Object getData(@NotNull @NonNls String dataId) {
+      if (values.containsKey(dataId)) {
+        return values.get(dataId);
+      }
+      final Editor editor = (Editor)values.get(EDITOR.getName());
+      if (editor != null) {
+        return DataManager.getInstance().getDataContext(editor.getContentComponent()).getData(dataId);
+      }
+      return null;
+    }
+  }
+
   /**
    * This was used as an experiment to execute actions as a runnable.
    */
   static class ActionRunner implements Runnable {
-    public ActionRunner(Editor editor, DataContext context, Command cmd, KeyStroke key) {
+    @Contract(pure = true)
+    ActionRunner(Editor editor, DataContext context, Command cmd, KeyStroke key) {
       this.editor = editor;
       this.context = context;
       this.cmd = cmd;
@@ -737,7 +791,11 @@ public class KeyHandler {
       CommandState editorState = CommandState.getInstance(editor);
       boolean wasRecording = editorState.isRecording();
 
-      executeAction(cmd.getAction(), context);
+      if (cmd.getAction() == null) return;
+      CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> cmd.getAction().getHandler()
+                                                      .execute(editor, null, getProjectAwareDataContext(editor, context)), cmd.getAction().getText(),
+                                                    DocCommandGroupId.noneGroupId(editor.getDocument()),
+                                                    UndoConfirmationPolicy.DEFAULT, editor.getDocument());
       if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
         VimPlugin.getChange().processCommand(editor, cmd);
       }
