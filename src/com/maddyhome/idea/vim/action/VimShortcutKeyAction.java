@@ -30,6 +30,7 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.RegisterActions;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -177,9 +178,9 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     if (values == null) return false;
 
     return values.stream().anyMatch(actionId -> {
-      final AnAction action = ActionManager.getInstance().getAction(actionId);
-      if (!(action instanceof VimCommandAction)) return false;
-      return ((VimCommandAction)action).getKeyStrokesSet().stream()
+      final VimCommandActionBase action = RegisterActions.findAction(actionId);
+      if (action == null) return false;
+      return action.getKeyStrokesSet().stream()
         .anyMatch(ks -> !ks.isEmpty() && ks.get(0).equals(keyStroke));
     });
   }

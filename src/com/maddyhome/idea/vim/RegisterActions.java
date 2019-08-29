@@ -20,13 +20,20 @@ package com.maddyhome.idea.vim;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.maddyhome.idea.vim.action.VimActionBean;
+import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.group.KeyGroup;
 import com.maddyhome.idea.vim.key.Shortcut;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 
-class RegisterActions {
+public class RegisterActions {
+
+  private static final ExtensionPointName<VimActionBean> VIM_ACTIONS_EP =
+    ExtensionPointName.create("IdeaVIM.vimAction");
+
   /**
    * Register all the key/action mappings for the plugin.
    */
@@ -39,13 +46,27 @@ class RegisterActions {
 
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       setup.run();
-    } else {
+    }
+    else {
       ApplicationManager.getApplication().executeOnPooledThread(setup);
     }
   }
 
+  @Nullable
+  public static VimCommandActionBase findAction(@NotNull String id) {
+    return VIM_ACTIONS_EP.extensions().filter(vimActionBean -> vimActionBean.getId().equals(id)).findFirst()
+      .map(VimActionBean::getAction).orElse(null);
+  }
+
+  @NotNull
+  public static VimCommandActionBase findActionOrDie(@NotNull String id) {
+    VimCommandActionBase action = findAction(id);
+    if (action == null) throw new RuntimeException("Action " + id + " is not registered");
+    return action;
+  }
+
   private static void registerVimCommandActions() {
-    ExtensionPointName.<VimActionBean>create("IdeaVIM.vimAction").extensions().forEach(actionBean -> {
+    VIM_ACTIONS_EP.extensions().forEach(actionBean -> {
       VimPlugin.getKey().registerCommandAction(actionBean.getAction());
     });
   }

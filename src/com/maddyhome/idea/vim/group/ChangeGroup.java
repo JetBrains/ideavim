@@ -45,6 +45,7 @@ import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.util.ObjectUtils;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.RegisterActions;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.command.*;
@@ -1273,17 +1274,17 @@ public class ChangeGroup {
       switch (id) {
         case VIM_MOTION_WORD_RIGHT:
           kludge = true;
-          motion.setAction(((VimCommandActionBase)ActionManager.getInstance().getAction(VIM_MOTION_WORD_END_RIGHT)));
+          motion.setAction(RegisterActions.findActionOrDie(VIM_MOTION_WORD_END_RIGHT));
           motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
           break;
         case VIM_MOTION_BIG_WORD_RIGHT:
           kludge = true;
-          motion.setAction((VimCommandActionBase)ActionManager.getInstance().getAction(VIM_MOTION_BIG_WORD_END_RIGHT));
+          motion.setAction(RegisterActions.findActionOrDie(VIM_MOTION_BIG_WORD_END_RIGHT));
           motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
           break;
         case VIM_MOTION_CAMEL_RIGHT:
           kludge = true;
-          motion.setAction((VimCommandActionBase)ActionManager.getInstance().getAction(VIM_MOTION_CAMEL_END_RIGHT));
+          motion.setAction(RegisterActions.findActionOrDie(VIM_MOTION_CAMEL_END_RIGHT));
           motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
           break;
       }
@@ -2041,7 +2042,7 @@ public class ChangeGroup {
       if (oldOffset >= 0 && delta != 0) {
         final List<AnAction> positionCaretActions = new ArrayList<>();
         final String motionName = delta < 0 ? "VimMotionLeft" : "VimMotionRight";
-        final AnAction action = ActionManager.getInstance().getAction(motionName);
+        final AnAction action = RegisterActions.findAction(motionName);
         final int count = Math.abs(delta);
         for (int i = 0; i < count; i++) {
           positionCaretActions.add(action);

@@ -18,11 +18,12 @@
 
 package com.maddyhome.idea.vim.action.change.insert;
 
-import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.RegisterActions;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
+import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
@@ -70,7 +71,7 @@ final public class InsertExitModeAction extends VimCommandAction {
   }
 
   @NotNull
-  public static VimCommandAction getInstance() {
-    return (VimCommandAction)ActionManager.getInstance().getAction(ACTION_ID);
+  public static VimCommandActionBase getInstance() {
+    return RegisterActions.findActionOrDie(ACTION_ID);
   }
 }
