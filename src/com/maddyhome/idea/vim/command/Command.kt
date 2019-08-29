@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.command
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.editor.actionSystem.EditorAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import java.util.*
 import javax.swing.KeyStroke
@@ -30,17 +31,15 @@ import javax.swing.KeyStroke
  */
 data class Command(
   var rawCount: Int,
-  var action: AnAction?,
+  var action: VimCommandActionBase?,
   val type: Type,
   var flags: EnumSet<CommandFlags>
 ) {
 
   init {
-    if (action is EditorAction) {
-      val handler = (action as EditorAction).handler
-      if (handler is EditorActionHandlerBase) {
-        handler.process(this)
-      }
+    val handler = action?.handler
+    if (handler is EditorActionHandlerBase) {
+      handler.process(this)
     }
   }
 

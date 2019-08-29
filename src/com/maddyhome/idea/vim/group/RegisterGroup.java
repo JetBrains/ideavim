@@ -33,6 +33,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction;
 import com.maddyhome.idea.vim.action.motion.search.SearchAgainNextAction;
 import com.maddyhome.idea.vim.action.motion.search.SearchAgainPreviousAction;
@@ -294,7 +295,7 @@ public class RegisterGroup {
       if (argument != null) {
         Command motionCommand = argument.getMotion();
         if (motionCommand != null) {
-          AnAction action = motionCommand.getAction();
+          VimCommandActionBase action = motionCommand.getAction();
           return action instanceof MotionPercentOrMatchAction || action instanceof MotionSentencePreviousStartAction
             || action instanceof MotionSentenceNextStartAction || action instanceof MotionGotoFileMarkAction
             || action instanceof SearchEntryFwdAction || action instanceof SearchEntryRevAction

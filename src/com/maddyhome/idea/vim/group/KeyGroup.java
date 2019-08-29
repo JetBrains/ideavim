@@ -318,7 +318,7 @@ public class KeyGroup {
 
   @NotNull
   private Node addNode(@NotNull ParentNode base,
-                       AnAction action,
+                       VimCommandActionBase action,
                        @NotNull Command.Type cmdType,
                        EnumSet<CommandFlags> cmdFlags,
                        @NotNull KeyStroke key,

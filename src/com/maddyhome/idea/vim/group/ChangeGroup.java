@@ -46,6 +46,7 @@ import com.intellij.util.ObjectUtils;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.Register;
@@ -455,13 +456,16 @@ public class ChangeGroup {
       if (lastNewLine > 0) {
         final Command motion = argument.getMotion();
         if (motion != null) {
-          final String id = ActionManager.getInstance().getId(motion.getAction());
-          if (id.equals(VIM_MOTION_WORD_RIGHT) ||
-              id.equals(VIM_MOTION_BIG_WORD_RIGHT) ||
-              id.equals(VIM_MOTION_CAMEL_RIGHT)) {
-            if (!SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), -1)) {
-              final int start = range.getStartOffset();
-              range = new TextRange(start, start + lastNewLine);
+          VimCommandActionBase action = motion.getAction();
+          if (action != null) {
+            String id = action.getId();
+            if (id.equals(VIM_MOTION_WORD_RIGHT) ||
+                id.equals(VIM_MOTION_BIG_WORD_RIGHT) ||
+                id.equals(VIM_MOTION_CAMEL_RIGHT)) {
+              if (!SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), -1)) {
+                final int start = range.getStartOffset();
+                range = new TextRange(start, start + lastNewLine);
+              }
             }
           }
         }
@@ -1244,10 +1248,11 @@ public class ChangeGroup {
                               @NotNull Argument argument) {
     // Vim treats cw as ce and cW as cE if cursor is on a non-blank character
     final Command motion = argument.getMotion();
-    if (motion == null) {
-      return false;
-    }
-    String id = ActionManager.getInstance().getId(motion.getAction());
+    if (motion == null ) return false;
+    VimCommandActionBase action = motion.getAction();
+    if (action == null) return false;
+
+    String id = action.getId();
     boolean kludge = false;
     boolean bigWord = id.equals(VIM_MOTION_BIG_WORD_RIGHT);
     final CharSequence chars = editor.getDocument().getCharsSequence();
@@ -1268,17 +1273,17 @@ public class ChangeGroup {
       switch (id) {
         case VIM_MOTION_WORD_RIGHT:
           kludge = true;
-          motion.setAction(ActionManager.getInstance().getAction(VIM_MOTION_WORD_END_RIGHT));
+          motion.setAction(((VimCommandActionBase)ActionManager.getInstance().getAction(VIM_MOTION_WORD_END_RIGHT)));
           motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
           break;
         case VIM_MOTION_BIG_WORD_RIGHT:
           kludge = true;
-          motion.setAction(ActionManager.getInstance().getAction(VIM_MOTION_BIG_WORD_END_RIGHT));
+          motion.setAction((VimCommandActionBase)ActionManager.getInstance().getAction(VIM_MOTION_BIG_WORD_END_RIGHT));
           motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
           break;
         case VIM_MOTION_CAMEL_RIGHT:
           kludge = true;
-          motion.setAction(ActionManager.getInstance().getAction(VIM_MOTION_CAMEL_END_RIGHT));
+          motion.setAction((VimCommandActionBase)ActionManager.getInstance().getAction(VIM_MOTION_CAMEL_END_RIGHT));
           motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
           break;
       }

@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim.key;
 
-import com.intellij.openapi.actionSystem.AnAction;
+import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
@@ -42,7 +42,7 @@ public class ArgumentNode implements Node {
    * @param flags    Any special flags associated with this argument.
    */
   @Contract(pure = true)
-  public ArgumentNode(AnAction action, @NotNull Command.Type cmdType, @NotNull Argument.Type argType,
+  public ArgumentNode(VimCommandActionBase action, @NotNull Command.Type cmdType, @NotNull Argument.Type argType,
                       EnumSet<CommandFlags> flags) {
     this.action = action;
     this.argType = argType;
@@ -55,7 +55,7 @@ public class ArgumentNode implements Node {
    *
    * @return The argument's action
    */
-  public AnAction getAction() {
+  public VimCommandActionBase getAction() {
     return action;
   }
 
@@ -117,7 +117,7 @@ public class ArgumentNode implements Node {
     return Objects.hash(action, argType, cmdType, flags);
   }
 
-  protected final AnAction action;
+  protected final VimCommandActionBase action;
   @NotNull protected final Argument.Type argType;
   @NotNull protected final Command.Type cmdType;
   protected final EnumSet<CommandFlags> flags;
