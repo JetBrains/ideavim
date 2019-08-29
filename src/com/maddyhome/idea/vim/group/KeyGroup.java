@@ -273,7 +273,7 @@ public class KeyGroup {
       shortcuts.add(new Shortcut(keyStrokes.toArray(new KeyStroke[0])));
     }
     registerAction(commandAction.getMappingModes(), actionId, commandAction.getType(), commandAction.getFlags(),
-                   shortcuts.toArray(new Shortcut[0]), commandAction.getArgumentType());
+                   shortcuts.toArray(new Shortcut[0]), commandAction.getArgumentType(), commandAction);
   }
 
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, Shortcut shortcut) {
@@ -281,7 +281,8 @@ public class KeyGroup {
   }
 
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, @NotNull Shortcut[] shortcuts) {
-    registerAction(mappingModes, actName, cmdType, cmdFlags, shortcuts, Argument.Type.NONE);
+    AnAction action = ActionManager.getInstance().getAction(actName);
+    registerAction(mappingModes, actName, cmdType, cmdFlags, shortcuts, Argument.Type.NONE, action);
   }
 
   private void registerAction(@NotNull Set<MappingMode> mappingModes,
@@ -289,10 +290,10 @@ public class KeyGroup {
                               @NotNull Command.Type cmdType,
                               EnumSet<CommandFlags> cmdFlags,
                               @NotNull Shortcut[] shortcuts,
-                              @NotNull Argument.Type argType) {
+                              @NotNull Argument.Type argType, AnAction action) {
     for (Shortcut shortcut : shortcuts) {
       final KeyStroke[] keys = registerRequiredShortcut(shortcut);
-      registerAction(mappingModes, actName, cmdType, cmdFlags, keys, argType);
+      registerAction(mappingModes, actName, action, cmdType, cmdFlags, keys, argType);
     }
   }
 
@@ -306,7 +307,12 @@ public class KeyGroup {
     return keys;
   }
 
-  private void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, @NotNull KeyStroke[] keys,
+  private void registerAction(@NotNull Set<MappingMode> mappingModes,
+                              @NotNull String actName,
+                              AnAction action,
+                              @NotNull Command.Type cmdType,
+                              EnumSet<CommandFlags> cmdFlags,
+                              @NotNull KeyStroke[] keys,
                               @NotNull Argument.Type argType) {
     for (MappingMode mappingMode : mappingModes) {
       if (ApplicationManager.getApplication().isUnitTestMode()) {
@@ -319,7 +325,7 @@ public class KeyGroup {
       for (int i = 0; i < len; i++) {
         if (node instanceof ParentNode) {
           final ParentNode base = (ParentNode)node;
-          node = addNode(base, actName, cmdType, cmdFlags, keys[i], argType, i == len - 1);
+          node = addNode(base, actName, action, cmdType, cmdFlags, keys[i], argType, i == len - 1);
         }
       }
     }
@@ -334,13 +340,15 @@ public class KeyGroup {
   private Map<MappingMode, Set<List<KeyStroke>>> identityChecker;
 
   @NotNull
-  private Node addNode(@NotNull ParentNode base, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, @NotNull KeyStroke key,
-                       @NotNull Argument.Type argType, boolean last) {
+  private Node addNode(@NotNull ParentNode base,
+                       @NotNull String actName,
+                       AnAction action,
+                       @NotNull Command.Type cmdType,
+                       EnumSet<CommandFlags> cmdFlags,
+                       @NotNull KeyStroke key,
+                       @NotNull Argument.Type argType,
+                       boolean last) {
     // Lets get the actual action for the supplied action name
-    ActionManager aMgr = ActionManager.getInstance();
-    AnAction action = aMgr.getAction(actName);
-    assert action != null : actName + " is null";
-
     Node node = base.getChild(key);
     // Is this the first time we have seen this character at this point in the tree?
     if (node == null) {

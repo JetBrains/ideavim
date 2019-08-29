@@ -211,7 +211,7 @@ object VimListenerManager {
     }
   }
 
-  private object VimFileEditorManagerListener : FileEditorManagerListener {
+  object VimFileEditorManagerListener : FileEditorManagerListener {
     override fun selectionChanged(event: FileEditorManagerEvent) {
       MotionGroup.fileEditorManagerSelectionChangedCallback(event)
       FileGroup.fileEditorManagerSelectionChangedCallback(event)

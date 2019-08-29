@@ -17,10 +17,9 @@
  */
 package com.maddyhome.idea.vim;
 
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.application.ApplicationManager;
-import com.maddyhome.idea.vim.action.VimCommandActionBase;
+import com.intellij.openapi.extensions.ExtensionPointName;
+import com.maddyhome.idea.vim.action.VimActionBean;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
@@ -50,13 +49,9 @@ class RegisterActions {
   }
 
   private static void registerVimCommandActions() {
-    final ActionManagerEx manager = ActionManagerEx.getInstanceEx();
-    for (String actionId : manager.getPluginActions(VimPlugin.getPluginId())) {
-      final AnAction action = manager.getAction(actionId);
-      if (action instanceof VimCommandActionBase) {
-        VimPlugin.getKey().registerCommandAction((VimCommandActionBase)action, actionId);
-      }
-    }
+    ExtensionPointName.<VimActionBean>create("IdeaVIM.vimAction").extensions().forEach(actionBean -> {
+      VimPlugin.getKey().registerCommandAction(actionBean.getAction(), actionBean.getId());
+    });
   }
 
   private static void registerSystemMappings() {
