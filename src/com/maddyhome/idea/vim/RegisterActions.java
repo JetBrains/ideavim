@@ -46,7 +46,7 @@ class RegisterActions {
 
   private static void registerVimCommandActions() {
     ExtensionPointName.<VimActionBean>create("IdeaVIM.vimAction").extensions().forEach(actionBean -> {
-      VimPlugin.getKey().registerCommandAction(actionBean.getAction(), actionBean.getId());
+      VimPlugin.getKey().registerCommandAction(actionBean.getAction());
     });
   }
 

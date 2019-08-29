@@ -62,6 +62,8 @@ import javax.swing.KeyStroke
  */
 sealed class VimCommandActionBase : EditorAction(null) {
 
+  var id = ""
+
   init {
     @Suppress("LeakingThis")
     setupHandler(makeActionHandler())

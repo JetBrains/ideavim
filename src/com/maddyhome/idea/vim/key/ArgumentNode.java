@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
@@ -35,23 +36,18 @@ public class ArgumentNode implements Node {
   /**
    * Creates a node for the given action.
    *
-   * @param actionId The id of the action.
    * @param action   The action this arguments is mapped to.
    * @param cmdType  The type of the command this argument is for.
    * @param argType  The type of the argument.
    * @param flags    Any special flags associated with this argument.
    */
-  public ArgumentNode(String actionId, AnAction action, @NotNull Command.Type cmdType, @NotNull Argument.Type argType,
+  @Contract(pure = true)
+  public ArgumentNode(AnAction action, @NotNull Command.Type cmdType, @NotNull Argument.Type argType,
                       EnumSet<CommandFlags> flags) {
-    this.actionId = actionId;
     this.action = action;
     this.argType = argType;
     this.cmdType = cmdType;
     this.flags = flags;
-  }
-
-  public String getActionId() {
-    return actionId;
   }
 
   /**
@@ -96,9 +92,7 @@ public class ArgumentNode implements Node {
   public String toString() {
 
     return "ArgumentNode[" +
-           "actionId=" +
-           actionId +
-           ", action=" +
+           "action=" +
            action +
            ", argType=" +
            argType +
@@ -112,8 +106,7 @@ public class ArgumentNode implements Node {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     ArgumentNode that = (ArgumentNode) o;
-    return Objects.equals(actionId, that.actionId) &&
-            Objects.equals(action, that.action) &&
+    return Objects.equals(action, that.action) &&
             argType == that.argType &&
             cmdType == that.cmdType &&
             Objects.equals(flags, that.flags);
@@ -121,10 +114,9 @@ public class ArgumentNode implements Node {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actionId, action, argType, cmdType, flags);
+    return Objects.hash(action, argType, cmdType, flags);
   }
 
-  protected final String actionId;
   protected final AnAction action;
   @NotNull protected final Argument.Type argType;
   @NotNull protected final Command.Type cmdType;

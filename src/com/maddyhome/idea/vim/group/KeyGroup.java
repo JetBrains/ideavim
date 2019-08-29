@@ -267,10 +267,10 @@ public class KeyGroup {
     registerRequiredShortcut(shortcut);
   }
 
-  public void registerCommandAction(@NotNull VimCommandActionBase commandAction, @NotNull String actionId) {
+  public void registerCommandAction(@NotNull VimCommandActionBase commandAction) {
     for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
       final KeyStroke[] keys = registerRequiredShortcut(new Shortcut(keyStrokes.toArray(new KeyStroke[0])));
-      registerAction(commandAction.getMappingModes(), actionId, commandAction, commandAction.getType(),
+      registerAction(commandAction.getMappingModes(), commandAction, commandAction.getType(),
                      commandAction.getFlags(), keys, commandAction.getArgumentType());
     }
   }
@@ -286,8 +286,7 @@ public class KeyGroup {
   }
 
   private void registerAction(@NotNull Set<MappingMode> mappingModes,
-                              @NotNull String actName,
-                              AnAction action,
+                              VimCommandActionBase action,
                               @NotNull Command.Type cmdType,
                               EnumSet<CommandFlags> cmdFlags,
                               @NotNull KeyStroke[] keys,
@@ -295,7 +294,7 @@ public class KeyGroup {
     for (MappingMode mappingMode : mappingModes) {
       if (ApplicationManager.getApplication().isUnitTestMode()) {
         identityChecker = new HashMap<>();
-        checkIdentity(mappingMode, actName, keys);
+        checkIdentity(mappingMode, action.getId(), keys);
       }
       Node node = getKeyRoot(mappingMode);
       final int len = keys.length;
@@ -303,7 +302,7 @@ public class KeyGroup {
       for (int i = 0; i < len; i++) {
         if (node instanceof ParentNode) {
           final ParentNode base = (ParentNode)node;
-          node = addNode(base, actName, action, cmdType, cmdFlags, keys[i], argType, i == len - 1);
+          node = addNode(base, action, cmdType, cmdFlags, keys[i], argType, i == len - 1);
         }
       }
     }
@@ -319,7 +318,6 @@ public class KeyGroup {
 
   @NotNull
   private Node addNode(@NotNull ParentNode base,
-                       @NotNull String actName,
                        AnAction action,
                        @NotNull Command.Type cmdType,
                        EnumSet<CommandFlags> cmdFlags,
@@ -332,7 +330,7 @@ public class KeyGroup {
     if (node == null) {
       // If this is the last keystroke in the shortcut, and there is no argument, add a command node
       if (last && argType == Argument.Type.NONE) {
-        node = new CommandNode(key, actName, action, cmdType, cmdFlags);
+        node = new CommandNode(key, action, cmdType, cmdFlags);
       }
       // If this are more keystrokes in the shortcut or there is an argument, add a branch node
       else {
@@ -344,7 +342,7 @@ public class KeyGroup {
 
     // If this is the last keystroke in the shortcut and we have an argument, add an argument node
     if (last && node instanceof BranchNode && argType != Argument.Type.NONE) {
-      ArgumentNode arg = new ArgumentNode(actName, action, cmdType, argType, cmdFlags);
+      ArgumentNode arg = new ArgumentNode(action, cmdType, argType, cmdFlags);
       ((BranchNode)node).addChild(arg, BranchNode.ARGUMENT);
     }
 

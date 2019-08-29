@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.key;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -35,21 +36,16 @@ public class CommandNode implements Node {
    * Creates a command node for the key and action
    *
    * @param key     The final keystroke in this command
-   * @param actName The name of the action
    * @param action  The action that executes this command
    * @param cmdType The type of the command
    * @param flags   Any special flags needs by the command
    */
-  public CommandNode(KeyStroke key, String actName, AnAction action, @NotNull Command.Type cmdType, EnumSet<CommandFlags> flags) {
+  @Contract(pure = true)
+  public CommandNode(KeyStroke key, AnAction action, @NotNull Command.Type cmdType, EnumSet<CommandFlags> flags) {
     this.key = key;
-    this.actionId = actName;
     this.action = action;
     this.type = cmdType;
     this.flags = flags;
-  }
-
-  public String getActionId() {
-    return actionId;
   }
 
   /**
@@ -92,7 +88,7 @@ public class CommandNode implements Node {
   @NotNull
   public String toString() {
 
-    return "CommandNode[key=" + key + ", actionId=" + actionId + ", action=" + action + ", argType=" + type + "]";
+    return "CommandNode[key=" + key + ", action=" + action + ", argType=" + type + "]";
   }
 
   @Override
@@ -102,19 +98,17 @@ public class CommandNode implements Node {
     CommandNode that = (CommandNode) o;
     return Objects.equals(key, that.key) &&
             Objects.equals(action, that.action) &&
-            Objects.equals(actionId, that.actionId) &&
             type == that.type &&
             Objects.equals(flags, that.flags);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(key, action, actionId, type, flags);
+    return Objects.hash(key, action, type, flags);
   }
 
   protected final KeyStroke key;
   protected final AnAction action;
-  protected final String actionId;
   @NotNull protected final Command.Type type;
   protected final EnumSet<CommandFlags> flags;
 }

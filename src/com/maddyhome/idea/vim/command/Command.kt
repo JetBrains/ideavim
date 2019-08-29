@@ -30,7 +30,6 @@ import javax.swing.KeyStroke
  */
 data class Command(
   var rawCount: Int,
-  val actionId: String?,
   var action: AnAction?,
   val type: Type,
   var flags: EnumSet<CommandFlags>

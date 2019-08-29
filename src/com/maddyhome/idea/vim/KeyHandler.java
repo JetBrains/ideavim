@@ -555,13 +555,13 @@ public class KeyHandler {
                                      node.getAction().getClass().getName());
         }
         // Create the motion command and add it to the stack
-        Command cmd = new Command(count, node.getActionId(), node.getAction(), node.getCmdType(), node.getFlags());
+        Command cmd = new Command(count, node.getAction(), node.getCmdType(), node.getFlags());
         cmd.setKeys(keys);
         currentCmd.push(cmd);
       }
       else if (node.getCmdType() == Command.Type.RESET) {
         currentCmd.clear();
-        Command cmd = new Command(1, node.getActionId(), node.getAction(), node.getCmdType(), node.getFlags());
+        Command cmd = new Command(1, node.getAction(), node.getCmdType(), node.getFlags());
         cmd.setKeys(keys);
         currentCmd.push(cmd);
       }
@@ -580,7 +580,7 @@ public class KeyHandler {
     // The user entered a valid command that doesn't take any arguments
     else {
       // Create the command and add it to the stack
-      Command cmd = new Command(count, node.getActionId(), node.getAction(), node.getCmdType(), node.getFlags());
+      Command cmd = new Command(count, node.getAction(), node.getCmdType(), node.getFlags());
       cmd.setKeys(keys);
       currentCmd.push(cmd);
 
@@ -598,7 +598,7 @@ public class KeyHandler {
                                      @NotNull CommandState editorState,
                                      @NotNull ArgumentNode node) {
     // Create a new command based on what the user has typed so far, excluding this keystroke.
-    Command cmd = new Command(count, node.getActionId(), node.getAction(), node.getCmdType(), node.getFlags());
+    Command cmd = new Command(count, node.getAction(), node.getCmdType(), node.getFlags());
     cmd.setKeys(keys);
     currentCmd.push(cmd);
     // What type of argument does this command expect?

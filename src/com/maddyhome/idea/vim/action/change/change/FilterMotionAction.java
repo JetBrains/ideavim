@@ -101,7 +101,7 @@ public class FilterMotionAction extends VimCommandAction {
           count = 1;
         }
 
-        Command command = new Command(count, null, null, Command.Type.UNDEFINED, EnumSet.noneOf(CommandFlags.class));
+        Command command = new Command(count, null, Command.Type.UNDEFINED, EnumSet.noneOf(CommandFlags.class));
         VimPlugin.getProcess().startFilterCommand(editor, context, command);
 
         return true;
