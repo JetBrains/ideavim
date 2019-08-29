@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorAction
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -133,4 +134,16 @@ abstract class MotionEditorAction : VimCommandActionBase() {
   }
 
   final override val type: Command.Type = Command.Type.MOTION
+}
+
+abstract class NativeAction : VimCommandAction() {
+
+  abstract val actionName: String
+
+  final override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      KeyHandler.executeAction(actionName, context)
+      return true
+    }
+  }
 }

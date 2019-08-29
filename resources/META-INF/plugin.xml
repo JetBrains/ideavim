@@ -420,6 +420,22 @@
 
     <vimAction id="VimCtrlDownAction" actionClass="com.maddyhome.idea.vim.action.motion.scroll.CtrlDownAction" text="Ctrl down"/>
     <vimAction id="VimCtrlUpAction" actionClass="com.maddyhome.idea.vim.action.motion.scroll.CtrlUpAction" text="Ctrl up"/>
+
+    <!-- Folds -->
+    <vimAction id="VimCollapseAllRegions" actionClass="com.maddyhome.idea.vim.action.fold.VimCollapseAllRegions" text="Collapse All Regions"/>
+    <vimAction id="VimCollapseRegion" actionClass="com.maddyhome.idea.vim.action.fold.VimCollapseRegion" text="Collapse Region"/>
+    <vimAction id="VimCollapseRegionRecursively" actionClass="com.maddyhome.idea.vim.action.fold.VimCollapseRegionRecursively" text="Collapse Region Recursively"/>
+    <vimAction id="VimExpandAllRegions" actionClass="com.maddyhome.idea.vim.action.fold.VimExpandAllRegions" text="Expand All Regions"/>
+    <vimAction id="VimExpandRegion" actionClass="com.maddyhome.idea.vim.action.fold.VimExpandRegion" text="Expand Region"/>
+    <vimAction id="VimExpandRegionRecursively" actionClass="com.maddyhome.idea.vim.action.fold.VimExpandRegionRecursively" text="Expand Region Recursively"/>
+
+    <!-- Editor Actions -->
+    <vimAction id="VimEditorBackSpace" actionClass="com.maddyhome.idea.vim.action.editor.VimEditorBackSpace" text="Editor Back Space"/>
+    <vimAction id="VimEditorDelete" actionClass="com.maddyhome.idea.vim.action.editor.VimEditorDelete" text="Editor Delete"/>
+    <vimAction id="VimEditorDown" actionClass="com.maddyhome.idea.vim.action.editor.VimEditorDown" text="Editor Down"/>
+    <vimAction id="VimEditorTab" actionClass="com.maddyhome.idea.vim.action.editor.VimEditorTab" text="Editor Tab"/>
+    <vimAction id="VimEditorUp" actionClass="com.maddyhome.idea.vim.action.editor.VimEditorUp" text="Editor Up"/>
+    <vimAction id="VimQuickJavaDoc" actionClass="com.maddyhome.idea.vim.action.editor.VimQuickJavaDoc" text="Quick Javadoc"/>
   </extensions>
 
   <actions>

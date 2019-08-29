@@ -268,32 +268,10 @@ public class KeyGroup {
   }
 
   public void registerCommandAction(@NotNull VimCommandActionBase commandAction, @NotNull String actionId) {
-    final List<Shortcut> shortcuts = new ArrayList<>();
     for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
-      shortcuts.add(new Shortcut(keyStrokes.toArray(new KeyStroke[0])));
-    }
-    registerAction(commandAction.getMappingModes(), actionId, commandAction.getType(), commandAction.getFlags(),
-                   shortcuts.toArray(new Shortcut[0]), commandAction.getArgumentType(), commandAction);
-  }
-
-  public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, Shortcut shortcut) {
-    registerAction(mappingModes, actName, cmdType, EnumSet.noneOf(CommandFlags.class), new Shortcut[]{shortcut});
-  }
-
-  public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, @NotNull Shortcut[] shortcuts) {
-    AnAction action = ActionManager.getInstance().getAction(actName);
-    registerAction(mappingModes, actName, cmdType, cmdFlags, shortcuts, Argument.Type.NONE, action);
-  }
-
-  private void registerAction(@NotNull Set<MappingMode> mappingModes,
-                              @NotNull String actName,
-                              @NotNull Command.Type cmdType,
-                              EnumSet<CommandFlags> cmdFlags,
-                              @NotNull Shortcut[] shortcuts,
-                              @NotNull Argument.Type argType, AnAction action) {
-    for (Shortcut shortcut : shortcuts) {
-      final KeyStroke[] keys = registerRequiredShortcut(shortcut);
-      registerAction(mappingModes, actName, action, cmdType, cmdFlags, keys, argType);
+      final KeyStroke[] keys = registerRequiredShortcut(new Shortcut(keyStrokes.toArray(new KeyStroke[0])));
+      registerAction(commandAction.getMappingModes(), actionId, commandAction, commandAction.getType(),
+                     commandAction.getFlags(), keys, commandAction.getArgumentType());
     }
   }
 
