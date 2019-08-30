@@ -37,7 +37,7 @@ class MotionScrollPageDownAction : VimCommandAction() {
   override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
     override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<C-F>", "<PageDown>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-F>", "<PageDown>")
 
     override val type: Command.Type = Command.Type.OTHER_READONLY
 

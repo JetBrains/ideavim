@@ -43,7 +43,7 @@ class PutVisualTextMoveCursorAction : VimCommandAction() {
 
     override val mappingModes: Set<MappingMode> = MappingMode.V
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("gp", "gP")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gp", "gP")
 
     override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

@@ -39,7 +39,7 @@ class VisualSwapEndsAction : VimCommandAction() {
 
     override val mappingModes: EnumSet<MappingMode> = MappingMode.V
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("o")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("o")
 
     override val type: Command.Type = Command.Type.OTHER_READONLY
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {

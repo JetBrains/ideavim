@@ -39,7 +39,7 @@ class MotionOuterBlockBraceAction : TextObjectAction() {
 
     override val mappingModes: Set<MappingMode> = MappingMode.VO
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("aB", "a{", "a}")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("aB", "a{", "a}")
 
     override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE, CommandFlags.FLAG_TEXT_BLOCK)
 

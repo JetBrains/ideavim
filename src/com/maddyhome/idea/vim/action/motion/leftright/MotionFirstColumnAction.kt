@@ -35,7 +35,7 @@ class MotionFirstColumnAction : MotionEditorAction() {
   override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
     override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("0")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("0")
 
     override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 
@@ -54,7 +54,7 @@ class MotionFirstColumnInsertModeAction : MotionEditorAction() {
   override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
     override val mappingModes: Set<MappingMode> = MappingMode.I
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<Home>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Home>")
 
     override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
 

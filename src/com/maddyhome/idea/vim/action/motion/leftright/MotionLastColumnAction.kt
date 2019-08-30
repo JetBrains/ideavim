@@ -41,7 +41,7 @@ class MotionLastColumnAction : MotionEditorAction() {
   override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
     override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("$")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("$")
 
     override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE)
 
@@ -84,7 +84,7 @@ class MotionLastColumnInsertAction : MotionEditorAction() {
   override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
     override val mappingModes: Set<MappingMode> = MappingMode.I
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<End>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<End>")
 
     override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
 

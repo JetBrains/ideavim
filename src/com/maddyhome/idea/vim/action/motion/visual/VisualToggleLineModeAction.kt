@@ -42,7 +42,7 @@ class VisualToggleLineModeAction : VimCommandAction() {
 
     override val mappingModes: MutableSet<MappingMode> = MappingMode.NV
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("V")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("V")
 
     override val type: Command.Type = Command.Type.OTHER_READONLY
 

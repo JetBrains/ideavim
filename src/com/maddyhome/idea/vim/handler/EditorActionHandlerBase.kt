@@ -86,6 +86,9 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
 }
 
 sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
+  var id = ""
+  var text = ""
+
   abstract val mappingModes: Set<MappingMode>
 
   abstract val keyStrokesSet: Set<List<KeyStroke>>

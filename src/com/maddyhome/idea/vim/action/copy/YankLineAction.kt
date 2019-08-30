@@ -37,7 +37,7 @@ class YankLineAction : VimCommandAction() {
   override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
     override val mappingModes: Set<MappingMode> = MappingMode.N
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("Y")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("Y")
 
     override val type: Command.Type = Command.Type.COPY
 
@@ -51,7 +51,7 @@ class YankLineMidCountAction : VimCommandAction() {
   override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
     override val mappingModes: Set<MappingMode> = MappingMode.N
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("yy")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("yy")
 
     override val type: Command.Type = Command.Type.COPY
 

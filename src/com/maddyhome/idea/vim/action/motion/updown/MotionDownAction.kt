@@ -37,7 +37,7 @@ class MotionDownAction : MotionEditorAction() {
   override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
     override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("j", "<C-N>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("j", "<C-N>")
 
     override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
 
@@ -73,7 +73,7 @@ class MotionDownNotLineWiseAction : MotionEditorAction() {
   override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
     override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("gj", "g<Down>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gj", "g<Down>")
 
     override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 

@@ -42,7 +42,7 @@ class GnPreviousTextObject : TextObjectAction() {
 
     override val mappingModes: Set<MappingMode> = MappingMode.O
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("gN")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gN")
 
     override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE)
     override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {

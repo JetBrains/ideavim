@@ -117,6 +117,13 @@ sealed class MotionActionHandler : EditorActionHandlerBase.SingleExecution() {
 
   final override val type: Command.Type = Command.Type.MOTION
 
+  fun getHandlerOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+    return when (this) {
+      is SingleExecution -> getOffset(editor, context, count, rawCount, argument)
+      is ForEachCaret -> getOffset(editor, caret, context, count, rawCount, argument)
+    }
+  }
+
   final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val blockSubmodeActive = editor.inBlockSubMode
 

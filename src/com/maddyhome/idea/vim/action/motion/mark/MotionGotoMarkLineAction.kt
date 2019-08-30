@@ -35,7 +35,7 @@ class MotionGotoMarkLineAction : MotionEditorAction() {
   override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
     override val mappingModes: Set<MappingMode> = MappingMode.N
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("'")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("'")
 
     override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
@@ -59,7 +59,7 @@ class MotionGotoMarkLineNoSaveJumpAction : MotionEditorAction() {
   override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
     override val mappingModes: Set<MappingMode> = MappingMode.N
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("g'")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("g'")
 
     override val argumentType: Argument.Type = Argument.Type.CHARACTER
 

@@ -16,7 +16,7 @@ class VimCollapseAllRegions : VimCommandAction() {
 
     override val mappingModes: Set<MappingMode> = MappingMode.NV
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("zM")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zM")
 
     override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -33,7 +33,7 @@ class VimCollapseRegion : VimCommandAction() {
 
     override val mappingModes: Set<MappingMode> = MappingMode.NV
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("zc")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zc")
 
     override val type: Command.Type = Command.Type.OTHER_READONLY
 

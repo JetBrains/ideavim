@@ -41,7 +41,7 @@ class MotionShiftHomeAction : VimCommandAction() {
   override fun makeActionHandler(): VimActionHandler = object : ShiftedSpecialKeyHandler() {
     override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<S-Home>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Home>")
 
     override val type: Command.Type = Command.Type.OTHER_READONLY
 

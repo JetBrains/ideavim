@@ -39,7 +39,7 @@ class MotionShiftRightAction : VimCommandAction() {
   override fun makeActionHandler(): VimActionHandler = object : ShiftedArrowKeyHandler() {
     override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<S-Right>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Right>")
 
     override val type: Command.Type = Command.Type.OTHER_READONLY
     override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {

@@ -39,7 +39,7 @@ class MotionInnerBlockSingleQuoteAction : TextObjectAction() {
 
     override val mappingModes: Set<MappingMode> = VO
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("i'")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("i'")
 
     override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE, CommandFlags.FLAG_TEXT_BLOCK)
 

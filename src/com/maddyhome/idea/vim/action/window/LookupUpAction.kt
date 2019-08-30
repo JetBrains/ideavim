@@ -27,7 +27,6 @@ import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
-import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -45,7 +44,7 @@ class LookupUpAction : VimCommandAction() {
 
     override val mappingModes: MutableSet<MappingMode> = MappingMode.I
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<C-P>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-P>")
 
     override val type: Command.Type = Command.Type.OTHER_READONLY
 

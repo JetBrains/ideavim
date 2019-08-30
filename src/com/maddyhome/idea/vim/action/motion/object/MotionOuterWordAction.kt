@@ -39,7 +39,7 @@ class MotionOuterWordAction : TextObjectAction() {
 
     override val mappingModes: Set<MappingMode> = MappingMode.VO
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("aw")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("aw")
 
     override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE)
 

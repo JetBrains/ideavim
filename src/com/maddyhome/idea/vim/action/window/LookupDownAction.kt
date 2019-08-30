@@ -44,7 +44,7 @@ class LookupDownAction : VimCommandAction() {
 
     override val mappingModes: MutableSet<MappingMode> = MappingMode.I
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<C-N>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-N>")
 
     override val type: Command.Type = Command.Type.OTHER_READONLY
 

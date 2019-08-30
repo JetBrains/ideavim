@@ -18,18 +18,10 @@
 
 package com.maddyhome.idea.vim.action
 
-import com.google.common.collect.ImmutableSet
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.StringHelper
-import javax.swing.KeyStroke
 
 /**
  * Structure of commands
@@ -55,24 +47,11 @@ import javax.swing.KeyStroke
  */
 sealed class VimCommandActionBase {
 
-  var id = ""
-  var text = ""
   val handler by lazy {
     makeActionHandler()
   }
 
   protected abstract fun makeActionHandler(): EditorActionHandlerBase
-
-  protected companion object {
-    @JvmStatic
-    fun parseKeysSet(vararg keyStrings: String): Set<List<KeyStroke>> {
-      val builder = ImmutableSet.builder<List<KeyStroke>>()
-      for (keyString in keyStrings) {
-        builder.add(StringHelper.parseKeys(keyString))
-      }
-      return builder.build()
-    }
-  }
 }
 
 abstract class VimCommandAction : VimCommandActionBase() {
@@ -81,30 +60,8 @@ abstract class VimCommandAction : VimCommandActionBase() {
 
 abstract class TextObjectAction : VimCommandActionBase() {
   abstract override fun makeActionHandler(): TextObjectActionHandler
-
-  fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
-    val actionHandler = handler as? TextObjectActionHandler
-      ?: throw RuntimeException("TextObjectAction works only with TextObjectActionHandler")
-
-    return actionHandler.getRange(editor, caret, context, count, rawCount, argument)
-  }
 }
 
 abstract class MotionEditorAction : VimCommandActionBase() {
   abstract override fun makeActionHandler(): MotionActionHandler
-
-  fun getOffset(editor: Editor,
-                caret: Caret,
-                context: DataContext,
-                count: Int,
-                rawCount: Int,
-                argument: Argument?): Int {
-    val actionHandler = handler as? MotionActionHandler
-      ?: throw RuntimeException("MotionAction works only with MotionHandler")
-
-    return when (actionHandler) {
-      is MotionActionHandler.SingleExecution -> actionHandler.getOffset(editor, context, count, rawCount, argument)
-      is MotionActionHandler.ForEachCaret -> actionHandler.getOffset(editor, caret, context, count, rawCount, argument)
-    }
-  }
 }

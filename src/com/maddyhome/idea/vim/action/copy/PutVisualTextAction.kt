@@ -42,7 +42,7 @@ class PutVisualTextAction : VimCommandAction() {
   override fun makeActionHandler(): VimActionHandler = object : VisualOperatorActionHandler.SingleExecution() {
     override val mappingModes: Set<MappingMode> = MappingMode.V
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("p", "P")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("p", "P")
 
     override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

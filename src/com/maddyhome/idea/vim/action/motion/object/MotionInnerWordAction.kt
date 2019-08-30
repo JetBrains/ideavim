@@ -38,7 +38,7 @@ class MotionInnerWordAction : TextObjectAction() {
 
     override val mappingModes: Set<MappingMode> = MappingMode.VO
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("iw")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("iw")
 
     override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE)
 

@@ -42,7 +42,7 @@ class SelectMotionRightAction : MotionEditorAction() {
 
     override val mappingModes: MutableSet<MappingMode> = MappingMode.S
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<Right>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Right>")
 
     override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
       val keymodel = OptionsManager.keymodel

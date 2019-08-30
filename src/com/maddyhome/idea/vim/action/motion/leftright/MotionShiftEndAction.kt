@@ -43,7 +43,7 @@ class MotionShiftEndAction : VimCommandAction() {
   override fun makeActionHandler(): VimActionHandler = object : ShiftedSpecialKeyHandler() {
     override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<S-End>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-End>")
 
     override val type: Command.Type = Command.Type.OTHER_READONLY
 

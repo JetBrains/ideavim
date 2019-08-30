@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.MotionEditorAction
-import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -35,7 +34,7 @@ class MotionGotoMarkAction : MotionEditorAction() {
   override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
     override val mappingModes: Set<MappingMode> = MappingMode.N
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("`")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("`")
 
     override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
@@ -56,7 +55,7 @@ class MotionGotoMarkNoSaveJumpAction : MotionEditorAction() {
 
     override val mappingModes: Set<MappingMode> = MappingMode.N
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("g`")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("g`")
 
     override val argumentType: Argument.Type = Argument.Type.CHARACTER
 

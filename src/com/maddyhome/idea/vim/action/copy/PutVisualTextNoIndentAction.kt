@@ -43,7 +43,7 @@ class PutVisualTextNoIndentAction : VimCommandAction() {
 
     override val mappingModes: Set<MappingMode> = MappingMode.V
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("[p", "]p", "[P", "]P")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("[p", "]p", "[P", "]P")
 
     override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

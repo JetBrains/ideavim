@@ -43,7 +43,7 @@ class MotionEndAction : MotionEditorAction() {
   override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
     override val mappingModes: MutableSet<MappingMode> = MappingMode.NVOS
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<End>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<End>")
 
     override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
     override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,

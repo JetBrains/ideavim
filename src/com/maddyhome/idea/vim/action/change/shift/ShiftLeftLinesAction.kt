@@ -38,7 +38,7 @@ class ShiftLeftLinesAction : VimCommandAction() {
   override fun makeActionHandler(): VimActionHandler = object : ChangeEditorActionHandler.ForEachCaret() {
     override val mappingModes: Set<MappingMode> = MappingMode.I
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<C-D>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-D>")
 
     override val type: Command.Type = Command.Type.INSERT
 
@@ -61,7 +61,7 @@ class ShiftLeftLinesNormalModeAction : VimCommandAction() {
   override fun makeActionHandler(): VimActionHandler = object : ChangeEditorActionHandler.ForEachCaret() {
     override val mappingModes: Set<MappingMode> = MappingMode.N
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<<")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<<")
 
     override val type: Command.Type = Command.Type.CHANGE
 

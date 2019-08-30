@@ -44,6 +44,8 @@ import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
+import com.maddyhome.idea.vim.handler.MotionActionHandler;
+import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.CommandStateHelper;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
@@ -129,7 +131,7 @@ public class MotionGroup {
       start = caret.getOffset();
 
       // Execute the motion (without moving the cursor) and get where we end
-      end = action.getOffset(editor, caret, context, cnt, raw, cmd.getArgument());
+      end = ((MotionActionHandler)action.getHandler()).getHandlerOffset(editor, caret, context, cnt, raw, cmd.getArgument());
 
       // Invalid motion
       if (end == -1) {
@@ -139,7 +141,7 @@ public class MotionGroup {
     else if (cmd.getAction() instanceof TextObjectAction) {
       TextObjectAction action = (TextObjectAction)cmd.getAction();
 
-      TextRange range = action.getRange(editor, caret, context, cnt, raw, cmd.getArgument());
+      TextRange range = ((TextObjectActionHandler)action.getHandler()).getRange(editor, caret, context, cnt, raw, cmd.getArgument());
 
       if (range == null) {
         return null;

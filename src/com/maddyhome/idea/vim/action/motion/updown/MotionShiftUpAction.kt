@@ -42,7 +42,7 @@ class MotionShiftUpAction : VimCommandAction() {
 
     override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<S-Up>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Up>")
 
     override val type: Command.Type = Command.Type.OTHER_READONLY
     override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {

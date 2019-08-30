@@ -38,7 +38,7 @@ class SelectEnterAction : VimCommandAction() {
 
     override val mappingModes: MutableSet<MappingMode> = MappingMode.S
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<enter>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<enter>")
 
     override val type: Command.Type = Command.Type.INSERT
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {

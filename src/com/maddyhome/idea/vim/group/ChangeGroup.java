@@ -458,7 +458,7 @@ public class ChangeGroup {
         final Command motion = argument.getMotion();
         if (motion != null) {
           VimCommandActionBase action = motion.getAction();
-          String id = action.getId();
+          String id = action.getHandler().getId();
           if (id.equals(VIM_MOTION_WORD_RIGHT) ||
               id.equals(VIM_MOTION_BIG_WORD_RIGHT) ||
               id.equals(VIM_MOTION_CAMEL_RIGHT)) {
@@ -1253,7 +1253,7 @@ public class ChangeGroup {
     final Command motion = argument.getMotion();
     if (motion == null ) return false;
 
-    String id = motion.getAction().getId();
+    String id = motion.getAction().getHandler().getId();
     boolean kludge = false;
     boolean bigWord = id.equals(VIM_MOTION_BIG_WORD_RIGHT);
     final CharSequence chars = editor.getDocument().getCharsSequence();

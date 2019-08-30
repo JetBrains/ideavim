@@ -36,7 +36,7 @@ class MotionDownFirstNonSpaceAction : MotionEditorAction() {
   public override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
     override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("+", "<C-M>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("+", "<C-M>")
 
     override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
 
@@ -55,7 +55,7 @@ class EnterNormalAction : MotionEditorAction() {
   public override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
     override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<CR>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<CR>")
 
     override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
 

@@ -294,7 +294,7 @@ public class KeyGroup {
     for (MappingMode mappingMode : mappingModes) {
       if (ApplicationManager.getApplication().isUnitTestMode()) {
         identityChecker = new HashMap<>();
-        checkIdentity(mappingMode, action.getId(), keys);
+        checkIdentity(mappingMode, action.getHandler().getId(), keys);
       }
       Node node = getKeyRoot(mappingMode);
       final int len = keys.length;

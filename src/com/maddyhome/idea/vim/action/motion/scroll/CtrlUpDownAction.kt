@@ -20,7 +20,7 @@ class CtrlDownAction : VimCommandAction() {
     return object : VimActionHandler.SingleExecution() {
       override val mappingModes: Set<MappingMode> = MappingMode.N
 
-      override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<C-Down>")
+      override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-Down>")
 
       override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -41,7 +41,7 @@ class CtrlUpAction : VimCommandAction() {
     return object : VimActionHandler.SingleExecution() {
       override val mappingModes: Set<MappingMode> = MappingMode.N
 
-      override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<C-Up>")
+      override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-Up>")
 
       override val type: Command.Type = Command.Type.OTHER_READONLY
 

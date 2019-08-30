@@ -16,8 +16,8 @@ class VimActionBean : AbstractExtensionPointBean() {
 
   val action: VimCommandActionBase by lazy {
     instantiate<VimCommandActionBase>(actionClass, ApplicationManager.getApplication().picoContainer).also {
-      it.text = text
-      it.id = id
+      it.handler.text = text
+      it.handler.id = id
     }
   }
 }

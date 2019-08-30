@@ -97,7 +97,7 @@ public class KeyHandler {
 
   public static void executeVimAction(@NotNull Editor editor, @NotNull VimCommandActionBase cmd, DataContext context) {
     CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> cmd.getHandler()
-                                                    .execute(editor, getProjectAwareDataContext(editor, context)), cmd.getText(),
+                                                    .execute(editor, getProjectAwareDataContext(editor, context)), cmd.getHandler().getText(),
                                                   DocCommandGroupId.noneGroupId(editor.getDocument()),
                                                   UndoConfirmationPolicy.DEFAULT, editor.getDocument());
   }
@@ -545,7 +545,7 @@ public class KeyHandler {
     if (ApplicationManager.getApplication().isDispatchThread()) {
       Runnable action = new ActionRunner(editor, context, cmd, key);
       VimCommandActionBase cmdAction = cmd.getAction();
-      String name = cmdAction.getText();
+      String name = cmdAction.getHandler().getText();
 
       if (type.isWrite()) {
         RunnableHelper.runWriteCommand(project, action, name, action);

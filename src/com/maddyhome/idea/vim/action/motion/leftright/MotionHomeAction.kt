@@ -36,7 +36,7 @@ class MotionHomeAction : MotionEditorAction() {
   override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
     override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<Home>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Home>")
 
     override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
     override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
