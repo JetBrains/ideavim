@@ -97,7 +97,7 @@ public class KeyHandler {
 
   public static void executeVimAction(@NotNull Editor editor, @NotNull VimCommandActionBase cmd, DataContext context) {
     CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> cmd.getHandler()
-                                                    .execute(editor, null, getProjectAwareDataContext(editor, context)), cmd.getText(),
+                                                    .execute(editor, getProjectAwareDataContext(editor, context)), cmd.getText(),
                                                   DocCommandGroupId.noneGroupId(editor.getDocument()),
                                                   UndoConfirmationPolicy.DEFAULT, editor.getDocument());
   }
