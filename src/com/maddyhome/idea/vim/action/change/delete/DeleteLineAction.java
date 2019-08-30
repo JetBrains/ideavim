@@ -45,32 +45,32 @@ public class DeleteLineAction extends VimCommandAction {
 
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("dd");
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.DELETE;
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_ALLOW_MID_COUNT);
-  }
-
-  @NotNull
-  @Override
   protected VimActionHandler makeActionHandler() {
     return new ChangeEditorActionHandler.ForEachCaret() {
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.N;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("dd");
+      }
+
+      @NotNull
+      @Override
+      public Command.Type getType() {
+        return Command.Type.DELETE;
+      }
+
+      @NotNull
+      @Override
+      public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_ALLOW_MID_COUNT);
+      }
+
       @Override
       public boolean execute(@NotNull Editor editor,
                              @NotNull Caret caret,

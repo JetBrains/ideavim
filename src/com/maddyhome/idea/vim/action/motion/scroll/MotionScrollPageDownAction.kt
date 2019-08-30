@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -33,35 +34,37 @@ import javax.swing.KeyStroke
 
 
 class MotionScrollPageDownAction : VimCommandAction() {
-  override val mappingModes: Set<MappingMode> = MappingMode.NVO
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
+    override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-F>", "<PageDown>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<C-F>", "<PageDown>")
 
-  override val type: Command.Type = Command.Type.OTHER_READONLY
+    override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun makeActionHandler(): VimActionHandler = MotionScrollPageDownActionHandler
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      return VimPlugin.getMotion().scrollFullPage(editor, cmd.count)
+    }
+  }
 }
 
 class MotionScrollPageDownInsertModeAction : VimCommandAction() {
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
 
-  override val mappingModes: Set<MappingMode> = MappingMode.I
-  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.CTRL_MASK)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, KeyEvent.CTRL_MASK)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_MASK)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, KeyEvent.SHIFT_MASK))
-  )
+    override val mappingModes: Set<MappingMode> = MappingMode.I
+    override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
+      listOf(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0)),
+      listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.CTRL_MASK)),
+      listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, KeyEvent.CTRL_MASK)),
+      listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_MASK)),
+      listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, KeyEvent.SHIFT_MASK))
+    )
 
-  override val type: Command.Type = Command.Type.OTHER_READONLY
+    override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
+    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
 
-  override fun makeActionHandler(): VimActionHandler = MotionScrollPageDownActionHandler
-}
-
-private object MotionScrollPageDownActionHandler : VimActionHandler.SingleExecution() {
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    return VimPlugin.getMotion().scrollFullPage(editor, cmd.count)
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      return VimPlugin.getMotion().scrollFullPage(editor, cmd.count)
+    }
   }
 }

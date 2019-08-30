@@ -39,26 +39,26 @@ import java.util.Set;
 public class MotionPercentOrMatchAction extends MotionEditorAction {
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("%");
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_SAVE_JUMP);
-  }
-
-  @NotNull
-  @Override
   public MotionActionHandler makeActionHandler() {
     return new MotionActionHandler.ForEachCaret() {
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.NVO;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("%");
+      }
+
+      @NotNull
+      @Override
+      public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_SAVE_JUMP);
+      }
+
       @Override
       public int getOffset(@NotNull Editor editor,
                            @NotNull Caret caret,

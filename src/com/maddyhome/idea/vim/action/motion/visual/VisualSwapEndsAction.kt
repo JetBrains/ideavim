@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.VimActionHandler
@@ -34,17 +35,17 @@ import javax.swing.KeyStroke
  */
 class VisualSwapEndsAction : VimCommandAction() {
   override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
+
+
+    override val mappingModes: EnumSet<MappingMode> = MappingMode.V
+
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("o")
+
+    override val type: Command.Type = Command.Type.OTHER_READONLY
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       var ret = true
       editor.vimForEachCaret { ret = ret and VimPlugin.getVisualMotion().swapVisualEnds(editor, it) }
       return ret
     }
   }
-
-  override val mappingModes: EnumSet<MappingMode> = MappingMode.V
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("o")
-
-  override val type: Command.Type = Command.Type.OTHER_READONLY
 }
-

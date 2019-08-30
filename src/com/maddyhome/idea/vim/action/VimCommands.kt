@@ -22,19 +22,13 @@ import com.google.common.collect.ImmutableSet
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.helper.noneOfEnum
-import java.util.*
 import javax.swing.KeyStroke
 
 /**
@@ -69,23 +63,6 @@ sealed class VimCommandActionBase {
 
   protected abstract fun makeActionHandler(): EditorActionHandlerBase
 
-  abstract val mappingModes: Set<MappingMode>
-
-  abstract val keyStrokesSet: Set<List<KeyStroke>>
-
-  abstract val type: Command.Type
-
-  open val argumentType: Argument.Type = Argument.Type.NONE
-
-  /**
-   * Returns various binary flags for the command.
-   *
-   * These legacy flags will be refactored in future releases.
-   *
-   * @see com.maddyhome.idea.vim.command.Command
-   */
-  open val flags: EnumSet<CommandFlags> = noneOfEnum()
-
   protected companion object {
     @JvmStatic
     fun parseKeysSet(vararg keyStrings: String): Set<List<KeyStroke>> {
@@ -111,8 +88,6 @@ abstract class TextObjectAction : VimCommandActionBase() {
 
     return actionHandler.getRange(editor, caret, context, count, rawCount, argument)
   }
-
-  final override val type: Command.Type = Command.Type.MOTION
 }
 
 abstract class MotionEditorAction : VimCommandActionBase() {
@@ -130,20 +105,6 @@ abstract class MotionEditorAction : VimCommandActionBase() {
     return when (actionHandler) {
       is MotionActionHandler.SingleExecution -> actionHandler.getOffset(editor, context, count, rawCount, argument)
       is MotionActionHandler.ForEachCaret -> actionHandler.getOffset(editor, caret, context, count, rawCount, argument)
-    }
-  }
-
-  final override val type: Command.Type = Command.Type.MOTION
-}
-
-abstract class NativeAction : VimCommandAction() {
-
-  abstract val actionName: String
-
-  final override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
-    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-      KeyHandler.executeAction(actionName, context)
-      return true
     }
   }
 }

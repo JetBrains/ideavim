@@ -28,7 +28,12 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.vimSelectionStart
 
 /**
  * @author Alex Plate
@@ -109,6 +114,8 @@ sealed class MotionActionHandler : EditorActionHandlerBase.SingleExecution() {
      */
     open fun postMove(editor: Editor, context: DataContext, cmd: Command) = Unit
   }
+
+  final override val type: Command.Type = Command.Type.MOTION
 
   final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val blockSubmodeActive = editor.inBlockSubMode

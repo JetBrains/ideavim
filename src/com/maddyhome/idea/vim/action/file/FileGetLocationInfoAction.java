@@ -37,6 +37,24 @@ public class FileGetLocationInfoAction extends VimCommandAction {
   @Override
   protected VimActionHandler makeActionHandler() {
     return new VimActionHandler.SingleExecution() {
+
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.NV;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("g<C-G>");
+      }
+
+      @NotNull
+      @Override
+      public Command.Type getType() {
+        return Command.Type.OTHER_READONLY;
+      }
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         VimPlugin.getFile().displayLocationInfo(editor);
@@ -44,23 +62,5 @@ public class FileGetLocationInfoAction extends VimCommandAction {
         return true;
       }
     };
-  }
-
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.NV;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("g<C-G>");
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
   }
 }

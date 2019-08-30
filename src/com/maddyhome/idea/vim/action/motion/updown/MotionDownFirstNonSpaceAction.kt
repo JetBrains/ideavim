@@ -18,13 +18,13 @@
 
 package com.maddyhome.idea.vim.action.motion.updown
 
-import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.MotionEditorAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -33,13 +33,13 @@ import java.util.*
 import javax.swing.KeyStroke
 
 class MotionDownFirstNonSpaceAction : MotionEditorAction() {
-  override val mappingModes: Set<MappingMode> = MappingMode.NVO
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("+", "<C-M>")
-
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
-
   public override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
+    override val mappingModes: Set<MappingMode> = MappingMode.NVO
+
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("+", "<C-M>")
+
+    override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
+
     override fun getOffset(editor: Editor,
                            caret: Caret,
                            context: DataContext,
@@ -52,13 +52,13 @@ class MotionDownFirstNonSpaceAction : MotionEditorAction() {
 }
 
 class EnterNormalAction : MotionEditorAction() {
-  override val mappingModes: Set<MappingMode> = MappingMode.NVO
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<CR>")
-
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
-
   public override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
+    override val mappingModes: Set<MappingMode> = MappingMode.NVO
+
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<CR>")
+
+    override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
+
     override fun getOffset(editor: Editor,
                            caret: Caret,
                            context: DataContext,

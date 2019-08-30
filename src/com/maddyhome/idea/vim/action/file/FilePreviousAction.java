@@ -38,30 +38,30 @@ import java.util.Set;
 public class FilePreviousAction extends VimCommandAction {
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    Set<List<KeyStroke>> keys = new HashSet<>();
-    keys
-      .add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_6, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK)));
-    keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_CIRCUMFLEX, KeyEvent.CTRL_MASK)));
-    return keys;
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
-
-  @NotNull
-  @Override
   protected VimActionHandler makeActionHandler() {
     return new VimActionHandler.SingleExecution() {
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.N;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        Set<List<KeyStroke>> keys = new HashSet<>();
+        keys
+          .add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_6, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK)));
+        keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_CIRCUMFLEX, KeyEvent.CTRL_MASK)));
+        return keys;
+      }
+
+      @NotNull
+      @Override
+      public Command.Type getType() {
+        return Command.Type.OTHER_READONLY;
+      }
+
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         VimPlugin.getFile().selectPreviousTab(context);

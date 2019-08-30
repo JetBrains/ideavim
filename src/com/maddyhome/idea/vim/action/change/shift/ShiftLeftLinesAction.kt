@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -34,36 +35,45 @@ import javax.swing.KeyStroke
 
 
 class ShiftLeftLinesAction : VimCommandAction() {
-  override val mappingModes: Set<MappingMode> = MappingMode.I
+  override fun makeActionHandler(): VimActionHandler = object : ChangeEditorActionHandler.ForEachCaret() {
+    override val mappingModes: Set<MappingMode> = MappingMode.I
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-D>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<C-D>")
 
-  override val type: Command.Type = Command.Type.INSERT
+    override val type: Command.Type = Command.Type.INSERT
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
+    override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
 
-  override fun makeActionHandler(): VimActionHandler = ShiftLeftLinesActionHandler
+    override fun execute(editor: Editor,
+                         caret: Caret,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Boolean {
+      VimPlugin.getChange().indentLines(editor, caret, context, count, -1)
+
+      return true
+    }
+  }
 }
 
 class ShiftLeftLinesNormalModeAction : VimCommandAction() {
-  override val mappingModes: Set<MappingMode> = MappingMode.N
+  override fun makeActionHandler(): VimActionHandler = object : ChangeEditorActionHandler.ForEachCaret() {
+    override val mappingModes: Set<MappingMode> = MappingMode.N
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<<")
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<<")
 
-  override val type: Command.Type = Command.Type.CHANGE
+    override val type: Command.Type = Command.Type.CHANGE
 
-  override fun makeActionHandler(): VimActionHandler = ShiftLeftLinesActionHandler
-}
+    override fun execute(editor: Editor,
+                         caret: Caret,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Boolean {
+      VimPlugin.getChange().indentLines(editor, caret, context, count, -1)
 
-private object ShiftLeftLinesActionHandler : ChangeEditorActionHandler.ForEachCaret() {
-  override fun execute(editor: Editor,
-                       caret: Caret,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
-    VimPlugin.getChange().indentLines(editor, caret, context, count, -1)
-
-    return true
+      return true
+    }
   }
 }

@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.VimActionHandler
@@ -35,6 +36,13 @@ import javax.swing.KeyStroke
 
 class SelectDeleteAction : VimCommandAction() {
   override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
+
+
+    override val mappingModes: MutableSet<MappingMode> = MappingMode.S
+
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<BS>", "<DEL>")
+
+    override val type: Command.Type = Command.Type.INSERT
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
       val actions = VimPlugin.getKey().getActions(editor.component, enterKeyStroke)
@@ -48,10 +56,4 @@ class SelectDeleteAction : VimCommandAction() {
       return true
     }
   }
-
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.S
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<BS>", "<DEL>")
-
-  override val type: Command.Type = Command.Type.INSERT
 }

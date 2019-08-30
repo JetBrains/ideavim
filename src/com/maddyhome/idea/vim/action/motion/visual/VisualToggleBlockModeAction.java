@@ -42,6 +42,30 @@ public class VisualToggleBlockModeAction extends VimCommandAction {
   @Override
   protected VimActionHandler makeActionHandler() {
     return new VimActionHandler.SingleExecution() {
+
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.NV;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("<C-q>", "<C-v>");
+      }
+
+      @NotNull
+      @Override
+      public Command.Type getType() {
+        return Command.Type.OTHER_READONLY;
+      }
+
+      @NotNull
+      @Override
+      public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_MOT_BLOCKWISE);
+      }
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         final ListOption listOption = OptionsManager.INSTANCE.getSelectmode();
@@ -53,29 +77,5 @@ public class VisualToggleBlockModeAction extends VimCommandAction {
           .toggleVisual(editor, cmd.getCount(), cmd.getRawCount(), CommandState.SubMode.VISUAL_BLOCK);
       }
     };
-  }
-
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.NV;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<C-q>", "<C-v>");
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MOT_BLOCKWISE);
   }
 }

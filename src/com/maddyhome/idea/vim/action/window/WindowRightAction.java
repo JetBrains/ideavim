@@ -41,6 +41,25 @@ final public class WindowRightAction extends VimCommandAction {
   @Override
   final protected VimActionHandler makeActionHandler() {
     return new VimActionHandler.SingleExecution() {
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Set<MappingMode> getMappingModes() {
+        return MappingMode.N;
+      }
+
+      @NotNull
+      @Override
+      final public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("<C-W>l", "<C-W><C-L>", "<C-W><Right>");
+      }
+
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Command.Type getType() {
+        return Command.Type.OTHER_READONLY;
+      }
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         VimPlugin.getWindow().selectWindowInRow(context, cmd.getCount(), false);
@@ -49,23 +68,4 @@ final public class WindowRightAction extends VimCommandAction {
     };
   }
 
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<C-W>l", "<C-W><C-L>", "<C-W><Right>");
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
 }

@@ -42,32 +42,32 @@ final public class InsertExitModeAction extends VimCommandAction {
   @Override
   final protected VimActionHandler makeActionHandler() {
     return new VimActionHandler.SingleExecution() {
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Set<MappingMode> getMappingModes() {
+        return MappingMode.I;
+      }
+
+      @NotNull
+      @Override
+      final public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("<C-[>", "<C-C>", "<Esc>", "<C-\\><C-N>");
+      }
+
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Command.Type getType() {
+        return Command.Type.INSERT;
+      }
+
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         VimPlugin.getChange().processEscape(editor, context);
         return true;
       }
     };
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.I;
-  }
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<C-[>", "<C-C>", "<Esc>", "<C-\\><C-N>");
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.INSERT;
   }
 
   @NotNull

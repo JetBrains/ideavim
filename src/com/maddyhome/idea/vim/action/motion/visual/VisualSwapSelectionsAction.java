@@ -41,6 +41,26 @@ final public class VisualSwapSelectionsAction extends VimCommandAction {
   @Override
   final protected VimActionHandler makeActionHandler() {
     return new VimActionHandler.SingleExecution() {
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Set<MappingMode> getMappingModes() {
+        return MappingMode.V;
+      }
+
+      @NotNull
+      @Override
+      final public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("gv");
+      }
+
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Command.Type getType() {
+        return Command.Type.OTHER_READONLY;
+      }
+
       // FIXME: 2019-03-05 Make it multicaret
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
@@ -49,24 +69,4 @@ final public class VisualSwapSelectionsAction extends VimCommandAction {
     };
   }
 
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
-  }
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("gv");
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
 }
-

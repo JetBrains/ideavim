@@ -34,15 +34,15 @@ import javax.swing.KeyStroke
 
 class MotionArrowLeftAction : MotionEditorAction() {
   override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
+
+    override val mappingModes: MutableSet<MappingMode> = MappingMode.NVO
+
+    override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Left>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0)))
+
+    override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
     override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
       return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -count, false)
     }
   }
-
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVO
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Left>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0)))
-
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 }
 

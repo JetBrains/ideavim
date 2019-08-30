@@ -41,32 +41,32 @@ import java.util.Set;
 public class ChangeEndOfLineAction extends VimCommandAction {
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("C");
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.CHANGE;
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_NO_REPEAT, CommandFlags.FLAG_MULTIKEY_UNDO);
-  }
-
-  @NotNull
-  @Override
   protected VimActionHandler makeActionHandler() {
     return new ChangeEditorActionHandler.ForEachCaret() {
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.N;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("C");
+      }
+
+      @NotNull
+      @Override
+      public Command.Type getType() {
+        return Command.Type.CHANGE;
+      }
+
+      @NotNull
+      @Override
+      public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_NO_REPEAT, CommandFlags.FLAG_MULTIKEY_UNDO);
+      }
+
       @Override
       public boolean execute(@NotNull Editor editor,
                              @NotNull Caret caret,

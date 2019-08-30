@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.MotionEditorAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -31,39 +32,49 @@ import java.util.*
 import javax.swing.KeyStroke
 
 class MotionGotoMarkLineAction : MotionEditorAction() {
-  override val mappingModes: Set<MappingMode> = MappingMode.N
+  override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
+    override val mappingModes: Set<MappingMode> = MappingMode.N
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("'")
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("'")
 
-  override val argumentType: Argument.Type = Argument.Type.CHARACTER
+    override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
+    override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
 
-  override fun makeActionHandler(): MotionActionHandler = MotionGotoMarkLineActionHandler
+    override fun getOffset(editor: Editor,
+                           caret: Caret,
+                           context: DataContext,
+                           count: Int,
+                           rawCount: Int,
+                           argument: Argument?): Int {
+      if (argument == null) return -1
+
+      val mark = argument.character
+      return VimPlugin.getMotion().moveCaretToMark(editor, mark, true)
+    }
+  }
 }
 
 class MotionGotoMarkLineNoSaveJumpAction : MotionEditorAction() {
-  override val mappingModes: Set<MappingMode> = MappingMode.N
+  override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
+    override val mappingModes: Set<MappingMode> = MappingMode.N
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("g'")
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("g'")
 
-  override val argumentType: Argument.Type = Argument.Type.CHARACTER
+    override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
+    override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
 
-  override fun makeActionHandler(): MotionActionHandler = MotionGotoMarkLineActionHandler
-}
+    override fun getOffset(editor: Editor,
+                           caret: Caret,
+                           context: DataContext,
+                           count: Int,
+                           rawCount: Int,
+                           argument: Argument?): Int {
+      if (argument == null) return -1
 
-private object MotionGotoMarkLineActionHandler : MotionActionHandler.ForEachCaret() {
-  override fun getOffset(editor: Editor,
-                         caret: Caret,
-                         context: DataContext,
-                         count: Int,
-                         rawCount: Int,
-                         argument: Argument?): Int {
-    if (argument == null) return -1
-
-    val mark = argument.character
-    return VimPlugin.getMotion().moveCaretToMark(editor, mark, true)
+      val mark = argument.character
+      return VimPlugin.getMotion().moveCaretToMark(editor, mark, true)
+    }
   }
 }

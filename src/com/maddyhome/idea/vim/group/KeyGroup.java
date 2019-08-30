@@ -268,10 +268,10 @@ public class KeyGroup {
   }
 
   public void registerCommandAction(@NotNull VimCommandActionBase commandAction) {
-    for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
+    for (List<KeyStroke> keyStrokes : commandAction.getHandler().getKeyStrokesSet()) {
       final KeyStroke[] keys = registerRequiredShortcut(new Shortcut(keyStrokes.toArray(new KeyStroke[0])));
-      registerAction(commandAction.getMappingModes(), commandAction, commandAction.getType(),
-                     commandAction.getFlags(), keys, commandAction.getArgumentType());
+      registerAction(commandAction.getHandler().getMappingModes(), commandAction, commandAction.getHandler().getType(),
+                     commandAction.getHandler().getFlags(), keys, commandAction.getHandler().getArgumentType());
     }
   }
 

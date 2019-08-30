@@ -40,6 +40,25 @@ final public class WindowOnlyAction extends VimCommandAction {
   @Override
   final protected VimActionHandler makeActionHandler() {
     return new VimActionHandler.SingleExecution() {
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Set<MappingMode> getMappingModes() {
+        return MappingMode.N;
+      }
+
+      @NotNull
+      @Override
+      final public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("<C-W>o", "<C-W><C-O>");
+      }
+
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Command.Type getType() {
+        return Command.Type.OTHER_READONLY;
+      }
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         VimPlugin.getWindow().closeAllExceptCurrent(context);
@@ -48,23 +67,4 @@ final public class WindowOnlyAction extends VimCommandAction {
     };
   }
 
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<C-W>o", "<C-W><C-O>");
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
 }

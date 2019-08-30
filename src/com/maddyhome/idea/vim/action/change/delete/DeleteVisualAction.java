@@ -47,41 +47,42 @@ final public class DeleteVisualAction extends VimCommandAction {
   @Override
   final protected VimActionHandler makeActionHandler() {
     return new VisualOperatorActionHandler.ForEachCaret() {
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Set<MappingMode> getMappingModes() {
+        return MappingMode.V;
+      }
+
+      @NotNull
+      @Override
+      final public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("d", "x", "<Del>");
+      }
+
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Command.Type getType() {
+        return Command.Type.DELETE;
+      }
+
+      @NotNull
+      @Override
+      final public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL);
+      }
+
       @Override
       public boolean executeAction(@NotNull Editor editor,
-                                      @NotNull Caret caret,
-                                      @NotNull DataContext context,
-                                      @NotNull Command cmd,
-                                      @NotNull VimSelection range) {
+                                   @NotNull Caret caret,
+                                   @NotNull DataContext context,
+                                   @NotNull Command cmd,
+                                   @NotNull VimSelection range) {
         SelectionType selectionType = range.getType();
         return VimPlugin.getChange().deleteRange(editor, caret, range.toVimTextRange(false), selectionType, false);
       }
     };
   }
 
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
-  }
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("d", "x", "<Del>");
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.DELETE;
-  }
-
-  @NotNull
-  @Override
-  final public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL);
-  }
 }

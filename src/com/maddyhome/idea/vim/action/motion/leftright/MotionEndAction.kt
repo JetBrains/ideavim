@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.MotionEditorAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -40,6 +41,11 @@ import javax.swing.KeyStroke
 
 class MotionEndAction : MotionEditorAction() {
   override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
+    override val mappingModes: MutableSet<MappingMode> = MappingMode.NVOS
+
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<End>")
+
+    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
     override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
                         rawCount: Int, argument: Argument?): Int {
       var allow = false
@@ -64,9 +70,4 @@ class MotionEndAction : MotionEditorAction() {
     }
   }
 
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVOS
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<End>")
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
 }

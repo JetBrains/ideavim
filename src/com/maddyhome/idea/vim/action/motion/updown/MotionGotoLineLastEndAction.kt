@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.MotionEditorAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
@@ -34,42 +35,59 @@ import java.util.*
 import javax.swing.KeyStroke
 
 class MotionGotoLineLastEndAction : MotionEditorAction() {
-  override val mappingModes: Set<MappingMode> = MappingMode.NVO
+  override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
+    override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-End>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<C-End>")
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
+    override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
 
-  override fun makeActionHandler(): MotionActionHandler = MotionGotoLineLastEndActionHandler
+    override fun getOffset(editor: Editor,
+                           caret: Caret,
+                           context: DataContext,
+                           count: Int,
+                           rawCount: Int,
+                           argument: Argument?): Int {
+      var allow = false
+      if (editor.inInsertMode) {
+        allow = true
+      } else if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+        val opt = OptionsManager.selection
+        if (opt.value != "old") {
+          allow = true
+        }
+      }
+
+      return VimPlugin.getMotion().moveCaretGotoLineLastEnd(editor, rawCount, count - 1, allow)
+    }
+  }
 }
 
 class MotionGotoLineLastEndInsertAction : MotionEditorAction() {
-  override val mappingModes: Set<MappingMode> = MappingMode.I
+  override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
+    override val mappingModes: Set<MappingMode> = MappingMode.I
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-End>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<C-End>")
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES)
+    override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES)
 
-  override fun makeActionHandler(): MotionActionHandler = MotionGotoLineLastEndActionHandler
-}
-
-private object MotionGotoLineLastEndActionHandler : MotionActionHandler.ForEachCaret() {
-  override fun getOffset(editor: Editor,
-                         caret: Caret,
-                         context: DataContext,
-                         count: Int,
-                         rawCount: Int,
-                         argument: Argument?): Int {
-    var allow = false
-    if (editor.inInsertMode) {
-      allow = true
-    } else if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
-      val opt = OptionsManager.selection
-      if (opt.value != "old") {
+    override fun getOffset(editor: Editor,
+                           caret: Caret,
+                           context: DataContext,
+                           count: Int,
+                           rawCount: Int,
+                           argument: Argument?): Int {
+      var allow = false
+      if (editor.inInsertMode) {
         allow = true
+      } else if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+        val opt = OptionsManager.selection
+        if (opt.value != "old") {
+          allow = true
+        }
       }
-    }
 
-    return VimPlugin.getMotion().moveCaretGotoLineLastEnd(editor, rawCount, count - 1, allow)
+      return VimPlugin.getMotion().moveCaretGotoLineLastEnd(editor, rawCount, count - 1, allow)
+    }
   }
 }

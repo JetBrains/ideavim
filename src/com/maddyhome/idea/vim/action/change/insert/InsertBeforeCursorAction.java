@@ -43,6 +43,31 @@ final public class InsertBeforeCursorAction extends VimCommandAction {
   @Override
   final protected VimActionHandler makeActionHandler() {
     return new ChangeEditorActionHandler.SingleExecution() {
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Set<MappingMode> getMappingModes() {
+        return MappingMode.N;
+      }
+
+      @NotNull
+      @Override
+      final public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("i", "<Insert>");
+      }
+
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Command.Type getType() {
+        return Command.Type.INSERT;
+      }
+
+      @NotNull
+      @Override
+      final public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO);
+      }
       @Override
       final public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
                                    @Nullable Argument argument) {
@@ -52,29 +77,4 @@ final public class InsertBeforeCursorAction extends VimCommandAction {
     };
   }
 
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("i", "<Insert>");
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.INSERT;
-  }
-
-  @NotNull
-  @Override
-  final public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO);
-  }
 }

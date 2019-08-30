@@ -41,32 +41,32 @@ import java.util.Set;
 public class InsertDeletePreviousWordAction extends VimCommandAction {
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.I;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<C-W>");
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.INSERT;
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES);
-  }
-
-  @NotNull
-  @Override
   protected VimActionHandler makeActionHandler() {
     return new ChangeEditorActionHandler.ForEachCaret() {
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.I;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("<C-W>");
+      }
+
+      @NotNull
+      @Override
+      public Command.Type getType() {
+        return Command.Type.INSERT;
+      }
+
+      @NotNull
+      @Override
+      public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES);
+      }
+
       @Override
       public boolean execute(@NotNull Editor editor,
                              @NotNull Caret caret,

@@ -40,32 +40,32 @@ import java.util.Set;
 public class InsertNewLineAboveAction extends VimCommandAction {
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("O");
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.INSERT;
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO);
-  }
-
-  @NotNull
-  @Override
   protected VimActionHandler makeActionHandler() {
     return new ChangeEditorActionHandler.SingleExecution() {
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.N;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("O");
+      }
+
+      @NotNull
+      @Override
+      public Command.Type getType() {
+        return Command.Type.INSERT;
+      }
+
+      @NotNull
+      @Override
+      public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO);
+      }
+
       @Override
       public boolean execute(@NotNull Editor editor,
                              @NotNull DataContext context,

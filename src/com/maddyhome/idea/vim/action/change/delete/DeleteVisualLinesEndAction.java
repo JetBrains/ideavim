@@ -49,12 +49,38 @@ final public class DeleteVisualLinesEndAction extends VimCommandAction {
   @Override
   final protected VimActionHandler makeActionHandler() {
     return new VisualOperatorActionHandler.ForEachCaret() {
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Set<MappingMode> getMappingModes() {
+        return MappingMode.V;
+      }
+
+      @NotNull
+      @Override
+      final public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("D");
+      }
+
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Command.Type getType() {
+        return Command.Type.DELETE;
+      }
+
+      @NotNull
+      @Override
+      final public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_EXIT_VISUAL);
+      }
+
       @Override
       public boolean executeAction(@NotNull Editor editor,
-                                      @NotNull Caret caret,
-                                      @NotNull DataContext context,
-                                      @NotNull Command cmd,
-                                      @NotNull VimSelection range) {
+                                   @NotNull Caret caret,
+                                   @NotNull DataContext context,
+                                   @NotNull Command cmd,
+                                   @NotNull VimSelection range) {
         TextRange vimTextRange = range.toVimTextRange(true);
         if (range.getType() == SelectionType.BLOCK_WISE) {
           final int[] starts = vimTextRange.getStartOffsets();
@@ -69,37 +95,13 @@ final public class DeleteVisualLinesEndAction extends VimCommandAction {
             .deleteRange(editor, editor.getCaretModel().getPrimaryCaret(), blockRange, SelectionType.BLOCK_WISE, false);
         }
         else {
-          final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, vimTextRange.getStartOffset()),
-                                                    EditorHelper.getLineEndForOffset(editor, vimTextRange.getEndOffset()) + 1);
+          final TextRange lineRange =
+            new TextRange(EditorHelper.getLineStartForOffset(editor, vimTextRange.getStartOffset()),
+                          EditorHelper.getLineEndForOffset(editor, vimTextRange.getEndOffset()) + 1);
           return VimPlugin.getChange().deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false);
         }
       }
     };
   }
 
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
-  }
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("D");
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.DELETE;
-  }
-
-  @NotNull
-  @Override
-  final public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_EXIT_VISUAL);
-  }
 }

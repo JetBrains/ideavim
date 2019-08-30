@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
@@ -37,6 +38,13 @@ import javax.swing.KeyStroke
 
 class MotionShiftDownAction : VimCommandAction() {
   override fun makeActionHandler(): VimActionHandler = object : ShiftedArrowKeyHandler() {
+
+
+    override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
+
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<S-Down>")
+
+    override val type: Command.Type = Command.Type.OTHER_READONLY
     override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
       editor.vimForEachCaret { caret ->
         val vertical = VimPlugin.getMotion().moveCaretVertical(editor, caret, cmd.count)
@@ -51,10 +59,4 @@ class MotionShiftDownAction : VimCommandAction() {
       VimPlugin.getMotion().scrollFullPage(editor, cmd.count)
     }
   }
-
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Down>")
-
-  override val type: Command.Type = Command.Type.OTHER_READONLY
 }

@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
@@ -36,6 +37,13 @@ import javax.swing.KeyStroke
 
 class SelectEnableLineModeAction : VimCommandAction() {
   override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
+
+
+    override val mappingModes: MutableSet<MappingMode> = MappingMode.N
+
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("gH")
+
+    override val type: Command.Type = Command.Type.OTHER_READONLY
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       editor.caretModel.runForEachCaret { caret ->
         val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
@@ -45,10 +53,4 @@ class SelectEnableLineModeAction : VimCommandAction() {
       return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE)
     }
   }
-
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.N
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gH")
-
-  override val type: Command.Type = Command.Type.OTHER_READONLY
 }

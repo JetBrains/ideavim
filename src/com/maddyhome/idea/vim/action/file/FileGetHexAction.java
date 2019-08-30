@@ -34,26 +34,26 @@ import java.util.Set;
 public class FileGetHexAction extends VimCommandAction {
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("g8");
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
-
-  @NotNull
-  @Override
   protected VimActionHandler makeActionHandler() {
     return new VimActionHandler.SingleExecution() {
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.N;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("g8");
+      }
+
+      @NotNull
+      @Override
+      public Command.Type getType() {
+        return Command.Type.OTHER_READONLY;
+      }
+
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         VimPlugin.getFile().displayHexInfo(editor);

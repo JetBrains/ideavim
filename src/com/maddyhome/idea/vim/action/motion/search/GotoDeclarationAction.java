@@ -40,6 +40,31 @@ public class GotoDeclarationAction extends VimCommandAction {
   @Override
   protected VimActionHandler makeActionHandler() {
     return new VimActionHandler.SingleExecution() {
+
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.NV;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        // TODO: <C-]> is a tag command similar to gD, the tag stack is not implemented
+        return parseKeysSet("gD", "gd", "<C-]>");
+      }
+
+      @NotNull
+      @Override
+      public Command.Type getType() {
+        return Command.Type.OTHER_READONLY;
+      }
+
+      @NotNull
+      @Override
+      public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_SAVE_JUMP);
+      }
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         VimPlugin.getMark().saveJumpLocation(editor);
@@ -48,30 +73,5 @@ public class GotoDeclarationAction extends VimCommandAction {
         return true;
       }
     };
-  }
-
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.NV;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    // TODO: <C-]> is a tag command similar to gD, the tag stack is not implemented
-    return parseKeysSet("gD", "gd", "<C-]>");
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_SAVE_JUMP);
   }
 }

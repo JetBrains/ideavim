@@ -38,38 +38,38 @@ import java.util.Set;
 public class YankMotionAction extends VimCommandAction {
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("y");
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.COPY;
-  }
-
-  @NotNull
-  @Override
-  public Argument.Type getArgumentType() {
-    return Argument.Type.MOTION;
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_OP_PEND);
-  }
-
-  @NotNull
-  @Override
   protected VimActionHandler makeActionHandler() {
     return new VimActionHandler.SingleExecution() {
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.N;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("y");
+      }
+
+      @NotNull
+      @Override
+      public Command.Type getType() {
+        return Command.Type.COPY;
+      }
+
+      @NotNull
+      @Override
+      public Argument.Type getArgumentType() {
+        return Argument.Type.MOTION;
+      }
+
+      @NotNull
+      @Override
+      public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_OP_PEND);
+      }
+
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         final Argument argument = cmd.getArgument();

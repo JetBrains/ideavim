@@ -49,6 +49,33 @@ final public class DeleteJoinVisualLinesAction extends VimCommandAction {
   @Override
   final protected VimActionHandler makeActionHandler() {
     return new VisualOperatorActionHandler.SingleExecution() {
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Set<MappingMode> getMappingModes() {
+        return MappingMode.V;
+      }
+
+      @NotNull
+      @Override
+      final public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("gJ");
+      }
+
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Command.Type getType() {
+        return Command.Type.DELETE;
+      }
+
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL);
+      }
+
       @Override
       public boolean executeForAllCarets(@NotNull Editor editor,
                                          @NotNull DataContext context,
@@ -76,30 +103,4 @@ final public class DeleteJoinVisualLinesAction extends VimCommandAction {
     };
   }
 
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
-  }
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("gJ");
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.DELETE;
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL);
-  }
 }

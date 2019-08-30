@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.MotionEditorAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -33,49 +34,72 @@ import java.util.*
 import javax.swing.KeyStroke
 
 class MotionUpAction : MotionEditorAction() {
-  override val mappingModes: Set<MappingMode> = MappingMode.NVO
+  override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
+    override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("k", "<C-P>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("k", "<C-P>")
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
+    override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
 
-  override fun makeActionHandler(): MotionActionHandler = MotionUpActionHandler
+    private var col: Int = 0
+    override fun getOffset(editor: Editor,
+                           caret: Caret,
+                           context: DataContext,
+                           count: Int,
+                           rawCount: Int,
+                           argument: Argument?): Int {
+      return VimPlugin.getMotion().moveCaretVertical(editor, caret, -count)
+    }
+
+    override fun preOffsetComputation(editor: Editor,
+                                      caret: Caret,
+                                      context: DataContext,
+                                      cmd: Command): Boolean {
+      col = EditorHelper.prepareLastColumn(editor, caret)
+      return true
+    }
+
+    override fun postMove(editor: Editor,
+                          caret: Caret,
+                          context: DataContext,
+                          cmd: Command) {
+      EditorHelper.updateLastColumn(editor, caret, col)
+    }
+  }
 }
 
 class MotionUpNotLineWiseAction : MotionEditorAction() {
-  override val mappingModes: Set<MappingMode> = MappingMode.NVO
+  override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
+    override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gk", "g<Up>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("gk", "g<Up>")
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
+    override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 
-  override fun makeActionHandler(): MotionActionHandler = MotionUpActionHandler
-}
 
-private object MotionUpActionHandler : MotionActionHandler.ForEachCaret() {
+    private var col: Int = 0
+    override fun getOffset(editor: Editor,
+                           caret: Caret,
+                           context: DataContext,
+                           count: Int,
+                           rawCount: Int,
+                           argument: Argument?): Int {
+      return VimPlugin.getMotion().moveCaretVertical(editor, caret, -count)
+    }
 
-  private var col: Int = 0
-  override fun getOffset(editor: Editor,
-                         caret: Caret,
-                         context: DataContext,
-                         count: Int,
-                         rawCount: Int,
-                         argument: Argument?): Int {
-    return VimPlugin.getMotion().moveCaretVertical(editor, caret, -count)
-  }
+    override fun preOffsetComputation(editor: Editor,
+                                      caret: Caret,
+                                      context: DataContext,
+                                      cmd: Command): Boolean {
+      col = EditorHelper.prepareLastColumn(editor, caret)
+      return true
+    }
 
-  override fun preOffsetComputation(editor: Editor,
-                                    caret: Caret,
-                                    context: DataContext,
-                                    cmd: Command): Boolean {
-    col = EditorHelper.prepareLastColumn(editor, caret)
-    return true
-  }
-
-  override fun postMove(editor: Editor,
-                        caret: Caret,
-                        context: DataContext,
-                        cmd: Command) {
-    EditorHelper.updateLastColumn(editor, caret, col)
+    override fun postMove(editor: Editor,
+                          caret: Caret,
+                          context: DataContext,
+                          cmd: Command) {
+      EditorHelper.updateLastColumn(editor, caret, col)
+    }
   }
 }

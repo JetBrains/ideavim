@@ -39,32 +39,32 @@ import java.util.Set;
 public class MotionRightTillMatchCharAction extends MotionEditorAction {
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("t");
-  }
-
-  @NotNull
-  @Override
-  public Argument.Type getArgumentType() {
-    return Argument.Type.DIGRAPH;
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE, CommandFlags.FLAG_ALLOW_DIGRAPH);
-  }
-
-  @NotNull
-  @Override
   public MotionActionHandler makeActionHandler() {
     return new MotionActionHandler.ForEachCaret() {
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.NVO;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("t");
+      }
+
+      @NotNull
+      @Override
+      public Argument.Type getArgumentType() {
+        return Argument.Type.DIGRAPH;
+      }
+
+      @NotNull
+      @Override
+      public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE, CommandFlags.FLAG_ALLOW_DIGRAPH);
+      }
+
       @Override
       public int getOffset(@NotNull Editor editor,
                            @NotNull Caret caret,

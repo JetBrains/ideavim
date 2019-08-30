@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.handler
 
+import com.google.common.collect.ImmutableSet
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.diagnostic.Logger
@@ -25,9 +26,16 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.CaretSpecificDataContext
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
+import com.maddyhome.idea.vim.helper.noneOfEnum
+import java.util.*
+import javax.swing.KeyStroke
 
 /**
  * Structure of handlers
@@ -78,6 +86,23 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
 }
 
 sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
+  abstract val mappingModes: Set<MappingMode>
+
+  abstract val keyStrokesSet: Set<List<KeyStroke>>
+
+  abstract val type: Command.Type
+
+  open val argumentType: Argument.Type = Argument.Type.NONE
+
+  /**
+   * Returns various binary flags for the command.
+   *
+   * These legacy flags will be refactored in future releases.
+   *
+   * @see com.maddyhome.idea.vim.command.Command
+   */
+  open val flags: EnumSet<CommandFlags> = noneOfEnum()
+
 
   abstract class ForEachCaret : EditorActionHandlerBase(true) {
     abstract fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean
@@ -127,7 +152,16 @@ sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     // No-op
   }
 
-  private companion object {
+  protected companion object {
     private val logger = Logger.getInstance(EditorActionHandlerBase::class.java.name)
+
+    @JvmStatic
+    fun parseKeysSet(vararg keyStrings: String): Set<List<KeyStroke>> {
+      val builder = ImmutableSet.builder<List<KeyStroke>>()
+      for (keyString in keyStrings) {
+        builder.add(StringHelper.parseKeys(keyString))
+      }
+      return builder.build()
+    }
   }
 }

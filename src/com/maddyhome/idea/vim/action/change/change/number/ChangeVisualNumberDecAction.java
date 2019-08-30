@@ -43,41 +43,41 @@ final public class ChangeVisualNumberDecAction extends VimCommandAction {
   @Override
   final protected VimActionHandler makeActionHandler() {
     return new VisualOperatorActionHandler.ForEachCaret() {
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Set<MappingMode> getMappingModes() {
+        return MappingMode.V;
+      }
+
+      @NotNull
+      @Override
+      final public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("<C-X>");
+      }
+
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Command.Type getType() {
+        return Command.Type.CHANGE;
+      }
+
+      @NotNull
+      @Override
+      final public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL);
+      }
+
       @Override
       public boolean executeAction(@NotNull Editor editor,
-                                      @NotNull Caret caret,
-                                      @NotNull DataContext context,
-                                      @NotNull Command cmd,
-                                      @NotNull VimSelection range) {
+                                   @NotNull Caret caret,
+                                   @NotNull DataContext context,
+                                   @NotNull Command cmd,
+                                   @NotNull VimSelection range) {
         return VimPlugin.getChange()
           .changeNumberVisualMode(editor, caret, range.toVimTextRange(false), -cmd.getCount(), false);
       }
     };
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
-  }
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<C-X>");
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.CHANGE;
-  }
-
-  @NotNull
-  @Override
-  final public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL);
   }
 }

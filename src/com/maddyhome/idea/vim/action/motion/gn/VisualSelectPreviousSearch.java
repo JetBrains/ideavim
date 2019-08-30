@@ -40,6 +40,25 @@ final public class VisualSelectPreviousSearch extends MotionEditorAction {
   @Override
   public MotionActionHandler makeActionHandler() {
     return new MotionActionHandler.SingleExecution() {
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Set<MappingMode> getMappingModes() {
+        return MappingMode.NV;
+      }
+
+      @NotNull
+      @Override
+      final public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("gN");
+      }
+
+      @NotNull
+      @Override
+      final public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.noneOf(CommandFlags.class);
+      }
+
       @Override
       final public int getOffset(@NotNull Editor editor,
                                  @NotNull DataContext context,
@@ -49,24 +68,5 @@ final public class VisualSelectPreviousSearch extends MotionEditorAction {
         return VimPlugin.getMotion().selectNextSearch(editor, count, false);
       }
     };
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.NV;
-  }
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("gN");
-  }
-
-  @NotNull
-  @Override
-  final public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.noneOf(CommandFlags.class);
   }
 }

@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.TextObjectAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -38,6 +39,12 @@ import javax.swing.KeyStroke
 
 class GnPreviousTextObject : TextObjectAction() {
   override fun makeActionHandler(): TextObjectActionHandler = object : TextObjectActionHandler() {
+
+    override val mappingModes: Set<MappingMode> = MappingMode.O
+
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("gN")
+
+    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE)
     override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
       if (caret != editor.caretModel.primaryCaret) return null
       val range = VimPlugin.getSearch().getNextSearchRange(editor, count, false)
@@ -45,10 +52,4 @@ class GnPreviousTextObject : TextObjectAction() {
       return range?.let { TextRange(it.startOffset, it.endOffset - adj) }
     }
   }
-
-  override val mappingModes: Set<MappingMode> = MappingMode.O
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gN")
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE)
 }

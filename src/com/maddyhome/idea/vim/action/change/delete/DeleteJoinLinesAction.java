@@ -40,26 +40,26 @@ import java.util.Set;
 public class DeleteJoinLinesAction extends VimCommandAction {
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("gJ");
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.DELETE;
-  }
-
-  @NotNull
-  @Override
   protected VimActionHandler makeActionHandler() {
     return new ChangeEditorActionHandler.SingleExecution() {
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.N;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("gJ");
+      }
+
+      @NotNull
+      @Override
+      public Command.Type getType() {
+        return Command.Type.DELETE;
+      }
+
       @Override
       public boolean execute(@NotNull Editor editor,
                              @NotNull DataContext context,

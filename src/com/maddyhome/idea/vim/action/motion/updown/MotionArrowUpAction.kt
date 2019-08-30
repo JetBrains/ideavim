@@ -37,6 +37,13 @@ import javax.swing.KeyStroke
 
 class MotionArrowUpAction : MotionEditorAction() {
   override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
+
+
+    override val mappingModes: MutableSet<MappingMode> = MappingMode.NVOS
+
+    override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Up>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0)))
+
+    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
     private var col: Int = 0
 
     override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
@@ -52,10 +59,4 @@ class MotionArrowUpAction : MotionEditorAction() {
       EditorHelper.updateLastColumn(editor, caret, col)
     }
   }
-
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVOS
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Up>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0)))
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
 }

@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.TextObjectAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -35,14 +36,15 @@ import javax.swing.KeyStroke
 
 class MotionOuterBigWordAction : TextObjectAction() {
   override fun makeActionHandler(): TextObjectActionHandler = object : TextObjectActionHandler() {
+
+    override val mappingModes: Set<MappingMode> = MappingMode.VO
+
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("aW")
+
+    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE)
+
     override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
       return VimPlugin.getMotion().getWordRange(editor, caret, count, true, true)
     }
   }
-
-  override val mappingModes: Set<MappingMode> = MappingMode.VO
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("aW")
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE)
 }

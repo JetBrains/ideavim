@@ -180,7 +180,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     return values.stream().anyMatch(actionId -> {
       final VimCommandActionBase action = RegisterActions.findAction(actionId);
       if (action == null) return false;
-      return action.getKeyStrokesSet().stream()
+      return action.getHandler().getKeyStrokesSet().stream()
         .anyMatch(ks -> !ks.isEmpty() && ks.get(0).equals(keyStroke));
     });
   }
@@ -203,7 +203,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
   }
 
   private boolean isEnabledForLookup(@NotNull KeyStroke keyStroke) {
-    for (List<KeyStroke> keys : InsertExitModeAction.getInstance().getKeyStrokesSet()) {
+    for (List<KeyStroke> keys : InsertExitModeAction.getInstance().getHandler().getKeyStrokesSet()) {
       // XXX: Currently we cannot handle <C-\><C-N> because of the importance of <C-N> for the IDE on Linux
       if (keys.size() == 1 && keyStroke.equals(keys.get(0))) {
         return true;

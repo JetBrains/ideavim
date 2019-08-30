@@ -41,38 +41,38 @@ import java.util.Set;
 public class ChangeCharacterAction extends VimCommandAction {
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("r");
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.CHANGE;
-  }
-
-  @NotNull
-  @Override
-  public Argument.Type getArgumentType() {
-    return Argument.Type.DIGRAPH;
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_ALLOW_DIGRAPH);
-  }
-
-  @NotNull
-  @Override
   protected VimActionHandler makeActionHandler() {
     return new ChangeEditorActionHandler.ForEachCaret() {
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.N;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("r");
+      }
+
+      @NotNull
+      @Override
+      public Command.Type getType() {
+        return Command.Type.CHANGE;
+      }
+
+      @NotNull
+      @Override
+      public Argument.Type getArgumentType() {
+        return Argument.Type.DIGRAPH;
+      }
+
+      @NotNull
+      @Override
+      public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_ALLOW_DIGRAPH);
+      }
+
       @Override
       public boolean execute(@NotNull Editor editor,
                              @NotNull Caret caret,

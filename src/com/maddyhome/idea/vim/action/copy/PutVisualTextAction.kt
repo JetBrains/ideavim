@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -39,6 +40,13 @@ import javax.swing.KeyStroke
  */
 class PutVisualTextAction : VimCommandAction() {
   override fun makeActionHandler(): VimActionHandler = object : VisualOperatorActionHandler.SingleExecution() {
+    override val mappingModes: Set<MappingMode> = MappingMode.V
+
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("p", "P")
+
+    override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
+
+    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
     override fun executeForAllCarets(editor: Editor,
                                      context: DataContext,
                                      cmd: Command,
@@ -54,12 +62,4 @@ class PutVisualTextAction : VimCommandAction() {
       return VimPlugin.getPut().putText(editor, context, putData)
     }
   }
-
-  override val mappingModes: Set<MappingMode> = MappingMode.V
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("p", "P")
-
-  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 }

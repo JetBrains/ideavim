@@ -41,30 +41,30 @@ import java.util.Set;
 public class InsertPreviousInsertExitAction extends VimCommandAction {
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.I;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    Set<List<KeyStroke>> keys = new HashSet<>();
-    keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK)));
-    keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_MASK)));
-    keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_AT, KeyEvent.CTRL_MASK)));
-    return keys;
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.INSERT;
-  }
-
-  @NotNull
-  @Override
   protected VimActionHandler makeActionHandler() {
     return new ChangeEditorActionHandler.SingleExecution() {
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.I;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        Set<List<KeyStroke>> keys = new HashSet<>();
+        keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK)));
+        keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_MASK)));
+        keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_AT, KeyEvent.CTRL_MASK)));
+        return keys;
+      }
+
+      @NotNull
+      @Override
+      public Command.Type getType() {
+        return Command.Type.INSERT;
+      }
+
       @Override
       public boolean execute(@NotNull Editor editor,
                              @NotNull DataContext context,

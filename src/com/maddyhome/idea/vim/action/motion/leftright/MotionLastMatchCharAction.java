@@ -36,20 +36,20 @@ import java.util.Set;
 public class MotionLastMatchCharAction extends MotionEditorAction {
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet(";");
-  }
-
-  @NotNull
-  @Override
   public MotionActionHandler makeActionHandler() {
     return new MotionActionHandler.ForEachCaret() {
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.NVO;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet(";");
+      }
+
       @Override
       public int getOffset(@NotNull Editor editor,
                            @NotNull Caret caret,

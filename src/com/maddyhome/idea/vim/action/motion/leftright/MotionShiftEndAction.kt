@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -40,6 +41,13 @@ import javax.swing.KeyStroke
 
 class MotionShiftEndAction : VimCommandAction() {
   override fun makeActionHandler(): VimActionHandler = object : ShiftedSpecialKeyHandler() {
+    override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
+
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("<S-End>")
+
+    override val type: Command.Type = Command.Type.OTHER_READONLY
+
+    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
     override fun motion(editor: Editor, context: DataContext, cmd: Command) {
       editor.vimForEachCaret { caret ->
         var allow = false
@@ -60,11 +68,4 @@ class MotionShiftEndAction : VimCommandAction() {
     }
   }
 
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-End>")
-
-  override val type: Command.Type = Command.Type.OTHER_READONLY
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
 }

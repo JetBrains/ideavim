@@ -36,21 +36,21 @@ import java.util.Set;
 public class MotionJumpPreviousAction extends MotionEditorAction {
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    // TODO: <C-T> is a tag command similar to <C-O>, the tag stack is not implemented
-    return parseKeysSet("<C-O>", "<C-T>");
-  }
-
-  @NotNull
-  @Override
   public MotionActionHandler makeActionHandler() {
     return new MotionActionHandler.ForEachCaret() {
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.N;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        // TODO: <C-T> is a tag command similar to <C-O>, the tag stack is not implemented
+        return parseKeysSet("<C-O>", "<C-T>");
+      }
+
       @Override
       public int getOffset(@NotNull Editor editor,
                            @NotNull Caret caret,

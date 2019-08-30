@@ -30,6 +30,12 @@ import javax.swing.KeyStroke
 
 class SelectEscapeAction : VimCommandAction() {
   override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
+
+    override val mappingModes: MutableSet<MappingMode> = MappingMode.S
+
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<esc>")
+
+    override val type: Command.Type = Command.Type.OTHER_READONLY
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       val blockMode = editor.inBlockSubMode
       VimPlugin.getVisualMotion().exitSelectMode(editor, true)
@@ -37,9 +43,4 @@ class SelectEscapeAction : VimCommandAction() {
       return true
     }
   }
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.S
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<esc>")
-
-  override val type: Command.Type = Command.Type.OTHER_READONLY
 }

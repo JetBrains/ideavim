@@ -47,49 +47,49 @@ final public class ChangeVisualCharacterAction extends VimCommandAction {
   @Override
   final protected VimActionHandler makeActionHandler() {
     return new VisualOperatorActionHandler.ForEachCaret() {
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Set<MappingMode> getMappingModes() {
+        return MappingMode.V;
+      }
+
+      @NotNull
+      @Override
+      final public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("r");
+      }
+
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Command.Type getType() {
+        return Command.Type.CHANGE;
+      }
+
+      @Contract(pure = true)
+      @NotNull
+      @Override
+      final public Argument.Type getArgumentType() {
+        return Argument.Type.DIGRAPH;
+      }
+
+      @NotNull
+      @Override
+      final public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_ALLOW_DIGRAPH, CommandFlags.FLAG_EXIT_VISUAL);
+      }
+
       @Override
       public boolean executeAction(@NotNull Editor editor,
-                                      @NotNull Caret caret,
-                                      @NotNull DataContext context,
-                                      @NotNull Command cmd,
-                                      @NotNull VimSelection range) {
+                                   @NotNull Caret caret,
+                                   @NotNull DataContext context,
+                                   @NotNull Command cmd,
+                                   @NotNull VimSelection range) {
         final Argument argument = cmd.getArgument();
         return argument != null &&
                VimPlugin.getChange().changeCharacterRange(editor, range.toVimTextRange(false), argument.getCharacter());
       }
     };
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
-  }
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("r");
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.CHANGE;
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Argument.Type getArgumentType() {
-    return Argument.Type.DIGRAPH;
-  }
-
-  @NotNull
-  @Override
-  final public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_ALLOW_DIGRAPH, CommandFlags.FLAG_EXIT_VISUAL);
   }
 }

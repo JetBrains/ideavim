@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.TextObjectAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -34,6 +35,13 @@ import javax.swing.KeyStroke
 
 class MotionInnerBlockAngleAction : TextObjectAction() {
   override fun makeActionHandler(): TextObjectActionHandler = object : TextObjectActionHandler() {
+
+    override val mappingModes: Set<MappingMode> = MappingMode.VO
+
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("i>", "i<")
+
+    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE, CommandFlags.FLAG_TEXT_BLOCK)
+
     override fun getRange(editor: Editor,
                           caret: Caret,
                           context: DataContext,
@@ -43,10 +51,4 @@ class MotionInnerBlockAngleAction : TextObjectAction() {
       return VimPlugin.getMotion().getBlockRange(editor, caret, count, false, '<')
     }
   }
-
-  override val mappingModes: Set<MappingMode> = MappingMode.VO
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("i>", "i<")
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE, CommandFlags.FLAG_TEXT_BLOCK)
 }

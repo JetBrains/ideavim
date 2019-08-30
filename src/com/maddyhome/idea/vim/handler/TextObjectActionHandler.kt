@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
  * This handler gets executed for each caret.
  */
 abstract class TextObjectActionHandler : EditorActionHandlerBase.ForEachCaret() {
+  final override val type: Command.Type = Command.Type.MOTION
   abstract fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange?
   override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
     if (!editor.inVisualMode) return true

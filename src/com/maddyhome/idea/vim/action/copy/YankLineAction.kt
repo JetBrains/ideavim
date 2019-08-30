@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -32,29 +33,33 @@ import javax.swing.KeyStroke
 
 
 class YankLineAction : VimCommandAction() {
-  override val mappingModes: Set<MappingMode> = MappingMode.N
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("Y")
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
+    override val mappingModes: Set<MappingMode> = MappingMode.N
 
-  override val type: Command.Type = Command.Type.COPY
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("Y")
 
-  override fun makeActionHandler(): VimActionHandler = YankLineActionHandler
+    override val type: Command.Type = Command.Type.COPY
+
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      return VimPlugin.getYank().yankLine(editor, cmd.count)
+    }
+  }
 }
 
 class YankLineMidCountAction : VimCommandAction() {
-  override val mappingModes: Set<MappingMode> = MappingMode.N
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
+    override val mappingModes: Set<MappingMode> = MappingMode.N
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("yy")
+    override val keyStrokesSet: Set<List<KeyStroke>> = VimCommandActionBase.parseKeysSet("yy")
 
-  override val type: Command.Type = Command.Type.COPY
+    override val type: Command.Type = Command.Type.COPY
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_ALLOW_MID_COUNT)
+    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_ALLOW_MID_COUNT)
 
-  override fun makeActionHandler(): VimActionHandler = YankLineActionHandler
-}
-
-private object YankLineActionHandler : VimActionHandler.SingleExecution() {
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    return VimPlugin.getYank().yankLine(editor, cmd.count)
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      return VimPlugin.getYank().yankLine(editor, cmd.count)
+    }
   }
 }
+

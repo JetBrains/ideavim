@@ -42,38 +42,38 @@ import java.util.Set;
 public class FilterMotionAction extends VimCommandAction {
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("!");
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.CHANGE;
-  }
-
-  @NotNull
-  @Override
-  public Argument.Type getArgumentType() {
-    return Argument.Type.MOTION;
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_OP_PEND);
-  }
-
-  @NotNull
-  @Override
   protected VimActionHandler makeActionHandler() {
     return new VimActionHandler.SingleExecution() {
+      @NotNull
+      @Override
+      public Set<MappingMode> getMappingModes() {
+        return MappingMode.N;
+      }
+
+      @NotNull
+      @Override
+      public Set<List<KeyStroke>> getKeyStrokesSet() {
+        return parseKeysSet("!");
+      }
+
+      @NotNull
+      @Override
+      public Command.Type getType() {
+        return Command.Type.CHANGE;
+      }
+
+      @NotNull
+      @Override
+      public Argument.Type getArgumentType() {
+        return Argument.Type.MOTION;
+      }
+
+      @NotNull
+      @Override
+      public EnumSet<CommandFlags> getFlags() {
+        return EnumSet.of(CommandFlags.FLAG_OP_PEND);
+      }
+
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         final Argument argument = cmd.getArgument();
@@ -102,7 +102,8 @@ public class FilterMotionAction extends VimCommandAction {
           count = 1;
         }
 
-        Command command = new Command(count, new EmptyAction(), Command.Type.UNDEFINED, EnumSet.noneOf(CommandFlags.class));
+        Command command =
+          new Command(count, new EmptyAction(), Command.Type.UNDEFINED, EnumSet.noneOf(CommandFlags.class));
         VimPlugin.getProcess().startFilterCommand(editor, context, command);
 
         return true;
@@ -113,26 +114,26 @@ public class FilterMotionAction extends VimCommandAction {
   private static class EmptyAction extends VimCommandAction {
     @NotNull
     @Override
-    public Set<MappingMode> getMappingModes() {
-      return Collections.emptySet();
-    }
-
-    @NotNull
-    @Override
-    public Set<List<KeyStroke>> getKeyStrokesSet() {
-      return Collections.emptySet();
-    }
-
-    @NotNull
-    @Override
-    public Command.Type getType() {
-      return Command.Type.OTHER_SELF_SYNCHRONIZED;
-    }
-
-    @NotNull
-    @Override
     protected VimActionHandler makeActionHandler() {
       return new VimActionHandler.SingleExecution() {
+        @NotNull
+        @Override
+        public Set<MappingMode> getMappingModes() {
+          return Collections.emptySet();
+        }
+
+        @NotNull
+        @Override
+        public Set<List<KeyStroke>> getKeyStrokesSet() {
+          return Collections.emptySet();
+        }
+
+        @NotNull
+        @Override
+        public Command.Type getType() {
+          return Command.Type.OTHER_SELF_SYNCHRONIZED;
+        }
+
         @Override
         public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
           return false;
