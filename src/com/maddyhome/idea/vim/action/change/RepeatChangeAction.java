@@ -83,7 +83,7 @@ public class RepeatChangeAction extends VimCommandAction {
           char reg = VimPlugin.getRegister().getCurrentRegister();
           VimPlugin.getRegister().selectRegister(state.getLastChangeRegister());
           try {
-            KeyHandler.executeAction(cmd.getAction(), context);
+            KeyHandler.executeVimAction(editor, cmd.getAction(), context);
           }
           catch (Exception e) {
             // oops

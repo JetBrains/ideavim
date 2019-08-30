@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableSet
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.actionSystem.EditorAction
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
@@ -60,14 +59,12 @@ import javax.swing.KeyStroke
  *
  * @author vlan
  */
-sealed class VimCommandActionBase : EditorAction(null) {
+sealed class VimCommandActionBase {
 
   var id = ""
   var text = ""
-
-  init {
-    @Suppress("LeakingThis")
-    setupHandler(makeActionHandler())
+  val handler by lazy {
+    makeActionHandler()
   }
 
   protected abstract fun makeActionHandler(): EditorActionHandlerBase

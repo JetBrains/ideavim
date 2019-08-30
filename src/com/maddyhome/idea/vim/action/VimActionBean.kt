@@ -1,6 +1,5 @@
 package com.maddyhome.idea.vim.action
 
-import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.extensions.AbstractExtensionPointBean
 import com.intellij.util.xmlb.annotations.Attribute
@@ -19,7 +18,6 @@ class VimActionBean : AbstractExtensionPointBean() {
     instantiate<VimCommandActionBase>(actionClass, ApplicationManager.getApplication().picoContainer).also {
       it.text = text
       it.id = id
-      ActionManager.getInstance().registerAction(id, it)
     }
   }
 }

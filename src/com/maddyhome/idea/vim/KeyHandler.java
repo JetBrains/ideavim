@@ -95,6 +95,13 @@ public class KeyHandler {
     return origHandler;
   }
 
+  public static void executeVimAction(@NotNull Editor editor, @NotNull VimCommandActionBase cmd, DataContext context) {
+    CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> cmd.getHandler()
+                                                    .execute(editor, null, getProjectAwareDataContext(editor, context)), cmd.getText(),
+                                                  DocCommandGroupId.noneGroupId(editor.getDocument()),
+                                                  UndoConfirmationPolicy.DEFAULT, editor.getDocument());
+  }
+
   /**
    * Execute an action
    *
@@ -785,10 +792,7 @@ public class KeyHandler {
       CommandState editorState = CommandState.getInstance(editor);
       boolean wasRecording = editorState.isRecording();
 
-      CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> cmd.getAction().getHandler()
-                                                      .execute(editor, null, getProjectAwareDataContext(editor, context)), cmd.getAction().getText(),
-                                                    DocCommandGroupId.noneGroupId(editor.getDocument()),
-                                                    UndoConfirmationPolicy.DEFAULT, editor.getDocument());
+      executeVimAction(editor, cmd.getAction(), context);
       if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
         VimPlugin.getChange().processCommand(editor, cmd);
       }

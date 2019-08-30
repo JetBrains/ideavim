@@ -492,6 +492,10 @@ public class ChangeGroup {
             KeyHandler.executeAction((AnAction)lastStroke, context);
             strokes.add(lastStroke);
           }
+          else if (lastStroke instanceof VimCommandActionBase) {
+            KeyHandler.executeVimAction(editor, (VimCommandActionBase)lastStroke, context);
+            strokes.add(lastStroke);
+          }
           else if (lastStroke instanceof char[]) {
             final char[] chars = (char[])lastStroke;
             insertText(editor, caret, new String(chars));
@@ -2033,12 +2037,12 @@ public class ChangeGroup {
     }
 
     @NotNull
-    private List<AnAction> getAdjustCaretActions(@NotNull DocumentEvent e) {
+    private List<VimCommandActionBase> getAdjustCaretActions(@NotNull DocumentEvent e) {
       final int delta = e.getOffset() - oldOffset;
       if (oldOffset >= 0 && delta != 0) {
-        final List<AnAction> positionCaretActions = new ArrayList<>();
+        final List<VimCommandActionBase> positionCaretActions = new ArrayList<>();
         final String motionName = delta < 0 ? "VimMotionLeft" : "VimMotionRight";
-        final AnAction action = RegisterActions.findAction(motionName);
+        final VimCommandActionBase action = RegisterActions.findAction(motionName);
         final int count = Math.abs(delta);
         for (int i = 0; i < count; i++) {
           positionCaretActions.add(action);

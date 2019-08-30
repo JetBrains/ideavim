@@ -19,7 +19,6 @@
 package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.action.VimCommandActionBase
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -35,10 +34,7 @@ data class Command(
 ) {
 
   init {
-    val handler = action.handler
-    if (handler is EditorActionHandlerBase) {
-      handler.process(this)
-    }
+    action.handler.process(this)
   }
 
   var count: Int
