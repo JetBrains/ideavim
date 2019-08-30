@@ -641,7 +641,7 @@ public class ChangeGroup {
             repeatInsertText(editor, context, started ? (i == 0 ? count : count + 1) : count);
           }
           else if (EditorHelper.getVisualLineLength(editor, visualLine + i) >= repeatColumn) {
-            caret.moveToVisualPosition(new VisualPosition(visualLine + i, repeatColumn));
+            caret.moveToLogicalPosition(new LogicalPosition(logicalLine + i, repeatColumn));
             repeatInsertText(editor, context, started ? (i == 0 ? count : count + 1) : count);
           }
         }
