@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -101,11 +102,42 @@ public class FilterMotionAction extends VimCommandAction {
           count = 1;
         }
 
-        Command command = new Command(count, null, Command.Type.UNDEFINED, EnumSet.noneOf(CommandFlags.class));
+        Command command = new Command(count, new EmptyAction(), Command.Type.UNDEFINED, EnumSet.noneOf(CommandFlags.class));
         VimPlugin.getProcess().startFilterCommand(editor, context, command);
 
         return true;
       }
     };
+  }
+
+  private static class EmptyAction extends VimCommandAction {
+    @NotNull
+    @Override
+    public Set<MappingMode> getMappingModes() {
+      return Collections.emptySet();
+    }
+
+    @NotNull
+    @Override
+    public Set<List<KeyStroke>> getKeyStrokesSet() {
+      return Collections.emptySet();
+    }
+
+    @NotNull
+    @Override
+    public Command.Type getType() {
+      return Command.Type.OTHER_SELF_SYNCHRONIZED;
+    }
+
+    @NotNull
+    @Override
+    protected VimActionHandler makeActionHandler() {
+      return new VimActionHandler.SingleExecution() {
+        @Override
+        public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+          return false;
+        }
+      };
+    }
   }
 }

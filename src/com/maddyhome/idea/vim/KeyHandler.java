@@ -538,7 +538,7 @@ public class KeyHandler {
     if (ApplicationManager.getApplication().isDispatchThread()) {
       Runnable action = new ActionRunner(editor, context, cmd, key);
       VimCommandActionBase cmdAction = cmd.getAction();
-      String name = cmdAction == null ? "" : cmdAction.getText();
+      String name = cmdAction.getText();
 
       if (type.isWrite()) {
         RunnableHelper.runWriteCommand(project, action, name, action);
@@ -592,12 +592,6 @@ public class KeyHandler {
       Command cmd = new Command(count, node.getAction(), node.getCmdType(), node.getFlags());
       cmd.setKeys(keys);
       currentCmd.push(cmd);
-
-      // This is a sanity check that the command has a valid action. This should only fail if the
-      // programmer made a typo or forgot to add the action to the plugin.xml file
-      if (cmd.getAction() == null) {
-        state = State.ERROR;
-      }
     }
   }
 
@@ -791,7 +785,6 @@ public class KeyHandler {
       CommandState editorState = CommandState.getInstance(editor);
       boolean wasRecording = editorState.isRecording();
 
-      if (cmd.getAction() == null) return;
       CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> cmd.getAction().getHandler()
                                                       .execute(editor, null, getProjectAwareDataContext(editor, context)), cmd.getAction().getText(),
                                                     DocCommandGroupId.noneGroupId(editor.getDocument()),
