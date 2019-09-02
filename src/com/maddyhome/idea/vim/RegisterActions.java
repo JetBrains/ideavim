@@ -19,7 +19,6 @@ package com.maddyhome.idea.vim;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.extensions.ExtensionPointName;
-import com.maddyhome.idea.vim.action.VimActionBean;
 import com.maddyhome.idea.vim.group.KeyGroup;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.key.Shortcut;
@@ -31,7 +30,7 @@ import java.awt.event.KeyEvent;
 
 public class RegisterActions {
 
-  public static final ExtensionPointName<VimActionBean> VIM_ACTIONS_EP =
+  public static final ExtensionPointName<EditorActionHandlerBase> VIM_ACTIONS_EP =
     ExtensionPointName.create("IdeaVIM.vimAction");
 
   /**
@@ -54,8 +53,8 @@ public class RegisterActions {
 
   @Nullable
   public static EditorActionHandlerBase findAction(@NotNull String id) {
-    return VIM_ACTIONS_EP.extensions().filter(vimActionBean -> vimActionBean.getAction().getId().equals(id)).findFirst()
-      .map(VimActionBean::getAction).orElse(null);
+    return VIM_ACTIONS_EP.extensions().filter(vimActionBean -> vimActionBean.getId().equals(id)).findFirst()
+      .orElse(null);
   }
 
   @NotNull
@@ -67,7 +66,7 @@ public class RegisterActions {
 
   private static void registerVimCommandActions() {
     VIM_ACTIONS_EP.extensions().forEach(actionBean -> {
-      VimPlugin.getKey().registerCommandAction(actionBean.getAction());
+      VimPlugin.getKey().registerCommandAction(actionBean);
     });
   }
 

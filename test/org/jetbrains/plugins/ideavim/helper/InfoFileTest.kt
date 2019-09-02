@@ -23,9 +23,6 @@ class InfoFileTest : VimTestCase() {
   }
 
   private inline fun forEachAction(supply: (action: EditorActionHandlerBase) -> Unit) {
-    for (actionBean in VIM_ACTIONS_EP.extensions) {
-      val action = actionBean.action
-      supply(action)
-    }
+    VIM_ACTIONS_EP.extensions.forEach { supply(it) }
   }
 }
