@@ -77,12 +77,12 @@ public class ChangeGroup {
 
   private static final int MAX_REPEAT_CHARS_COUNT = 10000;
 
-  private static final String VIM_MOTION_BIG_WORD_RIGHT = "VimMotionBigWordRight";
-  private static final String VIM_MOTION_WORD_RIGHT = "VimMotionWordRight";
-  private static final String VIM_MOTION_CAMEL_RIGHT = "VimMotionCamelRight";
-  private static final String VIM_MOTION_WORD_END_RIGHT = "VimMotionWordEndRight";
-  private static final String VIM_MOTION_BIG_WORD_END_RIGHT = "VimMotionBigWordEndRight";
-  private static final String VIM_MOTION_CAMEL_END_RIGHT = "VimMotionCamelEndRight";
+  private static final String VIM_MOTION_BIG_WORD_RIGHT = "VimMotionBigWordRightAction";
+  private static final String VIM_MOTION_WORD_RIGHT = "VimMotionWordRightAction";
+  private static final String VIM_MOTION_CAMEL_RIGHT = "VimMotionCamelRightAction";
+  private static final String VIM_MOTION_WORD_END_RIGHT = "VimMotionWordEndRightAction";
+  private static final String VIM_MOTION_BIG_WORD_END_RIGHT = "VimMotionBigWordEndRightAction";
+  private static final String VIM_MOTION_CAMEL_END_RIGHT = "VimMotionCamelEndRightAction";
 
   @Nullable private Command lastInsert;
 
@@ -2041,7 +2041,7 @@ public class ChangeGroup {
       final int delta = e.getOffset() - oldOffset;
       if (oldOffset >= 0 && delta != 0) {
         final List<EditorActionHandlerBase> positionCaretActions = new ArrayList<>();
-        final String motionName = delta < 0 ? "VimMotionLeft" : "VimMotionRight";
+        final String motionName = delta < 0 ? "VimMotionLeftAction" : "VimMotionRightAction";
         final EditorActionHandlerBase action = RegisterActions.findAction(motionName);
         final int count = Math.abs(delta);
         for (int i = 0; i < count; i++) {

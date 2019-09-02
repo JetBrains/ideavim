@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Set;
 
 final public class InsertExitModeAction extends VimActionHandler.SingleExecution {
-  private static final String ACTION_ID = "VimInsertExitMode";
+  private static final String ACTION_ID = "VimInsertExitModeAction";
 
   @NotNull
   public static EditorActionHandlerBase getInstance() {

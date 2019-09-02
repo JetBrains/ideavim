@@ -86,8 +86,7 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
 }
 
 sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
-  var id = ""
-  var text = ""
+  val id: String = this::class.java.simpleName.let { if (it.startsWith("Vim", true)) it else "Vim$it" }
 
   abstract val mappingModes: Set<MappingMode>
 

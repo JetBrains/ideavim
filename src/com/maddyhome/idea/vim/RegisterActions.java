@@ -54,7 +54,7 @@ public class RegisterActions {
 
   @Nullable
   public static EditorActionHandlerBase findAction(@NotNull String id) {
-    return VIM_ACTIONS_EP.extensions().filter(vimActionBean -> vimActionBean.getId().equals(id)).findFirst()
+    return VIM_ACTIONS_EP.extensions().filter(vimActionBean -> vimActionBean.getAction().getId().equals(id)).findFirst()
       .map(VimActionBean::getAction).orElse(null);
   }
 
