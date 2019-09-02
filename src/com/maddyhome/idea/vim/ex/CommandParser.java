@@ -80,11 +80,15 @@ public class CommandParser {
       VimPlugin.Initialization.commandsInitialized();
     };
 
+    // Temporally remove async initialization
+    setup.run();
+    /*
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       setup.run();
     } else {
       ApplicationManager.getApplication().executeOnPooledThread(setup);
     }
+    */
   }
 
   /**

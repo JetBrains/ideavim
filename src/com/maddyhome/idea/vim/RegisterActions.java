@@ -43,12 +43,16 @@ public class RegisterActions {
       VimPlugin.Initialization.actionsInitialized();
     };
 
+    // Temporally remove async initialization
+    setup.run();
+    /*
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       setup.run();
     }
     else {
       ApplicationManager.getApplication().executeOnPooledThread(setup);
     }
+    */
   }
 
   @Nullable
