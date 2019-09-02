@@ -5,6 +5,8 @@ import com.intellij.ide.actions.OpenFileAction
 import com.intellij.ide.actions.ShowFilePathAction
 import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.notification.Notification
+import com.intellij.notification.NotificationDisplayType
+import com.intellij.notification.NotificationGroup
 import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
@@ -101,7 +103,7 @@ class NotificationService(private val project: Project?) {
     Messages.getQuestionIcon())
 
   fun specialKeymap(keymap: Keymap, listener: NotificationListener.Adapter) {
-    Notification(IDEAVIM_STICKY_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+    IDEAVIM_STICKY_GROUP.createNotification(IDEAVIM_NOTIFICATION_TITLE,
       "IdeaVim plugin doesn't use the special \"Vim\" keymap any longer. " +
         "Switching to \"${keymap.presentableName}\" keymap.<br/><br/>" +
         "Now it is possible to set up:<br/>" +
@@ -112,7 +114,7 @@ class NotificationService(private val project: Project?) {
         "</ul>", NotificationType.INFORMATION, listener).notify(project)
   }
 
-  fun noVimrcAsDefault() = Notification(IDEAVIM_STICKY_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+  fun noVimrcAsDefault() = IDEAVIM_STICKY_GROUP.createNotification(IDEAVIM_NOTIFICATION_TITLE, "",
     "The ~/.vimrc file is no longer read by default, use ~/.ideavimrc instead. You can read it from your " +
       "~/.ideavimrc using this command:<br/><br/>" +
       "<code>source ~/.vimrc</code>", NotificationType.INFORMATION).notify(project)
@@ -185,7 +187,7 @@ class NotificationService(private val project: Project?) {
   }
 
   companion object {
-    const val IDEAVIM_STICKY_NOTIFICATION_ID = "ideavim-sticky"
+    val IDEAVIM_STICKY_GROUP = NotificationGroup("ideavim-sticky", NotificationDisplayType.STICKY_BALLOON, false)
     const val IDEAVIM_NOTIFICATION_ID = "ideavim"
     const val IDEAVIM_NOTIFICATION_TITLE = "IdeaVim"
     const val ideajoinExamplesUrl = "https://github.com/JetBrains/ideavim/wiki/%60ideajoin%60-examples"

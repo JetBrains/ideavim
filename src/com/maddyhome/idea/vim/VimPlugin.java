@@ -299,8 +299,6 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     if (initialized) return;
     initialized = true;
 
-    Notifications.Bus.register(NotificationService.IDEAVIM_STICKY_NOTIFICATION_ID, NotificationDisplayType.STICKY_BALLOON);
-
     ApplicationManager.getApplication().invokeLater(this::updateState);
 
     getEditor().turnOn();
