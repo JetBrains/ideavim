@@ -22,6 +22,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.colors.EditorColors;
+import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.markup.*;
@@ -30,6 +31,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
+import com.intellij.ui.ColorUtil;
 import com.intellij.util.Processor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandFlags;
@@ -1331,10 +1333,27 @@ public class SearchGroup {
       attributes.setEffectType(EffectType.ROUNDED_BOX);
       attributes.setEffectColor(editor.getColorsScheme().getColor(EditorColors.CARET_COLOR));
     }
+    if (attributes.getErrorStripeColor() == null) {
+      attributes.setErrorStripeColor(getFallbackErrorStripeColor(attributes, editor.getColorsScheme()));
+    }
     final RangeHighlighter highlighter = editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION - 1,
       attributes, HighlighterTargetArea.EXACT_RANGE);
     highlighter.setErrorStripeTooltip(tooltip);
     return highlighter;
+  }
+
+  /**
+   * Return a valid error stripe colour based on editor background
+   *
+   * Based on HighlightManager#addRangeHighlight behaviour, which we can't use because it will hide highlights when
+   * hitting Escape
+   */
+  private static @Nullable Color getFallbackErrorStripeColor(TextAttributes attributes, EditorColorsScheme colorsScheme) {
+    if (attributes.getBackgroundColor() != null) {
+      boolean isDark = ColorUtil.isDark(colorsScheme.getDefaultBackground());
+      return isDark ? attributes.getBackgroundColor().brighter() : attributes.getBackgroundColor().darker();
+    }
+    return null;
   }
 
   private static void removeSearchHighlight(@NotNull Editor editor) {
