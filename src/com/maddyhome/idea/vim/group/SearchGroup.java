@@ -407,7 +407,7 @@ public class SearchGroup {
           }
           UserDataManager.setVimLastSearch(editor, pattern);
         }
-        else if (shouldAddCurrentMatchSearchHighlight(showHighlights, initialOffset)) {
+        else if (shouldAddCurrentMatchSearchHighlight(pattern, showHighlights, initialOffset)) {
           final boolean wrap = OptionsManager.INSTANCE.getWrapscan().isSet();
           final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE);
           if (wrap) searchOptions.add(SearchOptions.WRAP);
@@ -420,7 +420,7 @@ public class SearchGroup {
             highlightSearchResults(editor, pattern, results, currentMatchOffset);
           }
         }
-        else if (isIncrementalSearchHighlights(initialOffset)) {
+        else if (shouldMaintainCurrentMatchOffset(pattern, initialOffset)) {
           final Integer offset = UserDataManager.getVimIncsearchCurrentMatchOffset(editor);
           if (offset != null) {
             currentMatchOffset = offset;
@@ -451,14 +451,24 @@ public class SearchGroup {
   /**
    * Add search highlight for current match if hlsearch is false and we're performing incsearch highlights
    */
-  @Contract(value = "true, _ -> false", pure = true)
-  private boolean shouldAddCurrentMatchSearchHighlight(boolean hlSearch, int initialOffset) {
-    return !hlSearch && isIncrementalSearchHighlights(initialOffset);
+  @Contract("_, true, _ -> false")
+  private boolean shouldAddCurrentMatchSearchHighlight(@Nullable String pattern, boolean hlSearch, int initialOffset) {
+    return !hlSearch && isIncrementalSearchHighlights(initialOffset) && pattern != null && pattern.length() > 0;
+  }
+
+  /**
+   * Keep the current match offset if the pattern is still valid and we're performing incremental search highlights
+   * This will keep the caret position when editing the offset in e.g. `/foo/e+1`
+   */
+  @Contract("null, _ -> false")
+  private boolean shouldMaintainCurrentMatchOffset(@Nullable String pattern, int initialOffset) {
+    return pattern != null && pattern.length() > 0 && isIncrementalSearchHighlights(initialOffset);
   }
 
   /**
    * initialOffset is only valid if we're highlighting incsearch
    */
+  @Contract(pure = true)
   private boolean isIncrementalSearchHighlights(int initialOffset) {
     return initialOffset != -1;
   }

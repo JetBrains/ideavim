@@ -24,13 +24,13 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.ScrollType;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.LineRange;
+import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.regexp.CharPointer;
@@ -161,13 +161,13 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   }
 
   public void deactivate(boolean refocusOwningEditor) {
-    deactivate(refocusOwningEditor, false);
+    deactivate(refocusOwningEditor, true);
   }
 
   /**
    * Turns off the ex entry field and optionally puts the focus back to the original component
    */
-  public void deactivate(boolean refocusOwningEditor, boolean scrollToOldPosition) {
+  public void deactivate(boolean refocusOwningEditor, boolean resetCaret) {
     logger.info("Deactivate ex entry panel");
     if (!active) return;
     active = false;
@@ -176,10 +176,6 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       // incsearch won't change in the lifetime of this activation
       if (isIncSearchEnabled()) {
         entry.getDocument().removeDocumentListener(incSearchDocumentListener);
-        final Editor editor = entry.getEditor();
-        if (!editor.isDisposed() && scrollToOldPosition) {
-          editor.getScrollingModel().scroll(horizontalOffset, verticalOffset);
-        }
 
         // TODO: Reduce the amount of unnecessary work here
         // If incsearch and hlsearch are enabled, and if this is a search panel, we'll have all of the results correctly
@@ -189,6 +185,11 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
         // search that we did for incsearch and add highlights back. The `:nohlsearch` command, even if bound to a
         // shortcut, is still processed by the ex entry panel, so deactivating will force update remove, search and add
         // of the current search results before the `NoHLSearchHandler` will remove all highlights again
+        final Editor editor = entry.getEditor();
+        if (!editor.isDisposed() && resetCaret) {
+          resetCaretOffset(editor);
+        }
+
         VimPlugin.getSearch().resetIncsearchHighlights();
       }
 
@@ -216,6 +217,12 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   private void reset() {
     deactivate(false);
     LafManager.getInstance().removeLafManagerListener(this);
+  }
+
+  private void resetCaretOffset(@NotNull Editor editor) {
+    // Reset the original caret, with original scroll offsets
+    MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), caretOffset);
+    editor.getScrollingModel().scroll(horizontalOffset, verticalOffset);
   }
 
   @NotNull private final DocumentListener incSearchDocumentListener = new DocumentAdapter() {
@@ -261,10 +268,10 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
         VimPlugin.getEditor().closeEditorSearchSession(editor);
         final int matchOffset = VimPlugin.getSearch().updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
         if (matchOffset != -1) {
-          editor.getScrollingModel().scrollTo(editor.offsetToLogicalPosition(matchOffset), ScrollType.CENTER);
+          MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), matchOffset);
         }
         else {
-          editor.getScrollingModel().scroll(horizontalOffset, verticalOffset);
+          resetCaretOffset(editor);
         }
       }
     }

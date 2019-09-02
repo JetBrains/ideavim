@@ -135,11 +135,11 @@ public class ProcessGroup {
     return res;
   }
 
-  public void cancelExEntry(@NotNull final Editor editor, boolean scrollToOldPosition) {
+  public void cancelExEntry(@NotNull final Editor editor, boolean resetCaret) {
     CommandState.getInstance(editor).popState();
     KeyHandler.getInstance().reset(editor);
     ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.deactivate(true, scrollToOldPosition);
+    panel.deactivate(true, resetCaret);
   }
 
   private void record(Editor editor, @NotNull String text) {

@@ -346,7 +346,19 @@ class SearchGroupTest : VimTestCase() {
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
-    typeText(parseKeys("/", "la<CR>"))
+    typeText(parseKeys("/", "la"))
+    assertPosition(1, 14)
+  }
+
+  fun `test incsearch + hlsearch moves caret to start of first match`() {
+    setHighlightSearch()
+    setIncrementalSearch()
+    configureByText(
+      """I found it in a legendary land
+         |${c}all rocks and lavender and tufted grass,
+         |where it was settled on some sodden sand
+         |hard by the torrent of a mountain pass.""".trimMargin())
+    typeText(parseKeys("/", "la"))
     assertPosition(1, 14)
   }
 
@@ -357,11 +369,35 @@ class SearchGroupTest : VimTestCase() {
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
-    typeText(parseKeys("?", "la<CR>"))
+    typeText(parseKeys("?", "la"))
+    assertPosition(0, 26)
+  }
+
+  fun `test incsearch + hlsearch moves caret to start of first match (backwards)`() {
+    setHighlightSearch()
+    setIncrementalSearch()
+    configureByText(
+      """I found it in a legendary land
+           |${c}all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+    typeText(parseKeys("?", "la"))
     assertPosition(0, 26)
   }
 
   fun `test incsearch resets caret if no match found`() {
+    setIncrementalSearch()
+    configureByText(
+      """I found it in a legendary land
+             |${c}all rocks and lavender and tufted grass,
+             |where it was settled on some sodden sand
+             |hard by the torrent of a mountain pass.""".trimMargin())
+    typeText(parseKeys("/", "lazzz"))
+    assertPosition(1, 0)
+  }
+
+  fun `test incsearch + hlsearch resets caret if no match found`() {
+    setHighlightSearch()
     setIncrementalSearch()
     configureByText(
       """I found it in a legendary land
@@ -381,7 +417,70 @@ class SearchGroupTest : VimTestCase() {
            |hard by the torrent of a mountain pass.""".trimMargin())
     typeText(parseKeys("/", "la"))
     typeText(parseKeys("<Esc>"))
-    assertOffset(31)
+    assertPosition(1, 0)
+  }
+
+  fun `test incsearch + hlsearch resets caret if cancelled`() {
+    setHighlightSearch()
+    setIncrementalSearch()
+    configureByText(
+      """I found it in a legendary land
+           |${c}all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+    typeText(parseKeys("/", "la"))
+    typeText(parseKeys("<Esc>"))
+    assertPosition(1, 0)
+  }
+
+  fun `test incsearch resets caret on backspace`() {
+    setIncrementalSearch()
+    configureByText(
+      """I found it in a legendary land
+           |${c}all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+    typeText(parseKeys("/", "wh"))
+    assertPosition(2, 0)
+    typeText(parseKeys("<BS><BS>"))
+    assertPosition(1, 0)
+  }
+
+  fun `test incsearch + hlsearch resets caret on backspace`() {
+    setHighlightSearch()
+    setIncrementalSearch()
+    configureByText(
+      """I found it in a legendary land
+           |${c}all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+    typeText(parseKeys("/", "wh"))
+    assertPosition(2, 0)
+    typeText(parseKeys("<BS><BS>"))
+    assertPosition(1, 0)
+  }
+
+  fun `test search result position with incsearch`() {
+    setIncrementalSearch()
+    configureByText(
+      """I found it in a legendary land
+           |${c}all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+    typeText(parseKeys("/", "and", "<CR>"))
+    assertPosition(1, 10)
+  }
+
+  fun `test search result position with incsearch + hlsearch`() {
+    setHighlightSearch()
+    setIncrementalSearch()
+    configureByText(
+      """I found it in a legendary land
+           |${c}all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+    typeText(parseKeys("/", "and", "<CR>"))
+    assertPosition(1, 10)
   }
 
   fun `test incsearch highlights only current match with nohlsearch`() {
@@ -686,6 +785,8 @@ class SearchGroupTest : VimTestCase() {
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
+
+    // TODO: Check caret position
   }
 
   fun `test cancelling incsearch highlights for substitute command shows previous highlights`() {
@@ -705,6 +806,8 @@ class SearchGroupTest : VimTestCase() {
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
+
+    // TODO: Check caret position
   }
 
   fun `test highlight search results`() {
