@@ -48,16 +48,17 @@ public class CommandParser {
   private static final Pattern TRIM_WHITESPACE = Pattern.compile("[ \\t]*(.*)[ \\t\\n\\r]+", Pattern.DOTALL);
   private final ExtensionPointName<CommandHandler> EX_COMMAND_EP = ExtensionPointName.create("IdeaVIM.vimExCommand");
 
+  private static class CommandParserHolder {
+    static final CommandParser INSTANCE = new CommandParser();
+  }
+
   /**
    * There is only one parser.
    *
    * @return The singleton instance
    */
   public synchronized static CommandParser getInstance() {
-    if (ourInstance == null) {
-      ourInstance = new CommandParser();
-    }
-    return ourInstance;
+    return CommandParserHolder.INSTANCE;
   }
 
   /**
@@ -601,8 +602,6 @@ public class CommandParser {
 
   @NotNull private final CommandNode root = new CommandNode();
   private AtomicBoolean registered = new AtomicBoolean(false);
-
-  private static CommandParser ourInstance;
 
   private enum State {
     START,

@@ -17,7 +17,6 @@
  */
 package com.maddyhome.idea.vim;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.maddyhome.idea.vim.group.KeyGroup;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
@@ -69,9 +68,8 @@ public class RegisterActions {
   }
 
   private static void registerVimCommandActions() {
-    VIM_ACTIONS_EP.extensions().forEach(actionBean -> {
-      VimPlugin.getKey().registerCommandAction(actionBean);
-    });
+    KeyGroup parser = VimPlugin.getKey();
+    VIM_ACTIONS_EP.extensions().forEach(parser::registerCommandAction);
   }
 
   private static void registerEmptyShortcuts() {

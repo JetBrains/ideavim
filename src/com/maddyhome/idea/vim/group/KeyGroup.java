@@ -65,7 +65,7 @@ public class KeyGroup {
   private static final String TEXT_ELEMENT = "text";
 
   @NotNull private final Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<>();
-  @NotNull private final Set<KeyStroke> requiredShortcutKeys = new HashSet<>();
+  @NotNull private final Set<KeyStroke> requiredShortcutKeys = new HashSet<>(300);
   @NotNull private final HashMap<MappingMode, RootNode> keyRoots = new HashMap<>();
   @NotNull private final Map<MappingMode, KeyMapping> keyMappings = new HashMap<>();
   @Nullable private OperatorFunction operatorFunction = null;
@@ -291,11 +291,12 @@ public class KeyGroup {
                               EnumSet<CommandFlags> cmdFlags,
                               @NotNull KeyStroke[] keys,
                               @NotNull Argument.Type argType) {
-    for (MappingMode mappingMode : mappingModes) {
-      if (ApplicationManager.getApplication().isUnitTestMode()) {
-        identityChecker = new HashMap<>();
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      for (MappingMode mappingMode : mappingModes) {
         checkIdentity(mappingMode, action.getId(), keys);
       }
+    }
+    for (MappingMode mappingMode : mappingModes) {
       Node node = getKeyRoot(mappingMode);
       final int len = keys.length;
       // Add a child for each keystroke in the shortcut for this action
@@ -314,7 +315,7 @@ public class KeyGroup {
     keySets.add(Arrays.asList(keys));
   }
 
-  private Map<MappingMode, Set<List<KeyStroke>>> identityChecker;
+  private Map<MappingMode, Set<List<KeyStroke>>> identityChecker = new HashMap<>();
 
   @NotNull
   private Node addNode(@NotNull ParentNode base,
