@@ -21,12 +21,13 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.ex.handler.*;
+import com.maddyhome.idea.vim.ex.handler.GotoLineHandler;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
 import com.maddyhome.idea.vim.group.HistoryGroup;
 import com.maddyhome.idea.vim.helper.MessageHelper;
@@ -45,69 +46,7 @@ import java.util.regex.Pattern;
 public class CommandParser {
   private static final int MAX_RECURSION = 100;
   private static final Pattern TRIM_WHITESPACE = Pattern.compile("[ \\t]*(.*)[ \\t\\n\\r]+", Pattern.DOTALL);
-  private final CommandHandler[] myHandlers = new CommandHandler[] {
-    new ActionListHandler(),
-    new AsciiHandler(),
-    new CmdFilterHandler(),
-    new CmdHandler(),
-    new CmdClearHandler(),
-    new CopyTextHandler(),
-    new DelCmdHandler(),
-    new DeleteLinesHandler(),
-    new DeleteMarksHandler(),
-    new DigraphHandler(),
-    new DumpLineHandler(),
-    new EditFileHandler(),
-    new ActionHandler(),
-    new EchoHandler(),
-    new ExitHandler(),
-    new FindClassHandler(),
-    new FindFileHandler(),
-    new FindSymbolHandler(),
-    new GotoCharacterHandler(),
-    //new GotoLineHandler(); - not needed here
-    new HelpHandler(),
-    new HistoryHandler(),
-    new JoinLinesHandler(),
-    new JumpsHandler(),
-    new LetHandler(),
-    new MapHandler(),
-    new MarkHandler(),
-    new MarksHandler(),
-    new MoveTextHandler(),
-    new NextFileHandler(),
-    new NoHLSearchHandler(),
-    new OnlyHandler(),
-    new PreviousFileHandler(),
-    new PromptFindHandler(),
-    new PromptReplaceHandler(),
-    new PutLinesHandler(),
-    new QuitHandler(),
-    new RedoHandler(),
-    new RegistersHandler(),
-    new RepeatHandler(),
-    new SelectFileHandler(),
-    new SelectFirstFileHandler(),
-    new SelectLastFileHandler(),
-    new SetHandler(),
-    new ShiftLeftHandler(),
-    new ShiftRightHandler(),
-    new SourceHandler(),
-    new SortHandler(),
-    new SplitHandler(),
-    new SubstituteHandler(),
-    new UndoHandler(),
-    new WriteAllHandler(),
-    new WriteHandler(),
-    new WriteNextFileHandler(),
-    new WritePreviousFileHandler(),
-    new WriteQuitHandler(),
-    new YankLinesHandler(),
-    new ShellHandler(),
-    new NextTabHandler(),
-    new PreviousTabHandler(),
-    new TabOnlyHandler()
-};
+  private final ExtensionPointName<CommandHandler> EX_COMMAND_EP = ExtensionPointName.create("IdeaVIM.vimExCommand");
 
   /**
    * There is only one parser.
@@ -134,7 +73,7 @@ public class CommandParser {
     if (registered.getAndSet(true)) return;
 
     Runnable setup = () -> {
-      for (CommandHandler handler : myHandlers) {
+      for (CommandHandler handler : EX_COMMAND_EP.getExtensions()) {
         handler.register();
       }
 
