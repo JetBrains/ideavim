@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.action.change.change;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
@@ -32,35 +31,29 @@ import java.util.List;
 import java.util.Set;
 
 
-public class FilterCountLinesAction extends VimCommandAction {
+public class FilterCountLinesAction extends VimActionHandler.SingleExecution {
   @NotNull
   @Override
-  protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler.SingleExecution() {
-      @NotNull
-      @Override
-      public Set<MappingMode> getMappingModes() {
-        return MappingMode.N;
-      }
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
+  }
 
-      @NotNull
-      @Override
-      public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("!!");
-      }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("!!");
+  }
 
-      @NotNull
-      @Override
-      public Command.Type getType() {
-        return Command.Type.CHANGE;
-      }
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.CHANGE;
+  }
 
-      @Override
-      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        VimPlugin.getProcess().startFilterCommand(editor, context, cmd);
+  @Override
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+    VimPlugin.getProcess().startFilterCommand(editor, context, cmd);
 
-        return true;
-      }
-    };
+    return true;
   }
 }

@@ -22,10 +22,9 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.RegisterActions;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
-import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -34,44 +33,37 @@ import javax.swing.*;
 import java.util.List;
 import java.util.Set;
 
-final public class InsertExitModeAction extends VimCommandAction {
+final public class InsertExitModeAction extends VimActionHandler.SingleExecution {
   private static final String ACTION_ID = "VimInsertExitMode";
 
-  @Contract(" -> new")
+  @NotNull
+  public static EditorActionHandlerBase getInstance() {
+    return RegisterActions.findActionOrDie(ACTION_ID);
+  }
+
+  @Contract(pure = true)
   @NotNull
   @Override
-  final protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler.SingleExecution() {
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Set<MappingMode> getMappingModes() {
-        return MappingMode.I;
-      }
-
-      @NotNull
-      @Override
-      final public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("<C-[>", "<C-C>", "<Esc>", "<C-\\><C-N>");
-      }
-
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Command.Type getType() {
-        return Command.Type.INSERT;
-      }
-
-      @Override
-      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        VimPlugin.getChange().processEscape(editor, context);
-        return true;
-      }
-    };
+  final public Set<MappingMode> getMappingModes() {
+    return MappingMode.I;
   }
 
   @NotNull
-  public static VimCommandActionBase getInstance() {
-    return RegisterActions.findActionOrDie(ACTION_ID);
+  @Override
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("<C-[>", "<C-C>", "<Esc>", "<C-\\><C-N>");
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.INSERT;
+  }
+
+  @Override
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+    VimPlugin.getChange().processEscape(editor, context);
+    return true;
   }
 }

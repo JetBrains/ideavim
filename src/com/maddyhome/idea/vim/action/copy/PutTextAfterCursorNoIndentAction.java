@@ -21,14 +21,12 @@ package com.maddyhome.idea.vim.action.copy;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.group.copy.PutData;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,43 +35,37 @@ import java.util.List;
 import java.util.Set;
 
 
-public class PutTextAfterCursorNoIndentAction extends VimCommandAction {
+public class PutTextAfterCursorNoIndentAction extends ChangeEditorActionHandler.SingleExecution {
   @NotNull
   @Override
-  protected VimActionHandler makeActionHandler() {
-    return new ChangeEditorActionHandler.SingleExecution() {
-      @NotNull
-      @Override
-      public Set<MappingMode> getMappingModes() {
-        return MappingMode.N;
-      }
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
+  }
 
-      @NotNull
-      @Override
-      public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("]p");
-      }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("]p");
+  }
 
-      @NotNull
-      @Override
-      public Command.Type getType() {
-        return Command.Type.OTHER_SELF_SYNCHRONIZED;
-      }
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.OTHER_SELF_SYNCHRONIZED;
+  }
 
-      @Override
-      public boolean execute(@NotNull Editor editor,
-                             @NotNull DataContext context,
-                             int count,
-                             int rawCount,
-                             @Nullable Argument argument) {
-        final Register lastRegister = VimPlugin.getRegister().getLastRegister();
+  @Override
+  public boolean execute(@NotNull Editor editor,
+                         @NotNull DataContext context,
+                         int count,
+                         int rawCount,
+                         @Nullable Argument argument) {
+    final Register lastRegister = VimPlugin.getRegister().getLastRegister();
 
-        final PutData.TextData textData =
-          lastRegister != null ? new PutData.TextData(lastRegister.getText(), lastRegister.getType(),
-                                                      lastRegister.getTransferableData()) : null;
-        final PutData putData = new PutData(textData, null, count, false, false, false, -1);
-        return VimPlugin.getPut().putText(editor, context, putData);
-      }
-    };
+    final PutData.TextData textData =
+      lastRegister != null ? new PutData.TextData(lastRegister.getText(), lastRegister.getType(),
+                                                  lastRegister.getTransferableData()) : null;
+    final PutData putData = new PutData(textData, null, count, false, false, false, -1);
+    return VimPlugin.getPut().putText(editor, context, putData);
   }
 }

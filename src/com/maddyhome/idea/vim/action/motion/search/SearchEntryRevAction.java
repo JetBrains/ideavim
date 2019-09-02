@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
@@ -35,53 +34,46 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-public class SearchEntryRevAction extends MotionEditorAction {
+public class SearchEntryRevAction extends MotionActionHandler.ForEachCaret {
   @NotNull
   @Override
-  public MotionActionHandler makeActionHandler() {
-    return new MotionActionHandler.ForEachCaret() {
-      @NotNull
-      @Override
-      public Set<MappingMode> getMappingModes() {
-        return MappingMode.NVO;
-      }
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.NVO;
+  }
 
-      @NotNull
-      @Override
-      public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("?");
-      }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("?");
+  }
 
-      @NotNull
-      @Override
-      public Argument.Type getArgumentType() {
-        return Argument.Type.EX_STRING;
-      }
+  @NotNull
+  @Override
+  public Argument.Type getArgumentType() {
+    return Argument.Type.EX_STRING;
+  }
 
-      @NotNull
-      @Override
-      public EnumSet<CommandFlags> getFlags() {
-        return EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SEARCH_REV, CommandFlags.FLAG_SAVE_JUMP);
-      }
+  @NotNull
+  @Override
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SEARCH_REV, CommandFlags.FLAG_SAVE_JUMP);
+  }
 
-      @Override
-      public int getOffset(@NotNull Editor editor,
-                           @NotNull Caret caret,
-                           @NotNull DataContext context,
-                           int count,
-                           int rawCount,
-                           @Nullable Argument argument) {
-        if (argument == null) {
-          return -1;
-        }
-        final String command = argument.getString();
-        if (command == null) {
-          return -1;
-        }
+  @Override
+  public int getOffset(@NotNull Editor editor,
+                       @NotNull Caret caret,
+                       @NotNull DataContext context,
+                       int count,
+                       int rawCount,
+                       @Nullable Argument argument) {
+    if (argument == null) {
+      return -1;
+    }
+    final String command = argument.getString();
+    if (command == null) {
+      return -1;
+    }
 
-        return VimPlugin.getSearch()
-          .search(editor, caret, command, count, EnumSet.of(CommandFlags.FLAG_SEARCH_REV), false);
-      }
-    };
+    return VimPlugin.getSearch().search(editor, caret, command, count, EnumSet.of(CommandFlags.FLAG_SEARCH_REV), false);
   }
 }

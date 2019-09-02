@@ -26,8 +26,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.VimCommandAction
-import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -39,30 +37,28 @@ import javax.swing.KeyStroke
 /**
  * @author Alex Plate
  */
-class LookupDownAction : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
+class LookupDownAction : VimActionHandler.SingleExecution() {
 
-    override val mappingModes: MutableSet<MappingMode> = MappingMode.I
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.I
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-N>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-N>")
 
-    override val type: Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TYPEAHEAD_SELF_MANAGE)
-    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-      val activeLookup = LookupManager.getActiveLookup(editor)
-      if (activeLookup != null) {
-        IdeEventQueue.getInstance().flushDelayedKeyEvents()
-        EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN)
-          .execute(editor, editor.caretModel.primaryCaret, context)
-      } else {
-        val keyStroke = keyStrokesSet.first().first()
-        val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
-        for (action in actions) {
-          if (KeyHandler.executeAction(action, context)) break
-        }
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TYPEAHEAD_SELF_MANAGE)
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    val activeLookup = LookupManager.getActiveLookup(editor)
+    if (activeLookup != null) {
+      IdeEventQueue.getInstance().flushDelayedKeyEvents()
+      EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN)
+        .execute(editor, editor.caretModel.primaryCaret, context)
+    } else {
+      val keyStroke = keyStrokesSet.first().first()
+      val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
+      for (action in actions) {
+        if (KeyHandler.executeAction(action, context)) break
       }
-      return true
     }
+    return true
   }
 }

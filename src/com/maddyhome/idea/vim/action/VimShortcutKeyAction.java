@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.RegisterActions;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.CommandStateHelper;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -178,9 +179,9 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     if (values == null) return false;
 
     return values.stream().anyMatch(actionId -> {
-      final VimCommandActionBase action = RegisterActions.findAction(actionId);
+      final EditorActionHandlerBase action = RegisterActions.findAction(actionId);
       if (action == null) return false;
-      return action.getHandler().getKeyStrokesSet().stream()
+      return action.getKeyStrokesSet().stream()
         .anyMatch(ks -> !ks.isEmpty() && ks.get(0).equals(keyStroke));
     });
   }
@@ -203,7 +204,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
   }
 
   private boolean isEnabledForLookup(@NotNull KeyStroke keyStroke) {
-    for (List<KeyStroke> keys : InsertExitModeAction.getInstance().getHandler().getKeyStrokesSet()) {
+    for (List<KeyStroke> keys : InsertExitModeAction.getInstance().getKeyStrokesSet()) {
       // XXX: Currently we cannot handle <C-\><C-N> because of the importance of <C-N> for the IDE on Linux
       if (keys.size() == 1 && keyStroke.equals(keys.get(0))) {
         return true;

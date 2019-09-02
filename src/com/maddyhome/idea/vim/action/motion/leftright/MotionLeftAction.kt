@@ -22,8 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.MotionEditorAction
-import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -32,42 +30,38 @@ import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-class MotionLeftAction : MotionEditorAction() {
-  override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
-    override val mappingModes: Set<MappingMode> = MappingMode.NVO
+class MotionLeftAction : MotionActionHandler.ForEachCaret() {
+  override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("h")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("h")
 
-    override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 
 
-    override fun getOffset(editor: Editor,
-                           caret: Caret,
-                           context: DataContext,
-                           count: Int,
-                           rawCount: Int,
-                           argument: Argument?): Int {
-      return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -count, false)
-    }
+  override fun getOffset(editor: Editor,
+                         caret: Caret,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
+    return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -count, false)
   }
 }
 
-class MotionLeftInsertModeAction : MotionEditorAction() {
-  override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
-    override val mappingModes: Set<MappingMode> = MappingMode.I
+class MotionLeftInsertModeAction : MotionActionHandler.ForEachCaret() {
+  override val mappingModes: Set<MappingMode> = MappingMode.I
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-      listOf(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)),
-      listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0))
-    )
+  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0))
+  )
 
-    override fun getOffset(editor: Editor,
-                           caret: Caret,
-                           context: DataContext,
-                           count: Int,
-                           rawCount: Int,
-                           argument: Argument?): Int {
-      return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -count, false)
-    }
+  override fun getOffset(editor: Editor,
+                         caret: Caret,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
+    return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -count, false)
   }
 }

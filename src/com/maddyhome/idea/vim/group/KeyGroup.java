@@ -31,7 +31,6 @@ import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
@@ -39,6 +38,7 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.Shortcut;
 import com.maddyhome.idea.vim.key.*;
@@ -267,11 +267,11 @@ public class KeyGroup {
     registerRequiredShortcut(shortcut);
   }
 
-  public void registerCommandAction(@NotNull VimCommandActionBase commandAction) {
-    for (List<KeyStroke> keyStrokes : commandAction.getHandler().getKeyStrokesSet()) {
+  public void registerCommandAction(@NotNull EditorActionHandlerBase commandAction) {
+    for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
       final KeyStroke[] keys = registerRequiredShortcut(new Shortcut(keyStrokes.toArray(new KeyStroke[0])));
-      registerAction(commandAction.getHandler().getMappingModes(), commandAction, commandAction.getHandler().getType(),
-                     commandAction.getHandler().getFlags(), keys, commandAction.getHandler().getArgumentType());
+      registerAction(commandAction.getMappingModes(), commandAction, commandAction.getType(),
+                     commandAction.getFlags(), keys, commandAction.getArgumentType());
     }
   }
 
@@ -286,7 +286,7 @@ public class KeyGroup {
   }
 
   private void registerAction(@NotNull Set<MappingMode> mappingModes,
-                              VimCommandActionBase action,
+                              EditorActionHandlerBase action,
                               @NotNull Command.Type cmdType,
                               EnumSet<CommandFlags> cmdFlags,
                               @NotNull KeyStroke[] keys,
@@ -294,7 +294,7 @@ public class KeyGroup {
     for (MappingMode mappingMode : mappingModes) {
       if (ApplicationManager.getApplication().isUnitTestMode()) {
         identityChecker = new HashMap<>();
-        checkIdentity(mappingMode, action.getHandler().getId(), keys);
+        checkIdentity(mappingMode, action.getId(), keys);
       }
       Node node = getKeyRoot(mappingMode);
       final int len = keys.length;
@@ -318,7 +318,7 @@ public class KeyGroup {
 
   @NotNull
   private Node addNode(@NotNull ParentNode base,
-                       VimCommandActionBase action,
+                       EditorActionHandlerBase action,
                        @NotNull Command.Type cmdType,
                        EnumSet<CommandFlags> cmdFlags,
                        @NotNull KeyStroke key,
@@ -361,7 +361,7 @@ public class KeyGroup {
     for (KeyStroke key : keyStrokes) {
       shortcuts.add(new KeyboardShortcut(key, null));
     }
-    return new CustomShortcutSet(shortcuts.toArray(new com.intellij.openapi.actionSystem.Shortcut[shortcuts.size()]));
+    return new CustomShortcutSet(shortcuts.toArray(new com.intellij.openapi.actionSystem.Shortcut[0]));
   }
 
   @NotNull

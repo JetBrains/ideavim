@@ -32,34 +32,29 @@ import java.util.List;
 import java.util.Set;
 
 
-public class ResetModeAction extends VimCommandAction {
+public class ResetModeAction extends VimActionHandler.SingleExecution {
+
   @NotNull
   @Override
-  protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler.SingleExecution() {
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.NO;
+  }
 
-      @NotNull
-      @Override
-      public Set<MappingMode> getMappingModes() {
-        return MappingMode.NO;
-      }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("<C-\\><C-N>");
+  }
 
-      @NotNull
-      @Override
-      public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("<C-\\><C-N>");
-      }
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.RESET;
+  }
 
-      @NotNull
-      @Override
-      public Command.Type getType() {
-        return Command.Type.RESET;
-      }
-      @Override
-      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        KeyHandler.getInstance().fullReset(HelperKt.getTopLevelEditor(editor));
-        return true;
-      }
-    };
+  @Override
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+    KeyHandler.getInstance().fullReset(HelperKt.getTopLevelEditor(editor));
+    return true;
   }
 }

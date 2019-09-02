@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
@@ -40,69 +39,62 @@ import java.util.Set;
 /**
  * @author vlan
  */
-final public class OperatorAction extends VimCommandAction {
-  @Contract(" -> new")
+final public class OperatorAction extends VimActionHandler.SingleExecution {
+  @Contract(pure = true)
   @NotNull
   @Override
-  final protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler.SingleExecution() {
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Set<MappingMode> getMappingModes() {
-        return MappingMode.N;
-      }
-
-      @NotNull
-      @Override
-      final public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("g@");
-      }
-
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Command.Type getType() {
-        return Command.Type.OTHER_SELF_SYNCHRONIZED;
-      }
-
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Argument.Type getArgumentType() {
-        return Argument.Type.MOTION;
-      }
-
-      @NotNull
-      @Override
-      final public EnumSet<CommandFlags> getFlags() {
-        return EnumSet.of(CommandFlags.FLAG_OP_PEND);
-      }
-      @Override
-      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        final OperatorFunction operatorFunction = VimPlugin.getKey().getOperatorFunction();
-        if (operatorFunction != null) {
-          final Argument argument = cmd.getArgument();
-          if (argument != null) {
-            final Command motion = argument.getMotion();
-            if (motion != null) {
-              final TextRange range = MotionGroup
-                .getMotionRange(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd.getCount(),
-                                cmd.getRawCount(), argument, true);
-              if (range != null) {
-                VimPlugin.getMark().setChangeMarks(editor, range);
-                final SelectionType selectionType = SelectionType.fromCommandFlags(motion.getFlags());
-                KeyHandler.getInstance().reset(editor);
-                return operatorFunction.apply(editor, context, selectionType);
-              }
-            }
-          }
-          return false;
-        }
-        VimPlugin.showMessage(MessageHelper.message("E774"));
-        return false;
-      }
-    };
+  final public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
   }
 
+  @NotNull
+  @Override
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("g@");
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.OTHER_SELF_SYNCHRONIZED;
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Argument.Type getArgumentType() {
+    return Argument.Type.MOTION;
+  }
+
+  @NotNull
+  @Override
+  final public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_OP_PEND);
+  }
+
+  @Override
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+    final OperatorFunction operatorFunction = VimPlugin.getKey().getOperatorFunction();
+    if (operatorFunction != null) {
+      final Argument argument = cmd.getArgument();
+      if (argument != null) {
+        final Command motion = argument.getMotion();
+        if (motion != null) {
+          final TextRange range = MotionGroup
+            .getMotionRange(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd.getCount(),
+                            cmd.getRawCount(), argument, true);
+          if (range != null) {
+            VimPlugin.getMark().setChangeMarks(editor, range);
+            final SelectionType selectionType = SelectionType.fromCommandFlags(motion.getFlags());
+            KeyHandler.getInstance().reset(editor);
+            return operatorFunction.apply(editor, context, selectionType);
+          }
+        }
+      }
+      return false;
+    }
+    VimPlugin.showMessage(MessageHelper.message("E774"));
+    return false;
+  }
 }

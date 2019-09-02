@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim.command
 
-import com.maddyhome.idea.vim.action.VimCommandActionBase
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -28,13 +28,13 @@ import javax.swing.KeyStroke
  */
 data class Command(
   var rawCount: Int,
-  var action: VimCommandActionBase,
+  var action: EditorActionHandlerBase,
   val type: Type,
   var flags: EnumSet<CommandFlags>
 ) {
 
   init {
-    action.handler.process(this)
+    action.process(this)
   }
 
   var count: Int

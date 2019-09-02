@@ -21,26 +21,23 @@ package com.maddyhome.idea.vim.action.motion.select
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import javax.swing.KeyStroke
 
-class SelectEscapeAction : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
+class SelectEscapeAction : VimActionHandler.SingleExecution() {
 
-    override val mappingModes: MutableSet<MappingMode> = MappingMode.S
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.S
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<esc>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<esc>")
 
-    override val type: Command.Type = Command.Type.OTHER_READONLY
-    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-      val blockMode = editor.inBlockSubMode
-      VimPlugin.getVisualMotion().exitSelectMode(editor, true)
-      if (blockMode) editor.caretModel.removeSecondaryCarets()
-      return true
-    }
+  override val type: Command.Type = Command.Type.OTHER_READONLY
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    val blockMode = editor.inBlockSubMode
+    VimPlugin.getVisualMotion().exitSelectMode(editor, true)
+    if (blockMode) editor.caretModel.removeSecondaryCarets()
+    return true
   }
 }

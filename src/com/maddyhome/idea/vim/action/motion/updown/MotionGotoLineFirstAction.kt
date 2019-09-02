@@ -22,8 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.MotionEditorAction
-import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -31,40 +29,36 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import java.util.*
 import javax.swing.KeyStroke
 
-class MotionGotoLineFirstAction : MotionEditorAction() {
-  override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
-    override val mappingModes: Set<MappingMode> = MappingMode.NVO
+class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
+  override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gg", "<C-Home>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gg", "<C-Home>")
 
-    override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
 
-    override fun getOffset(editor: Editor,
-                           caret: Caret,
-                           context: DataContext,
-                           count: Int,
-                           rawCount: Int,
-                           argument: Argument?): Int {
-      return VimPlugin.getMotion().moveCaretGotoLineFirst(editor, count - 1)
-    }
+  override fun getOffset(editor: Editor,
+                         caret: Caret,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
+    return VimPlugin.getMotion().moveCaretGotoLineFirst(editor, count - 1)
   }
 }
 
-class MotionGotoLineFirstInsertAction : MotionEditorAction() {
-  override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
-    override val mappingModes: Set<MappingMode> = MappingMode.I
+class MotionGotoLineFirstInsertAction : MotionActionHandler.ForEachCaret() {
+  override val mappingModes: Set<MappingMode> = MappingMode.I
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-Home>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-Home>")
 
-    override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES)
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES)
 
-    override fun getOffset(editor: Editor,
-                           caret: Caret,
-                           context: DataContext,
-                           count: Int,
-                           rawCount: Int,
-                           argument: Argument?): Int {
-      return VimPlugin.getMotion().moveCaretGotoLineFirst(editor, count - 1)
-    }
+  override fun getOffset(editor: Editor,
+                         caret: Caret,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
+    return VimPlugin.getMotion().moveCaretGotoLineFirst(editor, count - 1)
   }
 }

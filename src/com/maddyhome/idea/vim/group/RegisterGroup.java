@@ -32,7 +32,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction;
 import com.maddyhome.idea.vim.action.motion.search.SearchAgainNextAction;
 import com.maddyhome.idea.vim.action.motion.search.SearchAgainPreviousAction;
@@ -49,6 +48,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.option.ListOption;
@@ -294,7 +294,7 @@ public class RegisterGroup {
       if (argument != null) {
         Command motionCommand = argument.getMotion();
         if (motionCommand != null) {
-          VimCommandActionBase action = motionCommand.getAction();
+          EditorActionHandlerBase action = motionCommand.getAction();
           return action instanceof MotionPercentOrMatchAction || action instanceof MotionSentencePreviousStartAction
             || action instanceof MotionSentenceNextStartAction || action instanceof MotionGotoFileMarkAction
             || action instanceof SearchEntryFwdAction || action instanceof SearchEntryRevAction

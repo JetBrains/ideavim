@@ -18,10 +18,10 @@
 
 package com.maddyhome.idea.vim.key;
 
-import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +42,7 @@ public class ArgumentNode implements Node {
    * @param flags    Any special flags associated with this argument.
    */
   @Contract(pure = true)
-  public ArgumentNode(VimCommandActionBase action, @NotNull Command.Type cmdType, @NotNull Argument.Type argType,
+  public ArgumentNode(EditorActionHandlerBase action, @NotNull Command.Type cmdType, @NotNull Argument.Type argType,
                       EnumSet<CommandFlags> flags) {
     this.action = action;
     this.argType = argType;
@@ -55,7 +55,7 @@ public class ArgumentNode implements Node {
    *
    * @return The argument's action
    */
-  public VimCommandActionBase getAction() {
+  public EditorActionHandlerBase getAction() {
     return action;
   }
 
@@ -117,7 +117,7 @@ public class ArgumentNode implements Node {
     return Objects.hash(action, argType, cmdType, flags);
   }
 
-  protected final VimCommandActionBase action;
+  protected final EditorActionHandlerBase action;
   @NotNull protected final Argument.Type argType;
   @NotNull protected final Command.Type cmdType;
   protected final EnumSet<CommandFlags> flags;

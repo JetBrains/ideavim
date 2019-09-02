@@ -22,8 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.TextObjectAction
-import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -33,17 +31,15 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 import javax.swing.KeyStroke
 
-class MotionInnerWordAction : TextObjectAction() {
-  override fun makeActionHandler(): TextObjectActionHandler = object : TextObjectActionHandler() {
+class MotionInnerWordAction : TextObjectActionHandler() {
 
-    override val mappingModes: Set<MappingMode> = MappingMode.VO
+  override val mappingModes: Set<MappingMode> = MappingMode.VO
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("iw")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("iw")
 
-    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE)
 
-    override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
-      return VimPlugin.getMotion().getWordRange(editor, caret, count, false, false)
-    }
+  override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
+    return VimPlugin.getMotion().getWordRange(editor, caret, count, false, false)
   }
 }

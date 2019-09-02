@@ -22,12 +22,10 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,42 +34,36 @@ import java.util.List;
 import java.util.Set;
 
 
-public class InsertCharacterBelowCursorAction extends VimCommandAction {
+public class InsertCharacterBelowCursorAction extends ChangeEditorActionHandler.ForEachCaret {
   @NotNull
   @Override
-  protected VimActionHandler makeActionHandler() {
-    return new ChangeEditorActionHandler.ForEachCaret() {
-      @NotNull
-      @Override
-      public Set<MappingMode> getMappingModes() {
-        return MappingMode.I;
-      }
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.I;
+  }
 
-      @NotNull
-      @Override
-      public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("<C-E>");
-      }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("<C-E>");
+  }
 
-      @NotNull
-      @Override
-      public Command.Type getType() {
-        return Command.Type.INSERT;
-      }
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.INSERT;
+  }
 
-      @Override
-      public boolean execute(@NotNull Editor editor,
-                             @NotNull Caret caret,
-                             @NotNull DataContext context,
-                             int count,
-                             int rawCount,
-                             @Nullable Argument argument) {
-        if (editor.isOneLineMode()) {
-          return false;
-        }
+  @Override
+  public boolean execute(@NotNull Editor editor,
+                         @NotNull Caret caret,
+                         @NotNull DataContext context,
+                         int count,
+                         int rawCount,
+                         @Nullable Argument argument) {
+    if (editor.isOneLineMode()) {
+      return false;
+    }
 
-        return VimPlugin.getChange().insertCharacterAroundCursor(editor, caret, 1);
-      }
-    };
+    return VimPlugin.getChange().insertCharacterAroundCursor(editor, caret, 1);
   }
 }

@@ -21,12 +21,10 @@ package com.maddyhome.idea.vim.action.change.insert;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,42 +36,37 @@ import java.util.List;
 import java.util.Set;
 
 
-public class InsertPreviousInsertExitAction extends VimCommandAction {
+public class InsertPreviousInsertExitAction extends ChangeEditorActionHandler.SingleExecution {
   @NotNull
   @Override
-  protected VimActionHandler makeActionHandler() {
-    return new ChangeEditorActionHandler.SingleExecution() {
-      @NotNull
-      @Override
-      public Set<MappingMode> getMappingModes() {
-        return MappingMode.I;
-      }
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.I;
+  }
 
-      @NotNull
-      @Override
-      public Set<List<KeyStroke>> getKeyStrokesSet() {
-        Set<List<KeyStroke>> keys = new HashSet<>();
-        keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK)));
-        keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_MASK)));
-        keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_AT, KeyEvent.CTRL_MASK)));
-        return keys;
-      }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    Set<List<KeyStroke>> keys = new HashSet<>();
+    keys
+      .add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK)));
+    keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_MASK)));
+    keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_AT, KeyEvent.CTRL_MASK)));
+    return keys;
+  }
 
-      @NotNull
-      @Override
-      public Command.Type getType() {
-        return Command.Type.INSERT;
-      }
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.INSERT;
+  }
 
-      @Override
-      public boolean execute(@NotNull Editor editor,
-                             @NotNull DataContext context,
-                             int count,
-                             int rawCount,
-                             @Nullable Argument argument) {
-        VimPlugin.getChange().insertPreviousInsert(editor, context, true);
-        return false;
-      }
-    };
+  @Override
+  public boolean execute(@NotNull Editor editor,
+                         @NotNull DataContext context,
+                         int count,
+                         int rawCount,
+                         @Nullable Argument argument) {
+    VimPlugin.getChange().insertPreviousInsert(editor, context, true);
+    return false;
   }
 }

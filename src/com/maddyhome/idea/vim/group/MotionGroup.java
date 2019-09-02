@@ -33,8 +33,6 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.MotionEditorAction;
-import com.maddyhome.idea.vim.action.TextObjectAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
@@ -124,24 +122,24 @@ public class MotionGroup {
     int raw = rawCount == 0 && cmd.getRawCount() == 0 ? 0 : cnt;
     int start = 0;
     int end = 0;
-    if (cmd.getAction() instanceof MotionEditorAction) {
-      MotionEditorAction action = (MotionEditorAction)cmd.getAction();
+    if (cmd.getAction() instanceof MotionActionHandler) {
+      MotionActionHandler action = (MotionActionHandler)cmd.getAction();
 
       // This is where we are now
       start = caret.getOffset();
 
       // Execute the motion (without moving the cursor) and get where we end
-      end = ((MotionActionHandler)action.getHandler()).getHandlerOffset(editor, caret, context, cnt, raw, cmd.getArgument());
+      end = action.getHandlerOffset(editor, caret, context, cnt, raw, cmd.getArgument());
 
       // Invalid motion
       if (end == -1) {
         return null;
       }
     }
-    else if (cmd.getAction() instanceof TextObjectAction) {
-      TextObjectAction action = (TextObjectAction)cmd.getAction();
+    else if (cmd.getAction() instanceof TextObjectActionHandler) {
+      TextObjectActionHandler action = (TextObjectActionHandler)cmd.getAction();
 
-      TextRange range = ((TextObjectActionHandler)action.getHandler()).getRange(editor, caret, context, cnt, raw, cmd.getArgument());
+      TextRange range = action.getRange(editor, caret, context, cnt, raw, cmd.getArgument());
 
       if (range == null) {
         return null;

@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.action.copy;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
@@ -35,46 +34,40 @@ import java.util.List;
 import java.util.Set;
 
 
-public class SelectRegisterAction extends VimCommandAction {
+public class SelectRegisterAction extends VimActionHandler.SingleExecution {
   @NotNull
   @Override
-  protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler.SingleExecution() {
-      @NotNull
-      @Override
-      public Set<MappingMode> getMappingModes() {
-        return MappingMode.NVO;
-      }
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.NVO;
+  }
 
-      @NotNull
-      @Override
-      public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("\"");
-      }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("\"");
+  }
 
-      @NotNull
-      @Override
-      public Command.Type getType() {
-        return Command.Type.SELECT_REGISTER;
-      }
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.SELECT_REGISTER;
+  }
 
-      @NotNull
-      @Override
-      public EnumSet<CommandFlags> getFlags() {
-        return EnumSet.of(CommandFlags.FLAG_EXPECT_MORE);
-      }
+  @NotNull
+  @Override
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_EXPECT_MORE);
+  }
 
-      @NotNull
-      @Override
-      public Argument.Type getArgumentType() {
-        return Argument.Type.CHARACTER;
-      }
+  @NotNull
+  @Override
+  public Argument.Type getArgumentType() {
+    return Argument.Type.CHARACTER;
+  }
 
-      @Override
-      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        final Argument argument = cmd.getArgument();
-        return argument != null && VimPlugin.getRegister().selectRegister(argument.getCharacter());
-      }
-    };
+  @Override
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+    final Argument argument = cmd.getArgument();
+    return argument != null && VimPlugin.getRegister().selectRegister(argument.getCharacter());
   }
 }

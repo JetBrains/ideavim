@@ -31,12 +31,12 @@ import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
-import com.maddyhome.idea.vim.action.MotionEditorAction;
-import com.maddyhome.idea.vim.action.TextObjectAction;
-import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.group.RegisterGroup;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.MotionActionHandler;
+import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -95,9 +95,9 @@ public class KeyHandler {
     return origHandler;
   }
 
-  public static void executeVimAction(@NotNull Editor editor, @NotNull VimCommandActionBase cmd, DataContext context) {
-    CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> cmd.getHandler()
-                                                    .execute(editor, getProjectAwareDataContext(editor, context)), cmd.getHandler().getText(),
+  public static void executeVimAction(@NotNull Editor editor, @NotNull EditorActionHandlerBase cmd, DataContext context) {
+    CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> cmd
+                                                    .execute(editor, getProjectAwareDataContext(editor, context)), cmd.getText(),
                                                   DocCommandGroupId.noneGroupId(editor.getDocument()),
                                                   UndoConfirmationPolicy.DEFAULT, editor.getDocument());
   }
@@ -544,8 +544,8 @@ public class KeyHandler {
 
     if (ApplicationManager.getApplication().isDispatchThread()) {
       Runnable action = new ActionRunner(editor, context, cmd, key);
-      VimCommandActionBase cmdAction = cmd.getAction();
-      String name = cmdAction.getHandler().getText();
+      EditorActionHandlerBase cmdAction = cmd.getAction();
+      String name = cmdAction.getText();
 
       if (type.isWrite()) {
         RunnableHelper.runWriteCommand(project, action, name, action);
@@ -566,8 +566,8 @@ public class KeyHandler {
     if (currentArg == Argument.Type.MOTION) {
       // We have been expecting a motion argument - is this one?
       if (node.getCmdType() == Command.Type.MOTION) {
-        if (!(node.getAction() instanceof MotionEditorAction) && !(node.getAction() instanceof TextObjectAction)) {
-          throw new RuntimeException("MOTION cmd type can be used only with MotionEditorAction or TextObjectAction - " +
+        if (!(node.getAction() instanceof MotionActionHandler) && !(node.getAction() instanceof TextObjectActionHandler)) {
+          throw new RuntimeException("MOTION cmd type can be used only with MotionActionHandler or TextObjectActionHandler - " +
                                      node.getAction().getClass().getName());
         }
         // Create the motion command and add it to the stack

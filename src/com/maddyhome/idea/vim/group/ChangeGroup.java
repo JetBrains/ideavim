@@ -47,7 +47,6 @@ import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.RegisterActions;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.Register;
@@ -56,6 +55,7 @@ import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
@@ -457,8 +457,8 @@ public class ChangeGroup {
       if (lastNewLine > 0) {
         final Command motion = argument.getMotion();
         if (motion != null) {
-          VimCommandActionBase action = motion.getAction();
-          String id = action.getHandler().getId();
+          EditorActionHandlerBase action = motion.getAction();
+          String id = action.getId();
           if (id.equals(VIM_MOTION_WORD_RIGHT) ||
               id.equals(VIM_MOTION_BIG_WORD_RIGHT) ||
               id.equals(VIM_MOTION_CAMEL_RIGHT)) {
@@ -492,8 +492,8 @@ public class ChangeGroup {
             KeyHandler.executeAction((AnAction)lastStroke, context);
             strokes.add(lastStroke);
           }
-          else if (lastStroke instanceof VimCommandActionBase) {
-            KeyHandler.executeVimAction(editor, (VimCommandActionBase)lastStroke, context);
+          else if (lastStroke instanceof EditorActionHandlerBase) {
+            KeyHandler.executeVimAction(editor, (EditorActionHandlerBase)lastStroke, context);
             strokes.add(lastStroke);
           }
           else if (lastStroke instanceof char[]) {
@@ -1253,7 +1253,7 @@ public class ChangeGroup {
     final Command motion = argument.getMotion();
     if (motion == null ) return false;
 
-    String id = motion.getAction().getHandler().getId();
+    String id = motion.getAction().getId();
     boolean kludge = false;
     boolean bigWord = id.equals(VIM_MOTION_BIG_WORD_RIGHT);
     final CharSequence chars = editor.getDocument().getCharsSequence();
@@ -2037,12 +2037,12 @@ public class ChangeGroup {
     }
 
     @NotNull
-    private List<VimCommandActionBase> getAdjustCaretActions(@NotNull DocumentEvent e) {
+    private List<EditorActionHandlerBase> getAdjustCaretActions(@NotNull DocumentEvent e) {
       final int delta = e.getOffset() - oldOffset;
       if (oldOffset >= 0 && delta != 0) {
-        final List<VimCommandActionBase> positionCaretActions = new ArrayList<>();
+        final List<EditorActionHandlerBase> positionCaretActions = new ArrayList<>();
         final String motionName = delta < 0 ? "VimMotionLeft" : "VimMotionRight";
-        final VimCommandActionBase action = RegisterActions.findAction(motionName);
+        final EditorActionHandlerBase action = RegisterActions.findAction(motionName);
         final int count = Math.abs(delta);
         for (int i = 0; i < count; i++) {
           positionCaretActions.add(action);

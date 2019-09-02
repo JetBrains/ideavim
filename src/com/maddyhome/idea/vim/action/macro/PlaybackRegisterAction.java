@@ -23,7 +23,6 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
@@ -34,45 +33,39 @@ import javax.swing.*;
 import java.util.List;
 import java.util.Set;
 
-public class PlaybackRegisterAction extends VimCommandAction {
+public class PlaybackRegisterAction extends VimActionHandler.SingleExecution {
   @NotNull
   @Override
-  protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler.SingleExecution() {
-      @NotNull
-      @Override
-      public Set<MappingMode> getMappingModes() {
-        return MappingMode.N;
-      }
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
+  }
 
-      @NotNull
-      @Override
-      public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("@");
-      }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("@");
+  }
 
-      @NotNull
-      @Override
-      public Command.Type getType() {
-        return Command.Type.OTHER_WRITABLE;
-      }
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.OTHER_WRITABLE;
+  }
 
-      @NotNull
-      @Override
-      public Argument.Type getArgumentType() {
-        return Argument.Type.CHARACTER;
-      }
+  @NotNull
+  @Override
+  public Argument.Type getArgumentType() {
+    return Argument.Type.CHARACTER;
+  }
 
-      @Override
-      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        final Argument argument = cmd.getArgument();
-        if (argument == null) {
-          return false;
-        }
-        final char reg = argument.getCharacter();
-        final Project project = PlatformDataKeys.PROJECT.getData(context);
-        return VimPlugin.getMacro().playbackRegister(editor, context, project, reg, cmd.getCount());
-      }
-    };
+  @Override
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+    final Argument argument = cmd.getArgument();
+    if (argument == null) {
+      return false;
+    }
+    final char reg = argument.getCharacter();
+    final Project project = PlatformDataKeys.PROJECT.getData(context);
+    return VimPlugin.getMacro().playbackRegister(editor, context, project, reg, cmd.getCount());
   }
 }

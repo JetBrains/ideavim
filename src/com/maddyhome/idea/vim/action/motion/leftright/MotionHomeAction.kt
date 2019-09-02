@@ -22,8 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.MotionEditorAction
-import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -32,17 +30,14 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 import javax.swing.KeyStroke
 
-class MotionHomeAction : MotionEditorAction() {
-  override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
-    override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
+class MotionHomeAction : NonShiftedSpecialKeyHandler() {
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Home>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Home>")
 
-    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
-    override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
-                        rawCount: Int, argument: Argument?): Int {
-      return VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
-    }
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
+  override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
+                      rawCount: Int, argument: Argument?): Int {
+    return VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
   }
-
 }

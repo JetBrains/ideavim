@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim.action.motion.gn;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
@@ -34,39 +33,32 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-final public class VisualSelectPreviousSearch extends MotionEditorAction {
-  @Contract(" -> new")
+final public class VisualSelectPreviousSearch extends MotionActionHandler.SingleExecution {
+  @Contract(pure = true)
   @NotNull
   @Override
-  public MotionActionHandler makeActionHandler() {
-    return new MotionActionHandler.SingleExecution() {
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Set<MappingMode> getMappingModes() {
-        return MappingMode.NV;
-      }
+  final public Set<MappingMode> getMappingModes() {
+    return MappingMode.NV;
+  }
 
-      @NotNull
-      @Override
-      final public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("gN");
-      }
+  @NotNull
+  @Override
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("gN");
+  }
 
-      @NotNull
-      @Override
-      final public EnumSet<CommandFlags> getFlags() {
-        return EnumSet.noneOf(CommandFlags.class);
-      }
+  @NotNull
+  @Override
+  final public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.noneOf(CommandFlags.class);
+  }
 
-      @Override
-      final public int getOffset(@NotNull Editor editor,
-                                 @NotNull DataContext context,
-                                 int count,
-                                 int rawCount,
-                                 @Nullable Argument argument) {
-        return VimPlugin.getMotion().selectNextSearch(editor, count, false);
-      }
-    };
+  @Override
+  final public int getOffset(@NotNull Editor editor,
+                             @NotNull DataContext context,
+                             int count,
+                             int rawCount,
+                             @Nullable Argument argument) {
+    return VimPlugin.getMotion().selectNextSearch(editor, count, false);
   }
 }

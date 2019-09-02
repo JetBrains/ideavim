@@ -21,14 +21,11 @@ package com.maddyhome.idea.vim.action.motion.leftright
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.VimCommandAction
-import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ShiftedSpecialKeyHandler
-import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import java.util.*
@@ -37,21 +34,18 @@ import javax.swing.KeyStroke
 /**
  * @author Alex Plate
  */
-class MotionShiftHomeAction : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : ShiftedSpecialKeyHandler() {
-    override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
+class MotionShiftHomeAction : ShiftedSpecialKeyHandler() {
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Home>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Home>")
 
-    override val type: Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
-    override fun motion(editor: Editor, context: DataContext, cmd: Command) {
-      editor.vimForEachCaret { caret ->
-        val newOffset = VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
-        MotionGroup.moveCaret(editor, caret, newOffset)
-      }
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
+  override fun motion(editor: Editor, context: DataContext, cmd: Command) {
+    editor.vimForEachCaret { caret ->
+      val newOffset = VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
+      MotionGroup.moveCaret(editor, caret, newOffset)
     }
   }
-
 }

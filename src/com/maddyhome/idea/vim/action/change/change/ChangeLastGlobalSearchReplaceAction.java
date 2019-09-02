@@ -21,13 +21,11 @@ package com.maddyhome.idea.vim.action.change.change;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,39 +35,33 @@ import java.util.List;
 import java.util.Set;
 
 
-public class ChangeLastGlobalSearchReplaceAction extends VimCommandAction {
+public class ChangeLastGlobalSearchReplaceAction extends ChangeEditorActionHandler.SingleExecution {
   @NotNull
   @Override
-  protected VimActionHandler makeActionHandler() {
-    return new ChangeEditorActionHandler.SingleExecution() {
-      @NotNull
-      @Override
-      public Set<MappingMode> getMappingModes() {
-        return MappingMode.N;
-      }
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
+  }
 
-      @NotNull
-      @Override
-      public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("g&");
-      }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("g&");
+  }
 
-      @NotNull
-      @Override
-      public Command.Type getType() {
-        return Command.Type.OTHER_SELF_SYNCHRONIZED;
-      }
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.OTHER_SELF_SYNCHRONIZED;
+  }
 
-      @Override
-      public boolean execute(@NotNull Editor editor,
-                             @NotNull DataContext context,
-                             int count,
-                             int rawCount,
-                             @Nullable Argument argument) {
-        final LineRange range = new LineRange(0, EditorHelper.getLineCount(editor) - 1);
-        return VimPlugin.getSearch()
-          .searchAndReplace(editor, editor.getCaretModel().getPrimaryCaret(), range, "s", "//~/&");
-      }
-    };
+  @Override
+  public boolean execute(@NotNull Editor editor,
+                         @NotNull DataContext context,
+                         int count,
+                         int rawCount,
+                         @Nullable Argument argument) {
+    final LineRange range = new LineRange(0, EditorHelper.getLineCount(editor) - 1);
+    return VimPlugin.getSearch()
+      .searchAndReplace(editor, editor.getCaretModel().getPrimaryCaret(), range, "s", "//~/&");
   }
 }

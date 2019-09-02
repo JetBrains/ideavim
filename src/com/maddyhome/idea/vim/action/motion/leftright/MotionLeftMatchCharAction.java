@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
@@ -36,50 +35,44 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-public class MotionLeftMatchCharAction extends MotionEditorAction {
+public class MotionLeftMatchCharAction extends MotionActionHandler.ForEachCaret {
   @NotNull
   @Override
-  public MotionActionHandler makeActionHandler() {
-    return new MotionActionHandler.ForEachCaret() {
-      @NotNull
-      @Override
-      public Set<MappingMode> getMappingModes() {
-        return MappingMode.NVO;
-      }
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.NVO;
+  }
 
-      @NotNull
-      @Override
-      public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("F");
-      }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("F");
+  }
 
-      @NotNull
-      @Override
-      public Argument.Type getArgumentType() {
-        return Argument.Type.DIGRAPH;
-      }
+  @NotNull
+  @Override
+  public Argument.Type getArgumentType() {
+    return Argument.Type.DIGRAPH;
+  }
 
-      @NotNull
-      @Override
-      public EnumSet<CommandFlags> getFlags() {
-        return EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_ALLOW_DIGRAPH);
-      }
+  @NotNull
+  @Override
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_ALLOW_DIGRAPH);
+  }
 
-      @Override
-      public int getOffset(@NotNull Editor editor,
-                           @NotNull Caret caret,
-                           @NotNull DataContext context,
-                           int count,
-                           int rawCount,
-                           @Nullable Argument argument) {
-        if (argument == null) {
-          VimPlugin.indicateError();
-          return caret.getOffset();
-        }
-        int res = VimPlugin.getMotion().moveCaretToNextCharacterOnLine(editor, caret, -count, argument.getCharacter());
-        VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_F, argument.getCharacter());
-        return res;
-      }
-    };
+  @Override
+  public int getOffset(@NotNull Editor editor,
+                       @NotNull Caret caret,
+                       @NotNull DataContext context,
+                       int count,
+                       int rawCount,
+                       @Nullable Argument argument) {
+    if (argument == null) {
+      VimPlugin.indicateError();
+      return caret.getOffset();
+    }
+    int res = VimPlugin.getMotion().moveCaretToNextCharacterOnLine(editor, caret, -count, argument.getCharacter());
+    VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_F, argument.getCharacter());
+    return res;
   }
 }

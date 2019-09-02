@@ -23,12 +23,10 @@ import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.Contract;
@@ -43,64 +41,56 @@ import java.util.Set;
 /**
  * @author vlan
  */
-final public class DeleteJoinVisualLinesAction extends VimCommandAction {
-  @Contract(" -> new")
+final public class DeleteJoinVisualLinesAction extends VisualOperatorActionHandler.SingleExecution {
+  @Contract(pure = true)
   @NotNull
   @Override
-  final protected VimActionHandler makeActionHandler() {
-    return new VisualOperatorActionHandler.SingleExecution() {
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Set<MappingMode> getMappingModes() {
-        return MappingMode.V;
-      }
-
-      @NotNull
-      @Override
-      final public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("gJ");
-      }
-
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Command.Type getType() {
-        return Command.Type.DELETE;
-      }
-
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public EnumSet<CommandFlags> getFlags() {
-        return EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL);
-      }
-
-      @Override
-      public boolean executeForAllCarets(@NotNull Editor editor,
-                                         @NotNull DataContext context,
-                                         @NotNull Command cmd,
-                                         @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
-        if (editor.isOneLineMode()) return false;
-
-        if (OptionsManager.INSTANCE.getIdeajoin().isSet()) {
-          VimPlugin.getChange().joinViaIdeaBySelections(editor, context, caretsAndSelections);
-          return true;
-        }
-
-        Ref<Boolean> res = Ref.create(true);
-        editor.getCaretModel().runForEachCaret(caret -> {
-          if (!caret.isValid()) return;
-          final VimSelection range = caretsAndSelections.get(caret);
-          if (range == null) return;
-
-          if (!VimPlugin.getChange().deleteJoinRange(editor, caret, range.toVimTextRange(true).normalize(), false)) {
-            res.set(false);
-          }
-        }, true);
-        return res.get();
-      }
-    };
+  final public Set<MappingMode> getMappingModes() {
+    return MappingMode.V;
   }
 
+  @NotNull
+  @Override
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("gJ");
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.DELETE;
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL);
+  }
+
+  @Override
+  public boolean executeForAllCarets(@NotNull Editor editor,
+                                     @NotNull DataContext context,
+                                     @NotNull Command cmd,
+                                     @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
+    if (editor.isOneLineMode()) return false;
+
+    if (OptionsManager.INSTANCE.getIdeajoin().isSet()) {
+      VimPlugin.getChange().joinViaIdeaBySelections(editor, context, caretsAndSelections);
+      return true;
+    }
+
+    Ref<Boolean> res = Ref.create(true);
+    editor.getCaretModel().runForEachCaret(caret -> {
+      if (!caret.isValid()) return;
+      final VimSelection range = caretsAndSelections.get(caret);
+      if (range == null) return;
+
+      if (!VimPlugin.getChange().deleteJoinRange(editor, caret, range.toVimTextRange(true).normalize(), false)) {
+        res.set(false);
+      }
+    }, true);
+    return res.get();
+  }
 }

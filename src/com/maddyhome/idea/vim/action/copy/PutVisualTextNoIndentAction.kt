@@ -22,14 +22,11 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.VimCommandAction
-import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.group.visual.VimSelection
-import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
@@ -38,27 +35,25 @@ import javax.swing.KeyStroke
 /**
  * @author vlan
  */
-class PutVisualTextNoIndentAction : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : VisualOperatorActionHandler.SingleExecution() {
+class PutVisualTextNoIndentAction : VisualOperatorActionHandler.SingleExecution() {
 
-    override val mappingModes: Set<MappingMode> = MappingMode.V
+  override val mappingModes: Set<MappingMode> = MappingMode.V
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("[p", "]p", "[P", "]P")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("[p", "]p", "[P", "]P")
 
-    override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
-    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
-    override fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean {
-      if (caretsAndSelections.isEmpty()) return false
-      val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type, it.transferableData) }
-      VimPlugin.getRegister().resetRegister()
+  override fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean {
+    if (caretsAndSelections.isEmpty()) return false
+    val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type, it.transferableData) }
+    VimPlugin.getRegister().resetRegister()
 
-      val insertBeforeCaret = cmd.keys[1].keyChar == 'P'
-      val selection = PutData.VisualSelection(caretsAndSelections, caretsAndSelections.values.first().type)
-      val putData = PutData(textData, selection, cmd.count, insertBeforeCaret, _indent = false, caretAfterInsertedText = false)
+    val insertBeforeCaret = cmd.keys[1].keyChar == 'P'
+    val selection = PutData.VisualSelection(caretsAndSelections, caretsAndSelections.values.first().type)
+    val putData = PutData(textData, selection, cmd.count, insertBeforeCaret, _indent = false, caretAfterInsertedText = false)
 
-      return VimPlugin.getPut().putText(editor, context, putData)
-    }
+    return VimPlugin.getPut().putText(editor, context, putData)
   }
 }

@@ -23,8 +23,6 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.MotionEditorAction
-import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.MotionActionHandler
@@ -37,31 +35,29 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 
-class SelectMotionRightAction : MotionEditorAction() {
-  override fun makeActionHandler() = object : MotionActionHandler.ForEachCaret() {
+class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
 
-    override val mappingModes: MutableSet<MappingMode> = MappingMode.S
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.S
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Right>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Right>")
 
-    override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-      val keymodel = OptionsManager.keymodel
-      if (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel) {
-        logger.info("Keymodel option has stopselect. Exiting select mode")
-        val startSelection = caret.selectionStart
-        val endSelection = caret.selectionEnd
-        VimPlugin.getVisualMotion().exitSelectMode(editor, false)
-        if (editor.isTemplateActive()) {
-          logger.info("Template is active. Activate insert mode")
-          VimPlugin.getChange().insertBeforeCursor(editor, context)
-          if (caret.offset in startSelection..endSelection) {
-            return endSelection
-          }
+  override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+    val keymodel = OptionsManager.keymodel
+    if (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel) {
+      logger.info("Keymodel option has stopselect. Exiting select mode")
+      val startSelection = caret.selectionStart
+      val endSelection = caret.selectionEnd
+      VimPlugin.getVisualMotion().exitSelectMode(editor, false)
+      if (editor.isTemplateActive()) {
+        logger.info("Template is active. Activate insert mode")
+        VimPlugin.getChange().insertBeforeCursor(editor, context)
+        if (caret.offset in startSelection..endSelection) {
+          return endSelection
         }
-        return caret.offset
       }
-      return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, count, false)
+      return caret.offset
     }
+    return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, count, false)
   }
 
   companion object {

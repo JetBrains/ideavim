@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim.action.window;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
@@ -34,37 +33,30 @@ import java.util.Set;
 /**
  * @author rasendubi
  */
-final public class WindowOnlyAction extends VimCommandAction {
-  @Contract(" -> new")
+final public class WindowOnlyAction extends VimActionHandler.SingleExecution {
+  @Contract(pure = true)
   @NotNull
   @Override
-  final protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler.SingleExecution() {
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Set<MappingMode> getMappingModes() {
-        return MappingMode.N;
-      }
-
-      @NotNull
-      @Override
-      final public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("<C-W>o", "<C-W><C-O>");
-      }
-
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Command.Type getType() {
-        return Command.Type.OTHER_READONLY;
-      }
-      @Override
-      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        VimPlugin.getWindow().closeAllExceptCurrent(context);
-        return true;
-      }
-    };
+  final public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
   }
 
+  @NotNull
+  @Override
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("<C-W>o", "<C-W><C-O>");
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.OTHER_READONLY;
+  }
+
+  @Override
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+    VimPlugin.getWindow().closeAllExceptCurrent(context);
+    return true;
+  }
 }

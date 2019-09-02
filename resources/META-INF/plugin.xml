@@ -44,7 +44,7 @@
   <extensionPoints>
     <extensionPoint name="vimExtension" interface="com.maddyhome.idea.vim.extension.VimExtension"/>
     <extensionPoint name="vimAction" beanClass="com.maddyhome.idea.vim.action.VimActionBean">
-      <with attribute="actionClass" implements="com.maddyhome.idea.vim.action.VimCommandActionBase"/>
+      <with attribute="actionClass" implements="com.maddyhome.idea.vim.handler.EditorActionHandlerBase"/>
     </extensionPoint>
   </extensionPoints>
 

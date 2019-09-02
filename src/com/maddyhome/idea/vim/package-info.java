@@ -33,10 +33,10 @@
  * |i_CTRL-G_j|           TODO
  * |i_CTRL-G_k|           TODO
  * |i_CTRL-G_u|           TODO
- * |i_<BS>|               IntelliJ editor backspace
+ * |i_<BS>|               {@link com.maddyhome.idea.vim.action.editor.VimEditorBackSpace}
  * |i_digraph|            IdeaVim enter digraph
  * |i_CTRL-H|             IntelliJ editor backspace
- * |i_<Tab>|              IntelliJ editor tab
+ * |i_<Tab>|              {@link com.maddyhome.idea.vim.action.editor.VimEditorTab}
  * |i_CTRL-I|             IntelliJ editor tab
  * |i_<NL>|               {@link com.maddyhome.idea.vim.action.change.insert.InsertEnterAction}
  * |i_CTRL-J|             TODO
@@ -69,16 +69,16 @@
  * |i_CTRL-_|             TODO
  * |i_0_CTRL-D|           TODO
  * |i_^_CTRL-D|           TODO
- * |i_<Del>|              IntelliJ editor delete
+ * |i_<Del>|              {@link com.maddyhome.idea.vim.action.editor.VimEditorDelete}
  * |i_<Left>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLeftInsertModeAction}
  * |i_<S-Left>|           {@link com.maddyhome.idea.vim.action.motion.text.MotionWordLeftInsertAction}
  * |i_<C-Left>|           {@link com.maddyhome.idea.vim.action.motion.text.MotionWordLeftInsertAction}
  * |i_<Right>|            {@link com.maddyhome.idea.vim.action.motion.leftright.MotionRightInsertAction}
  * |i_<S-Right>|          {@link com.maddyhome.idea.vim.action.motion.text.MotionWordRightInsertAction}
  * |i_<C-Right>|          {@link com.maddyhome.idea.vim.action.motion.text.MotionWordRightInsertAction}
- * |i_<Up>|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionUpAction}
+ * |i_<Up>|               {@link com.maddyhome.idea.vim.action.editor.VimEditorUp}
  * |i_<S-Up>|             {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpInsertModeAction}
- * |i_<Down>|             {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownNotLineWiseAction}
+ * |i_<Down>|             {@link com.maddyhome.idea.vim.action.editor.VimEditorDown}
  * |i_<S-Down>|           {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownInsertModeAction}
  * |i_<Home>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnInsertModeAction}
  * |i_<C-Home>|           {@link com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstInsertAction}
@@ -168,7 +168,7 @@
  * |H|                    {@link com.maddyhome.idea.vim.action.motion.screen.MotionFirstScreenLineAction}
  * |I|                    {@link com.maddyhome.idea.vim.action.change.insert.InsertBeforeFirstNonBlankAction}
  * |J|                    {@link com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesSpacesAction}
- * |K|                    TODO
+ * |K|                    {@link com.maddyhome.idea.vim.action.editor.VimQuickJavaDoc}
  * |L|                    {@link com.maddyhome.idea.vim.action.motion.screen.MotionLastScreenLineAction}
  * |M|                    {@link com.maddyhome.idea.vim.action.motion.screen.MotionMiddleScreenLineAction}
  * |N|                    {@link com.maddyhome.idea.vim.action.motion.search.SearchAgainPreviousAction}
@@ -455,23 +455,23 @@
  * |z.|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollMiddleScreenLineStartAction}
  * |z=|                   TODO
  * |zA|                   TODO
- * |zC|                   IntelliJ collapse region recursively
+ * |zC|                   {@link com.maddyhome.idea.vim.action.fold.VimCollapseRegionRecursively}
  * |zD|                   TODO
  * |zE|                   TODO
  * |zF|                   TODO
  * |zG|                   TODO
  * |zH|                   TODO
  * |zL|                   TODO
- * |zM|                   IntelliJ collapse all regions
+ * |zM|                   {@link com.maddyhome.idea.vim.action.fold.VimCollapseAllRegions}
  * |zN|                   TODO
- * |zO|                   IntelliJ expand region recursively
- * |zR|                   IntelliJ expand all regions
+ * |zO|                   {@link com.maddyhome.idea.vim.action.fold.VimExpandRegionRecursively}
+ * |zR|                   {@link com.maddyhome.idea.vim.action.fold.VimExpandAllRegions}
  * |zW|                   TODO
  * |zX|                   TODO
  * |z^|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLinePageStartAction}
  * |za|                   TODO
  * |zb|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLineAction}
- * |zc|                   IntelliJ collapse region
+ * |zc|                   {@link com.maddyhome.idea.vim.action.fold.VimCollapseRegion}
  * |zd|                   not applicable
  * |ze|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenColumnAction}
  * |zf|                   not applicable
@@ -483,7 +483,7 @@
  * |zl|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnLeftAction}
  * |zm|                   TODO
  * |zn|                   TODO
- * |zo|                   IntelliJ expand region
+ * |zo|                   {@link com.maddyhome.idea.vim.action.fold.VimExpandRegion}
  * |zr|                   TODO
  * |zs|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenColumnAction}
  * |zt|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLineAction}

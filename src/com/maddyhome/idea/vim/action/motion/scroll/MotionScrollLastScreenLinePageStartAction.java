@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.action.motion.scroll;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.group.MotionGroup;
@@ -34,52 +33,46 @@ import java.util.List;
 import java.util.Set;
 
 
-public class MotionScrollLastScreenLinePageStartAction extends VimCommandAction {
+public class MotionScrollLastScreenLinePageStartAction extends VimActionHandler.SingleExecution {
   @NotNull
   @Override
-  protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler.SingleExecution() {
-      @NotNull
-      @Override
-      public Set<MappingMode> getMappingModes() {
-        return MappingMode.NVO;
-      }
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.NVO;
+  }
 
-      @NotNull
-      @Override
-      public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("z^");
-      }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("z^");
+  }
 
-      @NotNull
-      @Override
-      public Command.Type getType() {
-        return Command.Type.OTHER_READONLY;
-      }
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.OTHER_READONLY;
+  }
 
-      @Override
-      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+  @Override
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
 
-        final MotionGroup motion = VimPlugin.getMotion();
+    final MotionGroup motion = VimPlugin.getMotion();
 
-        int line = cmd.getRawCount();
-        if (line == 0) {
-          final int prevVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor) - 1;
-          line = EditorHelper.visualLineToLogicalLine(editor, prevVisualLine) + 1;  // rawCount is 1 based
-          return motion.scrollLineToLastScreenLine(editor, line, true);
-        }
+    int line = cmd.getRawCount();
+    if (line == 0) {
+      final int prevVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor) - 1;
+      line = EditorHelper.visualLineToLogicalLine(editor, prevVisualLine) + 1;  // rawCount is 1 based
+      return motion.scrollLineToLastScreenLine(editor, line, true);
+    }
 
-        // [count]z^ first scrolls [count] to the bottom of the window, then moves the caret to the line that is now at
-        // the top, and then move that line to the bottom of the window
-        line = EditorHelper.normalizeLine(editor, line);
-        if (motion.scrollLineToLastScreenLine(editor, line, true)) {
+    // [count]z^ first scrolls [count] to the bottom of the window, then moves the caret to the line that is now at
+    // the top, and then move that line to the bottom of the window
+    line = EditorHelper.normalizeLine(editor, line);
+    if (motion.scrollLineToLastScreenLine(editor, line, true)) {
 
-          line = EditorHelper.getVisualLineAtTopOfScreen(editor);
-          line = EditorHelper.visualLineToLogicalLine(editor, line) + 1;  // rawCount is 1 based
-          return motion.scrollLineToLastScreenLine(editor, line, true);
-        }
-        return false;
-      }
-    };
+      line = EditorHelper.getVisualLineAtTopOfScreen(editor);
+      line = EditorHelper.visualLineToLogicalLine(editor, line) + 1;  // rawCount is 1 based
+      return motion.scrollLineToLastScreenLine(editor, line, true);
+    }
+    return false;
   }
 }

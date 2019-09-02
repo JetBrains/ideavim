@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
@@ -38,46 +37,40 @@ import java.util.List;
 import java.util.Set;
 
 
-public class MotionColumnAction extends MotionEditorAction {
+public class MotionColumnAction extends MotionActionHandler.ForEachCaret {
   @NotNull
   @Override
-  public MotionActionHandler makeActionHandler() {
-    return new MotionActionHandler.ForEachCaret() {
-      @NotNull
-      @Override
-      public Set<MappingMode> getMappingModes() {
-        return MappingMode.NVO;
-      }
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.NVO;
+  }
 
-      @NotNull
-      @Override
-      public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("|");
-      }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("|");
+  }
 
-      @NotNull
-      @Override
-      public EnumSet<CommandFlags> getFlags() {
-        return EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE);
-      }
+  @NotNull
+  @Override
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE);
+  }
 
-      @Override
-      public int getOffset(@NotNull Editor editor,
-                           @NotNull Caret caret,
-                           @NotNull DataContext context,
-                           int count,
-                           int rawCount,
-                           @Nullable Argument argument) {
-        return VimPlugin.getMotion().moveCaretToColumn(editor, caret, count - 1, false);
-      }
+  @Override
+  public int getOffset(@NotNull Editor editor,
+                       @NotNull Caret caret,
+                       @NotNull DataContext context,
+                       int count,
+                       int rawCount,
+                       @Nullable Argument argument) {
+    return VimPlugin.getMotion().moveCaretToColumn(editor, caret, count - 1, false);
+  }
 
-      @Override
-      public void postMove(@NotNull Editor editor,
-                           @NotNull Caret caret,
-                           @NotNull DataContext context,
-                           @NotNull Command cmd) {
-        UserDataManager.setVimLastColumn(caret, cmd.getCount() - 1);
-      }
-    };
+  @Override
+  public void postMove(@NotNull Editor editor,
+                       @NotNull Caret caret,
+                       @NotNull DataContext context,
+                       @NotNull Command cmd) {
+    UserDataManager.setVimLastColumn(caret, cmd.getCount() - 1);
   }
 }

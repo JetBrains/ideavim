@@ -3,7 +3,6 @@ package com.maddyhome.idea.vim.action.editor
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -13,126 +12,114 @@ import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-class VimEditorBackSpace : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
-    val actionName: String = "EditorBackSpace"
+class VimEditorBackSpace : VimActionHandler.SingleExecution() {
+  private val actionName: String = "EditorBackSpace"
 
-    override val mappingModes: Set<MappingMode> = MappingMode.I
+  override val mappingModes: Set<MappingMode> = MappingMode.I
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-      listOf(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK)),
-      listOf(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0))
-    )
+  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0))
+  )
 
-    override val type: Command.Type = Command.Type.INSERT
+  override val type: Command.Type = Command.Type.INSERT
 
-    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-      KeyHandler.executeAction(actionName, context)
-      return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    KeyHandler.executeAction(actionName, context)
+    return true
   }
 }
 
-class VimEditorDelete : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
-    val actionName: String = "EditorDelete"
+class VimEditorDelete : VimActionHandler.SingleExecution() {
+  private val actionName: String = "EditorDelete"
 
-    override val mappingModes: Set<MappingMode> = MappingMode.I
+  override val mappingModes: Set<MappingMode> = MappingMode.I
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-      listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0))
-    )
+  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0))
+  )
 
-    override val type: Command.Type = Command.Type.INSERT
+  override val type: Command.Type = Command.Type.INSERT
 
-    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 
-    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-      KeyHandler.executeAction(actionName, context)
-      return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    KeyHandler.executeAction(actionName, context)
+    return true
   }
 }
 
-class VimEditorDown : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
-    val actionName: String = "EditorDown"
+class VimEditorDown : VimActionHandler.SingleExecution() {
+  private val actionName: String = "EditorDown"
 
-    override val mappingModes: Set<MappingMode> = MappingMode.I
+  override val mappingModes: Set<MappingMode> = MappingMode.I
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-      listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)),
-      listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0))
-    )
+  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0))
+  )
 
-    override val type: Command.Type = Command.Type.INSERT
+  override val type: Command.Type = Command.Type.INSERT
 
-    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
 
-    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-      KeyHandler.executeAction(actionName, context)
-      return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    KeyHandler.executeAction(actionName, context)
+    return true
   }
 }
 
-class VimEditorTab : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
-    val actionName: String = "EditorTab"
+class VimEditorTab : VimActionHandler.SingleExecution() {
+  private val actionName: String = "EditorTab"
 
-    override val mappingModes: Set<MappingMode> = MappingMode.I
+  override val mappingModes: Set<MappingMode> = MappingMode.I
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-      listOf(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_MASK)),
-      listOf(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0))
-    )
+  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_MASK)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0))
+  )
 
-    override val type: Command.Type = Command.Type.INSERT
+  override val type: Command.Type = Command.Type.INSERT
 
-    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 
-    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-      KeyHandler.executeAction(actionName, context)
-      return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    KeyHandler.executeAction(actionName, context)
+    return true
   }
 }
 
-class VimEditorUp : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
-    val actionName: String = "EditorUp"
+class VimEditorUp : VimActionHandler.SingleExecution() {
+  private val actionName: String = "EditorUp"
 
-    override val mappingModes: Set<MappingMode> = MappingMode.I
+  override val mappingModes: Set<MappingMode> = MappingMode.I
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-      listOf(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)),
-      listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0))
-    )
+  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0))
+  )
 
-    override val type: Command.Type = Command.Type.INSERT
+  override val type: Command.Type = Command.Type.INSERT
 
-    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
 
-    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-      KeyHandler.executeAction(actionName, context)
-      return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    KeyHandler.executeAction(actionName, context)
+    return true
   }
 }
 
-class VimQuickJavaDoc : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
-    val actionName: String = "QuickJavaDoc"
+class VimQuickJavaDoc : VimActionHandler.SingleExecution() {
+  private val actionName: String = "QuickJavaDoc"
 
-    override val mappingModes: Set<MappingMode> = MappingMode.N
+  override val mappingModes: Set<MappingMode> = MappingMode.N
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("K")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("K")
 
-    override val type: Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-      KeyHandler.executeAction(actionName, context)
-      return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    KeyHandler.executeAction(actionName, context)
+    return true
   }
 }

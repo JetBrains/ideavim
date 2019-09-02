@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
@@ -36,53 +35,47 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-public class MotionPercentOrMatchAction extends MotionEditorAction {
+public class MotionPercentOrMatchAction extends MotionActionHandler.ForEachCaret {
   @NotNull
   @Override
-  public MotionActionHandler makeActionHandler() {
-    return new MotionActionHandler.ForEachCaret() {
-      @NotNull
-      @Override
-      public Set<MappingMode> getMappingModes() {
-        return MappingMode.NVO;
-      }
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.NVO;
+  }
 
-      @NotNull
-      @Override
-      public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("%");
-      }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("%");
+  }
 
-      @NotNull
-      @Override
-      public EnumSet<CommandFlags> getFlags() {
-        return EnumSet.of(CommandFlags.FLAG_SAVE_JUMP);
-      }
+  @NotNull
+  @Override
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_SAVE_JUMP);
+  }
 
-      @Override
-      public int getOffset(@NotNull Editor editor,
-                           @NotNull Caret caret,
-                           @NotNull DataContext context,
-                           int count,
-                           int rawCount,
-                           @Nullable Argument argument) {
-        if (rawCount == 0) {
-          return VimPlugin.getMotion().moveCaretToMatchingPair(editor, caret);
-        }
-        else {
-          return VimPlugin.getMotion().moveCaretToLinePercent(editor, count);
-        }
-      }
+  @Override
+  public int getOffset(@NotNull Editor editor,
+                       @NotNull Caret caret,
+                       @NotNull DataContext context,
+                       int count,
+                       int rawCount,
+                       @Nullable Argument argument) {
+    if (rawCount == 0) {
+      return VimPlugin.getMotion().moveCaretToMatchingPair(editor, caret);
+    }
+    else {
+      return VimPlugin.getMotion().moveCaretToLinePercent(editor, count);
+    }
+  }
 
-      @Override
-      public void process(@NotNull Command cmd) {
-        if (cmd.getRawCount() == 0) {
-          cmd.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
-        }
-        else {
-          cmd.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE));
-        }
-      }
-    };
+  @Override
+  public void process(@NotNull Command cmd) {
+    if (cmd.getRawCount() == 0) {
+      cmd.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
+    }
+    else {
+      cmd.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE));
+    }
   }
 }

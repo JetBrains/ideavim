@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.action.motion.visual;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -37,48 +36,41 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-final public class VisualToggleCharacterModeAction extends VimCommandAction {
-  @Contract(" -> new")
+final public class VisualToggleCharacterModeAction extends VimActionHandler.SingleExecution {
+  @Contract(pure = true)
   @NotNull
   @Override
-  final protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler.SingleExecution() {
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Set<MappingMode> getMappingModes() {
-        return MappingMode.NV;
-      }
-
-      @NotNull
-      @Override
-      final public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("v");
-      }
-
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Command.Type getType() {
-        return Command.Type.OTHER_READONLY;
-      }
-
-      @NotNull
-      @Override
-      final public EnumSet<CommandFlags> getFlags() {
-        return EnumSet.of(CommandFlags.FLAG_MOT_CHARACTERWISE);
-      }
-      @Override
-      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        final ListOption listOption = OptionsManager.INSTANCE.getSelectmode();
-        if (listOption.contains("cmd")) {
-          return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER);
-        }
-
-        return VimPlugin.getVisualMotion()
-          .toggleVisual(editor, cmd.getCount(), cmd.getRawCount(), CommandState.SubMode.VISUAL_CHARACTER);
-      }
-    };
+  final public Set<MappingMode> getMappingModes() {
+    return MappingMode.NV;
   }
 
+  @NotNull
+  @Override
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("v");
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.OTHER_READONLY;
+  }
+
+  @NotNull
+  @Override
+  final public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_MOT_CHARACTERWISE);
+  }
+
+  @Override
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+    final ListOption listOption = OptionsManager.INSTANCE.getSelectmode();
+    if (listOption.contains("cmd")) {
+      return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER);
+    }
+
+    return VimPlugin.getVisualMotion()
+      .toggleVisual(editor, cmd.getCount(), cmd.getRawCount(), CommandState.SubMode.VISUAL_CHARACTER);
+  }
 }

@@ -21,8 +21,6 @@ package com.maddyhome.idea.vim.action.motion.select
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.VimCommandAction
-import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
@@ -36,25 +34,23 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 
-class SelectEnableCharacterModeAction : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
+class SelectEnableCharacterModeAction : VimActionHandler.SingleExecution() {
 
 
-    override val mappingModes: MutableSet<MappingMode> = MappingMode.N
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.N
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gh")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gh")
 
-    override val type: Command.Type = Command.Type.OTHER_READONLY
-    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-      editor.caretModel.runForEachCaret { caret ->
-        val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
-        caret.run {
-          vimSetSystemSelectionSilently(offset, (offset + 1).coerceAtMost(lineEnd))
-          moveToOffset((offset + 1).coerceAtMost(lineEnd))
-          vimLastColumn = visualPosition.column
-        }
+  override val type: Command.Type = Command.Type.OTHER_READONLY
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    editor.caretModel.runForEachCaret { caret ->
+      val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+      caret.run {
+        vimSetSystemSelectionSilently(offset, (offset + 1).coerceAtMost(lineEnd))
+        moveToOffset((offset + 1).coerceAtMost(lineEnd))
+        vimLastColumn = visualPosition.column
       }
-      return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
     }
+    return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
   }
 }

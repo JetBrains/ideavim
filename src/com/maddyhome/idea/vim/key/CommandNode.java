@@ -18,9 +18,9 @@
 
 package com.maddyhome.idea.vim.key;
 
-import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +41,7 @@ public class CommandNode implements Node {
    * @param flags   Any special flags needs by the command
    */
   @Contract(pure = true)
-  public CommandNode(KeyStroke key, VimCommandActionBase action, @NotNull Command.Type cmdType, EnumSet<CommandFlags> flags) {
+  public CommandNode(KeyStroke key, EditorActionHandlerBase action, @NotNull Command.Type cmdType, EnumSet<CommandFlags> flags) {
     this.key = key;
     this.action = action;
     this.type = cmdType;
@@ -53,7 +53,7 @@ public class CommandNode implements Node {
    *
    * @return The command's action
    */
-  public VimCommandActionBase getAction() {
+  public EditorActionHandlerBase getAction() {
     return action;
   }
 
@@ -108,7 +108,7 @@ public class CommandNode implements Node {
   }
 
   protected final KeyStroke key;
-  protected final VimCommandActionBase action;
+  protected final EditorActionHandlerBase action;
   @NotNull protected final Command.Type type;
   protected final EnumSet<CommandFlags> flags;
 }

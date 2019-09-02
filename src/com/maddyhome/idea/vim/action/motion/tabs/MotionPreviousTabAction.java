@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.action.motion.tabs;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
@@ -36,37 +35,31 @@ import java.util.Set;
 /**
  * @author oleg
  */
-public class MotionPreviousTabAction extends MotionEditorAction {
+public class MotionPreviousTabAction extends MotionActionHandler.SingleExecution {
   @NotNull
   @Override
-  public MotionActionHandler makeActionHandler() {
-    return new MotionActionHandler.SingleExecution() {
-      @NotNull
-      @Override
-      public Set<MappingMode> getMappingModes() {
-        return MappingMode.NVO;
-      }
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.NVO;
+  }
 
-      @NotNull
-      @Override
-      public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("gT");
-      }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("gT");
+  }
 
-      @NotNull
-      @Override
-      public EnumSet<CommandFlags> getFlags() {
-        return EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE);
-      }
+  @NotNull
+  @Override
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE);
+  }
 
-      @Override
-      public int getOffset(@NotNull final Editor editor,
-                           @NotNull final DataContext context,
-                           final int count,
-                           final int rawCount,
-                           final Argument argument) {
-        return VimPlugin.getMotion().moveCaretGotoPreviousTab(editor, context, rawCount);
-      }
-    };
+  @Override
+  public int getOffset(@NotNull final Editor editor,
+                       @NotNull final DataContext context,
+                       final int count,
+                       final int rawCount,
+                       final Argument argument) {
+    return VimPlugin.getMotion().moveCaretGotoPreviousTab(editor, context, rawCount);
   }
 }

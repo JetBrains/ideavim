@@ -22,8 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.MotionEditorAction
-import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -37,88 +35,84 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import java.util.*
 import javax.swing.KeyStroke
 
-class MotionLastColumnAction : MotionEditorAction() {
-  override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
-    override val mappingModes: Set<MappingMode> = MappingMode.NVO
+class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
+  override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("$")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("$")
 
-    override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE)
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE)
 
-    override fun getOffset(editor: Editor,
-                           caret: Caret,
-                           context: DataContext,
-                           count: Int,
-                           rawCount: Int,
-                           argument: Argument?): Int {
-      var allow = false
-      if (editor.inInsertMode) {
-        allow = true
-      } else if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
-        val opt = OptionsManager.selection
-        if (opt.value != "old") {
-          allow = true
-        }
-      }
-
-      return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow)
-    }
-
-    override fun postMove(editor: Editor,
-                          caret: Caret,
-                          context: DataContext,
-                          cmd: Command) {
-      caret.vimLastColumn = MotionGroup.LAST_COLUMN
-    }
-
-    override fun preMove(editor: Editor,
+  override fun getOffset(editor: Editor,
                          caret: Caret,
                          context: DataContext,
-                         cmd: Command) {
-      caret.vimLastColumn = MotionGroup.LAST_COLUMN
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
+    var allow = false
+    if (editor.inInsertMode) {
+      allow = true
+    } else if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+      val opt = OptionsManager.selection
+      if (opt.value != "old") {
+        allow = true
+      }
     }
+
+    return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow)
+  }
+
+  override fun postMove(editor: Editor,
+                        caret: Caret,
+                        context: DataContext,
+                        cmd: Command) {
+    caret.vimLastColumn = MotionGroup.LAST_COLUMN
+  }
+
+  override fun preMove(editor: Editor,
+                       caret: Caret,
+                       context: DataContext,
+                       cmd: Command) {
+    caret.vimLastColumn = MotionGroup.LAST_COLUMN
   }
 }
 
-class MotionLastColumnInsertAction : MotionEditorAction() {
-  override fun makeActionHandler(): MotionActionHandler = object : MotionActionHandler.ForEachCaret() {
-    override val mappingModes: Set<MappingMode> = MappingMode.I
+class MotionLastColumnInsertAction : MotionActionHandler.ForEachCaret() {
+  override val mappingModes: Set<MappingMode> = MappingMode.I
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<End>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<End>")
 
-    override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
 
-    override fun getOffset(editor: Editor,
-                           caret: Caret,
-                           context: DataContext,
-                           count: Int,
-                           rawCount: Int,
-                           argument: Argument?): Int {
-      var allow = false
-      if (editor.inInsertMode) {
-        allow = true
-      } else if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
-        val opt = OptionsManager.selection
-        if (opt.value != "old") {
-          allow = true
-        }
-      }
-
-      return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow)
-    }
-
-    override fun postMove(editor: Editor,
-                          caret: Caret,
-                          context: DataContext,
-                          cmd: Command) {
-      caret.vimLastColumn = MotionGroup.LAST_COLUMN
-    }
-
-    override fun preMove(editor: Editor,
+  override fun getOffset(editor: Editor,
                          caret: Caret,
                          context: DataContext,
-                         cmd: Command) {
-      caret.vimLastColumn = MotionGroup.LAST_COLUMN
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
+    var allow = false
+    if (editor.inInsertMode) {
+      allow = true
+    } else if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+      val opt = OptionsManager.selection
+      if (opt.value != "old") {
+        allow = true
+      }
     }
+
+    return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow)
+  }
+
+  override fun postMove(editor: Editor,
+                        caret: Caret,
+                        context: DataContext,
+                        cmd: Command) {
+    caret.vimLastColumn = MotionGroup.LAST_COLUMN
+  }
+
+  override fun preMove(editor: Editor,
+                       caret: Caret,
+                       context: DataContext,
+                       cmd: Command) {
+    caret.vimLastColumn = MotionGroup.LAST_COLUMN
   }
 }

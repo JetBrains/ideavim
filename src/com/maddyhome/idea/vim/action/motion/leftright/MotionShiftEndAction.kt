@@ -21,14 +21,11 @@ package com.maddyhome.idea.vim.action.motion.leftright
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.VimCommandAction
-import com.maddyhome.idea.vim.action.VimCommandActionBase
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ShiftedSpecialKeyHandler
-import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inSelectMode
@@ -39,33 +36,30 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import java.util.*
 import javax.swing.KeyStroke
 
-class MotionShiftEndAction : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : ShiftedSpecialKeyHandler() {
-    override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
+class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-End>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-End>")
 
-    override val type: Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-    override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
-    override fun motion(editor: Editor, context: DataContext, cmd: Command) {
-      editor.vimForEachCaret { caret ->
-        var allow = false
-        if (editor.inInsertMode) {
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
+  override fun motion(editor: Editor, context: DataContext, cmd: Command) {
+    editor.vimForEachCaret { caret ->
+      var allow = false
+      if (editor.inInsertMode) {
+        allow = true
+      } else if (editor.inVisualMode || editor.inSelectMode) {
+        val opt = OptionsManager.selection
+        if (opt.value != "old") {
           allow = true
-        } else if (editor.inVisualMode || editor.inSelectMode) {
-          val opt = OptionsManager.selection
-          if (opt.value != "old") {
-            allow = true
-          }
         }
-
-        val newOffset = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, cmd.count - 1, allow)
-        caret.vimLastColumn = MotionGroup.LAST_COLUMN
-        MotionGroup.moveCaret(editor, caret, newOffset)
-        caret.vimLastColumn = MotionGroup.LAST_COLUMN
       }
+
+      val newOffset = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, cmd.count - 1, allow)
+      caret.vimLastColumn = MotionGroup.LAST_COLUMN
+      MotionGroup.moveCaret(editor, caret, newOffset)
+      caret.vimLastColumn = MotionGroup.LAST_COLUMN
     }
   }
-
 }

@@ -22,13 +22,11 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,44 +36,38 @@ import java.util.List;
 import java.util.Set;
 
 
-public class ChangeCharactersAction extends VimCommandAction {
+public class ChangeCharactersAction extends ChangeEditorActionHandler.ForEachCaret {
   @NotNull
   @Override
-  protected VimActionHandler makeActionHandler() {
-    return new ChangeEditorActionHandler.ForEachCaret() {
-      @NotNull
-      @Override
-      public Set<MappingMode> getMappingModes() {
-        return MappingMode.N;
-      }
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
+  }
 
-      @NotNull
-      @Override
-      public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("s");
-      }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("s");
+  }
 
-      @NotNull
-      @Override
-      public Command.Type getType() {
-        return Command.Type.CHANGE;
-      }
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.CHANGE;
+  }
 
-      @NotNull
-      @Override
-      public EnumSet<CommandFlags> getFlags() {
-        return EnumSet.of(CommandFlags.FLAG_NO_REPEAT, CommandFlags.FLAG_MULTIKEY_UNDO);
-      }
+  @NotNull
+  @Override
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_NO_REPEAT, CommandFlags.FLAG_MULTIKEY_UNDO);
+  }
 
-      @Override
-      public boolean execute(@NotNull Editor editor,
-                             @NotNull Caret caret,
-                             @NotNull DataContext context,
-                             int count,
-                             int rawCount,
-                             @Nullable Argument argument) {
-        return VimPlugin.getChange().changeCharacters(editor, caret, count);
-      }
-    };
+  @Override
+  public boolean execute(@NotNull Editor editor,
+                         @NotNull Caret caret,
+                         @NotNull DataContext context,
+                         int count,
+                         int rawCount,
+                         @Nullable Argument argument) {
+    return VimPlugin.getChange().changeCharacters(editor, caret, count);
   }
 }

@@ -22,13 +22,11 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -41,55 +39,48 @@ import java.util.Set;
 /**
  * @author vlan
  */
-final public class ChangeVisualCharacterAction extends VimCommandAction {
-  @Contract(" -> new")
+final public class ChangeVisualCharacterAction extends VisualOperatorActionHandler.ForEachCaret {
+  @Contract(pure = true)
   @NotNull
   @Override
-  final protected VimActionHandler makeActionHandler() {
-    return new VisualOperatorActionHandler.ForEachCaret() {
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Set<MappingMode> getMappingModes() {
-        return MappingMode.V;
-      }
+  final public Set<MappingMode> getMappingModes() {
+    return MappingMode.V;
+  }
 
-      @NotNull
-      @Override
-      final public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("r");
-      }
+  @NotNull
+  @Override
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("r");
+  }
 
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Command.Type getType() {
-        return Command.Type.CHANGE;
-      }
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.CHANGE;
+  }
 
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Argument.Type getArgumentType() {
-        return Argument.Type.DIGRAPH;
-      }
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Argument.Type getArgumentType() {
+    return Argument.Type.DIGRAPH;
+  }
 
-      @NotNull
-      @Override
-      final public EnumSet<CommandFlags> getFlags() {
-        return EnumSet.of(CommandFlags.FLAG_ALLOW_DIGRAPH, CommandFlags.FLAG_EXIT_VISUAL);
-      }
+  @NotNull
+  @Override
+  final public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_ALLOW_DIGRAPH, CommandFlags.FLAG_EXIT_VISUAL);
+  }
 
-      @Override
-      public boolean executeAction(@NotNull Editor editor,
-                                   @NotNull Caret caret,
-                                   @NotNull DataContext context,
-                                   @NotNull Command cmd,
-                                   @NotNull VimSelection range) {
-        final Argument argument = cmd.getArgument();
-        return argument != null &&
-               VimPlugin.getChange().changeCharacterRange(editor, range.toVimTextRange(false), argument.getCharacter());
-      }
-    };
+  @Override
+  public boolean executeAction(@NotNull Editor editor,
+                               @NotNull Caret caret,
+                               @NotNull DataContext context,
+                               @NotNull Command cmd,
+                               @NotNull VimSelection range) {
+    final Argument argument = cmd.getArgument();
+    return argument != null &&
+           VimPlugin.getChange().changeCharacterRange(editor, range.toVimTextRange(false), argument.getCharacter());
   }
 }

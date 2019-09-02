@@ -22,13 +22,11 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -42,55 +40,48 @@ import java.util.Set;
 /**
  * @author vlan
  */
-final public class VisualBlockAppendAction extends VimCommandAction {
-  @Contract(" -> new")
+final public class VisualBlockAppendAction extends VisualOperatorActionHandler.SingleExecution {
+  @Contract(pure = true)
   @NotNull
   @Override
-  final protected VimActionHandler makeActionHandler() {
-    return new VisualOperatorActionHandler.SingleExecution() {
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Set<MappingMode> getMappingModes() {
-        return MappingMode.V;
-      }
-
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Set<List<KeyStroke>> getKeyStrokesSet() {
-        return parseKeysSet("A");
-      }
-
-      @Contract(pure = true)
-      @NotNull
-      @Override
-      final public Command.Type getType() {
-        return Command.Type.INSERT;
-      }
-
-      @NotNull
-      @Override
-      final public EnumSet<CommandFlags> getFlags() {
-        return EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO, CommandFlags.FLAG_EXIT_VISUAL);
-      }
-      @Override
-      final public boolean executeForAllCarets(@NotNull Editor editor,
-                                         @NotNull DataContext context,
-                                         @NotNull Command cmd,
-                                         @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
-        if (editor.isOneLineMode()) return false;
-        VimSelection range = caretsAndSelections.values().stream().findFirst().orElse(null);
-        if (range == null) return false;
-        if (range.getType() == SelectionType.BLOCK_WISE) {
-          return VimPlugin.getChange().blockInsert(editor, context, range.toVimTextRange(false), true);
-        }
-        else {
-          VimPlugin.getChange().insertAfterLineEnd(editor, context);
-          return true;
-        }
-      }
-    };
+  final public Set<MappingMode> getMappingModes() {
+    return MappingMode.V;
   }
 
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("A");
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.INSERT;
+  }
+
+  @NotNull
+  @Override
+  final public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO, CommandFlags.FLAG_EXIT_VISUAL);
+  }
+
+  @Override
+  final public boolean executeForAllCarets(@NotNull Editor editor,
+                                           @NotNull DataContext context,
+                                           @NotNull Command cmd,
+                                           @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
+    if (editor.isOneLineMode()) return false;
+    VimSelection range = caretsAndSelections.values().stream().findFirst().orElse(null);
+    if (range == null) return false;
+    if (range.getType() == SelectionType.BLOCK_WISE) {
+      return VimPlugin.getChange().blockInsert(editor, context, range.toVimTextRange(false), true);
+    }
+    else {
+      VimPlugin.getChange().insertAfterLineEnd(editor, context);
+      return true;
+    }
+  }
 }
