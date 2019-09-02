@@ -36,22 +36,8 @@ public class RegisterActions {
    * Register all the key/action mappings for the plugin.
    */
   static void registerActions() {
-    Runnable setup = () -> {
-      registerVimCommandActions();
-      registerEmptyShortcuts();
-      VimPlugin.Initialization.actionsInitialized();
-    };
-
-    // Temporally remove async initialization
-    setup.run();
-    /*
-    if (ApplicationManager.getApplication().isUnitTestMode()) {
-      setup.run();
-    }
-    else {
-      ApplicationManager.getApplication().executeOnPooledThread(setup);
-    }
-    */
+    registerVimCommandActions();
+    registerEmptyShortcuts();
   }
 
   @Nullable

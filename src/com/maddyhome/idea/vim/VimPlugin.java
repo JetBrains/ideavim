@@ -305,21 +305,31 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     getSearch().turnOn();
     VimListenerManager.INSTANCE.turnOn();
 
-    // Register vim actions in command mode
-    RegisterActions.registerActions();
-
     // Add some listeners so we can handle special events
     DocumentManager.getInstance().addDocumentListener(MarkGroup.MarkUpdater.INSTANCE);
     DocumentManager.getInstance().addDocumentListener(SearchGroup.DocumentSearchListener.INSTANCE);
 
-    // Register ex handlers
-    CommandParser.getInstance().registerHandlers();
+    Runnable asyncSetup = () -> {
+      // Register vim actions in command mode
+      RegisterActions.registerActions();
 
-    if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      final File ideaVimRc = VimScriptParser.findIdeaVimRc();
-      if (ideaVimRc != null) {
-        VimScriptParser.executeFile(ideaVimRc);
+      // Register ex handlers
+      CommandParser.getInstance().registerHandlers();
+
+      if (!ApplicationManager.getApplication().isUnitTestMode()) {
+        final File ideaVimRc = VimScriptParser.findIdeaVimRc();
+        if (ideaVimRc != null) {
+          VimScriptParser.executeFile(ideaVimRc);
+        }
       }
+
+      Initialization.initialized();
+    };
+
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      asyncSetup.run();
+    } else {
+      ApplicationManager.getApplication().executeOnPooledThread(asyncSetup);
     }
   }
 
@@ -403,20 +413,14 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   }
 
   public static class Initialization {
-    private static final AtomicBoolean initializedActions = new AtomicBoolean(false);
-    private static final AtomicBoolean initializedCommands = new AtomicBoolean(false);
+    private static final AtomicBoolean initialized = new AtomicBoolean(false);
 
     public static boolean notInitialized() {
-      return !(initializedActions.get() &&
-               initializedCommands.get());
+      return !(initialized.get());
     }
 
-    public static void actionsInitialized() {
-      initializedActions.set(true);
-    }
-
-    public static void commandsInitialized() {
-      initializedCommands.set(true);
+    public static void initialized() {
+      initialized.set(true);
     }
   }
 

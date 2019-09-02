@@ -73,23 +73,9 @@ public class CommandParser {
   public void registerHandlers() {
     if (registered.getAndSet(true)) return;
 
-    Runnable setup = () -> {
-      for (CommandHandler handler : EX_COMMAND_EP.getExtensions()) {
-        handler.register();
-      }
-
-      VimPlugin.Initialization.commandsInitialized();
-    };
-
-    // Temporally remove async initialization
-    setup.run();
-    /*
-    if (ApplicationManager.getApplication().isUnitTestMode()) {
-      setup.run();
-    } else {
-      ApplicationManager.getApplication().executeOnPooledThread(setup);
+    for (CommandHandler handler : EX_COMMAND_EP.getExtensions()) {
+      handler.register();
     }
-    */
   }
 
   /**
