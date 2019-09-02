@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.group.copy
@@ -46,6 +46,8 @@ class YankGroup {
     val motion = argument.motion ?: return false
 
     val caretModel = editor.caretModel
+    if (caretModel.caretCount <= 0) return false
+
     val ranges = ArrayList<Pair<Int, Int>>(caretModel.caretCount)
     val startOffsets = HashMap<Caret, Int>(caretModel.caretCount)
     for (caret in caretModel.allCarets) {
@@ -59,6 +61,8 @@ class YankGroup {
 
     val type = SelectionType.fromCommandFlags(motion.flags)
     val range = getTextRange(ranges, type)
+
+    if (range.size() == 0) return false;
 
     val selectionType = if (type == SelectionType.CHARACTER_WISE && range.isMultiple) SelectionType.BLOCK_WISE else type
     return yankRange(editor, range, selectionType, startOffsets)

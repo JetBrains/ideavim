@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.helper;
@@ -71,4 +71,5 @@ public interface Msg {
   String e_patnotf2 = "e_patnotf2";
   String unkopt = "unkopt";
   String e_invarg = "e_invarg";
+  String E475 = "E475";
 }

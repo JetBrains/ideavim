@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 package com.maddyhome.idea.vim.group;
 
@@ -824,7 +824,7 @@ public class MotionGroup {
     return -2;
   }
 
-  public int moveCaretToJump(@NotNull Editor editor, @NotNull Caret caret, int count) {
+  public int moveCaretToJump(@NotNull Editor editor, int count) {
     final int spot = VimPlugin.getMark().getJumpSpot();
     final Jump jump = VimPlugin.getMark().getJump(count);
 
@@ -851,7 +851,7 @@ public class MotionGroup {
         if (spot == -1) {
           VimPlugin.getMark().addJump(editor, false);
         }
-        moveCaret(newEditor, caret,
+        moveCaret(newEditor, newEditor.getCaretModel().getCurrentCaret(),
                   EditorHelper.normalizeOffset(newEditor, newEditor.logicalPositionToOffset(lp), false));
       }
 

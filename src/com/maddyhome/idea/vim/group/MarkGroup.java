@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.group;
@@ -325,12 +325,15 @@ public class MarkGroup {
     fileMarks.clear();
   }
 
-  private void removeMark(char ch, @NotNull Mark mark, @NotNull Editor editor) {
+  public void removeMark(char ch, @NotNull Mark mark, @NotNull Editor editor) {
     if (FILE_MARKS.indexOf(ch) >= 0) {
       HashMap fmarks = getFileMarks(mark.getFilename());
       fmarks.remove(ch);
     }
     else if (GLOBAL_MARKS.indexOf(ch) >= 0) {
+      // Global marks are added to global and file marks
+      HashMap fmarks = getFileMarks(mark.getFilename());
+      fmarks.remove(ch);
       globalMarks.remove(ch);
       removeSystemMark(ch, editor);
     }
@@ -797,19 +800,38 @@ public class MarkGroup {
   private static final int SAVE_MARK_COUNT = 20;
   private static final int SAVE_JUMP_COUNT = 100;
 
-  private static final String WR_GLOBAL_MARKS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  private static final String WR_FILE_MARKS = "abcdefghijklmnopqrstuvwxyz'";
-  private static final String RO_GLOBAL_MARKS = "0123456789";
-  private static final String RO_FILE_MARKS = ".[]<>^{}()";
-  private static final String SAVE_FILE_MARKS = WR_FILE_MARKS + ".^[]\"";
+  public static final String WR_GLOBAL_MARKS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  public static final String WR_REGULAR_FILE_MARKS = "abcdefghijklmnopqrstuvwxyz";
+  /** Marks: abcdefghijklmnopqrstuvwxyz' */
+  private static final String WR_FILE_MARKS = WR_REGULAR_FILE_MARKS + "'";
 
+  public static final String RO_GLOBAL_MARKS = "0123456789";
+  private static final String RO_FILE_MARKS = ".[]<>^{}()";
+
+  private static final String DEL_CONTEXT_FILE_MARKS = ".^[]\"";
+  /** Marks: .^[]"abcdefghijklmnopqrstuvwxyz */
+  public static final String DEL_FILE_MARKS = DEL_CONTEXT_FILE_MARKS + WR_REGULAR_FILE_MARKS;
+  /** Marks: 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ*/
+  private static final String DEL_GLOBAL_MARKS = RO_GLOBAL_MARKS + WR_GLOBAL_MARKS;
+  /** Marks: .^[]"abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ  */
+  public static final String DEL_MARKS = DEL_FILE_MARKS + DEL_GLOBAL_MARKS;
+
+  /** Marks: abcdefghijklmnopqrstuvwxyz'.^[]" */
+  private static final String SAVE_FILE_MARKS = WR_FILE_MARKS + DEL_CONTEXT_FILE_MARKS;
+
+  /** Marks: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 */
   private static final String GLOBAL_MARKS = WR_GLOBAL_MARKS + RO_GLOBAL_MARKS;
+  /** Marks: abcdefghijklmnopqrstuvwxyz'[]<>^{}() */
   private static final String FILE_MARKS = WR_FILE_MARKS + RO_FILE_MARKS;
 
+  /** Marks: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' */
   private static final String WRITE_MARKS = WR_GLOBAL_MARKS + WR_FILE_MARKS;
+  /** Marks: 0123456789.[]<>^{}() */
   private static final String READONLY_MARKS = RO_GLOBAL_MARKS + RO_FILE_MARKS;
 
+  /** Marks: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' */
   private static final String VALID_SET_MARKS = WRITE_MARKS;
+  /** Marks: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'0123456789.[]<>^{}() */
   private static final String VALID_GET_MARKS = WRITE_MARKS + READONLY_MARKS;
 
   private static final Logger logger = Logger.getInstance(MarkGroup.class.getName());

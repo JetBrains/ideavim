@@ -19,4 +19,9 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
     """.trimIndent())
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
+
+  fun `test backward search on empty string`() {
+    doTest(parseKeys("*"), "", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    assertPluginError(false)
+  }
 }

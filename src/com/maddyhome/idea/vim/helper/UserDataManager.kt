@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 @file:JvmName("UserDataManager")
@@ -89,7 +89,8 @@ var Editor.vimCommandState: CommandState? by userData()
 var Editor.vimChangeGroup: Boolean by userDataOr { false }
 var Editor.vimMotionGroup: Boolean by userDataOr { false }
 var Editor.vimEditorGroup: Boolean by userDataOr { false }
-var Editor.vimLineNumbersShown: Boolean by userDataOr { false }
+var Editor.vimLineNumbersInitialState: Boolean by userDataOr { false }
+var Editor.vimHasRelativeLineNumbersInstalled: Boolean by userDataOr { false }
 var Editor.vimMorePanel: ExOutputPanel? by userData()
 var Editor.vimExOutput: ExOutputModel? by userData()
 var Editor.vimTestInputModel: TestInputModel? by userData()

@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 @file:Suppress("RemoveCurlyBracesFromTemplate")
@@ -100,6 +100,32 @@ class VimSurroundExtensionTest : VimTestCase() {
     configureByText("<p>${c}Hello</p>")
     typeText(parseKeys("VS<div class = \"container\">"))
     myFixture.checkResult("<div class = \"container\"><p>Hello</p></div>")
+  }
+
+  fun testSurroundFunctionName() {
+    configureByText("foo = b${c}ar")
+    typeText(parseKeys("ysiwfbaz"))
+    myFixture.checkResult("foo = ${c}baz(bar)")
+  }
+
+  fun testSurroundFunctionNameDoesNothingIfInputIsEmpty() {
+    // The cursor does not move. This is different from Vim
+    // where the cursor moves to the beginning of the text object.
+    configureByText("foo = b${c}ar")
+    typeText(parseKeys("ysiwf"))
+    myFixture.checkResult("foo = b${c}ar")
+  }
+
+  fun testSurroundFunctionNameWithInnerSpacing() {
+    configureByText("foo = b${c}ar")
+    typeText(parseKeys("ysiwFbaz"))
+    myFixture.checkResult("foo = ${c}baz( bar )")
+  }
+
+  fun testSurroundSpace() {
+    configureByText("foo(b${c}ar)")
+    typeText(parseKeys("csbs"))
+    myFixture.checkResult("foo${c} bar")
   }
 
   /* visual surround */

@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.helper;
@@ -830,5 +830,12 @@ public class EditorHelper {
   public static boolean isFileEditor(@NotNull Editor editor) {
     final VirtualFile virtualFile = getVirtualFile(editor);
     return virtualFile != null && !(virtualFile instanceof LightVirtualFile);
+  }
+
+  /**
+   * Checks if the editor is a diff window
+   */
+  public static boolean isDiffEditor(@NotNull Editor editor) {
+    return editor.getEditorKind() == EditorKind.DIFF;
   }
 }

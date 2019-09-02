@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 package com.maddyhome.idea.vim;
 
@@ -343,6 +343,8 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
     ApplicationManager.getApplication().invokeLater(this::updateState);
 
+    getEditor().turnOn();
+    getSearch().turnOn();
     VimListenerManager.INSTANCE.turnOn();
 
     // Register vim actions in command mode

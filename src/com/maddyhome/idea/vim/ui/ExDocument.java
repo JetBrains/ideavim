@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ui;
@@ -57,7 +57,7 @@ public class ExDocument extends PlainDocument {
    * <p/>
    * This method is thread safe, although most Swing methods
    * are not. Please see
-   * <A HREF="http://java.sun.com/products/jfc/swingdoc-archive/threads.html">Threads
+   * <A HREF="https://java.sun.com/products/jfc/swingdoc-archive/threads.html">Threads
    * and Swing</A> for more information.
    *
    * @param offs the starting offset >= 0

@@ -3,7 +3,6 @@ package com.maddyhome.idea.vim.group.visual
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.mode
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.singleTask
-import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.option.OptionsManager
 import javax.swing.Timer
 
@@ -48,16 +47,14 @@ object VimVisualTimer {
   var swingTimer: Timer? = null
   var mode: CommandState.Mode? = null
 
-  inline fun singleTask(editorHasSelection: Boolean, currentMode: CommandState.Mode, crossinline task: () -> Unit) {
+  inline fun singleTask(currentMode: CommandState.Mode, crossinline task: (initialMode: CommandState.Mode?) -> Unit) {
     swingTimer?.stop()
 
     if (mode == null) mode = currentMode
 
     // Default delay - 100 ms
     val timer = Timer(OptionsManager.visualEnterDelay.value()) {
-      if (mode?.hasVisualSelection == true || editorHasSelection) {
-        task()
-      }
+      task(mode)
       swingTimer = null
       mode = null
     }

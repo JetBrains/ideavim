@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package org.jetbrains.plugins.ideavim.action.motion.`object`
@@ -245,8 +245,8 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
 
   //|d| |v_it|
   fun testDeleteInnerTagSlashesInAttribute() {
-    typeTextInFile(parseKeys("dit"), "<a href=\"http://isitchristmas.com\" class=\"button\">Bing ${c}Bing bing</a>")
-    myFixture.checkResult("<a href=\"http://isitchristmas.com\" class=\"button\"></a>")
+    typeTextInFile(parseKeys("dit"), "<a href=\"https://isitchristmas.com\" class=\"button\">Bing ${c}Bing bing</a>")
+    myFixture.checkResult("<a href=\"https://isitchristmas.com\" class=\"button\"></a>")
   }
 
   // VIM-1090 |d| |v_it|

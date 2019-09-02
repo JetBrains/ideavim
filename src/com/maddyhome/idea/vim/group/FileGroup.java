@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.group;
@@ -220,7 +220,7 @@ public class FileGroup {
     if (project == null) return;
     FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
     VirtualFile vf = lastSelections.get(fem);
-    if (vf != null) {
+    if (vf != null && vf.isValid()) {
       fem.openFile(vf, true);
     }
     else {
