@@ -4682,6 +4682,11 @@ public class RegExp {
 
     public int lnum = 0;
     public int col = 0;
+
+    @Override
+    public String toString() {
+      return "lpos: (" + lnum + ", " + col + ")";
+    }
   }
 
   /*

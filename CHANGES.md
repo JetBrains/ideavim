@@ -23,6 +23,11 @@ To be released
 * [VIM-1032](https://youtrack.jetbrains.com/issue/VIM-1032) Annotations work well with relative line numbers enabled
 * [VIM-1762](https://youtrack.jetbrains.com/issue/VIM-1762) Relative line numbers respect line number theme
 * [VIM-1720](https://youtrack.jetbrains.com/issue/VIM-1720) Add `:delmarks` command
+* [VIM-1717](https://youtrack.jetbrains.com/issue/VIM-1717) Fix incorrect scroll location if no match with `incsearch`
+* [VIM-1757](https://youtrack.jetbrains.com/issue/VIM-1757) Fix incorrect search results when specifying offset as part of search command
+* Fix search highlights not showing after deleting last result
+* Update current line highlight during incsearch and replace operation
+* [VIM-1773](https://youtrack.jetbrains.com/issue/VIM-1773) Provide fallback error stripe colour if not defined
 
 0.53, 2019-08-07
 --------------
