@@ -26,6 +26,8 @@ import com.intellij.codeInsight.editorActions.TextBlockTransferableData;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.CaretStateTransferableData;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.richcopy.view.HtmlTransferableData;
+import com.intellij.openapi.editor.richcopy.view.RtfTransferableData;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
@@ -267,6 +269,12 @@ public class RegisterGroup {
       }
     });
     transferableDatas.add(new CaretStateTransferableData(new int[]{0}, new int[]{text.length()}));
+
+    // These data provided by {@link com.intellij.openapi.editor.richcopy.TextWithMarkupProcessor} doesn't work with
+    //   IdeaVim and I don't see a way to fix it
+    // See https://youtrack.jetbrains.com/issue/VIM-1785
+    // See https://youtrack.jetbrains.com/issue/VIM-1731
+    transferableDatas.removeIf(it -> (it instanceof RtfTransferableData) || (it instanceof HtmlTransferableData));
     return transferableDatas;
   }
 
