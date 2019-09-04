@@ -105,6 +105,14 @@ class VisualMotionGroup {
     return true
   }
 
+  /**
+   * This method should be in sync with [predictMode]
+   *
+   * Control unexpected (non vim) selection change and adjust mode to it. The new mode is now enabled immidiatelly,
+   *   but with some delay (using [VimVisualTimer]
+   *
+   * See [VimVisualTimer] to more info
+   */
   fun controlNonVimSelectionChange(editor: Editor, selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER) {
     VimVisualTimer.singleTask(editor.mode) { initialMode ->
       logger.info("Adjust non-vim selection. Source: $selectionSource")
@@ -158,7 +166,16 @@ class VisualMotionGroup {
     }
   }
 
-  // TODO: 2019-07-30 This method should be used for [controlNonVimSelectionChange]
+  /**
+   * This method should be in sync with [controlNonVimSelectionChange]
+   *
+   * Predict mode after changing visual selection. The prediction will be correct if there is only one sequential
+   *   visual change (e.g. somebody executed "extract selection" action. The prediction can be wrong in case of
+   *   multiple sequential visual changes (e.g. "technical" visual selection during typing in japanese)
+   *
+   * This method is created to improve user experience. It allows to avoid delay in some operations
+   *   (because [controlNonVimSelectionChange] is not executed immediately)
+   */
   fun predictMode(editor: Editor, selectionSource: VimListenerManager.SelectionSource): CommandState.Mode {
     if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
       val selectMode = OptionsManager.selectmode
