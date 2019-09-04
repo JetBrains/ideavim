@@ -48,7 +48,7 @@ class YankLinesHandler : CommandHandler.SingleExecution() {
     for (caret in caretModel.allCarets) {
       val range = cmd.getTextRange(editor, caret, context, true)
       starts.add(range.startOffset)
-      ends.add(range.endOffset - 1)
+      ends.add(range.endOffset)
     }
 
     return VimPlugin.getYank().yankRange(editor,

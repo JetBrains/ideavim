@@ -35,6 +35,7 @@ To be released
   [VIM-1731](https://youtrack.jetbrains.com/issue/VIM-1731)
   Fix some problems with yanking to clipboard
 * [VIM-1781](https://youtrack.jetbrains.com/issue/VIM-1781) Fix yanking with dollar motion
+* [VIM-1772](https://youtrack.jetbrains.com/issue/VIM-1772) Fix yanking with `:y` command
 
 0.53, 2019-08-07
 --------------
