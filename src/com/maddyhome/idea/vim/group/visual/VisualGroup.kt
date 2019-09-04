@@ -152,41 +152,43 @@ fun updateCaretState(editor: Editor) {
   }
 }
 
+fun charToNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.Mode): Pair<Int, Int> {
+  val (nativeStart, nativeEnd) = sort(start, end)
+  val lineEnd = EditorHelper.getLineEndForOffset(editor, nativeEnd)
+  val adj = if (VimPlugin.getVisualMotion().exclusiveSelection || nativeEnd == lineEnd || mode == CommandState.Mode.SELECT) 0 else 1
+  val adjEnd = (nativeEnd + adj).coerceAtMost(EditorHelper.getFileSize(editor))
+  return nativeStart to adjEnd
+}
+
 /**
  * Convert vim's selection start and end to corresponding native selection.
  *
  * Adds caret adjustment or extends to line start / end in case of linewise selection
  */
-fun toNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.Mode, subMode: CommandState.SubMode): Pair<Int, Int> =
-  when (subMode) {
-    CommandState.SubMode.VISUAL_LINE -> {
-      val (nativeStart, nativeEnd) = sort(start, end)
-      val lineStart = EditorHelper.getLineStartForOffset(editor, nativeStart)
-      // Extend to \n char of line to fill full line with selection
-      val lineEnd = (EditorHelper.getLineEndForOffset(editor, nativeEnd) + 1).coerceAtMost(EditorHelper.getFileSize(editor, true))
-      lineStart to lineEnd
-    }
-    CommandState.SubMode.VISUAL_CHARACTER -> {
-      val (nativeStart, nativeEnd) = sort(start, end)
-      val lineEnd = EditorHelper.getLineEndForOffset(editor, nativeEnd)
-      val adj = if (VimPlugin.getVisualMotion().exclusiveSelection || nativeEnd == lineEnd || mode == CommandState.Mode.SELECT) 0 else 1
-      val adjEnd = (nativeEnd + adj).coerceAtMost(EditorHelper.getFileSize(editor))
-      nativeStart to adjEnd
-    }
-    CommandState.SubMode.VISUAL_BLOCK -> {
-      var blockStart = editor.offsetToLogicalPosition(start)
-      var blockEnd = editor.offsetToLogicalPosition(end)
-      if (!VimPlugin.getVisualMotion().exclusiveSelection && mode != CommandState.Mode.SELECT) {
-        if (blockStart.column > blockEnd.column) {
-          blockStart = LogicalPosition(blockStart.line, blockStart.column + 1)
-        } else {
-          blockEnd = LogicalPosition(blockEnd.line, blockEnd.column + 1)
-        }
+fun lineToNativeSelection(editor: Editor, start: Int, end: Int): Pair<Int, Int> {
+  val (nativeStart, nativeEnd) = sort(start, end)
+  val lineStart = EditorHelper.getLineStartForOffset(editor, nativeStart)
+  // Extend to \n char of line to fill full line with selection
+  val lineEnd = (EditorHelper.getLineEndForOffset(editor, nativeEnd) + 1).coerceAtMost(EditorHelper.getFileSize(editor, true))
+  return lineStart to lineEnd
+}
+
+fun blockToNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.Mode): Pair<LogicalPosition, LogicalPosition> {
+  var blockStart = editor.offsetToLogicalPosition(start)
+  var blockEnd = editor.offsetToLogicalPosition(end)
+  if (!VimPlugin.getVisualMotion().exclusiveSelection && mode != CommandState.Mode.SELECT) {
+    if (blockStart.column > blockEnd.column) {
+      if (blockStart.column < EditorHelper.getLineLength(editor, blockStart.line)) {
+        blockStart = LogicalPosition(blockStart.line, blockStart.column + 1)
       }
-      editor.logicalPositionToOffset(blockStart) to editor.logicalPositionToOffset(blockEnd)
+    } else {
+      if (blockEnd.column < EditorHelper.getLineLength(editor, blockEnd.line)) {
+        blockEnd = LogicalPosition(blockEnd.line, blockEnd.column + 1)
+      }
     }
-    else -> sort(start, end)
   }
+  return blockStart to blockEnd
+}
 
 fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: CommandState.Mode) {
   if (predictedMode != CommandState.Mode.VISUAL) {
@@ -218,16 +220,19 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
   val subMode = editor.subMode
   val mode = editor.mode
   when (subMode) {
-    CommandState.SubMode.VISUAL_LINE, CommandState.SubMode.VISUAL_CHARACTER -> {
-      val (nativeStart, nativeEnd) = toNativeSelection(editor, start, end, mode, subMode)
+    CommandState.SubMode.VISUAL_CHARACTER -> {
+      val (nativeStart, nativeEnd) = charToNativeSelection(editor, start, end, mode)
+      caret.vimSetSystemSelectionSilently(nativeStart, nativeEnd)
+    }
+    CommandState.SubMode.VISUAL_LINE -> {
+      val (nativeStart, nativeEnd) = lineToNativeSelection(editor, start, end)
       caret.vimSetSystemSelectionSilently(nativeStart, nativeEnd)
     }
     CommandState.SubMode.VISUAL_BLOCK -> {
       editor.caretModel.removeSecondaryCarets()
 
       // Set system selection
-      val (nativeStart, nativeEnd) = toNativeSelection(editor, selectionStart, selectionEnd, mode, subMode)
-      val (blockStart, blockEnd) = editor.offsetToLogicalPosition(nativeStart) to editor.offsetToLogicalPosition(nativeEnd)
+      val (blockStart, blockEnd) = blockToNativeSelection(editor, selectionStart, selectionEnd, mode)
       val lastColumn = editor.caretModel.primaryCaret.vimLastColumn
       editor.selectionModel.vimSetSystemBlockSelectionSilently(blockStart, blockEnd)
 

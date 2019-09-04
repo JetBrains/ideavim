@@ -55,11 +55,11 @@ sealed class VimSelection {
   companion object {
     fun create(vimStart: Int, vimEnd: Int, type: SelectionType, editor: Editor) = when (type) {
       CHARACTER_WISE -> {
-        val nativeSelection = toNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL, type.toSubMode())
+        val nativeSelection = charToNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL)
         VimCharacterSelection(vimStart, vimEnd, nativeSelection.first, nativeSelection.second, editor)
       }
       LINE_WISE -> {
-        val nativeSelection = toNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL, type.toSubMode())
+        val nativeSelection = lineToNativeSelection(editor, vimStart, vimEnd)
         VimLineSelection(vimStart, vimEnd, nativeSelection.first, nativeSelection.second, editor)
       }
       BLOCK_WISE -> VimBlockSelection(vimStart, vimEnd, editor, false)
@@ -152,7 +152,9 @@ class VimBlockSelection(
   override val editor: Editor,
   val toLineEnd: Boolean
 ) : VimSelection() {
-  override fun getNativeStartAndEnd() = toNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL, type.toSubMode())
+  override fun getNativeStartAndEnd() = blockToNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL).let {
+    editor.logicalPositionToOffset(it.first) to editor.logicalPositionToOffset(it.second)
+  }
 
   override val type = BLOCK_WISE
 
@@ -167,10 +169,8 @@ class VimBlockSelection(
   }
 
   private fun forEachLine(action: (start: Int, end: Int) -> Unit) {
-    val offsets = toNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL, type.toSubMode())
-    val logicalStart = editor.offsetToLogicalPosition(min(offsets.first, offsets.second))
-    val logicalEnd = editor.offsetToLogicalPosition(max(offsets.first, offsets.second))
-    val lineRange = if (logicalStart.line > logicalEnd.line) logicalStart.line downTo logicalEnd.line else logicalStart.line..logicalEnd.line
+    val (logicalStart, logicalEnd) = blockToNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL)
+    val lineRange = if (logicalStart.line > logicalEnd.line) logicalEnd.line..logicalStart.line else logicalStart.line..logicalEnd.line
     lineRange.map { line ->
       val start = editor.logicalPositionToOffset(LogicalPosition(line, logicalStart.column))
       val end = if (toLineEnd) {

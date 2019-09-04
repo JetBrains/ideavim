@@ -222,6 +222,22 @@ zxcvbn${c}werty
                     """.trimIndent(), SelectionType.BLOCK_WISE)
   }
 
+  fun `test block yank with dollar motion backward`() {
+    doTest(parseKeys("<C-V>k$", "y"),
+      """
+                            A Discovery
+
+                            I found it in a legendary land
+                            al${c}l rocks and lavender and tufted grass,[ additional symbols]
+                            where it was settled on some sodden sand
+                            hard by the torrent of a mountain pass.
+                            """.trimIndent(),
+      """
+                    found it in a legendary land
+                    l rocks and lavender and tufted grass,[ additional symbols]
+                    """.trimIndent(), SelectionType.BLOCK_WISE)
+  }
+
   private fun doTest(keys: List<KeyStroke>, before: String, expectedText: String, expectedType: SelectionType) {
     configureByText(before)
     typeText(keys)
