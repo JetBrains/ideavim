@@ -386,10 +386,10 @@ class VisualMotionGroup {
     updateCaretState(editor)
   }
 
-  fun resetVisual(editor: Editor) {
+  @RWLockLabel.NoLockRequired
+  fun exitVisual(editor: Editor) {
     val wasBlockSubMode = editor.inBlockSubMode
     val selectionType = SelectionType.fromSubMode(editor.subMode)
-
     SelectionVimListenerSuppressor.lock().use {
       if (wasBlockSubMode) {
         editor.caretModel.allCarets.forEach { it.visualAttributes = editor.caretModel.primaryCaret.visualAttributes }
@@ -399,7 +399,6 @@ class VisualMotionGroup {
         editor.caretModel.allCarets.forEach(Caret::removeSelection)
       }
     }
-
     if (editor.inVisualMode) {
       editor.vimLastSelectionType = selectionType
       // FIXME: 2019-03-05 Make it multicaret
@@ -409,13 +408,7 @@ class VisualMotionGroup {
       editor.caretModel.allCarets.forEach { it.vimSelectionStartClear() }
 
       editor.subMode = CommandState.SubMode.NONE
-    }
-  }
 
-  @RWLockLabel.NoLockRequired
-  fun exitVisual(editor: Editor) {
-    resetVisual(editor)
-    if (editor.inVisualMode) {
       CommandState.getInstance(editor).popState()
     }
   }

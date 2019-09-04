@@ -66,7 +66,7 @@ final public class FilterVisualLinesAction extends VimActionHandler.SingleExecut
   @Override
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
     VimPlugin.getProcess().startFilterCommand(editor, context, cmd);
-    VimPlugin.getVisualMotion().resetVisual(editor);
+    VimPlugin.getVisualMotion().exitVisual(editor);
     return true;
   }
 }
