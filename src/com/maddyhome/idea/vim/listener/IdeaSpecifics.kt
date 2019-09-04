@@ -84,6 +84,10 @@ object IdeaSpecifics {
       //region Enter insert mode after surround with if
       if (surrounderAction == action.javaClass.name && surrounderItems.any { action.templatePresentation.text.endsWith(it) }) {
         editor?.let {
+          val commandState = CommandState.getInstance(editor)
+          while (commandState.mode != CommandState.Mode.COMMAND) {
+            commandState.popState()
+          }
           VimPlugin.getChange().insertBeforeCursor(it, dataContext)
           KeyHandler.getInstance().reset(it)
         }
