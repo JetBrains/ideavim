@@ -18,13 +18,26 @@
 
 package com.maddyhome.idea.vim.group.visual
 
-import com.intellij.openapi.editor.*
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.CaretVisualAttributes
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.colors.EditorColors
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.helper.inSelectMode
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.sort
+import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.helper.vimSelectionStart
 
 /**
  * @author Alex Plate
@@ -145,11 +158,13 @@ fun updateCaretState(editor: Editor) {
   }
 
   // Update shape
-  when (editor.mode) {
-    CommandState.Mode.COMMAND, CommandState.Mode.VISUAL, CommandState.Mode.REPLACE -> ChangeGroup.resetCaret(editor, false)
-    CommandState.Mode.SELECT, CommandState.Mode.INSERT -> ChangeGroup.resetCaret(editor, true)
-    CommandState.Mode.REPEAT, CommandState.Mode.EX_ENTRY -> Unit
-  }
+  editor.mode.resetShape(editor)
+}
+
+fun CommandState.Mode.resetShape(editor: Editor) = when (this) {
+  CommandState.Mode.COMMAND, CommandState.Mode.VISUAL, CommandState.Mode.REPLACE -> ChangeGroup.resetCaret(editor, false)
+  CommandState.Mode.SELECT, CommandState.Mode.INSERT -> ChangeGroup.resetCaret(editor, true)
+  CommandState.Mode.REPEAT, CommandState.Mode.EX_ENTRY -> Unit
 }
 
 fun charToNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.Mode): Pair<Int, Int> {
@@ -191,6 +206,7 @@ fun blockToNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandSt
 }
 
 fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: CommandState.Mode) {
+  predictedMode.resetShape(editor)
   if (predictedMode != CommandState.Mode.VISUAL) {
     if (!predictedMode.isEndAllowed) {
       editor.caretModel.allCarets.forEach { caret ->
