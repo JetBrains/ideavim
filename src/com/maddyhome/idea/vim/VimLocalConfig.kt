@@ -31,8 +31,10 @@ import org.jdom.Element
  * @author Alex Plate
  */
 
-@State(name = "VimLocalSettings",
-  storages = [Storage("$APP_CONFIG$/vim_local_settings.xml", roamingType = RoamingType.DISABLED)])
+@State(name = "VimLocalSettings", storages = [
+    Storage("$APP_CONFIG$/vim_local_settings.xml", roamingType = RoamingType.DISABLED, deprecated = true),
+    Storage("$APP_CONFIG/vim_local_settings.xml", roamingType = RoamingType.DISABLED)
+  ])
 class VimLocalConfig : PersistentStateComponent<Element> {
   override fun getState(): Element {
     val element = Element("ideavim-local")
