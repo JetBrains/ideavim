@@ -145,12 +145,17 @@ IdeaVim extensions, you have to enable them via this command in your ~/.ideavimr
 Available extensions:
 
 * surround
+    * `set surround`
     * Emulates [vim-surround](https://github.com/tpope/vim-surround)
     * Commands: `ys`, `cs`, `ds`, `S`
+
 * multiple-cursors
+    * `set multiple-cursors`
     * Emulates [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors)
     * Commands: `<A-n>`, `<A-x>`, `<A-p>`, `g<A-n>`
+
 * commentary
+    * `set commentary`
     * Emulates [commentary.vim](https://github.com/tpope/vim-commentary)
     * Commands: `gcc`, `gc + motion`, `v_gc`
 
