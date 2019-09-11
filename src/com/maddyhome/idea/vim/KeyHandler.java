@@ -295,7 +295,7 @@ public class KeyHandler {
   }
 
   private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull final DataContext context) {
-    if (state != State.COMMAND && count == 0 && currentArg == Argument.Type.NONE && currentCmd.size() == 0) {
+    if (state != State.COMMAND && count == 0 && currentArg == null && currentCmd.size() == 0) {
       RegisterGroup register = VimPlugin.getRegister();
       if (register.getCurrentRegister() == register.getDefaultRegister()) {
         if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -315,7 +315,7 @@ public class KeyHandler {
     commandState.stopMappingTimer();
 
     final MappingMode mappingMode = commandState.getMappingMode();
-    if (MappingMode.NVO.contains(mappingMode) && (state != State.NEW_COMMAND || currentArg != Argument.Type.NONE)) {
+    if (MappingMode.NVO.contains(mappingMode) && (state != State.NEW_COMMAND || currentArg != null)) {
       return false;
     }
 
@@ -635,7 +635,7 @@ public class KeyHandler {
     // If the current keystroke is really the first character of an argument the user needs to enter,
     // recursively go back and handle this keystroke again with all the state properly updated to
     // handle the argument
-    if (currentArg != Argument.Type.NONE) {
+    if (currentArg != null) {
       partialReset(editor);
       handleKey(editor, key, context);
       return false;
@@ -710,7 +710,7 @@ public class KeyHandler {
     partialReset(editor);
     state = State.NEW_COMMAND;
     currentCmd.clear();
-    currentArg = Argument.Type.NONE;
+    currentArg = null;
     digraph = null;
   }
 
@@ -833,7 +833,7 @@ public class KeyHandler {
   private List<KeyStroke> keys;
   private State state;
   @NotNull private final Stack<Command> currentCmd = new Stack<>();
-  @NotNull private Argument.Type currentArg;
+  @Nullable private Argument.Type currentArg;
   private TypedActionHandler origHandler;
   @Nullable private DigraphSequence digraph = null;
   private char lastChar;

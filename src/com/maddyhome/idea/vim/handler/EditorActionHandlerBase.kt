@@ -94,7 +94,7 @@ sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
 
   abstract val type: Command.Type
 
-  open val argumentType: Argument.Type = Argument.Type.NONE
+  open val argumentType: Argument.Type? = null
 
   /**
    * Returns various binary flags for the command.

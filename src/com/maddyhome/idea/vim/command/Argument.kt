@@ -38,7 +38,7 @@ class Argument private constructor(
   constructor(strArg: String) : this(string = strArg, type = Type.EX_STRING)
 
   enum class Type {
-    NONE, MOTION, CHARACTER, DIGRAPH, EX_STRING
+    MOTION, CHARACTER, DIGRAPH, EX_STRING
   }
 
   companion object {

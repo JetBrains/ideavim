@@ -290,7 +290,7 @@ public class KeyGroup {
                               @NotNull Command.Type cmdType,
                               EnumSet<CommandFlags> cmdFlags,
                               @NotNull KeyStroke[] keys,
-                              @NotNull Argument.Type argType) {
+                              @Nullable Argument.Type argType) {
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       for (MappingMode mappingMode : mappingModes) {
         checkIdentity(mappingMode, action.getId(), keys);
@@ -323,14 +323,14 @@ public class KeyGroup {
                        @NotNull Command.Type cmdType,
                        EnumSet<CommandFlags> cmdFlags,
                        @NotNull KeyStroke key,
-                       @NotNull Argument.Type argType,
+                       @Nullable Argument.Type argType,
                        boolean last) {
     // Lets get the actual action for the supplied action name
     Node node = base.getChild(key);
     // Is this the first time we have seen this character at this point in the tree?
     if (node == null) {
       // If this is the last keystroke in the shortcut, and there is no argument, add a command node
-      if (last && argType == Argument.Type.NONE) {
+      if (last && argType == null) {
         node = new CommandNode(key, action, cmdType, cmdFlags);
       }
       // If this are more keystrokes in the shortcut or there is an argument, add a branch node
@@ -342,7 +342,7 @@ public class KeyGroup {
     }
 
     // If this is the last keystroke in the shortcut and we have an argument, add an argument node
-    if (last && node instanceof BranchNode && argType != Argument.Type.NONE) {
+    if (last && node instanceof BranchNode && argType != null) {
       ArgumentNode arg = new ArgumentNode(action, cmdType, argType, cmdFlags);
       ((BranchNode)node).setArgument(arg);
     }
