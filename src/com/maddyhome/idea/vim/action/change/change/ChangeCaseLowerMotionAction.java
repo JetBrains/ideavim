@@ -58,12 +58,6 @@ public class ChangeCaseLowerMotionAction extends ChangeEditorActionHandler.ForEa
 
   @NotNull
   @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_OP_PEND);
-  }
-
-  @NotNull
-  @Override
   public Argument.Type getArgumentType() {
     return Argument.Type.MOTION;
   }

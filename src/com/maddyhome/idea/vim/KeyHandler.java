@@ -610,22 +610,22 @@ public class KeyHandler {
     cmd.setKeys(keys);
     currentCmd.push(cmd);
     // What type of argument does this command expect?
-    switch (node.getArgType()) {
+    Argument.Type argType = node.getArgType();
+    switch (argType) {
       case DIGRAPH:
         //digraphState = 0;
         digraph = new DigraphSequence();
         // No break - fall through
       case CHARACTER:
+        state = State.NEW_COMMAND;
+        currentArg = node.getArgType();
+        break;
       case MOTION:
         state = State.NEW_COMMAND;
         currentArg = node.getArgType();
         // Is the current command an operator? If so set the state to only accept "operator pending"
         // commands
-        if (node.getFlags().contains(CommandFlags.FLAG_OP_PEND)) {
-          editorState.pushState(editorState.getMode(), editorState.getSubMode(), MappingMode.OP_PENDING);
-        }
-        break;
-      case EX_STRING:
+        editorState.pushState(editorState.getMode(), editorState.getSubMode(), MappingMode.OP_PENDING);
         break;
       default:
         // Oops - we aren't expecting any other type of argument

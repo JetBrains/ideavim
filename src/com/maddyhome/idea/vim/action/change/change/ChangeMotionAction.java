@@ -57,12 +57,6 @@ public class ChangeMotionAction extends ChangeEditorActionHandler.ForEachCaret {
 
   @NotNull
   @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_OP_PEND, CommandFlags.FLAG_MULTIKEY_UNDO);
-  }
-
-  @NotNull
-  @Override
   public Argument.Type getArgumentType() {
     return Argument.Type.MOTION;
   }

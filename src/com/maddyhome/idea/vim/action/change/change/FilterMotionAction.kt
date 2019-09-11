@@ -40,8 +40,6 @@ class FilterMotionAction : VimActionHandler.SingleExecution() {
 
   override val argumentType: Argument.Type = Argument.Type.MOTION
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_OP_PEND)
-
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val argument = cmd.argument ?: return false
     val range = MotionGroup

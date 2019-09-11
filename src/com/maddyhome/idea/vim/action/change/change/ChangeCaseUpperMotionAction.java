@@ -62,12 +62,6 @@ public class ChangeCaseUpperMotionAction extends ChangeEditorActionHandler.ForEa
     return Argument.Type.MOTION;
   }
 
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_OP_PEND);
-  }
-
   @Override
   public boolean execute(@NotNull Editor editor,
                          @NotNull Caret caret,

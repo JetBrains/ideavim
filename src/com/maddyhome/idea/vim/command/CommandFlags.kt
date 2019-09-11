@@ -63,10 +63,6 @@ enum class CommandFlags {
    */
   FLAG_EXIT_VISUAL,
   /**
-   * Special flag used for any mappings involving operators
-   */
-  FLAG_OP_PEND,
-  /**
    * This command starts a multi-command undo transaction
    */
   FLAG_MULTIKEY_UNDO,

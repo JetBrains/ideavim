@@ -67,12 +67,6 @@ final public class OperatorAction extends VimActionHandler.SingleExecution {
     return Argument.Type.MOTION;
   }
 
-  @NotNull
-  @Override
-  final public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_OP_PEND);
-  }
-
   @Override
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
     final OperatorFunction operatorFunction = VimPlugin.getKey().getOperatorFunction();
