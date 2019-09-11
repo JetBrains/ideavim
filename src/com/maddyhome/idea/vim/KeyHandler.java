@@ -666,7 +666,7 @@ public class KeyHandler {
     }
     editorState.setCurrentNode(node);
 
-    ArgumentNode arg = (ArgumentNode)((BranchNode)editorState.getCurrentNode()).getArgumentNode();
+    ArgumentNode arg = ((BranchNode)editorState.getCurrentNode()).getArgument();
     if (arg != null) {
       if (currentArg == Argument.Type.MOTION && arg.getCmdType() != Command.Type.MOTION) {
         editorState.popState();

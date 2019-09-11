@@ -344,7 +344,7 @@ public class KeyGroup {
     // If this is the last keystroke in the shortcut and we have an argument, add an argument node
     if (last && node instanceof BranchNode && argType != Argument.Type.NONE) {
       ArgumentNode arg = new ArgumentNode(action, cmdType, argType, cmdFlags);
-      ((BranchNode)node).addChild(arg, BranchNode.ARGUMENT);
+      ((BranchNode)node).setArgument(arg);
     }
 
     if (base instanceof BranchNode) {

@@ -36,21 +36,21 @@ interface Node
  */
 sealed class ParentNode : Node {
 
-  protected val children = mutableMapOf<Any, Node>()
+  protected val children: MutableMap<KeyStroke, Node> = mutableMapOf()
 
   /** This adds a child node keyed by the supplied key */
-  fun addChild(child: Node, key: Any) {
+  fun addChild(child: Node, key: KeyStroke) {
     children[key] = child
   }
 
   /** Returns the child node associated with the supplied key. The key must be the same as used in [addChild] */
-  fun getChild(key: Any): Node? = children[key]
+  fun getChild(key: KeyStroke): Node? = children[key]
 
   /**
    * Returns the child node associated with the supplied key. The key must be the same as used in [.addChild]
    * If this is BranchNode and no such child is found but there is an argument node, the argument node is returned.
    */
-  open fun getChildOrArgument(key: Any): Node? = children[key]
+  open fun getChildOrArgument(key: KeyStroke): Node? = children[key]
 }
 
 class RootNode : ParentNode() {
@@ -103,8 +103,7 @@ class BranchNode(
   flags: EnumSet<CommandFlags> = noneOfEnum()
 ) : ParentNode() {
 
-  val argumentNode: Node?
-    get() = children[ARGUMENT]
+  var argument: ArgumentNode? = null
 
   val flags: EnumSet<CommandFlags> = EnumSet.copyOf(flags)
 
@@ -112,7 +111,7 @@ class BranchNode(
    * Returns the child node associated with the supplied key. The key must be the same as used in [addChild].
    * If no such child is found but there is an argument node, the argument node is returned.
    */
-  override fun getChildOrArgument(key: Any): Node? = super.getChild(key) ?: children[ARGUMENT]
+  override fun getChildOrArgument(key: KeyStroke): Node? = getChild(key) ?: argument
 
   override fun toString(): String =
     "BranchNode[children=[${children.entries.joinToString { (key, value) -> "$key -> $value" }}]"
@@ -133,11 +132,6 @@ class BranchNode(
     var result = key.hashCode()
     result = 31 * result + flags.hashCode()
     return result
-  }
-
-  companion object {
-    /** This is a special key for an argument child node */
-    const val ARGUMENT = "argument"
   }
 }
 
