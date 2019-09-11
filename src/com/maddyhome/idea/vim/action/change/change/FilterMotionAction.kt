@@ -16,115 +16,66 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.change.change;
+package com.maddyhome.idea.vim.action.change.change
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.LogicalPosition;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.handler.VimActionHandler
+import java.util.*
+import javax.swing.KeyStroke
 
 
-public class FilterMotionAction extends VimActionHandler.SingleExecution {
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
+class FilterMotionAction : VimActionHandler.SingleExecution() {
+  override val mappingModes: Set<MappingMode> = MappingMode.N
 
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("!");
-  }
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("!")
 
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.CHANGE;
-  }
+  override val type: Command.Type = Command.Type.CHANGE
 
-  @NotNull
-  @Override
-  public Argument.Type getArgumentType() {
-    return Argument.Type.MOTION;
-  }
+  override val argumentType: Argument.Type = Argument.Type.MOTION
 
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_OP_PEND);
-  }
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_OP_PEND)
 
-  @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-    final Argument argument = cmd.getArgument();
-    if (argument == null) {
-      return false;
-    }
-    TextRange range = MotionGroup
-      .getMotionRange(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd.getCount(), cmd.getRawCount(),
-                      argument, false);
-    if (range == null) {
-      return false;
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    val argument = cmd.argument ?: return false
+    val range = MotionGroup
+      .getMotionRange(editor, editor.caretModel.primaryCaret, context, cmd.count, cmd.rawCount,
+        argument, false)
+      ?: return false
 
-    LogicalPosition current = editor.getCaretModel().getLogicalPosition();
-    LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
-    LogicalPosition end = editor.offsetToLogicalPosition(range.getEndOffset());
+    val current = editor.caretModel.logicalPosition
+    val start = editor.offsetToLogicalPosition(range.startOffset)
+    val end = editor.offsetToLogicalPosition(range.endOffset)
     if (current.line != start.line) {
-      MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), range.getStartOffset());
+      MotionGroup.moveCaret(editor, editor.caretModel.primaryCaret, range.startOffset)
     }
 
-    int count;
-    if (start.line < end.line) {
-      count = end.line - start.line + 1;
-    }
-    else {
-      count = 1;
-    }
+    val count = if (start.line < end.line) end.line - start.line + 1 else 1
 
-    Command command = new Command(count, new EmptyAction(), Command.Type.UNDEFINED, EnumSet.noneOf(CommandFlags.class));
-    VimPlugin.getProcess().startFilterCommand(editor, context, command);
+    val command = Command(count, EmptyAction(), Command.Type.UNDEFINED, EnumSet.noneOf(CommandFlags::class.java))
+    VimPlugin.getProcess().startFilterCommand(editor, context, command)
 
-    return true;
+    return true
   }
 
-  private static class EmptyAction extends VimActionHandler.SingleExecution {
-    @NotNull
-    @Override
-    public Set<MappingMode> getMappingModes() {
-      return Collections.emptySet();
-    }
+  private class EmptyAction : VimActionHandler.SingleExecution() {
+    override val mappingModes: Set<MappingMode>
+      get() = emptySet()
 
-    @NotNull
-    @Override
-    public Set<List<KeyStroke>> getKeyStrokesSet() {
-      return Collections.emptySet();
-    }
+    override val keyStrokesSet: Set<List<KeyStroke>>
+      get() = emptySet()
 
-    @NotNull
-    @Override
-    public Command.Type getType() {
-      return Command.Type.OTHER_SELF_SYNCHRONIZED;
-    }
+    override val type: Command.Type
+      get() = Command.Type.OTHER_SELF_SYNCHRONIZED
 
-    @Override
-    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      return false;
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      return false
     }
   }
 }
