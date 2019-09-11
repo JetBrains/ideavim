@@ -114,9 +114,6 @@ public class MotionGroup {
                                          @NotNull Argument argument,
                                          boolean incNewline) {
     final Command cmd = argument.getMotion();
-    if (cmd == null) {
-      return null;
-    }
     // Normalize the counts between the command and the motion argument
     int cnt = cmd.getCount() * count;
     int raw = rawCount == 0 && cmd.getRawCount() == 0 ? 0 : cnt;

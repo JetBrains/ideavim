@@ -456,16 +456,14 @@ public class ChangeGroup {
       final int lastNewLine = text.lastIndexOf('\n');
       if (lastNewLine > 0) {
         final Command motion = argument.getMotion();
-        if (motion != null) {
-          EditorActionHandlerBase action = motion.getAction();
-          String id = action.getId();
-          if (id.equals(VIM_MOTION_WORD_RIGHT) ||
-              id.equals(VIM_MOTION_BIG_WORD_RIGHT) ||
-              id.equals(VIM_MOTION_CAMEL_RIGHT)) {
-            if (!SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), -1)) {
-              final int start = range.getStartOffset();
-              range = new TextRange(start, start + lastNewLine);
-            }
+        EditorActionHandlerBase action = motion.getAction();
+        String id = action.getId();
+        if (id.equals(VIM_MOTION_WORD_RIGHT) ||
+            id.equals(VIM_MOTION_BIG_WORD_RIGHT) ||
+            id.equals(VIM_MOTION_CAMEL_RIGHT)) {
+          if (!SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), -1)) {
+            final int start = range.getStartOffset();
+            range = new TextRange(start, start + lastNewLine);
           }
         }
       }
@@ -1109,9 +1107,6 @@ public class ChangeGroup {
     // 2) There is only whitespace before the start of the range
     // 3) There is only whitespace after the end of the range
     final Command motion = argument.getMotion();
-    if (motion == null) {
-      return false;
-    }
     EnumSet<CommandFlags> flags = motion.getFlags().clone();
     if (!isChange && !motion.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE)) {
       LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
@@ -1251,7 +1246,6 @@ public class ChangeGroup {
                               @NotNull Argument argument) {
     // Vim treats cw as ce and cW as cE if cursor is on a non-blank character
     final Command motion = argument.getMotion();
-    if (motion == null ) return false;
 
     String id = motion.getAction().getId();
     boolean kludge = false;

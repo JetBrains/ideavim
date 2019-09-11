@@ -64,9 +64,7 @@ public class RepeatChangeAction extends VimActionHandler.SingleExecution {
         Argument arg = cmd.getArgument();
         if (arg != null) {
           Command mot = arg.getMotion();
-          if (mot != null) {
-            mot.setCount(0);
-          }
+          mot.setCount(0);
         }
       }
       Command save = state.getCommand();

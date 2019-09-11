@@ -301,14 +301,12 @@ public class RegisterGroup {
       Argument argument = currentCommand.getArgument();
       if (argument != null) {
         Command motionCommand = argument.getMotion();
-        if (motionCommand != null) {
-          EditorActionHandlerBase action = motionCommand.getAction();
-          return action instanceof MotionPercentOrMatchAction || action instanceof MotionSentencePreviousStartAction
-            || action instanceof MotionSentenceNextStartAction || action instanceof MotionGotoFileMarkAction
-            || action instanceof SearchEntryFwdAction || action instanceof SearchEntryRevAction
-            || action instanceof SearchAgainNextAction || action instanceof SearchAgainPreviousAction
-            || action instanceof MotionParagraphNextAction || action instanceof MotionParagraphPreviousAction;
-        }
+        EditorActionHandlerBase action = motionCommand.getAction();
+        return action instanceof MotionPercentOrMatchAction || action instanceof MotionSentencePreviousStartAction
+          || action instanceof MotionSentenceNextStartAction || action instanceof MotionGotoFileMarkAction
+          || action instanceof SearchEntryFwdAction || action instanceof SearchEntryRevAction
+          || action instanceof SearchAgainNextAction || action instanceof SearchAgainPreviousAction
+          || action instanceof MotionParagraphNextAction || action instanceof MotionParagraphPreviousAction;
       }
     }
 

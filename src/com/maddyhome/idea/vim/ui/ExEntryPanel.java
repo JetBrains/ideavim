@@ -328,6 +328,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
    *
    * @return The user entered text
    */
+  @Nullable
   public String getText() {
     return entry.getActualText();
   }

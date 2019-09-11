@@ -70,9 +70,6 @@ public class SearchEntryFwdAction extends MotionActionHandler.ForEachCaret {
       return -1;
     }
     final String command = argument.getString();
-    if (command == null) {
-      return -1;
-    }
 
     return VimPlugin.getSearch().search(editor, caret, command, count, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false);
   }

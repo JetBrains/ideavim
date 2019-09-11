@@ -58,25 +58,9 @@ class FilterMotionAction : VimActionHandler.SingleExecution() {
 
     val count = if (start.line < end.line) end.line - start.line + 1 else 1
 
-    val command = Command(count, EmptyAction(), Command.Type.UNDEFINED, EnumSet.noneOf(CommandFlags::class.java))
-    VimPlugin.getProcess().startFilterCommand(editor, context, command)
+    VimPlugin.getProcess().startFilterCommand(editor, context, Argument.EMPTY_COMMAND.copy(rawCount = count))
 
     return true
-  }
-
-  private class EmptyAction : VimActionHandler.SingleExecution() {
-    override val mappingModes: Set<MappingMode>
-      get() = emptySet()
-
-    override val keyStrokesSet: Set<List<KeyStroke>>
-      get() = emptySet()
-
-    override val type: Command.Type
-      get() = Command.Type.OTHER_SELF_SYNCHRONIZED
-
-    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-      return false
-    }
   }
 }
 

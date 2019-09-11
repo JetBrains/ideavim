@@ -43,7 +43,7 @@ class YankGroup {
    * @return true if able to yank the text, false if not
    */
   fun yankMotion(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument): Boolean {
-    val motion = argument.motion ?: return false
+    val motion = argument.motion
 
     val caretModel = editor.caretModel
     if (caretModel.caretCount <= 0) return false

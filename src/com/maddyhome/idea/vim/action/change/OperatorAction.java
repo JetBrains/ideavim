@@ -80,16 +80,14 @@ final public class OperatorAction extends VimActionHandler.SingleExecution {
       final Argument argument = cmd.getArgument();
       if (argument != null) {
         final Command motion = argument.getMotion();
-        if (motion != null) {
-          final TextRange range = MotionGroup
-            .getMotionRange(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd.getCount(),
-                            cmd.getRawCount(), argument, true);
-          if (range != null) {
-            VimPlugin.getMark().setChangeMarks(editor, range);
-            final SelectionType selectionType = SelectionType.fromCommandFlags(motion.getFlags());
-            KeyHandler.getInstance().reset(editor);
-            return operatorFunction.apply(editor, context, selectionType);
-          }
+        final TextRange range = MotionGroup
+          .getMotionRange(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd.getCount(),
+                          cmd.getRawCount(), argument, true);
+        if (range != null) {
+          VimPlugin.getMark().setChangeMarks(editor, range);
+          final SelectionType selectionType = SelectionType.fromCommandFlags(motion.getFlags());
+          KeyHandler.getInstance().reset(editor);
+          return operatorFunction.apply(editor, context, selectionType);
         }
       }
       return false;

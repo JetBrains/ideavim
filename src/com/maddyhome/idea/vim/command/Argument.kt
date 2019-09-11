@@ -18,20 +18,37 @@
 
 package com.maddyhome.idea.vim.command
 
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.handler.VimActionHandler
+import java.util.*
+import javax.swing.KeyStroke
+
 /**
  * This represents a command argument.
  */
-data class Argument internal constructor(
+class Argument private constructor(
   val character: Char = 0.toChar(),
-  val motion: Command? = null,
-  val string: String? = null,
+  val motion: Command = EMPTY_COMMAND,
+  val string: String = "",
   val type: Type
 ) {
-  constructor(motionArg: Command?) : this(motion = motionArg, type = Type.MOTION)
+  constructor(motionArg: Command) : this(motion = motionArg, type = Type.MOTION)
   constructor(charArg: Char) : this(character = charArg, type = Type.CHARACTER)
-  constructor(strArg: String?) : this(string = strArg, type = Type.STRING)
+  constructor(strArg: String) : this(string = strArg, type = Type.EX_STRING)
 
   enum class Type {
-    NONE, MOTION, CHARACTER, STRING, DIGRAPH, EX_STRING
+    NONE, MOTION, CHARACTER, DIGRAPH, EX_STRING
+  }
+
+  companion object {
+    @JvmField
+    val EMPTY_COMMAND = Command(0, object : VimActionHandler.SingleExecution() {
+      override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean = true
+
+      override val mappingModes: Set<MappingMode> = emptySet()
+      override val keyStrokesSet: Set<List<KeyStroke>> = emptySet()
+      override val type: Command.Type = Command.Type.UNDEFINED
+    }, Command.Type.UNDEFINED, EnumSet.noneOf(CommandFlags::class.java))
   }
 }

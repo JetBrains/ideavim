@@ -509,10 +509,8 @@ public class KeyHandler {
       final Command mot = arg.getMotion();
       // If no count was entered for either command then nothing changes. If either had a count then
       // the motion gets the product of both.
-      if (mot != null) {
-        int cnt = cmd.getRawCount() == 0 && mot.getRawCount() == 0 ? 0 : cmd.getCount() * mot.getCount();
-        mot.setCount(cnt);
-      }
+      int cnt = cmd.getRawCount() == 0 && mot.getRawCount() == 0 ? 0 : cmd.getCount() * mot.getCount();
+      mot.setCount(cnt);
       cmd.setCount(0);
     }
 

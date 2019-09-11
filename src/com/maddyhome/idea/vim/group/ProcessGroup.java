@@ -59,12 +59,14 @@ public class ProcessGroup {
     panel.activate(editor, context, label, initText, count);
   }
 
+  @NotNull
   public String endSearchCommand(@NotNull final Editor editor) {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true);
 
-    record(editor, panel.getText());
-    return panel.getText();
+    String text = panel.getText() != null ? panel.getText() : "";
+    record(editor, text);
+    return text;
   }
 
   public void startExCommand(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
