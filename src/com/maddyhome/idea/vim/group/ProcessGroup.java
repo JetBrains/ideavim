@@ -74,7 +74,7 @@ public class ProcessGroup {
     if (editor.isOneLineMode()) return;
 
     String initText = getRange(editor, cmd);
-    CommandState.getInstance(editor).pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
+    CommandState.getInstance(editor).pushState(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, ":", initText, 1);
   }
@@ -149,7 +149,7 @@ public class ProcessGroup {
 
   public void startFilterCommand(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
     String initText = getRange(editor, cmd) + "!";
-    CommandState.getInstance(editor).pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
+    CommandState.getInstance(editor).pushState(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, ":", initText, 1);
   }

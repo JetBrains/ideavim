@@ -681,7 +681,7 @@ public class KeyHandler {
         VimPlugin.getProcess().startSearchCommand(editor, context, count, key);
         state = State.NEW_COMMAND;
         currentArg = Argument.Type.EX_STRING;
-        editorState.pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
+        editorState.pushState(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
       }
     }
   }

@@ -8,13 +8,13 @@ import com.maddyhome.idea.vim.command.CommandState
 val CommandState.Mode.isEndAllowed
   get() = when (this) {
     CommandState.Mode.INSERT, CommandState.Mode.REPEAT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
-    CommandState.Mode.COMMAND, CommandState.Mode.EX_ENTRY, CommandState.Mode.REPLACE -> false
+    CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE -> false
   }
 
 val CommandState.Mode.hasVisualSelection
   get() = when (this) {
     CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
-    CommandState.Mode.REPLACE, CommandState.Mode.EX_ENTRY, CommandState.Mode.COMMAND, CommandState.Mode.INSERT, CommandState.Mode.REPEAT -> false
+    CommandState.Mode.REPLACE, CommandState.Mode.CMD_LINE, CommandState.Mode.COMMAND, CommandState.Mode.INSERT, CommandState.Mode.REPEAT -> false
   }
 
 val Editor.mode

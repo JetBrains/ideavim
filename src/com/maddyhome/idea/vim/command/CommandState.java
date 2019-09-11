@@ -316,7 +316,7 @@ public class CommandState {
   }
 
   public enum Mode {
-    COMMAND, INSERT, REPLACE, REPEAT, VISUAL, SELECT, EX_ENTRY
+    COMMAND, INSERT, REPLACE, REPEAT, VISUAL, SELECT, CMD_LINE
   }
 
   public enum SubMode {
