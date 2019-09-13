@@ -51,6 +51,7 @@ enum class CommandFlags {
   FLAG_IGNORE_SIDE_SCROLL_JUMP,
   /**
    * Indicates a command can accept a count in mid command
+   * E.g. d2d, c2c
    */
   FLAG_ALLOW_MID_COUNT,
   /**
