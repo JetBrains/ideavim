@@ -18,7 +18,9 @@
 
 package com.maddyhome.idea.vim.key;
 
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multiset;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import org.jetbrains.annotations.NotNull;
@@ -28,11 +30,20 @@ import javax.swing.*;
 import java.util.*;
 
 /**
+ * Container for key mappings for some mode
+ * Iterable by "from" keys
+ *
  * @author vlan
  */
 public class KeyMapping implements Iterable<List<KeyStroke>> {
+  /** Contains all key mapping for some mode. */
   @NotNull private final Map<ImmutableList<KeyStroke>, MappingInfo> myKeys = new HashMap<>();
-  @NotNull private final Map<ImmutableList<KeyStroke>, Integer> myPrefixes = new HashMap<>();
+  /**
+   * Set the contains all possible prefixes for mappings.
+   * E.g. if there is mapping for "hello", this set will contain "h", "he", "hel", etc.
+   * Multiset is used to correctly remove the mappings.
+   */
+  @NotNull private final Multiset<ImmutableList<KeyStroke>> myPrefixes = HashMultiset.create();
 
   @NotNull
   @Override
@@ -45,15 +56,18 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
     return myKeys.get(ImmutableList.copyOf(keys));
   }
 
-  public void put(@NotNull Set<MappingMode> mappingModes, @NotNull List<KeyStroke> fromKeys,
-                  @Nullable List<KeyStroke> toKeys, @Nullable VimExtensionHandler extensionHandler, boolean recursive) {
+  public void put(@NotNull Set<MappingMode> mappingModes,
+                  @NotNull List<KeyStroke> fromKeys,
+                  @Nullable List<KeyStroke> toKeys,
+                  @Nullable VimExtensionHandler extensionHandler,
+                  boolean recursive) {
     myKeys.put(ImmutableList.copyOf(fromKeys),
                new MappingInfo(mappingModes, fromKeys, toKeys, extensionHandler, recursive));
     List<KeyStroke> prefix = new ArrayList<>();
     final int prefixLength = fromKeys.size() - 1;
     for (int i = 0; i < prefixLength; i++) {
       prefix.add(fromKeys.get(i));
-      increment(ImmutableList.copyOf(prefix));
+      myPrefixes.add(ImmutableList.copyOf(prefix));
     }
   }
 
@@ -63,31 +77,11 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
     final int prefixLength = keys.size() - 1;
     for (int i = 0; i < prefixLength; i++) {
       prefix.add(keys.get(i));
-      decrement(ImmutableList.copyOf(prefix));
+      myPrefixes.remove(ImmutableList.copyOf(prefix));
     }
   }
 
   public boolean isPrefix(@NotNull List<KeyStroke> keys) {
-    return myPrefixes.get(ImmutableList.copyOf(keys)) != null;
-  }
-
-  private void increment(@NotNull ImmutableList<KeyStroke> prefix) {
-    Integer count = myPrefixes.get(prefix);
-    if (count == null) {
-      count = 0;
-    }
-    myPrefixes.put(prefix, count + 1);
-  }
-
-  private void decrement(@NotNull ImmutableList<KeyStroke> prefix) {
-    final Integer count = myPrefixes.get(prefix);
-    if (count != null) {
-      if (count <= 1) {
-        myPrefixes.remove(prefix);
-      }
-      else {
-        myPrefixes.put(prefix, count - 1);
-      }
-    }
+    return myPrefixes.contains(ImmutableList.copyOf(keys));
   }
 }

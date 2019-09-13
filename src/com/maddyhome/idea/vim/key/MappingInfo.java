@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.key;
 
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,8 +39,11 @@ public class MappingInfo implements Comparable<MappingInfo> {
   @Nullable private final VimExtensionHandler myExtensionHandler;
   private final boolean myRecursive;
 
-  public MappingInfo(@NotNull Set<MappingMode> mappingModes, @NotNull List<KeyStroke> fromKeys,
-                     @Nullable List<KeyStroke> toKeys, @Nullable VimExtensionHandler extensionHandler,
+  @Contract(pure = true)
+  public MappingInfo(@NotNull Set<MappingMode> mappingModes,
+                     @NotNull List<KeyStroke> fromKeys,
+                     @Nullable List<KeyStroke> toKeys,
+                     @Nullable VimExtensionHandler extensionHandler,
                      boolean recursive) {
     myMappingModes = mappingModes;
     myFromKeys = fromKeys;

@@ -331,6 +331,13 @@ public class KeyHandler {
     final Application application = ApplicationManager.getApplication();
 
     if (mapping.isPrefix(fromKeys)) {
+      // Okay, there is some mapping that starts with inserted key sequence. So,
+      //   either the user will continue to enter the mapping, or (if timeout option is set)
+      //   the entered command should be executed. Here we set up the times that will execute
+      //   typed keys after some delay.
+      // E.g. there is a map for "dweri". If the user types "d", "w" they mean either "dweri" or "dw" command.
+      //   If the user will continue typing "e", "r" and "i", the timer will be cancelled. If the user will
+      //   not type anything, the "dw" command will be executed.
       mappingKeys.add(key);
       if (!application.isUnitTestMode() && OptionsManager.INSTANCE.getTimeout().isSet()) {
         commandState.startMappingTimer(actionEvent -> application.invokeLater(() -> {
@@ -346,6 +353,8 @@ public class KeyHandler {
       return true;
     }
     else if (mappingInfo != null) {
+      // Okay, there is a mapping for the entered key sequence
+      //   now the another key sequence should be executed, or the handler that attached to this command
       mappingKeys.clear();
       final Runnable handleMappedKeys = () -> {
         if (editor.isDisposed()) {
@@ -355,6 +364,7 @@ public class KeyHandler {
         final VimExtensionHandler extensionHandler = mappingInfo.getExtensionHandler();
         final EditorDataContext currentContext = new EditorDataContext(editor);
         if (toKeys != null) {
+          // Here is a mapping to another key sequence
           final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), toKeys);
           boolean first = true;
           for (KeyStroke keyStroke : toKeys) {
@@ -364,6 +374,7 @@ public class KeyHandler {
           }
         }
         else if (extensionHandler != null) {
+          // Here is a mapping to some vim handler
           final CommandProcessor processor = CommandProcessor.getInstance();
           processor.executeCommand(editor.getProject(), () -> extensionHandler.execute(editor, context),
                                    "Vim " + extensionHandler.getClass().getSimpleName(), null);
@@ -396,6 +407,12 @@ public class KeyHandler {
       return true;
     }
     else {
+      // If the user enters a command that starts with known mapping, but it is not exactly this mapping,
+      //   mapping handler prevents further processing of there keys.
+      // E.g. if there is a mapping for "hello" and user enters command "help"
+      //   the processing of "h", "e" and "l" will be prevented by this handler.
+      //   However, these keys should be processed as usual when user enters "p"
+      //   and the following for loop does exactly that.
       final List<KeyStroke> unhandledKeys = new ArrayList<>(mappingKeys);
       mappingKeys.clear();
       for (KeyStroke keyStroke : unhandledKeys) {
