@@ -55,8 +55,19 @@ repositories {
 }
 
 dependencies {
-  compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+  compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
   compile "org.jetbrains:annotations:17.0.0"
+}
+
+compileKotlin {
+  kotlinOptions {
+    jvmTarget = javaVersion
+  }
+}
+compileTestKotlin {
+  kotlinOptions {
+    jvmTarget = javaVersion
+  }
 }
 
 tasks.register("slackEapNotification") {

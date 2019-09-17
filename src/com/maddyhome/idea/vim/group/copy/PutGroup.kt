@@ -26,6 +26,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.*
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
@@ -281,10 +282,7 @@ class PutGroup {
       // Manually add CaretStateTransferableData to avoid adjustment of copied text to multicaret
       mutableTransferableData += CaretStateTransferableData(intArrayOf(0), intArrayOf(s.length))
     }
-    if (logger.isDebugEnabled) {
-      val transferableClasses = transferableData.joinToString { it.javaClass.name }
-      logger.debug("Paste text with transferable data: $transferableClasses")
-    }
+    logger.debug { "Paste text with transferable data: ${transferableData.joinToString { it.javaClass.name }}" }
     val content = TextBlockTransferable(s, mutableTransferableData, RawText(text))
     CopyPasteManager.getInstance().setContents(content)
     return content

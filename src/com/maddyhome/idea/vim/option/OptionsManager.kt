@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.option
 
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExOutputModel
@@ -324,12 +325,7 @@ object OptionsManager {
     var empty = cols.size % colCount
     empty = if (empty == 0) colCount else empty
 
-    if (logger.isDebugEnabled) {
-      logger.debug("showOptions")
-      logger.debug("width=$width")
-      logger.debug("colCount=$colCount")
-      logger.debug("height=$height")
-    }
+    logger.debug { "showOptions, width=$width, colCount=$colCount, height=$height" }
 
     val res = StringBuilder()
     if (showIntro) {

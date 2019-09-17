@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.handler
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Ref
@@ -107,10 +108,8 @@ sealed class VisualOperatorActionHandler : VimActionHandler.SingleExecution() {
     editor.vimChangeActionSwitchMode = null
 
     val selections = editor.collectSelections() ?: return false
-    if (logger.isDebugEnabled) {
-      logger.debug("Count of selection segments: ${selections.size}")
-      selections.values.forEachIndexed { index, vimSelection -> logger.debug("Caret $index: $vimSelection") }
-    }
+    logger.debug { "Count of selection segments: ${selections.size}" }
+    logger.debug { selections.values.joinToString("\n") { vimSelection -> "Caret: $vimSelection" } }
 
     val commandWrapper = VisualStartFinishWrapper(editor, cmd)
     commandWrapper.start()
@@ -208,9 +207,7 @@ sealed class VisualOperatorActionHandler : VimActionHandler.SingleExecution() {
         } else null
         this@VisualStartFinishWrapper.visualChanges[it] = change
       }
-      if (logger.isDebugEnabled) {
-        visualChanges.values.forEachIndexed { index, visualChange -> logger.debug("Caret $index: $visualChange") }
-      }
+      logger.debug { visualChanges.values.joinToString("\n") { "Caret: $visualChanges" } }
 
       // If this is a mutli key change then exit visual now
       if (CommandFlags.FLAG_MULTIKEY_UNDO in cmd.flags || CommandFlags.FLAG_EXIT_VISUAL in cmd.flags) {
