@@ -36,6 +36,8 @@ To be released
   Fix some problems with yanking to clipboard
 * [VIM-1781](https://youtrack.jetbrains.com/issue/VIM-1781) Fix yanking with dollar motion
 * [VIM-1772](https://youtrack.jetbrains.com/issue/VIM-1772) Fix yanking with `:y` command
+* [VIM-1685](https://youtrack.jetbrains.com/issue/VIM-1685) Fix `ESC` for insert mode
+* [VIM-1752](https://youtrack.jetbrains.com/issue/VIM-1752) Fix `ESC` for insert mode
 
 0.53, 2019-08-07
 --------------
