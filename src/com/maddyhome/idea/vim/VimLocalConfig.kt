@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim
 
-import com.intellij.configurationStore.APP_CONFIG
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.RoamingType
@@ -32,8 +31,8 @@ import org.jdom.Element
  */
 
 @State(name = "VimLocalSettings", storages = [
-    Storage("$APP_CONFIG$/vim_local_settings.xml", roamingType = RoamingType.DISABLED, deprecated = true),
-    Storage("$APP_CONFIG/vim_local_settings.xml", roamingType = RoamingType.DISABLED)
+    Storage("\$APP_CONFIG$$/vim_local_settings.xml", roamingType = RoamingType.DISABLED, deprecated = true),
+    Storage("\$APP_CONFIG$/vim_local_settings.xml", roamingType = RoamingType.DISABLED)
   ])
 class VimLocalConfig : PersistentStateComponent<Element> {
   override fun getState(): Element {
