@@ -311,13 +311,12 @@ public class KeyHandler {
   private boolean handleKeyMapping(@NotNull final Editor editor,
                                    @NotNull final KeyStroke key,
                                    @NotNull final DataContext context) {
+    if (state == State.CHAR_OR_DIGRAPH) return false;
+
     final CommandState commandState = CommandState.getInstance(editor);
     commandState.stopMappingTimer();
 
     final MappingMode mappingMode = commandState.getMappingMode();
-    if (MappingMode.NVO.contains(mappingMode) && (state != State.NEW_COMMAND || currentArg != null)) {
-      return false;
-    }
 
     final List<KeyStroke> mappingKeys = commandState.getMappingKeys();
     final List<KeyStroke> fromKeys = new ArrayList<>(mappingKeys);
@@ -634,8 +633,8 @@ public class KeyHandler {
         digraph = new DigraphSequence();
         // No break - fall through
       case CHARACTER:
-        state = State.NEW_COMMAND;
         currentArg = node.getArgType();
+        // State should be CHAR_OR_DIGRAPH already
         break;
       case MOTION:
         state = State.NEW_COMMAND;
@@ -689,6 +688,9 @@ public class KeyHandler {
         editorState.popState();
         state = State.BAD_COMMAND;
         return;
+      }
+      if (arg.getArgType() == Argument.Type.CHARACTER || arg.getArgType() == Argument.Type.DIGRAPH ) {
+        state = State.CHAR_OR_DIGRAPH;
       }
       if (editorState.isRecording() && arg.getFlags().contains(CommandFlags.FLAG_NO_ARG_RECORDING)) {
         handleKey(editor, KeyStroke.getKeyStroke(' '), context);
@@ -843,7 +845,22 @@ public class KeyHandler {
   }
 
   private enum State {
-    NEW_COMMAND, COMMAND, READY, ERROR, BAD_COMMAND
+    /**
+     * Awaiting a new command
+     */
+    NEW_COMMAND,
+
+    /**
+     * Awaiting for continuation of the command
+     */
+    COMMAND,
+    /**
+     * Awaiting for char or digraph input. In this mode mappings doesn't work (even for <C-K>)
+     */
+    CHAR_OR_DIGRAPH,
+    READY,
+    ERROR,
+    BAD_COMMAND
   }
 
   private int count;
