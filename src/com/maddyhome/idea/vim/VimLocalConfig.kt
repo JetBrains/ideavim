@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.State
@@ -56,13 +57,10 @@ class VimLocalConfig : PersistentStateComponent<Element> {
       VimPlugin.getHistory().readData(state)
     }
 
-    // Disable multithreading for EAP release
-    setup()
-/*
     if (ApplicationManager.getApplication().isUnitTestMode) {
+      setup()
     } else {
       ApplicationManager.getApplication().executeOnPooledThread(setup)
     }
-*/
   }
 }
