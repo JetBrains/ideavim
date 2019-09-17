@@ -41,7 +41,7 @@ _Available since 0.53.1 EAP:_
 * [VIM-1685](https://youtrack.jetbrains.com/issue/VIM-1685) Fix `ESC` for insert mode
 * [VIM-1752](https://youtrack.jetbrains.com/issue/VIM-1752) Fix `ESC` for insert mode
 
-__To Be Released:__
+_To Be Released:_
 
 ...
 
