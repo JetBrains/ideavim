@@ -16,8 +16,10 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-To be released
+To Be Released
 --------------
+_Available since 0.53.1 EAP:_
+
 **Features:**
 * Support surrounding with a function name ([link](https://github.com/tpope/vim-surround/blob/master/doc/surround.txt#L138))
 * [VIM-1720](https://youtrack.jetbrains.com/issue/VIM-1720) Add `:delmarks` command
@@ -38,6 +40,10 @@ To be released
 * [VIM-1772](https://youtrack.jetbrains.com/issue/VIM-1772) Fix yanking with `:y` command
 * [VIM-1685](https://youtrack.jetbrains.com/issue/VIM-1685) Fix `ESC` for insert mode
 * [VIM-1752](https://youtrack.jetbrains.com/issue/VIM-1752) Fix `ESC` for insert mode
+
+__To Be Released:__
+
+...
 
 0.53, 2019-08-07
 --------------
