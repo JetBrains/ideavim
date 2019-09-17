@@ -27,6 +27,9 @@ import com.maddyhome.idea.vim.helper.UndoRedoHelper;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -41,7 +44,10 @@ public class UndoAction extends VimActionHandler.SingleExecution {
   @NotNull
   @Override
   public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("u", "<Undo>");
+    Set<List<KeyStroke>> keys = new HashSet<>();
+    keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0)));
+    keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_UNDO, 0)));
+    return keys;
   }
 
   @NotNull
