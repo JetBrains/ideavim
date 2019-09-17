@@ -21,9 +21,7 @@ import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationListener;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
@@ -326,11 +324,14 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
       Initialization.initialized();
     };
 
+    // Disable multithreading for EAP release
+    asyncSetup.run();
+    /*
     if (ApplicationManager.getApplication().isUnitTestMode()) {
-      asyncSetup.run();
     } else {
       ApplicationManager.getApplication().executeOnPooledThread(asyncSetup);
     }
+    */
   }
 
   @NotNull
@@ -519,10 +520,14 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
       this.state.readData(element);
     };
 
+    // Disable multithreading for EAP release
+    setup.run();
+    /*
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       setup.run();
     } else {
       ApplicationManager.getApplication().executeOnPooledThread(setup);
     }
+    */
   }
 }
