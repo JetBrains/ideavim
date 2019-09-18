@@ -33,6 +33,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+
 
 public class UndoAction extends VimActionHandler.SingleExecution {
   @NotNull
@@ -45,7 +47,7 @@ public class UndoAction extends VimActionHandler.SingleExecution {
   @Override
   public Set<List<KeyStroke>> getKeyStrokesSet() {
     Set<List<KeyStroke>> keys = new HashSet<>();
-    keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0)));
+    keys.add(parseKeys("u"));
     keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_UNDO, 0)));
     return keys;
   }
