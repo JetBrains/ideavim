@@ -664,4 +664,14 @@ public class ChangeActionTest extends VimTestCase {
            "gaganis s gaganis\n" +
            "gaganis <caret>gaganis gaganis\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
+
+  public void testChangeSameLine() {
+    doTest(parseKeys("d_"),
+           "line 1\n"+
+           "line<caret> 2\n"+
+           "line 3",
+           "line 1\n"+
+           "<caret>line 3",
+           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+  }
 }

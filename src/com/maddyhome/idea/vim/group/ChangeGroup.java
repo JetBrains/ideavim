@@ -1078,49 +1078,34 @@ public class ChangeGroup {
     return true;
   }
 
-  /**
-   * Delete all text moved over by the supplied motion command argument.
-   *
-   * @param editor   The editor to delete the text from
-   * @param caret    The caret on which the motion appears to be performed
-   * @param context  The data context
-   * @param count    The number of times to repeat the deletion
-   * @param rawCount The actual count entered by the user
-   * @param argument The motion command
-   * @param isChange if from a change
-   * @return true if able to delete the text, false if not
-   */
-  public boolean deleteMotion(@NotNull Editor editor,
-                              @NotNull Caret caret,
-                              @NotNull DataContext context,
-                              int count,
-                              int rawCount,
-                              @NotNull final Argument argument,
-                              boolean isChange) {
+  @Nullable
+  public Pair<TextRange, SelectionType> getDeleteRangeAndType(@NotNull Editor editor,
+                                                              @NotNull Caret caret,
+                                                              @NotNull DataContext context,
+                                                              int count,
+                                                              int rawCount,
+                                                              @NotNull final Argument argument,
+                                                              boolean isChange) {
     final TextRange range = getDeleteMotionRange(editor, caret, context, count, rawCount, argument);
-    if (range == null) {
-      return (EditorHelper.getFileSize(editor) == 0);
-    }
+    if (range == null) return null;
 
     // Delete motion commands that are not linewise become linewise if all the following are true:
     // 1) The range is across multiple lines
     // 2) There is only whitespace before the start of the range
     // 3) There is only whitespace after the end of the range
+    SelectionType type = SelectionType.fromCommandFlags(argument.getMotion().getFlags());
     final Command motion = argument.getMotion();
-    EnumSet<CommandFlags> flags = motion.getFlags().clone();
     if (!isChange && !motion.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE)) {
       LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
       LogicalPosition end = editor.offsetToLogicalPosition(range.getEndOffset());
       if (start.line != end.line) {
         if (!SearchHelper.anyNonWhitespace(editor, range.getStartOffset(), -1) &&
             !SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), 1)) {
-          flags.remove(CommandFlags.FLAG_MOT_EXCLUSIVE);
-          flags.remove(CommandFlags.FLAG_MOT_INCLUSIVE);
-          flags.add(CommandFlags.FLAG_MOT_LINEWISE);
+          type = SelectionType.LINE_WISE;
         }
       }
     }
-    return deleteRange(editor, caret, range, SelectionType.fromCommandFlags(flags), isChange);
+    return new Pair<>(range, type);
   }
 
   /**
@@ -1310,12 +1295,11 @@ public class ChangeGroup {
       }
     }
 
-    boolean res = deleteMotion(editor, caret, context, count, rawCount, argument, true);
-    if (res) {
-      UserDataManager.setVimChangeActionSwitchMode(editor, CommandState.Mode.INSERT);
-    }
+    Pair<TextRange, SelectionType> deleteRangeAndType =
+      getDeleteRangeAndType(editor, caret, context, count, rawCount, argument, true);
+    if (deleteRangeAndType == null) return false;
 
-    return res;
+    return changeRange(editor, caret, deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), context);
   }
 
   /**
