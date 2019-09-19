@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class ToggleRecordingAction extends VimActionHandler.SingleExecution {
+public final class ToggleRecordingAction extends VimActionHandler.SingleExecution {
 
   @NotNull
   @Override

@@ -47,7 +47,7 @@ final public class VisualExitModeAction extends VimActionHandler.SingleExecution
   @NotNull
   @Override
   final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<Esc>", "<C-[>", "<C-C>", "<C-\\><C-N>");
+    return parseKeysSet("<Esc>", "<C-[>", "<C-C>");
   }
 
   @Contract(pure = true)

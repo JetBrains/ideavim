@@ -51,7 +51,7 @@ final public class InsertExitModeAction extends VimActionHandler.SingleExecution
   @NotNull
   @Override
   final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<C-[>", "<C-C>", "<Esc>", "<C-\\><C-N>");
+    return parseKeysSet("<C-[>", "<C-C>", "<Esc>");
   }
 
   @Contract(pure = true)

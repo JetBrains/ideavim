@@ -72,6 +72,7 @@ data class Command(
      */
     COPY,
     PASTE,
+    // TODO REMOVE?
     RESET,
     /**
      * Represents commands that select the register.

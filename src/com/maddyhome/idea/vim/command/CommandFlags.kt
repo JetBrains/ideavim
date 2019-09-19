@@ -48,6 +48,8 @@ enum class CommandFlags {
   FLAG_SAVE_STROKE,
   FLAG_IGNORE_SCROLL_JUMP,
   FLAG_IGNORE_SIDE_SCROLL_JUMP,
+
+  //TODO REMOVE!
   /**
    * Search Flags
    */
@@ -65,6 +67,8 @@ enum class CommandFlags {
    * This command should be followed by another command
    */
   FLAG_EXPECT_MORE,
+
+  // TODO REMOVE
   /**
    * This flag indicates the command's argument isn't used while recording
    */

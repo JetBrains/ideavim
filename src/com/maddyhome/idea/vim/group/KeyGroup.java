@@ -32,9 +32,6 @@ import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
@@ -66,7 +63,7 @@ public class KeyGroup {
 
   @NotNull private final Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<>();
   @NotNull private final Set<KeyStroke> requiredShortcutKeys = new HashSet<>(300);
-  @NotNull private final HashMap<MappingMode, RootNode> keyRoots = new HashMap<>();
+  @NotNull private final Map<MappingMode, ParentNode> keyRoots = new HashMap<>();
   @NotNull private final Map<MappingMode, KeyMapping> keyMappings = new HashMap<>();
   @Nullable private OperatorFunction operatorFunction = null;
 
@@ -243,15 +240,8 @@ public class KeyGroup {
    * @param mappingMode The mapping mode
    * @return The key mapping tree root
    */
-  public RootNode getKeyRoot(@NotNull MappingMode mappingMode) {
-    RootNode res = keyRoots.get(mappingMode);
-    // Create the root node if one doesn't exist yet for this mode
-    if (res == null) {
-      res = new RootNode();
-      keyRoots.put(mappingMode, res);
-    }
-
-    return res;
+  public ParentNode getKeyRoot(@NotNull MappingMode mappingMode) {
+    return keyRoots.computeIfAbsent(mappingMode, (key) -> new ParentNode() {});
   }
 
   /**
@@ -264,96 +254,68 @@ public class KeyGroup {
    * @param shortcut The shortcut to register
    */
   public void registerShortcutWithoutAction(Shortcut shortcut) {
-    registerRequiredShortcut(shortcut);
+    registerRequiredShortcut(Arrays.asList(shortcut.getKeys()));
   }
 
   public void registerCommandAction(@NotNull EditorActionHandlerBase commandAction) {
-    for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
-      final KeyStroke[] keys = registerRequiredShortcut(new Shortcut(keyStrokes.toArray(new KeyStroke[0])));
-      registerAction(commandAction.getMappingModes(), commandAction, commandAction.getType(),
-                     commandAction.getFlags(), keys, commandAction.getArgumentType());
-    }
-  }
-
-  private KeyStroke[] registerRequiredShortcut(@NotNull Shortcut shortcut) {
-    final KeyStroke[] keys = shortcut.getKeys();
-    for (KeyStroke key : keys) {
-      if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
-        requiredShortcutKeys.add(key);
-      }
-    }
-    return keys;
-  }
-
-  private void registerAction(@NotNull Set<MappingMode> mappingModes,
-                              EditorActionHandlerBase action,
-                              @NotNull Command.Type cmdType,
-                              EnumSet<CommandFlags> cmdFlags,
-                              @NotNull KeyStroke[] keys,
-                              @Nullable Argument.Type argType) {
     if (ApplicationManager.getApplication().isUnitTestMode()) {
-      for (MappingMode mappingMode : mappingModes) {
-        checkIdentity(mappingMode, action.getId(), keys);
+      for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
+        for (MappingMode mappingMode : commandAction.getMappingModes()) {
+          checkIdentity(mappingMode, commandAction.getId(), keyStrokes);
+        }
       }
     }
-    for (MappingMode mappingMode : mappingModes) {
-      Node node = getKeyRoot(mappingMode);
-      final int len = keys.length;
-      // Add a child for each keystroke in the shortcut for this action
-      for (int i = 0; i < len; i++) {
-        if (node instanceof ParentNode) {
-          final ParentNode base = (ParentNode)node;
-          node = addNode(base, action, cmdType, cmdFlags, keys[i], argType, i == len - 1);
+
+    for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
+      registerRequiredShortcut(keyStrokes);
+
+      for (MappingMode mappingMode : commandAction.getMappingModes()) {
+        Node node = getKeyRoot(mappingMode);
+        final int len = keyStrokes.size();
+        // Add a child for each keystroke in the shortcut for this action
+        for (int i = 0; i < len; i++) {
+          if (!(node instanceof ParentNode)) {
+            throw new RuntimeException("Error in tree constructing");
+          }
+
+          node = addMNode((ParentNode)node, commandAction, keyStrokes.get(i), i == len - 1);
         }
       }
     }
   }
 
-  private void checkIdentity(MappingMode mappingMode, String actName, KeyStroke[] keys) {
+  private void registerRequiredShortcut(@NotNull List<KeyStroke> keys) {
+    for (KeyStroke key : keys) {
+      if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
+        requiredShortcutKeys.add(key);
+      }
+    }
+  }
+
+  private void checkIdentity(MappingMode mappingMode, String actName, List<KeyStroke> keys) {
     Set<List<KeyStroke>> keySets = identityChecker.computeIfAbsent(mappingMode, k -> new HashSet<>());
-    if (keySets.contains(Arrays.asList(keys))) throw new RuntimeException("This keymap already exists: " + mappingMode + " keys: " + Arrays.asList(keys) + " action:" + actName);
-    keySets.add(Arrays.asList(keys));
+    if (keySets.contains(keys)) throw new RuntimeException("This keymap already exists: " + mappingMode + " keys: " + keys + " action:" + actName);
+    keySets.add(keys);
   }
 
   private Map<MappingMode, Set<List<KeyStroke>>> identityChecker = new HashMap<>();
 
   @NotNull
-  private Node addNode(@NotNull ParentNode base,
-                       EditorActionHandlerBase action,
-                       @NotNull Command.Type cmdType,
-                       EnumSet<CommandFlags> cmdFlags,
-                       @NotNull KeyStroke key,
-                       @Nullable Argument.Type argType,
-                       boolean last) {
-    // Lets get the actual action for the supplied action name
-    Node node = base.getChild(key);
-    // Is this the first time we have seen this character at this point in the tree?
-    if (node == null) {
-      // If this is the last keystroke in the shortcut, and there is no argument, add a command node
-      if (last && argType == null) {
-        node = new CommandNode(key, action, cmdType, cmdFlags);
-      }
-      // If this are more keystrokes in the shortcut or there is an argument, add a branch node
-      else {
-        node = new BranchNode(key, cmdFlags);
-      }
+  private Node addMNode(@NotNull ParentNode base,
+                        EditorActionHandlerBase action,
+                        KeyStroke key,
+                        boolean isLastInSequence) {
+    Node existing = base.getChild(key);
+    if (existing != null) return existing;
 
-      base.addChild(node, key);
+    Node newNode;
+    if (isLastInSequence) {
+      newNode = new CommandNode(action);
+    } else {
+      newNode = new CommandPartNode();
     }
-
-    // If this is the last keystroke in the shortcut and we have an argument, add an argument node
-    if (last && node instanceof BranchNode && argType != null) {
-      ArgumentNode arg = new ArgumentNode(action, cmdType, argType, cmdFlags);
-      ((BranchNode)node).setArgument(arg);
-    }
-
-    if (base instanceof BranchNode) {
-      // All flags of a child should be added to parent
-      // Otherwise set of this flags will differ for different initialization orders
-      ((BranchNode)base).getFlags().addAll(cmdFlags);
-    }
-
-    return node;
+    base.addChild(key, newNode);
+    return newNode;
   }
 
   @NotNull

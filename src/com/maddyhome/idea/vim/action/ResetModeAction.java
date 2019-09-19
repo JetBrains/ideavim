@@ -37,7 +37,7 @@ public class ResetModeAction extends VimActionHandler.SingleExecution {
   @NotNull
   @Override
   public Set<MappingMode> getMappingModes() {
-    return MappingMode.NO;
+    return MappingMode.ALL;
   }
 
   @NotNull

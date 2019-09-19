@@ -18,152 +18,20 @@
 
 package com.maddyhome.idea.vim.key
 
-import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
-import com.maddyhome.idea.vim.helper.noneOfEnum
-import java.util.*
 import javax.swing.KeyStroke
 
-/**
- * Marker interface for all key/action tree nodes
- */
 interface Node
 
-/**
- * This abstract node is used as a base for any node that can contain child nodes
- */
-sealed class ParentNode : Node {
+abstract class ParentNode : Node {
+  private val children: MutableMap<KeyStroke, Node> = mutableMapOf()
 
-  protected val children: MutableMap<KeyStroke, Node> = mutableMapOf()
-
-  /** This adds a child node keyed by the supplied key */
-  fun addChild(child: Node, key: KeyStroke) {
-    children[key] = child
-  }
-
-  /** Returns the child node associated with the supplied key. The key must be the same as used in [addChild] */
-  fun getChild(key: KeyStroke): Node? = children[key]
-
-  /**
-   * Returns the child node associated with the supplied key. The key must be the same as used in [.addChild]
-   * If this is BranchNode and no such child is found but there is an argument node, the argument node is returned.
-   */
-  open fun getChildOrArgument(key: KeyStroke): Node? = children[key]
-}
-
-class RootNode : ParentNode() {
-  override fun toString(): String =
-    "RootNode[children=[${children.entries.joinToString { (key, value) -> "$key -> $value" }}]"
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (javaClass != other?.javaClass) return false
-    return true
-  }
-
-  override fun hashCode(): Int = javaClass.hashCode()
-}
-
-class ArgumentNode(
-  val action: EditorActionHandlerBase,
-  val cmdType: Command.Type,
-  val argType: Argument.Type,
-  val flags: EnumSet<CommandFlags>
-) : Node {
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (javaClass != other?.javaClass) return false
-
-    other as ArgumentNode
-
-    if (action != other.action) return false
-    if (cmdType != other.cmdType) return false
-    if (argType != other.argType) return false
-    if (flags != other.flags) return false
-
-    return true
-  }
-
-  override fun hashCode(): Int {
-    var result = action.hashCode()
-    result = 31 * result + cmdType.hashCode()
-    result = 31 * result + argType.hashCode()
-    result = 31 * result + flags.hashCode()
-    return result
-  }
-
-  override fun toString(): String = "ArgumentNode(action=$action, cmdType=$cmdType, argType=$argType, flags=$flags)"
-}
-
-class BranchNode(
-  val key: KeyStroke,
-  flags: EnumSet<CommandFlags> = noneOfEnum()
-) : ParentNode() {
-
-  var argument: ArgumentNode? = null
-
-  val flags: EnumSet<CommandFlags> = EnumSet.copyOf(flags)
-
-  /**
-   * Returns the child node associated with the supplied key. The key must be the same as used in [addChild].
-   * If no such child is found but there is an argument node, the argument node is returned.
-   */
-  override fun getChildOrArgument(key: KeyStroke): Node? = getChild(key) ?: argument
-
-  override fun toString(): String =
-    "BranchNode[children=[${children.entries.joinToString { (key, value) -> "$key -> $value" }}]"
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (javaClass != other?.javaClass) return false
-
-    other as BranchNode
-
-    if (key != other.key) return false
-    if (flags != other.flags) return false
-
-    return true
-  }
-
-  override fun hashCode(): Int {
-    var result = key.hashCode()
-    result = 31 * result + flags.hashCode()
-    return result
+  open fun getChild(key: KeyStroke): Node? = children[key]
+  open fun addChild(key: KeyStroke, node: Node) {
+    children[key] = node
   }
 }
 
-class CommandNode(
-  val key: KeyStroke,
-  val action: EditorActionHandlerBase,
-  val cmdType: Command.Type,
-  val flags: EnumSet<CommandFlags>
-) : Node {
+class CommandNode(val action: EditorActionHandlerBase) : Node
 
-  override fun toString(): String = "CommandNode[key=$key, action=$action, argType=$cmdType]"
-
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (javaClass != other?.javaClass) return false
-
-    other as CommandNode
-
-    @Suppress("DuplicatedCode")
-    if (key != other.key) return false
-    if (action != other.action) return false
-    if (cmdType != other.cmdType) return false
-    if (flags != other.flags) return false
-
-    return true
-  }
-
-  override fun hashCode(): Int {
-    var result = key.hashCode()
-    result = 31 * result + action.hashCode()
-    result = 31 * result + cmdType.hashCode()
-    result = 31 * result + flags.hashCode()
-    return result
-  }
-}
+class CommandPartNode : ParentNode()

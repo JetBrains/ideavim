@@ -31,12 +31,12 @@ import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
+import com.maddyhome.idea.vim.action.macro.ToggleRecordingAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.group.RegisterGroup;
+import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
-import com.maddyhome.idea.vim.handler.MotionActionHandler;
-import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -209,26 +209,17 @@ public class KeyHandler {
 
       // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
       // return the node matching this keystroke
-      Node node = editorState.getCurrentNode().getChildOrArgument(key);
+      Node node = editorState.getCurrentNode().getChild(key);
 
-      if (handleDigraph(editor, key, context, node)) {
-        return;
-      }
+      if (handleDigraph(editor, key, context, node)) return;
 
       node = mapOpCommand(key, node, editorState);
 
-      // If this is a branch node we have entered only part of a multi-key command
-      if (node instanceof BranchNode) {
-        handleBranchNode(editor, context, editorState, chKey, (BranchNode)node);
+      if (node instanceof CommandNode) {
+        handleCommandNode(editor, context, key, (CommandNode)node, editorState);
       }
-      // If this is a command node the user has entered a valid key sequence of a known command
-      else if (node instanceof CommandNode) {
-        handleCommandNode(editor, (CommandNode)node);
-      }
-      // If this is an argument node then the last keystroke was not part of the current command but should
-      // be the first keystroke of the argument of the current command
-      else if (node instanceof ArgumentNode) {
-        shouldRecord = handleArgumentNode(editor, key, context, editorState, (ArgumentNode)node);
+      else if (node instanceof CommandPartNode) {
+        editorState.setCurrentNode((CommandPartNode)node);
       }
       else {
         if (lastWasBS && lastChar != 0 && OptionsManager.INSTANCE.getDigraph().isSet()) {
@@ -271,15 +262,8 @@ public class KeyHandler {
       if (editorState.getMappingMode() == MappingMode.OP_PENDING) {
         editorState.popState();
       }
-      else {
-        VimPlugin.indicateError();
-        reset(editor);
-      }
-    }
-    // We had some sort of error so reset the handler and let the user know (beep)
-    else if (state == State.ERROR) {
       VimPlugin.indicateError();
-      fullReset(editor);
+      reset(editor);
     }
     else if (isRecording && shouldRecord) {
       VimPlugin.getRegister().recordKeyStroke(key);
@@ -292,7 +276,7 @@ public class KeyHandler {
       EditorActionHandlerBase action = currentCmd.peek().getAction();
       if (action.getFlags().contains(CommandFlags.FLAG_DUPLICABLE_OPERATOR) &&
           action.getKeyStrokesSet().stream().anyMatch(o -> o.size() == 1 && o.get(0).equals(key))) {
-        return editorState.getCurrentNode().getChildOrArgument(KeyStroke.getKeyStroke('_'));
+        return editorState.getCurrentNode().getChild(KeyStroke.getKeyStroke('_'));
       }
     }
     return node;
@@ -311,7 +295,7 @@ public class KeyHandler {
   }
 
   private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull final DataContext context) {
-    if (state != State.COMMAND && count == 0 && currentArg == null && currentCmd.size() == 0) {
+    if (count == 0 && currentArg == null && currentCmd.size() == 0) {
       RegisterGroup register = VimPlugin.getRegister();
       if (register.getCurrentRegister() == register.getDefaultRegister()) {
         if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -447,7 +431,7 @@ public class KeyHandler {
   }
 
   private boolean isEditorReset(@NotNull KeyStroke key, @NotNull CommandState editorState) {
-    return (editorState.getMode() == CommandState.Mode.COMMAND || state == State.COMMAND) &&
+    return (editorState.getMode() == CommandState.Mode.COMMAND) &&
            StringHelper.isCloseKeyStroke(key);
   }
 
@@ -589,89 +573,58 @@ public class KeyHandler {
     }
   }
 
-  private void handleCommandNode(@NotNull Editor editor, @NotNull CommandNode node) {
-    // If all does well we are ready to process this command
-    state = State.READY;
-    // Did we just get the completed sequence for a motion command argument?
-    if (currentArg == Argument.Type.MOTION) {
-      // We have been expecting a motion argument - is this one?
-      if (node.getCmdType() == Command.Type.MOTION) {
-        if (!(node.getAction() instanceof MotionActionHandler) &&
-            !(node.getAction() instanceof TextObjectActionHandler)) {
-          throw new RuntimeException(
-            "MOTION cmd type can be used only with MotionActionHandler or TextObjectActionHandler - " +
-            node.getAction().getClass().getName());
-        }
-        // Create the motion command and add it to the stack
-        Command cmd = new Command(count, node.getAction(), node.getCmdType(), node.getFlags());
-        cmd.setKeys(keys);
-        currentCmd.push(cmd);
-      }
-      else if (node.getCmdType() == Command.Type.RESET) {
-        currentCmd.clear();
-        Command cmd = new Command(1, node.getAction(), node.getCmdType(), node.getFlags());
-        cmd.setKeys(keys);
-        currentCmd.push(cmd);
-      }
-      else {
-        // Oops - this wasn't a motion command. The user goofed and typed something else
-        state = State.BAD_COMMAND;
-      }
+  private void handleCommandNode(Editor editor, DataContext context, KeyStroke key, @NotNull CommandNode node, CommandState editorState) {
+    // The user entered a valid command that doesn't take any arguments
+    // Create the command and add it to the stack
+    Command cmd = new Command(count, node.getAction(), node.getAction().getType(), node.getAction().getFlags());
+    cmd.setKeys(keys);
+    currentCmd.push(cmd);
+
+    if (currentArg != null && !checkArgumentCompatibility(node)) return;
+
+    if (node.getAction().getArgumentType() == null || stopMacroRecord(node, editorState)) {
+      state = State.READY;
+    } else {
+      currentArg = node.getAction().getArgumentType();
+      startWaitingForArgument(editor, context, key.getKeyChar(), currentArg, editorState);
+      partialReset(editor);
     }
-    else if (currentArg == Argument.Type.EX_STRING && node.getFlags().contains(CommandFlags.FLAG_COMPLETE_EX)) {
+
+    // TODO please get rid of this
+    if (currentArg == Argument.Type.EX_STRING && node.getAction().getFlags().contains(CommandFlags.FLAG_COMPLETE_EX)) {
       String text = VimPlugin.getProcess().endSearchCommand(editor);
       Argument arg = new Argument(text);
-      Command cmd = currentCmd.peek();
+      cmd = currentCmd.peek();
       cmd.setArgument(arg);
       CommandState.getInstance(editor).popState();
     }
-    // The user entered a valid command that doesn't take any arguments
-    else {
-      // Create the command and add it to the stack
-      Command cmd = new Command(count, node.getAction(), node.getCmdType(), node.getFlags());
-      cmd.setKeys(keys);
-      currentCmd.push(cmd);
+  }
+
+  private boolean stopMacroRecord(CommandNode node, @NotNull CommandState editorState) {
+    return editorState.isRecording() && node.getAction() instanceof ToggleRecordingAction;
+  }
+
+  private void startWaitingForArgument(Editor editor, DataContext context, char key, @NotNull Argument.Type argument, CommandState editorState) {
+    switch (argument) {
+      case CHARACTER:
+      case DIGRAPH:
+        digraph = new DigraphSequence();
+        state = State.CHAR_OR_DIGRAPH;
+        break;
+      case MOTION:
+        editorState.pushState(editorState.getMode(), editorState.getSubMode(), MappingMode.OP_PENDING);
+        break;
+      case EX_STRING:
+        VimPlugin.getProcess().startSearchCommand(editor, context, count, key);
+        state = State.NEW_COMMAND;
+        editorState.pushState(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
+        currentCmd.pop();
     }
   }
 
-  private boolean handleArgumentNode(@NotNull Editor editor,
-                                     @NotNull KeyStroke key,
-                                     @NotNull DataContext context,
-                                     @NotNull CommandState editorState,
-                                     @NotNull ArgumentNode node) {
-    // Create a new command based on what the user has typed so far, excluding this keystroke.
-    Command cmd = new Command(count, node.getAction(), node.getCmdType(), node.getFlags());
-    cmd.setKeys(keys);
-    currentCmd.push(cmd);
-    // What type of argument does this command expect?
-    Argument.Type argType = node.getArgType();
-    switch (argType) {
-      case DIGRAPH:
-        //digraphState = 0;
-        digraph = new DigraphSequence();
-        // No break - fall through
-      case CHARACTER:
-        currentArg = node.getArgType();
-        // State should be CHAR_OR_DIGRAPH already
-        break;
-      case MOTION:
-        state = State.NEW_COMMAND;
-        currentArg = node.getArgType();
-        // Is the current command an operator? If so set the state to only accept "operator pending"
-        // commands
-        editorState.pushState(editorState.getMode(), editorState.getSubMode(), MappingMode.OP_PENDING);
-        break;
-      default:
-        // Oops - we aren't expecting any other type of argument
-        state = State.ERROR;
-    }
-
-    // If the current keystroke is really the first character of an argument the user needs to enter,
-    // recursively go back and handle this keystroke again with all the state properly updated to
-    // handle the argument
-    if (currentArg != null) {
-      partialReset(editor);
-      handleKey(editor, key, context);
+  private boolean checkArgumentCompatibility(@NotNull CommandNode node) {
+    if (currentArg == Argument.Type.MOTION && node.getAction().getType() != Command.Type.MOTION) {
+      state = State.BAD_COMMAND;
       return false;
     }
     return true;
@@ -687,37 +640,6 @@ public class KeyHandler {
     ActionManager aMgr = ActionManager.getInstance();
     AnAction action = aMgr.getAction(name);
     return action != null && executeAction(action, context);
-  }
-
-  private void handleBranchNode(@NotNull Editor editor,
-                                @NotNull DataContext context,
-                                @NotNull CommandState editorState,
-                                char key,
-                                @NotNull BranchNode node) {
-    state = State.COMMAND;
-    editorState.setCurrentNode(node);
-
-    ArgumentNode arg = ((BranchNode)editorState.getCurrentNode()).getArgument();
-    if (arg != null) {
-      if (currentArg == Argument.Type.MOTION && arg.getCmdType() != Command.Type.MOTION) {
-        editorState.popState();
-        state = State.BAD_COMMAND;
-        return;
-      }
-      if (arg.getArgType() == Argument.Type.CHARACTER || arg.getArgType() == Argument.Type.DIGRAPH) {
-        state = State.CHAR_OR_DIGRAPH;
-      }
-      if (editorState.isRecording() && arg.getFlags().contains(CommandFlags.FLAG_NO_ARG_RECORDING)) {
-        handleKey(editor, KeyStroke.getKeyStroke(' '), context);
-      }
-
-      if (arg.getArgType() == Argument.Type.EX_STRING) {
-        VimPlugin.getProcess().startSearchCommand(editor, context, count, key);
-        state = State.NEW_COMMAND;
-        currentArg = Argument.Type.EX_STRING;
-        editorState.pushState(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
-      }
-    }
   }
 
   /**
@@ -761,6 +683,10 @@ public class KeyHandler {
     lastChar = 0;
     lastWasBS = false;
     VimPlugin.getRegister().resetRegister();
+    if (editor != null) {
+      VisualGroupKt.updateCaretState(editor);
+      editor.getSelectionModel().removeSelection();
+    }
   }
 
   // This method is copied from com.intellij.openapi.editor.actionSystem.EditorAction.getProjectAwareDataContext
@@ -865,15 +791,11 @@ public class KeyHandler {
      * Awaiting a new command
      */
     NEW_COMMAND,
-
-    /**
-     * Awaiting for continuation of the command
-     */
-    COMMAND,
     /**
      * Awaiting for char or digraph input. In this mode mappings doesn't work (even for <C-K>)
      */
-    CHAR_OR_DIGRAPH, READY, ERROR, BAD_COMMAND
+    // TODO  and this probably also REMOVE
+    CHAR_OR_DIGRAPH, READY,  BAD_COMMAND
   }
 
   private int count;
