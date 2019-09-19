@@ -1127,12 +1127,15 @@ public class ChangeGroup {
     final boolean res = deleteText(editor, range, type);
     final int size = EditorHelper.getFileSize(editor);
     if (res) {
-      final int pos;
+      int pos;
       if (caret.getOffset() > size) {
         pos = size - 1;
       }
       else {
         pos = EditorHelper.normalizeOffset(editor, range.getStartOffset(), isChange);
+        if (type == SelectionType.LINE_WISE) {
+          pos = VimPlugin.getMotion().moveCaretToLineStart(editor, editor.offsetToLogicalPosition(pos).line);
+        }
       }
       MotionGroup.moveCaret(editor, caret, pos);
     }
@@ -1237,32 +1240,37 @@ public class ChangeGroup {
     boolean bigWord = id.equals(VIM_MOTION_BIG_WORD_RIGHT);
     final CharSequence chars = editor.getDocument().getCharsSequence();
     final int offset = caret.getOffset();
-    final CharacterHelper.CharacterType charType = CharacterHelper.charType(chars.charAt(offset), bigWord);
-    if (EditorHelper.getFileSize(editor) > 0 && charType != CharacterHelper.CharacterType.WHITESPACE) {
-      final boolean lastWordChar = offset > EditorHelper.getFileSize(editor) ||
-                                   CharacterHelper.charType(chars.charAt(offset + 1), bigWord) != charType;
-      final ImmutableSet<String> wordMotions =
-        ImmutableSet.of(VIM_MOTION_WORD_RIGHT, VIM_MOTION_BIG_WORD_RIGHT, VIM_MOTION_CAMEL_RIGHT);
-      if (wordMotions.contains(id) && lastWordChar && motion.getCount() == 1) {
-        final boolean res = deleteCharacter(editor, caret, 1, true);
-        if (res) {
-          UserDataManager.setVimChangeActionSwitchMode(editor, CommandState.Mode.INSERT);
+    if (EditorHelper.getFileSize(editor) > 0) {
+      final CharacterHelper.CharacterType charType = CharacterHelper.charType(chars.charAt(offset), bigWord);
+      if (charType != CharacterHelper.CharacterType.WHITESPACE) {
+        final boolean lastWordChar = offset > EditorHelper.getFileSize(editor) ||
+                                     CharacterHelper.charType(chars.charAt(offset + 1), bigWord) != charType;
+        final ImmutableSet<String> wordMotions =
+          ImmutableSet.of(VIM_MOTION_WORD_RIGHT, VIM_MOTION_BIG_WORD_RIGHT, VIM_MOTION_CAMEL_RIGHT);
+        if (wordMotions.contains(id) && lastWordChar && motion.getCount() == 1) {
+          final boolean res = deleteCharacter(editor, caret, 1, true);
+          if (res) {
+            UserDataManager.setVimChangeActionSwitchMode(editor, CommandState.Mode.INSERT);
+          }
+          return res;
         }
-        return res;
-      }
-      switch (id) {
-        case VIM_MOTION_WORD_RIGHT:
-          kludge = true;
-          motion.setAction(RegisterActions.findActionOrDie(VIM_MOTION_WORD_END_RIGHT));
-          break;
-        case VIM_MOTION_BIG_WORD_RIGHT:
-          kludge = true;
-          motion.setAction(RegisterActions.findActionOrDie(VIM_MOTION_BIG_WORD_END_RIGHT));
-          break;
-        case VIM_MOTION_CAMEL_RIGHT:
-          kludge = true;
-          motion.setAction(RegisterActions.findActionOrDie(VIM_MOTION_CAMEL_END_RIGHT));
-          break;
+        switch (id) {
+          case VIM_MOTION_WORD_RIGHT:
+            kludge = true;
+            motion.setAction(RegisterActions.findActionOrDie(VIM_MOTION_WORD_END_RIGHT));
+
+            break;
+          case VIM_MOTION_BIG_WORD_RIGHT:
+            kludge = true;
+            motion.setAction(RegisterActions.findActionOrDie(VIM_MOTION_BIG_WORD_END_RIGHT));
+
+            break;
+          case VIM_MOTION_CAMEL_RIGHT:
+            kludge = true;
+            motion.setAction(RegisterActions.findActionOrDie(VIM_MOTION_CAMEL_END_RIGHT));
+
+            break;
+        }
       }
     }
 
@@ -1700,6 +1708,15 @@ public class ChangeGroup {
   /**
    * Delete text from the document. This will fail if being asked to store the deleted text into a read-only
    * register.
+   *
+   * End offset of range is exclusive
+   *
+   * delete new TextRange(1, 5)
+   * 0123456789
+   * Hello, xyz
+   * .||||....
+   *
+   * end <= text.length
    *
    * @param editor The editor to delete from
    * @param range  The range to delete

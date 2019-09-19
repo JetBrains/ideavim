@@ -18,16 +18,19 @@
 
 package com.maddyhome.idea.vim.common;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Please prefer {@link com.maddyhome.idea.vim.group.visual.VimSelection} for visual selection
  */
 public class TextRange {
+  @Contract(pure = true)
   public TextRange(int start, int end) {
     this(new int[]{start}, new int[]{end});
   }
 
+  @Contract(pure = true)
   public TextRange(int[] starts, int[] ends) {
     this.starts = starts;
     this.ends = ends;
@@ -89,11 +92,12 @@ public class TextRange {
     }
   }
 
+  @Contract(mutates = "this")
   public boolean normalize(final int fileSize) {
     for (int i = 0; i < size(); i++) {
       normalizeIndex(i);
       starts[i] = Math.max(0, Math.min(starts[i], fileSize));
-      if (starts[i] == fileSize) {
+      if (starts[i] == fileSize && fileSize != 0) {
         return false;
       }
       ends[i] = Math.max(0, Math.min(ends[i], fileSize));

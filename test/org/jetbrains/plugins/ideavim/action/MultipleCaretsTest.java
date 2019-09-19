@@ -1206,44 +1206,6 @@ public class MultipleCaretsTest extends VimTestCase {
                           "abcde<caret> abcde\n");
   }
 
-  public void testDeleteLineAction() {
-    typeTextInFile(parseKeys("d3d"),
-                   "abc<caret>de\n" +
-                   "abcde\n" +
-                   "abcde\n" +
-                   "abcde\n" +
-                   "ab<caret>cde\n" +
-                   "abcde\n" +
-                   "abcde\n");
-    myFixture.checkResult("<caret>abcde\n");
-  }
-
-  public void testDeleteMotionAction() {
-    typeTextInFile(parseKeys("dt)"),
-                   "public class Foo {\n" +
-                   "  int foo(int a, int b) {\n" +
-                   "    boolean bar = (a < 0 && (b < 0 || a > 0)<caret> || b != 0);\n" +
-                   "    if (bar<caret> || b != 0) {\n" +
-                   "      return a;\n" +
-                   "    }\n" +
-                   "    else {\n" +
-                   "      return b;\n" +
-                   "    }\n" +
-                   "  }\n" +
-                   "}\n");
-    myFixture.checkResult("public class Foo {\n" +
-                   "  int foo(int a, int b) {\n" +
-                   "    boolean bar = (a < 0 && (b < 0 || a > 0)<caret>);\n" +
-                   "    if (bar<caret>) {\n" +
-                   "      return a;\n" +
-                   "    }\n" +
-                   "    else {\n" +
-                   "      return b;\n" +
-                   "    }\n" +
-                   "  }\n" +
-                   "}\n");
-  }
-
   public void testDeleteVisualAction() {
     typeTextInFile(parseKeys("vlj"),
                    "abc<caret>de\n" +
