@@ -24,17 +24,14 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.option.OptionsManager
-import java.util.*
 import javax.swing.KeyStroke
 
 class MotionEndAction : NonShiftedSpecialKeyHandler() {
@@ -42,7 +39,6 @@ class MotionEndAction : NonShiftedSpecialKeyHandler() {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<End>")
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
   override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
                       rawCount: Int, argument: Argument?): Int {
     var allow = false

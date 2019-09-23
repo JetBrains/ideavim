@@ -70,8 +70,6 @@ class MotionDownNotLineWiseAction : MotionActionHandler.ForEachCaret() {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gj", "g<Down>")
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
-
   private var col: Int = 0
   override fun getOffset(editor: Editor,
                          caret: Caret,

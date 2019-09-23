@@ -22,12 +22,13 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.ex.*
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandlerFlags
+import com.maddyhome.idea.vim.ex.CommandName
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.*
 import kotlin.math.min
 
 /**
@@ -37,7 +38,6 @@ import kotlin.math.min
 class GotoLineHandler : CommandHandler.ForEachCaret() {
   override val names: Array<CommandName> = arrayOf()
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
-  override val optFlags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
 
   /**
    * Moves the cursor to the line entered by the user

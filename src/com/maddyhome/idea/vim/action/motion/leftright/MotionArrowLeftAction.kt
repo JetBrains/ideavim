@@ -23,12 +23,10 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import java.awt.event.KeyEvent
-import java.util.*
 import javax.swing.KeyStroke
 
 class MotionArrowLeftAction : NonShiftedSpecialKeyHandler() {
@@ -37,7 +35,6 @@ class MotionArrowLeftAction : NonShiftedSpecialKeyHandler() {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Left>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0)))
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
   override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
     return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -count, false)
   }

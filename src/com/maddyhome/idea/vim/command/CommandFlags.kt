@@ -26,7 +26,6 @@ enum class CommandFlags {
   FLAG_MOT_CHARACTERWISE,
   FLAG_MOT_BLOCKWISE,
   FLAG_MOT_INCLUSIVE,
-  FLAG_MOT_EXCLUSIVE,
   /**
    * Indicates that the cursor position should be saved prior to this motion command
    */

@@ -36,7 +36,7 @@ class MotionGotoMarkAction : MotionActionHandler.ForEachCaret() {
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP)
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int,
                          rawCount: Int, argument: Argument?): Int {
@@ -54,8 +54,6 @@ class MotionGotoMarkNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("g`")
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
-
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 
   override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int,
                          rawCount: Int, argument: Argument?): Int {

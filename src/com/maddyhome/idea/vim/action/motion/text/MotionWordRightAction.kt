@@ -35,9 +35,6 @@ class MotionWordRightAction : MotionActionHandler.ForEachCaret() {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("w")
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
-
-
   override fun getOffset(editor: Editor,
                          caret: Caret,
                          context: DataContext,

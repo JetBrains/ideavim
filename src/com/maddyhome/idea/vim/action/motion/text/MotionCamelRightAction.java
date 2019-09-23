@@ -23,14 +23,12 @@ import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -46,12 +44,6 @@ public class MotionCamelRightAction extends MotionActionHandler.ForEachCaret {
   @Override
   public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("[w");
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE);
   }
 
   @Override

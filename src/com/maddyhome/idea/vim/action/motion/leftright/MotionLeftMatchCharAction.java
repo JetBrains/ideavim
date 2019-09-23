@@ -57,7 +57,7 @@ public class MotionLeftMatchCharAction extends MotionActionHandler.ForEachCaret 
   @NotNull
   @Override
   public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_ALLOW_DIGRAPH);
+    return EnumSet.of(CommandFlags.FLAG_ALLOW_DIGRAPH);
   }
 
   @Override

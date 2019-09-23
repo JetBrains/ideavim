@@ -50,7 +50,7 @@ public class MotionSectionBackwardStartAction extends MotionActionHandler.ForEac
   @NotNull
   @Override
   public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP);
+    return EnumSet.of(CommandFlags.FLAG_SAVE_JUMP);
   }
 
   @Override

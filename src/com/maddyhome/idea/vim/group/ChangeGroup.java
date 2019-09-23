@@ -1290,7 +1290,7 @@ public class ChangeGroup {
           motion.setCount(motion.getCount() - 1);
         }
         else {
-          motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE));
+          motion.setFlags(EnumSet.noneOf(CommandFlags.class));
         }
       }
     }
