@@ -35,10 +35,6 @@ enum class CommandFlags {
    */
   FLAG_SAVE_JUMP,
   /**
-   * Special flag that says this is characterwise only for visual mode
-   */
-  FLAG_VISUAL_CHARACTERWISE,
-  /**
    * Special command flag that indicates it is not to be repeated
    */
   FLAG_NO_REPEAT,

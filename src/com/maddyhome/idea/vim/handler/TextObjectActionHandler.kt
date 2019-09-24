@@ -57,9 +57,9 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase.ForEachCaret() 
       caret.vimSetSelection(newstart, newstart, false)
     }
 
-    if (CommandFlags.FLAG_MOT_LINEWISE in cmd.flags && CommandFlags.FLAG_VISUAL_CHARACTERWISE !in cmd.flags && editor.subMode != CommandState.SubMode.VISUAL_LINE) {
+    if (CommandFlags.FLAG_MOT_LINEWISE in cmd.flags && editor.subMode != CommandState.SubMode.VISUAL_LINE) {
       VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE)
-    } else if ((CommandFlags.FLAG_MOT_LINEWISE !in cmd.flags || CommandFlags.FLAG_VISUAL_CHARACTERWISE in cmd.flags) && editor.subMode == CommandState.SubMode.VISUAL_LINE) {
+    } else if (CommandFlags.FLAG_MOT_LINEWISE !in cmd.flags && editor.subMode == CommandState.SubMode.VISUAL_LINE) {
       VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
     }
 
