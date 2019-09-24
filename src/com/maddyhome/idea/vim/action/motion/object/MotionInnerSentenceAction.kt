@@ -38,7 +38,7 @@ class MotionInnerSentenceAction : TextObjectActionHandler() {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("is")
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_INCLUSIVE, CommandFlags.FLAG_TEXT_BLOCK)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
   override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
     return VimPlugin.getMotion().getSentenceRange(editor, caret, count, false)

@@ -1254,17 +1254,14 @@ public class ChangeGroup {
         case VIM_MOTION_WORD_RIGHT:
           kludge = true;
           motion.setAction(RegisterActions.findActionOrDie(VIM_MOTION_WORD_END_RIGHT));
-          motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
           break;
         case VIM_MOTION_BIG_WORD_RIGHT:
           kludge = true;
           motion.setAction(RegisterActions.findActionOrDie(VIM_MOTION_BIG_WORD_END_RIGHT));
-          motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
           break;
         case VIM_MOTION_CAMEL_RIGHT:
           kludge = true;
           motion.setAction(RegisterActions.findActionOrDie(VIM_MOTION_CAMEL_END_RIGHT));
-          motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
           break;
       }
     }

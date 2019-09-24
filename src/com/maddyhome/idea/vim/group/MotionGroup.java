@@ -126,42 +126,22 @@ public class MotionGroup {
       end = action.getHandlerOffset(editor, caret, context, cnt, raw, cmd.getArgument());
 
       // Invalid motion
-      if (end == -1) {
-        return null;
-      }
+      if (end == -1) return null;
+
+      // If inclusive, add the last character to the range
+      if (action.getMotionType() == MotionType.INCLUSIVE) end++;
     }
     else if (cmd.getAction() instanceof TextObjectActionHandler) {
       TextObjectActionHandler action = (TextObjectActionHandler)cmd.getAction();
 
       TextRange range = action.getRange(editor, caret, context, cnt, raw, cmd.getArgument());
 
-      if (range == null) {
-        return null;
-      }
+      if (range == null) return null;
 
       start = range.getStartOffset();
       end = range.getEndOffset();
-    }
 
-    // If we are a linewise motion we need to normalize the start and stop then move the start to the beginning
-    // of the line and move the end to the end of the line.
-    EnumSet<CommandFlags> flags = cmd.getFlags();
-    if (flags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
-      if (start > end) {
-        int t = start;
-        start = end;
-        end = t;
-      }
-
-      start = EditorHelper.getLineStartForOffset(editor, start);
-      end = Math
-        .min(EditorHelper.getLineEndForOffset(editor, end) + (incNewline ? 1 : 0), EditorHelper.getFileSize(editor));
-    }
-    // If characterwise and inclusive, add the last character to the range
-    else if (flags.contains(CommandFlags.FLAG_MOT_INCLUSIVE) ||
-             (cmd.getAction() instanceof MotionActionHandler &&
-              ((MotionActionHandler)cmd.getAction()).getMotionType() == MotionType.INCLUSIVE)) {
-      end++;
+      if (cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE)) end--;
     }
 
     // Normalize the range
@@ -169,6 +149,15 @@ public class MotionGroup {
       int t = start;
       start = end;
       end = t;
+    }
+
+    // If we are a linewise motion we need to normalize the start and stop then move the start to the beginning
+    // of the line and move the end to the end of the line.
+    EnumSet<CommandFlags> flags = cmd.getFlags();
+    if (flags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
+      start = EditorHelper.getLineStartForOffset(editor, start);
+      end = Math
+        .min(EditorHelper.getLineEndForOffset(editor, end) + (incNewline ? 1 : 0), EditorHelper.getFileSize(editor));
     }
 
     return new TextRange(start, end);

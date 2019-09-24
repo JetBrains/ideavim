@@ -41,11 +41,10 @@ class GnPreviousTextObject : TextObjectActionHandler() {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gN")
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE)
   override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
     if (caret != editor.caretModel.primaryCaret) return null
     val range = VimPlugin.getSearch().getNextSearchRange(editor, count, false)
-    val adj = VimPlugin.getVisualMotion().selectionAdj
-    return range?.let { TextRange(it.startOffset, it.endOffset - adj) }
+    return range?.let { TextRange(it.startOffset, it.endOffset) }
   }
 }

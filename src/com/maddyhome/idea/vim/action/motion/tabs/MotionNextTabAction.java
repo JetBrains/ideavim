@@ -22,14 +22,12 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.MotionType;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -49,12 +47,6 @@ public class MotionNextTabAction extends MotionActionHandler.SingleExecution {
     return parseKeysSet("gt");
   }
 
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE);
-  }
-
   @Override
   public int getOffset(@NotNull final Editor editor,
                        @NotNull final DataContext context,
@@ -67,6 +59,6 @@ public class MotionNextTabAction extends MotionActionHandler.SingleExecution {
   @NotNull
   @Override
   public MotionType getMotionType() {
-    return MotionType.EXCLUSIVE;
+    return MotionType.INCLUSIVE;
   }
 }

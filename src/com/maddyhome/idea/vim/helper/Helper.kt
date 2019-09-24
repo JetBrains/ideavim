@@ -22,6 +22,7 @@ import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.injected.editor.EditorWindow
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.common.TextRange
 import java.util.*
 
 /**
@@ -141,3 +142,6 @@ annotation class RWLockLabel {
   @Target(AnnotationTarget.FUNCTION)
   annotation class NoLockRequired
 }
+
+val TextRange.endOffsetInclusive
+  get() = if (this.endOffset > 0 && this.endOffset > this.startOffset) this.endOffset - 1 else this.endOffset

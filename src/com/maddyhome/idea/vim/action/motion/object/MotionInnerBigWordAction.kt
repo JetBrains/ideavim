@@ -37,7 +37,7 @@ class MotionInnerBigWordAction : TextObjectActionHandler() {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("iW")
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE)
 
   override fun getRange(editor: Editor,
                         caret: Caret,

@@ -38,7 +38,7 @@ class MotionOuterBigWordAction : TextObjectActionHandler() {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("aW")
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE)
 
   override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
     return VimPlugin.getMotion().getWordRange(editor, caret, count, true, true)

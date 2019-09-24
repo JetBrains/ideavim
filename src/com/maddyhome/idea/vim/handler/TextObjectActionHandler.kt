@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
+import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
@@ -49,8 +50,8 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase.ForEachCaret() 
     val range = getRange(editor, caret, context, cmd.count, cmd.rawCount, cmd.argument) ?: return false
 
     val block = CommandFlags.FLAG_TEXT_BLOCK in cmd.flags
-    val newstart = if (block || caret.offset >= caret.vimSelectionStart) range.startOffset else range.endOffset
-    val newend = if (block || caret.offset >= caret.vimSelectionStart) range.endOffset else range.startOffset
+    val newstart = if (block || caret.offset >= caret.vimSelectionStart) range.startOffset else range.endOffsetInclusive
+    val newend = if (block || caret.offset >= caret.vimSelectionStart) range.endOffsetInclusive else range.startOffset
 
     if (caret.vimSelectionStart == caret.offset || block) {
       caret.vimSetSelection(newstart, newstart, false)

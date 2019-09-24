@@ -33,6 +33,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -150,7 +151,7 @@ public class SearchHelper {
       if (quoteRange != null) {
         int startOffset = quoteRange.getStartOffset();
         int endOffset = quoteRange.getEndOffset();
-        CharSequence subSequence = chars.subSequence(startOffset, endOffset + 1);
+        CharSequence subSequence = chars.subSequence(startOffset, endOffset);
         int inQuotePos = pos - startOffset;
         int inQuoteStart = findBlockLocation(subSequence, close, type, -1, inQuotePos, count, false);
         if (inQuoteStart != -1) {
@@ -198,7 +199,8 @@ public class SearchHelper {
       }
     }
 
-    return new TextRange(bstart, bend);
+    // End offset exclusive
+    return new TextRange(bstart, bend + 1);
   }
 
   private static int findMatchingBlockCommentPair(@NotNull PsiComment comment, int pos, @Nullable String prefix,
@@ -508,9 +510,9 @@ public class SearchHelper {
       }
 
       if (isOuter) {
-        return new TextRange(openingTag.getStartOffset(), closingTagTextRange.getEndOffset() - 1);
+        return new TextRange(openingTag.getStartOffset(), closingTagTextRange.getEndOffset());
       } else {
-        return new TextRange(openingTag.getEndOffset(), Math.max(closingTagTextRange.getStartOffset() - 1, openingTag.getEndOffset()));
+        return new TextRange(openingTag.getEndOffset(), closingTagTextRange.getStartOffset());
       }
     }
   }
@@ -658,7 +660,9 @@ public class SearchHelper {
       start++;
       end--;
     }
-    return new TextRange(start, end);
+
+    // End offset exclusive
+    return new TextRange(start, end + 1);
   }
 
   private static boolean checkInString(@NotNull CharSequence chars, int pos, boolean str) {
@@ -1155,6 +1159,7 @@ public class SearchHelper {
     return new TextRange(start, end);
   }
 
+  @Contract("_, _, _, _, _, _, _ -> new")
   @NotNull
   public static TextRange findWordUnderCursor(@NotNull Editor editor, @NotNull Caret caret, int count, int dir,
                                               boolean isOuter, boolean isBig, boolean hasSelection) {
@@ -1293,7 +1298,8 @@ public class SearchHelper {
       logger.debug("end=" + end);
     }
 
-    return new TextRange(start, end);
+    // End offset is exclusive
+    return new TextRange(start, end + 1);
   }
 
   /**
@@ -1886,6 +1892,7 @@ public class SearchHelper {
     return res;
   }
 
+  @Contract("_, _, _, _ -> new")
   @NotNull
   public static TextRange findSentenceRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
     CharSequence chars = editor.getDocument().getCharsSequence();
@@ -1902,14 +1909,14 @@ public class SearchHelper {
         start = ssel;
         end = findSentenceRangeEnd(editor, chars, offset, max, count, isOuter, true);
 
-        return new TextRange(start, end);
+        return new TextRange(start, end + 1);
       }
       // Backward selection
       else {
         end = esel - 1;
         start = findSentenceRangeEnd(editor, chars, offset, max, -count, isOuter, true);
 
-        return new TextRange(end, start);
+        return new TextRange(end, start + 1);
       }
     }
     else {
@@ -1922,7 +1929,7 @@ public class SearchHelper {
 
       int start = findSentenceRangeEnd(editor, chars, offset, max, -1, space, false);
 
-      return new TextRange(start, end);
+      return new TextRange(start, end + 1);
     }
   }
 
@@ -2133,7 +2140,7 @@ public class SearchHelper {
     int start = EditorHelper.getLineStartOffset(editor, sline);
     int end = EditorHelper.getLineStartOffset(editor, eline);
 
-    return new TextRange(start, end);
+    return new TextRange(start, end + 1);
   }
 
   public static int findMethodStart(@NotNull Editor editor, @NotNull Caret caret, int count) {

@@ -38,7 +38,7 @@ class MotionInnerBlockBraceAction : TextObjectActionHandler() {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("iB", "i{", "i}")
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE, CommandFlags.FLAG_TEXT_BLOCK)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_TEXT_BLOCK)
 
   override fun getRange(editor: Editor,
                         caret: Caret,
