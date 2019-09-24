@@ -32,7 +32,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -76,7 +75,7 @@ final public class OperatorAction extends VimActionHandler.SingleExecution {
         final Command motion = argument.getMotion();
         final TextRange range = MotionGroup
           .getMotionRange(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd.getCount(),
-                          cmd.getRawCount(), argument, true);
+                          cmd.getRawCount(), argument);
         if (range != null) {
           VimPlugin.getMark().setChangeMarks(editor, range);
           final SelectionType selectionType = SelectionType.fromCommandFlags(motion.getFlags());

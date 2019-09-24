@@ -448,7 +448,7 @@ public class ChangeGroup {
                                                 int count,
                                                 int rawCount,
                                                 @NotNull Argument argument) {
-    TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument, true);
+    TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
     // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is deleted when it shouldn't be.
     if (range != null) {
       String text =
@@ -1512,7 +1512,7 @@ public class ChangeGroup {
                                   int rawCount,
                                   char type,
                                   @NotNull Argument argument) {
-    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument, true);
+    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
     return range != null && changeCaseRange(editor, caret, range, type);
   }
 
@@ -1538,9 +1538,9 @@ public class ChangeGroup {
                                int count,
                                int rawCount,
                                @NotNull Argument argument) {
-    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument, false);
+    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
     if (range != null) {
-      autoIndentRange(editor, caret, context, range);
+      autoIndentRange(editor, caret, context, new TextRange(range.getStartOffset(), HelperKt.getEndOffsetInclusive(range)));
     }
   }
 
@@ -1593,7 +1593,7 @@ public class ChangeGroup {
                            int rawCount,
                            @NotNull Argument argument,
                            int dir) {
-    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument, false);
+    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
     if (range != null) {
       indentRange(editor, caret, context, range, 1, dir);
     }

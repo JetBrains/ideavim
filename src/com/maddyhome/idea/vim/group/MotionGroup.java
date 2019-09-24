@@ -99,7 +99,6 @@ public class MotionGroup {
    * @param count      The count applied to the motion
    * @param rawCount   The actual count entered by the user
    * @param argument   Any argument needed by the motion
-   * @param incNewline True if to include newline
    * @return The motion's range
    */
   @Nullable
@@ -108,8 +107,7 @@ public class MotionGroup {
                                          DataContext context,
                                          int count,
                                          int rawCount,
-                                         @NotNull Argument argument,
-                                         boolean incNewline) {
+                                         @NotNull Argument argument) {
     final Command cmd = argument.getMotion();
     // Normalize the counts between the command and the motion argument
     int cnt = cmd.getCount() * count;
@@ -156,8 +154,7 @@ public class MotionGroup {
     EnumSet<CommandFlags> flags = cmd.getFlags();
     if (flags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
       start = EditorHelper.getLineStartForOffset(editor, start);
-      end = Math
-        .min(EditorHelper.getLineEndForOffset(editor, end) + (incNewline ? 1 : 0), EditorHelper.getFileSize(editor));
+      end = Math.min(EditorHelper.getLineEndForOffset(editor, end) + 1, EditorHelper.getFileSize(editor));
     }
 
     return new TextRange(start, end);

@@ -23,11 +23,10 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import java.util.*
+import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import javax.swing.KeyStroke
 
 
@@ -44,12 +43,12 @@ class FilterMotionAction : VimActionHandler.SingleExecution() {
     val argument = cmd.argument ?: return false
     val range = MotionGroup
       .getMotionRange(editor, editor.caretModel.primaryCaret, context, cmd.count, cmd.rawCount,
-        argument, false)
+        argument)
       ?: return false
 
     val current = editor.caretModel.logicalPosition
     val start = editor.offsetToLogicalPosition(range.startOffset)
-    val end = editor.offsetToLogicalPosition(range.endOffset)
+    val end = editor.offsetToLogicalPosition(range.endOffsetInclusive)
     if (current.line != start.line) {
       MotionGroup.moveCaret(editor, editor.caretModel.primaryCaret, range.startOffset)
     }

@@ -51,7 +51,7 @@ class YankGroup {
     val ranges = ArrayList<Pair<Int, Int>>(caretModel.caretCount)
     val startOffsets = HashMap<Caret, Int>(caretModel.caretCount)
     for (caret in caretModel.allCarets) {
-      val motionRange = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument, true)
+      val motionRange = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument)
         ?: continue
 
       assert(motionRange.size() == 1)
