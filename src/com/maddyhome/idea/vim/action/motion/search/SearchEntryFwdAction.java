@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.MotionType;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -72,5 +73,11 @@ public class SearchEntryFwdAction extends MotionActionHandler.ForEachCaret {
     final String command = argument.getString();
 
     return VimPlugin.getSearch().search(editor, caret, command, count, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false);
+  }
+
+  @NotNull
+  @Override
+  public MotionType getMotionType() {
+    return MotionType.EXCLUSIVE;
   }
 }

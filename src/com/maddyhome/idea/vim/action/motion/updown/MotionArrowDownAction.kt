@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
@@ -35,7 +36,7 @@ import java.util.*
 import javax.swing.KeyStroke
 
 class MotionArrowDownAction : NonShiftedSpecialKeyHandler() {
-
+  override val motionType: MotionType = MotionType.INCLUSIVE
 
   override val mappingModes: Set<MappingMode> = MappingMode.NVOS
 

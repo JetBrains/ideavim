@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.MotionType;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -60,5 +61,11 @@ final public class VisualSelectNextSearch extends MotionActionHandler.SingleExec
                              int rawCount,
                              @Nullable Argument argument) {
     return VimPlugin.getMotion().selectNextSearch(editor, count, true);
+  }
+
+  @NotNull
+  @Override
+  public MotionType getMotionType() {
+    return MotionType.EXCLUSIVE;
   }
 }

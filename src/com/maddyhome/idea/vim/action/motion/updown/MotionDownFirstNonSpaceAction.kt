@@ -26,11 +26,14 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import java.util.*
 import javax.swing.KeyStroke
 
 class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.INCLUSIVE
+
   override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("+", "<C-M>")
@@ -48,6 +51,8 @@ class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
 }
 
 class EnterNormalAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.INCLUSIVE
+
   override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<CR>")

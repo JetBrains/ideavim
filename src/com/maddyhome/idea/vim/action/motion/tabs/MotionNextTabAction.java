@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.MotionType;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -61,5 +62,11 @@ public class MotionNextTabAction extends MotionActionHandler.SingleExecution {
                        final int rawCount,
                        final Argument argument) {
     return VimPlugin.getMotion().moveCaretGotoNextTab(editor, context, rawCount);
+  }
+
+  @NotNull
+  @Override
+  public MotionType getMotionType() {
+    return MotionType.EXCLUSIVE;
   }
 }

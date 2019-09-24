@@ -22,10 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -71,11 +68,14 @@ public class MotionPercentOrMatchAction extends MotionActionHandler.ForEachCaret
 
   @Override
   public void process(@NotNull Command cmd) {
-    if (cmd.getRawCount() == 0) {
-      cmd.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
-    }
-    else {
+    if (cmd.getRawCount() != 0) {
       cmd.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE));
     }
+  }
+
+  @NotNull
+  @Override
+  public MotionType getMotionType() {
+    return MotionType.INCLUSIVE;
   }
 }

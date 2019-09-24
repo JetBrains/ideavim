@@ -25,12 +25,15 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
 class MotionWordRightAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.EXCLUSIVE
+
   override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("w")
@@ -46,6 +49,8 @@ class MotionWordRightAction : MotionActionHandler.ForEachCaret() {
 }
 
 class MotionWordRightInsertAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.EXCLUSIVE
+
   override val mappingModes: Set<MappingMode> = MappingMode.I
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(

@@ -18,6 +18,11 @@
 
 package com.maddyhome.idea.vim.command
 
+enum class MotionType {
+  INCLUSIVE,
+  EXCLUSIVE
+}
+
 enum class CommandFlags {
   /**
    * Motion flags

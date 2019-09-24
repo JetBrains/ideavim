@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.option.KeyModelOptionData
@@ -36,6 +37,7 @@ import javax.swing.KeyStroke
  */
 
 class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override val mappingModes: MutableSet<MappingMode> = MappingMode.S
 

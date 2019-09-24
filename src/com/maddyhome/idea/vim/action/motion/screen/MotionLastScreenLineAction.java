@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.MotionType;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,31 +36,37 @@ import java.util.List;
 import java.util.Set;
 
 public class MotionLastScreenLineAction extends MotionActionHandler.ForEachCaret {
-@NotNull
-@Override
-public Set<MappingMode> getMappingModes() {
-  return MappingMode.NVO;
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.NVO;
   }
 
-@NotNull
-@Override
-public Set<List<KeyStroke>> getKeyStrokesSet() {
-  return parseKeysSet("L");
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("L");
   }
 
-@NotNull
-@Override
-public EnumSet<CommandFlags> getFlags() {
-  return EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP);
+  @NotNull
+  @Override
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP);
   }
 
-@Override
-public int getOffset(@NotNull Editor editor,
-@NotNull Caret caret,
-@NotNull DataContext context,
-  int count,
-  int rawCount,
-@Nullable Argument argument) {
-  return VimPlugin.getMotion().moveCaretToLastScreenLine(editor, count);
+  @Override
+  public int getOffset(@NotNull Editor editor,
+                       @NotNull Caret caret,
+                       @NotNull DataContext context,
+                       int count,
+                       int rawCount,
+                       @Nullable Argument argument) {
+    return VimPlugin.getMotion().moveCaretToLastScreenLine(editor, count);
   }
+
+  @NotNull
+  @Override
+  public MotionType getMotionType() {
+    return MotionType.INCLUSIVE;
   }
+}

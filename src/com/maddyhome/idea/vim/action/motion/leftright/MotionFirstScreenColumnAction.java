@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.MotionType;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -52,5 +53,11 @@ public class MotionFirstScreenColumnAction extends MotionActionHandler.ForEachCa
                        int rawCount,
                        Argument argument) {
     return VimPlugin.getMotion().moveCaretToLineScreenStart(editor, caret);
+  }
+
+  @NotNull
+  @Override
+  public MotionType getMotionType() {
+    return MotionType.EXCLUSIVE;
   }
 }

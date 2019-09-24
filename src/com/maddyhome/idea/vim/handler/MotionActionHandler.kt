@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inBlockSubMode
@@ -114,6 +115,8 @@ sealed class MotionActionHandler : EditorActionHandlerBase.SingleExecution() {
      */
     open fun postMove(editor: Editor, context: DataContext, cmd: Command) = Unit
   }
+
+  abstract val motionType: MotionType
 
   final override val type: Command.Type = Command.Type.MOTION
 

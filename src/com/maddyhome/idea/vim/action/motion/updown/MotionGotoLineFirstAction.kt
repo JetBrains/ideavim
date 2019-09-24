@@ -25,11 +25,14 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import java.util.*
 import javax.swing.KeyStroke
 
 class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.INCLUSIVE
+
   override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gg", "<C-Home>")
@@ -47,6 +50,8 @@ class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
 }
 
 class MotionGotoLineFirstInsertAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.EXCLUSIVE
+
   override val mappingModes: Set<MappingMode> = MappingMode.I
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-Home>")

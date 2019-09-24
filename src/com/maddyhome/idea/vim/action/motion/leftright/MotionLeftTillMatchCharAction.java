@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.MotionType;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
@@ -75,5 +76,11 @@ public class MotionLeftTillMatchCharAction extends MotionActionHandler.ForEachCa
       VimPlugin.getMotion().moveCaretToBeforeNextCharacterOnLine(editor, caret, -count, argument.getCharacter());
     VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_T, argument.getCharacter());
     return res;
+  }
+
+  @NotNull
+  @Override
+  public MotionType getMotionType() {
+    return MotionType.EXCLUSIVE;
   }
 }

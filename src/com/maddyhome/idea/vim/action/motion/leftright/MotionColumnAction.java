@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.MotionType;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import com.maddyhome.idea.vim.helper.UserDataManager;
 import org.jetbrains.annotations.NotNull;
@@ -64,5 +65,11 @@ public class MotionColumnAction extends MotionActionHandler.ForEachCaret {
                        @NotNull DataContext context,
                        @NotNull Command cmd) {
     UserDataManager.setVimLastColumn(caret, cmd.getCount() - 1);
+  }
+
+  @NotNull
+  @Override
+  public MotionType getMotionType() {
+    return MotionType.EXCLUSIVE;
   }
 }

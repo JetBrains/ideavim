@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.MotionType;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +58,7 @@ public class MotionRightTillMatchCharAction extends MotionActionHandler.ForEachC
   @NotNull
   @Override
   public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE, CommandFlags.FLAG_ALLOW_DIGRAPH);
+    return EnumSet.of(CommandFlags.FLAG_ALLOW_DIGRAPH);
   }
 
   @Override
@@ -74,5 +75,11 @@ public class MotionRightTillMatchCharAction extends MotionActionHandler.ForEachC
     int res = VimPlugin.getMotion().moveCaretToBeforeNextCharacterOnLine(editor, caret, count, argument.getCharacter());
     VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_t, argument.getCharacter());
     return res;
+  }
+
+  @NotNull
+  @Override
+  public MotionType getMotionType() {
+    return MotionType.INCLUSIVE;
   }
 }

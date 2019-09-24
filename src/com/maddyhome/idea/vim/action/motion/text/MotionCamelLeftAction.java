@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.MotionType;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,5 +55,11 @@ public class MotionCamelLeftAction extends MotionActionHandler.ForEachCaret {
                        int rawCount,
                        @Nullable Argument argument) {
     return VimPlugin.getMotion().moveCaretToNextCamel(editor, caret, -count);
+  }
+
+  @NotNull
+  @Override
+  public MotionType getMotionType() {
+    return MotionType.EXCLUSIVE;
   }
 }

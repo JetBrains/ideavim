@@ -32,7 +32,6 @@ import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -47,12 +46,6 @@ public class MotionLastScreenColumnAction extends MotionActionHandler.ForEachCar
   @Override
   public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("g$", "g<End>");
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE);
   }
 
   @Override
@@ -82,5 +75,11 @@ public class MotionLastScreenColumnAction extends MotionActionHandler.ForEachCar
                        @NotNull DataContext context,
                        @NotNull Command cmd) {
     UserDataManager.setVimLastColumn(caret, MotionGroup.LAST_COLUMN);
+  }
+
+  @NotNull
+  @Override
+  public MotionType getMotionType() {
+    return MotionType.INCLUSIVE;
   }
 }

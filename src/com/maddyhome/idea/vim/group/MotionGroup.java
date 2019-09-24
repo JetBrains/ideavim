@@ -33,10 +33,7 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -161,7 +158,9 @@ public class MotionGroup {
         .min(EditorHelper.getLineEndForOffset(editor, end) + (incNewline ? 1 : 0), EditorHelper.getFileSize(editor));
     }
     // If characterwise and inclusive, add the last character to the range
-    else if (flags.contains(CommandFlags.FLAG_MOT_INCLUSIVE)) {
+    else if (flags.contains(CommandFlags.FLAG_MOT_INCLUSIVE) ||
+             (cmd.getAction() instanceof MotionActionHandler &&
+              ((MotionActionHandler)cmd.getAction()).getMotionType() == MotionType.INCLUSIVE)) {
       end++;
     }
 

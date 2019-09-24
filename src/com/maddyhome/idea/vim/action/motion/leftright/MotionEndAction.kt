@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.inInsertMode
@@ -35,6 +36,8 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import javax.swing.KeyStroke
 
 class MotionEndAction : NonShiftedSpecialKeyHandler() {
+  override val motionType: MotionType = MotionType.EXCLUSIVE
+
   override val mappingModes: MutableSet<MappingMode> = MappingMode.NVOS
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<End>")

@@ -25,11 +25,14 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import java.util.*
 import javax.swing.KeyStroke
 
 class MotionGotoMarkLineAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.INCLUSIVE
+
   override val mappingModes: Set<MappingMode> = MappingMode.N
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("'")
@@ -52,6 +55,8 @@ class MotionGotoMarkLineAction : MotionActionHandler.ForEachCaret() {
 }
 
 class MotionGotoMarkLineNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
+  override val motionType: MotionType = MotionType.INCLUSIVE
+
   override val mappingModes: Set<MappingMode> = MappingMode.N
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("g'")
