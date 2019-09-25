@@ -95,11 +95,13 @@ public class KeyHandler {
     return origHandler;
   }
 
-  public static void executeVimAction(@NotNull Editor editor, @NotNull EditorActionHandlerBase cmd, DataContext context) {
-    CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> cmd
-                                                    .execute(editor, getProjectAwareDataContext(editor, context)), cmd.getId(),
-                                                  DocCommandGroupId.noneGroupId(editor.getDocument()),
-                                                  UndoConfirmationPolicy.DEFAULT, editor.getDocument());
+  public static void executeVimAction(@NotNull Editor editor,
+                                      @NotNull EditorActionHandlerBase cmd,
+                                      DataContext context) {
+    CommandProcessor.getInstance()
+      .executeCommand(editor.getProject(), () -> cmd.execute(editor, getProjectAwareDataContext(editor, context)),
+                      cmd.getId(), DocCommandGroupId.noneGroupId(editor.getDocument()), UndoConfirmationPolicy.DEFAULT,
+                      editor.getDocument());
   }
 
   /**
@@ -207,11 +209,13 @@ public class KeyHandler {
 
       // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
       // return the node matching this keystroke
-      final Node node = editorState.getCurrentNode().getChildOrArgument(key);
+      Node node = editorState.getCurrentNode().getChildOrArgument(key);
 
       if (handleDigraph(editor, key, context, node)) {
         return;
       }
+
+      node = mapOpCommand(key, node, editorState);
 
       // If this is a branch node we have entered only part of a multi-key command
       if (node instanceof BranchNode) {
@@ -280,6 +284,18 @@ public class KeyHandler {
     else if (isRecording && shouldRecord) {
       VimPlugin.getRegister().recordKeyStroke(key);
     }
+  }
+
+  /** See the description for {@link CommandFlags#FLAG_DUPLICABLE_OPERATOR} */
+  private Node mapOpCommand(KeyStroke key, Node node, @NotNull CommandState editorState) {
+    if (editorState.getMappingMode() == MappingMode.OP_PENDING && !currentCmd.empty()) {
+      EditorActionHandlerBase action = currentCmd.peek().getAction();
+      if (action.getFlags().contains(CommandFlags.FLAG_DUPLICABLE_OPERATOR) &&
+          action.getKeyStrokesSet().stream().anyMatch(o -> o.size() == 1 && o.get(0).equals(key))) {
+        return editorState.getCurrentNode().getChildOrArgument(KeyStroke.getKeyStroke('_'));
+      }
+    }
+    return node;
   }
 
   private static <T> boolean isPrefix(@NotNull List<T> list1, @NotNull List<T> list2) {
@@ -580,9 +596,11 @@ public class KeyHandler {
     if (currentArg == Argument.Type.MOTION) {
       // We have been expecting a motion argument - is this one?
       if (node.getCmdType() == Command.Type.MOTION) {
-        if (!(node.getAction() instanceof MotionActionHandler) && !(node.getAction() instanceof TextObjectActionHandler)) {
-          throw new RuntimeException("MOTION cmd type can be used only with MotionActionHandler or TextObjectActionHandler - " +
-                                     node.getAction().getClass().getName());
+        if (!(node.getAction() instanceof MotionActionHandler) &&
+            !(node.getAction() instanceof TextObjectActionHandler)) {
+          throw new RuntimeException(
+            "MOTION cmd type can be used only with MotionActionHandler or TextObjectActionHandler - " +
+            node.getAction().getClass().getName());
         }
         // Create the motion command and add it to the stack
         Command cmd = new Command(count, node.getAction(), node.getCmdType(), node.getFlags());
@@ -676,10 +694,7 @@ public class KeyHandler {
                                 @NotNull CommandState editorState,
                                 char key,
                                 @NotNull BranchNode node) {
-    // Flag that we aren't allowing any more count digits (unless it's OK)
-    if (!node.getFlags().contains(CommandFlags.FLAG_ALLOW_MID_COUNT)) {
-      state = State.COMMAND;
-    }
+    state = State.COMMAND;
     editorState.setCurrentNode(node);
 
     ArgumentNode arg = ((BranchNode)editorState.getCurrentNode()).getArgument();
@@ -689,7 +704,7 @@ public class KeyHandler {
         state = State.BAD_COMMAND;
         return;
       }
-      if (arg.getArgType() == Argument.Type.CHARACTER || arg.getArgType() == Argument.Type.DIGRAPH ) {
+      if (arg.getArgType() == Argument.Type.CHARACTER || arg.getArgType() == Argument.Type.DIGRAPH) {
         state = State.CHAR_OR_DIGRAPH;
       }
       if (editorState.isRecording() && arg.getFlags().contains(CommandFlags.FLAG_NO_ARG_RECORDING)) {
@@ -750,7 +765,8 @@ public class KeyHandler {
 
   // This method is copied from com.intellij.openapi.editor.actionSystem.EditorAction.getProjectAwareDataContext
   @NotNull
-  private static DataContext getProjectAwareDataContext(@NotNull final Editor editor, @NotNull final DataContext original) {
+  private static DataContext getProjectAwareDataContext(@NotNull final Editor editor,
+                                                        @NotNull final DataContext original) {
     if (PROJECT.getData(original) == editor.getProject()) {
       return new DialogAwareDataContext(original);
     }
@@ -857,10 +873,7 @@ public class KeyHandler {
     /**
      * Awaiting for char or digraph input. In this mode mappings doesn't work (even for <C-K>)
      */
-    CHAR_OR_DIGRAPH,
-    READY,
-    ERROR,
-    BAD_COMMAND
+    CHAR_OR_DIGRAPH, READY, ERROR, BAD_COMMAND
   }
 
   private int count;

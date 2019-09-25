@@ -283,7 +283,6 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesSpacesAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteJoinVisualLinesAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteJoinVisualLinesSpacesAction"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteLineAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteMotionAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteVisualAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteVisualLinesAction"/>
@@ -314,20 +313,16 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesEndAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.change.FilterMotionAction"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.FilterCountLinesAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.change.FilterVisualLinesAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.change.AutoIndentLinesVisualAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ReformatCodeVisualAction"/>
 
     <!-- Shift -->
-    <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.AutoIndentLinesAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.AutoIndentMotionAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.ShiftLeftLinesAction"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.ShiftLeftLinesNormalModeAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.ShiftLeftMotionAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.ShiftLeftVisualAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.ShiftRightLinesAction"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.ShiftRightLinesNormalModeAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.ShiftRightMotionAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.ShiftRightVisualAction"/>
 
@@ -340,7 +335,6 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorActionMoveCursor"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.SelectRegisterAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.YankLineAction"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.copy.YankLineMidCountAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.YankMotionAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.YankVisualAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.YankVisualLinesAction"/>

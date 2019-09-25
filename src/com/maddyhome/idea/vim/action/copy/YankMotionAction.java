@@ -59,6 +59,12 @@ public class YankMotionAction extends VimActionHandler.SingleExecution {
     return Argument.Type.MOTION;
   }
 
+  @NotNull
+  @Override
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_DUPLICABLE_OPERATOR);
+  }
+
   @Override
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
     final Argument argument = cmd.getArgument();

@@ -22,10 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.command.SelectionType;
+import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import kotlin.Pair;
@@ -33,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -60,6 +58,12 @@ public class DeleteMotionAction extends ChangeEditorActionHandler.ForEachCaret {
   @Override
   public Argument.Type getArgumentType() {
     return Argument.Type.MOTION;
+  }
+
+  @NotNull
+  @Override
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_DUPLICABLE_OPERATOR);
   }
 
   @Override

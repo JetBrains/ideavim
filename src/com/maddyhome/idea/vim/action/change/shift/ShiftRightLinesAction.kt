@@ -51,17 +51,3 @@ class ShiftRightLinesAction : ChangeEditorActionHandler.ForEachCaret() {
     return true
   }
 }
-
-class ShiftRightLinesNormalModeAction : ChangeEditorActionHandler.ForEachCaret() {
-  override val mappingModes: Set<MappingMode> = MappingMode.N
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet(">>")
-
-  override val type: Command.Type = Command.Type.CHANGE
-
-  override fun execute(editor: Editor, caret: Caret, context: DataContext, count: Int,
-                       rawCount: Int, argument: Argument?): Boolean {
-    VimPlugin.getChange().indentLines(editor, caret, context, count, 1)
-    return true
-  }
-}

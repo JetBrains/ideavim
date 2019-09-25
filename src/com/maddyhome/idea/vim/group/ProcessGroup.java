@@ -111,6 +111,7 @@ public class ProcessGroup {
         CommandParser.getInstance().processCommand(editor, context, text, 1);
       }
       else {
+        // FIXME looks like this branch gets never executed
         int pos = VimPlugin.getSearch().search(editor, text, panel.getCount(),
                                                                  panel.getLabel().equals("/")
                                                                  ? EnumSet.of(CommandFlags.FLAG_SEARCH_FWD)

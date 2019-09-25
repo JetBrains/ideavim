@@ -23,10 +23,13 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
+import com.maddyhome.idea.vim.helper.enumSetOf
+import java.util.*
 import javax.swing.KeyStroke
 
 
@@ -38,6 +41,8 @@ class FilterMotionAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.CHANGE
 
   override val argumentType: Argument.Type = Argument.Type.MOTION
+
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_DUPLICABLE_OPERATOR)
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val argument = cmd.argument ?: return false
