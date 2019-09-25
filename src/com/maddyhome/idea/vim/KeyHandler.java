@@ -32,6 +32,8 @@ import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.action.macro.ToggleRecordingAction;
+import com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction;
+import com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.group.RegisterGroup;
@@ -586,16 +588,27 @@ public class KeyHandler {
       state = State.READY;
     } else {
       currentArg = node.getAction().getArgumentType();
-      startWaitingForArgument(editor, context, key.getKeyChar(), currentArg, editorState);
+      startWaitingForArgument(editor, context, key.getKeyChar(), currentArg, editorState, node.getAction());
       partialReset(editor);
     }
 
-    // TODO please get rid of this
+    // TODO In the name of God, get rid of EX_STRING, FLAG_COMPLETE_EX and all the related staff
     if (currentArg == Argument.Type.EX_STRING && node.getAction().getFlags().contains(CommandFlags.FLAG_COMPLETE_EX)) {
+      EditorActionHandlerBase action;
+      if (forwardSearch) {
+        action = new SearchEntryFwdAction();
+      } else {
+        action = new SearchEntryRevAction();
+      }
+
       String text = VimPlugin.getProcess().endSearchCommand(editor);
+      currentCmd.pop();
+
       Argument arg = new Argument(text);
-      cmd = currentCmd.peek();
+      cmd = new Command(count, action, action.getType(), action.getFlags());
+      cmd.setKeys(keys);
       cmd.setArgument(arg);
+      currentCmd.push(cmd);
       CommandState.getInstance(editor).popState();
     }
   }
@@ -604,7 +617,7 @@ public class KeyHandler {
     return editorState.isRecording() && node.getAction() instanceof ToggleRecordingAction;
   }
 
-  private void startWaitingForArgument(Editor editor, DataContext context, char key, @NotNull Argument.Type argument, CommandState editorState) {
+  private void startWaitingForArgument(Editor editor, DataContext context, char key, @NotNull Argument.Type argument, CommandState editorState, EditorActionHandlerBase action) {
     switch (argument) {
       case CHARACTER:
       case DIGRAPH:
@@ -615,6 +628,8 @@ public class KeyHandler {
         editorState.pushState(editorState.getMode(), editorState.getSubMode(), MappingMode.OP_PENDING);
         break;
       case EX_STRING:
+        forwardSearch = !(action instanceof SearchEntryRevAction);
+
         VimPlugin.getProcess().startSearchCommand(editor, context, count, key);
         state = State.NEW_COMMAND;
         editorState.pushState(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
@@ -807,6 +822,8 @@ public class KeyHandler {
   @Nullable private DigraphSequence digraph = null;
   private char lastChar;
   private boolean lastWasBS;
+
+  private boolean forwardSearch = true;
 
   private static KeyHandler instance;
 }
