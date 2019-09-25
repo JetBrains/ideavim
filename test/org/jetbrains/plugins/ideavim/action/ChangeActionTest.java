@@ -29,25 +29,6 @@ import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
  * @author vlan
  */
 public class ChangeActionTest extends VimTestCase {
-  // |c| |t|
-  public void testChangeLinesTillForwards() {
-    doTest(parseKeys("ct(", "for "), "<caret>if (condition) {\n" + "}\n", "for (condition) {\n" + "}\n",
-           CommandState.Mode.INSERT, CommandState.SubMode.NONE);
-  }
-
-  // VIM-276 |c| |T|
-  public void testChangeLinesTillBackwards() {
-    doTest(parseKeys("cT("), "if (condition) {<caret>\n" + "}\n", "if (\n" + "}\n", CommandState.Mode.INSERT,
-           CommandState.SubMode.NONE);
-  }
-
-  // VIM-276 |c| |F|
-  public void ignoreTestChangeLinesToBackwards() {
-    doTest(parseKeys("cFc"),
-           "if (condition) {<caret>\n" +
-           "}\n",
-           "if (\n" + "}\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
-  }
 
   // VIM-620 |i_CTRL-O|
   public void testInsertSingleCommandAndInserting() {
@@ -161,48 +142,10 @@ public class ChangeActionTest extends VimTestCase {
            CommandState.SubMode.NONE);
   }
 
-  // VIM-200 |c| |w|
-  public void testChangeWordAtLastChar() {
-    doTest(parseKeys("cw"), "on<caret>e two three\n", "on<caret> two three\n", CommandState.Mode.INSERT,
-           CommandState.SubMode.NONE);
-  }
-
-  // VIM-1380 |c| |w| |count|
-  public void testChangeTwoWordsAtLastChar() {
-    doTest(parseKeys("c2w"), "on<caret>e two three\n", "on<caret> three\n", CommandState.Mode.INSERT,
-           CommandState.SubMode.NONE);
-  }
-
   // VIM-1380 |d| |w| |count|
   public void testDeleteTwoWordsAtLastChar() {
     doTest(parseKeys("d2w"), "on<caret>e two three\n", "on<caret>three\n", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
-  }
-
-  // VIM-515 |c| |W|
-  public void testChangeBigWordWithPunctuationAndAlpha() {
-    doTest(parseKeys("cW"), "foo<caret>(bar baz\n", "foo baz\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
-  }
-
-  // VIM-300 |c| |w|
-  public void testChangeWordTwoWordsWithoutWhitespace() {
-    doTest(parseKeys("cw"), "<caret>$value\n", "value\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
-  }
-
-  // VIM-296 |cc|
-  public void testChangeLineAtLastLine() {
-    doTest(parseKeys("cc"),
-           "foo\n" +
-           "<caret>bar\n",
-           "foo\n<caret>" + "\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
-  }
-
-  // VIM-536 |cc|
-  public void testChangeLineAtSecondLastLine() {
-    doTest(parseKeys("ccbaz"),
-           "<caret>foo\n" +
-           "bar\n",
-           "baz\n" + "bar\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
   }
 
   // VIM-394 |d| |v_aw|
@@ -236,23 +179,6 @@ public class ChangeActionTest extends VimTestCase {
     VimPlugin.getRegister().setKeys('a', stringToKeys("World"));
     doTest(parseKeys("A", ", ", "<C-R>", "a", "!"), "<caret>Hello\n", "Hello, World!\n", CommandState.Mode.INSERT,
            CommandState.SubMode.NONE);
-  }
-
-  // VIM-421 |c| |w|
-  public void testChangeLastWordInLine() {
-    doTest(parseKeys("cw"),
-           "ab.<caret>cd\n", "ab.<caret>\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
-  }
-
-  // VIM-421 |c| |iw|
-  public void testChangeLastInnerWordInLine() {
-    doTest(parseKeys("c", "iw", "baz"),
-           "foo bar bo<caret>o\n", "foo bar baz\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
-  }
-
-  // VIM-421 |c| |w|
-  public void testChangeLastCharInLine() {
-    doTest(parseKeys("cw"), "fo<caret>o\n", "fo<caret>\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
   }
 
   // VIM-404 |O|
