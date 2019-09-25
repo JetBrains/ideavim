@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.*;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation;
+import static java.util.stream.Collectors.joining;
 
 /**
  * @author vlan
@@ -259,10 +260,12 @@ public class KeyGroup {
 
   public void registerCommandAction(@NotNull EditorActionHandlerBase commandAction) {
     if (ApplicationManager.getApplication().isUnitTestMode()) {
-      for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
-        for (MappingMode mappingMode : commandAction.getMappingModes()) {
-          checkIdentity(mappingMode, commandAction.getId(), keyStrokes);
-        }
+      if (identityChecker == null) {
+        identityChecker = new HashMap<>();
+        prefixes = new HashMap<>();
+      }
+      for (List<KeyStroke> keys : commandAction.getKeyStrokesSet()) {
+        checkCommand(commandAction.getMappingModes(), commandAction, keys);
       }
     }
 
@@ -275,7 +278,7 @@ public class KeyGroup {
         // Add a child for each keystroke in the shortcut for this action
         for (int i = 0; i < len; i++) {
           if (!(node instanceof ParentNode)) {
-            throw new RuntimeException("Error in tree constructing");
+            throw new Error("Error in tree constructing");
           }
 
           node = addMNode((ParentNode)node, commandAction, keyStrokes.get(i), i == len - 1);
@@ -292,13 +295,49 @@ public class KeyGroup {
     }
   }
 
+  private void checkCommand(@NotNull Set<MappingMode> mappingModes, EditorActionHandlerBase action, List<KeyStroke> keys) {
+    for (MappingMode mappingMode : mappingModes) {
+      checkIdentity(mappingMode, action.getId(), keys);
+    }
+    checkCorrectCombination(action, keys);
+  }
+
   private void checkIdentity(MappingMode mappingMode, String actName, List<KeyStroke> keys) {
     Set<List<KeyStroke>> keySets = identityChecker.computeIfAbsent(mappingMode, k -> new HashSet<>());
-    if (keySets.contains(keys)) throw new RuntimeException("This keymap already exists: " + mappingMode + " keys: " + keys + " action:" + actName);
+    if (keySets.contains(keys)) {
+      throw new RuntimeException("This keymap already exists: " + mappingMode + " keys: " +
+                                                             keys + " action:" + actName);
+    }
     keySets.add(keys);
   }
 
-  private Map<MappingMode, Set<List<KeyStroke>>> identityChecker = new HashMap<>();
+  private void checkCorrectCombination(EditorActionHandlerBase action, List<KeyStroke> keys) {
+    for (Map.Entry<List<KeyStroke>, String> entry : prefixes.entrySet()) {
+      List<KeyStroke> prefix = entry.getKey();
+      if (prefix.size() == keys.size()) continue;
+      int shortOne = Math.min(prefix.size(), keys.size());
+      int i;
+      for (i = 0; i < shortOne; i++) {
+        if (!prefix.get(i).equals(keys.get(i))) break;
+      }
+
+      List<String> actionExceptions = Arrays.asList("VimInsertDeletePreviousWordAction", "VimInsertAfterCursorAction", "VimInsertBeforeCursorAction", "VimFilterVisualLinesAction", "VimAutoIndentMotionAction");
+      if (i == shortOne && !actionExceptions.contains(action.getId()) && !actionExceptions.contains(entry.getValue())) {
+        throw new RuntimeException("Prefix found! " +
+                                   keys +
+                                   " in command " +
+                                   action.getId() +
+                                   " is the same as " +
+                                   prefix.stream().map(Object::toString).collect(joining(", ")) +
+                                   " in " +
+                                   entry.getValue());
+      }
+    }
+    prefixes.put(keys, action.getId());
+  }
+
+  private Map<MappingMode, Set<List<KeyStroke>>> identityChecker;
+  private Map<List<KeyStroke>, String> prefixes;
 
   @NotNull
   private Node addMNode(@NotNull ParentNode base,
