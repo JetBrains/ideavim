@@ -77,7 +77,7 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
     abstract fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean
   }
 
-  override fun baseExecute(editor: Editor, caret: Caret?, context: DataContext, cmd: Command): Boolean {
+  final override fun baseExecute(editor: Editor, caret: Caret?, context: DataContext, cmd: Command): Boolean {
     return when (this) {
       is ForEachCaret -> caret == null || execute(editor, caret, context, cmd)
       is SingleExecution -> execute(editor, context, cmd)
