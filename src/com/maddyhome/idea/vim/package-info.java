@@ -156,8 +156,6 @@
  * |>>|                   translated to >_
  * |?|                    {@link com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction}
  * |@|                    {@link com.maddyhome.idea.vim.action.macro.PlaybackRegisterAction}
- * |@:|                   {@link com.maddyhome.idea.vim.action.change.RepeatExCommandAction}
- * |@@|                   {@link com.maddyhome.idea.vim.action.macro.PlaybackLastRegisterAction}
  * |A|                    {@link com.maddyhome.idea.vim.action.change.insert.InsertAfterLineEndAction}
  * |B|                    {@link com.maddyhome.idea.vim.action.motion.text.MotionBigWordLeftAction}
  * |C|                    {@link com.maddyhome.idea.vim.action.change.change.ChangeEndOfLineAction}

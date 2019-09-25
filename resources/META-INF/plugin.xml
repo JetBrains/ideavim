@@ -376,7 +376,6 @@
     <!-- Macro -->
     <vimAction implementation="com.maddyhome.idea.vim.action.macro.ToggleRecordingAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.macro.PlaybackRegisterAction"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.macro.PlaybackLastRegisterAction"/>
 
     <!-- Command Line -->
     <vimAction implementation="com.maddyhome.idea.vim.action.ex.ProcessExEntryAction"/>
@@ -385,7 +384,6 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeLastSearchReplaceAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeLastGlobalSearchReplaceAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.RepeatChangeAction"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.change.RepeatExCommandAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.ExEntryAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.ResetModeAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.RedoAction"/>
