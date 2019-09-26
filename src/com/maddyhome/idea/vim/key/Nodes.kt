@@ -21,17 +21,29 @@ package com.maddyhome.idea.vim.key
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import javax.swing.KeyStroke
 
+/**
+ * All the commands are stored into the tree where the key is either a complete command (for `x`, `j`, `l`, etc.),
+ * or a part of a command (e.g. `g` for `gg`).
+ *
+ * This tree is pretty wide and looks like this:
+ *
+ *              root
+ *               |
+ *    -----------------------------------
+ *    |       |           |             |
+ *    j       G           g             f
+ *              ----------        ----------------
+ *             |        |         |      |       |
+ *             c        f         c      o       m
+ *
+ *
+ * If the command is complete, it's represented as a [CommandNode]. If this character is a part of command
+ *   and the user should complete the sequence, it's [CommandPartNode]
+ */
 interface Node
 
-abstract class ParentNode : Node {
-  private val children: MutableMap<KeyStroke, Node> = mutableMapOf()
-
-  open fun getChild(key: KeyStroke): Node? = children[key]
-  open fun addChild(key: KeyStroke, node: Node) {
-    children[key] = node
-  }
-}
-
+/** Represents complete command */
 class CommandNode(val action: EditorActionHandlerBase) : Node
 
-class CommandPartNode : ParentNode()
+/** Represents part of command */
+class CommandPartNode : Node, HashMap<KeyStroke, Node>()

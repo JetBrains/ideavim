@@ -22,7 +22,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.UserDataManager;
-import com.maddyhome.idea.vim.key.ParentNode;
+import com.maddyhome.idea.vim.key.CommandPartNode;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.Contract;
@@ -46,7 +46,7 @@ public class CommandState {
   @NotNull private final Stack<State> myStates = new Stack<>();
   @NotNull private final State myDefaultState = new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
   @Nullable private Command myCommand;
-  @NotNull private ParentNode myCurrentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
+  @NotNull private CommandPartNode myCurrentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
   @NotNull private final List<KeyStroke> myMappingKeys = new ArrayList<>();
   @NotNull private final Timer myMappingTimer;
   private EnumSet<CommandFlags> myFlags = EnumSet.noneOf(CommandFlags.class);
@@ -277,11 +277,11 @@ public class CommandState {
   }
 
   @NotNull
-  public ParentNode getCurrentNode() {
+  public CommandPartNode getCurrentNode() {
     return myCurrentNode;
   }
 
-  public void setCurrentNode(@NotNull ParentNode currentNode) {
+  public void setCurrentNode(@NotNull CommandPartNode currentNode) {
     this.myCurrentNode = currentNode;
   }
 

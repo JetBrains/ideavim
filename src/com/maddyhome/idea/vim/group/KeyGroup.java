@@ -64,7 +64,7 @@ public class KeyGroup {
 
   @NotNull private final Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<>();
   @NotNull private final Set<KeyStroke> requiredShortcutKeys = new HashSet<>(300);
-  @NotNull private final Map<MappingMode, ParentNode> keyRoots = new HashMap<>();
+  @NotNull private final Map<MappingMode, CommandPartNode> keyRoots = new HashMap<>();
   @NotNull private final Map<MappingMode, KeyMapping> keyMappings = new HashMap<>();
   @Nullable private OperatorFunction operatorFunction = null;
 
@@ -241,8 +241,8 @@ public class KeyGroup {
    * @param mappingMode The mapping mode
    * @return The key mapping tree root
    */
-  public ParentNode getKeyRoot(@NotNull MappingMode mappingMode) {
-    return keyRoots.computeIfAbsent(mappingMode, (key) -> new ParentNode() {});
+  public CommandPartNode getKeyRoot(@NotNull MappingMode mappingMode) {
+    return keyRoots.computeIfAbsent(mappingMode, (key) -> new CommandPartNode());
   }
 
   /**
@@ -277,11 +277,11 @@ public class KeyGroup {
         final int len = keyStrokes.size();
         // Add a child for each keystroke in the shortcut for this action
         for (int i = 0; i < len; i++) {
-          if (!(node instanceof ParentNode)) {
+          if (!(node instanceof CommandPartNode)) {
             throw new Error("Error in tree constructing");
           }
 
-          node = addMNode((ParentNode)node, commandAction, keyStrokes.get(i), i == len - 1);
+          node = addMNode((CommandPartNode)node, commandAction, keyStrokes.get(i), i == len - 1);
         }
       }
     }
@@ -340,11 +340,11 @@ public class KeyGroup {
   private Map<List<KeyStroke>, String> prefixes;
 
   @NotNull
-  private Node addMNode(@NotNull ParentNode base,
+  private Node addMNode(@NotNull CommandPartNode base,
                         EditorActionHandlerBase action,
-                        KeyStroke key,
+                        @NotNull KeyStroke key,
                         boolean isLastInSequence) {
-    Node existing = base.getChild(key);
+    Node existing = base.get(key);
     if (existing != null) return existing;
 
     Node newNode;
@@ -353,7 +353,7 @@ public class KeyGroup {
     } else {
       newNode = new CommandPartNode();
     }
-    base.addChild(key, newNode);
+    base.put(key, newNode);
     return newNode;
   }
 

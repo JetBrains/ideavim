@@ -211,7 +211,7 @@ public class KeyHandler {
 
       // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
       // return the node matching this keystroke
-      Node node = editorState.getCurrentNode().getChild(key);
+      Node node = editorState.getCurrentNode().get(key);
 
       if (handleDigraph(editor, key, context, node)) return;
 
@@ -278,7 +278,7 @@ public class KeyHandler {
       EditorActionHandlerBase action = currentCmd.peek().getAction();
       if (action.getFlags().contains(CommandFlags.FLAG_DUPLICABLE_OPERATOR) &&
           action.getKeyStrokesSet().stream().anyMatch(o -> o.size() == 1 && o.get(0).equals(key))) {
-        return editorState.getCurrentNode().getChild(KeyStroke.getKeyStroke('_'));
+        return editorState.getCurrentNode().get(KeyStroke.getKeyStroke('_'));
       }
     }
     return node;
