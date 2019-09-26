@@ -77,9 +77,9 @@ public class ChangeGroup {
 
   private static final int MAX_REPEAT_CHARS_COUNT = 10000;
 
-  private static final String VIM_MOTION_BIG_WORD_RIGHT = "VimMotionBigWordRightAction";
-  private static final String VIM_MOTION_WORD_RIGHT = "VimMotionWordRightAction";
-  private static final String VIM_MOTION_CAMEL_RIGHT = "VimMotionCamelRightAction";
+  public static final String VIM_MOTION_BIG_WORD_RIGHT = "VimMotionBigWordRightAction";
+  public static final String VIM_MOTION_WORD_RIGHT = "VimMotionWordRightAction";
+  public static final String VIM_MOTION_CAMEL_RIGHT = "VimMotionCamelRightAction";
   private static final String VIM_MOTION_WORD_END_RIGHT = "VimMotionWordEndRightAction";
   private static final String VIM_MOTION_BIG_WORD_END_RIGHT = "VimMotionBigWordEndRightAction";
   private static final String VIM_MOTION_CAMEL_END_RIGHT = "VimMotionCamelEndRightAction";
@@ -439,36 +439,6 @@ public class ChangeGroup {
       EventFacade.getInstance().removeEditorMouseListener(editor, listener);
       UserDataManager.setVimChangeGroup(editor, false);
     }
-  }
-
-  @Nullable
-  private static TextRange getDeleteMotionRange(@NotNull Editor editor,
-                                                @NotNull Caret caret,
-                                                @NotNull DataContext context,
-                                                int count,
-                                                int rawCount,
-                                                @NotNull Argument argument) {
-    TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
-    // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is deleted when it shouldn't be.
-    if (range != null) {
-      String text =
-        editor.getDocument().getCharsSequence().subSequence(range.getStartOffset(), range.getEndOffset()).toString();
-      final int lastNewLine = text.lastIndexOf('\n');
-      if (lastNewLine > 0) {
-        final Command motion = argument.getMotion();
-        EditorActionHandlerBase action = motion.getAction();
-        String id = action.getId();
-        if (id.equals(VIM_MOTION_WORD_RIGHT) ||
-            id.equals(VIM_MOTION_BIG_WORD_RIGHT) ||
-            id.equals(VIM_MOTION_CAMEL_RIGHT)) {
-          if (!SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), -1)) {
-            final int start = range.getStartOffset();
-            range = new TextRange(start, start + lastNewLine);
-          }
-        }
-      }
-    }
-    return range;
   }
 
   /**
@@ -1086,7 +1056,7 @@ public class ChangeGroup {
                                                               int rawCount,
                                                               @NotNull final Argument argument,
                                                               boolean isChange) {
-    final TextRange range = getDeleteMotionRange(editor, caret, context, count, rawCount, argument);
+    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
     if (range == null) return null;
 
     // Delete motion commands that are not linewise become linewise if all the following are true:

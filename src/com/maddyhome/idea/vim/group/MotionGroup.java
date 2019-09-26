@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.CommandStateHelper;
@@ -56,6 +57,8 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.io.File;
 import java.util.EnumSet;
+
+import static com.maddyhome.idea.vim.group.ChangeGroup.*;
 
 /**
  * This handles all motion related commands and marks
@@ -155,6 +158,20 @@ public class MotionGroup {
     if (flags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
       start = EditorHelper.getLineStartForOffset(editor, start);
       end = Math.min(EditorHelper.getLineEndForOffset(editor, end) + 1, EditorHelper.getFileSize(editor, true));
+    }
+
+    // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is operated when it shouldn't be.
+    String text = editor.getDocument().getCharsSequence().subSequence(start, end).toString();
+    final int lastNewLine = text.lastIndexOf('\n');
+    if (lastNewLine > 0) {
+      String id = argument.getMotion().getAction().getId();
+      if (id.equals(VIM_MOTION_WORD_RIGHT) ||
+          id.equals(VIM_MOTION_BIG_WORD_RIGHT) ||
+          id.equals(VIM_MOTION_CAMEL_RIGHT)) {
+        if (!SearchHelper.anyNonWhitespace(editor, end, -1)) {
+          end = start + lastNewLine;
+        }
+      }
     }
 
     return new TextRange(start, end);
