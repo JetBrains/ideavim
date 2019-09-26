@@ -25,10 +25,7 @@ class YankVisualLinesActionTest : VimTestCase() {
     """.trimIndent()
     configureByText(text)
     typeText(parseKeys("vjY"))
-    val savedText = VimPlugin.getRegister().lastRegister?.text ?: run {
-      fail()
-      return
-    }
+    val savedText = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
     TestCase.assertEquals(yankedTest, savedText)
   }
 
@@ -45,10 +42,7 @@ class YankVisualLinesActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.""".trimIndent()
     configureByText(text)
     typeText(parseKeys("vjY"))
-    val savedText = VimPlugin.getRegister().lastRegister?.text ?: run {
-      fail()
-      return
-    }
+    val savedText = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
     TestCase.assertEquals(yankedTest, savedText)
   }
 
@@ -68,10 +62,7 @@ class YankVisualLinesActionTest : VimTestCase() {
     """.trimIndent()
     configureByText(text)
     typeText(parseKeys("VjY"))
-    val savedText = VimPlugin.getRegister().lastRegister?.text ?: run {
-      fail()
-      return
-    }
+    val savedText = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
     TestCase.assertEquals(yankedTest, savedText)
   }
 }

@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.option.OptionsManager
-import junit.framework.TestCase
+import kotlin.test.fail
 
 /**
  * @author Alex Plate
@@ -69,7 +69,7 @@ inline fun waitAndAssert(timeInMillis: Int = 1000, condition: () -> Boolean) {
     IdeEventQueue.getInstance().flushQueue()
     if (condition()) return
   }
-  TestCase.fail()
+  fail()
 }
 
 fun waitAndAssertMode(fixture: CodeInsightTestFixture, mode: CommandState.Mode, timeInMillis: Int = OptionsManager.visualEnterDelay.value() + 1000) {
@@ -79,10 +79,8 @@ fun waitAndAssertMode(fixture: CodeInsightTestFixture, mode: CommandState.Mode, 
 fun assertDoesntChange(timeInMillis: Int = 1000, condition: () -> Boolean) {
   val end = System.currentTimeMillis() + timeInMillis
   while (end > System.currentTimeMillis()) {
-    if (!condition()) {
-      TestCase.fail()
-      return
-    }
+    if (!condition()) fail()
+
     Thread.sleep(10)
     IdeEventQueue.getInstance().flushQueue()
   }

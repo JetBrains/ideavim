@@ -106,10 +106,7 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarkskOptionsData.name) {
     configureByText(text)
     val bookmarkManager = BookmarkManager.getInstance(myFixture.project)
     bookmarkManager.addEditorBookmark(myFixture.editor, 2)
-    val bookmark = bookmarkManager.findEditorBookmark(myFixture.editor.document, 2) ?: run {
-      TestCase.fail()
-      return
-    }
+    val bookmark = bookmarkManager.findEditorBookmark(myFixture.editor.document, 2) ?: kotlin.test.fail()
     bookmarkManager.setMnemonic(bookmark, 'A')
     val vimMarks = VimPlugin.getMark().getMarks(myFixture.editor)
     TestCase.assertEquals(1, vimMarks.size)
@@ -129,18 +126,12 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarkskOptionsData.name) {
     configureByText(text)
     var bookmarkManager = BookmarkManager.getInstance(myFixture.project)
     bookmarkManager.addEditorBookmark(myFixture.editor, 2)
-    var bookmark = bookmarkManager.findEditorBookmark(myFixture.editor.document, 2) ?: run {
-      TestCase.fail()
-      return
-    }
+    var bookmark = bookmarkManager.findEditorBookmark(myFixture.editor.document, 2) ?: kotlin.test.fail()
     bookmarkManager.setMnemonic(bookmark, 'A')
 
     bookmarkManager = BookmarkManager.getInstance(myFixture.project)
     bookmarkManager.addEditorBookmark(myFixture.editor, 4)
-    bookmark = bookmarkManager.findEditorBookmark(myFixture.editor.document, 4) ?: run {
-      TestCase.fail()
-      return
-    }
+    bookmark = bookmarkManager.findEditorBookmark(myFixture.editor.document, 4) ?: kotlin.test.fail()
     bookmarkManager.setMnemonic(bookmark, 'A')
     val vimMarks = VimPlugin.getMark().getMarks(myFixture.editor)
     TestCase.assertEquals(1, vimMarks.size)
