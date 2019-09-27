@@ -49,6 +49,6 @@ class Argument private constructor(
       override val mappingModes: Set<MappingMode> = emptySet()
       override val keyStrokesSet: Set<List<KeyStroke>> = emptySet()
       override val type: Command.Type = Command.Type.UNDEFINED
-    }, Command.Type.UNDEFINED, EnumSet.noneOf(CommandFlags::class.java))
+    }, Command.Type.UNDEFINED, EnumSet.noneOf(CommandFlags::class.java), emptyList())
   }
 }

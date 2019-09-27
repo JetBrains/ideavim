@@ -30,7 +30,8 @@ data class Command(
   var rawCount: Int,
   var action: EditorActionHandlerBase,
   val type: Type,
-  var flags: EnumSet<CommandFlags>
+  var flags: EnumSet<CommandFlags>,
+  var keys: List<KeyStroke>
 ) {
 
   init {
@@ -43,7 +44,6 @@ data class Command(
       rawCount = value
     }
 
-  var keys: List<KeyStroke> = emptyList()
   var argument: Argument? = null
 
   enum class Type {

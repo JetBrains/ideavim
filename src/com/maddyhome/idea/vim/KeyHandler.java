@@ -31,6 +31,7 @@ import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
+import com.maddyhome.idea.vim.action.ExEntryAction;
 import com.maddyhome.idea.vim.action.macro.ToggleRecordingAction;
 import com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction;
 import com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction;
@@ -272,7 +273,9 @@ public class KeyHandler {
     }
   }
 
-  /** See the description for {@link CommandFlags#FLAG_DUPLICABLE_OPERATOR} */
+  /**
+   * See the description for {@link CommandFlags#FLAG_DUPLICABLE_OPERATOR}
+   */
   private Node mapOpCommand(KeyStroke key, Node node, @NotNull CommandState editorState) {
     if (editorState.getMappingMode() == MappingMode.OP_PENDING && !currentCmd.empty()) {
       EditorActionHandlerBase action = currentCmd.peek().getAction();
@@ -433,8 +436,7 @@ public class KeyHandler {
   }
 
   private boolean isEditorReset(@NotNull KeyStroke key, @NotNull CommandState editorState) {
-    return (editorState.getMode() == CommandState.Mode.COMMAND) &&
-           StringHelper.isCloseKeyStroke(key);
+    return (editorState.getMode() == CommandState.Mode.COMMAND) && StringHelper.isCloseKeyStroke(key);
   }
 
   private void handleCharArgument(@NotNull KeyStroke key, char chKey) {
@@ -575,18 +577,21 @@ public class KeyHandler {
     }
   }
 
-  private void handleCommandNode(Editor editor, DataContext context, KeyStroke key, @NotNull CommandNode node, CommandState editorState) {
-    // The user entered a valid command that doesn't take any arguments
-    // Create the command and add it to the stack
-    Command cmd = new Command(count, node.getAction(), node.getAction().getType(), node.getAction().getFlags());
-    cmd.setKeys(keys);
+  private void handleCommandNode(Editor editor,
+                                 DataContext context,
+                                 KeyStroke key,
+                                 @NotNull CommandNode node,
+                                 CommandState editorState) {
+    // The user entered a valid command. Create the command and add it to the stack
+    Command cmd = new Command(count, node.getAction(), node.getAction().getType(), node.getAction().getFlags(), keys);
     currentCmd.push(cmd);
 
     if (currentArg != null && !checkArgumentCompatibility(node)) return;
 
     if (node.getAction().getArgumentType() == null || stopMacroRecord(node, editorState)) {
       state = State.READY;
-    } else {
+    }
+    else {
       currentArg = node.getAction().getArgumentType();
       startWaitingForArgument(editor, context, key.getKeyChar(), currentArg, editorState, node.getAction());
       partialReset(editor);
@@ -597,7 +602,8 @@ public class KeyHandler {
       EditorActionHandlerBase action;
       if (forwardSearch) {
         action = new SearchEntryFwdAction();
-      } else {
+      }
+      else {
         action = new SearchEntryRevAction();
       }
 
@@ -605,8 +611,7 @@ public class KeyHandler {
       currentCmd.pop();
 
       Argument arg = new Argument(text);
-      cmd = new Command(count, action, action.getType(), action.getFlags());
-      cmd.setKeys(keys);
+      cmd = new Command(count, action, action.getType(), action.getFlags(), keys);
       cmd.setArgument(arg);
       currentCmd.push(cmd);
       CommandState.getInstance(editor).popState();
@@ -617,7 +622,12 @@ public class KeyHandler {
     return editorState.isRecording() && node.getAction() instanceof ToggleRecordingAction;
   }
 
-  private void startWaitingForArgument(Editor editor, DataContext context, char key, @NotNull Argument.Type argument, CommandState editorState, EditorActionHandlerBase action) {
+  private void startWaitingForArgument(Editor editor,
+                                       DataContext context,
+                                       char key,
+                                       @NotNull Argument.Type argument,
+                                       CommandState editorState,
+                                       EditorActionHandlerBase action) {
     switch (argument) {
       case CHARACTER:
       case DIGRAPH:
@@ -638,7 +648,9 @@ public class KeyHandler {
   }
 
   private boolean checkArgumentCompatibility(@NotNull CommandNode node) {
-    if (currentArg == Argument.Type.MOTION && node.getAction().getType() != Command.Type.MOTION) {
+    if (currentArg == Argument.Type.MOTION &&
+        node.getAction().getType() != Command.Type.MOTION &&
+        !(node.getAction() instanceof ExEntryAction)) {
       state = State.BAD_COMMAND;
       return false;
     }
@@ -810,7 +822,7 @@ public class KeyHandler {
      * Awaiting for char or digraph input. In this mode mappings doesn't work (even for <C-K>)
      */
     // TODO  and this probably also REMOVE
-    CHAR_OR_DIGRAPH, READY,  BAD_COMMAND
+    CHAR_OR_DIGRAPH, READY, BAD_COMMAND
   }
 
   private int count;
