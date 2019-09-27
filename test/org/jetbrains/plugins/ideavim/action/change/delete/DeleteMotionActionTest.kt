@@ -1,3 +1,5 @@
+@file:Suppress("RemoveCurlyBracesFromTemplate")
+
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.VimPlugin
@@ -74,5 +76,25 @@ class DeleteMotionActionTest : VimTestCase() {
          |}
          """.trimMargin()
     )
+  }
+
+  fun `test delete empty line`() {
+    val file = """
+            A Discovery
+            ${c}
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+    val newFile = """
+            A Discovery
+            ${c}I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+    typeTextInFile(parseKeys("dd"), file)
+    myFixture.checkResult(newFile)
   }
 }

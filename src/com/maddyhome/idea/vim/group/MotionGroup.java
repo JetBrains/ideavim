@@ -130,7 +130,7 @@ public class MotionGroup {
       if (end == -1) return null;
 
       // If inclusive, add the last character to the range
-      if (action.getMotionType() == MotionType.INCLUSIVE) end++;
+      if (action.getMotionType() == MotionType.INCLUSIVE && !cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE)) end++;
     }
     else if (cmd.getAction() instanceof TextObjectActionHandler) {
       TextObjectActionHandler action = (TextObjectActionHandler)cmd.getAction();
