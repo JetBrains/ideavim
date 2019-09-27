@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
@@ -49,14 +50,17 @@ class YankGroup {
     if (caretModel.caretCount <= 0) return false
 
     val ranges = ArrayList<Pair<Int, Int>>(caretModel.caretCount)
-    val startOffsets = HashMap<Caret, Int>(caretModel.caretCount)
+
+    // This logic is from original vim
+    val startOffsets = if (argument.motion.action is MotionDownLess1FirstNonSpaceAction) null else HashMap<Caret, Int>(caretModel.caretCount)
+
     for (caret in caretModel.allCarets) {
       val motionRange = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument)
         ?: continue
 
       assert(motionRange.size() == 1)
       ranges.add(motionRange.startOffset to motionRange.endOffset)
-      startOffsets[caret] = motionRange.normalize().startOffset
+      startOffsets?.put(caret, motionRange.normalize().startOffset)
     }
 
     val type = SelectionType.fromCommandFlags(motion.flags)
