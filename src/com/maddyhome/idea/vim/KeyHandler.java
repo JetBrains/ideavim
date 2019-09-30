@@ -360,53 +360,33 @@ public class KeyHandler {
       // Okay, there is a mapping for the entered key sequence
       //   now the another key sequence should be executed, or the handler that attached to this command
       mappingKeys.clear();
-      final Runnable handleMappedKeys = () -> {
-        if (editor.isDisposed()) {
-          return;
-        }
-        final List<KeyStroke> toKeys = mappingInfo.getToKeys();
-        final VimExtensionHandler extensionHandler = mappingInfo.getExtensionHandler();
-        final EditorDataContext currentContext = new EditorDataContext(editor);
-        if (toKeys != null) {
-          // Here is a mapping to another key sequence
-          final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), toKeys);
-          boolean first = true;
-          for (KeyStroke keyStroke : toKeys) {
-            final boolean recursive = mappingInfo.isRecursive() && !(first && fromIsPrefix);
-            handleKey(editor, keyStroke, currentContext, recursive);
-            first = false;
-          }
-        }
-        else if (extensionHandler != null) {
-          // Here is a mapping to some vim handler
-          final CommandProcessor processor = CommandProcessor.getInstance();
-          processor.executeCommand(editor.getProject(), () -> extensionHandler.execute(editor, context),
-                                   "Vim " + extensionHandler.getClass().getSimpleName(), null);
-        }
 
-        // NB: mappingInfo MUST be non-null here, so if equal
-        //  then prevMappingInfo is also non-null; this also
-        //  means that the prev mapping was a prefix, but the
-        //  next key typed (`key`) was not part of that
-        if (prevMappingInfo == mappingInfo) {
-          // post to end of queue so it's handled AFTER
-          //  an <Plug> mapping is invoked (since that
-          //  will also get posted)
-          Runnable handleRemainingKey = () -> handleKey(editor, key, currentContext);
-
-          if (application.isUnitTestMode()) {
-            handleRemainingKey.run();
-          }
-          else {
-            application.invokeLater(handleRemainingKey);
-          }
+      final List<KeyStroke> toKeys = mappingInfo.getToKeys();
+      final VimExtensionHandler extensionHandler = mappingInfo.getExtensionHandler();
+      final EditorDataContext currentContext = new EditorDataContext(editor);
+      if (toKeys != null) {
+        // Here is a mapping to another key sequence
+        final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), toKeys);
+        boolean first = true;
+        for (KeyStroke keyStroke : toKeys) {
+          final boolean recursive = mappingInfo.isRecursive() && !(first && fromIsPrefix);
+          handleKey(editor, keyStroke, currentContext, recursive);
+          first = false;
         }
-      };
-      if (application.isUnitTestMode()) {
-        handleMappedKeys.run();
       }
-      else {
-        application.invokeLater(handleMappedKeys);
+      else if (extensionHandler != null) {
+        // Here is a mapping to some vim handler
+        final CommandProcessor processor = CommandProcessor.getInstance();
+        processor.executeCommand(editor.getProject(), () -> extensionHandler.execute(editor, context),
+                                 "Vim " + extensionHandler.getClass().getSimpleName(), null);
+      }
+
+      // NB: mappingInfo MUST be non-null here, so if equal
+      //  then prevMappingInfo is also non-null; this also
+      //  means that the prev mapping was a prefix, but the
+      //  next key typed (`key`) was not part of that
+      if (prevMappingInfo == mappingInfo) {
+        handleKey(editor, key, currentContext);
       }
       return true;
     }
