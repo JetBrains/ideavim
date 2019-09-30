@@ -50,6 +50,7 @@ import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
+import kotlin.Pair;
 import kotlin.ranges.IntProgression;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -111,53 +112,67 @@ public class MotionGroup {
                                          int count,
                                          int rawCount,
                                          @NotNull Argument argument) {
-    final Command cmd = argument.getMotion();
-    // Normalize the counts between the command and the motion argument
-    int cnt = cmd.getCount() * count;
-    int raw = rawCount == 0 && cmd.getRawCount() == 0 ? 0 : cnt;
-    int start = 0;
-    int end = 0;
-    if (cmd.getAction() instanceof MotionActionHandler) {
-      MotionActionHandler action = (MotionActionHandler)cmd.getAction();
+    int start;
+    int end;
+    if (argument.getType() == Argument.Type.OFFSETS ) {
+      final Pair<Integer, Integer> offsets = argument.getOffsets().get(caret);
+      if (offsets == null) return null;
 
-      // This is where we are now
-      start = caret.getOffset();
-
-      // Execute the motion (without moving the cursor) and get where we end
-      end = action.getHandlerOffset(editor, caret, context, cnt, raw, cmd.getArgument());
-
-      // Invalid motion
-      if (end == -1) return null;
-
-      // If inclusive, add the last character to the range
-      if (action.getMotionType() == MotionType.INCLUSIVE && !cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE)) end++;
+      start = offsets.getFirst();
+      end = offsets.getSecond();
     }
-    else if (cmd.getAction() instanceof TextObjectActionHandler) {
-      TextObjectActionHandler action = (TextObjectActionHandler)cmd.getAction();
+    else {
+      final Command cmd = argument.getMotion();
+      // Normalize the counts between the command and the motion argument
+      int cnt = cmd.getCount() * count;
+      int raw = rawCount == 0 && cmd.getRawCount() == 0 ? 0 : cnt;
+      if (cmd.getAction() instanceof MotionActionHandler) {
+        MotionActionHandler action = (MotionActionHandler)cmd.getAction();
 
-      TextRange range = action.getRange(editor, caret, context, cnt, raw, cmd.getArgument());
+        // This is where we are now
+        start = caret.getOffset();
 
-      if (range == null) return null;
+        // Execute the motion (without moving the cursor) and get where we end
+        end = action.getHandlerOffset(editor, caret, context, cnt, raw, cmd.getArgument());
 
-      start = range.getStartOffset();
-      end = range.getEndOffset();
+        // Invalid motion
+        if (end == -1) return null;
 
-      if (cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE)) end--;
-    }
+        // If inclusive, add the last character to the range
+        if (action.getMotionType() == MotionType.INCLUSIVE &&
+            !cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE)) {
+          end++;
+        }
+      }
+      else if (cmd.getAction() instanceof TextObjectActionHandler) {
+        TextObjectActionHandler action = (TextObjectActionHandler)cmd.getAction();
 
-    // Normalize the range
-    if (start > end) {
-      int t = start;
-      start = end;
-      end = t;
-    }
+        TextRange range = action.getRange(editor, caret, context, cnt, raw, cmd.getArgument());
 
-    // If we are a linewise motion we need to normalize the start and stop then move the start to the beginning
-    // of the line and move the end to the end of the line.
-    EnumSet<CommandFlags> flags = cmd.getFlags();
-    if (flags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
-      start = EditorHelper.getLineStartForOffset(editor, start);
-      end = Math.min(EditorHelper.getLineEndForOffset(editor, end) + 1, EditorHelper.getFileSize(editor, true));
+        if (range == null) return null;
+
+        start = range.getStartOffset();
+        end = range.getEndOffset();
+
+        if (cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE)) end--;
+      } else {
+        throw new RuntimeException("Commands doesn't take " + cmd.getAction().getClass().getSimpleName() + " as an operator");
+      }
+
+      // Normalize the range
+      if (start > end) {
+        int t = start;
+        start = end;
+        end = t;
+      }
+
+      // If we are a linewise motion we need to normalize the start and stop then move the start to the beginning
+      // of the line and move the end to the end of the line.
+      EnumSet<CommandFlags> flags = cmd.getFlags();
+      if (flags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
+        start = EditorHelper.getLineStartForOffset(editor, start);
+        end = Math.min(EditorHelper.getLineEndForOffset(editor, end) + 1, EditorHelper.getFileSize(editor, true));
+      }
     }
 
     // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is operated when it shouldn't be.

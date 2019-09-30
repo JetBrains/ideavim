@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.command
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import java.util.*
@@ -30,15 +31,17 @@ import javax.swing.KeyStroke
 class Argument private constructor(
   val character: Char = 0.toChar(),
   val motion: Command = EMPTY_COMMAND,
+  val offsets: Map<Caret, Pair<Int, Int>> = emptyMap(),
   val string: String = "",
   val type: Type
 ) {
   constructor(motionArg: Command) : this(motion = motionArg, type = Type.MOTION)
   constructor(charArg: Char) : this(character = charArg, type = Type.CHARACTER)
   constructor(strArg: String) : this(string = strArg, type = Type.EX_STRING)
+  constructor(offsets: Map<Caret, Pair<Int, Int>>) : this(offsets = offsets, type = Type.OFFSETS)
 
   enum class Type {
-    MOTION, CHARACTER, DIGRAPH, EX_STRING
+    MOTION, CHARACTER, DIGRAPH, EX_STRING, OFFSETS
   }
 
   companion object {

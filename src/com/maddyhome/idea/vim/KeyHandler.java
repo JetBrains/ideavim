@@ -26,6 +26,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
@@ -42,7 +43,10 @@ import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.*;
+import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
+import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import kotlin.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -51,6 +55,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.intellij.openapi.actionSystem.CommonDataKeys.*;
 import static com.intellij.openapi.actionSystem.PlatformDataKeys.PROJECT_FILE_DIRECTORY;
@@ -188,7 +194,12 @@ public class KeyHandler {
       count = count * 10 + (chKey - '0');
     }
     else if (allowKeyMappings && handleKeyMapping(editor, key, context)) {
-      return;
+      if (editorState.getMappingMode() != MappingMode.OP_PENDING ||
+          currentCmd.isEmpty() ||
+          currentCmd.peek().getArgument() == null ||
+          currentCmd.peek().getArgument().getType() != Argument.Type.OFFSETS) {
+            return;
+          }
     }
     // Pressing delete while entering a count "removes" the last digit entered
     // Unlike the digits, this must be checked *after* checking for key mappings
@@ -377,8 +388,38 @@ public class KeyHandler {
       else if (extensionHandler != null) {
         // Here is a mapping to some vim handler
         final CommandProcessor processor = CommandProcessor.getInstance();
+        Map<Caret, Integer> startOffsets =
+          editor.getCaretModel().getAllCarets().stream().collect(Collectors.toMap(Function.identity(), Caret::getOffset));
+
         processor.executeCommand(editor.getProject(), () -> extensionHandler.execute(editor, context),
                                  "Vim " + extensionHandler.getClass().getSimpleName(), null);
+
+        if (CommandState.getInstance(editor).getMappingMode() == MappingMode.OP_PENDING &&
+            !currentCmd.isEmpty() &&
+            currentCmd.peek().getArgument() == null) {
+          Map<Caret, Pair<Integer, Integer>> offsets = new HashMap<>();
+          for (Caret caret : editor.getCaretModel().getAllCarets()) {
+            @Nullable Integer startOffset = startOffsets.get(caret);
+            if (caret.hasSelection()) {
+              offsets.put(caret, new Pair<>(caret.getSelectionStart(), caret.getSelectionEnd()));
+            }
+            else if (startOffset != null && startOffset != caret.getOffset()) {
+              offsets.put(caret, new Pair<>(startOffset, caret.getOffset()));
+            }
+            if (startOffset != null) {
+              try(VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
+                // Move caret to the initial offset for better undo action
+                //  This is not a necessary thing, but without it undo action look less convenient
+                editor.getCaretModel().moveToOffset(startOffset);
+              }
+            }
+          }
+
+          if (!offsets.isEmpty()) {
+            currentCmd.peek().setArgument(new Argument(offsets));
+            state = State.READY;
+          }
+        }
       }
 
       // NB: mappingInfo MUST be non-null here, so if equal
