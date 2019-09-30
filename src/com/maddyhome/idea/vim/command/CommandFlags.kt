@@ -26,6 +26,8 @@ enum class MotionType {
 enum class CommandFlags {
   /**
    * Motion flags
+   *
+   * TODO it should be only INCLUSIVE, EXCLUSIVE and LINEWISE motions. Should be moved to [MotionType]
    */
   FLAG_MOT_LINEWISE,
   FLAG_MOT_CHARACTERWISE,
@@ -68,11 +70,6 @@ enum class CommandFlags {
    */
   FLAG_EXPECT_MORE,
 
-  // TODO REMOVE
-  /**
-   * This flag indicates the command's argument isn't used while recording
-   */
-  FLAG_NO_ARG_RECORDING,
   /**
    * Indicate that the character argument may come from a digraph
    */

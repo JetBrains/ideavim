@@ -57,12 +57,6 @@ public final class ToggleRecordingAction extends VimActionHandler.SingleExecutio
     return Argument.Type.CHARACTER;
   }
 
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_NO_ARG_RECORDING);
-  }
-
   @Override
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
     if (!CommandState.getInstance(editor).isRecording()) {

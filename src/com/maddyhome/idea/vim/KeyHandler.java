@@ -835,15 +835,13 @@ public class KeyHandler {
   }
 
   private enum State {
-    /**
-     * Awaiting a new command
-     */
+    /** Awaiting a new command */
     NEW_COMMAND,
-    /**
-     * Awaiting for char or digraph input. In this mode mappings doesn't work (even for <C-K>)
-     */
-    // TODO  and this probably also REMOVE
-    CHAR_OR_DIGRAPH, READY, BAD_COMMAND
+    // TODO  This should be probably processed in some better way
+    /** Awaiting for char or digraph input. In this mode mappings doesn't work (even for <C-K>) */
+    CHAR_OR_DIGRAPH,
+    READY,
+    BAD_COMMAND
   }
 
   private int count;

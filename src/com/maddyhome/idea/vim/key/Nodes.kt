@@ -37,13 +37,16 @@ import javax.swing.KeyStroke
  *             c        f         c      o       m
  *
  *
+ *  Here j, G, c, f, c, o, m will be presented as a [CommandNode], and g and f as a [CommandPartNode]
+ *
+ *
  * If the command is complete, it's represented as a [CommandNode]. If this character is a part of command
  *   and the user should complete the sequence, it's [CommandPartNode]
  */
 interface Node
 
-/** Represents complete command */
+/** Represents a complete command */
 class CommandNode(val action: EditorActionHandlerBase) : Node
 
-/** Represents part of command */
+/** Represents a part of the command */
 class CommandPartNode : Node, HashMap<KeyStroke, Node>()
