@@ -75,11 +75,11 @@ import java.io.Closeable
  *  }
  * ```
  *
- * [VimListenerSuppressor] implements [Closeable], so you can use try-with-resources block
+ * [Locked] implements [Closeable], so you can use try-with-resources block
  *
  * java
  * ```
- * try (final VimListenerSuppressor ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
+ * try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
  *     ....
  * }
  * ```
@@ -87,26 +87,34 @@ import java.io.Closeable
  * Kotlin
  * ```
  * SelectionVimListenerSuppressor.lock().use { ... }
- * _or_
- * SelectionVimListenerSuppressor.use { ... }
  * ```
  */
-sealed class VimListenerSuppressor : Closeable {
+sealed class VimListenerSuppressor{
   private var caretListenerSuppressor = 0
 
-  fun lock(): VimListenerSuppressor {
+  fun lock(): Locked {
     caretListenerSuppressor++
-    return this
+    return Locked()
   }
 
-  fun unlock() {
-    caretListenerSuppressor--
+  fun unlock(action: (() -> Unit)? = null) {
+    if (action != null) {
+      try {
+        action()
+      } finally {
+          caretListenerSuppressor--
+      }
+    } else {
+      caretListenerSuppressor--
+    }
   }
-
-  override fun close() = unlock()
 
   val isNotLocked: Boolean
     get() = caretListenerSuppressor == 0
+
+  inner class Locked : Closeable  {
+    override fun close() = unlock()
+  }
 }
 
 object SelectionVimListenerSuppressor : VimListenerSuppressor()
@@ -303,7 +311,7 @@ object VimListenerManager {
         logger.debug("Release mouse after dragging")
         val editor = event.editor
         val caret = editor.caretModel.primaryCaret
-        SelectionVimListenerSuppressor.use {
+        SelectionVimListenerSuppressor.unlock {
           val predictedMode = VimPlugin.getVisualMotion().predictMode(editor, VimListenerManager.SelectionSource.MOUSE)
           VimPlugin.getVisualMotion().controlNonVimSelectionChange(editor, VimListenerManager.SelectionSource.MOUSE)
           moveCaretOneCharLeftFromSelectionEnd(editor, predictedMode)

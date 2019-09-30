@@ -73,7 +73,7 @@ public class VimTypedActionHandler implements TypedActionHandlerEx {
       }
     }
     else {
-      try (final VimListenerSuppressor ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
+      try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
         TypedActionHandler origHandler = handler.getOriginalHandler();
         origHandler.execute(editor, charTyped, context);
       }

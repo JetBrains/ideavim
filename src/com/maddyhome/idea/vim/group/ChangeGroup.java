@@ -816,7 +816,7 @@ public class ChangeGroup {
                                         @NotNull final DataContext context,
                                         @NotNull final KeyStroke key) {
     boolean res;
-    try (VimListenerSuppressor ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
+    try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
       res = processKey(editor, context, key);
 
       VimPlugin.getVisualMotion().exitSelectModeAndResetKeyHandler(editor, false);
