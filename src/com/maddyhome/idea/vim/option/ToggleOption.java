@@ -31,7 +31,7 @@ public class ToggleOption extends Option {
    * @param abbrev The short name
    * @param dflt   The default value
    */
-  ToggleOption(String name, String abbrev, boolean dflt) {
+  public ToggleOption(String name, String abbrev, boolean dflt) {
     super(name, abbrev);
 
     this.dflt = dflt;

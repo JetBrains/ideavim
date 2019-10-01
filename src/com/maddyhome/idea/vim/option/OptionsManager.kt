@@ -73,10 +73,6 @@ object OptionsManager {
   val wrapscan = addOption(ToggleOption("wrapscan", "ws", true))
   val visualEnterDelay = addOption(NumberOption("visualdelay", "visualdelay", 100, 0, Int.MAX_VALUE))
 
-  init {
-    registerExtensionOptions()
-  }
-
   fun isSet(name: String): Boolean {
     val option = getOption(name)
     return option is ToggleOption && option.getValue()
@@ -90,26 +86,6 @@ object OptionsManager {
    * Gets an option by the supplied name or short name.
    */
   fun getOption(name: String): Option? = options[name] ?: abbrevs[name]
-
-  private fun registerExtensionOptions() {
-    for (extension in VimExtension.EP_NAME.extensionList) {
-      val name = extension.name
-      val option = ToggleOption(name, name, false)
-      option.addOptionChangeListener {
-        for (extensionInListener in VimExtension.EP_NAME.extensionList) {
-          if (name == extensionInListener.name) {
-            if (isSet(name)) {
-              extensionInListener.init()
-              logger.info("IdeaVim extension '$name' initialized")
-            } else {
-              extensionInListener.dispose()
-            }
-          }
-        }
-      }
-      addOption(option)
-    }
-  }
 
   /**
    * This parses a set of :set commands. The following types of commands are supported:

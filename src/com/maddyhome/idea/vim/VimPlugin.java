@@ -46,6 +46,7 @@ import com.intellij.openapi.wm.WindowManager;
 import com.intellij.util.io.HttpRequests;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser;
+import com.maddyhome.idea.vim.extension.VimExtensionRegistrar;
 import com.maddyhome.idea.vim.group.*;
 import com.maddyhome.idea.vim.group.copy.PutGroup;
 import com.maddyhome.idea.vim.group.copy.YankGroup;
@@ -315,6 +316,9 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
       // Register ex handlers
       CommandParser.getInstance().registerHandlers();
+
+      // Register extensions
+      VimExtensionRegistrar.INSTANCE.registerExtensions();
 
       if (!ApplicationManager.getApplication().isUnitTestMode()) {
         final File ideaVimRc = VimScriptParser.findIdeaVimRc();
