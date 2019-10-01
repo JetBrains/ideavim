@@ -388,13 +388,14 @@ public class KeyHandler {
       else if (extensionHandler != null) {
         // Here is a mapping to some vim handler
         final CommandProcessor processor = CommandProcessor.getInstance();
+        final boolean isPendingMode = CommandState.getInstance(editor).getMappingMode() == MappingMode.OP_PENDING;
         Map<Caret, Integer> startOffsets =
           editor.getCaretModel().getAllCarets().stream().collect(Collectors.toMap(Function.identity(), Caret::getOffset));
 
         processor.executeCommand(editor.getProject(), () -> extensionHandler.execute(editor, context),
                                  "Vim " + extensionHandler.getClass().getSimpleName(), null);
 
-        if (CommandState.getInstance(editor).getMappingMode() == MappingMode.OP_PENDING &&
+        if (isPendingMode &&
             !currentCmd.isEmpty() &&
             currentCmd.peek().getArgument() == null) {
           Map<Caret, Pair<Integer, Integer>> offsets = new HashMap<>();
