@@ -318,7 +318,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
       CommandParser.getInstance().registerHandlers();
 
       // Register extensions
-      VimExtensionRegistrar.INSTANCE.registerExtensions();
+      VimExtensionRegistrar.registerExtensions();
 
       if (!ApplicationManager.getApplication().isUnitTestMode()) {
         final File ideaVimRc = VimScriptParser.findIdeaVimRc();
