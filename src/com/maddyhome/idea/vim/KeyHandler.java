@@ -439,12 +439,25 @@ public class KeyHandler {
       //   the processing of "h", "e" and "l" will be prevented by this handler.
       //   However, these keys should be processed as usual when user enters "p"
       //   and the following for loop does exactly that.
-      final List<KeyStroke> unhandledKeys = new ArrayList<>(mappingKeys);
+      //
+      // Okay, why the first key is handler separately?
+      // Let's assume the next mappings:
+      //   - map ds j
+      //   - map I 2l
+      // If user enters `dI`, the first `d` will be caught be this handler because it's a prefix for `ds` command.
+      //  After the user enters `I`, the caught `d` should be processed without mapping and the rest of keys
+      //  should be processed with mappings (to make I work)
+      if (mappingKeys.isEmpty()) return false;
+
+      // Well, this will always be false, but just for protection
+      if (fromKeys.isEmpty()) return false;
+      final List<KeyStroke> unhandledKeys = new ArrayList<>(fromKeys);
       mappingKeys.clear();
-      for (KeyStroke keyStroke : unhandledKeys) {
-        handleKey(editor, keyStroke, context, false);
+      handleKey(editor, unhandledKeys.get(0), context, false);
+      for (KeyStroke keyStroke : unhandledKeys.subList(1, unhandledKeys.size())) {
+        handleKey(editor, keyStroke, context, true);
       }
-      return false;
+      return true;
     }
   }
 

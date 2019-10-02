@@ -325,4 +325,12 @@ public class MapCommandTest extends VimTestCase {
     typeText(parseKeys(",fa!<Esc>"));
     myFixture.checkResult("Hello!\n");
   }
+
+  public void testIntersectingCommands() {
+    configureByText("123<caret>4567890");
+    typeText(commandToKeys("map ds h"));
+    typeText(commandToKeys("map I 3l"));
+    typeText(parseKeys("dI"));
+    myFixture.checkResult("123<caret>7890");
+  }
 }
