@@ -45,7 +45,7 @@ final public class VisualBlockInsertAction extends VisualOperatorActionHandler.S
   @NotNull
   @Override
   final public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
+    return MappingMode.X;
   }
 
   @NotNull

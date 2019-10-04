@@ -11,7 +11,7 @@ import javax.swing.KeyStroke
 class VimCollapseAllRegions : VimActionHandler.SingleExecution() {
   val actionName: String = "CollapseAllRegions"
 
-  override val mappingModes: Set<MappingMode> = MappingMode.NV
+  override val mappingModes: Set<MappingMode> = MappingMode.NX
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zM")
 
@@ -26,7 +26,7 @@ class VimCollapseAllRegions : VimActionHandler.SingleExecution() {
 class VimCollapseRegion : VimActionHandler.SingleExecution() {
   private val actionName: String = "CollapseRegion"
 
-  override val mappingModes: Set<MappingMode> = MappingMode.NV
+  override val mappingModes: Set<MappingMode> = MappingMode.NX
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zc")
 
@@ -41,7 +41,7 @@ class VimCollapseRegion : VimActionHandler.SingleExecution() {
 class VimCollapseRegionRecursively : VimActionHandler.SingleExecution() {
   private val actionName: String = "CollapseRegionRecursively"
 
-  override val mappingModes: Set<MappingMode> = MappingMode.NV
+  override val mappingModes: Set<MappingMode> = MappingMode.NX
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zC")
 
@@ -56,7 +56,7 @@ class VimCollapseRegionRecursively : VimActionHandler.SingleExecution() {
 class VimExpandAllRegions : VimActionHandler.SingleExecution() {
   private val actionName: String = "ExpandAllRegions"
 
-  override val mappingModes: Set<MappingMode> = MappingMode.NV
+  override val mappingModes: Set<MappingMode> = MappingMode.NX
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zR")
 
@@ -71,7 +71,7 @@ class VimExpandAllRegions : VimActionHandler.SingleExecution() {
 class VimExpandRegion : VimActionHandler.SingleExecution() {
   private val actionName: String = "ExpandRegion"
 
-  override val mappingModes: Set<MappingMode> = MappingMode.NV
+  override val mappingModes: Set<MappingMode> = MappingMode.NX
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zo")
 
@@ -86,7 +86,7 @@ class VimExpandRegion : VimActionHandler.SingleExecution() {
 class VimExpandRegionRecursively : VimActionHandler.SingleExecution() {
   private val actionName: String = "ExpandRegionRecursively"
 
-  override val mappingModes: Set<MappingMode> = MappingMode.NV
+  override val mappingModes: Set<MappingMode> = MappingMode.NX
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zO")
 

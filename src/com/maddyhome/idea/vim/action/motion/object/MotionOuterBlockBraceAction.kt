@@ -34,7 +34,7 @@ import javax.swing.KeyStroke
 
 class MotionOuterBlockBraceAction : TextObjectActionHandler() {
 
-  override val mappingModes: Set<MappingMode> = MappingMode.VO
+  override val mappingModes: Set<MappingMode> = MappingMode.XO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("aB", "a{", "a}")
 

@@ -37,7 +37,7 @@ import javax.swing.KeyStroke
  */
 class PutVisualTextNoIndentAction : VisualOperatorActionHandler.SingleExecution() {
 
-  override val mappingModes: Set<MappingMode> = MappingMode.V
+  override val mappingModes: Set<MappingMode> = MappingMode.X
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("[p", "]p", "[P", "]P")
 

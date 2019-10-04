@@ -33,7 +33,7 @@ import javax.swing.KeyStroke
 class MotionArrowLeftAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVO
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NXO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Left>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0)))
 

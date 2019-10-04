@@ -34,7 +34,7 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import javax.swing.KeyStroke
 
 class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NV
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-End>")
 

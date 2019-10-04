@@ -43,7 +43,7 @@ final public class YankVisualLinesAction extends VisualOperatorActionHandler.Sin
   @NotNull
   @Override
   final public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
+    return MappingMode.X;
   }
 
   @NotNull

@@ -89,12 +89,12 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>YSurround"), new YSurroundHandler(), false);
     putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>CSurround"), new CSurroundHandler(), false);
     putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>DSurround"), new DSurroundHandler(), false);
-    putExtensionHandlerMapping(MappingMode.VO, parseKeys("<Plug>VSurround"), new VSurroundHandler(), false);
+    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>VSurround"), new VSurroundHandler(), false);
 
     putKeyMapping(MappingMode.N, parseKeys("ys"), parseKeys("<Plug>YSurround"), true);
     putKeyMapping(MappingMode.N, parseKeys("cs"), parseKeys("<Plug>CSurround"), true);
     putKeyMapping(MappingMode.N, parseKeys("ds"), parseKeys("<Plug>DSurround"), true);
-    putKeyMapping(MappingMode.VO, parseKeys("S"), parseKeys("<Plug>VSurround"), true);
+    putKeyMapping(MappingMode.XO, parseKeys("S"), parseKeys("<Plug>VSurround"), true);
   }
 
   @Nullable

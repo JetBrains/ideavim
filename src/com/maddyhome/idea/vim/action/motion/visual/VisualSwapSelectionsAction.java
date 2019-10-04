@@ -39,7 +39,7 @@ final public class VisualSwapSelectionsAction extends VimActionHandler.SingleExe
   @NotNull
   @Override
   final public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
+    return MappingMode.X;
   }
 
   @NotNull

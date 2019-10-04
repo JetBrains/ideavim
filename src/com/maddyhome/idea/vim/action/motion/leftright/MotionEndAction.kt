@@ -38,7 +38,7 @@ import javax.swing.KeyStroke
 class MotionEndAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVOS
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<End>")
 

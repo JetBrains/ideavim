@@ -34,7 +34,7 @@ import javax.swing.KeyStroke
 class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
-  override val mappingModes: Set<MappingMode> = MappingMode.NVO
+  override val mappingModes: Set<MappingMode> = MappingMode.NXO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("+", "<C-M>")
 
@@ -53,7 +53,7 @@ class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
 class EnterNormalAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
-  override val mappingModes: Set<MappingMode> = MappingMode.NVO
+  override val mappingModes: Set<MappingMode> = MappingMode.NXO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<CR>")
 

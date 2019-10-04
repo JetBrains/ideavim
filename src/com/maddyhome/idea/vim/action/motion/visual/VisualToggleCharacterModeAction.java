@@ -41,7 +41,7 @@ final public class VisualToggleCharacterModeAction extends VimActionHandler.Sing
   @NotNull
   @Override
   final public Set<MappingMode> getMappingModes() {
-    return MappingMode.NV;
+    return MappingMode.NX;
   }
 
   @NotNull

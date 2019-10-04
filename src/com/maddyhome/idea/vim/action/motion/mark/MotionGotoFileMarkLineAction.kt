@@ -33,7 +33,7 @@ import javax.swing.KeyStroke
 class MotionGotoFileMarkLineAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
-  override val mappingModes: Set<MappingMode> = MappingMode.VO
+  override val mappingModes: Set<MappingMode> = MappingMode.XO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("'")
 
@@ -57,7 +57,7 @@ class MotionGotoFileMarkLineAction : MotionActionHandler.ForEachCaret() {
 class MotionGotoFileMarkLineNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
-  override val mappingModes: Set<MappingMode> = MappingMode.VO
+  override val mappingModes: Set<MappingMode> = MappingMode.XO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("g'")
 

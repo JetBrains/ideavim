@@ -34,7 +34,7 @@ import javax.swing.KeyStroke
 
 class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
 
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.VS
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.V
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-G>")
 

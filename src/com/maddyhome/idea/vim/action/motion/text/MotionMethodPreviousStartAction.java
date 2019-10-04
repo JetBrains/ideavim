@@ -39,7 +39,7 @@ public class MotionMethodPreviousStartAction extends MotionActionHandler.ForEach
   @NotNull
   @Override
   public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
+    return MappingMode.NXO;
   }
 
   @NotNull

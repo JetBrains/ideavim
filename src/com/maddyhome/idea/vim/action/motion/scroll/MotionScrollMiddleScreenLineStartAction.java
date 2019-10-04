@@ -35,7 +35,7 @@ public class MotionScrollMiddleScreenLineStartAction extends VimActionHandler.Si
   @NotNull
   @Override
   public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
+    return MappingMode.NXO;
   }
 
   @NotNull

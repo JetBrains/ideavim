@@ -35,7 +35,7 @@ import javax.swing.KeyStroke
 class MotionDownAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
-  override val mappingModes: Set<MappingMode> = MappingMode.NVO
+  override val mappingModes: Set<MappingMode> = MappingMode.NXO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("j", "<C-N>")
 
@@ -71,7 +71,7 @@ class MotionDownAction : MotionActionHandler.ForEachCaret() {
 class MotionDownNotLineWiseAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override val mappingModes: Set<MappingMode> = MappingMode.NVO
+  override val mappingModes: Set<MappingMode> = MappingMode.NXO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gj", "g<Down>")
 

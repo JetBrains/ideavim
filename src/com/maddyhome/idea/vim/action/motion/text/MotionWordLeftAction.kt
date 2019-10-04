@@ -34,7 +34,7 @@ import javax.swing.KeyStroke
 class MotionWordLeftAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override val mappingModes: Set<MappingMode> = MappingMode.NVO
+  override val mappingModes: Set<MappingMode> = MappingMode.NXO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("b")
 

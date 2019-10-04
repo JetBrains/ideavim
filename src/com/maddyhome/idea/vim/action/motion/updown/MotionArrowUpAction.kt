@@ -38,7 +38,7 @@ import javax.swing.KeyStroke
 class MotionArrowUpAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVOS
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Up>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0)))
 

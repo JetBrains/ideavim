@@ -36,7 +36,7 @@ public class MotionFirstScreenColumnAction extends MotionActionHandler.ForEachCa
   @NotNull
   @Override
   public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
+    return MappingMode.NXO;
   }
 
   @NotNull

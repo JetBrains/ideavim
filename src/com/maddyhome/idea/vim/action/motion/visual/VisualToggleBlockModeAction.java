@@ -41,7 +41,7 @@ public class VisualToggleBlockModeAction extends VimActionHandler.SingleExecutio
   @NotNull
   @Override
   public Set<MappingMode> getMappingModes() {
-    return MappingMode.NV;
+    return MappingMode.NX;
   }
 
   @NotNull

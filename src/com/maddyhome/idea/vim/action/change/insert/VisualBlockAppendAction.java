@@ -45,7 +45,7 @@ final public class VisualBlockAppendAction extends VisualOperatorActionHandler.S
   @NotNull
   @Override
   final public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
+    return MappingMode.X;
   }
 
   @Contract(pure = true)

@@ -40,7 +40,7 @@ final public class ChangeVisualNumberIncAction extends VisualOperatorActionHandl
   @NotNull
   @Override
   final public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
+    return MappingMode.X;
   }
 
   @NotNull

@@ -50,21 +50,21 @@ public enum MappingMode {
   CMD_LINE;
 
   public static final EnumSet<MappingMode> N = EnumSet.of(NORMAL);
-  public static final EnumSet<MappingMode> V = EnumSet.of(VISUAL);
+  public static final EnumSet<MappingMode> X = EnumSet.of(VISUAL);
   public static final EnumSet<MappingMode> O = EnumSet.of(OP_PENDING);
   public static final EnumSet<MappingMode> I = EnumSet.of(INSERT);
   public static final EnumSet<MappingMode> C = EnumSet.of(CMD_LINE);
   public static final EnumSet<MappingMode> S = EnumSet.of(SELECT);
+  public static final EnumSet<MappingMode> V = EnumSet.of(VISUAL, SELECT);
 
   public static final EnumSet<MappingMode> NO = EnumSet.of(NORMAL, OP_PENDING);
-  public static final EnumSet<MappingMode> VO = EnumSet.of(VISUAL, OP_PENDING);
-  public static final EnumSet<MappingMode> NV = EnumSet.of(NORMAL, VISUAL);
+  public static final EnumSet<MappingMode> XO = EnumSet.of(VISUAL, OP_PENDING);
+  public static final EnumSet<MappingMode> NX = EnumSet.of(NORMAL, VISUAL);
   public static final EnumSet<MappingMode> IC = EnumSet.of(INSERT, CMD_LINE);
-  public static final EnumSet<MappingMode> VS = EnumSet.of(VISUAL, SELECT);
+  public static final EnumSet<MappingMode> NV = EnumSet.of(NORMAL, VISUAL, SELECT);
 
-  public static final EnumSet<MappingMode> NVS = EnumSet.of(NORMAL, VISUAL, SELECT);
-  public static final EnumSet<MappingMode> NVO = EnumSet.of(NORMAL, VISUAL, OP_PENDING);
+  public static final EnumSet<MappingMode> NXO = EnumSet.of(NORMAL, VISUAL, OP_PENDING);
+  public static final EnumSet<MappingMode> NVO = EnumSet.of(NORMAL, VISUAL, OP_PENDING, SELECT);
 
-  public static final EnumSet<MappingMode> NVOS = EnumSet.of(NORMAL, VISUAL, OP_PENDING, SELECT);
   public static final EnumSet<MappingMode> ALL = EnumSet.allOf(MappingMode.class);
 }

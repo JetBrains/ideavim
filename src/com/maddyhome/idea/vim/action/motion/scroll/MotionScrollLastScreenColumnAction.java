@@ -35,7 +35,7 @@ public class MotionScrollLastScreenColumnAction extends VimActionHandler.SingleE
   @NotNull
   @Override
   public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
+    return MappingMode.NXO;
   }
 
   @NotNull

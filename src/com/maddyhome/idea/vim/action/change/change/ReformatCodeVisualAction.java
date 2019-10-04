@@ -43,7 +43,7 @@ final public class ReformatCodeVisualAction extends VisualOperatorActionHandler.
   @NotNull
   @Override
   final public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
+    return MappingMode.X;
   }
 
   @NotNull

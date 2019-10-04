@@ -38,7 +38,7 @@ public class MotionCamelLeftAction extends MotionActionHandler.ForEachCaret {
   @NotNull
   @Override
   public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
+    return MappingMode.NXO;
   }
 
   @NotNull

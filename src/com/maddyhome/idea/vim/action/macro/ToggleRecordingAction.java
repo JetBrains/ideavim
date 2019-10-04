@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -36,7 +35,7 @@ public final class ToggleRecordingAction extends VimActionHandler.SingleExecutio
   @NotNull
   @Override
   public Set<MappingMode> getMappingModes() {
-    return MappingMode.NV;
+    return MappingMode.NX;
   }
 
   @NotNull

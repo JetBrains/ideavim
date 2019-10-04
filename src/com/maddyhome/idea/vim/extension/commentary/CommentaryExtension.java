@@ -39,11 +39,11 @@ public class CommentaryExtension extends VimNonDisposableExtension {
   protected void initOnce() {
     putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentMotion)"), new CommentMotionHandler(), false);
     putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentLine)"), new CommentLineHandler(), false);
-    putExtensionHandlerMapping(MappingMode.VO, parseKeys("<Plug>(CommentMotionV)"), new CommentMotionVHandler(), false);
+    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>(CommentMotionV)"), new CommentMotionVHandler(), false);
 
     putKeyMapping(MappingMode.N, parseKeys("gc"), parseKeys("<Plug>(CommentMotion)"), true);
     putKeyMapping(MappingMode.N, parseKeys("gcc"), parseKeys("<Plug>(CommentLine)"), true);
-    putKeyMapping(MappingMode.VO, parseKeys("gc"), parseKeys("<Plug>(CommentMotionV)"), true);
+    putKeyMapping(MappingMode.XO, parseKeys("gc"), parseKeys("<Plug>(CommentMotionV)"), true);
   }
 
   private static class CommentMotionHandler implements VimExtensionHandler {

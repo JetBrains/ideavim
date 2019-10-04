@@ -39,7 +39,7 @@ public class SearchWholeWordForwardAction extends MotionActionHandler.ForEachCar
   @NotNull
   @Override
   public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
+    return MappingMode.NXO;
   }
 
   @NotNull

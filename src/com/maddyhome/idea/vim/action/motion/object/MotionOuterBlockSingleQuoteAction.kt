@@ -33,7 +33,7 @@ import javax.swing.KeyStroke
 
 class MotionOuterBlockSingleQuoteAction : TextObjectActionHandler() {
 
-  override val mappingModes: Set<MappingMode> = MappingMode.VO
+  override val mappingModes: Set<MappingMode> = MappingMode.XO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("a'")
 

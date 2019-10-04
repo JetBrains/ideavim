@@ -37,7 +37,7 @@ public class MotionScrollColumnRightAction extends VimActionHandler.SingleExecut
   @NotNull
   @Override
   public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
+    return MappingMode.NXO;
   }
 
   @NotNull

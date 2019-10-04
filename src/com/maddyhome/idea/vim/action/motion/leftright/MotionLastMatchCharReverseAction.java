@@ -37,7 +37,7 @@ public class MotionLastMatchCharReverseAction extends MotionActionHandler.ForEac
   @NotNull
   @Override
   public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
+    return MappingMode.NXO;
   }
 
   @NotNull

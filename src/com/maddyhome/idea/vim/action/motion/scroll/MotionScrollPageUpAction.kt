@@ -32,7 +32,7 @@ import javax.swing.KeyStroke
 
 
 class MotionScrollPageUpAction : VimActionHandler.SingleExecution() {
-  override val mappingModes: Set<MappingMode> = MappingMode.NVO
+  override val mappingModes: Set<MappingMode> = MappingMode.NXO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-B>", "<PageUp>")
 

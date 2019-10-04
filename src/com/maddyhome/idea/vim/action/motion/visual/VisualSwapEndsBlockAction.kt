@@ -33,7 +33,7 @@ import javax.swing.KeyStroke
 class VisualSwapEndsBlockAction : VimActionHandler.SingleExecution() {
 
 
-  override val mappingModes: Set<MappingMode> = MappingMode.V
+  override val mappingModes: Set<MappingMode> = MappingMode.X
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("O")
 

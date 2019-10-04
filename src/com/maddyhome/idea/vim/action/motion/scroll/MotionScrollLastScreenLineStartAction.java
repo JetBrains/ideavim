@@ -35,7 +35,7 @@ public class MotionScrollLastScreenLineStartAction extends VimActionHandler.Sing
   @NotNull
   @Override
   public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
+    return MappingMode.NXO;
   }
 
   @NotNull

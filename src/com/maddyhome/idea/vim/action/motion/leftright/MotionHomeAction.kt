@@ -31,7 +31,7 @@ import javax.swing.KeyStroke
 class MotionHomeAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NV
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Home>")
 

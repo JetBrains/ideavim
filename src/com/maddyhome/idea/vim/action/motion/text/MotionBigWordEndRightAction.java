@@ -38,7 +38,7 @@ public class MotionBigWordEndRightAction extends MotionActionHandler.ForEachCare
   @NotNull
   @Override
   public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
+    return MappingMode.NXO;
   }
 
   @NotNull

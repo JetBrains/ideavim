@@ -34,7 +34,7 @@ import javax.swing.KeyStroke
 class VisualSwapEndsAction : VimActionHandler.SingleExecution() {
 
 
-  override val mappingModes: EnumSet<MappingMode> = MappingMode.V
+  override val mappingModes: EnumSet<MappingMode> = MappingMode.X
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("o")
 

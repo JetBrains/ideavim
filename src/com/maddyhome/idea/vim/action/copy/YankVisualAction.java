@@ -42,7 +42,7 @@ final public class YankVisualAction extends VisualOperatorActionHandler.SingleEx
   @NotNull
   @Override
   final public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
+    return MappingMode.X;
   }
 
   @NotNull

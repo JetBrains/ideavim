@@ -32,7 +32,7 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 class MotionShiftHomeAction : ShiftedSpecialKeyHandler() {
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NV
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Home>")
 

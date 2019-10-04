@@ -35,7 +35,7 @@ public class MotionScrollHalfPageDownAction extends VimActionHandler.SingleExecu
   @NotNull
   @Override
   public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
+    return MappingMode.NXO;
   }
 
   @NotNull

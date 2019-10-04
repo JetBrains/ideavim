@@ -39,7 +39,7 @@ public class GotoDeclarationAction extends VimActionHandler.SingleExecution {
   @NotNull
   @Override
   public Set<MappingMode> getMappingModes() {
-    return MappingMode.NV;
+    return MappingMode.NX;
   }
 
   @NotNull

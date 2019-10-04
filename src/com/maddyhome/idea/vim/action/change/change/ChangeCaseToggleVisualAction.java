@@ -44,7 +44,7 @@ final public class ChangeCaseToggleVisualAction extends VisualOperatorActionHand
   @NotNull
   @Override
   final public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
+    return MappingMode.X;
   }
 
   @NotNull

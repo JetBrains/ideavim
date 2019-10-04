@@ -37,7 +37,7 @@ import javax.swing.KeyStroke
 class VisualToggleLineModeAction : VimActionHandler.SingleExecution() {
 
 
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NV
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NX
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("V")
 
