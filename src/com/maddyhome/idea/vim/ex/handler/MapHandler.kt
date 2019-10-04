@@ -106,10 +106,7 @@ class MapHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
                                  val toKeys: List<KeyStroke>)
 
   private class CommandInfo(val prefix: String, suffix: String, val mappingModes: Set<MappingMode>, val isRecursive: Boolean) {
-    val command =
-      if (suffix.isBlank()) {
-        prefix
-      } else "$prefix[$suffix]"
+    val command = if (suffix.isBlank()) prefix else "$prefix[$suffix]"
   }
 
   companion object {
@@ -173,20 +170,19 @@ class MapHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
   private fun getFirstBarSeparatedCommand(input: String): String {
     val inputBuilder = StringBuilder()
     var escape = false
-    for (i in 0 until input.length) {
-      val c = input[i]
+    for (element in input) {
       if (escape) {
         escape = false
-        if (c != '|') {
+        if (element != '|') {
           inputBuilder.append('\\')
         }
-        inputBuilder.append(c)
-      } else if (c == '\\' || c == CTRL_V) {
+        inputBuilder.append(element)
+      } else if (element == '\\' || element == CTRL_V) {
         escape = true
-      } else if (c == '|') {
+      } else if (element == '|') {
         break
       } else {
-        inputBuilder.append(c)
+        inputBuilder.append(element)
       }
     }
     if (input.endsWith("\\")) {
