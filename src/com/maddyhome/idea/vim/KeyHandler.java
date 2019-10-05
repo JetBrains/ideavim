@@ -158,6 +158,16 @@ public class KeyHandler {
     return false;
   }
 
+  public void startDigraphSequence(@NotNull Editor editor) {
+    final CommandState editorState = CommandState.getInstance(editor);
+    editorState.startDigraphSequence();
+  }
+
+  public void startLiteralSequence(@NotNull Editor editor) {
+    final CommandState editorState = CommandState.getInstance(editor);
+    editorState.startLiteralSequence();
+  }
+
   /**
    * This is the main key handler for the Vim plugin. Every keystroke not handled directly by Idea is sent here for
    * processing.
@@ -236,19 +246,18 @@ public class KeyHandler {
       // For debugging purposes we track the keys entered for this command
       keys.add(key);
 
+      if (handleDigraph(editor, key, context, editorState)) return;
+
       // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
       // return the node matching this keystroke
       Node node = editorState.getCurrentNode().get(key);
-
-      if (handleDigraph(editor, key, context, node, editorState)) return;
-
       node = mapOpCommand(key, node, editorState);
 
       if (node instanceof CommandNode) {
-        handleCommandNode(editor, context, key, (CommandNode)node, editorState);
+        handleCommandNode(editor, context, key, (CommandNode) node, editorState);
       }
       else if (node instanceof CommandPartNode) {
-        editorState.setCurrentNode((CommandPartNode)node);
+        editorState.setCurrentNode((CommandPartNode) node);
       }
       else {
         if (lastWasBS && lastChar != 0 && OptionsManager.INSTANCE.getDigraph().isSet()) {
@@ -576,33 +585,49 @@ public class KeyHandler {
   private boolean handleDigraph(@NotNull Editor editor,
                                 @NotNull KeyStroke key,
                                 @NotNull DataContext context,
-                                @Nullable Node node,
                                 @NotNull CommandState editorState) {
-    DigraphSequence digraphSequence = editorState.getDigraphSequence();
-    if (digraphSequence == null && !(node instanceof CommandNode) && DigraphSequence.isDigraphStart(key)) {
-      digraphSequence = editorState.startDigraphSequence();
-    }
-    if (digraphSequence != null) {
-      DigraphSequence.DigraphResult res = digraphSequence.processKey(key, editor);
-      switch (res.getResult()) {
-        case DigraphSequence.DigraphResult.RES_OK:
-          return true;
-        case DigraphSequence.DigraphResult.RES_BAD:
-          editorState.endDigraphSequence();
-          return true;
-        case DigraphSequence.DigraphResult.RES_DONE:
-          if (currentArg == Argument.Type.DIGRAPH) {
-            currentArg = Argument.Type.CHARACTER;
-          }
-          editorState.endDigraphSequence();
-          final KeyStroke stroke = res.getStroke();
-          if (stroke == null) {
-            return false;
-          }
-          handleKey(editor, stroke, context);
-          return true;
+
+    // Support starting a digraph/literal sequence if the operator accepts one as an argument, e.g. 'r' or 'f'.
+    // Normally, we start the sequence (in Insert or CmdLine mode) through a VimAction that can be mapped. Our
+    // VimActions don't work as arguments for operators, so we have to special case here. Helpfully, Vim appears to
+    // hardcode the shortcuts, and doesn't support mapping, so everything works nicely.
+    if (currentArg == Argument.Type.DIGRAPH) {
+      if (DigraphSequence.isDigraphStart(key)) {
+        editorState.startDigraphSequence();
+        return true;
+      }
+      if (DigraphSequence.isLiteralStart(key)) {
+        editorState.startLiteralSequence();
+        return true;
       }
     }
+
+    DigraphSequence.DigraphResult res = editorState.processDigraphKey(key, editor);
+    switch (res.getResult()) {
+      case DigraphSequence.DigraphResult.RES_HANDLED:
+      case DigraphSequence.DigraphResult.RES_BAD:
+        return true;
+
+      case DigraphSequence.DigraphResult.RES_DONE:
+        if (currentArg == Argument.Type.DIGRAPH) {
+          currentArg = Argument.Type.CHARACTER;
+        }
+        final KeyStroke stroke = res.getStroke();
+        if (stroke == null) {
+          return false;
+        }
+        handleKey(editor, stroke, context);
+        return true;
+
+      case DigraphSequence.DigraphResult.RES_UNHANDLED:
+        if (currentArg == Argument.Type.DIGRAPH) {
+          currentArg = Argument.Type.CHARACTER;
+          handleKey(editor, key, context);
+          return true;
+        }
+        return false;
+    }
+
     return false;
   }
 
@@ -731,7 +756,6 @@ public class KeyHandler {
     switch (argument) {
       case CHARACTER:
       case DIGRAPH:
-        editorState.startDigraphSequence();
         state = State.CHAR_OR_DIGRAPH;
         break;
       case MOTION:
@@ -797,7 +821,6 @@ public class KeyHandler {
     state = State.NEW_COMMAND;
     currentCmd.clear();
     currentArg = null;
-    CommandState.getInstance(editor).endDigraphSequence();
   }
 
   /**

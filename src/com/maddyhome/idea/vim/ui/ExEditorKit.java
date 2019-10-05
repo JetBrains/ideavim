@@ -93,7 +93,7 @@ public class ExEditorKit extends DefaultEditorKit {
         }
       }
       else {
-        return KeyStroke.getKeyStroke(new Character(ch), mods);
+        return KeyStroke.getKeyStroke(Character.valueOf(ch), mods);
       }
     }
 
@@ -111,6 +111,7 @@ public class ExEditorKit extends DefaultEditorKit {
   static final String HistoryUpFilter = "history-up-filter";
   static final String HistoryDownFilter = "history-down-filter";
   static final String StartDigraph = "start-digraph";
+  static final String StartLiteral = "start-literal";
 
   @NotNull private final Action[] exActions = new Action[]{
     new CancelEntryAction(),
@@ -126,6 +127,7 @@ public class ExEditorKit extends DefaultEditorKit {
     new HistoryDownFilterAction(),
     new ToggleInsertReplaceAction(),
     new StartDigraphAction(),
+    new StartLiteralAction(),
     new InsertRegisterAction(),
   };
 
@@ -485,21 +487,22 @@ public class ExEditorKit extends DefaultEditorKit {
     }
   }
 
-  public static class StartDigraphAction extends TextAction implements MultiStepAction {
-    @Nullable private DigraphSequence digraphSequence;
+  private static abstract class StartDigraphLiteralActionBase extends TextAction implements MultiStepAction {
+    @Nullable
+    private DigraphSequence digraphSequence;
 
-    StartDigraphAction() {
-      super(StartDigraph);
+    public StartDigraphLiteralActionBase(String name) {
+      super(name);
     }
 
     @Override
-    public void actionPerformed(@NotNull ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {
       final ExTextField target = (ExTextField)getTextComponent(e);
       final KeyStroke key = convert(e);
       if (key != null && digraphSequence != null) {
         DigraphSequence.DigraphResult res = digraphSequence.processKey(key, target.getEditor());
         switch (res.getResult()) {
-          case DigraphSequence.DigraphResult.RES_OK:
+          case DigraphSequence.DigraphResult.RES_HANDLED:
             target.setCurrentActionPromptCharacter(res.getPromptCharacter());
             break;
 
@@ -522,16 +525,40 @@ public class ExEditorKit extends DefaultEditorKit {
             break;
         }
       }
-      else if (key != null && DigraphSequence.isDigraphStart(key)) {
+      else if (key != null) {
         digraphSequence = new DigraphSequence();
-        DigraphSequence.DigraphResult res = digraphSequence.processKey(key, target.getEditor());
+        DigraphSequence.DigraphResult res = start(digraphSequence);
         target.setCurrentAction(this, res.getPromptCharacter());
       }
     }
 
+    protected abstract DigraphSequence.DigraphResult start(@NotNull DigraphSequence digraphSequence);
+
     @Override
     public void reset() {
       digraphSequence = null;
+    }
+  }
+
+  public static class StartDigraphAction extends StartDigraphLiteralActionBase {
+    StartDigraphAction() {
+      super(StartDigraph);
+    }
+
+    @Override
+    protected DigraphSequence.DigraphResult start(@NotNull DigraphSequence digraphSequence) {
+      return digraphSequence.startDigraphSequence();
+    }
+  }
+
+  public static class StartLiteralAction extends StartDigraphLiteralActionBase {
+    StartLiteralAction() {
+      super(StartLiteral);
+    }
+
+    @Override
+    protected DigraphSequence.DigraphResult start(@NotNull DigraphSequence digraphSequence) {
+      return digraphSequence.startLiteralSequence();
     }
   }
 

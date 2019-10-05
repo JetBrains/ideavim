@@ -32,13 +32,27 @@ public class DigraphSequence {
   }
 
   public static boolean isDigraphStart(@NotNull KeyStroke key) {
-    if ((key.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
-      if (key.getKeyCode() == KeyEvent.VK_K || key.getKeyCode() == KeyEvent.VK_V || key.getKeyCode() == KeyEvent.VK_Q) {
-        return true;
-      }
-    }
+    return key.getKeyCode() == KeyEvent.VK_K && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0;
+  }
 
-    return false;
+  public static boolean isLiteralStart(@NotNull KeyStroke key) {
+    return (key.getKeyCode() == KeyEvent.VK_V || key.getKeyCode() == KeyEvent.VK_Q) && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0;
+  }
+
+  public DigraphResult startDigraphSequence() {
+    logger.debug("startDigraphSequence");
+
+    digraphState = DIG_STATE_DIG_ONE;
+    return DigraphResult.HANDLED_DIGRAPH;
+  }
+
+  public DigraphResult startLiteralSequence() {
+    logger.debug("startLiteralSequence");
+
+    digraphState = DIG_STATE_CODE_START;
+    codeChars = new char[8];
+    codeCnt = 0;
+    return DigraphResult.HANDLED_LITERAL;
   }
 
   @NotNull
@@ -46,44 +60,32 @@ public class DigraphSequence {
     switch (digraphState) {
       case DIG_STATE_START:
         logger.debug("DIG_STATE_START");
-        if (key.getKeyCode() == KeyEvent.VK_K && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
-          logger.debug("found Ctrl-K");
-          digraphState = DIG_STATE_DIG_ONE;
-          return DigraphResult.OK_DIGRAPH;
-        }
-        else if ((key.getKeyCode() == KeyEvent.VK_V || key.getKeyCode() == KeyEvent.VK_Q) &&
-                 (key.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
-          logger.debug("found Ctrl-V");
-          digraphState = DIG_STATE_CODE_START;
-          codeChars = new char[8];
-          codeCnt = 0;
-          return DigraphResult.OK_LITERAL;
-        }
-        else {
-          return new DigraphResult(key);
-        }
+        // TODO: Remove this state?
+        // Perhaps use this to handle {char}<BS>{char}? Rename to e.g. DIG_STATE_PENDING, store last char, and move
+        // state if key is <BS>?
+        return DigraphResult.UNHANDLED;
+
       case DIG_STATE_DIG_ONE:
         logger.debug("DIG_STATE_DIG_ONE");
         if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
           digraphChar = key.getKeyChar();
           digraphState = DIG_STATE_DIG_TWO;
 
-          return new DigraphResult(DigraphResult.RES_OK, digraphChar);
+          return DigraphResult.handled(digraphChar);
         }
-        else {
-          digraphState = DIG_STATE_START;
-          return DigraphResult.BAD;
-        }
+        digraphState = DIG_STATE_START;
+        return DigraphResult.BAD;
+
       case DIG_STATE_DIG_TWO:
         logger.debug("DIG_STATE_DIG_TWO");
         digraphState = DIG_STATE_START;
         if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
           char ch = VimPlugin.getDigraph().getDigraph(digraphChar, key.getKeyChar());
 
-          return new DigraphResult(KeyStroke.getKeyStroke(ch));
+          return DigraphResult.done(KeyStroke.getKeyStroke(ch));
         }
-
         return DigraphResult.BAD;
+
       case DIG_STATE_CODE_START:
         logger.debug("DIG_STATE_CODE_START");
         switch (key.getKeyChar()) {
@@ -93,26 +95,26 @@ public class DigraphSequence {
             digraphState = DIG_STATE_CODE_CHAR;
             codeType = 8;
             logger.debug("Octal");
-            return DigraphResult.OK_LITERAL;
+            return DigraphResult.HANDLED_LITERAL;
           case 'x':
           case 'X':
             codeMax = 2;
             digraphState = DIG_STATE_CODE_CHAR;
             codeType = 16;
             logger.debug("hex2");
-            return DigraphResult.OK_LITERAL;
+            return DigraphResult.HANDLED_LITERAL;
           case 'u':
             codeMax = 4;
             digraphState = DIG_STATE_CODE_CHAR;
             codeType = 16;
             logger.debug("hex4");
-            return DigraphResult.OK_LITERAL;
+            return DigraphResult.HANDLED_LITERAL;
           case 'U':
             codeMax = 8;
             digraphState = DIG_STATE_CODE_CHAR;
             codeType = 16;
             logger.debug("hex8");
-            return DigraphResult.OK_LITERAL;
+            return DigraphResult.HANDLED_LITERAL;
           case '0':
           case '1':
           case '2':
@@ -128,21 +130,22 @@ public class DigraphSequence {
             codeType = 10;
             codeChars[codeCnt++] = key.getKeyChar();
             logger.debug("decimal");
-            return DigraphResult.OK_LITERAL;
+            return DigraphResult.HANDLED_LITERAL;
           default:
             switch (key.getKeyCode()) {
               case KeyEvent.VK_TAB:
                 KeyStroke code = KeyStroke.getKeyStroke('\t');
                 digraphState = DIG_STATE_START;
 
-                return new DigraphResult(code);
+                return DigraphResult.done(code);
               default:
                 logger.debug("unknown");
                 digraphState = DIG_STATE_START;
 
-                return new DigraphResult(key);
+                return DigraphResult.done(key);
             }
         }
+
       case DIG_STATE_CODE_CHAR:
         logger.debug("DIG_STATE_CODE_CHAR");
         boolean valid = false;
@@ -174,10 +177,10 @@ public class DigraphSequence {
             KeyStroke code = KeyStroke.getKeyStroke((char)val);
             digraphState = DIG_STATE_START;
 
-            return new DigraphResult(code);
+            return DigraphResult.done(code);
           }
           else {
-            return DigraphResult.OK_LITERAL;
+            return DigraphResult.HANDLED_LITERAL;
           }
         }
         else if (codeCnt > 0) {
@@ -189,39 +192,49 @@ public class DigraphSequence {
 
           VimPlugin.getMacro().postKey(key, editor);
 
-          return new DigraphResult(code);
+          return DigraphResult.done(code);
         }
-        else {
-          return DigraphResult.BAD;
-        }
+        return DigraphResult.BAD;
+
       default:
         return DigraphResult.BAD;
     }
   }
 
+  // TODO: Move this class outside of DigraphSequence. It's used externally
   public static class DigraphResult {
-    public static final int RES_OK = 0;
-    public static final int RES_BAD = 1;
-    public static final int RES_DONE = 2;
+    public static final int RES_HANDLED = 0;
+    public static final int RES_UNHANDLED = 1;
+    public static final int RES_DONE = 3;
+    public static final int RES_BAD = 4;
 
-    static final DigraphResult OK_DIGRAPH = new DigraphResult(RES_OK, '?');
-    static final DigraphResult OK_LITERAL = new DigraphResult(RES_OK, '^');
+    static final DigraphResult HANDLED_DIGRAPH = new DigraphResult(RES_HANDLED, '?');
+    static final DigraphResult HANDLED_LITERAL = new DigraphResult(RES_HANDLED, '^');
+    static final DigraphResult UNHANDLED = new DigraphResult(RES_UNHANDLED);
     static final DigraphResult BAD = new DigraphResult(RES_BAD);
 
-    DigraphResult(int result) {
+    private DigraphResult(int result) {
       this.result = result;
       stroke = null;
     }
 
-    DigraphResult(int result, char promptCharacter) {
+    private DigraphResult(int result, char promptCharacter) {
       this.result = result;
       this.promptCharacter = promptCharacter;
       stroke = null;
     }
 
-    DigraphResult(@Nullable KeyStroke stroke) {
+    private DigraphResult(@Nullable KeyStroke stroke) {
       result = RES_DONE;
       this.stroke = stroke;
+    }
+
+    public static DigraphResult done(@Nullable KeyStroke stroke) {
+      return new DigraphResult(stroke);
+    }
+
+    public static DigraphResult handled(char promptCharacter) {
+      return new DigraphResult(RES_HANDLED, promptCharacter);
     }
 
     @Nullable

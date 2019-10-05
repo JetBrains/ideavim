@@ -197,6 +197,8 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertSingleCommandAction" mappingModes="I" keys="«C-O»"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.VisualBlockInsertAction" mappingModes="X" keys="I"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.VisualBlockAppendAction" mappingModes="X" keys="A"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.StartInsertDigraphAction" mappingModes="IC" keys="«C-K»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.StartInsertLiteralAction" mappingModes="IC" keys="«C-V»,«C-Q»"/>
 
     <!-- Delete -->
     <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteCharacterAction" mappingModes="N" keys="«DEL»"/>

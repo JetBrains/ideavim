@@ -55,7 +55,7 @@ public class CommandState {
   @Nullable private Command myCommand;
   private EnumSet<CommandFlags> myFlags = EnumSet.noneOf(CommandFlags.class);
   private boolean myIsRecording = false;
-  private DigraphSequence digraphSequence = null;
+  @NotNull private DigraphSequence digraphSequence = new DigraphSequence();
   private boolean dotRepeatInProgress = false;
   private int count = 0;
 
@@ -133,17 +133,16 @@ public class CommandState {
     updateStatus();
   }
 
-  public DigraphSequence getDigraphSequence() {
-    return digraphSequence;
+  public void startDigraphSequence() {
+    digraphSequence.startDigraphSequence();
   }
 
-  public DigraphSequence startDigraphSequence() {
-    digraphSequence = new DigraphSequence();
-    return digraphSequence;
+  public void startLiteralSequence() {
+    digraphSequence.startLiteralSequence();
   }
 
-  public void endDigraphSequence() {
-    digraphSequence = null;
+  public DigraphSequence.DigraphResult processDigraphKey(KeyStroke key, Editor editor) {
+    return digraphSequence.processKey(key, editor);
   }
 
   public int getCount() {
@@ -252,7 +251,7 @@ public class CommandState {
     myCommand = null;
     myStates.clear();
     updateStatus();
-    digraphSequence = null;
+    startDigraphSequence();
     count = 0;
   }
 
