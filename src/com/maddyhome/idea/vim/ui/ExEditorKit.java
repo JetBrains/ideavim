@@ -22,6 +22,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.helper.DigraphResult;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import org.jetbrains.annotations.NotNull;
@@ -500,13 +501,13 @@ public class ExEditorKit extends DefaultEditorKit {
       final ExTextField target = (ExTextField)getTextComponent(e);
       final KeyStroke key = convert(e);
       if (key != null && digraphSequence != null) {
-        DigraphSequence.DigraphResult res = digraphSequence.processKey(key, target.getEditor());
+        DigraphResult res = digraphSequence.processKey(key, target.getEditor());
         switch (res.getResult()) {
-          case DigraphSequence.DigraphResult.RES_HANDLED:
+          case DigraphResult.RES_HANDLED:
             target.setCurrentActionPromptCharacter(res.getPromptCharacter());
             break;
 
-          case DigraphSequence.DigraphResult.RES_BAD:
+          case DigraphResult.RES_BAD:
             target.clearCurrentAction();
             // Eat the character, unless it's <C-C>, in which case, forward on and cancel entry. Note that at some point
             // we should support input of control characters
@@ -515,7 +516,7 @@ public class ExEditorKit extends DefaultEditorKit {
             }
             break;
 
-          case DigraphSequence.DigraphResult.RES_DONE:
+          case DigraphResult.RES_DONE:
             final KeyStroke digraph = res.getStroke();
             digraphSequence = null;
             target.clearCurrentAction();
@@ -527,12 +528,12 @@ public class ExEditorKit extends DefaultEditorKit {
       }
       else if (key != null) {
         digraphSequence = new DigraphSequence();
-        DigraphSequence.DigraphResult res = start(digraphSequence);
+        DigraphResult res = start(digraphSequence);
         target.setCurrentAction(this, res.getPromptCharacter());
       }
     }
 
-    protected abstract DigraphSequence.DigraphResult start(@NotNull DigraphSequence digraphSequence);
+    protected abstract DigraphResult start(@NotNull DigraphSequence digraphSequence);
 
     @Override
     public void reset() {
@@ -546,7 +547,7 @@ public class ExEditorKit extends DefaultEditorKit {
     }
 
     @Override
-    protected DigraphSequence.DigraphResult start(@NotNull DigraphSequence digraphSequence) {
+    protected DigraphResult start(@NotNull DigraphSequence digraphSequence) {
       return digraphSequence.startDigraphSequence();
     }
   }
@@ -557,7 +558,7 @@ public class ExEditorKit extends DefaultEditorKit {
     }
 
     @Override
-    protected DigraphSequence.DigraphResult start(@NotNull DigraphSequence digraphSequence) {
+    protected DigraphResult start(@NotNull DigraphSequence digraphSequence) {
       return digraphSequence.startLiteralSequence();
     }
   }

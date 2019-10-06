@@ -595,13 +595,13 @@ public class KeyHandler {
       }
     }
 
-    DigraphSequence.DigraphResult res = editorState.processDigraphKey(key, editor);
+    DigraphResult res = editorState.processDigraphKey(key, editor);
     switch (res.getResult()) {
-      case DigraphSequence.DigraphResult.RES_HANDLED:
-      case DigraphSequence.DigraphResult.RES_BAD:
+      case DigraphResult.RES_HANDLED:
+      case DigraphResult.RES_BAD:
         return true;
 
-      case DigraphSequence.DigraphResult.RES_DONE:
+      case DigraphResult.RES_DONE:
         if (currentArg == Argument.Type.DIGRAPH) {
           currentArg = Argument.Type.CHARACTER;
         }
@@ -612,7 +612,7 @@ public class KeyHandler {
         handleKey(editor, stroke, context);
         return true;
 
-      case DigraphSequence.DigraphResult.RES_UNHANDLED:
+      case DigraphResult.RES_UNHANDLED:
         if (currentArg == Argument.Type.DIGRAPH) {
           currentArg = Argument.Type.CHARACTER;
           handleKey(editor, key, context);

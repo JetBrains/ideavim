@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.command;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.helper.DigraphResult;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.key.CommandPartNode;
@@ -141,7 +142,7 @@ public class CommandState {
     digraphSequence.startLiteralSequence();
   }
 
-  public DigraphSequence.DigraphResult processDigraphKey(KeyStroke key, Editor editor) {
+  public DigraphResult processDigraphKey(KeyStroke key, Editor editor) {
     return digraphSequence.processKey(key, editor);
   }
 
