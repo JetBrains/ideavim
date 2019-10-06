@@ -260,11 +260,6 @@ public class KeyHandler {
         editorState.setCurrentNode((CommandPartNode) node);
       }
       else {
-        if (lastWasBS && lastChar != 0 && OptionsManager.INSTANCE.getDigraph().isSet()) {
-          char dig = VimPlugin.getDigraph().getDigraph(lastChar, key.getKeyChar());
-          key = KeyStroke.getKeyStroke(dig);
-        }
-
         // If we are in insert/replace mode send this key in for processing
         if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
           if (!VimPlugin.getChange().processKey(editor, context, key)) {
@@ -286,8 +281,6 @@ public class KeyHandler {
           state = State.BAD_COMMAND;
         }
 
-        lastChar = lastWasBS && lastChar != 0 ? 0 : key.getKeyChar();
-        lastWasBS = false;
         partialReset(editor);
       }
     }
@@ -666,13 +659,6 @@ public class KeyHandler {
     // Save off the command we are about to execute
     editorState.setCommand(cmd);
 
-    if (lastChar != 0 && !lastWasBS) {
-      lastWasBS = key.equals(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0));
-    }
-    else {
-      lastChar = 0;
-    }
-
     Project project = editor.getProject();
     final Command.Type type = cmd.getType();
     if (type.isWrite() && !editor.getDocument().isWritable()) {
@@ -833,8 +819,6 @@ public class KeyHandler {
     VimPlugin.clearError();
     CommandState.getInstance(editor).reset();
     reset(editor);
-    lastChar = 0;
-    lastWasBS = false;
     VimPlugin.getRegister().resetRegister();
     if (editor != null) {
       VisualGroupKt.updateCaretState(editor);
@@ -959,8 +943,6 @@ public class KeyHandler {
   private State state = State.NEW_COMMAND;
   @NotNull private final Stack<Command> currentCmd = new Stack<>();
   @Nullable private Argument.Type currentArg;
-  private char lastChar;
-  private boolean lastWasBS;
 
   private boolean forwardSearch = true;
 }

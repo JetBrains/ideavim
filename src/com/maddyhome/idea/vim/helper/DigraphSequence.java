@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.helper;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,11 +59,23 @@ public class DigraphSequence {
   @NotNull
   public DigraphResult processKey(@NotNull KeyStroke key, @NotNull Editor editor) {
     switch (digraphState) {
-      case DIG_STATE_START:
-        logger.debug("DIG_STATE_START");
-        // TODO: Remove this state?
-        // Perhaps use this to handle {char}<BS>{char}? Rename to e.g. DIG_STATE_PENDING, store last char, and move
-        // state if key is <BS>?
+      case DIG_STATE_PENDING:
+        logger.debug("DIG_STATE_PENDING");
+        if (key.getKeyCode() == KeyEvent.VK_BACK_SPACE && OptionsManager.INSTANCE.getDigraph().isSet()) {
+          digraphState = DIG_STATE_BACK_SPACE;
+        } else if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
+          digraphChar = key.getKeyChar();
+        }
+        return DigraphResult.UNHANDLED;
+
+      case DIG_STATE_BACK_SPACE:
+        logger.debug("DIG_STATE_BACK_SPACE");
+        digraphState = DIG_STATE_PENDING;
+        if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
+          char ch = VimPlugin.getDigraph().getDigraph(digraphChar, key.getKeyChar());
+          digraphChar = 0;
+          return DigraphResult.done(KeyStroke.getKeyStroke(ch));
+        }
         return DigraphResult.UNHANDLED;
 
       case DIG_STATE_DIG_ONE:
@@ -73,12 +86,12 @@ public class DigraphSequence {
 
           return DigraphResult.handled(digraphChar);
         }
-        digraphState = DIG_STATE_START;
+        digraphState = DIG_STATE_PENDING;
         return DigraphResult.BAD;
 
       case DIG_STATE_DIG_TWO:
         logger.debug("DIG_STATE_DIG_TWO");
-        digraphState = DIG_STATE_START;
+        digraphState = DIG_STATE_PENDING;
         if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
           char ch = VimPlugin.getDigraph().getDigraph(digraphChar, key.getKeyChar());
 
@@ -135,12 +148,12 @@ public class DigraphSequence {
             switch (key.getKeyCode()) {
               case KeyEvent.VK_TAB:
                 KeyStroke code = KeyStroke.getKeyStroke('\t');
-                digraphState = DIG_STATE_START;
+                digraphState = DIG_STATE_PENDING;
 
                 return DigraphResult.done(code);
               default:
                 logger.debug("unknown");
-                digraphState = DIG_STATE_START;
+                digraphState = DIG_STATE_PENDING;
 
                 return DigraphResult.done(key);
             }
@@ -175,7 +188,7 @@ public class DigraphSequence {
             String digits = new String(codeChars, 0, codeCnt);
             int val = Integer.parseInt(digits, codeType);
             KeyStroke code = KeyStroke.getKeyStroke((char)val);
-            digraphState = DIG_STATE_START;
+            digraphState = DIG_STATE_PENDING;
 
             return DigraphResult.done(code);
           }
@@ -187,7 +200,7 @@ public class DigraphSequence {
           logger.debug("invalid");
           String digits = new String(codeChars, 0, codeCnt);
           int val = Integer.parseInt(digits, codeType);
-          digraphState = DIG_STATE_START;
+          digraphState = DIG_STATE_PENDING;
           KeyStroke code = KeyStroke.getKeyStroke((char)val);
 
           VimPlugin.getMacro().postKey(key, editor);
@@ -255,18 +268,19 @@ public class DigraphSequence {
     private char promptCharacter;
   }
 
-  private int digraphState = DIG_STATE_START;
+  private int digraphState = DIG_STATE_PENDING;
   private char digraphChar;
   private char[] codeChars;
   private int codeCnt;
   private int codeType;
   private int codeMax;
 
-  private static final int DIG_STATE_START = 1;
+  private static final int DIG_STATE_PENDING = 1;
   private static final int DIG_STATE_DIG_ONE = 2;
   private static final int DIG_STATE_DIG_TWO = 3;
   private static final int DIG_STATE_CODE_START = 10;
   private static final int DIG_STATE_CODE_CHAR = 11;
+  private static final int DIG_STATE_BACK_SPACE = 20;
 
   private static final Logger logger = Logger.getInstance(DigraphSequence.class.getName());
 }
