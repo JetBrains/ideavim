@@ -38,8 +38,8 @@ import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
+import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.CommandStateHelper;
@@ -115,11 +115,12 @@ public class MotionGroup {
     int start;
     int end;
     if (argument.getType() == Argument.Type.OFFSETS ) {
-      final Pair<Integer, Integer> offsets = argument.getOffsets().get(caret);
+      final VimSelection offsets = argument.getOffsets().get(caret);
       if (offsets == null) return null;
 
-      start = offsets.getFirst();
-      end = offsets.getSecond();
+      final Pair<Integer, Integer> nativeStartAndEnd = offsets.getNativeStartAndEnd();
+      start = nativeStartAndEnd.getFirst();
+      end = nativeStartAndEnd.getSecond();
     }
     else {
       final Command cmd = argument.getMotion();

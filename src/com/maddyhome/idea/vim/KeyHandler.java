@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.group.RegisterGroup;
+import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.*;
@@ -400,17 +401,27 @@ public class KeyHandler {
         if (isPendingMode &&
             !currentCmd.isEmpty() &&
             currentCmd.peek().getArgument() == null) {
-          Map<Caret, Pair<Integer, Integer>> offsets = new HashMap<>();
+          Map<Caret, VimSelection> offsets = new HashMap<>();
+
           for (Caret caret : editor.getCaretModel().getAllCarets()) {
             @Nullable Integer startOffset = startOffsets.get(caret);
             if (caret.hasSelection()) {
-              offsets.put(caret, new Pair<>(caret.getSelectionStart(), caret.getSelectionEnd()));
+              final VimSelection vimSelection = VimSelection.Companion
+                .create(UserDataManager.getVimSelectionStart(caret), caret.getOffset(),
+                        SelectionType.fromSubMode(CommandStateHelper.getSubMode(editor)), editor);
+              offsets.put(caret, vimSelection);
+              commandState.popState();
             }
             else if (startOffset != null && startOffset != caret.getOffset()) {
-              offsets.put(caret, new Pair<>(startOffset, caret.getOffset()));
-            }
-            if (startOffset != null) {
-              try(VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
+              int endOffset = caret.getOffset();
+              if (startOffset < endOffset) {
+                endOffset -= 1;
+              }
+              final VimSelection vimSelection = VimSelection.Companion
+                .create(startOffset, endOffset, SelectionType.CHARACTER_WISE, editor);
+              offsets.put(caret, vimSelection);
+
+              try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
                 // Move caret to the initial offset for better undo action
                 //  This is not a necessary thing, but without it undo action look less convenient
                 editor.getCaretModel().moveToOffset(startOffset);
