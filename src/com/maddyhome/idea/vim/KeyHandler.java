@@ -357,8 +357,9 @@ public class KeyHandler {
       mappingKeys.add(key);
       if (!application.isUnitTestMode() && OptionsManager.INSTANCE.getTimeout().isSet()) {
         commandState.startMappingTimer(actionEvent -> application.invokeLater(() -> {
+          final KeyStroke firstKey = mappingKeys.get(0);
           mappingKeys.clear();
-          if (editor.isDisposed() || mappingKeys.get(0).equals(parseKeys("<Plug>").get(0))) {
+          if (editor.isDisposed() || firstKey.equals(parseKeys("<Plug>").get(0))) {
             return;
           }
           for (KeyStroke keyStroke : fromKeys) {
