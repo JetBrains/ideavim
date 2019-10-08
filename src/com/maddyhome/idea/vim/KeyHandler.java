@@ -60,6 +60,7 @@ import java.util.stream.Collectors;
 
 import static com.intellij.openapi.actionSystem.CommonDataKeys.*;
 import static com.intellij.openapi.actionSystem.PlatformDataKeys.PROJECT_FILE_DIRECTORY;
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 /**
  * This handlers every keystroke that the user can argType except those that are still valid hotkeys for various Idea
@@ -357,7 +358,7 @@ public class KeyHandler {
       if (!application.isUnitTestMode() && OptionsManager.INSTANCE.getTimeout().isSet()) {
         commandState.startMappingTimer(actionEvent -> application.invokeLater(() -> {
           mappingKeys.clear();
-          if (editor.isDisposed()) {
+          if (editor.isDisposed() || mappingKeys.get(0).equals(parseKeys("<Plug>").get(0))) {
             return;
           }
           for (KeyStroke keyStroke : fromKeys) {
@@ -440,22 +441,34 @@ public class KeyHandler {
       //   However, these keys should be processed as usual when user enters "p"
       //   and the following for loop does exactly that.
       //
-      // Okay, why the first key is handler separately?
+      // Okay, look at the code below. Why is the first key handled separately?
       // Let's assume the next mappings:
       //   - map ds j
       //   - map I 2l
       // If user enters `dI`, the first `d` will be caught be this handler because it's a prefix for `ds` command.
       //  After the user enters `I`, the caught `d` should be processed without mapping and the rest of keys
       //  should be processed with mappings (to make I work)
+      //
+      // Additionally, the <Plug>mappings are not executed if the are failed to map to somethings.
+      //   E.g.
+      //   - map <Plug>iA  someAction
+      //   - map I <Plug>i
+      //   For `IA` someAction should be executed.
+      //   But if the user types `Ib`, `<Plug>i` won't be executed again. Only `b` will be passed to keyHandler.
       if (mappingKeys.isEmpty()) return false;
 
       // Well, this will always be false, but just for protection
       if (fromKeys.isEmpty()) return false;
       final List<KeyStroke> unhandledKeys = new ArrayList<>(fromKeys);
       mappingKeys.clear();
-      handleKey(editor, unhandledKeys.get(0), context, false);
-      for (KeyStroke keyStroke : unhandledKeys.subList(1, unhandledKeys.size())) {
-        handleKey(editor, keyStroke, context, true);
+
+      if (unhandledKeys.get(0).equals(parseKeys("<Plug>").get(0))) {
+        handleKey(editor, unhandledKeys.get(unhandledKeys.size() - 1), context);
+      } else {
+        handleKey(editor, unhandledKeys.get(0), context, false);
+        for (KeyStroke keyStroke : unhandledKeys.subList(1, unhandledKeys.size())) {
+          handleKey(editor, keyStroke, context, true);
+        }
       }
       return true;
     }

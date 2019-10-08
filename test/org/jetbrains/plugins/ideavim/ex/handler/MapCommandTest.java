@@ -333,4 +333,13 @@ public class MapCommandTest extends VimTestCase {
     typeText(parseKeys("dI"));
     myFixture.checkResult("123<caret>7890");
   }
+
+
+  public void testIncompleteMapping() {
+    configureByText("123<caret>4567890");
+    typeText(commandToKeys("map <Plug>(Hi)l lll"));
+    typeText(commandToKeys("map I <Plug>(Hi)"));
+    typeText(parseKeys("Ih"));
+    myFixture.checkResult("12<caret>34567890");
+  }
 }
