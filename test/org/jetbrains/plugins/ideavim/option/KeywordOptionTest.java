@@ -143,4 +143,18 @@ public class KeywordOptionTest extends VimTestCase {
   public void testMultibyteCharactersAreKeywords() throws ExException {
     assertIsKeyword('Ź');
   }
+
+  public void testToRegex() {
+    setKeyword("=-,a-c");
+    final List<String> res = option.toRegex();
+    assertEquals(2, res.size());
+    assertTrue(res.contains("-"));
+    assertTrue(res.contains("[a-c]"));
+  }
+
+  public void testAllLettersToRegex() {
+    setKeyword("=@");
+    final List<String> res = option.toRegex();
+    assertEquals(res.get(0), "\\p{L}");
+  }
 }

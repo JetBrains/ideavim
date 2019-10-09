@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public final class KeywordOption extends ListOption {
   @NotNull private final Pattern validationPattern;
@@ -183,6 +184,18 @@ public final class KeywordOption extends ListOption {
       }
     }
     return false;
+  }
+
+  public List<String> toRegex() {
+    return keywordSpecs.stream().map(spec -> {
+      if (spec.isAllLetters) {
+        return "\\p{L}";
+      } else if (spec.isRange) {
+        return "[" + (char)spec.rangeLow.intValue() + "-" + (char)spec.rangeHigh.intValue() + "]";
+      } else {
+        return (char)spec.rangeLow.intValue() + "";
+      }
+    }).collect(Collectors.toList());
   }
 
   private static final class KeywordSpec {
