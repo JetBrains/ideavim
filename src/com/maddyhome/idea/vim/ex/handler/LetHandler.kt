@@ -66,6 +66,6 @@ class LetHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
   }
 
   companion object {
-    private val SIMPLE_ASSIGNMENT = Pattern.compile("([A-Za-z_][A-Za-z_0-9]*)[ \\t]*=[ \\t]*(.*)")
+    private val SIMPLE_ASSIGNMENT = Pattern.compile("((?:[gswtblav]:)?[A-Za-z_][A-Za-z_0-9]*)[ \\t]*=[ \\t]*(.*)")
   }
 }
