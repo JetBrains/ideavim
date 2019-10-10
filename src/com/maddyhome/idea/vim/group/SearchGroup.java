@@ -95,6 +95,12 @@ public class SearchGroup {
     return lastSearch;
   }
 
+  // This method is used in AceJump integration plugin
+  @SuppressWarnings("unused")
+  public int getLastDir() {
+    return lastDir;
+  }
+
   @Nullable
   public String getLastPattern() {
     return lastPattern;
