@@ -186,6 +186,7 @@ public final class KeywordOption extends ListOption {
     return false;
   }
 
+  // This function is used in AceJump integration plugin
   public List<String> toRegex() {
     return keywordSpecs.stream().map(spec -> {
       if (spec.isAllLetters) {
