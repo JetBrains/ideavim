@@ -115,8 +115,10 @@ public class SearchGroup {
     VimPlugin.getHistory().addEntry(HistoryGroup.SEARCH, lastPattern);
   }
 
+  // This method should not be private because it's used in external plugins
+  @SuppressWarnings("WeakerAccess")
   @NotNull
-  private static List<TextRange> findAll(@NotNull Editor editor,
+  public static List<TextRange> findAll(@NotNull Editor editor,
                                          @NotNull String pattern,
                                          int startLine,
                                          int endLine,
