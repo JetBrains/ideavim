@@ -53,11 +53,17 @@ public class CommandState {
   @NotNull private final List<KeyStroke> myMappingKeys = new ArrayList<>();
   @NotNull private final Timer myMappingTimer;
 
+  /**
+   * The last command executed
+   */
   @Nullable private Command myCommand;
   private EnumSet<CommandFlags> myFlags = EnumSet.noneOf(CommandFlags.class);
   private boolean myIsRecording = false;
-  @NotNull private DigraphSequence digraphSequence = new DigraphSequence();
   private boolean dotRepeatInProgress = false;
+
+  // State used to build the next command
+  @NotNull private DigraphSequence digraphSequence = new DigraphSequence();
+  @NotNull private final List<KeyStroke> keys = new ArrayList<>();
   private int count = 0;
 
   private CommandState() {
@@ -159,6 +165,14 @@ public class CommandState {
     return myMappingKeys;
   }
 
+  public List<KeyStroke> getKeys() {
+    return keys;
+  }
+
+  public void addKey(KeyStroke keyStroke) {
+    keys.add(keyStroke);
+  }
+
   public void startMappingTimer(@NotNull ActionListener actionListener) {
     final NumberOption timeoutLength = OptionsManager.INSTANCE.getTimeoutlen();
     myMappingTimer.setInitialDelay(timeoutLength.value());
@@ -251,6 +265,7 @@ public class CommandState {
   public void reset() {
     myCommand = null;
     myStates.clear();
+    keys.clear();
     updateStatus();
     startDigraphSequence();
     count = 0;

@@ -244,7 +244,7 @@ public class KeyHandler {
     // to an entered command. Let's figure out which it is
     else {
       // For debugging purposes we track the keys entered for this command
-      keys.add(key);
+      editorState.addKey(key);
 
       if (handleDigraph(editor, key, context, editorState)) return;
 
@@ -694,7 +694,7 @@ public class KeyHandler {
                                  CommandState editorState) {
     // The user entered a valid command. Create the command and add it to the stack
     final EditorActionHandlerBase myAction = node.getActionHolder().getAction();
-    Command cmd = new Command(editorState.getCount(), myAction, myAction.getType(), myAction.getFlags(), keys);
+    Command cmd = new Command(editorState.getCount(), myAction, myAction.getType(), myAction.getFlags(), editorState.getKeys());
     currentCmd.push(cmd);
 
     if (currentArg != null && !checkArgumentCompatibility(node)) return;
@@ -722,7 +722,7 @@ public class KeyHandler {
       currentCmd.pop();
 
       Argument arg = new Argument(text);
-      cmd = new Command(editorState.getCount(), action, action.getType(), action.getFlags(), keys);
+      cmd = new Command(editorState.getCount(), action, action.getType(), action.getFlags(), editorState.getKeys());
       cmd.setArgument(arg);
       currentCmd.push(cmd);
       CommandState.getInstance(editor).popState();
@@ -789,11 +789,11 @@ public class KeyHandler {
    * @param editor The editor to reset.
    */
   public void partialReset(@Nullable Editor editor) {
-    keys = new ArrayList<>();
     CommandState editorState = CommandState.getInstance(editor);
     editorState.setCount(0);
     editorState.stopMappingTimer();
     editorState.getMappingKeys().clear();
+    editorState.getKeys().clear();
     editorState.setCurrentNode(VimPlugin.getKey().getKeyRoot(editorState.getMappingMode()));
   }
 
@@ -939,7 +939,6 @@ public class KeyHandler {
   private static KeyHandler instance;
 
   // TODO: All of this state needs to be per-editor
-  private List<KeyStroke> keys = new ArrayList<>();
   private State state = State.NEW_COMMAND;
   @NotNull private final Stack<Command> currentCmd = new Stack<>();
   @Nullable private Argument.Type currentArg;
