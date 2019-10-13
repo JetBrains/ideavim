@@ -59,6 +59,10 @@ public class ProcessGroup {
     panel.activate(editor, context, label, initText, count);
   }
 
+  public boolean isForwardSearch() {
+    return ExEntryPanel.getInstance().getLabel().equals("/");
+  }
+
   @NotNull
   public String endSearchCommand(@NotNull final Editor editor) {
     ExEntryPanel panel = ExEntryPanel.getInstance();

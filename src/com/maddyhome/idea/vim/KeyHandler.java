@@ -711,7 +711,7 @@ public class KeyHandler {
     // TODO In the name of God, get rid of EX_STRING, FLAG_COMPLETE_EX and all the related staff
     if (currentArg == Argument.Type.EX_STRING && myAction.getFlags().contains(CommandFlags.FLAG_COMPLETE_EX)) {
       EditorActionHandlerBase action;
-      if (forwardSearch) {
+      if (VimPlugin.getProcess().isForwardSearch()) {
         action = new SearchEntryFwdAction();
       }
       else {
@@ -752,8 +752,6 @@ public class KeyHandler {
         editorState.pushState(editorState.getMode(), editorState.getSubMode(), MappingMode.OP_PENDING);
         break;
       case EX_STRING:
-        forwardSearch = !(action instanceof SearchEntryRevAction);
-
         VimPlugin.getProcess().startSearchCommand(editor, context, editorState.getCount(), key);
         state = State.NEW_COMMAND;
         editorState.pushState(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
@@ -942,6 +940,4 @@ public class KeyHandler {
   private State state = State.NEW_COMMAND;
   @NotNull private final Stack<Command> currentCmd = new Stack<>();
   @Nullable private Argument.Type currentArg;
-
-  private boolean forwardSearch = true;
 }
