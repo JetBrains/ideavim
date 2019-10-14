@@ -50,15 +50,16 @@ public class CommandState {
   @NotNull private final Stack<State> myStates = new Stack<>();
   @NotNull private final State myDefaultState = new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
   @NotNull private CommandPartNode myCurrentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
-  @NotNull private final List<KeyStroke> myMappingKeys = new ArrayList<>();
+  @Nullable private Argument.Type myCurrentArgumentType;
   @NotNull private final Timer myMappingTimer;
+  @NotNull private final List<KeyStroke> myMappingKeys = new ArrayList<>();
+  private boolean myIsRecording = false;
 
   /**
    * The last command executed
    */
   @Nullable private Command myCommand;
   private EnumSet<CommandFlags> myFlags = EnumSet.noneOf(CommandFlags.class);
-  private boolean myIsRecording = false;
   private boolean dotRepeatInProgress = false;
 
   // State used to build the next command
@@ -297,6 +298,15 @@ public class CommandState {
 
   public void setCurrentNode(@NotNull CommandPartNode currentNode) {
     this.myCurrentNode = currentNode;
+  }
+
+  @Nullable
+  public Argument.Type getCurrentArgumentType() {
+    return myCurrentArgumentType;
+  }
+
+  public void setCurrentArgumentType(Argument.Type argumentType) {
+    myCurrentArgumentType = argumentType;
   }
 
   public String toSimpleString() {

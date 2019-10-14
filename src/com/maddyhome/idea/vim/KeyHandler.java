@@ -237,7 +237,7 @@ public class KeyHandler {
     }
     // If we got this far the user is entering a command or supplying an argument to an entered command.
     // First let's check to see if we are at the point of expecting a single character argument to a command.
-    else if (currentArg == Argument.Type.CHARACTER) {
+    else if (editorState.getCurrentArgumentType() == Argument.Type.CHARACTER) {
       handleCharArgument(key, chKey);
     }
     // If we are this far, then the user must be entering a command or a non-single-character argument
@@ -332,7 +332,7 @@ public class KeyHandler {
   }
 
   private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull final DataContext context, CommandState editorState) {
-    if (editorState.getCount() == 0 && currentArg == null && currentCmd.size() == 0) {
+    if (editorState.getCount() == 0 && editorState.getCurrentArgumentType() == null && currentCmd.size() == 0) {
       RegisterGroup register = VimPlugin.getRegister();
       if (register.getCurrentRegister() == register.getDefaultRegister()) {
         if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -528,8 +528,8 @@ public class KeyHandler {
     // See `:help N<Del>`
     return (editorState.getMode() == CommandState.Mode.COMMAND || editorState.getMode() == CommandState.Mode.VISUAL) &&
            state == State.NEW_COMMAND &&
-           currentArg != Argument.Type.CHARACTER &&
-           currentArg != Argument.Type.DIGRAPH &&
+           editorState.getCurrentArgumentType() != Argument.Type.CHARACTER &&
+           editorState.getCurrentArgumentType() != Argument.Type.DIGRAPH &&
            key.getKeyCode() == KeyEvent.VK_DELETE &&
            editorState.getCount() != 0;
   }
@@ -569,8 +569,8 @@ public class KeyHandler {
   private boolean isCommandCount(char chKey, @NotNull CommandState editorState) {
     return (editorState.getMode() == CommandState.Mode.COMMAND || editorState.getMode() == CommandState.Mode.VISUAL) &&
            state == State.NEW_COMMAND &&
-           currentArg != Argument.Type.CHARACTER &&
-           currentArg != Argument.Type.DIGRAPH &&
+           editorState.getCurrentArgumentType() != Argument.Type.CHARACTER &&
+           editorState.getCurrentArgumentType() != Argument.Type.DIGRAPH &&
            Character.isDigit(chKey) &&
            (editorState.getCount() != 0 || chKey != '0');
   }
@@ -584,7 +584,7 @@ public class KeyHandler {
     // Normally, we start the sequence (in Insert or CmdLine mode) through a VimAction that can be mapped. Our
     // VimActions don't work as arguments for operators, so we have to special case here. Helpfully, Vim appears to
     // hardcode the shortcuts, and doesn't support mapping, so everything works nicely.
-    if (currentArg == Argument.Type.DIGRAPH) {
+    if (editorState.getCurrentArgumentType() == Argument.Type.DIGRAPH) {
       if (DigraphSequence.isDigraphStart(key)) {
         editorState.startDigraphSequence();
         return true;
@@ -602,8 +602,8 @@ public class KeyHandler {
         return true;
 
       case DigraphResult.RES_DONE:
-        if (currentArg == Argument.Type.DIGRAPH) {
-          currentArg = Argument.Type.CHARACTER;
+        if (editorState.getCurrentArgumentType() == Argument.Type.DIGRAPH) {
+          editorState.setCurrentArgumentType(Argument.Type.CHARACTER);
         }
         final KeyStroke stroke = res.getStroke();
         if (stroke == null) {
@@ -613,8 +613,8 @@ public class KeyHandler {
         return true;
 
       case DigraphResult.RES_UNHANDLED:
-        if (currentArg == Argument.Type.DIGRAPH) {
-          currentArg = Argument.Type.CHARACTER;
+        if (editorState.getCurrentArgumentType() == Argument.Type.DIGRAPH) {
+          editorState.setCurrentArgumentType(Argument.Type.CHARACTER);
           handleKey(editor, key, context);
           return true;
         }
@@ -697,19 +697,19 @@ public class KeyHandler {
     Command cmd = new Command(editorState.getCount(), myAction, myAction.getType(), myAction.getFlags(), editorState.getKeys());
     currentCmd.push(cmd);
 
-    if (currentArg != null && !checkArgumentCompatibility(node)) return;
+    if (editorState.getCurrentArgumentType() != null && !checkArgumentCompatibility(node, editorState)) return;
 
     if (myAction.getArgumentType() == null || stopMacroRecord(node, editorState)) {
       state = State.READY;
     }
     else {
-      currentArg = myAction.getArgumentType();
-      startWaitingForArgument(editor, context, key.getKeyChar(), currentArg, editorState, myAction);
+      editorState.setCurrentArgumentType(node.getActionHolder().getAction().getArgumentType());
+      startWaitingForArgument(editor, context, key.getKeyChar(), editorState.getCurrentArgumentType(), editorState);
       partialReset(editor);
     }
 
     // TODO In the name of God, get rid of EX_STRING, FLAG_COMPLETE_EX and all the related staff
-    if (currentArg == Argument.Type.EX_STRING && myAction.getFlags().contains(CommandFlags.FLAG_COMPLETE_EX)) {
+    if (editorState.getCurrentArgumentType() == Argument.Type.EX_STRING && myAction.getFlags().contains(CommandFlags.FLAG_COMPLETE_EX)) {
       EditorActionHandlerBase action;
       if (VimPlugin.getProcess().isForwardSearch()) {
         action = new SearchEntryFwdAction();
@@ -737,8 +737,7 @@ public class KeyHandler {
                                        DataContext context,
                                        char key,
                                        @NotNull Argument.Type argument,
-                                       CommandState editorState,
-                                       EditorActionHandlerBase action) {
+                                       CommandState editorState) {
     switch (argument) {
       case CHARACTER:
       case DIGRAPH:
@@ -759,8 +758,8 @@ public class KeyHandler {
     }
   }
 
-  private boolean checkArgumentCompatibility(@NotNull CommandNode node) {
-    if (currentArg == Argument.Type.MOTION &&
+  private boolean checkArgumentCompatibility(@NotNull CommandNode node, @NotNull CommandState editorState) {
+    if (editorState.getCurrentArgumentType() == Argument.Type.MOTION &&
         node.getActionHolder().getAction().getType() != Command.Type.MOTION) {
       state = State.BAD_COMMAND;
       return false;
@@ -804,7 +803,8 @@ public class KeyHandler {
     partialReset(editor);
     state = State.NEW_COMMAND;
     currentCmd.clear();
-    currentArg = null;
+    CommandState editorState = CommandState.getInstance(editor);
+    editorState.setCurrentArgumentType(null);
   }
 
   /**
@@ -939,5 +939,4 @@ public class KeyHandler {
   // TODO: All of this state needs to be per-editor
   private State state = State.NEW_COMMAND;
   @NotNull private final Stack<Command> currentCmd = new Stack<>();
-  @Nullable private Argument.Type currentArg;
 }
