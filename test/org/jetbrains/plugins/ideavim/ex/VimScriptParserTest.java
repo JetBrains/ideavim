@@ -36,4 +36,11 @@ public class VimScriptParserTest extends VimTestCase {
     typeText(commandToKeys("echo s"));
     assertExOutput("foo\n");
   }
+
+  public void testLetStringLiteralEchoWithNumeric() {
+    configureByText("\n");
+    typeText(commandToKeys("let s = 100"));
+    typeText(commandToKeys("echo s"));
+    assertExOutput("100\n");
+  }
 }

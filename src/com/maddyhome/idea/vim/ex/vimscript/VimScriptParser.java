@@ -43,6 +43,7 @@ public class VimScriptParser {
   private static final Pattern DOUBLE_QUOTED_STRING = Pattern.compile("\"([^\"]*)\"");
   private static final Pattern SINGLE_QUOTED_STRING = Pattern.compile("'([^']*)'");
   private static final Pattern REFERENCE_EXPR = Pattern.compile("([A-Za-z_][A-Za-z_0-9]*)");
+  private static final Pattern DEC_NUMBER = Pattern.compile("(\\d+)");
 
   private VimScriptParser() {
   }
@@ -140,6 +141,10 @@ public class VimScriptParser {
         throw new ExException(String.format("Undefined variable: %s", name));
       }
     }
+    m = DEC_NUMBER.matcher(expression);
+    if (m.matches()) {
+      return Integer.parseInt(m.group(1));
+    }
     throw new ExException(String.format("Invalid expression: %s", expression));
   }
 
@@ -148,6 +153,8 @@ public class VimScriptParser {
     // TODO: Return meaningful value representations
     if (value instanceof String) {
       return (String)value;
+    } else if (value instanceof Integer) {
+      return value.toString();
     }
     throw new ExException(String.format("Cannot convert '%s' to string", value));
   }
