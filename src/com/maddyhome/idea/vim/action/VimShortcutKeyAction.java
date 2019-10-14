@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.helper.CommandStateHelper;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
+import com.maddyhome.idea.vim.listener.IdeaSpecifics;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
@@ -133,6 +134,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       // Workaround for smart step into
       final Key<?> SMART_STEP_INPLACE_DATA = Key.findKeyByName("SMART_STEP_INPLACE_DATA");
       if (SMART_STEP_INPLACE_DATA != null && editor.getUserData(SMART_STEP_INPLACE_DATA) != null) return false;
+      if (IdeaSpecifics.INSTANCE.aceJumpActive()) return false;
 
       final int keyCode = keyStroke.getKeyCode();
       if (LookupManager.getActiveLookup(editor) != null && !passCommandToVimWithLookup(keyStroke)) {
