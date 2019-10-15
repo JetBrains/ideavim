@@ -43,7 +43,8 @@ _Available since 0.53.1 EAP:_
 
 _To Be Released:_
 
-...
+**Fixes:**
+* [VIM-1804](https://youtrack.jetbrains.com/issue/VIM-1804) Exit insert move after toggling IdeaVim
 
 0.53, 2019-08-07
 --------------

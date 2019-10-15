@@ -27,8 +27,6 @@ import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.editor.colors.EditorFontType;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
-import com.intellij.openapi.editor.event.EditorFactoryEvent;
-import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
@@ -51,7 +49,6 @@ import java.util.List;
  * @author vlan
  */
 public class EditorGroup {
-  private static final boolean BLOCK_CURSOR_VIM_VALUE = true;
   private static final boolean ANIMATED_SCROLLING_VIM_VALUE = false;
   private static final boolean REFRAIN_FROM_SCROLLING_VIM_VALUE = true;
 
@@ -69,22 +66,14 @@ public class EditorGroup {
   };
 
   public void turnOn() {
-    setCursors(BLOCK_CURSOR_VIM_VALUE);
-    setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
-    setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
-
     for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
-      initLineNumbers(editor);
+      VimPlugin.getEditor().editorCreated(editor);
     }
   }
 
   public void turnOff() {
-    setCursors(isBlockCursor);
-    setAnimatedScrolling(isAnimatedScrolling);
-    setRefrainFromScrolling(isRefrainFromScrolling);
-
     for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
-      deinitLineNumbers(editor, false);
+      VimPlugin.getEditor().editorDeinit(editor, false);
     }
   }
 
@@ -210,29 +199,6 @@ public class EditorGroup {
     }
   }
 
-  private void setCursors(boolean isBlock) {
-    Editor[] editors = EditorFactory.getInstance().getAllEditors();
-    for (Editor editor : editors) {
-      // Vim plugin should be turned on in insert mode
-      ((EditorEx)editor).setInsertMode(true);
-      editor.getSettings().setBlockCursor(isBlock);
-    }
-  }
-
-  private void setAnimatedScrolling(boolean isOn) {
-    Editor[] editors = EditorFactory.getInstance().getAllEditors();
-    for (Editor editor : editors) {
-      editor.getSettings().setAnimatedScrolling(isOn);
-    }
-  }
-
-  private void setRefrainFromScrolling(boolean isOn) {
-    Editor[] editors = EditorFactory.getInstance().getAllEditors();
-    for (Editor editor : editors) {
-      editor.getSettings().setRefrainFromScrolling(isOn);
-    }
-  }
-
   public void saveData(@NotNull Element element) {
     final Element editor = new Element("editor");
     element.addContent(editor);
@@ -273,8 +239,7 @@ public class EditorGroup {
     }
   }
 
-  public void editorCreated(@NotNull EditorFactoryEvent event) {
-    final Editor editor = event.getEditor();
+  public void editorCreated(@NotNull Editor editor) {
     isBlockCursor = editor.getSettings().isBlockCursor();
     isAnimatedScrolling = editor.getSettings().isAnimatedScrolling();
     isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
@@ -294,11 +259,11 @@ public class EditorGroup {
     editor.getSettings().setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
   }
 
-  public void editorReleased(@NotNull EditorFactoryEvent event) {
-    final Editor editor = event.getEditor();
-    deinitLineNumbers(editor, true);
+  public void editorDeinit(@NotNull Editor editor, boolean isReleased) {
+    deinitLineNumbers(editor, isReleased);
     UserDataManager.unInitializeEditor(editor);
     VimPlugin.getKey().unregisterShortcutKeys(editor);
+    editor.getSettings().setBlockCursor(isBlockCursor);
     editor.getSettings().setAnimatedScrolling(isAnimatedScrolling);
     editor.getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
     DocumentManager.getInstance().removeListeners(editor.getDocument());

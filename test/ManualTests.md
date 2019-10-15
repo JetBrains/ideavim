@@ -92,3 +92,20 @@ Caret stays in _block_ shape with a normal mode
 
 ![](resources/manualTests/7.1.gif)
 ![](resources/manualTests/7.2.gif)
+
+
+## #7 [Last run: 15-10-2019]
+
+_Action:_  
+Turn emulation off and on
+
+_Result:_  
+Vim emulator works as expected
+
+## #8 [Last run: 15-10-2019]
+
+_Action:_  
+Start up IJ with disabled emulator, turn it on
+
+_Result:_  
+Vim emulator works as expected
