@@ -45,6 +45,7 @@ _To Be Released:_
 
 **Fixes:**
 * [VIM-1804](https://youtrack.jetbrains.com/issue/VIM-1804) Exit insert move after toggling IdeaVim
+* [VIM-1749](https://youtrack.jetbrains.com/issue/VIM-1749) Tag surround is finished on `>`
 
 0.53, 2019-08-07
 --------------

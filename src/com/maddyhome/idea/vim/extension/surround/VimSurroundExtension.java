@@ -113,7 +113,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
 
   @Nullable
   private static Pair<String, String> inputTagPair(@NotNull Editor editor) {
-    final String tagInput = inputString(editor, "<");
+    final String tagInput = inputString(editor, "<", '>');
     final Matcher matcher = tagNameAndAttributesCapturePattern.matcher(tagInput);
 
     if (matcher.find()) {
@@ -131,7 +131,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     @NotNull Editor editor,
     boolean withInternalSpaces
   ) {
-    final String functionNameInput = inputString(editor, "function: ");
+    final String functionNameInput = inputString(editor, "function: ", null);
 
     if (functionNameInput.isEmpty()) {
       return null;

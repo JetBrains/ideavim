@@ -110,17 +110,24 @@ public class VimExtensionFacade {
    * Returns a string typed in the input box similar to 'input()'.
    */
   @NotNull
-  public static String inputString(@NotNull Editor editor, @NotNull String prompt) {
+  public static String inputString(@NotNull Editor editor, @NotNull String prompt, @Nullable Character finishOn) {
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       final StringBuilder builder = new StringBuilder();
       final TestInputModel inputModel = TestInputModel.getInstance(editor);
-      for (KeyStroke key = inputModel.nextKeyStroke();
-           key != null && !StringHelper.isCloseKeyStroke(key) && key.getKeyCode() != KeyEvent.VK_ENTER;
+      KeyStroke key;
+      for (key = inputModel.nextKeyStroke();
+           key != null &&
+           !StringHelper.isCloseKeyStroke(key) &&
+           key.getKeyCode() != KeyEvent.VK_ENTER &&
+           (finishOn == null || key.getKeyChar() != finishOn);
            key = inputModel.nextKeyStroke()) {
         final char c = key.getKeyChar();
         if (c != KeyEvent.CHAR_UNDEFINED) {
           builder.append(c);
         }
+      }
+      if (finishOn != null && key != null && key.getKeyChar() == finishOn) {
+        builder.append(key.getKeyChar());
       }
       return builder.toString();
     }
@@ -135,6 +142,11 @@ public class VimExtensionFacade {
           return false;
         }
         else if (key.getKeyCode() == KeyEvent.VK_ENTER) {
+          text.set(exEntryPanel.getText());
+          exEntryPanel.deactivate(true);
+          return false;
+        } else if (finishOn != null && key.getKeyChar() == finishOn) {
+          exEntryPanel.handleKey(key);
           text.set(exEntryPanel.getText());
           exEntryPanel.deactivate(true);
           return false;
