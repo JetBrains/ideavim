@@ -86,3 +86,31 @@ tasks.register("slackEapNotification") {
     }
   }
 }
+
+ext{
+  // counter of test cases in error
+  nbTestOnError = 0
+}
+
+test {
+  // use "afterTest" hook to increment nbTestOnError   counter
+  afterTest {  desc ,  result  ->
+    if (result.getResultType().equals(TestResult.ResultType.FAILURE)){
+      nbTestOnError++
+    }
+  }
+}
+
+task('teamCityReport') {
+  // consider this task "UP TO DATE" if `test` task did not execute
+  outputs.upToDateWhen {
+    !test.didWork
+  }
+  doLast {
+    def result = nbTestOnError > 0 ? 'FAILURE' : 'SUCCESS'
+    println "##teamcity[buildStatus status='$result' text='{build.status.text} $ideaVersion']"
+  }
+}
+
+// create "finalized by" dependency
+test.finalizedBy teamCityReport
