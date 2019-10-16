@@ -482,7 +482,7 @@
   </extensions>
 
   <actions>
-    <action id="VimPluginToggle" class="com.maddyhome.idea.vim.action.VimPluginToggleAction" text="Vim Emulator" description="Toggle the vim plugin On/off">
+    <action id="VimPluginToggle" class="com.maddyhome.idea.vim.action.VimPluginToggleAction" text="Vim Emulator" description="Toggle the vim plugin On/off" icon="VimIcons.IDEAVIM">
       <keyboard-shortcut first-keystroke="control alt V" keymap="$default"/>
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>
