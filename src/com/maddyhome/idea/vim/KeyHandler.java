@@ -38,6 +38,7 @@ import com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction;
 import com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
+import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
@@ -47,7 +48,6 @@ import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.option.OptionsManager;
-import kotlin.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -324,6 +324,7 @@ public class KeyHandler {
       }
     }
     reset(editor);
+    ChangeGroup.resetCaret(editor, false);
   }
 
   private boolean handleKeyMapping(@NotNull final Editor editor,
