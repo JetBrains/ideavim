@@ -21,9 +21,7 @@ import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationListener;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
@@ -367,6 +365,8 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     if (enabled) {
       getInstance().turnOnPlugin();
     }
+
+    StatusBarIcon.INSTANCE.update();
   }
 
   public static boolean isError() {

@@ -70,6 +70,8 @@
 
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
+
+    <statusBarWidgetProvider implementation="com.maddyhome.idea.vim.StatusBarIconProvider"/>
   </extensions>
 
   <extensions defaultExtensionNs="IdeaVIM">

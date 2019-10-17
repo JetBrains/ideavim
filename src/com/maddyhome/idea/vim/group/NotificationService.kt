@@ -12,6 +12,7 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
+import com.intellij.openapi.application.ex.ApplicationManagerEx
 import com.intellij.openapi.keymap.Keymap
 import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.options.ShowSettingsUtil
@@ -81,22 +82,6 @@ class NotificationService(private val project: Project?) {
     notification.notify(project)
   }
 
-  private fun createIdeaVimRcManually(message: String) {
-    val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, message, NotificationType.WARNING)
-    var actionName = if (SystemInfo.isMac) "Reveal Home in Finder" else "Show Home in " + ShowFilePathAction.getFileManagerName()
-    if (!File(System.getProperty("user.home")).exists()) {
-      actionName = ""
-    }
-    notification.addAction(object : AnAction(actionName) {
-      override fun actionPerformed(e: AnActionEvent) {
-        val homeDir = File(System.getProperty("user.home"))
-        ShowFilePathAction.openDirectory(homeDir)
-        notification.expire()
-      }
-    })
-    notification.notify(project)
-  }
-
   fun enableRepeatingMode() = Messages.showYesNoDialog("Do you want to enable repeating keys in Mac OS X on press and hold?\n\n" +
     "(You can do it manually by running 'defaults write -g " +
     "ApplePressAndHoldEnabled 0' in the console).", IDEAVIM_NOTIFICATION_TITLE,
@@ -143,7 +128,37 @@ class NotificationService(private val project: Project?) {
       listener).notify(project)
   }
 
-  private inner class OpenIdeaVimRcAction(val notification: Notification) : AnAction("Open ~/.ideavimrc") {
+  fun notifyFailedToDownloadEap() {
+    Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+      """Failed to update IdeaVim to EAP version. Please update the plugin manually.""",
+      NotificationType.ERROR).notify(project)
+  }
+
+  fun notifySubscribedToEap() {
+    Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+      """You are successfully subscribed to IdeaVim EAP releases.""",
+      NotificationType.INFORMATION).notify(project)
+  }
+
+  fun notifyEapDownloaded() {
+    val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+      """IdeaVim EAP will be installed after restart.""",
+      NotificationType.INFORMATION)
+    notification.addAction(object : AnAction("Restart") {
+      override fun actionPerformed(e: AnActionEvent) {
+        ApplicationManagerEx.getApplicationEx().restart(true)
+      }
+    })
+    notification.notify(project)
+  }
+
+  fun notifyEapFinished() {
+    Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+      """You have finished Early Access Program. Please reinstall IdeaVim to get the stable version.""",
+      NotificationType.INFORMATION).notify(project)
+  }
+
+  class OpenIdeaVimRcAction(private val notification: Notification?) : AnAction("Open ~/.ideavimrc") {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project
       if (eventProject != null) {
@@ -154,8 +169,8 @@ class NotificationService(private val project: Project?) {
           return
         }
       }
-      notification.expire()
-      createIdeaVimRcManually("Cannot create configuration file.<br/>Please create <code>~/.ideavimrc</code> manually")
+      notification?.expire()
+      createIdeaVimRcManually("Cannot create configuration file.<br/>Please create <code>~/.ideavimrc</code> manually", eventProject)
     }
   }
 
@@ -175,7 +190,7 @@ class NotificationService(private val project: Project?) {
         }
       }
       notification.expire()
-      createIdeaVimRcManually("Option is enabled, but the file is not modified<br/>Please modify <code>~/.ideavimrc</code> manually")
+      createIdeaVimRcManually("Option is enabled, but the file is not modified<br/>Please modify <code>~/.ideavimrc</code> manually", project)
     }
   }
 
@@ -192,5 +207,21 @@ class NotificationService(private val project: Project?) {
     const val IDEAVIM_NOTIFICATION_TITLE = "IdeaVim"
     const val ideajoinExamplesUrl = "https://github.com/JetBrains/ideavim/wiki/%60ideajoin%60-examples"
     const val selectModeUrl = "https://vimhelp.org/visual.txt.html#Select-mode"
+
+    private fun createIdeaVimRcManually(message: String, project: Project?) {
+      val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, message, NotificationType.WARNING)
+      var actionName = if (SystemInfo.isMac) "Reveal Home in Finder" else "Show Home in " + ShowFilePathAction.getFileManagerName()
+      if (!File(System.getProperty("user.home")).exists()) {
+        actionName = ""
+      }
+      notification.addAction(object : AnAction(actionName) {
+        override fun actionPerformed(e: AnActionEvent) {
+          val homeDir = File(System.getProperty("user.home"))
+          ShowFilePathAction.openDirectory(homeDir)
+          notification.expire()
+        }
+      })
+      notification.notify(project)
+    }
   }
 }
