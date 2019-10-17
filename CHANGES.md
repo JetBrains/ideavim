@@ -43,6 +43,9 @@ _Available since 0.53.1 EAP:_
 
 _To Be Released:_
 
+**Features:**
+* Add IdeaVim icon to status bar ([VIM-943](https://youtrack.jetbrains.com/issue/VIM-943))
+
 **Fixes:**
 * [VIM-1804](https://youtrack.jetbrains.com/issue/VIM-1804) Exit insert move after toggling IdeaVim
 * [VIM-1749](https://youtrack.jetbrains.com/issue/VIM-1749) Tag surround is finished on `>`
