@@ -82,7 +82,8 @@ private object StatusBarIcon : StatusBarWidget, StatusBarWidget.IconPresentation
     popup.show(component)
   }
 
-  override fun getPresentation(): StatusBarWidget.WidgetPresentation? = this
+  // TODO [VERSION UPDATE] After 193 use `getPresentation()`
+  override fun getPresentation(type: StatusBarWidget.PlatformType): StatusBarWidget.WidgetPresentation? = this
 
   private fun getActions(component: Component): DefaultActionGroup {
     val actionGroup = DefaultActionGroup()
@@ -220,11 +221,11 @@ private object JoinEap : AnAction() {
           "IdeaVim $version EAP", "Yes", "Install without restart", "Cancel", null)
         when (res) {
           Messages.YES -> updatePlugin(project, downloader) { updated ->
-              if (updated) {
-                ApplicationManagerEx.getApplicationEx().restart(true)
-              } else {
-                notificator.notifyFailedToDownloadEap()
-              }
+            if (updated) {
+              ApplicationManagerEx.getApplicationEx().restart(true)
+            } else {
+              notificator.notifyFailedToDownloadEap()
+            }
           }
           Messages.NO -> updatePlugin(project, downloader) { notificator.notifyEapDownloaded() }
           else -> notificator.notifySubscribedToEap()
