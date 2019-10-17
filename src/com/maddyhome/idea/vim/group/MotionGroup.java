@@ -1279,6 +1279,16 @@ public class MotionGroup {
       if (lastColumnCurrentLine != pos.column) {
         col = pos.column;
       }
+
+      // Inline hints are counted as 1 in visual position. So, to keep the correct column
+      //   we decrease the column by the number of inline hints
+      int startOffset = editor.getDocument().getLineStartOffset(logicalPosition.line);
+      int inlineElements =
+        editor.getInlayModel().getInlineElementsInRange(startOffset, caret.getOffset()).size();
+      if (inlineElements > 0) {
+        col = Math.max(0, col - inlineElements);
+      }
+
       final int normalizedCol = EditorHelper
         .normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
       VisualPosition newPos = new VisualPosition(line, normalizedCol);

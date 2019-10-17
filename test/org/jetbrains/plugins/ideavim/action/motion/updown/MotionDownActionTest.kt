@@ -20,6 +20,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
+import com.intellij.codeInsight.daemon.impl.HintRenderer
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -82,5 +83,37 @@ class MotionDownActionTest : VimTestCase() {
             ${c}all rocks and lavender and tufted grass,
         """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun `test with inlays`() {
+    val keys = parseKeys("j")
+    val before = """
+            I found it in a ${c}legendary land
+            all rocks and lavender and tufted grass,
+        """.trimIndent()
+    val after = """
+            I found it in a legendary land
+            all rocks and la${c}vender and tufted grass,
+        """.trimIndent()
+    configureByText(before)
+    myFixture.editor.inlayModel.addInlineElement(2, HintRenderer("Hello"))
+    typeText(keys)
+    myFixture.checkResult(after)
+  }
+
+  fun `test with inlays 2`() {
+    val keys = parseKeys("j")
+    val before = """
+            I found it in a ${c}legendary land
+            all rocks and lavender and tufted grass,
+        """.trimIndent()
+    val after = """
+            I found it in a legendary land
+            all rocks and la${c}vender and tufted grass,
+        """.trimIndent()
+    configureByText(before)
+    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    typeText(keys)
+    myFixture.checkResult(after)
   }
 }
