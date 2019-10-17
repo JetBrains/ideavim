@@ -298,6 +298,7 @@ object VimListenerManager {
 
   private object EditorMouseHandler : EditorMouseListener, EditorMouseMotionListener {
     private var mouseDragging = false
+    private var cutOffFixed = false
 
     override fun mouseDragged(e: EditorMouseEvent) {
       if (!mouseDragging) {
@@ -314,6 +315,21 @@ object VimListenerManager {
       }
       if (mouseDragging && e.editor.caretModel.primaryCaret.hasSelection()) {
         ChangeGroup.resetCaret(e.editor, true)
+
+        if (!cutOffFixed && ComponentMouseListener.cutOffEnd) {
+          cutOffFixed = true
+          SelectionVimListenerSuppressor.lock().use {
+            e.editor.caretModel.primaryCaret.let { caret ->
+              if (caret.selectionEnd == e.editor.document.getLineEndOffset(caret.logicalPosition.line) - 1
+                && caret.leadSelectionOffset == caret.selectionEnd) {
+                // A small but important customization. Because IdeaVim doesn't allow to put the caret on the line end,
+                //   the selection can omit the last character if the selection was started in the middle on the
+                //   last character in line and has a negative direction.
+                caret.setSelection(caret.selectionStart, caret.selectionEnd + 1)
+              }
+            }
+          }
+        }
       }
     }
 
@@ -337,6 +353,7 @@ object VimListenerManager {
         }
 
         mouseDragging = false
+        cutOffFixed = false
       }
     }
 
@@ -380,6 +397,9 @@ object VimListenerManager {
   }
 
   private object ComponentMouseListener : MouseAdapter() {
+
+    var cutOffEnd = false
+
     override fun mousePressed(e: MouseEvent?) {
       val editor = (e?.component as? EditorComponentImpl)?.editor ?: return
       val predictedMode = VimPlugin.getVisualMotion().predictMode(editor, VimListenerManager.SelectionSource.MOUSE)
@@ -389,11 +409,14 @@ object VimListenerManager {
             editor.caretModel.runForEachCaret { caret ->
               val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
               val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
-              if (caret.offset == lineEnd && lineEnd != lineStart) {
+              cutOffEnd = if (caret.offset == lineEnd && lineEnd != lineStart) {
                 caret.moveToOffset(caret.offset - 1)
+                true
+              } else {
+                false
               }
             }
-          }
+          } else cutOffEnd = false
         }
         2 -> moveCaretOneCharLeftFromSelectionEnd(editor, predictedMode)
       }
