@@ -116,4 +116,100 @@ class MotionDownActionTest : VimTestCase() {
     typeText(keys)
     myFixture.checkResult(after)
   }
+
+  fun `test with inlays 3`() {
+    val keys = parseKeys("j")
+    val before = """
+            I found it in a ${c}legendary land
+            all rocks and lavender and tufted grass,
+        """.trimIndent()
+    val after = """
+            I found it in a legendary land
+            all rocks and la${c}vender and tufted grass,
+        """.trimIndent()
+    configureByText(before)
+    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    typeText(keys)
+    myFixture.checkResult(after)
+  }
+
+  fun `test with inlays 4`() {
+    val keys = parseKeys("j")
+    val before = """
+            I found it in a legendary ${c}land
+            all rocks and lavender
+        """.trimIndent()
+    val after = """
+            I found it in a legendary land
+            all rocks and lavende${c}r
+        """.trimIndent()
+    configureByText(before)
+    myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    typeText(keys)
+    myFixture.checkResult(after)
+  }
+
+  fun `test with inlays 5`() {
+    val keys = parseKeys("jk")
+    val before = """
+            I found it in a legendary ${c}land
+            all rocks and lavender
+        """.trimIndent()
+    val after = """
+            I found it in a legendary ${c}land
+            all rocks and lavender
+        """.trimIndent()
+    configureByText(before)
+    myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    typeText(keys)
+    myFixture.checkResult(after)
+  }
+
+  fun `test motion up down without inlays`() {
+    val keys = parseKeys("jk")
+    val before = """
+            I found ${c}it in a legendary land
+            all rocks and lavender
+        """.trimIndent()
+    val after = """
+            I found ${c}it in a legendary land
+            all rocks and lavender
+        """.trimIndent()
+    configureByText(before)
+    typeText(keys)
+    myFixture.checkResult(after)
+  }
+
+  fun `test with inlays 6`() {
+    val keys = parseKeys("j")
+    val before = """
+            I found it in a legendary ${c}land
+            all rocks and lavender
+        """.trimIndent()
+    val after = """
+            I found it in a legendary land
+            all rocks and lavende${c}r
+        """.trimIndent()
+    configureByText(before)
+    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    typeText(keys)
+    myFixture.checkResult(after)
+  }
+
+  fun `test with inlays 7`() {
+    val keys = parseKeys("jk")
+    val before = """
+            I found it in a legendary ${c}land
+            all rocks and lavender
+        """.trimIndent()
+    val after = """
+            I found it in a legendary ${c}land
+            all rocks and lavender
+        """.trimIndent()
+    configureByText(before)
+    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    typeText(keys)
+    myFixture.checkResult(after)
+  }
 }

@@ -52,4 +52,20 @@ object DocumentManager {
       EventFacade.getInstance().removeDocumentListener(doc, docListener)
     }
   }
+
+  fun xyz() {
+    abc(true)
+    abd(true)
+  }
+
+  fun abc(xx: Boolean) {}
+  fun abd(xx: Boolean) {}
 }
+
+fun xyz() {
+  abc(true)
+  abd(true)
+}
+
+fun abc(xx: Boolean) {}
+fun abd(xx: Boolean) {}

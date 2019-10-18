@@ -1271,6 +1271,7 @@ public class MotionGroup {
       return -1;
     }
     else {
+      boolean savedColumn = true;
       int col = UserDataManager.getVimLastColumn(caret);
       int line = EditorHelper.normalizeVisualLine(editor, pos.line + count);
       final CommandState.Mode mode = CommandStateHelper.getMode(editor);
@@ -1278,25 +1279,26 @@ public class MotionGroup {
 
       if (lastColumnCurrentLine != pos.column) {
         col = pos.column;
+        savedColumn = false;
       }
 
       // Inline hints are counted as 1 in visual position. So, to keep the correct column
       //   we decrease the column by the number of inline hints
-      int startOffset = editor.getDocument().getLineStartOffset(logicalPosition.line);
-      int inlineElements =
-        editor.getInlayModel().getInlineElementsInRange(startOffset, caret.getOffset()).size();
-      if (inlineElements > 0) {
-        col = Math.max(0, col - inlineElements);
-      }
+      int curLineStartOffset = editor.getDocument().getLineStartOffset(logicalPosition.line);
+      int curInlineElements = editor.getInlayModel().getInlineElementsInRange(curLineStartOffset, caret.getOffset()).size();
 
-      final int normalizedCol = EditorHelper
+      VisualPosition newVisualPos = new VisualPosition(line, col);
+      int newOffset = EditorHelper.visualPositionToOffset(editor, newVisualPos);
+      int lineStartNewOffset = editor.getDocument().getLineStartOffset(editor.visualToLogicalPosition(newVisualPos).line);
+      int newInlineElements = editor.getInlayModel().getInlineElementsInRange(lineStartNewOffset, newOffset).size();
+
+      if (!savedColumn) col -= curInlineElements;
+
+      col = EditorHelper
         .normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
-      VisualPosition newPos = new VisualPosition(line, normalizedCol);
+      col += newInlineElements;
+      VisualPosition newPos = new VisualPosition(line, col);
 
-      if (editor.visualToLogicalPosition(newPos).line == newPos.line && editor.visualToLogicalPosition(newPos).column != newPos.column) {
-        // There is some inconsistency with parameter hints (they are counted as one column)
-        return editor.logicalPositionToOffset(new LogicalPosition(line, normalizedCol));
-      }
       return EditorHelper.visualPositionToOffset(editor, newPos);
     }
   }

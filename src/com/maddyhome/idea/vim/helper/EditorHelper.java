@@ -35,6 +35,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static java.lang.Integer.max;
+
 /**
  * This is a set of helper methods for working with editors. All line and column values are zero based.
  */
@@ -705,7 +707,10 @@ public class EditorHelper {
     final LogicalPosition logicalPosition = caret.getLogicalPosition();
     final int lastColumn = EditorHelper.lastColumnForLine(editor, logicalPosition.line, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
     if (pos.column != lastColumn) {
-      return pos.column;
+      int lColumn = pos.column;
+      int startOffset = editor.getDocument().getLineStartOffset(logicalPosition.line);
+      lColumn -= max(0, editor.getInlayModel().getInlineElementsInRange(startOffset, caret.getOffset()).size());
+      return lColumn;
     } else {
       return UserDataManager.getVimLastColumn(caret);
     }
@@ -715,7 +720,15 @@ public class EditorHelper {
     VisualPosition pos = caret.getVisualPosition();
     final LogicalPosition logicalPosition = caret.getLogicalPosition();
     final int lastColumn = EditorHelper.lastColumnForLine(editor, logicalPosition.line, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
-    int targetColumn = pos.column != lastColumn ? pos.column : prevLastColumn;
+    int targetColumn;
+    if (pos.column != lastColumn) {
+      targetColumn = pos.column;
+      int startOffset = editor.getDocument().getLineStartOffset(logicalPosition.line);
+      targetColumn -= max(0, editor.getInlayModel().getInlineElementsInRange(startOffset, caret.getOffset()).size());
+    }
+    else {
+      targetColumn = prevLastColumn;
+    }
     UserDataManager.setVimLastColumn(caret, targetColumn);
   }
 
