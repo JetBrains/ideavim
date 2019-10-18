@@ -16,52 +16,40 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.helper;
+package com.maddyhome.idea.vim.helper
 
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.event.DocumentListener;
-import com.intellij.openapi.util.Key;
-import com.maddyhome.idea.vim.EventFacade;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.editor.Document
+import com.intellij.openapi.editor.event.DocumentListener
+import com.intellij.openapi.util.Key
+import com.maddyhome.idea.vim.EventFacade
+import com.maddyhome.idea.vim.group.MarkGroup
+import com.maddyhome.idea.vim.group.SearchGroup
 
-import java.util.HashSet;
+object DocumentManager {
+  private val docListeners = mutableSetOf<DocumentListener>()
+  private val LISTENER_MARKER = Key<String>("VimlistenerMarker")
 
-public class DocumentManager {
-  @NotNull
-  public static DocumentManager getInstance() {
-    return instance;
+  init {
+    docListeners += MarkGroup.MarkUpdater.INSTANCE
+    docListeners += SearchGroup.DocumentSearchListener.INSTANCE
   }
 
-  public void addDocumentListener(final DocumentListener listener) {
-    docListeners.add(listener);
-  }
+  fun addListeners(doc: Document) {
+    val marker = doc.getUserData(LISTENER_MARKER)
+    if (marker != null) return
 
-  public void addListeners(@NotNull Document doc) {
-    Object marker = doc.getUserData(LISTENER_MARKER);
-    if (marker != null) {
-      return;
-    }
-
-    doc.putUserData(LISTENER_MARKER, "foo");
-    for (DocumentListener docListener : docListeners) {
-      EventFacade.getInstance().addDocumentListener(doc, docListener);
+    doc.putUserData(LISTENER_MARKER, "foo")
+    for (docListener in docListeners) {
+      EventFacade.getInstance().addDocumentListener(doc, docListener)
     }
   }
 
-  public void removeListeners(@NotNull Document doc) {
-    Object marker = doc.getUserData(LISTENER_MARKER);
-    if (marker == null) {
-      return;
-    }
+  fun removeListeners(doc: Document) {
+    doc.getUserData(LISTENER_MARKER) ?: return
 
-    doc.putUserData(LISTENER_MARKER, null);
-    for (DocumentListener docListener : docListeners) {
-      EventFacade.getInstance().removeDocumentListener(doc, docListener);
+    doc.putUserData(LISTENER_MARKER, null)
+    for (docListener in docListeners) {
+      EventFacade.getInstance().removeDocumentListener(doc, docListener)
     }
   }
-
-
-  private static final Key<String> LISTENER_MARKER = new Key<>("listenerMarker");
-  @NotNull private final HashSet<DocumentListener> docListeners = new HashSet<>();
-  @NotNull private static final DocumentManager instance = new DocumentManager();
 }

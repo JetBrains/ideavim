@@ -49,7 +49,6 @@ import com.maddyhome.idea.vim.group.*;
 import com.maddyhome.idea.vim.group.copy.PutGroup;
 import com.maddyhome.idea.vim.group.copy.YankGroup;
 import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
-import com.maddyhome.idea.vim.helper.DocumentManager;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -304,9 +303,6 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     getSearch().turnOn();
     VimListenerManager.INSTANCE.turnOn();
 
-    // Add some listeners so we can handle special events
-    DocumentManager.getInstance().addDocumentListener(MarkGroup.MarkUpdater.INSTANCE);
-    DocumentManager.getInstance().addDocumentListener(SearchGroup.DocumentSearchListener.INSTANCE);
 
     Runnable asyncSetup = () -> {
       // Register vim actions in command mode

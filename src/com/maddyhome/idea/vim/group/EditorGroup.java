@@ -243,7 +243,7 @@ public class EditorGroup {
     isBlockCursor = editor.getSettings().isBlockCursor();
     isAnimatedScrolling = editor.getSettings().isAnimatedScrolling();
     isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
-    DocumentManager.getInstance().addListeners(editor.getDocument());
+    DocumentManager.INSTANCE.addListeners(editor.getDocument());
     VimPlugin.getKey().registerRequiredShortcutKeys(editor);
 
     initLineNumbers(editor);
@@ -266,7 +266,7 @@ public class EditorGroup {
     editor.getSettings().setBlockCursor(isBlockCursor);
     editor.getSettings().setAnimatedScrolling(isAnimatedScrolling);
     editor.getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
-    DocumentManager.getInstance().removeListeners(editor.getDocument());
+    DocumentManager.INSTANCE.removeListeners(editor.getDocument());
   }
 
   public void notifyIdeaJoin(@Nullable Project project) {
