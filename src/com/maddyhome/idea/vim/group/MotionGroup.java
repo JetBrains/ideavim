@@ -853,7 +853,7 @@ public class MotionGroup {
     }
 
     final LogicalPosition lp = new LogicalPosition(jump.getLogicalLine(), jump.getCol());
-    final String fileName = jump.getFilename();
+    final String fileName = jump.getFilepath();
     if (!vf.getPath().equals(fileName) && fileName != null) {
       final VirtualFile newFile =
         LocalFileSystem.getInstance().findFileByPath(fileName.replace(File.separatorChar, '/'));

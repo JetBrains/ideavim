@@ -47,10 +47,10 @@ class JumpsHandler : CommandHandler.SingleExecution() {
 
       text.append(" ")
       val vf = EditorHelper.getVirtualFile(editor)
-      if (vf != null && vf.path == jump.filename) {
+      if (vf != null && vf.path == jump.filepath) {
         text.append(toKeyNotation(stringToKeys(EditorHelper.getLineText(editor, jump.logicalLine).trim())))
       } else {
-        text.append(jump.filename)
+        text.append(jump.filepath)
       }
 
       text.append("\n")

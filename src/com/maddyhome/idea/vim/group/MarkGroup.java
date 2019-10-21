@@ -296,11 +296,11 @@ public class MarkGroup {
 
     LogicalPosition lp = editor.offsetToLogicalPosition(offset);
     Jump jump = new Jump(lp.line, lp.column, vf.getPath());
-    final String filename = jump.getFilename();
+    final String filename = jump.getFilepath();
 
     for (int i = 0; i < jumps.size(); i++) {
       Jump j = jumps.get(i);
-      if (filename != null && filename.equals(j.getFilename()) && j.getLogicalLine() == jump.getLogicalLine()) {
+      if (filename != null && filename.equals(j.getFilepath()) && j.getLogicalLine() == jump.getLogicalLine()) {
         jumps.remove(i);
         break;
       }
@@ -353,7 +353,7 @@ public class MarkGroup {
 
     ArrayList<Mark> list = new ArrayList<>(res);
 
-    list.sort(new Mark.KeySorter<>());
+    list.sort(Comparator.comparingInt(Mark::getKey));
 
     return list;
   }
@@ -478,15 +478,13 @@ public class MarkGroup {
 
     Element jumpsElem = new Element("jumps");
     for (Jump jump : jumps) {
-      if (!jump.isClear()) {
-        Element jumpElem = new Element("jump");
-        jumpElem.setAttribute("line", Integer.toString(jump.getLogicalLine()));
-        jumpElem.setAttribute("column", Integer.toString(jump.getCol()));
-        jumpElem.setAttribute("filename", StringUtil.notNullize(jump.getFilename()));
-        jumpsElem.addContent(jumpElem);
-        if (logger.isDebugEnabled()) {
-          logger.debug("saved jump = " + jump);
-        }
+      Element jumpElem = new Element("jump");
+      jumpElem.setAttribute("line", Integer.toString(jump.getLogicalLine()));
+      jumpElem.setAttribute("column", Integer.toString(jump.getCol()));
+      jumpElem.setAttribute("filename", StringUtil.notNullize(jump.getFilepath()));
+      jumpsElem.addContent(jumpElem);
+      if (logger.isDebugEnabled()) {
+        logger.debug("saved jump = " + jump);
       }
     }
     element.addContent(jumpsElem);
