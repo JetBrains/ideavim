@@ -49,4 +49,7 @@ interface Node
 class CommandNode(val action: EditorActionHandlerBase) : Node
 
 /** Represents a part of the command */
-class CommandPartNode : Node, HashMap<KeyStroke, Node>()
+open class CommandPartNode : Node, HashMap<KeyStroke, Node>()
+
+/** Represents a root node for the mode */
+class RootNode : CommandPartNode()

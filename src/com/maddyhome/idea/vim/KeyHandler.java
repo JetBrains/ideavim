@@ -195,7 +195,7 @@ public class KeyHandler {
       // Update the count
       count = count * 10 + (chKey - '0');
     }
-    else if (allowKeyMappings && handleKeyMapping(editor, key, context)) {
+    else if (!waitCommandFinish(editor) && allowKeyMappings && handleKeyMapping(editor, key, context)) {
       if (editorState.getMappingMode() != MappingMode.OP_PENDING ||
           currentCmd.isEmpty() ||
           currentCmd.peek().getArgument() == null ||
@@ -284,6 +284,10 @@ public class KeyHandler {
     else if (isRecording && shouldRecord) {
       VimPlugin.getRegister().recordKeyStroke(key);
     }
+  }
+
+  private boolean waitCommandFinish(@NotNull Editor editor) {
+    return !(CommandState.getInstance(editor).getCurrentNode() instanceof RootNode);
   }
 
   /**
