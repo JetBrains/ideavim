@@ -37,17 +37,18 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.common.Jump;
-import com.maddyhome.idea.vim.common.Mark;
-import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.common.*;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jdom.Element;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class contains all the mark related functionality
@@ -96,14 +97,14 @@ public class MarkGroup {
                                                   false);
       offset = EditorHelper.normalizeOffset(editor, offset, false);
       LogicalPosition lp = editor.offsetToLogicalPosition(offset);
-      mark = new Mark(ch, lp.line, lp.column, vf.getPath(), extractProtocol(vf));
+      mark = new VimMark(ch, lp.line, lp.column, vf.getPath(), extractProtocol(vf));
     }
     else if ("()".indexOf(ch) >= 0 && vf != null) {
       int offset = SearchHelper.findNextSentenceStart(editor, editor.getCaretModel().getPrimaryCaret(),
                                                       ch == '(' ? -1 : 1, false, true);
       offset = EditorHelper.normalizeOffset(editor, offset, false);
       LogicalPosition lp = editor.offsetToLogicalPosition(offset);
-      mark = new Mark(ch, lp.line, lp.column, vf.getPath(), extractProtocol(vf));
+      mark = new VimMark(ch, lp.line, lp.column, vf.getPath(), extractProtocol(vf));
     }
     // If this is a file mark, get the mark from this file
     else if (FILE_MARKS.indexOf(ch) >= 0) {
@@ -197,58 +198,54 @@ public class MarkGroup {
       return false;
     }
 
-    Mark mark = new Mark(ch, lp.line, lp.column, vf.getPath(), extractProtocol(vf));
     // File specific marks get added to the file
     if (FILE_MARKS.indexOf(ch) >= 0) {
       HashMap<Character, Mark> fmarks = getFileMarks(editor.getDocument());
-      if (fmarks == null) {
-        return false;
-      }
+      if (fmarks == null) return false;
+
+      Mark mark = new VimMark(ch, lp.line, lp.column, vf.getPath(), extractProtocol(vf));
       fmarks.put(ch, mark);
     }
     // Global marks get set to both the file and the global list of marks
     else if (GLOBAL_MARKS.indexOf(ch) >= 0) {
       HashMap<Character, Mark> fmarks = getFileMarks(editor.getDocument());
-      if (fmarks == null) {
-        return false;
+      if (fmarks == null) return false;
+
+      Bookmark systemMark = createOrGetSystemMark(ch, lp.line, editor);
+      Mark mark;
+      if (systemMark != null) {
+        mark = new IntellijMark(systemMark, lp.column, editor.getProject());
+      } else {
+        mark = new VimMark(ch, lp.line, lp.column, vf.getPath(), extractProtocol(vf));
       }
       fmarks.put(ch, mark);
       Mark oldMark = globalMarks.put(ch, mark);
-      if (oldMark != null) {
+      if (oldMark instanceof VimMark) {
         oldMark.clear();
       }
-      setSystemMark(ch, lp.line, editor);
     }
 
     return true;
   }
 
-  private void setSystemMark(char ch, int line, @NotNull Editor editor) {
-    if (!OptionsManager.INSTANCE.getIdeamarks().isSet()) return;
+  @Nullable
+  private Bookmark createOrGetSystemMark(char ch, int line, @NotNull Editor editor) {
+    if (!OptionsManager.INSTANCE.getIdeamarks().isSet()) return null;
     final Project project = editor.getProject();
-    if (project == null) return;
-    final BookmarkManager bookmarkManager = BookmarkManager.getInstance(project);
-
-    Bookmark bookmark = bookmarkManager.findEditorBookmark(editor.getDocument(), line);
-    if (bookmark != null && bookmark.getMnemonic() == ch) return;
-
-    final VirtualFile virtualFile = EditorHelper.getVirtualFile(editor);
-    if (virtualFile == null) return;
-    bookmark = bookmarkManager.addTextBookmark(virtualFile, line, "");
-    bookmarkManager.setMnemonic(bookmark, ch);
-  }
-
-  private void removeSystemMark(char ch, @NotNull Editor editor) {
-    if (!OptionsManager.INSTANCE.getIdeamarks().isSet()) return;
-    final Project project = editor.getProject();
-    if (project == null) return;
+    if (project == null) return null;
     final BookmarkManager bookmarkManager = BookmarkManager.getInstance(project);
 
     Bookmark bookmark = bookmarkManager.findBookmarkForMnemonic(ch);
-    if (bookmark != null) bookmarkManager.removeBookmark(bookmark);
+    if (bookmark != null && bookmark.getLine() == line) return bookmark;
+
+    final VirtualFile virtualFile = EditorHelper.getVirtualFile(editor);
+    if (virtualFile == null) return null;
+    bookmark = bookmarkManager.addTextBookmark(virtualFile, line, "");
+    bookmarkManager.setMnemonic(bookmark, ch);
+    return bookmark;
   }
 
-  private String extractProtocol(@NotNull VirtualFile vf) {
+  public static String extractProtocol(@NotNull VirtualFile vf) {
     return VirtualFileManager.extractProtocol(vf.getUrl());
   }
 
@@ -325,7 +322,7 @@ public class MarkGroup {
     fileMarks.clear();
   }
 
-  public void removeMark(char ch, @NotNull Mark mark, @NotNull Editor editor) {
+  public void removeMark(char ch, @NotNull Mark mark) {
     if (FILE_MARKS.indexOf(ch) >= 0) {
       HashMap fmarks = getFileMarks(mark.getFilename());
       fmarks.remove(ch);
@@ -335,7 +332,6 @@ public class MarkGroup {
       HashMap fmarks = getFileMarks(mark.getFilename());
       fmarks.remove(ch);
       globalMarks.remove(ch);
-      removeSystemMark(ch, editor);
     }
 
     mark.clear();
@@ -501,7 +497,7 @@ public class MarkGroup {
       List markList = marksElem.getChildren("mark");
       for (Object aMarkList : markList) {
         Element markElem = (Element)aMarkList;
-        Mark mark = new Mark(markElem.getAttributeValue("key").charAt(0),
+        Mark mark = new VimMark(markElem.getAttributeValue("key").charAt(0),
                              Integer.parseInt(markElem.getAttributeValue("line")),
                              Integer.parseInt(markElem.getAttributeValue("column")),
                              markElem.getAttributeValue("filename"),
@@ -535,7 +531,7 @@ public class MarkGroup {
         List markList = fileElem.getChildren("mark");
         for (Object aMarkList : markList) {
           Element markElem = (Element)aMarkList;
-          Mark mark = new Mark(markElem.getAttributeValue("key").charAt(0),
+          Mark mark = new VimMark(markElem.getAttributeValue("key").charAt(0),
                                Integer.parseInt(markElem.getAttributeValue("line")),
                                Integer.parseInt(markElem.getAttributeValue("column")),
                                filename,
@@ -591,7 +587,9 @@ public class MarkGroup {
 
       // Now analyze each mark to determine if it needs to be updated or removed
       for (Character ch : marks.keySet()) {
-        Mark mark = marks.get(ch);
+        Mark myMark = marks.get(ch);
+        if (!(myMark instanceof VimMark)) continue;
+        VimMark mark = (VimMark) myMark;
 
         if (logger.isDebugEnabled()) logger.debug("mark = " + mark);
         // If the end of the deleted text is prior to the marked line, simply shift the mark up by the
@@ -612,7 +610,7 @@ public class MarkGroup {
                                             && delStartOff == markLineStartOff;
           // If the marked line is completely within the deleted text, remove the mark (except the special case)
           if (delStartOff <= markLineStartOff && delEndOff >= markLineEndOff && !changeFromMarkLineStart) {
-            VimPlugin.getMark().removeMark(ch, mark, editor);
+            VimPlugin.getMark().removeMark(ch, mark);
             logger.debug("Removed mark");
           }
           // The deletion only covers part of the marked line so shift the mark only if the deletion begins
@@ -645,7 +643,7 @@ public class MarkGroup {
       int lines = insEnd.line - insStart.line;
       if (lines == 0) return;
 
-      for (Mark mark : marks.values()) {
+      for (VimMark mark : marks.values().stream().filter(VimMark.class::isInstance).map(VimMark.class::cast).collect(Collectors.toList())) {
         if (logger.isDebugEnabled()) logger.debug("mark = " + mark);
         // Shift the mark if the insertion began on a line prior to the marked line.
         if (insStart.line < mark.getLogicalLine()) {
@@ -734,58 +732,50 @@ public class MarkGroup {
   }
 
   public static class MarkListener implements BookmarksListener {
+
+    private WeakReference<Project> project;
+    private Bookmark bookmarkTemplate = null;
+
+    @Contract(pure = true)
+    public MarkListener(Project project) {
+      this.project = new WeakReference<>(project);
+    }
+
     @Override
     public void bookmarkAdded(@NotNull Bookmark b) {
       if (!OptionsManager.INSTANCE.getIdeamarks().isSet()) return;
-
-      if (GLOBAL_MARKS.indexOf(b.getMnemonic()) != -1) {
-        try {
-          OptionsManager.INSTANCE.getIdeamarks().reset();
-          final Editor editor = EditorHelper.getEditor(b.getFile());
-          if (editor == null) return;
-
-          final Mark existing = VimPlugin.getMark().getMark(editor, b.getMnemonic());
-          if (existing != null
-              && existing.getFilename() != null
-              && existing.getFilename().equals(b.getFile().getCanonicalPath())
-              && existing.getLogicalLine() == b.getLine()) {
-            return;
-          }
-
-          VimPlugin.getMark().setMark(editor, b.getMnemonic(),
-                                      VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, b.getLine()));
-        }
-        finally {
-          OptionsManager.INSTANCE.getIdeamarks().set();
-        }
-      }
+      bookmarkTemplate = b;
     }
 
     @Override
     public void bookmarkRemoved(@NotNull Bookmark b) {
       if (!OptionsManager.INSTANCE.getIdeamarks().isSet()) return;
 
-      if (GLOBAL_MARKS.indexOf(b.getMnemonic()) != -1) {
-        try {
-          OptionsManager.INSTANCE.getIdeamarks().reset();
-          final Editor editor = EditorHelper.getEditor(b.getFile());
-          if (editor == null) return;
-
-          final Mark mark = VimPlugin.getMark().getMark(editor, b.getMnemonic());
-          if (mark != null) VimPlugin.getMark().removeMark(b.getMnemonic(), mark, editor);
-        }
-        finally {
-          OptionsManager.INSTANCE.getIdeamarks().set();
-        }
+      char ch = b.getMnemonic();
+      if (GLOBAL_MARKS.indexOf(ch) != -1) {
+        FileMarks<Character, Mark> fmarks = VimPlugin.getMark().getFileMarks(b.getFile().getPath());
+        fmarks.remove(ch);
+        VimPlugin.getMark().globalMarks.remove(ch);
+        // No need to call mark.clear()
       }
     }
 
     @Override
     public void bookmarkChanged(@NotNull Bookmark b) {
+      /* IJ sets named marks in two steps. Firstly it creates an unnamed mark, then adds a mnemonic */
       if (!OptionsManager.INSTANCE.getIdeamarks().isSet()) return;
+      if (b != bookmarkTemplate) return;
+      bookmarkTemplate = null;
 
-      if (GLOBAL_MARKS.indexOf(b.getMnemonic()) != -1) {
-        this.bookmarkAdded(b);
+      char ch = b.getMnemonic();
+      if (GLOBAL_MARKS.indexOf(ch) != -1) {
+        int col = 0;
+        Editor editor = EditorHelper.getEditor(b.getFile());
+        if (editor != null) col = editor.getCaretModel().getCurrentCaret().getLogicalPosition().column;
+        IntellijMark mark = new IntellijMark(b, col, project.get());
+        FileMarks<Character, Mark> fmarks = VimPlugin.getMark().getFileMarks(b.getFile().getPath());
+        fmarks.put(ch, mark);
+        VimPlugin.getMark().globalMarks.put(ch, mark);
       }
     }
   }

@@ -181,7 +181,7 @@ object VimListenerManager {
   object ProjectListeners {
     fun add(project: Project) {
       val eventFacade = EventFacade.getInstance()
-      eventFacade.connectBookmarkListener(project, MarkGroup.MarkListener())
+      eventFacade.connectBookmarkListener(project, MarkGroup.MarkListener(project))
       eventFacade.connectFileEditorManagerListener(project, VimFileEditorManagerListener)
       IdeaSpecifics.addIdeaSpecificsListeners(project)
     }

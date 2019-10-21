@@ -25,7 +25,11 @@ import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.group.MarkGroup.*
+import com.maddyhome.idea.vim.group.MarkGroup.DEL_FILE_MARKS
+import com.maddyhome.idea.vim.group.MarkGroup.DEL_MARKS
+import com.maddyhome.idea.vim.group.MarkGroup.RO_GLOBAL_MARKS
+import com.maddyhome.idea.vim.group.MarkGroup.WR_GLOBAL_MARKS
+import com.maddyhome.idea.vim.group.MarkGroup.WR_REGULAR_FILE_MARKS
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 
@@ -73,7 +77,7 @@ private fun deleteMark(editor: Editor, character: Char) {
   if (character != ' ') {
     val markGroup = VimPlugin.getMark()
     val mark = markGroup.getMark(editor, character) ?: return
-    markGroup.removeMark(character, mark, editor)
+    markGroup.removeMark(character, mark)
   }
 }
 

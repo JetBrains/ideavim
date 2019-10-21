@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim;
 
+import com.intellij.ide.bookmarks.BookmarkManager;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.application.PathManager;
@@ -97,6 +98,8 @@ public abstract class VimTestCase extends UsefulTestCase {
     if (swingTimer != null) {
       swingTimer.stop();
     }
+    BookmarkManager bookmarkManager = BookmarkManager.getInstance(myFixture.getProject());
+    bookmarkManager.getValidBookmarks().forEach(bookmarkManager::removeBookmark);
     myFixture.tearDown();
     myFixture = null;
     ExEntryPanel.getInstance().deactivate(false);
