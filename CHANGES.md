@@ -44,7 +44,10 @@ _Available since 0.53.1 EAP:_
 _To Be Released:_
 
 **Features:**
-* Add IdeaVim icon to status bar ([VIM-943](https://youtrack.jetbrains.com/issue/VIM-943))
+* Add IdeaVim icon to the status bar ([VIM-943](https://youtrack.jetbrains.com/issue/VIM-943))
+
+**Changes:**
+* Remove the default IdeaVim toggle shortcut (<kbd>CTRL</kbd><kbd>ALT</kbd><kbd>V</kbd>)
 
 **Fixes:**
 * [VIM-1804](https://youtrack.jetbrains.com/issue/VIM-1804) Exit insert move after toggling IdeaVim

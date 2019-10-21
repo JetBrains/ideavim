@@ -5,7 +5,6 @@ import com.intellij.ide.DataManager
 import com.intellij.ide.plugins.InstalledPluginsState
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.ide.plugins.RepositoryHelper
-import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -143,10 +142,6 @@ class HelpLink(
 }
 
 private object VimStatusBarToggle : VimPluginToggleAction() {
-  init {
-    this.copyShortcutFrom(ActionManager.getInstance().getAction("VimPluginToggle"))
-  }
-
   override fun update(e: AnActionEvent) {
     super.update(e)
     e.presentation.text = if (VimPlugin.isEnabled()) "Disable" else "Enable"
