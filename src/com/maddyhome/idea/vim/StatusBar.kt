@@ -87,12 +87,12 @@ private object StatusBarIcon : StatusBarWidget, StatusBarWidget.IconPresentation
     val actionGroup = DefaultActionGroup()
 
     actionGroup.add(VimStatusBarToggle)
-    actionGroup.addSeparator("Settings")
+    actionGroup.addSeparator()
     actionGroup.add(NotificationService.OpenIdeaVimRcAction(null))
     actionGroup.add(ShortcutConflictsSettings)
     actionGroup.addSeparator("EAP" + if (JoinEap.eapActive()) " (Active)" else "")
     actionGroup.add(JoinEap)
-    actionGroup.add(HelpLink("About EAP", "https://github.com/JetBrains/ideavim#get-early-access", null))
+    actionGroup.add(HelpLink("About EAP...", "https://github.com/JetBrains/ideavim#get-early-access", null))
     actionGroup.addSeparator()
     actionGroup.add(Help(component))
 
@@ -143,11 +143,11 @@ class HelpLink(
 private object VimStatusBarToggle : VimPluginToggleAction() {
   override fun update(e: AnActionEvent) {
     super.update(e)
-    e.presentation.text = if (VimPlugin.isEnabled()) "Disable" else "Enable"
+    e.presentation.text = if (VimPlugin.isEnabled()) "Enabled" else "Enable"
   }
 }
 
-private object ShortcutConflictsSettings : AnAction("Shortcut Settings") {
+private object ShortcutConflictsSettings : AnAction("Settings...") {
   override fun actionPerformed(e: AnActionEvent) {
     ShowSettingsUtil.getInstance().editConfigurable(e.project, VimEmulationConfigurable())
   }
@@ -172,7 +172,7 @@ private object JoinEap : AnAction() {
     if (eapActive()) {
       e.presentation.text = "Finish EAP"
     } else {
-      e.presentation.text = "Get Early Access"
+      e.presentation.text = "Get Early Access..."
     }
   }
 
