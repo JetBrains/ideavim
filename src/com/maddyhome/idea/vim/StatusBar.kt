@@ -10,7 +10,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.application.ex.ApplicationManagerEx
-import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.progress.PerformInBackgroundOption
 import com.intellij.openapi.progress.ProgressIndicator
@@ -179,14 +178,12 @@ private object JoinEap : AnAction() {
 
   private fun checkForUpdates(project: Project?) {
     val notificator = VimPlugin.getNotifications(project)
-    val pluginDescriptor = PluginManager.getPlugin(VimPlugin.getPluginId()) ?: return
 
-    val state = InstalledPluginsState.getInstance()
     val pluginRef = Ref.create<PluginDownloader>()
 
     object : Task.Backgroundable(null, "Checking for IdeaVim EAP version", true) {
       override fun run(indicator: ProgressIndicator) {
-        val toUpdate = mutableMapOf<PluginId, PluginDownloader>()
+        val downloaders = mutableListOf<PluginDownloader>()
         val build = ApplicationInfo.getInstance().build
         for (host in RepositoryHelper.getPluginHosts()) {
           val newPluginDescriptor = RepositoryHelper
@@ -195,11 +192,9 @@ private object JoinEap : AnAction() {
             .maxWith(java.util.Comparator { o1, o2 -> VersionComparatorUtil.compare(o1.version, o2.version) })
             ?: continue
 
-          val downloader = PluginDownloader.createDownloader(newPluginDescriptor, host, build)
-          state.onDescriptorDownload(pluginDescriptor)
-          UpdateChecker.checkAndPrepareToInstall(downloader, state, toUpdate, mutableListOf(), indicator)
+          downloaders += PluginDownloader.createDownloader(newPluginDescriptor, host, build)
         }
-        val plugin = toUpdate.values.maxWith(java.util.Comparator { o1, o2 -> VersionComparatorUtil.compare(o1.pluginVersion, o2.pluginVersion) })
+        val plugin = downloaders.maxWith(java.util.Comparator { o1, o2 -> VersionComparatorUtil.compare(o1.pluginVersion, o2.pluginVersion) })
         pluginRef.set(plugin)
       }
 
@@ -208,22 +203,31 @@ private object JoinEap : AnAction() {
           notificator.notifySubscribedToEap()
           return
         }
+        val currentVersion = PluginManager.getPlugin(VimPlugin.getPluginId())?.version ?: ""
+        if (VersionComparatorUtil.compare(downloader.pluginVersion, currentVersion) <= 0) {
+          notificator.notifySubscribedToEap()
+          return
+        }
 
         val version = downloader.pluginVersion
-        @Suppress("MoveVariableDeclarationIntoWhen")
-        val res = Messages.showYesNoCancelDialog(null,
-          "Do you want to install EAP version of IdeaVim and restart the IDE to apply changes?",
-          "IdeaVim $version EAP", "Yes", "Install without restart", "Cancel", null)
+        val message = "Do you want to install the EAP version of IdeaVim and restart the IDE to apply the changes?"
+        val res = Messages.showDialog(project, message,
+          "IdeaVim $version", null, arrayOf("Yes", "Install without Restart", "Install Later", "Cancel"), 0, 2, null)
         when (res) {
-          Messages.YES -> updatePlugin(project, downloader) { updated ->
+          0 -> updatePlugin(project, downloader) { updated ->
             if (updated) {
               ApplicationManagerEx.getApplicationEx().restart(true)
             } else {
               notificator.notifyFailedToDownloadEap()
             }
           }
-          Messages.NO -> updatePlugin(project, downloader) { notificator.notifyEapDownloaded() }
-          else -> notificator.notifySubscribedToEap()
+          1 -> updatePlugin(project, downloader) { notificator.notifyEapDownloaded() }
+          2 -> notificator.notifySubscribedToEap()
+          else -> {
+            if (eapActive()) {
+              UpdateSettings.getInstance().storedPluginHosts -= EAP_LINK
+            }
+          }
         }
       }
 
@@ -242,6 +246,9 @@ private object JoinEap : AnAction() {
     return object : Task.Backgroundable(null, "Plugin Updates", true, PerformInBackgroundOption.DEAF) {
       private var updated = false
       override fun run(indicator: ProgressIndicator) {
+        val state = InstalledPluginsState.getInstance()
+        state.onDescriptorDownload(downloader.descriptor)
+        UpdateChecker.checkAndPrepareToInstall(downloader, state, mutableMapOf(VimPlugin.getPluginId() to downloader), mutableListOf(), indicator)
         updated = UpdateInstaller.installPluginUpdates(listOf(downloader), indicator)
       }
 

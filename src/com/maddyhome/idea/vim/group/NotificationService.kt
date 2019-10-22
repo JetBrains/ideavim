@@ -130,7 +130,7 @@ class NotificationService(private val project: Project?) {
 
   fun notifyFailedToDownloadEap() {
     Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
-      """Failed to update IdeaVim to EAP version. Please update the plugin manually.""",
+      """Failed to update IdeaVim to the EAP version. Please update the plugin manually.""",
       NotificationType.ERROR).notify(project)
   }
 
@@ -142,7 +142,7 @@ class NotificationService(private val project: Project?) {
 
   fun notifyEapDownloaded() {
     val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
-      """IdeaVim EAP will be installed after restart.""",
+      """IdeaVim EAP will be installed after a restart.""",
       NotificationType.INFORMATION)
     notification.addAction(object : AnAction("Restart") {
       override fun actionPerformed(e: AnActionEvent) {
@@ -154,7 +154,7 @@ class NotificationService(private val project: Project?) {
 
   fun notifyEapFinished() {
     Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
-      """You have finished Early Access Program. Please reinstall IdeaVim to get the stable version.""",
+      """You have finished the Early Access Program. Please reinstall IdeaVim to get the stable version.""",
       NotificationType.INFORMATION).notify(project)
   }
 
