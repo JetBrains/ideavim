@@ -42,7 +42,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.helper.EditorDataContext
-import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.SelectModeOptionData
 import java.beans.PropertyChangeEvent
@@ -112,7 +112,7 @@ object IdeaSpecifics {
       if (!editor.selectionModel.hasSelection()) {
         // Enable insert mode if there is no selection in template
         // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
-        if (editor.mode == CommandState.Mode.COMMAND) {
+        if (editor.inNormalMode) {
           VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
           KeyHandler.getInstance().reset(editor)
         }

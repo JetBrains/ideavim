@@ -30,7 +30,25 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.RWLockLabel
+import com.maddyhome.idea.vim.helper.hasVisualSelection
+import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.helper.inInsertMode
+import com.maddyhome.idea.vim.helper.inNormalMode
+import com.maddyhome.idea.vim.helper.inSelectMode
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.isTemplateActive
+import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.vimForEachCaret
+import com.maddyhome.idea.vim.helper.vimKeepingVisualOperatorAction
+import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.helper.vimLastSelectionType
+import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
+import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.helper.vimSelectionStartClear
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -155,7 +173,7 @@ class VisualMotionGroup {
           exitSelectModeAndResetKeyHandler(editor, true)
 
           val templateActive = editor.isTemplateActive()
-          if (templateActive && editor.mode == CommandState.Mode.COMMAND) {
+          if (templateActive && editor.inNormalMode) {
             VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
           }
           KeyHandler.getInstance().reset(editor)
@@ -198,7 +216,7 @@ class VisualMotionGroup {
       }
     } else {
       val templateActive = editor.isTemplateActive()
-      if (templateActive && editor.mode == CommandState.Mode.COMMAND || editor.mode == CommandState.Mode.INSERT) {
+      if (templateActive && editor.inNormalMode || editor.inInsertMode) {
         return CommandState.Mode.INSERT
       }
       return CommandState.Mode.COMMAND

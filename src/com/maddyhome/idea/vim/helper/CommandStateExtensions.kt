@@ -26,6 +26,10 @@ var Editor.subMode
     CommandState.getInstance(this).subMode = value
   }
 
+@get:JvmName("inNormalMode")
+val Editor.inNormalMode
+  get() = this.mode == CommandState.Mode.COMMAND
+
 @get:JvmName("inInsertMode")
 val Editor.inInsertMode
   get() = this.mode == CommandState.Mode.INSERT || this.mode == CommandState.Mode.REPLACE
@@ -48,4 +52,4 @@ val Editor.inBlockSubMode
 
 @get:JvmName("inSingleCommandMode")
 val Editor.inSingleCommandMode
-  get() = this.subMode == CommandState.SubMode.SINGLE_COMMAND && this.mode == CommandState.Mode.COMMAND
+  get() = this.subMode == CommandState.SubMode.SINGLE_COMMAND && this.inNormalMode
