@@ -44,6 +44,7 @@ import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.option.SaveModeFor
 import com.maddyhome.idea.vim.option.SelectModeOptionData
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
@@ -109,12 +110,17 @@ object IdeaSpecifics {
     override fun templateStarted(state: TemplateState) {
       val editor = state.editor ?: return
       notifySelectmode(state, editor.project)
-      if (!editor.selectionModel.hasSelection()) {
-        // Enable insert mode if there is no selection in template
-        // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
-        if (editor.inNormalMode) {
-          VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
-          KeyHandler.getInstance().reset(editor)
+
+      if (SaveModeFor.saveTemplate(editor)) {
+        SaveModeFor.correctSelection(editor)
+      } else {
+        if (!editor.selectionModel.hasSelection()) {
+          // Enable insert mode if there is no selection in template
+          // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
+          if (editor.inNormalMode) {
+            VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
+            KeyHandler.getInstance().reset(editor)
+          }
         }
       }
     }

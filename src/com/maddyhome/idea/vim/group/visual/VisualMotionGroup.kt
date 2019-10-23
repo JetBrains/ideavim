@@ -52,6 +52,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStartClear
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.option.SaveModeFor
 import com.maddyhome.idea.vim.option.SelectModeOptionData
 
 /**
@@ -137,6 +138,11 @@ class VisualMotionGroup {
       if (initialMode?.hasVisualSelection == true || editor.caretModel.allCarets.any(Caret::hasSelection)) {
         if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
           val commandState = CommandState.getInstance(editor)
+          if (editor.isTemplateActive() && SaveModeFor.saveTemplate(editor) ||
+            selectionSource == VimListenerManager.SelectionSource.OTHER && SaveModeFor.saveRefactoring(editor)) {
+            SaveModeFor.correctSelection(editor)
+            return@singleTask
+          }
           logger.info("Some carets have selection. State before adjustment: ${commandState.toSimpleString()}")
           while (commandState.mode != CommandState.Mode.COMMAND) {
             commandState.popState()

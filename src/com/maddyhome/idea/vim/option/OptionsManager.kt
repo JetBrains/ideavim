@@ -18,15 +18,20 @@
 
 package com.maddyhome.idea.vim.option
 
+import com.intellij.codeInsight.lookup.LookupManager
+import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExOutputModel
-import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.helper.inInsertMode
+import com.maddyhome.idea.vim.helper.inNormalMode
+import com.maddyhome.idea.vim.helper.inSelectMode
+import com.maddyhome.idea.vim.helper.inVisualMode
 import org.jetbrains.annotations.Contract
 import java.util.*
 import kotlin.math.ceil
@@ -72,6 +77,7 @@ object OptionsManager {
   val visualbell = addOption(ToggleOption("visualbell", "vb", false))
   val wrapscan = addOption(ToggleOption("wrapscan", "ws", true))
   val visualEnterDelay = addOption(NumberOption("visualdelay", "visualdelay", 100, 0, Int.MAX_VALUE))
+  val saveModeFor = addOption(BoundListOption(SaveModeFor.name, SaveModeFor.name, arrayOf(), SaveModeFor.availableOptions))
 
   fun isSet(name: String): Boolean {
     val option = getOption(name)
@@ -425,4 +431,54 @@ object SmartCaseOptionsData {
 object IgnoreCaseOptionsData {
   const val name = "ignorecase"
   const val abbr = "ic"
+}
+
+object SaveModeFor {
+  const val name = "savemodefor"
+
+  const val refactoring = SelectModeOptionData.refactoring
+  const val iRefactoring = "i-"+SelectModeOptionData.refactoring
+  const val nRefactoring = "n-"+SelectModeOptionData.refactoring
+  const val vRefactoring = "v-"+SelectModeOptionData.refactoring
+  const val sRefactoring = "s-"+SelectModeOptionData.refactoring
+
+  const val template = SelectModeOptionData.template
+  const val iTemplate = "i-"+SelectModeOptionData.template
+  const val nTemplate = "n-"+SelectModeOptionData.template
+  const val vTemplate = "v-"+SelectModeOptionData.template
+  const val sTemplate = "s-"+SelectModeOptionData.template
+
+  val availableOptions = arrayOf(
+    refactoring, iRefactoring, nRefactoring, vRefactoring, sRefactoring,
+    template, iTemplate, nTemplate, vTemplate, sTemplate
+  )
+
+  fun saveTemplate(editor: Editor): Boolean {
+    return when {
+      template in OptionsManager.saveModeFor -> true
+      nTemplate in OptionsManager.saveModeFor && editor.inNormalMode -> true
+      iTemplate in OptionsManager.saveModeFor && editor.inInsertMode -> true
+      vTemplate in OptionsManager.saveModeFor && editor.inVisualMode -> true
+      sTemplate in OptionsManager.saveModeFor && editor.inSelectMode -> true
+      else -> false
+    }
+  }
+
+  fun saveRefactoring(editor: Editor): Boolean {
+    return when {
+      refactoring in OptionsManager.saveModeFor -> true
+      nRefactoring in OptionsManager.saveModeFor && editor.inNormalMode -> true
+      iRefactoring in OptionsManager.saveModeFor && editor.inInsertMode -> true
+      vRefactoring in OptionsManager.saveModeFor && editor.inVisualMode -> true
+      sRefactoring in OptionsManager.saveModeFor && editor.inSelectMode -> true
+      else -> false
+    }
+  }
+
+  fun correctSelection(editor: Editor) {
+    if (!editor.inSelectMode && !editor.inVisualMode) {
+      val lookup = LookupManager.getActiveLookup(editor) as? LookupImpl
+      lookup?.performGuardedChange { editor.selectionModel.removeSelection() }
+    }
+  }
 }
