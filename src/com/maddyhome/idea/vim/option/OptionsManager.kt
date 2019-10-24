@@ -437,16 +437,16 @@ object SaveModeFor {
   const val name = "savemodefor"
 
   const val refactoring = SelectModeOptionData.refactoring
-  const val iRefactoring = "i-"+SelectModeOptionData.refactoring
-  const val nRefactoring = "n-"+SelectModeOptionData.refactoring
-  const val vRefactoring = "v-"+SelectModeOptionData.refactoring
-  const val sRefactoring = "s-"+SelectModeOptionData.refactoring
+  const val iRefactoring = "i-" + SelectModeOptionData.refactoring
+  const val nRefactoring = "n-" + SelectModeOptionData.refactoring
+  const val vRefactoring = "v-" + SelectModeOptionData.refactoring
+  const val sRefactoring = "s-" + SelectModeOptionData.refactoring
 
   const val template = SelectModeOptionData.template
-  const val iTemplate = "i-"+SelectModeOptionData.template
-  const val nTemplate = "n-"+SelectModeOptionData.template
-  const val vTemplate = "v-"+SelectModeOptionData.template
-  const val sTemplate = "s-"+SelectModeOptionData.template
+  const val iTemplate = "i-" + SelectModeOptionData.template
+  const val nTemplate = "n-" + SelectModeOptionData.template
+  const val vTemplate = "v-" + SelectModeOptionData.template
+  const val sTemplate = "s-" + SelectModeOptionData.template
 
   val availableOptions = arrayOf(
     refactoring, iRefactoring, nRefactoring, vRefactoring, sRefactoring,
