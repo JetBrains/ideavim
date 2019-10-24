@@ -35,15 +35,17 @@ import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.option.SaveModeFor
 import com.maddyhome.idea.vim.option.SelectModeOptionData
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
 
 /**
  * @author Alex Plate
  */
-class TemplateTest : VimTestCase() {
+class TemplateTest : VimOptionTestCase(SaveModeFor.name) {
 
   private lateinit var disposable: Disposable
 
@@ -57,6 +59,7 @@ class TemplateTest : VimTestCase() {
     Disposer.dispose(disposable)
   }
 
+  @VimOptionDefaultAll
   fun `test simple rename`() {
     configureByJavaText("""
             class Hello {
@@ -75,6 +78,7 @@ class TemplateTest : VimTestCase() {
         """.trimIndent())
   }
 
+  @VimOptionDefaultAll
   fun `test type rename`() {
     configureByJavaText("""
             class Hello {
@@ -99,6 +103,7 @@ class TemplateTest : VimTestCase() {
         """.trimIndent())
   }
 
+  @VimOptionDefaultAll
   fun `test selectmode without template`() {
     OptionsManager.selectmode.remove(SelectModeOptionData.template)
     configureByJavaText("""
@@ -115,6 +120,7 @@ class TemplateTest : VimTestCase() {
     typeText(parseKeys("<CR>"))
   }
 
+  @VimOptionDefaultAll
   fun `test prepend`() {
     configureByJavaText("""
             class Hello {
@@ -141,6 +147,7 @@ class TemplateTest : VimTestCase() {
         """.trimIndent())
   }
 
+  @VimOptionDefaultAll
   fun `test motion right`() {
     configureByJavaText("""
             class Hello {
@@ -164,6 +171,7 @@ class TemplateTest : VimTestCase() {
         """.trimIndent())
   }
 
+  @VimOptionDefaultAll
   fun `test motion left on age`() {
     configureByJavaText("""
             class Hello {
@@ -187,6 +195,7 @@ class TemplateTest : VimTestCase() {
         """.trimIndent())
   }
 
+  @VimOptionDefaultAll
   fun `test motion right on age`() {
     configureByJavaText("""
             class Hello {
@@ -210,6 +219,7 @@ class TemplateTest : VimTestCase() {
         """.trimIndent())
   }
 
+  @VimOptionDefaultAll
   fun `test escape`() {
     configureByJavaText("""
             class Hello {
@@ -234,6 +244,7 @@ class TemplateTest : VimTestCase() {
         """.trimIndent())
   }
 
+  @VimOptionDefaultAll
   fun `test escape after typing`() {
     configureByJavaText("""
             class Hello {
@@ -258,6 +269,7 @@ class TemplateTest : VimTestCase() {
         """.trimIndent())
   }
 
+  @VimOptionDefaultAll
   fun `test notification on first time`() {
     EventLog.markAllAsRead(myFixture.project)
     VimPlugin.getVimState().isTemplateInSelectModeNotified = false
@@ -288,6 +300,8 @@ class TemplateTest : VimTestCase() {
     val editor = if (myFixture.editor is EditorWindow) (myFixture.editor as EditorWindow).delegate else myFixture.editor
     VimListenerManager.EditorListeners.add(editor)
 
+    // TODO: 24.10.2019 [VERSION UPDATE] 2019.1
+    @Suppress("DEPRECATION")
     TemplateManagerImpl.setTemplateTesting(myFixture.project, disposable)
     handler.doRename(myFixture.elementAtCaret, editor, dataContext)
     return editor
