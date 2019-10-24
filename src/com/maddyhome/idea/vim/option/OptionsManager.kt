@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.option
 
 import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.codeInsight.lookup.impl.LookupImpl
+import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
@@ -28,10 +29,14 @@ import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.isBlockCaret
+import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import org.jetbrains.annotations.Contract
 import java.util.*
 import kotlin.math.ceil
@@ -476,9 +481,27 @@ object SaveModeFor {
   }
 
   fun correctSelection(editor: Editor) {
-    if (!editor.inSelectMode && !editor.inVisualMode) {
-      val lookup = LookupManager.getActiveLookup(editor) as? LookupImpl
-      lookup?.performGuardedChange { editor.selectionModel.removeSelection() }
+    val action: () -> Unit = {
+      if (!editor.mode.hasVisualSelection) {
+        SelectionVimListenerSuppressor.lock().use {
+          editor.selectionModel.removeSelection()
+        }
+      }
+
+      if (editor.mode.isBlockCaret) {
+        TemplateManagerImpl.getTemplateState(editor)?.currentVariableRange?.let { segmentRange ->
+          if (!segmentRange.isEmpty && segmentRange.endOffset == editor.caretModel.offset && editor.caretModel.offset != 0) {
+            editor.caretModel.moveToOffset(editor.caretModel.offset - 1)
+          }
+        }
+      }
+    }
+
+    val lookup = LookupManager.getActiveLookup(editor) as? LookupImpl
+    if (lookup != null) {
+      lookup.performGuardedChange(action)
+    } else {
+      action()
     }
   }
 }

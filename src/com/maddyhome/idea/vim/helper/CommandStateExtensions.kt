@@ -11,6 +11,12 @@ val CommandState.Mode.isEndAllowed
     CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE -> false
   }
 
+val CommandState.Mode.isBlockCaret
+  get() = when (this) {
+    CommandState.Mode.REPEAT, CommandState.Mode.VISUAL, CommandState.Mode.COMMAND -> true
+    CommandState.Mode.INSERT, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.SELECT -> false
+  }
+
 val CommandState.Mode.hasVisualSelection
   get() = when (this) {
     CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
