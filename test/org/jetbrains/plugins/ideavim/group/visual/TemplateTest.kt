@@ -33,12 +33,18 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.inInsertMode
+import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.SaveModeFor
 import com.maddyhome.idea.vim.option.SelectModeOptionData
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
+import org.jetbrains.plugins.ideavim.assertDoesntChange
 import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
 
@@ -294,6 +300,46 @@ class TemplateTest : VimOptionTestCase(SaveModeFor.name) {
     assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
     assertTrue(SelectModeOptionData.name in notification.content)
     assertEquals(3, notification.actions.size)
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(SaveModeFor.name, VimTestOptionType.LIST, ["template"]))
+  fun `test template in normal mode`() {
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+    startRenaming(VariableInplaceRenameHandler())
+    assertDoesntChange { myFixture.editor.inNormalMode }
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(SaveModeFor.name, VimTestOptionType.LIST, ["i-template"]))
+  fun `test save mode for different mode`() {
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(SaveModeFor.name, VimTestOptionType.LIST, ["i-template"]))
+  fun `test save mode for insert mode`() {
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+    typeText(parseKeys("i"))
+    startRenaming(VariableInplaceRenameHandler())
+    assertDoesntChange { myFixture.editor.inInsertMode }
   }
 
   private fun startRenaming(handler: VariableInplaceRenameHandler): Editor {

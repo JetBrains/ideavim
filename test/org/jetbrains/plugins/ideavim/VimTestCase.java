@@ -45,6 +45,8 @@ import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer;
 import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
+import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
@@ -100,7 +102,9 @@ public abstract class VimTestCase extends UsefulTestCase {
     }
     BookmarkManager bookmarkManager = BookmarkManager.getInstance(myFixture.getProject());
     bookmarkManager.getValidBookmarks().forEach(bookmarkManager::removeBookmark);
-    myFixture.tearDown();
+    try(VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
+      myFixture.tearDown();
+    }
     myFixture = null;
     ExEntryPanel.getInstance().deactivate(false);
     VimScriptGlobalEnvironment.getInstance().getVariables().clear();
