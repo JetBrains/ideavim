@@ -422,17 +422,19 @@ public class MarkGroup {
 
   public void saveData(@NotNull Element element) {
     Element marksElem = new Element("globalmarks");
-    for (Mark mark : globalMarks.values()) {
-      if (!mark.isClear()) {
-        Element markElem = new Element("mark");
-        markElem.setAttribute("key", Character.toString(mark.getKey()));
-        markElem.setAttribute("line", Integer.toString(mark.getLogicalLine()));
-        markElem.setAttribute("column", Integer.toString(mark.getCol()));
-        markElem.setAttribute("filename", StringUtil.notNullize(mark.getFilename()));
-        markElem.setAttribute("protocol", StringUtil.notNullize(mark.getProtocol(), "file"));
-        marksElem.addContent(markElem);
-        if (logger.isDebugEnabled()) {
-          logger.debug("saved mark = " + mark);
+    if (!OptionsManager.INSTANCE.getIdeamarks().isSet()) {
+      for (Mark mark : globalMarks.values()) {
+        if (!mark.isClear()) {
+          Element markElem = new Element("mark");
+          markElem.setAttribute("key", Character.toString(mark.getKey()));
+          markElem.setAttribute("line", Integer.toString(mark.getLogicalLine()));
+          markElem.setAttribute("column", Integer.toString(mark.getCol()));
+          markElem.setAttribute("filename", StringUtil.notNullize(mark.getFilename()));
+          markElem.setAttribute("protocol", StringUtil.notNullize(mark.getProtocol(), "file"));
+          marksElem.addContent(markElem);
+          if (logger.isDebugEnabled()) {
+            logger.debug("saved mark = " + mark);
+          }
         }
       }
     }
@@ -493,19 +495,21 @@ public class MarkGroup {
     // (see com.intellij.openapi.application.Application.runReadAction())
 
     Element marksElem = element.getChild("globalmarks");
-    if (marksElem != null) {
+    if (marksElem != null && !OptionsManager.INSTANCE.getIdeamarks().isSet()) {
       List markList = marksElem.getChildren("mark");
       for (Object aMarkList : markList) {
         Element markElem = (Element)aMarkList;
-        Mark mark = new VimMark(markElem.getAttributeValue("key").charAt(0),
-                             Integer.parseInt(markElem.getAttributeValue("line")),
-                             Integer.parseInt(markElem.getAttributeValue("column")),
-                             markElem.getAttributeValue("filename"),
-                             markElem.getAttributeValue("protocol"));
+        Mark mark = VimMark.create(markElem.getAttributeValue("key").charAt(0),
+                                   Integer.parseInt(markElem.getAttributeValue("line")),
+                                   Integer.parseInt(markElem.getAttributeValue("column")),
+                                   markElem.getAttributeValue("filename"),
+                                   markElem.getAttributeValue("protocol"));
 
-        globalMarks.put(mark.getKey(), mark);
-        HashMap<Character, Mark> fmarks = getFileMarks(mark.getFilename());
-        fmarks.put(mark.getKey(), mark);
+        if (mark != null) {
+          globalMarks.put(mark.getKey(), mark);
+          HashMap<Character, Mark> fmarks = getFileMarks(mark.getFilename());
+          fmarks.put(mark.getKey(), mark);
+        }
       }
     }
 
@@ -531,13 +535,13 @@ public class MarkGroup {
         List markList = fileElem.getChildren("mark");
         for (Object aMarkList : markList) {
           Element markElem = (Element)aMarkList;
-          Mark mark = new VimMark(markElem.getAttributeValue("key").charAt(0),
-                               Integer.parseInt(markElem.getAttributeValue("line")),
-                               Integer.parseInt(markElem.getAttributeValue("column")),
-                               filename,
-                               markElem.getAttributeValue("protocol"));
+          Mark mark = VimMark.create(markElem.getAttributeValue("key").charAt(0),
+                                     Integer.parseInt(markElem.getAttributeValue("line")),
+                                     Integer.parseInt(markElem.getAttributeValue("column")),
+                                     filename,
+                                     markElem.getAttributeValue("protocol"));
 
-          fmarks.put(mark.getKey(), mark);
+          if (mark != null) fmarks.put(mark.getKey(), mark);
         }
         fmarks.setTimestamp(timestamp);
       }
