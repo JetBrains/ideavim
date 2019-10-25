@@ -20,8 +20,10 @@ package com.maddyhome.idea.vim.action.motion.updown
 
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -67,7 +69,7 @@ class EnterNormalAction : MotionActionHandler.ForEachCaret() {
                          argument: Argument?): Int {
     val templateState = TemplateManagerImpl.getTemplateState(editor)
     return if (templateState != null) {
-      templateState.gotoEnd(false)
+      KeyHandler.executeAction(IdeActions.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE, context)
       -1
     } else {
       VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, count)
