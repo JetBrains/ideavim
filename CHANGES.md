@@ -54,6 +54,7 @@ _To Be Released:_
 * [VIM-1749](https://youtrack.jetbrains.com/issue/VIM-1749) Tag surround is finished on `>`
 * [VIM-1801](https://youtrack.jetbrains.com/issue/VIM-1801) Fix j/k motions with inline hints
 * [VIM-1800](https://youtrack.jetbrains.com/issue/VIM-1800) Improve ideamarks option
+* [VIM-1819](https://youtrack.jetbrains.com/issue/VIM-1819) Fix execution of some rider actions
 
 0.53, 2019-08-07
 --------------

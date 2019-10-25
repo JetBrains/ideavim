@@ -127,10 +127,13 @@ public class KeyHandler {
     // What is "place"? Leave it the empty string for now.
     // Is the template presentation sufficient?
     // What are the modifiers? Is zero OK?
+    //
+    // beforeActionPerformedUpdate should be called to update the action. It fixes some rider-specific problems
+    //   because rider use async update method. See VIM-1819
     final AnActionEvent event =
       new AnActionEvent(null, context, ActionPlaces.ACTION_SEARCH, action.getTemplatePresentation(),
                         ActionManager.getInstance(), 0);
-    action.update(event);
+    action.beforeActionPerformedUpdate(event);
     if (event.getPresentation().isEnabled()) {
       action.actionPerformed(event);
       return true;
