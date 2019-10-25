@@ -20,14 +20,14 @@
 
 package org.jetbrains.plugins.ideavim.group.visual
 
+import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.ide.DataManager
 import com.intellij.injected.editor.EditorWindow
 import com.intellij.notification.EventLog
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.util.Disposer
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler
+import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestUtil.doInlineRename
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
@@ -53,16 +53,11 @@ import org.jetbrains.plugins.ideavim.waitAndAssertMode
  */
 class TemplateTest : VimOptionTestCase(SaveModeFor.name) {
 
-  private lateinit var disposable: Disposable
-
   override fun setUp() {
     super.setUp()
-    disposable = Disposer.newDisposable()
-  }
-
-  override fun tearDown() {
-    super.tearDown()
-    Disposer.dispose(disposable)
+    // TODO: 24.10.2019 [VERSION UPDATE] 2019.1
+    @Suppress("DEPRECATION")
+    TemplateManagerImpl.setTemplateTesting(myFixture.project, myFixture.testRootDisposable)
   }
 
   @VimOptionDefaultAll
@@ -342,13 +337,30 @@ class TemplateTest : VimOptionTestCase(SaveModeFor.name) {
     assertDoesntChange { myFixture.editor.inInsertMode }
   }
 
+  @VimOptionTestConfiguration(VimTestOption(SaveModeFor.name, VimTestOptionType.LIST, ["template"]))
+  fun `test template with multiple times`() {
+    configureByJavaText(c)
+    val manager = TemplateManager.getInstance(myFixture.project)
+    val template = manager.createTemplate("vn", "user", "\$V1$ var = \$V2$;")
+    template.addVariable("V1", "", "\"123\"", true)
+    template.addVariable("V2", "", "\"239\"", true)
+
+    manager.startTemplate(myFixture.editor, template)
+    PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
+
+    assertMode(CommandState.Mode.COMMAND)
+    assertOffset(2)
+    typeText(parseKeys("<CR>"))
+    assertMode(CommandState.Mode.COMMAND)
+    assertOffset(12)
+    typeText(parseKeys("<CR>"))
+    assertNull(TemplateManagerImpl.getTemplateState(myFixture.editor))
+  }
+
   private fun startRenaming(handler: VariableInplaceRenameHandler): Editor {
     val editor = if (myFixture.editor is EditorWindow) (myFixture.editor as EditorWindow).delegate else myFixture.editor
     VimListenerManager.EditorListeners.add(editor)
 
-    // TODO: 24.10.2019 [VERSION UPDATE] 2019.1
-    @Suppress("DEPRECATION")
-    TemplateManagerImpl.setTemplateTesting(myFixture.project, disposable)
     handler.doRename(myFixture.elementAtCaret, editor, dataContext)
     return editor
   }

@@ -482,7 +482,7 @@ object SaveModeFor {
 
   fun correctSelection(editor: Editor) {
     val action: () -> Unit = {
-      if (!editor.mode.hasVisualSelection) {
+      if (!editor.mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
         SelectionVimListenerSuppressor.lock().use {
           editor.selectionModel.removeSelection()
         }

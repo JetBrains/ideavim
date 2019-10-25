@@ -111,6 +111,14 @@ object IdeaSpecifics {
       val editor = state.editor ?: return
       notifySelectmode(state, editor.project)
 
+      state.addTemplateStateListener(object : TemplateEditingAdapter() {
+        override fun currentVariableChanged(templateState: TemplateState, template: Template?, oldIndex: Int, newIndex: Int) {
+          if (SaveModeFor.saveTemplate(editor)) {
+            SaveModeFor.correctSelection(editor)
+          }
+        }
+      })
+
       if (SaveModeFor.saveTemplate(editor)) {
         SaveModeFor.correctSelection(editor)
       } else {
