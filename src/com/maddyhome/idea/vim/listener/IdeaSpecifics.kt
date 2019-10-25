@@ -65,7 +65,7 @@ object IdeaSpecifics {
   }
 
   private object VimActionListener : AnActionListener {
-    private val surrounderItems = listOf("if", "if / else")
+    private val surrounderItems = listOf("if", "if / else", "for")
     private val surrounderAction = "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
     private var editor: Editor? = null
     override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
