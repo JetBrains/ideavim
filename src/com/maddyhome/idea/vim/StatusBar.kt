@@ -90,11 +90,18 @@ private object StatusBarIcon : StatusBarWidget, StatusBarWidget.IconPresentation
     actionGroup.addSeparator()
     actionGroup.add(NotificationService.OpenIdeaVimRcAction(null))
     actionGroup.add(ShortcutConflictsSettings)
-    actionGroup.addSeparator("EAP" + if (JoinEap.eapActive()) " (Active)" else "")
-    actionGroup.add(JoinEap)
-    actionGroup.add(HelpLink("About EAP...", "https://github.com/JetBrains/ideavim#get-early-access", null))
     actionGroup.addSeparator()
-    actionGroup.add(Help(component))
+
+    val eapGroup = DefaultActionGroup("EAP" + if (JoinEap.eapActive()) " (Active)" else "", true)
+    eapGroup.add(JoinEap)
+    eapGroup.add(HelpLink("About EAP...", "https://github.com/JetBrains/ideavim#get-early-access", null))
+    actionGroup.add(eapGroup)
+
+    val helpGroup = DefaultActionGroup("Contacts && Help", true)
+    helpGroup.add(HelpLink("Contact on Twitter", "https://twitter.com/ideavim", VimIcons.TWITTER))
+    helpGroup.add(HelpLink("Create an Issue", "https://youtrack.jetbrains.com/issues/VIM", VimIcons.YOUTRACK))
+    helpGroup.add(HelpLink("Contribute on GitHub", "https://github.com/JetBrains/ideavim", VimIcons.GITHUB))
+    actionGroup.add(helpGroup)
 
     return actionGroup
   }
@@ -102,32 +109,6 @@ private object StatusBarIcon : StatusBarWidget, StatusBarWidget.IconPresentation
   fun update() {
     statusBar?.updateWidget(this.ID())
   }
-}
-
-private class Help(val component: Component) : AnAction("Contacts && Help") {
-  override fun actionPerformed(e: AnActionEvent) {
-
-    val helpGroup = DefaultActionGroup()
-
-    helpGroup.add(HelpLink("Contact on Twitter", "https://twitter.com/ideavim", VimIcons.TWITTER))
-    helpGroup.add(HelpLink("Create an Issue", "https://youtrack.jetbrains.com/issues/VIM", VimIcons.YOUTRACK))
-    helpGroup.add(HelpLink("Contribute on GitHub", "https://github.com/JetBrains/ideavim", VimIcons.GITHUB))
-
-    val popup = JBPopupFactory.getInstance()
-      .createActionGroupPopup("Contacts & Help", helpGroup,
-        DataManager.getInstance().getDataContext(component), false, null,
-        helpGroup.childrenCount)
-    popup.addListener(object : JBPopupListener {
-      override fun beforeShown(event: LightweightWindowEvent) {
-        val location = component.locationOnScreen
-        val size = popup.size
-        popup.setLocation(Point(location.x + component.width - size.width, location.y - size.height))
-      }
-    })
-
-    popup.show(component)
-  }
-
 }
 
 class HelpLink(
