@@ -6,19 +6,19 @@ import com.intellij.ide.plugins.InstalledPluginsState
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.ide.plugins.PluginManagerMain
 import com.intellij.ide.plugins.RepositoryHelper
-import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.progress.PerformInBackgroundOption
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
+import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.popup.JBPopupFactory
-import com.intellij.openapi.ui.popup.JBPopupListener
-import com.intellij.openapi.ui.popup.LightweightWindowEvent
+import com.intellij.openapi.ui.popup.ListPopup
 import com.intellij.openapi.updateSettings.impl.PluginDownloader
 import com.intellij.openapi.updateSettings.impl.UpdateChecker
 import com.intellij.openapi.updateSettings.impl.UpdateInstaller
@@ -27,13 +27,13 @@ import com.intellij.openapi.util.Ref
 import com.intellij.openapi.wm.StatusBar
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetProvider
+import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.Consumer
 import com.intellij.util.text.VersionComparatorUtil
 import com.maddyhome.idea.vim.action.VimPluginToggleAction
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import icons.VimIcons
-import java.awt.Component
 import java.awt.Point
 import java.awt.event.MouseEvent
 import javax.swing.Icon
@@ -41,10 +41,10 @@ import javax.swing.SwingConstants
 
 
 private class StatusBarIconProvider : StatusBarWidgetProvider {
-  override fun getWidget(project: Project) = StatusBarIcon
+  override fun getWidget(project: Project) = VimStatusBar
 }
 
-private object StatusBarIcon : StatusBarWidget, StatusBarWidget.IconPresentation {
+private object VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
 
   private var statusBar: StatusBar? = null
 
@@ -62,28 +62,48 @@ private object StatusBarIcon : StatusBarWidget, StatusBarWidget.IconPresentation
 
   override fun getClickConsumer() = Consumer<MouseEvent> { event ->
     val component = event.component
-    val actions = getActions(component)
-    val popup = JBPopupFactory.getInstance()
-      .createActionGroupPopup("IdeaVim", actions,
-        DataManager.getInstance().getDataContext(component), false, null,
-        actions.childrenCount)
-    popup.addListener(object : JBPopupListener {
-      override fun beforeShown(event: LightweightWindowEvent) {
-        val location = component.locationOnScreen
-        val size = popup.size
-        popup.setLocation(Point(location.x + component.width - size.width, location.y - size.height))
-      }
-    })
+    val popup = VimActionsPopup.getPopup(DataManager.getInstance().getDataContext(component))
+    val dimension = popup.content.preferredSize
 
-    popup.setAdText("Version ${VimPlugin.getVersion()}", SwingConstants.CENTER)
-
-    popup.show(component)
+    // Trying to find the best position. 16 - size of the icon, 1 - height of the delimiter
+    val at = Point(-dimension.width + 16, -dimension.height - 1)
+    popup.show(RelativePoint(component, at))
   }
 
   // TODO [VERSION UPDATE] After 193 use `getPresentation()`
+  @Suppress("DEPRECATION", "UnstableApiUsage")
   override fun getPresentation(type: StatusBarWidget.PlatformType): StatusBarWidget.WidgetPresentation? = this
 
-  private fun getActions(component: Component): DefaultActionGroup {
+  fun update() {
+    statusBar?.updateWidget(this.ID())
+  }
+}
+
+class VimActions : DumbAwareAction() {
+  override fun actionPerformed(e: AnActionEvent) {
+    val project = e.project ?: return
+    VimActionsPopup.getPopup(e.dataContext).showCenteredInCurrentWindow(project)
+  }
+
+  override fun update(e: AnActionEvent) {
+    val project = e.project
+    e.presentation.isEnabledAndVisible = project != null && !project.isDisposed
+  }
+}
+
+private object VimActionsPopup {
+  fun getPopup(dataContext: DataContext): ListPopup {
+    val actions = getActions()
+    val popup = JBPopupFactory.getInstance()
+      .createActionGroupPopup("IdeaVim", actions,
+        dataContext, false, null,
+        actions.childrenCount)
+    popup.setAdText("Version ${VimPlugin.getVersion()}", SwingConstants.CENTER)
+
+    return popup
+  }
+
+  private fun getActions(): DefaultActionGroup {
     val actionGroup = DefaultActionGroup()
 
     actionGroup.add(VimStatusBarToggle)
@@ -105,17 +125,13 @@ private object StatusBarIcon : StatusBarWidget, StatusBarWidget.IconPresentation
 
     return actionGroup
   }
-
-  fun update() {
-    statusBar?.updateWidget(this.ID())
-  }
 }
 
-class HelpLink(
+private class HelpLink(
   name: String,
   val link: String,
   icon: Icon?
-) : AnAction(name, null, icon) {
+) : DumbAwareAction(name, null, icon) {
   override fun actionPerformed(e: AnActionEvent) {
     BrowserUtil.browse(link)
   }
@@ -128,13 +144,13 @@ private object VimStatusBarToggle : VimPluginToggleAction() {
   }
 }
 
-private object ShortcutConflictsSettings : AnAction("Settings...") {
+private object ShortcutConflictsSettings : DumbAwareAction("Settings...") {
   override fun actionPerformed(e: AnActionEvent) {
     ShowSettingsUtil.getInstance().editConfigurable(e.project, VimEmulationConfigurable())
   }
 }
 
-private object JoinEap : AnAction() {
+private object JoinEap : DumbAwareAction() {
   private const val EAP_LINK = "https://plugins.jetbrains.com/plugins/eap/ideavim"
 
   fun eapActive() = EAP_LINK in UpdateSettings.getInstance().storedPluginHosts

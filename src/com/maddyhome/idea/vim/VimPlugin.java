@@ -362,7 +362,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
       getInstance().turnOnPlugin();
     }
 
-    StatusBarIcon.INSTANCE.update();
+    VimStatusBar.INSTANCE.update();
   }
 
   public static boolean isError() {
