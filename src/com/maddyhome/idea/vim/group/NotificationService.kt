@@ -12,7 +12,6 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
-import com.intellij.openapi.application.ex.ApplicationManagerEx
 import com.intellij.openapi.keymap.Keymap
 import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.options.ShowSettingsUtil
@@ -138,18 +137,6 @@ class NotificationService(private val project: Project?) {
     Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
       """You are successfully subscribed to IdeaVim EAP releases.""",
       NotificationType.INFORMATION).notify(project)
-  }
-
-  fun notifyEapDownloaded() {
-    val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
-      """IdeaVim EAP will be installed after a restart.""",
-      NotificationType.INFORMATION)
-    notification.addAction(object : AnAction("Restart") {
-      override fun actionPerformed(e: AnActionEvent) {
-        ApplicationManagerEx.getApplicationEx().restart(true)
-      }
-    })
-    notification.notify(project)
   }
 
   fun notifyEapFinished() {

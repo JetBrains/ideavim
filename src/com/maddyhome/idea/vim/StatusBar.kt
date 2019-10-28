@@ -4,12 +4,12 @@ import com.intellij.ide.BrowserUtil
 import com.intellij.ide.DataManager
 import com.intellij.ide.plugins.InstalledPluginsState
 import com.intellij.ide.plugins.PluginManager
+import com.intellij.ide.plugins.PluginManagerMain
 import com.intellij.ide.plugins.RepositoryHelper
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationInfo
-import com.intellij.openapi.application.ex.ApplicationManagerEx
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.progress.PerformInBackgroundOption
 import com.intellij.openapi.progress.ProgressIndicator
@@ -191,24 +191,13 @@ private object JoinEap : AnAction() {
         }
 
         val version = downloader.pluginVersion
-        val message = "Do you want to install the EAP version of IdeaVim and restart the IDE to apply the changes?"
-        val res = Messages.showDialog(project, message,
-          "IdeaVim $version", null, arrayOf("Yes", "Install without Restart", "Install Later", "Cancel"), 0, 2, null)
+        val message = "Do you want to install the EAP version of IdeaVim?"
+        @Suppress("MoveVariableDeclarationIntoWhen")
+        val res = Messages.showYesNoCancelDialog(project, message, "IdeaVim $version", null)
         when (res) {
-          0 -> updatePlugin(project, downloader) { updated ->
-            if (updated) {
-              ApplicationManagerEx.getApplicationEx().restart(true)
-            } else {
-              notificator.notifyFailedToDownloadEap()
-            }
-          }
-          1 -> updatePlugin(project, downloader) { notificator.notifyEapDownloaded() }
-          2 -> notificator.notifySubscribedToEap()
-          else -> {
-            if (eapActive()) {
-              UpdateSettings.getInstance().storedPluginHosts -= EAP_LINK
-            }
-          }
+          Messages.YES -> updatePlugin(project, downloader)
+          Messages.NO -> notificator.notifySubscribedToEap()
+          Messages.CANCEL -> if (eapActive()) UpdateSettings.getInstance().storedPluginHosts -= EAP_LINK
         }
       }
 
@@ -222,7 +211,7 @@ private object JoinEap : AnAction() {
     }.queue()
   }
 
-  private fun updatePlugin(project: Project?, downloader: PluginDownloader, onSuccess: (updated: Boolean) -> Unit) {
+  private fun updatePlugin(project: Project?, downloader: PluginDownloader) {
     val notificator = VimPlugin.getNotifications(project)
     return object : Task.Backgroundable(null, "Plugin Updates", true, PerformInBackgroundOption.DEAF) {
       private var updated = false
@@ -234,7 +223,11 @@ private object JoinEap : AnAction() {
       }
 
       override fun onSuccess() {
-        onSuccess(updated)
+        if (updated) {
+          PluginManagerMain.notifyPluginsUpdated(null)
+        } else {
+          notificator.notifyFailedToDownloadEap()
+        }
       }
 
       override fun onCancel() {
