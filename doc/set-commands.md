@@ -54,24 +54,6 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
     
     'relativenumber' 'rnu'   show the line number relative to the line with
                              the cursor
-    
-    'savemodefor'    'savemodefor'   String (default "")          - IdeaVim ONLY
-                     
-                     This is a comma-separated list of words, which specify when to save
-                     the current mode in case it would be changed by default behavior (refactorings).
-                     This option overrides `selectmode` and allows to save
-                     normal/inset/visual mode during the renaming, exctracting, or any other
-                     refactoring.
-                     
-                     Possible values:
-                     'template', 'n-template', 'i-template', 'v-template'
-                         save the mode when starting a template.
-                     'refactoring', 'n-refactoring', 'i-refactoring', 'v-refactoring'
-                         save the mode when starting a non-template refactoring.
-                      
-                      The value without prefix states for all modes. 'n-' prefix means "save normal mode",
-                      'i-' - "save inset mode", 'v-' - "save visual mode".
-    
     'scroll'         'scr'   lines to scroll with CTRL-U and CTRL-D
     'scrolljump'     'sj'    minimum number of lines to scroll
     'scrolloff'      'so'    minimum number of lines above and below the cursor
