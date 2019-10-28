@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.action;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.project.DumbAware;
+import com.maddyhome.idea.vim.VimActions;
 import com.maddyhome.idea.vim.VimPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,5 +50,20 @@ public class VimPluginToggleAction extends ToggleAction implements DumbAware {
   @Override
   public void setSelected(@NotNull AnActionEvent event, boolean b) {
     VimPlugin.setEnabled(b);
+  }
+
+  @Override
+  public void update(@NotNull AnActionEvent e) {
+    super.update(e);
+    if (VimActions.actionPlace.equals(e.getPlace())) {
+      if (VimPlugin.isEnabled()) {
+        e.getPresentation().setText("Enabled");
+      } else {
+        e.getPresentation().setText("Enable");
+      }
+    }
+    else {
+      e.getPresentation().setText("Vim Emulator");
+    }
   }
 }

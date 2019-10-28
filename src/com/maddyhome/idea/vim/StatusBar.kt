@@ -6,6 +6,7 @@ import com.intellij.ide.plugins.InstalledPluginsState
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.ide.plugins.PluginManagerMain
 import com.intellij.ide.plugins.RepositoryHelper
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -30,7 +31,6 @@ import com.intellij.openapi.wm.StatusBarWidgetProvider
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.Consumer
 import com.intellij.util.text.VersionComparatorUtil
-import com.maddyhome.idea.vim.action.VimPluginToggleAction
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import icons.VimIcons
@@ -38,7 +38,6 @@ import java.awt.Point
 import java.awt.event.MouseEvent
 import javax.swing.Icon
 import javax.swing.SwingConstants
-
 
 private class StatusBarIconProvider : StatusBarWidgetProvider {
   override fun getWidget(project: Project) = VimStatusBar
@@ -80,6 +79,11 @@ private object VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation 
 }
 
 class VimActions : DumbAwareAction() {
+
+  companion object {
+    const val actionPlace = "VimActionsPopup"
+  }
+
   override fun actionPerformed(e: AnActionEvent) {
     val project = e.project ?: return
     VimActionsPopup.getPopup(e.dataContext).showCenteredInCurrentWindow(project)
@@ -96,8 +100,8 @@ private object VimActionsPopup {
     val actions = getActions()
     val popup = JBPopupFactory.getInstance()
       .createActionGroupPopup("IdeaVim", actions,
-        dataContext, false, null,
-        actions.childrenCount)
+        dataContext, JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, false,
+        VimActions.actionPlace)
     popup.setAdText("Version ${VimPlugin.getVersion()}", SwingConstants.CENTER)
 
     return popup
@@ -105,8 +109,9 @@ private object VimActionsPopup {
 
   private fun getActions(): DefaultActionGroup {
     val actionGroup = DefaultActionGroup()
+    actionGroup.isPopup = true
 
-    actionGroup.add(VimStatusBarToggle)
+    actionGroup.add(ActionManager.getInstance().getAction("VimPluginToggle"))
     actionGroup.addSeparator()
     actionGroup.add(NotificationService.OpenIdeaVimRcAction(null))
     actionGroup.add(ShortcutConflictsSettings)
@@ -134,13 +139,6 @@ private class HelpLink(
 ) : DumbAwareAction(name, null, icon) {
   override fun actionPerformed(e: AnActionEvent) {
     BrowserUtil.browse(link)
-  }
-}
-
-private object VimStatusBarToggle : VimPluginToggleAction() {
-  override fun update(e: AnActionEvent) {
-    super.update(e)
-    e.presentation.text = if (VimPlugin.isEnabled()) "Enabled" else "Enable"
   }
 }
 
