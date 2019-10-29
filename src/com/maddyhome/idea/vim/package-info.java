@@ -113,9 +113,9 @@
  * |CTRL-L|               not applicable
  * |<CR>|                 {@link com.maddyhome.idea.vim.action.motion.updown.EnterNormalAction}
  * |CTRL-M|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownFirstNonSpaceAction}
- * |CTRL-N|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownAction}
+ * |CTRL-N|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownCtrlNAction}
  * |CTRL-O|               {@link com.maddyhome.idea.vim.action.motion.mark.MotionJumpPreviousAction}
- * |CTRL-P|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionUpAction}
+ * |CTRL-P|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionUpCtrlPAction}
  * |CTRL-R|               {@link com.maddyhome.idea.vim.action.change.RedoAction}
  * |CTRL-T|               TODO
  * |CTRL-U|               {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageUpAction}

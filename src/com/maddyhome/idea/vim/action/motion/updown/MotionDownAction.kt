@@ -18,9 +18,13 @@
 
 package com.maddyhome.idea.vim.action.motion.updown
 
+import com.intellij.codeInsight.lookup.LookupManager
+import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
@@ -32,17 +36,17 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import java.util.*
 import javax.swing.KeyStroke
 
-class MotionDownAction : MotionActionHandler.ForEachCaret() {
+open class MotionDownAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
   override val mappingModes: Set<MappingMode> = MappingMode.NXO
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("j", "<C-N>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("j")
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
 
-
   private var col: Int = 0
+
   override fun getOffset(editor: Editor,
                          caret: Caret,
                          context: DataContext,
@@ -65,6 +69,24 @@ class MotionDownAction : MotionActionHandler.ForEachCaret() {
                         context: DataContext,
                         cmd: Command) {
     EditorHelper.updateLastColumn(editor, caret, col)
+  }
+}
+
+class MotionDownCtrlNAction : MotionDownAction() {
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-N>")
+
+  override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+    val activeLookup = LookupManager.getActiveLookup(editor)
+    return if (activeLookup != null) {
+      val primaryCaret = editor.caretModel.primaryCaret
+      if (caret == primaryCaret) {
+        IdeEventQueue.getInstance().flushDelayedKeyEvents()
+        EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN).execute(editor, primaryCaret, context)
+      }
+      caret.offset
+    } else {
+      super.getOffset(editor, caret, context, count, rawCount, argument)
+    }
   }
 }
 

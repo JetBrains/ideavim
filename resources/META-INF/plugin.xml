@@ -113,6 +113,7 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftEndAction"/>
     <!-- Up/Down -->
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionDownAction"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionDownCtrlNAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionDownNotLineWiseAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionDownFirstNonSpaceAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.EnterNormalAction"/>
@@ -124,6 +125,7 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastEndInsertAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionUpAction"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionUpCtrlPAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionUpNotLineWiseAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionUpFirstNonSpaceAction"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionArrowDownAction"/>
