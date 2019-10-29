@@ -19,8 +19,7 @@
 package com.maddyhome.idea.vim.action;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.ToggleAction;
-import com.intellij.openapi.project.DumbAware;
+import com.intellij.openapi.project.DumbAwareToggleAction;
 import com.maddyhome.idea.vim.VimActions;
 import com.maddyhome.idea.vim.VimPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
  * This class is used to handle the Vim Plugin enabled/disabled toggle. This is most likely used as a menu option
  * but could also be used as a toolbar item.
  */
-public class VimPluginToggleAction extends ToggleAction implements DumbAware {
+public class VimPluginToggleAction extends DumbAwareToggleAction {
   /**
    * Indicates if the toggle is on or off
    *
