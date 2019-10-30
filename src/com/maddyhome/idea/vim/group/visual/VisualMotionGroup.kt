@@ -146,7 +146,7 @@ class VisualMotionGroup {
           while (commandState.mode != CommandState.Mode.COMMAND) {
             commandState.popState()
           }
-          val autodetectedMode = autodetectVisualMode(editor)
+          val autodetectedMode = autodetectVisualSubmode(editor)
           val selectMode = OptionsManager.selectmode
           when {
             editor.isOneLineMode -> {
@@ -279,7 +279,7 @@ class VisualMotionGroup {
 
   @Deprecated("Use enterVisualMode or toggleVisual methods")
   fun setVisualMode(editor: Editor) {
-    val autodetectedMode = autodetectVisualMode(editor)
+    val autodetectedMode = autodetectVisualSubmode(editor)
 
     if (editor.inVisualMode) {
       CommandState.getInstance(editor).popState()
@@ -324,7 +324,7 @@ class VisualMotionGroup {
    * - DOES NOT check if carets actually have any selection
    */
   fun enterVisualMode(editor: Editor, subMode: CommandState.SubMode? = null): Boolean {
-    val autodetectedSubMode = subMode ?: autodetectVisualMode(editor)
+    val autodetectedSubMode = subMode ?: autodetectVisualSubmode(editor)
     CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, autodetectedSubMode, MappingMode.VISUAL)
     if (autodetectedSubMode == CommandState.SubMode.VISUAL_BLOCK) {
       editor.caretModel.primaryCaret.run { vimSelectionStart = vimLeadSelectionOffset }
@@ -342,7 +342,7 @@ class VisualMotionGroup {
     return true
   }
 
-  private fun autodetectVisualMode(editor: Editor): CommandState.SubMode {
+  private fun autodetectVisualSubmode(editor: Editor): CommandState.SubMode {
     if (editor.caretModel.caretCount > 1 && seemsLikeBlockMode(editor)) {
       return CommandState.SubMode.VISUAL_BLOCK
     }
