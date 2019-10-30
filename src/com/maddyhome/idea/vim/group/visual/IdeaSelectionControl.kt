@@ -1,5 +1,6 @@
 package com.maddyhome.idea.vim.group.visual
 
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
@@ -29,7 +30,7 @@ object IdeaSelectionControl {
    */
   fun controlNonVimSelectionChange(editor: Editor, selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER) {
     VimVisualTimer.singleTask(editor.mode) { initialMode ->
-      VisualMotionGroup.logger.info("Adjust non-vim selection. Source: $selectionSource")
+      logger.info("Adjust non-vim selection. Source: $selectionSource")
       if (initialMode?.hasVisualSelection == true || editor.caretModel.allCarets.any(Caret::hasSelection)) {
         if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
           val commandState = CommandState.getInstance(editor)
@@ -37,7 +38,7 @@ object IdeaSelectionControl {
             IdeaRefactorMode.correctSelection(editor)
             return@singleTask
           }
-          VisualMotionGroup.logger.info("Some carets have selection. State before adjustment: ${commandState.toSimpleString()}")
+          logger.info("Some carets have selection. State before adjustment: ${commandState.toSimpleString()}")
 
           editor.popAllModes()
 
@@ -45,30 +46,30 @@ object IdeaSelectionControl {
           val selectMode = OptionsManager.selectmode
           when {
             editor.isOneLineMode -> {
-              VisualMotionGroup.logger.info("Enter select mode. Reason: one line mode")
+              logger.info("Enter select mode. Reason: one line mode")
               VimPlugin.getVisualMotion().enterSelectMode(editor, autodetectedMode)
             }
             selectionSource == VimListenerManager.SelectionSource.MOUSE && SelectModeOptionData.mouse in selectMode -> {
-              VisualMotionGroup.logger.info("Enter select mode. Selection source is mouse and selectMode option has mouse")
+              logger.info("Enter select mode. Selection source is mouse and selectMode option has mouse")
               VimPlugin.getVisualMotion().enterSelectMode(editor, autodetectedMode)
             }
             editor.isTemplateActive() && IdeaRefactorMode.selectMode() -> {
-              VisualMotionGroup.logger.info("Enter select mode. Template is active and selectMode has template")
+              logger.info("Enter select mode. Template is active and selectMode has template")
               VimPlugin.getVisualMotion().enterSelectMode(editor, autodetectedMode)
             }
             selectionSource == VimListenerManager.SelectionSource.OTHER && SelectModeOptionData.refactoring in selectMode -> {
-              VisualMotionGroup.logger.info("Enter select mode. Selection source is OTHER and selectMode has refactoring")
+              logger.info("Enter select mode. Selection source is OTHER and selectMode has refactoring")
               VimPlugin.getVisualMotion().enterSelectMode(editor, autodetectedMode)
             }
             else -> {
-              VisualMotionGroup.logger.info("Enter visual mode")
+              logger.info("Enter visual mode")
               VimPlugin.getVisualMotion().enterVisualMode(editor, autodetectedMode)
             }
           }
           KeyHandler.getInstance().reset(editor)
         } else {
           val commandState = CommandState.getInstance(editor)
-          VisualMotionGroup.logger.info("None of carets have selection. State before adjustment: ${commandState.toSimpleString()}")
+          logger.info("None of carets have selection. State before adjustment: ${commandState.toSimpleString()}")
           editor.hardResetAllModes()
 
           val templateActive = editor.isTemplateActive()
@@ -79,7 +80,7 @@ object IdeaSelectionControl {
         }
       }
       updateCaretState(editor)
-      VisualMotionGroup.logger.info("${editor.mode} is enabled")
+      logger.info("${editor.mode} is enabled")
     }
   }
 
@@ -124,4 +125,6 @@ object IdeaSelectionControl {
       return CommandState.Mode.COMMAND
     }
   }
+
+  private val logger = Logger.getInstance(IdeaSelectionControl::class.java)
 }

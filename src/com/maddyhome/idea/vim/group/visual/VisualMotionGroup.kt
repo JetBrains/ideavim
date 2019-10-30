@@ -45,10 +45,6 @@ import com.maddyhome.idea.vim.option.OptionsManager
  * @author Alex Plate
  */
 class VisualMotionGroup {
-  companion object {
-    val logger = Logger.getInstance(VisualMotionGroup::class.java)
-  }
-
   fun selectPreviousVisualMode(editor: Editor): Boolean {
     val lastSelectionType = editor.vimLastSelectionType ?: return false
     val visualMarks = VimPlugin.getMark().getVisualSelectionMarks(editor) ?: return false
