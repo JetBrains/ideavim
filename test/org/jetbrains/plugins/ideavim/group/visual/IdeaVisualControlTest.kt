@@ -24,14 +24,16 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.VimTestCase
+import com.maddyhome.idea.vim.option.SelectModeOptionData
+import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
 
 /**
  * @author Alex Plate
  */
-@Suppress("ClassName")
-class IdeaVisualControlTest : VimTestCase() {
+class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
+  @VimOptionDefaultAll
   fun `test enable character selection no selection`() {
     configureByText("""
             A Discovery
@@ -48,6 +50,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable character selection cursor in the middle`() {
     configureByText("""
             A Discovery
@@ -86,6 +89,7 @@ class IdeaVisualControlTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """)
+  @VimOptionDefaultAll
   fun `test enable character selection cursor on end`() {
     configureByText("""
             A Discovery
@@ -116,6 +120,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable character selection cursor on start`() {
     configureByText("""
             A Discovery
@@ -146,6 +151,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable character selection lineend`() {
     configureByText("""
             A Discovery
@@ -176,6 +182,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable character selection next line`() {
     configureByText("""
             A Discovery
@@ -206,6 +213,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable character selection start on line start`() {
     configureByText("""
             A Discovery
@@ -236,6 +244,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable character selection start on line end`() {
     configureByText("""
             A Discovery
@@ -266,6 +275,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable character selection multicaret`() {
     configureByText("""
             A Discovery
@@ -294,6 +304,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable line selection`() {
     configureByText("""
             A Discovery
@@ -337,6 +348,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable line selection next line`() {
     configureByText("""
             A Discovery
@@ -367,6 +379,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable line selection cursor on last line`() {
     configureByText("""
             A Discovery
@@ -397,6 +410,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable line selection cursor on first line`() {
     configureByText("""
             A Discovery
@@ -427,6 +441,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable line selection multicaret`() {
     configureByText("""
             A Discovery
@@ -457,6 +472,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable line selection motion up`() {
     configureByText("""
             A Discovery
@@ -487,6 +503,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable character selection looks like block`() {
     configureByText("""
             A Discovery
@@ -504,6 +521,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable character selection`() {
     configureByText("""
             A Discovery
@@ -534,6 +552,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable character selection with longer line`() {
     configureByText("""
             A Discovery
@@ -564,6 +583,7 @@ class IdeaVisualControlTest : VimTestCase() {
     assertCaretsColour()
   }
 
+  @VimOptionDefaultAll
   fun `test enable character selection caret to the left`() {
     configureByText("""
             A Discovery
