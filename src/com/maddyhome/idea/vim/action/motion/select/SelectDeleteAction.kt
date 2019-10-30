@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.helper.exitSelectMode
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -48,7 +49,7 @@ class SelectDeleteAction : VimActionHandler.SingleExecution() {
         break
       }
     }
-    VimPlugin.getVisualMotion().exitSelectMode(editor, true)
+    editor.exitSelectMode(true)
     VimPlugin.getChange().insertBeforeCursor(editor, context)
     return true
   }

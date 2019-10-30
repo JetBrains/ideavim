@@ -31,19 +31,14 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.RWLockLabel
-import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.inSelectMode
+import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
-import com.maddyhome.idea.vim.helper.vimKeepingVisualOperatorAction
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
 import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimSelectionStart
-import com.maddyhome.idea.vim.helper.vimSelectionStartClear
-import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.option.OptionsManager
 
 /**
@@ -148,7 +143,7 @@ class VisualMotionGroup {
 
     if (subMode == editor.subMode) {
       // Disable visual subMode
-      exitVisual(editor)
+      editor.exitVisualMode()
       return true
     }
 
@@ -277,67 +272,6 @@ class VisualMotionGroup {
       ?: throw RuntimeException("No carets")
     val lastLine = editor.offsetToLogicalPosition(selections.last().first).line
     return selections.first().first to editor.logicalPositionToOffset(LogicalPosition(lastLine, maxColumn))
-  }
-
-  //=============================== EXIT VISUAL and SELECT MODE ==============================================
-  /**
-   * [adjustCaretPosition] - if true, caret will be moved one char left if it's on the line end
-   * This method resets KeyHandler and should be used if you are calling it from non-vim mechanism (like adjusting
-   *   editor's selection)
-   */
-  fun exitSelectModeAndResetKeyHandler(editor: Editor, adjustCaretPosition: Boolean) {
-    if (!editor.inSelectMode) return
-
-    exitSelectMode(editor, adjustCaretPosition)
-
-    KeyHandler.getInstance().reset(editor)
-  }
-
-  fun exitSelectMode(editor: Editor, adjustCaretPosition: Boolean) {
-    if (!editor.inSelectMode) return
-
-    CommandState.getInstance(editor).popState()
-    SelectionVimListenerSuppressor.lock().use {
-      editor.caretModel.allCarets.forEach {
-        it.removeSelection()
-        it.vimSelectionStartClear()
-        if (adjustCaretPosition) {
-          val lineEnd = EditorHelper.getLineEndForOffset(editor, it.offset)
-          val lineStart = EditorHelper.getLineStartForOffset(editor, it.offset)
-          if (it.offset == lineEnd && it.offset != lineStart) {
-            it.moveToOffset(it.offset - 1)
-          }
-        }
-      }
-    }
-    updateCaretState(editor)
-  }
-
-  @RWLockLabel.NoLockRequired
-  fun exitVisual(editor: Editor) {
-    val wasBlockSubMode = editor.inBlockSubMode
-    val selectionType = SelectionType.fromSubMode(editor.subMode)
-    SelectionVimListenerSuppressor.lock().use {
-      if (wasBlockSubMode) {
-        editor.caretModel.allCarets.forEach { it.visualAttributes = editor.caretModel.primaryCaret.visualAttributes }
-        editor.caretModel.removeSecondaryCarets()
-      }
-      if (!editor.vimKeepingVisualOperatorAction) {
-        editor.caretModel.allCarets.forEach(Caret::removeSelection)
-      }
-    }
-    if (editor.inVisualMode) {
-      editor.vimLastSelectionType = selectionType
-      // FIXME: 2019-03-05 Make it multicaret
-      val primaryCaret = editor.caretModel.primaryCaret
-      val vimSelectionStart = primaryCaret.vimSelectionStart
-      VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(vimSelectionStart, primaryCaret.offset))
-      editor.caretModel.allCarets.forEach { it.vimSelectionStartClear() }
-
-      editor.subMode = CommandState.SubMode.NONE
-
-      CommandState.getInstance(editor).popState()
-    }
   }
 
   val exclusiveSelection: Boolean

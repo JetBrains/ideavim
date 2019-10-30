@@ -278,7 +278,7 @@ public class ChangeGroup {
   public void insertPreviousInsert(@NotNull Editor editor, @NotNull DataContext context, boolean exit) {
     repeatInsertText(editor, context, 1);
     if (exit) {
-      processEscape(editor, context);
+      ModeHelper.exitInsertMode(editor, context);
     }
   }
 
@@ -476,10 +476,9 @@ public class ChangeGroup {
   /**
    * Terminate insert/replace mode after the user presses Escape or Ctrl-C
    *
-   * @param editor  The editor that was being edited
-   * @param context The data context
+   * DEPRECATED. Please, don't use this function directly. Use ModeHelper.exitInsert
    */
-  public void processEscape(@NotNull Editor editor, @NotNull DataContext context) {
+  public void processEscape(@NotNull Editor editor, @Nullable DataContext context) {
     int cnt = lastInsert != null ? lastInsert.getCount() : 0;
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
       setInsertEditorState(editor, true);
@@ -496,7 +495,9 @@ public class ChangeGroup {
 
     lastStrokes = new ArrayList<>(strokes);
 
-    repeatInsert(editor, context, cnt == 0 ? 0 : cnt - 1, true);
+    if (context != null) {
+      repeatInsert(editor, context, cnt == 0 ? 0 : cnt - 1, true);
+    }
 
     final MarkGroup markGroup = VimPlugin.getMark();
     final int offset = editor.getCaretModel().getPrimaryCaret().getOffset();
@@ -819,7 +820,8 @@ public class ChangeGroup {
     try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
       res = processKey(editor, context, key);
 
-      VimPlugin.getVisualMotion().exitSelectModeAndResetKeyHandler(editor, false);
+      ModeHelper.exitSelectMode(editor, false);
+      KeyHandler.getInstance().reset(editor);
 
       if (isPrintableChar(key.getKeyChar()) || activeTemplateWithLeftRightMotion(editor, key)) {
         VimPlugin.getChange().insertBeforeCursor(editor, context);

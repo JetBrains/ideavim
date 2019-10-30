@@ -6,11 +6,13 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.helper.hardResetAllModes
 import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.popAllModes
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -36,9 +38,9 @@ object IdeaSelectionControl {
             return@singleTask
           }
           VisualMotionGroup.logger.info("Some carets have selection. State before adjustment: ${commandState.toSimpleString()}")
-          while (commandState.mode != CommandState.Mode.COMMAND) {
-            commandState.popState()
-          }
+
+          editor.popAllModes()
+
           val autodetectedMode = VimPlugin.getVisualMotion().autodetectVisualSubmode(editor)
           val selectMode = OptionsManager.selectmode
           when {
@@ -67,8 +69,7 @@ object IdeaSelectionControl {
         } else {
           val commandState = CommandState.getInstance(editor)
           VisualMotionGroup.logger.info("None of carets have selection. State before adjustment: ${commandState.toSimpleString()}")
-          VimPlugin.getVisualMotion().exitVisual(editor)
-          VimPlugin.getVisualMotion().exitSelectModeAndResetKeyHandler(editor, true)
+          editor.hardResetAllModes()
 
           val templateActive = editor.isTemplateActive()
           if (templateActive && editor.inNormalMode) {

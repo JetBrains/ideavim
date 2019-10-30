@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
+import com.maddyhome.idea.vim.helper.ModeHelper;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -66,7 +67,7 @@ final public class FilterVisualLinesAction extends VimActionHandler.SingleExecut
   @Override
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
     VimPlugin.getProcess().startFilterCommand(editor, context, cmd);
-    VimPlugin.getVisualMotion().exitVisual(editor);
+    ModeHelper.exitVisualMode(editor);
     return true;
   }
 }

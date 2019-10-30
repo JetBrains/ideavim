@@ -39,6 +39,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.maddyhome.idea.vim.EventFacade
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimTypedActionHandler
 import com.maddyhome.idea.vim.command.CommandState
@@ -54,6 +55,8 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.exitSelectMode
+import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
@@ -377,9 +380,10 @@ object VimListenerManager {
 
         if (event.mouseEvent.clickCount == 1) {
           if (editor.inVisualMode) {
-            VimPlugin.getVisualMotion().exitVisual(editor)
+            editor.exitVisualMode()
           } else if (editor.inSelectMode) {
-            VimPlugin.getVisualMotion().exitSelectModeAndResetKeyHandler(editor, false)
+            editor.exitSelectMode(false)
+            KeyHandler.getInstance().reset(editor)
           }
         }
         // TODO: 2019-03-22 Multi?

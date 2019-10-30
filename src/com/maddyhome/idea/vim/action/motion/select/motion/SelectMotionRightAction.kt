@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.option.KeyModelOptionData
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -49,7 +50,7 @@ class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
       logger.info("Keymodel option has stopselect. Exiting select mode")
       val startSelection = caret.selectionStart
       val endSelection = caret.selectionEnd
-      VimPlugin.getVisualMotion().exitSelectMode(editor, false)
+      editor.exitSelectMode(false)
       if (editor.isTemplateActive()) {
         logger.info("Template is active. Activate insert mode")
         VimPlugin.getChange().insertBeforeCursor(editor, context)

@@ -25,6 +25,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.exitSelectMode
+import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.option.KeyModelOptionData
@@ -118,10 +120,10 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
   final override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
     val keymodel = OptionsManager.keymodel
     if (editor.inSelectMode && (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel)) {
-      VimPlugin.getVisualMotion().exitSelectMode(editor, false)
+      editor.exitSelectMode(false)
     }
     if (editor.inVisualMode && (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopvisual in keymodel)) {
-      VimPlugin.getVisualMotion().exitVisual(editor)
+      editor.exitVisualMode()
     }
 
     return offset(editor, caret, context, count, rawCount, argument)

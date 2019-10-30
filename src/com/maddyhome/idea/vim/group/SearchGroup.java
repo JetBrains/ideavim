@@ -986,7 +986,7 @@ public class SearchGroup {
                                   @NotNull String excmd, String exarg) {
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
     if (CommandStateHelper.inVisualMode(editor)) {
-      VimPlugin.getVisualMotion().exitVisual(editor);
+      ModeHelper.exitVisualMode(editor);
     }
 
     CharPointer cmd = new CharPointer(new StringBuffer(exarg));

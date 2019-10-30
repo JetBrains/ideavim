@@ -20,11 +20,11 @@ package com.maddyhome.idea.vim.action.motion.visual;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.helper.HelperKt;
+import com.maddyhome.idea.vim.helper.ModeHelper;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -59,7 +59,7 @@ final public class VisualExitModeAction extends VimActionHandler.SingleExecution
 
   @Override
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-    VimPlugin.getVisualMotion().exitVisual(HelperKt.getTopLevelEditor(editor));
+    ModeHelper.exitVisualMode(HelperKt.getTopLevelEditor(editor));
     return true;
   }
 }

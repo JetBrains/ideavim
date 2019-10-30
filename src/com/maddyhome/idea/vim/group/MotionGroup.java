@@ -42,10 +42,7 @@ import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
-import com.maddyhome.idea.vim.helper.CommandStateHelper;
-import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.SearchHelper;
-import com.maddyhome.idea.vim.helper.UserDataManager;
+import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -327,7 +324,7 @@ public class MotionGroup {
       VisualGroupKt.vimMoveSelectionToCaret(caret);
     }
     else {
-      VimPlugin.getVisualMotion().exitVisual(editor);
+      ModeHelper.exitVisualMode(editor);
     }
   }
 
@@ -1334,7 +1331,7 @@ public class MotionGroup {
       final Editor editor = ((TextEditor)fileEditor).getEditor();
       ExOutputModel.getInstance(editor).clear();
       if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-        VimPlugin.getVisualMotion().exitVisual(editor);
+        ModeHelper.exitVisualMode(editor);
         KeyHandler.getInstance().reset(editor);
       }
     }
