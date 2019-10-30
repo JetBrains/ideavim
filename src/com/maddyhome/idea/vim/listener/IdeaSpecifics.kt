@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.inNormalMode
@@ -77,7 +78,7 @@ object IdeaSpecifics {
           // Rider moves caret to the end of selection
           editor?.caretModel?.addCaretListener(object : CaretListener {
             override fun caretPositionChanged(event: CaretEvent) {
-              val predictedMode = VimPlugin.getVisualMotion().predictMode(event.editor, VimListenerManager.SelectionSource.OTHER)
+              val predictedMode = IdeaSelectionControl.predictMode(event.editor, VimListenerManager.SelectionSource.OTHER)
               moveCaretOneCharLeftFromSelectionEnd(event.editor, predictedMode)
               event.editor.caretModel.removeCaretListener(this)
             }

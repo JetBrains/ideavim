@@ -49,6 +49,7 @@ import com.maddyhome.idea.vim.group.FileGroup
 import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SearchGroup
+import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
@@ -273,7 +274,7 @@ object VimListenerManager {
 
       if (SelectionVimListenerSuppressor.isNotLocked) {
         logger.info("Adjust non vim selection change")
-        VimPlugin.getVisualMotion().controlNonVimSelectionChange(editor)
+        IdeaSelectionControl.controlNonVimSelectionChange(editor)
       }
 
       if (myMakingChanges || document is DocumentEx && document.isInEventsHandling) {
@@ -346,8 +347,8 @@ object VimListenerManager {
         val editor = event.editor
         val caret = editor.caretModel.primaryCaret
         SelectionVimListenerSuppressor.unlock {
-          val predictedMode = VimPlugin.getVisualMotion().predictMode(editor, VimListenerManager.SelectionSource.MOUSE)
-          VimPlugin.getVisualMotion().controlNonVimSelectionChange(editor, VimListenerManager.SelectionSource.MOUSE)
+          val predictedMode = IdeaSelectionControl.predictMode(editor, VimListenerManager.SelectionSource.MOUSE)
+          IdeaSelectionControl.controlNonVimSelectionChange(editor, VimListenerManager.SelectionSource.MOUSE)
           moveCaretOneCharLeftFromSelectionEnd(editor, predictedMode)
           caret.vimLastColumn = editor.caretModel.visualPosition.column
         }
@@ -402,7 +403,7 @@ object VimListenerManager {
 
     override fun mousePressed(e: MouseEvent?) {
       val editor = (e?.component as? EditorComponentImpl)?.editor ?: return
-      val predictedMode = VimPlugin.getVisualMotion().predictMode(editor, VimListenerManager.SelectionSource.MOUSE)
+      val predictedMode = IdeaSelectionControl.predictMode(editor, VimListenerManager.SelectionSource.MOUSE)
       when (e.clickCount) {
         1 -> {
           if (!predictedMode.isEndAllowed) {

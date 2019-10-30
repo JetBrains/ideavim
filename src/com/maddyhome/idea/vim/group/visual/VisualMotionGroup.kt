@@ -30,17 +30,11 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.RWLockLabel
-import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.inInsertMode
-import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.helper.isTemplateActive
-import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimKeepingVisualOperatorAction
@@ -50,10 +44,7 @@ import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.helper.vimSelectionStartClear
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
-import com.maddyhome.idea.vim.listener.VimListenerManager
-import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.option.SelectModeOptionData
 
 /**
  * @author Alex Plate
@@ -122,113 +113,6 @@ class VisualMotionGroup {
     }
 
     return true
-  }
-
-  /**
-   * This method should be in sync with [predictMode]
-   *
-   * Control unexpected (non vim) selection change and adjust mode to it. The new mode is now enabled immidiatelly,
-   *   but with some delay (using [VimVisualTimer]
-   *
-   * See [VimVisualTimer] to more info
-   */
-  fun controlNonVimSelectionChange(editor: Editor, selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER) {
-    VimVisualTimer.singleTask(editor.mode) { initialMode ->
-      logger.info("Adjust non-vim selection. Source: $selectionSource")
-      if (initialMode?.hasVisualSelection == true || editor.caretModel.allCarets.any(Caret::hasSelection)) {
-        if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
-          val commandState = CommandState.getInstance(editor)
-          if (editor.isTemplateActive() && IdeaRefactorMode.keepMode()) {
-            IdeaRefactorMode.correctSelection(editor)
-            return@singleTask
-          }
-          logger.info("Some carets have selection. State before adjustment: ${commandState.toSimpleString()}")
-          while (commandState.mode != CommandState.Mode.COMMAND) {
-            commandState.popState()
-          }
-          val autodetectedMode = autodetectVisualSubmode(editor)
-          val selectMode = OptionsManager.selectmode
-          when {
-            editor.isOneLineMode -> {
-              logger.info("Enter select mode. Reason: one line mode")
-              enterSelectMode(editor, autodetectedMode)
-            }
-            selectionSource == VimListenerManager.SelectionSource.MOUSE && SelectModeOptionData.mouse in selectMode -> {
-              logger.info("Enter select mode. Selection source is mouse and selectMode option has mouse")
-              enterSelectMode(editor, autodetectedMode)
-            }
-            editor.isTemplateActive() && IdeaRefactorMode.selectMode() -> {
-              logger.info("Enter select mode. Template is active and selectMode has template")
-              enterSelectMode(editor, autodetectedMode)
-            }
-            selectionSource == VimListenerManager.SelectionSource.OTHER && SelectModeOptionData.refactoring in selectMode -> {
-              logger.info("Enter select mode. Selection source is OTHER and selectMode has refactoring")
-              enterSelectMode(editor, autodetectedMode)
-            }
-            else -> {
-              logger.info("Enter visual mode")
-              enterVisualMode(editor, autodetectedMode)
-            }
-          }
-          KeyHandler.getInstance().reset(editor)
-        } else {
-          val commandState = CommandState.getInstance(editor)
-          logger.info("None of carets have selection. State before adjustment: ${commandState.toSimpleString()}")
-          exitVisual(editor)
-          exitSelectModeAndResetKeyHandler(editor, true)
-
-          val templateActive = editor.isTemplateActive()
-          if (templateActive && editor.inNormalMode) {
-            VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
-          }
-          KeyHandler.getInstance().reset(editor)
-        }
-      }
-      updateCaretState(editor)
-      logger.info("${editor.mode} is enabled")
-    }
-  }
-
-  /**
-   * This method should be in sync with [controlNonVimSelectionChange]
-   *
-   * Predict mode after changing visual selection. The prediction will be correct if there is only one sequential
-   *   visual change (e.g. somebody executed "extract selection" action. The prediction can be wrong in case of
-   *   multiple sequential visual changes (e.g. "technical" visual selection during typing in japanese)
-   *
-   * This method is created to improve user experience. It allows to avoid delay in some operations
-   *   (because [controlNonVimSelectionChange] is not executed immediately)
-   */
-  fun predictMode(editor: Editor, selectionSource: VimListenerManager.SelectionSource): CommandState.Mode {
-    if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
-      val selectMode = OptionsManager.selectmode
-      if (editor.isTemplateActive() && IdeaRefactorMode.keepMode()) {
-        return editor.mode
-      }
-      return when {
-        editor.isOneLineMode -> {
-          CommandState.Mode.SELECT
-        }
-        selectionSource == VimListenerManager.SelectionSource.MOUSE && SelectModeOptionData.mouse in selectMode -> {
-          CommandState.Mode.SELECT
-        }
-        editor.isTemplateActive() && IdeaRefactorMode.selectMode() -> {
-          CommandState.Mode.SELECT
-        }
-        selectionSource == VimListenerManager.SelectionSource.OTHER && SelectModeOptionData.refactoring in selectMode -> {
-          CommandState.Mode.SELECT
-        }
-        else -> {
-          CommandState.Mode.VISUAL
-        }
-      }
-    } else {
-      val templateActive = editor.isTemplateActive()
-      if (templateActive && editor.inNormalMode || editor.inInsertMode) {
-        return CommandState.Mode.INSERT
-      }
-      return CommandState.Mode.COMMAND
-    }
   }
 
   //=============================== ENTER VISUAL and SELECT MODE ==============================================
@@ -342,7 +226,7 @@ class VisualMotionGroup {
     return true
   }
 
-  private fun autodetectVisualSubmode(editor: Editor): CommandState.SubMode {
+  fun autodetectVisualSubmode(editor: Editor): CommandState.SubMode {
     if (editor.caretModel.caretCount > 1 && seemsLikeBlockMode(editor)) {
       return CommandState.SubMode.VISUAL_BLOCK
     }

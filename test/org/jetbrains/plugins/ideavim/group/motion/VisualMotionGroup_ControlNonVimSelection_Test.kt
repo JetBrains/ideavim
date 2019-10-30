@@ -20,12 +20,10 @@
 
 package org.jetbrains.plugins.ideavim.group.motion
 
-import com.intellij.openapi.editor.LogicalPosition
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
 
@@ -44,7 +42,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     assertMode(CommandState.Mode.COMMAND)
     assertSubMode(CommandState.SubMode.NONE)
     assertCaretsColour()
@@ -60,7 +58,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
@@ -98,7 +96,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
@@ -128,7 +126,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
@@ -158,7 +156,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
@@ -188,7 +186,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
@@ -218,7 +216,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
@@ -248,7 +246,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
@@ -277,7 +275,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             where it was $s${c}settled$se on some sodden sand
             hard by the torrent of a mountain ${s}pass.$c$se""".trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
@@ -306,7 +304,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
@@ -349,7 +347,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
@@ -379,7 +377,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
@@ -409,7 +407,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
@@ -439,7 +437,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.$se
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
@@ -469,7 +467,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
@@ -499,7 +497,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             ha${s}rd by $c${se}the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
@@ -516,7 +514,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
@@ -546,7 +544,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
@@ -576,7 +574,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
-    VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
