@@ -91,7 +91,7 @@ object IdeaSelectionControl {
     }
   }
 
-  private fun dontChangeMode(editor: Editor): Boolean = editor.isTemplateActive() && IdeaRefactorMode.keepMode()
+  private fun dontChangeMode(editor: Editor): Boolean = editor.isTemplateActive() && (IdeaRefactorMode.keepMode() || editor.mode.hasVisualSelection)
 
   private fun chooseNonSelectionMode(editor: Editor): CommandState.Mode {
     val templateActive = editor.isTemplateActive()

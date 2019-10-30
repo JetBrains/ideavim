@@ -32,6 +32,8 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
+import com.maddyhome.idea.vim.helper.inSelectMode
+import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -290,6 +292,130 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     typeText(parseKeys("i"))
     startRenaming(VariableInplaceRenameHandler())
     assertDoesntChange { myFixture.editor.inInsertMode }
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.keep]))
+  fun `test save mode for visual mode`() {
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+    typeText(parseKeys("vll"))
+    startRenaming(VariableInplaceRenameHandler())
+    assertDoesntChange { myFixture.editor.inVisualMode }
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.select]))
+  fun `test template to select in normal mode`() {
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.select]))
+  fun `test template to select in insert mode`() {
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+    typeText(parseKeys("i"))
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.select]))
+  fun `test template to select in visual mode`() {
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+    typeText(parseKeys("vll"))
+    startRenaming(VariableInplaceRenameHandler())
+    assertDoesntChange { myFixture.editor.inVisualMode }
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.select]))
+  fun `test template to select in select mode`() {
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+    typeText(parseKeys("vll<C-G>"))
+    startRenaming(VariableInplaceRenameHandler())
+    assertDoesntChange { myFixture.editor.inSelectMode }
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.visual]))
+  fun `test template to visual in normal mode`() {
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.visual]))
+  fun `test template to visual in insert mode`() {
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+    typeText(parseKeys("i"))
+    startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.visual]))
+  fun `test template to visual in visual mode`() {
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+    typeText(parseKeys("vll"))
+    startRenaming(VariableInplaceRenameHandler())
+    assertDoesntChange { myFixture.editor.inVisualMode }
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.visual]))
+  fun `test template to visual in select mode`() {
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+    typeText(parseKeys("vll<C-G>"))
+    startRenaming(VariableInplaceRenameHandler())
+    assertDoesntChange { myFixture.editor.inSelectMode }
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.keep]))
