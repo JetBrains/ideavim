@@ -42,6 +42,7 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.option.OptionsManager
 import java.lang.Integer.min
 import java.util.*
+import kotlin.Comparator
 
 private const val NEXT_WHOLE_OCCURRENCE = "<Plug>NextWholeOccurrence"
 private const val NEXT_OCCURRENCE = "<Plug>NextOccurrence"
@@ -86,6 +87,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
     override fun executeInWriteAction(editor: Editor, context: DataContext) {
       val caretModel = editor.caretModel
       val commandState = CommandState.getInstance(editor)
+      val patternComparator = if (OptionsManager.ignorecase.isSet) String.CASE_INSENSITIVE_ORDER else Comparator(String::compareTo);
 
       if (commandState.mode != CommandState.Mode.VISUAL) {
         if (caretModel.caretCount > 1) return
@@ -98,10 +100,10 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
         if (nextOffset == caret.selectionStart) VimPlugin.showMessage("No more matches")
       } else {
         val newPositions = arrayListOf<VisualPosition>()
-        val patterns = sortedSetOf<String>()
+        val patterns = sortedSetOf<String>(patternComparator)
         for (caret in caretModel.allCarets) {
           val selectedText = caret.selectedText ?: return
-          patterns += if (OptionsManager.ignorecase.isSet) selectedText.toLowerCase() else selectedText
+          patterns += selectedText
 
           val lines = selectedText.count { it == '\n' }
           if (lines > 0) {
@@ -123,7 +125,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
         val primaryCaret = editor.caretModel.primaryCaret
         val nextOffset = VimPlugin.getSearch().searchNextFromOffset(editor, primaryCaret.offset + 1, 1)
         val pattern = patterns.first()
-        if (nextOffset == -1 || EditorHelper.getText(editor, nextOffset, nextOffset + pattern.length) != pattern) {
+        if (nextOffset == -1 || patternComparator.compare(EditorHelper.getText(editor, nextOffset, nextOffset + pattern.length), pattern) != 0) {
           if (caretModel.caretCount > 1) return
 
           val newNextOffset = VimPlugin.getSearch().search(editor, pattern, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
