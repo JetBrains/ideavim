@@ -30,10 +30,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.hasVisualSelection
-import com.maddyhome.idea.vim.helper.inInsertMode
-import com.maddyhome.idea.vim.helper.inNormalMode
-import com.maddyhome.idea.vim.helper.inSelectMode
-import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isBlockCaret
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
@@ -82,7 +78,7 @@ object OptionsManager {
   val visualbell = addOption(ToggleOption("visualbell", "vb", false))
   val wrapscan = addOption(ToggleOption("wrapscan", "ws", true))
   val visualEnterDelay = addOption(NumberOption("visualdelay", "visualdelay", 100, 0, Int.MAX_VALUE))
-  val saveModeFor = addOption(BoundListOption(SaveModeFor.name, SaveModeFor.name, arrayOf(), SaveModeFor.availableOptions))
+  val idearefactormode = addOption(BoundStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues))
 
   fun isSet(name: String): Boolean {
     val option = getOption(name)
@@ -378,11 +374,14 @@ object SelectModeOptionData {
   const val mouse = "mouse"
   const val key = "key"
   const val cmd = "cmd"
+
+  @Deprecated("Please, use `idearefactormode`")
   const val template = "template"
   const val refactoring = "refactoring"
 
+  @Suppress("DEPRECATION")
   val options = arrayOf(mouse, key, cmd, template, refactoring)
-  val default = arrayOf(template)
+  val default = emptyArray<String>()
   val option = BoundListOption(name, abbr, default, options)
 }
 
@@ -438,47 +437,18 @@ object IgnoreCaseOptionsData {
   const val abbr = "ic"
 }
 
-object SaveModeFor {
-  const val name = "savemodefor"
+object IdeaRefactorMode {
+  const val name = "idearefactormode"
 
-  const val refactoring = SelectModeOptionData.refactoring
-  const val iRefactoring = "i-" + SelectModeOptionData.refactoring
-  const val nRefactoring = "n-" + SelectModeOptionData.refactoring
-  const val vRefactoring = "v-" + SelectModeOptionData.refactoring
-  const val sRefactoring = "s-" + SelectModeOptionData.refactoring
+  const val keep = "keep"
+  const val select = "select"
+  const val visual = "visual"
 
-  const val template = SelectModeOptionData.template
-  const val iTemplate = "i-" + SelectModeOptionData.template
-  const val nTemplate = "n-" + SelectModeOptionData.template
-  const val vTemplate = "v-" + SelectModeOptionData.template
-  const val sTemplate = "s-" + SelectModeOptionData.template
+  val availableValues = arrayOf(keep, select, visual)
 
-  val availableOptions = arrayOf(
-    refactoring, iRefactoring, nRefactoring, vRefactoring, sRefactoring,
-    template, iTemplate, nTemplate, vTemplate, sTemplate
-  )
-
-  fun saveTemplate(editor: Editor): Boolean {
-    return when {
-      template in OptionsManager.saveModeFor -> true
-      nTemplate in OptionsManager.saveModeFor && editor.inNormalMode -> true
-      iTemplate in OptionsManager.saveModeFor && editor.inInsertMode -> true
-      vTemplate in OptionsManager.saveModeFor && editor.inVisualMode -> true
-      sTemplate in OptionsManager.saveModeFor && editor.inSelectMode -> true
-      else -> false
-    }
-  }
-
-  fun saveRefactoring(editor: Editor): Boolean {
-    return when {
-      refactoring in OptionsManager.saveModeFor -> true
-      nRefactoring in OptionsManager.saveModeFor && editor.inNormalMode -> true
-      iRefactoring in OptionsManager.saveModeFor && editor.inInsertMode -> true
-      vRefactoring in OptionsManager.saveModeFor && editor.inVisualMode -> true
-      sRefactoring in OptionsManager.saveModeFor && editor.inSelectMode -> true
-      else -> false
-    }
-  }
+  fun keepMode(): Boolean = OptionsManager.idearefactormode.value == keep
+  fun selectMode(): Boolean = OptionsManager.idearefactormode.value == select
+  fun visualMode(): Boolean = OptionsManager.idearefactormode.value == visual
 
   fun correctSelection(editor: Editor) {
     val action: () -> Unit = {

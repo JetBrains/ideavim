@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.option.SelectModeOptionData
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import java.io.File
 import javax.swing.KeyStroke
@@ -36,25 +35,6 @@ class NotificationService(private val project: Project?) {
   // This constructor is used to create an applicationService
   @Suppress("unused")
   constructor() : this(null)
-
-  fun notifyAboutTemplateInSelectMode() {
-    val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
-      "We recommend to add <b><code>template</code></b> to the <b><code>selectmode</code></b> option to enable <a href='#select'>select mode</a> during template editing" +
-        "<br/><code>set selectmode+=template</code></b>",
-      NotificationType.INFORMATION, NotificationListener { _, event ->
-      if (event.description == "#select") {
-        BrowserLauncher.instance.open(selectModeUrl)
-      }
-    })
-
-    notification.addAction(OpenIdeaVimRcAction(notification))
-
-    notification.addAction(AppendToIdeaVimRcAction(notification, "set selectmode+=template", "template") { OptionsManager.selectmode.append(SelectModeOptionData.template) })
-
-    notification.addAction(HelpLink(notification, selectModeUrl))
-
-    notification.notify(project)
-  }
 
   fun notifyAboutIdeaPut() {
     val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,

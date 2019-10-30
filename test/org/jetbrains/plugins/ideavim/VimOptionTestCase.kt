@@ -18,10 +18,10 @@
 
 package org.jetbrains.plugins.ideavim
 
+import com.maddyhome.idea.vim.option.BoundStringOption
 import com.maddyhome.idea.vim.option.ListOption
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.ToggleOption
-import junit.framework.TestCase
 
 /**
  * @author Alex Plate
@@ -45,41 +45,40 @@ abstract class VimOptionTestCase(option: String, vararg otherOptions: String) : 
   override fun runTest() {
     val testMethod = this.javaClass.getMethod(this.name)
     if (!testMethod.isAnnotationPresent(VimOptionDefaultAll::class.java)) {
-      if (!testMethod.isAnnotationPresent(VimOptionTestConfiguration::class.java)) TestCase.fail("You should add VimOptionTestConfiguration with options for this method")
+      if (!testMethod.isAnnotationPresent(VimOptionTestConfiguration::class.java)) kotlin.test.fail("You should add VimOptionTestConfiguration with options for this method")
 
       val annotationValues = testMethod.getDeclaredAnnotation(VimOptionTestConfiguration::class.java) ?: run {
-        TestCase.fail("You should have at least one VimOptionTestConfiguration annotation. Or you can use VimOptionDefaultAll")
-        return
+        kotlin.test.fail("You should have at least one VimOptionTestConfiguration annotation. Or you can use VimOptionDefaultAll")
       }
       val defaultOptions = testMethod.getDeclaredAnnotation(VimOptionDefault::class.java)?.values ?: emptyArray()
 
       val annotationsValueList = annotationValues.value.map { it.option } + defaultOptions
       val annotationsValueSet = annotationsValueList.toSet()
-      if (annotationsValueSet.size < annotationsValueList.size) TestCase.fail("You have duplicated options")
-      if (annotationsValueSet != options) TestCase.fail("You should present all options in annotations")
+      if (annotationsValueSet.size < annotationsValueList.size) kotlin.test.fail("You have duplicated options")
+      if (annotationsValueSet != options) kotlin.test.fail("You should present all options in annotations")
 
       annotationValues.value.forEach {
         val option = OptionsManager.getOption(it.option)
         when (it.type) {
           VimTestOptionType.TOGGLE -> {
             if (option !is ToggleOption) {
-              TestCase.fail("${it.option} is not a toggle option. Change it for method `${testMethod.name}`")
-              return
+              kotlin.test.fail("${it.option} is not a toggle option. Change it for method `${testMethod.name}`")
             }
             if (it.values.size != 1) {
-              TestCase.fail("You should provide only one value for Toggle option. Change it for method `${testMethod.name}`")
-              return
+              kotlin.test.fail("You should provide only one value for Toggle option. Change it for method `${testMethod.name}`")
             }
 
             if (it.values.first().toBoolean()) option.set() else option.reset()
           }
           VimTestOptionType.LIST -> {
-            if (option !is ListOption) {
-              TestCase.fail("${it.option} is not a list option. Change it for method `${testMethod.name}`")
-              return
-            }
+            if (option !is ListOption) kotlin.test.fail("${it.option} is not a list option. Change it for method `${testMethod.name}`")
 
             option.set(it.values.joinToString(","))
+          }
+          VimTestOptionType.VALUE -> {
+            if (option !is BoundStringOption) kotlin.test.fail("${it.option} is not a value option. Change it for method `${testMethod.name}`")
+
+            option.set(it.values.first())
           }
         }
       }
@@ -106,5 +105,6 @@ annotation class VimTestOption(
 
 enum class VimTestOptionType {
   LIST,
-  TOGGLE
+  TOGGLE,
+  VALUE
 }

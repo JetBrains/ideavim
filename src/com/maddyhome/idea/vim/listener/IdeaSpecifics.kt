@@ -43,9 +43,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.inNormalMode
-import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.option.SaveModeFor
-import com.maddyhome.idea.vim.option.SelectModeOptionData
+import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 
@@ -109,18 +107,17 @@ object IdeaSpecifics {
   private object VimTemplateManagerListener : TemplateManagerListener {
     override fun templateStarted(state: TemplateState) {
       val editor = state.editor ?: return
-      notifySelectmode(state, editor.project)
 
       state.addTemplateStateListener(object : TemplateEditingAdapter() {
         override fun currentVariableChanged(templateState: TemplateState, template: Template?, oldIndex: Int, newIndex: Int) {
-          if (SaveModeFor.saveTemplate(editor)) {
-            SaveModeFor.correctSelection(editor)
+          if (IdeaRefactorMode.keepMode()) {
+            IdeaRefactorMode.correctSelection(editor)
           }
         }
       })
 
-      if (SaveModeFor.saveTemplate(editor)) {
-        SaveModeFor.correctSelection(editor)
+      if (IdeaRefactorMode.keepMode()) {
+        IdeaRefactorMode.correctSelection(editor)
       } else {
         if (!editor.selectionModel.hasSelection()) {
           // Enable insert mode if there is no selection in template
@@ -131,22 +128,6 @@ object IdeaSpecifics {
           }
         }
       }
-    }
-
-    private fun notifySelectmode(state: TemplateState, project: Project?) {
-      if (VimPlugin.getVimState().isTemplateInSelectModeNotified || SelectModeOptionData.template in OptionsManager.selectmode) return
-
-      VimPlugin.getVimState().isTemplateInSelectModeNotified = true
-
-      state.addTemplateStateListener(object : TemplateEditingAdapter() {
-        override fun templateFinished(template: Template, brokenOff: Boolean) {
-          VimPlugin.getNotifications(project).notifyAboutTemplateInSelectMode()
-        }
-
-        override fun templateCancelled(template: Template?) {
-          VimPlugin.getNotifications(project).notifyAboutTemplateInSelectMode()
-        }
-      })
     }
   }
   //endregion

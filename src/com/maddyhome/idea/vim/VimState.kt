@@ -10,7 +10,6 @@ import kotlin.reflect.KProperty
 class VimState {
   var isIdeaJoinNotified by StateProperty("idea-join")
   var isIdeaPutNotified by StateProperty("idea-put")
-  var isTemplateInSelectModeNotified by StateProperty("template-selectmode")
 
   fun readData(element: Element) {
     val notifications = element.getChild("notifications")

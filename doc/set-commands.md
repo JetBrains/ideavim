@@ -18,6 +18,19 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
     
                      If true, creation of global mark will trigger creation of IDE's bookmark
                      and vice versa.
+                     
+    `idearefactormode` `idearefactormode` String(default "select")      - IdeaVim ONLY  [To Be Released]
+    
+                 Define the mode that would be enabled during
+                 the refactoring (renaming, live template, introduce variable, etc)
+                 
+                 One of the following values:
+                 - keep  - keep the mode that was enabled before starting a refactoring
+                 - select - start refactoring in select mode
+                 - visual - start refactoring in visual mode
+                 
+                 This option has effect if you are in normal, insert or replace mode before refactoring start.
+                 Visual or select mode are not changed.
     
     'ignorecase'     'ic'       ignore case in search patterns
     'iskeyword'      'isk'      defines keywords for commands like 'w', '*', etc.
@@ -59,7 +72,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
     'scrolloff'      'so'    minimum number of lines above and below the cursor
     'selection'      'sel'   what type of selection to use
 
-    `selectmode`     `slm`   String (default "template")
+    `selectmode`     `slm`   String (default "")
 
                  This is a comma-separated list of words, which specify when to start
                  Select mode instead of Visual mode, when a selection is started.
@@ -67,7 +80,10 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                    mouse           when using the mouse
                    key             when using shifted special[1] keys
                    cmd             when using "v", "V", or <C-V>
-                   template        when starting a template       - IdeaVim ONLY
+
+                   template        DEPRECATED. PLEASE USE `idearefactormode` OPTION
+                                   when starting a template       - IdeaVim ONLY
+
                    refactoring     when refactoring without      - IdeaVim ONLY
                                     a template is performed
 

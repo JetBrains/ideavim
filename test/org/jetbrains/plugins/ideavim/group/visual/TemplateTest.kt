@@ -24,34 +24,29 @@ import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.ide.DataManager
 import com.intellij.injected.editor.EditorWindow
-import com.intellij.notification.EventLog
 import com.intellij.openapi.editor.Editor
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler
 import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestUtil.doInlineRename
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
+import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.option.SaveModeFor
-import com.maddyhome.idea.vim.option.SelectModeOptionData
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 import org.jetbrains.plugins.ideavim.VimTestOptionType
 import org.jetbrains.plugins.ideavim.assertDoesntChange
-import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
 
 /**
  * @author Alex Plate
  */
-class TemplateTest : VimOptionTestCase(SaveModeFor.name) {
+class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
 
   override fun setUp() {
     super.setUp()
@@ -106,7 +101,7 @@ class TemplateTest : VimOptionTestCase(SaveModeFor.name) {
 
   @VimOptionDefaultAll
   fun `test selectmode without template`() {
-    OptionsManager.selectmode.remove(SelectModeOptionData.template)
+    OptionsManager.idearefactormode.set(IdeaRefactorMode.visual)
     configureByJavaText("""
             class Hello {
                 public static void main() {
@@ -270,34 +265,7 @@ class TemplateTest : VimOptionTestCase(SaveModeFor.name) {
         """.trimIndent())
   }
 
-  @VimOptionDefaultAll
-  fun `test notification on first time`() {
-    EventLog.markAllAsRead(myFixture.project)
-    VimPlugin.getVimState().isTemplateInSelectModeNotified = false
-    OptionsManager.selectmode.set("")
-
-    configureByJavaText("""
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-        """.trimIndent())
-    startRenaming(VariableInplaceRenameHandler())
-    typeText(parseKeys("<CR>"))
-
-    waitAndAssert(5000) {
-      val notifications = EventLog.getLogModel(myFixture.project).notifications
-      notifications.isNotEmpty() && notifications.last().title == NotificationService.IDEAVIM_NOTIFICATION_TITLE
-    }
-    val notification = EventLog.getLogModel(myFixture.project).notifications.last()
-
-    assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
-    assertTrue(SelectModeOptionData.name in notification.content)
-    assertEquals(3, notification.actions.size)
-  }
-
-  @VimOptionTestConfiguration(VimTestOption(SaveModeFor.name, VimTestOptionType.LIST, ["template"]))
+  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.keep]))
   fun `test template in normal mode`() {
     configureByJavaText("""
             class Hello {
@@ -310,20 +278,7 @@ class TemplateTest : VimOptionTestCase(SaveModeFor.name) {
     assertDoesntChange { myFixture.editor.inNormalMode }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(SaveModeFor.name, VimTestOptionType.LIST, ["i-template"]))
-  fun `test save mode for different mode`() {
-    configureByJavaText("""
-            class Hello {
-                public static void main() {
-                    int my${c}Var = 5;
-                }
-            }
-        """.trimIndent())
-    startRenaming(VariableInplaceRenameHandler())
-    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
-  }
-
-  @VimOptionTestConfiguration(VimTestOption(SaveModeFor.name, VimTestOptionType.LIST, ["i-template"]))
+  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.keep]))
   fun `test save mode for insert mode`() {
     configureByJavaText("""
             class Hello {
@@ -337,7 +292,7 @@ class TemplateTest : VimOptionTestCase(SaveModeFor.name) {
     assertDoesntChange { myFixture.editor.inInsertMode }
   }
 
-  @VimOptionTestConfiguration(VimTestOption(SaveModeFor.name, VimTestOptionType.LIST, ["template"]))
+  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.keep]))
   fun `test template with multiple times`() {
     configureByJavaText(c)
     val manager = TemplateManager.getInstance(myFixture.project)

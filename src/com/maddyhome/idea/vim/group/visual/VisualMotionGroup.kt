@@ -51,8 +51,8 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.helper.vimSelectionStartClear
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.listener.VimListenerManager
+import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.option.SaveModeFor
 import com.maddyhome.idea.vim.option.SelectModeOptionData
 
 /**
@@ -138,9 +138,8 @@ class VisualMotionGroup {
       if (initialMode?.hasVisualSelection == true || editor.caretModel.allCarets.any(Caret::hasSelection)) {
         if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
           val commandState = CommandState.getInstance(editor)
-          if (editor.isTemplateActive() && SaveModeFor.saveTemplate(editor) ||
-            selectionSource == VimListenerManager.SelectionSource.OTHER && SaveModeFor.saveRefactoring(editor)) {
-            SaveModeFor.correctSelection(editor)
+          if (editor.isTemplateActive() && IdeaRefactorMode.keepMode()) {
+            IdeaRefactorMode.correctSelection(editor)
             return@singleTask
           }
           logger.info("Some carets have selection. State before adjustment: ${commandState.toSimpleString()}")
@@ -158,7 +157,7 @@ class VisualMotionGroup {
               logger.info("Enter select mode. Selection source is mouse and selectMode option has mouse")
               enterSelectMode(editor, autodetectedMode)
             }
-            editor.isTemplateActive() && SelectModeOptionData.template in selectMode -> {
+            editor.isTemplateActive() && IdeaRefactorMode.selectMode() -> {
               logger.info("Enter select mode. Template is active and selectMode has template")
               enterSelectMode(editor, autodetectedMode)
             }
@@ -203,6 +202,9 @@ class VisualMotionGroup {
   fun predictMode(editor: Editor, selectionSource: VimListenerManager.SelectionSource): CommandState.Mode {
     if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
       val selectMode = OptionsManager.selectmode
+      if (editor.isTemplateActive() && IdeaRefactorMode.keepMode()) {
+        return editor.mode
+      }
       return when {
         editor.isOneLineMode -> {
           CommandState.Mode.SELECT
@@ -210,7 +212,7 @@ class VisualMotionGroup {
         selectionSource == VimListenerManager.SelectionSource.MOUSE && SelectModeOptionData.mouse in selectMode -> {
           CommandState.Mode.SELECT
         }
-        editor.isTemplateActive() && SelectModeOptionData.template in selectMode -> {
+        editor.isTemplateActive() && IdeaRefactorMode.selectMode() -> {
           CommandState.Mode.SELECT
         }
         selectionSource == VimListenerManager.SelectionSource.OTHER && SelectModeOptionData.refactoring in selectMode -> {
