@@ -284,6 +284,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
     getKey().saveData(element);
     getEditor().saveData(element);
+    this.state.saveData(element);
 
     return element;
   }
