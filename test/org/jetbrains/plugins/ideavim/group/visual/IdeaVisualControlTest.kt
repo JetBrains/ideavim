@@ -18,7 +18,7 @@
 
 @file:Suppress("RemoveCurlyBracesFromTemplate")
 
-package org.jetbrains.plugins.ideavim.group.motion
+package org.jetbrains.plugins.ideavim.group.visual
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
@@ -31,7 +31,7 @@ import org.jetbrains.plugins.ideavim.waitAndAssertMode
  * @author Alex Plate
  */
 @Suppress("ClassName")
-class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
+class IdeaVisualControlTest : VimTestCase() {
   fun `test enable character selection no selection`() {
     configureByText("""
             A Discovery
