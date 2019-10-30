@@ -1,6 +1,6 @@
 # Manual Tests
 
-## #1 [Last run: 17-09-2019]
+## #1 [Last run: 30-10-2019]
 
 _Initial mode:_ NORMAL
 
@@ -14,7 +14,7 @@ Word is selected, block-caret is placed on the word end (offset = `word end - 1`
 ![](resources/manualTests/1.png)
 
 
-## #2 [Last run: 17-09-2019]
+## #2 [Last run: 30-10-2019]
 
 _Initial mode:_ NORMAL
 
@@ -26,7 +26,7 @@ Last word is selected, block caret is placed on the word end without bouncing
 
 ![](resources/manualTests/2.png)
 
-## #3 [Last run: 17-09-2019]
+## #3 [Last run: 30-10-2019]
 
 _Initial mode:_ NORMAL
 
@@ -38,7 +38,7 @@ Line is selected. Caret is placed on the line end
 
 ![](resources/manualTests/3.png)
 
-## #4 [Last run: 17-09-2019]
+## #4 [Last run: 30-10-2019]
 
 _Initial mode:_ NORMAL
 
@@ -51,7 +51,7 @@ After mouse release, caret moves one character back and becomes block shape
 
 ![](resources/manualTests/4.gif)
 
-## #5 [Last run: 17-09-2019]
+## #5 [Last run: 30-10-2019]
 
 _Initial mode:_ NORMAL
 
@@ -65,7 +65,7 @@ After mouse release, caret moves one character back and becomes block shape
 
 ![](resources/manualTests/5.gif)
 
-## #6 [Last run: 17-09-2019]
+## #6 [Last run: 30-10-2019]
 
 _Initial mode:_ NORMAL
 
@@ -77,7 +77,7 @@ Line is selected, caret is on the first position
 
 ![](resources/manualTests/6.gif)
 
-## #6 [Last run: 17-09-2019]
+## #6 [Last run: 30-10-2019]
 
 _Initial mode:_ NORMAL
 
