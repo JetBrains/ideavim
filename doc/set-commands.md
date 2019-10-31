@@ -80,13 +80,14 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                    mouse           when using the mouse
                    key             when using shifted special[1] keys
                    cmd             when using "v", "V", or <C-V>
-
-                   template        DEPRECATED. PLEASE USE `idearefactormode` OPTION
-                                   when starting a template       - IdeaVim ONLY
-
-                   refactoring     DEPRECATED. PLEASE USE ideaselection
-                   ideaselection   when IDE sets a selection      - IdeaVim ONLY
+                   ideaselection   when IDE sets a selection      - IdeaVim ONLY      [To Be Released]
                                    (examples: extend selection, wrap with while, etc.)
+
+                   Deprecated values:  [To Be Released]
+                   template        ~~please use `idearefactormode` option~~
+                                   when starting a template       - IdeaVim ONLY
+                   refactoring     ~~please use ideaselection~~
+                                   same as ideaselection          - IdeaVim ONLY
 
     'showmode'       'smd'       message on the status line to show current mode
     
