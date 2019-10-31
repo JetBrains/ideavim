@@ -41,13 +41,16 @@ _Available since 0.53.1 EAP:_
 * [VIM-1685](https://youtrack.jetbrains.com/issue/VIM-1685) Fix `ESC` for insert mode
 * [VIM-1752](https://youtrack.jetbrains.com/issue/VIM-1752) Fix `ESC` for insert mode
 
-_To Be Released:_
+_Available since 0.53.2 EAP:_
 
 **Features:**
 * Add IdeaVim icon to the status bar ([VIM-943](https://youtrack.jetbrains.com/issue/VIM-943))
+* EasyMotion plugin emulation ([VIM-820](https://youtrack.jetbrains.com/issue/VIM-820))
 
 **Changes:**
 * Remove the default IdeaVim toggle shortcut (<kbd>CTRL</kbd><kbd>ALT</kbd><kbd>V</kbd>)
+* Rename `refactoring` value of `selectmode` option to `ideaselection`
+* Remove `template` value of `selectmode` option and replace it with `idearefactormode` option.
 
 **Fixes:**
 * [VIM-1804](https://youtrack.jetbrains.com/issue/VIM-1804) Exit insert move after toggling IdeaVim
@@ -55,6 +58,7 @@ _To Be Released:_
 * [VIM-1801](https://youtrack.jetbrains.com/issue/VIM-1801) Fix j/k motions with inline hints
 * [VIM-1800](https://youtrack.jetbrains.com/issue/VIM-1800) Improve ideamarks option
 * [VIM-1819](https://youtrack.jetbrains.com/issue/VIM-1819) Fix execution of some rider actions
+* [VIM-1604](https://youtrack.jetbrains.com/issue/VIM-1604) Add IdeaVim logo
 
 0.53, 2019-08-07
 --------------
