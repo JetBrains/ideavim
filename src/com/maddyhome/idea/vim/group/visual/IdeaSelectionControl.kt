@@ -115,7 +115,7 @@ object IdeaSelectionControl {
         if (logReason) logger.info("Enter select mode. Template is active and selectMode has template")
         CommandState.Mode.SELECT
       }
-      selectionSource == VimListenerManager.SelectionSource.OTHER && SelectModeOptionData.refactoring in OptionsManager.selectmode -> {
+      selectionSource == VimListenerManager.SelectionSource.OTHER && SelectModeOptionData.ideaselectionEnabled() -> {
         if (logReason) logger.info("Enter select mode. Selection source is OTHER and selectMode has refactoring")
         CommandState.Mode.SELECT
       }

@@ -24,9 +24,13 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.SelectModeOptionData
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
 
 /**
@@ -612,5 +616,37 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
     assertCaretsColour()
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.ideaselection]))
+  fun `test control selection`() {
+    configureByText("""
+            A Discovery
+
+            I ${c}found it in a legendary land
+            all rocks and lavender and tufted grass,
+        """.trimIndent())
+    VimListenerManager.turnOn()
+    assertMode(CommandState.Mode.COMMAND)
+
+    myFixture.editor.selectionModel.setSelection(5, 10)
+
+    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [""]))
+  fun `test control selection to visual mode`() {
+    configureByText("""
+            A Discovery
+
+            I ${c}found it in a legendary land
+            all rocks and lavender and tufted grass,
+        """.trimIndent())
+    VimListenerManager.turnOn()
+    assertMode(CommandState.Mode.COMMAND)
+
+    myFixture.editor.selectionModel.setSelection(5, 10)
+
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
   }
 }

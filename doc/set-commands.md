@@ -84,8 +84,9 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                    template        DEPRECATED. PLEASE USE `idearefactormode` OPTION
                                    when starting a template       - IdeaVim ONLY
 
-                   refactoring     when refactoring without      - IdeaVim ONLY
-                                    a template is performed
+                   refactoring     DEPRECATED. PLEASE USE ideaselection
+                   ideaselection   when IDE sets a selection      - IdeaVim ONLY
+                                   (examples: extend selection, wrap with while, etc.)
 
     'showmode'       'smd'       message on the status line to show current mode
     

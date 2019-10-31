@@ -375,14 +375,22 @@ object SelectModeOptionData {
   const val key = "key"
   const val cmd = "cmd"
 
-  @Deprecated("Please, use `idearefactormode`")
+  @Deprecated("Please, use `idearefactormode` option")
   const val template = "template"
+  @Deprecated("Please, use `ideaselection`")
   const val refactoring = "refactoring"
 
+  const val ideaselection = "ideaselection"
+
   @Suppress("DEPRECATION")
-  val options = arrayOf(mouse, key, cmd, template, refactoring)
+  val options = arrayOf(mouse, key, cmd, template, refactoring, ideaselection)
   val default = emptyArray<String>()
   val option = BoundListOption(name, abbr, default, options)
+
+  fun ideaselectionEnabled(): Boolean {
+    @Suppress("DEPRECATION")
+    return ideaselection in OptionsManager.selectmode || refactoring in OptionsManager.selectmode
+  }
 }
 
 object ClipboardOptionsData {
