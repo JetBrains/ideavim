@@ -626,7 +626,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             I ${c}found it in a legendary land
             all rocks and lavender and tufted grass,
         """.trimIndent())
-    VimListenerManager.turnOn()
+    VimListenerManager.EditorListeners.addAll()
     assertMode(CommandState.Mode.COMMAND)
 
     myFixture.editor.selectionModel.setSelection(5, 10)
@@ -642,7 +642,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             I ${c}found it in a legendary land
             all rocks and lavender and tufted grass,
         """.trimIndent())
-    VimListenerManager.turnOn()
+    VimListenerManager.EditorListeners.addAll()
     assertMode(CommandState.Mode.COMMAND)
 
     myFixture.editor.selectionModel.setSelection(5, 10)
