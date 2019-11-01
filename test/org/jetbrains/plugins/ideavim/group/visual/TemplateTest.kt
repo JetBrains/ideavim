@@ -20,6 +20,7 @@
 
 package org.jetbrains.plugins.ideavim.group.visual
 
+import com.intellij.codeInsight.lookup.Lookup
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.ide.DataManager
@@ -436,6 +437,27 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     assertOffset(12)
     typeText(parseKeys("<CR>"))
     assertNull(TemplateManagerImpl.getTemplateState(myFixture.editor))
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.keep]))
+  fun `test template with lookup`() {
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+    startRenaming(VariableInplaceRenameHandler())
+    val lookupValue = myFixture.lookupElementStrings?.get(0) ?: kotlin.test.fail()
+    myFixture.finishLookup(Lookup.NORMAL_SELECT_CHAR)
+    myFixture.checkResult("""
+            class Hello {
+                public static void main() {
+                    int $lookupValue = 5;
+                }
+            }
+        """.trimIndent())
   }
 
   private fun startRenaming(handler: VariableInplaceRenameHandler): Editor {

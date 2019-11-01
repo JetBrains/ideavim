@@ -18,6 +18,8 @@
 
 package com.maddyhome.idea.vim.option
 
+import com.intellij.codeInsight.lookup.LookupEvent
+import com.intellij.codeInsight.lookup.LookupListener
 import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
@@ -477,7 +479,19 @@ object IdeaRefactorMode {
 
     val lookup = LookupManager.getActiveLookup(editor) as? LookupImpl
     if (lookup != null) {
+      val selStart = editor.selectionModel.selectionStart
+      val selEnd = editor.selectionModel.selectionEnd
       lookup.performGuardedChange(action)
+      lookup.addLookupListener(object : LookupListener {
+        override fun beforeItemSelected(event: LookupEvent): Boolean {
+          // FIXME: 01.11.2019 Nasty workaround because of problems in IJ platform
+          //   Lookup replaces selected text and not the template itself. So, if there is no selection
+          //   in the template, lookup value will not replace the template, but just insert value on the caret position
+          lookup.performGuardedChange { editor.selectionModel.setSelection(selStart, selEnd) }
+          lookup.removeLookupListener(this)
+          return true
+        }
+      })
     } else {
       action()
     }
