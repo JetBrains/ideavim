@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.RegisterActions;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.helper.ModeHelper;
 import org.jetbrains.annotations.Contract;
@@ -34,16 +33,17 @@ import java.util.Set;
 
 final public class InsertExitModeAction extends VimActionHandler.SingleExecution {
   private static final String ACTION_ID = "VimInsertExitModeAction";
+  public Set<List<KeyStroke>> keySet = parseKeysSet("<C-[>", "<C-C>", "<Esc>");
 
   @NotNull
-  public static EditorActionHandlerBase getInstance() {
-    return RegisterActions.findActionOrDie(ACTION_ID);
+  public static InsertExitModeAction getInstance() {
+    return (InsertExitModeAction)RegisterActions.findActionOrDie(ACTION_ID);
   }
 
   @NotNull
   @Override
   final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<C-[>", "<C-C>", "<Esc>");
+    return keySet;
   }
 
   @Contract(pure = true)

@@ -38,8 +38,9 @@ import javax.swing.KeyStroke
  */
 class LookupUpAction : VimActionHandler.SingleExecution() {
 
+  private val keySet = parseKeysSet("<C-P>")
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-P>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = keySet
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -51,7 +52,7 @@ class LookupUpAction : VimActionHandler.SingleExecution() {
       EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_UP)
         .execute(editor, editor.caretModel.primaryCaret, context)
     } else {
-      val keyStroke = keyStrokesSet.first().first()
+      val keyStroke = keySet.first().first()
       val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
       for (action in actions) {
         if (KeyHandler.executeAction(action, context)) break

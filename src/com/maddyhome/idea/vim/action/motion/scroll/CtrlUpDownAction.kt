@@ -14,12 +14,14 @@ import javax.swing.KeyStroke
 // FIXME: 2019-07-05 Workaround to make jump through methods work
 class CtrlDownAction : VimActionHandler.SingleExecution() {
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-Down>")
+  private val keySet = parseKeysSet("<C-Down>")
+
+  override val keyStrokesSet: Set<List<KeyStroke>> = keySet
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    val keyStroke = keyStrokesSet.first().first()
+    val keyStroke = keySet.first().first()
     val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
     for (action in actions) {
       if (KeyHandler.executeAction(action, context)) break
@@ -30,12 +32,14 @@ class CtrlDownAction : VimActionHandler.SingleExecution() {
 
 class CtrlUpAction : VimActionHandler.SingleExecution() {
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-Up>")
+  private val keySet = parseKeysSet("<C-Up>")
+
+  override val keyStrokesSet: Set<List<KeyStroke>> = keySet
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    val keyStroke = keyStrokesSet.first().first()
+    val keyStroke = keySet.first().first()
     val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
     for (action in actions) {
       if (KeyHandler.executeAction(action, context)) break
