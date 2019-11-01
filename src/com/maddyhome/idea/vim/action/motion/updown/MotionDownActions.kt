@@ -51,7 +51,7 @@ sealed class MotionDownBase : MotionActionHandler.ForEachCaret() {
 open class MotionDownAction : MotionDownBase() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("j")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("j")
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
 
@@ -81,7 +81,7 @@ class MotionDownCtrlNAction : MotionDownAction() {
 class MotionDownNotLineWiseAction : MotionDownBase() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gj", "g<Down>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gj", "g<Down>")
 
   override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
     return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)

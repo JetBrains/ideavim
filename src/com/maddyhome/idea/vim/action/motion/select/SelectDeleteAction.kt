@@ -35,7 +35,7 @@ import javax.swing.KeyStroke
 class SelectDeleteAction : VimActionHandler.SingleExecution() {
 
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<BS>", "<DEL>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<BS>", "<DEL>")
 
   override val type: Command.Type = Command.Type.INSERT
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {

@@ -30,7 +30,7 @@ import javax.swing.KeyStroke
 class MotionHomeAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Home>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Home>")
 
   override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
                       rawCount: Int, argument: Argument?): Int {

@@ -28,7 +28,7 @@ import javax.swing.KeyStroke
 
 class SelectEscapeAction : VimActionHandler.SingleExecution() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<esc>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<esc>")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {

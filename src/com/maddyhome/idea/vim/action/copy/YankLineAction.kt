@@ -28,7 +28,7 @@ import javax.swing.KeyStroke
 
 class YankLineAction : VimActionHandler.SingleExecution() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("Y")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("Y")
 
   override val type: Command.Type = Command.Type.COPY
 

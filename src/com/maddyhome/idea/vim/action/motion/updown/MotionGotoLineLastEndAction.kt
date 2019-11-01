@@ -35,7 +35,7 @@ import javax.swing.KeyStroke
 class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-End>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-End>")
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
 
@@ -62,7 +62,7 @@ class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
 class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-End>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-End>")
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES)
 

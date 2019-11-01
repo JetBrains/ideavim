@@ -32,7 +32,7 @@ import javax.swing.KeyStroke
 
 class MotionOuterBlockDoubleQuoteAction : TextObjectActionHandler() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("a\"")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("a\"")
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_TEXT_BLOCK)
 

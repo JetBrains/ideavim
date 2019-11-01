@@ -34,7 +34,7 @@ import javax.swing.KeyStroke
 
 class FilterMotionAction : VimActionHandler.SingleExecution() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("!")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("!")
 
   override val type: Command.Type = Command.Type.CHANGE
 

@@ -10,7 +10,7 @@ import javax.swing.KeyStroke
 class VimCollapseAllRegions : VimActionHandler.SingleExecution() {
   val actionName: String = "CollapseAllRegions"
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zM")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zM")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -23,7 +23,7 @@ class VimCollapseAllRegions : VimActionHandler.SingleExecution() {
 class VimCollapseRegion : VimActionHandler.SingleExecution() {
   private val actionName: String = "CollapseRegion"
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zc")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zc")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -36,7 +36,7 @@ class VimCollapseRegion : VimActionHandler.SingleExecution() {
 class VimCollapseRegionRecursively : VimActionHandler.SingleExecution() {
   private val actionName: String = "CollapseRegionRecursively"
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zC")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zC")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -49,7 +49,7 @@ class VimCollapseRegionRecursively : VimActionHandler.SingleExecution() {
 class VimExpandAllRegions : VimActionHandler.SingleExecution() {
   private val actionName: String = "ExpandAllRegions"
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zR")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zR")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -62,7 +62,7 @@ class VimExpandAllRegions : VimActionHandler.SingleExecution() {
 class VimExpandRegion : VimActionHandler.SingleExecution() {
   private val actionName: String = "ExpandRegion"
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zo")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zo")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -75,7 +75,7 @@ class VimExpandRegion : VimActionHandler.SingleExecution() {
 class VimExpandRegionRecursively : VimActionHandler.SingleExecution() {
   private val actionName: String = "ExpandRegionRecursively"
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zO")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("zO")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {

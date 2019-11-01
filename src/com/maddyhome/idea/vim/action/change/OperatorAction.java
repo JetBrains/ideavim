@@ -22,7 +22,9 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.*;
+import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
@@ -68,8 +70,8 @@ final public class OperatorAction extends VimActionHandler.SingleExecution {
       if (argument != null) {
         final Command motion = argument.getMotion();
         final TextRange range = MotionGroup
-          .getMotionRange(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd.getCount(),
-                          cmd.getRawCount(), argument);
+          .getMotionRange(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd.getCount(), cmd.getRawCount(),
+                          argument);
         if (range != null) {
           VimPlugin.getMark().setChangeMarks(editor, range);
           final SelectionType selectionType = SelectionType.fromCommandFlags(motion.getFlags());

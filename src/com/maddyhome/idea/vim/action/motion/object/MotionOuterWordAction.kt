@@ -33,7 +33,7 @@ import javax.swing.KeyStroke
 
 class MotionOuterWordAction : TextObjectActionHandler() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("aw")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("aw")
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE)
 

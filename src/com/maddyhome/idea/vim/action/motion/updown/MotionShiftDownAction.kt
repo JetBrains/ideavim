@@ -35,7 +35,7 @@ import javax.swing.KeyStroke
 class MotionShiftDownAction : ShiftedArrowKeyHandler() {
 
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Down>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Down>")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
   override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {

@@ -39,7 +39,7 @@ import javax.swing.KeyStroke
 class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Right>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Right>")
 
   override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
     val keymodel = OptionsManager.keymodel

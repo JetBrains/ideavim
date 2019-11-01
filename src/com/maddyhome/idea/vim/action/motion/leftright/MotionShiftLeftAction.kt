@@ -33,7 +33,7 @@ import javax.swing.KeyStroke
 
 class MotionShiftLeftAction : ShiftedArrowKeyHandler() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Left>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Left>")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
   override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {

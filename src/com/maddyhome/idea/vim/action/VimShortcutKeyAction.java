@@ -58,35 +58,42 @@ import static java.awt.event.KeyEvent.*;
  * These keys are not passed to {@link com.maddyhome.idea.vim.VimTypedActionHandler} and should be handled by actions.
  */
 public class VimShortcutKeyAction extends AnAction implements DumbAware {
+  @NotNull public static final Set<KeyStroke> VIM_ONLY_EDITOR_KEYS =
+    ImmutableSet.<KeyStroke>builder().addAll(getKeyStrokes(VK_ENTER, 0)).addAll(getKeyStrokes(VK_ESCAPE, 0))
+      .addAll(getKeyStrokes(VK_TAB, 0)).addAll(getKeyStrokes(VK_BACK_SPACE, 0, CTRL_MASK))
+      .addAll(getKeyStrokes(VK_INSERT, 0)).addAll(getKeyStrokes(VK_DELETE, 0, CTRL_MASK))
+      .addAll(getKeyStrokes(VK_UP, 0, CTRL_MASK, SHIFT_MASK)).addAll(getKeyStrokes(VK_DOWN, 0, CTRL_MASK, SHIFT_MASK))
+      .addAll(getKeyStrokes(VK_LEFT, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
+      .addAll(getKeyStrokes(VK_RIGHT, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
+      .addAll(getKeyStrokes(VK_HOME, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
+      .addAll(getKeyStrokes(VK_END, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
+      .addAll(getKeyStrokes(VK_PAGE_UP, 0, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
+      .addAll(getKeyStrokes(VK_PAGE_DOWN, 0, SHIFT_MASK, CTRL_MASK | SHIFT_MASK)).build();
   private static final String ACTION_ID = "VimShortcutKeyAction";
-
-  @NotNull public static final Set<KeyStroke> VIM_ONLY_EDITOR_KEYS = ImmutableSet.<KeyStroke>builder()
-    .addAll(getKeyStrokes(VK_ENTER, 0))
-    .addAll(getKeyStrokes(VK_ESCAPE, 0))
-    .addAll(getKeyStrokes(VK_TAB, 0))
-    .addAll(getKeyStrokes(VK_BACK_SPACE, 0, CTRL_MASK))
-    .addAll(getKeyStrokes(VK_INSERT, 0))
-    .addAll(getKeyStrokes(VK_DELETE, 0, CTRL_MASK))
-    .addAll(getKeyStrokes(VK_UP, 0, CTRL_MASK, SHIFT_MASK))
-    .addAll(getKeyStrokes(VK_DOWN, 0, CTRL_MASK, SHIFT_MASK))
-    .addAll(getKeyStrokes(VK_LEFT, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
-    .addAll(getKeyStrokes(VK_RIGHT, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
-    .addAll(getKeyStrokes(VK_HOME, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
-    .addAll(getKeyStrokes(VK_END, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
-    .addAll(getKeyStrokes(VK_PAGE_UP, 0, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
-    .addAll(getKeyStrokes(VK_PAGE_DOWN, 0, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
-    .build();
-
-  @NotNull private static final Set<KeyStroke> NON_FILE_EDITOR_KEYS = ImmutableSet.<KeyStroke>builder()
-    .addAll(getKeyStrokes(VK_ENTER, 0))
-    .addAll(getKeyStrokes(VK_ESCAPE, 0))
-    .addAll(getKeyStrokes(VK_TAB, 0))
-    .addAll(getKeyStrokes(VK_UP, 0))
-    .addAll(getKeyStrokes(VK_DOWN, 0))
-    .build();
+  @NotNull private static final Set<KeyStroke> NON_FILE_EDITOR_KEYS =
+    ImmutableSet.<KeyStroke>builder().addAll(getKeyStrokes(VK_ENTER, 0)).addAll(getKeyStrokes(VK_ESCAPE, 0))
+      .addAll(getKeyStrokes(VK_TAB, 0)).addAll(getKeyStrokes(VK_UP, 0)).addAll(getKeyStrokes(VK_DOWN, 0)).build();
 
   private static final Logger ourLogger = Logger.getInstance(VimShortcutKeyAction.class.getName());
   private static AnAction ourInstance = null;
+
+  @NotNull
+  public static AnAction getInstance() {
+    if (ourInstance == null) {
+      final AnAction originalAction = ActionManager.getInstance().getAction(ACTION_ID);
+      ourInstance = EmptyAction.wrap(originalAction);
+    }
+    return ourInstance;
+  }
+
+  @NotNull
+  private static List<KeyStroke> getKeyStrokes(int keyCode, @NotNull int... modifiers) {
+    final List<KeyStroke> keyStrokes = new ArrayList<>();
+    for (int modifier : modifiers) {
+      keyStrokes.add(KeyStroke.getKeyStroke(keyCode, modifier));
+    }
+    return keyStrokes;
+  }
 
   @Override
   public void actionPerformed(@NotNull AnActionEvent e) {
@@ -114,15 +121,6 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
   @Override
   public void update(@NotNull AnActionEvent e) {
     e.getPresentation().setEnabled(isEnabled(e));
-  }
-
-  @NotNull
-  public static AnAction getInstance() {
-    if (ourInstance == null) {
-      final AnAction originalAction = ActionManager.getInstance().getAction(ACTION_ID);
-      ourInstance = EmptyAction.wrap(originalAction);
-    }
-    return ourInstance;
   }
 
   private boolean isEnabled(@NotNull AnActionEvent e) {
@@ -183,8 +181,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     return values.stream().anyMatch(actionId -> {
       final EditorActionHandlerBase action = RegisterActions.findAction(actionId);
       if (action == null) return false;
-      return action.getKeyStrokesSet().stream()
-        .anyMatch(ks -> !ks.isEmpty() && ks.get(0).equals(keyStroke));
+      return action.getKeyStrokesSet().stream().anyMatch(ks -> !ks.isEmpty() && ks.get(0).equals(keyStroke));
     });
   }
 
@@ -221,15 +218,6 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
 
   private boolean isShortcutConflict(@NotNull KeyStroke keyStroke) {
     return !VimPlugin.getKey().getKeymapConflicts(keyStroke).isEmpty();
-  }
-
-  @NotNull
-  private static List<KeyStroke> getKeyStrokes(int keyCode, @NotNull int... modifiers) {
-    final List<KeyStroke> keyStrokes = new ArrayList<>();
-    for (int modifier : modifiers) {
-      keyStrokes.add(KeyStroke.getKeyStroke(keyCode, modifier));
-    }
-    return keyStrokes;
   }
 
   @Nullable

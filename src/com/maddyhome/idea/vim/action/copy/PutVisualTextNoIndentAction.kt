@@ -36,7 +36,7 @@ import javax.swing.KeyStroke
  */
 class PutVisualTextNoIndentAction : VisualOperatorActionHandler.SingleExecution() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("[p", "]p", "[P", "]P")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("[p", "]p", "[P", "]P")
 
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

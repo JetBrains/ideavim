@@ -33,7 +33,7 @@ import javax.swing.KeyStroke
 
 class MotionInnerSentenceAction : TextObjectActionHandler() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("is")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("is")
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 

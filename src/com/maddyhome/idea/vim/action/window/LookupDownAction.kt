@@ -38,7 +38,7 @@ import javax.swing.KeyStroke
  */
 class LookupDownAction : VimActionHandler.SingleExecution() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-N>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-N>")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

@@ -39,7 +39,7 @@ import javax.swing.KeyStroke
 class LookupUpAction : VimActionHandler.SingleExecution() {
 
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-P>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-P>")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

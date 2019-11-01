@@ -156,10 +156,10 @@ public class AddInlaysAction extends AnAction {
 
       private FontRenderContext getCurrentContext(Editor editor) {
         FontRenderContext editorContext = FontInfo.getFontRenderContext(editor.getContentComponent());
-        return new FontRenderContext(editorContext.getTransform(),
-                                     AntialiasingType.getKeyForCurrentScope(false), editor instanceof EditorImpl
-                                                                                    ? ((EditorImpl)editor).myFractionalMetricsHintValue
-                                                                                    : RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
+        return new FontRenderContext(editorContext.getTransform(), AntialiasingType.getKeyForCurrentScope(false),
+                                     editor instanceof EditorImpl
+                                     ? ((EditorImpl)editor).myFractionalMetricsHintValue
+                                     : RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
       }
     }
   }

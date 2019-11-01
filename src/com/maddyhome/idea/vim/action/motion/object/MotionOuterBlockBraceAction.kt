@@ -33,7 +33,7 @@ import javax.swing.KeyStroke
 
 class MotionOuterBlockBraceAction : TextObjectActionHandler() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("aB", "a{", "a}")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("aB", "a{", "a}")
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_TEXT_BLOCK)
 

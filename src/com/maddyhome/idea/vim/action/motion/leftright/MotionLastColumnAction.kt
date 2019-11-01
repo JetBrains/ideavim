@@ -38,7 +38,7 @@ import javax.swing.KeyStroke
 class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("$")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("$")
 
   override fun getOffset(editor: Editor,
                          caret: Caret,
@@ -77,7 +77,7 @@ class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
 class MotionLastColumnInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<End>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<End>")
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
 

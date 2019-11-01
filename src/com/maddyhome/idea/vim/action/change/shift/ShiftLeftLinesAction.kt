@@ -32,7 +32,7 @@ import javax.swing.KeyStroke
 
 class ShiftLeftLinesAction : ChangeEditorActionHandler.ForEachCaret() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-D>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-D>")
 
   override val type: Command.Type = Command.Type.INSERT
 

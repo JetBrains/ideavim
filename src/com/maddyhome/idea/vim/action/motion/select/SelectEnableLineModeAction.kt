@@ -35,7 +35,7 @@ import javax.swing.KeyStroke
 class SelectEnableLineModeAction : VimActionHandler.SingleExecution() {
 
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gH")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gH")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {

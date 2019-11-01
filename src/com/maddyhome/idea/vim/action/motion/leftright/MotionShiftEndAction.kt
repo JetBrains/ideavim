@@ -34,7 +34,7 @@ import javax.swing.KeyStroke
 
 class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-End>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-End>")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

@@ -32,7 +32,7 @@ import javax.swing.KeyStroke
 class MotionGotoFileMarkAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("`")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("`")
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
@@ -54,7 +54,7 @@ class MotionGotoFileMarkAction : MotionActionHandler.ForEachCaret() {
 class MotionGotoFileMarkNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("g`")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("g`")
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
 

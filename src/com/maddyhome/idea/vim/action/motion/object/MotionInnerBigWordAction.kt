@@ -32,7 +32,7 @@ import javax.swing.KeyStroke
 
 class MotionInnerBigWordAction : TextObjectActionHandler() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("iW")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("iW")
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE)
 

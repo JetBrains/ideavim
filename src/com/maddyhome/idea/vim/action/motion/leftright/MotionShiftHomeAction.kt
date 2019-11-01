@@ -32,7 +32,7 @@ import javax.swing.KeyStroke
  */
 class MotionShiftHomeAction : ShiftedSpecialKeyHandler() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Home>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Home>")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

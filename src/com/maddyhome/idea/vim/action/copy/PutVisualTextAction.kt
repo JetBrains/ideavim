@@ -36,7 +36,7 @@ import javax.swing.KeyStroke
  */
 class PutVisualTextAction : VisualOperatorActionHandler.SingleExecution() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("p", "P")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("p", "P")
 
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

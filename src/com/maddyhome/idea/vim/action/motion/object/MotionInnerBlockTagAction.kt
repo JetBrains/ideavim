@@ -32,7 +32,7 @@ import javax.swing.KeyStroke
 
 class MotionInnerBlockTagAction : TextObjectActionHandler() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("it")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("it")
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_TEXT_BLOCK)
 

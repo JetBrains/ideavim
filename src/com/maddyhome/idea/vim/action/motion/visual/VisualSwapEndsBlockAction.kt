@@ -32,7 +32,7 @@ import javax.swing.KeyStroke
 class VisualSwapEndsBlockAction : VimActionHandler.SingleExecution() {
 
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("O")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("O")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {

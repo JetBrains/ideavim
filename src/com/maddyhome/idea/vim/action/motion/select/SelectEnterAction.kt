@@ -32,7 +32,7 @@ import javax.swing.KeyStroke
 
 class SelectEnterAction : VimActionHandler.SingleExecution() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<enter>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<enter>")
 
   override val type: Command.Type = Command.Type.INSERT
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {

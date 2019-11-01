@@ -33,7 +33,7 @@ import javax.swing.KeyStroke
 
 class MotionOuterParagraphAction : TextObjectActionHandler() {
 
-    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("ap")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("ap")
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_TEXT_BLOCK)
 
