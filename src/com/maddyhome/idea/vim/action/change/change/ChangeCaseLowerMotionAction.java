@@ -22,21 +22,21 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.DuplicableOperatorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
 
-public class ChangeCaseLowerMotionAction extends ChangeEditorActionHandler.ForEachCaret {
+public class ChangeCaseLowerMotionAction extends ChangeEditorActionHandler.ForEachCaret
+  implements DuplicableOperatorAction {
 
   @NotNull
   @Override
@@ -56,12 +56,6 @@ public class ChangeCaseLowerMotionAction extends ChangeEditorActionHandler.ForEa
     return Argument.Type.MOTION;
   }
 
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_DUPLICABLE_OPERATOR);
-  }
-
   @Override
   public boolean execute(@NotNull Editor editor,
                          @NotNull Caret caret,
@@ -72,5 +66,10 @@ public class ChangeCaseLowerMotionAction extends ChangeEditorActionHandler.ForEa
     return argument != null &&
            VimPlugin.getChange()
              .changeCaseMotion(editor, caret, context, count, rawCount, CharacterHelper.CASE_LOWER, argument);
+  }
+
+  @Override
+  public char getDuplicateWith() {
+    return 'u';
   }
 }

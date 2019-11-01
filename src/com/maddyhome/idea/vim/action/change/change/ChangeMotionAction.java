@@ -22,20 +22,19 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.DuplicableOperatorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
 
-public class ChangeMotionAction extends ChangeEditorActionHandler.ForEachCaret {
+public class ChangeMotionAction extends ChangeEditorActionHandler.ForEachCaret implements DuplicableOperatorAction {
 
   @NotNull
   @Override
@@ -55,12 +54,6 @@ public class ChangeMotionAction extends ChangeEditorActionHandler.ForEachCaret {
     return Argument.Type.MOTION;
   }
 
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_DUPLICABLE_OPERATOR);
-  }
-
   @Override
   public boolean execute(@NotNull Editor editor,
                          @NotNull Caret caret,
@@ -69,5 +62,10 @@ public class ChangeMotionAction extends ChangeEditorActionHandler.ForEachCaret {
                          int rawCount,
                          @Nullable Argument argument) {
     return argument != null && VimPlugin.getChange().changeMotion(editor, caret, context, count, rawCount, argument);
+  }
+
+  @Override
+  public char getDuplicateWith() {
+    return 'c';
   }
 }

@@ -32,6 +32,7 @@ import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
+import com.maddyhome.idea.vim.action.DuplicableOperatorAction;
 import com.maddyhome.idea.vim.action.ExEntryAction;
 import com.maddyhome.idea.vim.action.macro.ToggleRecordingAction;
 import com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction;
@@ -294,14 +295,13 @@ public class KeyHandler {
   }
 
   /**
-   * See the description for {@link CommandFlags#FLAG_DUPLICABLE_OPERATOR}
+   * See the description for {@link com.maddyhome.idea.vim.action.DuplicableOperatorAction}
    */
   private Node mapOpCommand(KeyStroke key, Node node, @NotNull CommandState editorState) {
     if (editorState.getMappingMode() == MappingMode.OP_PENDING && !currentCmd.empty()) {
       EditorActionHandlerBase action = currentCmd.peek().getAction();
-      if (action.getFlags().contains(CommandFlags.FLAG_DUPLICABLE_OPERATOR) &&
-          action.getKeyStrokesSet().stream().anyMatch(
-             o -> (o.size() == 1 || (o.size() == 2 && o.get(0).getKeyChar() == 'g')) && o.get(o.size() - 1).equals(key))) {
+      if (action instanceof DuplicableOperatorAction &&
+          ((DuplicableOperatorAction)action).getDuplicateWith() == key.getKeyChar()) {
         return editorState.getCurrentNode().get(KeyStroke.getKeyStroke('_'));
       }
     }

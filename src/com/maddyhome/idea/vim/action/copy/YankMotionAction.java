@@ -21,19 +21,18 @@ package com.maddyhome.idea.vim.action.copy;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.DuplicableOperatorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
 
-public class YankMotionAction extends VimActionHandler.SingleExecution {
+public class YankMotionAction extends VimActionHandler.SingleExecution implements DuplicableOperatorAction {
 
   @NotNull
   @Override
@@ -53,12 +52,6 @@ public class YankMotionAction extends VimActionHandler.SingleExecution {
     return Argument.Type.MOTION;
   }
 
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_DUPLICABLE_OPERATOR);
-  }
-
   @Override
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
     final Argument argument = cmd.getArgument();
@@ -67,5 +60,10 @@ public class YankMotionAction extends VimActionHandler.SingleExecution {
     }
 
     return VimPlugin.getYank().yankMotion(editor, context, cmd.getCount(), cmd.getRawCount(), argument);
+  }
+
+  @Override
+  public char getDuplicateWith() {
+    return 'y';
   }
 }
