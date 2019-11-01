@@ -30,16 +30,14 @@ import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.option.KeyModelOptionData
 import com.maddyhome.idea.vim.option.OptionsManager
-import javax.swing.KeyStroke
 
 /**
  * @author Alex Plate
  */
 
 class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Left>")
+  override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
     val keymodel = OptionsManager.keymodel

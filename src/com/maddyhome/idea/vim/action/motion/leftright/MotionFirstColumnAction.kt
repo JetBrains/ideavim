@@ -27,12 +27,9 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import java.util.*
-import javax.swing.KeyStroke
 
 class MotionFirstColumnAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("0")
 
   override fun getOffset(editor: Editor,
                          caret: Caret,
@@ -46,8 +43,6 @@ class MotionFirstColumnAction : MotionActionHandler.ForEachCaret() {
 
 class MotionFirstColumnInsertModeAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Home>")
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
 

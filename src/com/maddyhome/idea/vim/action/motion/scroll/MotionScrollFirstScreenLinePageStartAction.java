@@ -26,18 +26,8 @@ import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
-
 
 public class MotionScrollFirstScreenLinePageStartAction extends VimActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("z+");
-  }
 
   @NotNull
   @Override

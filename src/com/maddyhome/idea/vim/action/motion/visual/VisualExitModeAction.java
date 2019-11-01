@@ -27,20 +27,10 @@ import com.maddyhome.idea.vim.helper.ModeHelper;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
-
 /**
  * @author vlan
  */
 final public class VisualExitModeAction extends VimActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<Esc>", "<C-[>", "<C-C>");
-  }
 
   @Contract(pure = true)
   @NotNull

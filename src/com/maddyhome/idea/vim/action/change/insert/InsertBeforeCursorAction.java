@@ -29,18 +29,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
 
 final public class InsertBeforeCursorAction extends ChangeEditorActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("i", "<Insert>");
-  }
 
   @Contract(pure = true)
   @NotNull

@@ -26,20 +26,10 @@ import com.maddyhome.idea.vim.command.MotionType;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
-
 /**
  * @author oleg
  */
 public class MotionNextTabAction extends MotionActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("gt");
-  }
 
   @Override
   public int getOffset(@NotNull final Editor editor,

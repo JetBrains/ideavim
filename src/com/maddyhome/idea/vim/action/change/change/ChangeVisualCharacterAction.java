@@ -30,21 +30,12 @@ import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author vlan
  */
 final public class ChangeVisualCharacterAction extends VisualOperatorActionHandler.ForEachCaret {
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("r");
-  }
 
   @Contract(pure = true)
   @NotNull

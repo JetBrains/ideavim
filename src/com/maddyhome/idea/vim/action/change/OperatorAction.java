@@ -33,20 +33,10 @@ import com.maddyhome.idea.vim.key.OperatorFunction;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
-
 /**
  * @author vlan
  */
 final public class OperatorAction extends VimActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("g@");
-  }
 
   @Contract(pure = true)
   @NotNull

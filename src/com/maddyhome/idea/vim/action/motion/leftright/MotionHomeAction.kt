@@ -25,12 +25,9 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
-import javax.swing.KeyStroke
 
 class MotionHomeAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Home>")
 
   override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
                       rawCount: Int, argument: Argument?): Int {

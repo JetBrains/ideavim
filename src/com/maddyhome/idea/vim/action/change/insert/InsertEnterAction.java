@@ -27,19 +27,10 @@ import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.helper.HelperKt;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
 
 
 public class InsertEnterAction extends VimActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<C-M>", "<CR>");
-  }
 
   @NotNull
   @Override

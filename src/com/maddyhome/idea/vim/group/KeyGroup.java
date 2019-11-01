@@ -265,7 +265,7 @@ public class KeyGroup {
     if (actionKeys == null) {
       final EditorActionHandlerBase action = actionHolder.getAction();
       if (action instanceof ComplicatedKeysAction) {
-        actionKeys = action.getKeyStrokesSet();
+        actionKeys = ((ComplicatedKeysAction)action).getKeyStrokesSet();
       } else {
         throw new RuntimeException("Cannot register action: " + action.getClass().getName());
       }

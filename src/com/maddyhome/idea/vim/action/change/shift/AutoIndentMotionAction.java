@@ -29,20 +29,10 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
-
 /**
  * @author Aleksey Lagoshin
  */
 public class AutoIndentMotionAction extends ChangeEditorActionHandler.ForEachCaret implements DuplicableOperatorAction {
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("=");
-  }
 
   @NotNull
   @Override

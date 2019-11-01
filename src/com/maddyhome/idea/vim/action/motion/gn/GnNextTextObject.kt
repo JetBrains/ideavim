@@ -36,8 +36,6 @@ import javax.swing.KeyStroke
 
 class GnNextTextObject : TextObjectActionHandler() {
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gn")
-
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE)
 
   override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {

@@ -27,19 +27,10 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
 
 
 public class SelectRegisterAction extends VimActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("\"");
-  }
 
   @NotNull
   @Override

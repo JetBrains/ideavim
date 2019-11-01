@@ -32,9 +32,8 @@ import java.util.*
 import javax.swing.KeyStroke
 
 class MotionWordLeftAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("b")
+  override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(editor: Editor,
                          caret: Caret,

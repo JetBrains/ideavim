@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
-import javax.swing.KeyStroke
 
 /**
  * @author Alex Plate
@@ -32,9 +31,8 @@ import javax.swing.KeyStroke
 
 class SelectEnterAction : VimActionHandler.SingleExecution() {
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<enter>")
-
   override val type: Command.Type = Command.Type.INSERT
+
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     VimPlugin.getChange().processEnter(editor.getTopLevelEditor(), context)
     return true

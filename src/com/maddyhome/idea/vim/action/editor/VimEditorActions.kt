@@ -102,8 +102,6 @@ class VimEditorUp : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
 class VimQuickJavaDoc : VimActionHandler.SingleExecution() {
   private val actionName: String = "QuickJavaDoc"
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("K")
-
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {

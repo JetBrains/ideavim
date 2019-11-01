@@ -32,21 +32,12 @@ import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author vlan
  */
 final public class ChangeVisualLinesEndAction extends VisualOperatorActionHandler.ForEachCaret {
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("C");
-  }
 
   @Contract(pure = true)
   @NotNull

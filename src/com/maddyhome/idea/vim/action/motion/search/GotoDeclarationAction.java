@@ -27,20 +27,10 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
 
 
 public class GotoDeclarationAction extends VimActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    // TODO: <C-]> is a tag command similar to gD, the tag stack is not implemented
-    return parseKeysSet("gD", "gd", "<C-]>");
-  }
 
   @NotNull
   @Override

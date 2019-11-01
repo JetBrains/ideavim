@@ -29,19 +29,12 @@ import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.util.*;
 
 /**
  * @author vlan
  */
 final public class YankVisualAction extends VisualOperatorActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("y");
-  }
 
   @NotNull
   @Override

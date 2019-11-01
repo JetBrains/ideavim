@@ -26,20 +26,10 @@ import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
-
 /**
  * @author vlan
  */
 final public class WindowUpAction extends VimActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<C-W>k", "<C-W><C-K>", "<C-W><Up>");
-  }
 
   @Contract(pure = true)
   @NotNull

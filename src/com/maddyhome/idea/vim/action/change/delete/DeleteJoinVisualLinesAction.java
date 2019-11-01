@@ -31,22 +31,13 @@ import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author vlan
  */
 final public class DeleteJoinVisualLinesAction extends VisualOperatorActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("gJ");
-  }
 
   @Contract(pure = true)
   @NotNull

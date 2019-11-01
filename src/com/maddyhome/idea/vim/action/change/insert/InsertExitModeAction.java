@@ -40,12 +40,6 @@ final public class InsertExitModeAction extends VimActionHandler.SingleExecution
     return (InsertExitModeAction)RegisterActions.findActionOrDie(ACTION_ID);
   }
 
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return keySet;
-  }
-
   @Contract(pure = true)
   @NotNull
   @Override

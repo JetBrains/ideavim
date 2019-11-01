@@ -6,7 +6,6 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import javax.swing.KeyStroke
 
 /**
  * @author Alex Plate
@@ -15,8 +14,6 @@ import javax.swing.KeyStroke
 class CtrlDownAction : VimActionHandler.SingleExecution() {
 
   private val keySet = parseKeysSet("<C-Down>")
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = keySet
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -33,8 +30,6 @@ class CtrlDownAction : VimActionHandler.SingleExecution() {
 class CtrlUpAction : VimActionHandler.SingleExecution() {
 
   private val keySet = parseKeysSet("<C-Up>")
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = keySet
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

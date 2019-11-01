@@ -33,7 +33,6 @@ import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import java.util.*
-import javax.swing.KeyStroke
 
 sealed class MotionUpBase : MotionActionHandler.ForEachCaret() {
   private var col: Int = 0
@@ -51,8 +50,6 @@ sealed class MotionUpBase : MotionActionHandler.ForEachCaret() {
 open class MotionUpAction : MotionUpBase() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("k")
-
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
 
   override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
@@ -61,8 +58,6 @@ open class MotionUpAction : MotionUpBase() {
 }
 
 class MotionUpCtrlPAction : MotionUpAction() {
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-P>")
-
   override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
     val activeLookup = LookupManager.getActiveLookup(editor)
     return if (activeLookup != null) {
@@ -80,8 +75,6 @@ class MotionUpCtrlPAction : MotionUpAction() {
 
 class MotionUpNotLineWiseAction : MotionUpBase() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gk", "g<Up>")
 
   override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
     return VimPlugin.getMotion().moveCaretVertical(editor, caret, -count)

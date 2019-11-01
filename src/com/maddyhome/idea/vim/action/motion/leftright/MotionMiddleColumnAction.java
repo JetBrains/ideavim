@@ -28,17 +28,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
-
 public class MotionMiddleColumnAction extends MotionActionHandler.ForEachCaret {
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("gm");
-  }
 
   @Override
   public int getOffset(@NotNull Editor editor,

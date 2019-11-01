@@ -30,12 +30,9 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import java.util.*
-import javax.swing.KeyStroke
 
 class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("+", "<C-M>")
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
 
@@ -51,8 +48,6 @@ class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
 
 class EnterNormalAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<CR>")
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
 

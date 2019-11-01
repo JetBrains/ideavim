@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.visual.updateCaretState
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import javax.swing.KeyStroke
 
 /**
  * @author Alex Plate
@@ -34,9 +33,8 @@ import javax.swing.KeyStroke
 
 class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-G>")
-
   override val type: Command.Type = Command.Type.OTHER_READONLY
+
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val commandState = CommandState.getInstance(editor)
     val subMode = commandState.subMode

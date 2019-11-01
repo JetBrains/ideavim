@@ -30,17 +30,14 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.option.OptionsManager
 import java.util.*
-import javax.swing.KeyStroke
 
 
 class VisualToggleLineModeAction : VimActionHandler.SingleExecution() {
 
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("V")
-
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
+
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val listOption = OptionsManager.selectmode
     return if ("cmd" in listOption) {

@@ -87,8 +87,6 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
 sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   val id: String = this::class.java.simpleName.let { if (it.startsWith("Vim", true)) it else "Vim$it" }
 
-  abstract val keyStrokesSet: Set<List<KeyStroke>>
-
   abstract val type: Command.Type
 
   open val argumentType: Argument.Type? = null

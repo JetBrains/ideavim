@@ -31,7 +31,6 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
-import javax.swing.KeyStroke
 
 /**
  * @author Alex Plate
@@ -39,8 +38,6 @@ import javax.swing.KeyStroke
 class LookupDownAction : VimActionHandler.SingleExecution() {
 
   private val keySet = parseKeysSet("<C-N>")
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = keySet
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

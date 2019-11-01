@@ -28,12 +28,9 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
-import javax.swing.KeyStroke
 
 
 class MotionInnerParagraphAction : TextObjectActionHandler() {
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("ip")
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_TEXT_BLOCK)
 

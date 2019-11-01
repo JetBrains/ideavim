@@ -25,20 +25,10 @@ import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
-
 /**
  * @author rasendubi
  */
 final public class CloseWindowAction extends VimActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<C-W>c");
-  }
 
   @Contract(pure = true)
   @NotNull

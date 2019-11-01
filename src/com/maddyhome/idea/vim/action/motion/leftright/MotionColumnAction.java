@@ -30,18 +30,8 @@ import com.maddyhome.idea.vim.helper.UserDataManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
-
 
 public class MotionColumnAction extends MotionActionHandler.ForEachCaret {
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("|");
-  }
 
   @Override
   public int getOffset(@NotNull Editor editor,

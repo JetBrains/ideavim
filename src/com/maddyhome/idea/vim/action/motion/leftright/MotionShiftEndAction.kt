@@ -30,11 +30,8 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.option.OptionsManager
-import javax.swing.KeyStroke
 
 class MotionShiftEndAction : ShiftedSpecialKeyHandler() {
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-End>")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

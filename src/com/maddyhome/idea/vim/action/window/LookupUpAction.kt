@@ -31,7 +31,6 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
-import javax.swing.KeyStroke
 
 /**
  * @author Alex Plate
@@ -40,11 +39,10 @@ class LookupUpAction : VimActionHandler.SingleExecution() {
 
   private val keySet = parseKeysSet("<C-P>")
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = keySet
-
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TYPEAHEAD_SELF_MANAGE)
+
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val activeLookup = LookupManager.getActiveLookup(editor)
     if (activeLookup != null) {

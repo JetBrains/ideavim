@@ -27,17 +27,7 @@ import com.maddyhome.idea.vim.command.MotionType;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
-
 public class MotionFirstScreenColumnAction extends MotionActionHandler.ForEachCaret {
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("g0", "g<Home>");
-  }
 
   @Override
   public int getOffset(@NotNull Editor editor,

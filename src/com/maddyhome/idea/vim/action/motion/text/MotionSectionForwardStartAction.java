@@ -38,12 +38,6 @@ public class MotionSectionForwardStartAction extends MotionActionHandler.ForEach
 
   @NotNull
   @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("][");
-  }
-
-  @NotNull
-  @Override
   public EnumSet<CommandFlags> getFlags() {
     return EnumSet.of(CommandFlags.FLAG_SAVE_JUMP);
   }

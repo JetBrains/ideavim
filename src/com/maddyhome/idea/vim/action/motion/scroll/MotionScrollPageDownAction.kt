@@ -33,8 +33,6 @@ import javax.swing.KeyStroke
 
 class MotionScrollPageDownAction : VimActionHandler.SingleExecution() {
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-F>", "￿<PageDown>")
-
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {

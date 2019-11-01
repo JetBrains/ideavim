@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import java.util.*
-import javax.swing.KeyStroke
 
 /**
  * This represents a command argument.
@@ -50,7 +49,6 @@ class Argument private constructor(
     val EMPTY_COMMAND = Command(0, object : VimActionHandler.SingleExecution() {
       override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean = true
 
-        override val keyStrokesSet: Set<List<KeyStroke>> = emptySet()
       override val type: Command.Type = Command.Type.UNDEFINED
     }, Command.Type.UNDEFINED, EnumSet.noneOf(CommandFlags::class.java), emptyList())
   }

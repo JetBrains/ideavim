@@ -27,12 +27,9 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import java.util.*
-import javax.swing.KeyStroke
 
 class MotionGotoMarkAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("`")
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
@@ -49,8 +46,6 @@ class MotionGotoMarkAction : MotionActionHandler.ForEachCaret() {
 
 class MotionGotoMarkNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("g`")
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
 

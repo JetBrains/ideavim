@@ -24,13 +24,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.inBlockSubMode
-import javax.swing.KeyStroke
 
 class SelectEscapeAction : VimActionHandler.SingleExecution() {
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<esc>")
-
   override val type: Command.Type = Command.Type.OTHER_READONLY
+
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val blockMode = editor.inBlockSubMode
     editor.exitSelectMode(true)

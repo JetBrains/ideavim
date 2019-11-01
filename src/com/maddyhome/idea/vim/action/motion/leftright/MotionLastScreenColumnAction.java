@@ -34,17 +34,7 @@ import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
-
 public class MotionLastScreenColumnAction extends MotionActionHandler.ForEachCaret {
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("g$", "g<End>");
-  }
 
   @Override
   public int getOffset(@NotNull Editor editor,

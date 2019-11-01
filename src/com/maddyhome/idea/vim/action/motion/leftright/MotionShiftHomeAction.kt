@@ -25,14 +25,11 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.vimForEachCaret
-import javax.swing.KeyStroke
 
 /**
  * @author Alex Plate
  */
 class MotionShiftHomeAction : ShiftedSpecialKeyHandler() {
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Home>")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 

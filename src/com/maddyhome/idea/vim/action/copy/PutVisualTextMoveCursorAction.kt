@@ -29,14 +29,11 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
-import javax.swing.KeyStroke
 
 /**
  * @author vlan
  */
 class PutVisualTextMoveCursorAction : VisualOperatorActionHandler.SingleExecution() {
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gp", "gP")
 
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

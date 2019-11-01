@@ -32,18 +32,8 @@ import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
-
 
 public class DeleteMotionAction extends ChangeEditorActionHandler.ForEachCaret implements DuplicableOperatorAction {
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("d");
-  }
 
   @NotNull
   @Override
