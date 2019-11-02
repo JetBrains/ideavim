@@ -22,56 +22,56 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.group.visual.VimSelection;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import org.jetbrains.annotations.Contract;
+import com.maddyhome.idea.vim.command.*;
+import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * @author vlan
- */
-final public class ReformatCodeVisualAction extends VisualOperatorActionHandler.ForEachCaret {
-  @Contract(pure = true)
+public class ReformatCodeMotionAction extends ChangeEditorActionHandler.ForEachCaret {
   @NotNull
   @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.X;
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
   }
 
   @NotNull
   @Override
-  final public Set<List<KeyStroke>> getKeyStrokesSet() {
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("gq");
   }
 
-  @Contract(pure = true)
   @NotNull
   @Override
-  final public Command.Type getType() {
+  public Command.Type getType() {
     return Command.Type.CHANGE;
   }
 
   @NotNull
   @Override
-  final public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_EXIT_VISUAL);
+  public Argument.Type getArgumentType() {
+    return Argument.Type.MOTION;
+  }
+
+  @NotNull
+  @Override
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_DUPLICABLE_OPERATOR);
   }
 
   @Override
-  public boolean executeAction(@NotNull Editor editor,
-                               @NotNull Caret caret,
-                               @NotNull DataContext context,
-                               @NotNull Command cmd,
-                               @NotNull VimSelection range) {
-    VimPlugin.getChange().reformatCodeSelection(editor, caret, range);
-    return true;
+  public boolean execute(@NotNull Editor editor,
+                         @NotNull Caret caret,
+                         @NotNull DataContext context,
+                         int count,
+                         int rawCount,
+                         @Nullable Argument argument) {
+    return argument != null &&
+      VimPlugin.getChange()
+        .reformatCodeMotion(editor, caret, context, count, rawCount, argument);
   }
 }

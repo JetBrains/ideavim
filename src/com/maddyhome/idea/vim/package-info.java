@@ -428,7 +428,7 @@
  * |go|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionNthCharacterAction}
  * |gp|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextMoveCursorAction}
  * |gp|                   {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorActionMoveCursor}
- * |gq|                   TODO
+ * |gq|                   {@link com.maddyhome.idea.vim.action.change.change.ReformatCodeMotionAction}
  * |gr|                   TODO
  * |gs|                   TODO
  * |gt|                   {@link com.maddyhome.idea.vim.action.motion.tabs.MotionNextTabAction}
