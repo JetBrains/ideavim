@@ -141,7 +141,7 @@ public class StringHelper {
             if (c == '\\') {
               state = KeyParserState.ESCAPE;
             }
-            else if (c == '<') {
+            else if (c == '<' || c == '«') {
               state = KeyParserState.SPECIAL;
               specialKeyBuilder = new StringBuilder();
             }
@@ -170,14 +170,17 @@ public class StringHelper {
             }
             break;
           case SPECIAL:
-            if (c == '>') {
+            if (c == '>' || c == '»') {
               state = KeyParserState.INIT;
               final String specialKeyName = specialKeyBuilder.toString();
               final String lower = specialKeyName.toLowerCase();
               if ("sid".equals(lower)) {
                 throw new IllegalArgumentException("<" + specialKeyName + "> is not supported");
               }
-              if (!"nop".equals(lower)) {
+              if ("comma".equals(lower)) {
+                result.add(KeyStroke.getKeyStroke(','));
+              }
+              else if (!"nop".equals(lower)) {
                 final List<KeyStroke> leader = parseMapLeader(specialKeyName);
                 final KeyStroke specialKey = parseSpecialKey(specialKeyName, 0);
                 if (leader != null) {

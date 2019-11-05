@@ -39,13 +39,7 @@ class ActionBeanClass : AbstractExtensionPointBean() {
 
   fun getParsedKeys(): Set<List<KeyStroke>>? {
     val myKeys = keys ?: return null
-    val escapedKeys = myKeys
-      .replace('»', '>')
-      .replace('«', '<')
-      .split(",")
-      .dropLastWhile { it.isEmpty() }
-      .map { it.replace("<COMMA>", ",") }
-      .toTypedArray()
+    val escapedKeys = myKeys.split(",").toTypedArray()
     return EditorActionHandlerBase.parseKeysSet(*escapedKeys)
   }
 
