@@ -6,10 +6,13 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.EditorDataContext
-import com.maddyhome.idea.vim.helper.hardResetAllModes
+import com.maddyhome.idea.vim.helper.exitSelectMode
+import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
+import com.maddyhome.idea.vim.helper.inSelectMode
+import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.popAllModes
@@ -51,9 +54,12 @@ object IdeaSelectionControl {
         activateMode(editor, chooseSelectionMode(editor, selectionSource, true))
       } else {
         logger.info("None of carets have selection. State before adjustment: ${CommandState.getInstance(editor).toSimpleString()}")
-        editor.hardResetAllModes()
+        if (editor.inVisualMode) editor.exitVisualMode()
+        if (editor.inSelectMode) editor.exitSelectMode(false)
 
-        activateMode(editor, chooseNonSelectionMode(editor))
+        if (editor.inNormalMode) {
+          activateMode(editor, chooseNonSelectionMode(editor))
+        }
       }
 
       KeyHandler.getInstance().reset(editor)
