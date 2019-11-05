@@ -545,8 +545,8 @@ public class CommandParser {
   public void addHandler(@NotNull ExBeanClass handlerHolder) {
     // Iterator through each command name alias
     CommandName[] names;
-    if (handlerHolder.getName() != null) {
-      names = CommandDefinitionKt.commands(handlerHolder.getName().split(","));
+    if (handlerHolder.getNames() != null) {
+      names = CommandDefinitionKt.commands(handlerHolder.getNames().split(","));
     }
     else if (handlerHolder.getHandler() instanceof ComplicatedNameExCommand) {
       names = ((ComplicatedNameExCommand)handlerHolder.getHandler()).getNames();

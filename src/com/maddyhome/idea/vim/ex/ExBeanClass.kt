@@ -8,8 +8,8 @@ class ExBeanClass : AbstractExtensionPointBean() {
   @Attribute("implementation")
   var implementation: String? = null
 
-  @Attribute("name")
-  var name: String? = null
+  @Attribute("names")
+  var names: String? = null
 
   val handler: CommandHandler by lazy {
     this.instantiateClass<CommandHandler>(
