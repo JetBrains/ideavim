@@ -86,7 +86,6 @@ public class KeyHandler {
    * Creates an instance
    */
   private KeyHandler() {
-    reset(null);
   }
 
   /**
@@ -897,8 +896,8 @@ public class KeyHandler {
   }
 
   private int count;
-  private List<KeyStroke> keys;
-  private State state;
+  private List<KeyStroke> keys = new ArrayList<>();
+  private State state = State.NEW_COMMAND;
   @NotNull private final Stack<Command> currentCmd = new Stack<>();
   @Nullable private Argument.Type currentArg;
   private TypedActionHandler origHandler;
