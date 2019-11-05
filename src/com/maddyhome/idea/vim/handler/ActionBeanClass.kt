@@ -6,6 +6,22 @@ import com.intellij.util.xmlb.annotations.Attribute
 import com.maddyhome.idea.vim.command.MappingMode
 import javax.swing.KeyStroke
 
+/**
+ * Action holder for IdeaVim actions.
+ *
+ * [implementation] should be subclass of [EditorActionHandlerBase]
+ *
+ * [modes] ("mappingModes") defines the action modes. E.g. "NO" - action works in normal and op-pending modes.
+ *   Warning: V - Visual and Select mode. X - Visual mode. (like vmap and xmap).
+ *   Use "ALL" to enable action for all modes.
+ *
+ * [keys] comma-separated list of keys for the action. E.g. `gt,gT` - action gets executed on `gt` or `gT`
+ * Since xml doesn't allow using raw `<` character, use « and » symbols for mappings with modifiers.
+ *   E.g. `«C-U»` - CTRL-U (<C-U> in vim notation)
+ * If you want to use exactly `<` character, replace it with `&lt;`. E.g. `i&lt;` - i<
+ * If you want to use comma in mapping, use `«COMMA»`
+ * Do not place a whitespace around the comma!
+ */
 class ActionBeanClass : AbstractExtensionPointBean() {
   @Attribute("implementation")
   var implementation: String? = null
@@ -17,8 +33,8 @@ class ActionBeanClass : AbstractExtensionPointBean() {
   var keys: String? = null
 
   val action: EditorActionHandlerBase by lazy {
-    this.instantiateClass<EditorActionHandlerBase>(implementation
-      ?: "", ApplicationManager.getApplication().picoContainer)
+    this.instantiateClass<EditorActionHandlerBase>(
+      implementation ?: "", ApplicationManager.getApplication().picoContainer)
   }
 
   fun getParsedKeys(): Set<List<KeyStroke>>? {
