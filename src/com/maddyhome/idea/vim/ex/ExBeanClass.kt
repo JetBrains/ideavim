@@ -20,3 +20,7 @@ class ExBeanClass : AbstractExtensionPointBean() {
     CommandParser.getInstance().addHandler(this)
   }
 }
+
+interface ComplicatedNameExCommand {
+  val names: Array<CommandName>
+}

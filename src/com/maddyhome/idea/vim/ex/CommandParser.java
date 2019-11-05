@@ -547,8 +547,12 @@ public class CommandParser {
     CommandName[] names;
     if (handlerHolder.getName() != null) {
       names = CommandDefinitionKt.commands(handlerHolder.getName().split(","));
-    } else {
-      names = handlerHolder.getHandler().getNames();
+    }
+    else if (handlerHolder.getHandler() instanceof ComplicatedNameExCommand) {
+      names = ((ComplicatedNameExCommand)handlerHolder.getHandler()).getNames();
+    }
+    else {
+      throw new RuntimeException("Cannot create an ex command: " + handlerHolder);
     }
     for (CommandName name : names) {
       CommandNode node = root;
