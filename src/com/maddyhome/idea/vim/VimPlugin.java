@@ -108,7 +108,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   public void initComponent() {
     LOG.debug("initComponent");
 
-    if (isEnabled()) initializePlugin();
+    if (isEnabled()) initializePlugin(true);
 
     LOG.debug("done");
   }
@@ -294,14 +294,16 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     return getNotifications(null);
   }
 
-  private void initializePlugin() {
+  private void initializePlugin(boolean firstInitialization) {
     if (initialized) return;
     initialized = true;
 
     ApplicationManager.getApplication().invokeLater(this::updateState);
 
-    getEditor().turnOn();
-    getSearch().turnOn();
+    if (!firstInitialization) {
+      getEditor().turnOn();
+      getSearch().turnOn();
+    }
     VimListenerManager.INSTANCE.turnOn();
 
 
@@ -438,7 +440,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
       getSearch().turnOn();
       VimListenerManager.INSTANCE.turnOn();
     } else {
-      initializePlugin();
+      initializePlugin(false);
     }
   }
 
