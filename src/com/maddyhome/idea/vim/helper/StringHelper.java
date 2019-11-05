@@ -18,8 +18,6 @@
 
 package com.maddyhome.idea.vim.helper;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.util.text.StringUtil;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
 import org.apache.commons.codec.binary.Base64;
@@ -29,7 +27,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.awt.event.KeyEvent.*;
 import static javax.swing.KeyStroke.getKeyStroke;
@@ -44,82 +43,6 @@ public class StringHelper {
    * Fake key for <Plug> mappings
    */
   private static final int VK_PLUG = KeyEvent.CHAR_UNDEFINED - 1;
-
-  private static final Map<String, Integer> VIM_KEY_NAMES = ImmutableMap.<String, Integer>builder()
-    .put("cr", VK_ENTER)
-    .put("enter", VK_ENTER)
-    .put("return", VK_ENTER)
-    .put("ins", VK_INSERT)
-    .put("insert", VK_INSERT)
-    .put("home", VK_HOME)
-    .put("end", VK_END)
-    .put("pageup", VK_PAGE_UP)
-    .put("pagedown", VK_PAGE_DOWN)
-    .put("del", VK_DELETE)
-    .put("delete", VK_DELETE)
-    .put("esc", VK_ESCAPE)
-    .put("bs", VK_BACK_SPACE)
-    .put("backspace", VK_BACK_SPACE)
-    .put("tab", VK_TAB)
-    .put("up", VK_UP)
-    .put("down", VK_DOWN)
-    .put("left", VK_LEFT)
-    .put("right", VK_RIGHT)
-    .put("f1", VK_F1)
-    .put("f2", VK_F2)
-    .put("f3", VK_F3)
-    .put("f4", VK_F4)
-    .put("f5", VK_F5)
-    .put("f6", VK_F6)
-    .put("f7", VK_F7)
-    .put("f8", VK_F8)
-    .put("f9", VK_F9)
-    .put("f10", VK_F10)
-    .put("f11", VK_F11)
-    .put("f12", VK_F12)
-    .put("plug", VK_PLUG)
-    .build();
-  private static final Map<Integer, String> VIM_KEY_VALUES = ImmutableMap.<Integer, String>builder()
-    .put(VK_ENTER, "cr")
-    .put(VK_INSERT, "ins")
-    .put(VK_HOME, "home")
-    .put(VK_END, "end")
-    .put(VK_PAGE_UP, "pageup")
-    .put(VK_PAGE_DOWN, "pagedown")
-    .put(VK_DELETE, "del")
-    .put(VK_ESCAPE, "esc")
-    .put(VK_BACK_SPACE, "bs")
-    .put(VK_TAB, "tab")
-    .put(VK_UP, "up")
-    .put(VK_DOWN, "down")
-    .put(VK_LEFT, "left")
-    .put(VK_RIGHT, "right")
-    .put(VK_F1, "f1")
-    .put(VK_F2, "f2")
-    .put(VK_F3, "f3")
-    .put(VK_F4, "f4")
-    .put(VK_F5, "f5")
-    .put(VK_F6, "f6")
-    .put(VK_F7, "f7")
-    .put(VK_F8, "f8")
-    .put(VK_F9, "f9")
-    .put(VK_F10, "f10")
-    .put(VK_F11, "f11")
-    .put(VK_F12, "f12")
-    .put(VK_PLUG, "plug")
-    .build();
-
-  private static final Map<String, Character> VIM_TYPED_KEY_NAMES = ImmutableMap.<String, Character>builder()
-    .put("space", ' ')
-    .put("bar", '|')
-    .put("bslash", '\\')
-    .put("lt", '<')
-    .build();
-
-  private static final Set<String> UPPERCASE_DISPLAY_KEY_NAMES = ImmutableSet.<String>builder()
-    .add("cr")
-    .add("bs")
-    .build();
 
   private StringHelper() {}
 
@@ -299,9 +222,9 @@ public class StringHelper {
       prefix += "S-";
     }
 
-    String name = VIM_KEY_VALUES.get(keyCode);
+    String name = getVimKeyValue(keyCode);
     if (name != null) {
-      if (UPPERCASE_DISPLAY_KEY_NAMES.contains(name)) {
+      if (containsDisplayUppercaseKeyNames(name)) {
         name = name.toUpperCase();
       }
       else {
@@ -394,8 +317,8 @@ public class StringHelper {
   @Nullable
   private static KeyStroke parseSpecialKey(@NotNull String s, int modifiers) {
     final String lower = s.toLowerCase();
-    final Integer keyCode = VIM_KEY_NAMES.get(lower);
-    final Character typedChar = VIM_TYPED_KEY_NAMES.get(lower);
+    final Integer keyCode = getVimKeyName(lower);
+    final Character typedChar = getVimTypedKeyName(lower);
     if (keyCode != null) {
       return getKeyStroke(keyCode, modifiers);
     }
@@ -418,6 +341,153 @@ public class StringHelper {
       return getTypedOrPressedKeyStroke(s.charAt(0), modifiers);
     }
     return null;
+  }
+
+  private static boolean containsDisplayUppercaseKeyNames(String lower) {
+    return "cr".equals(lower) || "bs".equals(lower);
+  }
+
+  private static Character getVimTypedKeyName(String lower) {
+    switch (lower) {
+      case "space":
+        return ' ';
+      case "bar":
+        return '|';
+      case "bslash":
+        return '\\';
+      case "lt":
+        return '<';
+      default:
+        return null;
+    }
+  }
+
+  private static Integer getVimKeyName(String lower) {
+    switch (lower) {
+      case "cr":
+      case "enter":
+      case "return":
+        return VK_ENTER;
+      case "ins":
+      case "insert":
+        return VK_INSERT;
+      case "home":
+        return VK_HOME;
+      case "end":
+        return VK_END;
+      case "pageup":
+        return VK_PAGE_UP;
+      case "pagedown":
+        return VK_PAGE_DOWN;
+      case "del":
+      case "delete":
+        return VK_DELETE;
+      case "esc":
+        return VK_ESCAPE;
+      case "bs":
+        return VK_BACK_SPACE;
+      case "backspace":
+        return VK_BACK_SPACE;
+      case "tab":
+        return VK_TAB;
+      case "up":
+        return VK_UP;
+      case "down":
+        return VK_DOWN;
+      case "left":
+        return VK_LEFT;
+      case "right":
+        return VK_RIGHT;
+      case "f1":
+        return VK_F1;
+      case "f2":
+        return VK_F2;
+      case "f3":
+        return VK_F3;
+      case "f4":
+        return VK_F4;
+      case "f5":
+        return VK_F5;
+      case "f6":
+        return VK_F6;
+      case "f7":
+        return VK_F7;
+      case "f8":
+        return VK_F8;
+      case "f9":
+        return VK_F9;
+      case "f10":
+        return VK_F10;
+      case "f11":
+        return VK_F11;
+      case "f12":
+        return VK_F12;
+      case "plug":
+        return VK_PLUG;
+      default:
+        return null;
+    }
+  }
+
+  private static String getVimKeyValue(int c) {
+    switch (c) {
+      case VK_ENTER:
+        return "cr";
+      case VK_INSERT:
+        return "ins";
+      case VK_HOME:
+        return "home";
+      case VK_END:
+        return "end";
+      case VK_PAGE_UP:
+        return "pageup";
+      case VK_PAGE_DOWN:
+        return "pagedown";
+      case VK_DELETE:
+        return "del";
+      case VK_ESCAPE:
+        return "esc";
+      case VK_BACK_SPACE:
+        return "bs";
+      case VK_TAB:
+        return "tab";
+      case VK_UP:
+        return "up";
+      case VK_DOWN:
+        return "down";
+      case VK_LEFT:
+        return "left";
+      case VK_RIGHT:
+        return "right";
+      case VK_F1:
+        return "f1";
+      case VK_F2:
+        return "f2";
+      case VK_F3:
+        return "f3";
+      case VK_F4:
+        return "f4";
+      case VK_F5:
+        return "f5";
+      case VK_F6:
+        return "f6";
+      case VK_F7:
+        return "f7";
+      case VK_F8:
+        return "f8";
+      case VK_F9:
+        return "f9";
+      case VK_F10:
+        return "f10";
+      case VK_F11:
+        return "f11";
+      case VK_F12:
+        return "f12";
+      case VK_PLUG:
+        return "plug";
+      default:
+        return null;
+    }
   }
 
   @NotNull

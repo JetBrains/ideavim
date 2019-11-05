@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.handler
 
-import com.google.common.collect.ImmutableSet
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.diagnostic.Logger
@@ -153,12 +152,8 @@ sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     private val logger = Logger.getInstance(EditorActionHandlerBase::class.java.name)
 
     @JvmStatic
-    fun parseKeysSet(vararg keyStrings: String): Set<List<KeyStroke>> {
-      val builder = ImmutableSet.builder<List<KeyStroke>>()
-      for (keyString in keyStrings) {
-        builder.add(StringHelper.parseKeys(keyString))
-      }
-      return builder.build()
-    }
+    fun parseKeysSet(vararg keyStrings: String): Set<List<KeyStroke>> = List(keyStrings.size) {
+      StringHelper.parseKeys(keyStrings[it])
+    }.toSet()
   }
 }
