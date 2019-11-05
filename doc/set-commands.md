@@ -24,7 +24,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                  Define the mode that would be enabled during
                  the refactoring (renaming, live template, introduce variable, etc)
                  
-                 One of the following values:
+                 Use one of the following values:
                  - keep  - keep the mode that was enabled before starting a refactoring
                  - select - start refactoring in select mode
                  - visual - start refactoring in visual mode
