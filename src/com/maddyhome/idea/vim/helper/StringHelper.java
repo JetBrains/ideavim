@@ -79,7 +79,35 @@ public class StringHelper {
     .put("f12", VK_F12)
     .put("plug", VK_PLUG)
     .build();
-  private static final Map<Integer, String> VIM_KEY_VALUES = invertMap(VIM_KEY_NAMES);
+  private static final Map<Integer, String> VIM_KEY_VALUES = ImmutableMap.<Integer, String>builder()
+    .put(VK_ENTER, "cr")
+    .put(VK_INSERT, "ins")
+    .put(VK_HOME, "home")
+    .put(VK_END, "end")
+    .put(VK_PAGE_UP, "pageup")
+    .put(VK_PAGE_DOWN, "pagedown")
+    .put(VK_DELETE, "del")
+    .put(VK_ESCAPE, "esc")
+    .put(VK_BACK_SPACE, "bs")
+    .put(VK_TAB, "tab")
+    .put(VK_UP, "up")
+    .put(VK_DOWN, "down")
+    .put(VK_LEFT, "left")
+    .put(VK_RIGHT, "right")
+    .put(VK_F1, "f1")
+    .put(VK_F2, "f2")
+    .put(VK_F3, "f3")
+    .put(VK_F4, "f4")
+    .put(VK_F5, "f5")
+    .put(VK_F6, "f6")
+    .put(VK_F7, "f7")
+    .put(VK_F8, "f8")
+    .put(VK_F9, "f9")
+    .put(VK_F10, "f10")
+    .put(VK_F11, "f11")
+    .put(VK_F12, "f12")
+    .put(VK_PLUG, "plug")
+    .build();
 
   private static final Map<String, Character> VIM_TYPED_KEY_NAMES = ImmutableMap.<String, Character>builder()
     .put("space", ' ')
@@ -361,18 +389,6 @@ public class StringHelper {
       }
     }
     return true;
-  }
-
-  @NotNull
-  private static <K, V> Map<V, K> invertMap(@NotNull Map<K, V> map) {
-    final Map<V, K> inverted = new HashMap<>();
-    for (Map.Entry<K, V> entry : map.entrySet()) {
-      final V value = entry.getValue();
-      if (!inverted.containsKey(value)) {
-        inverted.put(value, entry.getKey());
-      }
-    }
-    return inverted;
   }
 
   @Nullable
