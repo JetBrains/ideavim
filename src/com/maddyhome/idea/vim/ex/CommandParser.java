@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
 public class CommandParser {
   private static final int MAX_RECURSION = 100;
   private static final Pattern TRIM_WHITESPACE = Pattern.compile("[ \\t]*(.*)[ \\t\\n\\r]+", Pattern.DOTALL);
-  private final ExtensionPointName<CommandHandler> EX_COMMAND_EP = ExtensionPointName.create("IdeaVIM.vimExCommand");
+  private final ExtensionPointName<ExBeanClass> EX_COMMAND_EP = ExtensionPointName.create("IdeaVIM.vimExCommand");
 
   private static class CommandParserHolder {
     static final CommandParser INSTANCE = new CommandParser();
@@ -73,8 +73,8 @@ public class CommandParser {
   public void registerHandlers() {
     if (registered.getAndSet(true)) return;
 
-    for (CommandHandler handler : EX_COMMAND_EP.getExtensions()) {
-      handler.register();
+    for (ExBeanClass handler : EX_COMMAND_EP.getExtensions()) {
+      handler.getHandler().register();
     }
   }
 
