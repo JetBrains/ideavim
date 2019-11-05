@@ -74,7 +74,7 @@ public class CommandParser {
     if (registered.getAndSet(true)) return;
 
     for (ExBeanClass handler : EX_COMMAND_EP.getExtensions()) {
-      handler.getHandler().register();
+      handler.register();
     }
   }
 
@@ -201,7 +201,8 @@ public class CommandParser {
         return null;
       }
     }
-    return node.getCommandHandler();
+    final ExBeanClass handlerHolder = node.getCommandHandler();
+    return handlerHolder != null ? handlerHolder.getHandler() : null;
   }
 
   /**
@@ -540,14 +541,16 @@ public class CommandParser {
     return new ExCommand(ranges, command.toString(), argumentString);
   }
 
-  /**
-   * Adds a command handler to the parser
-   *
-   * @param handler The new handler to add
-   */
-  public void addHandler(@NotNull CommandHandler handler) {
+  /** Adds a command handler to the parser */
+  public void addHandler(@NotNull ExBeanClass handlerHolder) {
     // Iterator through each command name alias
-    for (CommandName name : handler.getNames()) {
+    CommandName[] names;
+    if (handlerHolder.getName() != null) {
+      names = CommandDefinitionKt.commands(handlerHolder.getName().split(","));
+    } else {
+      names = handlerHolder.getHandler().getNames();
+    }
+    for (CommandName name : names) {
       CommandNode node = root;
       String text = name.getRequired();
       // Build a tree for each character in the required portion of the command name
@@ -563,10 +566,10 @@ public class CommandParser {
       // For the last character we need to add the actual handler
       CommandNode cn = node.getChild(text.charAt(text.length() - 1));
       if (cn == null) {
-        cn = node.addChild(text.charAt(text.length() - 1), handler);
+        cn = node.addChild(text.charAt(text.length() - 1), handlerHolder);
       }
       else {
-        cn.setCommandHandler(handler);
+        cn.setCommandHandler(handlerHolder);
       }
       node = cn;
 
@@ -575,10 +578,10 @@ public class CommandParser {
       for (int i = 0; i < text.length(); i++) {
         cn = node.getChild(text.charAt(i));
         if (cn == null) {
-          cn = node.addChild(text.charAt(i), handler);
+          cn = node.addChild(text.charAt(i), handlerHolder);
         }
         else if (cn.getCommandHandler() == null) {
-          cn.setCommandHandler(handler);
+          cn.setCommandHandler(handlerHolder);
         }
 
         node = cn;

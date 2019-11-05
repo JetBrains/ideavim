@@ -49,10 +49,6 @@ sealed class CommandHandler {
     abstract fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean
   }
 
-  fun register() {
-    CommandParser.getInstance().addHandler(this)
-  }
-
   enum class RangeFlag {
     /**
      * Indicates that a range must be specified with this command

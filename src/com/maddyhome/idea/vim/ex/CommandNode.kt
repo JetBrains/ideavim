@@ -20,12 +20,12 @@ package com.maddyhome.idea.vim.ex
 
 import java.util.*
 
-class CommandNode(command: CommandHandler? = null) {
+class CommandNode(command: ExBeanClass? = null) {
 
-  var commandHandler: CommandHandler? = command
+  var commandHandler: ExBeanClass? = command
   private val nodes = HashMap<Char, CommandNode>()
 
-  fun addChild(ch: Char, command: CommandHandler?) = CommandNode(command).also {
+  fun addChild(ch: Char, command: ExBeanClass?) = CommandNode(command).also {
     nodes[ch] = it
   }
 
