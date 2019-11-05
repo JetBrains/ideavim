@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.helper.StringHelper
 
 class RegistersHandler : CommandHandler.SingleExecution() {
-  override val names = commands("di[splay]", "reg[isters]")
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val regs = VimPlugin.getRegister().registers.joinToString("\n", prefix = "--- Registers ---\n") { reg ->

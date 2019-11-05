@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 import kotlin.math.absoluteValue
 
 class JumpsHandler : CommandHandler.SingleExecution() {
-  override val names = commands("ju[mps]")
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val jumps = VimPlugin.getMark().jumps

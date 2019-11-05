@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.*
 
 class DeleteLinesHandler : CommandHandler.ForEachCaret() {
-  override val names: Array<CommandName> = commands("d[elete]")
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
   override fun execute(editor: Editor, caret: Caret, context: DataContext,

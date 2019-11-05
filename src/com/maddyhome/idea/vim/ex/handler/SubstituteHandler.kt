@@ -23,11 +23,9 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class SubstituteHandler : CommandHandler.SingleExecution() {
-  override val names = commands("s[ubstitute]", "&", "~")
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     var result = true

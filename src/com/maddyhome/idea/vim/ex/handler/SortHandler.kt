@@ -31,7 +31,6 @@ import java.util.*
  * @author Alex Selesse
  */
 class SortHandler : CommandHandler.SingleExecution() {
-  override val names = commands("sor[t]")
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
   @Throws(ExException::class)

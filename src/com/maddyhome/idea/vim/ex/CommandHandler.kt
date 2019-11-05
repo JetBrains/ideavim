@@ -37,7 +37,6 @@ import java.util.*
  */
 sealed class CommandHandler {
 
-  abstract val names: Array<CommandName>
   abstract val argFlags: CommandHandlerFlags
   protected open val optFlags: EnumSet<CommandFlags> = noneOfEnum()
 

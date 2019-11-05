@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.*
 
 class YankLinesHandler : CommandHandler.SingleExecution() {
-  override val names = commands("y[ank]")
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)

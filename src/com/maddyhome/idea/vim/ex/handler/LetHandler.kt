@@ -30,7 +30,6 @@ import java.util.regex.Pattern
  * @author vlan
  */
 class LetHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
-  override val names = commands("let")
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)

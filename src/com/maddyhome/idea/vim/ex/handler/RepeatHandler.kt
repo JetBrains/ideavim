@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_SAVE_LAST
 import com.maddyhome.idea.vim.group.MotionGroup
 
 class RepeatHandler : CommandHandler.ForEachCaret() {
-  override val names: Array<CommandName> = commands("@")
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.SELF_SYNCHRONIZED, DONT_SAVE_LAST)
 
   private var lastArg = ':'

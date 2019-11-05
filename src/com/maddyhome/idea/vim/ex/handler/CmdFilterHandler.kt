@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.helper.Msg
 import java.io.IOException
 
 class CmdFilterHandler : CommandHandler.SingleExecution() {
-  override val names = commands("!")
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     logger.info("execute")

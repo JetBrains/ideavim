@@ -22,14 +22,12 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 /**
  * @author John Grib
  */
 class ShellHandler : CommandHandler.SingleExecution() {
-  override val names = commands("sh[ell]")
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
     KeyHandler.executeAction("ActivateTerminalToolWindow", context)

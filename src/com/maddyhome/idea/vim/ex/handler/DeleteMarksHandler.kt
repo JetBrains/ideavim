@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.MarkGroup.DEL_FILE_MARKS
 import com.maddyhome.idea.vim.group.MarkGroup.DEL_MARKS
@@ -45,7 +44,6 @@ private const val UNESCAPED_QUOTE = "\""
  * @author Jørgen Granseth
  */
 class DeleteMarksHandler : CommandHandler.SingleExecution() {
-  override val names = commands("delm[arks]")
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
