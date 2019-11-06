@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -38,7 +39,7 @@ public final class KeywordOption extends ListOption {
     super(name, abbrev, defaultValue,
           "(\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9^]|[0-9]{1,3})),)*\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9]|[0-9]{1,3})),?$");
     validationPattern = Pattern.compile(pattern);
-    set(getValue());
+    initialSet(defaultValue);
   }
 
   @Override
@@ -81,6 +82,14 @@ public final class KeywordOption extends ListOption {
     return true;
   }
 
+  private void initialSet(String[] values) {
+    final List<String> vals = Arrays.asList(values);
+    final List<KeywordSpec> specs = valsToReversedSpecs(vals);
+    value = vals;
+    keywordSpecs = specs;
+    fireOptionChangeEvent();
+  }
+
   @Override
   public boolean set(@NotNull String val) {
     final List<String> vals = parseVals(val);
@@ -100,6 +109,15 @@ public final class KeywordOption extends ListOption {
       value = dflt;
       set(getValue());
     }
+  }
+
+  @NotNull
+  private List<KeywordSpec> valsToReversedSpecs(@NotNull List<String> vals) {
+    final ArrayList<KeywordSpec> res = new ArrayList<>();
+    for (int i = vals.size() - 1; i >= 0; i--) {
+      res.add(new KeywordSpec(vals.get(i)));
+    }
+    return res;
   }
 
   @Nullable
@@ -207,10 +225,17 @@ public final class KeywordOption extends ListOption {
     private Integer rangeLow;
     private Integer rangeHigh;
 
+    private boolean initialized = false;
+
     public KeywordSpec(@NotNull String part) {
-
       this.part = part;
+    }
 
+    private void initializeValues() {
+      if (initialized) return;
+      initialized = true;
+
+      String part = this.part;
       negate = part.matches("^\\^.+");
 
       if (negate) {
@@ -261,14 +286,17 @@ public final class KeywordOption extends ListOption {
     }
 
     public boolean isValid() {
+      initializeValues();
       return (!isRange || isAllLetters) || (rangeLow <= rangeHigh);
     }
 
     public boolean negate() {
+      initializeValues();
       return negate;
     }
 
     public boolean contains(int code) {
+      initializeValues();
       if (isAllLetters) {
         return Character.isLetter(code);
       }
