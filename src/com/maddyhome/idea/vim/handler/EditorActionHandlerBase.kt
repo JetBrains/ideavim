@@ -151,6 +151,8 @@ sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   companion object {
     private val logger = Logger.getInstance(EditorActionHandlerBase::class.java.name)
 
+    fun parseKeysSet(keyStrings: List<String>) = keyStrings.map { StringHelper.parseKeys(it) }.toSet()
+
     @JvmStatic
     fun parseKeysSet(vararg keyStrings: String): Set<List<KeyStroke>> = List(keyStrings.size) {
       StringHelper.parseKeys(keyStrings[it])

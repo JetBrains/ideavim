@@ -2,6 +2,7 @@ package com.maddyhome.idea.vim.handler
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.extensions.AbstractExtensionPointBean
+import com.intellij.util.SmartList
 import com.intellij.util.xmlb.annotations.Attribute
 import com.maddyhome.idea.vim.command.MappingMode
 import javax.swing.KeyStroke
@@ -39,8 +40,8 @@ class ActionBeanClass : AbstractExtensionPointBean() {
 
   fun getParsedKeys(): Set<List<KeyStroke>>? {
     val myKeys = keys ?: return null
-    val escapedKeys = myKeys.split(",").toTypedArray()
-    return EditorActionHandlerBase.parseKeysSet(*escapedKeys)
+    val escapedKeys = myKeys.splitByComma()
+    return EditorActionHandlerBase.parseKeysSet(escapedKeys)
   }
 
   fun getParsedModes(): Set<MappingMode>? {
@@ -65,5 +66,22 @@ class ActionBeanClass : AbstractExtensionPointBean() {
       }
     }
     return res.toSet()
+  }
+
+  private fun String.splitByComma(): List<String> {
+    if (this.isEmpty()) return ArrayList()
+    val res = SmartList<String>()
+    var start = 0
+    var current = 0
+    while (current < this.length) {
+      if (this[current] == ',') {
+        res += this.substring(start, current)
+        current++
+        start = current
+      }
+      current++
+    }
+    res += this.substring(start, current)
+    return res
   }
 }
