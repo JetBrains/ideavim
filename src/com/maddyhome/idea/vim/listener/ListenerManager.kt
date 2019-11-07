@@ -145,9 +145,9 @@ object VimListenerManager {
 
   val logger = Logger.getInstance(VimListenerManager::class.java)
 
-  fun turnOn() {
+  fun turnOn(initializing: Boolean) {
     GlobalListeners.enable()
-    ProjectListeners.addAll()
+    ProjectListeners.addAll(initializing)
     EditorListeners.addAll()
   }
 
@@ -196,8 +196,10 @@ object VimListenerManager {
       ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }.forEach { IdeaSpecifics.removeIdeaSpecificsListeners(it) }
     }
 
-    fun addAll() {
-      ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }.forEach { add(it) }
+    fun addAll(initializing: Boolean) {
+      if (!initializing) {
+        ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }.forEach { add(it) }
+      }
     }
   }
 

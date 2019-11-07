@@ -304,7 +304,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
       getEditor().turnOn();
       getSearch().turnOn();
     }
-    VimListenerManager.INSTANCE.turnOn();
+    VimListenerManager.INSTANCE.turnOn(true);
 
 
     Runnable asyncSetup = () -> {
@@ -438,7 +438,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
       getEditor().turnOn();
       getSearch().turnOn();
-      VimListenerManager.INSTANCE.turnOn();
+      VimListenerManager.INSTANCE.turnOn(false);
     } else {
       initializePlugin(false);
     }
