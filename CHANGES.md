@@ -52,6 +52,10 @@ _Available since 0.53.2 EAP:_
 * Rename `refactoring` value of `selectmode` option to `ideaselection`
 * Remove `template` value of `selectmode` option and replace it with `idearefactormode` option.
 
+_To Be Released:_
+
+...
+
 **Fixes:**
 * [VIM-1804](https://youtrack.jetbrains.com/issue/VIM-1804) Exit insert move after toggling IdeaVim
 * [VIM-1749](https://youtrack.jetbrains.com/issue/VIM-1749) Tag surround is finished on `>`
