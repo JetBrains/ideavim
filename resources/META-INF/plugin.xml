@@ -74,6 +74,8 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
 
     <statusBarWidgetProvider implementation="com.maddyhome.idea.vim.StatusBarIconProvider"/>
+
+    <statistics.applicationUsagesCollector implementation="com.maddyhome.idea.vim.VimSetOptionsCollector"/>
   </extensions>
 
   <extensions defaultExtensionNs="IdeaVIM">
