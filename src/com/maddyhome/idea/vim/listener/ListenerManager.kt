@@ -160,12 +160,6 @@ object VimListenerManager {
   object GlobalListeners {
     @JvmStatic
     fun enable() {
-      val typedAction = EditorActionManager.getInstance().typedAction
-      if (typedAction.rawHandler !is VimTypedActionHandler) {
-        // Actually this if should always be true, but just as protection
-        EventFacade.getInstance().setupTypedActionHandler(VimTypedActionHandler(typedAction.rawHandler))
-      }
-
       OptionsManager.number.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
       OptionsManager.relativenumber.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
 
@@ -173,7 +167,9 @@ object VimListenerManager {
     }
 
     fun disable() {
-      EventFacade.getInstance().restoreTypedActionHandler()
+      if (VimEditorFactoryListener.typedHandlerConnected) {
+        EventFacade.getInstance().restoreTypedActionHandler()
+      }
 
       OptionsManager.number.removeOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
       OptionsManager.relativenumber.removeOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
@@ -252,7 +248,23 @@ object VimListenerManager {
   }
 
   private object VimEditorFactoryListener : EditorFactoryListener {
+
+    var typedHandlerConnected = false
+
+    private fun enableTypedHandler() {
+      if (typedHandlerConnected) return
+      typedHandlerConnected = true
+
+      // There is no sense to connect to EditorActionManager before the first editor was created
+      val typedAction = EditorActionManager.getInstance().typedAction
+      if (typedAction.rawHandler !is VimTypedActionHandler) {
+        // Actually this if should always be true, but just as protection
+        EventFacade.getInstance().setupTypedActionHandler(VimTypedActionHandler(typedAction.rawHandler))
+      }
+    }
+
     override fun editorCreated(event: EditorFactoryEvent) {
+      enableTypedHandler()
       VimPlugin.getEditor().editorCreated(event.editor)
       VimPlugin.getMotion().editorCreated(event)
       VimPlugin.getChange().editorCreated(event)
