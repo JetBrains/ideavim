@@ -23,7 +23,9 @@ import com.intellij.ide.ui.LafManagerListener;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.ScrollingModel;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -221,8 +223,15 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
 
   private void resetCaretOffset(@NotNull Editor editor) {
     // Reset the original caret, with original scroll offsets
-    MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), caretOffset);
-    editor.getScrollingModel().scroll(horizontalOffset, verticalOffset);
+    final Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+    if (primaryCaret.getOffset() != caretOffset) {
+      MotionGroup.moveCaret(editor, primaryCaret, caretOffset);
+    }
+    final ScrollingModel scrollingModel = editor.getScrollingModel();
+    if (scrollingModel.getHorizontalScrollOffset() != horizontalOffset ||
+        scrollingModel.getVerticalScrollOffset() != verticalOffset) {
+      scrollingModel.scroll(horizontalOffset, verticalOffset);
+    }
   }
 
   @NotNull private final DocumentListener incSearchDocumentListener = new DocumentAdapter() {
