@@ -20,20 +20,22 @@ package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.ex.commands
 import junit.framework.TestCase
-import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.VimTestCase.assertThrows
+import org.junit.Test
+import kotlin.test.assertEquals
 
 /**
  * @author Alex Plate
  */
-class CommandParserTest : VimTestCase() {
+class CommandParserTest {
+  @Test
   fun `test one letter without optional`() {
     val commands = commands("a")
-    TestCase.assertEquals(1, commands.size)
+    assertEquals(1, commands.size)
     assertEquals("a", commands[0].required)
     assertEquals("", commands[0].optional)
   }
 
+  @Test
   fun `test without optional`() {
     val commands = commands("a_discovery")
     TestCase.assertEquals(1, commands.size)
@@ -41,24 +43,7 @@ class CommandParserTest : VimTestCase() {
     assertEquals("", commands[0].optional)
   }
 
-  fun `test empty optional`() {
-    assertThrows<RuntimeException>(RuntimeException::class.java) {
-      commands("a_discovery[]")
-    }
-  }
-
-  fun `test empty`() {
-    assertThrows<RuntimeException>(RuntimeException::class.java) {
-      commands("")
-    }
-  }
-
-  fun `test no closing bracket`() {
-    assertThrows<RuntimeException>(RuntimeException::class.java) {
-      commands("a_discovery[")
-    }
-  }
-
+  @Test
   fun `test with optional`() {
     val commands = commands("a[discovery]")
     TestCase.assertEquals(1, commands.size)

@@ -21,8 +21,9 @@ package com.maddyhome.idea.vim.ex
 data class CommandName(val required: String, val optional: String = "")
 
 fun commands(vararg commands: String) = commands.map { command ->
-  commandPattern.matchEntire(command)?.groupValues?.let { CommandName(it[1], it[2]) }
-    ?: throw RuntimeException("$command is invalid!")
+  val openBracketIndex = command.indexOf('[')
+  if (openBracketIndex < 0) CommandName(command)
+  else CommandName(command.take(openBracketIndex), command.substring(openBracketIndex + 1, command.lastIndex))
 }.toTypedArray()
 
 fun flags(
@@ -31,5 +32,3 @@ fun flags(
   access: CommandHandler.Access,
   vararg flags: CommandHandler.Flag
 ) = CommandHandlerFlags(rangeFlag, argumentFlag, access, flags.toSet())
-
-private val commandPattern: Regex = "^([^\\[]+)(?:\\[([^]]+)])?\$".toRegex()
