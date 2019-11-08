@@ -1,31 +1,35 @@
 package com.maddyhome.idea.vim
 
 import com.intellij.internal.statistic.beans.UsageDescriptor
-import com.intellij.internal.statistic.eventLog.FeatureUsageData
 import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesCollector
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
+import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.SelectModeOptionData
 
 class VimSetOptionsCollector : ApplicationUsagesCollector() {
   override fun getGroupId() = "vim.setcommands"
 
-  override fun getVersion() = 1
-
   // TODO: 07.11.2019 [VERSION UPDATE] 192+ should be removed
   @Suppress("UnstableApiUsage", "DEPRECATION")
   override fun getUsages(): MutableSet<UsageDescriptor> = mutableSetOf<UsageDescriptor>().apply {
-    add(booleanDescriptor("enabled.ideaput", OptionsManager.clipboard.contains(ClipboardOptionsData.ideaput)))
-    add(booleanDescriptor("enabled.ideamarks", OptionsManager.ideamarks.isSet))
-    add(UsageDescriptor("selected.idearefactormode", FeatureUsageData().addData("value", OptionsManager.idearefactormode.value)))
-    add(booleanDescriptor("enabled.ideaselection", OptionsManager.selectmode.contains(SelectModeOptionData.ideaselection)))
-    add(booleanDescriptor("enabled.ideajoin", OptionsManager.ideajoin.isSet))
+    add(booleanDescriptor("ideaput", OptionsManager.clipboard.contains(ClipboardOptionsData.ideaput)))
+    add(booleanDescriptor("ideamarks", OptionsManager.ideamarks.isSet))
+    add(UsageDescriptor("selected.idearefactormode", refactorMode(OptionsManager.idearefactormode.value)))
+    add(booleanDescriptor("ideaselection", OptionsManager.selectmode.contains(SelectModeOptionData.ideaselection)))
+    add(booleanDescriptor("ideajoin", OptionsManager.ideajoin.isSet))
   }
 
-  @Suppress("UnstableApiUsage")
+  @Suppress("UnstableApiUsage", "DEPRECATION")
   private fun booleanDescriptor(key: String, value: Boolean): UsageDescriptor {
-    @Suppress("UnstableApiUsage")
-    return UsageDescriptor(key, FeatureUsageData().addData("enabled", value))
+    return UsageDescriptor(key + if (value) ".enabled" else ".disabled", 1)
+  }
+
+  private fun refactorMode(refactorMode: String): Int = when (refactorMode) {
+    IdeaRefactorMode.keep -> 1
+    IdeaRefactorMode.select -> 2
+    IdeaRefactorMode.visual -> 3
+    else -> -1
   }
 }
 
