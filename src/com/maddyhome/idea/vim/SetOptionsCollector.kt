@@ -15,7 +15,7 @@ class VimSetOptionsCollector : ApplicationUsagesCollector() {
   override fun getUsages(): MutableSet<UsageDescriptor> = mutableSetOf<UsageDescriptor>().apply {
     add(booleanDescriptor("ideaput", OptionsManager.clipboard.contains(ClipboardOptionsData.ideaput)))
     add(booleanDescriptor("ideamarks", OptionsManager.ideamarks.isSet))
-    add(UsageDescriptor("selected.idearefactormode", refactorMode(OptionsManager.idearefactormode.value)))
+    add(UsageDescriptor("idearefactormode.selected", refactorMode(OptionsManager.idearefactormode.value)))
     add(booleanDescriptor("ideaselection", OptionsManager.selectmode.contains(SelectModeOptionData.ideaselection)))
     add(booleanDescriptor("ideajoin", OptionsManager.ideajoin.isSet))
   }
