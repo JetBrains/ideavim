@@ -40,6 +40,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -313,7 +314,8 @@ public class SearchHelper {
                                        int cnt,
                                        boolean allowInString) {
     int res = -1;
-    final int inCheckPos = dir < 0 && pos > 0 ? pos - 1 : pos;
+    Function<Integer, Integer> inCheckPosF = x -> dir < 0 && x > 0 ? x - 1 : x;
+    final int inCheckPos = inCheckPosF.apply(pos);
     boolean inString = checkInString(chars, inCheckPos, true);
     boolean initialInString = inString;
     boolean inChar = checkInString(chars, inCheckPos, false);
@@ -344,11 +346,11 @@ public class SearchHelper {
           stack++;
         }
         // We found the start/end of a string
-        else if (!inChar && isQuoteWithoutEscape(chars, pos, '"')) {
-          inString = !inString;
+        else if (!inChar) {
+          inString = checkInString(chars, inCheckPosF.apply(pos), true);
         }
-        else if (!inString && isQuoteWithoutEscape(chars, pos, '\'')) {
-          inChar = !inChar;
+        else if (!inString) {
+          inChar = checkInString(chars, inCheckPosF.apply(pos), false);
         }
       }
 
@@ -680,6 +682,22 @@ public class SearchHelper {
       else if (!inString && isQuoteWithoutEscape(chars, i, '\'')) {
         inChar = !inChar;
       }
+    }
+    int i = pos;
+    if (inString || inChar) {
+      boolean hasClosingString = false;
+      boolean hasClosingChar = false;
+      while(i < chars.length() && chars.charAt(i) != '\n' && ((inChar && !hasClosingChar) || (inString && !hasClosingString))) {
+        if(inString && !inChar && isQuoteWithoutEscape(chars, i, '"')) {
+          hasClosingString = true;
+        }
+        if(inChar && !inString && isQuoteWithoutEscape(chars, i, '\'')) {
+          hasClosingChar = true;
+        }
+        i++;
+      }
+      inString = inString && hasClosingString;
+      inChar = inChar && hasClosingChar;
     }
 
     return str ? inString : inChar;
