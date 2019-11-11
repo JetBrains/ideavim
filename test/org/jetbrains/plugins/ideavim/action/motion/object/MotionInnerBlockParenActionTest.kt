@@ -102,6 +102,22 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
     myFixture.checkResult("foo()\n")
   }
 
+  // VIM-1008 |d| |v_ib|
+  fun testDeleteInnerBlockWithQuote() {
+    typeTextInFile(parseKeys("di)"),
+      "(abc${c}def'ghi)"
+    )
+    myFixture.checkResult("()")
+  }
+
+  // VIM-1008 |d| |v_ib|
+  fun testDeleteInnerBlockWithDoubleQuote() {
+    typeTextInFile(parseKeys("di)"),
+      """(abc${c}def"ghi)"""
+    )
+    myFixture.checkResult("()")
+  }
+
   // VIM-326 |d| |v_ib|
   fun testDeleteInnerBlockCaretBeforeString() {
     typeTextInFile(parseKeys("di)"),
