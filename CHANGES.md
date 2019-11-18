@@ -52,6 +52,11 @@ _Available since 0.53.2 EAP:_
 * Rename `refactoring` value of `selectmode` option to `ideaselection`
 * Remove `template` value of `selectmode` option and replace it with `idearefactormode` option.
 
+**Fixes:**
+* [VIM-1189](https://youtrack.jetbrains.com/issue/VIM-1189)
+  [VIM-927](https://youtrack.jetbrains.com/issue/VIM-927)
+  Fix mappings to black hole register
+
 _To Be Released:_
 
 ...
