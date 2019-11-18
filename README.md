@@ -201,4 +201,5 @@ for a list of authors and contributors.
 License
 -------
 
-IdeaVim is licensed under the terms of the GNU Public License version 2.
+IdeaVim is licensed under the terms of the GNU Public License version 2
+or any later version.
