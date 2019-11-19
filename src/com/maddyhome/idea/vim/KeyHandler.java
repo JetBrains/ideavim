@@ -421,9 +421,12 @@ public class KeyHandler {
               commandState.popState();
             }
             else if (startOffset != null && startOffset != caret.getOffset()) {
+              // Command line motions are always characterwise exclusive
               int endOffset = caret.getOffset();
               if (startOffset < endOffset) {
                 endOffset -= 1;
+              } else {
+                startOffset -= 1;
               }
               final VimSelection vimSelection = VimSelection.Companion
                 .create(startOffset, endOffset, SelectionType.CHARACTER_WISE, editor);
