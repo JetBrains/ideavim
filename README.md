@@ -49,7 +49,7 @@ Get Early Access
 Would you like to try new features and fixes? Join the Early Access Program and
 receive EAP builds as updates!  
 
-1. Click the IdeaVim icon in the status bar | `EAP` | `Join EAP`
+1. Click the IdeaVim icon in the status bar | `EAP` | `Get Early Access...`
 
 Or subscribe to EAP updates manually:
 
