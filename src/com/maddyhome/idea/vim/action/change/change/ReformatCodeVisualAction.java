@@ -71,7 +71,7 @@ final public class ReformatCodeVisualAction extends VisualOperatorActionHandler.
                                @NotNull DataContext context,
                                @NotNull Command cmd,
                                @NotNull VimSelection range) {
-    VimPlugin.getChange().reformatCode(editor, range);
+    VimPlugin.getChange().reformatCodeSelection(editor, caret, range);
     return true;
   }
 }

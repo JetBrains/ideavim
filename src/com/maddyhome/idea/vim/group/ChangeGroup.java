@@ -1496,19 +1496,42 @@ public class ChangeGroup {
     return range != null && changeCaseRange(editor, caret, range, type);
   }
 
-  public void reformatCode(@NotNull Editor editor, @NotNull VimSelection range) {
+  public boolean reformatCodeMotion(@NotNull Editor editor,
+                             @NotNull Caret caret,
+                             DataContext context,
+                             int count,
+                             int rawCount,
+                             @NotNull Argument argument) {
+    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
+    return range != null && reformatCodeRange(editor, caret, range);
+  }
+
+  public void reformatCodeSelection(@NotNull Editor editor, @NotNull Caret caret, @NotNull VimSelection range) {
+    final TextRange textRange = range.toVimTextRange(true);
+    reformatCodeRange(editor, caret, textRange);
+  }
+
+  private boolean reformatCodeRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull TextRange range) {
+    int[] starts = range.getStartOffsets();
+    int[] ends = range.getEndOffsets();
+    final int firstLine = editor.offsetToLogicalPosition(range.getStartOffset()).line;
+    for (int i = ends.length - 1; i >= 0; i--) {
+      final int startOffset = EditorHelper.getLineStartForOffset(editor, starts[i]);
+      final int endOffset = EditorHelper.getLineEndForOffset(editor, ends[i] - (startOffset == ends[i] ? 0 : 1));
+      reformatCode(editor, startOffset, endOffset);
+    }
+    final int newOffset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
+    MotionGroup.moveCaret(editor, caret, newOffset);
+    return true;
+  }
+
+  private void reformatCode(@NotNull Editor editor, int start, int end) {
     final Project project = editor.getProject();
     if (project == null) return;
     final PsiFile file = PsiUtilBase.getPsiFileInEditor(editor, project);
     if (file == null) return;
-
-    final Pair<Integer, Integer> nativeStartAndEnd = range.getNativeStartAndEnd();
-    final Pair<Integer, Integer> sortedNativeStartAndEnd = HelperKt.sort(nativeStartAndEnd.getFirst(), nativeStartAndEnd.getSecond());
-    final int startOffset = EditorHelper.getLineStartForOffset(editor, sortedNativeStartAndEnd.getFirst());
-    final int endOffset = EditorHelper.getLineEndForOffset(editor, sortedNativeStartAndEnd.getSecond());
-
     final com.intellij.openapi.util.TextRange textRange =
-      com.intellij.openapi.util.TextRange.create(startOffset, endOffset);
+      com.intellij.openapi.util.TextRange.create(start, end);
     CodeStyleManager.getInstance(project).reformatText(file, Collections.singletonList(textRange));
   }
 

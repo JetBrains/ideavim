@@ -300,7 +300,8 @@ public class KeyHandler {
     if (editorState.getMappingMode() == MappingMode.OP_PENDING && !currentCmd.empty()) {
       EditorActionHandlerBase action = currentCmd.peek().getAction();
       if (action.getFlags().contains(CommandFlags.FLAG_DUPLICABLE_OPERATOR) &&
-          action.getKeyStrokesSet().stream().anyMatch(o -> o.size() == 1 && o.get(0).equals(key))) {
+          action.getKeyStrokesSet().stream().anyMatch(
+             o -> (o.size() == 1 || (o.size() == 2 && o.get(0).getKeyChar() == 'g')) && o.get(o.size() - 1).equals(key))) {
         return editorState.getCurrentNode().get(KeyStroke.getKeyStroke('_'));
       }
     }
