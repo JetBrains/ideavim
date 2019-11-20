@@ -39,12 +39,6 @@ import java.util.Set;
  * @author vlan
  */
 final public class DeleteVisualLinesAction extends VisualOperatorActionHandler.ForEachCaret {
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.X;
-  }
 
   @NotNull
   @Override

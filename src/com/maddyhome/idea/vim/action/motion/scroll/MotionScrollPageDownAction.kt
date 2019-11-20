@@ -21,9 +21,9 @@ package com.maddyhome.idea.vim.action.motion.scroll
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.awt.event.KeyEvent
@@ -32,9 +32,8 @@ import javax.swing.KeyStroke
 
 
 class MotionScrollPageDownAction : VimActionHandler.SingleExecution() {
-  override val mappingModes: Set<MappingMode> = MappingMode.NXO
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-F>", "<PageDown>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-F>", "￿<PageDown>")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -43,9 +42,8 @@ class MotionScrollPageDownAction : VimActionHandler.SingleExecution() {
   }
 }
 
-class MotionScrollPageDownInsertModeAction : VimActionHandler.SingleExecution() {
+class MotionScrollPageDownInsertModeAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
 
-  override val mappingModes: Set<MappingMode> = MappingMode.I
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0)),
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.CTRL_MASK)),

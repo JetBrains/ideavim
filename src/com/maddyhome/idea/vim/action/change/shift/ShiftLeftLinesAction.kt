@@ -25,16 +25,14 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import java.util.*
 import javax.swing.KeyStroke
 
 
 class ShiftLeftLinesAction : ChangeEditorActionHandler.ForEachCaret() {
-  override val mappingModes: Set<MappingMode> = MappingMode.I
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-D>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-D>")
 
   override val type: Command.Type = Command.Type.INSERT
 

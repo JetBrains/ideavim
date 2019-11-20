@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
 import com.maddyhome.idea.vim.helper.vimForEachCaret
@@ -33,9 +32,8 @@ import javax.swing.KeyStroke
  */
 
 class MotionShiftLeftAction : ShiftedArrowKeyHandler() {
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NV
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Left>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Left>")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
   override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {

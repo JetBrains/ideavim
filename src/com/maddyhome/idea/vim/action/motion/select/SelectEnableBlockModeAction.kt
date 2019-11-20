@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -37,9 +36,7 @@ import javax.swing.KeyStroke
 class SelectEnableBlockModeAction : VimActionHandler.SingleExecution() {
 
 
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.N
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("g<C-h>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("g<C-h>")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {

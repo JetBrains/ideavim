@@ -34,12 +34,6 @@ public final class ToggleRecordingAction extends VimActionHandler.SingleExecutio
 
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.NX;
-  }
-
-  @NotNull
-  @Override
   public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("q");
   }

@@ -20,8 +20,8 @@ package com.maddyhome.idea.vim.action.change;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.action.ComplicatedKeysAction;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.helper.UndoRedoHelper;
 import org.jetbrains.annotations.NotNull;
@@ -36,12 +36,7 @@ import java.util.Set;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 
-public class UndoAction extends VimActionHandler.SingleExecution {
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
+public class UndoAction extends VimActionHandler.SingleExecution implements ComplicatedKeysAction {
 
   @NotNull
   @Override

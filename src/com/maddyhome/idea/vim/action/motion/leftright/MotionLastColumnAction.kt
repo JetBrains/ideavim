@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.MotionActionHandler
@@ -39,9 +38,7 @@ import javax.swing.KeyStroke
 class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
-  override val mappingModes: Set<MappingMode> = MappingMode.NXO
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("$")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("$")
 
   override fun getOffset(editor: Editor,
                          caret: Caret,
@@ -80,9 +77,7 @@ class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
 class MotionLastColumnInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override val mappingModes: Set<MappingMode> = MappingMode.I
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<End>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<End>")
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
 

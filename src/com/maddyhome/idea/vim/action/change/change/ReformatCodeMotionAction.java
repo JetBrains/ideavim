@@ -35,12 +35,6 @@ import java.util.Set;
 public class ReformatCodeMotionAction extends ChangeEditorActionHandler.ForEachCaret {
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
-
-  @NotNull
-  @Override
   public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("gq");
   }

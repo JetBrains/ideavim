@@ -23,6 +23,6 @@ class InfoFileTest : VimTestCase() {
   }
 
   private inline fun forEachAction(supply: (action: EditorActionHandlerBase) -> Unit) {
-    VIM_ACTIONS_EP.extensions.forEach { supply(it) }
+    VIM_ACTIONS_EP.extensions.map { it.action }.forEach { supply(it) }
   }
 }

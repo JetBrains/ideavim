@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
@@ -34,9 +33,8 @@ import javax.swing.KeyStroke
 
 
 class FilterMotionAction : VimActionHandler.SingleExecution() {
-  override val mappingModes: Set<MappingMode> = MappingMode.N
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("!")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("!")
 
   override val type: Command.Type = Command.Type.CHANGE
 

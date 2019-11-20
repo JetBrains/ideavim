@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import org.jetbrains.annotations.Contract;
@@ -36,12 +35,6 @@ import java.util.List;
 import java.util.Set;
 
 final public class ChangeVisualNumberAvalancheDecAction extends VisualOperatorActionHandler.ForEachCaret {
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.X;
-  }
 
   @NotNull
   @Override

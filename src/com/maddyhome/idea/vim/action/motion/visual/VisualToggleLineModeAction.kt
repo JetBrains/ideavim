@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
@@ -36,8 +35,6 @@ import javax.swing.KeyStroke
 
 class VisualToggleLineModeAction : VimActionHandler.SingleExecution() {
 
-
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NX
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("V")
 

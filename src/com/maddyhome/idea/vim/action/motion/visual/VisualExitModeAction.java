@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.action.motion.visual;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.helper.ModeHelper;
@@ -36,13 +35,6 @@ import java.util.Set;
  * @author vlan
  */
 final public class VisualExitModeAction extends VimActionHandler.SingleExecution {
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.X;
-  }
 
   @NotNull
   @Override

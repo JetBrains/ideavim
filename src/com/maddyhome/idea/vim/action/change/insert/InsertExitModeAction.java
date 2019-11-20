@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.RegisterActions;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.helper.ModeHelper;
@@ -39,13 +38,6 @@ final public class InsertExitModeAction extends VimActionHandler.SingleExecution
   @NotNull
   public static EditorActionHandlerBase getInstance() {
     return RegisterActions.findActionOrDie(ACTION_ID);
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.I;
   }
 
   @NotNull

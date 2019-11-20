@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
@@ -36,8 +35,6 @@ import javax.swing.KeyStroke
  */
 
 class GnNextTextObject : TextObjectActionHandler() {
-
-  override val mappingModes: Set<MappingMode> = MappingMode.O
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gn")
 

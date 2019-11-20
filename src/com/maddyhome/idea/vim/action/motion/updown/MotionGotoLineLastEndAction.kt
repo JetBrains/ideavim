@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.inInsertMode
@@ -36,9 +35,7 @@ import javax.swing.KeyStroke
 class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
-  override val mappingModes: Set<MappingMode> = MappingMode.NXO
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-End>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-End>")
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
 
@@ -65,9 +62,7 @@ class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
 class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override val mappingModes: Set<MappingMode> = MappingMode.I
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-End>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-End>")
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES)
 

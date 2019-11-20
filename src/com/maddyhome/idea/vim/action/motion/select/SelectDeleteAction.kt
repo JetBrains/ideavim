@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import java.awt.event.KeyEvent
@@ -36,9 +35,7 @@ import javax.swing.KeyStroke
 class SelectDeleteAction : VimActionHandler.SingleExecution() {
 
 
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.S
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<BS>", "<DEL>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<BS>", "<DEL>")
 
   override val type: Command.Type = Command.Type.INSERT
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {

@@ -36,11 +36,6 @@ import java.util.Set;
 
 
 public class DeleteMotionAction extends ChangeEditorActionHandler.ForEachCaret {
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
 
   @NotNull
   @Override

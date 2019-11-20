@@ -36,11 +36,6 @@ import java.util.List;
 import java.util.Set;
 
 public class MotionLastScreenColumnAction extends MotionActionHandler.ForEachCaret {
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.NXO;
-  }
 
   @NotNull
   @Override

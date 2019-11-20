@@ -28,7 +28,6 @@ import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
@@ -39,11 +38,6 @@ import java.util.List;
 import java.util.Set;
 
 public class PlaybackRegisterAction extends VimActionHandler.SingleExecution {
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
 
   @NotNull
   @Override

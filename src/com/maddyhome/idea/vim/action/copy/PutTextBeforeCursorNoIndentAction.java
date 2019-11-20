@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.group.copy.PutData;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
@@ -36,11 +35,6 @@ import java.util.Set;
 
 
 public class PutTextBeforeCursorNoIndentAction extends ChangeEditorActionHandler.SingleExecution {
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
 
   @NotNull
   @Override

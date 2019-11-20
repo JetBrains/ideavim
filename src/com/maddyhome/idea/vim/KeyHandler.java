@@ -655,22 +655,23 @@ public class KeyHandler {
                                  @NotNull CommandNode node,
                                  CommandState editorState) {
     // The user entered a valid command. Create the command and add it to the stack
-    Command cmd = new Command(count, node.getAction(), node.getAction().getType(), node.getAction().getFlags(), keys);
+    final EditorActionHandlerBase myAction = node.getActionHolder().getAction();
+    Command cmd = new Command(count, myAction, myAction.getType(), myAction.getFlags(), keys);
     currentCmd.push(cmd);
 
     if (currentArg != null && !checkArgumentCompatibility(node)) return;
 
-    if (node.getAction().getArgumentType() == null || stopMacroRecord(node, editorState)) {
+    if (myAction.getArgumentType() == null || stopMacroRecord(node, editorState)) {
       state = State.READY;
     }
     else {
-      currentArg = node.getAction().getArgumentType();
-      startWaitingForArgument(editor, context, key.getKeyChar(), currentArg, editorState, node.getAction());
+      currentArg = myAction.getArgumentType();
+      startWaitingForArgument(editor, context, key.getKeyChar(), currentArg, editorState, myAction);
       partialReset(editor);
     }
 
     // TODO In the name of God, get rid of EX_STRING, FLAG_COMPLETE_EX and all the related staff
-    if (currentArg == Argument.Type.EX_STRING && node.getAction().getFlags().contains(CommandFlags.FLAG_COMPLETE_EX)) {
+    if (currentArg == Argument.Type.EX_STRING && myAction.getFlags().contains(CommandFlags.FLAG_COMPLETE_EX)) {
       EditorActionHandlerBase action;
       if (forwardSearch) {
         action = new SearchEntryFwdAction();
@@ -691,7 +692,7 @@ public class KeyHandler {
   }
 
   private boolean stopMacroRecord(CommandNode node, @NotNull CommandState editorState) {
-    return editorState.isRecording() && node.getAction() instanceof ToggleRecordingAction;
+    return editorState.isRecording() && node.getActionHolder().getAction() instanceof ToggleRecordingAction;
   }
 
   private void startWaitingForArgument(Editor editor,
@@ -721,8 +722,8 @@ public class KeyHandler {
 
   private boolean checkArgumentCompatibility(@NotNull CommandNode node) {
     if (currentArg == Argument.Type.MOTION &&
-        node.getAction().getType() != Command.Type.MOTION &&
-        !(node.getAction() instanceof ExEntryAction)) {
+        node.getActionHolder().getAction().getType() != Command.Type.MOTION &&
+        !(node.getActionHolder().getAction() instanceof ExEntryAction)) {
       state = State.BAD_COMMAND;
       return false;
     }

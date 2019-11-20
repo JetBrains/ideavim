@@ -39,12 +39,6 @@ import java.util.Set;
  * @author vlan
  */
 final public class OperatorAction extends VimActionHandler.SingleExecution {
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
 
   @NotNull
   @Override

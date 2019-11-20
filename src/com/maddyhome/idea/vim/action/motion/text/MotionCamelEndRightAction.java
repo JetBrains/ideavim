@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.MotionType;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
@@ -35,11 +34,6 @@ import java.util.Set;
 
 
 public class MotionCamelEndRightAction extends MotionActionHandler.ForEachCaret {
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.NXO;
-  }
 
   @NotNull
   @Override

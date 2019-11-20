@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim.key
 
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.handler.ActionBeanClass
 import javax.swing.KeyStroke
 
 /**
@@ -46,7 +46,7 @@ import javax.swing.KeyStroke
 interface Node
 
 /** Represents a complete command */
-class CommandNode(val action: EditorActionHandlerBase) : Node
+class CommandNode(val actionHolder: ActionBeanClass) : Node
 
 /** Represents a part of the command */
 open class CommandPartNode : Node, HashMap<KeyStroke, Node>()

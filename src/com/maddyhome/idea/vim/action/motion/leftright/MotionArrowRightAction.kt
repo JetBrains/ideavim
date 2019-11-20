@@ -22,18 +22,16 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class MotionArrowRightAction : NonShiftedSpecialKeyHandler() {
+class MotionArrowRightAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction {
   override val motionType: MotionType = MotionType.EXCLUSIVE
-
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NXO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     parseKeys("<Right>"),

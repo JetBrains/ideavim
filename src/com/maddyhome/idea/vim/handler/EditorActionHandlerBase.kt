@@ -30,7 +30,6 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.noneOfEnum
@@ -87,8 +86,6 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
 
 sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   val id: String = this::class.java.simpleName.let { if (it.startsWith("Vim", true)) it else "Vim$it" }
-
-  abstract val mappingModes: Set<MappingMode>
 
   abstract val keyStrokesSet: Set<List<KeyStroke>>
 
@@ -154,7 +151,7 @@ sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     // No-op
   }
 
-  protected companion object {
+  companion object {
     private val logger = Logger.getInstance(EditorActionHandlerBase::class.java.name)
 
     @JvmStatic

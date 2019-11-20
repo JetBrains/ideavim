@@ -21,9 +21,9 @@ package com.maddyhome.idea.vim.action.change.insert;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.ComplicatedKeysAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,12 +36,8 @@ import java.util.List;
 import java.util.Set;
 
 
-public class InsertPreviousInsertExitAction extends ChangeEditorActionHandler.SingleExecution {
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.I;
-  }
+public class InsertPreviousInsertExitAction extends ChangeEditorActionHandler.SingleExecution
+  implements ComplicatedKeysAction {
 
   @NotNull
   @Override

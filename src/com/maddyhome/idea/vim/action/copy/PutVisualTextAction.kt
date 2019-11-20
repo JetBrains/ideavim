@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
@@ -36,9 +35,8 @@ import javax.swing.KeyStroke
  * @author vlan
  */
 class PutVisualTextAction : VisualOperatorActionHandler.SingleExecution() {
-  override val mappingModes: Set<MappingMode> = MappingMode.X
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("p", "P")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("p", "P")
 
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

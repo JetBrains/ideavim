@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.exitSelectMode
@@ -40,9 +39,7 @@ import javax.swing.KeyStroke
 class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.S
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Left>")
+    override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Left>")
 
   override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
     val keymodel = OptionsManager.keymodel

@@ -31,10 +31,12 @@ import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.ComplicatedKeysAction;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
+import com.maddyhome.idea.vim.handler.ActionBeanClass;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.Shortcut;
@@ -258,21 +260,36 @@ public class KeyGroup {
     registerRequiredShortcut(Arrays.asList(shortcut.getKeys()));
   }
 
-  public void registerCommandAction(@NotNull EditorActionHandlerBase commandAction) {
+  public void registerCommandAction(@NotNull ActionBeanClass actionHolder) {
+    Set<List<KeyStroke>> actionKeys = actionHolder.getParsedKeys();
+    if (actionKeys == null) {
+      final EditorActionHandlerBase action = actionHolder.getAction();
+      if (action instanceof ComplicatedKeysAction) {
+        actionKeys = action.getKeyStrokesSet();
+      } else {
+        throw new RuntimeException("Cannot register action: " + action.getClass().getName());
+      }
+    }
+
+    Set<MappingMode> actionModes = actionHolder.getParsedModes();
+    if (actionModes == null) {
+      throw new RuntimeException("Cannot register action: " + actionHolder.getImplementation());
+    }
+
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       if (identityChecker == null) {
         identityChecker = new HashMap<>();
         prefixes = new HashMap<>();
       }
-      for (List<KeyStroke> keys : commandAction.getKeyStrokesSet()) {
-        checkCommand(commandAction.getMappingModes(), commandAction, keys);
+      for (List<KeyStroke> keys : actionKeys) {
+        checkCommand(actionModes, actionHolder.getAction(), keys);
       }
     }
 
-    for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
+    for (List<KeyStroke> keyStrokes : actionKeys) {
       registerRequiredShortcut(keyStrokes);
 
-      for (MappingMode mappingMode : commandAction.getMappingModes()) {
+      for (MappingMode mappingMode : actionModes) {
         Node node = getKeyRoot(mappingMode);
         final int len = keyStrokes.size();
         // Add a child for each keystroke in the shortcut for this action
@@ -281,7 +298,7 @@ public class KeyGroup {
             throw new Error("Error in tree constructing");
           }
 
-          node = addMNode((CommandPartNode)node, commandAction, keyStrokes.get(i), i == len - 1);
+          node = addMNode((CommandPartNode)node, actionHolder, keyStrokes.get(i), i == len - 1);
         }
       }
     }
@@ -341,7 +358,7 @@ public class KeyGroup {
 
   @NotNull
   private Node addMNode(@NotNull CommandPartNode base,
-                        EditorActionHandlerBase action,
+                        ActionBeanClass actionHolder,
                         @NotNull KeyStroke key,
                         boolean isLastInSequence) {
     Node existing = base.get(key);
@@ -349,7 +366,7 @@ public class KeyGroup {
 
     Node newNode;
     if (isLastInSequence) {
-      newNode = new CommandNode(action);
+      newNode = new CommandNode(actionHolder);
     } else {
       newNode = new CommandPartNode();
     }

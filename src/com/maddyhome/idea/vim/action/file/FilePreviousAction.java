@@ -21,8 +21,8 @@ package com.maddyhome.idea.vim.action.file;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.ComplicatedKeysAction;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,12 +34,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class FilePreviousAction extends VimActionHandler.SingleExecution {
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
+public class FilePreviousAction extends VimActionHandler.SingleExecution implements ComplicatedKeysAction {
 
   @NotNull
   @Override

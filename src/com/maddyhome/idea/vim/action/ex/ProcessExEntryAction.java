@@ -21,9 +21,9 @@ package com.maddyhome.idea.vim.action.ex;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.ComplicatedKeysAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,14 +37,7 @@ import java.util.Set;
  * <p>
  * The mapping for this action means that the ex command is executed as a write action
  */
-public class ProcessExEntryAction extends VimActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.C;
-  }
-
+public class ProcessExEntryAction extends VimActionHandler.SingleExecution implements ComplicatedKeysAction {
   @NotNull
   @Override
   public Set<List<KeyStroke>> getKeyStrokesSet() {

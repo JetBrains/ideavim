@@ -35,11 +35,6 @@ import java.util.Set;
 
 
 public class RepeatChangeAction extends VimActionHandler.SingleExecution {
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
 
   @NotNull
   @Override
