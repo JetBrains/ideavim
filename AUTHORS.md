@@ -267,6 +267,10 @@ Contributors:
   [![icon][github]](https://github.com/hajdamak)
   &nbsp;
   Rafał Hajdacki
+* [![icon][mail]](mailto:igrek+github@fastem.com)
+  [![icon][github]](https://github.com/igrekster)
+  &nbsp;
+  igrekster
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.

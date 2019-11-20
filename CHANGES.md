@@ -19,8 +19,12 @@ usual beta standards.
 [To Be Released]
 --------------
 
-*Features*
+**Features:**
 * Support XDG settings standard ([VIM-664](https://youtrack.jetbrains.com/issue/VIM-664))
+
+**Fixes:**
+* [VIM-1823](https://youtrack.jetbrains.com/issue/VIM-1823) Fix multiple carets with ignorecase
+
 
 0.54, 2019-11-20
 --------------
