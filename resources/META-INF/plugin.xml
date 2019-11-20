@@ -326,7 +326,7 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.change.change.FilterVisualLinesAction" mappingModes="X" keys="!"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.change.AutoIndentLinesVisualAction" mappingModes="X" keys="="/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ReformatCodeVisualAction" mappingModes="X" keys="gq"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ReformatCodeMotionAction"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ReformatCodeMotionAction" mappingModes="N" keys="gq"/>
 
     <!-- Shift -->
     <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.AutoIndentMotionAction" mappingModes="N" keys="="/>
