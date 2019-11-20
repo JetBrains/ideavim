@@ -34,7 +34,9 @@ class ActionBeanClass : AbstractExtensionPointBean() {
   var keys: String? = null
 
   val action: EditorActionHandlerBase by lazy {
-    this.instantiateClass<EditorActionHandlerBase>(
+    // FIXME. [VERSION UPDATE] change to instantiateClass for 193+
+    @Suppress("DEPRECATION")
+    this.instantiate<EditorActionHandlerBase>(
       implementation ?: "", ApplicationManager.getApplication().picoContainer)
   }
 
