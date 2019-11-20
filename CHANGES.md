@@ -16,6 +16,12 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+[To Be Released]
+--------------
+
+*Features*
+* Support XDG settings standard ([VIM-664](https://youtrack.jetbrains.com/issue/VIM-664))
+
 0.54, 2019-11-20
 --------------
 

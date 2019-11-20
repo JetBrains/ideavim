@@ -29,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -40,7 +41,7 @@ import java.util.regex.Pattern;
 public class VimScriptParser {
   public static final String VIMRC_FILE_NAME = "ideavimrc";
   public static final String[] HOME_VIMRC_PATHS = {"." + VIMRC_FILE_NAME, "_" + VIMRC_FILE_NAME};
-  public static final String XDG_VIMRC_PATH = "ideavim/" + VIMRC_FILE_NAME;
+  public static final String XDG_VIMRC_PATH = "ideavim" + File.pathSeparator + VIMRC_FILE_NAME;
   public static final int BUFSIZE = 4096;
   private static final Pattern EOL_SPLIT_PATTERN = Pattern.compile(" *(\r\n|\n)+ *");
   private static final Pattern DOUBLE_QUOTED_STRING = Pattern.compile("\"([^\"]*)\"");
@@ -67,13 +68,15 @@ public class VimScriptParser {
 
     // Check in XDG config directory
     final String xdgConfigHomeProperty = System.getenv("XDG_CONFIG_HOME");
-    final File xdgConfig;
+    File xdgConfig = null;
     if (xdgConfigHomeProperty == null || Objects.equals(xdgConfigHomeProperty, "")) {
-      xdgConfig = new File(homeDirName, ".config/" + XDG_VIMRC_PATH);
+      if (homeDirName != null) {
+        xdgConfig = Paths.get(homeDirName, ".config", XDG_VIMRC_PATH).toFile();
+      }
     } else {
       xdgConfig = new File(xdgConfigHomeProperty, XDG_VIMRC_PATH);
     }
-    if (xdgConfig.exists()) {
+    if (xdgConfig != null && xdgConfig.exists()) {
       return xdgConfig;
     }
 

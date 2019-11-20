@@ -127,6 +127,9 @@ will affect where IdeaVim looks for your .ideavimrc file. For example, if you
 have `-Duser.home=/my/alternate/home` then IdeaVim will source
 `/my/alternate/home/.ideavimrc` instead of `~/.ideavimrc`.
 
+Alternatively, you can set up initialization commands using [XDG](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) standard.
+Put your settings to `$XDG_CONFIG_HOME$/ideavim/ideavimrc` file.     [To Be Released]
+
 
 Emulated Vim Plugins
 --------------------

@@ -263,6 +263,10 @@ Contributors:
   [![icon][github]](https://github.com/jorgengranseth)
   &nbsp;
   Jørgen Granseth
+* [![icon][mail]](mailto:rafal@hajdacki.com)
+  [![icon][github]](https://github.com/hajdamak)
+  &nbsp;
+  Rafał Hajdacki
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
