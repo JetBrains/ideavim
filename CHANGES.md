@@ -24,6 +24,7 @@ usual beta standards.
 
 **Fixes:**
 * [VIM-1823](https://youtrack.jetbrains.com/issue/VIM-1823) Fix multiple carets with ignorecase
+* [VIM-1053](https://youtrack.jetbrains.com/issue/VIM-1053) Implement gq+motion. Make some `g` commands duplicable.
 
 
 0.54, 2019-11-20
