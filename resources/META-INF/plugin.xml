@@ -3,9 +3,9 @@
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
       <ul>
-        <li>EasyMotion plugin emulation</li>
+        <li>EasyMotion plugin emulation (<a href="https://github.com/JetBrains/ideavim#emulated-vim-plugins">link</a>)</li>
         <li>Support surrounding with a function name</li>
-        <li>Add IdeaVim logo to status bar</li>
+        <li>Add IdeaVim logo to the status bar</li>
         <li>Various bug fixes</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>

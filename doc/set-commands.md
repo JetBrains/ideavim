@@ -19,7 +19,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                      If true, creation of global mark will trigger creation of IDE's bookmark
                      and vice versa.
                      
-    `idearefactormode` `idearefactormode` String(default "select")      - IdeaVim ONLY  [To Be Released]
+    `idearefactormode` `idearefactormode` String(default "select")      - IdeaVim ONLY
     
                  Define the mode that would be enabled during
                  the refactoring (renaming, live template, introduce variable, etc)
@@ -80,10 +80,10 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                    mouse           when using the mouse
                    key             when using shifted special[1] keys
                    cmd             when using "v", "V", or <C-V>
-                   ideaselection   when IDE sets a selection      - IdeaVim ONLY      [To Be Released]
+                   ideaselection   when IDE sets a selection      - IdeaVim ONLY
                                    (examples: extend selection, wrap with while, etc.)
 
-                   Deprecated values:  [To Be Released]
+                   Deprecated values:
                    template        ~~please use `idearefactormode` option~~
                                    when starting a template       - IdeaVim ONLY
                    refactoring     ~~please use ideaselection~~

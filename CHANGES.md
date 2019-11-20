@@ -8,21 +8,27 @@ Get an Early Access
 -------------------
 
 Would you like to try new features and fixes? Join the Early Access Program and
-receive EAP builds as updates! Add this URL to "Settings | Plugins |
-Browse Repositories | Manage Repositories":
-[https://plugins.jetbrains.com/plugins/eap/ideavim](https://plugins.jetbrains.com/plugins/eap/ideavim)
+receive EAP builds as updates! Use the `Join EAP` option in the status bar or
+add this URL to "Settings | Plugins | Manage Plugin Repositories":
+`https://plugins.jetbrains.com/plugins/eap/ideavim`
 
 It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-To Be Released
+0.54, 2019-11-20
 --------------
-_Available since 0.53.1 EAP:_
 
 **Features:**
+* EasyMotion plugin emulation ([VIM-820](https://youtrack.jetbrains.com/issue/VIM-820) | [Instructions](https://github.com/JetBrains/ideavim#emulated-vim-plugins))
 * Support surrounding with a function name ([link](https://github.com/tpope/vim-surround/blob/master/doc/surround.txt#L138))
-* [VIM-1720](https://youtrack.jetbrains.com/issue/VIM-1720) Add `:delmarks` command
+* Add `:delmarks` command ([VIM-1720](https://youtrack.jetbrains.com/issue/VIM-1720))
+* Add IdeaVim icon to the status bar ([VIM-943](https://youtrack.jetbrains.com/issue/VIM-943))
+
+**Changes:**
+* Remove the default IdeaVim toggle shortcut (<kbd>CTRL</kbd><kbd>ALT</kbd><kbd>V</kbd>)
+* Rename `refactoring` value of `selectmode` option to `ideaselection`
+* Remove `template` value of `selectmode` option and replace it with `idearefactormode` option.
 
 **Fixes:**
 * [VIM-1766](https://youtrack.jetbrains.com/issue/VIM-1766) Fix disappearing caret in ex entry on Linux
@@ -40,34 +46,16 @@ _Available since 0.53.1 EAP:_
 * [VIM-1772](https://youtrack.jetbrains.com/issue/VIM-1772) Fix yanking with `:y` command
 * [VIM-1685](https://youtrack.jetbrains.com/issue/VIM-1685) Fix `ESC` for insert mode
 * [VIM-1752](https://youtrack.jetbrains.com/issue/VIM-1752) Fix `ESC` for insert mode
-
-_Available since 0.53.2 EAP:_
-
-**Features:**
-* Add IdeaVim icon to the status bar ([VIM-943](https://youtrack.jetbrains.com/issue/VIM-943))
-* EasyMotion plugin emulation ([VIM-820](https://youtrack.jetbrains.com/issue/VIM-820))
-
-**Changes:**
-* Remove the default IdeaVim toggle shortcut (<kbd>CTRL</kbd><kbd>ALT</kbd><kbd>V</kbd>)
-* Rename `refactoring` value of `selectmode` option to `ideaselection`
-* Remove `template` value of `selectmode` option and replace it with `idearefactormode` option.
-
-**Fixes:**
 * [VIM-1189](https://youtrack.jetbrains.com/issue/VIM-1189)
   [VIM-927](https://youtrack.jetbrains.com/issue/VIM-927)
   Fix mappings to black hole register
-
-_To Be Released:_
-
-...
-
-**Fixes:**
 * [VIM-1804](https://youtrack.jetbrains.com/issue/VIM-1804) Exit insert move after toggling IdeaVim
 * [VIM-1749](https://youtrack.jetbrains.com/issue/VIM-1749) Tag surround is finished on `>`
 * [VIM-1801](https://youtrack.jetbrains.com/issue/VIM-1801) Fix j/k motions with inline hints
 * [VIM-1800](https://youtrack.jetbrains.com/issue/VIM-1800) Improve ideamarks option
 * [VIM-1819](https://youtrack.jetbrains.com/issue/VIM-1819) Fix execution of some rider actions
 * [VIM-1604](https://youtrack.jetbrains.com/issue/VIM-1604) Add IdeaVim logo
+
 
 0.53, 2019-08-07
 --------------

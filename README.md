@@ -49,6 +49,10 @@ Get Early Access
 Would you like to try new features and fixes? Join the Early Access Program and
 receive EAP builds as updates!  
 
+1. Click the IdeaVim icon in the status bar | `EAP` | `Join EAP`
+
+Or subscribe to EAP updates manually:
+
 1. Open `Settings | Plugins`
 2. Click the gear icon :gear:, select `Manage Plugin Repositories`, and add the following url:
  `https://plugins.jetbrains.com/plugins/eap/ideavim`
@@ -128,24 +132,32 @@ Emulated Vim Plugins
 --------------------
 
 IdeaVim extensions emulate some plugins of the original Vim. In order to use
-IdeaVim extensions, you have to enable them via this command in your ~/.ideavimrc:
+IdeaVim extensions, you have to enable them via this command in your `~/.ideavimrc`:
 
     set <extension-name>
 
 Available extensions:
 
+* easymotion
+    * Setup:  
+        * Install [IdeaVim-EasyMotion](https://plugins.jetbrains.com/plugin/13360-ideavim-easymotion/)
+        and [AceJump](https://plugins.jetbrains.com/plugin/7086-acejump/) plugins.
+        * `set easymotion`
+    * Emulates [vim-easymotion](https://github.com/easymotion/vim-easymotion)
+    * Commands: All commands with the mappings are supported. See the [full list of supported commands](https://github.com/AlexPl292/IdeaVim-EasyMotion#supported-commands).
+
 * surround
-    * `set surround`
+    * Setup: `set surround`
     * Emulates [vim-surround](https://github.com/tpope/vim-surround)
     * Commands: `ys`, `cs`, `ds`, `S`
 
 * multiple-cursors
-    * `set multiple-cursors`
+    * Setup: `set multiple-cursors`
     * Emulates [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors)
     * Commands: `<A-n>`, `<A-x>`, `<A-p>`, `g<A-n>`
 
 * commentary
-    * `set commentary`
+    * Setup: `set commentary`
     * Emulates [commentary.vim](https://github.com/tpope/vim-commentary)
     * Commands: `gcc`, `gc + motion`, `v_gc`
 
