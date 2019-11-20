@@ -29,17 +29,8 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
-
 public class ReformatCodeMotionAction extends ChangeEditorActionHandler.ForEachCaret
   implements DuplicableOperatorAction {
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("gq");
-  }
 
   @NotNull
   @Override
