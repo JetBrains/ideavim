@@ -509,4 +509,24 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimIndent())
     doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
+
+  fun `test multiple capitalized occurrences with ignorecase`() {
+    val before = """text ${c}Test text Test text Test text Test text"""
+    configureByText(before)
+
+    typeText(commandToKeys("set ignorecase"))
+    typeText(parseKeys("<A-n><A-n><A-n><A-n>"))
+    val after = """text ${s}Test${se} text ${s}Test${se} text ${s}Test${se} text ${s}Test${se} text"""
+    myFixture.checkResult(after)
+  }
+
+  fun `test multiple mixed case occurrences with ignorecase`() {
+    val before = """text ${c}Test text tesT text TEST text test text"""
+    configureByText(before)
+
+    typeText(commandToKeys("set ignorecase"))
+    typeText(parseKeys("<A-n><A-n><A-n><A-n>"))
+    val after = """text ${s}Test${se} text ${s}tesT${se} text ${s}TEST${se} text ${s}test${se} text"""
+    myFixture.checkResult(after)
+  }
 }
