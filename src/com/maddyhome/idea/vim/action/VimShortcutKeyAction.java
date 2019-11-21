@@ -29,6 +29,8 @@ import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.Pair;
+import com.intellij.ui.KeyStrokeAdapter;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.RegisterActions;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -223,11 +225,28 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     return !VimPlugin.getKey().getKeymapConflicts(keyStroke).isEmpty();
   }
 
+  /**
+   * getDefaultKeyStroke is needed for NEO layout keyboard VIM-987
+   * but we should cache the value because on the second call (isEnabled -> actionPerformed)
+   *   the event is already consumed
+   */
+  @NotNull private Pair<KeyEvent, KeyStroke> keyStrokeCache = new Pair<>(null, null);
+
   @Nullable
   private KeyStroke getKeyStroke(@NotNull AnActionEvent e) {
     final InputEvent inputEvent = e.getInputEvent();
     if (inputEvent instanceof KeyEvent) {
       final KeyEvent keyEvent = (KeyEvent)inputEvent;
+      final KeyStroke defaultKeyStroke = KeyStrokeAdapter.getDefaultKeyStroke(keyEvent);
+      Pair<KeyEvent, KeyStroke> strokeCache = this.keyStrokeCache;
+      if (defaultKeyStroke != null) {
+        this.keyStrokeCache = new Pair<>(keyEvent, defaultKeyStroke);
+        return defaultKeyStroke;
+      }
+      else if (strokeCache.first == keyEvent) {
+        this.keyStrokeCache = new Pair<>(null, null);
+        return strokeCache.second;
+      }
       return KeyStroke.getKeyStrokeForEvent(keyEvent);
     }
     return null;
