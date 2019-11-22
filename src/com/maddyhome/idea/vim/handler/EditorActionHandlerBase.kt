@@ -84,7 +84,7 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
 }
 
 sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
-  val id: String = this::class.java.simpleName.let { if (it.startsWith("Vim", true)) it else "Vim$it" }
+  val id: String = getActionId(this::class.java.name)
 
   abstract val type: Command.Type
 
@@ -157,5 +157,11 @@ sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     fun parseKeysSet(vararg keyStrings: String): Set<List<KeyStroke>> = List(keyStrings.size) {
       StringHelper.parseKeys(keyStrings[it])
     }.toSet()
+
+    fun getActionId(classFullName: String): String {
+      return classFullName
+        .takeLastWhile { it != '.' }
+        .let { if (it.startsWith("Vim", true)) it else "Vim$it" }
+    }
   }
 }

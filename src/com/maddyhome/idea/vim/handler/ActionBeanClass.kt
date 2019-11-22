@@ -33,6 +33,8 @@ class ActionBeanClass : AbstractExtensionPointBean() {
   @Attribute("keys")
   var keys: String? = null
 
+  val actionId: String get() = implementation?.let { EditorActionHandlerBase.getActionId(it) } ?: ""
+
   val action: EditorActionHandlerBase by lazy {
     // FIXME. [VERSION UPDATE] change to instantiateClass for 193+
     @Suppress("DEPRECATION")
