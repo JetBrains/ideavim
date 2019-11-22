@@ -32,14 +32,13 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.Pair;
 import com.intellij.ui.KeyStrokeAdapter;
 import com.maddyhome.idea.vim.KeyHandler;
-import com.maddyhome.idea.vim.RegisterActions;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.CommandStateHelper;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import com.maddyhome.idea.vim.listener.IdeaSpecifics;
 import com.maddyhome.idea.vim.option.ListOption;
@@ -137,7 +136,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       if (IdeaSpecifics.INSTANCE.aceJumpActive()) return false;
 
       final int keyCode = keyStroke.getKeyCode();
-      if (LookupManager.getActiveLookup(editor) != null && !passCommandToVimWithLookup(keyStroke)) {
+      if (LookupManager.getActiveLookup(editor) != null) {
         return isEnabledForLookup(keyStroke);
       }
       if (keyCode == VK_ESCAPE) {
@@ -175,21 +174,6 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     return false;
   }
 
-  private boolean passCommandToVimWithLookup(@NotNull KeyStroke keyStroke) {
-    final ListOption popupActions = OptionsManager.INSTANCE.getLookupActions();
-    final List<String> values = popupActions.values();
-    if (values == null) return false;
-
-    // FIXME Broken because of getKeyStrokesSet.
-    //   Should be fixed along with :map jk <ESC>
-    return values.stream().anyMatch(actionId -> {
-      final EditorActionHandlerBase action = RegisterActions.findAction(actionId);
-      if (action == null) return false;
-      //return action.getKeyStrokesSet().stream().anyMatch(ks -> !ks.isEmpty() && ks.get(0).equals(keyStroke));
-      return false;
-    });
-  }
-
   private boolean isEnabledForEscape(@NotNull Editor editor) {
     final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
     return isPrimaryEditor(editor) || (EditorHelper.isFileEditor(editor) && mode != CommandState.Mode.COMMAND);
@@ -208,16 +192,36 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
   }
 
   private boolean isEnabledForLookup(@NotNull KeyStroke keyStroke) {
-    for (List<KeyStroke> keys : InsertExitModeAction.getInstance().keySet) {
+    final Set<List<KeyStroke>> allowedKeys = EditorActionHandlerBase.parseKeysSet(
+      // Escape
+      "<C-[>", "<C-C>", "<Esc>",
+      // Backspace
+      "<BS>",
+      // One command
+      "<C-O>",
+      // Lookup up
+      "<C-P>",
+      // Lookup down
+      "<C-N>");
+
+    for (List<KeyStroke> keys : allowedKeys) {
       // XXX: Currently we cannot handle <C-\><C-N> because of the importance of <C-N> for the IDE on Linux
-      if (keys.size() == 1 && keyStroke.equals(keys.get(0))) {
+      if (keyStroke.equals(keys.get(0))) {
         return true;
       }
     }
-    //noinspection RedundantIfStatement
-    if (keyStroke.equals(KeyStroke.getKeyStroke(VK_BACK_SPACE, 0))) {
-      return true;
+
+    // We allow users to set custom keys that will work with lookup in case devs forgot something
+    final ListOption popupActions = OptionsManager.INSTANCE.getLookupKeys();
+    final List<String> values = popupActions.values();
+    if (values == null) return false;
+    for (String value : values) {
+      final List<KeyStroke> keys = StringHelper.parseKeys(value);
+      if (keys.size() >= 1 && keyStroke.equals(keys.get(0))) {
+        return true;
+      }
     }
+
     return false;
   }
 
@@ -228,7 +232,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
   /**
    * getDefaultKeyStroke is needed for NEO layout keyboard VIM-987
    * but we should cache the value because on the second call (isEnabled -> actionPerformed)
-   *   the event is already consumed
+   * the event is already consumed
    */
   @NotNull private Pair<KeyEvent, KeyStroke> keyStrokeCache = new Pair<>(null, null);
 

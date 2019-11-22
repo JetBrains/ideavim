@@ -27,6 +27,7 @@ usual beta standards.
 * [VIM-1053](https://youtrack.jetbrains.com/issue/VIM-1053)
   [VIM-1038](https://youtrack.jetbrains.com/issue/VIM-1038)
   Implement gq+motion. Make some `g` commands duplicable.
+* [VIM-1325](https://youtrack.jetbrains.com/issue/VIM-1325) Fix bindings for active lookup
 
 
 0.54, 2019-11-20

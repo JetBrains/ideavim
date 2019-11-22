@@ -18,8 +18,6 @@
 
 package com.maddyhome.idea.vim;
 
-import com.intellij.codeInsight.lookup.Lookup;
-import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
@@ -27,12 +25,9 @@ import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
-import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
-import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.awt.event.KeyEvent;
 
 /**
  * Accepts all regular keystrokes and passes them on to the Vim key handler.
@@ -51,40 +46,16 @@ public class VimTypedActionHandler implements TypedActionHandlerEx {
 
   @Override
   public void beforeExecute(@NotNull Editor editor, char charTyped, @NotNull DataContext context, @NotNull ActionPlan plan) {
-    if (isEnabled(editor)) {
-      handler.beforeHandleKey(editor, KeyStroke.getKeyStroke(charTyped), context, plan);
-    }
-    else {
-      TypedActionHandler originalHandler = handler.getOriginalHandler();
-      if (originalHandler instanceof TypedActionHandlerEx) {
-        ((TypedActionHandlerEx)originalHandler).beforeExecute(editor, charTyped, context, plan);
-      }
-    }
+    handler.beforeHandleKey(editor, KeyStroke.getKeyStroke(charTyped), context, plan);
   }
 
   @Override
   public void execute(@NotNull final Editor editor, final char charTyped, @NotNull final DataContext context) {
-    if (isEnabled(editor) && charTyped != KeyEvent.CHAR_UNDEFINED) {
-      try {
-        handler.handleKey(editor, KeyStroke.getKeyStroke(charTyped), new EditorDataContext(editor));
-      }
-      catch (Throwable e) {
-        logger.error(e);
-      }
+    try {
+      handler.handleKey(editor, KeyStroke.getKeyStroke(charTyped), new EditorDataContext(editor));
     }
-    else {
-      try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
-        TypedActionHandler origHandler = handler.getOriginalHandler();
-        origHandler.execute(editor, charTyped, context);
-      }
+    catch (Throwable e) {
+      logger.error(e);
     }
-  }
-
-  private boolean isEnabled(@NotNull Editor editor) {
-    if (VimPlugin.isEnabled()) {
-      final Lookup lookup = LookupManager.getActiveLookup(editor);
-      return lookup == null || !lookup.isFocused();
-    }
-    return false;
   }
 }

@@ -59,12 +59,6 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
     'matchpairs'     'mps'   pairs of characters that "%" can match
     'nrformats'      'nf'    number formats recognized for CTRL-A command
     'number'         'nu'    print the line number in front of each line
-    
-    `lookupactions`  `lookupactions`  String (default "VimLookupUp,VimLookupDown")  - IdeaVim Only
-             
-                  By default all actions are handled by the IDE if lookup is active.
-                  This list of comma-separated words enables defined vim actions for active lookup.
-    
     'relativenumber' 'rnu'   show the line number relative to the line with
                              the cursor
     'scroll'         'scr'   lines to scroll with CTRL-U and CTRL-D
