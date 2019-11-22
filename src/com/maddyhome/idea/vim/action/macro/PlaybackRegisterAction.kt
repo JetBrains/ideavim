@@ -15,67 +15,46 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.macro
 
-package com.maddyhome.idea.vim.action.macro;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.util.Ref
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.ex.CommandParser
+import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.handler.VimActionHandler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.application.Application;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Ref;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.ex.CommandParser;
-import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import org.jetbrains.annotations.NotNull;
+class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
-public class PlaybackRegisterAction extends VimActionHandler.SingleExecution {
+  override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_SELF_SYNCHRONIZED;
-  }
-
-  @NotNull
-  @Override
-  public Argument.Type getArgumentType() {
-    return Argument.Type.CHARACTER;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-    final Argument argument = cmd.getArgument();
-    if (argument == null) {
-      return false;
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    val argument = cmd.argument ?: return false
+    val reg = argument.character
+    val project = PlatformDataKeys.PROJECT.getData(context)
+    val application = ApplicationManager.getApplication()
+    val res = Ref.create(false)
+    when (reg) {
+        '@' -> {
+          application.runWriteAction { res.set(VimPlugin.getMacro().playbackLastRegister(editor, context, project, cmd.count)) }
+        }
+        ':' -> { // No write action
+          try {
+            res.set(CommandParser.getInstance().processLastCommand(editor, context, cmd.count))
+          } catch (e: ExException) {
+            res.set(false)
+          }
+        }
+        else -> {
+          application.runWriteAction { res.set(VimPlugin.getMacro().playbackRegister(editor, context, project, reg, cmd.count)) }
+        }
     }
-    final char reg = argument.getCharacter();
-    final Project project = PlatformDataKeys.PROJECT.getData(context);
-    Application application = ApplicationManager.getApplication();
-    Ref<Boolean> res = Ref.create(false);
-
-    if (reg == '@') {
-      application.runWriteAction(
-        () -> res.set(VimPlugin.getMacro().playbackLastRegister(editor, context, project, cmd.getCount())));
-    }
-    else if (reg == ':') {
-      // No write action
-      try {
-        res.set(CommandParser.getInstance().processLastCommand(editor, context, cmd.getCount()));
-      }
-      catch (ExException e) {
-        res.set(false);
-      }
-    }
-    else {
-      application.runWriteAction(
-        () -> res.set(VimPlugin.getMacro().playbackRegister(editor, context, project, reg, cmd.getCount())));
-    }
-
-    return res.get();
+    return res.get()
   }
 }
