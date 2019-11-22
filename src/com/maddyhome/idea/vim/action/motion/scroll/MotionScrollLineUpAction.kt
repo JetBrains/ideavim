@@ -15,27 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.motion.scroll
 
-package com.maddyhome.idea.vim.action.motion.scroll;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.handler.VimActionHandler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import org.jetbrains.annotations.NotNull;
+class MotionScrollLineUpAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-
-public class MotionScrollLineUpAction extends VimActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-    return VimPlugin.getMotion().scrollLine(editor, -cmd.getCount());
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    return VimPlugin.getMotion().scrollLine(editor, -cmd.count)
   }
 }

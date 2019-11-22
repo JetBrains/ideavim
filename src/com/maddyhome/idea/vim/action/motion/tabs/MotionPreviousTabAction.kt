@@ -15,34 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.motion.tabs
 
-package com.maddyhome.idea.vim.action.motion.tabs;
-
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.MotionType;
-import com.maddyhome.idea.vim.handler.MotionActionHandler;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.MotionActionHandler
 
 /**
  * @author oleg
  */
-public class MotionPreviousTabAction extends MotionActionHandler.SingleExecution {
-
-  @Override
-  public int getOffset(@NotNull final Editor editor,
-                       @NotNull final DataContext context,
-                       final int count,
-                       final int rawCount,
-                       final Argument argument) {
-    return VimPlugin.getMotion().moveCaretGotoPreviousTab(editor, context, rawCount);
+class MotionPreviousTabAction : MotionActionHandler.SingleExecution() {
+  override fun getOffset(editor: Editor,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
+    return VimPlugin.getMotion().moveCaretGotoPreviousTab(editor, context, rawCount)
   }
 
-  @NotNull
-  @Override
-  public MotionType getMotionType() {
-    return MotionType.INCLUSIVE;
-  }
+  override val motionType: MotionType = MotionType.INCLUSIVE
 }

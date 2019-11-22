@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 sealed class MotionDownBase : MotionActionHandler.ForEachCaret() {
@@ -51,7 +52,7 @@ open class MotionDownAction : MotionDownBase() {
 
   override val motionType: MotionType = MotionType.INCLUSIVE
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
 
   override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
     return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)

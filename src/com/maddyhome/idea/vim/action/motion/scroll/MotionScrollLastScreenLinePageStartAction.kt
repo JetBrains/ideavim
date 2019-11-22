@@ -15,48 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.motion.scroll
 
-package com.maddyhome.idea.vim.action.motion.scroll;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.helper.EditorHelper
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import com.maddyhome.idea.vim.helper.EditorHelper;
-import org.jetbrains.annotations.NotNull;
+class MotionScrollLastScreenLinePageStartAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-
-public class MotionScrollLastScreenLinePageStartAction extends VimActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-
-    final MotionGroup motion = VimPlugin.getMotion();
-
-    int line = cmd.getRawCount();
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    val motion = VimPlugin.getMotion()
+    var line = cmd.rawCount
     if (line == 0) {
-      final int prevVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor) - 1;
-      line = EditorHelper.visualLineToLogicalLine(editor, prevVisualLine) + 1;  // rawCount is 1 based
-      return motion.scrollLineToLastScreenLine(editor, line, true);
+      val prevVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor) - 1
+      line = EditorHelper.visualLineToLogicalLine(editor, prevVisualLine) + 1 // rawCount is 1 based
+      return motion.scrollLineToLastScreenLine(editor, line, true)
     }
-
     // [count]z^ first scrolls [count] to the bottom of the window, then moves the caret to the line that is now at
     // the top, and then move that line to the bottom of the window
-    line = EditorHelper.normalizeLine(editor, line);
+    line = EditorHelper.normalizeLine(editor, line)
     if (motion.scrollLineToLastScreenLine(editor, line, true)) {
-
-      line = EditorHelper.getVisualLineAtTopOfScreen(editor);
-      line = EditorHelper.visualLineToLogicalLine(editor, line) + 1;  // rawCount is 1 based
-      return motion.scrollLineToLastScreenLine(editor, line, true);
+      line = EditorHelper.getVisualLineAtTopOfScreen(editor)
+      line = EditorHelper.visualLineToLogicalLine(editor, line) + 1 // rawCount is 1 based
+      return motion.scrollLineToLastScreenLine(editor, line, true)
     }
-    return false;
+    return false
   }
 }

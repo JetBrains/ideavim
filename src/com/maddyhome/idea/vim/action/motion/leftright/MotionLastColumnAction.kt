@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -74,7 +75,7 @@ class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
 class MotionLastColumnInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 
   override fun getOffset(editor: Editor,
                          caret: Caret,

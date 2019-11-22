@@ -15,32 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.motion.visual
 
-package com.maddyhome.idea.vim.action.motion.visual;
-
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.handler.VimActionHandler
 
 /**
  * @author vlan
  */
-final public class VisualSelectPreviousAction extends VimActionHandler.SingleExecution {
+class VisualSelectPreviousAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-    // FIXME: 2019-03-05 Make it multicaret
-    return VimPlugin.getVisualMotion().selectPreviousVisualMode(editor);
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean { // FIXME: 2019-03-05 Make it multicaret
+    return VimPlugin.getVisualMotion().selectPreviousVisualMode(editor)
   }
 }

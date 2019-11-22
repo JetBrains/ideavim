@@ -15,45 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.motion.leftright
 
-package com.maddyhome.idea.vim.action.motion.leftright;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.helper.vimLastColumn
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.MotionType;
-import com.maddyhome.idea.vim.handler.MotionActionHandler;
-import com.maddyhome.idea.vim.helper.UserDataManager;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-
-public class MotionColumnAction extends MotionActionHandler.ForEachCaret {
-
-  @Override
-  public int getOffset(@NotNull Editor editor,
-                       @NotNull Caret caret,
-                       @NotNull DataContext context,
-                       int count,
-                       int rawCount,
-                       @Nullable Argument argument) {
-    return VimPlugin.getMotion().moveCaretToColumn(editor, caret, count - 1, false);
+class MotionColumnAction : MotionActionHandler.ForEachCaret() {
+  override fun getOffset(editor: Editor,
+                         caret: Caret,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
+    return VimPlugin.getMotion().moveCaretToColumn(editor, caret, count - 1, false)
   }
 
-  @Override
-  public void postMove(@NotNull Editor editor,
-                       @NotNull Caret caret,
-                       @NotNull DataContext context,
-                       @NotNull Command cmd) {
-    UserDataManager.setVimLastColumn(caret, cmd.getCount() - 1);
+  override fun postMove(editor: Editor,
+                        caret: Caret,
+                        context: DataContext,
+                        cmd: Command) {
+    caret.vimLastColumn = cmd.count - 1
   }
 
-  @NotNull
-  @Override
-  public MotionType getMotionType() {
-    return MotionType.EXCLUSIVE;
-  }
+  override val motionType: MotionType = MotionType.EXCLUSIVE
 }

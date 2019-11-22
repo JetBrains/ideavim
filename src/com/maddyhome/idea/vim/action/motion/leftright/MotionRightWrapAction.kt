@@ -15,34 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.motion.leftright
 
-package com.maddyhome.idea.vim.action.motion.leftright;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.MotionActionHandler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.MotionType;
-import com.maddyhome.idea.vim.handler.MotionActionHandler;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-public class MotionRightWrapAction extends MotionActionHandler.ForEachCaret {
-
-  @Override
-  public int getOffset(@NotNull Editor editor,
-                       @NotNull Caret caret,
-                       @NotNull DataContext context,
-                       int count,
-                       int rawCount,
-                       @Nullable Argument argument) {
-    return VimPlugin.getMotion().moveCaretHorizontalWrap(editor, caret, count);
+class MotionRightWrapAction : MotionActionHandler.ForEachCaret() {
+  override fun getOffset(editor: Editor,
+                         caret: Caret,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
+    return VimPlugin.getMotion().moveCaretHorizontalWrap(editor, caret, count)
   }
 
-  @NotNull
-  @Override
-  public MotionType getMotionType() {
-    return MotionType.EXCLUSIVE;
-  }
+  override val motionType: MotionType = MotionType.EXCLUSIVE
 }

@@ -15,57 +15,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.motion.leftright
 
-package com.maddyhome.idea.vim.action.motion.leftright;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
+import java.util.*
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.MotionType;
-import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.handler.MotionActionHandler;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+class MotionLeftTillMatchCharAction : MotionActionHandler.ForEachCaret() {
+  override val argumentType: Argument.Type = Argument.Type.DIGRAPH
 
-import java.util.EnumSet;
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_ALLOW_DIGRAPH)
 
-public class MotionLeftTillMatchCharAction extends MotionActionHandler.ForEachCaret {
-
-  @NotNull
-  @Override
-  public Argument.Type getArgumentType() {
-    return Argument.Type.DIGRAPH;
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_ALLOW_DIGRAPH);
-  }
-
-  @Override
-  public int getOffset(@NotNull Editor editor,
-                       @NotNull Caret caret,
-                       @NotNull DataContext context,
-                       int count,
-                       int rawCount,
-                       @Nullable Argument argument) {
+  override fun getOffset(editor: Editor,
+                         caret: Caret,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
     if (argument == null) {
-      VimPlugin.indicateError();
-      return caret.getOffset();
+      VimPlugin.indicateError()
+      return caret.offset
     }
-    int res =
-      VimPlugin.getMotion().moveCaretToBeforeNextCharacterOnLine(editor, caret, -count, argument.getCharacter());
-    VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_T, argument.getCharacter());
-    return res;
+    val res = VimPlugin.getMotion().moveCaretToBeforeNextCharacterOnLine(editor, caret, -count, argument.character)
+    VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_T, argument.character)
+    return res
   }
 
-  @NotNull
-  @Override
-  public MotionType getMotionType() {
-    return MotionType.EXCLUSIVE;
-  }
+  override val motionType: MotionType = MotionType.EXCLUSIVE
 }

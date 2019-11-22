@@ -15,42 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.maddyhome.idea.vim.action.motion.gn;
+package com.maddyhome.idea.vim.action.motion.gn
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.MotionType;
-import com.maddyhome.idea.vim.handler.MotionActionHandler;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.helper.noneOfEnum
+import java.util.*
 
-import java.util.EnumSet;
+class VisualSelectPreviousSearch : MotionActionHandler.SingleExecution() {
+  override val flags: EnumSet<CommandFlags> = noneOfEnum()
 
-final public class VisualSelectPreviousSearch extends MotionActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  final public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.noneOf(CommandFlags.class);
+  override fun getOffset(editor: Editor,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
+    return VimPlugin.getMotion().selectNextSearch(editor, count, false)
   }
 
-  @Override
-  final public int getOffset(@NotNull Editor editor,
-                             @NotNull DataContext context,
-                             int count,
-                             int rawCount,
-                             @Nullable Argument argument) {
-    return VimPlugin.getMotion().selectNextSearch(editor, count, false);
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  public MotionType getMotionType() {
-    return MotionType.EXCLUSIVE;
-  }
+  override val motionType: MotionType = MotionType.EXCLUSIVE
 }

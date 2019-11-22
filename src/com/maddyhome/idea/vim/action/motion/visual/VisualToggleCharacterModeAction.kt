@@ -15,46 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.motion.visual
 
-package com.maddyhome.idea.vim.action.motion.visual;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.option.ListOption
+import com.maddyhome.idea.vim.option.OptionsManager.selectmode
+import java.util.*
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import com.maddyhome.idea.vim.option.ListOption;
-import com.maddyhome.idea.vim.option.OptionsManager;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+class VisualToggleCharacterModeAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-import java.util.EnumSet;
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE)
 
-final public class VisualToggleCharacterModeAction extends VimActionHandler.SingleExecution {
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
-
-  @NotNull
-  @Override
-  final public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MOT_CHARACTERWISE);
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-    final ListOption listOption = OptionsManager.INSTANCE.getSelectmode();
-    if (listOption.contains("cmd")) {
-      return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER);
-    }
-
-    return VimPlugin.getVisualMotion()
-      .toggleVisual(editor, cmd.getCount(), cmd.getRawCount(), CommandState.SubMode.VISUAL_CHARACTER);
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    val listOption: ListOption = selectmode
+    return if (listOption.contains("cmd")) {
+      VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
+    } else VimPlugin.getVisualMotion()
+      .toggleVisual(editor, cmd.count, cmd.rawCount, CommandState.SubMode.VISUAL_CHARACTER)
   }
 }

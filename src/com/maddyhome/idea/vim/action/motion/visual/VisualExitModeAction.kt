@@ -15,34 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.motion.visual
 
-package com.maddyhome.idea.vim.action.motion.visual;
-
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import com.maddyhome.idea.vim.helper.HelperKt;
-import com.maddyhome.idea.vim.helper.ModeHelper;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.helper.getTopLevelEditor
 
 /**
  * @author vlan
  */
-final public class VisualExitModeAction extends VimActionHandler.SingleExecution {
+class VisualExitModeAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-    ModeHelper.exitVisualMode(HelperKt.getTopLevelEditor(editor));
-    return true;
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    editor.getTopLevelEditor().exitVisualMode()
+    return true
   }
 }
-

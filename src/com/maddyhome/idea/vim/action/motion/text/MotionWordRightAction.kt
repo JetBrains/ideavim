@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
 import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
@@ -55,7 +56,7 @@ class MotionWordRightInsertAction : MotionActionHandler.ForEachCaret(), Complica
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, KeyEvent.SHIFT_MASK))
   )
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 
   override fun getOffset(editor: Editor,
                          caret: Caret,

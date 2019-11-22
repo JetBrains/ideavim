@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.option.OptionsManager
 import java.util.*
@@ -34,7 +35,7 @@ import java.util.*
 class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(editor: Editor,
                          caret: Caret,
@@ -59,7 +60,7 @@ class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
 class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
 
   override fun getOffset(editor: Editor,
                          caret: Caret,

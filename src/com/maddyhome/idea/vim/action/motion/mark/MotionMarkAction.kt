@@ -15,35 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.motion.mark
 
-package com.maddyhome.idea.vim.action.motion.mark;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.handler.VimActionHandler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import org.jetbrains.annotations.NotNull;
+class MotionMarkAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
+  override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
-public class MotionMarkAction extends VimActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
-
-  @NotNull
-  @Override
-  public Argument.Type getArgumentType() {
-    return Argument.Type.CHARACTER;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-    final Argument argument = cmd.getArgument();
-    return argument != null && VimPlugin.getMark().setMark(editor, argument.getCharacter());
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    val argument = cmd.argument
+    return argument != null && VimPlugin.getMark().setMark(editor, argument.character)
   }
 }

@@ -15,59 +15,47 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.motion.leftright
 
-package com.maddyhome.idea.vim.action.motion.leftright;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.helper.inInsertMode
+import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.option.OptionsManager.selection
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.MotionType;
-import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.handler.MotionActionHandler;
-import com.maddyhome.idea.vim.helper.CommandStateHelper;
-import com.maddyhome.idea.vim.helper.UserDataManager;
-import com.maddyhome.idea.vim.option.BoundStringOption;
-import com.maddyhome.idea.vim.option.OptionsManager;
-import org.jetbrains.annotations.NotNull;
-
-public class MotionLastScreenColumnAction extends MotionActionHandler.ForEachCaret {
-
-  @Override
-  public int getOffset(@NotNull Editor editor,
-                       @NotNull Caret caret,
-                       @NotNull DataContext context,
-                       int count,
-                       int rawCount,
-                       Argument argument) {
-    boolean allow = false;
-    if (CommandStateHelper.inInsertMode(editor)) {
-      allow = true;
-    }
-    else if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-      BoundStringOption opt = OptionsManager.INSTANCE.getSelection();
-      if (!opt.getValue().equals("old")) {
-        allow = true;
+class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
+  override fun getOffset(editor: Editor,
+                         caret: Caret,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
+    var allow = false
+    if (editor.inInsertMode) {
+      allow = true
+    } else if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+      val opt = selection
+      if (opt.value != "old") {
+        allow = true
       }
     }
-
-    return VimPlugin.getMotion().moveCaretToLineScreenEnd(editor, caret, allow);
+    return VimPlugin.getMotion().moveCaretToLineScreenEnd(editor, caret, allow)
   }
 
-  @Override
-  public void postMove(@NotNull Editor editor,
-                       @NotNull Caret caret,
-                       @NotNull DataContext context,
-                       @NotNull Command cmd) {
-    UserDataManager.setVimLastColumn(caret, MotionGroup.LAST_COLUMN);
+  override fun postMove(editor: Editor,
+                        caret: Caret,
+                        context: DataContext,
+                        cmd: Command) {
+    caret.vimLastColumn = MotionGroup.LAST_COLUMN
   }
 
-  @NotNull
-  @Override
-  public MotionType getMotionType() {
-    return MotionType.INCLUSIVE;
-  }
+  override val motionType: MotionType = MotionType.INCLUSIVE
 }
