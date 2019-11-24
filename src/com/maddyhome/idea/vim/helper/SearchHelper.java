@@ -99,10 +99,10 @@ public class SearchHelper {
     int pos = caret.getOffset();
     int loc = blockChars.indexOf(type);
     // What direction should we go now (-1 is backward, 1 is forward)
-    int dir = loc % 2 == 0 ? -1 : 1;
+    Direction dir = loc % 2 == 0 ? Direction.BACK : Direction.FORWARD;
     // Which character did we find and which should we now search for
     char match = blockChars.charAt(loc);
-    char found = blockChars.charAt(loc - dir);
+    char found = blockChars.charAt(loc - dir.toInt());
 
     return findBlockLocation(chars, found, match, dir, pos, count, false);
   }
@@ -154,10 +154,10 @@ public class SearchHelper {
         int endOffset = quoteRange.getEndOffset();
         CharSequence subSequence = chars.subSequence(startOffset, endOffset);
         int inQuotePos = pos - startOffset;
-        int inQuoteStart = findBlockLocation(subSequence, close, type, -1, inQuotePos, count, false);
+        int inQuoteStart = findBlockLocation(subSequence, close, type, Direction.BACK, inQuotePos, count, false);
         if (inQuoteStart != -1) {
           startPosInStringFound = true;
-          int inQuoteEnd = findBlockLocation(subSequence, type, close, 1, inQuoteStart, 1, false);
+          int inQuoteEnd = findBlockLocation(subSequence, type, close, Direction.FORWARD, inQuoteStart, 1, false);
           if (inQuoteEnd != -1) {
             bstart = inQuoteStart + startOffset;
             bend = inQuoteEnd + startOffset;
@@ -167,9 +167,9 @@ public class SearchHelper {
     }
 
     if (!startPosInStringFound) {
-      bstart = findBlockLocation(chars, close, type, -1, pos, count, false);
+      bstart = findBlockLocation(chars, close, type, Direction.BACK, pos, count, false);
       if (bstart != -1) {
-        bend = findBlockLocation(chars, type, close, 1, bstart, 1, false);
+        bend = findBlockLocation(chars, type, close, Direction.FORWARD, bstart, 1, false);
       }
     }
 
@@ -282,10 +282,10 @@ public class SearchHelper {
     // If we found one ...
     if (loc >= 0) {
       // What direction should we go now (-1 is backward, 1 is forward)
-      int dir = loc % 2 == 0 ? 1 : -1;
+      Direction dir = loc % 2 == 0 ? Direction.FORWARD : Direction.BACK;
       // Which character did we find and which should we now search for
       char found = getPairChars().charAt(loc);
-      char match = getPairChars().charAt(loc + dir);
+      char match = getPairChars().charAt(loc + dir.toInt());
       res = findBlockLocation(chars, found, match, dir, pos, 1, true);
     }
 
@@ -309,7 +309,7 @@ public class SearchHelper {
   private static int findBlockLocation(@NotNull CharSequence chars,
                                        char found,
                                        char match,
-                                       int dir,
+                                       @NotNull Direction dir,
                                        int pos,
                                        int cnt,
                                        boolean allowInString) {
