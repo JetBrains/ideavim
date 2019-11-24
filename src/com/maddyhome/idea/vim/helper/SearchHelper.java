@@ -416,6 +416,24 @@ public class SearchHelper {
     return cnt;
   }
 
+  public static Pair<Character, Integer> findPositionOfFirstCharacter(
+    @NotNull CharSequence chars,
+    int pos,
+    final Set<Character> quotes,
+    boolean searchEscaped,
+    @NotNull Direction direction
+  ) {
+    int dir = direction.toInt();
+    while (pos >= 0 && pos < chars.length()) {
+      final char c = chars.charAt(pos);
+      if (quotes.contains(c) && (pos == 0 || searchEscaped || isQuoteWithoutEscape(chars, pos, c))) {
+        return Pair.create(c, pos);
+      }
+      pos += dir;
+    }
+    return null;
+  }
+
   private static int findCharacterPosition(@NotNull CharSequence chars, int pos, final char c, boolean currentLineOnly,
                                            boolean searchEscaped, @NotNull Direction direction) {
     while (pos >= 0 && pos < chars.length() && (!currentLineOnly || chars.charAt(pos) != '\n')) {
