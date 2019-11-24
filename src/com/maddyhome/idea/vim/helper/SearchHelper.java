@@ -419,7 +419,7 @@ public class SearchHelper {
   private static int findCharacterPosition(@NotNull CharSequence chars, int pos, final char c, boolean currentLineOnly,
                                            boolean searchEscaped, @NotNull Direction direction) {
     while (pos >= 0 && pos < chars.length() && (!currentLineOnly || chars.charAt(pos) != '\n')) {
-      if (chars.charAt(pos) == c && (pos == 0 || searchEscaped || chars.charAt(pos - 1) != '\\')) {
+      if (chars.charAt(pos) == c && (pos == 0 || searchEscaped || isQuoteWithoutEscape(chars, pos, c))) {
         return pos;
       }
       pos += direction.toInt();
