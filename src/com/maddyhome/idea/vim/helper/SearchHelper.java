@@ -368,13 +368,8 @@ public class SearchHelper {
     if (chars.charAt(pos) != quote) return false;
 
     int backslashCounter = 0;
-    while (pos-- > 0) {
-      if (chars.charAt(pos) == '\\') {
-        backslashCounter++;
-      }
-      else {
-        break;
-      }
+    while (pos-- > 0 && chars.charAt(pos) == '\\') {
+      backslashCounter++;
     }
     return backslashCounter % 2 == 0;
   }
