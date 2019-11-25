@@ -15,50 +15,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.change.change
 
-package com.maddyhome.idea.vim.action.change.change;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
+import java.util.*
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+class ChangeCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
+  override val type: Command.Type = Command.Type.CHANGE
 
-import java.util.EnumSet;
+  override val argumentType: Argument.Type = Argument.Type.DIGRAPH
 
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_ALLOW_DIGRAPH)
 
-public class ChangeCharacterAction extends ChangeEditorActionHandler.ForEachCaret {
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.CHANGE;
-  }
-
-  @NotNull
-  @Override
-  public Argument.Type getArgumentType() {
-    return Argument.Type.DIGRAPH;
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_ALLOW_DIGRAPH);
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor,
-                         @NotNull Caret caret,
-                         @NotNull DataContext context,
-                         int count,
-                         int rawCount,
-                         @Nullable Argument argument) {
-    return argument != null && VimPlugin.getChange().changeCharacter(editor, caret, count, argument.getCharacter());
+  override fun execute(editor: Editor,
+                       caret: Caret,
+                       context: DataContext,
+                       count: Int,
+                       rawCount: Int,
+                       argument: Argument?): Boolean {
+    return argument != null && VimPlugin.getChange().changeCharacter(editor, caret, count, argument.character)
   }
 }

@@ -15,37 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.change.change
 
-package com.maddyhome.idea.vim.action.change.change;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.ex.LineRange
+import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
+import com.maddyhome.idea.vim.helper.EditorHelper
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.ex.LineRange;
-import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import com.maddyhome.idea.vim.helper.EditorHelper;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+class ChangeLastGlobalSearchReplaceAction : ChangeEditorActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
-
-public class ChangeLastGlobalSearchReplaceAction extends ChangeEditorActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_SELF_SYNCHRONIZED;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor,
-                         @NotNull DataContext context,
-                         int count,
-                         int rawCount,
-                         @Nullable Argument argument) {
-    final LineRange range = new LineRange(0, EditorHelper.getLineCount(editor) - 1);
+  override fun execute(editor: Editor,
+                       context: DataContext,
+                       count: Int,
+                       rawCount: Int,
+                       argument: Argument?): Boolean {
+    val range = LineRange(0, EditorHelper.getLineCount(editor) - 1)
     return VimPlugin.getSearch()
-      .searchAndReplace(editor, editor.getCaretModel().getPrimaryCaret(), range, "s", "//~/&");
+      .searchAndReplace(editor, editor.caretModel.primaryCaret, range, "s", "//~/&")
   }
 }

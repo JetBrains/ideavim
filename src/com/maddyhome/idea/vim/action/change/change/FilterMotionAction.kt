@@ -31,11 +31,11 @@ import com.maddyhome.idea.vim.helper.endOffsetInclusive
 
 class FilterMotionAction : VimActionHandler.SingleExecution(), DuplicableOperatorAction {
 
-  override val duplicateWith: Char = '!'
-
   override val type: Command.Type = Command.Type.CHANGE
 
   override val argumentType: Argument.Type = Argument.Type.MOTION
+
+  override val duplicateWith: Char = '!'
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val argument = cmd.argument ?: return false
