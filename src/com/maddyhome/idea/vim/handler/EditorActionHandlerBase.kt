@@ -59,8 +59,6 @@ import javax.swing.KeyStroke
  *
  *  SpecialKeyHandlers are not presented here because these handlers are created to a limited set of commands and they
  *    are already implemented
- *
- * See also VimCommands.kt for commands structure
  */
 
 /**
