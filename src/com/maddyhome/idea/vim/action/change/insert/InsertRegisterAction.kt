@@ -15,35 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.change.insert
 
-package com.maddyhome.idea.vim.action.change.insert;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.handler.VimActionHandler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import org.jetbrains.annotations.NotNull;
+class InsertRegisterAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.INSERT
 
+  override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
-public class InsertRegisterAction extends VimActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.INSERT;
-  }
-
-  @NotNull
-  @Override
-  public Argument.Type getArgumentType() {
-    return Argument.Type.CHARACTER;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-    final Argument argument = cmd.getArgument();
-    return argument != null && VimPlugin.getChange().insertRegister(editor, context, argument.getCharacter());
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    val argument = cmd.argument
+    return argument != null && VimPlugin.getChange().insertRegister(editor, context, argument.character)
   }
 }

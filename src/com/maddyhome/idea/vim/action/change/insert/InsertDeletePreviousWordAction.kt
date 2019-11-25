@@ -15,44 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.change.insert
 
-package com.maddyhome.idea.vim.action.change.insert;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
+import java.util.*
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+class InsertDeletePreviousWordAction : ChangeEditorActionHandler.ForEachCaret() {
+  override val type: Command.Type = Command.Type.INSERT
 
-import java.util.EnumSet;
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
 
-
-public class InsertDeletePreviousWordAction extends ChangeEditorActionHandler.ForEachCaret {
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.INSERT;
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES);
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor,
-                         @NotNull Caret caret,
-                         @NotNull DataContext context,
-                         int count,
-                         int rawCount,
-                         @Nullable Argument argument) {
-    return VimPlugin.getChange().insertDeletePreviousWord(editor, caret);
+  override fun execute(editor: Editor,
+                       caret: Caret,
+                       context: DataContext,
+                       count: Int,
+                       rawCount: Int,
+                       argument: Argument?): Boolean {
+    return VimPlugin.getChange().insertDeletePreviousWord(editor, caret)
   }
 }

@@ -15,29 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.change.insert
 
-package com.maddyhome.idea.vim.action.change.insert;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.helper.exitInsertMode
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import com.maddyhome.idea.vim.helper.ModeHelper;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+class InsertExitModeAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.INSERT
 
-final public class InsertExitModeAction extends VimActionHandler.SingleExecution {
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.INSERT;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-    ModeHelper.exitInsertMode(editor, context);
-    return true;
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    editor.exitInsertMode(context)
+    return true
   }
 }
