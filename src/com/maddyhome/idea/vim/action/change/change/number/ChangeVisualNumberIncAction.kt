@@ -15,44 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.change.change.number
 
-package com.maddyhome.idea.vim.action.change.change.number;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
+import java.util.*
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.group.visual.VimSelection;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+class ChangeVisualNumberIncAction : VisualOperatorActionHandler.ForEachCaret() {
+  override val type: Command.Type = Command.Type.CHANGE
 
-import java.util.EnumSet;
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
-final public class ChangeVisualNumberIncAction extends VisualOperatorActionHandler.ForEachCaret {
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.CHANGE;
-  }
-
-  @NotNull
-  @Override
-  final public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL);
-  }
-
-  @Override
-  public boolean executeAction(@NotNull Editor editor,
-                               @NotNull Caret caret,
-                               @NotNull DataContext context,
-                               @NotNull Command cmd,
-                               @NotNull VimSelection range) {
+  override fun executeAction(editor: Editor,
+                             caret: Caret,
+                             context: DataContext,
+                             cmd: Command,
+                             range: VimSelection): Boolean {
     return VimPlugin.getChange()
-      .changeNumberVisualMode(editor, caret, range.toVimTextRange(false), cmd.getCount(), false);
+      .changeNumberVisualMode(editor, caret, range.toVimTextRange(false), cmd.count, false)
   }
 }
