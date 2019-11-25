@@ -15,29 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action
 
-package com.maddyhome.idea.vim.action;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.helper.getTopLevelEditor
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.KeyHandler;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import com.maddyhome.idea.vim.helper.HelperKt;
-import org.jetbrains.annotations.NotNull;
+class ResetModeAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.RESET
 
-
-public class ResetModeAction extends VimActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.RESET;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-    KeyHandler.getInstance().fullReset(HelperKt.getTopLevelEditor(editor));
-    return true;
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    KeyHandler.getInstance().fullReset(editor.getTopLevelEditor())
+    return true
   }
 }
