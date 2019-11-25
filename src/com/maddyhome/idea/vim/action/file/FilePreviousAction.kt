@@ -15,47 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.file
 
-package com.maddyhome.idea.vim.action.file;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.ComplicatedKeysAction
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.handler.VimActionHandler
+import java.awt.event.KeyEvent
+import javax.swing.KeyStroke
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.ComplicatedKeysAction;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import org.jetbrains.annotations.NotNull;
+class FilePreviousAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
+  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_6, KeyEvent.CTRL_MASK or KeyEvent.SHIFT_MASK)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_CIRCUMFLEX, KeyEvent.CTRL_MASK))
+  )
 
-import javax.swing.*;
-import java.awt.event.KeyEvent;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-
-public class FilePreviousAction extends VimActionHandler.SingleExecution implements ComplicatedKeysAction {
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    Set<List<KeyStroke>> keys = new HashSet<>();
-    keys
-      .add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_6, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK)));
-    keys.add(Collections.singletonList(KeyStroke.getKeyStroke(KeyEvent.VK_CIRCUMFLEX, KeyEvent.CTRL_MASK)));
-    return keys;
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-    VimPlugin.getFile().selectPreviousTab(context);
-
-    return true;
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    VimPlugin.getFile().selectPreviousTab(context)
+    return true
   }
 }

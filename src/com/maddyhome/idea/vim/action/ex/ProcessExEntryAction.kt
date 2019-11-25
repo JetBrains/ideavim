@@ -15,49 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.ex
 
-package com.maddyhome.idea.vim.action.ex;
-
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.ComplicatedKeysAction;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.ComplicatedKeysAction
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.handler.VimActionHandler
+import java.util.*
+import javax.swing.KeyStroke
 
 /**
  * Called by KeyHandler to process the contents of the ex entry panel
- * <p>
+ *
  * The mapping for this action means that the ex command is executed as a write action
  */
-public class ProcessExEntryAction extends VimActionHandler.SingleExecution implements ComplicatedKeysAction {
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<CR>", "<C-M>", String.valueOf((char)0x0a), String.valueOf((char)0x0d));
-  }
+class ProcessExEntryAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<CR>", "<C-M>", 0x0a.toChar().toString(), 0x0d.toChar().toString())
 
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_SELF_SYNCHRONIZED;
-  }
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_COMPLETE_EX);
-  }
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_COMPLETE_EX)
 
-  @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-    return VimPlugin.getProcess().processExEntry(editor, context);
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    return VimPlugin.getProcess().processExEntry(editor, context)
   }
 }
