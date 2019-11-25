@@ -32,6 +32,8 @@ import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.ui.popup.ListPopup;
 import com.maddyhome.idea.vim.action.DuplicableOperatorAction;
 import com.maddyhome.idea.vim.action.ExEntryAction;
 import com.maddyhome.idea.vim.action.macro.ToggleRecordingAction;
@@ -55,7 +57,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.List;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -122,21 +126,34 @@ public class KeyHandler {
    * @param context The context to run it in
    */
   public static boolean executeAction(@NotNull AnAction action, @NotNull DataContext context) {
-    // Hopefully all the arguments are sufficient. So far they all seem to work OK.
-    // We don't have a specific InputEvent so that is null
-    // What is "place"? Leave it the empty string for now.
-    // Is the template presentation sufficient?
-    // What are the modifiers? Is zero OK?
-    //
-    // beforeActionPerformedUpdate should be called to update the action. It fixes some rider-specific problems
-    //   because rider use async update method. See VIM-1819
     final AnActionEvent event =
       new AnActionEvent(null, context, ActionPlaces.ACTION_SEARCH, action.getTemplatePresentation(),
                         ActionManager.getInstance(), 0);
-    action.beforeActionPerformedUpdate(event);
-    if (event.getPresentation().isEnabled()) {
-      action.actionPerformed(event);
+
+    if (action instanceof ActionGroup && !((ActionGroup)action).canBePerformed(context)) {
+      // Some of the AcitonGroups should not be performed, but shown as a popup
+      ListPopup popup = JBPopupFactory.getInstance()
+        .createActionGroupPopup(event.getPresentation().getText(), (ActionGroup)action, context, false, null, -1);
+
+      Component component = context.getData(PlatformDataKeys.CONTEXT_COMPONENT);
+      if (component != null) {
+        Window window = SwingUtilities.getWindowAncestor(component);
+        if (window != null) {
+          popup.showInCenterOf(window);
+        }
+        return true;
+      }
+      popup.showInFocusCenter();
       return true;
+    }
+    else {
+      // beforeActionPerformedUpdate should be called to update the action. It fixes some rider-specific problems
+      //   because rider use async update method. See VIM-1819
+      action.beforeActionPerformedUpdate(event);
+      if (event.getPresentation().isEnabled()) {
+        action.actionPerformed(event);
+        return true;
+      }
     }
     return false;
   }
