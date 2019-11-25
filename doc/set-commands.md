@@ -13,25 +13,6 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
     'gdefault'       'gd'       the ":substitute" flag 'g' is by default
     'history'        'hi'       number of command-lines that are remembered
     'hlsearch'       'hls'      highlight matches with the last search pattern
-    
-    `ideamarks`      `ideamarks` Boolean (default true)     - IdeaVim ONLY
-    
-                     If true, creation of global mark will trigger creation of IDE's bookmark
-                     and vice versa.
-                     
-    `idearefactormode` `idearefactormode` String(default "select")      - IdeaVim ONLY
-    
-                 Define the mode that would be enabled during
-                 the refactoring (renaming, live template, introduce variable, etc)
-                 
-                 Use one of the following values:
-                 - keep  - keep the mode that was enabled before starting a refactoring
-                 - select - start refactoring in select mode
-                 - visual - start refactoring in visual mode
-                 
-                 This option has effect if you are in normal, insert or replace mode before refactoring start.
-                 Visual or select mode are not changed.
-    
     'ignorecase'     'ic'       ignore case in search patterns
     'iskeyword'      'isk'      defines keywords for commands like 'w', '*', etc.
     'incsearch'      'is'       show where search pattern typed so far matches
@@ -84,12 +65,6 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                                    same as ideaselection          - IdeaVim ONLY
 
     'showmode'       'smd'       message on the status line to show current mode
-    
-    `ideajoin`      `ideajoin` Boolean (default false)     - IdeaVim ONLY
-    
-                  If true, join command will be performed via IDE
-                  See wiki/`ideajoin` examples
-    
     'sidescroll'     'ss'        minimum number of columns to scroll horizontally
     'sidescrolloff'  'siso'      min. number of columns to left and right of cursor
     'smartcase'      'scs'       no ignore case when pattern is uppercase
@@ -99,6 +74,35 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
     'viminfo'        'vi'        information to remember after restart
     'visualbell'     'vb'        use visual bell instead of beeping
     'wrapscan'       'ws'        searches wrap around the end of file
+    
+    
+    
+    IdeaVim only commands:
+
+    `ideamarks`      `ideamarks` Boolean (default true)
+    
+                     If true, creation of global mark will trigger creation of IDE's bookmark
+                     and vice versa.
+                     
+    `idearefactormode` `idearefactormode` String(default "select")
+    
+                 Define the mode that would be enabled during
+                 the refactoring (renaming, live template, introduce variable, etc)
+                 
+                 Use one of the following values:
+                 - keep  - keep the mode that was enabled before starting a refactoring
+                 - select - start refactoring in select mode
+                 - visual - start refactoring in visual mode
+                 
+                 This option has effect if you are in normal, insert or replace mode before refactoring start.
+                 Visual or select mode are not changed.
+    
+    
+    `ideajoin`      `ideajoin` Boolean (default false)
+    
+                  If true, join command will be performed via IDE
+                  See wiki/`ideajoin` examples
+
 
     ----------
     [1] - cursor keys, <End>, <Home>, <PageUp> and <PageDown>
