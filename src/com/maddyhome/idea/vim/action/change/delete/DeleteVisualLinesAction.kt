@@ -15,61 +15,46 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.change.delete
 
-package com.maddyhome.idea.vim.action.change.delete;
-
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.SelectionType;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.group.visual.VimSelection;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.maddyhome.idea.vim.helper.EditorHelper;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.EnumSet;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.CommandState.SubMode
+import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.enumSetOf
+import java.util.*
 
 /**
  * @author vlan
  */
-final public class DeleteVisualLinesAction extends VisualOperatorActionHandler.ForEachCaret {
+class DeleteVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
+  override val type: Command.Type = Command.Type.DELETE
 
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.DELETE;
-  }
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_EXIT_VISUAL)
 
-  @NotNull
-  @Override
-  final public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_EXIT_VISUAL);
-  }
-
-  @Override
-  public boolean executeAction(@NotNull Editor editor,
-                               @NotNull Caret caret,
-                               @NotNull DataContext context,
-                               @NotNull Command cmd,
-                               @NotNull VimSelection range) {
-    final CommandState.SubMode mode = CommandState.getInstance(editor).getSubMode();
-    final TextRange textRange = range.toVimTextRange(false);
-    if (mode == CommandState.SubMode.VISUAL_BLOCK) {
-      return VimPlugin.getChange()
-        .deleteRange(editor, editor.getCaretModel().getPrimaryCaret(), textRange, SelectionType.fromSubMode(mode),
-                     false);
-    }
-    else {
-      final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, textRange.getStartOffset()),
-                                                EditorHelper.getLineEndForOffset(editor, textRange.getEndOffset()) + 1);
-      return VimPlugin.getChange().deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false);
+  override fun executeAction(editor: Editor,
+                             caret: Caret,
+                             context: DataContext,
+                             cmd: Command,
+                             range: VimSelection): Boolean {
+    val mode = CommandState.getInstance(editor).subMode
+    val textRange = range.toVimTextRange(false)
+    return if (mode == SubMode.VISUAL_BLOCK) {
+      VimPlugin.getChange()
+        .deleteRange(editor, editor.caretModel.primaryCaret, textRange, SelectionType.fromSubMode(mode), false)
+    } else {
+      val lineRange = TextRange(EditorHelper.getLineStartForOffset(editor, textRange.startOffset),
+        EditorHelper.getLineEndForOffset(editor, textRange.endOffset) + 1)
+      VimPlugin.getChange().deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false)
     }
   }
 }

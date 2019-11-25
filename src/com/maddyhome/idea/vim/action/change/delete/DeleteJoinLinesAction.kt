@@ -15,46 +15,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.change.delete
 
-package com.maddyhome.idea.vim.action.change.delete;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.util.Ref
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
+import com.maddyhome.idea.vim.option.OptionsManager.ideajoin
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.util.Ref;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import com.maddyhome.idea.vim.option.OptionsManager;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+class DeleteJoinLinesAction : ChangeEditorActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.DELETE
 
-
-public class DeleteJoinLinesAction extends ChangeEditorActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.DELETE;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor,
-                         @NotNull DataContext context,
-                         int count,
-                         int rawCount,
-                         @Nullable Argument argument) {
-    if (editor.isOneLineMode()) return false;
-
-    if (OptionsManager.INSTANCE.getIdeajoin().isSet()) {
-      return VimPlugin.getChange().joinViaIdeaByCount(editor, context, count);
+  override fun execute(editor: Editor,
+                       context: DataContext,
+                       count: Int,
+                       rawCount: Int,
+                       argument: Argument?): Boolean {
+    if (editor.isOneLineMode) return false
+    if (ideajoin.isSet) {
+      return VimPlugin.getChange().joinViaIdeaByCount(editor, context, count)
     }
-    VimPlugin.getEditor().notifyIdeaJoin(editor.getProject());
-
-    Ref<Boolean> res = Ref.create(true);
-    editor.getCaretModel().runForEachCaret(caret -> {
-      if (!VimPlugin.getChange().deleteJoinLines(editor, caret, count, false)) res.set(false);
-    }, true);
-    return res.get();
+    VimPlugin.getEditor().notifyIdeaJoin(editor.project)
+    val res = Ref.create(true)
+    editor.caretModel.runForEachCaret({ caret: Caret -> if (!VimPlugin.getChange().deleteJoinLines(editor, caret, count, false)) res.set(false) }, true)
+    return res.get()
   }
 }

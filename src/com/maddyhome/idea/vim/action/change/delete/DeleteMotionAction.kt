@@ -15,56 +15,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.change.delete
 
-package com.maddyhome.idea.vim.action.change.delete;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.DuplicableOperatorAction
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.DuplicableOperatorAction;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.SelectionType;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import kotlin.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+class DeleteMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
+  override val type: Command.Type = Command.Type.DELETE
 
+  override val argumentType: Argument.Type = Argument.Type.MOTION
 
-public class DeleteMotionAction extends ChangeEditorActionHandler.ForEachCaret implements DuplicableOperatorAction {
+  override val duplicateWith: Char = 'd'
 
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.DELETE;
-  }
-
-  @NotNull
-  @Override
-  public Argument.Type getArgumentType() {
-    return Argument.Type.MOTION;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor,
-                         @NotNull Caret caret,
-                         @NotNull DataContext context,
-                         int count,
-                         int rawCount,
-                         @Nullable Argument argument) {
-    if (argument == null) return false;
-    Pair<TextRange, SelectionType> deleteRangeAndType =
-      VimPlugin.getChange().getDeleteRangeAndType(editor, caret, context, count, rawCount, argument, false);
-
-    if (deleteRangeAndType == null) return false;
-    return VimPlugin.getChange()
-      .deleteRange(editor, caret, deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), false);
-  }
-
-  @Override
-  public char getDuplicateWith() {
-    return 'd';
+  override fun execute(editor: Editor,
+                       caret: Caret,
+                       context: DataContext,
+                       count: Int,
+                       rawCount: Int,
+                       argument: Argument?): Boolean {
+    if (argument == null) return false
+    val (first, second) = VimPlugin.getChange()
+      .getDeleteRangeAndType(editor, caret, context, count, rawCount, argument, false) ?: return false
+    return VimPlugin.getChange().deleteRange(editor, caret, first, second, false)
   }
 }
