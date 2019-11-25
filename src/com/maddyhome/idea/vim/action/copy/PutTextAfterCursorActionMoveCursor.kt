@@ -15,41 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.copy
 
-package com.maddyhome.idea.vim.action.copy;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.group.copy.PutData
+import com.maddyhome.idea.vim.group.copy.PutData.TextData
+import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.common.Register;
-import com.maddyhome.idea.vim.group.copy.PutData;
-import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+class PutTextAfterCursorActionMoveCursor : ChangeEditorActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
-
-public class PutTextAfterCursorActionMoveCursor extends ChangeEditorActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_SELF_SYNCHRONIZED;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor,
-                         @NotNull DataContext context,
-                         int count,
-                         int rawCount,
-                         @Nullable Argument argument) {
-    final Register lastRegister = VimPlugin.getRegister().getLastRegister();
-
-    final PutData.TextData textData =
-      lastRegister != null ? new PutData.TextData(lastRegister.getText(), lastRegister.getType(),
-                                                  lastRegister.getTransferableData()) : null;
-    final PutData putData = new PutData(textData, null, count, false, true, true, -1);
-    return VimPlugin.getPut().putText(editor, context, putData);
+  override fun execute(editor: Editor,
+                       context: DataContext,
+                       count: Int,
+                       rawCount: Int,
+                       argument: Argument?): Boolean {
+    val lastRegister = VimPlugin.getRegister().lastRegister
+    val textData = if (lastRegister != null) TextData(lastRegister.text, lastRegister.type, lastRegister.transferableData) else null
+    val putData = PutData(textData, null, count, false, _indent = true, caretAfterInsertedText = true, putToLine = -1)
+    return VimPlugin.getPut().putText(editor, context, putData)
   }
 }

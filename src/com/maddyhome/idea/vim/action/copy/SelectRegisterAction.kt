@@ -15,44 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.copy
 
-package com.maddyhome.idea.vim.action.copy;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
+import java.util.*
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import org.jetbrains.annotations.NotNull;
+class SelectRegisterAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.SELECT_REGISTER
 
-import java.util.EnumSet;
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXPECT_MORE)
 
+  override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
-public class SelectRegisterAction extends VimActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.SELECT_REGISTER;
-  }
-
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_EXPECT_MORE);
-  }
-
-  @NotNull
-  @Override
-  public Argument.Type getArgumentType() {
-    return Argument.Type.CHARACTER;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-    final Argument argument = cmd.getArgument();
-    return argument != null && VimPlugin.getRegister().selectRegister(argument.getCharacter());
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    val argument = cmd.argument
+    return argument != null && VimPlugin.getRegister().selectRegister(argument.character)
   }
 }

@@ -15,57 +15,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.copy
 
-package com.maddyhome.idea.vim.action.copy;
-
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.group.visual.VimSelection;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.*;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
+import java.util.*
 
 /**
  * @author vlan
  */
-final public class YankVisualAction extends VisualOperatorActionHandler.SingleExecution {
+class YankVisualAction : VisualOperatorActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.COPY
 
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.COPY;
-  }
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
-  @NotNull
-  @Override
-  final public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL);
-  }
-
-  @Override
-  final public boolean executeForAllCarets(@NotNull Editor editor,
-                                           @NotNull DataContext context,
-                                           @NotNull Command cmd,
-                                           @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
-    Collection<? extends VimSelection> selections = caretsAndSelections.values();
-
-    List<Integer> starts = new ArrayList<>();
-    List<Integer> ends = new ArrayList<>();
-    selections.forEach(selection -> {
-      TextRange textRange = selection.toVimTextRange(false);
-      Arrays.stream(textRange.getStartOffsets()).boxed().forEach(starts::add);
-      Arrays.stream(textRange.getEndOffsets()).boxed().forEach(ends::add);
-    });
-    VimSelection vimSelection = selections.stream().findFirst().orElse(null);
-    if (vimSelection == null) return false;
-    int[] startsArray = starts.stream().mapToInt(i -> i).toArray();
-    int[] endsArray = ends.stream().mapToInt(i -> i).toArray();
-    return VimPlugin.getYank().yankRange(editor, new TextRange(startsArray, endsArray), vimSelection.getType(), true);
+  override fun executeForAllCarets(editor: Editor,
+                                   context: DataContext,
+                                   cmd: Command,
+                                   caretsAndSelections: Map<Caret, VimSelection>): Boolean {
+    val selections = caretsAndSelections.values
+    val starts: MutableList<Int> = ArrayList()
+    val ends: MutableList<Int> = ArrayList()
+    selections.forEach { selection: VimSelection ->
+      val textRange = selection.toVimTextRange(false)
+      textRange.startOffsets.forEach { e: Int -> starts.add(e) }
+      textRange.endOffsets.forEach { e: Int -> ends.add(e) }
+    }
+    val vimSelection = selections.firstOrNull() ?: return false
+    val startsArray = starts.toIntArray()
+    val endsArray = ends.toIntArray()
+    return VimPlugin.getYank().yankRange(editor, TextRange(startsArray, endsArray), vimSelection.type, true)
   }
 }
