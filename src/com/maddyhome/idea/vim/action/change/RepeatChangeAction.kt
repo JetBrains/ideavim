@@ -15,69 +15,53 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.change
 
-package com.maddyhome.idea.vim.action.change;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.handler.VimActionHandler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.KeyHandler;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import org.jetbrains.annotations.NotNull;
+class RepeatChangeAction : VimActionHandler.SingleExecution() {
+  override val type: Command.Type = Command.Type.OTHER_WRITABLE
 
-
-public class RepeatChangeAction extends VimActionHandler.SingleExecution {
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_WRITABLE;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command command) {
-    CommandState state = CommandState.getInstance(editor);
-    Command cmd = state.getLastChangeCommand();
-
-    if (cmd != null) {
-      if (command.getRawCount() > 0) {
-        cmd.setCount(command.getCount());
-        Argument arg = cmd.getArgument();
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    val state = CommandState.getInstance(editor)
+    val lastCommand = state.lastChangeCommand
+    return if (lastCommand != null) {
+      if (cmd.rawCount > 0) {
+        lastCommand.count = cmd.count
+        val arg = lastCommand.argument
         if (arg != null) {
-          Command mot = arg.getMotion();
-          mot.setCount(0);
+          val mot = arg.motion
+          mot.count = 0
         }
       }
-      Command save = state.getCommand();
-      int lastFTCmd = VimPlugin.getMotion().getLastFTCmd();
-      char lastFTChar = VimPlugin.getMotion().getLastFTChar();
-
-      state.setCommand(cmd);
-      state.pushState(CommandState.Mode.REPEAT, CommandState.SubMode.NONE, MappingMode.NORMAL);
-      char reg = VimPlugin.getRegister().getCurrentRegister();
-      VimPlugin.getRegister().selectRegister(state.getLastChangeRegister());
+      val save = state.command
+      val lastFTCmd = VimPlugin.getMotion().lastFTCmd
+      val lastFTChar = VimPlugin.getMotion().lastFTChar
+      state.setCommand(lastCommand)
+      state.pushState(CommandState.Mode.REPEAT, CommandState.SubMode.NONE, MappingMode.NORMAL)
+      val reg = VimPlugin.getRegister().currentRegister
+      VimPlugin.getRegister().selectRegister(state.lastChangeRegister)
       try {
-        KeyHandler.executeVimAction(editor, cmd.getAction(), context);
+        KeyHandler.executeVimAction(editor, lastCommand.action, context)
+      } catch (e: Exception) { // oops
       }
-      catch (Exception e) {
-        // oops
-      }
-      state.popState();
+      state.popState()
       if (save != null) {
-        state.setCommand(save);
+        state.setCommand(save)
       }
-      VimPlugin.getMotion().setLastFTCmd(lastFTCmd, lastFTChar);
-      state.saveLastChangeCommand(cmd);
-      VimPlugin.getRegister().selectRegister(reg);
-
-      return true;
-    }
-    else {
-      return false;
+      VimPlugin.getMotion().setLastFTCmd(lastFTCmd, lastFTChar)
+      state.saveLastChangeCommand(lastCommand)
+      VimPlugin.getRegister().selectRegister(reg)
+      true
+    } else {
+      false
     }
   }
 }

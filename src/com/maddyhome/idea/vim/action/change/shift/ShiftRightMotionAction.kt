@@ -15,53 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.action.change.shift
 
-package com.maddyhome.idea.vim.action.change.shift;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.DuplicableOperatorAction
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.DuplicableOperatorAction;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+class ShiftRightMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
+  override val type: Command.Type = Command.Type.CHANGE
 
+  override val argumentType: Argument.Type = Argument.Type.MOTION
 
-public class ShiftRightMotionAction extends ChangeEditorActionHandler.ForEachCaret implements DuplicableOperatorAction {
+  override val duplicateWith: Char = '>'
 
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.CHANGE;
-  }
-
-  @NotNull
-  @Override
-  public Argument.Type getArgumentType() {
-    return Argument.Type.MOTION;
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor,
-                         @NotNull Caret caret,
-                         @NotNull DataContext context,
-                         int count,
-                         int rawCount,
-                         @Nullable Argument argument) {
-    if (argument != null) {
-      VimPlugin.getChange().indentMotion(editor, caret, context, count, rawCount, argument, 1);
-      return true;
+  override fun execute(editor: Editor,
+                       caret: Caret,
+                       context: DataContext,
+                       count: Int,
+                       rawCount: Int,
+                       argument: Argument?): Boolean {
+    return if (argument != null) {
+      VimPlugin.getChange().indentMotion(editor, caret, context, count, rawCount, argument, 1)
+      true
+    } else {
+      false
     }
-    else {
-      return false;
-    }
-  }
-
-  @Override
-  public char getDuplicateWith() {
-    return '>';
   }
 }
