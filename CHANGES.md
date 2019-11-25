@@ -31,6 +31,7 @@ usual beta standards.
   [VIM-1050](https://youtrack.jetbrains.com/issue/VIM-1050)
   [VIM-1627](https://youtrack.jetbrains.com/issue/VIM-1627)
   Fix bindings for active lookup
+* [VIM-1845](https://youtrack.jetbrains.com/issue/VIM-1845) Show ActionGroup popups
 
 
 0.54, 2019-11-20
