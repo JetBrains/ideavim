@@ -35,7 +35,7 @@ class CommandGroup {
     val name = this.getAliasName(command)
     // If the first letter is not uppercase then it cannot be an alias
     // and reject immediately.
-    if (!name[0].isUpperCase()) {
+    if (name.isEmpty() || !name[0].isUpperCase()) {
       return false
     }
 
