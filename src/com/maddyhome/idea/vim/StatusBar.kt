@@ -64,8 +64,7 @@ private object VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation 
     val popup = VimActionsPopup.getPopup(DataManager.getInstance().getDataContext(component))
     val dimension = popup.content.preferredSize
 
-    // Trying to find the best position. 16 - size of the icon, 1 - height of the delimiter
-    val at = Point(-dimension.width + 16, -dimension.height - 1)
+    val at = Point(0, -dimension.height)
     popup.show(RelativePoint(component, at))
   }
 
