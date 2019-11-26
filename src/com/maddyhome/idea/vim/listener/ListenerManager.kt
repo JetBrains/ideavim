@@ -160,7 +160,6 @@ object VimListenerManager {
   }
 
   object GlobalListeners {
-    @JvmStatic
     fun enable() {
       OptionsManager.number.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
       OptionsManager.relativenumber.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
@@ -171,6 +170,7 @@ object VimListenerManager {
     fun disable() {
       if (VimEditorFactoryListener.typedHandlerConnected) {
         EventFacade.getInstance().restoreTypedActionHandler()
+        VimEditorFactoryListener.typedHandlerConnected = false
       }
 
       OptionsManager.number.removeOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
@@ -202,6 +202,7 @@ object VimListenerManager {
   object EditorListeners {
     fun addAll() {
       val editors = EditorFactory.getInstance().allEditors
+      if (editors.isNotEmpty()) VimEditorFactoryListener.enableTypedHandler()
       for (editor in editors) {
         if (!editor.vimMotionGroup) {
           add(editor)
@@ -251,7 +252,7 @@ object VimListenerManager {
 
     var typedHandlerConnected = false
 
-    private fun enableTypedHandler() {
+    fun enableTypedHandler() {
       if (typedHandlerConnected) return
       typedHandlerConnected = true
 
