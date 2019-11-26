@@ -341,12 +341,12 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
   @NotNull
   public static String getVersion() {
+    final IdeaPluginDescriptor plugin = PluginManager.getPlugin(getPluginId());
     if (!ApplicationManager.getApplication().isInternal()) {
-      final IdeaPluginDescriptor plugin = PluginManager.getPlugin(getPluginId());
       return plugin != null ? plugin.getVersion() : "SNAPSHOT";
     }
     else {
-      return "INTERNAL";
+      return "INTERNAL" + (plugin != null ? " - " + plugin.getVersion() : "");
     }
   }
 
