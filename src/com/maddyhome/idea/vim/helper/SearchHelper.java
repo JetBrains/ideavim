@@ -408,11 +408,10 @@ public class SearchHelper {
     return findCharacterPosition(chars, pos, quote, true, false, direction);
   }
 
-  private static int countCharactersInLine(@NotNull CharSequence chars, int pos, char c, boolean searchEscaped,
-                                           @NotNull Direction direction) {
+  private static int countCharactersInLine(@NotNull CharSequence chars, int pos, char c) {
     int cnt = 0;
-    while (pos != -1 && (chars.charAt(pos + direction.toInt()) != '\n')) {
-      pos = findCharacterPosition(chars, pos + direction.toInt(), c, searchEscaped, true, direction);
+    while (pos > 0 && (chars.charAt(pos + Direction.BACK.toInt()) != '\n')) {
+      pos = findCharacterPosition(chars, pos + Direction.BACK.toInt(), c, false, true, Direction.BACK);
       if (pos != -1) {
         cnt++;
       }
@@ -640,7 +639,7 @@ public class SearchHelper {
     int end = current;
 
     if (chars.charAt(pos) == quote && current == pos) {
-      final int quotes = countCharactersInLine(chars, pos, quote, false, Direction.BACK) + 1;
+      final int quotes = countCharactersInLine(chars, pos, quote) + 1;
 
       if (quotes % 2 == 0) {
         start = findPreviousQuoteInLine(chars, current - 1, quote);
