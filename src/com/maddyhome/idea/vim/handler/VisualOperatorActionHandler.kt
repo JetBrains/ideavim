@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.change.VimRepeater
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
@@ -226,7 +227,7 @@ sealed class VisualOperatorActionHandler : VimActionHandler.SingleExecution() {
       }
 
       if (res) {
-        CommandState.getInstance(editor).saveLastChangeCommand(cmd)
+        VimRepeater.saveLastChange(cmd)
         editor.vimForEachCaret { caret -> visualChanges[caret]?.let { caret.vimLastVisualOperatorRange = it } }
         editor.caretModel.allCarets.forEach { it.vimLastColumn = it.visualPosition.column }
       }

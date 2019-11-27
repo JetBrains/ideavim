@@ -40,9 +40,6 @@ import java.util.stream.Collectors;
 public class CommandState {
   private static final int DEFAULT_TIMEOUT_LENGTH = 1000;
 
-  @Nullable private static Command ourLastChange = null;
-  private char myLastChangeRegister;
-
   @NotNull private final Stack<State> myStates = new Stack<>();
   @NotNull private final State myDefaultState = new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
   @Nullable private Command myCommand;
@@ -57,7 +54,6 @@ public class CommandState {
     myMappingTimer = new Timer(DEFAULT_TIMEOUT_LENGTH, null);
     myMappingTimer.setRepeats(false);
     myStates.push(new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL));
-    myLastChangeRegister = VimPlugin.getRegister().getDefaultRegister();
   }
 
   @Contract("null -> new")
@@ -236,35 +232,6 @@ public class CommandState {
   @NotNull
   public MappingMode getMappingMode() {
     return currentState().getMappingMode();
-  }
-
-  /**
-   * Gets the last command that performed a change
-   *
-   * @return The last change command, null if there hasn't been a change yet
-   */
-  @Nullable
-  public Command getLastChangeCommand() {
-    return ourLastChange;
-  }
-
-  /**
-   * Gets the register used by the last saved change command
-   *
-   * @return The register key
-   */
-  public char getLastChangeRegister() {
-    return myLastChangeRegister;
-  }
-
-  /**
-   * Saves the last command that performed a change. It also preserves the register the command worked with.
-   *
-   * @param cmd The change command
-   */
-  public void saveLastChangeCommand(Command cmd) {
-    ourLastChange = cmd;
-    myLastChangeRegister = VimPlugin.getRegister().getCurrentRegister();
   }
 
   public boolean isRecording() {

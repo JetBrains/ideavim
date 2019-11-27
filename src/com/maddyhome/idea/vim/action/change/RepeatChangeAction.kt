@@ -31,37 +31,49 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val state = CommandState.getInstance(editor)
-    val lastCommand = state.lastChangeCommand
-    return if (lastCommand != null) {
-      if (cmd.rawCount > 0) {
-        lastCommand.count = cmd.count
-        val arg = lastCommand.argument
-        if (arg != null) {
-          val mot = arg.motion
-          mot.count = 0
-        }
+    val lastCommand = VimRepeater.lastChangeCommand ?: return false
+
+    if (cmd.rawCount > 0) {
+      lastCommand.count = cmd.count
+      val arg = lastCommand.argument
+      if (arg != null) {
+        val mot = arg.motion
+        mot.count = 0
       }
-      val save = state.command
-      val lastFTCmd = VimPlugin.getMotion().lastFTCmd
-      val lastFTChar = VimPlugin.getMotion().lastFTChar
-      state.setCommand(lastCommand)
-      state.pushState(CommandState.Mode.REPEAT, CommandState.SubMode.NONE, MappingMode.NORMAL)
-      val reg = VimPlugin.getRegister().currentRegister
-      VimPlugin.getRegister().selectRegister(state.lastChangeRegister)
-      try {
-        KeyHandler.executeVimAction(editor, lastCommand.action, context)
-      } catch (e: Exception) { // oops
-      }
-      state.popState()
-      if (save != null) {
-        state.setCommand(save)
-      }
-      VimPlugin.getMotion().setLastFTCmd(lastFTCmd, lastFTChar)
-      state.saveLastChangeCommand(lastCommand)
-      VimPlugin.getRegister().selectRegister(reg)
-      true
-    } else {
-      false
     }
+
+    // Save state
+    val save = state.command
+    val lastFTCmd = VimPlugin.getMotion().lastFTCmd
+    val lastFTChar = VimPlugin.getMotion().lastFTChar
+    val reg = VimPlugin.getRegister().currentRegister
+
+    state.setCommand(lastCommand)
+    state.pushState(CommandState.Mode.REPEAT, CommandState.SubMode.NONE, MappingMode.NORMAL)
+    VimPlugin.getRegister().selectRegister(VimRepeater.lastChangeRegister)
+
+    try {
+      KeyHandler.executeVimAction(editor, lastCommand.action, context)
+    } catch (ignored: Exception) {
+    }
+
+    state.popState()
+
+    // Restore state
+    if (save != null) state.setCommand(save)
+    VimPlugin.getMotion().setLastFTCmd(lastFTCmd, lastFTChar)
+    VimRepeater.saveLastChange(lastCommand)
+    VimPlugin.getRegister().selectRegister(reg)
+    return true
+  }
+}
+
+object VimRepeater {
+  var lastChangeCommand: Command? = null
+  var lastChangeRegister = VimPlugin.getRegister().defaultRegister
+
+  fun saveLastChange(command: Command) {
+    lastChangeCommand = command
+    lastChangeRegister = VimPlugin.getRegister().currentRegister
   }
 }

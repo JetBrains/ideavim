@@ -23,9 +23,9 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.change.VimRepeater
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 
@@ -63,7 +63,7 @@ sealed class ChangeEditorActionHandler : VimActionHandler.SingleExecution() {
     }
 
     if (worked.get()) {
-      CommandState.getInstance(editor).saveLastChangeCommand(cmd)
+      VimRepeater.saveLastChange(cmd)
       editor.caretModel.allCarets.forEach { it.vimLastColumn = it.visualPosition.column }
     }
 
