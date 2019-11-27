@@ -32,7 +32,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
 import com.intellij.ui.ColorUtil;
-import com.intellij.util.Processor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.SelectionType;
@@ -48,6 +47,7 @@ import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import com.maddyhome.idea.vim.ui.ModalEntry;
+import kotlin.jvm.functions.Function1;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -175,7 +175,7 @@ public class SearchGroup {
   @NotNull
   private static ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match) {
     final Ref<ReplaceConfirmationChoice> result = Ref.create(ReplaceConfirmationChoice.QUIT);
-    final Processor<KeyStroke> keyStrokeProcessor = key -> {
+    final Function1<KeyStroke, Boolean> keyStrokeProcessor = key -> {
       final ReplaceConfirmationChoice choice;
       final char c = key.getKeyChar();
       if (StringHelper.isCloseKeyStroke(key) || c == 'q') {
@@ -197,7 +197,7 @@ public class SearchGroup {
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       final TestInputModel inputModel = TestInputModel.getInstance(editor);
       for (KeyStroke key = inputModel.nextKeyStroke(); key != null; key = inputModel.nextKeyStroke()) {
-        if (!keyStrokeProcessor.process(key)) {
+        if (!keyStrokeProcessor.invoke(key)) {
           break;
         }
       }
@@ -206,7 +206,7 @@ public class SearchGroup {
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
       final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
       exEntryPanel.activate(editor, new EditorDataContext(editor), "Replace with " + match + " (y/n/a/q/l)?", "", 1);
-      ModalEntry.activate(keyStrokeProcessor);
+      ModalEntry.INSTANCE.activate(keyStrokeProcessor);
       exEntryPanel.deactivate(true, false);
     }
     return result.get();

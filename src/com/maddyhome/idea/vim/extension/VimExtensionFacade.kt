@@ -15,30 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.extension
 
-package com.maddyhome.idea.vim.extension;
-
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.util.Ref;
-import com.maddyhome.idea.vim.KeyHandler;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.common.Register;
-import com.maddyhome.idea.vim.helper.EditorDataContext;
-import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.helper.TestInputModel;
-import com.maddyhome.idea.vim.key.OperatorFunction;
-import com.maddyhome.idea.vim.ui.ExEntryPanel;
-import com.maddyhome.idea.vim.ui.ModalEntry;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import java.awt.event.KeyEvent;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.TestInputModel
+import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.ui.ExEntryPanel
+import com.maddyhome.idea.vim.ui.ModalEntry
+import java.awt.event.KeyEvent
+import javax.swing.KeyStroke
 
 /**
  * Vim API facade that defines functions similar to the built-in functions and statements of the original Vim.
@@ -47,30 +38,25 @@ import java.util.Set;
  *
  * @author vlan
  */
-public class VimExtensionFacade {
-  private VimExtensionFacade() {}
-
-  /**
-   * The 'map' command for mapping keys to handlers defined in extensions.
-   */
-  public static void putExtensionHandlerMapping(@NotNull Set<MappingMode> modes, @NotNull List<KeyStroke> fromKeys,
-                                                @NotNull VimExtensionHandler extensionHandler, boolean recursive) {
-    VimPlugin.getKey().putKeyMapping(modes, fromKeys, null, extensionHandler, recursive);
+object VimExtensionFacade {
+  /** The 'map' command for mapping keys to handlers defined in extensions. */
+  @JvmStatic
+  fun putExtensionHandlerMapping(modes: MutableSet<MappingMode>, fromKeys: MutableList<KeyStroke>,
+                                 extensionHandler: VimExtensionHandler, recursive: Boolean) {
+    VimPlugin.getKey().putKeyMapping(modes, fromKeys, null, extensionHandler, recursive)
   }
 
-  /**
-   * The 'map' command for mapping keys to other keys.
-   */
-  public static void putKeyMapping(@NotNull Set<MappingMode> modes, @NotNull List<KeyStroke> fromKeys,
-                                   @NotNull List<KeyStroke> toKeys, boolean recursive) {
-    VimPlugin.getKey().putKeyMapping(modes, fromKeys, toKeys, null, recursive);
+  /** The 'map' command for mapping keys to other keys. */
+  @JvmStatic
+  fun putKeyMapping(modes: MutableSet<MappingMode>, fromKeys: MutableList<KeyStroke>,
+                    toKeys: MutableList<KeyStroke>, recursive: Boolean) {
+    VimPlugin.getKey().putKeyMapping(modes, fromKeys, toKeys, null, recursive)
   }
 
-  /**
-   * Sets the value of 'operatorfunc' to be used as the operator function in 'g@'.
-   */
-  public static void setOperatorFunction(@NotNull OperatorFunction function) {
-    VimPlugin.getKey().setOperatorFunction(function);
+  /** Sets the value of 'operatorfunc' to be used as the operator function in 'g@'. */
+  @JvmStatic
+  fun setOperatorFunction(function: OperatorFunction) {
+    VimPlugin.getKey().setOperatorFunction(function)
   }
 
   /**
@@ -79,102 +65,90 @@ public class VimExtensionFacade {
    * XXX: Currently it doesn't make the editor enter the normal mode, it doesn't recover from incomplete commands, it
    * leaves the editor in the insert mode if it's been activated.
    */
-  public static void executeNormal(@NotNull List<KeyStroke> keys, @NotNull Editor editor) {
-    final EditorDataContext context = new EditorDataContext(editor);
-    for (KeyStroke key : keys) {
-      KeyHandler.getInstance().handleKey(editor, key, context);
-    }
+  @JvmStatic
+  fun executeNormal(keys: MutableList<KeyStroke>, editor: Editor) {
+    val context = EditorDataContext(editor)
+    keys.forEach { KeyHandler.getInstance().handleKey(editor, it, context) }
   }
 
-  /**
-   * Returns a single key stroke from the user input similar to 'getchar()'.
-   */
-  @NotNull
-  public static KeyStroke inputKeyStroke(@NotNull Editor editor) {
-    final KeyStroke key;
-    if (ApplicationManager.getApplication().isUnitTestMode()) {
-      key = TestInputModel.getInstance(editor).nextKeyStroke();
+  /** Returns a single key stroke from the user input similar to 'getchar()'. */
+  @JvmStatic
+  fun inputKeyStroke(editor: Editor): KeyStroke {
+    val key: KeyStroke? = if (ApplicationManager.getApplication().isUnitTestMode) {
+      TestInputModel.getInstance(editor).nextKeyStroke()
+    } else {
+      var ref: KeyStroke? = null
+      ModalEntry.activate { stroke: KeyStroke? ->
+        ref = stroke
+        false
+      }
+      ref
     }
-    else {
-      final Ref<KeyStroke> ref = Ref.create();
-      ModalEntry.activate(stroke -> {
-        ref.set(stroke);
-        return false;
-      });
-      key = ref.get();
-    }
-    return key != null ? key : KeyStroke.getKeyStroke((char)KeyEvent.VK_ESCAPE);
+    return key ?: KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE.toChar())
   }
 
-  /**
-   * Returns a string typed in the input box similar to 'input()'.
-   */
-  @NotNull
-  public static String inputString(@NotNull Editor editor, @NotNull String prompt, @Nullable Character finishOn) {
-    if (ApplicationManager.getApplication().isUnitTestMode()) {
-      final StringBuilder builder = new StringBuilder();
-      final TestInputModel inputModel = TestInputModel.getInstance(editor);
-      KeyStroke key;
-      for (key = inputModel.nextKeyStroke();
-           key != null &&
-           !StringHelper.isCloseKeyStroke(key) &&
-           key.getKeyCode() != KeyEvent.VK_ENTER &&
-           (finishOn == null || key.getKeyChar() != finishOn);
-           key = inputModel.nextKeyStroke()) {
-        final char c = key.getKeyChar();
+  /** Returns a string typed in the input box similar to 'input()'. */
+  @JvmStatic
+  fun inputString(editor: Editor, prompt: String, finishOn: Char?): String {
+    return if (ApplicationManager.getApplication().isUnitTestMode) {
+      val builder = StringBuilder()
+      val inputModel = TestInputModel.getInstance(editor)
+      var key: KeyStroke? = inputModel.nextKeyStroke()
+      while (key != null
+        && !StringHelper.isCloseKeyStroke(key) && key.keyCode != KeyEvent.VK_ENTER
+        && (finishOn == null || key.keyChar != finishOn)) {
+        val c = key.keyChar
         if (c != KeyEvent.CHAR_UNDEFINED) {
-          builder.append(c);
+          builder.append(c)
         }
+        key = inputModel.nextKeyStroke()
       }
-      if (finishOn != null && key != null && key.getKeyChar() == finishOn) {
-        builder.append(key.getKeyChar());
+      if (finishOn != null && key != null && key.keyChar == finishOn) {
+        builder.append(key.keyChar)
       }
-      return builder.toString();
-    }
-    else {
-      final Ref<String> text = Ref.create("");
+      builder.toString()
+    } else {
+      var text = ""
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for input()
-      final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
-      exEntryPanel.activate(editor, new EditorDataContext(editor), prompt.isEmpty() ? " " : prompt, "", 1);
-      ModalEntry.activate(key -> {
-        if (StringHelper.isCloseKeyStroke(key)) {
-          exEntryPanel.deactivate(true);
-          return false;
+      val exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts()
+      exEntryPanel.activate(editor, EditorDataContext(editor), if (prompt.isEmpty()) " " else prompt, "", 1)
+      ModalEntry.activate { key: KeyStroke ->
+        return@activate when {
+          StringHelper.isCloseKeyStroke(key) -> {
+            exEntryPanel.deactivate(true)
+            false
+          }
+          key.keyCode == KeyEvent.VK_ENTER -> {
+            text = exEntryPanel.text ?: ""
+            exEntryPanel.deactivate(true)
+            false
+          }
+          finishOn != null && key.keyChar == finishOn -> {
+            exEntryPanel.handleKey(key)
+            text = exEntryPanel.text ?: ""
+            exEntryPanel.deactivate(true)
+            false
+          }
+          else -> {
+            exEntryPanel.handleKey(key)
+            true
+          }
         }
-        else if (key.getKeyCode() == KeyEvent.VK_ENTER) {
-          text.set(exEntryPanel.getText());
-          exEntryPanel.deactivate(true);
-          return false;
-        } else if (finishOn != null && key.getKeyChar() == finishOn) {
-          exEntryPanel.handleKey(key);
-          text.set(exEntryPanel.getText());
-          exEntryPanel.deactivate(true);
-          return false;
-        } else {
-          exEntryPanel.handleKey(key);
-          return true;
-        }
-      });
-      return text.get();
+      }
+      text
     }
   }
 
-  /**
-   * Get the current contents of the given register similar to 'getreg()'.
-   */
-  @Nullable
-  public static List<KeyStroke> getRegister(char register) {
-    final Register reg = VimPlugin.getRegister().getRegister(register);
-    if (reg == null) {
-      return null;
-    }
-    return reg.getKeys();
+  /** Get the current contents of the given register similar to 'getreg()'. */
+  @JvmStatic
+  fun getRegister(register: Char): MutableList<KeyStroke>? {
+    val reg = VimPlugin.getRegister().getRegister(register) ?: return null
+    return reg.keys
   }
 
-  /**
-   * Set the current contents of the given register
-   */
-  public static void setRegister(char register, @Nullable List<KeyStroke> keys) {
-    VimPlugin.getRegister().setKeys(register, keys != null ? keys : Collections.emptyList());
+  /** Set the current contents of the given register */
+  @JvmStatic
+  fun setRegister(register: Char, keys: MutableList<KeyStroke?>?) {
+    VimPlugin.getRegister().setKeys(register, keys ?: emptyList())
   }
 }
