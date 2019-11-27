@@ -21,6 +21,7 @@ usual beta standards.
 
 **Features:**
 * Support XDG settings standard ([VIM-664](https://youtrack.jetbrains.com/issue/VIM-664))
+* Add option to remove the status bar icon ([VIM-1847](https://youtrack.jetbrains.com/issue/VIM-1847))
 
 **Fixes:**
 * [VIM-1823](https://youtrack.jetbrains.com/issue/VIM-1823) Fix multiple carets with ignorecase

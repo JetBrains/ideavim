@@ -103,6 +103,10 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                   If true, join command will be performed via IDE
                   See wiki/`ideajoin` examples
 
+    `ideastatusbar`  `ideastatusbar` Boolean (default true)    [To Be Released]
+    
+                  If false, IdeaVim icon won't be shown in the status bar.
+                  Works only from `~/.ideavimrc` after the IDE restart.
 
     ----------
     [1] - cursor keys, <End>, <Home>, <PageUp> and <PageDown>

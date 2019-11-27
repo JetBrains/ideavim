@@ -32,6 +32,7 @@ import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.Consumer
 import com.intellij.util.text.VersionComparatorUtil
 import com.maddyhome.idea.vim.group.NotificationService
+import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import icons.VimIcons
 import java.awt.Point
@@ -40,10 +41,10 @@ import javax.swing.Icon
 import javax.swing.SwingConstants
 
 private class StatusBarIconProvider : StatusBarWidgetProvider {
-  override fun getWidget(project: Project) = VimStatusBar
+  override fun getWidget(project: Project): VimStatusBar? = if (OptionsManager.ideastatusbar.isSet) VimStatusBar else null
 }
 
-private object VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
+object VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
 
   private var statusBar: StatusBar? = null
 

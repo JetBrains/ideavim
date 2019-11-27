@@ -81,6 +81,7 @@ object OptionsManager {
   val wrapscan = addOption(ToggleOption("wrapscan", "ws", true))
   val visualEnterDelay = addOption(NumberOption("visualdelay", "visualdelay", 100, 0, Int.MAX_VALUE))
   val idearefactormode = addOption(BoundStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues))
+  val ideastatusbar = addOption(ToggleOption("ideastatusbar", "ideastatusbar", true))
 
   fun isSet(name: String): Boolean {
     val option = getOption(name)
