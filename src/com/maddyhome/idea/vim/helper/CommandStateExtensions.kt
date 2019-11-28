@@ -7,20 +7,20 @@ import com.maddyhome.idea.vim.command.CommandState
 
 val CommandState.Mode.isEndAllowed
   get() = when (this) {
-    CommandState.Mode.INSERT, CommandState.Mode.REPEAT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
+    CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
     CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE -> false
   }
 
 val CommandState.Mode.isBlockCaret
   get() = when (this) {
-    CommandState.Mode.REPEAT, CommandState.Mode.VISUAL, CommandState.Mode.COMMAND -> true
+    CommandState.Mode.VISUAL, CommandState.Mode.COMMAND -> true
     CommandState.Mode.INSERT, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.SELECT -> false
   }
 
 val CommandState.Mode.hasVisualSelection
   get() = when (this) {
     CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
-    CommandState.Mode.REPLACE, CommandState.Mode.CMD_LINE, CommandState.Mode.COMMAND, CommandState.Mode.INSERT, CommandState.Mode.REPEAT -> false
+    CommandState.Mode.REPLACE, CommandState.Mode.CMD_LINE, CommandState.Mode.COMMAND, CommandState.Mode.INSERT -> false
   }
 
 val Editor.mode
@@ -42,7 +42,7 @@ val Editor.inInsertMode
 
 @get:JvmName("inRepeatMode")
 val Editor.inRepeatMode
-  get() = this.mode == CommandState.Mode.REPEAT
+  get() = CommandState.getInstance(this).isDotRepeatInProgress
 
 @get:JvmName("inVisualMode")
 val Editor.inVisualMode

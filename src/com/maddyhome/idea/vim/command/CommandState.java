@@ -49,6 +49,7 @@ public class CommandState {
   private EnumSet<CommandFlags> myFlags = EnumSet.noneOf(CommandFlags.class);
   private boolean myIsRecording = false;
   private static Logger logger = Logger.getInstance(CommandState.class.getName());
+  private boolean dotRepeatInProgress = false;
 
   private CommandState() {
     myMappingTimer = new Timer(DEFAULT_TIMEOUT_LENGTH, null);
@@ -282,8 +283,16 @@ public class CommandState {
     VimPlugin.showMode(msg.toString());
   }
 
+  public boolean isDotRepeatInProgress() {
+    return dotRepeatInProgress;
+  }
+
+  public void setDotRepeatInProgress(boolean dotRepeatInProgress) {
+    this.dotRepeatInProgress = dotRepeatInProgress;
+  }
+
   public enum Mode {
-    COMMAND, INSERT, REPLACE, REPEAT, VISUAL, SELECT, CMD_LINE
+    COMMAND, INSERT, REPLACE, VISUAL, SELECT, CMD_LINE
   }
 
   public enum SubMode {

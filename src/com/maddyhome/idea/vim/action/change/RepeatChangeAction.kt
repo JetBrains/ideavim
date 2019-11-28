@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 class RepeatChangeAction : VimActionHandler.SingleExecution() {
@@ -49,7 +48,7 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
     val reg = VimPlugin.getRegister().currentRegister
 
     state.setCommand(lastCommand)
-    state.pushState(CommandState.Mode.REPEAT, CommandState.SubMode.NONE, MappingMode.NORMAL)
+    state.isDotRepeatInProgress = true
     VimPlugin.getRegister().selectRegister(VimRepeater.lastChangeRegister)
 
     try {
@@ -57,7 +56,7 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
     } catch (ignored: Exception) {
     }
 
-    state.popState()
+    state.isDotRepeatInProgress = false
 
     // Restore state
     if (save != null) state.setCommand(save)

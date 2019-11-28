@@ -241,7 +241,8 @@ public class ChangeGroup {
 
   private void runEnterAction(Editor editor, @NotNull DataContext context) {
     CommandState state = CommandState.getInstance(editor);
-    if (state.getMode() != CommandState.Mode.REPEAT) {
+    if (!state.isDotRepeatInProgress()) {
+      // While repeating the enter action has been already executed because `initInsert` repeats the input
       final ActionManager actionManager = ActionManager.getInstance();
       final AnAction action = actionManager.getAction("EditorEnter");
       if (action != null) {
@@ -381,7 +382,8 @@ public class ChangeGroup {
     }
 
     final Command cmd = state.getCommand();
-    if (cmd != null && state.getMode() == CommandState.Mode.REPEAT) {
+    if (cmd != null && state.isDotRepeatInProgress()) {
+      state.pushState(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
       if (mode == CommandState.Mode.REPLACE) {
         setInsertEditorState(editor, false);
       }
@@ -394,6 +396,7 @@ public class ChangeGroup {
       if (mode == CommandState.Mode.REPLACE) {
         setInsertEditorState(editor, true);
       }
+      state.popState();
     }
     else {
       lastInsert = cmd;
