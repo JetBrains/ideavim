@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.group.visual
 
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
@@ -31,6 +30,7 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.subMode
@@ -51,8 +51,7 @@ class VisualMotionGroup {
 
     editor.caretModel.removeSecondaryCarets()
 
-    CommandState.getInstance(editor)
-      .pushState(CommandState.Mode.VISUAL, lastSelectionType.toSubMode(), MappingMode.VISUAL)
+    editor.commandState.pushState(CommandState.Mode.VISUAL, lastSelectionType.toSubMode(), MappingMode.VISUAL)
 
     val primaryCaret = editor.caretModel.primaryCaret
     primaryCaret.vimSetSelection(visualMarks.startOffset, visualMarks.endOffset, true)
@@ -121,7 +120,7 @@ class VisualMotionGroup {
       if (rawCount > 0) {
         val primarySubMode = editor.caretModel.primaryCaret.vimLastVisualOperatorRange?.type?.toSubMode()
           ?: subMode
-        CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, primarySubMode, MappingMode.VISUAL)
+        editor.commandState.pushState(CommandState.Mode.VISUAL, primarySubMode, MappingMode.VISUAL)
 
         editor.vimForEachCaret {
           val range = it.vimLastVisualOperatorRange ?: VisualChange.default(subMode)
@@ -131,7 +130,7 @@ class VisualMotionGroup {
           it.vimSetSelection(it.offset, end, true)
         }
       } else {
-        CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
+        editor.commandState.pushState(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
         editor.vimForEachCaret { it.vimSetSelection(it.offset) }
       }
       return true
@@ -157,9 +156,9 @@ class VisualMotionGroup {
     val autodetectedMode = autodetectVisualSubmode(editor)
 
     if (editor.inVisualMode) {
-      CommandState.getInstance(editor).popState()
+      editor.commandState.popState()
     }
-    CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, autodetectedMode, MappingMode.VISUAL)
+    editor.commandState.pushState(CommandState.Mode.VISUAL, autodetectedMode, MappingMode.VISUAL)
     if (autodetectedMode == CommandState.SubMode.VISUAL_BLOCK) {
       val (start, end) = blockModeStartAndEnd(editor)
       editor.caretModel.removeSecondaryCarets()
@@ -200,7 +199,7 @@ class VisualMotionGroup {
    */
   fun enterVisualMode(editor: Editor, subMode: CommandState.SubMode? = null): Boolean {
     val autodetectedSubMode = subMode ?: autodetectVisualSubmode(editor)
-    CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, autodetectedSubMode, MappingMode.VISUAL)
+    editor.commandState.pushState(CommandState.Mode.VISUAL, autodetectedSubMode, MappingMode.VISUAL)
     if (autodetectedSubMode == CommandState.SubMode.VISUAL_BLOCK) {
       editor.caretModel.primaryCaret.run { vimSelectionStart = vimLeadSelectionOffset }
     } else {
@@ -211,7 +210,7 @@ class VisualMotionGroup {
   }
 
   fun enterSelectMode(editor: Editor, subMode: CommandState.SubMode): Boolean {
-    CommandState.getInstance(editor).pushState(CommandState.Mode.SELECT, subMode, MappingMode.SELECT)
+    editor.commandState.pushState(CommandState.Mode.SELECT, subMode, MappingMode.SELECT)
     editor.vimForEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
     updateCaretState(editor)
     return true

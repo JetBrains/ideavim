@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.CommandState.SubMode
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
@@ -31,6 +30,7 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.helper.subMode
 import java.util.*
 
 /**
@@ -46,7 +46,7 @@ class DeleteVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
                              context: DataContext,
                              cmd: Command,
                              range: VimSelection): Boolean {
-    val mode = CommandState.getInstance(editor).subMode
+    val mode = editor.subMode
     val textRange = range.toVimTextRange(false)
     return if (mode == SubMode.VISUAL_BLOCK) {
       VimPlugin.getChange()

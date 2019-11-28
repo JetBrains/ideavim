@@ -25,12 +25,12 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.inInsertMode
+import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.option.OptionsManager
 import java.util.*
@@ -47,7 +47,7 @@ class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
     var allow = false
     if (editor.inInsertMode) {
       allow = true
-    } else if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+    } else if (editor.inVisualMode) {
       val opt = OptionsManager.selection
       if (opt.value != "old") {
         allow = true
@@ -86,7 +86,7 @@ class MotionLastColumnInsertAction : MotionActionHandler.ForEachCaret() {
     var allow = false
     if (editor.inInsertMode) {
       allow = true
-    } else if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+    } else if (editor.inVisualMode) {
       val opt = OptionsManager.selection
       if (opt.value != "old") {
         allow = true

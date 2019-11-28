@@ -24,9 +24,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.noneOfEnum
@@ -147,7 +147,7 @@ sealed class CommandHandler {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_argforb))
       throw NoArgumentAllowedException()
     }
-    CommandState.getInstance(editor).flags = optFlags
+    editor.commandState.flags = optFlags
     if (editor.inVisualMode && Flag.SAVE_VISUAL !in argFlags.flags) {
       editor.exitVisualMode()
     }

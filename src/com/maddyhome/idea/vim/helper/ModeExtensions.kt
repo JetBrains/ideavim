@@ -16,14 +16,14 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
  * Pop all modes, but leave editor state. E.g. editor selection is not removed.
  */
 fun Editor.popAllModes() {
-  val commandState = CommandState.getInstance(this)
+  val commandState = this.commandState
   while (commandState.mode != CommandState.Mode.COMMAND) {
     commandState.popState()
   }
 }
 
 fun Editor.hardResetAllModes() {
-  val commandState = CommandState.getInstance(this)
+  val commandState = this.commandState
   while (!this.inNormalMode) {
     val statesBefore = commandState.toSimpleString()
     when (mode) {
@@ -60,7 +60,7 @@ fun Editor.exitVisualMode() {
 
     this.subMode = CommandState.SubMode.NONE
 
-    CommandState.getInstance(this).popState()
+    this.commandState.popState()
   }
 }
 
@@ -68,7 +68,7 @@ fun Editor.exitVisualMode() {
 fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
   if (!this.inSelectMode) return
 
-  CommandState.getInstance(this).popState()
+  this.commandState.popState()
   SelectionVimListenerSuppressor.lock().use {
     this.caretModel.allCarets.forEach {
       it.removeSelection()

@@ -25,7 +25,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
@@ -87,10 +86,9 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
   inner class NextOccurrenceHandler(val whole: Boolean = true) : WriteActionHandler() {
     override fun executeInWriteAction(editor: Editor, context: DataContext) {
       val caretModel = editor.caretModel
-      val commandState = CommandState.getInstance(editor)
       val patternComparator = if (OptionsManager.ignorecase.isSet) String.CASE_INSENSITIVE_ORDER else Comparator(String::compareTo);
 
-      if (commandState.mode != CommandState.Mode.VISUAL) {
+      if (!editor.inVisualMode) {
         if (caretModel.caretCount > 1) return
 
         val caret = caretModel.primaryCaret

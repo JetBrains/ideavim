@@ -28,8 +28,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import java.util.*
@@ -133,8 +133,7 @@ sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     val editor = _editor.getTopLevelEditor()
     logger.debug("Execute command with handler: " + this.javaClass.name)
 
-    val state = CommandState.getInstance(editor)
-    val cmd = state.command ?: run {
+    val cmd = editor.commandState.command ?: run {
       VimPlugin.indicateError()
       return
     }

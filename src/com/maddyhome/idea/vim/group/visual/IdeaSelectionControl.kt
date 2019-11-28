@@ -6,6 +6,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.hasVisualSelection
@@ -47,13 +48,13 @@ object IdeaSelectionControl {
           return@singleTask
         }
 
-        logger.info("Some carets have selection. State before adjustment: ${CommandState.getInstance(editor).toSimpleString()}")
+        logger.info("Some carets have selection. State before adjustment: ${editor.commandState.toSimpleString()}")
 
         editor.popAllModes()
 
         activateMode(editor, chooseSelectionMode(editor, selectionSource, true))
       } else {
-        logger.info("None of carets have selection. State before adjustment: ${CommandState.getInstance(editor).toSimpleString()}")
+        logger.info("None of carets have selection. State before adjustment: ${editor.commandState.toSimpleString()}")
         if (editor.inVisualMode) editor.exitVisualMode()
         if (editor.inSelectMode) editor.exitSelectMode(false)
 

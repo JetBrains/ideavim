@@ -24,12 +24,12 @@ val CommandState.Mode.hasVisualSelection
   }
 
 val Editor.mode
-  get() = CommandState.getInstance(this).mode
+  get() = this.commandState.mode
 
 var Editor.subMode
-  get() = CommandState.getInstance(this).subMode
+  get() = this.commandState.subMode
   set(value) {
-    CommandState.getInstance(this).subMode = value
+    this.commandState.subMode = value
   }
 
 @get:JvmName("inNormalMode")
@@ -42,7 +42,7 @@ val Editor.inInsertMode
 
 @get:JvmName("inRepeatMode")
 val Editor.inRepeatMode
-  get() = CommandState.getInstance(this).isDotRepeatInProgress
+  get() = this.commandState.isDotRepeatInProgress
 
 @get:JvmName("inVisualMode")
 val Editor.inVisualMode
@@ -59,3 +59,6 @@ val Editor.inBlockSubMode
 @get:JvmName("inSingleCommandMode")
 val Editor.inSingleCommandMode
   get() = this.subMode == CommandState.SubMode.SINGLE_COMMAND && this.inNormalMode
+
+val Editor?.commandState
+  get() = CommandState.getInstance(this)

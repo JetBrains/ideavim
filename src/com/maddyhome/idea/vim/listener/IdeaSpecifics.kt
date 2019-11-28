@@ -43,6 +43,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import java.beans.PropertyChangeEvent
@@ -90,7 +91,7 @@ object IdeaSpecifics {
       //region Enter insert mode after surround with if
       if (surrounderAction == action.javaClass.name && surrounderItems.any { action.templatePresentation.text.endsWith(it) }) {
         editor?.let {
-          val commandState = CommandState.getInstance(editor)
+          val commandState = editor.commandState
           while (commandState.mode != CommandState.Mode.COMMAND) {
             commandState.popState()
           }
