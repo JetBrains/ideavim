@@ -128,6 +128,59 @@ class VimSurroundExtensionTest : VimTestCase() {
     myFixture.checkResult("foo${c} bar")
   }
 
+  fun testRepeatSurround() {
+    val before = "if ${c}condition {\n}\n"
+    val after = "if ((condition)) {\n}\n"
+
+    doTest(parseKeys("ysiw)", "l", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun testRepeatSurroundDouble() {
+    val before = "if ${c}condition {\n}\n"
+    val after = "if (((condition))) {\n}\n"
+
+    doTest(parseKeys("ysiw)", "l", ".", "l", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun testRepeatDifferentChanges() {
+    val before = """
+                  if "${c}condition" { }
+                  if "condition" { }
+                    """
+    val after = """
+                  if '(condition)' { }
+                  if 'condition' { }
+                    """
+
+    doTest(parseKeys("ysiw)", "cs\"'", "j", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun testRepeatWrapWithFunction() {
+    val before = """
+                  if "${c}condition" { }
+                  if "condition" { }
+                    """
+    val after = """
+                  if "myFunction(condition)" { }
+                  if "myFunction(condition)" { }
+                    """
+
+    doTest(parseKeys("ysiwf", "myFunction<CR>", "j", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun testRepeatWrapWithTag() {
+    val before = """
+                  ${c}abc
+                  abc
+                    """
+    val after = """
+                  <myTag>abc</myTag>
+                  <myTag>abc</myTag>
+                    """
+
+    doTest(parseKeys("ysiwt", "myTag>", "j", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
   /* visual surround */
 
   fun testVisualSurroundWordParens() {
@@ -219,18 +272,19 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(parseKeys("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  fun testRepeatDeleteSurroundParens() {
+    val before = "if ((${c}condition)) {\n}\n"
+    val after = "if condition {\n}\n"
 
-  // TODO if/when we add proper repeat support
-  //public void testRepeatDeleteSurroundParens() {
-  //  final String before =
-  //    "if ((${c}condition)) {\n" +
-  //    "}\n";
-  //  final String after =
-  //    "if condition {\n" +
-  //    "}\n";
-  //
-  //  doTest(parseKeys("dsb."), before, after);
-  //}
+    doTest(parseKeys("dsb."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun testRepeatDeleteSurroundQuotes() {
+    val before = "if (\"${c}condition\") {\n}\n"
+    val after = "if (condition) {\n}\n"
+
+    doTest(parseKeys("ds\"."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
   /* Change surroundings */
 
@@ -262,15 +316,12 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest(parseKeys("cst\\<b>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  // TODO if/when we add proper repeat support
-  //public void testRepeatChangeSurroundingParens() {
-  //  final String before =
-  //    "foo(${c}index)(index2) = bar;";
-  //  final String after =
-  //    "foo[index][index2] = bar;";
-  //
-  //  doTest(parseKeys("csbrE."), before, after);
-  //}
+  fun testRepeatChangeSurroundingParens() {
+    val before = "foo(${c}index)(index2) = bar;"
+    val after = "foo[index][index2] = bar;"
+
+    doTest(parseKeys("csbrE."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
   @VimBehaviorDiffers("""
       <h1>Title</h1>

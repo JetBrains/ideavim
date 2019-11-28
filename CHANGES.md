@@ -20,6 +20,7 @@ usual beta standards.
 --------------
 
 **Features:**
+* Surround and Commentary extensions can be repeated with a dot command ([VIM-1118](https://youtrack.jetbrains.com/issue/VIM-1118))
 * Support XDG settings standard ([VIM-664](https://youtrack.jetbrains.com/issue/VIM-664))
 * Add option to remove the status bar icon ([VIM-1847](https://youtrack.jetbrains.com/issue/VIM-1847))
 

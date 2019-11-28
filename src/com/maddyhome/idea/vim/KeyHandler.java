@@ -36,6 +36,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
 import com.maddyhome.idea.vim.action.DuplicableOperatorAction;
 import com.maddyhome.idea.vim.action.ExEntryAction;
+import com.maddyhome.idea.vim.action.change.VimRepeater;
 import com.maddyhome.idea.vim.action.macro.ToggleRecordingAction;
 import com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction;
 import com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction;
@@ -420,9 +421,17 @@ public class KeyHandler {
         Map<Caret, Integer> startOffsets =
           editor.getCaretModel().getAllCarets().stream().collect(Collectors.toMap(Function.identity(), Caret::getOffset));
 
+        if (extensionHandler.isRepeatable()) {
+          VimRepeater.Extension.INSTANCE.clean();
+        }
         processor.executeCommand(editor.getProject(), () -> extensionHandler.execute(editor, context),
                                  "Vim " + extensionHandler.getClass().getSimpleName(), null);
 
+        if (extensionHandler.isRepeatable()) {
+          VimRepeater.Extension.INSTANCE.setLastExtensionHandler(extensionHandler);
+          VimRepeater.Extension.INSTANCE.setArgumentCaptured(null);
+          VimRepeater.INSTANCE.setRepeatHandler(true);
+        }
         if (isPendingMode &&
             !currentCmd.isEmpty() &&
             currentCmd.peek().getArgument() == null) {
@@ -724,6 +733,10 @@ public class KeyHandler {
         state = State.CHAR_OR_DIGRAPH;
         break;
       case MOTION:
+        if (CommandState.getInstance(editor).isDotRepeatInProgress() && VimRepeater.Extension.INSTANCE.getArgumentCaptured() != null) {
+          currentCmd.peek().setArgument(VimRepeater.Extension.INSTANCE.getArgumentCaptured());
+          state = State.READY;
+        }
         editorState.pushState(editorState.getMode(), editorState.getSubMode(), MappingMode.OP_PENDING);
         break;
       case EX_STRING:

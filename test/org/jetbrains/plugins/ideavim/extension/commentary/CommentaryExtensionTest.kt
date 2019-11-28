@@ -143,4 +143,48 @@ class CommentaryExtensionTest : JavaVimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
+
+  fun `test comment motion repeat`() {
+    doTest(StringHelper.parseKeys("gcj", "jj."),
+          """
+                 <caret>if (condition) {
+                 }
+                 if (condition) {
+                 }
+                 """.trimIndent(),
+          """
+                //if (condition) {
+                //}
+                //if (condition) {
+                //}
+                """.trimIndent())
+  }
+
+  fun `test comment motion right repeat`() {
+    doTest(StringHelper.parseKeys("gciw", "jj."),
+      """
+                <caret>if (condition) {
+                }
+                if (condition) {
+                }
+                """.trimIndent(),
+      """
+                /*if*/ (condition) {
+                }
+                /*if*/ (condition) {
+                }
+                """.trimIndent())
+  }
+
+  fun `test comment line repeat`() {
+    doTest(StringHelper.parseKeys("gcc", "j."),
+      """
+                 <caret>if (condition) {
+                 }
+                 """.trimIndent(),
+      """
+                //if (condition) {
+                //}
+                """.trimIndent())
+  }
 }

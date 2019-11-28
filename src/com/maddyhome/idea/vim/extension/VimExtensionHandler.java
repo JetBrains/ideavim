@@ -39,4 +39,8 @@ public interface VimExtensionHandler {
    * documents or virtual files.
    */
   void execute(@NotNull Editor editor, @NotNull DataContext context);
+
+  default boolean isRepeatable() {
+    return false;
+  }
 }

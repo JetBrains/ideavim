@@ -168,6 +168,11 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
 
   private static class YSurroundHandler implements VimExtensionHandler {
     @Override
+    public boolean isRepeatable() {
+      return true;
+    }
+
+    @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
       setOperatorFunction(new Operator());
       executeNormal(parseKeys("g@"), editor);
@@ -193,6 +198,11 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
   }
 
   private static class CSurroundHandler implements VimExtensionHandler {
+    @Override
+    public boolean isRepeatable() {
+      return true;
+    }
+
     @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
       final char charFrom = getChar(editor);
@@ -282,6 +292,11 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
   }
 
   private static class DSurroundHandler implements VimExtensionHandler {
+    @Override
+    public boolean isRepeatable() {
+      return true;
+    }
+
     @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
       // Deleting surround is just changing the surrounding to "nothing"

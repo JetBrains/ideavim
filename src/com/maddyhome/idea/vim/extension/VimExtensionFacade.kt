@@ -21,10 +21,12 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.change.VimRepeater
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.TestInputModel
+import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.ui.ExEntryPanel
 import com.maddyhome.idea.vim.ui.ModalEntry
@@ -74,6 +76,11 @@ object VimExtensionFacade {
   /** Returns a single key stroke from the user input similar to 'getchar()'. */
   @JvmStatic
   fun inputKeyStroke(editor: Editor): KeyStroke {
+    if (editor.commandState.isDotRepeatInProgress) {
+      val input = VimRepeater.Extension.consumeKeystroke()
+      return input ?: throw RuntimeException("Not enough keystrokes saved: ${VimRepeater.Extension.lastExtensionHandler}")
+    }
+
     val key: KeyStroke? = if (ApplicationManager.getApplication().isUnitTestMode) {
       TestInputModel.getInstance(editor).nextKeyStroke()
     } else {
@@ -84,13 +91,20 @@ object VimExtensionFacade {
       }
       ref
     }
-    return key ?: KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE.toChar())
+    val result = key ?: KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE.toChar())
+    VimRepeater.Extension.addKeystroke(result)
+    return result
   }
 
   /** Returns a string typed in the input box similar to 'input()'. */
   @JvmStatic
   fun inputString(editor: Editor, prompt: String, finishOn: Char?): String {
-    return if (ApplicationManager.getApplication().isUnitTestMode) {
+    if (editor.commandState.isDotRepeatInProgress) {
+      val input = VimRepeater.Extension.consumeString()
+      return input ?: throw RuntimeException("Not enough strings saved: ${VimRepeater.Extension.lastExtensionHandler}")
+    }
+
+    if (ApplicationManager.getApplication().isUnitTestMode) {
       val builder = StringBuilder()
       val inputModel = TestInputModel.getInstance(editor)
       var key: KeyStroke? = inputModel.nextKeyStroke()
@@ -106,7 +120,8 @@ object VimExtensionFacade {
       if (finishOn != null && key != null && key.keyChar == finishOn) {
         builder.append(key.keyChar)
       }
-      builder.toString()
+      VimRepeater.Extension.addString(builder.toString())
+      return builder.toString()
     } else {
       var text = ""
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for input()
@@ -135,7 +150,8 @@ object VimExtensionFacade {
           }
         }
       }
-      text
+      VimRepeater.Extension.addString(text)
+      return text;
     }
   }
 

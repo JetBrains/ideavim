@@ -64,6 +64,7 @@ sealed class ChangeEditorActionHandler : VimActionHandler.SingleExecution() {
 
     if (worked.get()) {
       VimRepeater.saveLastChange(cmd)
+      VimRepeater.repeatHandler = false
       editor.caretModel.allCarets.forEach { it.vimLastColumn = it.visualPosition.column }
     }
 

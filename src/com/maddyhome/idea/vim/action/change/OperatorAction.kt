@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.commandState
 
 /**
  * @author vlan
@@ -41,6 +42,9 @@ class OperatorAction : VimActionHandler.SingleExecution() {
     if (operatorFunction != null) {
       val argument = cmd.argument
       if (argument != null) {
+        if (!editor.commandState.isDotRepeatInProgress) {
+          VimRepeater.Extension.argumentCaptured = argument
+        }
         val motion = argument.motion
         val range = MotionGroup
           .getMotionRange(editor, editor.caretModel.primaryCaret, context, cmd.count, cmd.rawCount, argument)

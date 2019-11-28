@@ -3,10 +3,8 @@
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
       <ul>
-        <li>EasyMotion plugin emulation (<a href="https://github.com/JetBrains/ideavim#emulated-vim-plugins">link</a>)</li>
-        <li>Support surrounding with a function name</li>
-        <li>Add IdeaVim logo to the status bar</li>
-        <li>Various bug fixes</li>
+        <li>Fix `imap jk <ESC>` for the active autocompletion lookup</li>
+        <li>Surround and Commentary extensions can be repeated with a dot command</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
     ]]></change-notes>
