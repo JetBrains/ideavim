@@ -35,6 +35,7 @@ usual beta standards.
   Fix bindings for active lookup
 * [VIM-1845](https://youtrack.jetbrains.com/issue/VIM-1845) Show ActionGroup popups
 * [VIM-1424](https://youtrack.jetbrains.com/issue/VIM-1424) CTRL-A doesn't have any restrictions now
+* [VIM-1454](https://youtrack.jetbrains.com/issue/VIM-1454) Fix CTRL-W with autocompletion lookup
 
 
 0.54, 2019-11-20
