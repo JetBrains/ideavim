@@ -385,7 +385,7 @@ public class ChangeGroup {
       if (mode == CommandState.Mode.REPLACE) {
         setInsertEditorState(editor, false);
       }
-      if (cmd.getFlags().contains(CommandFlags.FLAG_NO_REPEAT)) {
+      if (cmd.getFlags().contains(CommandFlags.FLAG_NO_REPEAT_INSERT)) {
         repeatInsert(editor, context, 1, false);
       }
       else {
@@ -484,7 +484,7 @@ public class ChangeGroup {
       setInsertEditorState(editor, true);
     }
 
-    if (lastInsert != null && (lastInsert.getFlags().contains(CommandFlags.FLAG_NO_REPEAT))) {
+    if (lastInsert != null && (lastInsert.getFlags().contains(CommandFlags.FLAG_NO_REPEAT_INSERT))) {
       cnt = 1;
     }
 

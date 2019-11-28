@@ -31,7 +31,7 @@ import java.util.*
 class ChangeEndOfLineAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_NO_REPEAT, CommandFlags.FLAG_MULTIKEY_UNDO)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_NO_REPEAT_INSERT, CommandFlags.FLAG_MULTIKEY_UNDO)
 
   override fun execute(editor: Editor,
                        caret: Caret,

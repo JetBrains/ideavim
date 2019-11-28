@@ -37,9 +37,10 @@ enum class CommandFlags {
    */
   FLAG_SAVE_JUMP,
   /**
-   * Special command flag that indicates it is not to be repeated
+   * A special command flag indicating that the inserted text after this command will not be repeated.
+   * Example: `2i123` will insert `123123`, but `2s123` will insert `123`
    */
-  FLAG_NO_REPEAT,
+  FLAG_NO_REPEAT_INSERT,
   /**
    * This insert command should clear all saved keystrokes from the current insert
    */
