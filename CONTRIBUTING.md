@@ -20,7 +20,7 @@
 
 ### Where to Start
 
-In order to contribute to IdeaVim, you should have some understanding of Java or [Kotlin](https://kotlinlang.org/).
+In order to contribute to IdeaVim, you should have some understanding of [Kotlin](https://kotlinlang.org/) or Java.
 
 See also these docs on the IntelliJ API:
 
