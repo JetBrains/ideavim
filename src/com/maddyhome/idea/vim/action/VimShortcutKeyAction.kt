@@ -136,16 +136,12 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
   }
 
   private fun isEnabledForLookup(keyStroke: KeyStroke): Boolean {
-    val allowedKeys = parseKeysSet(
-      "<C-[>", "<C-C>", "<Esc>", // Escape
-      "<BS>",  // Backspace
-      "<C-O>",  // One command
-      "<C-P>",  // Lookup up
-      "<C-N>"  // Lookup down
+    val notAllowedKeys = parseKeysSet(
+      "<TAB>"
     )
-    for (keys in allowedKeys) { // XXX: Currently we cannot handle <C-\><C-N> because of the importance of <C-N> for the IDE on Linux
+    for (keys in notAllowedKeys) {
       if (keyStroke == keys[0]) {
-        return true
+        return false
       }
     }
     // We allow users to set custom keys that will work with lookup in case devs forgot something
@@ -154,10 +150,10 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
     for (value in values) {
       val keys = StringHelper.parseKeys(value)
       if (keys.size >= 1 && keyStroke == keys[0]) {
-        return true
+        return false
       }
     }
-    return false
+    return true
   }
 
   private fun isShortcutConflict(keyStroke: KeyStroke): Boolean {
