@@ -33,6 +33,7 @@ usual beta standards.
   [VIM-1627](https://youtrack.jetbrains.com/issue/VIM-1627)
   Fix bindings for active lookup
 * [VIM-1845](https://youtrack.jetbrains.com/issue/VIM-1845) Show ActionGroup popups
+* [VIM-1424](https://youtrack.jetbrains.com/issue/VIM-1424) CTRL-A doesn't have any restrictions now
 
 
 0.54, 2019-11-20

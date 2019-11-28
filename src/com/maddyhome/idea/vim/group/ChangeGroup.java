@@ -68,6 +68,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -1930,9 +1931,10 @@ public class ChangeGroup {
         }
       }
 
-      int num = (int)Long.parseLong(text.substring(2), 16);
-      num += count;
-      number = Integer.toHexString(num);
+
+      BigInteger num = new BigInteger(text.substring(2), 16);
+      num = num.add(BigInteger.valueOf(count));
+      number = num.toString(16);
       number = StringsKt.padStart(number, text.length() - 2, '0');
 
       if (!lastLower) {
@@ -1942,9 +1944,9 @@ public class ChangeGroup {
       number = text.substring(0, 2) + number;
     }
     else if (octal && text.startsWith("0") && text.length() > 1) {
-      int num = (int)Long.parseLong(text, 8);
-      num += count;
-      number = Integer.toOctalString(num);
+      BigInteger num = new BigInteger(text, 8);
+      num = num.add(BigInteger.valueOf(count));
+      number = num.toString(8);
       number = "0" + StringsKt.padStart(number, text.length() - 1, '0');
     }
     else if (alpha && Character.isLetter(ch)) {
@@ -1961,9 +1963,9 @@ public class ChangeGroup {
         len--;
       }
 
-      int num = Integer.parseInt(text);
-      num += count;
-      number = Integer.toString(num);
+      BigInteger num = new BigInteger(text);
+      num = num.add(BigInteger.valueOf(count));
+      number = num.toString();
 
       if (!octal && pad) {
         boolean neg = false;
