@@ -867,6 +867,7 @@ public class KeyHandler {
       CommandState editorState = CommandState.getInstance(editor);
       boolean wasRecording = editorState.isRecording();
 
+      KeyHandler.getInstance().state = State.NEW_COMMAND;
       executeVimAction(editor, cmd.getAction(), context);
       if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
         VimPlugin.getChange().processCommand(editor, cmd);
