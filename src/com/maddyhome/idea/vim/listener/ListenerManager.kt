@@ -145,12 +145,10 @@ object VimListenerManager {
 
   val logger = Logger.getInstance(VimListenerManager::class.java)
 
-  fun turnOn(startupInitializing: Boolean) {
+  fun turnOn() {
     GlobalListeners.enable()
-    if (!startupInitializing) {
-      ProjectListeners.addAll()
-      EditorListeners.addAll()
-    }
+    ProjectListeners.addAll()
+    EditorListeners.addAll()
   }
 
   fun turnOff() {
@@ -161,6 +159,12 @@ object VimListenerManager {
 
   object GlobalListeners {
     fun enable() {
+      val typedAction = EditorActionManager.getInstance().typedAction
+      if (typedAction.rawHandler !is VimTypedActionHandler) {
+        // Actually this if should always be true, but just as protection
+        EventFacade.getInstance().setupTypedActionHandler(VimTypedActionHandler(typedAction.rawHandler))
+      }
+
       OptionsManager.number.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
       OptionsManager.relativenumber.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
 
@@ -168,10 +172,7 @@ object VimListenerManager {
     }
 
     fun disable() {
-      if (VimEditorFactoryListener.typedHandlerConnected) {
-        EventFacade.getInstance().restoreTypedActionHandler()
-        VimEditorFactoryListener.typedHandlerConnected = false
-      }
+      EventFacade.getInstance().restoreTypedActionHandler()
 
       OptionsManager.number.removeOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
       OptionsManager.relativenumber.removeOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
@@ -202,7 +203,6 @@ object VimListenerManager {
   object EditorListeners {
     fun addAll() {
       val editors = EditorFactory.getInstance().allEditors
-      if (editors.isNotEmpty()) VimEditorFactoryListener.enableTypedHandler()
       for (editor in editors) {
         if (!editor.vimMotionGroup) {
           add(editor)
@@ -249,23 +249,7 @@ object VimListenerManager {
   }
 
   private object VimEditorFactoryListener : EditorFactoryListener {
-
-    var typedHandlerConnected = false
-
-    fun enableTypedHandler() {
-      if (typedHandlerConnected) return
-      typedHandlerConnected = true
-
-      // There is no sense to connect to EditorActionManager before the first editor was created
-      val typedAction = EditorActionManager.getInstance().typedAction
-      if (typedAction.rawHandler !is VimTypedActionHandler) {
-        // Actually this if should always be true, but just as protection
-        EventFacade.getInstance().setupTypedActionHandler(VimTypedActionHandler(typedAction.rawHandler))
-      }
-    }
-
     override fun editorCreated(event: EditorFactoryEvent) {
-      enableTypedHandler()
       VimPlugin.getEditor().editorCreated(event.editor)
       VimPlugin.getMotion().editorCreated(event)
       VimPlugin.getChange().editorCreated(event)

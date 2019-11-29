@@ -65,7 +65,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This plugin attempts to emulate the key binding and general functionality of Vim and gVim. See the supplied
@@ -108,7 +107,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   public void initComponent() {
     LOG.debug("initComponent");
 
-    if (isEnabled()) initializePlugin(true);
+    if (isEnabled()) initializePlugin();
 
     LOG.debug("done");
   }
@@ -294,43 +293,30 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     return getNotifications(null);
   }
 
-  private void initializePlugin(boolean firstInitialization) {
+  private void initializePlugin() {
     if (initialized) return;
     initialized = true;
 
     ApplicationManager.getApplication().invokeLater(this::updateState);
 
-    if (!firstInitialization) {
-      getEditor().turnOn();
-      getSearch().turnOn();
-    }
-    VimListenerManager.INSTANCE.turnOn(true);
+    getEditor().turnOn();
+    getSearch().turnOn();
+    VimListenerManager.INSTANCE.turnOn();
 
+    // Register vim actions in command mode
+    RegisterActions.registerActions();
 
-    Runnable asyncSetup = () -> {
-      // Register vim actions in command mode
-      RegisterActions.registerActions();
+    // Register ex handlers
+    CommandParser.getInstance().registerHandlers();
 
-      // Register ex handlers
-      CommandParser.getInstance().registerHandlers();
+    // Register extensions
+    VimExtensionRegistrar.registerExtensions();
 
-      // Register extensions
-      VimExtensionRegistrar.registerExtensions();
-
-      if (!ApplicationManager.getApplication().isUnitTestMode()) {
-        final File ideaVimRc = VimScriptParser.findIdeaVimRc();
-        if (ideaVimRc != null) {
-          VimScriptParser.executeFile(ideaVimRc);
-        }
+    if (!ApplicationManager.getApplication().isUnitTestMode()) {
+      final File ideaVimRc = VimScriptParser.findIdeaVimRc();
+      if (ideaVimRc != null) {
+        VimScriptParser.executeFile(ideaVimRc);
       }
-
-      Initialization.initialized();
-    };
-
-    if (ApplicationManager.getApplication().isUnitTestMode()) {
-      asyncSetup.run();
-    } else {
-      ApplicationManager.getApplication().executeOnPooledThread(asyncSetup);
     }
   }
 
@@ -415,18 +401,6 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     }
   }
 
-  public static class Initialization {
-    private static final AtomicBoolean initialized = new AtomicBoolean(false);
-
-    public static boolean notInitialized() {
-      return !(initialized.get());
-    }
-
-    public static void initialized() {
-      initialized.set(true);
-    }
-  }
-
   @NotNull
   private static VimPlugin getInstance() {
     return (VimPlugin)ApplicationManager.getApplication().getComponent(IDEAVIM_COMPONENT_NAME);
@@ -438,9 +412,9 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
       getEditor().turnOn();
       getSearch().turnOn();
-      VimListenerManager.INSTANCE.turnOn(false);
+      VimListenerManager.INSTANCE.turnOn();
     } else {
-      initializePlugin(false);
+      initializePlugin();
     }
   }
 
@@ -497,35 +471,27 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   public void loadState(@NotNull final Element element) {
     LOG.debug("Loading state");
 
-    Runnable setup = () -> {
-      // Restore whether the plugin is enabled or not
-      Element state = element.getChild("state");
-      if (state != null) {
-        try {
-          previousStateVersion = Integer.parseInt(state.getAttributeValue("version"));
-        }
-        catch (NumberFormatException ignored) {
-        }
-        enabled = Boolean.parseBoolean(state.getAttributeValue("enabled"));
-        previousKeyMap = state.getAttributeValue("keymap");
+    // Restore whether the plugin is enabled or not
+    Element state = element.getChild("state");
+    if (state != null) {
+      try {
+        previousStateVersion = Integer.parseInt(state.getAttributeValue("version"));
       }
-
-      if (previousStateVersion > 0 && previousStateVersion < 5) {
-        // Migrate settings from 4 to 5 version
-        getMark().readData(element);
-        getRegister().readData(element);
-        getSearch().readData(element);
-        getHistory().readData(element);
+      catch (NumberFormatException ignored) {
       }
-      getKey().readData(element);
-      getEditor().readData(element);
-      this.state.readData(element);
-    };
-
-    if (ApplicationManager.getApplication().isUnitTestMode()) {
-      setup.run();
-    } else {
-      ApplicationManager.getApplication().executeOnPooledThread(setup);
+      enabled = Boolean.parseBoolean(state.getAttributeValue("enabled"));
+      previousKeyMap = state.getAttributeValue("keymap");
     }
+
+    if (previousStateVersion > 0 && previousStateVersion < 5) {
+      // Migrate settings from 4 to 5 version
+      getMark().readData(element);
+      getRegister().readData(element);
+      getSearch().readData(element);
+      getHistory().readData(element);
+    }
+    getKey().readData(element);
+    getEditor().readData(element);
+    this.state.readData(element);
   }
 }
