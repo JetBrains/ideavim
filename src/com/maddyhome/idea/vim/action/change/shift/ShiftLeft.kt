@@ -22,10 +22,13 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
+import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
@@ -36,14 +39,35 @@ class ShiftLeftLinesAction : ChangeEditorActionHandler.ForEachCaret() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 
-  override fun execute(editor: Editor,
-                       caret: Caret,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
+  override fun execute(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean {
     VimPlugin.getChange().indentLines(editor, caret, context, count, -1)
 
+    return true
+  }
+}
+
+class ShiftLeftMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
+  override val type: Command.Type = Command.Type.CHANGE
+
+  override val argumentType: Argument.Type = Argument.Type.MOTION
+
+  override val duplicateWith: Char = '<'
+
+  override fun execute(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean {
+    argument ?: return false
+
+    VimPlugin.getChange().indentMotion(editor, caret, context, count, rawCount, argument, -1)
+    return true
+  }
+}
+
+class ShiftLeftVisualAction : VisualOperatorActionHandler.ForEachCaret() {
+  override val type: Command.Type = Command.Type.CHANGE
+
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
+
+  override fun executeAction(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: VimSelection): Boolean {
+    VimPlugin.getChange().indentRange(editor, caret, context, range.toVimTextRange(false), cmd.count, -1)
     return true
   }
 }
