@@ -90,7 +90,6 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
   // It is enabled by default to avoid any special configuration after plugin installation
   private boolean enabled = true;
-  private boolean initialized = false;
 
   private static final Logger LOG = Logger.getInstance(VimPlugin.class);
 
@@ -107,7 +106,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   public void initComponent() {
     LOG.debug("initComponent");
 
-    if (isEnabled()) initializePlugin();
+    if (isEnabled()) turnOnPlugin();
 
     LOG.debug("done");
   }
@@ -293,24 +292,11 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     return getNotifications(null);
   }
 
-  private void initializePlugin() {
-    if (initialized) return;
-    initialized = true;
+  private boolean ideavimrcRegistered = false;
 
-    ApplicationManager.getApplication().invokeLater(this::updateState);
-
-    getEditor().turnOn();
-    getSearch().turnOn();
-    VimListenerManager.INSTANCE.turnOn();
-
-    // Register vim actions in command mode
-    RegisterActions.registerActions();
-
-    // Register ex handlers
-    CommandParser.getInstance().registerHandlers();
-
-    // Register extensions
-    VimExtensionRegistrar.registerExtensions();
+  private void registerIdeavimrc() {
+    if (ideavimrcRegistered) return;
+    ideavimrcRegistered = true;
 
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       final File ideaVimRc = VimScriptParser.findIdeaVimRc();
@@ -407,15 +393,23 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   }
 
   private void turnOnPlugin() {
-    if (initialized) {
-      KeyHandler.getInstance().fullReset(null);
+    ApplicationManager.getApplication().invokeLater(this::updateState);
 
-      getEditor().turnOn();
-      getSearch().turnOn();
-      VimListenerManager.INSTANCE.turnOn();
-    } else {
-      initializePlugin();
-    }
+    getEditor().turnOn();
+    getSearch().turnOn();
+    VimListenerManager.INSTANCE.turnOn();
+
+    // Register vim actions in command mode
+    RegisterActions.registerActions();
+
+    // Register ex handlers
+    CommandParser.getInstance().registerHandlers();
+
+    // Register extensions
+    VimExtensionRegistrar.registerExtensions();
+
+    // Execute ~/.ideavimrc
+    registerIdeavimrc();
   }
 
   private void turnOffPlugin() {
@@ -427,8 +421,12 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     ExEntryPanel.fullReset();
   }
 
+  private boolean stateUpdated = false;
+
   private void updateState() {
+    if (stateUpdated) return;
     if (isEnabled() && !ApplicationManager.getApplication().isUnitTestMode()) {
+      stateUpdated = true;
       if (SystemInfo.isMac) {
         final MacKeyRepeat keyRepeat = MacKeyRepeat.getInstance();
         final Boolean enabled = keyRepeat.isEnabled();

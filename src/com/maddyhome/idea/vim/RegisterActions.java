@@ -32,11 +32,15 @@ public class RegisterActions {
 
   public static final ExtensionPointName<ActionBeanClass> VIM_ACTIONS_EP =
     ExtensionPointName.create("IdeaVIM.vimAction");
+  private static boolean actionsRegistered = false;
 
   /**
    * Register all the key/action mappings for the plugin.
    */
   static void registerActions() {
+    if (actionsRegistered) return;
+    actionsRegistered = true;
+
     registerVimCommandActions();
     registerEmptyShortcuts();
   }

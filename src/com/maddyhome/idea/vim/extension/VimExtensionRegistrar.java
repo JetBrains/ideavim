@@ -17,8 +17,12 @@ import java.util.Set;
 public class VimExtensionRegistrar {
 
   private static Set<String> registeredExtensions = new HashSet<>();
+  private static boolean extensionRegistered = false;
 
   public static void registerExtensions() {
+    if (extensionRegistered) return;
+    extensionRegistered = true;
+
     // TODO: [VERSION UPDATE] since 191 use
     //  ExtensionPoint.addExtensionPointListener(ExtensionPointListener<T>, boolean, Disposable)
     VimExtension.EP_NAME.getPoint(null).addExtensionPointListener(new ExtensionPointListener<VimExtension>() {

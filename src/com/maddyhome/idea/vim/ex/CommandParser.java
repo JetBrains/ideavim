@@ -35,7 +35,6 @@ import com.maddyhome.idea.vim.helper.Msg;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -71,7 +70,8 @@ public class CommandParser {
    * Registers all the supported Ex commands
    */
   public void registerHandlers() {
-    if (registered.getAndSet(true)) return;
+    if (registered) return;
+    registered = true;
 
     for (ExBeanClass handler : EX_COMMAND_EP.getExtensions()) {
       handler.register();
@@ -594,7 +594,7 @@ public class CommandParser {
   }
 
   @NotNull private final CommandNode root = new CommandNode();
-  private AtomicBoolean registered = new AtomicBoolean(false);
+  private boolean registered = false;
 
   private enum State {
     START,
