@@ -312,6 +312,8 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     return PluginId.getId(IDEAVIM_PLUGIN_ID);
   }
 
+  // [VERSION UPDATE] 193+ remove suppress
+  @SuppressWarnings({"MissingRecentApi", "UnstableApiUsage"})
   @NotNull
   public static String getVersion() {
     final IdeaPluginDescriptor plugin = PluginManager.getPlugin(getPluginId());
