@@ -107,7 +107,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   public void initComponent() {
     LOG.debug("initComponent");
 
-    if (isEnabled()) turnOnPlugin();
+    if (enabled) turnOnPlugin();
 
     LOG.debug("done");
   }
@@ -390,7 +390,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
   @NotNull
   private static VimPlugin getInstance() {
-    return (VimPlugin)ApplicationManager.getApplication().getComponent(IDEAVIM_COMPONENT_NAME);
+    return ApplicationManager.getApplication().getComponent(VimPlugin.class);
   }
 
   private void turnOnPlugin() {
