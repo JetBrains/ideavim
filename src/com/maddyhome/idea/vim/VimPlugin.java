@@ -102,6 +102,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
   @NotNull private final VimState state = new VimState();
 
+  // [VERSION UPDATE] 193+ replace with com.intellij.openapi.components.PersistentStateComponent.initializeComponent
   @Override
   public void initComponent() {
     LOG.debug("initComponent");
