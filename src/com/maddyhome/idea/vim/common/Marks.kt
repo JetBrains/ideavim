@@ -49,7 +49,7 @@ data class VimMark(
 
 class IntellijMark(bookmark: Bookmark, override val col: Int, project: Project?) : Mark {
 
-  val project: WeakReference<Project?> = WeakReference(project)
+  private val project: WeakReference<Project?> = WeakReference(project)
 
   override val key = bookmark.mnemonic
   override val logicalLine: Int
@@ -62,9 +62,15 @@ class IntellijMark(bookmark: Bookmark, override val col: Int, project: Project?)
   override fun isClear(): Boolean = getMark()?.isValid?.not() ?: false
   override fun clear() {
     val mark = getMark() ?: return
-    project.get()?.let { project -> BookmarkManager.getInstance(project).removeBookmark(mark) }
+    getProject()?.let { project -> BookmarkManager.getInstance(project).removeBookmark(mark) }
   }
 
   private fun getMark(): Bookmark? =
-    project.get()?.let { project -> BookmarkManager.getInstance(project).findBookmarkForMnemonic(key) }
+    getProject()?.let { project -> BookmarkManager.getInstance(project).findBookmarkForMnemonic(key) }
+
+  private fun getProject(): Project? {
+    val proj = project.get() ?: return null
+    if (proj.isDisposed) return null
+    return proj
+  }
 }

@@ -37,6 +37,7 @@ usual beta standards.
 * [VIM-1424](https://youtrack.jetbrains.com/issue/VIM-1424) CTRL-A doesn't have any restrictions now
 * [VIM-1454](https://youtrack.jetbrains.com/issue/VIM-1454) Fix CTRL-W with the autocompletion lookup
 * [VIM-1855](https://youtrack.jetbrains.com/issue/VIM-1855) Fix initialization error
+* [VIM-1853](https://youtrack.jetbrains.com/issue/VIM-1853) Fix marks for disposed projects
 
 
 0.54, 2019-11-20
