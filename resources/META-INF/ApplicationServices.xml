@@ -1,0 +1,23 @@
+<idea-plugin>
+  <extensions defaultExtensionNs="com.intellij">
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.MotionGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ChangeGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.CommandGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.MarkGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.RegisterGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.FileGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.SearchGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.ProcessGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.MacroGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.DigraphGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.HistoryGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.KeyGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.WindowGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.EditorGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.visual.VisualMotionGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.copy.YankGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.copy.PutGroup"/>
+
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
+  </extensions>
+</idea-plugin>

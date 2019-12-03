@@ -1,0 +1,64 @@
+<idea-plugin>
+  <extensions defaultExtensionNs="IdeaVIM">
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.ActionListHandler" names="actionlist"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.AsciiHandler" names="as[cii]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.CmdFilterHandler" names="!"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.CmdHandler" names="com[mand]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.CmdClearHandler" names="comc[lear]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.CopyTextHandler" names="co[py],t"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.DelCmdHandler" names="delc[ommand]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.DeleteLinesHandler" names="d[elete]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.DeleteMarksHandler" names="delm[arks]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.DigraphHandler" names="dig[raphs]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.DumpLineHandler" names="dump[line]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.EditFileHandler" names="bro[wse],e[dit]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.ActionHandler" names="action"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.EchoHandler" names="ec[ho]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.ExitHandler" names="qa[ll],quita[ll],wqa[ll],xa[ll]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.FindClassHandler" names="cla[ss]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.FindFileHandler" names="fin[d]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.FindSymbolHandler" names="sym[bol]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.GotoCharacterHandler" names="go[to]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.HelpHandler" names="h[elp]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.HistoryHandler" names="his[tory]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.JoinLinesHandler" names="j[oin]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.JumpsHandler" names="ju[mps]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.LetHandler" names="let"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.MapHandler"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.MarkHandler" names="ma[rk],k"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.MarksHandler" names="marks"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.MoveTextHandler" names="m[ove]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.NextFileHandler" names="n[ext]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.NoHLSearchHandler" names="noh[lsearch]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.OnlyHandler" names="on[ly]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PreviousFileHandler" names="N[ext],prev[ious]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PromptFindHandler" names="pro[mptfind]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PromptReplaceHandler" names="promptr[epl]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PutLinesHandler" names="pu[t]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.QuitHandler" names="q[uit],clo[se],hid[e]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.RedoHandler" names="red[o]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.RegistersHandler" names="di[splay],reg[isters]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.RepeatHandler" names="@"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SelectFileHandler" names="argu[ment]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SelectFirstFileHandler" names="fir[st],rew[ind]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SelectLastFileHandler" names="la[st]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SetHandler" names="se[t]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.ShiftLeftHandler"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.ShiftRightHandler"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SourceHandler" names="so[urce]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SortHandler" names="sor[t]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SplitHandler" names="vs[plit],sp[lit]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SubstituteHandler" names="s[ubstitute],&amp;,~"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.UndoHandler" names="u[ndo]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.WriteAllHandler" names="wa[ll]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.WriteHandler" names="w[rite]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.WriteNextFileHandler" names="wn[ext]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.WritePreviousFileHandler" names="wN[ext],wp[revious]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.WriteQuitHandler" names="wq,exi[t],x[it]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.YankLinesHandler" names="y[ank]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.ShellHandler" names="sh[ell]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.NextTabHandler" names="tabn[ext]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PreviousTabHandler" names="tabp[revious],tabN[ext]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.TabOnlyHandler" names="tabo[nly]"/>
+  </extensions>
+</idea-plugin>

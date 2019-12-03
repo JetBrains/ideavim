@@ -1,0 +1,345 @@
+<idea-plugin>
+  <extensions defaultExtensionNs="IdeaVIM">
+    <!-- Motions -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.tabs.MotionPreviousTabAction" mappingModes="NXO" keys="gT"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.tabs.MotionNextTabAction" mappingModes="NXO" keys="gt"/>
+    <!-- Left/Right -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionColumnAction" mappingModes="NXO" keys="|"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnAction" mappingModes="NXO" keys="0"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnInsertModeAction" mappingModes="I" keys="«Home»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenColumnAction" mappingModes="NXO" keys="g0,g«Home»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstNonSpaceAction" mappingModes="NXO" keys="^"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenNonSpaceAction" mappingModes="NXO" keys="g^"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction" mappingModes="NXO" keys="$"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnInsertAction" mappingModes="I" keys="«End»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLastScreenColumnAction" mappingModes="NXO" keys="g$,g«End»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharAction" mappingModes="NXO" keys=";"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharReverseAction" mappingModes="NXO" keys="«COMMA»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLastNonSpaceAction" mappingModes="NXO" keys="g_"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftAction" mappingModes="NXO" keys="h"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftInsertModeAction" mappingModes="I"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftWrapAction" mappingModes="NXO" keys="«BS»,«C-H»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftMatchCharAction" mappingModes="NXO" keys="F"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftTillMatchCharAction" mappingModes="NXO" keys="T"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionMiddleColumnAction" mappingModes="NXO" keys="gm"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionRightAction" mappingModes="NXO" keys="l"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionRightInsertAction" mappingModes="I"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionRightWrapAction" mappingModes="NXO" keys=" "/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionRightMatchCharAction" mappingModes="NXO" keys="f"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionRightTillMatchCharAction" mappingModes="NXO" keys="t"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionHomeAction" mappingModes="NV" keys="«Home»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftHomeAction" mappingModes="NV" keys="«S-Home»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionEndAction" mappingModes="NVO" keys="«End»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftEndAction" mappingModes="NV" keys="«S-End»"/>
+    <!-- Up/Down -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionDownAction" mappingModes="NXO" keys="j"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionDownCtrlNAction" mappingModes="NXO" keys="«C-N»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionDownNotLineWiseAction" mappingModes="NXO" keys="gj,g«Down»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionDownFirstNonSpaceAction" mappingModes="NXO" keys="+,«C-M»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.EnterNormalAction" mappingModes="NXO" keys="«CR»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction" mappingModes="NXO" keys="_"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstAction" mappingModes="NXO" keys="gg,«C-Home»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstInsertAction" mappingModes="I" keys="«C-Home»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastAction" mappingModes="NXO" keys="G"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastEndAction" mappingModes="NXO" keys="«C-End»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastEndInsertAction" mappingModes="I" keys="«C-End»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction" mappingModes="NXO" keys="%"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionUpAction" mappingModes="NXO" keys="k"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionUpCtrlPAction" mappingModes="NXO" keys="«C-P»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionUpNotLineWiseAction" mappingModes="NXO" keys="gk,g«Up»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionUpFirstNonSpaceAction" mappingModes="NXO" keys="-"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionArrowDownAction" mappingModes="NVO"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionArrowUpAction" mappingModes="NVO"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftAction" mappingModes="NXO"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightAction" mappingModes="NXO"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.LookupDownAction" mappingModes="I" keys="«C-N»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.LookupUpAction" mappingModes="I" keys="«C-P»"/>
+    <!-- Text -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionCamelEndLeftAction" mappingModes="NXO" keys="]b"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionCamelEndRightAction" mappingModes="NXO" keys="]w"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionCamelLeftAction" mappingModes="NXO" keys="[b"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionCamelRightAction" mappingModes="NXO" keys="[w"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionNthCharacterAction" mappingModes="NXO" keys="go"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionWordEndLeftAction" mappingModes="NXO" keys="ge"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionBigWordEndLeftAction" mappingModes="NXO" keys="gE"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionWordEndRightAction" mappingModes="NXO" keys="e"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionBigWordEndRightAction" mappingModes="NXO" keys="E"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionWordLeftAction" mappingModes="NXO" keys="b"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionWordLeftInsertAction" mappingModes="I"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionBigWordLeftAction" mappingModes="NXO" keys="B,«C-Left»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionWordRightAction" mappingModes="NXO" keys="w"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionWordRightInsertAction" mappingModes="I"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionBigWordRightAction" mappingModes="NXO" keys="W,«C-Right»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionSentenceNextStartAction" mappingModes="NXO" keys=")"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionSentencePreviousStartAction" mappingModes="NXO" keys="("/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionSentenceNextEndAction" mappingModes="NXO" keys="g)"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionSentencePreviousEndAction" mappingModes="NXO" keys="g("/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionParagraphNextAction" mappingModes="NXO" keys="}"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionParagraphPreviousAction" mappingModes="NXO" keys="{"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedBraceCloseAction" mappingModes="NXO" keys="]}"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedBraceOpenAction" mappingModes="NXO" keys="[{"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedParenCloseAction" mappingModes="NXO" keys="])"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedParenOpenAction" mappingModes="NXO" keys="[("/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardEndAction" mappingModes="NXO" keys="[]"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardStartAction" mappingModes="NXO" keys="[["/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardEndAction" mappingModes="NXO" keys="]]"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardStartAction" mappingModes="NXO" keys="]["/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousEndAction" mappingModes="NXO" keys="[M"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousStartAction" mappingModes="NXO" keys="[m"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionMethodNextEndAction" mappingModes="NXO" keys="]M"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.text.MotionMethodNextStartAction" mappingModes="NXO" keys="]m"/>
+    <!-- Text Objects -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionOuterWordAction" mappingModes="XO" keys="aw"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionOuterBigWordAction" mappingModes="XO" keys="aW"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionInnerWordAction" mappingModes="XO" keys="iw"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionInnerBigWordAction" mappingModes="XO" keys="iW"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockAngleAction" mappingModes="XO" keys="i>,i&lt;"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBraceAction" mappingModes="XO" keys="iB,i{,i}"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBracketAction" mappingModes="XO" keys="i[,i]"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockParenAction" mappingModes="XO" keys="ib,i(,i)"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockDoubleQuoteAction" mappingModes="XO" keys='i"'/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockSingleQuoteAction" mappingModes="XO" keys="i'"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBackQuoteAction" mappingModes="XO" keys="i`"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockTagAction" mappingModes="XO" keys="it"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockAngleAction" mappingModes="XO" keys="a&lt;,a>"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBraceAction" mappingModes="XO" keys="aB,a{,a}"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBracketAction" mappingModes="XO" keys="a[,a]"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockParenAction" mappingModes="XO" keys="ab,a(,a)"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockDoubleQuoteAction" mappingModes="XO" keys='a"'/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockSingleQuoteAction" mappingModes="XO" keys="a'"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBackQuoteAction" mappingModes="XO" keys="a`"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockTagAction" mappingModes="XO" keys="at"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionInnerParagraphAction" mappingModes="XO" keys="ip"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionOuterParagraphAction" mappingModes="XO" keys="ap"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionInnerSentenceAction" mappingModes="XO" keys="is"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.object.MotionOuterSentenceAction" mappingModes="XO" keys="as"/>
+    <!-- Marks -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.mark.MotionMarkAction" mappingModes="NX" keys="m"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction" mappingModes="XO" keys="`"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkNoSaveJumpAction" mappingModes="XO" keys="g`"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkLineAction" mappingModes="XO" keys="'"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkLineNoSaveJumpAction" mappingModes="XO" keys="g'"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkAction" mappingModes="N" keys="`"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkNoSaveJumpAction" mappingModes="N" keys="g`"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkLineAction" mappingModes="N" keys="'"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkLineNoSaveJumpAction" mappingModes="N" keys="g'"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.mark.MotionJumpNextAction" mappingModes="N" keys="«C-I»,«Tab»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.mark.MotionJumpPreviousAction" mappingModes="N" keys="«C-O»,«C-T»"/>
+    <!-- Screen -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.screen.MotionFirstScreenLineAction" mappingModes="NXO" keys="H"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.screen.MotionLastScreenLineAction" mappingModes="NXO" keys="L"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.screen.MotionMiddleScreenLineAction" mappingModes="NXO" keys="M"/>
+    <!-- Scroll -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLinePageStartAction" mappingModes="NXO" keys="z+"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLineStartAction" mappingModes="NXO" keys="z«CR»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLineAction" mappingModes="NXO" keys="zt"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageDownAction" mappingModes="NXO" keys="«C-D»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageUpAction" mappingModes="NXO" keys="«C-U»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLineAction" mappingModes="NXO" keys="zb"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLinePageStartAction" mappingModes="NXO" keys="z^"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLineStartAction" mappingModes="NXO" keys="z-"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineDownAction" mappingModes="NXO" keys="«C-E»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineUpAction" mappingModes="NXO" keys="«C-Y»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollMiddleScreenLineAction" mappingModes="NXO" keys="zz"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollMiddleScreenLineStartAction" mappingModes="NXO" keys="z."/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction" mappingModes="NXO" keys="«C-F»,«PageDown»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownInsertModeAction" mappingModes="I"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpAction" mappingModes="NXO" keys="«C-B»,«PageUp»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpInsertModeAction" mappingModes="I"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenColumnAction" mappingModes="NXO" keys="zs"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenColumnAction" mappingModes="NXO" keys="ze"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnLeftAction" mappingModes="NXO" keys="zl,z«Right»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnRightAction" mappingModes="NXO" keys="zh,z«Left»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionShiftDownAction" mappingModes="NV" keys="«S-Down»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionShiftUpAction" mappingModes="NV" keys="«S-Up»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftRightAction" mappingModes="NV" keys="«S-Right»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftLeftAction" mappingModes="NV" keys="«S-Left»"/>
+    <!-- Visual -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction" mappingModes="X" keys="«Esc»,«C-[»,«C-C»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.visual.VisualToggleCharacterModeAction" mappingModes="NX" keys="v"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.visual.VisualToggleLineModeAction" mappingModes="NX" keys="V"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.visual.VisualToggleBlockModeAction" mappingModes="NX" keys="«C-q»,«C-v»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.visual.VisualSwapEndsAction" mappingModes="X" keys="o"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.visual.VisualSwapEndsBlockAction" mappingModes="X" keys="O"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.visual.VisualSelectPreviousAction" mappingModes="N" keys="gv"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.visual.VisualSwapSelectionsAction" mappingModes="X" keys="gv"/>
+
+    <!-- Select-->
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.select.SelectEnableCharacterModeAction" mappingModes="N" keys="gh"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.select.SelectEnableLineModeAction" mappingModes="N" keys="gH"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.select.SelectEnableBlockModeAction" mappingModes="N" keys="g«C-h»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionRightAction" mappingModes="S" keys="«Right»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionLeftAction" mappingModes="S" keys="«Left»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode" mappingModes="V" keys="«C-G»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.select.SelectEnterAction" mappingModes="S" keys="«enter»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.select.SelectEscapeAction" mappingModes="S" keys="«esc»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.select.SelectDeleteAction" mappingModes="S" keys="«BS»,«DEL»"/>
+
+    <!-- Insert -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertAfterCursorAction" mappingModes="N" keys="a"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertAfterLineEndAction" mappingModes="N" keys="A"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertAtPreviousInsertAction" mappingModes="N" keys="gi"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertBeforeCursorAction" mappingModes="N" keys="i,«Insert»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertBeforeFirstNonBlankAction" mappingModes="N" keys="I"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertCharacterAboveCursorAction" mappingModes="I" keys="«C-Y»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertCharacterBelowCursorAction" mappingModes="I" keys="«C-E»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertDeleteInsertedTextAction" mappingModes="I" keys="«C-U»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertDeletePreviousWordAction" mappingModes="I" keys="«C-W»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertEnterAction" mappingModes="I" keys="«C-M»,«CR»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction" mappingModes="I" keys="«C-[»,«C-C»,«Esc»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertLineStartAction" mappingModes="N" keys="gI"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertNewLineAboveAction" mappingModes="N" keys="O"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertNewLineBelowAction" mappingModes="N" keys="o"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertAction" mappingModes="I" keys="«C-A»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertExitAction" mappingModes="I"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertRegisterAction" mappingModes="I" keys="«C-R»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertInsertAction" mappingModes="I" keys="«Ins»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertSingleCommandAction" mappingModes="I" keys="«C-O»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.VisualBlockInsertAction" mappingModes="X" keys="I"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.VisualBlockAppendAction" mappingModes="X" keys="A"/>
+
+    <!-- Delete -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteCharacterAction" mappingModes="N" keys="«DEL»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteCharacterLeftAction" mappingModes="N" keys="X"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteCharacterRightAction" mappingModes="N" keys="x"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteEndOfLineAction" mappingModes="N" keys="D"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesAction" mappingModes="N" keys="gJ"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesSpacesAction" mappingModes="N" keys="J"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteJoinVisualLinesAction" mappingModes="X" keys="gJ"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteJoinVisualLinesSpacesAction" mappingModes="X" keys="J"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteMotionAction" mappingModes="N" keys="d"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteVisualAction" mappingModes="X" keys="d,x,«Del»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteVisualLinesAction" mappingModes="X" keys="X"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteVisualLinesEndAction" mappingModes="X" keys="D"/>
+
+    <!-- Change -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerMotionAction" mappingModes="N" keys="gu"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerVisualAction" mappingModes="X" keys="u"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeCaseToggleCharacterAction" mappingModes="N" keys="~"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeCaseToggleMotionAction" mappingModes="N" keys="g~"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeCaseToggleVisualAction" mappingModes="X" keys="~"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperMotionAction" mappingModes="N" keys="gU"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperVisualAction" mappingModes="X" keys="U"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeCharacterAction" mappingModes="N" keys="r"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeCharactersAction" mappingModes="N" keys="s"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeEndOfLineAction" mappingModes="N" keys="C"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeLineAction" mappingModes="N" keys="S"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeMotionAction" mappingModes="N" keys="c"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.number.ChangeNumberIncAction" mappingModes="N" keys="«C-A»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.number.ChangeNumberDecAction" mappingModes="N" keys="«C-X»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberIncAction" mappingModes="X" keys="«C-A»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberDecAction" mappingModes="X" keys="«C-X»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberAvalancheIncAction" mappingModes="X" keys="g«C-A»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberAvalancheDecAction" mappingModes="X" keys="g«C-X»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeReplaceAction" mappingModes="N" keys="R"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeVisualAction" mappingModes="X" keys="c,s"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeVisualCharacterAction" mappingModes="X" keys="r"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesAction" mappingModes="X" keys="R,S"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesEndAction" mappingModes="X" keys="C"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.FilterMotionAction" mappingModes="N" keys="!"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.FilterVisualLinesAction" mappingModes="X" keys="!"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.AutoIndentLinesVisualAction" mappingModes="X" keys="="/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ReformatCodeVisualAction" mappingModes="X" keys="gq"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ReformatCodeMotionAction" mappingModes="N" keys="gq"/>
+
+    <!-- Shift -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.AutoIndentMotionAction" mappingModes="N" keys="="/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.ShiftLeftLinesAction" mappingModes="I" keys="«C-D»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.ShiftLeftMotionAction" mappingModes="N" keys="&lt;"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.ShiftLeftVisualAction" mappingModes="X" keys="&lt;"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.ShiftRightLinesAction" mappingModes="I" keys="«C-T»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.ShiftRightMotionAction" mappingModes="N" keys=">"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.shift.ShiftRightVisualAction" mappingModes="X" keys=">"/>
+
+    <!-- Copy -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutTextAfterCursorAction" mappingModes="N" keys="p"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorAction" mappingModes="N" keys="P"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction" mappingModes="N" keys="]p"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction" mappingModes="N" keys="[P,]P,[p"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutTextAfterCursorActionMoveCursor" mappingModes="N" keys="gp"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorActionMoveCursor" mappingModes="N" keys="gP"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.SelectRegisterAction" mappingModes="NXO" keys='"'/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.YankLineAction" mappingModes="N" keys="Y"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.YankMotionAction" mappingModes="N" keys="y"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.YankVisualAction" mappingModes="X" keys="y"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.YankVisualLinesAction" mappingModes="X" keys="Y"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutVisualTextAction" mappingModes="X" keys="p,P"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction" mappingModes="X" keys="[p,]p,]P,[P"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutVisualTextMoveCursorAction" mappingModes="X" keys="gp,gP"/>
+
+    <!-- File -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.file.FileSaveCloseAction" mappingModes="N" keys="ZQ,ZZ"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.file.FilePreviousAction" mappingModes="N"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.file.FileGetAsciiAction" mappingModes="N" keys="ga"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.file.FileGetHexAction" mappingModes="N" keys="g8"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.file.FileGetFileInfoAction" mappingModes="N" keys="«C-G»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.file.FileGetLocationInfoAction" mappingModes="NX" keys="g«C-G»"/>
+
+    <!-- Window -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.VerticalSplitAction" mappingModes="N" keys="«C-W»v,«C-W»«C-V»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.HorizontalSplitAction" mappingModes="N" keys="«C-W»s,«C-W»S,«C-W»«C-S»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.CloseWindowAction" mappingModes="N" keys="«C-W»c"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowOnlyAction" mappingModes="N" keys="«C-W»o,«C-W»«C-O»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowNextAction" mappingModes="N" keys="«C-W»w,«C-W»«C-W»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowPrevAction" mappingModes="N" keys="«C-W»W"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowLeftAction" mappingModes="N" keys="«C-W»h,«C-W»«C-H»,«C-W»«Left»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowRightAction" mappingModes="N" keys="«C-W»l,«C-W»«C-L»,«C-W»«Right»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowUpAction" mappingModes="N" keys="«C-W»k,«C-W»«C-K»,«C-W»«Up»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowDownAction" mappingModes="N" keys="«C-W»j,«C-W»«C-J»,«C-W»«Down»"/>
+
+    <!-- Search -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction" mappingModes="NXO" keys="/"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction" mappingModes="NXO" keys="?"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.search.SearchAgainNextAction" mappingModes="NXO" keys="n"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.search.SearchAgainPreviousAction" mappingModes="NXO" keys="N"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction" mappingModes="NXO" keys="*"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.search.SearchWholeWordBackwardAction" mappingModes="NXO" keys="#"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.search.SearchWordForwardAction" mappingModes="NXO" keys="g*"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.search.SearchWordBackwardAction" mappingModes="NXO" keys="g#"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction" mappingModes="NX" keys="gD,gd,«C-]»"/>
+
+    <!-- Macro -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.macro.ToggleRecordingAction" mappingModes="NX" keys="q"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.macro.PlaybackRegisterAction" mappingModes="N" keys="@"/>
+
+    <!-- Command Line -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.ex.ProcessExEntryAction" mappingModes="C"/>
+
+    <!-- Other -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeLastSearchReplaceAction" mappingModes="N" keys="&amp;"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.change.ChangeLastGlobalSearchReplaceAction" mappingModes="N" keys="g&amp;"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.RepeatChangeAction" mappingModes="N" keys="."/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.ExEntryAction" mappingModes="NXO" keys=":"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.ResetModeAction" mappingModes="ALL" keys="«C-\»«C-N»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.RedoAction" mappingModes="N" keys="«C-R»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.UndoAction" mappingModes="N"/>
+
+    <!-- Keys -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.OperatorAction" mappingModes="N" keys="g@"/>
+
+    <!-- Visual Selection of last Search Pattern (gn) -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.gn.VisualSelectNextSearch" mappingModes="NX" keys="gn"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.gn.VisualSelectPreviousSearch" mappingModes="NX" keys="gN"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.gn.GnNextTextObject" mappingModes="O" keys="gn"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.gn.GnPreviousTextObject" mappingModes="O" keys="gN"/>
+
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.CtrlDownAction" mappingModes="N" keys="«C-Down»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.CtrlUpAction" mappingModes="N" keys="«C-Up»"/>
+
+    <!-- Folds -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.fold.VimCollapseAllRegions" mappingModes="NX" keys="zM"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.fold.VimCollapseRegion" mappingModes="NX" keys="zc"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.fold.VimCollapseRegionRecursively" mappingModes="NX" keys="zC"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.fold.VimExpandAllRegions" mappingModes="NX" keys="zR"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.fold.VimExpandRegion" mappingModes="NX" keys="zo"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.fold.VimExpandRegionRecursively" mappingModes="NX" keys="zO"/>
+
+    <!-- Editor Actions -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.editor.VimEditorBackSpace" mappingModes="I"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.editor.VimEditorDelete" mappingModes="I"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.editor.VimEditorDown" mappingModes="I"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.editor.VimEditorTab" mappingModes="I"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.editor.VimEditorUp" mappingModes="I"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.editor.VimQuickJavaDoc" mappingModes="N" keys="K"/>
+  </extensions>
+</idea-plugin>
