@@ -137,7 +137,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
 
   private fun isEnabledForLookup(keyStroke: KeyStroke): Boolean {
     val notAllowedKeys = parseKeysSet(
-      "<TAB>", "<Down>", "<Up>"
+      "<TAB>", "<Down>", "<Up>", "<Enter>"
     )
     for (keys in notAllowedKeys) {
       if (keyStroke == keys[0]) {
