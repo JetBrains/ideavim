@@ -775,7 +775,7 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  private void partialReset(@Nullable Editor editor) {
+  public void partialReset(@Nullable Editor editor) {
     count = 0;
     keys = new ArrayList<>();
     CommandState editorState = CommandState.getInstance(editor);

@@ -38,6 +38,7 @@ usual beta standards.
 * [VIM-1454](https://youtrack.jetbrains.com/issue/VIM-1454) Fix CTRL-W with the autocompletion lookup
 * [VIM-1855](https://youtrack.jetbrains.com/issue/VIM-1855) Fix initialization error
 * [VIM-1853](https://youtrack.jetbrains.com/issue/VIM-1853) Fix marks for disposed projects
+* [VIM-1858](https://youtrack.jetbrains.com/issue/VIM-1858) Fix imap for autocomplete
 
 
 0.54, 2019-11-20

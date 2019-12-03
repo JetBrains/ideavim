@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.listener
 
+import com.intellij.codeInsight.lookup.LookupEvent
 import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.codeInsight.template.Template
 import com.intellij.codeInsight.template.TemplateEditingAdapter
@@ -134,13 +135,21 @@ object IdeaSpecifics {
   }
   //endregion
 
-  //region Register shortcuts for lookup
+  //region Register shortcuts for lookup and perform partial reset
   private object LookupListener : PropertyChangeListener {
     override fun propertyChange(evt: PropertyChangeEvent?) {
       if (evt != null && evt.propertyName == "activeLookup" && evt.oldValue == null && evt.newValue != null) {
         val lookup = evt.newValue
         if (lookup is LookupImpl) {
           VimPlugin.getKey().registerShortcutsForLookup(lookup)
+
+          lookup.addLookupListener(object : com.intellij.codeInsight.lookup.LookupListener {
+            override fun itemSelected(event: LookupEvent) {
+              // VIM-1858
+              KeyHandler.getInstance().partialReset(lookup.editor)
+              lookup.removeLookupListener(this)
+            }
+          })
         }
       }
     }
