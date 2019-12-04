@@ -84,6 +84,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
     val keyStroke = getKeyStroke(e)
     if (editor != null && keyStroke != null) {
       // Workaround for smart step into
+      @Suppress("DEPRECATION")
       val SMART_STEP_INPLACE_DATA = Key.findKeyByName("SMART_STEP_INPLACE_DATA")
       if (SMART_STEP_INPLACE_DATA != null && editor.getUserData(SMART_STEP_INPLACE_DATA) != null) return false
       if (aceJumpActive()) return false
