@@ -173,7 +173,7 @@ public class SearchGroup {
   }
 
   @NotNull
-  private static ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match) {
+  private static ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match, @NotNull Caret caret, int startoff) {
     final Ref<ReplaceConfirmationChoice> result = Ref.create(ReplaceConfirmationChoice.QUIT);
     final Function1<KeyStroke, Boolean> keyStrokeProcessor = key -> {
       final ReplaceConfirmationChoice choice;
@@ -206,6 +206,7 @@ public class SearchGroup {
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
       final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
       exEntryPanel.activate(editor, new EditorDataContext(editor), "Replace with " + match + " (y/n/a/q/l)?", "", 1);
+      MotionGroup.moveCaret(editor, caret, startoff);
       ModalEntry.INSTANCE.activate(keyStrokeProcessor);
       exEntryPanel.deactivate(true, false);
     }
@@ -1248,9 +1249,7 @@ public class SearchGroup {
           boolean doReplace = true;
           if (do_ask) {
             RangeHighlighter hl = highlightConfirm(editor, startoff, endoff);
-            MotionGroup.scrollPositionIntoView(editor, editor.offsetToVisualPosition(startoff), true);
-            MotionGroup.moveCaret(editor, caret, startoff);
-            final ReplaceConfirmationChoice choice = confirmChoice(editor, match);
+            final ReplaceConfirmationChoice choice = confirmChoice(editor, match, caret, startoff);
             editor.getMarkupModel().removeHighlighter(hl);
             switch (choice) {
               case SUBSTITUTE_THIS:
