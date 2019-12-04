@@ -195,6 +195,7 @@ public class SearchGroup {
       return false;
     };
     if (ApplicationManager.getApplication().isUnitTestMode()) {
+      MotionGroup.moveCaret(editor, caret, startoff);
       final TestInputModel inputModel = TestInputModel.getInstance(editor);
       for (KeyStroke key = inputModel.nextKeyStroke(); key != null; key = inputModel.nextKeyStroke()) {
         if (!keyStrokeProcessor.invoke(key)) {
