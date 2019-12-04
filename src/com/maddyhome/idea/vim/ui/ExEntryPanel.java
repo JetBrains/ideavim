@@ -78,6 +78,8 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       new ExShortcutKeyAction(this).registerCustomShortcutSet();
     }
 
+    // [VERSION UPDATE] 193+
+    //noinspection deprecation
     LafManager.getInstance().addLafManagerListener(this);
 
     updateUI();

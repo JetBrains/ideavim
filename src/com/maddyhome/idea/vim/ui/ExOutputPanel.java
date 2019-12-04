@@ -87,6 +87,8 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
 
     final Project project = editor.getProject();
     if (project != null) {
+      // [VERSION UPDATE] 193+
+      //noinspection deprecation
       LafManager.getInstance().addLafManagerListener(this, project);
     }
 
