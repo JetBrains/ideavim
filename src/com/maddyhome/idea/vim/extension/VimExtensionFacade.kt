@@ -43,15 +43,15 @@ import javax.swing.KeyStroke
 object VimExtensionFacade {
   /** The 'map' command for mapping keys to handlers defined in extensions. */
   @JvmStatic
-  fun putExtensionHandlerMapping(modes: MutableSet<MappingMode>, fromKeys: MutableList<KeyStroke>,
+  fun putExtensionHandlerMapping(modes: Set<MappingMode>, fromKeys: List<KeyStroke>,
                                  extensionHandler: VimExtensionHandler, recursive: Boolean) {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, null, extensionHandler, recursive)
   }
 
   /** The 'map' command for mapping keys to other keys. */
   @JvmStatic
-  fun putKeyMapping(modes: MutableSet<MappingMode>, fromKeys: MutableList<KeyStroke>,
-                    toKeys: MutableList<KeyStroke>, recursive: Boolean) {
+  fun putKeyMapping(modes: Set<MappingMode>, fromKeys: List<KeyStroke>,
+                    toKeys: List<KeyStroke>, recursive: Boolean) {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, toKeys, null, recursive)
   }
 
@@ -68,7 +68,7 @@ object VimExtensionFacade {
    * leaves the editor in the insert mode if it's been activated.
    */
   @JvmStatic
-  fun executeNormal(keys: MutableList<KeyStroke>, editor: Editor) {
+  fun executeNormal(keys: List<KeyStroke>, editor: Editor) {
     val context = EditorDataContext(editor)
     keys.forEach { KeyHandler.getInstance().handleKey(editor, it, context) }
   }
@@ -157,14 +157,14 @@ object VimExtensionFacade {
 
   /** Get the current contents of the given register similar to 'getreg()'. */
   @JvmStatic
-  fun getRegister(register: Char): MutableList<KeyStroke>? {
+  fun getRegister(register: Char): List<KeyStroke>? {
     val reg = VimPlugin.getRegister().getRegister(register) ?: return null
     return reg.keys
   }
 
   /** Set the current contents of the given register */
   @JvmStatic
-  fun setRegister(register: Char, keys: MutableList<KeyStroke?>?) {
+  fun setRegister(register: Char, keys: List<KeyStroke?>?) {
     VimPlugin.getRegister().setKeys(register, keys ?: emptyList())
   }
 }
