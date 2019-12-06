@@ -58,6 +58,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -117,7 +118,7 @@ public abstract class VimTestCase extends UsefulTestCase {
   protected void enableExtensions(@NotNull String... extensionNames) {
     for (String name : extensionNames) {
       ToggleOption option = (ToggleOption) OptionsManager.INSTANCE.getOption(name);
-      option.set();
+      Objects.requireNonNull(option).set();
     }
   }
 

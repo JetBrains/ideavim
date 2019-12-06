@@ -46,7 +46,7 @@ public final class KeywordOption extends ListOption {
   public boolean append(@NotNull String val) {
     final List<String> vals = parseVals(val);
     final List<KeywordSpec> specs = valsToValidatedAndReversedSpecs(vals);
-    if (vals == null || specs == null || value == null) {
+    if (vals == null || specs == null) {
       return false;
     }
     value.addAll(vals);
@@ -59,7 +59,7 @@ public final class KeywordOption extends ListOption {
   public boolean prepend(@NotNull String val) {
     final List<String> vals = parseVals(val);
     final List<KeywordSpec> specs = valsToValidatedAndReversedSpecs(vals);
-    if (vals == null || specs == null || value == null) {
+    if (vals == null || specs == null) {
       return false;
     }
     value.addAll(0, vals);
@@ -73,7 +73,7 @@ public final class KeywordOption extends ListOption {
   public boolean remove(@NotNull String val) {
     final List<String> vals = parseVals(val);
     final List<KeywordSpec> specs = valsToValidatedAndReversedSpecs(vals);
-    if (vals == null || specs == null || value == null) {
+    if (vals == null || specs == null) {
       return false;
     }
     value.removeAll(vals);
@@ -94,7 +94,7 @@ public final class KeywordOption extends ListOption {
   public boolean set(@NotNull String val) {
     final List<String> vals = parseVals(val);
     final List<KeywordSpec> specs = valsToValidatedAndReversedSpecs(vals);
-    if (vals == null || specs == null || value == null) {
+    if (vals == null || specs == null) {
       return false;
     }
     value = vals;
@@ -192,12 +192,11 @@ public final class KeywordOption extends ListOption {
   }
 
   public boolean isKeyword(char c) {
-    final int code = (int)c;
-    if (code >= '\u0100') {
+    if ((int)c >= '\u0100') {
       return true;
     }
     for (KeywordSpec spec : keywordSpecs) {
-      if (spec.contains(code)) {
+      if (spec.contains(c)) {
         return !spec.negate();
       }
     }
@@ -218,7 +217,7 @@ public final class KeywordOption extends ListOption {
   }
 
   private static final class KeywordSpec {
-    private String part;
+    private final String part;
     private boolean negate;
     private boolean isRange = false;
     private boolean isAllLetters = false;
@@ -266,7 +265,7 @@ public final class KeywordOption extends ListOption {
         return Integer.parseInt(str); // If we have a number, it represents the Unicode code point of a letter
       }
       else {
-        return (int)str.charAt(0); // If it's not a number we should only have strings consisting of one char
+        return str.charAt(0); // If it's not a number we should only have strings consisting of one char
       }
     }
 

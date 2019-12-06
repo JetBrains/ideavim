@@ -89,20 +89,18 @@ public class RegisterGroup {
 
   public RegisterGroup() {
     final ListOption clipboardOption = OptionsManager.INSTANCE.getClipboard();
-    if (clipboardOption != null) {
-      clipboardOption.addOptionChangeListener(event -> {
-        if (clipboardOption.contains("unnamed")) {
-          defaultRegister = '*';
-        }
-        else if (clipboardOption.contains("unnamedplus")) {
-          defaultRegister = '+';
-        }
-        else {
-          defaultRegister = '"';
-        }
-        lastRegister = defaultRegister;
-      });
-    }
+    clipboardOption.addOptionChangeListener(event -> {
+      if (clipboardOption.contains("unnamed")) {
+        defaultRegister = '*';
+      }
+      else if (clipboardOption.contains("unnamedplus")) {
+        defaultRegister = '+';
+      }
+      else {
+        defaultRegister = '"';
+      }
+      lastRegister = defaultRegister;
+    });
   }
 
   /**

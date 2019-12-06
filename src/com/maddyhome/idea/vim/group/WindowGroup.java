@@ -32,9 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
 
 public class WindowGroup {
@@ -150,15 +148,16 @@ public class WindowGroup {
   @NotNull
   private static FileEditorManagerEx getFileEditorManager(@NotNull DataContext context) {
     final Project project = PlatformDataKeys.PROJECT.getData(context);
-    return FileEditorManagerEx.getInstanceEx(project);
+    return FileEditorManagerEx.getInstanceEx(Objects.requireNonNull(project));
   }
 
   private void splitWindow(int orientation, @NotNull DataContext context, @NotNull String filename) {
     final Project project = PlatformDataKeys.PROJECT.getData(context);
+    if (project == null) return;
     final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
 
     VirtualFile virtualFile = null;
-    if (filename.length() > 0 && project != null) {
+    if (filename.length() > 0) {
       virtualFile = VimPlugin.getFile().findFile(filename, project);
       if (virtualFile == null) {
         VimPlugin.showMessage("Could not find file: " + filename);

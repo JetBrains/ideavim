@@ -343,9 +343,6 @@ public class MotionGroup {
   private VirtualFile markToVirtualFile(@NotNull Mark mark) {
     String protocol = mark.getProtocol();
     VirtualFileSystem fileSystem = VirtualFileManager.getInstance().getFileSystem(protocol);
-    if (mark.getFilename() == null) {
-      return null;
-    }
     return fileSystem.findFileByPath(mark.getFilename());
   }
 
@@ -769,7 +766,7 @@ public class MotionGroup {
       visualLine = EditorHelper.normalizeVisualLine(editor, visualLine + lines);
       EditorHelper.scrollVisualLineToTopOfScreen(editor, visualLine);
     }
-    else if (lines < 0) {
+    else {
       int visualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor);
       visualLine = EditorHelper.normalizeVisualLine(editor, visualLine + lines);
       EditorHelper.scrollVisualLineToBottomOfScreen(editor, visualLine);
@@ -851,7 +848,7 @@ public class MotionGroup {
 
     final LogicalPosition lp = new LogicalPosition(jump.getLogicalLine(), jump.getCol());
     final String fileName = jump.getFilepath();
-    if (!vf.getPath().equals(fileName) && fileName != null) {
+    if (!vf.getPath().equals(fileName)) {
       final VirtualFile newFile =
         LocalFileSystem.getInstance().findFileByPath(fileName.replace(File.separatorChar, '/'));
       if (newFile == null) {
@@ -1238,14 +1235,12 @@ public class MotionGroup {
   private void switchEditorTab(@Nullable EditorWindow editorWindow, int value, boolean absolute) {
     if (editorWindow != null) {
       final EditorTabbedContainer tabbedPane = editorWindow.getTabbedPane();
-      if (tabbedPane != null) {
-        if (absolute) {
-          tabbedPane.setSelectedIndex(value);
-        }
-        else {
-          int tabIndex = (value + tabbedPane.getSelectedIndex()) % tabbedPane.getTabCount();
-          tabbedPane.setSelectedIndex(tabIndex < 0 ? tabIndex + tabbedPane.getTabCount() : tabIndex);
-        }
+      if (absolute) {
+        tabbedPane.setSelectedIndex(value);
+      }
+      else {
+        int tabIndex = (value + tabbedPane.getSelectedIndex()) % tabbedPane.getTabCount();
+        tabbedPane.setSelectedIndex(tabIndex < 0 ? tabIndex + tabbedPane.getTabCount() : tabIndex);
       }
     }
   }

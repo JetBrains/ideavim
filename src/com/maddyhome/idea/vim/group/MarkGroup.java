@@ -297,7 +297,7 @@ public class MarkGroup {
 
     for (int i = 0; i < jumps.size(); i++) {
       Jump j = jumps.get(i);
-      if (filename != null && filename.equals(j.getFilepath()) && j.getLogicalLine() == jump.getLogicalLine()) {
+      if (filename.equals(j.getFilepath()) && j.getLogicalLine() == jump.getLogicalLine()) {
         jumps.remove(i);
         break;
       }
