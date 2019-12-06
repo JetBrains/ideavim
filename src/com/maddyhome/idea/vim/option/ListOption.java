@@ -42,9 +42,6 @@ public class ListOption extends TextOption {
   public String getValue() {
     StringBuilder res = new StringBuilder();
     int cnt = 0;
-    if (value == null) {
-      return "";
-    }
     for (String s : value) {
       if (cnt > 0) {
         res.append(",");
@@ -62,7 +59,7 @@ public class ListOption extends TextOption {
    *
    * @return The option's values
    */
-  @Nullable
+  @NotNull
   public List<String> values() {
     return value;
   }
@@ -75,7 +72,7 @@ public class ListOption extends TextOption {
    */
   public boolean contains(String val) {
     final List<String> vals = parseVals(val);
-    return value != null && vals != null && value.containsAll(vals);
+    return vals != null && value.containsAll(vals);
   }
 
   /**
@@ -138,7 +135,7 @@ public class ListOption extends TextOption {
   }
 
   protected boolean append(@Nullable List<String> vals) {
-    if (vals == null || value == null) {
+    if (vals == null) {
       return false;
     }
 
@@ -149,7 +146,7 @@ public class ListOption extends TextOption {
   }
 
   protected boolean prepend(@Nullable List<String> vals) {
-    if (vals == null || value == null) {
+    if (vals == null) {
       return false;
     }
 
@@ -160,7 +157,7 @@ public class ListOption extends TextOption {
   }
 
   protected boolean remove(@Nullable List<String> vals) {
-    if (vals == null || value == null) {
+    if (vals == null) {
       return false;
     }
 
@@ -224,7 +221,7 @@ public class ListOption extends TextOption {
   }
 
   @NotNull protected final List<String> dflt;
-  @Nullable protected List<String> value;
+  @NotNull protected List<String> value;
   protected final String pattern;
 
   /**
