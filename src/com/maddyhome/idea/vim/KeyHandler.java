@@ -35,7 +35,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
 import com.maddyhome.idea.vim.action.DuplicableOperatorAction;
-import com.maddyhome.idea.vim.action.ExEntryAction;
 import com.maddyhome.idea.vim.action.change.VimRepeater;
 import com.maddyhome.idea.vim.action.macro.ToggleRecordingAction;
 import com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction;
@@ -749,8 +748,7 @@ public class KeyHandler {
 
   private boolean checkArgumentCompatibility(@NotNull CommandNode node) {
     if (currentArg == Argument.Type.MOTION &&
-        node.getActionHolder().getAction().getType() != Command.Type.MOTION &&
-        !(node.getActionHolder().getAction() instanceof ExEntryAction)) {
+        node.getActionHolder().getAction().getType() != Command.Type.MOTION) {
       state = State.BAD_COMMAND;
       return false;
     }
