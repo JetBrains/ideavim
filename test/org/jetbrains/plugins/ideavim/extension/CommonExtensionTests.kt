@@ -71,7 +71,7 @@ class OpMappingTest : VimTestCase() {
   }
 }
 
-class TestExtension : VimNonDisposableExtension() {
+private class TestExtension : VimNonDisposableExtension() {
   override fun getName(): String = "TestExtension"
 
   override fun initOnce() {
