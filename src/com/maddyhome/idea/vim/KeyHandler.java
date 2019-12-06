@@ -214,12 +214,12 @@ public class KeyHandler {
       count = count * 10 + (chKey - '0');
     }
     else if (!waitCommandFinish(editor) && allowKeyMappings && handleKeyMapping(editor, key, context)) {
-      final Argument argument = currentCmd.peek().getArgument();
       if (editorState.getMappingMode() != MappingMode.OP_PENDING ||
-          currentCmd.isEmpty() || argument == null ||
-          argument.getType() != Argument.Type.OFFSETS) {
-            return;
-          }
+          currentCmd.isEmpty() ||
+          currentCmd.peek().getArgument() == null ||
+          Objects.requireNonNull(currentCmd.peek().getArgument()).getType() != Argument.Type.OFFSETS) {
+        return;
+      }
     }
     // Pressing delete while entering a count "removes" the last digit entered
     // Unlike the digits, this must be checked *after* checking for key mappings
