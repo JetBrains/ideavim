@@ -40,7 +40,7 @@ public class ListOption extends TextOption {
   @Override
   @NotNull
   public String getValue() {
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
     int cnt = 0;
     if (value == null) {
       return "";
