@@ -209,12 +209,13 @@ public class ExTextField extends JTextField {
     return super.getText();
   }
 
-  @Nullable
+  @NotNull
   String getActualText() {
     if (actualText != null) {
       return actualText;
     }
-    return super.getText();
+    final String text = super.getText();
+    return text == null ? "" : text;
   }
 
   void setEditor(@NotNull Editor editor, DataContext context) {

@@ -64,7 +64,7 @@ public class ProcessGroup {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true);
 
-    String text = panel.getText() != null ? panel.getText() : "";
+    String text = panel.getText();
     record(editor, text);
     return text;
   }

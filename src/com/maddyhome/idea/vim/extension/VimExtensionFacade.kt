@@ -134,13 +134,13 @@ object VimExtensionFacade {
             false
           }
           key.keyCode == KeyEvent.VK_ENTER -> {
-            text = exEntryPanel.text ?: ""
+            text = exEntryPanel.text
             exEntryPanel.deactivate(true)
             false
           }
           finishOn != null && key.keyChar == finishOn -> {
             exEntryPanel.handleKey(key)
-            text = exEntryPanel.text ?: ""
+            text = exEntryPanel.text
             exEntryPanel.deactivate(true)
             false
           }
