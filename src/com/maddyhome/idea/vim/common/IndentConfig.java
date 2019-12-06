@@ -35,10 +35,6 @@ public class IndentConfig {
       indentOptions = CodeStyle.getIndentOptions(project, editor.getDocument());
     } else {
       indentOptions = CodeStyle.getDefaultSettings().getIndentOptions();
-
-      if(indentOptions == null) {
-        indentOptions = new CommonCodeStyleSettings.IndentOptions();
-      }
     }
 
     return new IndentConfig(indentOptions);

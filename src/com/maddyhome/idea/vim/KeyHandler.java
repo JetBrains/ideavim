@@ -214,10 +214,10 @@ public class KeyHandler {
       count = count * 10 + (chKey - '0');
     }
     else if (!waitCommandFinish(editor) && allowKeyMappings && handleKeyMapping(editor, key, context)) {
+      final Argument argument = currentCmd.peek().getArgument();
       if (editorState.getMappingMode() != MappingMode.OP_PENDING ||
-          currentCmd.isEmpty() ||
-          currentCmd.peek().getArgument() == null ||
-          currentCmd.peek().getArgument().getType() != Argument.Type.OFFSETS) {
+          currentCmd.isEmpty() || argument == null ||
+          argument.getType() != Argument.Type.OFFSETS) {
             return;
           }
     }
