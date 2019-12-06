@@ -147,7 +147,7 @@ public final class CharacterClasses {
   public static boolean isPunct(char ch) {
     return ((ch >= '!' && ch <= '/') ||
             (ch >= ':' && ch <= '@') ||
-            (ch >= '[' && ch <= '\'') ||
+            (ch >= '[' && ch <= '`') ||
             (ch >= '{' && ch <= '~'));
   }
 
