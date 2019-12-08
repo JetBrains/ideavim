@@ -40,16 +40,19 @@ import java.util.stream.Collectors;
 public class CommandState {
   private static final int DEFAULT_TIMEOUT_LENGTH = 1000;
 
+  private static Logger logger = Logger.getInstance(CommandState.class.getName());
+
   @NotNull private final Stack<State> myStates = new Stack<>();
   @NotNull private final State myDefaultState = new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
-  @Nullable private Command myCommand;
   @NotNull private CommandPartNode myCurrentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
   @NotNull private final List<KeyStroke> myMappingKeys = new ArrayList<>();
   @NotNull private final Timer myMappingTimer;
+
+  @Nullable private Command myCommand;
   private EnumSet<CommandFlags> myFlags = EnumSet.noneOf(CommandFlags.class);
   private boolean myIsRecording = false;
-  private static Logger logger = Logger.getInstance(CommandState.class.getName());
   private boolean dotRepeatInProgress = false;
+  private int count = 0;
 
   private CommandState() {
     myMappingTimer = new Timer(DEFAULT_TIMEOUT_LENGTH, null);
@@ -123,6 +126,14 @@ public class CommandState {
   public void setSubMode(@NotNull SubMode submode) {
     currentState().setSubMode(submode);
     updateStatus();
+  }
+
+  public int getCount() {
+    return count;
+  }
+
+  public void setCount(int newCount) {
+    count = newCount;
   }
 
   @NotNull
@@ -223,6 +234,7 @@ public class CommandState {
     myCommand = null;
     myStates.clear();
     updateStatus();
+    count = 0;
   }
 
   /**

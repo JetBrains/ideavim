@@ -210,8 +210,7 @@ public class KeyHandler {
 
     // Check for command count before key mappings - otherwise e.g. ':map 0 ^' breaks command counts that contain a zero
     if (isCommandCount(editorState, chKey)) {
-      // Update the count
-      count = count * 10 + (chKey - '0');
+      editorState.setCount((editorState.getCount() * 10) + (chKey - '0'));
     }
     else if (!waitCommandFinish(editor) && allowKeyMappings && handleKeyMapping(editor, key, context)) {
       if (editorState.getMappingMode() != MappingMode.OP_PENDING ||
@@ -221,14 +220,14 @@ public class KeyHandler {
         return;
       }
     }
-    // Pressing delete while entering a count "removes" the last digit entered
+    // Pressing <DEL> while entering a count "removes" the last digit entered
     // Unlike the digits, this must be checked *after* checking for key mappings
     else if (isDeleteCommandCount(key, editorState)) {
       // "Remove" the last digit sent to us
-      count /= 10;
+      editorState.setCount(editorState.getCount() / 10);
     }
     else if (isEditorReset(key, editorState)) {
-      handleEditorReset(editor, key, context);
+      handleEditorReset(editor, key, context, editorState);
     }
     // If we got this far the user is entering a command or supplying an argument to an entered command.
     // First let's check to see if we are at the point of expecting a single character argument to a command.
@@ -334,8 +333,8 @@ public class KeyHandler {
     return true;
   }
 
-  private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull final DataContext context) {
-    if (count == 0 && currentArg == null && currentCmd.size() == 0) {
+  private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull final DataContext context, CommandState editorState) {
+    if (editorState.getCount() == 0 && currentArg == null && currentCmd.size() == 0) {
       RegisterGroup register = VimPlugin.getRegister();
       if (register.getCurrentRegister() == register.getDefaultRegister()) {
         if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -526,7 +525,7 @@ public class KeyHandler {
            currentArg != Argument.Type.CHARACTER &&
            currentArg != Argument.Type.DIGRAPH &&
            key.getKeyCode() == KeyEvent.VK_DELETE &&
-           count != 0;
+           editorState.getCount() != 0;
   }
 
   private boolean isEditorReset(@NotNull KeyStroke key, @NotNull CommandState editorState) {
@@ -567,7 +566,7 @@ public class KeyHandler {
            currentArg != Argument.Type.CHARACTER &&
            currentArg != Argument.Type.DIGRAPH &&
            Character.isDigit(chKey) &&
-           (count != 0 || chKey != '0');
+           (editorState.getCount() != 0 || chKey != '0');
   }
 
   private boolean handleDigraph(@NotNull Editor editor,
@@ -678,7 +677,7 @@ public class KeyHandler {
                                  CommandState editorState) {
     // The user entered a valid command. Create the command and add it to the stack
     final EditorActionHandlerBase myAction = node.getActionHolder().getAction();
-    Command cmd = new Command(count, myAction, myAction.getType(), myAction.getFlags(), keys);
+    Command cmd = new Command(editorState.getCount(), myAction, myAction.getType(), myAction.getFlags(), keys);
     currentCmd.push(cmd);
 
     if (currentArg != null && !checkArgumentCompatibility(node)) return;
@@ -706,7 +705,7 @@ public class KeyHandler {
       currentCmd.pop();
 
       Argument arg = new Argument(text);
-      cmd = new Command(count, action, action.getType(), action.getFlags(), keys);
+      cmd = new Command(editorState.getCount(), action, action.getType(), action.getFlags(), keys);
       cmd.setArgument(arg);
       currentCmd.push(cmd);
       CommandState.getInstance(editor).popState();
@@ -739,7 +738,7 @@ public class KeyHandler {
       case EX_STRING:
         forwardSearch = !(action instanceof SearchEntryRevAction);
 
-        VimPlugin.getProcess().startSearchCommand(editor, context, count, key);
+        VimPlugin.getProcess().startSearchCommand(editor, context, editorState.getCount(), key);
         state = State.NEW_COMMAND;
         editorState.pushState(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
         currentCmd.pop();
@@ -774,9 +773,9 @@ public class KeyHandler {
    * @param editor The editor to reset.
    */
   public void partialReset(@Nullable Editor editor) {
-    count = 0;
     keys = new ArrayList<>();
     CommandState editorState = CommandState.getInstance(editor);
+    editorState.setCount(0);
     editorState.stopMappingTimer();
     editorState.getMappingKeys().clear();
     editorState.setCurrentNode(VimPlugin.getKey().getKeyRoot(editorState.getMappingMode()));
@@ -922,7 +921,6 @@ public class KeyHandler {
     BAD_COMMAND
   }
 
-  private int count;
   private List<KeyStroke> keys = new ArrayList<>();
   private State state = State.NEW_COMMAND;
   @NotNull private final Stack<Command> currentCmd = new Stack<>();
