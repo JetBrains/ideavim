@@ -32,6 +32,7 @@ usual beta standards.
 * [VIM-1325](https://youtrack.jetbrains.com/issue/VIM-1325)
   [VIM-1050](https://youtrack.jetbrains.com/issue/VIM-1050)
   [VIM-1627](https://youtrack.jetbrains.com/issue/VIM-1627)
+  [VIM-1867](https://youtrack.jetbrains.com/issue/VIM-1867)
   Fix bindings for active lookup
 * [VIM-1845](https://youtrack.jetbrains.com/issue/VIM-1845) Show ActionGroup popups
 * [VIM-1424](https://youtrack.jetbrains.com/issue/VIM-1424) CTRL-A doesn't have any restrictions now
@@ -40,7 +41,6 @@ usual beta standards.
 * [VIM-1853](https://youtrack.jetbrains.com/issue/VIM-1853) Fix marks for disposed projects
 * [VIM-1858](https://youtrack.jetbrains.com/issue/VIM-1858) Fix imap for autocomplete
 * [VIM-1362](https://youtrack.jetbrains.com/issue/VIM-1362) Search with confirm doesn't scroll down far enough
-* [VIM-1867](https://youtrack.jetbrains.com/issue/VIM-1867) Fix left/right keys for lookup
 
 
 0.54, 2019-11-20
