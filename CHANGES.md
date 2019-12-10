@@ -40,6 +40,7 @@ usual beta standards.
 * [VIM-1853](https://youtrack.jetbrains.com/issue/VIM-1853) Fix marks for disposed projects
 * [VIM-1858](https://youtrack.jetbrains.com/issue/VIM-1858) Fix imap for autocomplete
 * [VIM-1362](https://youtrack.jetbrains.com/issue/VIM-1362) Search with confirm doesn't scroll down far enough
+* [VIM-1867](https://youtrack.jetbrains.com/issue/VIM-1867) Fix left/right keys for lookup
 
 
 0.54, 2019-11-20
