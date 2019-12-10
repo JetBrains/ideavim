@@ -208,11 +208,7 @@ public class KeyHandler {
     final boolean isRecording = editorState.isRecording();
     boolean shouldRecord = true;
 
-    // Check for command count before key mappings - otherwise e.g. ':map 0 ^' breaks command counts that contain a zero
-    if (isCommandCount(editorState, chKey)) {
-      editorState.setCount((editorState.getCount() * 10) + (chKey - '0'));
-    }
-    else if (!waitCommandFinish(editor) && allowKeyMappings && handleKeyMapping(editor, key, context)) {
+    if (!waitCommandFinish(editor) && allowKeyMappings && handleKeyMapping(editor, key, context)) {
       if (editorState.getMappingMode() != MappingMode.OP_PENDING ||
           currentCmd.isEmpty() ||
           currentCmd.peek().getArgument() == null ||
@@ -220,10 +216,10 @@ public class KeyHandler {
         return;
       }
     }
-    // Pressing <DEL> while entering a count "removes" the last digit entered
-    // Unlike the digits, this must be checked *after* checking for key mappings
+    else if (isCommandCount(chKey, editorState)) {
+      editorState.setCount((editorState.getCount() * 10) + (chKey - '0'));
+    }
     else if (isDeleteCommandCount(key, editorState)) {
-      // "Remove" the last digit sent to us
       editorState.setCount(editorState.getCount() / 10);
     }
     else if (isEditorReset(key, editorState)) {
@@ -354,6 +350,13 @@ public class KeyHandler {
     if (state == State.CHAR_OR_DIGRAPH) return false;
 
     final CommandState commandState = CommandState.getInstance(editor);
+
+    // "0" can be mapped, but the mapping isn't applied when entering a count. See `:help :map-modes`. Other digits are
+    // always mapped, even when entering a count
+    if (key.getKeyChar() == '0' && commandState.getCount() > 0) {
+      return false;
+    }
+
     commandState.stopMappingTimer();
 
     final MappingMode mappingMode = commandState.getMappingMode();
@@ -560,7 +563,7 @@ public class KeyHandler {
     }
   }
 
-  private boolean isCommandCount(@NotNull CommandState editorState, char chKey) {
+  private boolean isCommandCount(char chKey, @NotNull CommandState editorState) {
     return (editorState.getMode() == CommandState.Mode.COMMAND || editorState.getMode() == CommandState.Mode.VISUAL) &&
            state == State.NEW_COMMAND &&
            currentArg != Argument.Type.CHARACTER &&

@@ -348,4 +348,32 @@ public class MapCommandTest extends VimTestCase {
     typeText(parseKeys("gas"));
     myFixture.checkResult("123<caret>567890");
   }
+
+  public void testMapZero() {
+    configureByText("A quick <caret>brown fox jumps over the lazy dog");
+    typeText(commandToKeys("nmap 0 w"));
+    typeText(parseKeys("0"));
+    assertOffset(14);
+  }
+
+  public void testMapZeroIgnoredInCount() {
+    configureByText("A quick <caret>brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog");
+    typeText(commandToKeys("nmap 0 w"));
+    typeText(parseKeys("10w"));
+    assertOffset(51);
+  }
+
+  public void testMapNonZeroDigit() {
+    configureByText("A quick <caret>brown fox jumps over the lazy dog");
+    typeText(commandToKeys("nmap 2 w"));
+    typeText(parseKeys("2"));
+    assertOffset(14);
+  }
+
+  public void testMapNonZeroDigitNotIncludedInCount() {
+    configureByText("A quick <caret>brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog");
+    typeText(commandToKeys("nmap 2 w"));
+    typeText(parseKeys("92"));
+    assertOffset(45);
+  }
 }
