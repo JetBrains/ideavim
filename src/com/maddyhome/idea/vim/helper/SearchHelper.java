@@ -2165,9 +2165,6 @@ public class SearchHelper {
   @NotNull
   private static String parseOption(@NotNull ListOption option) {
     List<String> vals = option.values();
-    if (vals == null) {
-      return "";
-    }
     StringBuilder res = new StringBuilder();
     for (String s : vals) {
       if (s.length() == 3) {

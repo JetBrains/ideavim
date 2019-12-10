@@ -147,7 +147,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
     }
     // We allow users to set custom keys that will work with lookup in case devs forgot something
     val popupActions = lookupKeys
-    val values = popupActions.values() ?: return false
+    val values = popupActions.values()
     for (value in values) {
       val keys = StringHelper.parseKeys(value)
       if (keys.size >= 1 && keyStroke == keys[0]) {
