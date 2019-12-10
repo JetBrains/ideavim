@@ -240,7 +240,7 @@ public class KeyHandler {
       // return the node matching this keystroke
       Node node = editorState.getCurrentNode().get(key);
 
-      if (handleDigraph(editor, key, context, node)) return;
+      if (handleDigraph(editor, key, context, node, editorState)) return;
 
       node = mapOpCommand(key, node, editorState);
 
@@ -523,6 +523,7 @@ public class KeyHandler {
   }
 
   private boolean isDeleteCommandCount(@NotNull KeyStroke key, @NotNull CommandState editorState) {
+    // See `:help N<Del>`
     return (editorState.getMode() == CommandState.Mode.COMMAND || editorState.getMode() == CommandState.Mode.VISUAL) &&
            state == State.NEW_COMMAND &&
            currentArg != Argument.Type.CHARACTER &&
@@ -575,23 +576,25 @@ public class KeyHandler {
   private boolean handleDigraph(@NotNull Editor editor,
                                 @NotNull KeyStroke key,
                                 @NotNull DataContext context,
-                                @Nullable Node node) {
-    if (digraph == null && !(node instanceof CommandNode) && DigraphSequence.isDigraphStart(key)) {
-      digraph = new DigraphSequence();
+                                @Nullable Node node,
+                                @NotNull CommandState editorState) {
+    DigraphSequence digraphSequence = editorState.getDigraphSequence();
+    if (digraphSequence == null && !(node instanceof CommandNode) && DigraphSequence.isDigraphStart(key)) {
+      digraphSequence = editorState.startDigraphSequence();
     }
-    if (digraph != null) {
-      DigraphSequence.DigraphResult res = digraph.processKey(key, editor);
+    if (digraphSequence != null) {
+      DigraphSequence.DigraphResult res = digraphSequence.processKey(key, editor);
       switch (res.getResult()) {
         case DigraphSequence.DigraphResult.RES_OK:
           return true;
         case DigraphSequence.DigraphResult.RES_BAD:
-          digraph = null;
+          editorState.endDigraphSequence();
           return true;
         case DigraphSequence.DigraphResult.RES_DONE:
           if (currentArg == Argument.Type.DIGRAPH) {
             currentArg = Argument.Type.CHARACTER;
           }
-          digraph = null;
+          editorState.endDigraphSequence();
           final KeyStroke stroke = res.getStroke();
           if (stroke == null) {
             return false;
@@ -728,7 +731,7 @@ public class KeyHandler {
     switch (argument) {
       case CHARACTER:
       case DIGRAPH:
-        digraph = new DigraphSequence();
+        editorState.startDigraphSequence();
         state = State.CHAR_OR_DIGRAPH;
         break;
       case MOTION:
@@ -794,7 +797,7 @@ public class KeyHandler {
     state = State.NEW_COMMAND;
     currentCmd.clear();
     currentArg = null;
-    digraph = null;
+    CommandState.getInstance(editor).endDigraphSequence();
   }
 
   /**
@@ -924,16 +927,17 @@ public class KeyHandler {
     BAD_COMMAND
   }
 
+  private TypedActionHandler origHandler;
+
+  private static KeyHandler instance;
+
+  // TODO: All of this state needs to be per-editor
   private List<KeyStroke> keys = new ArrayList<>();
   private State state = State.NEW_COMMAND;
   @NotNull private final Stack<Command> currentCmd = new Stack<>();
   @Nullable private Argument.Type currentArg;
-  private TypedActionHandler origHandler;
-  @Nullable private DigraphSequence digraph = null;
   private char lastChar;
   private boolean lastWasBS;
 
   private boolean forwardSearch = true;
-
-  private static KeyHandler instance;
 }

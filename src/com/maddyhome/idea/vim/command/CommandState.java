@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.command;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.key.CommandPartNode;
 import com.maddyhome.idea.vim.option.NumberOption;
@@ -37,6 +38,9 @@ import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
+/**
+ * Used to maintain state while entering a Vim command (operator, motion, text object, etc.)
+ */
 public class CommandState {
   private static final int DEFAULT_TIMEOUT_LENGTH = 1000;
 
@@ -51,6 +55,7 @@ public class CommandState {
   @Nullable private Command myCommand;
   private EnumSet<CommandFlags> myFlags = EnumSet.noneOf(CommandFlags.class);
   private boolean myIsRecording = false;
+  private DigraphSequence digraphSequence = null;
   private boolean dotRepeatInProgress = false;
   private int count = 0;
 
@@ -126,6 +131,19 @@ public class CommandState {
   public void setSubMode(@NotNull SubMode submode) {
     currentState().setSubMode(submode);
     updateStatus();
+  }
+
+  public DigraphSequence getDigraphSequence() {
+    return digraphSequence;
+  }
+
+  public DigraphSequence startDigraphSequence() {
+    digraphSequence = new DigraphSequence();
+    return digraphSequence;
+  }
+
+  public void endDigraphSequence() {
+    digraphSequence = null;
   }
 
   public int getCount() {
@@ -234,6 +252,7 @@ public class CommandState {
     myCommand = null;
     myStates.clear();
     updateStatus();
+    digraphSequence = null;
     count = 0;
   }
 
