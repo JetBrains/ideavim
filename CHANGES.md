@@ -19,6 +19,8 @@ usual beta standards.
 [To Be Released]
 --------------
 
+_Available since 0.54.1 EAP:_
+
 **Features:**
 * Surround and Commentary extensions can be repeated with a dot command ([VIM-1118](https://youtrack.jetbrains.com/issue/VIM-1118))
 * Support XDG settings standard ([VIM-664](https://youtrack.jetbrains.com/issue/VIM-664))
