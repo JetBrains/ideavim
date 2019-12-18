@@ -349,13 +349,10 @@ public class KeyHandler {
   private boolean handleKeyMapping(@NotNull final Editor editor,
                                    @NotNull final KeyStroke key,
                                    @NotNull final DataContext context) {
-    if (state == State.CHAR_OR_DIGRAPH) return false;
 
     final CommandState commandState = CommandState.getInstance(editor);
 
-    // "0" can be mapped, but the mapping isn't applied when entering a count. See `:help :map-modes`. Other digits are
-    // always mapped, even when entering a count
-    if (key.getKeyChar() == '0' && commandState.getCount() > 0) {
+    if (state == State.CHAR_OR_DIGRAPH || isMappingDisabledForKey(key, commandState)) {
       return false;
     }
 
@@ -372,29 +369,7 @@ public class KeyHandler {
     final MappingInfo prevMappingInfo = mapping.get(mappingKeys);
     final MappingInfo mappingInfo = currentMappingInfo != null ? currentMappingInfo : prevMappingInfo;
 
-    final Application application = ApplicationManager.getApplication();
-
-    if (mapping.isPrefix(fromKeys)) {
-      // Okay, there is some mapping that starts with inserted key sequence. So,
-      //   either the user will continue to enter the mapping, or (if timeout option is set)
-      //   the entered command should be executed. Here we set up the times that will execute
-      //   typed keys after some delay.
-      // E.g. there is a map for "dweri". If the user types "d", "w" they mean either "dweri" or "dw" command.
-      //   If the user will continue typing "e", "r" and "i", the timer will be cancelled. If the user will
-      //   not type anything, the "dw" command will be executed.
-      mappingKeys.add(key);
-      if (!application.isUnitTestMode() && OptionsManager.INSTANCE.getTimeout().isSet()) {
-        commandState.startMappingTimer(actionEvent -> application.invokeLater(() -> {
-          final KeyStroke firstKey = mappingKeys.get(0);
-          mappingKeys.clear();
-          if (editor.isDisposed() || firstKey.equals(parseKeys("<Plug>").get(0))) {
-            return;
-          }
-          for (KeyStroke keyStroke : fromKeys) {
-            handleKey(editor, keyStroke, new EditorDataContext(editor), false);
-          }
-        }, ModalityState.stateForComponent(editor.getComponent())));
-      }
+    if (handleUnfinishedMappingSequence(editor, mapping, fromKeys, key)) {
       return true;
     }
     else if (mappingInfo != null) {
@@ -522,6 +497,55 @@ public class KeyHandler {
       }
       return true;
     }
+  }
+
+  private boolean isMappingDisabledForKey(@NotNull KeyStroke key, @NotNull CommandState commandState) {
+    // "0" can be mapped, but the mapping isn't applied when entering a count. Other digits are always mapped, even when
+    // entering a count.
+    // See `:help :map-modes`
+    return key.getKeyChar() == '0' && commandState.getCount() > 0;
+  }
+
+  private boolean handleUnfinishedMappingSequence(@NotNull Editor editor,
+                                                  @NotNull KeyMapping mapping,
+                                                  @NotNull List<KeyStroke> currentKeySequence,
+                                                  @NotNull KeyStroke key) {
+    // Is there at least one mapping that starts with the current sequence? E.g. if there is a mapping for "dweri", and
+    // the user has typed "dw"
+    // Note that currentKeySequence is the same as the state after commandState.getMappingKeys().add(key). It would be
+    // nice to tidy ths up
+    if (!mapping.isPrefix(currentKeySequence)) {
+      return false;
+    }
+
+    // Save the unhandled key strokes until we either complete or abandon the sequence.
+    final CommandState commandState = CommandState.getInstance(editor);
+    commandState.getMappingKeys().add(key);
+
+    // If the timeout option is set, set a timer that will abandon the sequence and replay the unhandled keys unmapped.
+    // Every time a key is pressed and handled, the timer is stopped. E.g. if there is a mapping for "dweri", and the
+    // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
+    // delete a word)
+    final Application application = ApplicationManager.getApplication();
+    if (!application.isUnitTestMode() && OptionsManager.INSTANCE.getTimeout().isSet()) {
+      commandState.startMappingTimer(actionEvent -> application.invokeLater(() -> {
+
+        final List<KeyStroke> unhandledKeys = new ArrayList<>(commandState.getMappingKeys());
+        commandState.getMappingKeys().clear();
+
+        // TODO: I'm not sure why we abandon plugin commands here
+        // Would be useful to have a comment or a helpfully named helper method here
+        if (editor.isDisposed() || unhandledKeys.get(0).equals(StringHelper.PlugKeyStroke)) {
+          return;
+        }
+
+        for (KeyStroke keyStroke : unhandledKeys) {
+          handleKey(editor, keyStroke, new EditorDataContext(editor), false);
+        }
+      }, ModalityState.stateForComponent(editor.getComponent())));
+    }
+
+    return true;
   }
 
   private boolean isDeleteCommandCount(@NotNull KeyStroke key, @NotNull CommandState editorState) {
