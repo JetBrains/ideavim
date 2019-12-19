@@ -83,7 +83,7 @@ public final class KeywordOption extends ListOption {
   }
 
   private void initialSet(String[] values) {
-    final List<String> vals = Arrays.asList(values);
+    final List<String> vals = new ArrayList<>(Arrays.asList(values));
     final List<KeywordSpec> specs = valsToReversedSpecs(vals);
     value = vals;
     keywordSpecs = specs;

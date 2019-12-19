@@ -44,6 +44,10 @@ _Available since 0.54.1 EAP:_
 * [VIM-1858](https://youtrack.jetbrains.com/issue/VIM-1858) Fix imap for autocomplete
 * [VIM-1362](https://youtrack.jetbrains.com/issue/VIM-1362) Search with confirm doesn't scroll down far enough
 
+_To Be Released:_
+
+**Fixes:**
+* [VIM-1875](https://youtrack.jetbrains.com/issue/VIM-1875) Fix `isk` in ~/.ideaivmrc 
 
 0.54, 2019-11-20
 --------------
