@@ -217,7 +217,7 @@ public class KeyHandler {
     final boolean isRecording = editorState.isRecording();
     boolean shouldRecord = true;
 
-    if (!waitCommandFinish(editor) && allowKeyMappings && handleKeyMapping(editor, key, context)) {
+    if (allowKeyMappings && handleKeyMapping(editor, key, context)) {
       if (editorState.getMappingMode() != MappingMode.OP_PENDING ||
           currentCmd.isEmpty() ||
           currentCmd.peek().getArgument() == null ||
@@ -300,10 +300,6 @@ public class KeyHandler {
     }
   }
 
-  private boolean waitCommandFinish(@NotNull Editor editor) {
-    return !(CommandState.getInstance(editor).getCurrentNode() instanceof RootNode);
-  }
-
   /**
    * See the description for {@link com.maddyhome.idea.vim.action.DuplicableOperatorAction}
    */
@@ -349,9 +345,11 @@ public class KeyHandler {
                                    @NotNull final KeyStroke key,
                                    @NotNull final DataContext context) {
 
-    final CommandState commandState = CommandState.getInstance(editor);
+   final CommandState commandState = CommandState.getInstance(editor);
 
-    if (state == State.CHAR_OR_DIGRAPH || isMappingDisabledForKey(key, commandState)) {
+    if (state == State.CHAR_OR_DIGRAPH
+      || isBuildingMultiKeyCommand(commandState)
+      || isMappingDisabledForKey(key, commandState)) {
       return false;
     }
 
@@ -370,6 +368,15 @@ public class KeyHandler {
     return handleUnfinishedMappingSequence(editor, mapping, currentlyUnhandledKeySequence, key)
       || handleCompleteMappingSequence(editor, context, mapping, previouslyUnhandledKeySequence, currentlyUnhandledKeySequence, key)
       || handleAbandonedMappingSequence(editor, commandState, context, previouslyUnhandledKeySequence, currentlyUnhandledKeySequence);
+  }
+
+  private boolean isBuildingMultiKeyCommand(CommandState commandState) {
+    // Don't apply mapping if we're in the middle of building a multi-key command.
+    // E.g. given nmap s v, don't try to map <C-W>s to <C-W>v
+    //   Similarly, nmap <C-W>a <C-W>s should not try to map the second <C-W> in <C-W><C-W>
+    // Note that we might still be at RootNode if we're handling a prefix, because we might be buffering keys until we
+    // get a match. This means we'll still process the rest of the keys of the prefix.
+    return !(commandState.getCurrentNode() instanceof RootNode);
   }
 
   private boolean isMappingDisabledForKey(@NotNull KeyStroke key, @NotNull CommandState commandState) {
