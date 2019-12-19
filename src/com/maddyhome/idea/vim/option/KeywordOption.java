@@ -44,19 +44,21 @@ public final class KeywordOption extends ListOption {
 
   @Override
   public boolean append(@NotNull String val) {
+    String oldValue = getValue();
     final List<String> vals = parseVals(val);
     final List<KeywordSpec> specs = valsToValidatedAndReversedSpecs(vals);
     if (vals == null || specs == null) {
       return false;
     }
-    value.addAll(vals);
+    this.value.addAll(vals);
     keywordSpecs.addAll(0, specs);
-    fireOptionChangeEvent();
+    fireOptionChangeEvent(oldValue, getValue());
     return true;
   }
 
   @Override
   public boolean prepend(@NotNull String val) {
+    String oldValue = getValue();
     final List<String> vals = parseVals(val);
     final List<KeywordSpec> specs = valsToValidatedAndReversedSpecs(vals);
     if (vals == null || specs == null) {
@@ -64,13 +66,14 @@ public final class KeywordOption extends ListOption {
     }
     value.addAll(0, vals);
     keywordSpecs.addAll(specs);
-    fireOptionChangeEvent();
+    fireOptionChangeEvent(oldValue, getValue());
     return true;
   }
 
 
   @Override
   public boolean remove(@NotNull String val) {
+    String oldValue = getValue();
     final List<String> vals = parseVals(val);
     final List<KeywordSpec> specs = valsToValidatedAndReversedSpecs(vals);
     if (vals == null || specs == null) {
@@ -78,20 +81,22 @@ public final class KeywordOption extends ListOption {
     }
     value.removeAll(vals);
     keywordSpecs.removeAll(specs);
-    fireOptionChangeEvent();
+    fireOptionChangeEvent(oldValue, getValue());
     return true;
   }
 
   private void initialSet(String[] values) {
+    String oldValue = getValue();
     final List<String> vals = new ArrayList<>(Arrays.asList(values));
     final List<KeywordSpec> specs = valsToReversedSpecs(vals);
     value = vals;
     keywordSpecs = specs;
-    fireOptionChangeEvent();
+    fireOptionChangeEvent(oldValue, getValue());
   }
 
   @Override
   public boolean set(@NotNull String val) {
+    String oldValue = getValue();
     final List<String> vals = parseVals(val);
     final List<KeywordSpec> specs = valsToValidatedAndReversedSpecs(vals);
     if (vals == null || specs == null) {
@@ -99,7 +104,7 @@ public final class KeywordOption extends ListOption {
     }
     value = vals;
     keywordSpecs = specs;
-    fireOptionChangeEvent();
+    fireOptionChangeEvent(oldValue, getValue());
     return true;
   }
 

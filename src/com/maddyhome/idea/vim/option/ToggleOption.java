@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents a boolean option
  */
-public class ToggleOption extends Option {
+public class ToggleOption extends Option<Boolean> {
   /**
    * Creates the option
    *
@@ -38,12 +38,8 @@ public class ToggleOption extends Option {
     this.value = dflt;
   }
 
-  /**
-   * The option's value
-   *
-   * @return The value
-   */
-  public boolean getValue() {
+  @Override
+  public Boolean getValue() {
     return value;
   }
 
@@ -81,7 +77,7 @@ public class ToggleOption extends Option {
     boolean old = value;
     value = val;
     if (val != old) {
-      fireOptionChangeEvent();
+      fireOptionChangeEvent(old, val);
     }
   }
 

@@ -2156,7 +2156,7 @@ public class SearchHelper {
       ListOption lo = OptionsManager.INSTANCE.getMatchpairs();
       pairsChars = parseOption(lo);
 
-      lo.addOptionChangeListener(event -> pairsChars = parseOption((ListOption)event.getOption()));
+      lo.addOptionChangeListener((oldValue, newValue) -> pairsChars = parseOption(lo));
     }
 
     return pairsChars;

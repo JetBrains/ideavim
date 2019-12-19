@@ -27,7 +27,7 @@ import java.util.List;
  * Represents an VIM options that can be set with the :set command. Listeners can be set that are interested in knowing
  * when the value of the option changes.
  */
-public abstract class Option {
+public abstract class Option<T> {
   /**
    * Create the option
    *
@@ -45,7 +45,7 @@ public abstract class Option {
    *
    * @param listener The listener
    */
-  public void addOptionChangeListener(OptionChangeListener listener) {
+  public void addOptionChangeListener(OptionChangeListener<T> listener) {
     listeners.add(listener);
   }
 
@@ -54,7 +54,7 @@ public abstract class Option {
    *
    * @param listener The listener
    */
-  public void removeOptionChangeListener(OptionChangeListener listener) {
+  public void removeOptionChangeListener(OptionChangeListener<T> listener) {
     listeners.remove(listener);
   }
 
@@ -92,14 +92,15 @@ public abstract class Option {
    * Lets all listeners know that the value has changed. Subclasses are responsible for calling this when their
    * value changes.
    */
-  protected void fireOptionChangeEvent() {
-    OptionChangeEvent event = new OptionChangeEvent(this);
-    for (OptionChangeListener listener : listeners) {
-      listener.valueChange(event);
+  protected void fireOptionChangeEvent(T oldValue, T newValue) {
+    for (OptionChangeListener<T> listener : listeners) {
+      listener.valueChange(oldValue, newValue);
     }
   }
 
+  public abstract T getValue();
+
   protected final String name;
   protected final String abbrev;
-  @NotNull protected final List<OptionChangeListener> listeners = new ArrayList<>();
+  @NotNull private final List<OptionChangeListener<T>> listeners = new ArrayList<>();
 }

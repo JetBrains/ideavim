@@ -63,12 +63,12 @@ import java.util.*;
 public class SearchGroup {
   public SearchGroup() {
     final OptionsManager options = OptionsManager.INSTANCE;
-    options.getHlsearch().addOptionChangeListener(event -> {
+    options.getHlsearch().addOptionChangeListener((oldValue, newValue) -> {
       resetShowSearchHighlight();
       forceUpdateSearchHighlights();
     });
 
-    final OptionChangeListener updateHighlightsIfVisible = event -> {
+    final OptionChangeListener<Boolean> updateHighlightsIfVisible = (oldValue, newValue) -> {
       if (showSearchHighlight) {
         forceUpdateSearchHighlights();
       }
