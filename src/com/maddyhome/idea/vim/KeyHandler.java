@@ -66,7 +66,6 @@ import java.util.stream.Collectors;
 
 import static com.intellij.openapi.actionSystem.CommonDataKeys.*;
 import static com.intellij.openapi.actionSystem.PlatformDataKeys.PROJECT_FILE_DIRECTORY;
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 /**
  * This handlers every keystroke that the user can argType except those that are still valid hotkeys for various Idea
@@ -366,49 +365,11 @@ public class KeyHandler {
 
     final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mappingMode);
 
-    if (handleUnfinishedMappingSequence(editor, mapping, currentlyUnhandledKeySequence, key)
-      || handleCompleteMappingSequence(editor, context, mapping, previouslyUnhandledKeySequence, currentlyUnhandledKeySequence, key)) {
-      return true;
-    }
-    else {
-      // If the user enters a command that starts with known mapping, but it is not exactly this mapping,
-      //   mapping handler prevents further processing of there keys.
-      // E.g. if there is a mapping for "hello" and user enters command "help"
-      //   the processing of "h", "e" and "l" will be prevented by this handler.
-      //   However, these keys should be processed as usual when user enters "p"
-      //   and the following for loop does exactly that.
-      //
-      // Okay, look at the code below. Why is the first key handled separately?
-      // Let's assume the next mappings:
-      //   - map ds j
-      //   - map I 2l
-      // If user enters `dI`, the first `d` will be caught be this handler because it's a prefix for `ds` command.
-      //  After the user enters `I`, the caught `d` should be processed without mapping and the rest of keys
-      //  should be processed with mappings (to make I work)
-      //
-      // Additionally, the <Plug>mappings are not executed if the are failed to map to somethings.
-      //   E.g.
-      //   - map <Plug>iA  someAction
-      //   - map I <Plug>i
-      //   For `IA` someAction should be executed.
-      //   But if the user types `Ib`, `<Plug>i` won't be executed again. Only `b` will be passed to keyHandler.
-      if (previouslyUnhandledKeySequence.isEmpty()) return false;
-
-      // Well, this will always be false, but just for protection
-      if (currentlyUnhandledKeySequence.isEmpty()) return false;
-      final List<KeyStroke> unhandledKeys = new ArrayList<>(currentlyUnhandledKeySequence);
-      previouslyUnhandledKeySequence.clear();
-
-      if (unhandledKeys.get(0).equals(parseKeys("<Plug>").get(0))) {
-        handleKey(editor, unhandledKeys.get(unhandledKeys.size() - 1), context);
-      } else {
-        handleKey(editor, unhandledKeys.get(0), context, false);
-        for (KeyStroke keyStroke : unhandledKeys.subList(1, unhandledKeys.size())) {
-          handleKey(editor, keyStroke, context, true);
-        }
-      }
-      return true;
-    }
+    // Returns true if any of these methods handle the key. False means that the key is unrelated to mapping and should
+    // be processed as normal.
+    return handleUnfinishedMappingSequence(editor, mapping, currentlyUnhandledKeySequence, key)
+      || handleCompleteMappingSequence(editor, context, mapping, previouslyUnhandledKeySequence, currentlyUnhandledKeySequence, key)
+      || handleAbandonedMappingSequence(editor, commandState, context, previouslyUnhandledKeySequence, currentlyUnhandledKeySequence);
   }
 
   private boolean isMappingDisabledForKey(@NotNull KeyStroke key, @NotNull CommandState commandState) {
@@ -557,6 +518,51 @@ public class KeyHandler {
     // If we've just evaluated the previous key sequence, make sure to also handle the current key
     if (previousMappingInfo == mappingInfo) {
       handleKey(editor, key, currentContext, true);
+    }
+
+    return true;
+  }
+
+  private boolean handleAbandonedMappingSequence(@NotNull Editor editor,
+                                                 @NotNull CommandState commandState,
+                                                 DataContext context,
+                                                 @NotNull List<KeyStroke> previouslyUnhandledKeySequence,
+                                                 @NotNull List<KeyStroke> currentlyUnhandledKeySequence) {
+
+    // The user has terminated a mapping sequence with an unexpected key
+    // E.g. if there is a mapping for "hello" and user enters command "help" the processing of "h", "e" and "l" will be
+    //   prevented by this handler. Make sure the currently unhandled keys are processed as normal.
+
+    // If there are no previous keys to handle, do nothing
+    if (previouslyUnhandledKeySequence.isEmpty()) {
+      return false;
+    }
+
+    // Okay, look at the code below. Why is the first key handled separately?
+    // Let's assume the next mappings:
+    //   - map ds j
+    //   - map I 2l
+    // If user enters `dI`, the first `d` will be caught be this handler because it's a prefix for `ds` command.
+    //  After the user enters `I`, the caught `d` should be processed without mapping and the rest of keys
+    //  should be processed with mappings (to make I work)
+    //
+    // Additionally, the <Plug>mappings are not executed if the are failed to map to somethings.
+    //   E.g.
+    //   - map <Plug>iA  someAction
+    //   - map I <Plug>i
+    //   For `IA` someAction should be executed.
+    //   But if the user types `Ib`, `<Plug>i` won't be executed again. Only `b` will be passed to keyHandler.
+
+    commandState.getMappingKeys().clear();
+
+    if (currentlyUnhandledKeySequence.get(0).equals(StringHelper.PlugKeyStroke)) {
+      handleKey(editor, currentlyUnhandledKeySequence.get(currentlyUnhandledKeySequence.size() - 1), context, true);
+    } else {
+      handleKey(editor, currentlyUnhandledKeySequence.get(0), context, false);
+
+      for (KeyStroke keyStroke : currentlyUnhandledKeySequence.subList(1, currentlyUnhandledKeySequence.size())) {
+        handleKey(editor, keyStroke, context, true);
+      }
     }
 
     return true;
@@ -930,9 +936,9 @@ public class KeyHandler {
         VimPlugin.getChange().processCommand(editor, cmd);
       }
 
-      // Now that the command has been executed let's clean up a few things.
+      // Now the command has been executed let's clean up a few things.
 
-      // By default the "empty" register is used by all commands so we want to reset whatever the last register
+      // By default, the "empty" register is used by all commands, so we want to reset whatever the last register
       // selected by the user was to the empty register - unless we just executed the "select register" command.
       if (cmd.getType() != Command.Type.SELECT_REGISTER) {
         VimPlugin.getRegister().resetRegister();
@@ -963,8 +969,8 @@ public class KeyHandler {
   private enum State {
     /** Awaiting a new command */
     NEW_COMMAND,
-    // TODO  This should be probably processed in some better way
-    /** Awaiting for char or digraph input. In this mode mappings doesn't work (even for <C-K>) */
+    // TODO: This should be probably processed in some better way
+    /** Awaiting char or digraph input. In this mode mappings doesn't work (even for <C-K>) */
     CHAR_OR_DIGRAPH,
     READY,
     BAD_COMMAND
