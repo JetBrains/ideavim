@@ -50,6 +50,17 @@ public abstract class Option<T> {
   }
 
   /**
+   * Registers an option change listener and fire an event.
+   *
+   * @param listener The listener
+   */
+  public void addOptionChangeListenerAndExecute(OptionChangeListener<T> listener) {
+    addOptionChangeListener(listener);
+    T value = getValue();
+    fireOptionChangeEvent(value, value);
+  }
+
+  /**
    * Removes the listener from the list.
    *
    * @param listener The listener

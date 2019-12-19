@@ -89,7 +89,7 @@ public class RegisterGroup {
 
   public RegisterGroup() {
     final ListOption clipboardOption = OptionsManager.INSTANCE.getClipboard();
-    clipboardOption.addOptionChangeListener((oldValue, newValue) -> {
+    clipboardOption.addOptionChangeListenerAndExecute((oldValue, newValue) -> {
       if (clipboardOption.contains("unnamed")) {
         defaultRegister = '*';
       }

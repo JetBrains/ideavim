@@ -47,7 +47,8 @@ _Available since 0.54.1 EAP:_
 _To Be Released:_
 
 **Fixes:**
-* [VIM-1875](https://youtrack.jetbrains.com/issue/VIM-1875) Fix `isk` in ~/.ideaivmrc 
+* [VIM-1875](https://youtrack.jetbrains.com/issue/VIM-1875) Fix `isk` in `~/.ideaivmrc`
+* [VIM-1874](https://youtrack.jetbrains.com/issue/VIM-1874) Fix `set clipboard=unnamed` execution from `~/.ideavimrc`
 
 0.54, 2019-11-20
 --------------

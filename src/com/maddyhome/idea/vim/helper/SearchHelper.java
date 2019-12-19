@@ -2154,9 +2154,7 @@ public class SearchHelper {
   private static String getPairChars() {
     if (pairsChars == null) {
       ListOption lo = OptionsManager.INSTANCE.getMatchpairs();
-      pairsChars = parseOption(lo);
-
-      lo.addOptionChangeListener((oldValue, newValue) -> pairsChars = parseOption(lo));
+      lo.addOptionChangeListenerAndExecute((oldValue, newValue) -> pairsChars = parseOption(lo));
     }
 
     return pairsChars;
