@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
 public class VimScriptParser {
   public static final String VIMRC_FILE_NAME = "ideavimrc";
   public static final String[] HOME_VIMRC_PATHS = {"." + VIMRC_FILE_NAME, "_" + VIMRC_FILE_NAME};
-  public static final String XDG_VIMRC_PATH = "ideavim" + File.pathSeparator + VIMRC_FILE_NAME;
+  public static final String XDG_VIMRC_PATH = "ideavim" + File.separator + VIMRC_FILE_NAME;
   public static final int BUFSIZE = 4096;
   private static final Pattern EOL_SPLIT_PATTERN = Pattern.compile(" *(\r\n|\n)+ *");
   private static final Pattern DOUBLE_QUOTED_STRING = Pattern.compile("\"([^\"]*)\"");
@@ -55,7 +55,6 @@ public class VimScriptParser {
   @Nullable
   public static File findIdeaVimRc() {
     final String homeDirName = System.getProperty("user.home");
-
     // Check whether file exists in home dir
     if (homeDirName != null) {
       for (String fileName : HOME_VIMRC_PATHS) {
