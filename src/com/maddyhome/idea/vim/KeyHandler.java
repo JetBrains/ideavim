@@ -360,102 +360,14 @@ public class KeyHandler {
 
     final MappingMode mappingMode = commandState.getMappingMode();
 
-    final List<KeyStroke> mappingKeys = commandState.getMappingKeys();
-    final List<KeyStroke> fromKeys = new ArrayList<>(mappingKeys);
-    fromKeys.add(key);
+    final List<KeyStroke> previouslyUnhandledKeySequence = commandState.getMappingKeys();
+    final List<KeyStroke> currentlyUnhandledKeySequence = new ArrayList<>(previouslyUnhandledKeySequence);
+    currentlyUnhandledKeySequence.add(key);
 
     final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mappingMode);
-    final MappingInfo currentMappingInfo = mapping.get(fromKeys);
-    final MappingInfo prevMappingInfo = mapping.get(mappingKeys);
-    final MappingInfo mappingInfo = currentMappingInfo != null ? currentMappingInfo : prevMappingInfo;
 
-    if (handleUnfinishedMappingSequence(editor, mapping, fromKeys, key)) {
-      return true;
-    }
-    else if (mappingInfo != null) {
-      // Okay, there is a mapping for the entered key sequence
-      //   now the another key sequence should be executed, or the handler that attached to this command
-      mappingKeys.clear();
-
-      final List<KeyStroke> toKeys = mappingInfo.getToKeys();
-      final VimExtensionHandler extensionHandler = mappingInfo.getExtensionHandler();
-      final EditorDataContext currentContext = new EditorDataContext(editor);
-      if (toKeys != null) {
-        // Here is a mapping to another key sequence
-        final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), toKeys);
-        boolean first = true;
-        for (KeyStroke keyStroke : toKeys) {
-          final boolean recursive = mappingInfo.isRecursive() && !(first && fromIsPrefix);
-          handleKey(editor, keyStroke, currentContext, recursive);
-          first = false;
-        }
-      }
-      else if (extensionHandler != null) {
-        // Here is a mapping to some vim handler
-        final CommandProcessor processor = CommandProcessor.getInstance();
-        final boolean isPendingMode = CommandState.getInstance(editor).getMappingMode() == MappingMode.OP_PENDING;
-        Map<Caret, Integer> startOffsets =
-          editor.getCaretModel().getAllCarets().stream().collect(Collectors.toMap(Function.identity(), Caret::getOffset));
-
-        if (extensionHandler.isRepeatable()) {
-          VimRepeater.Extension.INSTANCE.clean();
-        }
-        processor.executeCommand(editor.getProject(), () -> extensionHandler.execute(editor, context),
-                                 "Vim " + extensionHandler.getClass().getSimpleName(), null);
-
-        if (extensionHandler.isRepeatable()) {
-          VimRepeater.Extension.INSTANCE.setLastExtensionHandler(extensionHandler);
-          VimRepeater.Extension.INSTANCE.setArgumentCaptured(null);
-          VimRepeater.INSTANCE.setRepeatHandler(true);
-        }
-        if (isPendingMode &&
-            !currentCmd.isEmpty() &&
-            currentCmd.peek().getArgument() == null) {
-          Map<Caret, VimSelection> offsets = new HashMap<>();
-
-          for (Caret caret : editor.getCaretModel().getAllCarets()) {
-            @Nullable Integer startOffset = startOffsets.get(caret);
-            if (caret.hasSelection()) {
-              final VimSelection vimSelection = VimSelection.Companion
-                .create(UserDataManager.getVimSelectionStart(caret), caret.getOffset(),
-                        SelectionType.fromSubMode(CommandStateHelper.getSubMode(editor)), editor);
-              offsets.put(caret, vimSelection);
-              commandState.popState();
-            }
-            else if (startOffset != null && startOffset != caret.getOffset()) {
-              // Command line motions are always characterwise exclusive
-              int endOffset = caret.getOffset();
-              if (startOffset < endOffset) {
-                endOffset -= 1;
-              } else {
-                startOffset -= 1;
-              }
-              final VimSelection vimSelection = VimSelection.Companion
-                .create(startOffset, endOffset, SelectionType.CHARACTER_WISE, editor);
-              offsets.put(caret, vimSelection);
-
-              try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
-                // Move caret to the initial offset for better undo action
-                //  This is not a necessary thing, but without it undo action look less convenient
-                editor.getCaretModel().moveToOffset(startOffset);
-              }
-            }
-          }
-
-          if (!offsets.isEmpty()) {
-            currentCmd.peek().setArgument(new Argument(offsets));
-            state = State.READY;
-          }
-        }
-      }
-
-      // NB: mappingInfo MUST be non-null here, so if equal
-      //  then prevMappingInfo is also non-null; this also
-      //  means that the prev mapping was a prefix, but the
-      //  next key typed (`key`) was not part of that
-      if (prevMappingInfo == mappingInfo) {
-        handleKey(editor, key, currentContext);
-      }
+    if (handleUnfinishedMappingSequence(editor, mapping, currentlyUnhandledKeySequence, key)
+      || handleCompleteMappingSequence(editor, context, mapping, previouslyUnhandledKeySequence, currentlyUnhandledKeySequence, key)) {
       return true;
     }
     else {
@@ -480,12 +392,12 @@ public class KeyHandler {
       //   - map I <Plug>i
       //   For `IA` someAction should be executed.
       //   But if the user types `Ib`, `<Plug>i` won't be executed again. Only `b` will be passed to keyHandler.
-      if (mappingKeys.isEmpty()) return false;
+      if (previouslyUnhandledKeySequence.isEmpty()) return false;
 
       // Well, this will always be false, but just for protection
-      if (fromKeys.isEmpty()) return false;
-      final List<KeyStroke> unhandledKeys = new ArrayList<>(fromKeys);
-      mappingKeys.clear();
+      if (currentlyUnhandledKeySequence.isEmpty()) return false;
+      final List<KeyStroke> unhandledKeys = new ArrayList<>(currentlyUnhandledKeySequence);
+      previouslyUnhandledKeySequence.clear();
 
       if (unhandledKeys.get(0).equals(parseKeys("<Plug>").get(0))) {
         handleKey(editor, unhandledKeys.get(unhandledKeys.size() - 1), context);
@@ -508,13 +420,14 @@ public class KeyHandler {
 
   private boolean handleUnfinishedMappingSequence(@NotNull Editor editor,
                                                   @NotNull KeyMapping mapping,
-                                                  @NotNull List<KeyStroke> currentKeySequence,
+                                                  @NotNull List<KeyStroke> currentlyUnhandledKeySequence,
                                                   @NotNull KeyStroke key) {
-    // Is there at least one mapping that starts with the current sequence? E.g. if there is a mapping for "dweri", and
-    // the user has typed "dw"
-    // Note that currentKeySequence is the same as the state after commandState.getMappingKeys().add(key). It would be
-    // nice to tidy ths up
-    if (!mapping.isPrefix(currentKeySequence)) {
+    // Is there at least one mapping that starts with the current sequence? This does not include complete matches,
+    // unless a sequence is also a prefix for another mapping. We eagerly evaluate the shortest mapping, so even if a
+    // mapping is a prefix, it will get evaluated when the next character is entered.
+    // Note that currentlyUnhandledKeySequence is the same as the state after commandState.getMappingKeys().add(key). It
+    // would be nice to tidy ths up
+    if (!mapping.isPrefix(currentlyUnhandledKeySequence)) {
       return false;
     }
 
@@ -543,6 +456,107 @@ public class KeyHandler {
           handleKey(editor, keyStroke, new EditorDataContext(editor), false);
         }
       }, ModalityState.stateForComponent(editor.getComponent())));
+    }
+
+    return true;
+  }
+
+  private boolean handleCompleteMappingSequence(@NotNull Editor editor,
+                                                DataContext context, @NotNull KeyMapping mapping,
+                                                @NotNull List<KeyStroke> previouslyUnhandledKeySequence,
+                                                @NotNull List<KeyStroke> currentlyUnhandledKeySequence, KeyStroke key) {
+
+    // If the current sequence is a complete mapping, then evaluate it. If not, check if the previous sequence was a
+    // mapping which was also a prefix, and evaluate it if so.
+    final MappingInfo previousMappingInfo = mapping.get(previouslyUnhandledKeySequence);
+    final MappingInfo currentMappingInfo = mapping.get(currentlyUnhandledKeySequence);
+    final MappingInfo mappingInfo = currentMappingInfo != null ? currentMappingInfo : previousMappingInfo;
+
+    if (mappingInfo == null) {
+      return false;
+    }
+
+    final CommandState commandState = CommandState.getInstance(editor);
+    commandState.getMappingKeys().clear();
+
+    final EditorDataContext currentContext = new EditorDataContext(editor);
+
+    final List<KeyStroke> toKeys = mappingInfo.getToKeys();
+    final VimExtensionHandler extensionHandler = mappingInfo.getExtensionHandler();
+
+    if (toKeys != null) {
+      final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), toKeys);
+      boolean first = true;
+      for (KeyStroke keyStroke : toKeys) {
+        final boolean recursive = mappingInfo.isRecursive() && !(first && fromIsPrefix);
+        handleKey(editor, keyStroke, currentContext, recursive);
+        first = false;
+      }
+    }
+    else if (extensionHandler != null) {
+      final CommandProcessor processor = CommandProcessor.getInstance();
+      final boolean isPendingMode = CommandState.getInstance(editor).getMappingMode() == MappingMode.OP_PENDING;
+
+      Map<Caret, Integer> startOffsets =
+        editor.getCaretModel().getAllCarets().stream().collect(Collectors.toMap(Function.identity(), Caret::getOffset));
+
+      if (extensionHandler.isRepeatable()) {
+        VimRepeater.Extension.INSTANCE.clean();
+      }
+
+      processor.executeCommand(editor.getProject(), () -> extensionHandler.execute(editor, context),
+        "Vim " + extensionHandler.getClass().getSimpleName(), null);
+
+      if (extensionHandler.isRepeatable()) {
+        VimRepeater.Extension.INSTANCE.setLastExtensionHandler(extensionHandler);
+        VimRepeater.Extension.INSTANCE.setArgumentCaptured(null);
+        VimRepeater.INSTANCE.setRepeatHandler(true);
+      }
+
+      if (isPendingMode &&
+        !currentCmd.isEmpty() &&
+        currentCmd.peek().getArgument() == null) {
+        Map<Caret, VimSelection> offsets = new HashMap<>();
+
+        for (Caret caret : editor.getCaretModel().getAllCarets()) {
+          @Nullable Integer startOffset = startOffsets.get(caret);
+          if (caret.hasSelection()) {
+            final VimSelection vimSelection = VimSelection.Companion
+              .create(UserDataManager.getVimSelectionStart(caret), caret.getOffset(),
+                SelectionType.fromSubMode(CommandStateHelper.getSubMode(editor)), editor);
+            offsets.put(caret, vimSelection);
+            commandState.popState();
+          }
+          else if (startOffset != null && startOffset != caret.getOffset()) {
+            // Command line motions are always characterwise exclusive
+            int endOffset = caret.getOffset();
+            if (startOffset < endOffset) {
+              endOffset -= 1;
+            } else {
+              startOffset -= 1;
+            }
+            final VimSelection vimSelection = VimSelection.Companion
+              .create(startOffset, endOffset, SelectionType.CHARACTER_WISE, editor);
+            offsets.put(caret, vimSelection);
+
+            try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
+              // Move caret to the initial offset for better undo action
+              //  This is not a necessary thing, but without it undo action look less convenient
+              editor.getCaretModel().moveToOffset(startOffset);
+            }
+          }
+        }
+
+        if (!offsets.isEmpty()) {
+          currentCmd.peek().setArgument(new Argument(offsets));
+          state = State.READY;
+        }
+      }
+    }
+
+    // If we've just evaluated the previous key sequence, make sure to also handle the current key
+    if (previousMappingInfo == mappingInfo) {
+      handleKey(editor, key, currentContext, true);
     }
 
     return true;
