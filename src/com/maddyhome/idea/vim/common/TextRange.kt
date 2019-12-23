@@ -15,119 +15,93 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.common
 
-package com.maddyhome.idea.vim.common;
-
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Contract
+import kotlin.math.max
+import kotlin.math.min
 
 /**
- * Please prefer {@link com.maddyhome.idea.vim.group.visual.VimSelection} for visual selection
+ * Please prefer [com.maddyhome.idea.vim.group.visual.VimSelection] for visual selection
  */
-public class TextRange {
-  @Contract(pure = true)
-  public TextRange(int start, int end) {
-    this(new int[]{start}, new int[]{end});
-  }
+class TextRange(val startOffsets: IntArray, val endOffsets: IntArray) {
+  constructor(start: Int, end: Int) : this(intArrayOf(start), intArrayOf(end))
 
-  @Contract(pure = true)
-  public TextRange(int[] starts, int[] ends) {
-    this.starts = starts;
-    this.ends = ends;
-  }
+  val isMultiple
+    get() = startOffsets.size > 1
 
-  public boolean isMultiple() {
-    return starts != null && starts.length > 1;
-  }
-
-  public int getMaxLength() {
-    int max = 0;
-    for (int i = 0; i < size(); i++) {
-      max = Math.max(max, getEndOffsets()[i] - getStartOffsets()[i]);
+  val maxLength: Int
+    get() {
+      var max = 0
+      for (i in 0 until size()) {
+        max = max(max, endOffsets[i] - startOffsets[i])
+      }
+      return max
     }
 
-    return max;
-  }
-
-  public int getSelectionCount() {
-    int res = 0;
-    for (int i = 0; i < size(); i++) {
-      res += getEndOffsets()[i] - getStartOffsets()[i];
+  val selectionCount: Int
+    get() {
+      var res = 0
+      for (i in 0 until size()) {
+        res += endOffsets[i] - startOffsets[i]
+      }
+      return res
     }
 
-    return res;
+  fun size(): Int = startOffsets.size
+
+  val startOffset: Int
+    get() = startOffsets.first()
+
+  val endOffset: Int
+    get() = endOffsets.last()
+
+  fun normalize(): TextRange {
+    normalizeIndex(0)
+    return this
   }
 
-  public int size() {
-    return starts.length;
-  }
-
-  public int getStartOffset() {
-    return starts[0];
-  }
-
-  public int getEndOffset() {
-    return ends[ends.length - 1];
-  }
-
-  public int[] getStartOffsets() {
-    return starts;
-  }
-
-  public int[] getEndOffsets() {
-    return ends;
-  }
-
-  @NotNull
-  public TextRange normalize() {
-    normalizeIndex(0);
-    return this;
-  }
-
-  private void normalizeIndex(final int index) {
-    if (index < size() && ends[index] < starts[index]) {
-      int t = starts[index];
-      starts[index] = ends[index];
-      ends[index] = t;
+  private fun normalizeIndex(index: Int) {
+    if (index < size() && endOffsets[index] < startOffsets[index]) {
+      val t = startOffsets[index]
+      startOffsets[index] = endOffsets[index]
+      endOffsets[index] = t
     }
   }
 
   @Contract(mutates = "this")
-  public boolean normalize(final int fileSize) {
-    for (int i = 0; i < size(); i++) {
-      normalizeIndex(i);
-      starts[i] = Math.max(0, Math.min(starts[i], fileSize));
-      if (starts[i] == fileSize && fileSize != 0) {
-        return false;
+  fun normalize(fileSize: Int): Boolean {
+    for (i in 0 until size()) {
+      normalizeIndex(i)
+      startOffsets[i] = max(0, min(startOffsets[i], fileSize))
+      if (startOffsets[i] == fileSize && fileSize != 0) {
+        return false
       }
-      ends[i] = Math.max(0, Math.min(ends[i], fileSize));
+      endOffsets[i] = max(0, min(endOffsets[i], fileSize))
     }
-    return true;
+    return true
   }
 
-  public boolean contains(final int offset) {
-    if (isMultiple()) {
-      return false;
-    }
-    return this.getStartOffset() <= offset && offset < this.getEndOffset();
-  }
+  operator fun contains(offset: Int): Boolean = if (isMultiple) false else offset in startOffset until endOffset
 
-  @NotNull
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append("TextRange");
-    sb.append("{starts=").append(starts == null ? "null" : "");
-    for (int i = 0; starts != null && i < starts.length; ++i) {
-      sb.append(i == 0 ? "" : ", ").append(starts[i]);
-    }
-    sb.append(", ends=").append(ends == null ? "null" : "");
-    for (int i = 0; ends != null && i < ends.length; ++i) {
-      sb.append(i == 0 ? "" : ", ").append(ends[i]);
-    }
-    sb.append('}');
-    return sb.toString();
-  }
+  override fun toString(): String {
+    val sb = StringBuilder()
+    sb.append("TextRange")
+    sb.append("{starts=")
 
-  private final int[] starts;
-  private final int[] ends;
+    var i = 0
+    while (i < startOffsets.size) {
+      sb.append(if (i == 0) "" else ", ").append(startOffsets[i])
+      ++i
+    }
+
+    sb.append(", ends=")
+    i = 0
+    while (i < endOffsets.size) {
+      sb.append(if (i == 0) "" else ", ").append(endOffsets[i])
+      ++i
+    }
+    sb.append('}')
+    return sb.toString()
+  }
 }

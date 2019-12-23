@@ -1,76 +1,49 @@
-package com.maddyhome.idea.vim.common;
+package com.maddyhome.idea.vim.common
 
-import com.intellij.application.options.CodeStyle;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
+import com.intellij.application.options.CodeStyle
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.project.Project
+import com.intellij.psi.codeStyle.CommonCodeStyleSettings.IndentOptions
 
-public class IndentConfig {
+class IndentConfig private constructor(indentOptions: IndentOptions) {
+  private val indentSize = indentOptions.INDENT_SIZE
+  private val tabSize = indentOptions.TAB_SIZE
+  private val isUseTabs = indentOptions.USE_TAB_CHARACTER
 
-  private final int indentSize;
-  private final int tabSize;
-  private final boolean useTabs;
+  fun getTotalIndent(count: Int): Int = indentSize * count
 
-  private IndentConfig(CommonCodeStyleSettings.IndentOptions indentOptions) {
-    this.indentSize = indentOptions.INDENT_SIZE;
-    this.tabSize = indentOptions.TAB_SIZE;
-    this.useTabs = indentOptions.USE_TAB_CHARACTER;
-  }
+  fun createIndentByCount(count: Int): String = createIndentBySize(getTotalIndent(count))
 
-  public static IndentConfig create(Editor editor) {
-    return create(editor, editor.getProject());
-  }
-
-  public static IndentConfig create(Editor editor, DataContext context) {
-    return create(editor, PlatformDataKeys.PROJECT.getData(context));
-  }
-
-  public static IndentConfig create(Editor editor, Project project) {
-    CommonCodeStyleSettings.IndentOptions indentOptions;
-
-    if(project != null) {
-      indentOptions = CodeStyle.getIndentOptions(project, editor.getDocument());
+  fun createIndentBySize(size: Int): String {
+    val tabCount: Int
+    val spaceCount: Int
+    if (isUseTabs) {
+      tabCount = size / tabSize
+      spaceCount = size % tabSize
     } else {
-      indentOptions = CodeStyle.getDefaultSettings().getIndentOptions();
+      tabCount = 0
+      spaceCount = size
+    }
+    return "\t".repeat(tabCount) + " ".repeat(spaceCount)
+  }
+
+  companion object {
+    @JvmStatic
+    fun create(editor: Editor, context: DataContext): IndentConfig {
+      return create(editor, PlatformDataKeys.PROJECT.getData(context))
     }
 
-    return new IndentConfig(indentOptions);
-  }
-
-  public int getIndentSize() {
-    return indentSize;
-  }
-
-  public int getTabSize() {
-    return tabSize;
-  }
-
-  public boolean isUseTabs() {
-    return useTabs;
-  }
-
-  public int getTotalIndent(int count) {
-    return indentSize * count;
-  }
-
-  public String createIndentByCount(int count) {
-    return createIndentBySize(getTotalIndent(count));
-  }
-
-  public String createIndentBySize(int size) {
-    final int tabCount;
-    final int spaceCount;
-    if (useTabs) {
-      tabCount = size / tabSize;
-      spaceCount = size % tabSize;
+    @JvmStatic
+    @JvmOverloads
+    fun create(editor: Editor, project: Project? = editor.project): IndentConfig {
+      val indentOptions = if (project != null) {
+        CodeStyle.getIndentOptions(project, editor.document)
+      } else {
+        CodeStyle.getDefaultSettings().indentOptions
+      }
+      return IndentConfig(indentOptions)
     }
-    else {
-      tabCount = 0;
-      spaceCount = size;
-    }
-    return StringUtil.repeat("\t", tabCount) + StringUtil.repeat(" ", spaceCount);
   }
 }

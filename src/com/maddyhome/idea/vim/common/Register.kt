@@ -15,107 +15,61 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.common
 
-package com.maddyhome.idea.vim.common;
+import com.intellij.codeInsight.editorActions.TextBlockTransferableData
+import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.helper.StringHelper
+import java.awt.event.KeyEvent
+import java.util.*
+import javax.swing.KeyStroke
 
-import com.intellij.codeInsight.editorActions.TextBlockTransferableData;
-import com.maddyhome.idea.vim.command.SelectionType;
-import com.maddyhome.idea.vim.helper.StringHelper;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+class Register {
+  var name: Char
+  val type: SelectionType
+  val keys: MutableList<KeyStroke>
+  val transferableData: MutableList<out TextBlockTransferableData>
 
-import javax.swing.*;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
-/**
- * Represents a register.
- */
-public class Register {
-  private char name;
-  @NotNull private final SelectionType type;
-  @NotNull private final List<KeyStroke> keys;
-  @NotNull private List<? extends TextBlockTransferableData> transferableData = new ArrayList<>();
-
-  public Register(char name, @NotNull SelectionType type, @NotNull List<KeyStroke> keys) {
-    this.name = name;
-    this.type = type;
-    this.keys = keys;
+  constructor(name: Char, type: SelectionType, keys: MutableList<KeyStroke>) {
+    this.name = name
+    this.type = type
+    this.keys = keys
+    this.transferableData = mutableListOf()
   }
 
-  public Register(char name, @NotNull SelectionType type, @NotNull String text, @NotNull List<? extends TextBlockTransferableData> transferableData) {
-    this.name = name;
-    this.type = type;
-    this.keys = StringHelper.stringToKeys(text);
-    this.transferableData = transferableData;
+  constructor(name: Char, type: SelectionType, text: String, transferableData: MutableList<out TextBlockTransferableData>) {
+    this.name = name
+    this.type = type
+    this.keys = StringHelper.stringToKeys(text)
+    this.transferableData = transferableData
   }
 
-  public void rename(char name) {
-    this.name = name;
-  }
-
-  /**
-   * Get the name the register is assigned to.
-   */
-  public char getName() {
-    return name;
-  }
-
-  @NotNull
-  public List<? extends TextBlockTransferableData> getTransferableData() {
-    return transferableData;
-  }
-
-  /**
-   * Get the register type.
-   */
-  @NotNull
-  public SelectionType getType() {
-    return type;
-  }
-
-  /**
-   * Get the text in the register.
-   */
-  @Nullable
-  public String getText() {
-    final StringBuilder builder = new StringBuilder();
-    for (KeyStroke key : keys) {
-      final char c = key.getKeyChar();
-      if (c == KeyEvent.CHAR_UNDEFINED) {
-        return null;
+  val text: String?
+    get() {
+      val builder = StringBuilder()
+      for (key in keys) {
+        val c = key.keyChar
+        if (c == KeyEvent.CHAR_UNDEFINED) {
+          return null
+        }
+        builder.append(c)
       }
-      builder.append(c);
+      return builder.toString()
     }
-    return builder.toString();
-  }
-
-  /**
-   * Get the sequence of keys in the register.
-   */
-  @NotNull
-  public List<KeyStroke> getKeys() {
-    return keys;
-  }
 
   /**
    * Append the supplied text to any existing text.
    */
-  public void addTextAndResetTransferableData(@NotNull String text) {
-    addKeys(StringHelper.stringToKeys(text));
-    transferableData.clear();
+  fun addTextAndResetTransferableData(text: String) {
+    addKeys(StringHelper.stringToKeys(text))
+    transferableData.clear()
   }
 
-  public void addKeys(@NotNull List<KeyStroke> keys) {
-    this.keys.addAll(keys);
+  fun addKeys(keys: List<KeyStroke>) {
+    this.keys.addAll(keys)
   }
 
-  public static class KeySorter implements Comparator<Register> {
-    @Override
-    public int compare(@NotNull Register o1, @NotNull Register o2) {
-      return Character.compare(o1.name, o2.name);
-    }
+  object KeySorter : Comparator<Register> {
+    override fun compare(o1: Register, o2: Register): Int = o1.name.compareTo(o2.name)
   }
 }
