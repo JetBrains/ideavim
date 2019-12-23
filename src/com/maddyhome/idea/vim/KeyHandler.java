@@ -345,7 +345,8 @@ public class KeyHandler {
                                    @NotNull final KeyStroke key,
                                    @NotNull final DataContext context) {
 
-   final CommandState commandState = CommandState.getInstance(editor);
+    final CommandState commandState = CommandState.getInstance(editor);
+    final MappingState mappingState = commandState.getMappingState();
 
     if (state == State.CHAR_OR_DIGRAPH
       || isBuildingMultiKeyCommand(commandState)
@@ -353,21 +354,18 @@ public class KeyHandler {
       return false;
     }
 
-    commandState.stopMappingTimer();
+    mappingState.stopMappingTimer();
 
-    final MappingMode mappingMode = commandState.getMappingMode();
+    // Save the unhandled key strokes until we either complete or abandon the sequence.
+    mappingState.addKey(key);
 
-    final List<KeyStroke> previouslyUnhandledKeySequence = commandState.getMappingKeys();
-    final List<KeyStroke> currentlyUnhandledKeySequence = new ArrayList<>(previouslyUnhandledKeySequence);
-    currentlyUnhandledKeySequence.add(key);
-
-    final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mappingMode);
+    final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(commandState.getMappingMode());
 
     // Returns true if any of these methods handle the key. False means that the key is unrelated to mapping and should
     // be processed as normal.
-    return handleUnfinishedMappingSequence(editor, mapping, currentlyUnhandledKeySequence, key)
-      || handleCompleteMappingSequence(editor, context, mapping, previouslyUnhandledKeySequence, currentlyUnhandledKeySequence, key)
-      || handleAbandonedMappingSequence(editor, commandState, context, previouslyUnhandledKeySequence, currentlyUnhandledKeySequence);
+    return handleUnfinishedMappingSequence(editor, mappingState, mapping)
+      || handleCompleteMappingSequence(editor, context, commandState, mappingState, mapping, key)
+      || handleAbandonedMappingSequence(editor, mappingState, context);
   }
 
   private boolean isBuildingMultiKeyCommand(CommandState commandState) {
@@ -387,21 +385,16 @@ public class KeyHandler {
   }
 
   private boolean handleUnfinishedMappingSequence(@NotNull Editor editor,
-                                                  @NotNull KeyMapping mapping,
-                                                  @NotNull List<KeyStroke> currentlyUnhandledKeySequence,
-                                                  @NotNull KeyStroke key) {
+                                                  @NotNull MappingState mappingState,
+                                                  @NotNull KeyMapping mapping) {
     // Is there at least one mapping that starts with the current sequence? This does not include complete matches,
     // unless a sequence is also a prefix for another mapping. We eagerly evaluate the shortest mapping, so even if a
     // mapping is a prefix, it will get evaluated when the next character is entered.
     // Note that currentlyUnhandledKeySequence is the same as the state after commandState.getMappingKeys().add(key). It
     // would be nice to tidy ths up
-    if (!mapping.isPrefix(currentlyUnhandledKeySequence)) {
+    if (!mapping.isPrefix(mappingState.getKeys())) {
       return false;
     }
-
-    // Save the unhandled key strokes until we either complete or abandon the sequence.
-    final CommandState commandState = CommandState.getInstance(editor);
-    commandState.getMappingKeys().add(key);
 
     // If the timeout option is set, set a timer that will abandon the sequence and replay the unhandled keys unmapped.
     // Every time a key is pressed and handled, the timer is stopped. E.g. if there is a mapping for "dweri", and the
@@ -409,10 +402,9 @@ public class KeyHandler {
     // delete a word)
     final Application application = ApplicationManager.getApplication();
     if (!application.isUnitTestMode() && OptionsManager.INSTANCE.getTimeout().isSet()) {
-      commandState.startMappingTimer(actionEvent -> application.invokeLater(() -> {
+      mappingState.startMappingTimer(actionEvent -> application.invokeLater(() -> {
 
-        final List<KeyStroke> unhandledKeys = new ArrayList<>(commandState.getMappingKeys());
-        commandState.getMappingKeys().clear();
+        final List<KeyStroke> unhandledKeys = mappingState.detachKeys();
 
         // TODO: I'm not sure why we abandon plugin commands here
         // Would be useful to have a comment or a helpfully named helper method here
@@ -430,22 +422,39 @@ public class KeyHandler {
   }
 
   private boolean handleCompleteMappingSequence(@NotNull Editor editor,
-                                                DataContext context, @NotNull KeyMapping mapping,
-                                                @NotNull List<KeyStroke> previouslyUnhandledKeySequence,
-                                                @NotNull List<KeyStroke> currentlyUnhandledKeySequence, KeyStroke key) {
+                                                @NotNull DataContext context,
+                                                @NotNull CommandState commandState,
+                                                @NotNull MappingState mappingState,
+                                                @NotNull KeyMapping mapping,
+                                                KeyStroke key) {
 
-    // If the current sequence is a complete mapping, then evaluate it. If not, check if the previous sequence was a
-    // mapping which was also a prefix, and evaluate it if so.
-    final MappingInfo previousMappingInfo = mapping.get(previouslyUnhandledKeySequence);
-    final MappingInfo currentMappingInfo = mapping.get(currentlyUnhandledKeySequence);
-    final MappingInfo mappingInfo = currentMappingInfo != null ? currentMappingInfo : previousMappingInfo;
+    // The current sequence isn't a prefix, check to see if it's a completed sequence.
+    final MappingInfo currentMappingInfo = mapping.get(mappingState.getKeys());
+    MappingInfo mappingInfo = currentMappingInfo;
+    if (mappingInfo == null) {
+      // It's an abandoned sequence, check to see if the previous sequence was a complete sequence.
+      // TODO: This is incorrect behaviour
+      // What about sequences that were completed N keys ago?
+      // This should really be handled as part of an abandoned key sequence. We should also consolidate the replay
+      // of cached keys - this happens in timeout, here and also in abandoned sequences.
+      // Extract most of this method into handleMappingInfo. If we have a complete sequence, call it and we're done.
+      // If it's not a complete sequence, handleAbandonedMappingSequence should do something like call
+      // mappingState.detachKeys and look for the longest complete sequence in the returned list, evaluate it, and then
+      // replay any keys not yet handled. NB: The actual implementation should be compared to Vim behaviour to see what
+      // should actually happen.
+      final ArrayList<KeyStroke> previouslyUnhandledKeySequence = new ArrayList<>();
+      mappingState.getKeys().forEach(previouslyUnhandledKeySequence::add);
+      if (previouslyUnhandledKeySequence.size() > 1) {
+        previouslyUnhandledKeySequence.remove(previouslyUnhandledKeySequence.size() - 1);
+        mappingInfo = mapping.get(previouslyUnhandledKeySequence);
+      }
+    }
 
     if (mappingInfo == null) {
       return false;
     }
 
-    final CommandState commandState = CommandState.getInstance(editor);
-    commandState.getMappingKeys().clear();
+    mappingState.clearKeys();
 
     final EditorDataContext currentContext = new EditorDataContext(editor);
 
@@ -523,7 +532,7 @@ public class KeyHandler {
     }
 
     // If we've just evaluated the previous key sequence, make sure to also handle the current key
-    if (previousMappingInfo == mappingInfo) {
+    if (mappingInfo != currentMappingInfo) {
       handleKey(editor, key, currentContext, true);
     }
 
@@ -531,17 +540,17 @@ public class KeyHandler {
   }
 
   private boolean handleAbandonedMappingSequence(@NotNull Editor editor,
-                                                 @NotNull CommandState commandState,
-                                                 DataContext context,
-                                                 @NotNull List<KeyStroke> previouslyUnhandledKeySequence,
-                                                 @NotNull List<KeyStroke> currentlyUnhandledKeySequence) {
+                                                 @NotNull MappingState mappingState,
+                                                 DataContext context) {
 
     // The user has terminated a mapping sequence with an unexpected key
     // E.g. if there is a mapping for "hello" and user enters command "help" the processing of "h", "e" and "l" will be
     //   prevented by this handler. Make sure the currently unhandled keys are processed as normal.
 
-    // If there are no previous keys to handle, do nothing
-    if (previouslyUnhandledKeySequence.isEmpty()) {
+    final List<KeyStroke> unhandledKeyStrokes = mappingState.detachKeys();
+
+    // If there is only the current key to handle, do nothing
+    if (unhandledKeyStrokes.size() == 1) {
       return false;
     }
 
@@ -560,14 +569,12 @@ public class KeyHandler {
     //   For `IA` someAction should be executed.
     //   But if the user types `Ib`, `<Plug>i` won't be executed again. Only `b` will be passed to keyHandler.
 
-    commandState.getMappingKeys().clear();
-
-    if (currentlyUnhandledKeySequence.get(0).equals(StringHelper.PlugKeyStroke)) {
-      handleKey(editor, currentlyUnhandledKeySequence.get(currentlyUnhandledKeySequence.size() - 1), context, true);
+    if (unhandledKeyStrokes.get(0).equals(StringHelper.PlugKeyStroke)) {
+      handleKey(editor, unhandledKeyStrokes.get(unhandledKeyStrokes.size() - 1), context, true);
     } else {
-      handleKey(editor, currentlyUnhandledKeySequence.get(0), context, false);
+      handleKey(editor, unhandledKeyStrokes.get(0), context, false);
 
-      for (KeyStroke keyStroke : currentlyUnhandledKeySequence.subList(1, currentlyUnhandledKeySequence.size())) {
+      for (KeyStroke keyStroke : unhandledKeyStrokes.subList(1, unhandledKeyStrokes.size())) {
         handleKey(editor, keyStroke, context, true);
       }
     }
@@ -839,8 +846,7 @@ public class KeyHandler {
   public void partialReset(@Nullable Editor editor) {
     CommandState editorState = CommandState.getInstance(editor);
     editorState.setCount(0);
-    editorState.stopMappingTimer();
-    editorState.getMappingKeys().clear();
+    editorState.getMappingState().reset();
     editorState.getKeys().clear();
     editorState.setCurrentNode(VimPlugin.getKey().getKeyRoot(editorState.getMappingMode()));
   }

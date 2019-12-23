@@ -25,14 +25,12 @@ import com.maddyhome.idea.vim.helper.DigraphResult;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.key.CommandPartNode;
-import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -43,16 +41,14 @@ import java.util.stream.Collectors;
  * Used to maintain state while entering a Vim command (operator, motion, text object, etc.)
  */
 public class CommandState {
-  private static final int DEFAULT_TIMEOUT_LENGTH = 1000;
-
   private static Logger logger = Logger.getInstance(CommandState.class.getName());
+
+  @NotNull private final MappingState mappingState = new MappingState();
 
   @NotNull private final Stack<State> myStates = new Stack<>();
   @NotNull private final State myDefaultState = new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
   @NotNull private CommandPartNode myCurrentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
   @Nullable private Argument.Type myCurrentArgumentType;
-  @NotNull private final Timer myMappingTimer;
-  @NotNull private final List<KeyStroke> myMappingKeys = new ArrayList<>();
   private boolean myIsRecording = false;
 
   /**
@@ -68,8 +64,6 @@ public class CommandState {
   private int count = 0;
 
   private CommandState() {
-    myMappingTimer = new Timer(DEFAULT_TIMEOUT_LENGTH, null);
-    myMappingTimer.setRepeats(false);
     myStates.push(new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL));
   }
 
@@ -87,6 +81,11 @@ public class CommandState {
     }
 
     return res;
+  }
+
+  @NotNull
+  public MappingState getMappingState() {
+    return mappingState;
   }
 
   @Nullable
@@ -162,30 +161,12 @@ public class CommandState {
   }
 
   @NotNull
-  public List<KeyStroke> getMappingKeys() {
-    return myMappingKeys;
-  }
-
   public List<KeyStroke> getKeys() {
     return keys;
   }
 
   public void addKey(KeyStroke keyStroke) {
     keys.add(keyStroke);
-  }
-
-  public void startMappingTimer(@NotNull ActionListener actionListener) {
-    final NumberOption timeoutLength = OptionsManager.INSTANCE.getTimeoutlen();
-    myMappingTimer.setInitialDelay(timeoutLength.value());
-    for (ActionListener listener : myMappingTimer.getActionListeners()) {
-      myMappingTimer.removeActionListener(listener);
-    }
-    myMappingTimer.addActionListener(actionListener);
-    myMappingTimer.start();
-  }
-
-  public void stopMappingTimer() {
-    myMappingTimer.stop();
   }
 
   @NotNull

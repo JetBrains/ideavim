@@ -51,7 +51,10 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
   }
 
   @Nullable
-  public MappingInfo get(@NotNull List<KeyStroke> keys) {
+  public MappingInfo get(@NotNull Iterable<KeyStroke> keys) {
+    // Having a parameter of Iterable allows for a nicer API, because we know when a given list is immutable.
+    // TODO: Should we change this to be a trie?
+    assert (keys instanceof List) : "keys must be of type List<KeyStroke>";
     return myKeys.get(keys);
   }
 
@@ -80,7 +83,10 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
     }
   }
 
-  public boolean isPrefix(@NotNull List<KeyStroke> keys) {
+  public boolean isPrefix(@NotNull Iterable<KeyStroke> keys) {
+    // Having a parameter of Iterable allows for a nicer API, because we know when a given list is immutable.
+    // Perhaps we should look at changing this to a trie or something?
+    assert (keys instanceof List) : "keys must be of type List<KeyStroke>";
     return myPrefixes.contains(keys);
   }
 }
