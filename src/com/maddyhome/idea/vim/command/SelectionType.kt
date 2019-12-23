@@ -15,77 +15,49 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.command
 
-package com.maddyhome.idea.vim.command;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.util.EnumSet;
+import com.maddyhome.idea.vim.command.CommandState.SubMode
+import java.util.*
 
 /**
  * @author vlan
  */
-public enum SelectionType {
+enum class SelectionType(val value: Int) {
   // Integer values for registers serialization in RegisterGroup.readData()
-  LINE_WISE(1 << 1),
-  CHARACTER_WISE(1 << 2),
-  BLOCK_WISE(1 << 3);
+  LINE_WISE(1 shl 1),
+  CHARACTER_WISE(1 shl 2),
+  BLOCK_WISE(1 shl 3);
 
-  SelectionType(int value) {
-    this.value = value;
+  fun toSubMode() = when (this) {
+    LINE_WISE -> SubMode.VISUAL_LINE
+    CHARACTER_WISE -> SubMode.VISUAL_CHARACTER
+    BLOCK_WISE -> SubMode.VISUAL_BLOCK
   }
 
-  private final int value;
-
-  public int getValue() {
-    return value;
-  }
-
-  @NotNull
-  public static SelectionType fromValue(int value) {
-    for (SelectionType type : SelectionType.values()) {
-      if (type.getValue() == value) {
-        return type;
+  companion object {
+    @JvmStatic
+    fun fromValue(value: Int): SelectionType {
+      for (type in values()) {
+        if (type.value == value) {
+          return type
+        }
       }
+      return CHARACTER_WISE
     }
-    return CHARACTER_WISE;
-  }
 
-  @NotNull
-  public static SelectionType fromSubMode(@NotNull CommandState.SubMode subMode) {
-    switch (subMode) {
-      case VISUAL_LINE:
-        return LINE_WISE;
-      case VISUAL_BLOCK:
-        return BLOCK_WISE;
-      default:
-        return CHARACTER_WISE;
+    @JvmStatic
+    fun fromSubMode(subMode: SubMode): SelectionType = when (subMode) {
+      SubMode.VISUAL_LINE -> LINE_WISE
+      SubMode.VISUAL_BLOCK -> BLOCK_WISE
+      else -> CHARACTER_WISE
     }
-  }
 
-  @NotNull
-  public CommandState.SubMode toSubMode() {
-    switch (this) {
-      case LINE_WISE:
-        return CommandState.SubMode.VISUAL_LINE;
-      case CHARACTER_WISE:
-        return CommandState.SubMode.VISUAL_CHARACTER;
-      case BLOCK_WISE:
-        return CommandState.SubMode.VISUAL_BLOCK;
-      default:
-        return CommandState.SubMode.VISUAL_CHARACTER;
-    }
-  }
-
-  public static SelectionType fromCommandFlags(EnumSet<CommandFlags> flags) {
-    if (flags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
-      return SelectionType.LINE_WISE;
-    }
-    else if (flags.contains(CommandFlags.FLAG_MOT_BLOCKWISE)) {
-      return SelectionType.BLOCK_WISE;
-    }
-    else {
-      return SelectionType.CHARACTER_WISE;
+    @JvmStatic
+    fun fromCommandFlags(flags: EnumSet<CommandFlags>) = when {
+      CommandFlags.FLAG_MOT_LINEWISE in flags -> LINE_WISE
+      CommandFlags.FLAG_MOT_BLOCKWISE in flags -> BLOCK_WISE
+      else -> CHARACTER_WISE
     }
   }
 }
