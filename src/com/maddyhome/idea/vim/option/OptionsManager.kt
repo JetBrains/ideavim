@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.isBlockCaret
 import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import org.jetbrains.annotations.Contract
 import java.util.*
@@ -466,6 +467,13 @@ object IdeaRefactorMode {
       if (!editor.mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
         SelectionVimListenerSuppressor.lock().use {
           editor.selectionModel.removeSelection()
+        }
+      }
+      if (editor.mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
+        val autodetectedSubmode = VimPlugin.getVisualMotion().autodetectVisualSubmode(editor)
+        if (editor.subMode != autodetectedSubmode) {
+          // Update the submode
+          editor.subMode = autodetectedSubmode
         }
       }
 

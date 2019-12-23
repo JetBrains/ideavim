@@ -20,10 +20,14 @@
 
 package org.jetbrains.plugins.ideavim.group.visual
 
+import com.intellij.codeInsight.template.TemplateManager
+import com.intellij.codeInsight.template.impl.ConstantNode
+import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.SelectModeOptionData
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
@@ -31,6 +35,7 @@ import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 import org.jetbrains.plugins.ideavim.VimTestOptionType
+import org.jetbrains.plugins.ideavim.waitAndAssert
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
 
 /**
@@ -648,5 +653,58 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     myFixture.editor.selectionModel.setSelection(5, 10)
 
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [""]))
+  fun `test control selection from line to char visual modes`() {
+    configureByText("""
+            A Discovery
+
+            I ${c}found it in a legendary land
+            all rocks and lavender and tufted grass,
+        """.trimIndent())
+    typeText(parseKeys("V"))
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+
+    myFixture.editor.selectionModel.setSelection(2, 5)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+
+    waitAndAssert { myFixture.editor.subMode == CommandState.SubMode.VISUAL_CHARACTER }
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [""]))
+  fun `test control selection from line to char visual modes in keep mode`() {
+    configureByText("""
+            A Discovery
+
+            I ${c}found it in a legendary land
+            all rocks and lavender and tufted grass,
+        """.trimIndent())
+
+    startDummyTemplate()
+
+    typeText(parseKeys("V"))
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+
+    myFixture.editor.selectionModel.setSelection(2, 5)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+
+    waitAndAssert { myFixture.editor.subMode == CommandState.SubMode.VISUAL_CHARACTER }
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
+  }
+
+  private fun startDummyTemplate() {
+    TemplateManagerImpl.setTemplateTesting(myFixture.testRootDisposable)
+    val templateManager = TemplateManager.getInstance(myFixture.project)
+    val createdTemplate = templateManager.createTemplate("", "")
+    createdTemplate.addVariable(ConstantNode("1"), true)
+    templateManager.startTemplate(myFixture.editor, createdTemplate)
   }
 }
