@@ -50,6 +50,7 @@ _To Be Released:_
 * [VIM-1875](https://youtrack.jetbrains.com/issue/VIM-1875) Fix `isk` in `~/.ideaivmrc`
 * [VIM-1874](https://youtrack.jetbrains.com/issue/VIM-1874) Fix `set clipboard=unnamed` execution from `~/.ideavimrc`
 * [VIM-1878](https://youtrack.jetbrains.com/issue/VIM-1878) Fix `c` command after extract method action
+* [VIM-1884](https://youtrack.jetbrains.com/issue/VIM-1884) Show quickDoc during popup with `CTRL-J`
 
 0.54, 2019-11-20
 --------------
