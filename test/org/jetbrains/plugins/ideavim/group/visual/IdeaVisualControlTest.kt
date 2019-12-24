@@ -20,9 +20,6 @@
 
 package org.jetbrains.plugins.ideavim.group.visual
 
-import com.intellij.codeInsight.template.TemplateManager
-import com.intellij.codeInsight.template.impl.ConstantNode
-import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
@@ -676,6 +673,9 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     assertCaretsColour()
   }
 
+
+/*
+  // [VERSION UPDATE] 191+ Open this test
   @VimOptionTestConfiguration(VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [""]))
   fun `test control selection from line to char visual modes in keep mode`() {
     configureByText("""
@@ -707,4 +707,5 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     createdTemplate.addVariable(ConstantNode("1"), true)
     templateManager.startTemplate(myFixture.editor, createdTemplate)
   }
+*/
 }
