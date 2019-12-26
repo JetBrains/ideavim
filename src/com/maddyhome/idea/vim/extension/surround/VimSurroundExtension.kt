@@ -15,40 +15,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.extension.surround
 
-package com.maddyhome.idea.vim.extension.surround;
-
-import com.google.common.collect.ImmutableMap;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.application.WriteAction;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.util.Pair;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.command.SelectionType;
-import com.maddyhome.idea.vim.common.Mark;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.extension.VimExtensionHandler;
-import com.maddyhome.idea.vim.extension.VimNonDisposableExtension;
-import com.maddyhome.idea.vim.group.ChangeGroup;
-import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.key.OperatorFunction;
-import com.maddyhome.idea.vim.option.ClipboardOptionsData;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormal
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegister
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.inputKeyStroke
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.inputString
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
+import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.extension.VimNonDisposableExtension
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.option.ClipboardOptionsData.IdeaputDisabler
+import java.awt.event.KeyEvent
+import javax.swing.KeyStroke
 
 /**
  * Port of vim-surround.
@@ -58,300 +51,206 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
  * @author dhleong
  * @author vlan
  */
-public class VimSurroundExtension extends VimNonDisposableExtension {
+class VimSurroundExtension : VimNonDisposableExtension() {
+  override fun getName() = "surround"
 
-  private static final char REGISTER = '"';
-  private final static Pattern tagNameAndAttributesCapturePattern = Pattern.compile("(\\w+)([^>]*)>");
+  override fun initOnce() {
+    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>YSurround"), YSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>CSurround"), CSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>DSurround"), DSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.XO, StringHelper.parseKeys("<Plug>VSurround"), VSurroundHandler(), false)
 
-  private static final Map<Character, Pair<String, String>> SURROUND_PAIRS = ImmutableMap.<Character, Pair<String, String>>builder()
-    .put('b', Pair.create("(", ")"))
-    .put('(', Pair.create("( ", " )"))
-    .put(')', Pair.create("(", ")"))
-    .put('B', Pair.create("{", "}"))
-    .put('{', Pair.create("{ ", " }"))
-    .put('}', Pair.create("{", "}"))
-    .put('r', Pair.create("[", "]"))
-    .put('[', Pair.create("[ ", " ]"))
-    .put(']', Pair.create("[", "]"))
-    .put('a', Pair.create("<", ">"))
-    .put('>', Pair.create("<", ">"))
-    .put('s', Pair.create(" ", ""))
-    .build();
-
-  @NotNull
-  @Override
-  public String getName() {
-    return "surround";
+    putKeyMapping(MappingMode.N, StringHelper.parseKeys("ys"), StringHelper.parseKeys("<Plug>YSurround"), true)
+    putKeyMapping(MappingMode.N, StringHelper.parseKeys("cs"), StringHelper.parseKeys("<Plug>CSurround"), true)
+    putKeyMapping(MappingMode.N, StringHelper.parseKeys("ds"), StringHelper.parseKeys("<Plug>DSurround"), true)
+    putKeyMapping(MappingMode.XO, StringHelper.parseKeys("S"), StringHelper.parseKeys("<Plug>VSurround"), true)
   }
 
-  @Override
-  protected void initOnce() {
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>YSurround"), new YSurroundHandler(), false);
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>CSurround"), new CSurroundHandler(), false);
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>DSurround"), new DSurroundHandler(), false);
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>VSurround"), new VSurroundHandler(), false);
+  private class YSurroundHandler : VimExtensionHandler {
+    override fun isRepeatable() = true
 
-    putKeyMapping(MappingMode.N, parseKeys("ys"), parseKeys("<Plug>YSurround"), true);
-    putKeyMapping(MappingMode.N, parseKeys("cs"), parseKeys("<Plug>CSurround"), true);
-    putKeyMapping(MappingMode.N, parseKeys("ds"), parseKeys("<Plug>DSurround"), true);
-    putKeyMapping(MappingMode.XO, parseKeys("S"), parseKeys("<Plug>VSurround"), true);
-  }
-
-  @Nullable
-  private static Pair<String, String> getSurroundPair(char c) {
-    if (SURROUND_PAIRS.containsKey(c)) {
-      return SURROUND_PAIRS.get(c);
-    }
-    else if (!Character.isLetter(c)) {
-      final String s = String.valueOf(c);
-      return Pair.create(s, s);
-    }
-    else {
-      return null;
+    override fun execute(editor: Editor, context: DataContext) {
+      setOperatorFunction(Operator())
+      executeNormal(StringHelper.parseKeys("g@"), editor)
     }
   }
 
-  @Nullable
-  private static Pair<String, String> inputTagPair(@NotNull Editor editor) {
-    final String tagInput = inputString(editor, "<", '>');
-    final Matcher matcher = tagNameAndAttributesCapturePattern.matcher(tagInput);
-
-    if (matcher.find()) {
-      final String tagName = matcher.group(1);
-      final String tagAttributes = matcher.group(2);
-      return Pair.create("<" + tagName + tagAttributes + ">", "</" + tagName + ">");
-    }
-    else {
-      return null;
-    }
-  }
-
-  @Nullable
-  private static Pair<String, String> inputFunctionName(
-    @NotNull Editor editor,
-    boolean withInternalSpaces
-  ) {
-    final String functionNameInput = inputString(editor, "function: ", null);
-
-    if (functionNameInput.isEmpty()) {
-      return null;
-    }
-
-    return withInternalSpaces
-      ? Pair.create(functionNameInput + "( ", " )")
-      : Pair.create(functionNameInput + "(", ")");
-  }
-
-  @Nullable
-  private static Pair<String, String> getOrInputPair(char c, @NotNull Editor editor) {
-    switch (c) {
-      case '<':
-      case 't':
-        return inputTagPair(editor);
-      case 'f':
-        return inputFunctionName(editor, false);
-      case 'F':
-        return inputFunctionName(editor, true);
-      default:
-        return getSurroundPair(c);
-    }
-  }
-
-  private static char getChar(@NotNull Editor editor) {
-    final KeyStroke key = inputKeyStroke(editor);
-    final char keyChar = key.getKeyChar();
-    if (keyChar == KeyEvent.CHAR_UNDEFINED || keyChar == KeyEvent.VK_ESCAPE) {
-      return 0;
-    }
-    return keyChar;
-  }
-
-  private static class YSurroundHandler implements VimExtensionHandler {
-    @Override
-    public boolean isRepeatable() {
-      return true;
-    }
-
-    @Override
-    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      setOperatorFunction(new Operator());
-      executeNormal(parseKeys("g@"), editor);
-    }
-  }
-
-  private static class VSurroundHandler implements VimExtensionHandler {
-    @Override
-    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      int selectionStart = editor.getCaretModel().getPrimaryCaret().getSelectionStart();
+  private class VSurroundHandler : VimExtensionHandler {
+    override fun execute(editor: Editor, context: DataContext) {
+      val selectionStart = editor.caretModel.primaryCaret.selectionStart
       // NB: Operator ignores SelectionType anyway
-      if (!new Operator().apply(editor, context, SelectionType.CHARACTER_WISE)) {
-        return;
+      if (!Operator().apply(editor, context, SelectionType.CHARACTER_WISE)) {
+        return
       }
-
-      WriteAction.run(() -> {
+      runWriteAction {
         // Leave visual mode
-        executeNormal(parseKeys("<Esc>"), editor);
-        editor.getCaretModel().moveToOffset(selectionStart);
-      });
-    }
-
-  }
-
-  private static class CSurroundHandler implements VimExtensionHandler {
-    @Override
-    public boolean isRepeatable() {
-      return true;
-    }
-
-    @Override
-    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      final char charFrom = getChar(editor);
-      if (charFrom == 0) {
-        return;
-      }
-
-      final char charTo = getChar(editor);
-      if (charTo == 0) {
-        return;
-      }
-
-      Pair<String, String> newSurround = getOrInputPair(charTo, editor);
-      if (newSurround == null) {
-        return;
-      }
-
-      WriteAction.run(() -> change(editor, charFrom, newSurround));
-    }
-
-    static void change(@NotNull Editor editor, char charFrom, @Nullable Pair<String, String> newSurround) {
-      // We take over the " register, so preserve it
-      final List<KeyStroke> oldValue = getRegister(REGISTER);
-
-      // Extract the inner value
-      perform("di" + pick(charFrom), editor);
-      List<KeyStroke> innerValue = getRegister(REGISTER);
-      if (innerValue == null) {
-        innerValue = new ArrayList<>();
-      } else {
-        innerValue = new ArrayList<>(innerValue);
-      }
-
-      // Delete the surrounding
-      perform("da" + pick(charFrom), editor);
-
-      // Insert the surrounding characters and paste
-      if (newSurround != null) {
-        innerValue.addAll(0, parseKeys(escape(newSurround.first)));
-        innerValue.addAll(parseKeys(escape(newSurround.second)));
-      }
-      pasteSurround(innerValue, editor);
-
-      // Restore the old value
-      setRegister(REGISTER, oldValue);
-
-      // Jump back to start
-      executeNormal(parseKeys("`["), editor);
-    }
-
-    @NotNull
-    private static String escape(@NotNull String sequence) {
-      return sequence.replace("<", "\\<");
-    }
-
-    private static void perform(@NotNull String sequence, @NotNull Editor editor) {
-      try (ClipboardOptionsData.IdeaputDisabler ignored = new ClipboardOptionsData.IdeaputDisabler()) {
-        executeNormal(parseKeys("\"" + REGISTER + sequence), editor);
-      }
-    }
-
-    private static void pasteSurround(@NotNull List<KeyStroke> innerValue, @NotNull Editor editor) {
-      // This logic is direct from vim-surround
-      final int offset = editor.getCaretModel().getOffset();
-      final int lineEndOffset = EditorHelper.getLineEndForOffset(editor, offset);
-
-      final Mark motionEndMark = VimPlugin.getMark().getMark(editor, ']');
-      final int motionEndOffset;
-      if (motionEndMark != null) {
-        motionEndOffset = EditorHelper.getOffset(editor, motionEndMark.getLogicalLine(), motionEndMark.getCol());
-      }
-      else {
-        motionEndOffset = -1;
-      }
-      final String pasteCommand = motionEndOffset == lineEndOffset && offset + 1 == lineEndOffset ? "p" : "P";
-      setRegister(REGISTER, innerValue);
-      perform(pasteCommand, editor);
-    }
-
-    private static char pick(char charFrom) {
-      switch (charFrom) {
-        case 'a': return '>';
-        case 'r': return ']';
-        default: return charFrom;
+        executeNormal(StringHelper.parseKeys("<Esc>"), editor)
+        editor.caretModel.moveToOffset(selectionStart)
       }
     }
   }
 
-  private static class DSurroundHandler implements VimExtensionHandler {
-    @Override
-    public boolean isRepeatable() {
-      return true;
+  private class CSurroundHandler : VimExtensionHandler {
+    override fun isRepeatable() = true
+
+    override fun execute(editor: Editor, context: DataContext) {
+      val charFrom = getChar(editor)
+      if (charFrom.toInt() == 0) return
+
+      val charTo = getChar(editor)
+      if (charTo.toInt() == 0) return
+
+      val newSurround = getOrInputPair(charTo, editor) ?: return
+      runWriteAction { change(editor, charFrom, newSurround) }
     }
 
-    @Override
-    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      // Deleting surround is just changing the surrounding to "nothing"
-      final char charFrom = getChar(editor);
-      if (charFrom == 0) {
-        return;
-      }
-      WriteAction.run(() -> CSurroundHandler.change(editor, charFrom, null));
-    }
-  }
-
-  private static class Operator implements OperatorFunction {
-    @Override
-    public boolean apply(@NotNull Editor editor, @NotNull DataContext context, @NotNull SelectionType selectionType) {
-      final char c = getChar(editor);
-      if (c == 0) {
-        return true;
-      }
-      final Pair<String, String> pair = getOrInputPair(c, editor);
-      if (pair == null) {
-        return false;
-      }
-      // XXX: Will it work with line-wise or block-wise selections?
-      final TextRange range = getSurroundRange(editor);
-      if (range == null) {
-        return false;
-      }
-      WriteAction.run(() -> {
-        final ChangeGroup change = VimPlugin.getChange();
-        final String leftSurround = pair.getFirst();
-        final Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-        primaryCaret.moveToOffset(range.getStartOffset());
-        change.insertText(editor, primaryCaret, leftSurround);
-        primaryCaret.moveToOffset(range.getEndOffset() + leftSurround.length());
-        change.insertText(editor, primaryCaret, pair.getSecond());
-
+    companion object {
+      fun change(editor: Editor, charFrom: Char, newSurround: Pair<String, String>?) {
+        // We take over the " register, so preserve it
+        val oldValue: List<KeyStroke>? = getRegister(REGISTER)
+        // Extract the inner value
+        perform("di" + pick(charFrom), editor)
+        val innerValue: MutableList<KeyStroke> = getRegister(REGISTER)?.toMutableList() ?: mutableListOf()
+        // Delete the surrounding
+        perform("da" + pick(charFrom), editor)
+        // Insert the surrounding characters and paste
+        if (newSurround != null) {
+          innerValue.addAll(0, StringHelper.parseKeys(escape(newSurround.first)))
+          innerValue.addAll(StringHelper.parseKeys(escape(newSurround.second)))
+        }
+        pasteSurround(innerValue, editor)
+        // Restore the old value
+        setRegister(REGISTER, oldValue)
         // Jump back to start
-        executeNormal(parseKeys("`["), editor);
-      });
-      return true;
+        executeNormal(StringHelper.parseKeys("`["), editor)
+      }
+
+      private fun escape(sequence: String): String = sequence.replace("<", "\\<")
+
+      private fun perform(sequence: String, editor: Editor) {
+        IdeaputDisabler().use { executeNormal(StringHelper.parseKeys("\"" + REGISTER + sequence), editor) }
+      }
+
+      private fun pasteSurround(innerValue: List<KeyStroke?>, editor: Editor) { // This logic is direct from vim-surround
+        val offset = editor.caretModel.offset
+        val lineEndOffset = EditorHelper.getLineEndForOffset(editor, offset)
+        val motionEndMark = VimPlugin.getMark().getMark(editor, ']')
+        val motionEndOffset = if (motionEndMark != null) {
+          EditorHelper.getOffset(editor, motionEndMark.logicalLine, motionEndMark.col)
+        } else -1
+        val pasteCommand = if (motionEndOffset == lineEndOffset && offset + 1 == lineEndOffset) "p" else "P"
+        setRegister(REGISTER, innerValue)
+        perform(pasteCommand, editor)
+      }
+
+      private fun pick(charFrom: Char) = when (charFrom) {
+        'a' -> '>'
+        'r' -> ']'
+        else -> charFrom
+      }
+    }
+  }
+
+  private class DSurroundHandler : VimExtensionHandler {
+    override fun isRepeatable() = true
+
+    override fun execute(editor: Editor, context: DataContext) {
+      // Deleting surround is just changing the surrounding to "nothing"
+      val charFrom = getChar(editor)
+      if (charFrom.toInt() == 0) return
+
+      runWriteAction { CSurroundHandler.change(editor, charFrom, null) }
+    }
+  }
+
+  private class Operator : OperatorFunction {
+    override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
+      val c = getChar(editor)
+      if (c.toInt() == 0) return true
+
+      val pair = getOrInputPair(c, editor) ?: return false
+      // XXX: Will it work with line-wise or block-wise selections?
+      val range = getSurroundRange(editor) ?: return false
+      runWriteAction {
+        val change = VimPlugin.getChange()
+        val leftSurround = pair.first
+        val primaryCaret = editor.caretModel.primaryCaret
+        primaryCaret.moveToOffset(range.startOffset)
+        change.insertText(editor, primaryCaret, leftSurround)
+        primaryCaret.moveToOffset(range.endOffset + leftSurround.length)
+        change.insertText(editor, primaryCaret, pair.second)
+        // Jump back to start
+        executeNormal(StringHelper.parseKeys("`["), editor)
+      }
+      return true
     }
 
-    @Nullable
-    private TextRange getSurroundRange(@NotNull Editor editor) {
-      final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
-      switch (mode) {
-        case COMMAND:
-          return VimPlugin.getMark().getChangeMarks(editor);
-        case VISUAL:
-          int selectionStart = editor.getCaretModel().getPrimaryCaret().getSelectionStart();
-          int selectionEnd = editor.getCaretModel().getPrimaryCaret().getSelectionEnd();
-          return new TextRange(selectionStart, selectionEnd);
-        default:
-          return null;
-      }
+    private fun getSurroundRange(editor: Editor): TextRange? = when (editor.mode) {
+      CommandState.Mode.COMMAND -> VimPlugin.getMark().getChangeMarks(editor)
+      CommandState.Mode.VISUAL -> editor.caretModel.primaryCaret.run { TextRange(selectionStart, selectionEnd) }
+      else -> null
+    }
+  }
+
+  companion object {
+    private const val REGISTER = '"'
+
+    private val tagNameAndAttributesCapturePattern = "(\\w+)([^>]*)>".toPattern()
+
+    private val SURROUND_PAIRS = mapOf(
+      'b' to ("(" to ")"),
+      '(' to ("( " to " )"),
+      ')' to ("(" to ")"),
+      'B' to ("{" to "}"),
+      '{' to ("{ " to " }"),
+      '}' to ("{" to "}"),
+      'r' to ("[" to "]"),
+      '[' to ("[ " to " ]"),
+      ']' to ("[" to "]"),
+      'a' to ("<" to ">"),
+      '>' to ("<" to ">"),
+      's' to (" " to "")
+    )
+
+    private fun getSurroundPair(c: Char): Pair<String, String>? = if (c in SURROUND_PAIRS) {
+      SURROUND_PAIRS[c]
+    } else if (!c.isLetter()) {
+      val s = c.toString()
+      s to s
+    } else null
+
+    private fun inputTagPair(editor: Editor): Pair<String, String>? {
+      val tagInput = inputString(editor, "<", '>')
+      val matcher = tagNameAndAttributesCapturePattern.matcher(tagInput)
+      return if (matcher.find()) {
+        val tagName = matcher.group(1)
+        val tagAttributes = matcher.group(2)
+        "<$tagName$tagAttributes>" to "</$tagName>"
+      } else null
+    }
+
+    private fun inputFunctionName(
+      editor: Editor,
+      withInternalSpaces: Boolean
+    ): Pair<String, String>? {
+      val functionNameInput = inputString(editor, "function: ", null)
+      if (functionNameInput.isEmpty()) return null
+      return if (withInternalSpaces) "$functionNameInput( " to " )" else "$functionNameInput(" to ")"
+    }
+
+    private fun getOrInputPair(c: Char, editor: Editor): Pair<String, String>? = when (c) {
+      '<', 't' -> inputTagPair(editor)
+      'f' -> inputFunctionName(editor, false)
+      'F' -> inputFunctionName(editor, true)
+      else -> getSurroundPair(c)
+    }
+
+    private fun getChar(editor: Editor): Char {
+      val key = inputKeyStroke(editor)
+      val keyChar = key.keyChar
+      return if (keyChar == KeyEvent.CHAR_UNDEFINED || keyChar.toInt() == KeyEvent.VK_ESCAPE) {
+        0.toChar()
+      } else keyChar
     }
   }
 }
