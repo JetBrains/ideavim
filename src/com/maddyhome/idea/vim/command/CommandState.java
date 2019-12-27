@@ -47,9 +47,9 @@ public class CommandState {
   private static final ModeState defaultModeState = new ModeState(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
 
   @NotNull private CurrentCommandState commandState = CurrentCommandState.NEW_COMMAND;
-  @NotNull private final Stack<ModeState> modeStates = new Stack<>();
-  @NotNull private final MappingState mappingState = new MappingState();
-  @NotNull private final DigraphSequence digraphSequence = new DigraphSequence();
+  private final Stack<ModeState> modeStates = new Stack<>();
+  private final MappingState mappingState = new MappingState();
+  private final DigraphSequence digraphSequence = new DigraphSequence();
   private boolean isRecording = false;
   private boolean dotRepeatInProgress = false;
 
@@ -66,8 +66,8 @@ public class CommandState {
   @Nullable private Command executingCommand;
 
   // State used to build the next command
-  @NotNull private final List<KeyStroke> keys = new ArrayList<>();
-  @NotNull private final Stack<Command> commands = new Stack<>();
+  private final List<KeyStroke> keys = new ArrayList<>();
+  private final Stack<Command> commands = new Stack<>();
   @NotNull private CommandPartNode myCurrentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
   @Nullable private Argument.Type myCurrentArgumentType;
   private int count = 0;
