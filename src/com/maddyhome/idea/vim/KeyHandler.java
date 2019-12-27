@@ -237,7 +237,7 @@ public class KeyHandler {
     // If we got this far the user is entering a command or supplying an argument to an entered command.
     // First let's check to see if we are at the point of expecting a single character argument to a command.
     else if (editorState.getCurrentArgumentType() == Argument.Type.CHARACTER) {
-      handleCharArgument(key, chKey);
+      handleCharArgument(key, chKey, editorState);
     }
     // If we are this far, then the user must be entering a command or a non-single-character argument
     // to an entered command. Let's figure out which it is
@@ -277,7 +277,7 @@ public class KeyHandler {
         }
         // If we get here then the user has entered an unrecognized series of keystrokes
         else {
-          state = State.BAD_COMMAND;
+          editorState.setCommandState(CurrentCommandState.BAD_COMMAND);
         }
 
         partialReset(editor);
@@ -285,10 +285,10 @@ public class KeyHandler {
     }
 
     // Do we have a fully entered command at this point? If so, lets execute it
-    if (state == State.READY) {
+    if (editorState.getCommandState() == CurrentCommandState.READY) {
       executeCommand(editor, key, context, editorState);
     }
-    else if (state == State.BAD_COMMAND) {
+    else if (editorState.getCommandState() == CurrentCommandState.BAD_COMMAND) {
       if (editorState.getMappingMode() == MappingMode.OP_PENDING) {
         editorState.popModes();
       }
@@ -348,7 +348,7 @@ public class KeyHandler {
     final CommandState commandState = CommandState.getInstance(editor);
     final MappingState mappingState = commandState.getMappingState();
 
-    if (state == State.CHAR_OR_DIGRAPH
+    if (commandState.getCommandState() == CurrentCommandState.CHAR_OR_DIGRAPH
       || isBuildingMultiKeyCommand(commandState)
       || isMappingDisabledForKey(key, commandState)) {
       return false;
@@ -526,7 +526,7 @@ public class KeyHandler {
 
         if (!offsets.isEmpty()) {
           currentCmd.peek().setArgument(new Argument(offsets));
-          state = State.READY;
+          commandState.setCommandState(CurrentCommandState.READY);
         }
       }
     }
@@ -585,7 +585,7 @@ public class KeyHandler {
   private boolean isDeleteCommandCount(@NotNull KeyStroke key, @NotNull CommandState editorState) {
     // See `:help N<Del>`
     return (editorState.getMode() == CommandState.Mode.COMMAND || editorState.getMode() == CommandState.Mode.VISUAL) &&
-           state == State.NEW_COMMAND &&
+           editorState.getCommandState() == CurrentCommandState.NEW_COMMAND &&
            editorState.getCurrentArgumentType() != Argument.Type.CHARACTER &&
            editorState.getCurrentArgumentType() != Argument.Type.DIGRAPH &&
            key.getKeyCode() == KeyEvent.VK_DELETE &&
@@ -596,7 +596,7 @@ public class KeyHandler {
     return (editorState.getMode() == CommandState.Mode.COMMAND) && StringHelper.isCloseKeyStroke(key);
   }
 
-  private void handleCharArgument(@NotNull KeyStroke key, char chKey) {
+  private void handleCharArgument(@NotNull KeyStroke key, char chKey, @NotNull CommandState commandState) {
     // We are expecting a character argument - is this a regular character the user typed?
     // Some special keys can be handled as character arguments - let's check for them here.
     if (chKey == 0) {
@@ -616,17 +616,17 @@ public class KeyHandler {
       Argument arg = new Argument(chKey);
       Command cmd = currentCmd.peek();
       cmd.setArgument(arg);
-      state = State.READY;
+      commandState.setCommandState(CurrentCommandState.READY);
     }
     else {
       // Oops - this isn't a valid character argument
-      state = State.BAD_COMMAND;
+      commandState.setCommandState(CurrentCommandState.BAD_COMMAND);
     }
   }
 
   private boolean isCommandCount(char chKey, @NotNull CommandState editorState) {
     return (editorState.getMode() == CommandState.Mode.COMMAND || editorState.getMode() == CommandState.Mode.VISUAL) &&
-           state == State.NEW_COMMAND &&
+           editorState.getCommandState() == CurrentCommandState.NEW_COMMAND &&
            editorState.getCurrentArgumentType() != Argument.Type.CHARACTER &&
            editorState.getCurrentArgumentType() != Argument.Type.DIGRAPH &&
            Character.isDigit(chKey) &&
@@ -758,7 +758,7 @@ public class KeyHandler {
     if (editorState.getCurrentArgumentType() != null && !checkArgumentCompatibility(node, editorState)) return;
 
     if (myAction.getArgumentType() == null || stopMacroRecord(node, editorState)) {
-      state = State.READY;
+      editorState.setCommandState(CurrentCommandState.READY);
     }
     else {
       editorState.setCurrentArgumentType(node.getActionHolder().getAction().getArgumentType());
@@ -799,18 +799,18 @@ public class KeyHandler {
     switch (argument) {
       case CHARACTER:
       case DIGRAPH:
-        state = State.CHAR_OR_DIGRAPH;
+        editorState.setCommandState(CurrentCommandState.CHAR_OR_DIGRAPH);
         break;
       case MOTION:
         if (CommandState.getInstance(editor).isDotRepeatInProgress() && VimRepeater.Extension.INSTANCE.getArgumentCaptured() != null) {
           currentCmd.peek().setArgument(VimRepeater.Extension.INSTANCE.getArgumentCaptured());
-          state = State.READY;
+          editorState.setCommandState(CurrentCommandState.READY);
         }
         editorState.pushModes(editorState.getMode(), editorState.getSubMode(), MappingMode.OP_PENDING);
         break;
       case EX_STRING:
         VimPlugin.getProcess().startSearchCommand(editor, context, editorState.getCount(), key);
-        state = State.NEW_COMMAND;
+        editorState.setCommandState(CurrentCommandState.NEW_COMMAND);
         editorState.pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
         currentCmd.pop();
     }
@@ -819,7 +819,7 @@ public class KeyHandler {
   private boolean checkArgumentCompatibility(@NotNull CommandNode node, @NotNull CommandState editorState) {
     if (editorState.getCurrentArgumentType() == Argument.Type.MOTION &&
         node.getActionHolder().getAction().getType() != Command.Type.MOTION) {
-      state = State.BAD_COMMAND;
+      editorState.setCommandState(CurrentCommandState.BAD_COMMAND);
       return false;
     }
     return true;
@@ -858,9 +858,9 @@ public class KeyHandler {
    */
   public void reset(@Nullable Editor editor) {
     partialReset(editor);
-    state = State.NEW_COMMAND;
     currentCmd.clear();
     CommandState editorState = CommandState.getInstance(editor);
+    editorState.setCommandState(CurrentCommandState.NEW_COMMAND);
     editorState.setCurrentArgumentType(null);
   }
 
@@ -943,7 +943,7 @@ public class KeyHandler {
       CommandState editorState = CommandState.getInstance(editor);
       boolean wasRecording = editorState.isRecording();
 
-      KeyHandler.getInstance().state = State.NEW_COMMAND;
+      editorState.setCommandState(CurrentCommandState.NEW_COMMAND);
       executeVimAction(editor, cmd.getAction(), context);
       if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
         VimPlugin.getChange().processCommand(editor, cmd);
@@ -979,21 +979,10 @@ public class KeyHandler {
     private final KeyStroke key;
   }
 
-  private enum State {
-    /** Awaiting a new command */
-    NEW_COMMAND,
-    // TODO: This should be probably processed in some better way
-    /** Awaiting char or digraph input. In this mode mappings doesn't work (even for <C-K>) */
-    CHAR_OR_DIGRAPH,
-    READY,
-    BAD_COMMAND
-  }
-
   private TypedActionHandler origHandler;
 
   private static KeyHandler instance;
 
   // TODO: All of this state needs to be per-editor
-  private State state = State.NEW_COMMAND;
   @NotNull private final Stack<Command> currentCmd = new Stack<>();
 }
