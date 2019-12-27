@@ -384,7 +384,7 @@ public class ChangeGroup {
 
     final Command cmd = state.getExecutingCommand();
     if (cmd != null && state.isDotRepeatInProgress()) {
-      state.pushModes(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
+      state.pushModes(mode, CommandState.SubMode.NONE);
       if (mode == CommandState.Mode.REPLACE) {
         setInsertEditorState(editor, false);
       }
@@ -412,7 +412,7 @@ public class ChangeGroup {
       eventFacade.addDocumentListener(document, documentListener);
       oldOffset = editor.getCaretModel().getOffset();
       setInsertEditorState(editor, mode == CommandState.Mode.INSERT);
-      state.pushModes(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
+      state.pushModes(mode, CommandState.SubMode.NONE);
 
       VisualGroupKt.updateCaretState(editor);
     }
@@ -716,7 +716,7 @@ public class ChangeGroup {
    */
   public void processSingleCommand(@NotNull Editor editor) {
     CommandState.getInstance(editor)
-      .pushModes(CommandState.Mode.COMMAND, CommandState.SubMode.SINGLE_COMMAND, MappingMode.NORMAL);
+      .pushModes(CommandState.Mode.COMMAND, CommandState.SubMode.SINGLE_COMMAND);
     clearStrokes(editor);
   }
 

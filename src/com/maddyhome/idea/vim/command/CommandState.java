@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  */
 public class CommandState {
   private static final Logger logger = Logger.getInstance(CommandState.class.getName());
-  private static final ModeState defaultModeState = new ModeState(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
+  private static final ModeState defaultModeState = new ModeState(Mode.COMMAND, SubMode.NONE);
 
   @NotNull private CurrentCommandState commandState = CurrentCommandState.NEW_COMMAND;
   private final Stack<ModeState> modeStates = new Stack<>();
@@ -68,12 +68,12 @@ public class CommandState {
   // State used to build the next command
   private final List<KeyStroke> keys = new ArrayList<>();
   private final Stack<Command> commands = new Stack<>();
-  @NotNull private CommandPartNode myCurrentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
+  @NotNull private CommandPartNode myCurrentNode = VimPlugin.getKey().getKeyRoot(MappingMode.NORMAL);
   @Nullable private Argument.Type myCurrentArgumentType;
   private int count = 0;
 
   private CommandState() {
-    modeStates.push(defaultModeState);
+    pushModes(defaultModeState.getMode(), defaultModeState.getSubMode());
   }
 
   @Contract("null -> new")
@@ -93,7 +93,7 @@ public class CommandState {
   }
 
   public boolean isOperatorPending() {
-    return getMappingMode() == MappingMode.OP_PENDING && !commands.empty();
+    return mappingState.getMappingMode() == MappingMode.OP_PENDING && !commands.empty();
   }
 
   public boolean isDuplicateOperatorKeyStroke(KeyStroke key) {
@@ -178,23 +178,60 @@ public class CommandState {
     return executingCommand != null ? executingCommand.getFlags() : EnumSet.noneOf(CommandFlags.class);
   }
 
-  public void pushModes(@NotNull Mode mode, @NotNull SubMode submode, @NotNull MappingMode mappingMode) {
-    final ModeState newModeState = new ModeState(mode, submode, mappingMode);
+  public void pushModes(@NotNull Mode mode, @NotNull SubMode submode) {
+    final ModeState newModeState = new ModeState(mode, submode);
     logger.info("Push new mode state: " + newModeState.toSimpleString());
     if (logger.isDebugEnabled()) {
       logger.debug("Stack of mode states before push: " + toSimpleString());
     }
     modeStates.push(newModeState);
+    setMappingMode();
     updateStatus();
   }
 
   public void popModes() {
     final ModeState popped = modeStates.pop();
+    setMappingMode();
     updateStatus();
     logger.info("Popped mode state: " + popped.toSimpleString());
     if (logger.isDebugEnabled()) {
       logger.debug("Stack of mode states after pop: " + toSimpleString());
     }
+  }
+
+  public void resetOpPending() {
+    if (getSubMode() == SubMode.OP_PENDING) {
+      popModes();
+    }
+  }
+
+  private void setMappingMode() {
+    final ModeState modeState = modeStates.peek();
+    if (modeState.getSubMode() == SubMode.OP_PENDING) {
+      mappingState.setMappingMode(MappingMode.OP_PENDING);
+    }
+    else {
+      mappingState.setMappingMode(modeToMappingMode(getMode()));
+    }
+  }
+
+  @Contract(pure = true)
+  private MappingMode modeToMappingMode(@NotNull Mode mode) {
+    switch (mode) {
+      case COMMAND:
+        return MappingMode.NORMAL;
+      case INSERT:
+      case REPLACE:
+        return MappingMode.INSERT;
+      case VISUAL:
+        return MappingMode.VISUAL;
+      case SELECT:
+        return MappingMode.SELECT;
+      case CMD_LINE:
+        return MappingMode.CMD_LINE;
+    }
+
+    throw new IllegalArgumentException("Unexpected mode: " + mode);
   }
 
   @NotNull
@@ -210,7 +247,7 @@ public class CommandState {
   public void setSubMode(@NotNull SubMode submode) {
     final ModeState modeState = currentModeState();
     popModes();
-    pushModes(modeState.getMode(), submode, modeState.getMappingMode());
+    pushModes(modeState.getMode(), submode);
     updateStatus();
   }
 
@@ -311,7 +348,7 @@ public class CommandState {
     if (oldMode != newMode) {
       ModeState modeState = currentModeState();
       popModes();
-      pushModes(newMode, modeState.getSubMode(), modeState.getMappingMode());
+      pushModes(newMode, modeState.getSubMode());
     }
   }
 
@@ -325,16 +362,6 @@ public class CommandState {
     updateStatus();
     startDigraphSequence();
     count = 0;
-  }
-
-  /**
-   * Gets the current key mapping mode
-   *
-   * @return The current key mapping mode
-   */
-  @NotNull
-  public MappingMode getMappingMode() {
-    return currentModeState().getMappingMode();
   }
 
   public boolean isRecording() {
@@ -408,19 +435,17 @@ public class CommandState {
   }
 
   public enum SubMode {
-    NONE, SINGLE_COMMAND, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
+    NONE, SINGLE_COMMAND, OP_PENDING, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
   }
 
   private static class ModeState {
     @NotNull private final Mode myMode;
     @NotNull private final SubMode mySubMode;
-    @NotNull private final MappingMode myMappingMode;
 
     @Contract(pure = true)
-    public ModeState(@NotNull Mode mode, @NotNull SubMode subMode, @NotNull MappingMode mappingMode) {
+    public ModeState(@NotNull Mode mode, @NotNull SubMode subMode) {
       this.myMode = mode;
       this.mySubMode = subMode;
-      this.myMappingMode = mappingMode;
     }
 
     @NotNull
@@ -431,11 +456,6 @@ public class CommandState {
     @NotNull
     public SubMode getSubMode() {
       return mySubMode;
-    }
-
-    @NotNull
-    public MappingMode getMappingMode() {
-      return myMappingMode;
     }
 
     public String toSimpleString() {

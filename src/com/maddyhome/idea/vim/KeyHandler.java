@@ -266,7 +266,7 @@ public class KeyHandler {
             shouldRecord = false;
           }
         }
-        else if (editorState.getMappingMode() == MappingMode.CMD_LINE) {
+        else if (editorState.getMappingState().getMappingMode() == MappingMode.CMD_LINE) {
           if (!VimPlugin.getProcess().processExKey(editor, key)) {
             shouldRecord = false;
           }
@@ -285,9 +285,7 @@ public class KeyHandler {
       executeCommand(editor, key, context, editorState);
     }
     else if (editorState.getCommandState() == CurrentCommandState.BAD_COMMAND) {
-      if (editorState.getMappingMode() == MappingMode.OP_PENDING) {
-        editorState.popModes();
-      }
+      editorState.resetOpPending();
       VimPlugin.indicateError();
       reset(editor);
     }
@@ -351,7 +349,7 @@ public class KeyHandler {
     // Save the unhandled key strokes until we either complete or abandon the sequence.
     mappingState.addKey(key);
 
-    final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(commandState.getMappingMode());
+    final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(commandState.getMappingState().getMappingMode());
 
     // Returns true if any of these methods handle the key. False means that the key is unrelated to mapping and should
     // be processed as normal.
@@ -696,9 +694,7 @@ public class KeyHandler {
     }
 
     // If we were in "operator pending" mode, reset back to normal mode.
-    if (editorState.getMappingMode() == MappingMode.OP_PENDING) {
-      editorState.popModes();
-    }
+    editorState.resetOpPending();
 
     // Save off the command we are about to execute
     editorState.setExecutingCommand(cmd);
@@ -787,12 +783,12 @@ public class KeyHandler {
           editorState.setCommandArgument(VimRepeater.Extension.INSTANCE.getArgumentCaptured());
           editorState.setCommandState(CurrentCommandState.READY);
         }
-        editorState.pushModes(editorState.getMode(), editorState.getSubMode(), MappingMode.OP_PENDING);
+        editorState.pushModes(editorState.getMode(), CommandState.SubMode.OP_PENDING);
         break;
       case EX_STRING:
         VimPlugin.getProcess().startSearchCommand(editor, context, editorState.getCount(), key);
         editorState.setCommandState(CurrentCommandState.NEW_COMMAND);
-        editorState.pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
+        editorState.pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE);
         editorState.popCommand();
     }
   }
@@ -829,7 +825,7 @@ public class KeyHandler {
     editorState.setCount(0);
     editorState.getMappingState().reset();
     editorState.getKeys().clear();
-    editorState.setCurrentNode(VimPlugin.getKey().getKeyRoot(editorState.getMappingMode()));
+    editorState.setCurrentNode(VimPlugin.getKey().getKeyRoot(editorState.getMappingState().getMappingMode()));
   }
 
   /**

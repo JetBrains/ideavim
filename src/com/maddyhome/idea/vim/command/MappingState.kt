@@ -9,6 +9,8 @@ class MappingState {
   val keys: Iterable<KeyStroke>
     get() = keyList
 
+  var mappingMode = MappingMode.NORMAL
+
   private val timer = Timer(OptionsManager.timeoutlen.value(), null)
   private var keyList = mutableListOf<KeyStroke>()
 

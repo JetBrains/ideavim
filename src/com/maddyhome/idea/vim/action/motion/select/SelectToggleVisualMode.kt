@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.visual.updateCaretState
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.commandState
@@ -42,7 +41,7 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
     val mode = commandState.mode
     commandState.popModes()
     if (mode == CommandState.Mode.VISUAL) {
-      commandState.pushModes(CommandState.Mode.SELECT, subMode, MappingMode.SELECT)
+      commandState.pushModes(CommandState.Mode.SELECT, subMode)
       if (subMode != CommandState.SubMode.VISUAL_LINE) {
         editor.caretModel.runForEachCaret {
           if (it.offset + VimPlugin.getVisualMotion().selectionAdj == it.selectionEnd) {
@@ -51,7 +50,7 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
         }
       }
     } else {
-      commandState.pushModes(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
+      commandState.pushModes(CommandState.Mode.VISUAL, subMode)
       if (subMode != CommandState.SubMode.VISUAL_LINE) {
         editor.caretModel.runForEachCaret {
           if (it.offset == it.selectionEnd && it.visualLineStart <= it.offset - VimPlugin.getVisualMotion().selectionAdj) {
