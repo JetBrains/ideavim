@@ -255,7 +255,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |dfkjsg
     """.trimMargin()
     val editor = configureByText(before)
-    editor.commandState.pushState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER, MappingMode.VISUAL)
+    editor.commandState.pushModes(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER, MappingMode.VISUAL)
 
     typeText(parseKeys("<A-p>"))
     myFixture.checkResult(before)
@@ -441,7 +441,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |dfkjsg
     """.trimMargin()
     val editor = configureByText(before)
-    editor.commandState.pushState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER, MappingMode.VISUAL)
+    editor.commandState.pushModes(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER, MappingMode.VISUAL)
 
     typeText(parseKeys("<A-x>"))
     assertMode(CommandState.Mode.VISUAL)

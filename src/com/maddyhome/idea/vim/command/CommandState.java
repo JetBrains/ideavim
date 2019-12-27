@@ -41,30 +41,29 @@ import java.util.stream.Collectors;
  * Used to maintain state while entering a Vim command (operator, motion, text object, etc.)
  */
 public class CommandState {
-  private static Logger logger = Logger.getInstance(CommandState.class.getName());
+  private static final Logger logger = Logger.getInstance(CommandState.class.getName());
+  private static final ModeState defaultModeState = new ModeState(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
 
   @NotNull private final MappingState mappingState = new MappingState();
-
-  @NotNull private final Stack<State> myStates = new Stack<>();
-  @NotNull private final State myDefaultState = new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
-  @NotNull private CommandPartNode myCurrentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
-  @Nullable private Argument.Type myCurrentArgumentType;
-  private boolean myIsRecording = false;
+  @NotNull private final Stack<ModeState> modeStates = new Stack<>();
+  private boolean isRecording = false;
+  private boolean dotRepeatInProgress = false;
 
   /**
    * The last command executed
    */
   @Nullable private Command myCommand;
   private EnumSet<CommandFlags> myFlags = EnumSet.noneOf(CommandFlags.class);
-  private boolean dotRepeatInProgress = false;
 
   // State used to build the next command
   @NotNull private DigraphSequence digraphSequence = new DigraphSequence();
   @NotNull private final List<KeyStroke> keys = new ArrayList<>();
+  @NotNull private CommandPartNode myCurrentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
+  @Nullable private Argument.Type myCurrentArgumentType;
   private int count = 0;
 
   private CommandState() {
-    myStates.push(new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL));
+    modeStates.push(defaultModeState);
   }
 
   @Contract("null -> new")
@@ -106,37 +105,39 @@ public class CommandState {
     this.myFlags = flags;
   }
 
-  public void pushState(@NotNull Mode mode, @NotNull SubMode submode, @NotNull MappingMode mappingMode) {
-    final State newState = new State(mode, submode, mappingMode);
-    logger.info("Push new state: " + newState.toSimpleString());
+  public void pushModes(@NotNull Mode mode, @NotNull SubMode submode, @NotNull MappingMode mappingMode) {
+    final ModeState newModeState = new ModeState(mode, submode, mappingMode);
+    logger.info("Push new mode state: " + newModeState.toSimpleString());
     if (logger.isDebugEnabled()) {
-      logger.debug("Stack state before push: " + toSimpleString());
+      logger.debug("Stack of mode states before push: " + toSimpleString());
     }
-    myStates.push(newState);
+    modeStates.push(newModeState);
     updateStatus();
   }
 
-  public void popState() {
-    final State popped = myStates.pop();
+  public void popModes() {
+    final ModeState popped = modeStates.pop();
     updateStatus();
-    logger.info("Pop state: " + popped.toSimpleString());
+    logger.info("Popped mode state: " + popped.toSimpleString());
     if (logger.isDebugEnabled()) {
-      logger.debug("Stack state after pop: " + toSimpleString());
+      logger.debug("Stack of mode states after pop: " + toSimpleString());
     }
   }
 
   @NotNull
   public Mode getMode() {
-    return currentState().getMode();
+    return currentModeState().getMode();
   }
 
   @NotNull
   public SubMode getSubMode() {
-    return currentState().getSubMode();
+    return currentModeState().getSubMode();
   }
 
   public void setSubMode(@NotNull SubMode submode) {
-    currentState().setSubMode(submode);
+    final ModeState modeState = currentModeState();
+    popModes();
+    pushModes(modeState.getMode(), submode, modeState.getMappingMode());
     updateStatus();
   }
 
@@ -171,21 +172,21 @@ public class CommandState {
 
   @NotNull
   private String getStatusString(int pos) {
-    State state;
-    if (pos >= 0 && pos < myStates.size()) {
-      state = myStates.get(pos);
+    ModeState modeState;
+    if (pos >= 0 && pos < modeStates.size()) {
+      modeState = modeStates.get(pos);
     }
     else if (pos < 0) {
-      state = myDefaultState;
+      modeState = defaultModeState;
     }
     else {
       return "";
     }
 
     final StringBuilder msg = new StringBuilder();
-    switch (state.getMode()) {
+    switch (modeState.getMode()) {
       case COMMAND:
-        if (state.getSubMode() == SubMode.SINGLE_COMMAND) {
+        if (modeState.getSubMode() == SubMode.SINGLE_COMMAND) {
           msg.append('(').append(getStatusString(pos - 1).toLowerCase()).append(')');
         }
         break;
@@ -198,21 +199,21 @@ public class CommandState {
       case VISUAL:
       case SELECT:
         if (pos > 0) {
-          State tmp = myStates.get(pos - 1);
+          ModeState tmp = modeStates.get(pos - 1);
           if (tmp.getMode() == Mode.COMMAND && tmp.getSubMode() == SubMode.SINGLE_COMMAND) {
             msg.append(getStatusString(pos - 1));
             msg.append(" - ");
           }
         }
-        switch (state.getSubMode()) {
+        switch (modeState.getSubMode()) {
           case VISUAL_LINE:
-            msg.append(state.getMode()).append(" LINE");
+            msg.append(modeState.getMode()).append(" LINE");
             break;
           case VISUAL_BLOCK:
-            msg.append(state.getMode()).append(" BLOCK");
+            msg.append(modeState.getMode()).append(" BLOCK");
             break;
           default:
-            msg.append(state.getMode());
+            msg.append(modeState.getMode());
         }
         break;
     }
@@ -235,9 +236,9 @@ public class CommandState {
     }
 
     if (oldMode != newMode) {
-      State state = currentState();
-      popState();
-      pushState(newMode, state.getSubMode(), state.getMappingMode());
+      ModeState modeState = currentModeState();
+      popModes();
+      pushModes(newMode, modeState.getSubMode(), modeState.getMappingMode());
     }
   }
 
@@ -246,7 +247,7 @@ public class CommandState {
    */
   public void reset() {
     myCommand = null;
-    myStates.clear();
+    modeStates.clear();
     keys.clear();
     updateStatus();
     startDigraphSequence();
@@ -260,15 +261,15 @@ public class CommandState {
    */
   @NotNull
   public MappingMode getMappingMode() {
-    return currentState().getMappingMode();
+    return currentModeState().getMappingMode();
   }
 
   public boolean isRecording() {
-    return myIsRecording;
+    return isRecording;
   }
 
   public void setRecording(boolean val) {
-    myIsRecording = val;
+    isRecording = val;
     updateStatus();
   }
 
@@ -291,23 +292,23 @@ public class CommandState {
   }
 
   public String toSimpleString() {
-    return myStates.stream().map(State::toSimpleString)
+    return modeStates.stream().map(ModeState::toSimpleString)
       .collect(Collectors.joining(", "));
   }
 
-  private State currentState() {
-    if (myStates.size() > 0) {
-      return myStates.peek();
+  private ModeState currentModeState() {
+    if (modeStates.size() > 0) {
+      return modeStates.peek();
     }
     else {
-      return myDefaultState;
+      return defaultModeState;
     }
   }
 
   private void updateStatus() {
     final StringBuilder msg = new StringBuilder();
     if (OptionsManager.INSTANCE.getShowmode().isSet()) {
-      msg.append(getStatusString(myStates.size() - 1));
+      msg.append(getStatusString(modeStates.size() - 1));
     }
 
     if (isRecording()) {
@@ -336,13 +337,13 @@ public class CommandState {
     NONE, SINGLE_COMMAND, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
   }
 
-  private static class State {
+  private static class ModeState {
     @NotNull private final Mode myMode;
-    @NotNull private SubMode mySubMode;
+    @NotNull private final SubMode mySubMode;
     @NotNull private final MappingMode myMappingMode;
 
     @Contract(pure = true)
-    public State(@NotNull Mode mode, @NotNull SubMode subMode, @NotNull MappingMode mappingMode) {
+    public ModeState(@NotNull Mode mode, @NotNull SubMode subMode, @NotNull MappingMode mappingMode) {
       this.myMode = mode;
       this.mySubMode = subMode;
       this.myMappingMode = mappingMode;
@@ -356,10 +357,6 @@ public class CommandState {
     @NotNull
     public SubMode getSubMode() {
       return mySubMode;
-    }
-
-    public void setSubMode(@NotNull SubMode subMode) {
-      this.mySubMode = subMode;
     }
 
     @NotNull

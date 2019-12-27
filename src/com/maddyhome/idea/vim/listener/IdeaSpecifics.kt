@@ -94,7 +94,7 @@ object IdeaSpecifics {
         editor?.let {
           val commandState = editor.commandState
           while (commandState.mode != CommandState.Mode.COMMAND) {
-            commandState.popState()
+            commandState.popModes()
           }
           VimPlugin.getChange().insertBeforeCursor(it, dataContext)
           KeyHandler.getInstance().reset(it)

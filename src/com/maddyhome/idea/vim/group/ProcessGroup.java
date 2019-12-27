@@ -78,7 +78,7 @@ public class ProcessGroup {
     if (editor.isOneLineMode()) return;
 
     String initText = getRange(editor, cmd);
-    CommandState.getInstance(editor).pushState(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
+    CommandState.getInstance(editor).pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, ":", initText, 1);
   }
@@ -95,7 +95,7 @@ public class ProcessGroup {
       return true;
     }
     else {
-      CommandState.getInstance(editor).popState();
+      CommandState.getInstance(editor).popModes();
       KeyHandler.getInstance().reset(editor);
       return false;
     }
@@ -106,7 +106,7 @@ public class ProcessGroup {
     panel.deactivate(true);
     boolean res = true;
     try {
-      CommandState.getInstance(editor).popState();
+      CommandState.getInstance(editor).popModes();
       logger.debug("processing command");
       final String text = panel.getText();
       record(editor, text);
@@ -140,7 +140,7 @@ public class ProcessGroup {
   }
 
   public void cancelExEntry(@NotNull final Editor editor, boolean resetCaret) {
-    CommandState.getInstance(editor).popState();
+    CommandState.getInstance(editor).popModes();
     KeyHandler.getInstance().reset(editor);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true, resetCaret);
@@ -154,7 +154,7 @@ public class ProcessGroup {
 
   public void startFilterCommand(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
     String initText = getRange(editor, cmd) + "!";
-    CommandState.getInstance(editor).pushState(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
+    CommandState.getInstance(editor).pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, ":", initText, 1);
   }

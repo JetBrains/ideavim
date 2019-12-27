@@ -384,7 +384,7 @@ public class ChangeGroup {
 
     final Command cmd = state.getCommand();
     if (cmd != null && state.isDotRepeatInProgress()) {
-      state.pushState(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
+      state.pushModes(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
       if (mode == CommandState.Mode.REPLACE) {
         setInsertEditorState(editor, false);
       }
@@ -397,7 +397,7 @@ public class ChangeGroup {
       if (mode == CommandState.Mode.REPLACE) {
         setInsertEditorState(editor, true);
       }
-      state.popState();
+      state.popModes();
     }
     else {
       lastInsert = cmd;
@@ -412,7 +412,7 @@ public class ChangeGroup {
       eventFacade.addDocumentListener(document, documentListener);
       oldOffset = editor.getCaretModel().getOffset();
       setInsertEditorState(editor, mode == CommandState.Mode.INSERT);
-      state.pushState(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
+      state.pushModes(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
 
       VisualGroupKt.updateCaretState(editor);
     }
@@ -508,7 +508,7 @@ public class ChangeGroup {
     markGroup.setMark(editor, '^', offset);
     markGroup.setMark(editor, MarkGroup.MARK_CHANGE_END, offset);
     markGroup.setMark(editor, MarkGroup.MARK_CHANGE_POS, offset);
-    CommandState.getInstance(editor).popState();
+    CommandState.getInstance(editor).popModes();
     exitAllSingleCommandInsertModes(editor);
 
     VisualGroupKt.updateCaretState(editor);
@@ -716,7 +716,7 @@ public class ChangeGroup {
    */
   public void processSingleCommand(@NotNull Editor editor) {
     CommandState.getInstance(editor)
-      .pushState(CommandState.Mode.COMMAND, CommandState.SubMode.SINGLE_COMMAND, MappingMode.NORMAL);
+      .pushModes(CommandState.Mode.COMMAND, CommandState.SubMode.SINGLE_COMMAND, MappingMode.NORMAL);
     clearStrokes(editor);
   }
 
@@ -1864,9 +1864,9 @@ public class ChangeGroup {
 
   private void exitAllSingleCommandInsertModes(@NotNull Editor editor) {
     while (CommandStateHelper.inSingleCommandMode(editor)) {
-      CommandState.getInstance(editor).popState();
+      CommandState.getInstance(editor).popModes();
       if (CommandStateHelper.inInsertMode(editor)) {
-        CommandState.getInstance(editor).popState();
+        CommandState.getInstance(editor).popModes();
       }
     }
   }

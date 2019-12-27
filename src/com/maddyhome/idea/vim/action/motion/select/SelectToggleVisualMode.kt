@@ -40,9 +40,9 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
     val commandState = editor.commandState
     val subMode = commandState.subMode
     val mode = commandState.mode
-    commandState.popState()
+    commandState.popModes()
     if (mode == CommandState.Mode.VISUAL) {
-      commandState.pushState(CommandState.Mode.SELECT, subMode, MappingMode.SELECT)
+      commandState.pushModes(CommandState.Mode.SELECT, subMode, MappingMode.SELECT)
       if (subMode != CommandState.SubMode.VISUAL_LINE) {
         editor.caretModel.runForEachCaret {
           if (it.offset + VimPlugin.getVisualMotion().selectionAdj == it.selectionEnd) {
@@ -51,7 +51,7 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
         }
       }
     } else {
-      commandState.pushState(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
+      commandState.pushModes(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
       if (subMode != CommandState.SubMode.VISUAL_LINE) {
         editor.caretModel.runForEachCaret {
           if (it.offset == it.selectionEnd && it.visualLineStart <= it.offset - VimPlugin.getVisualMotion().selectionAdj) {

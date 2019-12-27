@@ -290,7 +290,7 @@ public class KeyHandler {
     }
     else if (state == State.BAD_COMMAND) {
       if (editorState.getMappingMode() == MappingMode.OP_PENDING) {
-        editorState.popState();
+        editorState.popModes();
       }
       VimPlugin.indicateError();
       reset(editor);
@@ -502,7 +502,7 @@ public class KeyHandler {
               .create(UserDataManager.getVimSelectionStart(caret), caret.getOffset(),
                 SelectionType.fromSubMode(CommandStateHelper.getSubMode(editor)), editor);
             offsets.put(caret, vimSelection);
-            commandState.popState();
+            commandState.popModes();
           }
           else if (startOffset != null && startOffset != caret.getOffset()) {
             // Command line motions are always characterwise exclusive
@@ -711,7 +711,7 @@ public class KeyHandler {
 
     // If we were in "operator pending" mode, reset back to normal mode.
     if (editorState.getMappingMode() == MappingMode.OP_PENDING) {
-      editorState.popState();
+      editorState.popModes();
     }
 
     // Save off the command we are about to execute
@@ -783,7 +783,7 @@ public class KeyHandler {
       cmd = new Command(editorState.getCount(), action, action.getType(), action.getFlags(), editorState.getKeys());
       cmd.setArgument(arg);
       currentCmd.push(cmd);
-      CommandState.getInstance(editor).popState();
+      CommandState.getInstance(editor).popModes();
     }
   }
 
@@ -806,12 +806,12 @@ public class KeyHandler {
           currentCmd.peek().setArgument(VimRepeater.Extension.INSTANCE.getArgumentCaptured());
           state = State.READY;
         }
-        editorState.pushState(editorState.getMode(), editorState.getSubMode(), MappingMode.OP_PENDING);
+        editorState.pushModes(editorState.getMode(), editorState.getSubMode(), MappingMode.OP_PENDING);
         break;
       case EX_STRING:
         VimPlugin.getProcess().startSearchCommand(editor, context, editorState.getCount(), key);
         state = State.NEW_COMMAND;
-        editorState.pushState(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
+        editorState.pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
         currentCmd.pop();
     }
   }
@@ -963,7 +963,7 @@ public class KeyHandler {
       // "select register"
       if (editorState.getSubMode() == CommandState.SubMode.SINGLE_COMMAND &&
           (!cmd.getFlags().contains(CommandFlags.FLAG_EXPECT_MORE))) {
-        editorState.popState();
+        editorState.popModes();
       }
 
       KeyHandler.getInstance().reset(editor);
