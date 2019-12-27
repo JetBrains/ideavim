@@ -21,6 +21,8 @@ package com.maddyhome.idea.vim.command;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.DuplicableOperatorAction;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.DigraphResult;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.UserDataManager;
@@ -59,6 +61,7 @@ public class CommandState {
 
   // State used to build the next command
   @NotNull private final List<KeyStroke> keys = new ArrayList<>();
+  @NotNull private final Stack<Command> commands = new Stack<>();
   @NotNull private CommandPartNode myCurrentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
   @Nullable private Argument.Type myCurrentArgumentType;
   private int count = 0;
@@ -81,6 +84,71 @@ public class CommandState {
     }
 
     return res;
+  }
+
+  public boolean isOperatorPending() {
+    return getMappingMode() == MappingMode.OP_PENDING && !commands.empty();
+  }
+
+  public boolean isDuplicateOperatorKeyStroke(KeyStroke key) {
+    if (isOperatorPending()) {
+      final EditorActionHandlerBase action = commands.peek().getAction();
+      return action instanceof DuplicableOperatorAction && ((DuplicableOperatorAction) action).getDuplicateWith() == key.getKeyChar();
+    }
+    return false;
+  }
+
+  public boolean isDefaultState() {
+    return getCount() == 0 && getCurrentArgumentType() == null && commands.empty();
+  }
+
+  public void pushNewCommand(EditorActionHandlerBase action) {
+    Command command = new Command(getCount(), action, action.getType(), action.getFlags(), getKeys());
+    commands.push(command);
+  }
+
+  public void popCommand() {
+    commands.pop();
+  }
+
+  public void setCommandArgument(Argument argument) {
+    commands.peek().setArgument(argument);
+  }
+
+  public boolean hasCommandArgument() {
+    final Command command = commands.peek();
+    return command != null && command.getArgument() != null;
+  }
+
+  // TODO: What's the difference between this and getCurrentActionType?
+  @Nullable
+  public Argument.Type peekCommandArgumentType() {
+    final Command command = commands.peek();
+    if (command == null) {
+      return null;
+    }
+    final Argument argument = command.getArgument();
+    if (argument == null) {
+      return null;
+    }
+    return argument.getType();
+  }
+
+  public Command buildCommand() {
+    // Let's go through the command stack and merge it all into one command. At this time there should never
+    // be more than two commands on the stack - one is the actual command and the other would be a motion
+    // command argument needed by the first command
+    Command command = commands.pop();
+    while (commands.size() > 0) {
+      Command top = commands.pop();
+      top.setArgument(new Argument(command));
+      command = top;
+    }
+    return command;
+  }
+
+  public void clearCommands() {
+    commands.clear();
   }
 
   @NotNull public CurrentCommandState getCommandState() { return commandState; }
@@ -277,6 +345,7 @@ public class CommandState {
     updateStatus();
   }
 
+  // TODO: Only used to get child node + check if building multi-key command
   @NotNull
   public CommandPartNode getCurrentNode() {
     return myCurrentNode;

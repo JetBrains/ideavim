@@ -34,7 +34,6 @@ import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
-import com.maddyhome.idea.vim.action.DuplicableOperatorAction;
 import com.maddyhome.idea.vim.action.change.VimRepeater;
 import com.maddyhome.idea.vim.action.macro.ToggleRecordingAction;
 import com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction;
@@ -218,10 +217,7 @@ public class KeyHandler {
     boolean shouldRecord = true;
 
     if (allowKeyMappings && handleKeyMapping(editor, key, context)) {
-      if (editorState.getMappingMode() != MappingMode.OP_PENDING ||
-          currentCmd.isEmpty() ||
-          currentCmd.peek().getArgument() == null ||
-          Objects.requireNonNull(currentCmd.peek().getArgument()).getType() != Argument.Type.OFFSETS) {
+      if (!editorState.isOperatorPending() || editorState.peekCommandArgumentType() != Argument.Type.OFFSETS) {
         return;
       }
     }
@@ -304,12 +300,8 @@ public class KeyHandler {
    * See the description for {@link com.maddyhome.idea.vim.action.DuplicableOperatorAction}
    */
   private Node mapOpCommand(KeyStroke key, Node node, @NotNull CommandState editorState) {
-    if (editorState.getMappingMode() == MappingMode.OP_PENDING && !currentCmd.empty()) {
-      EditorActionHandlerBase action = currentCmd.peek().getAction();
-      if (action instanceof DuplicableOperatorAction &&
-          ((DuplicableOperatorAction)action).getDuplicateWith() == key.getKeyChar()) {
-        return editorState.getCurrentNode().get(KeyStroke.getKeyStroke('_'));
-      }
+    if (editorState.isDuplicateOperatorKeyStroke(key)) {
+      return editorState.getCurrentNode().get(KeyStroke.getKeyStroke('_'));
     }
     return node;
   }
@@ -327,7 +319,7 @@ public class KeyHandler {
   }
 
   private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull final DataContext context, CommandState editorState) {
-    if (editorState.getCount() == 0 && editorState.getCurrentArgumentType() == null && currentCmd.size() == 0) {
+    if (editorState.isDefaultState()) {
       RegisterGroup register = VimPlugin.getRegister();
       if (register.getCurrentRegister() == register.getDefaultRegister()) {
         if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -472,7 +464,11 @@ public class KeyHandler {
     }
     else if (extensionHandler != null) {
       final CommandProcessor processor = CommandProcessor.getInstance();
-      final boolean isPendingMode = CommandState.getInstance(editor).getMappingMode() == MappingMode.OP_PENDING;
+
+      // Cache isOperatorPending in case the extension changes the mode while moving the caret
+      // See CommonExtensionTest
+      // TODO: Is this legal? Should we assert in this case?
+      final boolean shouldCalculateOffsets = commandState.isOperatorPending();
 
       Map<Caret, Integer> startOffsets =
         editor.getCaretModel().getAllCarets().stream().collect(Collectors.toMap(Function.identity(), Caret::getOffset));
@@ -490,9 +486,7 @@ public class KeyHandler {
         VimRepeater.INSTANCE.setRepeatHandler(true);
       }
 
-      if (isPendingMode &&
-        !currentCmd.isEmpty() &&
-        currentCmd.peek().getArgument() == null) {
+      if (shouldCalculateOffsets && !commandState.hasCommandArgument()) {
         Map<Caret, VimSelection> offsets = new HashMap<>();
 
         for (Caret caret : editor.getCaretModel().getAllCarets()) {
@@ -525,7 +519,7 @@ public class KeyHandler {
         }
 
         if (!offsets.isEmpty()) {
-          currentCmd.peek().setArgument(new Argument(offsets));
+          commandState.setCommandArgument(new Argument(offsets));
           commandState.setCommandState(CurrentCommandState.READY);
         }
       }
@@ -611,11 +605,8 @@ public class KeyHandler {
     }
 
     if (chKey != 0) {
-      // Create the character argument, add it to the current command, and signal we are ready to process
-      // the command
-      Argument arg = new Argument(chKey);
-      Command cmd = currentCmd.peek();
-      cmd.setArgument(arg);
+      // Create the character argument, add it to the current command, and signal we are ready to process the command
+      commandState.setCommandArgument(new Argument(chKey));
       commandState.setCommandState(CurrentCommandState.READY);
     }
     else {
@@ -689,12 +680,7 @@ public class KeyHandler {
     // Let's go through the command stack and merge it all into one command. At this time there should never
     // be more than two commands on the stack - one is the actual command and the other would be a motion
     // command argument needed by the first command
-    Command cmd = currentCmd.pop();
-    while (currentCmd.size() > 0) {
-      Command top = currentCmd.pop();
-      top.setArgument(new Argument(cmd));
-      cmd = top;
-    }
+    final Command cmd = editorState.buildCommand();
 
     // If we have a command and a motion command argument, both could possibly have their own counts. We
     // need to adjust the counts so the motion gets the product of both counts and the count associated with
@@ -751,24 +737,22 @@ public class KeyHandler {
                                  @NotNull CommandNode node,
                                  CommandState editorState) {
     // The user entered a valid command. Create the command and add it to the stack
-    final EditorActionHandlerBase myAction = node.getActionHolder().getAction();
-    Command cmd = new Command(editorState.getCount(), myAction, myAction.getType(), myAction.getFlags(), editorState.getKeys());
-    currentCmd.push(cmd);
+    EditorActionHandlerBase action = node.getActionHolder().getAction();
+    editorState.pushNewCommand(action);
 
     if (editorState.getCurrentArgumentType() != null && !checkArgumentCompatibility(node, editorState)) return;
 
-    if (myAction.getArgumentType() == null || stopMacroRecord(node, editorState)) {
+    if (action.getArgumentType() == null || stopMacroRecord(node, editorState)) {
       editorState.setCommandState(CurrentCommandState.READY);
     }
     else {
-      editorState.setCurrentArgumentType(node.getActionHolder().getAction().getArgumentType());
+      editorState.setCurrentArgumentType(action.getArgumentType());
       startWaitingForArgument(editor, context, key.getKeyChar(), editorState.getCurrentArgumentType(), editorState);
       partialReset(editor);
     }
 
     // TODO In the name of God, get rid of EX_STRING, FLAG_COMPLETE_EX and all the related staff
-    if (editorState.getCurrentArgumentType() == Argument.Type.EX_STRING && myAction.getFlags().contains(CommandFlags.FLAG_COMPLETE_EX)) {
-      EditorActionHandlerBase action;
+    if (editorState.getCurrentArgumentType() == Argument.Type.EX_STRING && action.getFlags().contains(CommandFlags.FLAG_COMPLETE_EX)) {
       if (VimPlugin.getProcess().isForwardSearch()) {
         action = new SearchEntryFwdAction();
       }
@@ -777,13 +761,10 @@ public class KeyHandler {
       }
 
       String text = VimPlugin.getProcess().endSearchCommand(editor);
-      currentCmd.pop();
-
-      Argument arg = new Argument(text);
-      cmd = new Command(editorState.getCount(), action, action.getType(), action.getFlags(), editorState.getKeys());
-      cmd.setArgument(arg);
-      currentCmd.push(cmd);
-      CommandState.getInstance(editor).popModes();
+      editorState.popCommand();
+      editorState.pushNewCommand(action);
+      editorState.setCommandArgument(new Argument(text));
+      editorState.popModes();
     }
   }
 
@@ -802,8 +783,8 @@ public class KeyHandler {
         editorState.setCommandState(CurrentCommandState.CHAR_OR_DIGRAPH);
         break;
       case MOTION:
-        if (CommandState.getInstance(editor).isDotRepeatInProgress() && VimRepeater.Extension.INSTANCE.getArgumentCaptured() != null) {
-          currentCmd.peek().setArgument(VimRepeater.Extension.INSTANCE.getArgumentCaptured());
+        if (editorState.isDotRepeatInProgress() && VimRepeater.Extension.INSTANCE.getArgumentCaptured() != null) {
+          editorState.setCommandArgument(VimRepeater.Extension.INSTANCE.getArgumentCaptured());
           editorState.setCommandState(CurrentCommandState.READY);
         }
         editorState.pushModes(editorState.getMode(), editorState.getSubMode(), MappingMode.OP_PENDING);
@@ -812,7 +793,7 @@ public class KeyHandler {
         VimPlugin.getProcess().startSearchCommand(editor, context, editorState.getCount(), key);
         editorState.setCommandState(CurrentCommandState.NEW_COMMAND);
         editorState.pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
-        currentCmd.pop();
+        editorState.popCommand();
     }
   }
 
@@ -858,8 +839,8 @@ public class KeyHandler {
    */
   public void reset(@Nullable Editor editor) {
     partialReset(editor);
-    currentCmd.clear();
     CommandState editorState = CommandState.getInstance(editor);
+    editorState.clearCommands();
     editorState.setCommandState(CurrentCommandState.NEW_COMMAND);
     editorState.setCurrentArgumentType(null);
   }
@@ -982,7 +963,4 @@ public class KeyHandler {
   private TypedActionHandler origHandler;
 
   private static KeyHandler instance;
-
-  // TODO: All of this state needs to be per-editor
-  @NotNull private final Stack<Command> currentCmd = new Stack<>();
 }
