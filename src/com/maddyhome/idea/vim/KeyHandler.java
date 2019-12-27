@@ -245,7 +245,7 @@ public class KeyHandler {
 
       // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
       // return the node matching this keystroke
-      Node node = editorState.getCurrentNode().get(key);
+      Node node = editorState.getChildNode(key);
       node = mapOpCommand(key, node, editorState);
 
       if (node instanceof CommandNode) {
@@ -299,7 +299,7 @@ public class KeyHandler {
    */
   private Node mapOpCommand(KeyStroke key, Node node, @NotNull CommandState editorState) {
     if (editorState.isDuplicateOperatorKeyStroke(key)) {
-      return editorState.getCurrentNode().get(KeyStroke.getKeyStroke('_'));
+      return editorState.getChildNode(KeyStroke.getKeyStroke('_'));
     }
     return node;
   }
@@ -339,7 +339,7 @@ public class KeyHandler {
     final MappingState mappingState = commandState.getMappingState();
 
     if (commandState.getCommandState() == CurrentCommandState.CHAR_OR_DIGRAPH
-      || isBuildingMultiKeyCommand(commandState)
+      || commandState.isBuildingMultiKeyCommand()
       || isMappingDisabledForKey(key, commandState)) {
       return false;
     }
@@ -356,15 +356,6 @@ public class KeyHandler {
     return handleUnfinishedMappingSequence(editor, mappingState, mapping)
       || handleCompleteMappingSequence(editor, context, commandState, mappingState, mapping, key)
       || handleAbandonedMappingSequence(editor, mappingState, context);
-  }
-
-  private boolean isBuildingMultiKeyCommand(CommandState commandState) {
-    // Don't apply mapping if we're in the middle of building a multi-key command.
-    // E.g. given nmap s v, don't try to map <C-W>s to <C-W>v
-    //   Similarly, nmap <C-W>a <C-W>s should not try to map the second <C-W> in <C-W><C-W>
-    // Note that we might still be at RootNode if we're handling a prefix, because we might be buffering keys until we
-    // get a match. This means we'll still process the rest of the keys of the prefix.
-    return !(commandState.getCurrentNode() instanceof RootNode);
   }
 
   private boolean isMappingDisabledForKey(@NotNull KeyStroke key, @NotNull CommandState commandState) {

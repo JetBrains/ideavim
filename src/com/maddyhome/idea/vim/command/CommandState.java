@@ -27,6 +27,8 @@ import com.maddyhome.idea.vim.helper.DigraphResult;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.key.CommandPartNode;
+import com.maddyhome.idea.vim.key.Node;
+import com.maddyhome.idea.vim.key.RootNode;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -373,14 +375,22 @@ public class CommandState {
     updateStatus();
   }
 
-  // TODO: Only used to get child node + check if building multi-key command
-  @NotNull
-  public CommandPartNode getCurrentNode() {
-    return myCurrentNode;
+  @Nullable
+  public Node getChildNode(KeyStroke key) {
+    return myCurrentNode.get(key);
   }
 
   public void setCurrentNode(@NotNull CommandPartNode currentNode) {
     this.myCurrentNode = currentNode;
+  }
+
+  public boolean isBuildingMultiKeyCommand() {
+    // Don't apply mapping if we're in the middle of building a multi-key command.
+    // E.g. given nmap s v, don't try to map <C-W>s to <C-W>v
+    //   Similarly, nmap <C-W>a <C-W>s should not try to map the second <C-W> in <C-W><C-W>
+    // Note that we might still be at RootNode if we're handling a prefix, because we might be buffering keys until we
+    // get a match. This means we'll still process the rest of the keys of the prefix.
+    return !(myCurrentNode instanceof RootNode);
   }
 
   @Nullable
