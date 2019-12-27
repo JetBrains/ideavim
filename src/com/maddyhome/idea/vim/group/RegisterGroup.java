@@ -294,7 +294,7 @@ public class RegisterGroup {
   }
 
   private boolean isSmallDeletionSpecialCase(Editor editor) {
-    Command currentCommand = CommandState.getInstance(editor).getCommand();
+    Command currentCommand = CommandState.getInstance(editor).getExecutingCommand();
     if (currentCommand != null) {
       Argument argument = currentCommand.getArgument();
       if (argument != null) {

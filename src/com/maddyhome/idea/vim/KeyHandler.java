@@ -701,7 +701,7 @@ public class KeyHandler {
     }
 
     // Save off the command we are about to execute
-    editorState.setCommand(cmd);
+    editorState.setExecutingCommand(cmd);
 
     Project project = editor.getProject();
     final Command.Type type = cmd.getType();

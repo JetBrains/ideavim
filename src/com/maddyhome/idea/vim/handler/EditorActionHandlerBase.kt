@@ -133,7 +133,7 @@ sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     val editor = _editor.getTopLevelEditor()
     logger.debug("Execute command with handler: " + this.javaClass.name)
 
-    val cmd = editor.commandState.command ?: run {
+    val cmd = editor.commandState.executingCommand ?: run {
       VimPlugin.indicateError()
       return
     }

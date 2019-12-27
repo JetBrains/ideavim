@@ -382,7 +382,7 @@ public class ChangeGroup {
       }
     }
 
-    final Command cmd = state.getCommand();
+    final Command cmd = state.getExecutingCommand();
     if (cmd != null && state.isDotRepeatInProgress()) {
       state.pushModes(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
       if (mode == CommandState.Mode.REPLACE) {

@@ -54,9 +54,17 @@ public class CommandState {
   private boolean dotRepeatInProgress = false;
 
   /**
-   * The last command executed
+   * The currently executing command
+   *
+   * This is a complete command, e.g. operator + motion. Some actions/helpers require additional context from flags in
+   * the command/argument. Ideally, we would pass the command through KeyHandler#executeVimAction and
+   * EditorActionHandlerBase#execute, but we also need to know the command type in MarkGroup#updateMarkFromDelete,
+   * which is called via a document change event.
+   *
+   * This field is reset after the command has been executed.
    */
-  @Nullable private Command myCommand;
+  @Nullable private Command executingCommand;
+
   private EnumSet<CommandFlags> myFlags = EnumSet.noneOf(CommandFlags.class);
 
   // State used to build the next command
@@ -160,12 +168,12 @@ public class CommandState {
   }
 
   @Nullable
-  public Command getCommand() {
-    return myCommand;
+  public Command getExecutingCommand() {
+    return executingCommand;
   }
 
-  public void setCommand(@NotNull Command cmd) {
-    myCommand = cmd;
+  public void setExecutingCommand(@NotNull Command cmd) {
+    executingCommand = cmd;
     setFlags(cmd.getFlags());
   }
 
@@ -318,7 +326,7 @@ public class CommandState {
    * Resets the command, mode, visual mode, and mapping mode to initial values.
    */
   public void reset() {
-    myCommand = null;
+    executingCommand = null;
     modeStates.clear();
     keys.clear();
     updateStatus();
