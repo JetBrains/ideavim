@@ -147,7 +147,6 @@ sealed class CommandHandler {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_argforb))
       throw NoArgumentAllowedException()
     }
-    editor.commandState.flags = optFlags
     if (editor.inVisualMode && Flag.SAVE_VISUAL !in argFlags.flags) {
       editor.exitVisualMode()
     }

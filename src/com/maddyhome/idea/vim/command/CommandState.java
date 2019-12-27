@@ -65,8 +65,6 @@ public class CommandState {
    */
   @Nullable private Command executingCommand;
 
-  private EnumSet<CommandFlags> myFlags = EnumSet.noneOf(CommandFlags.class);
-
   // State used to build the next command
   @NotNull private final List<KeyStroke> keys = new ArrayList<>();
   @NotNull private final Stack<Command> commands = new Stack<>();
@@ -174,15 +172,10 @@ public class CommandState {
 
   public void setExecutingCommand(@NotNull Command cmd) {
     executingCommand = cmd;
-    setFlags(cmd.getFlags());
   }
 
-  public EnumSet<CommandFlags> getFlags() {
-    return myFlags;
-  }
-
-  public void setFlags(EnumSet<CommandFlags> flags) {
-    this.myFlags = flags;
+  public EnumSet<CommandFlags> getExecutingCommandFlags() {
+    return executingCommand != null ? executingCommand.getFlags() : EnumSet.noneOf(CommandFlags.class);
   }
 
   public void pushModes(@NotNull Mode mode, @NotNull SubMode submode, @NotNull MappingMode mappingMode) {
