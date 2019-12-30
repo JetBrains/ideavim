@@ -91,6 +91,18 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
       top.argument = Argument(command)
       command = top
     }
+    return fixCommandCounts(command)
+  }
+
+  private fun fixCommandCounts(command: Command): Command {
+    // If we have a command with a motion command argument, both could have their own counts. We need to adjust the
+    // counts, so the motion gets the product of both counts, and the count associated with the command gets reset.
+    // E.g. 3c2w (change 2 words, three times) becomes c6w (change 6 words)
+    if (command.argument?.type === Argument.Type.MOTION) {
+      val motion = command.argument!!.motion
+      motion.count = if (command.rawCount == 0 && motion.rawCount == 0) 0 else command.count * motion.count
+      command.count = 0
+    }
     return command
   }
 
