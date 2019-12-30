@@ -63,8 +63,9 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     return currentCommandPartNode !is RootNode
   }
 
-  fun setCurrentCommandPartArgument(argument: Argument) {
+  fun completeCommandPart(argument: Argument) {
     commandParts.peek().argument = argument
+    commandState = CurrentCommandState.READY
   }
 
   fun isDuplicateOperatorKeyStroke(key: KeyStroke): Boolean {
@@ -83,7 +84,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
   fun replaceCurrentCommandPart(action: EditorActionHandlerBase, argument: Argument) {
     popCommandPart()
     pushCommandPart(action)
-    setCurrentCommandPartArgument(argument)
+    commandParts.peek().argument = argument
   }
 
   fun popCommandPart() {

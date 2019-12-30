@@ -510,8 +510,7 @@ public class KeyHandler {
         }
 
         if (!offsets.isEmpty()) {
-          commandState.getCommandBuilder().setCurrentCommandPartArgument(new Argument(offsets));
-          commandState.getCommandBuilder().setCommandState(CurrentCommandState.READY);
+          commandState.getCommandBuilder().completeCommandPart(new Argument(offsets));
         }
       }
     }
@@ -602,8 +601,7 @@ public class KeyHandler {
     final CommandBuilder commandBuilder = commandState.getCommandBuilder();
     if (chKey != 0) {
       // Create the character argument, add it to the current command, and signal we are ready to process the command
-      commandBuilder.setCurrentCommandPartArgument(new Argument(chKey));
-      commandBuilder.setCommandState(CurrentCommandState.READY);
+      commandBuilder.completeCommandPart(new Argument(chKey));
     }
     else {
       // Oops - this isn't a valid character argument
@@ -755,8 +753,7 @@ public class KeyHandler {
         break;
       case MOTION:
         if (editorState.isDotRepeatInProgress() && VimRepeater.Extension.INSTANCE.getArgumentCaptured() != null) {
-          commandBuilder.setCurrentCommandPartArgument(VimRepeater.Extension.INSTANCE.getArgumentCaptured());
-          commandBuilder.setCommandState(CurrentCommandState.READY);
+          commandBuilder.completeCommandPart(VimRepeater.Extension.INSTANCE.getArgumentCaptured());
         }
         editorState.pushModes(editorState.getMode(), CommandState.SubMode.OP_PENDING);
         break;
