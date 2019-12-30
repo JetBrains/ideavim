@@ -40,7 +40,7 @@ public class VimExtensionRegistrar {
 
     registeredExtensions.add(name);
     ToggleOption option = new ToggleOption(name, name, false);
-    option.addOptionChangeListener(event -> {
+    option.addOptionChangeListener((oldValue, newValue) -> {
       for (VimExtension extensionInListener : VimExtension.EP_NAME.getExtensionList()) {
         if (name.equals(extensionInListener.getName())) {
           if (OptionsManager.INSTANCE.isSet(name)) {

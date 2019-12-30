@@ -32,7 +32,6 @@ import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.option.OptionChangeEvent;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import gnu.trove.TIntFunction;
@@ -276,7 +275,7 @@ public class EditorGroup {
     VimPlugin.getNotifications(project).notifyAboutIdeaJoin();
   }
 
-  public static class NumberChangeListener implements OptionChangeListener {
+  public static class NumberChangeListener implements OptionChangeListener<Boolean> {
     public static NumberChangeListener INSTANCE = new NumberChangeListener();
 
     @Contract(pure = true)
@@ -284,7 +283,7 @@ public class EditorGroup {
     }
 
     @Override
-    public void valueChange(OptionChangeEvent event) {
+    public void valueChange(Boolean oldValue, Boolean newValue) {
       for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
         if (UserDataManager.getVimEditorGroup(editor) && supportsVimLineNumbers(editor)) {
           updateLineNumbers(editor, true);

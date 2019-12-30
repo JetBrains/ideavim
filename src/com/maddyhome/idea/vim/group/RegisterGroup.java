@@ -89,7 +89,7 @@ public class RegisterGroup {
 
   public RegisterGroup() {
     final ListOption clipboardOption = OptionsManager.INSTANCE.getClipboard();
-    clipboardOption.addOptionChangeListener(event -> {
+    clipboardOption.addOptionChangeListenerAndExecute((oldValue, newValue) -> {
       if (clipboardOption.contains("unnamed")) {
         defaultRegister = '*';
       }
@@ -221,7 +221,7 @@ public class RegisterGroup {
         for (char d = '8'; d >= '1'; d--) {
           Register t = registers.get(d);
           if (t != null) {
-            t.rename((char)(d + 1));
+            t.setName((char)(d + 1));
             registers.put((char)(d + 1), t);
           }
         }
@@ -365,7 +365,7 @@ public class RegisterGroup {
         res.add(register);
       }
     }
-    res.sort(new Register.KeySorter());
+    res.sort(Register.KeySorter.INSTANCE);
     return res;
   }
 

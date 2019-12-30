@@ -128,8 +128,9 @@ public class ListOption extends TextOption {
       return false;
     }
 
-    value = vals;
-    fireOptionChangeEvent();
+    String oldValue = getValue();
+    this.value = vals;
+    fireOptionChangeEvent(oldValue, getValue());
 
     return true;
   }
@@ -139,8 +140,9 @@ public class ListOption extends TextOption {
       return false;
     }
 
+    String oldValue = getValue();
     value.addAll(vals);
-    fireOptionChangeEvent();
+    fireOptionChangeEvent(oldValue, getValue());
 
     return true;
   }
@@ -150,8 +152,9 @@ public class ListOption extends TextOption {
       return false;
     }
 
+    String oldValue = getValue();
     value.addAll(0, vals);
-    fireOptionChangeEvent();
+    fireOptionChangeEvent(oldValue, getValue());
 
     return true;
   }
@@ -161,8 +164,9 @@ public class ListOption extends TextOption {
       return false;
     }
 
+    String oldValue = getValue();
     value.removeAll(vals);
-    fireOptionChangeEvent();
+    fireOptionChangeEvent(oldValue, getValue());
 
     return true;
   }
@@ -230,8 +234,9 @@ public class ListOption extends TextOption {
   @Override
   public void resetDefault() {
     if (!dflt.equals(value)) {
+      String oldValue = getValue();
       value = new ArrayList<>(dflt);
-      fireOptionChangeEvent();
+      fireOptionChangeEvent(oldValue, getValue());
     }
   }
 }

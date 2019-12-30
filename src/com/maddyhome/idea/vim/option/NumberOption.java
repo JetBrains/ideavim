@@ -99,8 +99,10 @@ public class NumberOption extends TextOption {
     }
 
     if (inRange(num)) {
-      value = num;
-      fireOptionChangeEvent();
+
+      String oldValue = getValue();
+      this.value = num;
+      fireOptionChangeEvent(oldValue, getValue());
 
       return true;
     }
@@ -125,8 +127,9 @@ public class NumberOption extends TextOption {
     }
 
     if (inRange(value + num)) {
+      String oldValue = getValue();
       value += num;
-      fireOptionChangeEvent();
+      fireOptionChangeEvent(oldValue, getValue());
 
       return true;
     }
@@ -151,8 +154,9 @@ public class NumberOption extends TextOption {
     }
 
     if (inRange(value * num)) {
+      String oldValue = getValue();
       value *= num;
-      fireOptionChangeEvent();
+      fireOptionChangeEvent(oldValue, getValue());
 
       return true;
     }
@@ -177,8 +181,9 @@ public class NumberOption extends TextOption {
     }
 
     if (inRange(value - num)) {
+      String oldValue = getValue();
       value -= num;
-      fireOptionChangeEvent();
+      fireOptionChangeEvent(oldValue, getValue());
 
       return true;
     }
@@ -202,8 +207,9 @@ public class NumberOption extends TextOption {
   @Override
   public void resetDefault() {
     if (dflt != value) {
+      String oldValue = getValue();
       value = dflt;
-      fireOptionChangeEvent();
+      fireOptionChangeEvent(oldValue, getValue());
     }
   }
 

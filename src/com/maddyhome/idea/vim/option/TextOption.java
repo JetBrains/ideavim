@@ -18,12 +18,10 @@
 
 package com.maddyhome.idea.vim.option;
 
-public abstract class TextOption extends Option {
+public abstract class TextOption extends Option<String> {
   TextOption(String name, String abbrev) {
     super(name, abbrev);
   }
-
-  public abstract String getValue();
 
   public abstract boolean set(String val);
 

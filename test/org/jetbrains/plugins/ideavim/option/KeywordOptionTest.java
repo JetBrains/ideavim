@@ -56,6 +56,11 @@ public class KeywordOptionTest extends VimTestCase {
     assertEquals(",", option.values().get(0));
   }
 
+  public void testSingleCommaIsAValueAsAppend() throws ExException {
+    option.append(",");
+    assertTrue(option.values().contains(","));
+  }
+
   public void testSingleNegatedCommaIsAValue() throws ExException {
     option.set("^,");
     assertEquals("^,", option.values().get(0));

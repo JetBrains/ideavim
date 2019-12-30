@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.isBlockCaret
 import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import org.jetbrains.annotations.Contract
 import java.util.*
@@ -44,8 +45,8 @@ import kotlin.math.min
 object OptionsManager {
   private val logger = Logger.getInstance(OptionsManager::class.java)
 
-  private val options: MutableMap<String, Option> = mutableMapOf()
-  private val abbrevs: MutableMap<String, Option> = mutableMapOf()
+  private val options: MutableMap<String, Option<*>> = mutableMapOf()
+  private val abbrevs: MutableMap<String, Option<*>> = mutableMapOf()
 
   val clipboard = addOption(ListOption(ClipboardOptionsData.name, ClipboardOptionsData.abbr, arrayOf(ClipboardOptionsData.ideaput, "autoselect,exclude:cons\\|linux"), null))
   val digraph = addOption(ToggleOption("digraph", "dg", false))
@@ -95,7 +96,7 @@ object OptionsManager {
   /**
    * Gets an option by the supplied name or short name.
    */
-  fun getOption(name: String): Option? = options[name] ?: abbrevs[name]
+  fun getOption(name: String): Option<*>? = options[name] ?: abbrevs[name]
 
   /**
    * This parses a set of :set commands. The following types of commands are supported:
@@ -144,7 +145,7 @@ object OptionsManager {
     var error: String? = null
     var token = ""
     val tokenizer = StringTokenizer(args)
-    val toShow = mutableListOf<Option>()
+    val toShow = mutableListOf<Option<*>>()
     while (tokenizer.hasMoreTokens()) {
       token = tokenizer.nextToken()
       // See if a space has been backslashed, if no get the rest of the text
@@ -290,11 +291,11 @@ object OptionsManager {
    * @param opts      The list of options to display
    * @param showIntro True if intro is displayed, false if not
    */
-  private fun showOptions(editor: Editor?, opts: Collection<Option>, showIntro: Boolean) {
+  private fun showOptions(editor: Editor?, opts: Collection<Option<*>>, showIntro: Boolean) {
     if (editor == null) return
 
-    val cols = mutableListOf<Option>()
-    val extra = mutableListOf<Option>()
+    val cols = mutableListOf<Option<*>>()
+    val extra = mutableListOf<Option<*>>()
     for (option in opts) {
       if (option.toString().length > 19) extra.add(option) else cols.add(option)
     }
@@ -347,7 +348,7 @@ object OptionsManager {
   }
 
   @Contract("_ -> param1")
-  fun <T : Option> addOption(option: T): T {
+  fun <T : Option<*>> addOption(option: T): T {
     options += option.name to option
     abbrevs += option.abbrev to option
     return option
@@ -466,6 +467,13 @@ object IdeaRefactorMode {
       if (!editor.mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
         SelectionVimListenerSuppressor.lock().use {
           editor.selectionModel.removeSelection()
+        }
+      }
+      if (editor.mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
+        val autodetectedSubmode = VimPlugin.getVisualMotion().autodetectVisualSubmode(editor)
+        if (editor.subMode != autodetectedSubmode) {
+          // Update the submode
+          editor.subMode = autodetectedSubmode
         }
       }
 

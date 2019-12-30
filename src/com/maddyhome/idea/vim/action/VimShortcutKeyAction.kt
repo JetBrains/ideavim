@@ -138,7 +138,9 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
 
   private fun isEnabledForLookup(keyStroke: KeyStroke): Boolean {
     val notAllowedKeys = parseKeysSet(
-      "<TAB>", "<Down>", "<Up>", "<Enter>"
+      "<Tab>", "<Down>", "<Up>", "<Enter>", "<Left>", "<Right>",
+      // New line in vim, but QuickDoc on MacOs
+      "<C-J>"
     )
     for (keys in notAllowedKeys) {
       if (keyStroke == keys[0]) {
@@ -147,7 +149,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
     }
     // We allow users to set custom keys that will work with lookup in case devs forgot something
     val popupActions = lookupKeys
-    val values = popupActions.values() ?: return false
+    val values = popupActions.values()
     for (value in values) {
       val keys = StringHelper.parseKeys(value)
       if (keys.size >= 1 && keyStroke == keys[0]) {

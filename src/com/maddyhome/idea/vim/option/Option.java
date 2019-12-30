@@ -21,14 +21,13 @@ package com.maddyhome.idea.vim.option;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
  * Represents an VIM options that can be set with the :set command. Listeners can be set that are interested in knowing
  * when the value of the option changes.
  */
-public abstract class Option {
+public abstract class Option<T> {
   /**
    * Create the option
    *
@@ -46,8 +45,19 @@ public abstract class Option {
    *
    * @param listener The listener
    */
-  public void addOptionChangeListener(OptionChangeListener listener) {
+  public void addOptionChangeListener(OptionChangeListener<T> listener) {
     listeners.add(listener);
+  }
+
+  /**
+   * Registers an option change listener and fire an event.
+   *
+   * @param listener The listener
+   */
+  public void addOptionChangeListenerAndExecute(OptionChangeListener<T> listener) {
+    addOptionChangeListener(listener);
+    T value = getValue();
+    fireOptionChangeEvent(value, value);
   }
 
   /**
@@ -55,7 +65,7 @@ public abstract class Option {
    *
    * @param listener The listener
    */
-  public void removeOptionChangeListener(OptionChangeListener listener) {
+  public void removeOptionChangeListener(OptionChangeListener<T> listener) {
     listeners.remove(listener);
   }
 
@@ -93,24 +103,15 @@ public abstract class Option {
    * Lets all listeners know that the value has changed. Subclasses are responsible for calling this when their
    * value changes.
    */
-  protected void fireOptionChangeEvent() {
-    OptionChangeEvent event = new OptionChangeEvent(this);
-    for (OptionChangeListener listener : listeners) {
-      listener.valueChange(event);
+  protected void fireOptionChangeEvent(T oldValue, T newValue) {
+    for (OptionChangeListener<T> listener : listeners) {
+      listener.valueChange(oldValue, newValue);
     }
   }
 
-  /**
-   * Helper method used to sort lists of options by their name
-   */
-  static class NameSorter<V> implements Comparator<V> {
-    @Override
-    public int compare(@NotNull V o1, @NotNull V o2) {
-      return ((Option)o1).name.compareTo(((Option)o2).name);
-    }
-  }
+  public abstract T getValue();
 
   protected final String name;
   protected final String abbrev;
-  @NotNull protected final List<OptionChangeListener> listeners = new ArrayList<>();
+  @NotNull private final List<OptionChangeListener<T>> listeners = new ArrayList<>();
 }
