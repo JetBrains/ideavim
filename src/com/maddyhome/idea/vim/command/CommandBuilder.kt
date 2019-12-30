@@ -1,5 +1,6 @@
 package com.maddyhome.idea.vim.command
 
+import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.Node
@@ -66,8 +67,9 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     commandParts.peek().argument = argument
   }
 
-  fun getLastCommandPartAction(): EditorActionHandlerBase? {
-    return commandParts.peek()?.action
+  fun isDuplicateOperatorKeyStroke(key: KeyStroke): Boolean {
+    val action = commandParts.peek()?.action as? DuplicableOperatorAction
+    return action?.duplicateWith == key.keyChar
   }
 
   fun hasCurrentCommandPartArgument(): Boolean {

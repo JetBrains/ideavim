@@ -21,8 +21,6 @@ package com.maddyhome.idea.vim.command;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.DuplicableOperatorAction;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.DigraphResult;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.UserDataManager;
@@ -93,11 +91,7 @@ public class CommandState {
   }
 
   public boolean isDuplicateOperatorKeyStroke(KeyStroke key) {
-    if (isOperatorPending()) {
-      final EditorActionHandlerBase action = commandBuilder.getLastCommandPartAction();
-      return action instanceof DuplicableOperatorAction && ((DuplicableOperatorAction) action).getDuplicateWith() == key.getKeyChar();
-    }
-    return false;
+    return isOperatorPending() && commandBuilder.isDuplicateOperatorKeyStroke(key);
   }
 
   public CommandBuilder getCommandBuilder() {
