@@ -21,6 +21,13 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
   val isEmpty get() = commandParts.empty()
   val isAtDefaultState get() = isEmpty && count == 0 && expectedArgumentType == null
 
+  val isExpectingCount: Boolean
+    get() {
+      return commandState == CurrentCommandState.NEW_COMMAND &&
+        expectedArgumentType != Argument.Type.CHARACTER &&
+        expectedArgumentType != Argument.Type.DIGRAPH
+    }
+
   fun pushCommandPart(action: EditorActionHandlerBase) {
     commandParts.push(Command(count, action, action.type, action.flags, keys))
     keys = mutableListOf()

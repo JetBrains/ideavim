@@ -223,10 +223,10 @@ public class KeyHandler {
         return;
       }
     }
-    else if (isCommandCount(chKey, editorState)) {
+    else if (isCommandCountKey(chKey, editorState)) {
       commandBuilder.addCountCharacter(chKey);
     }
-    else if (isDeleteCommandCount(key, editorState)) {
+    else if (isDeleteCommandCountKey(key, editorState)) {
       commandBuilder.deleteCountCharacter();
     }
     else if (isEditorReset(key, editorState)) {
@@ -567,15 +567,18 @@ public class KeyHandler {
     return true;
   }
 
-  private boolean isDeleteCommandCount(@NotNull KeyStroke key, @NotNull CommandState editorState) {
+  private boolean isCommandCountKey(char chKey, @NotNull CommandState editorState) {
+    // Make sure to avoid handling '0' as the start of a count.
+    final CommandBuilder commandBuilder = editorState.getCommandBuilder();
+    return (editorState.getMode() == CommandState.Mode.COMMAND || editorState.getMode() == CommandState.Mode.VISUAL)
+      && commandBuilder.isExpectingCount() && Character.isDigit(chKey) && (commandBuilder.getCount() > 0 || chKey != '0');
+  }
+
+  private boolean isDeleteCommandCountKey(@NotNull KeyStroke key, @NotNull CommandState editorState) {
     // See `:help N<Del>`
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
-    return (editorState.getMode() == CommandState.Mode.COMMAND || editorState.getMode() == CommandState.Mode.VISUAL) &&
-           commandBuilder.getCommandState() == CurrentCommandState.NEW_COMMAND &&
-           commandBuilder.getExpectedArgumentType() != Argument.Type.CHARACTER &&
-           commandBuilder.getExpectedArgumentType() != Argument.Type.DIGRAPH &&
-           key.getKeyCode() == KeyEvent.VK_DELETE &&
-           commandBuilder.getCount() != 0;
+    return (editorState.getMode() == CommandState.Mode.COMMAND || editorState.getMode() == CommandState.Mode.VISUAL)
+      && commandBuilder.isExpectingCount() && commandBuilder.getCount() > 0 && key.getKeyCode() == KeyEvent.VK_DELETE;
   }
 
   private boolean isEditorReset(@NotNull KeyStroke key, @NotNull CommandState editorState) {
@@ -606,16 +609,6 @@ public class KeyHandler {
       // Oops - this isn't a valid character argument
       commandBuilder.setCommandState(CurrentCommandState.BAD_COMMAND);
     }
-  }
-
-  private boolean isCommandCount(char chKey, @NotNull CommandState editorState) {
-    final CommandBuilder commandBuilder = editorState.getCommandBuilder();
-    return (editorState.getMode() == CommandState.Mode.COMMAND || editorState.getMode() == CommandState.Mode.VISUAL) &&
-           commandBuilder.getCommandState() == CurrentCommandState.NEW_COMMAND &&
-           commandBuilder.getExpectedArgumentType() != Argument.Type.CHARACTER &&
-           commandBuilder.getExpectedArgumentType() != Argument.Type.DIGRAPH &&
-           Character.isDigit(chKey) &&
-           (commandBuilder.getCount() != 0 || chKey != '0');
   }
 
   private boolean handleDigraph(@NotNull Editor editor,
