@@ -243,6 +243,7 @@ public class KeyGroup {
    * @param mappingMode The mapping mode
    * @return The key mapping tree root
    */
+  @NotNull
   public CommandPartNode getKeyRoot(@NotNull MappingMode mappingMode) {
     return keyRoots.computeIfAbsent(mappingMode, (key) -> new RootNode());
   }

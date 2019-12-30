@@ -27,17 +27,13 @@ import com.maddyhome.idea.vim.helper.DigraphResult;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.key.CommandPartNode;
-import com.maddyhome.idea.vim.key.Node;
-import com.maddyhome.idea.vim.key.RootNode;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
@@ -48,7 +44,7 @@ public class CommandState {
   private static final Logger logger = Logger.getInstance(CommandState.class.getName());
   private static final ModeState defaultModeState = new ModeState(Mode.COMMAND, SubMode.NONE);
 
-  @NotNull private CurrentCommandState commandState = CurrentCommandState.NEW_COMMAND;
+  private final CommandBuilder commandBuilder = new CommandBuilder(getKeyRootNode(MappingMode.NORMAL));
   private final Stack<ModeState> modeStates = new Stack<>();
   private final MappingState mappingState = new MappingState();
   private final DigraphSequence digraphSequence = new DigraphSequence();
@@ -66,13 +62,6 @@ public class CommandState {
    * This field is reset after the command has been executed.
    */
   @Nullable private Command executingCommand;
-
-  // State used to build the next command
-  private final List<KeyStroke> keys = new ArrayList<>();
-  private final Stack<Command> commands = new Stack<>();
-  @NotNull private CommandPartNode myCurrentNode = VimPlugin.getKey().getKeyRoot(MappingMode.NORMAL);
-  @Nullable private Argument.Type myCurrentArgumentType;
-  private int count = 0;
 
   private CommandState() {
     pushModes(defaultModeState.getMode(), defaultModeState.getSubMode());
@@ -94,73 +83,26 @@ public class CommandState {
     return res;
   }
 
+  @NotNull
+  private static CommandPartNode getKeyRootNode(MappingMode mappingMode) {
+    return VimPlugin.getKey().getKeyRoot(mappingMode);
+  }
+
   public boolean isOperatorPending() {
-    return mappingState.getMappingMode() == MappingMode.OP_PENDING && !commands.empty();
+    return mappingState.getMappingMode() == MappingMode.OP_PENDING && !commandBuilder.isEmpty();
   }
 
   public boolean isDuplicateOperatorKeyStroke(KeyStroke key) {
     if (isOperatorPending()) {
-      final EditorActionHandlerBase action = commands.peek().getAction();
+      final EditorActionHandlerBase action = commandBuilder.getLastCommandPartAction();
       return action instanceof DuplicableOperatorAction && ((DuplicableOperatorAction) action).getDuplicateWith() == key.getKeyChar();
     }
     return false;
   }
 
-  public boolean isDefaultState() {
-    return getCount() == 0 && getCurrentArgumentType() == null && commands.empty();
+  public CommandBuilder getCommandBuilder() {
+    return commandBuilder;
   }
-
-  public void pushNewCommand(EditorActionHandlerBase action) {
-    Command command = new Command(getCount(), action, action.getType(), action.getFlags(), getKeys());
-    commands.push(command);
-  }
-
-  public void popCommand() {
-    commands.pop();
-  }
-
-  public void setCommandArgument(Argument argument) {
-    commands.peek().setArgument(argument);
-  }
-
-  public boolean hasCommandArgument() {
-    final Command command = commands.peek();
-    return command != null && command.getArgument() != null;
-  }
-
-  // TODO: What's the difference between this and getCurrentActionType?
-  @Nullable
-  public Argument.Type peekCommandArgumentType() {
-    final Command command = commands.peek();
-    if (command == null) {
-      return null;
-    }
-    final Argument argument = command.getArgument();
-    if (argument == null) {
-      return null;
-    }
-    return argument.getType();
-  }
-
-  public Command buildCommand() {
-    // Let's go through the command stack and merge it all into one command. At this time there should never
-    // be more than two commands on the stack - one is the actual command and the other would be a motion
-    // command argument needed by the first command
-    Command command = commands.pop();
-    while (commands.size() > 0) {
-      Command top = commands.pop();
-      top.setArgument(new Argument(command));
-      command = top;
-    }
-    return command;
-  }
-
-  public void clearCommands() {
-    commands.clear();
-  }
-
-  @NotNull public CurrentCommandState getCommandState() { return commandState; }
-  public void setCommandState(@NotNull CurrentCommandState state) { commandState = state; }
 
   @NotNull
   public MappingState getMappingState() {
@@ -207,8 +149,13 @@ public class CommandState {
     }
   }
 
+  private void resetModes() {
+    modeStates.clear();
+    setMappingMode();
+  }
+
   private void setMappingMode() {
-    final ModeState modeState = modeStates.peek();
+    final ModeState modeState = currentModeState();
     if (modeState.getSubMode() == SubMode.OP_PENDING) {
       mappingState.setMappingMode(MappingMode.OP_PENDING);
     }
@@ -263,23 +210,6 @@ public class CommandState {
 
   public DigraphResult processDigraphKey(KeyStroke key, Editor editor) {
     return digraphSequence.processKey(key, editor);
-  }
-
-  public int getCount() {
-    return count;
-  }
-
-  public void setCount(int newCount) {
-    count = newCount;
-  }
-
-  @NotNull
-  public List<KeyStroke> getKeys() {
-    return keys;
-  }
-
-  public void addKey(KeyStroke keyStroke) {
-    keys.add(keyStroke);
   }
 
   @NotNull
@@ -359,11 +289,11 @@ public class CommandState {
    */
   public void reset() {
     executingCommand = null;
-    modeStates.clear();
-    keys.clear();
-    updateStatus();
+    resetModes();
+    commandBuilder.resetInProgressCommandPart(getKeyRootNode(mappingState.getMappingMode()));
     startDigraphSequence();
-    count = 0;
+
+    updateStatus();
   }
 
   public boolean isRecording() {
@@ -373,33 +303,6 @@ public class CommandState {
   public void setRecording(boolean val) {
     isRecording = val;
     updateStatus();
-  }
-
-  @Nullable
-  public Node getChildNode(KeyStroke key) {
-    return myCurrentNode.get(key);
-  }
-
-  public void setCurrentNode(@NotNull CommandPartNode currentNode) {
-    this.myCurrentNode = currentNode;
-  }
-
-  public boolean isBuildingMultiKeyCommand() {
-    // Don't apply mapping if we're in the middle of building a multi-key command.
-    // E.g. given nmap s v, don't try to map <C-W>s to <C-W>v
-    //   Similarly, nmap <C-W>a <C-W>s should not try to map the second <C-W> in <C-W><C-W>
-    // Note that we might still be at RootNode if we're handling a prefix, because we might be buffering keys until we
-    // get a match. This means we'll still process the rest of the keys of the prefix.
-    return !(myCurrentNode instanceof RootNode);
-  }
-
-  @Nullable
-  public Argument.Type getCurrentArgumentType() {
-    return myCurrentArgumentType;
-  }
-
-  public void setCurrentArgumentType(Argument.Type argumentType) {
-    myCurrentArgumentType = argumentType;
   }
 
   public String toSimpleString() {

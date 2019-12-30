@@ -40,12 +40,9 @@ class MappingState {
     return currentKeys
   }
 
-  fun clearKeys() {
-    keyList.clear()
-  }
-
-  fun reset() {
+  fun resetMappingSequence() {
     stopMappingTimer()
-    clearKeys()
+    keyList.clear()
+    // NOTE: We intentionally don't reset mapping mode here
   }
 }
