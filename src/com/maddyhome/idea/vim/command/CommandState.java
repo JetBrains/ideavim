@@ -122,6 +122,23 @@ public class CommandState {
     return executingCommand != null ? executingCommand.getFlags() : EnumSet.noneOf(CommandFlags.class);
   }
 
+  public boolean isRecording() {
+    return isRecording;
+  }
+
+  public void setRecording(boolean val) {
+    isRecording = val;
+    updateStatus();
+  }
+
+  public boolean isDotRepeatInProgress() {
+    return dotRepeatInProgress;
+  }
+
+  public void setDotRepeatInProgress(boolean dotRepeatInProgress) {
+    this.dotRepeatInProgress = dotRepeatInProgress;
+  }
+
   public void pushModes(@NotNull Mode mode, @NotNull SubMode submode) {
     final ModeState newModeState = new ModeState(mode, submode);
     logger.info("Push new mode state: " + newModeState.toSimpleString());
@@ -212,6 +229,69 @@ public class CommandState {
     return digraphSequence.processKey(key, editor);
   }
 
+  /**
+   * Toggles the insert/overwrite state. If currently insert, goto replace mode. If currently replace, goto insert
+   * mode.
+   */
+  public void toggleInsertOverwrite() {
+    Mode oldMode = getMode();
+    Mode newMode = oldMode;
+    if (oldMode == Mode.INSERT) {
+      newMode = Mode.REPLACE;
+    }
+    else if (oldMode == Mode.REPLACE) {
+      newMode = Mode.INSERT;
+    }
+
+    if (oldMode != newMode) {
+      ModeState modeState = currentModeState();
+      popModes();
+      pushModes(newMode, modeState.getSubMode());
+    }
+  }
+
+  /**
+   * Resets the command, mode, visual mode, and mapping mode to initial values.
+   */
+  public void reset() {
+    executingCommand = null;
+    resetModes();
+    commandBuilder.resetInProgressCommandPart(getKeyRootNode(mappingState.getMappingMode()));
+    startDigraphSequence();
+
+    updateStatus();
+  }
+
+  public String toSimpleString() {
+    return modeStates.stream().map(ModeState::toSimpleString)
+      .collect(Collectors.joining(", "));
+  }
+
+  private ModeState currentModeState() {
+    if (modeStates.size() > 0) {
+      return modeStates.peek();
+    }
+    else {
+      return defaultModeState;
+    }
+  }
+
+  private void updateStatus() {
+    final StringBuilder msg = new StringBuilder();
+    if (OptionsManager.INSTANCE.getShowmode().isSet()) {
+      msg.append(getStatusString(modeStates.size() - 1));
+    }
+
+    if (isRecording()) {
+      if (msg.length() > 0) {
+        msg.append(" - ");
+      }
+      msg.append("recording");
+    }
+
+    VimPlugin.showMode(msg.toString());
+  }
+
   @NotNull
   private String getStatusString(int pos) {
     ModeState modeState;
@@ -261,86 +341,6 @@ public class CommandState {
     }
 
     return msg.toString();
-  }
-
-  /**
-   * Toggles the insert/overwrite state. If currently insert, goto replace mode. If currently replace, goto insert
-   * mode.
-   */
-  public void toggleInsertOverwrite() {
-    Mode oldMode = getMode();
-    Mode newMode = oldMode;
-    if (oldMode == Mode.INSERT) {
-      newMode = Mode.REPLACE;
-    }
-    else if (oldMode == Mode.REPLACE) {
-      newMode = Mode.INSERT;
-    }
-
-    if (oldMode != newMode) {
-      ModeState modeState = currentModeState();
-      popModes();
-      pushModes(newMode, modeState.getSubMode());
-    }
-  }
-
-  /**
-   * Resets the command, mode, visual mode, and mapping mode to initial values.
-   */
-  public void reset() {
-    executingCommand = null;
-    resetModes();
-    commandBuilder.resetInProgressCommandPart(getKeyRootNode(mappingState.getMappingMode()));
-    startDigraphSequence();
-
-    updateStatus();
-  }
-
-  public boolean isRecording() {
-    return isRecording;
-  }
-
-  public void setRecording(boolean val) {
-    isRecording = val;
-    updateStatus();
-  }
-
-  public String toSimpleString() {
-    return modeStates.stream().map(ModeState::toSimpleString)
-      .collect(Collectors.joining(", "));
-  }
-
-  private ModeState currentModeState() {
-    if (modeStates.size() > 0) {
-      return modeStates.peek();
-    }
-    else {
-      return defaultModeState;
-    }
-  }
-
-  private void updateStatus() {
-    final StringBuilder msg = new StringBuilder();
-    if (OptionsManager.INSTANCE.getShowmode().isSet()) {
-      msg.append(getStatusString(modeStates.size() - 1));
-    }
-
-    if (isRecording()) {
-      if (msg.length() > 0) {
-        msg.append(" - ");
-      }
-      msg.append("recording");
-    }
-
-    VimPlugin.showMode(msg.toString());
-  }
-
-  public boolean isDotRepeatInProgress() {
-    return dotRepeatInProgress;
-  }
-
-  public void setDotRepeatInProgress(boolean dotRepeatInProgress) {
-    this.dotRepeatInProgress = dotRepeatInProgress;
   }
 
   public enum Mode {
