@@ -10,11 +10,12 @@ import javax.swing.KeyStroke
 
 class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
   private val commandParts = Stack<Command>()
-  private var keys = mutableListOf<KeyStroke>()
+  private var keyList = mutableListOf<KeyStroke>()
 
   var commandState = CurrentCommandState.NEW_COMMAND
   var count = 0
     private set
+  val keys: Iterable<KeyStroke> get() = keyList
 
   // The argument type for the current command part's action. Kept separate to handle digraphs and characters. We first
   // try to accept a digraph. If we get it, set expected argument type to character and handle the converted key. If we
@@ -37,7 +38,6 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
   fun pushCommandPart(action: EditorActionHandlerBase) {
     commandParts.push(Command(count, action, action.type, action.flags))
     expectedArgumentType = action.argumentType
-    keys = mutableListOf()
   }
 
   fun popCommandPart() {
@@ -52,16 +52,24 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     expectedArgumentType = Argument.Type.CHARACTER
   }
 
-  fun addKey(keyStroke: KeyStroke) {
-    keys.add(keyStroke)
+  fun addKey(key: KeyStroke) {
+    keyList.add(key)
   }
 
-  fun addCountCharacter(chKey: Char) {
-    count = (count * 10) + (chKey - '0')
+  fun addCountCharacter(key: KeyStroke) {
+    count = (count * 10) + (key.keyChar - '0')
+    // If count overflows and flips negative, reset to 999999999L. In Vim, count is a long, which is *usually* 32 bits,
+    // so will flip at 2147483648. We store count as an Int, which is also 32 bit.
+    // See https://github.com/vim/vim/blob/b376ace1aeaa7614debc725487d75c8f756dd773/src/normal.c#L631
+    if (count < 0) {
+      count = 999999999
+    }
+    addKey(key)
   }
 
   fun deleteCountCharacter() {
     count /= 10
+    keyList.removeAt(keyList.size - 1)
   }
 
   fun setCurrentCommandPartNode(newNode: CommandPartNode) {
@@ -130,11 +138,11 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     resetInProgressCommandPart(commandPartNode)
     commandState = CurrentCommandState.NEW_COMMAND
     commandParts.clear()
+    keyList.clear()
     expectedArgumentType = null
   }
 
   fun resetInProgressCommandPart(commandPartNode: CommandPartNode) {
-    keys.clear()
     count = 0
     setCurrentCommandPartNode(commandPartNode)
   }

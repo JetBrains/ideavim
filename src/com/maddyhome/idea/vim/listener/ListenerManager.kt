@@ -65,6 +65,7 @@ import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimMotionGroup
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.ExEntryPanel
+import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.Closeable
@@ -167,6 +168,7 @@ object VimListenerManager {
 
       OptionsManager.number.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
       OptionsManager.relativenumber.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
+      OptionsManager.showcmd.addOptionChangeListener(ShowCmdOptionChangeListener)
 
       EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, ApplicationManager.getApplication())
     }
@@ -176,6 +178,7 @@ object VimListenerManager {
 
       OptionsManager.number.removeOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
       OptionsManager.relativenumber.removeOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
+      OptionsManager.showcmd.addOptionChangeListener(ShowCmdOptionChangeListener)
 
       EventFacade.getInstance().removeEditorFactoryListener(VimEditorFactoryListener)
     }

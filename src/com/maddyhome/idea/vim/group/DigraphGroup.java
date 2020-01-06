@@ -60,7 +60,6 @@ public class DigraphGroup {
 
     final String digraph = keys.get(ch);
     final String digraphText = digraph == null ? "" : ", Digr " + digraph;
-    final String hexText = (ch > 0xff) ? String.format("Hex %04x", (int) ch) : String.format("Hex %02x", (int) ch);
 
     if (ch < 0x100) {
       VimPlugin.showMessage(String.format("<%s>  %d,  Hex %02x,  Oct %03o%s",

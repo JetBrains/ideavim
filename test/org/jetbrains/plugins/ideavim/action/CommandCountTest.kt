@@ -21,4 +21,11 @@ class CommandCountTest : VimTestCase() {
     typeText(parseKeys("2d3l"))
     myFixture.checkResult("7890")
   }
+
+  // See https://github.com/vim/vim/blob/b376ace1aeaa7614debc725487d75c8f756dd773/src/normal.c#L631
+  fun `test count resets to 999999999L if gets too large`() {
+    configureByText("1")
+    typeText(parseKeys("12345678901234567890<C-A>"))
+    myFixture.checkResult("1000000000")
+  }
 }

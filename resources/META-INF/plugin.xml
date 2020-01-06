@@ -62,6 +62,7 @@
     <applicationConfigurable groupId="editor" instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
     <statusBarWidgetProvider implementation="com.maddyhome.idea.vim.StatusBarIconProvider"/>
+    <statusBarWidgetProvider implementation="com.maddyhome.idea.vim.ui.ShowCmdStatusBarWidget"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>

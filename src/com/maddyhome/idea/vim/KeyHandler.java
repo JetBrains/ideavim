@@ -48,6 +48,7 @@ import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import com.maddyhome.idea.vim.ui.ShowCmd;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -220,7 +221,7 @@ public class KeyHandler {
     try {
       if (!allowKeyMappings || !handleKeyMapping(editor, key, context)) {
         if (isCommandCountKey(chKey, editorState)) {
-          commandBuilder.addCountCharacter(chKey);
+          commandBuilder.addCountCharacter(key);
         } else if (isDeleteCommandCountKey(key, editorState)) {
           commandBuilder.deleteCountCharacter();
         } else if (isEditorReset(key, editorState)) {
@@ -234,17 +235,16 @@ public class KeyHandler {
         // If we are this far, then the user must be entering a command or a non-single-character argument
         // to an entered command. Let's figure out which it is.
         else if (!handleDigraph(editor, key, context, editorState)) {
-
-          commandBuilder.addKey(key);
-
           // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
           // return the node matching this keystroke
           final Node node = mapOpCommand(key, commandBuilder.getChildNode(key), editorState);
 
           if (node instanceof CommandNode) {
             handleCommandNode(editor, context, key, (CommandNode) node, editorState);
+            commandBuilder.addKey(key);
           } else if (node instanceof CommandPartNode) {
             commandBuilder.setCurrentCommandPartNode((CommandPartNode) node);
+            commandBuilder.addKey(key);
           } else {
             // If we are in insert/replace mode send this key in for processing
             if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
@@ -270,7 +270,7 @@ public class KeyHandler {
 
     // Do we have a fully entered command at this point? If so, let's execute it.
     if (commandBuilder.isReady()) {
-      executeCommand(editor, key, context, editorState);
+      executeCommand(editor, context, editorState);
     }
     else if (commandBuilder.isBad()) {
       editorState.resetOpPending();
@@ -282,6 +282,9 @@ public class KeyHandler {
     if (shouldRecord && editorState.isRecording()) {
       VimPlugin.getRegister().recordKeyStroke(key);
     }
+
+    // This will update immediately, if we're on the EDT (which we are)
+    ShowCmd.INSTANCE.update();
   }
 
   /**
@@ -615,10 +618,12 @@ public class KeyHandler {
     if (commandBuilder.getExpectedArgumentType() == Argument.Type.DIGRAPH) {
       if (DigraphSequence.isDigraphStart(key)) {
         editorState.startDigraphSequence();
+        editorState.getCommandBuilder().addKey(key);
         return true;
       }
       if (DigraphSequence.isLiteralStart(key)) {
         editorState.startLiteralSequence();
+        editorState.getCommandBuilder().addKey(key);
         return true;
       }
     }
@@ -626,6 +631,9 @@ public class KeyHandler {
     DigraphResult res = editorState.processDigraphKey(key, editor);
     switch (res.getResult()) {
       case DigraphResult.RES_HANDLED:
+        editorState.getCommandBuilder().addKey(key);
+        return true;
+
       case DigraphResult.RES_BAD:
         return true;
 
@@ -637,6 +645,7 @@ public class KeyHandler {
         if (stroke == null) {
           return false;
         }
+        editorState.getCommandBuilder().addKey(key);
         handleKey(editor, stroke, context);
         return true;
 
@@ -653,7 +662,6 @@ public class KeyHandler {
   }
 
   private void executeCommand(@NotNull Editor editor,
-                              @NotNull KeyStroke key,
                               @NotNull DataContext context,
                               @NotNull CommandState editorState) {
     final Command command = editorState.getCommandBuilder().buildCommand();
@@ -676,7 +684,7 @@ public class KeyHandler {
     }
 
     if (ApplicationManager.getApplication().isDispatchThread()) {
-      Runnable action = new ActionRunner(editor, context, command, key);
+      Runnable action = new ActionRunner(editor, context, command);
       EditorActionHandlerBase cmdAction = command.getAction();
       String name = cmdAction.getId();
 
@@ -884,11 +892,10 @@ public class KeyHandler {
    */
   static class ActionRunner implements Runnable {
     @Contract(pure = true)
-    ActionRunner(Editor editor, DataContext context, Command cmd, KeyStroke key) {
+    ActionRunner(Editor editor, DataContext context, Command cmd) {
       this.editor = editor;
       this.context = context;
       this.cmd = cmd;
-      this.key = key;
     }
 
     @Override
@@ -925,7 +932,6 @@ public class KeyHandler {
     private final Editor editor;
     private final DataContext context;
     private final Command cmd;
-    private final KeyStroke key;
   }
 
   private TypedActionHandler origHandler;
