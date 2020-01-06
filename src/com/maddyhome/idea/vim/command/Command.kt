@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import java.util.*
-import javax.swing.KeyStroke
 
 /**
  * This represents a single Vim command to be executed (operator, motion, text object, etc.). It may optionally include
@@ -30,8 +29,7 @@ data class Command(
   var rawCount: Int,
   var action: EditorActionHandlerBase,
   val type: Type,
-  var flags: EnumSet<CommandFlags>,
-  var keys: List<KeyStroke>
+  var flags: EnumSet<CommandFlags>
 ) {
 
   init {

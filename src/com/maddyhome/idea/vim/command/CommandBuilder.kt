@@ -35,7 +35,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     }
 
   fun pushCommandPart(action: EditorActionHandlerBase) {
-    commandParts.push(Command(count, action, action.type, action.flags, keys))
+    commandParts.push(Command(count, action, action.type, action.flags))
     expectedArgumentType = action.argumentType
     keys = mutableListOf()
   }
