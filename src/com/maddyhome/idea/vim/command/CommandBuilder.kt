@@ -72,6 +72,12 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     return currentCommandPartNode[key]
   }
 
+  fun isAwaitingCharOrDigraphArgument(): Boolean {
+    if (commandParts.size == 0) return false
+    val argumentType = commandParts.peek().action.argumentType
+    return argumentType == Argument.Type.CHARACTER || argumentType == Argument.Type.DIGRAPH
+  }
+
   fun isBuildingMultiKeyCommand(): Boolean {
     // Don't apply mapping if we're in the middle of building a multi-key command.
     // E.g. given nmap s v, don't try to map <C-W>s to <C-W>v
@@ -95,7 +101,8 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     return commandParts.peek()?.argument != null
   }
 
-  fun peekCurrentCommandPartArgumentType(): Argument.Type? {
+  fun peekCurrentCommandPartActualArgumentType(): Argument.Type? {
+    // This is the type of the actual assigned argument, if available. NOT the expected argument type.
     return commandParts.peek()?.argument?.type
   }
 

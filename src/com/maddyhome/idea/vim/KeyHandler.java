@@ -217,7 +217,7 @@ public class KeyHandler {
     boolean shouldRecord = true;
 
     if (allowKeyMappings && handleKeyMapping(editor, key, context)) {
-      if (!editorState.isOperatorPending() || commandBuilder.peekCurrentCommandPartArgumentType() != Argument.Type.OFFSETS) {
+      if (!editorState.isOperatorPending() || commandBuilder.peekCurrentCommandPartActualArgumentType() != Argument.Type.OFFSETS) {
         return;
       }
     }
@@ -338,7 +338,7 @@ public class KeyHandler {
     final MappingState mappingState = commandState.getMappingState();
     final CommandBuilder commandBuilder = commandState.getCommandBuilder();
 
-    if (commandBuilder.getCommandState() == CurrentCommandState.CHAR_OR_DIGRAPH
+    if (commandBuilder.isAwaitingCharOrDigraphArgument()
       || commandBuilder.isBuildingMultiKeyCommand()
       || isMappingDisabledForKey(key, commandState)) {
       return false;
@@ -760,10 +760,6 @@ public class KeyHandler {
                                        CommandState editorState) {
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
     switch (argument) {
-      case CHARACTER:
-      case DIGRAPH:
-        commandBuilder.setCommandState(CurrentCommandState.CHAR_OR_DIGRAPH);
-        break;
       case MOTION:
         if (editorState.isDotRepeatInProgress() && VimRepeater.Extension.INSTANCE.getArgumentCaptured() != null) {
           commandBuilder.completeCommandPart(VimRepeater.Extension.INSTANCE.getArgumentCaptured());
