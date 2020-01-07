@@ -636,7 +636,7 @@ public class KeyHandler {
 
       case DigraphResult.RES_DONE:
         if (commandBuilder.getExpectedArgumentType() == Argument.Type.DIGRAPH) {
-          commandBuilder.setExpectedArgumentType(Argument.Type.CHARACTER);
+          commandBuilder.fallbackToCharacterArgument();
         }
         final KeyStroke stroke = res.getStroke();
         if (stroke == null) {
@@ -647,7 +647,7 @@ public class KeyHandler {
 
       case DigraphResult.RES_UNHANDLED:
         if (commandBuilder.getExpectedArgumentType() == Argument.Type.DIGRAPH) {
-          commandBuilder.setExpectedArgumentType(Argument.Type.CHARACTER);
+          commandBuilder.fallbackToCharacterArgument();
           handleKey(editor, key, context);
           return true;
         }
@@ -705,9 +705,11 @@ public class KeyHandler {
     // The user entered a valid command. Create the command and add it to the stack.
     final EditorActionHandlerBase action = node.getActionHolder().getAction();
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
+    final Argument.Type expectedArgumentType = commandBuilder.getExpectedArgumentType();
+
     commandBuilder.pushCommandPart(action);
 
-    if (!checkArgumentCompatibility(action, commandBuilder)) {
+    if (!checkArgumentCompatibility(expectedArgumentType, action)) {
       commandBuilder.setCommandState(CurrentCommandState.BAD_COMMAND);
       return;
     }
@@ -717,13 +719,12 @@ public class KeyHandler {
     }
     else {
       final Argument.Type argumentType = action.getArgumentType();
-      commandBuilder.setExpectedArgumentType(argumentType);
       startWaitingForArgument(editor, context, key.getKeyChar(), argumentType, editorState);
       partialReset(editor);
     }
 
     // TODO In the name of God, get rid of EX_STRING, FLAG_COMPLETE_EX and all the related staff
-    if (commandBuilder.getExpectedArgumentType() == Argument.Type.EX_STRING && action.getFlags().contains(CommandFlags.FLAG_COMPLETE_EX)) {
+    if (expectedArgumentType == Argument.Type.EX_STRING && action.getFlags().contains(CommandFlags.FLAG_COMPLETE_EX)) {
       /* The only action that implements FLAG_COMPLETE_EX is ProcessExEntryAction.
          * When pressing ':', ExEntryAction is chosen as the command. Since it expects no arguments, it is invoked and
            calls ProcessGroup#startExCommand, pushes CMD_LINE mode, and the action is popped. The ex handler will push
@@ -779,8 +780,8 @@ public class KeyHandler {
     }
   }
 
-  private boolean checkArgumentCompatibility(@NotNull EditorActionHandlerBase action, @NotNull CommandBuilder commandBuilder) {
-    return !(commandBuilder.getExpectedArgumentType() == Argument.Type.MOTION && action.getType() != Command.Type.MOTION);
+  private boolean checkArgumentCompatibility(@Nullable Argument.Type expectedArgumentType, @NotNull EditorActionHandlerBase action) {
+    return !(expectedArgumentType == Argument.Type.MOTION && action.getType() != Command.Type.MOTION);
   }
 
   /**

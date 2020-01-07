@@ -13,8 +13,13 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
   private var keys = mutableListOf<KeyStroke>()
 
   var commandState = CurrentCommandState.NEW_COMMAND
-  var expectedArgumentType: Argument.Type? = null
   var count = 0
+    private set
+
+  // The argument type for the current command part's action. Kept separate to handle digraphs and characters. We first
+  // try to accept a digraph. If we get it, set expected argument type to character and handle the converted key. If we
+  // fail to convert to a digraph, set expected argument type to character and try to handle the key again.
+  var expectedArgumentType: Argument.Type? = null
     private set
 
   val isReady get() = commandState == CurrentCommandState.READY
@@ -31,7 +36,20 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
 
   fun pushCommandPart(action: EditorActionHandlerBase) {
     commandParts.push(Command(count, action, action.type, action.flags, keys))
+    expectedArgumentType = action.argumentType
     keys = mutableListOf()
+  }
+
+  fun popCommandPart() {
+    commandParts.pop()
+    expectedArgumentType = if (commandParts.size > 0) commandParts.peek().action.argumentType else null
+  }
+
+  fun fallbackToCharacterArgument() {
+    // Finished handling DIGRAPH. We either succeeded, in which case handle the converted character, or failed to parse,
+    // in which case try to handle input as a character argument.
+    assert(expectedArgumentType == Argument.Type.DIGRAPH) { "Cannot move state from $expectedArgumentType to CHARACTER"}
+    expectedArgumentType = Argument.Type.CHARACTER
   }
 
   fun addKey(keyStroke: KeyStroke) {
@@ -79,10 +97,6 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
 
   fun peekCurrentCommandPartArgumentType(): Argument.Type? {
     return commandParts.peek()?.argument?.type
-  }
-
-  fun popCommandPart() {
-    commandParts.pop()
   }
 
   fun buildCommand(): Command {
