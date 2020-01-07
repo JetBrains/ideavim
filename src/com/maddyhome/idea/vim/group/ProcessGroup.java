@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
@@ -116,6 +115,11 @@ public class ProcessGroup {
       }
       else {
         // FIXME looks like this branch gets never executed
+        // Search is handled through SearchEntry(Fwd|Rev)Action waiting for an argument type of EX_STRING. Once ex entry
+        // is complete, ProcessExEntryAction should be invoked which would invoke this method. However, keyHandler
+        // massages the Command stack, ignores ProcessExEntryAction, passes the ex content as a string argument to
+        // the previous SearchEntry(Fwd|Rev)Action and invokes it. This works better because the argument text is saved
+        // for repeats, and any leading operators are also executed (e.g. "d/foo")
         int pos = VimPlugin.getSearch().search(editor, text, panel.getCount(),
                                                                  panel.getLabel().equals("/")
                                                                  ? EnumSet.of(CommandFlags.FLAG_SEARCH_FWD)

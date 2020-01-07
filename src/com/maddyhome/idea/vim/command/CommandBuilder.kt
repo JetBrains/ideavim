@@ -81,12 +81,6 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     return commandParts.peek()?.argument?.type
   }
 
-  fun replaceCurrentCommandPart(action: EditorActionHandlerBase, argument: Argument) {
-    popCommandPart()
-    pushCommandPart(action)
-    commandParts.peek().argument = argument
-  }
-
   fun popCommandPart() {
     commandParts.pop()
   }

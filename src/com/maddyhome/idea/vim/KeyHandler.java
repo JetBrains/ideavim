@@ -36,8 +36,6 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
 import com.maddyhome.idea.vim.action.change.VimRepeater;
 import com.maddyhome.idea.vim.action.macro.ToggleRecordingAction;
-import com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction;
-import com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.group.ChangeGroup;
@@ -705,11 +703,14 @@ public class KeyHandler {
                                  @NotNull CommandNode node,
                                  CommandState editorState) {
     // The user entered a valid command. Create the command and add it to the stack.
-    EditorActionHandlerBase action = node.getActionHolder().getAction();
+    final EditorActionHandlerBase action = node.getActionHolder().getAction();
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
     commandBuilder.pushCommandPart(action);
 
-    if (!checkArgumentCompatibility(action, commandBuilder)) return;
+    if (!checkArgumentCompatibility(action, commandBuilder)) {
+      commandBuilder.setCommandState(CurrentCommandState.BAD_COMMAND);
+      return;
+    }
 
     if (action.getArgumentType() == null || stopMacroRecord(node, editorState)) {
       commandBuilder.setCommandState(CurrentCommandState.READY);
@@ -723,16 +724,27 @@ public class KeyHandler {
 
     // TODO In the name of God, get rid of EX_STRING, FLAG_COMPLETE_EX and all the related staff
     if (commandBuilder.getExpectedArgumentType() == Argument.Type.EX_STRING && action.getFlags().contains(CommandFlags.FLAG_COMPLETE_EX)) {
-      if (VimPlugin.getProcess().isForwardSearch()) {
-        action = new SearchEntryFwdAction();
-      }
-      else {
-        action = new SearchEntryRevAction();
-      }
+      /* The only action that implements FLAG_COMPLETE_EX is ProcessExEntryAction.
+         * When pressing ':', ExEntryAction is chosen as the command. Since it expects no arguments, it is invoked and
+           calls ProcessGroup#startExCommand, pushes CMD_LINE mode, and the action is popped. The ex handler will push
+           the final <CR> through handleKey, which chooses ProcessExEntryAction. Because we're not expecting EX_STRING,
+           this branch does NOT fire, and ProcessExEntryAction handles the ex cmd line entry.
+         * When pressing '/' or '?', SearchEntry(Fwd|Rev)Action is chosen as the command. This expects an argument of
+           EX_STRING, so startWaitingForArgument calls ProcessGroup#startSearchCommand. The ex handler pushes the final
+           <CR> through handleKey, which chooses ProcessExEntryAction, and we hit this branch. We don't invoke
+           ProcessExEntryAction, but pop it, set the search text as an argument on SearchEntry(Fwd|Rev)Action and invoke
+           that instead.
+         * When using '/' or '?' as part of a motion (e.g. "d/foo"), the above happens again, and all is good. Because
+           the text has been applied as an argument on the last command, '.' will correctly repeat it.
 
+         It's hard to see how to improve this. Removing EX_STRING means starting ex input has to happen in ExEntryAction
+         and SearchEntry(Fwd|Rev)Action, and the ex command invoked in ProcessExEntryAction, but that breaks any initial
+         operator, which would be invoked first (e.g. 'd' in "d/foo").
+      */
       String text = VimPlugin.getProcess().endSearchCommand(editor);
-      commandBuilder.replaceCurrentCommandPart(action, new Argument(text));
-      editorState.popModes();
+      commandBuilder.popCommandPart();  // Pop ProcessExEntryAction
+      commandBuilder.completeCommandPart(new Argument(text)); // Set search text on SearchEntry(Fwd|Rev)Action
+      editorState.popModes(); // Pop CMD_LINE
     }
   }
 
@@ -758,19 +770,17 @@ public class KeyHandler {
         editorState.pushModes(editorState.getMode(), CommandState.SubMode.OP_PENDING);
         break;
       case EX_STRING:
+        // The current Command expects an EX_STRING argument. E.g. SearchEntry(Fwd|Rev)Action. This won't execute until
+        // state hits READY. Start the ex input field, push CMD_LINE mode and wait for the argument.
         VimPlugin.getProcess().startSearchCommand(editor, context, commandBuilder.getCount(), key);
         commandBuilder.setCommandState(CurrentCommandState.NEW_COMMAND);
         editorState.pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE);
-        commandBuilder.popCommandPart();
+        break;
     }
   }
 
   private boolean checkArgumentCompatibility(@NotNull EditorActionHandlerBase action, @NotNull CommandBuilder commandBuilder) {
-    if (commandBuilder.getExpectedArgumentType() == Argument.Type.MOTION && action.getType() != Command.Type.MOTION) {
-      commandBuilder.setCommandState(CurrentCommandState.BAD_COMMAND);
-      return false;
-    }
-    return true;
+    return !(commandBuilder.getExpectedArgumentType() == Argument.Type.MOTION && action.getType() != Command.Type.MOTION);
   }
 
   /**
@@ -798,7 +808,7 @@ public class KeyHandler {
   }
 
   /**
-   * Resets the state of this handler. Does a partial reset then resets the mode, the command, and the argument
+   * Resets the state of this handler. Does a partial reset then resets the mode, the command, and the argument.
    *
    * @param editor The editor to reset.
    */
