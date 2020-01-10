@@ -27,13 +27,17 @@ import java.util.*
  */
 data class Command(
   var rawCount: Int,
-  var action: EditorActionHandlerBase,
+  var action: EditorActionHandlerBase?,
   val type: Type,
   var flags: EnumSet<CommandFlags>
 ) {
 
+  constructor(rawCount: Int, register: Char): this(rawCount, null, Type.SELECT_REGISTER, EnumSet.of(CommandFlags.FLAG_EXPECT_MORE)) {
+    this.register = register
+  }
+
   init {
-    action.process(this)
+    action?.process(this)
   }
 
   var count: Int
@@ -43,6 +47,7 @@ data class Command(
     }
 
   var argument: Argument? = null
+  var register: Char? = null
 
   enum class Type {
     /**
@@ -70,12 +75,12 @@ data class Command(
      */
     COPY,
     PASTE,
-    // TODO REMOVE?
-    RESET,
     /**
      * Represents commands that select the register.
      */
     SELECT_REGISTER,
+    // TODO REMOVE?
+    RESET,
     OTHER_READONLY,
     OTHER_WRITABLE,
     /**
@@ -86,7 +91,7 @@ data class Command(
 
     val isRead: Boolean
       get() = when (this) {
-        MOTION, COPY, SELECT_REGISTER, OTHER_READONLY, COMPLETION -> true
+        MOTION, COPY, OTHER_READONLY, COMPLETION -> true
         else -> false
       }
 

@@ -79,6 +79,25 @@ public class CopyActionTest extends VimTestCase {
     myFixture.checkResult("hellolo world\n");
   }
 
+  // |register| |y| |quote|
+  public void testYankRegisterUsesLastEnteredRegister() {
+    typeTextInFile(parseKeys("\"a\"byl", "\"ap"),
+      "hel<caret>lo world\n");
+    myFixture.checkResult("helllo world\n");
+  }
+
+  public void testYankAppendRegister() {
+    typeTextInFile(parseKeys("\"Ayl", "l", "\"Ayl", "\"Ap"),
+      "hel<caret>lo world\n");
+    myFixture.checkResult("hellolo world\n");
+  }
+
+  public void testYankWithInvalidRegister() {
+    typeTextInFile(parseKeys("\"&"),
+      "hel<caret>lo world\n");
+    assertPluginError(true);
+  }
+
   // |P|
   public void testYankPutBefore() {
     typeTextInFile(parseKeys("y2l", "P"),

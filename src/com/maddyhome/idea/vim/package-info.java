@@ -130,7 +130,7 @@
  * |<Space>|              {@link com.maddyhome.idea.vim.action.motion.leftright.MotionRightWrapAction}
  * |!|                    {@link com.maddyhome.idea.vim.action.change.change.FilterMotionAction}
  * |!!|                   translated to !_
- * |quote|                {@link com.maddyhome.idea.vim.action.copy.SelectRegisterAction}
+ * |quote|                handled by command key parser
  * |#|                    {@link com.maddyhome.idea.vim.action.motion.search.SearchWholeWordBackwardAction}
  * |$|                    {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction}
  * |%|                    {@link com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction}

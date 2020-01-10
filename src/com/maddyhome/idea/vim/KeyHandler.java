@@ -224,6 +224,10 @@ public class KeyHandler {
         else if (isExpectingCharArgument(commandBuilder)) {
           handleCharArgument(key, chKey, editorState);
         }
+        else if (editorState.getSubMode() == CommandState.SubMode.REGISTER_PENDING) {
+          commandBuilder.addKey(key);
+          handleSelectRegister(editorState, chKey);
+        }
         // If we are this far, then the user must be entering a command or a non-single-character argument
         // to an entered command. Let's figure out which it is.
         else if (!handleDigraph(editor, key, context, editorState)) {
@@ -237,7 +241,12 @@ public class KeyHandler {
           } else if (node instanceof CommandPartNode) {
             commandBuilder.setCurrentCommandPartNode((CommandPartNode) node);
             commandBuilder.addKey(key);
-          } else {
+          } else if (isSelectRegister(key, editorState)) {
+            editorState.pushModes(CommandState.Mode.COMMAND, CommandState.SubMode.REGISTER_PENDING);
+            commandBuilder.addKey(key);
+          }
+          else { // node == null
+
             // If we are in insert/replace mode send this key in for processing
             if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
               shouldRecord &= VimPlugin.getChange().processKey(editor, context, key);
@@ -266,6 +275,7 @@ public class KeyHandler {
     }
     else if (commandBuilder.isBad()) {
       editorState.resetOpPending();
+      editorState.resetRegisterPending();
       VimPlugin.indicateError();
       reset(editor);
     }
@@ -565,7 +575,29 @@ public class KeyHandler {
   }
 
   private boolean isEditorReset(@NotNull KeyStroke key, @NotNull CommandState editorState) {
-    return (editorState.getMode() == CommandState.Mode.COMMAND) && StringHelper.isCloseKeyStroke(key);
+    return editorState.getMode() == CommandState.Mode.COMMAND && StringHelper.isCloseKeyStroke(key);
+  }
+
+  private boolean isSelectRegister(@NotNull KeyStroke key, @NotNull CommandState editorState) {
+    if (editorState.getMode() != CommandState.Mode.COMMAND && editorState.getMode() != CommandState.Mode.VISUAL) {
+      return false;
+    }
+
+    if (editorState.getSubMode() == CommandState.SubMode.REGISTER_PENDING) {
+      return true;
+    }
+
+    return key.getKeyChar() == '"' && !editorState.isOperatorPending() && editorState.getCommandBuilder().getExpectedArgumentType() == null;
+  }
+
+  private void handleSelectRegister(@NotNull CommandState commandState, char chKey) {
+    commandState.resetRegisterPending();
+    if (VimPlugin.getRegister().isValid(chKey)) {
+      commandState.getCommandBuilder().pushCommandPart(chKey);
+    }
+    else {
+      commandState.getCommandBuilder().setCommandState(CurrentCommandState.BAD_COMMAND);
+    }
   }
 
   private boolean isExpectingCharArgument(@NotNull CommandBuilder commandBuilder) {
@@ -914,6 +946,11 @@ public class KeyHandler {
 
       editorState.getCommandBuilder().setCommandState(CurrentCommandState.NEW_COMMAND);
 
+      final Character register = cmd.getRegister();
+      if (register != null) {
+        VimPlugin.getRegister().selectRegister(register);
+      }
+
       executeVimAction(editor, cmd.getAction(), context);
       if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
         VimPlugin.getChange().processCommand(editor, cmd);
@@ -922,10 +959,8 @@ public class KeyHandler {
       // Now the command has been executed let's clean up a few things.
 
       // By default, the "empty" register is used by all commands, so we want to reset whatever the last register
-      // selected by the user was to the empty register - unless we just executed the "select register" command.
-      if (cmd.getType() != Command.Type.SELECT_REGISTER) {
-        VimPlugin.getRegister().resetRegister();
-      }
+      // selected by the user was to the empty register
+      VimPlugin.getRegister().resetRegister();
 
       // If, at this point, we are not in insert, replace, or visual modes, we need to restore the previous
       // mode we were in. This handles commands in those modes that temporarily allow us to execute normal

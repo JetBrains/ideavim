@@ -260,7 +260,6 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction" mappingModes="N" keys="[P,]P,[p"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutTextAfterCursorActionMoveCursor" mappingModes="N" keys="gp"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorActionMoveCursor" mappingModes="N" keys="gP"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.copy.SelectRegisterAction" mappingModes="NXO" keys='"'/>
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.YankLineAction" mappingModes="N" keys="Y"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.YankMotionAction" mappingModes="N" keys="y"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.YankVisualAction" mappingModes="X" keys="y"/>

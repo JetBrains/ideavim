@@ -155,11 +155,21 @@ class ShowCmdTest: VimTestCase() {
     assertEquals("12345678900987654321", getShowCmdTooltipText())
   }
 
-  // TODO: Select register is currently a standalone action, rather than part of the current command
-//  fun `test showcmd shows select register command`() {
-//    typeText(parseKeys("\"a32d"))
-//    assertEquals("\"a32d", getShowCmdText())
-//  }
+  fun `test showcmd shows select register command`() {
+    typeText(parseKeys("\"a32d"))
+    assertEquals("\"a32d", getShowCmdText())
+  }
+
+  fun `test showcmd shows count and select register command`() {
+    typeText(parseKeys("32\"ad"))
+    assertEquals("32\"ad", getShowCmdText())
+  }
+
+  fun `test showcmd shows repeated select register with counts`() {
+    typeText(parseKeys("22\"a22\"a22\"a22\"a22d22"))
+    assertEquals("a22\"a22d22", getShowCmdText())
+    assertEquals("22\"a22\"a22\"a22\"a22d22", getShowCmdTooltipText())
+  }
 
   private fun getShowCmdText() = ShowCmd.getWidgetText(myFixture.editor!!)
   private fun getShowCmdTooltipText() = ShowCmd.getFullText(myFixture.editor!!)
