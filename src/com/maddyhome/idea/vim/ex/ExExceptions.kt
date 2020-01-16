@@ -15,25 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.ex
 
-package com.maddyhome.idea.vim.ex;
+open class ExException(s: String? = null) : Exception(s)
 
-/**
- * Exception class
- */
-public class ExException extends Exception {
-  /**
-   * Constructs an <code>ExException</code> with no specified detail message.
-   */
-  public ExException() {
-  }
+class InvalidCommandException(message: String, cmd: String?) : ExException("$message | $cmd")
 
-  /**
-   * Constructs an <code>ExException</code> with the specified detail message.
-   *
-   * @param s the detail message.
-   */
-  public ExException(String s) {
-    super(s);
-  }
-}
+class InvalidRangeException(s: String) : ExException(s)
+
+class MissingArgumentException : ExException()
+
+class MissingRangeException : ExException()
+
+class NoArgumentAllowedException : ExException()
+
+class NoRangeAllowedException : ExException()
