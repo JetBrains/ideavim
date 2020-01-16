@@ -70,6 +70,10 @@ class Register {
   }
 
   object KeySorter : Comparator<Register> {
-    override fun compare(o1: Register, o2: Register): Int = o1.name.compareTo(o2.name)
+    private const val ORDER = "\"0123456789abcdefghijklmnopqrstuvwxyz-*+.:%#/="
+
+    override fun compare(o1: Register, o2: Register): Int {
+      return ORDER.indexOf(o1.name.toLowerCase()) - ORDER.indexOf(o2.name.toLowerCase())
+    }
   }
 }
