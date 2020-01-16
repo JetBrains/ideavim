@@ -15,108 +15,46 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.ex
 
-package com.maddyhome.idea.vim.ex;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.common.TextRange
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.common.TextRange;
-import org.jetbrains.annotations.NotNull;
+class ExCommand(val ranges: Ranges, val command: String, var argument: String) {
 
+  fun getLine(editor: Editor): Int = ranges.getLine(editor)
 
-public class ExCommand {
-  public ExCommand(@NotNull Ranges ranges, @NotNull String command, @NotNull String argument) {
-    this.ranges = ranges;
-    this.argument = argument;
-    this.command = command;
+  fun getLine(editor: Editor, caret: Caret, context: DataContext): Int = ranges.getLine(editor, caret, context)
+
+  fun getCount(editor: Editor, context: DataContext?, defaultCount: Int, checkCount: Boolean): Int {
+    val count = if (checkCount) countArgument else -1
+
+    val res = ranges.getCount(editor, context, count)
+    return if (res == -1) defaultCount else res
   }
 
-  public int getLine(@NotNull Editor editor) {
-    return ranges.getLine(editor);
+  fun getCount(editor: Editor, caret: Caret, context: DataContext, defaultCount: Int, checkCount: Boolean): Int {
+    val count = ranges.getCount(editor, caret, context, if (checkCount) countArgument else -1)
+    return if (count == -1) defaultCount else count
   }
 
-  public int getLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
-    return ranges.getLine(editor, caret, context);
+  fun getLineRange(editor: Editor): LineRange = ranges.getLineRange(editor, -1)
+
+  fun getLineRange(editor: Editor, caret: Caret, context: DataContext): LineRange {
+    return ranges.getLineRange(editor, caret, context, -1)
   }
 
-  public int getCount(@NotNull Editor editor, DataContext context, int defaultCount, boolean checkCount) {
-    int count = -1;
-    if (checkCount) {
-      count = getCountArgument();
-    }
-
-    int res = ranges.getCount(editor, context, count);
-    if (res == -1) {
-      res = defaultCount;
-    }
-
-    return res;
+  fun getTextRange(editor: Editor, context: DataContext?, checkCount: Boolean): TextRange {
+    val count = if (checkCount) countArgument else -1
+    return ranges.getTextRange(editor, context, count)
   }
 
-  public int getCount(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int defaultCount,
-                      boolean checkCount) {
-    final int count = ranges.getCount(editor, caret, context, checkCount ? getCountArgument() : -1);
-    if (count == -1) return defaultCount;
-    return count;
+  fun getTextRange(editor: Editor, caret: Caret, context: DataContext, checkCount: Boolean): TextRange {
+    return ranges.getTextRange(editor, caret, context, if (checkCount) countArgument else -1)
   }
 
-  @NotNull
-  public LineRange getLineRange(@NotNull Editor editor) {
-    return ranges.getLineRange(editor, -1);
-  }
-
-  public LineRange getLineRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
-    return ranges.getLineRange(editor, caret, context, -1);
-  }
-
-  @NotNull
-  public TextRange getTextRange(@NotNull Editor editor, DataContext context, boolean checkCount) {
-    int count = -1;
-    if (checkCount) {
-      count = getCountArgument();
-    }
-
-    return ranges.getTextRange(editor, context, count);
-  }
-
-  public TextRange getTextRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                                boolean checkCount) {
-    return ranges.getTextRange(editor, caret, context, checkCount ? getCountArgument() : -1);
-  }
-
-  private int getCountArgument() {
-    try {
-      return Integer.parseInt(argument);
-    }
-    catch (NumberFormatException e) {
-      return -1;
-    }
-  }
-
-  @NotNull
-  public String getCommand() {
-    return command;
-  }
-
-  @NotNull
-  public String getArgument() {
-    return argument;
-  }
-
-  public void setArgument(@NotNull String argument) {
-    this.argument = argument;
-  }
-
-  @NotNull
-  public Ranges getRanges() {
-    return ranges;
-  }
-
-  @NotNull
-  private final Ranges ranges;
-  @NotNull
-  private final String command;
-  @NotNull
-  private String argument;
+  private val countArgument: Int
+    get() = argument.toIntOrNull() ?: -1
 }
