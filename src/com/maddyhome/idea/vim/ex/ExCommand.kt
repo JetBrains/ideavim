@@ -21,6 +21,8 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.ex.ranges.LineRange
+import com.maddyhome.idea.vim.ex.ranges.Ranges
 
 class ExCommand(val ranges: Ranges, val command: String, var argument: String) {
 
@@ -31,7 +33,7 @@ class ExCommand(val ranges: Ranges, val command: String, var argument: String) {
   fun getCount(editor: Editor, context: DataContext?, defaultCount: Int, checkCount: Boolean): Int {
     val count = if (checkCount) countArgument else -1
 
-    val res = ranges.getCount(editor, context, count)
+    val res = ranges.getCount(editor, count)
     return if (res == -1) defaultCount else res
   }
 

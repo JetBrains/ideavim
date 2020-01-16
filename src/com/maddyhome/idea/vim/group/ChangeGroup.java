@@ -51,7 +51,7 @@ import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.ex.LineRange;
+import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
@@ -1787,8 +1787,8 @@ public class ChangeGroup {
   public boolean sortRange(@NotNull Editor editor,
                            @NotNull LineRange range,
                            @NotNull Comparator<String> lineComparator) {
-    final int startLine = range.getStartLine();
-    final int endLine = range.getEndLine();
+    final int startLine = range.startLine;
+    final int endLine = range.endLine;
     final int count = endLine - startLine + 1;
     if (count < 2) {
       return false;

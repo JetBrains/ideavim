@@ -28,7 +28,8 @@ import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.handler.GotoLineHandler;
-import com.maddyhome.idea.vim.ex.range.AbstractRange;
+import com.maddyhome.idea.vim.ex.ranges.Range;
+import com.maddyhome.idea.vim.ex.ranges.Ranges;
 import com.maddyhome.idea.vim.group.HistoryGroup;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
@@ -412,7 +413,7 @@ public class CommandParser {
             reprocess = false;
             break;
           case RANGE_DONE: // We have hit the end of a range - process it
-            Range[] range = AbstractRange.createRange(location.toString(), offsetTotal, move);
+            Range[] range = Range.createRange(location.toString(), offsetTotal, move);
             if (range == null) {
               error = MessageHelper.message(Msg.e_badrange, Character.toString(ch));
               state = State.ERROR;

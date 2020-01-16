@@ -15,30 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.ex.ranges
 
-package com.maddyhome.idea.vim.ex;
+class LineRange(startLine: Int, endLine: Int) {
 
+  @JvmField
+  val startLine: Int
+  @JvmField
+  val endLine: Int
 
-public class LineRange {
-  public LineRange(int startLine, int endLine) {
+  init {
     if (endLine >= startLine) {
-      this.startLine = startLine;
-      this.endLine = endLine;
+      this.startLine = startLine
+      this.endLine = endLine
+    } else {
+      this.startLine = endLine
+      this.endLine = startLine
     }
-    else {
-      this.startLine = endLine;
-      this.endLine = startLine;
-    }
   }
-
-  public int getStartLine() {
-    return startLine;
-  }
-
-  public int getEndLine() {
-    return endLine;
-  }
-
-  private final int startLine;
-  private final int endLine;
 }

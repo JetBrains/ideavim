@@ -37,7 +37,7 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.ex.LineRange;
+import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
@@ -377,7 +377,7 @@ public class SearchGroup {
   }
 
   public int updateIncsearchHighlights(@NotNull Editor editor, @NotNull String pattern, boolean forwards, int caretOffset, @Nullable LineRange searchRange) {
-    final int searchStartOffset = searchRange != null ? EditorHelper.getLineStartOffset(editor, searchRange.getStartLine()) : caretOffset;
+    final int searchStartOffset = searchRange != null ? EditorHelper.getLineStartOffset(editor, searchRange.startLine) : caretOffset;
     final boolean showHighlights = OptionsManager.INSTANCE.getHlsearch().isSet();
     return updateSearchHighlights(pattern, false, showHighlights, searchStartOffset, searchRange, forwards, false);
   }
@@ -410,8 +410,8 @@ public class SearchGroup {
         }
 
         if (shouldAddAllSearchHighlights(editor, pattern, showHighlights)) {
-          final int startLine = searchRange == null ? 0 : searchRange.getStartLine();
-          final int endLine = searchRange == null ? -1 : searchRange.getEndLine();
+          final int startLine = searchRange == null ? 0 : searchRange.startLine;
+          final int endLine = searchRange == null ? -1 : searchRange.endLine;
           List<TextRange> results = findAll(editor, pattern, startLine, endLine, shouldIgnoreCase(pattern, shouldIgnoreSmartCase));
           if (!results.isEmpty()) {
             currentMatchOffset = findClosestMatch(editor, results, initialOffset, forwards);
@@ -1114,8 +1114,8 @@ public class SearchGroup {
       cmd.inc();
     }
 
-    int line1 = range.getStartLine();
-    int line2 = range.getEndLine();
+    int line1 = range.startLine;
+    int line2 = range.endLine;
 
     if (line1 < 0 || line2 < 0) {
       return false;
