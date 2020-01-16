@@ -15,53 +15,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.ex
 
-package com.maddyhome.idea.vim.ex;
-
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.helper.UserDataManager;
-import com.maddyhome.idea.vim.ui.ExOutputPanel;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.helper.vimExOutput
+import com.maddyhome.idea.vim.ui.ExOutputPanel
 
 /**
  * @author vlan
  */
-public class ExOutputModel {
-  @NotNull private final Editor myEditor;
-  @Nullable private String myText;
+class ExOutputModel private constructor(private val myEditor: Editor) {
+  var text: String? = null
+    private set
 
-  private ExOutputModel(@NotNull Editor editor) {
-    myEditor = editor;
-  }
-
-  @NotNull
-  public static ExOutputModel getInstance(@NotNull Editor editor) {
-    ExOutputModel model = UserDataManager.getVimExOutput(editor);
-    if (model == null) {
-      model = new ExOutputModel(editor);
-      UserDataManager.setVimExOutput(editor, model);
-    }
-    return model;
-  }
-
-  public void output(@NotNull String text) {
-    myText = text;
-    if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      ExOutputPanel.getInstance(myEditor).setText(text);
+  fun output(text: String) {
+    this.text = text
+    if (!ApplicationManager.getApplication().isUnitTestMode) {
+      ExOutputPanel.getInstance(myEditor).setText(text)
     }
   }
 
-  public void clear() {
-    myText = null;
-    if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      ExOutputPanel.getInstance(myEditor).deactivate(false);
+  fun clear() {
+    text = null
+    if (!ApplicationManager.getApplication().isUnitTestMode) {
+      ExOutputPanel.getInstance(myEditor).deactivate(false)
     }
   }
 
-  @Nullable
-  public String getText() {
-    return myText;
+  companion object {
+    @JvmStatic
+    fun getInstance(editor: Editor): ExOutputModel {
+      var model = editor.vimExOutput
+      if (model == null) {
+        model = ExOutputModel(editor)
+        editor.vimExOutput = model
+      }
+      return model
+    }
   }
 }
