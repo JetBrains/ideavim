@@ -34,7 +34,6 @@ import com.intellij.openapi.util.Key
 import com.intellij.ui.KeyStrokeAdapter
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase.Companion.parseKeysSet
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper
@@ -42,7 +41,7 @@ import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.listener.IdeaSpecifics.aceJumpActive
-import com.maddyhome.idea.vim.option.OptionsManager.lookupKeys
+import com.maddyhome.idea.vim.option.OptionsManager
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -90,7 +89,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
       if (aceJumpActive()) return false
       val keyCode = keyStroke.keyCode
       if (LookupManager.getActiveLookup(editor) != null) {
-        return isEnabledForLookup(keyStroke)
+        return LookupKeys.isEnabledForLookup(keyStroke)
       }
       if (keyCode == KeyEvent.VK_ESCAPE) {
         return isEnabledForEscape(editor)
@@ -136,29 +135,6 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
     return fileEditorManager.allEditors.any { fileEditor -> editor == EditorUtil.getEditorEx(fileEditor) }
   }
 
-  private fun isEnabledForLookup(keyStroke: KeyStroke): Boolean {
-    val notAllowedKeys = parseKeysSet(
-      "<Tab>", "<Down>", "<Up>", "<Enter>", "<Left>", "<Right>",
-      // New line in vim, but QuickDoc on MacOs
-      "<C-J>"
-    )
-    for (keys in notAllowedKeys) {
-      if (keyStroke == keys[0]) {
-        return false
-      }
-    }
-    // We allow users to set custom keys that will work with lookup in case devs forgot something
-    val popupActions = lookupKeys
-    val values = popupActions.values()
-    for (value in values) {
-      val keys = StringHelper.parseKeys(value)
-      if (keys.size >= 1 && keyStroke == keys[0]) {
-        return false
-      }
-    }
-    return true
-  }
-
   private fun isShortcutConflict(keyStroke: KeyStroke): Boolean {
     return VimPlugin.getKey().getKeymapConflicts(keyStroke).isNotEmpty()
   }
@@ -188,6 +164,31 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
   }
 
   private fun getEditor(e: AnActionEvent): Editor? = e.getData(PlatformDataKeys.EDITOR)
+
+  /**
+   * Every time the key pressed with an active lookup, there is a decision:
+   *   should this key be processed by IdeaVim, or by IDE. For example, dot and enter should be processed by IDE, but
+   *   <C-W> by IdeaVim.
+   *
+   * The list of keys that should be processed by IDE is stored in [OptionsManager.lookupKeys]. So, we should search
+   *   if the pressed key is presented in this list. The caches are used to speedup the process.
+   */
+  private object LookupKeys {
+    private var parsedLookupKeys: List<KeyStroke> = parseLookupKeys()
+    private val lookupKeysCache = mutableMapOf<KeyStroke, Boolean>()
+
+    init {
+      OptionsManager.lookupKeys.addOptionChangeListener { _, _ ->
+        parsedLookupKeys = parseLookupKeys()
+        lookupKeysCache.clear()
+      }
+    }
+
+    fun isEnabledForLookup(keyStroke: KeyStroke): Boolean = lookupKeysCache.getOrPut(keyStroke) { keyStroke !in parsedLookupKeys }
+
+    private fun parseLookupKeys() = OptionsManager.lookupKeys.values()
+      .map { StringHelper.parseKeys(it) }.filter { it.isNotEmpty() }.map { it.first() }
+  }
 
   companion object {
     @JvmField

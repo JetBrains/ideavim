@@ -58,7 +58,7 @@ object OptionsManager {
   val incsearch = addOption(ToggleOption("incsearch", "is", false))
   val iskeyword = addOption(KeywordOption("iskeyword", "isk", arrayOf("@", "48-57", "_")))
   val keymodel = addOption(KeyModelOptionData.option)
-  val lookupKeys = addOption(ListOption("lookupkeys", "lookupkeys", arrayOf(), null))
+  val lookupKeys = addOption(ListOption(LookupKeysData.name, LookupKeysData.name, LookupKeysData.defaultValues, null))
   val matchpairs = addOption(ListOption("matchpairs", "mps", arrayOf("(:)", "{:}", "[:]"), ".:."))
   val more = addOption(ToggleOption("more", "more", true))
   val nrformats = addOption(BoundListOption("nrformats", "nf", arrayOf("octal", "hex"), arrayOf("octal", "hex", "alpha")))
@@ -505,4 +505,18 @@ object IdeaRefactorMode {
       action()
     }
   }
+}
+
+object LookupKeysData {
+  val name = "lookupkeys"
+  val defaultValues = arrayOf(
+    "<Tab>", "<Down>", "<Up>", "<Enter>", "<Left>", "<Right>",
+    "<C-Down>", "<C-Up>",
+    "<PageUp>", "<PageDown>",
+    // New line in vim, but QuickDoc on MacOs
+    "<C-J>",
+    // QuickDoc for non-mac layouts.
+    // Vim: Insert next non-digit literally (same as <Ctrl-V>). Not yet supported (19.01.2020)
+    "<C-Q>"
+  )
 }
