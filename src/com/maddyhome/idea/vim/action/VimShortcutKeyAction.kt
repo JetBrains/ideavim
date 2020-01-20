@@ -174,20 +174,18 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
    *   if the pressed key is presented in this list. The caches are used to speedup the process.
    */
   private object LookupKeys {
-    private var parsedLookupKeys: List<KeyStroke> = parseLookupKeys()
-    private val lookupKeysCache = mutableMapOf<KeyStroke, Boolean>()
+    private var parsedLookupKeys: Set<KeyStroke> = parseLookupKeys()
 
     init {
       OptionsManager.lookupKeys.addOptionChangeListener { _, _ ->
         parsedLookupKeys = parseLookupKeys()
-        lookupKeysCache.clear()
       }
     }
 
-    fun isEnabledForLookup(keyStroke: KeyStroke): Boolean = lookupKeysCache.getOrPut(keyStroke) { keyStroke !in parsedLookupKeys }
+    fun isEnabledForLookup(keyStroke: KeyStroke): Boolean = keyStroke !in parsedLookupKeys
 
     private fun parseLookupKeys() = OptionsManager.lookupKeys.values()
-      .map { StringHelper.parseKeys(it) }.filter { it.isNotEmpty() }.map { it.first() }
+      .map { StringHelper.parseKeys(it) }.filter { it.isNotEmpty() }.map { it.first() }.toSet()
   }
 
   companion object {
