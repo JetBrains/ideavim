@@ -16,13 +16,11 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-[To Be Released]
+0.55, 2020-01-20
 --------------
 
-_Available since 0.54.1 EAP:_
-
 **Features:**
-* Surround and Commentary extensions can be repeated with a dot command ([VIM-1118](https://youtrack.jetbrains.com/issue/VIM-1118))
+* Surround and Commentary extensions support repeating with a dot command ([VIM-1118](https://youtrack.jetbrains.com/issue/VIM-1118))
 * Support XDG settings standard ([VIM-664](https://youtrack.jetbrains.com/issue/VIM-664))
 * Add option to remove the status bar icon ([VIM-1847](https://youtrack.jetbrains.com/issue/VIM-1847))
 
@@ -43,10 +41,6 @@ _Available since 0.54.1 EAP:_
 * [VIM-1853](https://youtrack.jetbrains.com/issue/VIM-1853) Fix marks for disposed projects
 * [VIM-1858](https://youtrack.jetbrains.com/issue/VIM-1858) Fix imap for autocomplete
 * [VIM-1362](https://youtrack.jetbrains.com/issue/VIM-1362) Search with confirm doesn't scroll down far enough
-
-_Available since 0.54.2 EAP:_
-
-**Fixes:**
 * [VIM-1875](https://youtrack.jetbrains.com/issue/VIM-1875) Fix `isk` in `~/.ideaivmrc`
 * [VIM-1874](https://youtrack.jetbrains.com/issue/VIM-1874) Fix `set clipboard=unnamed` execution from `~/.ideavimrc`
 * [VIM-1878](https://youtrack.jetbrains.com/issue/VIM-1878) Fix `c` command after extract method action

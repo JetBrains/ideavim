@@ -3,8 +3,10 @@
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
       <ul>
-        <li>Fix `imap jk <ESC>` for the active autocompletion lookup</li>
-        <li>Surround and Commentary extensions can be repeated with a dot command</li>
+        <li>Support dot command for Surround and Commentary extensions</li>
+        <li>Support XDG settings standard</li>
+        <li>Add option to remove the status bar icon</li>
+        <li>Various bug fixes</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
     ]]></change-notes>
