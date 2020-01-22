@@ -621,8 +621,8 @@
  * |c_CTRL-K|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.StartDigraphAction}
  * |c_CTRL-L|             TO BE IMPLEMENTED
  * |c_CTRL-M|             {@link com.maddyhome.idea.vim.action.ex.ProcessExEntryAction}
- * |c_CTRL-N|             TO BE IMPLEMENTED
- * |c_CTRL-P|             TO BE IMPLEMENTED
+ * |c_CTRL-N|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryDownAction}
+ * |c_CTRL-P|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryUpAction}
  * |c_CTRL-Q|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.StartDigraphAction}
  * |c_CTRL-R|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.InsertRegisterAction}
  * |c_CTRL-R_CTRL-A|      TO BE IMPLEMENTED
