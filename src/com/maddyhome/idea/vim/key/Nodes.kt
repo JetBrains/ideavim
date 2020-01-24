@@ -29,12 +29,13 @@ import javax.swing.KeyStroke
  *
  *              root
  *               |
- *    -----------------------------------
- *    |       |           |             |
- *    j       G           g             f
- *              ----------        ----------------
- *             |        |         |      |       |
- *             c        f         c      o       m
+ *    -------------------------------------------
+ *    |       |           |                     |
+ *    j       G           g                     f
+ *                        |                     |
+ *                   ----------        ----------------
+ *                   |        |         |      |       |
+ *                   c        f         c      o       m
  *
  *
  *  Here j, G, c, f, c, o, m will be presented as a [CommandNode], and g and f as a [CommandPartNode]
@@ -43,6 +44,7 @@ import javax.swing.KeyStroke
  * If the command is complete, it's represented as a [CommandNode]. If this character is a part of command
  *   and the user should complete the sequence, it's [CommandPartNode]
  */
+@Suppress("GrazieInspection")
 interface Node
 
 /** Represents a complete command */
