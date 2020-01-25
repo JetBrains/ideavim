@@ -93,6 +93,7 @@ Supported:
 
 Emulated Vim plugins:
 
+* vim-easymotion
 * vim-surround
 * vim-multiple-cursors
 * vim-commentary
