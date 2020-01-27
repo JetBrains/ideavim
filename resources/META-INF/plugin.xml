@@ -61,11 +61,11 @@
     <statusBarWidgetProvider implementation="com.maddyhome.idea.vim.StatusBarIconProvider"/>
   </extensions>
 
-  <xi:include href="/META-INF/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
+  <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
-  <xi:include href="/META-INF/VimActions.xml" xpointer="xpointer(/idea-plugin/*)"/>
-  <xi:include href="/META-INF/VimExCommands.xml" xpointer="xpointer(/idea-plugin/*)"/>
-  <xi:include href="/META-INF/VimExtensions.xml" xpointer="xpointer(/idea-plugin/*)"/>
+  <xi:include href="/META-INF/includes/VimActions.xml" xpointer="xpointer(/idea-plugin/*)"/>
+  <xi:include href="/META-INF/includes/VimExCommands.xml" xpointer="xpointer(/idea-plugin/*)"/>
+  <xi:include href="/META-INF/includes/VimExtensions.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
   <actions>
     <action id="VimPluginToggle" class="com.maddyhome.idea.vim.action.VimPluginToggleAction" text="Vim Emulator" description="Toggle the vim plugin On/off">
