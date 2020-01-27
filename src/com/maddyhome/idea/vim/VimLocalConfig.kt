@@ -33,6 +33,7 @@ import org.jdom.Element
     Storage("\$APP_CONFIG$$/vim_local_settings.xml", roamingType = RoamingType.DISABLED, deprecated = true),
     Storage("\$APP_CONFIG$/vim_local_settings.xml", roamingType = RoamingType.DISABLED)
   ])
+// TODO: 27.01.2020 [VERSION UPDATE] 2019.3 https://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_services.html#light-services
 class VimLocalConfig : PersistentStateComponent<Element> {
   override fun getState(): Element {
     val element = Element("ideavim-local")
