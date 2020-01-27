@@ -16,6 +16,14 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+To Be Released
+--------------
+
+**Fixes:**
+* [VIM-1284](https://youtrack.jetbrains.com/issue/VIM-1284) Fix mapping of digits
+* Fix handling of counts on both operator and motion, e.g. `3d2w` deletes 6 words, instead of 32
+* Allow mapping of `<C-K>` and `<C-V>`/`<C-Q>`
+
 0.55, 2020-01-20
 --------------
 
@@ -46,13 +54,6 @@ usual beta standards.
 * [VIM-1878](https://youtrack.jetbrains.com/issue/VIM-1878) Fix `c` command after extract method action
 * [VIM-1884](https://youtrack.jetbrains.com/issue/VIM-1884) Show quickDoc during popup with `CTRL-J`
 * [VIM-987](https://youtrack.jetbrains.com/issue/VIM-987) Fix arrow keys for the NEO keyboard
-
-_Not yet released_
-
-**Fixes:**
-* [VIM-1284](https://youtrack.jetbrains.com/issue/VIM-1284) Fix mapping of digits
-* Fix handling of counts on both operator and motion, e.g. `3d2w` deletes 6 words, instead of 32
-* Allow mapping of `<C-K>` and `<C-V>`/`<C-Q>`
 
 0.54, 2019-11-20
 --------------
