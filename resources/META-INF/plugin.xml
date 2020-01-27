@@ -32,6 +32,9 @@
 
   <application-components>
     <component>
+      <implementation-class>com.maddyhome.idea.vim.DynamicLoaderStopper</implementation-class>
+    </component>
+    <component>
       <implementation-class>com.maddyhome.idea.vim.VimPlugin</implementation-class>
     </component>
     <component>
