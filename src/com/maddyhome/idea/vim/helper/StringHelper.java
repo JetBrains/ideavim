@@ -67,6 +67,9 @@ public class StringHelper {
     return res;
   }
 
+  @NotNull
+  public static final KeyStroke PlugKeyStroke = parseKeys("<Plug>").get(0);
+
   private enum KeyParserState {
     INIT,
     ESCAPE,

@@ -631,8 +631,8 @@ public class MotionGroup {
   }
 
   public static void scrollCaretIntoView(@NotNull Editor editor) {
-    final boolean scrollJump =
-      !CommandState.getInstance(editor).getFlags().contains(CommandFlags.FLAG_IGNORE_SCROLL_JUMP);
+    final EnumSet<CommandFlags> flags = CommandState.getInstance(editor).getExecutingCommandFlags();
+    final boolean scrollJump = flags.contains(CommandFlags.FLAG_IGNORE_SCROLL_JUMP);
     scrollPositionIntoView(editor, editor.getCaretModel().getVisualPosition(), scrollJump);
   }
 
@@ -698,7 +698,8 @@ public class MotionGroup {
 
     int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
     int width = EditorHelper.getScreenWidth(editor);
-    scrollJump = !CommandState.getInstance(editor).getFlags().contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP);
+    final EnumSet<CommandFlags> flags = CommandState.getInstance(editor).getExecutingCommandFlags();
+    scrollJump = !flags.contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP);
     scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();
     scrollJumpSize = 0;
     if (scrollJump) {

@@ -18,7 +18,7 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 fun Editor.popAllModes() {
   val commandState = this.commandState
   while (commandState.mode != CommandState.Mode.COMMAND) {
-    commandState.popState()
+    commandState.popModes()
   }
 }
 
@@ -30,11 +30,11 @@ fun Editor.hardResetAllModes() {
       CommandState.Mode.VISUAL -> exitVisualMode()
       CommandState.Mode.SELECT -> exitSelectMode(true)
       CommandState.Mode.INSERT -> exitInsertModeHardReset()
-      else -> commandState.popState()
+      else -> commandState.popModes()
     }
     if (statesBefore == commandState.toSimpleString()) {
       // This is just a protection against infinite loop
-      commandState.popState()
+      commandState.popModes()
     }
   }
 }
@@ -60,7 +60,7 @@ fun Editor.exitVisualMode() {
 
     this.subMode = CommandState.SubMode.NONE
 
-    this.commandState.popState()
+    this.commandState.popModes()
   }
 }
 
@@ -68,7 +68,7 @@ fun Editor.exitVisualMode() {
 fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
   if (!this.inSelectMode) return
 
-  this.commandState.popState()
+  this.commandState.popModes()
   SelectionVimListenerSuppressor.lock().use {
     this.caretModel.allCarets.forEach {
       it.removeSelection()

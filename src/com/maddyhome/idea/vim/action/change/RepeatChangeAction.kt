@@ -39,7 +39,7 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
     if (lastCommand == null && VimRepeater.Extension.lastExtensionHandler == null) return false
 
     // Save state
-    val save = state.command
+    val save = state.executingCommand
     val lastFTCmd = VimPlugin.getMotion().lastFTCmd
     val lastFTChar = VimPlugin.getMotion().lastFTChar
     val reg = VimPlugin.getRegister().currentRegister
@@ -62,7 +62,7 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
             mot.count = 0
           }
         }
-        state.setCommand(lastCommand)
+        state.setExecutingCommand(lastCommand)
 
         KeyHandler.executeVimAction(editor, lastCommand.action, context)
 
@@ -74,7 +74,7 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
     state.isDotRepeatInProgress = false
 
     // Restore state
-    if (save != null) state.setCommand(save)
+    if (save != null) state.setExecutingCommand(save)
     VimPlugin.getMotion().setLastFTCmd(lastFTCmd, lastFTChar)
     if (lastHandler != null) VimRepeater.Extension.lastExtensionHandler = lastHandler
     VimRepeater.repeatHandler = repeatHandler

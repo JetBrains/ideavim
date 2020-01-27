@@ -22,6 +22,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.helper.DigraphResult;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import org.jetbrains.annotations.NotNull;
@@ -93,7 +94,7 @@ public class ExEditorKit extends DefaultEditorKit {
         }
       }
       else {
-        return KeyStroke.getKeyStroke(new Character(ch), mods);
+        return KeyStroke.getKeyStroke(Character.valueOf(ch), mods);
       }
     }
 
@@ -111,6 +112,7 @@ public class ExEditorKit extends DefaultEditorKit {
   static final String HistoryUpFilter = "history-up-filter";
   static final String HistoryDownFilter = "history-down-filter";
   static final String StartDigraph = "start-digraph";
+  static final String StartLiteral = "start-literal";
 
   @NotNull private final Action[] exActions = new Action[]{
     new CancelEntryAction(),
@@ -126,6 +128,7 @@ public class ExEditorKit extends DefaultEditorKit {
     new HistoryDownFilterAction(),
     new ToggleInsertReplaceAction(),
     new StartDigraphAction(),
+    new StartLiteralAction(),
     new InsertRegisterAction(),
   };
 
@@ -485,25 +488,26 @@ public class ExEditorKit extends DefaultEditorKit {
     }
   }
 
-  public static class StartDigraphAction extends TextAction implements MultiStepAction {
-    @Nullable private DigraphSequence digraphSequence;
+  private static abstract class StartDigraphLiteralActionBase extends TextAction implements MultiStepAction {
+    @Nullable
+    private DigraphSequence digraphSequence;
 
-    StartDigraphAction() {
-      super(StartDigraph);
+    public StartDigraphLiteralActionBase(String name) {
+      super(name);
     }
 
     @Override
-    public void actionPerformed(@NotNull ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {
       final ExTextField target = (ExTextField)getTextComponent(e);
       final KeyStroke key = convert(e);
       if (key != null && digraphSequence != null) {
-        DigraphSequence.DigraphResult res = digraphSequence.processKey(key, target.getEditor());
+        DigraphResult res = digraphSequence.processKey(key, target.getEditor());
         switch (res.getResult()) {
-          case DigraphSequence.DigraphResult.RES_OK:
+          case DigraphResult.RES_HANDLED:
             target.setCurrentActionPromptCharacter(res.getPromptCharacter());
             break;
 
-          case DigraphSequence.DigraphResult.RES_BAD:
+          case DigraphResult.RES_BAD:
             target.clearCurrentAction();
             // Eat the character, unless it's <C-C>, in which case, forward on and cancel entry. Note that at some point
             // we should support input of control characters
@@ -512,7 +516,7 @@ public class ExEditorKit extends DefaultEditorKit {
             }
             break;
 
-          case DigraphSequence.DigraphResult.RES_DONE:
+          case DigraphResult.RES_DONE:
             final KeyStroke digraph = res.getStroke();
             digraphSequence = null;
             target.clearCurrentAction();
@@ -522,16 +526,40 @@ public class ExEditorKit extends DefaultEditorKit {
             break;
         }
       }
-      else if (key != null && DigraphSequence.isDigraphStart(key)) {
+      else if (key != null) {
         digraphSequence = new DigraphSequence();
-        DigraphSequence.DigraphResult res = digraphSequence.processKey(key, target.getEditor());
+        DigraphResult res = start(digraphSequence);
         target.setCurrentAction(this, res.getPromptCharacter());
       }
     }
 
+    protected abstract DigraphResult start(@NotNull DigraphSequence digraphSequence);
+
     @Override
     public void reset() {
       digraphSequence = null;
+    }
+  }
+
+  public static class StartDigraphAction extends StartDigraphLiteralActionBase {
+    StartDigraphAction() {
+      super(StartDigraph);
+    }
+
+    @Override
+    protected DigraphResult start(@NotNull DigraphSequence digraphSequence) {
+      return digraphSequence.startDigraphSequence();
+    }
+  }
+
+  public static class StartLiteralAction extends StartDigraphLiteralActionBase {
+    StartLiteralAction() {
+      super(StartLiteral);
+    }
+
+    @Override
+    protected DigraphResult start(@NotNull DigraphSequence digraphSequence) {
+      return digraphSequence.startLiteralSequence();
     }
   }
 

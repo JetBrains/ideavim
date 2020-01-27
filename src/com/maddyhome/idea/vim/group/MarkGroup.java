@@ -608,7 +608,7 @@ public class MarkGroup {
           int markLineStartOff = EditorHelper.getLineStartOffset(editor, mark.getLogicalLine());
           int markLineEndOff = EditorHelper.getLineEndOffset(editor, mark.getLogicalLine(), true);
 
-          Command command = CommandState.getInstance(editor).getCommand();
+          Command command = CommandState.getInstance(editor).getExecutingCommand();
           // If text is being changed from the start of the mark line (a special case for mark deletion)
           boolean changeFromMarkLineStart = command != null && command.getType() == Command.Type.CHANGE
                                             && delStartOff == markLineStartOff;
