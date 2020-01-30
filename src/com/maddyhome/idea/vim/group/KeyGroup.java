@@ -24,6 +24,7 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.keymap.Keymap;
@@ -63,6 +64,8 @@ public class KeyGroup {
   private static final String SHORTCUT_CONFLICT_ELEMENT = "shortcut-conflict";
   private static final String OWNER_ATTRIBUTE = "owner";
   private static final String TEXT_ELEMENT = "text";
+
+  private static final Logger logger = Logger.getInstance(KeyGroup.class);
 
   @NotNull private final Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<>();
   @NotNull private final Set<KeyStroke> requiredShortcutKeys = new HashSet<>(300);
@@ -262,6 +265,14 @@ public class KeyGroup {
   }
 
   public void registerCommandAction(@NotNull ActionBeanClass actionHolder) {
+
+    if (!VimPlugin.getPluginId().equals(actionHolder.getPluginId())) {
+      logger.error("IdeaVim doesn't accept contributions to `vimActions` extension points. " +
+                  "Please create a plugin using `VimExtension`. " +
+                  "Plugin to blame: " + actionHolder.getPluginId());
+      return;
+    }
+
     Set<List<KeyStroke>> actionKeys = actionHolder.getParsedKeys();
     if (actionKeys == null) {
       final EditorActionHandlerBase action = actionHolder.getAction();
