@@ -264,6 +264,13 @@ public class KeyGroup {
     registerRequiredShortcut(Arrays.asList(shortcut.getKeys()));
   }
 
+  public void unregisterCommandActions() {
+    requiredShortcutKeys.clear();
+    keyRoots.clear();
+    if (identityChecker != null) identityChecker.clear();
+    if (prefixes != null) prefixes.clear();
+  }
+
   public void registerCommandAction(@NotNull ActionBeanClass actionHolder) {
 
     if (!VimPlugin.getPluginId().equals(actionHolder.getPluginId())) {
@@ -365,8 +372,8 @@ public class KeyGroup {
     prefixes.put(keys, action.getId());
   }
 
-  private Map<MappingMode, Set<List<KeyStroke>>> identityChecker;
-  private Map<List<KeyStroke>, String> prefixes;
+  @Nullable private Map<MappingMode, Set<List<KeyStroke>>> identityChecker;
+  @Nullable private Map<List<KeyStroke>, String> prefixes;
 
   @NotNull
   private Node addMNode(@NotNull CommandPartNode base,
