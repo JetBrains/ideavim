@@ -18,16 +18,17 @@
 
 package org.jetbrains.plugins.ideavim.ex
 
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.ex.CommandParser.EX_COMMAND_EP
 import com.maddyhome.idea.vim.ex.commands
 import junit.framework.TestCase
-import org.junit.Test
-import kotlin.test.assertEquals
+import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
  * @author Alex Plate
  */
-class CommandParserTest {
-  @Test
+class CommandParserTest : VimTestCase() {
   fun `test one letter without optional`() {
     val commands = commands("a")
     assertEquals(1, commands.size)
@@ -35,7 +36,6 @@ class CommandParserTest {
     assertEquals("", commands[0].optional)
   }
 
-  @Test
   fun `test without optional`() {
     val commands = commands("a_discovery")
     TestCase.assertEquals(1, commands.size)
@@ -43,11 +43,58 @@ class CommandParserTest {
     assertEquals("", commands[0].optional)
   }
 
-  @Test
   fun `test with optional`() {
     val commands = commands("a[discovery]")
     TestCase.assertEquals(1, commands.size)
     assertEquals("a", commands[0].required)
     assertEquals("discovery", commands[0].optional)
+  }
+
+  fun `test simple ex command execution`() {
+    val keys = commandToKeys(">>")
+    val before = "I ${c}found it in a legendary land"
+    val after = "        ${c}I found it in a legendary land"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun `test execute in disabled state`() {
+    val keys = commandToKeys(">>")
+    val before = "I ${c}found it in a legendary land"
+    val after = "I ${c}found it in a legendary land"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+      VimPlugin.setEnabled(false)
+    }
+  }
+
+  fun `test turn off and on`() {
+    val keys = commandToKeys(">>")
+    val before = "I ${c}found it in a legendary land"
+    val after = "        ${c}I found it in a legendary land"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+      VimPlugin.setEnabled(false)
+      VimPlugin.setEnabled(true)
+    }
+  }
+
+  fun `test turn off and on twice`() {
+    val keys = commandToKeys(">>")
+    val before = "I ${c}found it in a legendary land"
+    val after = "        ${c}I found it in a legendary land"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+      VimPlugin.setEnabled(false)
+      VimPlugin.setEnabled(true)
+      VimPlugin.setEnabled(true)
+    }
+  }
+
+  fun `test unregister extension`() {
+    val keys = commandToKeys(">>")
+    val before = "I ${c}found it in a legendary land"
+    val after = "        ${c}I found it in a legendary land"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+      val extension = EX_COMMAND_EP.extensions().findFirst().get()
+      @Suppress("DEPRECATION")
+      EX_COMMAND_EP.getPoint(null).unregisterExtension(extension)
+    }
   }
 }

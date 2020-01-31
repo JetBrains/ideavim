@@ -19,8 +19,10 @@
 package com.maddyhome.idea.vim.ex
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.extensions.AbstractExtensionPointBean
 import com.intellij.util.xmlb.annotations.Attribute
+import com.maddyhome.idea.vim.VimPlugin
 
 class ExBeanClass : AbstractExtensionPointBean() {
   @Attribute("implementation")
@@ -37,6 +39,10 @@ class ExBeanClass : AbstractExtensionPointBean() {
   }
 
   fun register() {
+    if (pluginId != VimPlugin.getPluginId()) {
+      logger<ExBeanClass>().error("IdeaVim doesn't accept contributions to `vimActions` extension points. Please create a plugin using `VimExtension`. Plugin to blame: $pluginId")
+      return
+    }
     CommandParser.getInstance().addHandler(this)
   }
 }
