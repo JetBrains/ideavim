@@ -21,9 +21,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.extensions.ExtensionPointListener;
 import com.intellij.openapi.extensions.ExtensionPointName;
-import com.intellij.openapi.extensions.PluginDescriptor;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.SelectionType;
@@ -48,7 +46,7 @@ import java.util.regex.Pattern;
 public class CommandParser {
   private static final int MAX_RECURSION = 100;
   private static final Pattern TRIM_WHITESPACE = Pattern.compile("[ \\t]*(.*)[ \\t\\n\\r]+", Pattern.DOTALL);
-  public static final ExtensionPointName<ExBeanClass> EX_COMMAND_EP = ExtensionPointName.create("IdeaVIM.vimExCommand");
+  private final ExtensionPointName<ExBeanClass> EX_COMMAND_EP = ExtensionPointName.create("IdeaVIM.vimExCommand");
 
   private static class CommandParserHolder {
     static final CommandParser INSTANCE = new CommandParser();
@@ -67,43 +65,18 @@ public class CommandParser {
    * Don't let anyone create one of these.
    */
   private CommandParser() {
-    // IdeaVim doesn't support contribution to ex_command_ep extension point, so technically we can skip this update,
-    //   but let's support dynamic plugins in a more classic way and reload handlers on every EP change.
-    // TODO: [VERSION UPDATE] since 191 use
-    //  ExtensionPoint.addExtensionPointListener(ExtensionPointListener<T>, boolean, Disposable)
-    // TODO: [VERSION UPDATE] since 201 use
-    //  ExtensionPoint.addExtensionPointListener(ExtensionPointChangeListener, boolean, Disposable)
-    EX_COMMAND_EP.getPoint(null).addExtensionPointListener(new ExtensionPointListener<ExBeanClass>() {
-      @Override
-      public void extensionAdded(@NotNull ExBeanClass extension, @NotNull PluginDescriptor pluginDescriptor) {
-        // Suppress listener before the `VimPlugin.turnOn()` function execution. This logic should be rewritten after
-        //   version update (or earlier).
-        if (!initialRegistration) return;
-        unregisterHandlers();
-        registerHandlers();
-      }
-
-      @Override
-      public void extensionRemoved(@NotNull ExBeanClass extension, @NotNull PluginDescriptor pluginDescriptor) {
-        if (!initialRegistration) return;
-        unregisterHandlers();
-        registerHandlers();
-      }
-    });
-  }
-
-  private static boolean initialRegistration = false;
-
-  public void unregisterHandlers() {
-    root.clear();
   }
 
   /**
    * Registers all the supported Ex commands
    */
   public void registerHandlers() {
-    EX_COMMAND_EP.extensions().forEach(ExBeanClass::register);
-    initialRegistration = true;
+    if (registered) return;
+    registered = true;
+
+    for (ExBeanClass handler : EX_COMMAND_EP.getExtensions()) {
+      handler.register();
+    }
   }
 
   /**
@@ -622,6 +595,7 @@ public class CommandParser {
   }
 
   @NotNull private final CommandNode root = new CommandNode();
+  private boolean registered = false;
 
   private enum State {
     START,

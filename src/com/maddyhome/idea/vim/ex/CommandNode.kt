@@ -30,8 +30,4 @@ class CommandNode(command: ExBeanClass? = null) {
   }
 
   fun getChild(ch: Char) = nodes[ch]
-
-  fun clear() {
-    nodes.clear()
-  }
 }

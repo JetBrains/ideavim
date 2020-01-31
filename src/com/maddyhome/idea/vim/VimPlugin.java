@@ -420,11 +420,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   private void turnOffPlugin() {
     KeyHandler.getInstance().fullReset(null);
 
-    // Unregister vim actions in command mode
     RegisterActions.unregisterActions();
-
-    // Unregister ex handlers
-    CommandParser.getInstance().unregisterHandlers();
 
     getEditor().turnOff();
     getSearch().turnOff();
