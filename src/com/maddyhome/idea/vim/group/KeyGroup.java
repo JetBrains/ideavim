@@ -69,8 +69,8 @@ public class KeyGroup {
 
   @NotNull private final Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<>();
   @NotNull private final Set<KeyStroke> requiredShortcutKeys = new HashSet<>(300);
-  @NotNull private final Map<MappingMode, CommandPartNode> keyRoots = new HashMap<>();
-  @NotNull private final Map<MappingMode, KeyMapping> keyMappings = new HashMap<>();
+  @NotNull private final Map<MappingMode, CommandPartNode> keyRoots = new EnumMap<>(MappingMode.class);
+  @NotNull private final Map<MappingMode, KeyMapping> keyMappings = new EnumMap<>(MappingMode.class);
   @Nullable private OperatorFunction operatorFunction = null;
 
   void registerRequiredShortcutKeys(@NotNull Editor editor) {
