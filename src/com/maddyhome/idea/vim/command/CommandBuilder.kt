@@ -101,11 +101,6 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     return commandParts.peek()?.argument != null
   }
 
-  fun peekCurrentCommandPartActualArgumentType(): Argument.Type? {
-    // This is the type of the actual assigned argument, if available. NOT the expected argument type.
-    return commandParts.peek()?.argument?.type
-  }
-
   fun buildCommand(): Command {
     /* Let's go through the command stack and merge it all into one command. At this time there should never
        be more than two commands on the stack - one is the actual command, and the other would be a motion
