@@ -16,49 +16,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex
+package org.jetbrains.plugins.ideavim
 
+import com.maddyhome.idea.vim.RegisterActions.VIM_ACTIONS_EP
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.ex.CommandParser.EX_COMMAND_EP
-import com.maddyhome.idea.vim.ex.commands
-import junit.framework.TestCase
-import org.jetbrains.plugins.ideavim.VimTestCase
+import com.maddyhome.idea.vim.helper.StringHelper
 
-/**
- * @author Alex Plate
- */
-class CommandParserTest : VimTestCase() {
-  fun `test one letter without optional`() {
-    val commands = commands("a")
-    assertEquals(1, commands.size)
-    assertEquals("a", commands[0].required)
-    assertEquals("", commands[0].optional)
-  }
-
-  fun `test without optional`() {
-    val commands = commands("a_discovery")
-    TestCase.assertEquals(1, commands.size)
-    assertEquals("a_discovery", commands[0].required)
-    assertEquals("", commands[0].optional)
-  }
-
-  fun `test with optional`() {
-    val commands = commands("a[discovery]")
-    TestCase.assertEquals(1, commands.size)
-    assertEquals("a", commands[0].required)
-    assertEquals("discovery", commands[0].optional)
-  }
-
-  fun `test simple ex command execution`() {
-    val keys = commandToKeys(">>")
+class RegisterActionsTest : VimTestCase() {
+  fun `test simple action`() {
+    val keys = StringHelper.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
-    val after = "        ${c}I found it in a legendary land"
+    val after = "I f${c}ound it in a legendary land"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  fun `test execute in disabled state`() {
-    val keys = commandToKeys(">>")
+  fun `test action in disabled plugin`() {
+    val keys = StringHelper.parseKeys("jklwB") // just random keys
     val before = "I ${c}found it in a legendary land"
     val after = "I ${c}found it in a legendary land"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
@@ -66,20 +40,20 @@ class CommandParserTest : VimTestCase() {
     }
   }
 
-  fun `test turn off and on`() {
-    val keys = commandToKeys(">>")
+  fun `test turn plugin off and on`() {
+    val keys = StringHelper.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
-    val after = "        ${c}I found it in a legendary land"
+    val after = "I f${c}ound it in a legendary land"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.setEnabled(false)
       VimPlugin.setEnabled(true)
     }
   }
 
-  fun `test turn off and on twice`() {
-    val keys = commandToKeys(">>")
+  fun `test enable twice`() {
+    val keys = StringHelper.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
-    val after = "        ${c}I found it in a legendary land"
+    val after = "I f${c}ound it in a legendary land"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.setEnabled(false)
       VimPlugin.setEnabled(true)
@@ -88,13 +62,13 @@ class CommandParserTest : VimTestCase() {
   }
 
   fun `test unregister extension`() {
-    val keys = commandToKeys(">>")
+    val keys = StringHelper.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
-    val after = "        ${c}I found it in a legendary land"
+    val after = "I f${c}ound it in a legendary land"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
-      val extension = EX_COMMAND_EP.extensions().findFirst().get()
+      val motionRightAction = VIM_ACTIONS_EP.extensions().findAny().get();
       @Suppress("DEPRECATION")
-      EX_COMMAND_EP.getPoint(null).unregisterExtension(extension)
+      VIM_ACTIONS_EP.getPoint(null).unregisterExtension(motionRightAction)
     }
   }
 }

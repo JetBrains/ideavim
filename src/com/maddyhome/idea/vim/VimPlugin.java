@@ -330,6 +330,8 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   }
 
   public static void setEnabled(final boolean enabled) {
+    if (isEnabled() == enabled) return;
+
     if (!enabled) {
       getInstance().turnOffPlugin();
     }
@@ -417,6 +419,12 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
   private void turnOffPlugin() {
     KeyHandler.getInstance().fullReset(null);
+
+    // Unregister vim actions in command mode
+    RegisterActions.unregisterActions();
+
+    // Unregister ex handlers
+    CommandParser.getInstance().unregisterHandlers();
 
     getEditor().turnOff();
     getSearch().turnOff();

@@ -24,6 +24,7 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.keymap.Keymap;
@@ -64,10 +65,12 @@ public class KeyGroup {
   private static final String OWNER_ATTRIBUTE = "owner";
   private static final String TEXT_ELEMENT = "text";
 
+  private static final Logger logger = Logger.getInstance(KeyGroup.class);
+
   @NotNull private final Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<>();
   @NotNull private final Set<KeyStroke> requiredShortcutKeys = new HashSet<>(300);
-  @NotNull private final Map<MappingMode, CommandPartNode> keyRoots = new HashMap<>();
-  @NotNull private final Map<MappingMode, KeyMapping> keyMappings = new HashMap<>();
+  @NotNull private final Map<MappingMode, CommandPartNode> keyRoots = new EnumMap<>(MappingMode.class);
+  @NotNull private final Map<MappingMode, KeyMapping> keyMappings = new EnumMap<>(MappingMode.class);
   @Nullable private OperatorFunction operatorFunction = null;
 
   void registerRequiredShortcutKeys(@NotNull Editor editor) {
@@ -261,7 +264,22 @@ public class KeyGroup {
     registerRequiredShortcut(Arrays.asList(shortcut.getKeys()));
   }
 
+  public void unregisterCommandActions() {
+    requiredShortcutKeys.clear();
+    keyRoots.clear();
+    if (identityChecker != null) identityChecker.clear();
+    if (prefixes != null) prefixes.clear();
+  }
+
   public void registerCommandAction(@NotNull ActionBeanClass actionHolder) {
+
+    if (!VimPlugin.getPluginId().equals(actionHolder.getPluginId())) {
+      logger.error("IdeaVim doesn't accept contributions to `vimActions` extension points. " +
+                  "Please create a plugin using `VimExtension`. " +
+                  "Plugin to blame: " + actionHolder.getPluginId());
+      return;
+    }
+
     Set<List<KeyStroke>> actionKeys = actionHolder.getParsedKeys();
     if (actionKeys == null) {
       final EditorActionHandlerBase action = actionHolder.getAction();
@@ -354,8 +372,8 @@ public class KeyGroup {
     prefixes.put(keys, action.getId());
   }
 
-  private Map<MappingMode, Set<List<KeyStroke>>> identityChecker;
-  private Map<List<KeyStroke>, String> prefixes;
+  @Nullable private Map<MappingMode, Set<List<KeyStroke>>> identityChecker;
+  @Nullable private Map<List<KeyStroke>, String> prefixes;
 
   @NotNull
   private Node addMNode(@NotNull CommandPartNode base,
