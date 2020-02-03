@@ -66,12 +66,8 @@ public class RegisterActions {
   private static void registerEmptyShortcuts() {
     final KeyGroup parser = VimPlugin.getKey();
 
-    // Digraph shortcuts are handled directly by KeyHandler#handleKey, so they don't have an action. But we still need to
-    // register the shortcuts or the editor will swallow them. Technically, the shortcuts will be registered as part of
-    // other commands, but it's best to be explicit
-    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.CTRL_MASK)));
-    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK)));
-    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_MASK)));
+    // The {char1} <BS> {char2} shortcut is handled directly by KeyHandler#handleKey, so doesn't have an action. But we
+    // still need to register the shortcut, to make sure the editor doesn't swallow it.
     parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)));
   }
 }
