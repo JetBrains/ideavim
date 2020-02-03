@@ -250,6 +250,54 @@ public class StringHelper {
     return name != null ? "<" + prefix + name + ">" : "<<" + key.toString() + ">>";
   }
 
+  public static String toPrintableCharacters(@NotNull List<KeyStroke> keys) {
+    if (keys.isEmpty()) {
+      return "";
+    }
+    final StringBuilder builder = new StringBuilder();
+    for (KeyStroke key : keys) {
+      builder.append(toPrintableCharacter(key));
+    }
+    return builder.toString();
+  }
+
+  /**
+   * Convert a KeyStroke into the character it represents and return a printable version of the character.
+   *
+   * See :help 'isprint'
+   *
+   * @param key The KeyStroke to represent
+   * @return A printable String of the character represented by the KeyStroke
+   */
+  public static String toPrintableCharacter(@NotNull KeyStroke key) {
+    // TODO: Look at 'isprint', 'display' and 'encoding' settings
+    char c = key.getKeyChar();
+    if (c == CHAR_UNDEFINED && key.getModifiers() == 0) {
+      c = (char)key.getKeyCode();
+    }
+    else if (c == CHAR_UNDEFINED && (key.getModifiers() & CTRL_MASK) != 0) {
+      c = (char)(key.getKeyCode() - 'A' + 1);
+    }
+
+    if (c <= 31) {
+      return "^" + (char) (c + 'A' - 1);
+    } else if (c == 127) {
+      return "^" + (char) (c - 'A' + 1);
+      // Vim doesn't use these representations unless :set encoding=latin1. Technically, we could use them if the
+      // encoding of the buffer for the mark, jump or :ascii char is. But what encoding would we use for registers?
+      // Since we support Unicode, just treat everything as Unicode.
+//    } else if (c >= 128 && c <= 159) {
+//      return "~" + (char) (c - 'A' + 1);
+//    } else if (c >= 160 && c <= 254) {
+//      return "|" + (char)(c - (('A' - 1) * 2));
+//    } else if (c == 255) {
+//      return "~" + (char)(c - (('A' - 1) * 3));
+    } else if (CharacterHelper.isInvisibleControlCharacter(c) || CharacterHelper.isZeroWidthCharacter(c)) {
+      return String.format("<%04x>", (int) c);
+    }
+    return "" + c;
+  }
+
   public static boolean containsUpperCase(@NotNull String text) {
     for (int i = 0; i < text.length(); i++) {
       if (Character.isUpperCase(text.charAt(i)) && (i == 0 || text.charAt(i - 1) != '\\')) {

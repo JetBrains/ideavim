@@ -38,7 +38,7 @@ class RegistersHandler : CommandHandler.SingleExecution() {
           SelectionType.CHARACTER_WISE -> "c"
           SelectionType.BLOCK_WISE -> "b"
         }
-        "  $type  \"${reg.name}   ${StringHelper.toKeyNotation(reg.keys)}"
+        "  $type  \"${reg.name}   ${StringHelper.toPrintableCharacters(reg.keys)}"
       }
 
     ExOutputModel.getInstance(editor).output(regs)

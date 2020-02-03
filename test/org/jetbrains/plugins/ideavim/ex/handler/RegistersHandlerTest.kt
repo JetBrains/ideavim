@@ -66,6 +66,17 @@ class RegistersHandlerTest : VimTestCase() {
     assertExOutput("Type Name Content\n")
   }
 
+  fun `test correctly encodes non printable characters`() {
+    configureByText("")
+
+    VimPlugin.getRegister().setKeys('a', parseKeys("<Tab>Hello<Space>World<CR><Esc>"))
+
+    enterCommand("registers")
+    assertExOutput("""Type Name Content
+      |  c  "a   ^IHello World^J^[
+      """.trimMargin())
+  }
+
   fun `test display synonym for registers command`() {
     configureByText("")
 
