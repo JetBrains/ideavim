@@ -43,11 +43,9 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
-import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.io.File;
 import java.util.HashMap;
 
@@ -239,22 +237,6 @@ public class FileGroup {
     }
 
     return null;
-  }
-
-  public void displayAsciiInfo(@NotNull Editor editor) {
-    int offset = editor.getCaretModel().getOffset();
-    CharSequence charsSequence = editor.getDocument().getCharsSequence();
-    if (charsSequence.length() == 0 || offset >= charsSequence.length()) return;
-    char ch = charsSequence.charAt(offset);
-
-    VimPlugin.showMessage("<" +
-                          StringHelper.toKeyNotation(KeyStroke.getKeyStroke(ch)) +
-                          ">  " +
-                          (int)ch +
-                          ",  Hex " +
-                          Long.toHexString(ch) +
-                          ",  Octal " +
-                          Long.toOctalString(ch));
   }
 
   public void displayHexInfo(@NotNull Editor editor) {
