@@ -66,6 +66,21 @@ class RegistersHandlerTest : VimTestCase() {
     assertExOutput("Type Name Content\n")
   }
 
+  fun `test list truncates long registers`() {
+    configureByText("")
+
+    val indent = " ".repeat(20)
+    val text = "Really long line ".repeat(1000)
+
+    VimPlugin.getRegister().setKeys('a', parseKeys(indent + text))
+
+    // Does not trim whitespace
+    enterCommand("registers a")
+    assertExOutput("""Type Name Content
+                     |  c  "a   ${(indent + text).take(200)}
+      """.trimMargin())
+  }
+
   fun `test correctly encodes non printable characters`() {
     configureByText("")
 
@@ -73,7 +88,7 @@ class RegistersHandlerTest : VimTestCase() {
 
     enterCommand("registers")
     assertExOutput("""Type Name Content
-      |  c  "a   ^IHello World^J^[
+                     |  c  "a   ^IHello World^J^[
       """.trimMargin())
   }
 

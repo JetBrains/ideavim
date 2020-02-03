@@ -320,6 +320,7 @@ public class MarkGroup {
   public void resetAllMarks() {
     globalMarks.clear();
     fileMarks.clear();
+    jumps.clear();
   }
 
   public void removeMark(char ch, @NotNull Mark mark) {

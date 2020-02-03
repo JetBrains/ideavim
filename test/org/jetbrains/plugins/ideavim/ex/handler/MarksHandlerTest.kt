@@ -129,6 +129,17 @@ class MarksHandlerTest : VimTestCase() {
     """.trimMargin())
   }
 
+  fun `test list trims and truncates`() {
+    val indent = " ".repeat(100)
+    val text = "Really long line ".repeat(1000)
+    configureByText(indent + "$c" + text)
+    typeText(parseKeys("ma"))
+    enterCommand("marks a")
+    assertExOutput("""mark line  col file/text
+                     | a      1  100 ${text.substring(0, 200)}
+    """.trimMargin())
+  }
+
   fun `test list all marks in correct order`() {
     configureByText("""I found ${c}it in a legendary land
                       |all rocks and lavender and tufted grass,

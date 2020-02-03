@@ -40,7 +40,8 @@ class MarksHandler : CommandHandler.SingleExecution() {
         val column = mark.col.toString().padStart(3)
         val vf = EditorHelper.getVirtualFile(editor)
         val text = if (vf != null && vf.path == mark.filename) {
-          toPrintableCharacters(stringToKeys(EditorHelper.getLineText(editor, mark.logicalLine).trim()))
+          val lineText = EditorHelper.getLineText(editor, mark.logicalLine).trim().take(200)
+          toPrintableCharacters(stringToKeys(lineText)).take(200)
         } else {
           mark.filename
         }
