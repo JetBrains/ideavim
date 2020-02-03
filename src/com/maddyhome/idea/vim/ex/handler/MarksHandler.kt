@@ -23,40 +23,32 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
-import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
+import com.maddyhome.idea.vim.helper.StringHelper.*
 
 class MarksHandler : CommandHandler.SingleExecution() {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
 
-    val res = VimPlugin.getMark().getMarks(editor).joinToString("\n") { mark ->
+    // Yeah, lower case. Vim uses lower case here, but Title Case in :registers. Go figure.
+    val res = VimPlugin.getMark().getMarks(editor)
+      .filter { cmd.argument.isEmpty() || cmd.argument.contains(it.key) }
+      .joinToString("\n", prefix = "mark line  col file/text\n") { mark ->
 
-      val text = StringBuilder()
-      text.append(" ")
-      text.append(mark.key)
+        // Lines are 1 based, columns zero based. See :help :marks
+        val line = (mark.logicalLine + 1).toString().padStart(5)
+        val column = mark.col.toString().padStart(3)
+        val vf = EditorHelper.getVirtualFile(editor)
+        val text = if (vf != null && vf.path == mark.filename) {
+          toPrintableCharacters(stringToKeys(EditorHelper.getLineText(editor, mark.logicalLine).trim()))
+        } else {
+          mark.filename
+        }
 
-      text.append("   ")
-      var num = (mark.logicalLine + 1).toString()
-      text.append(num.padStart(5))
-
-      text.append("  ")
-      num = (mark.col + 1).toString()
-      text.append(num.padStart(3))
-
-      text.append(" ")
-      val vf = EditorHelper.getVirtualFile(editor)
-      if (vf != null && vf.path == mark.filename) {
-        text.append(toKeyNotation(stringToKeys(EditorHelper.getLineText(editor, mark.logicalLine).trim())))
-      } else {
-        text.append(mark.filename)
+        " ${mark.key}  $line  $column $text"
       }
 
-      text.toString()
-    }
-
-    ExOutputModel.getInstance(editor).output("mark  line  col file/text\n$res")
+    ExOutputModel.getInstance(editor).output(res)
 
     return true
   }
