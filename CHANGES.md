@@ -19,6 +19,8 @@ usual beta standards.
 To Be Released
 --------------
 
+_Available since 0.55.1 EAP:_
+
 **Fixes:**
 * [VIM-1284](https://youtrack.jetbrains.com/issue/VIM-1284) Fix mapping of digits
 * Fix handling of counts on both operator and motion, e.g. `3d2w` deletes 6 words, instead of 32
