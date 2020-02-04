@@ -267,7 +267,7 @@ public class ChangeGroup {
       MotionGroup.moveCaret(editor, caret, offset);
     }
 
-    insertAfterCursor(editor, context);
+    insertBeforeCursor(editor, context);
   }
 
   /**
@@ -483,11 +483,19 @@ public class ChangeGroup {
    * DEPRECATED. Please, don't use this function directly. Use ModeHelper.exitInsert
    */
   public void processEscape(@NotNull Editor editor, @Nullable DataContext context) {
-    int cnt = lastInsert != null ? lastInsert.getCount() : 0;
+
+    // Get the offset for marks before we exit insert mode - switching from insert to overtype subtracts one from the
+    // column offset.
+    int offset = editor.getCaretModel().getPrimaryCaret().getOffset();
+    final MarkGroup markGroup = VimPlugin.getMark();
+    markGroup.setMark(editor, '^', offset);
+    markGroup.setMark(editor, MarkGroup.MARK_CHANGE_END, offset);
+
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
       setInsertEditorState(editor, true);
     }
 
+    int cnt = lastInsert != null ? lastInsert.getCount() : 0;
     if (lastInsert != null && (lastInsert.getFlags().contains(CommandFlags.FLAG_NO_REPEAT_INSERT))) {
       cnt = 1;
     }
@@ -503,11 +511,10 @@ public class ChangeGroup {
       repeatInsert(editor, context, cnt == 0 ? 0 : cnt - 1, true);
     }
 
-    final MarkGroup markGroup = VimPlugin.getMark();
-    final int offset = editor.getCaretModel().getPrimaryCaret().getOffset();
-    markGroup.setMark(editor, '^', offset);
-    markGroup.setMark(editor, MarkGroup.MARK_CHANGE_END, offset);
+    // The change pos '.' mark is the offset AFTER processing escape, and after switching to overtype
+    offset = editor.getCaretModel().getPrimaryCaret().getOffset();
     markGroup.setMark(editor, MarkGroup.MARK_CHANGE_POS, offset);
+
     CommandState.getInstance(editor).popModes();
     exitAllSingleCommandInsertModes(editor);
 

@@ -23,8 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
-import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
+import com.maddyhome.idea.vim.helper.StringHelper.*
 import kotlin.math.absoluteValue
 
 class JumpsHandler : CommandHandler.SingleExecution() {
@@ -33,21 +32,23 @@ class JumpsHandler : CommandHandler.SingleExecution() {
     val jumps = VimPlugin.getMark().jumps
     val spot = VimPlugin.getMark().jumpSpot
 
-    val text = StringBuilder("  jump line  col file/text\n")
+    val text = StringBuilder(" jump line  col file/text\n")
     jumps.forEachIndexed { idx, jump ->
       val jumpSizeMinusSpot = jumps.size - idx - spot - 1
-      text.append(if (jumpSizeMinusSpot == 0) "> " else "  ")
+      text.append(if (jumpSizeMinusSpot == 0) ">" else " ")
       text.append(jumpSizeMinusSpot.absoluteValue.toString().padStart(3))
       text.append(" ")
       text.append((jump.logicalLine + 1).toString().padStart(5))
 
       text.append("  ")
-      text.append((jump.col + 1).toString().padStart(3))
+      text.append(jump.col.toString().padStart(3))
 
       text.append(" ")
       val vf = EditorHelper.getVirtualFile(editor)
       if (vf != null && vf.path == jump.filepath) {
-        text.append(toKeyNotation(stringToKeys(EditorHelper.getLineText(editor, jump.logicalLine).trim())))
+        val line = EditorHelper.getLineText(editor, jump.logicalLine).trim().take(200)
+        val keys = stringToKeys(line)
+        text.append(toPrintableCharacters(keys).take(200))
       } else {
         text.append(jump.filepath)
       }

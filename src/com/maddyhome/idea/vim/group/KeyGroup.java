@@ -40,7 +40,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.handler.ActionBeanClass;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.key.Shortcut;
 import com.maddyhome.idea.vim.key.*;
 import kotlin.text.StringsKt;
 import org.jdom.Element;
@@ -258,10 +257,10 @@ public class KeyGroup {
    * Digraphs are handled directly by KeyHandler#handleKey instead of via an action, but we need to still make sure the
    * shortcuts are registered, or the key handler won't see them
    * </p>
-   * @param shortcut The shortcut to register
+   * @param keyStroke The shortcut to register
    */
-  public void registerShortcutWithoutAction(Shortcut shortcut) {
-    registerRequiredShortcut(Arrays.asList(shortcut.getKeys()));
+  public void registerShortcutWithoutAction(KeyStroke keyStroke) {
+    registerRequiredShortcut(Collections.singletonList(keyStroke));
   }
 
   public void unregisterCommandActions() {

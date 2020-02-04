@@ -320,6 +320,7 @@ public class MarkGroup {
   public void resetAllMarks() {
     globalMarks.clear();
     fileMarks.clear();
+    jumps.clear();
   }
 
   public void removeMark(char ch, @NotNull Mark mark) {
@@ -349,7 +350,7 @@ public class MarkGroup {
 
     ArrayList<Mark> list = new ArrayList<>(res);
 
-    list.sort(Comparator.comparingInt(Mark::getKey));
+    list.sort(Mark.KeySorter.INSTANCE);
 
     return list;
   }

@@ -84,6 +84,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   private static long lastBeepTimeMillis;
 
   private boolean error = false;
+  private String message = null;
 
   private int previousStateVersion = 0;
   private String previousKeyMap = "";
@@ -349,6 +350,10 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     return getInstance().error;
   }
 
+  public static String getMessage() {
+    return getInstance().message;
+  }
+
   /**
    * Indicate to the user that an error has occurred. Just beep.
    */
@@ -377,6 +382,9 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   }
 
   public static void showMessage(@Nullable String msg) {
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      getInstance().message = msg;
+    }
     ProjectManager pm = ProjectManager.getInstance();
     Project[] projects = pm.getOpenProjects();
     for (Project project : projects) {

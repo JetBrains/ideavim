@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.group.RegisterGroup;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -40,5 +41,21 @@ public class MacroActionTest extends VimTestCase {
     final Register register = registerGroup.getRegister('a');
     assertNotNull(register);
     assertEquals("3l", register.getText());
+  }
+
+  public void testRecordMacroDoesNotExpandMap() {
+    configureByText("");
+    enterCommand("imap pp hello");
+    typeText(parseKeys("qa", "i", "pp<Esc>", "q"));
+    final Register register = VimPlugin.getRegister().getRegister('a');
+    assertNotNull(register);
+    assertEquals("ipp<Esc>", StringHelper.toKeyNotation(register.getKeys()));
+  }
+
+  public void testRecordMacroWithDigraph() {
+    typeTextInFile(parseKeys("qa", "i", "<C-K>OK<Esc>", "q"), "");
+    final Register register = VimPlugin.getRegister().getRegister('a');
+    assertNotNull(register);
+    assertEquals("i<C-K>OK<Esc>", StringHelper.toKeyNotation(register.getKeys()));
   }
 }

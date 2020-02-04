@@ -21,7 +21,9 @@ package com.maddyhome.idea.vim.ui;
 import com.intellij.codeInsight.editorActions.CopyPastePostProcessor;
 import com.intellij.codeInsight.editorActions.TextBlockTransferable;
 import com.intellij.codeInsight.editorActions.TextBlockTransferableData;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.RawText;
+import com.maddyhome.idea.vim.helper.TestClipboardModel;
 import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,8 +50,7 @@ public class ClipboardHandler {
     String res = null;
     List<TextBlockTransferableData> transferableData = new ArrayList<>();
     try {
-      Clipboard board = Toolkit.getDefaultToolkit().getSystemClipboard();
-      Transferable trans = board.getContents(null);
+      Transferable trans = getContents();
       Object data = trans.getTransferData(DataFlavor.stringFlavor);
 
       res = data.toString();
@@ -81,10 +82,28 @@ public class ClipboardHandler {
     try {
       final String s = TextBlockTransferable.convertLineSeparators(text, "\n", transferableData);
       TextBlockTransferable content = new TextBlockTransferable(s, transferableData, new RawText(rawText));
-      Clipboard board = Toolkit.getDefaultToolkit().getSystemClipboard();
-      board.setContents(content, null);
+      setContents(content);
     }
     catch (HeadlessException ignored) {
+    }
+  }
+
+  private static @NotNull Transferable getContents() {
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      return TestClipboardModel.INSTANCE.getContents();
+    }
+
+    Clipboard board = Toolkit.getDefaultToolkit().getSystemClipboard();
+    return board.getContents(null);
+  }
+
+  private static void setContents(@NotNull Transferable contents) {
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      TestClipboardModel.INSTANCE.setContents(contents);
+    }
+    else {
+      Clipboard board = Toolkit.getDefaultToolkit().getSystemClipboard();
+      board.setContents(contents, null);
     }
   }
 }
