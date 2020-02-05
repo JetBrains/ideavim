@@ -37,12 +37,12 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.checkInString;
 
 /**
  * Helper methods for searching text
@@ -314,17 +314,24 @@ public class SearchHelper {
                                        int cnt,
                                        boolean allowInString) {
     int res = -1;
-    Function<Integer, Integer> inCheckPosF = x -> dir < 0 && x > 0 ? x - 1 : x;
+    int initialPos = pos;
+    Function<Integer, Integer> inCheckPosF = x -> dir == Direction.BACK && x > 0 ? x - 1 : x + 1;
     final int inCheckPos = inCheckPosF.apply(pos);
     boolean inString = checkInString(chars, inCheckPos, true);
     boolean initialInString = inString;
     boolean inChar = checkInString(chars, inCheckPos, false);
-    boolean initial = true;
     int stack = 0;
     // Search to start or end of file, as appropriate
+    Set<Character> charsToSearch = Set.of('\'', '"', '\n', match, found);
     while (pos >= 0 && pos < chars.length() && cnt > 0) {
+      Pair<Character, Integer> ci = findPositionOfFirstCharacter(chars, pos, charsToSearch,  false, dir);
+      if (ci == null) {
+        return -1;
+      }
+      Character c = ci.first;
+      pos = ci.second;
       // If we found a match and we're not in a string...
-      if (chars.charAt(pos) == match && (allowInString ? initialInString == inString : !inString) && !inChar) {
+      if (c == match && (allowInString ? initialInString == inString : !inString) && !inChar) {
         // We found our match
         if (stack == 0) {
           res = pos;
@@ -336,13 +343,13 @@ public class SearchHelper {
         }
       }
       // End of line - mark not in a string any more (in case we started in the middle of one
-      else if (chars.charAt(pos) == '\n') {
+      else if (c == '\n') {
         inString = false;
         inChar = false;
       }
-      else if (!initial) {
+      else if (pos != initialPos) {
         // We found another character like our original - belongs to another pair
-        if (!inString && !inChar && chars.charAt(pos) == found) {
+        if (!inString && !inChar && c == found) {
           stack++;
         }
         // We found the start/end of a string
@@ -353,9 +360,7 @@ public class SearchHelper {
           inChar = checkInString(chars, inCheckPosF.apply(pos), false);
         }
       }
-
-      pos += dir;
-      initial = false;
+      pos += dir.toInt();
     }
 
     return res;
@@ -419,14 +424,14 @@ public class SearchHelper {
   public static Pair<Character, Integer> findPositionOfFirstCharacter(
     @NotNull CharSequence chars,
     int pos,
-    final Set<Character> quotes,
+    final Set<Character> needles,
     boolean searchEscaped,
     @NotNull Direction direction
   ) {
     int dir = direction.toInt();
     while (pos >= 0 && pos < chars.length()) {
       final char c = chars.charAt(pos);
-      if (quotes.contains(c) && (pos == 0 || searchEscaped || isQuoteWithoutEscape(chars, pos, c))) {
+      if (needles.contains(c) && (pos == 0 || searchEscaped || isQuoteWithoutEscape(chars, pos, c))) {
         return Pair.create(c, pos);
       }
       pos += dir;
@@ -677,43 +682,6 @@ public class SearchHelper {
 
     // End offset exclusive
     return new TextRange(start, end + 1);
-  }
-
-  private static boolean checkInString(@NotNull CharSequence chars, int pos, boolean str) {
-    if (chars.length() == 0) return false;
-//    int offset = pos;
-//    while (offset > 0 && chars.charAt(offset) != '\n') {
-//      offset--;
-//    }
-
-    boolean oddPrecedingQuotes = false;
-    boolean inChar = false;
-    for (int i = pos - 1; i > 0 && chars.charAt(i) != '\n'; i--) {
-      if (!inChar && isQuoteWithoutEscape(chars, i, '"')) {
-        oddPrecedingQuotes = !oddPrecedingQuotes;
-      }
-      else if (!oddPrecedingQuotes && isQuoteWithoutEscape(chars, i, '\'')) {
-        inChar = !inChar;
-      }
-    }
-    if (oddPrecedingQuotes || inChar) {
-      int i = pos;
-      boolean hasClosingString = false;
-      boolean hasClosingChar = false;
-      while(i < chars.length() && chars.charAt(i) != '\n' && ((inChar && !hasClosingChar) || (oddPrecedingQuotes && !hasClosingString))) {
-        if(oddPrecedingQuotes && !inChar && isQuoteWithoutEscape(chars, i, '"')) {
-          hasClosingString = true;
-        }
-        if(inChar && !oddPrecedingQuotes && isQuoteWithoutEscape(chars, i, '\'')) {
-          hasClosingChar = true;
-        }
-        i++;
-      }
-      oddPrecedingQuotes = oddPrecedingQuotes && hasClosingString;
-      inChar = inChar && hasClosingChar;
-    }
-
-    return str ? oddPrecedingQuotes : inChar;
   }
 
   public static int findNextCamelStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
