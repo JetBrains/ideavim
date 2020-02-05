@@ -374,7 +374,7 @@ public class SearchHelper {
     return backslashCounter % 2 == 0;
   }
 
-  private enum Direction {
+  public enum Direction {
     BACK(-1), FORWARD(1);
 
     private final int value;
@@ -383,7 +383,7 @@ public class SearchHelper {
       value = i;
     }
 
-    private int toInt() {
+    public int toInt() {
       return value;
     }
   }
