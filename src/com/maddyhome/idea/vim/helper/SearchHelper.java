@@ -681,39 +681,39 @@ public class SearchHelper {
 
   private static boolean checkInString(@NotNull CharSequence chars, int pos, boolean str) {
     if (chars.length() == 0) return false;
-    int offset = pos;
-    while (offset > 0 && chars.charAt(offset) != '\n') {
-      offset--;
-    }
+//    int offset = pos;
+//    while (offset > 0 && chars.charAt(offset) != '\n') {
+//      offset--;
+//    }
 
-    boolean inString = false;
+    boolean oddPrecedingQuotes = false;
     boolean inChar = false;
-    for (int i = offset; i <= pos; i++) {
+    for (int i = pos - 1; i > 0 && chars.charAt(i) != '\n'; i--) {
       if (!inChar && isQuoteWithoutEscape(chars, i, '"')) {
-        inString = !inString;
+        oddPrecedingQuotes = !oddPrecedingQuotes;
       }
-      else if (!inString && isQuoteWithoutEscape(chars, i, '\'')) {
+      else if (!oddPrecedingQuotes && isQuoteWithoutEscape(chars, i, '\'')) {
         inChar = !inChar;
       }
     }
-    int i = pos;
-    if (inString || inChar) {
+    if (oddPrecedingQuotes || inChar) {
+      int i = pos;
       boolean hasClosingString = false;
       boolean hasClosingChar = false;
-      while(i < chars.length() && chars.charAt(i) != '\n' && ((inChar && !hasClosingChar) || (inString && !hasClosingString))) {
-        if(inString && !inChar && isQuoteWithoutEscape(chars, i, '"')) {
+      while(i < chars.length() && chars.charAt(i) != '\n' && ((inChar && !hasClosingChar) || (oddPrecedingQuotes && !hasClosingString))) {
+        if(oddPrecedingQuotes && !inChar && isQuoteWithoutEscape(chars, i, '"')) {
           hasClosingString = true;
         }
-        if(inChar && !inString && isQuoteWithoutEscape(chars, i, '\'')) {
+        if(inChar && !oddPrecedingQuotes && isQuoteWithoutEscape(chars, i, '\'')) {
           hasClosingChar = true;
         }
         i++;
       }
-      inString = inString && hasClosingString;
+      oddPrecedingQuotes = oddPrecedingQuotes && hasClosingString;
       inChar = inChar && hasClosingChar;
     }
 
-    return str ? inString : inChar;
+    return str ? oddPrecedingQuotes : inChar;
   }
 
   public static int findNextCamelStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
