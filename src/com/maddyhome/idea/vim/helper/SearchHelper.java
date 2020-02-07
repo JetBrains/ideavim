@@ -322,7 +322,7 @@ public class SearchHelper {
     boolean inChar = checkInString(chars, inCheckPos, false);
     int stack = 0;
     // Search to start or end of file, as appropriate
-    Set<Character> charsToSearch = Set.of('\'', '"', '\n', match, found);
+    Set<Character> charsToSearch = new HashSet<>(Arrays.asList('\'', '"', '\n', match, found));
     while (pos >= 0 && pos < chars.length() && cnt > 0) {
       Pair<Character, Integer> ci = findPositionOfFirstCharacter(chars, pos, charsToSearch,  false, dir);
       if (ci == null) {
