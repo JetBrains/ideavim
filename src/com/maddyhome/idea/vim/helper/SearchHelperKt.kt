@@ -1,3 +1,21 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2020 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.maddyhome.idea.vim.helper
 
 import com.maddyhome.idea.vim.helper.SearchHelper.Direction
@@ -9,6 +27,8 @@ data class State(val position: Int, val trigger: Char, val inQuote: Boolean?, va
 fun checkInString(chars: CharSequence, currentPos: Int, str: Boolean): Boolean {
   val begin = findPositionOfFirstCharacter(chars, currentPos, setOf('\n'), false, Direction.BACK)?.second ?: 0
   val changes = quoteChanges(chars, begin)
+  // TODO: here we need to keep only the latest element in beforePos (if any) and
+  // don't need atAndAfterPos to be eagerly collected
   var (beforePos, atAndAfterPos) = changes.partition { it.position < currentPos }
 
   var (atPos, afterPos) = atAndAfterPos.partition { it.position == currentPos }
