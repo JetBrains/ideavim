@@ -60,17 +60,17 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
   override fun getName() = "multiple-cursors"
 
   override fun initOnce() {
-    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(NEXT_WHOLE_OCCURRENCE), NextOccurrenceHandler(), false)
-    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(NEXT_OCCURRENCE), NextOccurrenceHandler(whole = false), false)
-    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(ALL_WHOLE_OCCURRENCES), AllOccurrencesHandler(), false)
-    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(ALL_OCCURRENCES), AllOccurrencesHandler(whole = false), false)
-    putExtensionHandlerMapping(MappingMode.X, parseKeys(SKIP_OCCURRENCE), SkipOccurrenceHandler(), false)
-    putExtensionHandlerMapping(MappingMode.X, parseKeys(REMOVE_OCCURRENCE), RemoveOccurrenceHandler(), false)
+    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(NEXT_WHOLE_OCCURRENCE), owner, NextOccurrenceHandler(), false)
+    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(NEXT_OCCURRENCE), owner, NextOccurrenceHandler(whole = false), false)
+    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(ALL_WHOLE_OCCURRENCES), owner, AllOccurrencesHandler(), false )
+    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(ALL_OCCURRENCES), owner, AllOccurrencesHandler(whole = false), false )
+    putExtensionHandlerMapping(MappingMode.X, parseKeys(SKIP_OCCURRENCE), owner, SkipOccurrenceHandler(), false )
+    putExtensionHandlerMapping(MappingMode.X, parseKeys(REMOVE_OCCURRENCE), owner, RemoveOccurrenceHandler(), false )
 
-    putKeyMapping(MappingMode.NXO, parseKeys("<A-n>"), parseKeys(NEXT_WHOLE_OCCURRENCE), true)
-    putKeyMapping(MappingMode.NXO, parseKeys("g<A-n>"), parseKeys(NEXT_OCCURRENCE), true)
-    putKeyMapping(MappingMode.X, parseKeys("<A-x>"), parseKeys(SKIP_OCCURRENCE), true)
-    putKeyMapping(MappingMode.X, parseKeys("<A-p>"), parseKeys(REMOVE_OCCURRENCE), true)
+    putKeyMapping(MappingMode.NXO, parseKeys("<A-n>"), owner, parseKeys(NEXT_WHOLE_OCCURRENCE), true)
+    putKeyMapping(MappingMode.NXO, parseKeys("g<A-n>"), owner, parseKeys(NEXT_OCCURRENCE), true)
+    putKeyMapping(MappingMode.X, parseKeys("<A-x>"), owner, parseKeys(SKIP_OCCURRENCE), true)
+    putKeyMapping(MappingMode.X, parseKeys("<A-p>"), owner, parseKeys(REMOVE_OCCURRENCE), true)
   }
 
   abstract class WriteActionHandler : VimExtensionHandler {

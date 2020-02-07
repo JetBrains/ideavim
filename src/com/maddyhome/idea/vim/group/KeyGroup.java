@@ -68,7 +68,7 @@ public class KeyGroup {
   private static final Logger logger = Logger.getInstance(KeyGroup.class);
 
   @NotNull private final Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<>();
-  @NotNull private final Set<KeyStroke> requiredShortcutKeys = new HashSet<>(300);
+  @NotNull private final Set<RequiredShortcut> requiredShortcutKeys = new HashSet<>(300);
   @NotNull private final Map<MappingMode, CommandPartNode> keyRoots = new EnumMap<>(MappingMode.class);
   @NotNull private final Map<MappingMode, KeyMapping> keyMappings = new EnumMap<>(MappingMode.class);
   @Nullable private OperatorFunction operatorFunction = null;
@@ -116,29 +116,31 @@ public class KeyGroup {
 
   public void putKeyMapping(@NotNull Set<MappingMode> modes,
                             @NotNull List<KeyStroke> fromKeys,
+                            @NotNull RequiredShortcutOwner owner,
                             @NotNull VimExtensionHandler extensionHandler,
                             boolean recursive) {
     for (MappingMode mode : modes) {
       final KeyMapping mapping = getKeyMapping(mode);
       mapping.put(fromKeys, extensionHandler, recursive);
     }
-    registerKeyMapping(fromKeys);
+    registerKeyMapping(fromKeys, owner);
   }
 
   public void putKeyMapping(@NotNull Set<MappingMode> modes, @NotNull List<KeyStroke> fromKeys,
+                            @NotNull RequiredShortcutOwner owner,
                             @NotNull List<KeyStroke> toKeys, boolean recursive) {
     for (MappingMode mode : modes) {
       final KeyMapping mapping = getKeyMapping(mode);
       mapping.put(fromKeys, toKeys, recursive);
     }
-    registerKeyMapping(fromKeys);
+    registerKeyMapping(fromKeys, owner);
   }
 
-  private void registerKeyMapping(@NotNull List<KeyStroke> fromKeys) {
+  private void registerKeyMapping(@NotNull List<KeyStroke> fromKeys, RequiredShortcutOwner owner) {
     final int oldSize = requiredShortcutKeys.size();
     for (KeyStroke key : fromKeys) {
       if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
-        requiredShortcutKeys.add(key);
+        requiredShortcutKeys.add(new RequiredShortcut(key, owner));
       }
     }
     if (requiredShortcutKeys.size() != oldSize) {
@@ -218,10 +220,11 @@ public class KeyGroup {
 
   @NotNull
   public Map<KeyStroke, ShortcutOwner> getShortcutConflicts() {
-    final Set<KeyStroke> requiredShortcutKeys = this.requiredShortcutKeys;
+    final Set<RequiredShortcut> requiredShortcutKeys = this.requiredShortcutKeys;
     final Map<KeyStroke, ShortcutOwner> savedConflicts = getSavedShortcutConflicts();
     final Map<KeyStroke, ShortcutOwner> results = new HashMap<>();
-    for (KeyStroke keyStroke : requiredShortcutKeys) {
+    for (RequiredShortcut requiredShortcut : requiredShortcutKeys) {
+      KeyStroke keyStroke = requiredShortcut.getKeyStroke();
       if (!VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
         final List<AnAction> conflicts = getKeymapConflicts(keyStroke);
         if (!conflicts.isEmpty()) {
@@ -272,8 +275,8 @@ public class KeyGroup {
    * </p>
    * @param keyStroke The shortcut to register
    */
-  public void registerShortcutWithoutAction(KeyStroke keyStroke) {
-    registerRequiredShortcut(Collections.singletonList(keyStroke));
+  public void registerShortcutWithoutAction(KeyStroke keyStroke, RequiredShortcutOwner owner) {
+    registerRequiredShortcut(Collections.singletonList(keyStroke), owner);
   }
 
   public void unregisterCommandActions() {
@@ -318,7 +321,7 @@ public class KeyGroup {
     }
 
     for (List<KeyStroke> keyStrokes : actionKeys) {
-      registerRequiredShortcut(keyStrokes);
+      registerRequiredShortcut(keyStrokes, RequiredShortcutOwner.IdeaVim.INSTANCE);
 
       for (MappingMode mappingMode : actionModes) {
         Node node = getKeyRoot(mappingMode);
@@ -335,10 +338,10 @@ public class KeyGroup {
     }
   }
 
-  private void registerRequiredShortcut(@NotNull List<KeyStroke> keys) {
+  private void registerRequiredShortcut(@NotNull List<KeyStroke> keys, RequiredShortcutOwner owner) {
     for (KeyStroke key : keys) {
       if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
-        requiredShortcutKeys.add(key);
+        requiredShortcutKeys.add(new RequiredShortcut(key, owner));
       }
     }
   }
@@ -406,12 +409,12 @@ public class KeyGroup {
   }
 
   @NotNull
-  private static ShortcutSet toShortcutSet(@NotNull Collection<KeyStroke> keyStrokes) {
-    final List<com.intellij.openapi.actionSystem.Shortcut> shortcuts = new ArrayList<>();
-    for (KeyStroke key : keyStrokes) {
-      shortcuts.add(new KeyboardShortcut(key, null));
+  private static ShortcutSet toShortcutSet(@NotNull Collection<RequiredShortcut> requiredShortcuts) {
+    final List<Shortcut> shortcuts = new ArrayList<>();
+    for (RequiredShortcut key : requiredShortcuts) {
+      shortcuts.add(new KeyboardShortcut(key.getKeyStroke(), null));
     }
-    return new CustomShortcutSet(shortcuts.toArray(new com.intellij.openapi.actionSystem.Shortcut[0]));
+    return new CustomShortcutSet(shortcuts.toArray(new Shortcut[0]));
   }
 
   @NotNull

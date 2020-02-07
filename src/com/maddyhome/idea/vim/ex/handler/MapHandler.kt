@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.ex.handler.MapHandler.SpecialArgument.EXPR
 import com.maddyhome.idea.vim.ex.handler.MapHandler.SpecialArgument.SCRIPT
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.key.RequiredShortcutOwner
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -75,7 +76,7 @@ class MapHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler, Co
               throw ExException("Unsupported map argument: $unsupportedArgument")
             }
           }
-          VimPlugin.getKey().putKeyMapping(modes, arguments.fromKeys, arguments.toKeys, commandInfo.isRecursive)
+          VimPlugin.getKey().putKeyMapping(modes, arguments.fromKeys, RequiredShortcutOwner.IdeaVim, arguments.toKeys, commandInfo.isRecursive)
           return true
         }
       }

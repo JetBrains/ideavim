@@ -93,15 +93,15 @@ private class TestExtension : VimNonDisposableExtension() {
   override fun getName(): String = "TestExtension"
 
   override fun initOnce() {
-    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionEmulateInclusive"), MoveEmulateInclusive(), false)
-    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionBackwardsCharacter"), MoveBackwards(), false)
-    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionCharacter"), Move(), false)
-    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionLinewise"), MoveLinewise(), false)
+    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionEmulateInclusive"), owner, MoveEmulateInclusive(), false)
+    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionBackwardsCharacter"), owner, MoveBackwards(), false)
+    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionCharacter"), owner, Move(), false)
+    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionLinewise"), owner, MoveLinewise(), false)
 
-    putKeyMapping(MappingMode.O, parseKeys("U"), parseKeys("<Plug>TestExtensionEmulateInclusive"), true)
-    putKeyMapping(MappingMode.O, parseKeys("P"), parseKeys("<Plug>TestExtensionBackwardsCharacter"), true)
-    putKeyMapping(MappingMode.O, parseKeys("I"), parseKeys("<Plug>TestExtensionCharacter"), true)
-    putKeyMapping(MappingMode.O, parseKeys("O"), parseKeys("<Plug>TestExtensionLinewise"), true)
+    putKeyMapping(MappingMode.O, parseKeys("U"), owner, parseKeys("<Plug>TestExtensionEmulateInclusive"), true)
+    putKeyMapping(MappingMode.O, parseKeys("P"), owner, parseKeys("<Plug>TestExtensionBackwardsCharacter"), true)
+    putKeyMapping(MappingMode.O, parseKeys("I"), owner, parseKeys("<Plug>TestExtensionCharacter"), true)
+    putKeyMapping(MappingMode.O, parseKeys("O"), owner, parseKeys("<Plug>TestExtensionLinewise"), true)
   }
 
   private class MoveEmulateInclusive : VimExtensionHandler {

@@ -16,26 +16,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.extension;
+package com.maddyhome.idea.vim.key
 
-import com.intellij.openapi.extensions.ExtensionPointName;
-import com.maddyhome.idea.vim.key.RequiredShortcutOwner;
-import org.jetbrains.annotations.NotNull;
+import javax.swing.KeyStroke
 
-/**
- * @author vlan
- */
-public interface VimExtension {
-  @NotNull ExtensionPointName<VimExtension> EP_NAME = ExtensionPointName.create("IdeaVIM.vimExtension");
+class RequiredShortcut(val keyStroke: KeyStroke, val owner: RequiredShortcutOwner)
 
-  @NotNull
-  String getName();
+sealed class RequiredShortcutOwner {
+  object IdeaVim : RequiredShortcutOwner()
 
-  default RequiredShortcutOwner getOwner() {
-    return RequiredShortcutOwner.Plugin.Companion.get(getName());
+  @Suppress("DataClassPrivateConstructor")
+  data class Plugin private constructor(val name: String) : RequiredShortcutOwner() {
+    companion object {
+      fun get(name: String): Plugin = allOwners.computeIfAbsent(name) { Plugin(it) }
+
+      private val allOwners: MutableMap<String, Plugin> = mutableMapOf()
+    }
   }
-
-  void init();
-
-  void dispose();
 }

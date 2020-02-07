@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.key.OperatorFunction
+import com.maddyhome.idea.vim.key.RequiredShortcutOwner
 import com.maddyhome.idea.vim.ui.ExEntryPanel
 import com.maddyhome.idea.vim.ui.ModalEntry
 import java.awt.event.KeyEvent
@@ -44,15 +45,15 @@ object VimExtensionFacade {
   /** The 'map' command for mapping keys to handlers defined in extensions. */
   @JvmStatic
   fun putExtensionHandlerMapping(modes: Set<MappingMode>, fromKeys: List<KeyStroke>,
-                                 extensionHandler: VimExtensionHandler, recursive: Boolean) {
-    VimPlugin.getKey().putKeyMapping(modes, fromKeys, extensionHandler, recursive)
+                                 pluginOwner: RequiredShortcutOwner, extensionHandler: VimExtensionHandler, recursive: Boolean) {
+    VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)
   }
 
   /** The 'map' command for mapping keys to other keys. */
   @JvmStatic
   fun putKeyMapping(modes: Set<MappingMode>, fromKeys: List<KeyStroke>,
-                    toKeys: List<KeyStroke>, recursive: Boolean) {
-    VimPlugin.getKey().putKeyMapping(modes, fromKeys, toKeys, recursive)
+                    pluginOwner: RequiredShortcutOwner, toKeys: List<KeyStroke>, recursive: Boolean) {
+    VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, toKeys, recursive)
   }
 
   /** Sets the value of 'operatorfunc' to be used as the operator function in 'g@'. */

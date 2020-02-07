@@ -55,15 +55,15 @@ class VimSurroundExtension : VimNonDisposableExtension() {
   override fun getName() = "surround"
 
   override fun initOnce() {
-    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>YSurround"), YSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>CSurround"), CSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>DSurround"), DSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.XO, StringHelper.parseKeys("<Plug>VSurround"), VSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>YSurround"), owner, YSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>CSurround"), owner, CSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>DSurround"), owner, DSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.XO, StringHelper.parseKeys("<Plug>VSurround"), owner, VSurroundHandler(), false)
 
-    putKeyMapping(MappingMode.N, StringHelper.parseKeys("ys"), StringHelper.parseKeys("<Plug>YSurround"), true)
-    putKeyMapping(MappingMode.N, StringHelper.parseKeys("cs"), StringHelper.parseKeys("<Plug>CSurround"), true)
-    putKeyMapping(MappingMode.N, StringHelper.parseKeys("ds"), StringHelper.parseKeys("<Plug>DSurround"), true)
-    putKeyMapping(MappingMode.XO, StringHelper.parseKeys("S"), StringHelper.parseKeys("<Plug>VSurround"), true)
+    putKeyMapping(MappingMode.N, StringHelper.parseKeys("ys"), owner, StringHelper.parseKeys("<Plug>YSurround"), true)
+    putKeyMapping(MappingMode.N, StringHelper.parseKeys("cs"), owner, StringHelper.parseKeys("<Plug>CSurround"), true)
+    putKeyMapping(MappingMode.N, StringHelper.parseKeys("ds"), owner, StringHelper.parseKeys("<Plug>DSurround"), true)
+    putKeyMapping(MappingMode.XO, StringHelper.parseKeys("S"), owner, StringHelper.parseKeys("<Plug>VSurround"), true)
   }
 
   private class YSurroundHandler : VimExtensionHandler {
