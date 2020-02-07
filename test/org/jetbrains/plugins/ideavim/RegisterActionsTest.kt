@@ -18,9 +18,11 @@
 
 package org.jetbrains.plugins.ideavim
 
+import com.maddyhome.idea.vim.RegisterActions
 import com.maddyhome.idea.vim.RegisterActions.VIM_ACTIONS_EP
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.helper.StringHelper
 
 class RegisterActionsTest : VimTestCase() {
@@ -65,10 +67,13 @@ class RegisterActionsTest : VimTestCase() {
     val keys = StringHelper.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
+    var motionRightAction: ActionBeanClass? = null
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
-      val motionRightAction = VIM_ACTIONS_EP.extensions().findAny().get();
+      motionRightAction = VIM_ACTIONS_EP.extensions().findAny().get();
       @Suppress("DEPRECATION")
-      VIM_ACTIONS_EP.getPoint(null).unregisterExtension(motionRightAction)
+      VIM_ACTIONS_EP.getPoint(null).unregisterExtension(motionRightAction!!)
     }
+    @Suppress("DEPRECATION")
+    VIM_ACTIONS_EP.getPoint(null).registerExtension(motionRightAction!!)
   }
 }

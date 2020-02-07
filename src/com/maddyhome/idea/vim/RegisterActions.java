@@ -64,7 +64,7 @@ public class RegisterActions {
   /**
    * Register all the key/action mappings for the plugin.
    */
-  static void registerActions() {
+  public static void registerActions() {
     registerVimCommandActions();
     registerEmptyShortcuts();
     initialRegistration = true;

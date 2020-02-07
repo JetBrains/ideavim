@@ -20,7 +20,9 @@ package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.ex.CommandParser
 import com.maddyhome.idea.vim.ex.CommandParser.EX_COMMAND_EP
+import com.maddyhome.idea.vim.ex.ExBeanClass
 import com.maddyhome.idea.vim.ex.commands
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -91,10 +93,13 @@ class CommandParserTest : VimTestCase() {
     val keys = commandToKeys(">>")
     val before = "I ${c}found it in a legendary land"
     val after = "        ${c}I found it in a legendary land"
+    var extension: ExBeanClass? = null
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
-      val extension = EX_COMMAND_EP.extensions().findFirst().get()
+      extension = EX_COMMAND_EP.extensions().findFirst().get()
       @Suppress("DEPRECATION")
-      EX_COMMAND_EP.getPoint(null).unregisterExtension(extension)
+      EX_COMMAND_EP.getPoint(null).unregisterExtension(extension!!)
     }
+    @Suppress("DEPRECATION")
+    EX_COMMAND_EP.getPoint(null).registerExtension(extension!!)
   }
 }
