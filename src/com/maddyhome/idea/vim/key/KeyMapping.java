@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim.key;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,13 +57,22 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
     return myKeys.get(keys);
   }
 
-  public void put(@NotNull Set<MappingMode> mappingModes,
-                  @NotNull List<KeyStroke> fromKeys,
-                  @Nullable List<KeyStroke> toKeys,
-                  @Nullable VimExtensionHandler extensionHandler,
+  public void put(@NotNull List<KeyStroke> fromKeys,
+                  @NotNull VimExtensionHandler extensionHandler,
                   boolean recursive) {
-    myKeys.put(new ArrayList<>(fromKeys),
-               new MappingInfo(mappingModes, fromKeys, toKeys, extensionHandler, recursive));
+    myKeys.put(new ArrayList<>(fromKeys), new ToHandlerMappingInfo(extensionHandler, fromKeys, recursive));
+    List<KeyStroke> prefix = new ArrayList<>();
+    final int prefixLength = fromKeys.size() - 1;
+    for (int i = 0; i < prefixLength; i++) {
+      prefix.add(fromKeys.get(i));
+      myPrefixes.add(new ArrayList<>(prefix));
+    }
+  }
+
+  public void put(@NotNull List<KeyStroke> fromKeys,
+                  @NotNull List<KeyStroke> toKeys,
+                  boolean recursive) {
+    myKeys.put(new ArrayList<>(fromKeys), new ToKeysMappingInfo(toKeys, fromKeys, recursive));
     List<KeyStroke> prefix = new ArrayList<>();
     final int prefixLength = fromKeys.size() - 1;
     for (int i = 0; i < prefixLength; i++) {

@@ -75,8 +75,7 @@ class MapHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler, Co
               throw ExException("Unsupported map argument: $unsupportedArgument")
             }
           }
-          VimPlugin.getKey().putKeyMapping(modes, arguments.fromKeys, arguments.toKeys, null,
-            commandInfo.isRecursive)
+          VimPlugin.getKey().putKeyMapping(modes, arguments.fromKeys, arguments.toKeys, commandInfo.isRecursive)
           return true
         }
       }

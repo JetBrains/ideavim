@@ -15,99 +15,51 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.key
 
-package com.maddyhome.idea.vim.key;
-
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.extension.VimExtensionHandler;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import java.awt.event.KeyEvent;
-import java.util.List;
-import java.util.Set;
+import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import java.awt.event.KeyEvent
+import javax.swing.KeyStroke
+import kotlin.math.min
 
 /**
  * @author vlan
  */
-public class MappingInfo implements Comparable<MappingInfo> {
-  @NotNull private final Set<MappingMode> myMappingModes;
-  @NotNull private final List<KeyStroke> myFromKeys;
-  @Nullable private final List<KeyStroke> myToKeys;
-  @Nullable private final VimExtensionHandler myExtensionHandler;
-  private final boolean myRecursive;
-
-  @Contract(pure = true)
-  public MappingInfo(@NotNull Set<MappingMode> mappingModes,
-                     @NotNull List<KeyStroke> fromKeys,
-                     @Nullable List<KeyStroke> toKeys,
-                     @Nullable VimExtensionHandler extensionHandler,
-                     boolean recursive) {
-    myMappingModes = mappingModes;
-    myFromKeys = fromKeys;
-    myToKeys = toKeys;
-    myExtensionHandler = extensionHandler;
-    myRecursive = recursive;
+sealed class MappingInfo(val fromKeys: List<KeyStroke>, val isRecursive: Boolean) : Comparable<MappingInfo> {
+  override fun compareTo(other: MappingInfo): Int {
+    val size = fromKeys.size
+    val otherSize = other.fromKeys.size
+    val n = min(size, otherSize)
+    for (i in 0 until n) {
+      val diff = compareKeys(fromKeys[i], other.fromKeys[i])
+      if (diff != 0) return diff
+    }
+    return size - otherSize
   }
 
-  @Override
-  public int compareTo(@NotNull MappingInfo other) {
-    final int size = myFromKeys.size();
-    final int otherSize = other.myFromKeys.size();
-    final int n = Math.min(size, otherSize);
-    for (int i = 0; i < n; i++) {
-      final int diff = compareKeys(myFromKeys.get(i), other.myFromKeys.get(i));
-      if (diff != 0) {
-        return diff;
+  private fun compareKeys(key1: KeyStroke, key2: KeyStroke): Int {
+    val c1 = key1.keyChar
+    val c2 = key2.keyChar
+    return when {
+      c1 == KeyEvent.CHAR_UNDEFINED && c2 == KeyEvent.CHAR_UNDEFINED -> {
+        val keyCodeDiff = key1.keyCode - key2.keyCode
+        if (keyCodeDiff != 0) keyCodeDiff else key1.modifiers - key2.modifiers
       }
-    }
-    return size - otherSize;
-  }
-
-  @NotNull
-  public Set<MappingMode> getMappingModes() {
-    return myMappingModes;
-  }
-
-  @NotNull
-  public List<KeyStroke> getFromKeys() {
-    return myFromKeys;
-  }
-
-  @Nullable
-  public List<KeyStroke> getToKeys() {
-    return myToKeys;
-  }
-
-  @Nullable
-  public VimExtensionHandler getExtensionHandler() {
-    return myExtensionHandler;
-  }
-
-  public boolean isRecursive() {
-    return myRecursive;
-  }
-
-  private int compareKeys(@NotNull KeyStroke key1, @NotNull KeyStroke key2) {
-    final char c1 = key1.getKeyChar();
-    final char c2 = key2.getKeyChar();
-    if (c1 == KeyEvent.CHAR_UNDEFINED && c2 == KeyEvent.CHAR_UNDEFINED) {
-      final int keyCodeDiff = key1.getKeyCode() - key2.getKeyCode();
-      if (keyCodeDiff != 0) {
-        return keyCodeDiff;
-      }
-      return key1.getModifiers() - key2.getModifiers();
-    }
-    else if (c1 == KeyEvent.CHAR_UNDEFINED) {
-      return -1;
-    }
-    else if (c2 == KeyEvent.CHAR_UNDEFINED) {
-      return 1;
-    }
-    else {
-      return c1 - c2;
+      c1 == KeyEvent.CHAR_UNDEFINED -> -1
+      c2 == KeyEvent.CHAR_UNDEFINED -> 1
+      else -> c1 - c2
     }
   }
 }
+
+class ToKeysMappingInfo(
+  val toKeys: List<KeyStroke>,
+  fromKeys: List<KeyStroke>,
+  isRecursive: Boolean
+) : MappingInfo(fromKeys, isRecursive)
+
+class ToHandlerMappingInfo(
+  val extensionHandler: VimExtensionHandler,
+  fromKeys: List<KeyStroke>,
+  isRecursive: Boolean
+) : MappingInfo(fromKeys, isRecursive)

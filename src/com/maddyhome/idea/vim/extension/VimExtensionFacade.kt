@@ -45,14 +45,14 @@ object VimExtensionFacade {
   @JvmStatic
   fun putExtensionHandlerMapping(modes: Set<MappingMode>, fromKeys: List<KeyStroke>,
                                  extensionHandler: VimExtensionHandler, recursive: Boolean) {
-    VimPlugin.getKey().putKeyMapping(modes, fromKeys, null, extensionHandler, recursive)
+    VimPlugin.getKey().putKeyMapping(modes, fromKeys, extensionHandler, recursive)
   }
 
   /** The 'map' command for mapping keys to other keys. */
   @JvmStatic
   fun putKeyMapping(modes: Set<MappingMode>, fromKeys: List<KeyStroke>,
                     toKeys: List<KeyStroke>, recursive: Boolean) {
-    VimPlugin.getKey().putKeyMapping(modes, fromKeys, toKeys, null, recursive)
+    VimPlugin.getKey().putKeyMapping(modes, fromKeys, toKeys, recursive)
   }
 
   /** Sets the value of 'operatorfunc' to be used as the operator function in 'g@'. */
