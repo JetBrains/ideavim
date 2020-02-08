@@ -55,6 +55,7 @@ import java.util.*;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author vlan
@@ -74,8 +75,9 @@ public class KeyGroup {
   @Nullable private OperatorFunction operatorFunction = null;
 
   void registerRequiredShortcutKeys(@NotNull Editor editor) {
-    EventFacade.getInstance().registerCustomShortcutSet(VimShortcutKeyAction.getInstance(),
-                                                        toShortcutSet(requiredShortcutKeys), editor.getComponent());
+    EventFacade.getInstance()
+      .registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(requiredShortcutKeys),
+                                 editor.getComponent());
   }
 
   public void registerShortcutsForLookup(@NotNull LookupImpl lookup) {
@@ -128,11 +130,18 @@ public class KeyGroup {
     registerKeyMapping(fromKeys, owner);
   }
 
-  public void putKeyMapping(@NotNull Set<MappingMode> modes, @NotNull List<KeyStroke> fromKeys,
+  public void putKeyMapping(@NotNull Set<MappingMode> modes,
+                            @NotNull List<KeyStroke> fromKeys,
                             @NotNull MappingOwner owner,
-                            @NotNull List<KeyStroke> toKeys, boolean recursive) {
+                            @NotNull List<KeyStroke> toKeys,
+                            boolean recursive) {
     modes.stream().map(this::getKeyMapping).forEach(o -> o.put(fromKeys, toKeys, owner, recursive));
     registerKeyMapping(fromKeys, owner);
+  }
+
+  public List<Pair<List<KeyStroke>, MappingInfo>> getKeyMappingByOwner(@NotNull MappingOwner owner) {
+    return Arrays.stream(MappingMode.values()).map(this::getKeyMapping).flatMap(o -> o.getByOwner(owner).stream())
+      .collect(toList());
   }
 
   private void unregisterKeyMapping(MappingOwner owner) {
@@ -283,6 +292,7 @@ public class KeyGroup {
    * Digraphs are handled directly by KeyHandler#handleKey instead of via an action, but we need to still make sure the
    * shortcuts are registered, or the key handler won't see them
    * </p>
+   *
    * @param keyStroke The shortcut to register
    */
   public void registerShortcutWithoutAction(KeyStroke keyStroke, MappingOwner owner) {
@@ -300,8 +310,9 @@ public class KeyGroup {
 
     if (!VimPlugin.getPluginId().equals(actionHolder.getPluginId())) {
       logger.error("IdeaVim doesn't accept contributions to `vimActions` extension points. " +
-                  "Please create a plugin using `VimExtension`. " +
-                  "Plugin to blame: " + actionHolder.getPluginId());
+                   "Please create a plugin using `VimExtension`. " +
+                   "Plugin to blame: " +
+                   actionHolder.getPluginId());
       return;
     }
 
@@ -310,7 +321,8 @@ public class KeyGroup {
       final EditorActionHandlerBase action = actionHolder.getAction();
       if (action instanceof ComplicatedKeysAction) {
         actionKeys = ((ComplicatedKeysAction)action).getKeyStrokesSet();
-      } else {
+      }
+      else {
         throw new RuntimeException("Cannot register action: " + action.getClass().getName());
       }
     }
@@ -356,7 +368,9 @@ public class KeyGroup {
     }
   }
 
-  private void checkCommand(@NotNull Set<MappingMode> mappingModes, EditorActionHandlerBase action, List<KeyStroke> keys) {
+  private void checkCommand(@NotNull Set<MappingMode> mappingModes,
+                            EditorActionHandlerBase action,
+                            List<KeyStroke> keys) {
     for (MappingMode mappingMode : mappingModes) {
       checkIdentity(mappingMode, action.getId(), keys);
     }
@@ -366,8 +380,8 @@ public class KeyGroup {
   private void checkIdentity(MappingMode mappingMode, String actName, List<KeyStroke> keys) {
     Set<List<KeyStroke>> keySets = identityChecker.computeIfAbsent(mappingMode, k -> new HashSet<>());
     if (keySets.contains(keys)) {
-      throw new RuntimeException("This keymap already exists: " + mappingMode + " keys: " +
-                                                             keys + " action:" + actName);
+      throw new RuntimeException(
+        "This keymap already exists: " + mappingMode + " keys: " + keys + " action:" + actName);
     }
     keySets.add(keys);
   }
@@ -382,7 +396,9 @@ public class KeyGroup {
         if (!prefix.get(i).equals(keys.get(i))) break;
       }
 
-      List<String> actionExceptions = Arrays.asList("VimInsertDeletePreviousWordAction", "VimInsertAfterCursorAction", "VimInsertBeforeCursorAction", "VimFilterVisualLinesAction", "VimAutoIndentMotionAction");
+      List<String> actionExceptions = Arrays
+        .asList("VimInsertDeletePreviousWordAction", "VimInsertAfterCursorAction", "VimInsertBeforeCursorAction",
+                "VimFilterVisualLinesAction", "VimAutoIndentMotionAction");
       if (i == shortOne && !actionExceptions.contains(action.getId()) && !actionExceptions.contains(entry.getValue())) {
         throw new RuntimeException("Prefix found! " +
                                    keys +
@@ -411,7 +427,8 @@ public class KeyGroup {
     Node newNode;
     if (isLastInSequence) {
       newNode = new CommandNode(actionHolder);
-    } else {
+    }
+    else {
       newNode = new CommandPartNode();
     }
     base.put(key, newNode);

@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.key;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
+import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +36,9 @@ import java.util.stream.Collectors;
  * @author vlan
  */
 public class KeyMapping implements Iterable<List<KeyStroke>> {
-  /** Contains all key mapping for some mode. */
+  /**
+   * Contains all key mapping for some mode.
+   */
   @NotNull private final Map<List<KeyStroke>, MappingInfo> myKeys = new HashMap<>();
   /**
    * Set the contains all possible prefixes for mappings.
@@ -96,6 +99,11 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
         myPrefixes.remove(prefix);
       }
     });
+  }
+
+  public List<Pair<List<KeyStroke>, MappingInfo>> getByOwner(@NotNull MappingOwner owner) {
+    return myKeys.entrySet().stream().filter(o -> o.getValue().getOwner().equals(owner))
+      .map(o -> new Pair<>(o.getKey(), o.getValue())).collect(Collectors.toList());
   }
 
   public boolean isPrefix(@NotNull Iterable<KeyStroke> keys) {
