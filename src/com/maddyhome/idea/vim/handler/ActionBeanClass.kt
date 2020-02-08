@@ -40,6 +40,12 @@ import javax.swing.KeyStroke
  * If you want to use exactly `<` character, replace it with `&lt;`. E.g. `i&lt;` - i<
  * If you want to use comma in mapping, use `«COMMA»`
  * Do not place a whitespace around the comma!
+ *
+ *
+ * !! IMPORTANT !!
+ * You may wonder why the extension points are used instead of any other approach to register actions.
+ *   The reason is startup performance. Using the extension points you don't even have to load classes of actions.
+ *   So, all actions are loaded on demand, including classes in classloader.
  */
 class ActionBeanClass : AbstractExtensionPointBean() {
   @Attribute("implementation")
