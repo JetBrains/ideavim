@@ -59,7 +59,7 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
   }
 
   public void put(@NotNull List<KeyStroke> fromKeys,
-                  @NotNull RequiredShortcutOwner owner,
+                  @NotNull MappingOwner owner,
                   @NotNull VimExtensionHandler extensionHandler,
                   boolean recursive) {
     myKeys.put(new ArrayList<>(fromKeys), new ToHandlerMappingInfo(extensionHandler, fromKeys, recursive, owner));
@@ -68,7 +68,7 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
 
   public void put(@NotNull List<KeyStroke> fromKeys,
                   @NotNull List<KeyStroke> toKeys,
-                  @NotNull RequiredShortcutOwner owner,
+                  @NotNull MappingOwner owner,
                   boolean recursive) {
     myKeys.put(new ArrayList<>(fromKeys), new ToKeysMappingInfo(toKeys, fromKeys, recursive, owner));
     fillPrefixes(fromKeys);
@@ -83,7 +83,7 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
     }
   }
 
-  public void delete(@NotNull RequiredShortcutOwner owner) {
+  public void delete(@NotNull MappingOwner owner) {
     List<Map.Entry<List<KeyStroke>, MappingInfo>> toRemove =
       myKeys.entrySet().stream().filter(o -> o.getValue().getOwner().equals(owner)).collect(Collectors.toList());
 

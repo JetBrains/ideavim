@@ -114,14 +114,14 @@ public class KeyGroup {
     return true;
   }
 
-  public void removeKeyMapping(@NotNull RequiredShortcutOwner owner) {
+  public void removeKeyMapping(@NotNull MappingOwner owner) {
     Arrays.stream(MappingMode.values()).map(this::getKeyMapping).forEach(o -> o.delete(owner));
     unregisterKeyMapping(owner);
   }
 
   public void putKeyMapping(@NotNull Set<MappingMode> modes,
                             @NotNull List<KeyStroke> fromKeys,
-                            @NotNull RequiredShortcutOwner owner,
+                            @NotNull MappingOwner owner,
                             @NotNull VimExtensionHandler extensionHandler,
                             boolean recursive) {
     modes.stream().map(this::getKeyMapping).forEach(o -> o.put(fromKeys, owner, extensionHandler, recursive));
@@ -129,13 +129,13 @@ public class KeyGroup {
   }
 
   public void putKeyMapping(@NotNull Set<MappingMode> modes, @NotNull List<KeyStroke> fromKeys,
-                            @NotNull RequiredShortcutOwner owner,
+                            @NotNull MappingOwner owner,
                             @NotNull List<KeyStroke> toKeys, boolean recursive) {
     modes.stream().map(this::getKeyMapping).forEach(o -> o.put(fromKeys, toKeys, owner, recursive));
     registerKeyMapping(fromKeys, owner);
   }
 
-  private void unregisterKeyMapping(RequiredShortcutOwner owner) {
+  private void unregisterKeyMapping(MappingOwner owner) {
     final int oldSize = requiredShortcutKeys.size();
     requiredShortcutKeys.removeIf(requiredShortcut -> requiredShortcut.getOwner().equals(owner));
     if (requiredShortcutKeys.size() != oldSize) {
@@ -146,7 +146,7 @@ public class KeyGroup {
     }
   }
 
-  private void registerKeyMapping(@NotNull List<KeyStroke> fromKeys, RequiredShortcutOwner owner) {
+  private void registerKeyMapping(@NotNull List<KeyStroke> fromKeys, MappingOwner owner) {
     final int oldSize = requiredShortcutKeys.size();
     for (KeyStroke key : fromKeys) {
       if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
@@ -285,7 +285,7 @@ public class KeyGroup {
    * </p>
    * @param keyStroke The shortcut to register
    */
-  public void registerShortcutWithoutAction(KeyStroke keyStroke, RequiredShortcutOwner owner) {
+  public void registerShortcutWithoutAction(KeyStroke keyStroke, MappingOwner owner) {
     registerRequiredShortcut(Collections.singletonList(keyStroke), owner);
   }
 
@@ -331,7 +331,7 @@ public class KeyGroup {
     }
 
     for (List<KeyStroke> keyStrokes : actionKeys) {
-      registerRequiredShortcut(keyStrokes, RequiredShortcutOwner.IdeaVim.INSTANCE);
+      registerRequiredShortcut(keyStrokes, MappingOwner.IdeaVim.INSTANCE);
 
       for (MappingMode mappingMode : actionModes) {
         Node node = getKeyRoot(mappingMode);
@@ -348,7 +348,7 @@ public class KeyGroup {
     }
   }
 
-  private void registerRequiredShortcut(@NotNull List<KeyStroke> keys, RequiredShortcutOwner owner) {
+  private void registerRequiredShortcut(@NotNull List<KeyStroke> keys, MappingOwner owner) {
     for (KeyStroke key : keys) {
       if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
         requiredShortcutKeys.add(new RequiredShortcut(key, owner));

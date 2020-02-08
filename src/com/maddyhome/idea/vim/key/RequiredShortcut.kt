@@ -20,13 +20,13 @@ package com.maddyhome.idea.vim.key
 
 import javax.swing.KeyStroke
 
-class RequiredShortcut(val keyStroke: KeyStroke, val owner: RequiredShortcutOwner)
+class RequiredShortcut(val keyStroke: KeyStroke, val owner: MappingOwner)
 
-sealed class RequiredShortcutOwner {
-  object IdeaVim : RequiredShortcutOwner()
+sealed class MappingOwner {
+  object IdeaVim : MappingOwner()
 
   @Suppress("DataClassPrivateConstructor")
-  data class Plugin private constructor(val name: String) : RequiredShortcutOwner() {
+  data class Plugin private constructor(val name: String) : MappingOwner() {
     companion object {
       fun get(name: String): Plugin = allOwners.computeIfAbsent(name) { Plugin(it) }
 
