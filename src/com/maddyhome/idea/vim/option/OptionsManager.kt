@@ -353,6 +353,11 @@ object OptionsManager {
     abbrevs += option.abbrev to option
     return option
   }
+
+  fun removeOption(name: String) {
+    options.remove(name)
+    abbrevs.values.find { it.name == name }?.let { option -> abbrevs.remove(option.abbrev) }
+  }
 }
 
 object KeyModelOptionData {

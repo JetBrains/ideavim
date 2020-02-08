@@ -34,8 +34,10 @@ import java.util.Set;
  */
 public class VimExtensionRegistrar {
 
-  private static Set<String> registeredExtensions = new HashSet<>();
+  private static final Set<String> registeredExtensions = new HashSet<>();
   private static boolean extensionRegistered = false;
+
+  private static final Logger logger = Logger.getInstance(VimExtensionRegistrar.class);
 
   public static void registerExtensions() {
     if (extensionRegistered) return;
@@ -43,10 +45,16 @@ public class VimExtensionRegistrar {
 
     // TODO: [VERSION UPDATE] since 191 use
     //  ExtensionPoint.addExtensionPointListener(ExtensionPointListener<T>, boolean, Disposable)
+    //noinspection deprecation
     VimExtension.EP_NAME.getPoint(null).addExtensionPointListener(new ExtensionPointListener<VimExtension>() {
       @Override
       public void extensionAdded(@NotNull VimExtension extension, @NotNull PluginDescriptor pluginDescriptor) {
         registerExtension(extension);
+      }
+
+      @Override
+      public void extensionRemoved(@NotNull VimExtension extension, @NotNull PluginDescriptor pluginDescriptor) {
+        unregisterExtension(extension);
       }
     });
   }
@@ -74,5 +82,14 @@ public class VimExtensionRegistrar {
     OptionsManager.INSTANCE.addOption(option);
   }
 
-  private static Logger logger = Logger.getInstance(VimExtensionRegistrar.class);
+  synchronized private static void unregisterExtension(@NotNull VimExtension extension) {
+    String name = extension.getName();
+
+    if (!registeredExtensions.contains(name)) return;
+
+    registeredExtensions.remove(name);
+    extension.dispose();
+    OptionsManager.INSTANCE.removeOption(name);
+    logger.info("IdeaVim extension '" + name + "' disposed");
+  }
 }
