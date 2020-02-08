@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.helper.isBlockCaret
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.Contract
 import java.util.*
 import kotlin.math.ceil
@@ -82,6 +83,10 @@ object OptionsManager {
   val wrapscan = addOption(ToggleOption("wrapscan", "ws", true))
   val visualEnterDelay = addOption(NumberOption("visualdelay", "visualdelay", 100, 0, Int.MAX_VALUE))
   val idearefactormode = addOption(BoundStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues))
+  val ideastatusicon = addOption(BoundStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues))
+
+  @ApiStatus.ScheduledForRemoval(inVersion = "0.58")
+  @Deprecated("please use ideastatusicon")
   val ideastatusbar = addOption(ToggleOption("ideastatusbar", "ideastatusbar", true))
 
   fun isSet(name: String): Boolean {
@@ -386,6 +391,7 @@ object SelectModeOptionData {
 
   @Deprecated("Please, use `idearefactormode` option")
   const val template = "template"
+
   @Deprecated("Please, use `ideaselection`")
   const val refactoring = "refactoring"
 
@@ -524,4 +530,13 @@ object LookupKeysData {
     // Vim: Insert next non-digit literally (same as <Ctrl-V>). Not yet supported (19.01.2020)
     "<C-Q>"
   )
+}
+
+object IdeaStatusIcon {
+  const val enabled = "enabled"
+  const val gray = "gray"
+  const val disabled = "disabled"
+
+  val name = "ideastatusicon"
+  val allValues = arrayOf(enabled, gray, disabled)
 }

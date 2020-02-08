@@ -29,6 +29,11 @@ _Available since 0.55.1 EAP:_
 * [VIM-1835](https://youtrack.jetbrains.com/issue/VIM-1835) Macros record input keystrokes instead of mapped keystrokes
 * [VIM-1900](https://youtrack.jetbrains.com/issue/VIM-1900) Ensure non-printable output for `:registers`, `:marks` and `:jumps` is encoded correctly
 
+_To Be Released:_
+
+**Changes:**
+* Replace `ideastatusbar` option with `ideastatusicon`. Now you can make the icon gray.
+
 0.55, 2020-01-20
 --------------
 
