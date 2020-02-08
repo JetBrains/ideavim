@@ -389,9 +389,11 @@ object SelectModeOptionData {
   const val key = "key"
   const val cmd = "cmd"
 
+  @ApiStatus.ScheduledForRemoval(inVersion = "0.57")
   @Deprecated("Please, use `idearefactormode` option")
   const val template = "template"
 
+  @ApiStatus.ScheduledForRemoval(inVersion = "0.57")
   @Deprecated("Please, use `ideaselection`")
   const val refactoring = "refactoring"
 
