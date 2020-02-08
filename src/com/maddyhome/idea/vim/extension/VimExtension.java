@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.extension;
 
 import com.intellij.openapi.extensions.ExtensionPointName;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.key.RequiredShortcutOwner;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,5 +38,7 @@ public interface VimExtension {
 
   void init();
 
-  void dispose();
+  default void dispose() {
+    VimPlugin.getKey().removeKeyMapping(getOwner());
+  };
 }

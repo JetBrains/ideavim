@@ -27,10 +27,10 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
-import com.maddyhome.idea.vim.extension.VimNonDisposableExtension
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -56,10 +56,10 @@ private const val ALL_OCCURRENCES = "<Plug>AllOccurrences"
  *
  * See https://github.com/terryma/vim-multiple-cursors
  * */
-class VimMultipleCursorsExtension : VimNonDisposableExtension() {
+class VimMultipleCursorsExtension : VimExtension {
   override fun getName() = "multiple-cursors"
 
-  override fun initOnce() {
+  override fun init() {
     putExtensionHandlerMapping(MappingMode.NXO, parseKeys(NEXT_WHOLE_OCCURRENCE), owner, NextOccurrenceHandler(), false)
     putExtensionHandlerMapping(MappingMode.NXO, parseKeys(NEXT_OCCURRENCE), owner, NextOccurrenceHandler(whole = false), false)
     putExtensionHandlerMapping(MappingMode.NXO, parseKeys(ALL_WHOLE_OCCURRENCES), owner, AllOccurrencesHandler(), false )

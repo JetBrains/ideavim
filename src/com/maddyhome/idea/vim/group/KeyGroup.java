@@ -114,26 +114,36 @@ public class KeyGroup {
     return true;
   }
 
+  public void removeKeyMapping(@NotNull RequiredShortcutOwner owner) {
+    Arrays.stream(MappingMode.values()).map(this::getKeyMapping).forEach(o -> o.delete(owner));
+    unregisterKeyMapping(owner);
+  }
+
   public void putKeyMapping(@NotNull Set<MappingMode> modes,
                             @NotNull List<KeyStroke> fromKeys,
                             @NotNull RequiredShortcutOwner owner,
                             @NotNull VimExtensionHandler extensionHandler,
                             boolean recursive) {
-    for (MappingMode mode : modes) {
-      final KeyMapping mapping = getKeyMapping(mode);
-      mapping.put(fromKeys, extensionHandler, recursive);
-    }
+    modes.stream().map(this::getKeyMapping).forEach(o -> o.put(fromKeys, owner, extensionHandler, recursive));
     registerKeyMapping(fromKeys, owner);
   }
 
   public void putKeyMapping(@NotNull Set<MappingMode> modes, @NotNull List<KeyStroke> fromKeys,
                             @NotNull RequiredShortcutOwner owner,
                             @NotNull List<KeyStroke> toKeys, boolean recursive) {
-    for (MappingMode mode : modes) {
-      final KeyMapping mapping = getKeyMapping(mode);
-      mapping.put(fromKeys, toKeys, recursive);
-    }
+    modes.stream().map(this::getKeyMapping).forEach(o -> o.put(fromKeys, toKeys, owner, recursive));
     registerKeyMapping(fromKeys, owner);
+  }
+
+  private void unregisterKeyMapping(RequiredShortcutOwner owner) {
+    final int oldSize = requiredShortcutKeys.size();
+    requiredShortcutKeys.removeIf(requiredShortcut -> requiredShortcut.getOwner().equals(owner));
+    if (requiredShortcutKeys.size() != oldSize) {
+      for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
+        unregisterShortcutKeys(editor);
+        registerRequiredShortcutKeys(editor);
+      }
+    }
   }
 
   private void registerKeyMapping(@NotNull List<KeyStroke> fromKeys, RequiredShortcutOwner owner) {

@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Container for key mappings for some mode
@@ -58,21 +59,22 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
   }
 
   public void put(@NotNull List<KeyStroke> fromKeys,
+                  @NotNull RequiredShortcutOwner owner,
                   @NotNull VimExtensionHandler extensionHandler,
                   boolean recursive) {
-    myKeys.put(new ArrayList<>(fromKeys), new ToHandlerMappingInfo(extensionHandler, fromKeys, recursive));
-    List<KeyStroke> prefix = new ArrayList<>();
-    final int prefixLength = fromKeys.size() - 1;
-    for (int i = 0; i < prefixLength; i++) {
-      prefix.add(fromKeys.get(i));
-      myPrefixes.add(new ArrayList<>(prefix));
-    }
+    myKeys.put(new ArrayList<>(fromKeys), new ToHandlerMappingInfo(extensionHandler, fromKeys, recursive, owner));
+    fillPrefixes(fromKeys);
   }
 
   public void put(@NotNull List<KeyStroke> fromKeys,
                   @NotNull List<KeyStroke> toKeys,
+                  @NotNull RequiredShortcutOwner owner,
                   boolean recursive) {
-    myKeys.put(new ArrayList<>(fromKeys), new ToKeysMappingInfo(toKeys, fromKeys, recursive));
+    myKeys.put(new ArrayList<>(fromKeys), new ToKeysMappingInfo(toKeys, fromKeys, recursive, owner));
+    fillPrefixes(fromKeys);
+  }
+
+  private void fillPrefixes(@NotNull List<KeyStroke> fromKeys) {
     List<KeyStroke> prefix = new ArrayList<>();
     final int prefixLength = fromKeys.size() - 1;
     for (int i = 0; i < prefixLength; i++) {
@@ -81,14 +83,19 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
     }
   }
 
-  public void delete(@NotNull List<KeyStroke> keys) {
-    myKeys.remove(keys);
-    List<KeyStroke> prefix = new ArrayList<>();
-    final int prefixLength = keys.size() - 1;
-    for (int i = 0; i < prefixLength; i++) {
-      prefix.add(keys.get(i));
-      myPrefixes.remove(prefix);
-    }
+  public void delete(@NotNull RequiredShortcutOwner owner) {
+    List<Map.Entry<List<KeyStroke>, MappingInfo>> toRemove =
+      myKeys.entrySet().stream().filter(o -> o.getValue().getOwner().equals(owner)).collect(Collectors.toList());
+
+    toRemove.forEach(o -> myKeys.remove(o.getKey(), o.getValue()));
+    toRemove.stream().map(Map.Entry::getKey).forEach(keys -> {
+      List<KeyStroke> prefix = new ArrayList<>();
+      final int prefixLength = keys.size() - 1;
+      for (int i = 0; i < prefixLength; i++) {
+        prefix.add(keys.get(i));
+        myPrefixes.remove(prefix);
+      }
+    });
   }
 
   public boolean isPrefix(@NotNull Iterable<KeyStroke> keys) {

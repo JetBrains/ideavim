@@ -25,7 +25,7 @@ import kotlin.math.min
 /**
  * @author vlan
  */
-sealed class MappingInfo(val fromKeys: List<KeyStroke>, val isRecursive: Boolean) : Comparable<MappingInfo> {
+sealed class MappingInfo(val fromKeys: List<KeyStroke>, val isRecursive: Boolean, val owner: RequiredShortcutOwner) : Comparable<MappingInfo> {
   override fun compareTo(other: MappingInfo): Int {
     val size = fromKeys.size
     val otherSize = other.fromKeys.size
@@ -55,11 +55,13 @@ sealed class MappingInfo(val fromKeys: List<KeyStroke>, val isRecursive: Boolean
 class ToKeysMappingInfo(
   val toKeys: List<KeyStroke>,
   fromKeys: List<KeyStroke>,
-  isRecursive: Boolean
-) : MappingInfo(fromKeys, isRecursive)
+  isRecursive: Boolean,
+  owner: RequiredShortcutOwner
+) : MappingInfo(fromKeys, isRecursive, owner)
 
 class ToHandlerMappingInfo(
   val extensionHandler: VimExtensionHandler,
   fromKeys: List<KeyStroke>,
-  isRecursive: Boolean
-) : MappingInfo(fromKeys, isRecursive)
+  isRecursive: Boolean,
+  owner: RequiredShortcutOwner
+) : MappingInfo(fromKeys, isRecursive, owner)

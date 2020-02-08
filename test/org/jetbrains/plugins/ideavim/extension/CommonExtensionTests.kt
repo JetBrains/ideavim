@@ -23,10 +23,10 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
-import com.maddyhome.idea.vim.extension.VimNonDisposableExtension
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.isEndAllowed
@@ -89,10 +89,10 @@ class OpMappingTest : VimTestCase() {
   }
 }
 
-private class TestExtension : VimNonDisposableExtension() {
+private class TestExtension : VimExtension {
   override fun getName(): String = "TestExtension"
 
-  override fun initOnce() {
+  override fun init() {
     putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionEmulateInclusive"), owner, MoveEmulateInclusive(), false)
     putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionBackwardsCharacter"), owner, MoveBackwards(), false)
     putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionCharacter"), owner, Move(), false)

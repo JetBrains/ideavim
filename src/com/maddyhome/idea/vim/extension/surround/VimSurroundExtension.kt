@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormal
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegister
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.inputKeyStroke
@@ -34,7 +35,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
-import com.maddyhome.idea.vim.extension.VimNonDisposableExtension
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.mode
@@ -51,10 +51,10 @@ import javax.swing.KeyStroke
  * @author dhleong
  * @author vlan
  */
-class VimSurroundExtension : VimNonDisposableExtension() {
+class VimSurroundExtension : VimExtension {
   override fun getName() = "surround"
 
-  override fun initOnce() {
+  override fun init() {
     putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>YSurround"), owner, YSurroundHandler(), false)
     putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>CSurround"), owner, CSurroundHandler(), false)
     putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>DSurround"), owner, DSurroundHandler(), false)
