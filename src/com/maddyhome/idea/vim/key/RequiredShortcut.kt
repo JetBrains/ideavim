@@ -30,6 +30,8 @@ sealed class MappingOwner {
     companion object {
       fun get(name: String): Plugin = allOwners.computeIfAbsent(name) { Plugin(it) }
 
+      fun remove(name: String) = allOwners.remove(name)
+
       private val allOwners: MutableMap<String, Plugin> = mutableMapOf()
     }
   }

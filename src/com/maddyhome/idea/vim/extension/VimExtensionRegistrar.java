@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.extension;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.ExtensionPointListener;
 import com.intellij.openapi.extensions.PluginDescriptor;
+import com.maddyhome.idea.vim.key.MappingOwner;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import org.jetbrains.annotations.NotNull;
@@ -90,6 +91,7 @@ public class VimExtensionRegistrar {
     registeredExtensions.remove(name);
     extension.dispose();
     OptionsManager.INSTANCE.removeOption(name);
+    MappingOwner.Plugin.Companion.remove(name);
     logger.info("IdeaVim extension '" + name + "' disposed");
   }
 }
