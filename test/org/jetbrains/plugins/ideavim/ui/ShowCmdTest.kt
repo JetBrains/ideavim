@@ -1,6 +1,7 @@
 package org.jetbrains.plugins.ideavim.ui
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.ShowCmd
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -95,25 +96,41 @@ class ShowCmdTest: VimTestCase() {
     assertEquals("", getShowCmdText())
   }
 
-  // TODO: StartInsertDigraphAction is executed before the argument is parsed, so text is immediately cleared
-//  fun `test showcmd shows digraph entry in insert mode`() {
-//    typeText(parseKeys("i", "<C-K>O"))
-//    assertEquals("^KO", getShowCmdText())
-//  }
+  fun `test showcmd shows digraph entry in insert mode`() {
+    typeText(parseKeys("i", "<C-K>O"))
+    assertEquals("^KO", getShowCmdText())
+  }
 
-//  fun `test showcmd shows literal entry in insert mode`() {
-//    typeText(parseKeys("i", "<C-V>12"))
-//    assertEquals("^V12", getShowCmdText())
-//  }
+  fun `test showcmd clears when cancelling digraph entry in insert mode`() {
+    typeText(parseKeys("i", "<C-K>O", "<Esc>"))
+    assertEquals("", getShowCmdText())
+  }
 
-//  fun `test showcmd shows literal entry with CTRL-Q in insert mode`() {
-//    typeText(parseKeys("i", "<C-Q>12"))
-//    assertEquals("^V12", getShowCmdText())  // Yes, Vim shows ^V
-//  }
+  fun `test showcmd shows literal entry in insert mode`() {
+    typeText(parseKeys("i", "<C-V>12"))
+    assertEquals("^V12", getShowCmdText())
+  }
+
+  // Vim seems to hard code <C-Q> and swaps it for <C-V>
+  @VimBehaviorDiffers("^V12")
+  fun `test showcmd shows literal entry with CTRL-Q in insert mode`() {
+    typeText(parseKeys("i", "<C-Q>12"))
+    assertEquals("^Q12", getShowCmdText())
+  }
+
+  fun `test showcmd clears when cancelling literal entry in insert mode`() {
+    typeText(parseKeys("i", "<C-V>1", "<Esc>"))
+    assertEquals("", getShowCmdText())
+  }
 
   fun `test showcmd shows register entry in insert mode`() {
     typeText(parseKeys("i", "<C-R>"))
-    assertEquals("^R", getShowCmdText())  // Yes, Vim shows ^V
+    assertEquals("^R", getShowCmdText())
+  }
+
+  fun `test showcmd clears when cancelling registry entry in insert mode`() {
+    typeText(parseKeys("i", "<C-R>", "<Esc>"))
+    assertEquals("", getShowCmdText())
   }
 
   // Note that Vim shows the number of lines, or rows x cols for visual mode. We don't because IntelliJ already

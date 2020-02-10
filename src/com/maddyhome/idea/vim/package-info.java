@@ -40,7 +40,7 @@
  * |i_CTRL-I|             IntelliJ editor tab
  * |i_<NL>|               {@link com.maddyhome.idea.vim.action.change.insert.InsertEnterAction}
  * |i_CTRL-J|             TO BE IMPLEMENTED
- * |i_CTRL-K|             {@link com.maddyhome.idea.vim.action.change.insert.StartInsertDigraphAction}
+ * |i_CTRL-K|             {@link com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction}
  * |i_CTRL-L|             TO BE IMPLEMENTED
  * |i_<CR>|               {@link com.maddyhome.idea.vim.action.change.insert.InsertEnterAction}
  * |i_CTRL-M|             {@link com.maddyhome.idea.vim.action.change.insert.InsertEnterAction}
@@ -54,8 +54,8 @@
  * |i_CTRL-R_CTRL-P|      TO BE IMPLEMENTED
  * |i_CTRL-T|             {@link com.maddyhome.idea.vim.action.change.shift.ShiftRightLinesAction}
  * |i_CTRL-U|             {@link com.maddyhome.idea.vim.action.change.insert.InsertDeleteInsertedTextAction}
- * |i_CTRL-V|             {@link com.maddyhome.idea.vim.action.change.insert.StartInsertLiteralAction}
- * |i_CTRL-V_digit|       {@link com.maddyhome.idea.vim.action.change.insert.StartInsertLiteralAction}
+ * |i_CTRL-V|             {@link com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction}
+ * |i_CTRL-V_digit|       {@link com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction}
  * |i_CTRL-W|             {@link com.maddyhome.idea.vim.action.change.insert.InsertDeletePreviousWordAction}
  * |i_CTRL-X|             TO BE IMPLEMENTED
  * |i_CTRL-Y|             {@link com.maddyhome.idea.vim.action.change.insert.InsertCharacterAboveCursorAction}

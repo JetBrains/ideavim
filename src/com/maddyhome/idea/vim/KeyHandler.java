@@ -35,6 +35,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
 import com.maddyhome.idea.vim.action.change.VimRepeater;
+import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction;
+import com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction;
 import com.maddyhome.idea.vim.action.macro.ToggleRecordingAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
@@ -153,16 +155,6 @@ public class KeyHandler {
       }
     }
     return false;
-  }
-
-  public void startDigraphSequence(@NotNull Editor editor) {
-    final CommandState editorState = CommandState.getInstance(editor);
-    editorState.startDigraphSequence();
-  }
-
-  public void startLiteralSequence(@NotNull Editor editor) {
-    final CommandState editorState = CommandState.getInstance(editor);
-    editorState.startLiteralSequence();
   }
 
   /**
@@ -634,9 +626,6 @@ public class KeyHandler {
         editorState.getCommandBuilder().addKey(key);
         return true;
 
-      case DigraphResult.RES_BAD:
-        return true;
-
       case DigraphResult.RES_DONE:
         if (commandBuilder.getExpectedArgumentType() == Argument.Type.DIGRAPH) {
           commandBuilder.fallbackToCharacterArgument();
@@ -649,7 +638,16 @@ public class KeyHandler {
         handleKey(editor, stroke, context);
         return true;
 
+      case DigraphResult.RES_BAD:
+        // BAD is an error. We were expecting a valid character, and we didn't get it.
+        if (commandBuilder.getExpectedArgumentType() != null) {
+          commandBuilder.setCommandState(CurrentCommandState.BAD_COMMAND);
+        }
+        return true;
+
       case DigraphResult.RES_UNHANDLED:
+        // UNHANDLED means the key stroke made no sense in the context of a digraph, but isn't an error in the current
+        // state. E.g. waiting for {char} <BS> {char}. Let the key handler have a go at it.
         if (commandBuilder.getExpectedArgumentType() == Argument.Type.DIGRAPH) {
           commandBuilder.fallbackToCharacterArgument();
           handleKey(editor, key, context);
@@ -722,7 +720,7 @@ public class KeyHandler {
     }
     else {
       final Argument.Type argumentType = action.getArgumentType();
-      startWaitingForArgument(editor, context, key.getKeyChar(), argumentType, editorState);
+      startWaitingForArgument(editor, context, key.getKeyChar(), action, argumentType, editorState);
       partialReset(editor);
     }
 
@@ -759,6 +757,7 @@ public class KeyHandler {
   private void startWaitingForArgument(Editor editor,
                                        DataContext context,
                                        char key,
+                                       @NotNull EditorActionHandlerBase action,
                                        @NotNull Argument.Type argument,
                                        CommandState editorState) {
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
@@ -768,6 +767,17 @@ public class KeyHandler {
           commandBuilder.completeCommandPart(VimRepeater.Extension.INSTANCE.getArgumentCaptured());
         }
         editorState.pushModes(editorState.getMode(), CommandState.SubMode.OP_PENDING);
+        break;
+      case DIGRAPH:
+        // Command actions represent the completion of a command. Showcmd relies on this - if the action represents a
+        // part of a command, the showcmd output is reset part way through. This means we need to special case entering
+        // digraph/literal input mode. We have an action that takes a digraph as an argument, and pushes it back through
+        // the key handler when it's complete.
+        if (action instanceof InsertCompletedDigraphAction) {
+          editorState.startDigraphSequence();
+        } else if (action instanceof InsertCompletedLiteralAction) {
+          editorState.startLiteralSequence();
+        }
         break;
       case EX_STRING:
         // The current Command expects an EX_STRING argument. E.g. SearchEntry(Fwd|Rev)Action. This won't execute until

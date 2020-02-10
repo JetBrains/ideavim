@@ -40,9 +40,10 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     expectedArgumentType = action.argumentType
   }
 
-  fun popCommandPart() {
-    commandParts.pop()
+  fun popCommandPart(): Command {
+    val command = commandParts.pop()
     expectedArgumentType = if (commandParts.size > 0) commandParts.peek().action.argumentType else null
+    return command
   }
 
   fun fallbackToCharacterArgument() {
@@ -113,9 +114,9 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     /* Let's go through the command stack and merge it all into one command. At this time there should never
        be more than two commands on the stack - one is the actual command, and the other would be a motion
        command argument needed by the first command */
-    var command: Command = commandParts.pop()
+    var command: Command = popCommandPart()
     while (commandParts.size > 0) {
-      val top: Command = commandParts.pop()
+      val top: Command = popCommandPart()
       top.argument = Argument(command)
       command = top
     }
