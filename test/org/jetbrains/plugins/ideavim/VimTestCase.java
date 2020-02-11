@@ -87,6 +87,8 @@ public abstract class VimTestCase extends UsefulTestCase {
     VimPlugin.getKey().resetKeyMappings();
     VimPlugin.getSearch().resetState();
 
+    if (!VimPlugin.isEnabled()) VimPlugin.setEnabled(true);
+
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
     ExEntryPanel.getInstance().getEntry().setBounds(0,0, 100, 25);
   }

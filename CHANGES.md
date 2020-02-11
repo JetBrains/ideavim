@@ -19,6 +19,8 @@ usual beta standards.
 To Be Released
 --------------
 
+_Available since 0.55.1 EAP:_
+
 **Fixes:**
 * [VIM-1284](https://youtrack.jetbrains.com/issue/VIM-1284) Fix mapping of digits
 * Fix handling of counts on both operator and motion, e.g. `3d2w` deletes 6 words, instead of 32
@@ -27,6 +29,11 @@ To Be Released
 * [VIM-1835](https://youtrack.jetbrains.com/issue/VIM-1835) Macros record input keystrokes instead of mapped keystrokes
 * [VIM-1900](https://youtrack.jetbrains.com/issue/VIM-1900) Ensure non-printable output for `:registers`, `:marks` and `:jumps` is encoded correctly
 * [VIM-434](https://youtrack.jetbrains.com/issue/VIM-434) Add `'showcmd'` support, on by default
+
+_To Be Released:_
+
+**Changes:**
+* Replace `ideastatusbar` option with `ideastatusicon`. Now you can make the icon gray.
 
 0.55, 2020-01-20
 --------------

@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormal
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegister
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.inputKeyStroke
@@ -34,7 +35,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
-import com.maddyhome.idea.vim.extension.VimNonDisposableExtension
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.mode
@@ -51,19 +51,19 @@ import javax.swing.KeyStroke
  * @author dhleong
  * @author vlan
  */
-class VimSurroundExtension : VimNonDisposableExtension() {
+class VimSurroundExtension : VimExtension {
   override fun getName() = "surround"
 
-  override fun initOnce() {
-    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>YSurround"), YSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>CSurround"), CSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>DSurround"), DSurroundHandler(), false)
-    putExtensionHandlerMapping(MappingMode.XO, StringHelper.parseKeys("<Plug>VSurround"), VSurroundHandler(), false)
+  override fun init() {
+    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>YSurround"), owner, YSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>CSurround"), owner, CSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>DSurround"), owner, DSurroundHandler(), false)
+    putExtensionHandlerMapping(MappingMode.XO, StringHelper.parseKeys("<Plug>VSurround"), owner, VSurroundHandler(), false)
 
-    putKeyMapping(MappingMode.N, StringHelper.parseKeys("ys"), StringHelper.parseKeys("<Plug>YSurround"), true)
-    putKeyMapping(MappingMode.N, StringHelper.parseKeys("cs"), StringHelper.parseKeys("<Plug>CSurround"), true)
-    putKeyMapping(MappingMode.N, StringHelper.parseKeys("ds"), StringHelper.parseKeys("<Plug>DSurround"), true)
-    putKeyMapping(MappingMode.XO, StringHelper.parseKeys("S"), StringHelper.parseKeys("<Plug>VSurround"), true)
+    putKeyMapping(MappingMode.N, StringHelper.parseKeys("ys"), owner, StringHelper.parseKeys("<Plug>YSurround"), true)
+    putKeyMapping(MappingMode.N, StringHelper.parseKeys("cs"), owner, StringHelper.parseKeys("<Plug>CSurround"), true)
+    putKeyMapping(MappingMode.N, StringHelper.parseKeys("ds"), owner, StringHelper.parseKeys("<Plug>DSurround"), true)
+    putKeyMapping(MappingMode.XO, StringHelper.parseKeys("S"), owner, StringHelper.parseKeys("<Plug>VSurround"), true)
   }
 
   private class YSurroundHandler : VimExtensionHandler {

@@ -435,10 +435,8 @@ public class KeyHandler {
 
     final EditorDataContext currentContext = new EditorDataContext(editor);
 
-    final List<KeyStroke> toKeys = mappingInfo.getToKeys();
-    final VimExtensionHandler extensionHandler = mappingInfo.getExtensionHandler();
-
-    if (toKeys != null) {
+    if (mappingInfo instanceof ToKeysMappingInfo) {
+      final List<KeyStroke> toKeys = ((ToKeysMappingInfo)mappingInfo).getToKeys();
       final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), toKeys);
       boolean first = true;
       for (KeyStroke keyStroke : toKeys) {
@@ -447,7 +445,8 @@ public class KeyHandler {
         first = false;
       }
     }
-    else if (extensionHandler != null) {
+    else if (mappingInfo instanceof ToHandlerMappingInfo) {
+      final VimExtensionHandler extensionHandler = ((ToHandlerMappingInfo)mappingInfo).getExtensionHandler();
       final CommandProcessor processor = CommandProcessor.getInstance();
 
       // Cache isOperatorPending in case the extension changes the mode while moving the caret

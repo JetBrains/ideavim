@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.key.CommandPartNode;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -84,6 +85,13 @@ public class CommandState {
   @NotNull
   private static CommandPartNode getKeyRootNode(MappingMode mappingMode) {
     return VimPlugin.getKey().getKeyRoot(mappingMode);
+  }
+
+  // Keep the compatibility with the IdeaVim-EasyMotion plugin before the stable release
+  @ApiStatus.ScheduledForRemoval(inVersion = "0.56")
+  @Deprecated
+  public MappingMode getMappingMode() {
+    return mappingState.getMappingMode();
   }
 
   public boolean isOperatorPending() {

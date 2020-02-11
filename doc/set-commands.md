@@ -105,8 +105,20 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                   See wiki/`ideajoin` examples
 
     `ideastatusbar`  `ideastatusbar` Boolean (default true)
+                  DEPRECATED. Please use `ideastatusicon`
     
                   If false, IdeaVim icon won't be shown in the status bar.
+                  Works only from `~/.ideavimrc` after the IDE restart.
+                  
+    `ideastatusicon`  `ideastatusicon` String(default "enabled")
+    
+                 Define the behavior of IdeaVim icon in the status bar.
+                 
+                 Use one of the following values:
+                 - enabled - icon is shown in the status bar
+                 - gray - use the gray version of the icon
+                 - disabled - hide the icon
+                 
                   Works only from `~/.ideavimrc` after the IDE restart.
                   
     `lookupkeys`    `lookupkeys`   List of strings

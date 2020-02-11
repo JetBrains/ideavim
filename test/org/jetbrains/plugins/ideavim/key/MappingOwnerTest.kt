@@ -16,29 +16,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.extension;
+package org.jetbrains.plugins.ideavim.key
 
-import com.intellij.openapi.extensions.ExtensionPointName;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.key.MappingOwner;
-import org.jetbrains.annotations.NotNull;
+import com.maddyhome.idea.vim.key.MappingOwner
+import junit.framework.TestCase
+import org.jetbrains.plugins.ideavim.VimTestCase
 
-/**
- * @author vlan
- */
-public interface VimExtension {
-  @NotNull ExtensionPointName<VimExtension> EP_NAME = ExtensionPointName.create("IdeaVIM.vimExtension");
-
-  @NotNull
-  String getName();
-
-  default MappingOwner getOwner() {
-    return MappingOwner.Plugin.Companion.get(getName());
+class MappingOwnerTest : VimTestCase() {
+  fun `test get two plugin owners`() {
+    val pluginName = "MyPlugin"
+    val firstOwner = MappingOwner.Plugin.get(pluginName)
+    val secondOwner = MappingOwner.Plugin.get(pluginName)
+    TestCase.assertSame(firstOwner, secondOwner)
   }
-
-  void init();
-
-  default void dispose() {
-    VimPlugin.getKey().removeKeyMapping(getOwner());
-  };
 }
