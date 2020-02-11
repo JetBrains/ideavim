@@ -1,4 +1,4 @@
-<img src="resources/META-INF/pluginIcon.svg" width="80" height="80" alt="icon"  align="left"/>
+<img src="resources/META-INF/pluginIcon.svg" width="80" height="80" alt="icon" align="left"/>
 
 IdeaVim
 ===
@@ -7,8 +7,8 @@ IdeaVim
   <a href="https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub">
     <img src="https://jb.gg/badges/official.svg" alt="official JetBrains project"/>
   </a>
-  <a href="https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20191&guest=1">
-    <img src="https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20191)/statusIcon.svg?guest=1"/>
+  <a href="https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20201&guest=1">
+    <img src="https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20201)/statusIcon.svg?guest=1" alt="TeamCity Build"/>
   </a>
 </div>
 
