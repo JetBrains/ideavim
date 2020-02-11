@@ -83,7 +83,7 @@ class ShowCmdStatusBarWidget: StatusBarWidgetProvider {
     override fun getAlignment() = Component.CENTER_ALIGNMENT
 
     // Multiframe#copy to show the widget on popped out editors
-    override fun copy(): StatusBarWidget = Widget(project)
+    override fun copy(): StatusBarWidget = Widget(myProject)
 
     override fun selectionChanged(event: FileEditorManagerEvent) {
       // Update when changing selected editor
