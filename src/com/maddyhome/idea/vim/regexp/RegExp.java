@@ -29,8 +29,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class RegExp {
-  @Nullable public static reg_extmatch_T re_extmatch_out = null;
-  @Nullable public static reg_extmatch_T re_extmatch_in = null;
+  public static @Nullable reg_extmatch_T re_extmatch_out = null;
+  public static @Nullable reg_extmatch_T re_extmatch_in = null;
 
   /*
      * The opcodes are:
@@ -356,8 +356,7 @@ public class RegExp {
      * "p" must point to the character after the '['.
      * The returned pointer is on the matching ']', or the terminating NUL.
      */
-  @NotNull
-  private static CharPointer skip_anyof(@NotNull CharPointer p) {
+  private static @NotNull CharPointer skip_anyof(@NotNull CharPointer p) {
     if (p.charAt() == '^')      /* Complement of range. */ {
       p.inc();
     }
@@ -401,8 +400,7 @@ public class RegExp {
      * Take care of characters with a backslash in front of it.
      * Skip strings inside [ and ].
      */
-  @NotNull
-  public static CharPointer skip_regexp(@NotNull CharPointer p, char dirc, boolean magic) {
+  public static @NotNull CharPointer skip_regexp(@NotNull CharPointer p, char dirc, boolean magic) {
     int mymagic;
 
     if (magic) {
@@ -455,8 +453,7 @@ public class RegExp {
      * Beware that the optimization-preparation code in here knows about some
      * of the structure of the compiled regexp.
      */
-  @Nullable
-  public regprog_T vim_regcomp(@Nullable String expr, int magic) {
+  public @Nullable regprog_T vim_regcomp(@Nullable String expr, int magic) {
     regprog_T r;
     CharPointer scan;
     CharPointer longest;
@@ -587,8 +584,7 @@ public class RegExp {
      * is a trifle forced, but the need to tie the tails of the branches to what
      * follows makes it hard to avoid.
      */
-  @Nullable
-  private CharPointer reg(int paren, @NotNull Flags flagp) {
+  private @Nullable CharPointer reg(int paren, @NotNull Flags flagp) {
     CharPointer ret;
     CharPointer br;
     CharPointer ender;
@@ -708,8 +704,7 @@ public class RegExp {
      *
      * Implements the & operator.
      */
-  @Nullable
-  private CharPointer regbranch(@NotNull Flags flagp) {
+  private @Nullable CharPointer regbranch(@NotNull Flags flagp) {
     CharPointer ret;
     CharPointer chain = null;
     CharPointer latest;
@@ -750,8 +745,7 @@ public class RegExp {
      *
      * Implements the concatenation operator.
      */
-  @Nullable
-  private CharPointer regconcat(@NotNull Flags flagp) {
+  private @Nullable CharPointer regconcat(@NotNull Flags flagp) {
     CharPointer first = null;
     CharPointer chain = null;
     CharPointer latest;
@@ -831,8 +825,7 @@ public class RegExp {
      * It might seem that this node could be dispensed with entirely, but the
      * endmarker role is not redundant.
      */
-  @Nullable
-  private CharPointer regpiece(@NotNull Flags flagp) {
+  private @Nullable CharPointer regpiece(@NotNull Flags flagp) {
     CharPointer ret;
     int op;
     CharPointer next;
@@ -992,8 +985,7 @@ public class RegExp {
      * it can turn them into a single node, which is smaller to store and
      * faster to run.  Don't do this when one_exactly is set.
      */
-  @Nullable
-  private CharPointer regatom(@NotNull Flags flagp) {
+  private @Nullable CharPointer regatom(@NotNull Flags flagp) {
     CharPointer ret = null;
     Flags flags = new Flags();
     boolean cpo_lit = false;        /* 'cpoptions' contains 'l' flag */
@@ -1695,8 +1687,7 @@ public class RegExp {
   /*
      * Write a long as four bytes at "p" and return pointer to the next char.
      */
-  @NotNull
-  private CharPointer re_put_long(@NotNull CharPointer p, int val) {
+  private @NotNull CharPointer re_put_long(@NotNull CharPointer p, int val) {
     p.set((char)((val >> 24) & 0xff)).inc();
     p.set((char)((val >> 16) & 0xff)).inc();
     p.set((char)((val >> 8) & 0xff)).inc();
@@ -1939,8 +1930,7 @@ public class RegExp {
      * Should end with 'end'.  If minval is missing, zero is default, if maxval is
      * missing, a very big number is the default.
      */
-  @Nullable
-  private MinMax read_limits() {
+  private @Nullable MinMax read_limits() {
     boolean reverse = false;
     CharPointer first_char;
     int minval;
@@ -2022,8 +2012,7 @@ public class RegExp {
   /*
      * Get pointer to the line "lnum", which is relative to "reg_firstlnum".
      */
-  @Nullable
-  private CharPointer reg_getline(int lnum) {
+  private @Nullable CharPointer reg_getline(int lnum) {
     /* when looking behind for a match/no-match lnum is negative.  But we
          * can't go before line 1 */
     if (reg_firstlnum + lnum < 0) {
@@ -2208,8 +2197,7 @@ public class RegExp {
   /*
      * Create a new extmatch and mark it as referenced once.
      */
-  @NotNull
-  private reg_extmatch_T make_extmatch() {
+  private @NotNull reg_extmatch_T make_extmatch() {
     return new reg_extmatch_T();
   }
 
@@ -3555,8 +3543,7 @@ public class RegExp {
   /*
      * regnext - dig the "next" pointer out of a node
      */
-  @Nullable
-  private CharPointer regnext(@NotNull CharPointer p) {
+  private @Nullable CharPointer regnext(@NotNull CharPointer p) {
     int offset;
 
     offset = p.NEXT();
@@ -3739,8 +3726,7 @@ public class RegExp {
   /*
      * cstrchr: This function is used a lot for simple searches, keep it fast!
      */
-  @Nullable
-  private CharPointer cstrchr(@NotNull CharPointer s, char c) {
+  private @Nullable CharPointer cstrchr(@NotNull CharPointer s, char c) {
     if (!ireg_ic) {
       return s.strchr(c);
     }
@@ -3882,8 +3868,7 @@ public class RegExp {
    * <p/>
    * Returns the size of the replacement, including terminating '\u0000'.
    */
-  @Nullable
-  public String vim_regsub(regmatch_T rmp, CharPointer source, int magic, boolean backslash) {
+  public @Nullable String vim_regsub(regmatch_T rmp, CharPointer source, int magic, boolean backslash) {
     reg_match = rmp;
     reg_mmatch = null;
     reg_maxline = 0;
@@ -3891,8 +3876,7 @@ public class RegExp {
     return vim_regsub_both(source, magic, backslash);
   }
 
-  @Nullable
-  public String vim_regsub_multi(regmmatch_T rmp, int lnum, CharPointer source, int magic, boolean backslash) {
+  public @Nullable String vim_regsub_multi(regmmatch_T rmp, int lnum, CharPointer source, int magic, boolean backslash) {
     reg_match = null;
     reg_mmatch = rmp;
     //reg_buf = curbuf;           /* always works on the current buffer! */
@@ -3924,8 +3908,7 @@ public class RegExp {
     return mode;
   }
 
-  @Nullable
-  private String vim_regsub_both(@Nullable CharPointer source, int magic, boolean backslash) {
+  private @Nullable String vim_regsub_both(@Nullable CharPointer source, int magic, boolean backslash) {
     CharPointer src;
     StringBuffer dst = new StringBuffer();
     CharPointer s;
@@ -4211,8 +4194,7 @@ public class RegExp {
   /*
      * regdump - dump a regexp onto stdout in vaguely comprehensible form
      */
-  @NotNull
-  private String regdump(String pattern, @NotNull regprog_T r) {
+  private @NotNull String regdump(String pattern, @NotNull regprog_T r) {
     CharPointer start;
     CharPointer s;
     int op = EXACTLY;       /* Arbitrary non-END op. */
@@ -4290,8 +4272,7 @@ public class RegExp {
   /*
 * regprop - printable representation of opcode
 */
-  @NotNull
-  private String regprop(@NotNull CharPointer op) {
+  private @NotNull String regprop(@NotNull CharPointer op) {
     String p;
     StringBuffer buf = new StringBuffer();
 
@@ -4727,15 +4708,15 @@ public class RegExp {
       }
     }
 
-    @Nullable public regprog_T regprog;
-    @NotNull public lpos_T[] startpos = new lpos_T[NSUBEXP];
-    @NotNull public lpos_T[] endpos = new lpos_T[NSUBEXP];
+    public @Nullable regprog_T regprog;
+    public @NotNull lpos_T[] startpos = new lpos_T[NSUBEXP];
+    public @NotNull lpos_T[] endpos = new lpos_T[NSUBEXP];
     public boolean rmm_ic;
   }
 
   private int reg_do_extmatch = 0;
 
-  @Nullable private CharPointer reg_prev_sub = null;
+  private @Nullable CharPointer reg_prev_sub = null;
 
   private CharPointer regparse;      /* Input-scan pointer. */
   private int prevchr_len;    /* byte length of previous char */
@@ -4744,11 +4725,11 @@ public class RegExp {
   private int regnzpar;       /* \z() count. */
   private char re_has_z;       /* \z item detected */
   private CharPointer regcode;       /* Code-emit pointer */
-  @NotNull private boolean[] had_endbrace = new boolean[NSUBEXP];  /* flags, true if end of () found */
+  private @NotNull boolean[] had_endbrace = new boolean[NSUBEXP];  /* flags, true if end of () found */
   private int regflags;       /* RF_ flags for prog */
-  @NotNull private int[] brace_min = new int[10];  /* Minimums for complex brace repeats */
-  @NotNull private int[] brace_max = new int[10];  /* Maximums for complex brace repeats */
-  @NotNull private int[] brace_count = new int[10]; /* Current counts for complex brace repeats */
+  private @NotNull int[] brace_min = new int[10];  /* Minimums for complex brace repeats */
+  private @NotNull int[] brace_max = new int[10];  /* Maximums for complex brace repeats */
+  private @NotNull int[] brace_count = new int[10]; /* Current counts for complex brace repeats */
   private boolean had_eol;        /* true when EOL found by vim_regcomp() */
   private boolean one_exactly = false;    /* only do one char for EXACTLY */
 
@@ -4779,7 +4760,7 @@ public class RegExp {
 
   /* The current match-position is remembered with these variables: */
   private int reglnum;        /* line number, relative to first line */
-  @Nullable private CharPointer regline;       /* start of current line */
+  private @Nullable CharPointer regline;       /* start of current line */
   private CharPointer reginput;      /* current input, points into "regline" */
 
   private boolean need_clear_subexpr;     /* subexpressions still need to be
@@ -4801,7 +4782,7 @@ public class RegExp {
     * slow, we keep one allocated piece of memory and only re-allocate it when
     * it's too small.  It's freed in vim_regexec_both() when finished.
     */
-  @Nullable private CharPointer reg_tofree;
+  private @Nullable CharPointer reg_tofree;
   //private int reg_tofreelen;
 
   /*
@@ -4820,12 +4801,12 @@ public class RegExp {
     * reg_firstlnum        <invalid>               first line in which to search
     * reg_maxline          0                       last line nr
     */
-  @Nullable private regmatch_T reg_match;
-  @Nullable private regmmatch_T reg_mmatch;
-  @NotNull private CharPointer[] reg_startp = new CharPointer[NSUBEXP];
-  @NotNull private CharPointer[] reg_endp = new CharPointer[NSUBEXP];
-  @NotNull private lpos_T[] reg_startpos = new lpos_T[NSUBEXP];
-  @NotNull private lpos_T[] reg_endpos = new lpos_T[NSUBEXP];
+  private @Nullable regmatch_T reg_match;
+  private @Nullable regmmatch_T reg_mmatch;
+  private @NotNull CharPointer[] reg_startp = new CharPointer[NSUBEXP];
+  private @NotNull CharPointer[] reg_endp = new CharPointer[NSUBEXP];
+  private @NotNull lpos_T[] reg_startpos = new lpos_T[NSUBEXP];
+  private @NotNull lpos_T[] reg_endpos = new lpos_T[NSUBEXP];
   //static win_T            *reg_win;
   private Editor reg_buf;
   private int reg_firstlnum;
@@ -4833,10 +4814,10 @@ public class RegExp {
 
   private regsave_T behind_pos;
 
-  @NotNull private CharPointer[] reg_startzp = new CharPointer[NSUBEXP];  /* Workspace to mark beginning */
-  @NotNull private CharPointer[] reg_endzp = new CharPointer[NSUBEXP];    /*   and end of \z(...\) matches */
-  @NotNull private lpos_T[] reg_startzpos = new lpos_T[NSUBEXP]; /* idem, beginning pos */
-  @NotNull private lpos_T[] reg_endzpos = new lpos_T[NSUBEXP];   /* idem, end pos */
+  private @NotNull CharPointer[] reg_startzp = new CharPointer[NSUBEXP];  /* Workspace to mark beginning */
+  private @NotNull CharPointer[] reg_endzp = new CharPointer[NSUBEXP];    /*   and end of \z(...\) matches */
+  private @NotNull lpos_T[] reg_startzpos = new lpos_T[NSUBEXP]; /* idem, beginning pos */
+  private @NotNull lpos_T[] reg_endzpos = new lpos_T[NSUBEXP];   /* idem, end pos */
 
   private boolean got_int = false;
 

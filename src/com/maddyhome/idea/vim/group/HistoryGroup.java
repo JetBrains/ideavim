@@ -45,8 +45,7 @@ public class HistoryGroup {
     block.addEntry(text);
   }
 
-  @NotNull
-  public List<HistoryEntry> getEntries(String key, int first, int last) {
+  public @NotNull List<HistoryEntry> getEntries(String key, int first, int last) {
     HistoryBlock block = blocks(key);
 
     List<HistoryEntry> entries = block.getEntries();
@@ -184,12 +183,11 @@ public class HistoryGroup {
       }
     }
 
-    @NotNull
-    public List<HistoryEntry> getEntries() {
+    public @NotNull List<HistoryEntry> getEntries() {
       return entries;
     }
 
-    @NotNull private final List<HistoryEntry> entries = new ArrayList<>();
+    private final @NotNull List<HistoryEntry> entries = new ArrayList<>();
     private int counter;
   }
 
@@ -203,16 +201,15 @@ public class HistoryGroup {
       return number;
     }
 
-    @NotNull
-    public String getEntry() {
+    public @NotNull String getEntry() {
       return entry;
     }
 
     private final int number;
-    @NotNull private final String entry;
+    private final @NotNull String entry;
   }
 
-  @NotNull private final Map<String, HistoryBlock> histories = new HashMap<>();
+  private final @NotNull Map<String, HistoryBlock> histories = new HashMap<>();
 
   private static final Logger logger = Logger.getInstance(HistoryGroup.class.getName());
 }

@@ -60,7 +60,7 @@ public class VimExtensionRegistrar {
     });
   }
 
-  synchronized private static void registerExtension(@NotNull VimExtension extension) {
+  private static synchronized void registerExtension(@NotNull VimExtension extension) {
     String name = extension.getName();
 
     if (registeredExtensions.contains(name)) return;
@@ -83,7 +83,7 @@ public class VimExtensionRegistrar {
     OptionsManager.INSTANCE.addOption(option);
   }
 
-  synchronized private static void unregisterExtension(@NotNull VimExtension extension) {
+  private static synchronized void unregisterExtension(@NotNull VimExtension extension) {
     String name = extension.getName();
 
     if (!registeredExtensions.contains(name)) return;

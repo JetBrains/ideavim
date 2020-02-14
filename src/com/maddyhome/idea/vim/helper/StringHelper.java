@@ -46,8 +46,7 @@ public class StringHelper {
 
   private StringHelper() {}
 
-  @Nullable
-  private static String toEscapeNotation(@NotNull KeyStroke key) {
+  private static @Nullable String toEscapeNotation(@NotNull KeyStroke key) {
     final char c = key.getKeyChar();
     if (isControlCharacter(c)) {
       return "^" + (char)(c + 'A' - 1);
@@ -58,8 +57,7 @@ public class StringHelper {
     return null;
   }
 
-  @NotNull
-  public static List<KeyStroke> stringToKeys(@NotNull String s) {
+  public static @NotNull List<KeyStroke> stringToKeys(@NotNull String s) {
     final List<KeyStroke> res = new ArrayList<>();
     for (int i = 0; i < s.length(); i++) {
       res.add(getKeyStroke(s.charAt(i)));
@@ -67,8 +65,7 @@ public class StringHelper {
     return res;
   }
 
-  @NotNull
-  public static final KeyStroke PlugKeyStroke = parseKeys("<Plug>").get(0);
+  public static final @NotNull KeyStroke PlugKeyStroke = parseKeys("<Plug>").get(0);
 
   private enum KeyParserState {
     INIT,
@@ -82,8 +79,7 @@ public class StringHelper {
    * @throws java.lang.IllegalArgumentException if the mapping doesn't make sense for Vim emulation
    * @see :help <>
    */
-  @NotNull
-  public static List<KeyStroke> parseKeys(@NotNull String... strings) {
+  public static @NotNull List<KeyStroke> parseKeys(@NotNull String... strings) {
     final List<KeyStroke> result = new ArrayList<>();
     for (String s : strings) {
       KeyParserState state = KeyParserState.INIT;
@@ -167,8 +163,7 @@ public class StringHelper {
     return result;
   }
 
-  @Nullable
-  private static List<KeyStroke> parseMapLeader(@NotNull String s) {
+  private static @Nullable List<KeyStroke> parseMapLeader(@NotNull String s) {
     if ("leader".equals(s.toLowerCase())) {
       final Object mapLeader = VimScriptGlobalEnvironment.getInstance().getVariables().get("mapleader");
       if (mapLeader instanceof String) {
@@ -189,8 +184,7 @@ public class StringHelper {
     return key.getKeyChar() == CHAR_UNDEFINED && key.getKeyCode() < 0x20 && key.getModifiers() == 0;
   }
 
-  @NotNull
-  public static String toKeyNotation(@NotNull List<KeyStroke> keys) {
+  public static @NotNull String toKeyNotation(@NotNull List<KeyStroke> keys) {
     if (keys.isEmpty()) {
       return "<Nop>";
     }
@@ -201,8 +195,7 @@ public class StringHelper {
     return builder.toString();
   }
 
-  @NotNull
-  public static String toKeyNotation(@NotNull KeyStroke key) {
+  public static @NotNull String toKeyNotation(@NotNull KeyStroke key) {
     final char c = key.getKeyChar();
     final int keyCode = key.getKeyCode();
     final int modifiers = key.getModifiers();
@@ -318,8 +311,7 @@ public class StringHelper {
   /**
    * Set the text of an XML element, safely encode it if needed.
    */
-  @NotNull
-  public static Element setSafeXmlText(@NotNull Element element, @NotNull String text) {
+  public static @NotNull Element setSafeXmlText(@NotNull Element element, @NotNull String text) {
     final Character first = firstCharacter(text);
     final Character last = lastCharacter(text);
     if (!StringHelper.isXmlCharacterData(text) ||
@@ -338,8 +330,7 @@ public class StringHelper {
   /**
    * Get the (potentially safely encoded) text of an XML element.
    */
-  @Nullable
-  public static String getSafeXmlText(@NotNull Element element) {
+  public static @Nullable String getSafeXmlText(@NotNull Element element) {
     final String text = element.getText();
     final String encoding = element.getAttributeValue("encoding");
     if (encoding == null) {
@@ -365,8 +356,7 @@ public class StringHelper {
     return true;
   }
 
-  @Nullable
-  private static KeyStroke parseSpecialKey(@NotNull String s, int modifiers) {
+  private static @Nullable KeyStroke parseSpecialKey(@NotNull String s, int modifiers) {
     final String lower = s.toLowerCase();
     final Integer keyCode = getVimKeyName(lower);
     final Character typedChar = getVimTypedKeyName(lower);
@@ -541,8 +531,7 @@ public class StringHelper {
     }
   }
 
-  @NotNull
-  private static KeyStroke getTypedOrPressedKeyStroke(char c, int modifiers) {
+  private static @NotNull KeyStroke getTypedOrPressedKeyStroke(char c, int modifiers) {
     if (modifiers == 0) {
       return getKeyStroke(c);
     }
@@ -554,13 +543,11 @@ public class StringHelper {
     }
   }
 
-  @Nullable
-  private static Character lastCharacter(@NotNull String text) {
+  private static @Nullable Character lastCharacter(@NotNull String text) {
     return text.length() > 0 ? text.charAt(text.length() - 1) : null;
   }
 
-  @Nullable
-  private static Character firstCharacter(@NotNull String text) {
+  private static @Nullable Character firstCharacter(@NotNull String text) {
     return text.length() > 0 ? text.charAt(0) : null;
   }
 

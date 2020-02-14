@@ -31,15 +31,13 @@ import java.io.InputStreamReader;
 */
 public class MacKeyRepeat {
   public static final String FMT = "defaults %s -globalDomain ApplePressAndHoldEnabled";
-  @NotNull private static final MacKeyRepeat INSTANCE = new MacKeyRepeat();
+  private static final @NotNull MacKeyRepeat INSTANCE = new MacKeyRepeat();
 
-  @NotNull
-  public static MacKeyRepeat getInstance() {
+  public static @NotNull MacKeyRepeat getInstance() {
     return INSTANCE;
   }
 
-  @Nullable
-  public Boolean isEnabled() {
+  public @Nullable Boolean isEnabled() {
     final String command = String.format(FMT, "read");
     try {
       final Process process = Runtime.getRuntime().exec(command);
@@ -77,8 +75,7 @@ public class MacKeyRepeat {
     }
   }
 
-  @NotNull
-  private static String read(@NotNull InputStream stream) throws IOException {
+  private static @NotNull String read(@NotNull InputStream stream) throws IOException {
     return CharStreams.toString(new InputStreamReader(stream));
   }
 }

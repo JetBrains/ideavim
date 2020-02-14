@@ -68,11 +68,11 @@ public class KeyGroup {
 
   private static final Logger logger = Logger.getInstance(KeyGroup.class);
 
-  @NotNull private final Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<>();
-  @NotNull private final Set<RequiredShortcut> requiredShortcutKeys = new HashSet<>(300);
-  @NotNull private final Map<MappingMode, CommandPartNode> keyRoots = new EnumMap<>(MappingMode.class);
-  @NotNull private final Map<MappingMode, KeyMapping> keyMappings = new EnumMap<>(MappingMode.class);
-  @Nullable private OperatorFunction operatorFunction = null;
+  private final @NotNull Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<>();
+  private final @NotNull Set<RequiredShortcut> requiredShortcutKeys = new HashSet<>(300);
+  private final @NotNull Map<MappingMode, CommandPartNode> keyRoots = new EnumMap<>(MappingMode.class);
+  private final @NotNull Map<MappingMode, KeyMapping> keyMappings = new EnumMap<>(MappingMode.class);
+  private @Nullable OperatorFunction operatorFunction = null;
 
   void registerRequiredShortcutKeys(@NotNull Editor editor) {
     EventFacade.getInstance()
@@ -170,8 +170,7 @@ public class KeyGroup {
     }
   }
 
-  @Nullable
-  public OperatorFunction getOperatorFunction() {
+  public @Nullable OperatorFunction getOperatorFunction() {
     return operatorFunction;
   }
 
@@ -221,8 +220,7 @@ public class KeyGroup {
     }
   }
 
-  @NotNull
-  public List<AnAction> getKeymapConflicts(@NotNull KeyStroke keyStroke) {
+  public @NotNull List<AnAction> getKeymapConflicts(@NotNull KeyStroke keyStroke) {
     final KeymapManagerEx keymapManager = KeymapManagerEx.getInstanceEx();
     final Keymap keymap = keymapManager.getActiveKeymap();
     final KeyboardShortcut shortcut = new KeyboardShortcut(keyStroke, null);
@@ -237,8 +235,7 @@ public class KeyGroup {
     return actions;
   }
 
-  @NotNull
-  public Map<KeyStroke, ShortcutOwner> getShortcutConflicts() {
+  public @NotNull Map<KeyStroke, ShortcutOwner> getShortcutConflicts() {
     final Set<RequiredShortcut> requiredShortcutKeys = this.requiredShortcutKeys;
     final Map<KeyStroke, ShortcutOwner> savedConflicts = getSavedShortcutConflicts();
     final Map<KeyStroke, ShortcutOwner> results = new HashMap<>();
@@ -255,13 +252,11 @@ public class KeyGroup {
     return results;
   }
 
-  @NotNull
-  public Map<KeyStroke, ShortcutOwner> getSavedShortcutConflicts() {
+  public @NotNull Map<KeyStroke, ShortcutOwner> getSavedShortcutConflicts() {
     return shortcutConflicts;
   }
 
-  @NotNull
-  public KeyMapping getKeyMapping(@NotNull MappingMode mode) {
+  public @NotNull KeyMapping getKeyMapping(@NotNull MappingMode mode) {
     KeyMapping mapping = keyMappings.get(mode);
     if (mapping == null) {
       mapping = new KeyMapping();
@@ -280,8 +275,7 @@ public class KeyGroup {
    * @param mappingMode The mapping mode
    * @return The key mapping tree root
    */
-  @NotNull
-  public CommandPartNode getKeyRoot(@NotNull MappingMode mappingMode) {
+  public @NotNull CommandPartNode getKeyRoot(@NotNull MappingMode mappingMode) {
     return keyRoots.computeIfAbsent(mappingMode, (key) -> new RootNode());
   }
 
@@ -413,14 +407,13 @@ public class KeyGroup {
     prefixes.put(keys, action.getId());
   }
 
-  @Nullable private Map<MappingMode, Set<List<KeyStroke>>> identityChecker;
-  @Nullable private Map<List<KeyStroke>, String> prefixes;
+  private @Nullable Map<MappingMode, Set<List<KeyStroke>>> identityChecker;
+  private @Nullable Map<List<KeyStroke>, String> prefixes;
 
-  @NotNull
-  private Node addMNode(@NotNull CommandPartNode base,
-                        ActionBeanClass actionHolder,
-                        @NotNull KeyStroke key,
-                        boolean isLastInSequence) {
+  private @NotNull Node addMNode(@NotNull CommandPartNode base,
+                                 ActionBeanClass actionHolder,
+                                 @NotNull KeyStroke key,
+                                 boolean isLastInSequence) {
     Node existing = base.get(key);
     if (existing != null) return existing;
 
@@ -435,8 +428,7 @@ public class KeyGroup {
     return newNode;
   }
 
-  @NotNull
-  private static ShortcutSet toShortcutSet(@NotNull Collection<RequiredShortcut> requiredShortcuts) {
+  private static @NotNull ShortcutSet toShortcutSet(@NotNull Collection<RequiredShortcut> requiredShortcuts) {
     final List<Shortcut> shortcuts = new ArrayList<>();
     for (RequiredShortcut key : requiredShortcuts) {
       shortcuts.add(new KeyboardShortcut(key.getKeyStroke(), null));
@@ -444,8 +436,7 @@ public class KeyGroup {
     return new CustomShortcutSet(shortcuts.toArray(new Shortcut[0]));
   }
 
-  @NotNull
-  private static List<Pair<EnumSet<MappingMode>, MappingInfo>> getKeyMappingRows(@NotNull Set<MappingMode> modes) {
+  private static @NotNull List<Pair<EnumSet<MappingMode>, MappingInfo>> getKeyMappingRows(@NotNull Set<MappingMode> modes) {
     final Map<ImmutableList<KeyStroke>, EnumSet<MappingMode>> actualModes = new HashMap<>();
     for (MappingMode mode : modes) {
       final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
@@ -480,8 +471,7 @@ public class KeyGroup {
     return rows;
   }
 
-  @NotNull
-  private static String getModesStringCode(@NotNull Set<MappingMode> modes) {
+  private static @NotNull String getModesStringCode(@NotNull Set<MappingMode> modes) {
     if (modes.equals(MappingMode.NVO)) {
       return "";
     }
@@ -495,16 +485,14 @@ public class KeyGroup {
     return "";
   }
 
-  @NotNull
-  public List<AnAction> getActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
+  public @NotNull List<AnAction> getActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
     final List<AnAction> results = new ArrayList<>();
     results.addAll(getLocalActions(component, keyStroke));
     results.addAll(getKeymapActions(keyStroke));
     return results;
   }
 
-  @NotNull
-  private static List<AnAction> getLocalActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
+  private static @NotNull List<AnAction> getLocalActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
     final List<AnAction> results = new ArrayList<>();
     final KeyboardShortcut keyStrokeShortcut = new KeyboardShortcut(keyStroke, null);
     for (Component c = component; c != null; c = c.getParent()) {
@@ -526,8 +514,7 @@ public class KeyGroup {
     return results;
   }
 
-  @NotNull
-  private static List<AnAction> getKeymapActions(@NotNull KeyStroke keyStroke) {
+  private static @NotNull List<AnAction> getKeymapActions(@NotNull KeyStroke keyStroke) {
     final List<AnAction> results = new ArrayList<>();
     final Keymap keymap = KeymapManager.getInstance().getActiveKeymap();
     for (String id : keymap.getActionIds(keyStroke)) {

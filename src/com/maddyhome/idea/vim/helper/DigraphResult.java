@@ -39,8 +39,7 @@ public class DigraphResult {
     return new DigraphResult(RES_HANDLED, promptCharacter);
   }
 
-  @Nullable
-  public KeyStroke getStroke() {
+  public @Nullable KeyStroke getStroke() {
     return stroke;
   }
 
@@ -53,6 +52,6 @@ public class DigraphResult {
   }
 
   private final int result;
-  @Nullable private final KeyStroke stroke;
+  private final @Nullable KeyStroke stroke;
   private char promptCharacter;
 }

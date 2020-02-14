@@ -90,8 +90,7 @@ public class SearchGroup {
     showSearchHighlight = show;
   }
 
-  @Nullable
-  public String getLastSearch() {
+  public @Nullable String getLastSearch() {
     return lastSearch;
   }
 
@@ -101,8 +100,7 @@ public class SearchGroup {
     return lastDir;
   }
 
-  @Nullable
-  public String getLastPattern() {
+  public @Nullable String getLastPattern() {
     return lastPattern;
   }
 
@@ -123,8 +121,7 @@ public class SearchGroup {
 
   // This method should not be private because it's used in external plugins
   @SuppressWarnings("WeakerAccess")
-  @NotNull
-  public static List<TextRange> findAll(@NotNull Editor editor,
+  public static @NotNull List<TextRange> findAll(@NotNull Editor editor,
                                          @NotNull String pattern,
                                          int startLine,
                                          int endLine,
@@ -172,8 +169,7 @@ public class SearchGroup {
     return results;
   }
 
-  @NotNull
-  private static ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match, @NotNull Caret caret, int startoff) {
+  private static @NotNull ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match, @NotNull Caret caret, int startoff) {
     final Ref<ReplaceConfirmationChoice> result = Ref.create(ReplaceConfirmationChoice.QUIT);
     final Function1<KeyStroke, Boolean> keyStrokeProcessor = key -> {
       final ReplaceConfirmationChoice choice;
@@ -520,8 +516,7 @@ public class SearchGroup {
     return max.getStartOffset();
   }
 
-  @Nullable
-  public TextRange getNextSearchRange(@NotNull Editor editor, int count, boolean forwards) {
+  public @Nullable TextRange getNextSearchRange(@NotNull Editor editor, int count, boolean forwards) {
     editor.getCaretModel().removeSecondaryCarets();
     TextRange current = findUnderCaret(editor);
 
@@ -544,8 +539,7 @@ public class SearchGroup {
     }
   }
 
-  @Nullable
-  private TextRange findNextSearchForGn(@NotNull Editor editor, int count, boolean forwards) {
+  private @Nullable TextRange findNextSearchForGn(@NotNull Editor editor, int count, boolean forwards) {
     if (forwards) {
       final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE);
       return findIt(editor, lastSearch, editor.getCaretModel().getOffset(), count, searchOptions);
@@ -554,15 +548,13 @@ public class SearchGroup {
     }
   }
 
-  @Nullable
-  private TextRange findUnderCaret(@NotNull Editor editor) {
+  private @Nullable TextRange findUnderCaret(@NotNull Editor editor) {
     final TextRange backSearch = searchBackward(editor, editor.getCaretModel().getOffset() + 1, 1);
     if (backSearch == null) return null;
     return backSearch.contains(editor.getCaretModel().getOffset()) ? backSearch : null;
   }
 
-  @Nullable
-  private TextRange searchBackward(@NotNull Editor editor, int offset, int count) {
+  private @Nullable TextRange searchBackward(@NotNull Editor editor, int offset, int count) {
     // Backward search returns wrongs end offset for some cases. That's why we should perform additional forward search
     final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE, SearchOptions.BACKWARDS);
     final TextRange foundBackward = findIt(editor, lastSearch, offset, count, searchOptions);
@@ -1320,8 +1312,7 @@ public class SearchGroup {
     return true;
   }
 
-  @NotNull
-  private RangeHighlighter highlightConfirm(@NotNull Editor editor, int start, int end) {
+  private @NotNull RangeHighlighter highlightConfirm(@NotNull Editor editor, int start, int end) {
     TextAttributes color = new TextAttributes(
       editor.getColorsScheme().getColor(EditorColors.SELECTION_FOREGROUND_COLOR),
       editor.getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR),
@@ -1332,8 +1323,7 @@ public class SearchGroup {
                                                        color, HighlighterTargetArea.EXACT_RANGE);
   }
 
-  @NotNull
-  private static RangeHighlighter highlightMatch(@NotNull Editor editor, int start, int end, boolean current, String tooltip) {
+  private static @NotNull RangeHighlighter highlightMatch(@NotNull Editor editor, int start, int end, boolean current, String tooltip) {
     TextAttributes attributes = editor.getColorsScheme().getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES);
     if (current) {
       // This mimics what IntelliJ does with the Find live preview
@@ -1411,8 +1401,7 @@ public class SearchGroup {
     element.addContent(search);
   }
 
-  @NotNull
-  private static Element createElementWithText(@NotNull String name, @NotNull String text) {
+  private static @NotNull Element createElementWithText(@NotNull String name, @NotNull String text) {
     return StringHelper.setSafeXmlText(new Element(name), text);
   }
 
@@ -1442,8 +1431,7 @@ public class SearchGroup {
     }
   }
 
-  @Nullable
-  private static String getSafeChildText(@NotNull Element element, @NotNull String name) {
+  private static @Nullable String getSafeChildText(@NotNull Element element, @NotNull String name) {
     final Element child = element.getChild(name);
     return child != null ? StringHelper.getSafeXmlText(child) : null;
   }
@@ -1524,11 +1512,11 @@ public class SearchGroup {
     IGNORE_SMARTCASE,
   }
 
-  @Nullable private String lastSearch;
-  @Nullable private String lastPattern;
-  @Nullable private String lastSubstitute;
-  @Nullable private String lastReplace;
-  @Nullable private String lastOffset;
+  private @Nullable String lastSearch;
+  private @Nullable String lastPattern;
+  private @Nullable String lastSubstitute;
+  private @Nullable String lastReplace;
+  private @Nullable String lastOffset;
   private boolean lastIgnoreSmartCase;
   private int lastDir;
   private boolean showSearchHighlight = OptionsManager.INSTANCE.getHlsearch().isSet();

@@ -37,7 +37,7 @@ import javax.swing.*;
 public class VimTypedActionHandler implements TypedActionHandlerEx {
   private static final Logger logger = Logger.getInstance(VimTypedActionHandler.class.getName());
 
-  @NotNull private final KeyHandler handler;
+  private final @NotNull KeyHandler handler;
 
   public VimTypedActionHandler(TypedActionHandler origHandler) {
     handler = KeyHandler.getInstance();
@@ -50,7 +50,7 @@ public class VimTypedActionHandler implements TypedActionHandlerEx {
   }
 
   @Override
-  public void execute(@NotNull final Editor editor, final char charTyped, @NotNull final DataContext context) {
+  public void execute(final @NotNull Editor editor, final char charTyped, final @NotNull DataContext context) {
     try {
       handler.handleKey(editor, KeyStroke.getKeyStroke(charTyped), new EditorDataContext(editor));
     }

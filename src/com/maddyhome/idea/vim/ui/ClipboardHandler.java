@@ -45,8 +45,7 @@ public class ClipboardHandler {
    *
    * @return The clipboard string or null if data isn't plain text
    */
-  @NotNull
-  public static Pair<String, List<TextBlockTransferableData>> getClipboardTextAndTransferableData() {
+  public static @NotNull Pair<String, List<TextBlockTransferableData>> getClipboardTextAndTransferableData() {
     String res = null;
     List<TextBlockTransferableData> transferableData = new ArrayList<>();
     try {

@@ -286,8 +286,7 @@ public class ExTextField extends JTextField {
    * @return the default model implementation
    */
   @Override
-  @NotNull
-  protected Document createDefaultModel() {
+  protected @NotNull Document createDefaultModel() {
     return new ExDocument();
   }
 
@@ -547,7 +546,7 @@ public class ExTextField extends JTextField {
   private String actualText;
   private List<HistoryGroup.HistoryEntry> history;
   private int histIndex = 0;
-  @Nullable private ExEditorKit.MultiStepAction currentAction;
+  private @Nullable ExEditorKit.MultiStepAction currentAction;
   private char currentActionPromptCharacter;
   private int currentActionPromptCharacterOffset = -1;
 

@@ -46,18 +46,18 @@ import java.util.List;
  * This panel displays text in a <code>more</code> like window.
  */
 public class ExOutputPanel extends JPanel implements LafManagerListener {
-  @NotNull private final Editor myEditor;
+  private final @NotNull Editor myEditor;
 
-  @NotNull private final JLabel myLabel = new JLabel("more");
-  @NotNull private final JTextArea myText = new JTextArea();
-  @NotNull private final JScrollPane myScrollPane =
+  private final @NotNull JLabel myLabel = new JLabel("more");
+  private final @NotNull JTextArea myText = new JTextArea();
+  private final @NotNull JScrollPane myScrollPane =
     new JBScrollPane(myText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-  @NotNull private final ComponentAdapter myAdapter;
+  private final @NotNull ComponentAdapter myAdapter;
   private boolean myAtEnd = false;
   private int myLineHeight = 0;
 
-  @Nullable private JComponent myOldGlass = null;
-  @Nullable private LayoutManager myOldLayout = null;
+  private @Nullable JComponent myOldGlass = null;
+  private @Nullable LayoutManager myOldLayout = null;
   private boolean myWasOpaque = false;
 
   private boolean myActive = false;
@@ -95,8 +95,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     updateUI();
   }
 
-  @NotNull
-  public static ExOutputPanel getInstance(@NotNull Editor editor) {
+  public static @NotNull ExOutputPanel getInstance(@NotNull Editor editor) {
     ExOutputPanel panel = UserDataManager.getVimMorePanel(editor);
     if (panel == null) {
       panel = new ExOutputPanel(editor);
@@ -298,7 +297,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     close(null);
   }
 
-  private void close(@Nullable final KeyEvent e) {
+  private void close(final @Nullable KeyEvent e) {
     ApplicationManager.getApplication().invokeLater(() -> {
       deactivate(true);
 

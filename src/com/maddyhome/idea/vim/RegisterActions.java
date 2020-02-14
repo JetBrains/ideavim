@@ -71,14 +71,12 @@ public class RegisterActions {
     initialRegistration = true;
   }
 
-  @Nullable
-  public static EditorActionHandlerBase findAction(@NotNull String id) {
+  public static @Nullable EditorActionHandlerBase findAction(@NotNull String id) {
     return VIM_ACTIONS_EP.extensions().filter(vimActionBean -> vimActionBean.getActionId().equals(id)).findFirst()
       .map(ActionBeanClass::getAction).orElse(null);
   }
 
-  @NotNull
-  public static EditorActionHandlerBase findActionOrDie(@NotNull String id) {
+  public static @NotNull EditorActionHandlerBase findActionOrDie(@NotNull String id) {
     EditorActionHandlerBase action = findAction(id);
     if (action == null) throw new RuntimeException("Action " + id + " is not registered");
     return action;

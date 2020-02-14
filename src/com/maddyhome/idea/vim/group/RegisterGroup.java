@@ -83,9 +83,9 @@ public class RegisterGroup {
 
   private char defaultRegister = '"';
   private char lastRegister = defaultRegister;
-  @NotNull private final HashMap<Character, Register> registers = new HashMap<>();
+  private final @NotNull HashMap<Character, Register> registers = new HashMap<>();
   private char recordRegister = 0;
-  @Nullable private List<KeyStroke> recordList = null;
+  private @Nullable List<KeyStroke> recordList = null;
 
   public RegisterGroup() {
     final ListOption clipboardOption = OptionsManager.INSTANCE.getClipboard();
@@ -246,10 +246,9 @@ public class RegisterGroup {
     return true;
   }
 
-  @NotNull
-  public List<TextBlockTransferableData> getTransferableData(@NotNull Editor editor,
-                                                              @NotNull TextRange textRange,
-                                                              String text) {
+  public @NotNull List<TextBlockTransferableData> getTransferableData(@NotNull Editor editor,
+                                                                      @NotNull TextRange textRange,
+                                                                      String text) {
     final List<TextBlockTransferableData> transferableDatas = new ArrayList<>();
     final Project project = editor.getProject();
     if (project == null) return new ArrayList<>();
@@ -316,13 +315,11 @@ public class RegisterGroup {
    *
    * @return The register, null if no such register
    */
-  @Nullable
-  public Register getLastRegister() {
+  public @Nullable Register getLastRegister() {
     return getRegister(lastRegister);
   }
 
-  @Nullable
-  public Register getPlaybackRegister(char r) {
+  public @Nullable Register getPlaybackRegister(char r) {
     if (PLAYBACK_REGISTER.indexOf(r) != 0) {
       return getRegister(r);
     }
@@ -331,8 +328,7 @@ public class RegisterGroup {
     }
   }
 
-  @Nullable
-  public Register getRegister(char r) {
+  public @Nullable Register getRegister(char r) {
     // Uppercase registers actually get the lowercase register
     if (Character.isUpperCase(r)) {
       r = Character.toLowerCase(r);
@@ -356,8 +352,7 @@ public class RegisterGroup {
     return defaultRegister;
   }
 
-  @NotNull
-  public List<Register> getRegisters() {
+  public @NotNull List<Register> getRegisters() {
     final List<Register> res = new ArrayList<>(registers.values());
     for (Character r : CLIPBOARD_REGISTERS) {
       final Register register = refreshClipboardRegister(r);
@@ -419,7 +414,7 @@ public class RegisterGroup {
     recordRegister = 0;
   }
 
-  public void saveData(@NotNull final Element element) {
+  public void saveData(final @NotNull Element element) {
     logger.debug("saveData");
     final Element registersElement = new Element("registers");
     for (Character key : registers.keySet()) {
@@ -451,7 +446,7 @@ public class RegisterGroup {
     element.addContent(registersElement);
   }
 
-  public void readData(@NotNull final Element element) {
+  public void readData(final @NotNull Element element) {
     logger.debug("readData");
     final Element registersElement = element.getChild("registers");
     if (registersElement != null) {
@@ -491,8 +486,7 @@ public class RegisterGroup {
     }
   }
 
-  @Nullable
-  private Register refreshClipboardRegister(char r) {
+  private @Nullable Register refreshClipboardRegister(char r) {
     final Pair<String, List<TextBlockTransferableData>> clipboardData = ClipboardHandler.getClipboardTextAndTransferableData();
     final Register currentRegister = registers.get(r);
     final String text = clipboardData.getFirst();
@@ -506,8 +500,7 @@ public class RegisterGroup {
     return null;
   }
 
-  @NotNull
-  private SelectionType guessSelectionType(@NotNull String text) {
+  private @NotNull SelectionType guessSelectionType(@NotNull String text) {
     if (text.endsWith("\n")) {
       return SelectionType.LINE_WISE;
     }

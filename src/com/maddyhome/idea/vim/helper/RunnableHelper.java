@@ -49,7 +49,7 @@ public class RunnableHelper {
   }
 
   static class ReadAction implements Runnable {
-    @NotNull private final Runnable cmd;
+    private final @NotNull Runnable cmd;
 
     ReadAction(@NotNull Runnable cmd) {
       this.cmd = cmd;
@@ -62,7 +62,7 @@ public class RunnableHelper {
   }
 
   static class WriteAction implements Runnable {
-    @NotNull private final Runnable cmd;
+    private final @NotNull Runnable cmd;
 
     WriteAction(@NotNull Runnable cmd) {
       this.cmd = cmd;

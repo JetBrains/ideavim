@@ -114,9 +114,8 @@ public class WindowGroup {
     windows.get(normalized).setAsCurrentWindow(true);
   }
 
-  @NotNull
-  private static List<EditorWindow> findWindowsInRow(@NotNull EditorWindow anchor,
-                                                     @NotNull List<EditorWindow> windows, final boolean vertical) {
+  private static @NotNull List<EditorWindow> findWindowsInRow(@NotNull EditorWindow anchor,
+                                                              @NotNull List<EditorWindow> windows, final boolean vertical) {
     final Rectangle anchorRect = getEditorWindowRectangle(anchor);
     if (anchorRect != null) {
       final List<EditorWindow> result = new ArrayList<>();
@@ -145,8 +144,7 @@ public class WindowGroup {
     return Collections.singletonList(anchor);
   }
 
-  @NotNull
-  private static FileEditorManagerEx getFileEditorManager(@NotNull DataContext context) {
+  private static @NotNull FileEditorManagerEx getFileEditorManager(@NotNull DataContext context) {
     final Project project = PlatformDataKeys.PROJECT.getData(context);
     return FileEditorManagerEx.getInstanceEx(Objects.requireNonNull(project));
   }
@@ -171,8 +169,7 @@ public class WindowGroup {
     }
   }
 
-  @Nullable
-  private static Rectangle getEditorWindowRectangle(@NotNull EditorWindow window) {
+  private static @Nullable Rectangle getEditorWindowRectangle(@NotNull EditorWindow window) {
     final EditorWithProviderComposite editor = window.getSelectedEditor();
     if (editor != null) {
       final Point point = editor.getComponent().getLocationOnScreen();

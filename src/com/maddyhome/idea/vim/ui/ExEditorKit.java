@@ -50,8 +50,7 @@ public class ExEditorKit extends DefaultEditorKit {
    * @return the type
    */
   @Override
-  @NotNull
-  public String getContentType() {
+  public @NotNull String getContentType() {
     return "text/ideavim";
   }
 
@@ -77,13 +76,11 @@ public class ExEditorKit extends DefaultEditorKit {
    * @return the model
    */
   @Override
-  @NotNull
-  public Document createDefaultDocument() {
+  public @NotNull Document createDefaultDocument() {
     return new ExDocument();
   }
 
-  @Nullable
-  private static KeyStroke convert(@NotNull ActionEvent event) {
+  private static @Nullable KeyStroke convert(@NotNull ActionEvent event) {
     String cmd = event.getActionCommand();
     int mods = event.getModifiers();
     if (cmd != null && cmd.length() > 0) {
@@ -114,7 +111,7 @@ public class ExEditorKit extends DefaultEditorKit {
   static final String StartDigraph = "start-digraph";
   static final String StartLiteral = "start-literal";
 
-  @NotNull private final Action[] exActions = new Action[]{
+  private final @NotNull Action[] exActions = new Action[]{
     new CancelEntryAction(),
     new CompleteEntryAction(),
     new EscapeCharAction(),
@@ -217,7 +214,7 @@ public class ExEditorKit extends DefaultEditorKit {
       WAIT_REGISTER,
     }
 
-    @NotNull private State state = State.SKIP_CTRL_R;
+    private @NotNull State state = State.SKIP_CTRL_R;
 
     InsertRegisterAction() {
       super(InsertRegister);
@@ -308,7 +305,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-  private static abstract class DeleteCharAction extends TextAction {
+  private abstract static class DeleteCharAction extends TextAction {
 
     DeleteCharAction(String name) {
       super(name);
@@ -488,9 +485,8 @@ public class ExEditorKit extends DefaultEditorKit {
     }
   }
 
-  private static abstract class StartDigraphLiteralActionBase extends TextAction implements MultiStepAction {
-    @Nullable
-    private DigraphSequence digraphSequence;
+  private abstract static class StartDigraphLiteralActionBase extends TextAction implements MultiStepAction {
+    private @Nullable DigraphSequence digraphSequence;
 
     public StartDigraphLiteralActionBase(String name) {
       super(name);

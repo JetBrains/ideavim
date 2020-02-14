@@ -113,8 +113,7 @@ public class PsiHelper {
     }
   }
 
-  @Nullable
-  public static PsiFile getFile(@NotNull Editor editor) {
+  public static @Nullable PsiFile getFile(@NotNull Editor editor) {
     VirtualFile vf = EditorHelper.getVirtualFile(editor);
     if (vf != null) {
       Project proj = editor.getProject();
