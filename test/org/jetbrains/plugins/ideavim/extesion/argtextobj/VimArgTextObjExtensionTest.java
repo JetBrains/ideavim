@@ -1,6 +1,7 @@
 package org.jetbrains.plugins.ideavim.extesion.argtextobj;
 
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import java.util.Collections;
@@ -101,12 +102,15 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER);
   }
 
+  // The original author of this extension wanted this case to work
+  /*
   public void testArgumentsInsideAngleBrackets() {
     doTest(parseKeys("dia"),
            "std::vector<int, std::unique_p<caret>tr<bool>> v{};",
            "std::vector<int, <caret>> v{};",
            CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
+  */
 
   public void testBracketPriorityToHangleShiftOperators() {
     doTest(parseKeys("dia"),
@@ -163,13 +167,6 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
       "foo(<caret>)",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     assertPluginError(true);
-  }
-
-  public void testWhenUnbalancedHigherPriorityPairIsUsed() {
-    doTest(parseKeys("dia"),
-      "{ void foo(int arg1, bool arg2<caret> { body }\n}",
-      "{ void foo(int arg1, <caret>}",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testSkipCommasInsideNestedPairs() {
@@ -240,5 +237,63 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER);
   }
 
-}
+  public void testDeleteArrayArgument() {
+    doTest(parseKeys("dia"),
+           "function(int a, String[<caret>] b)",
+           "function(int a, <caret>)",
+           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("daa"),
+           "function(int a, String[<caret>] b)",
+           "function(int a)",
+           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+  }
 
+  public void testDeleteInClass() {
+    doTest(parseKeys("dia"),
+           "class MyClass{ public int myFun() { some<caret>Call(); } }",
+           "class MyClass{ public int myFun() { some<caret>Call(); } }",
+           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("daa"),
+           "class MyClass{ public int myFun() { some<caret>Call(); } }",
+           "class MyClass{ public int myFun() { some<caret>Call(); } }",
+           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+  }
+
+  // Original plugin doesn't remove the argument in case of space after function name
+  public void testFunctionWithSpaceAfterName() {
+    doTest(parseKeys("dia"),
+           "function (int <caret>a)",
+           "function (int <caret>a)",
+           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("daa"),
+           "function (int <caret>a)",
+           "function (int <caret>a)",
+           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+  }
+
+  @VimBehaviorDiffers(
+    originalVimAfter = "function (int <caret>a, int b)",
+    description = "Should work the same as testFunctionWithSpaceAfterName"
+  )
+  public void testFunctionWithSpaceAfterNameWithTwoArgs() {
+    doTest(parseKeys("dia"),
+           "function (int <caret>a, int b)",
+           "function (, int b)",
+           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("daa"),
+           "function (int <caret>a, int b)",
+           "function (int b)",
+           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+  }
+
+  public void testDeleteInIf() {
+    doTest(parseKeys("dia"),
+           "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }",
+           "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }",
+           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("daa"),
+           "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }",
+           "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }",
+           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+  }
+}

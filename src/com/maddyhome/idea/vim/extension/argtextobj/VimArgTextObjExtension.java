@@ -7,8 +7,8 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.extension.VimExtension;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
-import com.maddyhome.idea.vim.extension.VimNonDisposableExtension;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
@@ -24,12 +24,27 @@ import static com.maddyhome.idea.vim.group.visual.VisualGroupKt.vimSetSelection;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 import static java.util.Collections.emptyList;
 
-public class VimArgTextObjExtension extends VimNonDisposableExtension {
+/**
+ * @author igrekster
+ */
+
+public class VimArgTextObjExtension implements VimExtension {
 
   @NotNull
   @Override
   public String getName() {
     return "argtextobj";
+  }
+
+  @Override
+  public void init() {
+
+    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>InnerArgument"), getOwner(), new VimArgTextObjExtension.ArgumentHandler(true), false);
+    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>OuterArgument"), getOwner(), new VimArgTextObjExtension.ArgumentHandler(false), false);
+
+    putKeyMapping(MappingMode.XO, parseKeys("ia"), getOwner(), parseKeys("<Plug>InnerArgument"), true);
+    putKeyMapping(MappingMode.XO, parseKeys("aa"), getOwner(), parseKeys("<Plug>OuterArgument"), true);
+
   }
 
   /**
@@ -108,17 +123,6 @@ public class VimArgTextObjExtension extends VimNonDisposableExtension {
     }
   }
 
-  @Override
-  protected void initOnce() {
-
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>InnerArgument"), getOwner(), new VimArgTextObjExtension.ArgumentHandler(true), false);
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>OuterArgument"), getOwner(), new VimArgTextObjExtension.ArgumentHandler(false), false);
-
-    putKeyMapping(MappingMode.XO, parseKeys("ia"), getOwner(), parseKeys("<Plug>InnerArgument"), true);
-    putKeyMapping(MappingMode.XO, parseKeys("aa"), getOwner(), parseKeys("<Plug>OuterArgument"), true);
-
-  }
-
   /**
    * Helper class to find argument boundaries starting at the specified
    * position
@@ -131,10 +135,14 @@ public class VimArgTextObjExtension extends VimNonDisposableExtension {
     private int leftBracket;
     private int rightBracket;
     private String error = null;
-    final private static String QUOTES = "\"\'";
+    final private static String QUOTES = "\"'";
+
     // NOTE: brackets must match by the position, and ordered by rank.
-    final private static String OPEN_BRACKETS = "[{(<";
-    final private static String CLOSE_BRACKETS = "]})>";
+    // NOTE2: The original implementation worked for ], } and > as well, but because of some broken cases this feature
+    //   was removed.
+    final private static String OPEN_BRACKETS = "(";   // "[{(<"
+    final private static String CLOSE_BRACKETS = ")";  // "]})>"
+
     final private static int MAX_SEARCH_LINES = 10;
     final private static int MAX_SEARCH_OFFSET = MAX_SEARCH_LINES * 80;
 
@@ -250,10 +258,6 @@ public class VimArgTextObjExtension extends VimNonDisposableExtension {
 
     private boolean isIdentPreceding() {
       int i = leftBound - 1;
-      // Skip whitespace first.
-      while (i > 0 && Character.isWhitespace(getCharAt(i))) {
-        --i;
-      }
       final int idEnd = i;
       while (i > 0 && Character.isJavaIdentifierPart(getCharAt(i))) {
         --i;
@@ -265,9 +269,10 @@ public class VimArgTextObjExtension extends VimNonDisposableExtension {
      * Detects if current position is inside a quoted string and adjusts
      * left and right bounds to the boundaries of the string.
      *
-     * @note Does not support line continuations for quoted string ('\' at the end of line).
+     * NOTE: Does not support line continuations for quoted string ('\' at the end of line).
      */
     private void getOutOfQuotedText() {
+      // TODO this method should use IdeaVim methods to determine if the current position is in the string
       final int lineNo = document.getLineNumber(leftBound);
       final int lineStartOffset = document.getLineStartOffset(lineNo);
       final int lineEndOffset = document.getLineEndOffset(lineNo);
@@ -477,7 +482,7 @@ public class VimArgTextObjExtension extends VimNonDisposableExtension {
     private int skipSexp(final int start, final int end, SexpDirection dir) {
       char lastChar = getCharAt(start);
       assert dir.isOpenBracket(lastChar);
-      Stack<Character> bracketStack = new Stack<Character>();
+      Stack<Character> bracketStack = new Stack<>();
       bracketStack.push(lastChar);
       int i = start + dir.delta();
       while (!bracketStack.empty() && i != end) {
