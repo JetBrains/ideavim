@@ -1162,7 +1162,8 @@ public class ChangeGroup {
     final LogicalPosition lp =
       editor.offsetToLogicalPosition(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret));
 
-    if (editor.getDocument().getText().isEmpty()) {
+    // Please don't use `getDocument().getText().isEmpty()`
+    if (editor.getDocument().getTextLength() == 0) {
       insertBeforeCursor(editor, context);
       return true;
     }
@@ -1455,7 +1456,8 @@ public class ChangeGroup {
     boolean res = deleteRange(editor, caret, range, type, true);
     if (res) {
       if (type == SelectionType.LINE_WISE) {
-        if (editor.getDocument().getText().isEmpty()) {
+        // Please don't use `getDocument().getText().isEmpty()`
+        if (editor.getDocument().getTextLength() == 0) {
           insertBeforeCursor(editor, context);
         }
         else if (after) {

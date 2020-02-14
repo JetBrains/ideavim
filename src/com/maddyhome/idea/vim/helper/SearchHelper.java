@@ -205,6 +205,7 @@ public class SearchHelper {
   private static int findMatchingBlockCommentPair(@NotNull PsiComment comment, int pos, @Nullable String prefix,
                                                   @Nullable String suffix) {
     if (prefix != null && suffix != null) {
+      // TODO: Try to get rid of `getText()` because it takes a lot of time to calculate the string
       final String commentText = comment.getText();
       if (commentText.startsWith(prefix) && commentText.endsWith(suffix)) {
         final int endOffset = comment.getTextOffset() + comment.getTextLength();

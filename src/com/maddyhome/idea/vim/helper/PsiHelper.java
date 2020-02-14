@@ -95,6 +95,7 @@ public class PsiHelper {
         if (element.getLanguage().getID().equals("JAVA")) {
           // HACK: for Java classes and methods, we want to jump to the opening brace
           int textOffset = element.getTextOffset();
+          // TODO: Try to get rid of `getText()` because it takes a lot of time to calculate the string
           int braceIndex = element.getText().indexOf('{', textOffset - offset);
           if (braceIndex >= 0) {
             offset += braceIndex;

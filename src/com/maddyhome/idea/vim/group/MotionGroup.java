@@ -1025,13 +1025,13 @@ public class MotionGroup {
   public int moveCaretHorizontal(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowPastEnd) {
     int oldOffset = caret.getOffset();
     int diff = 0;
-    String text = editor.getDocument().getText();
+    CharSequence text = editor.getDocument().getCharsSequence();
     int sign = (int)Math.signum(count);
     for (Integer pointer : new IntProgression(0, count - sign, sign)) {
       int textPointer = oldOffset + pointer;
       if (textPointer < text.length() && textPointer >= 0) {
         // Actual char size can differ from 1 if unicode characters are used (like 🐔)
-        diff += Character.charCount(text.codePointAt(textPointer));
+        diff += Character.charCount(Character.codePointAt(text, textPointer));
       }
       else {
         diff += 1;
