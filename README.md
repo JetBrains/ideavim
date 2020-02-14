@@ -97,6 +97,7 @@ Emulated Vim plugins:
 * vim-surround
 * vim-multiple-cursors
 * vim-commentary
+* argtextobj.vim   [To Be Released]
 
 Not supported (yet):
 
@@ -164,6 +165,11 @@ Available extensions:
     * Setup: `set commentary`
     * Emulates [commentary.vim](https://github.com/tpope/vim-commentary)
     * Commands: `gcc`, `gc + motion`, `v_gc`
+
+* argtextobj   [To Be Released]
+    * Setup: `set argtextobj`
+    * Emulates [argtextobj.vim](https://www.vim.org/scripts/script.php?script_id=2699)
+    * Additional text objects: `aa`, `ia`
 
 
 Changes to the IDE

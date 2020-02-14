@@ -31,6 +31,9 @@ _Available since 0.55.1 EAP:_
 
 _To Be Released:_
 
+**Features:**
+* `argtextobj.vim` plugin emulation ([argtextobj.vim](https://vim.sourceforge.io/scripts/script.php?script_id=2699))
+
 **Changes:**
 * Replace `ideastatusbar` option with `ideastatusicon`. Now you can make the icon gray.
 

@@ -3,9 +3,7 @@
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
       <ul>
-        <li>Support dot command for Surround and Commentary extensions</li>
-        <li>Support XDG settings standard</li>
-        <li>Add option to remove the status bar icon</li>
+        <li>Support argtextobj.vim plugin emulation</li>
         <li>Various bug fixes</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
