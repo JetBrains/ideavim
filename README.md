@@ -167,7 +167,14 @@ Available extensions:
     * Commands: `gcc`, `gc + motion`, `v_gc`
 
 * argtextobj   [To Be Released]
-    * Setup: `set argtextobj`
+    * Setup:
+        * `set argtextobj`
+        * By default, only the arguments inside parenthesis are considered. To extend the functionality
+          to other types of brackets, set `g:argtextobj_pairs` variable to a comma-separated
+          list of colon-separated pairs (same as VIM's `matchpairs` option), like
+          `let g:argtextobj_pairs="(:),{:},<:>"`. The order of pairs matters when
+          handling symbols that can also be operators: `func(x << 5, 20) >> 17`. To handle
+          this syntax parenthesis, must come before angle brackets in the list.
     * Emulates [argtextobj.vim](https://www.vim.org/scripts/script.php?script_id=2699)
     * Additional text objects: `aa`, `ia`
 

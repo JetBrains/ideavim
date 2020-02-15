@@ -1,6 +1,7 @@
 package org.jetbrains.plugins.ideavim.extesion.argtextobj;
 
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
@@ -14,6 +15,10 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
   protected void setUp() throws Exception {
     super.setUp();
     enableExtensions("argtextobj");
+  }
+
+  private void setArgTextObjPairsVariable(String value) {
+    VimScriptGlobalEnvironment.getInstance().getVariables().put("g:argtextobj_pairs", value);
   }
 
   public void testDeleteAnArgument() {
@@ -102,15 +107,25 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER);
   }
 
-  // The original author of this extension wanted this case to work
-  /*
   public void testArgumentsInsideAngleBrackets() {
+    setArgTextObjPairsVariable("(:),<:>");
     doTest(parseKeys("dia"),
            "std::vector<int, std::unique_p<caret>tr<bool>> v{};",
            "std::vector<int, <caret>> v{};",
            CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
-  */
+
+  public void testWhenUnbalancedHigherPriorityPairIsUsed() {
+    setArgTextObjPairsVariable("{:},(:)");
+    doTest(parseKeys("dia"),
+      "namespace foo { void foo(int arg1, bool arg2<caret> { body }\n}",
+      "namespace foo { void foo(int arg1, <caret>}",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("dia"),
+      "namespace foo { void foo(int <caret>arg1, bool arg2 { body }\n}",
+      "namespace foo { <caret>, bool arg2 { body }\n}",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+  }
 
   public void testBracketPriorityToHangleShiftOperators() {
     doTest(parseKeys("dia"),
@@ -186,6 +201,13 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
+  public void testHandleNestedParenthesisForASingleArgument() {
+    doTest(parseKeys("dia"),
+      "foo((20*<caret>30))",
+      "foo(<caret>)",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+  }
+
   public void testHandleImbalancedPairs() {
     doTest(parseKeys("dia"),
       "foo(arg1, ba<caret>r(not-an-arg{body",
@@ -238,6 +260,7 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
   }
 
   public void testDeleteArrayArgument() {
+    setArgTextObjPairsVariable("[:],(:)");
     doTest(parseKeys("dia"),
            "function(int a, String[<caret>] b)",
            "function(int a, <caret>)",
@@ -259,7 +282,6 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
            CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
-  // Original plugin doesn't remove the argument in case of space after function name
   public void testFunctionWithSpaceAfterName() {
     doTest(parseKeys("dia"),
            "function (int <caret>a)",
@@ -296,4 +318,58 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
            "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }",
            CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
+
+  public void testParseVariablePairs() {
+    assertPluginError(false);
+    setArgTextObjPairsVariable("[:], (:)");
+    doTest(parseKeys("daa"), "f(a<caret>)", "f(a<caret>)", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    assertPluginError(true);
+    assertPluginErrorMessageContains("expecting ':', but got '(' instead");
+
+    setArgTextObjPairsVariable("[:](:)");
+    doTest(parseKeys("daa"), "f(a<caret>)", "f(a<caret>)", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    assertPluginError(true);
+    assertPluginErrorMessageContains("expecting ',', but got '(' instead");
+
+    setArgTextObjPairsVariable("=:=");
+    doTest(parseKeys("daa"), "f(a<caret>)", "f(a<caret>)", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    assertPluginError(true);
+    assertPluginErrorMessageContains("open and close brackets must be different");
+
+    setArgTextObjPairsVariable("[:],(:");
+    doTest(parseKeys("daa"), "f(a<caret>)", "f(a<caret>)", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    assertPluginError(true);
+    assertPluginErrorMessageContains("list of pairs is incomplete");
+
+    setArgTextObjPairsVariable("");
+    doTest(parseKeys("daa"), "f(a<caret>)", "f(a<caret>)", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    assertPluginError(true);
+    assertPluginErrorMessageContains("list of pairs is incomplete");
+
+    setArgTextObjPairsVariable("[:],(:)");
+    doTest(parseKeys("daa"), "f[a<caret>]", "f[<caret>]", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    assertPluginError(false);
+
+    setArgTextObjPairsVariable("::;");
+    doTest(parseKeys("daa"), "f: a<caret> ;", "f:<caret>;", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    assertPluginError(false);
+
+  }
+
+  public void testCppLambaArguments() {
+    setArgTextObjPairsVariable("[:],(:),{:},<:>");
+    doTest(parseKeys("daa"),
+      "[capture1, c = <caret>capture2] { return Clazz<int, bool>{ctorParam1, ctorParam2}; }",
+      "[capture1] { return Clazz<int, bool>{ctorParam1, ctorParam2}; }",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("daa"),
+      "[capture1, c = capture2] { return Clazz<int,<caret> bool>{ctorParam1, ctorParam2}; }",
+      "[capture1, c = capture2] { return Clazz<int>{ctorParam1, ctorParam2}; }",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("daa"),
+      "[capture1, c = capture2] { return Clazz<int, bool>{ctorPar<caret>am1, ctorParam2}; }",
+      "[capture1, c = capture2] { return Clazz<int, bool>{ctorParam2}; }",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+  }
+
 }
