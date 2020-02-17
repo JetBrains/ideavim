@@ -18,40 +18,163 @@
 
 package com.maddyhome.idea.vim.ex.handler
 
-import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.KeyHandler
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.helper.runAfterGotFocus
+import com.maddyhome.idea.vim.helper.EditorHelper
+import java.io.File
 
 /**
- * Handles buffers, files, ls command.
+ * Handles buffers, files, ls command. Supports +, =, a, %, # filters.
  *
  * @author John Weigel
  */
 class BufferListHandler : CommandHandler.SingleExecution() {
-
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
+  companion object {
+    const val FILE_NAME_PAD = 30
+    val SUPPORTED_FILTERS = setOf('+', '=', 'a', '%', '#')
+  }
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val arg = cmd.argument.trim()
+    val filter = pruneUnsupportedFilters(arg)
+    val bufferList = getBufferList(context, filter)
 
-    if (arg.isNotEmpty() && arg[0] != '+') {
-      VimPlugin.showMessage("Unsupported argument $arg")
-      return false
-    }
+    ExOutputModel.getInstance(editor).output(bufferList.joinToString(separator = "\n"))
 
-    val actionId = if (arg.isNotEmpty()) "RecentChangedFiles" else "RecentFiles"
-    val action = ActionManager.getInstance().getAction(actionId)
-
-    val application = ApplicationManager.getApplication()
-    if (!application.isUnitTestMode)
-      runAfterGotFocus(Runnable { KeyHandler.executeAction(action, context) })
     return true
   }
+
+  private fun pruneUnsupportedFilters(filter: String): String {
+    val sb = StringBuilder()
+
+    for (f in filter.asIterable()) {
+      if (SUPPORTED_FILTERS.contains(f)) {
+        sb.append(f)
+      }
+    }
+
+    return sb.toString()
+  }
+
+  private fun getBufferList(context: DataContext, filter: String): List<String> {
+    val bufferList = mutableListOf<String>()
+    val project = PlatformDataKeys.PROJECT.getData(context)
+
+    if (project != null) {
+      val fem = FileEditorManager.getInstance(project)
+      val openFiles = fem.openFiles
+      val bufNumPad = openFiles.size.toString().length
+      val currentFile = fem.selectedFiles[0]
+      val previousFile = VimPlugin.getFile().getPreviousTab(context)
+      val virtualFileDisplayMap = buildVirtualFileDisplayMap(project)
+
+      var index = 1
+      for (entry in virtualFileDisplayMap.entries) {
+        val file = entry.key
+        val displayFileName = entry.value
+        val editor = EditorHelper.getEditor(file)
+
+        if (editor != null) {
+          val bufStatus = getBufferStatus(editor, file, currentFile, previousFile)
+
+          if (bufStatusMatchesFilter(filter, bufStatus)) {
+            val lineNum = editor.caretModel.currentCaret.logicalPosition.line + 1
+            val lineNumPad = if (displayFileName.length < FILE_NAME_PAD) (FILE_NAME_PAD - displayFileName.length).toString() else ""
+
+            bufferList.add(String.format(
+              "   %${bufNumPad}s %s %s%${lineNumPad}s line: %d", index, bufStatus, displayFileName, "", lineNum)
+            )
+            index++
+          }
+        }
+      }
+    }
+
+    return bufferList
+  }
+
+  private fun buildVirtualFileDisplayMap(project: Project): Map<VirtualFile, String> {
+    val openFiles = FileEditorManager.getInstance(project).openFiles
+    val basePath = if (project.basePath != null) project.basePath + File.separator else ""
+    val filePaths = mutableMapOf<VirtualFile, String>()
+
+    for (file in openFiles) {
+      val filePath = file.path
+
+      // If the file is under the project path, then remove the project base path from the file.
+      val displayFilePath = if (basePath.isNotEmpty() && filePath.startsWith(basePath)) {
+        filePath.replace(basePath, "")
+      } else {
+        // File is not under the project base path so add the full path.
+        filePath
+      }
+
+      filePaths[file] = '"' + displayFilePath + '"'
+    }
+
+    return filePaths
+  }
+
+  private fun bufStatusMatchesFilter(filter: String, bufStatus: String): Boolean {
+    if (filter.isNotEmpty()) {
+      for (f in filter.asIterable()) {
+        if (!bufStatus.contains(f)) {
+          return false
+        }
+      }
+    }
+
+    return true
+  }
+}
+
+private fun getBufferStatus(editor: Editor, file: VirtualFile, currentFile: VirtualFile, previousFile: VirtualFile?): String {
+  val bufStatus = StringBuilder()
+
+  when {
+    currentFile == file -> {
+      bufStatus.append("%a  ")
+    }
+    previousFile == file -> {
+      bufStatus.append("#   ")
+    }
+    else -> {
+      bufStatus.append("    ")
+    }
+  }
+
+  if (!file.isWritable) {
+    bufStatus.setCharAt(2, '=')
+  }
+
+  if (isDocumentDirty(editor.document)) {
+    bufStatus.setCharAt(3, '+')
+  }
+
+  return bufStatus.toString()
+}
+
+private fun isDocumentDirty(document: Document): Boolean {
+  var line = 0
+
+  while (line < document.lineCount) {
+    if (document.isLineModified(line)) {
+      return true
+    }
+    line++
+  }
+
+  return false
 }

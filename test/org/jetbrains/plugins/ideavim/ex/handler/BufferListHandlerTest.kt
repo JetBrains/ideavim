@@ -18,17 +18,40 @@
 
 package org.jetbrains.plugins.ideavim.ex.handler
 
-import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
+import com.maddyhome.idea.vim.helper.StringHelper
+import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
  * @author John Weigel
  */
 class BufferListHandlerTest : VimTestCase() {
+  companion object {
+    const val DEFAULT_LS_OUTPUT = "   1 %a   \"/src/aaa.txt\"                 line: 1"
+  }
 
   fun testLsAction() {
     configureByText("\n")
     typeText(commandToKeys("ls"))
+
+    val output = getInstance(myFixture.editor).text
+    TestCase.assertNotNull(output)
+    val displayedLines = output!!.split("\n".toRegex()).toTypedArray()
+    TestCase.assertEquals(DEFAULT_LS_OUTPUT, displayedLines[0])
+
+    assertPluginError(false)
+  }
+
+  fun testLsActionWithLongFileName() {
+    configureByFileName( "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa.txt")
+    typeText(commandToKeys("ls"))
+
+    val output = getInstance(myFixture.editor).text
+    TestCase.assertNotNull(output)
+    val displayedLines = output!!.split("\n".toRegex()).toTypedArray()
+    TestCase.assertEquals("   1 %a   \"/src/aaaaaaaaaaaaaaaaaaaaaaaaaaaaa.txt\" line: 1", displayedLines[0])
+
     assertPluginError(false)
   }
 
@@ -44,15 +67,39 @@ class BufferListHandlerTest : VimTestCase() {
     assertPluginError(false)
   }
 
-  fun testBuffersActionWithSupportedArg() {
+  fun testBuffersActionWithSupportedFilterMatch() {
     configureByText("\n")
-    typeText(commandToKeys("buffers +"))
+    typeText(StringHelper.parseKeys("aa<esc>:buffers +<enter>"))
+
+    val output = getInstance(myFixture.editor).text
+    TestCase.assertNotNull(output)
+    val displayedLines = output!!.split("\n".toRegex()).toTypedArray()
+    TestCase.assertEquals("   1 %a + \"/src/aaa.txt\"                 line: 1", displayedLines[0])
+
     assertPluginError(false)
   }
 
-  fun testBuffersActionWithUnSupportedArg() {
+  fun testBuffersActionWithSupportedFilterDoesNotMatch() {
     configureByText("\n")
-    typeText(commandToKeys("buffers -"))
-    assertPluginError(true)
+    typeText(StringHelper.parseKeys("aa<esc>:buffers #<enter>"))
+
+    val output = getInstance(myFixture.editor).text
+    TestCase.assertNotNull(output)
+    val displayedLines = output!!.split("\n".toRegex()).toTypedArray()
+    TestCase.assertEquals("", displayedLines[0])
+
+    assertPluginError(false)
+  }
+
+  fun testBuffersActionWithUnSupportedFilter() {
+    configureByText("\n")
+    typeText(commandToKeys("buffers x"))
+
+    val output = getInstance(myFixture.editor).text
+    TestCase.assertNotNull(output)
+    val displayedLines = output!!.split("\n".toRegex()).toTypedArray()
+    TestCase.assertEquals(DEFAULT_LS_OUTPUT, displayedLines[0])
+
+    assertPluginError(false)
   }
 }

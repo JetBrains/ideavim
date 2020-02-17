@@ -225,6 +225,20 @@ public class FileGroup {
     }
   }
 
+  /**
+   * Returns the previous tab.
+   */
+  public VirtualFile getPreviousTab(@NotNull DataContext context) {
+    Project project = PlatformDataKeys.PROJECT.getData(context);
+    if (project == null) return null;
+    FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
+    VirtualFile vf = lastSelections.get(fem);
+    if (vf != null && vf.isValid()) {
+      return vf;
+    }
+    return null;
+  }
+
   @Nullable
   Editor selectEditor(Project project, @NotNull VirtualFile file) {
     FileEditorManager fMgr = FileEditorManager.getInstance(project);
