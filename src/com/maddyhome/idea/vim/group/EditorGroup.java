@@ -76,7 +76,7 @@ public class EditorGroup {
     }
   }
 
-  private void initLineNumbers(@NotNull final Editor editor) {
+  private void initLineNumbers(final @NotNull Editor editor) {
     if (!supportsVimLineNumbers(editor) || UserDataManager.getVimEditorGroup(editor)) {
       return;
     }
@@ -107,13 +107,13 @@ public class EditorGroup {
     }
   }
 
-  private static boolean supportsVimLineNumbers(@NotNull final Editor editor) {
+  private static boolean supportsVimLineNumbers(final @NotNull Editor editor) {
     // We only support line numbers in editors that are file based, and that aren't for diffs, which control their
     // own line numbers, often using EditorGutterComponentEx#setLineNumberConvertor
     return EditorHelper.isFileEditor(editor) && !EditorHelper.isDiffEditor(editor);
   }
 
-  private static void updateLineNumbers(@NotNull final Editor editor, final boolean requiresRepaint) {
+  private static void updateLineNumbers(final @NotNull Editor editor, final boolean requiresRepaint) {
     final boolean relativeNumber = OptionsManager.INSTANCE.getRelativenumber().isSet();
     final boolean number = OptionsManager.INSTANCE.getNumber().isSet();
 
@@ -142,7 +142,7 @@ public class EditorGroup {
     }
   }
 
-  private static boolean shouldShowBuiltinLineNumbers(@NotNull final Editor editor, boolean number, boolean relativeNumber) {
+  private static boolean shouldShowBuiltinLineNumbers(final @NotNull Editor editor, boolean number, boolean relativeNumber) {
     final boolean initialState = UserDataManager.getVimLineNumbersInitialState(editor);
 
     // Builtin relative line numbers requires EditorGutterComponentEx#setLineNumberConvertor. If we don't have that,
@@ -155,15 +155,15 @@ public class EditorGroup {
     return (initialState || number) && !relativeNumber;
   }
 
-  private static void setBuiltinLineNumbers(@NotNull final Editor editor, boolean show) {
+  private static void setBuiltinLineNumbers(final @NotNull Editor editor, boolean show) {
     editor.getSettings().setLineNumbersShown(show);
   }
 
-  private static boolean hasRelativeLineNumbersInstalled(@NotNull final Editor editor) {
+  private static boolean hasRelativeLineNumbersInstalled(final @NotNull Editor editor) {
     return UserDataManager.getVimHasRelativeLineNumbersInstalled(editor);
   }
 
-  private static void installRelativeLineNumbers(@NotNull final Editor editor) {
+  private static void installRelativeLineNumbers(final @NotNull Editor editor) {
     if (!hasRelativeLineNumbersInstalled(editor)) {
       final EditorGutter gutter = editor.getGutter();
       if (gutter instanceof EditorGutterComponentEx) {
@@ -176,7 +176,7 @@ public class EditorGroup {
     }
   }
 
-  private static void removeRelativeLineNumbers(@NotNull final Editor editor) {
+  private static void removeRelativeLineNumbers(final @NotNull Editor editor) {
     if (hasRelativeLineNumbersInstalled(editor)) {
       final EditorGutter gutter = editor.getGutter();
       if (gutter instanceof EditorGutterComponentEx) {
@@ -190,7 +190,7 @@ public class EditorGroup {
     }
   }
 
-  private static void repaintRelativeLineNumbers(@NotNull final Editor editor) {
+  private static void repaintRelativeLineNumbers(final @NotNull Editor editor) {
     final EditorGutter gutter = editor.getGutter();
     final EditorGutterComponentEx gutterComponent = gutter instanceof EditorGutterComponentEx ? (EditorGutterComponentEx) gutter : null;
     if (gutterComponent != null) {
@@ -222,8 +222,7 @@ public class EditorGroup {
     }
   }
 
-  @Nullable
-  public Boolean isKeyRepeat() {
+  public @Nullable Boolean isKeyRepeat() {
     return isKeyRepeat;
   }
 
@@ -293,11 +292,10 @@ public class EditorGroup {
   }
 
   private static class RelativeLineNumberConverter implements TIntFunction {
-    @NotNull
-    private final Editor editor;
+    private final @NotNull Editor editor;
 
     @Contract(pure = true)
-    RelativeLineNumberConverter(@NotNull final Editor editor) {
+    RelativeLineNumberConverter(final @NotNull Editor editor) {
       this.editor = editor;
     }
 
@@ -322,17 +320,15 @@ public class EditorGroup {
   }
 
   private static class RelativeLineNumberGutterProvider implements TextAnnotationGutterProvider {
-    @NotNull
-    private final Editor editor;
+    private final @NotNull Editor editor;
 
     @Contract(pure = true)
-    RelativeLineNumberGutterProvider(@NotNull final Editor editor) {
+    RelativeLineNumberGutterProvider(final @NotNull Editor editor) {
       this.editor = editor;
     }
 
-    @Nullable
     @Override
-    public String getLineText(int line, @NotNull Editor editor) {
+    public @Nullable String getLineText(int line, @NotNull Editor editor) {
       final boolean number = OptionsManager.INSTANCE.getNumber().isSet();
       if (number && isCaretLine(line, editor)) {
         return lineNumberToString(line + 1, editor, true);
@@ -360,9 +356,8 @@ public class EditorGroup {
         : StringsKt.padStart(Integer.toString(lineNumber), digitsCount, ' ');
     }
 
-    @Nullable
     @Override
-    public String getToolTip(int line, Editor editor) {
+    public @Nullable String getToolTip(int line, Editor editor) {
       return null;
     }
 
@@ -371,15 +366,13 @@ public class EditorGroup {
       return isCaretLine(line, editor) ? EditorFontType.BOLD: null;
     }
 
-    @Nullable
     @Override
-    public ColorKey getColor(int line, Editor editor) {
+    public @Nullable ColorKey getColor(int line, Editor editor) {
       return isCaretLine(line, editor) ? EditorColors.LINE_NUMBER_ON_CARET_ROW_COLOR : EditorColors.LINE_NUMBERS_COLOR;
     }
 
-    @Nullable
     @Override
-    public Color getBgColor(int line, Editor editor) {
+    public @Nullable Color getBgColor(int line, Editor editor) {
       return null;
     }
 

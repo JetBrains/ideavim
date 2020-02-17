@@ -62,8 +62,7 @@ public class ProcessGroup {
     return ExEntryPanel.getInstance().getLabel().equals("/");
   }
 
-  @NotNull
-  public String endSearchCommand(@NotNull final Editor editor) {
+  public @NotNull String endSearchCommand(final @NotNull Editor editor) {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true);
 
@@ -100,7 +99,7 @@ public class ProcessGroup {
     }
   }
 
-  public boolean processExEntry(@NotNull final Editor editor, @NotNull final DataContext context) {
+  public boolean processExEntry(final @NotNull Editor editor, final @NotNull DataContext context) {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true);
     boolean res = true;
@@ -143,7 +142,7 @@ public class ProcessGroup {
     return res;
   }
 
-  public void cancelExEntry(@NotNull final Editor editor, boolean resetCaret) {
+  public void cancelExEntry(final @NotNull Editor editor, boolean resetCaret) {
     CommandState.getInstance(editor).popModes();
     KeyHandler.getInstance().reset(editor);
     ExEntryPanel panel = ExEntryPanel.getInstance();
@@ -163,8 +162,7 @@ public class ProcessGroup {
     panel.activate(editor, context, ":", initText, 1);
   }
 
-  @NotNull
-  private String getRange(Editor editor, @NotNull Command cmd) {
+  private @NotNull String getRange(Editor editor, @NotNull Command cmd) {
     String initText = "";
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       initText = "'<,'>";
@@ -191,8 +189,7 @@ public class ProcessGroup {
     return true;
   }
 
-  @NotNull
-  public String executeCommand(@NotNull String command, @Nullable CharSequence input) throws IOException {
+  public @NotNull String executeCommand(@NotNull String command, @Nullable CharSequence input) throws IOException {
     if (logger.isDebugEnabled()) {
       logger.debug("command=" + command);
     }

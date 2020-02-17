@@ -23,7 +23,7 @@ import com.intellij.openapi.extensions.PluginDescriptor;
 import com.maddyhome.idea.vim.group.KeyGroup;
 import com.maddyhome.idea.vim.handler.ActionBeanClass;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
-import com.maddyhome.idea.vim.key.Shortcut;
+import com.maddyhome.idea.vim.key.MappingOwner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,20 +65,18 @@ public class RegisterActions {
   /**
    * Register all the key/action mappings for the plugin.
    */
-  static void registerActions() {
+  public static void registerActions() {
     registerVimCommandActions();
     registerEmptyShortcuts();
     initialRegistration = true;
   }
 
-  @Nullable
-  public static EditorActionHandlerBase findAction(@NotNull String id) {
+  public static @Nullable EditorActionHandlerBase findAction(@NotNull String id) {
     return VIM_ACTIONS_EP.extensions().filter(vimActionBean -> vimActionBean.getActionId().equals(id)).findFirst()
       .map(ActionBeanClass::getAction).orElse(null);
   }
 
-  @NotNull
-  public static EditorActionHandlerBase findActionOrDie(@NotNull String id) {
+  public static @NotNull EditorActionHandlerBase findActionOrDie(@NotNull String id) {
     EditorActionHandlerBase action = findAction(id);
     if (action == null) throw new RuntimeException("Action " + id + " is not registered");
     return action;
@@ -96,12 +94,8 @@ public class RegisterActions {
   private static void registerEmptyShortcuts() {
     final KeyGroup parser = VimPlugin.getKey();
 
-    // Digraph shortcuts are handled directly by KeyHandler#handleKey, so they don't have an action. But we still need to
-    // register the shortcuts or the editor will swallow them. Technically, the shortcuts will be registered as part of
-    // other commands, but it's best to be explicit
-    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.CTRL_MASK)));
-    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK)));
-    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_MASK)));
-    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)));
+    // The {char1} <BS> {char2} shortcut is handled directly by KeyHandler#handleKey, so doesn't have an action. But we
+    // still need to register the shortcut, to make sure the editor doesn't swallow it.
+    parser.registerShortcutWithoutAction(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), MappingOwner.IdeaVim.INSTANCE);
   }
 }

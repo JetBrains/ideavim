@@ -84,6 +84,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   private static long lastBeepTimeMillis;
 
   private boolean error = false;
+  private String message = null;
 
   private int previousStateVersion = 0;
   private String previousKeyMap = "";
@@ -93,14 +94,13 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
   private static final Logger LOG = Logger.getInstance(VimPlugin.class);
 
-  @NotNull
   @Override
-  public String getComponentName() {
+  public @NotNull String getComponentName() {
     return IDEAVIM_COMPONENT_NAME;
   }
 
 
-  @NotNull private final VimState state = new VimState();
+  private final @NotNull VimState state = new VimState();
 
   // [VERSION UPDATE] 193+ replace with com.intellij.openapi.components.PersistentStateComponent.initializeComponent
   @Override
@@ -122,8 +122,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   /**
    * @return NotificationService as applicationService if project is null and projectService otherwise
    */
-  @NotNull
-  public static NotificationService getNotifications(@Nullable Project project) {
+  public static @NotNull NotificationService getNotifications(@Nullable Project project) {
     if (project == null) {
       return ServiceManager.getService(NotificationService.class);
     } else {
@@ -131,14 +130,12 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     }
   }
 
-  @NotNull
-  public static VimState getVimState() {
+  public static @NotNull VimState getVimState() {
     return getInstance().state;
   }
 
 
-  @NotNull
-  public static MotionGroup getMotion() {
+  public static @NotNull MotionGroup getMotion() {
     return ServiceManager.getService(MotionGroup.class);
   }
 
@@ -190,83 +187,67 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     }
   }
 
-  @NotNull
-  public static ChangeGroup getChange() {
+  public static @NotNull ChangeGroup getChange() {
     return ServiceManager.getService(ChangeGroup.class);
   }
 
-  @NotNull
-  public static CommandGroup getCommand() {
+  public static @NotNull CommandGroup getCommand() {
     return ServiceManager.getService(CommandGroup.class);
   }
 
-  @NotNull
-  public static MarkGroup getMark() {
+  public static @NotNull MarkGroup getMark() {
     return ServiceManager.getService(MarkGroup.class);
   }
 
-  @NotNull
-  public static RegisterGroup getRegister() {
+  public static @NotNull RegisterGroup getRegister() {
     return ServiceManager.getService(RegisterGroup.class);
   }
 
-  @NotNull
-  public static FileGroup getFile() {
+  public static @NotNull FileGroup getFile() {
     return ServiceManager.getService(FileGroup.class);
   }
 
-  @NotNull
-  public static SearchGroup getSearch() {
+  public static @NotNull SearchGroup getSearch() {
     return ServiceManager.getService(SearchGroup.class);
   }
 
-  @NotNull
-  public static ProcessGroup getProcess() {
+  public static @NotNull ProcessGroup getProcess() {
     return ServiceManager.getService(ProcessGroup.class);
   }
 
-  @NotNull
-  public static MacroGroup getMacro() {
+  public static @NotNull MacroGroup getMacro() {
     return ServiceManager.getService(MacroGroup.class);
   }
 
-  @NotNull
-  public static DigraphGroup getDigraph() {
+  public static @NotNull DigraphGroup getDigraph() {
     return ServiceManager.getService(DigraphGroup.class);
   }
 
-  @NotNull
-  public static HistoryGroup getHistory() {
+  public static @NotNull HistoryGroup getHistory() {
     return ServiceManager.getService(HistoryGroup.class);
   }
 
-  @NotNull
-  public static KeyGroup getKey() {
+  public static @NotNull KeyGroup getKey() {
     return ServiceManager.getService(KeyGroup.class);
   }
 
-  @NotNull
-  public static WindowGroup getWindow() {
+  public static @NotNull WindowGroup getWindow() {
     return ServiceManager.getService(WindowGroup.class);
   }
 
-  @NotNull
-  public static EditorGroup getEditor() {
+  public static @NotNull EditorGroup getEditor() {
     return ServiceManager.getService(EditorGroup.class);
   }
 
-  @NotNull
-  public static VisualMotionGroup getVisualMotion() {
+  public static @NotNull VisualMotionGroup getVisualMotion() {
     return ServiceManager.getService(VisualMotionGroup.class);
   }
 
-  @NotNull
-  public static YankGroup getYank() {
+  public static @NotNull YankGroup getYank() {
     return ServiceManager.getService(YankGroup.class);
   }
 
-  @NotNull
-  public static PutGroup getPut() {
+  public static @NotNull PutGroup getPut() {
     return ServiceManager.getService(PutGroup.class);
   }
 
@@ -288,8 +269,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     return element;
   }
 
-  @NotNull
-  private static NotificationService getNotifications() {
+  private static @NotNull NotificationService getNotifications() {
     return getNotifications(null);
   }
 
@@ -307,15 +287,13 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     }
   }
 
-  @NotNull
-  public static PluginId getPluginId() {
+  public static @NotNull PluginId getPluginId() {
     return PluginId.getId(IDEAVIM_PLUGIN_ID);
   }
 
   // [VERSION UPDATE] 193+ remove suppress
   @SuppressWarnings({"MissingRecentApi", "UnstableApiUsage"})
-  @NotNull
-  public static String getVersion() {
+  public static @NotNull String getVersion() {
     final IdeaPluginDescriptor plugin = PluginManager.getPlugin(getPluginId());
     if (!ApplicationManager.getApplication().isInternal()) {
       return plugin != null ? plugin.getVersion() : "SNAPSHOT";
@@ -349,6 +327,10 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     return getInstance().error;
   }
 
+  public static String getMessage() {
+    return getInstance().message;
+  }
+
   /**
    * Indicate to the user that an error has occurred. Just beep.
    */
@@ -377,6 +359,9 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   }
 
   public static void showMessage(@Nullable String msg) {
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      getInstance().message = msg;
+    }
     ProjectManager pm = ProjectManager.getInstance();
     Project[] projects = pm.getOpenProjects();
     for (Project project : projects) {
@@ -392,8 +377,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     }
   }
 
-  @NotNull
-  private static VimPlugin getInstance() {
+  private static @NotNull VimPlugin getInstance() {
     return ApplicationManager.getApplication().getComponent(VimPlugin.class);
   }
 
@@ -477,7 +461,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   }
 
   @Override
-  public void loadState(@NotNull final Element element) {
+  public void loadState(final @NotNull Element element) {
     LOG.debug("Loading state");
 
     // Restore whether the plugin is enabled or not

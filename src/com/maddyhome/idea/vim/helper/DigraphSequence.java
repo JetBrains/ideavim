@@ -55,8 +55,7 @@ public class DigraphSequence {
     return DigraphResult.HANDLED_LITERAL;
   }
 
-  @NotNull
-  public DigraphResult processKey(@NotNull KeyStroke key, @NotNull Editor editor) {
+  public @NotNull DigraphResult processKey(@NotNull KeyStroke key, @NotNull Editor editor) {
     switch (digraphState) {
       case DIG_STATE_PENDING:
         logger.debug("DIG_STATE_PENDING");

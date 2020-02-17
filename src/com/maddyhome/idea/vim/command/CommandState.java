@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.key.CommandPartNode;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -59,15 +60,14 @@ public class CommandState {
    *
    * This field is reset after the command has been executed.
    */
-  @Nullable private Command executingCommand;
+  private @Nullable Command executingCommand;
 
   private CommandState() {
     pushModes(defaultModeState.getMode(), defaultModeState.getSubMode());
   }
 
   @Contract("null -> new")
-  @NotNull
-  public static CommandState getInstance(@Nullable Editor editor) {
+  public static @NotNull CommandState getInstance(@Nullable Editor editor) {
     if (editor == null) {
       return new CommandState();
     }
@@ -81,9 +81,15 @@ public class CommandState {
     return res;
   }
 
-  @NotNull
-  private static CommandPartNode getKeyRootNode(MappingMode mappingMode) {
+  private static @NotNull CommandPartNode getKeyRootNode(MappingMode mappingMode) {
     return VimPlugin.getKey().getKeyRoot(mappingMode);
+  }
+
+  // Keep the compatibility with the IdeaVim-EasyMotion plugin before the stable release
+  @ApiStatus.ScheduledForRemoval(inVersion = "0.56")
+  @Deprecated
+  public MappingMode getMappingMode() {
+    return mappingState.getMappingMode();
   }
 
   public boolean isOperatorPending() {
@@ -98,13 +104,11 @@ public class CommandState {
     return commandBuilder;
   }
 
-  @NotNull
-  public MappingState getMappingState() {
+  public @NotNull MappingState getMappingState() {
     return mappingState;
   }
 
-  @Nullable
-  public Command getExecutingCommand() {
+  public @Nullable Command getExecutingCommand() {
     return executingCommand;
   }
 
@@ -194,13 +198,11 @@ public class CommandState {
     throw new IllegalArgumentException("Unexpected mode: " + mode);
   }
 
-  @NotNull
-  public Mode getMode() {
+  public @NotNull Mode getMode() {
     return currentModeState().getMode();
   }
 
-  @NotNull
-  public SubMode getSubMode() {
+  public @NotNull SubMode getSubMode() {
     return currentModeState().getSubMode();
   }
 
@@ -286,8 +288,7 @@ public class CommandState {
     VimPlugin.showMode(msg.toString());
   }
 
-  @NotNull
-  private String getStatusString(int pos) {
+  private @NotNull String getStatusString(int pos) {
     ModeState modeState;
     if (pos >= 0 && pos < modeStates.size()) {
       modeState = modeStates.get(pos);
@@ -346,8 +347,8 @@ public class CommandState {
   }
 
   private static class ModeState {
-    @NotNull private final Mode myMode;
-    @NotNull private final SubMode mySubMode;
+    private final @NotNull Mode myMode;
+    private final @NotNull SubMode mySubMode;
 
     @Contract(pure = true)
     public ModeState(@NotNull Mode mode, @NotNull SubMode subMode) {
@@ -355,13 +356,11 @@ public class CommandState {
       this.mySubMode = subMode;
     }
 
-    @NotNull
-    public Mode getMode() {
+    public @NotNull Mode getMode() {
       return myMode;
     }
 
-    @NotNull
-    public SubMode getSubMode() {
+    public @NotNull SubMode getSubMode() {
       return mySubMode;
     }
 

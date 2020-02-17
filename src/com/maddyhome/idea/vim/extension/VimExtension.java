@@ -19,6 +19,8 @@
 package com.maddyhome.idea.vim.extension;
 
 import com.intellij.openapi.extensions.ExtensionPointName;
+import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.key.MappingOwner;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -30,7 +32,13 @@ public interface VimExtension {
   @NotNull
   String getName();
 
+  default MappingOwner getOwner() {
+    return MappingOwner.Plugin.Companion.get(getName());
+  }
+
   void init();
 
-  void dispose();
+  default void dispose() {
+    VimPlugin.getKey().removeKeyMapping(getOwner());
+  };
 }

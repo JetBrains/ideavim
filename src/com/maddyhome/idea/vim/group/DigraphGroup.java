@@ -20,10 +20,13 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -45,6 +48,27 @@ public class DigraphGroup {
     }
     else {
       return ch;
+    }
+  }
+
+  @SuppressWarnings("GrazieInspection")
+  public void displayAsciiInfo(@NotNull Editor editor) {
+    int offset = editor.getCaretModel().getOffset();
+    CharSequence charsSequence = editor.getDocument().getCharsSequence();
+    if (charsSequence.length() == 0 || offset >= charsSequence.length()) return;
+    char ch = charsSequence.charAt(offset);
+
+    final String digraph = keys.get(ch);
+    final String digraphText = digraph == null ? "" : ", Digr " + digraph;
+    final String hexText = (ch > 0xff) ? String.format("Hex %04x", (int) ch) : String.format("Hex %02x", (int) ch);
+
+    if (ch < 0x100) {
+      VimPlugin.showMessage(String.format("<%s>  %d,  Hex %02x,  Oct %03o%s",
+        StringHelper.toPrintableCharacter(KeyStroke.getKeyStroke(ch)), (int) ch, (int) ch, (int) ch, digraphText));
+    }
+    else {
+      VimPlugin.showMessage(String.format("<%s> %d, Hex %04x, Oct %o%s",
+        StringHelper.toPrintableCharacter(KeyStroke.getKeyStroke(ch)), (int) ch, (int) ch, (int) ch, digraphText));
     }
   }
 
@@ -1725,8 +1749,8 @@ public class DigraphGroup {
     'f', 't', '\ufb05', // LATIN SMALL LIGATURE FT
     's', 't', '\ufb06', // LATIN SMALL LIGATURE ST
   };
-  @NotNull private final HashMap<String, Character> digraphs = new HashMap<>(defaultDigraphs.length);
-  @NotNull private final TreeMap<Character, String> keys = new TreeMap<>();
+  private final @NotNull HashMap<String, Character> digraphs = new HashMap<>(defaultDigraphs.length);
+  private final @NotNull TreeMap<Character, String> keys = new TreeMap<>();
 
   private static final Logger logger = Logger.getInstance(DigraphGroup.class.getName());
 }

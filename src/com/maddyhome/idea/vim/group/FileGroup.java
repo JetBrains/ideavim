@@ -43,11 +43,9 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
-import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.io.File;
 import java.util.HashMap;
 
@@ -120,8 +118,7 @@ public class FileGroup {
     return found;
   }
 
-  @Nullable
-  private VirtualFile findFile(@NotNull VirtualFile root, @NotNull String filename) {
+  private @Nullable VirtualFile findFile(@NotNull VirtualFile root, @NotNull String filename) {
     VirtualFile res = root.findFileByRelativePath(filename);
     if (res != null) {
       return res;
@@ -253,22 +250,6 @@ public class FileGroup {
     }
 
     return null;
-  }
-
-  public void displayAsciiInfo(@NotNull Editor editor) {
-    int offset = editor.getCaretModel().getOffset();
-    CharSequence charsSequence = editor.getDocument().getCharsSequence();
-    if (charsSequence.length() == 0 || offset >= charsSequence.length()) return;
-    char ch = charsSequence.charAt(offset);
-
-    VimPlugin.showMessage("<" +
-                          StringHelper.toKeyNotation(KeyStroke.getKeyStroke(ch)) +
-                          ">  " +
-                          (int)ch +
-                          ",  Hex " +
-                          Long.toHexString(ch) +
-                          ",  Octal " +
-                          Long.toOctalString(ch));
   }
 
   public void displayHexInfo(@NotNull Editor editor) {
@@ -414,10 +395,10 @@ public class FileGroup {
     VimPlugin.showMessage(msg.toString());
   }
 
-  @NotNull private static final String disposableKey = "VimFileGroupDisposable";
+  private static final @NotNull String disposableKey = "VimFileGroupDisposable";
 
-  @NotNull private static final HashMap<FileEditorManager, VirtualFile> lastSelections = new HashMap<>();
-  @NotNull private static final Logger logger = Logger.getInstance(FileGroup.class.getName());
+  private static final @NotNull HashMap<FileEditorManager, VirtualFile> lastSelections = new HashMap<>();
+  private static final @NotNull Logger logger = Logger.getInstance(FileGroup.class.getName());
 
   /**
    * This method listens for editor tab changes so any insert/replace modes that need to be reset can be.

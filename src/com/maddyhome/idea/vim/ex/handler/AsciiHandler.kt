@@ -27,7 +27,7 @@ class AsciiHandler : CommandHandler.SingleExecution() {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-    VimPlugin.getFile().displayAsciiInfo(editor)
+    VimPlugin.getDigraph().displayAsciiInfo(editor)
     return true
   }
 }

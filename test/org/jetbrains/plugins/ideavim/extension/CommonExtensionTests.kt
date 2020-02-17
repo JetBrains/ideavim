@@ -20,13 +20,14 @@ package org.jetbrains.plugins.ideavim.extension
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.intellij.testFramework.UsefulTestCase
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
-import com.maddyhome.idea.vim.extension.VimNonDisposableExtension
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.isEndAllowed
@@ -36,11 +37,14 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class OpMappingTest : VimTestCase() {
   private var initialized = false
 
+  private val extension = TestExtension()
+
   override fun setUp() {
     super.setUp()
     if (!initialized) {
       initialized = true
-      TestExtension().init()
+      VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
+      enableExtensions("TestExtension")
     }
   }
 
@@ -87,21 +91,70 @@ class OpMappingTest : VimTestCase() {
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }
+
+  fun `test disable extension via set`() {
+    configureByText("${c}I found it in a legendary land")
+    typeText(parseKeys("Q"))
+    myFixture.checkResult("I${c} found it in a legendary land")
+
+    enterCommand("set noTestExtension")
+    typeText(parseKeys("Q"))
+    myFixture.checkResult("I${c} found it in a legendary land")
+
+    enterCommand("set TestExtension")
+    typeText(parseKeys("Q"))
+    myFixture.checkResult("I ${c}found it in a legendary land")
+  }
+
+  fun `test disable extension as extension point`() {
+    configureByText("${c}I found it in a legendary land")
+    typeText(parseKeys("Q"))
+    myFixture.checkResult("I${c} found it in a legendary land")
+
+    VimExtension.EP_NAME.getPoint(null).unregisterExtension(TestExtension::class.java)
+    UsefulTestCase.assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.owner))
+    typeText(parseKeys("Q"))
+    myFixture.checkResult("I${c} found it in a legendary land")
+
+    VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
+    UsefulTestCase.assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.owner))
+    enableExtensions("TestExtension")
+    typeText(parseKeys("Q"))
+    myFixture.checkResult("I ${c}found it in a legendary land")
+  }
+
+  fun `test disable disposed extension`() {
+    configureByText("${c}I found it in a legendary land")
+    typeText(parseKeys("Q"))
+    myFixture.checkResult("I${c} found it in a legendary land")
+
+    enterCommand("set noTestExtension")
+    VimExtension.EP_NAME.getPoint(null).unregisterExtension(TestExtension::class.java)
+    typeText(parseKeys("Q"))
+    myFixture.checkResult("I${c} found it in a legendary land")
+
+    VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
+    enableExtensions("TestExtension")
+    typeText(parseKeys("Q"))
+    myFixture.checkResult("I ${c}found it in a legendary land")
+  }
 }
 
-private class TestExtension : VimNonDisposableExtension() {
+private class TestExtension : VimExtension {
   override fun getName(): String = "TestExtension"
 
-  override fun initOnce() {
-    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionEmulateInclusive"), MoveEmulateInclusive(), false)
-    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionBackwardsCharacter"), MoveBackwards(), false)
-    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionCharacter"), Move(), false)
-    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionLinewise"), MoveLinewise(), false)
+  override fun init() {
+    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionEmulateInclusive"), owner, MoveEmulateInclusive(), false)
+    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionBackwardsCharacter"), owner, MoveBackwards(), false)
+    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionCharacter"), owner, Move(), false)
+    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionLinewise"), owner, MoveLinewise(), false)
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>TestMotion"), owner, MoveLinewiseInNormal(), false)
 
-    putKeyMapping(MappingMode.O, parseKeys("U"), parseKeys("<Plug>TestExtensionEmulateInclusive"), true)
-    putKeyMapping(MappingMode.O, parseKeys("P"), parseKeys("<Plug>TestExtensionBackwardsCharacter"), true)
-    putKeyMapping(MappingMode.O, parseKeys("I"), parseKeys("<Plug>TestExtensionCharacter"), true)
-    putKeyMapping(MappingMode.O, parseKeys("O"), parseKeys("<Plug>TestExtensionLinewise"), true)
+    putKeyMapping(MappingMode.O, parseKeys("U"), owner, parseKeys("<Plug>TestExtensionEmulateInclusive"), true)
+    putKeyMapping(MappingMode.O, parseKeys("P"), owner, parseKeys("<Plug>TestExtensionBackwardsCharacter"), true)
+    putKeyMapping(MappingMode.O, parseKeys("I"), owner, parseKeys("<Plug>TestExtensionCharacter"), true)
+    putKeyMapping(MappingMode.O, parseKeys("O"), owner, parseKeys("<Plug>TestExtensionLinewise"), true)
+    putKeyMapping(MappingMode.N, parseKeys("Q"), owner, parseKeys("<Plug>TestMotion"), true)
   }
 
   private class MoveEmulateInclusive : VimExtensionHandler {
@@ -130,6 +183,14 @@ private class TestExtension : VimNonDisposableExtension() {
       VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_LINE)
       val caret = editor.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().moveCaretVertical(editor, caret, 1)
+      MotionGroup.moveCaret(editor, caret, newOffset)
+    }
+  }
+
+  private class MoveLinewiseInNormal : VimExtensionHandler {
+    override fun execute(editor: Editor, context: DataContext) {
+      val caret = editor.caretModel.currentCaret
+      val newOffset = VimPlugin.getMotion().moveCaretHorizontal(editor, caret, 1, true)
       MotionGroup.moveCaret(editor, caret, newOffset)
     }
   }

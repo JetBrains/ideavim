@@ -213,8 +213,7 @@ public class NumberOption extends TextOption {
     }
   }
 
-  @Nullable
-  protected Integer asNumber(String val) {
+  protected @Nullable Integer asNumber(String val) {
     try {
       return Integer.decode(val);
     }
@@ -232,8 +231,7 @@ public class NumberOption extends TextOption {
    *
    * @return The option as a string
    */
-  @NotNull
-  public String toString() {
+  public @NotNull String toString() {
 
     return "  " + getName() + "=" + value;
   }

@@ -46,8 +46,7 @@ public class StringHelper {
 
   private StringHelper() {}
 
-  @Nullable
-  private static String toEscapeNotation(@NotNull KeyStroke key) {
+  private static @Nullable String toEscapeNotation(@NotNull KeyStroke key) {
     final char c = key.getKeyChar();
     if (isControlCharacter(c)) {
       return "^" + (char)(c + 'A' - 1);
@@ -58,8 +57,7 @@ public class StringHelper {
     return null;
   }
 
-  @NotNull
-  public static List<KeyStroke> stringToKeys(@NotNull String s) {
+  public static @NotNull List<KeyStroke> stringToKeys(@NotNull String s) {
     final List<KeyStroke> res = new ArrayList<>();
     for (int i = 0; i < s.length(); i++) {
       res.add(getKeyStroke(s.charAt(i)));
@@ -67,8 +65,7 @@ public class StringHelper {
     return res;
   }
 
-  @NotNull
-  public static final KeyStroke PlugKeyStroke = parseKeys("<Plug>").get(0);
+  public static final @NotNull KeyStroke PlugKeyStroke = parseKeys("<Plug>").get(0);
 
   private enum KeyParserState {
     INIT,
@@ -82,8 +79,7 @@ public class StringHelper {
    * @throws java.lang.IllegalArgumentException if the mapping doesn't make sense for Vim emulation
    * @see :help <>
    */
-  @NotNull
-  public static List<KeyStroke> parseKeys(@NotNull String... strings) {
+  public static @NotNull List<KeyStroke> parseKeys(@NotNull String... strings) {
     final List<KeyStroke> result = new ArrayList<>();
     for (String s : strings) {
       KeyParserState state = KeyParserState.INIT;
@@ -167,8 +163,7 @@ public class StringHelper {
     return result;
   }
 
-  @Nullable
-  private static List<KeyStroke> parseMapLeader(@NotNull String s) {
+  private static @Nullable List<KeyStroke> parseMapLeader(@NotNull String s) {
     if ("leader".equals(s.toLowerCase())) {
       final Object mapLeader = VimScriptGlobalEnvironment.getInstance().getVariables().get("mapleader");
       if (mapLeader instanceof String) {
@@ -189,8 +184,7 @@ public class StringHelper {
     return key.getKeyChar() == CHAR_UNDEFINED && key.getKeyCode() < 0x20 && key.getModifiers() == 0;
   }
 
-  @NotNull
-  public static String toKeyNotation(@NotNull List<KeyStroke> keys) {
+  public static @NotNull String toKeyNotation(@NotNull List<KeyStroke> keys) {
     if (keys.isEmpty()) {
       return "<Nop>";
     }
@@ -201,8 +195,7 @@ public class StringHelper {
     return builder.toString();
   }
 
-  @NotNull
-  public static String toKeyNotation(@NotNull KeyStroke key) {
+  public static @NotNull String toKeyNotation(@NotNull KeyStroke key) {
     final char c = key.getKeyChar();
     final int keyCode = key.getKeyCode();
     final int modifiers = key.getModifiers();
@@ -250,6 +243,54 @@ public class StringHelper {
     return name != null ? "<" + prefix + name + ">" : "<<" + key.toString() + ">>";
   }
 
+  public static String toPrintableCharacters(@NotNull List<KeyStroke> keys) {
+    if (keys.isEmpty()) {
+      return "";
+    }
+    final StringBuilder builder = new StringBuilder();
+    for (KeyStroke key : keys) {
+      builder.append(toPrintableCharacter(key));
+    }
+    return builder.toString();
+  }
+
+  /**
+   * Convert a KeyStroke into the character it represents and return a printable version of the character.
+   *
+   * See :help 'isprint'
+   *
+   * @param key The KeyStroke to represent
+   * @return A printable String of the character represented by the KeyStroke
+   */
+  public static String toPrintableCharacter(@NotNull KeyStroke key) {
+    // TODO: Look at 'isprint', 'display' and 'encoding' settings
+    char c = key.getKeyChar();
+    if (c == CHAR_UNDEFINED && key.getModifiers() == 0) {
+      c = (char)key.getKeyCode();
+    }
+    else if (c == CHAR_UNDEFINED && (key.getModifiers() & CTRL_MASK) != 0) {
+      c = (char)(key.getKeyCode() - 'A' + 1);
+    }
+
+    if (c <= 31) {
+      return "^" + (char) (c + 'A' - 1);
+    } else if (c == 127) {
+      return "^" + (char) (c - 'A' + 1);
+      // Vim doesn't use these representations unless :set encoding=latin1. Technically, we could use them if the
+      // encoding of the buffer for the mark, jump or :ascii char is. But what encoding would we use for registers?
+      // Since we support Unicode, just treat everything as Unicode.
+//    } else if (c >= 128 && c <= 159) {
+//      return "~" + (char) (c - 'A' + 1);
+//    } else if (c >= 160 && c <= 254) {
+//      return "|" + (char)(c - (('A' - 1) * 2));
+//    } else if (c == 255) {
+//      return "~" + (char)(c - (('A' - 1) * 3));
+    } else if (CharacterHelper.isInvisibleControlCharacter(c) || CharacterHelper.isZeroWidthCharacter(c)) {
+      return String.format("<%04x>", (int) c);
+    }
+    return "" + c;
+  }
+
   public static boolean containsUpperCase(@NotNull String text) {
     for (int i = 0; i < text.length(); i++) {
       if (Character.isUpperCase(text.charAt(i)) && (i == 0 || text.charAt(i - 1) != '\\')) {
@@ -270,8 +311,7 @@ public class StringHelper {
   /**
    * Set the text of an XML element, safely encode it if needed.
    */
-  @NotNull
-  public static Element setSafeXmlText(@NotNull Element element, @NotNull String text) {
+  public static @NotNull Element setSafeXmlText(@NotNull Element element, @NotNull String text) {
     final Character first = firstCharacter(text);
     final Character last = lastCharacter(text);
     if (!StringHelper.isXmlCharacterData(text) ||
@@ -290,8 +330,7 @@ public class StringHelper {
   /**
    * Get the (potentially safely encoded) text of an XML element.
    */
-  @Nullable
-  public static String getSafeXmlText(@NotNull Element element) {
+  public static @Nullable String getSafeXmlText(@NotNull Element element) {
     final String text = element.getText();
     final String encoding = element.getAttributeValue("encoding");
     if (encoding == null) {
@@ -317,8 +356,7 @@ public class StringHelper {
     return true;
   }
 
-  @Nullable
-  private static KeyStroke parseSpecialKey(@NotNull String s, int modifiers) {
+  private static @Nullable KeyStroke parseSpecialKey(@NotNull String s, int modifiers) {
     final String lower = s.toLowerCase();
     final Integer keyCode = getVimKeyName(lower);
     final Character typedChar = getVimTypedKeyName(lower);
@@ -493,8 +531,7 @@ public class StringHelper {
     }
   }
 
-  @NotNull
-  private static KeyStroke getTypedOrPressedKeyStroke(char c, int modifiers) {
+  private static @NotNull KeyStroke getTypedOrPressedKeyStroke(char c, int modifiers) {
     if (modifiers == 0) {
       return getKeyStroke(c);
     }
@@ -506,13 +543,11 @@ public class StringHelper {
     }
   }
 
-  @Nullable
-  private static Character lastCharacter(@NotNull String text) {
+  private static @Nullable Character lastCharacter(@NotNull String text) {
     return text.length() > 0 ? text.charAt(text.length() - 1) : null;
   }
 
-  @Nullable
-  private static Character firstCharacter(@NotNull String text) {
+  private static @Nullable Character firstCharacter(@NotNull String text) {
     return text.length() > 0 ? text.charAt(0) : null;
   }
 

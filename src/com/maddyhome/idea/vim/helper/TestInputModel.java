@@ -30,7 +30,7 @@ import java.util.List;
  * @author vlan
  */
 public class TestInputModel {
-  @NotNull private final List<KeyStroke> myKeyStrokes = Lists.newArrayList();
+  private final @NotNull List<KeyStroke> myKeyStrokes = Lists.newArrayList();
 
   private TestInputModel() {}
 
@@ -48,8 +48,7 @@ public class TestInputModel {
     myKeyStrokes.addAll(keyStrokes);
   }
 
-  @Nullable
-  public KeyStroke nextKeyStroke() {
+  public @Nullable KeyStroke nextKeyStroke() {
     if (!myKeyStrokes.isEmpty()) {
       return myKeyStrokes.remove(0);
     }

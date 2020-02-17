@@ -72,5 +72,5 @@ public class BoundListOption extends ListOption {
     return true;
   }
 
-  @NotNull protected final List<String> values;
+  protected final @NotNull List<String> values;
 }

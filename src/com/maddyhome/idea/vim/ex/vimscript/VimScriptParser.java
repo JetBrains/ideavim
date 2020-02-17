@@ -52,8 +52,7 @@ public class VimScriptParser {
   private VimScriptParser() {
   }
 
-  @Nullable
-  public static File findIdeaVimRc() {
+  public static @Nullable File findIdeaVimRc() {
     final String homeDirName = System.getProperty("user.home");
     // Check whether file exists in home dir
     if (homeDirName != null) {
@@ -82,8 +81,7 @@ public class VimScriptParser {
     return null;
   }
 
-  @Nullable
-  public static File findOrCreateIdeaVimRc() {
+  public static @Nullable File findOrCreateIdeaVimRc() {
     final File found = findIdeaVimRc();
     if (found != null) return found;
 
@@ -137,8 +135,7 @@ public class VimScriptParser {
     }
   }
 
-  @NotNull
-  public static Object evaluate(@NotNull String expression, @NotNull Map<String, Object> globals) throws ExException {
+  public static @NotNull Object evaluate(@NotNull String expression, @NotNull Map<String, Object> globals) throws ExException {
     // This evaluator is very basic, no proper parsing whatsoever. It is here as the very first step necessary to
     // support mapleader, VIM-650. See also VIM-669.
     Matcher m;
@@ -168,8 +165,7 @@ public class VimScriptParser {
     throw new ExException(String.format("Invalid expression: %s", expression));
   }
 
-  @NotNull
-  public static String expressionToString(@NotNull Object value) throws ExException {
+  public static @NotNull String expressionToString(@NotNull Object value) throws ExException {
     // TODO: Return meaningful value representations
     if (value instanceof String) {
       return (String)value;
@@ -179,8 +175,7 @@ public class VimScriptParser {
     throw new ExException(String.format("Cannot convert '%s' to string", value));
   }
 
-  @NotNull
-  private static String readFile(@NotNull File file) throws IOException {
+  private static @NotNull String readFile(@NotNull File file) throws IOException {
     final BufferedReader reader = new BufferedReader(new FileReader(file));
     final StringBuilder builder = new StringBuilder();
     final char[] buffer = new char[BUFSIZE];

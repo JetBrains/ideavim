@@ -21,7 +21,13 @@ package org.jetbrains.plugins.ideavim
 import com.maddyhome.idea.vim.RegisterActions.VIM_ACTIONS_EP
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.key.CommandNode
+import com.maddyhome.idea.vim.key.CommandPartNode
+import junit.framework.TestCase
+import javax.swing.KeyStroke
 
 class RegisterActionsTest : VimTestCase() {
   fun `test simple action`() {
@@ -65,10 +71,24 @@ class RegisterActionsTest : VimTestCase() {
     val keys = StringHelper.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
+    var motionRightAction: ActionBeanClass? = null
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
-      val motionRightAction = VIM_ACTIONS_EP.extensions().findAny().get();
+      motionRightAction = VIM_ACTIONS_EP.extensions().findAny().get();
+
+      TestCase.assertNotNull(getCommandNode())
+
       @Suppress("DEPRECATION")
-      VIM_ACTIONS_EP.getPoint(null).unregisterExtension(motionRightAction)
+      VIM_ACTIONS_EP.getPoint(null).unregisterExtension(motionRightAction!!)
+      TestCase.assertNull(getCommandNode())
     }
+    @Suppress("DEPRECATION")
+    VIM_ACTIONS_EP.getPoint(null).registerExtension(motionRightAction!!)
+    TestCase.assertNotNull(getCommandNode())
+  }
+
+  private fun getCommandNode(): CommandNode? {
+    // TODO: 08.02.2020 Sorry if your tests will fail because of this test
+    val node = VimPlugin.getKey().getKeyRoot(MappingMode.NORMAL)[KeyStroke.getKeyStroke('g')] as CommandPartNode
+    return node[KeyStroke.getKeyStroke('T')] as CommandNode?
   }
 }

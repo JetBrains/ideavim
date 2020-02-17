@@ -27,7 +27,7 @@ class FileGetAsciiAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    VimPlugin.getFile().displayAsciiInfo(editor)
+    VimPlugin.getDigraph().displayAsciiInfo(editor)
     return true
   }
 }

@@ -21,15 +21,25 @@ package com.maddyhome.idea.vim.ex.handler
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.helper.StringHelper
 
 class RegistersHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-    val regs = VimPlugin.getRegister().registers.joinToString("\n", prefix = "--- Registers ---\n") { reg ->
-      """"${reg.name}   ${StringHelper.toKeyNotation(reg.keys)}"""
-    }
+
+    val registerGroup = VimPlugin.getRegister()
+    val regs = registerGroup.registers
+      .filter { cmd.argument.isEmpty() || cmd.argument.contains(it.name) }
+      .joinToString("\n", prefix = "Type Name Content\n") { reg ->
+        val type = when (reg.type) {
+          SelectionType.LINE_WISE -> "l"
+          SelectionType.CHARACTER_WISE -> "c"
+          SelectionType.BLOCK_WISE -> "b"
+        }
+        "  $type  \"${reg.name}   ${StringHelper.toPrintableCharacters(reg.keys).take(200)}"
+      }
 
     ExOutputModel.getInstance(editor).output(regs)
 
