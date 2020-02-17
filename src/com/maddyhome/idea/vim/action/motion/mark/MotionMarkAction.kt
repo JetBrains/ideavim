@@ -19,6 +19,7 @@ package com.maddyhome.idea.vim.action.motion.mark
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
@@ -31,6 +32,10 @@ class MotionMarkAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val argument = cmd.argument
+    if (editor.project != null) {
+      IdeDocumentHistory.getInstance(editor.project).includeCurrentCommandAsNavigation()
+    }
+
     return argument != null && VimPlugin.getMark().setMark(editor, argument.character)
   }
 }
