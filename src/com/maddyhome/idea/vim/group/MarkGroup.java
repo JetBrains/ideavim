@@ -30,6 +30,7 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -74,6 +75,7 @@ public class MarkGroup {
   public void saveJumpLocation(@NotNull Editor editor) {
     addJump(editor, true);
     setMark(editor, '\'');
+    IdeDocumentHistory.getInstance(editor.getProject()).includeCurrentCommandAsNavigation();
   }
 
   /**
