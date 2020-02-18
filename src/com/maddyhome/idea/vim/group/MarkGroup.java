@@ -30,6 +30,7 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -64,6 +65,7 @@ public class MarkGroup {
     // Save off the last caret position of the file before it is closed
     Editor editor = event.getEditor();
     setMark(editor, '"', editor.getCaretModel().getOffset());
+    IdeDocumentHistory.getInstance(editor.getProject()).includeCurrentCommandAsNavigation();
   }
 
   /**
