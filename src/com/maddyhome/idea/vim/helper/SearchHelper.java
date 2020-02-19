@@ -37,11 +37,12 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.checkInString;
 
 /**
  * Helper methods for searching text
@@ -98,10 +99,10 @@ public class SearchHelper {
     int pos = caret.getOffset();
     int loc = blockChars.indexOf(type);
     // What direction should we go now (-1 is backward, 1 is forward)
-    int dir = loc % 2 == 0 ? -1 : 1;
+    Direction dir = loc % 2 == 0 ? Direction.BACK : Direction.FORWARD;
     // Which character did we find and which should we now search for
     char match = blockChars.charAt(loc);
-    char found = blockChars.charAt(loc - dir);
+    char found = blockChars.charAt(loc - dir.toInt());
 
     return findBlockLocation(chars, found, match, dir, pos, count, false);
   }
@@ -152,10 +153,10 @@ public class SearchHelper {
         int endOffset = quoteRange.getEndOffset();
         CharSequence subSequence = chars.subSequence(startOffset, endOffset);
         int inQuotePos = pos - startOffset;
-        int inQuoteStart = findBlockLocation(subSequence, close, type, -1, inQuotePos, count, false);
+        int inQuoteStart = findBlockLocation(subSequence, close, type, Direction.BACK, inQuotePos, count, false);
         if (inQuoteStart != -1) {
           startPosInStringFound = true;
-          int inQuoteEnd = findBlockLocation(subSequence, type, close, 1, inQuoteStart, 1, false);
+          int inQuoteEnd = findBlockLocation(subSequence, type, close, Direction.FORWARD, inQuoteStart, 1, false);
           if (inQuoteEnd != -1) {
             bstart = inQuoteStart + startOffset;
             bend = inQuoteEnd + startOffset;
@@ -165,9 +166,9 @@ public class SearchHelper {
     }
 
     if (!startPosInStringFound) {
-      bstart = findBlockLocation(chars, close, type, -1, pos, count, false);
+      bstart = findBlockLocation(chars, close, type, Direction.BACK, pos, count, false);
       if (bstart != -1) {
-        bend = findBlockLocation(chars, type, close, 1, bstart, 1, false);
+        bend = findBlockLocation(chars, type, close, Direction.FORWARD, bstart, 1, false);
       }
     }
 
@@ -281,10 +282,10 @@ public class SearchHelper {
     // If we found one ...
     if (loc >= 0) {
       // What direction should we go now (-1 is backward, 1 is forward)
-      int dir = loc % 2 == 0 ? 1 : -1;
+      Direction dir = loc % 2 == 0 ? Direction.FORWARD : Direction.BACK;
       // Which character did we find and which should we now search for
       char found = getPairChars().charAt(loc);
-      char match = getPairChars().charAt(loc + dir);
+      char match = getPairChars().charAt(loc + dir.toInt());
       res = findBlockLocation(chars, found, match, dir, pos, 1, true);
     }
 
@@ -308,21 +309,29 @@ public class SearchHelper {
   private static int findBlockLocation(@NotNull CharSequence chars,
                                        char found,
                                        char match,
-                                       int dir,
+                                       @NotNull Direction dir,
                                        int pos,
                                        int cnt,
                                        boolean allowInString) {
     int res = -1;
-    final int inCheckPos = dir < 0 && pos > 0 ? pos - 1 : pos;
+    int initialPos = pos;
+    Function<Integer, Integer> inCheckPosF = x -> dir == Direction.BACK && x > 0 ? x - 1 : x + 1;
+    final int inCheckPos = inCheckPosF.apply(pos);
     boolean inString = checkInString(chars, inCheckPos, true);
     boolean initialInString = inString;
     boolean inChar = checkInString(chars, inCheckPos, false);
-    boolean initial = true;
     int stack = 0;
     // Search to start or end of file, as appropriate
+    Set<Character> charsToSearch = new HashSet<>(Arrays.asList('\'', '"', '\n', match, found));
     while (pos >= 0 && pos < chars.length() && cnt > 0) {
+      Pair<Character, Integer> ci = findPositionOfFirstCharacter(chars, pos, charsToSearch,  false, dir);
+      if (ci == null) {
+        return -1;
+      }
+      Character c = ci.first;
+      pos = ci.second;
       // If we found a match and we're not in a string...
-      if (chars.charAt(pos) == match && (allowInString ? initialInString == inString : !inString) && !inChar) {
+      if (c == match && (allowInString ? initialInString == inString : !inString) && !inChar) {
         // We found our match
         if (stack == 0) {
           res = pos;
@@ -334,26 +343,24 @@ public class SearchHelper {
         }
       }
       // End of line - mark not in a string any more (in case we started in the middle of one
-      else if (chars.charAt(pos) == '\n') {
+      else if (c == '\n') {
         inString = false;
         inChar = false;
       }
-      else if (!initial) {
+      else if (pos != initialPos) {
         // We found another character like our original - belongs to another pair
-        if (!inString && !inChar && chars.charAt(pos) == found) {
+        if (!inString && !inChar && c == found) {
           stack++;
         }
         // We found the start/end of a string
-        else if (!inChar && isQuoteWithoutEscape(chars, pos, '"')) {
-          inString = !inString;
+        else if (!inChar) {
+          inString = checkInString(chars, inCheckPosF.apply(pos), true);
         }
-        else if (!inString && isQuoteWithoutEscape(chars, pos, '\'')) {
-          inChar = !inChar;
+        else if (!inString) {
+          inChar = checkInString(chars, inCheckPosF.apply(pos), false);
         }
       }
-
-      pos += dir;
-      initial = false;
+      pos += dir.toInt();
     }
 
     return res;
@@ -366,18 +373,13 @@ public class SearchHelper {
     if (chars.charAt(pos) != quote) return false;
 
     int backslashCounter = 0;
-    while (pos-- > 0) {
-      if (chars.charAt(pos) == '\\') {
-        backslashCounter++;
-      }
-      else {
-        break;
-      }
+    while (pos-- > 0 && chars.charAt(pos) == '\\') {
+      backslashCounter++;
     }
     return backslashCounter % 2 == 0;
   }
 
-  private enum Direction {
+  public enum Direction {
     BACK(-1), FORWARD(1);
 
     private final int value;
@@ -386,7 +388,7 @@ public class SearchHelper {
       value = i;
     }
 
-    private int toInt() {
+    public int toInt() {
       return value;
     }
   }
@@ -419,10 +421,28 @@ public class SearchHelper {
     return cnt;
   }
 
+  public static Pair<Character, Integer> findPositionOfFirstCharacter(
+    @NotNull CharSequence chars,
+    int pos,
+    final Set<Character> needles,
+    boolean searchEscaped,
+    @NotNull Direction direction
+  ) {
+    int dir = direction.toInt();
+    while (pos >= 0 && pos < chars.length()) {
+      final char c = chars.charAt(pos);
+      if (needles.contains(c) && (pos == 0 || searchEscaped || isQuoteWithoutEscape(chars, pos, c))) {
+        return Pair.create(c, pos);
+      }
+      pos += dir;
+    }
+    return null;
+  }
+
   private static int findCharacterPosition(@NotNull CharSequence chars, int pos, final char c, boolean currentLineOnly,
                                            boolean searchEscaped, @NotNull Direction direction) {
     while (pos >= 0 && pos < chars.length() && (!currentLineOnly || chars.charAt(pos) != '\n')) {
-      if (chars.charAt(pos) == c && (pos == 0 || searchEscaped || chars.charAt(pos - 1) != '\\')) {
+      if (chars.charAt(pos) == c && (pos == 0 || searchEscaped || isQuoteWithoutEscape(chars, pos, c))) {
         return pos;
       }
       pos += direction.toInt();
@@ -658,27 +678,6 @@ public class SearchHelper {
 
     // End offset exclusive
     return new TextRange(start, end + 1);
-  }
-
-  private static boolean checkInString(@NotNull CharSequence chars, int pos, boolean str) {
-    if (chars.length() == 0) return false;
-    int offset = pos;
-    while (offset > 0 && chars.charAt(offset) != '\n') {
-      offset--;
-    }
-
-    boolean inString = false;
-    boolean inChar = false;
-    for (int i = offset; i <= pos; i++) {
-      if (!inChar && isQuoteWithoutEscape(chars, i, '"')) {
-        inString = !inString;
-      }
-      else if (!inString && isQuoteWithoutEscape(chars, i, '\'')) {
-        inChar = !inChar;
-      }
-    }
-
-    return str ? inString : inChar;
   }
 
   public static int findNextCamelStart(@NotNull Editor editor, @NotNull Caret caret, int count) {

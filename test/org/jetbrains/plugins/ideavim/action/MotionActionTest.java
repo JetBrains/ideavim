@@ -292,6 +292,27 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("a{<caret>}b}");
   }
 
+  // VIM-1008 |c| |v_i{|
+  public void testDeleteInsideDoubleQuotesSurroundedBlockWithSingleQuote() {
+    configureByText("\"{do<caret>esn't work}\"");
+    typeText(parseKeys("ci{"));
+    myFixture.checkResult("\"{<caret>}\"");
+  }
+
+  // VIM-1008 |c| |v_i{|
+  public void testDeleteInsideSingleQuotesSurroundedBlock() {
+    configureByText("'{does n<caret>ot work}'");
+    typeText(parseKeys("ci{"));
+    myFixture.checkResult("'{<caret>}'");
+  }
+
+  // VIM-1008 |c| |v_i{|
+  public void testDeleteInsideDoublySurroundedBlock() {
+    configureByText("<p class=\"{{ $ctrl.so<caret>meClassName }}\"></p>");
+    typeText(parseKeys("ci{"));
+    myFixture.checkResult("<p class=\"{{<caret>}}\"></p>");
+  }
+
   // |d| |v_i>|
   public void testDeleteInnerAngleBracketBlock() {
     typeTextInFile(parseKeys("di>"),
@@ -347,6 +368,31 @@ public class MotionActionTest extends VimTestCase {
                    "f<caret>oo = [\"one\", \"two\", \"three\"];\n");
     myFixture.checkResult("foo = [\"\", \"two\", \"three\"];\n");
   }
+
+  public void testDeleteDoubleQuotedStringOddNumberOfQuotes() {
+    typeTextInFile(parseKeys("di\""),
+                   "abc\"def<caret>\"gh\"i");
+    myFixture.checkResult("abc\"\"gh\"i");
+  }
+
+  public void testDeleteDoubleQuotedStringBetweenEvenNumberOfQuotes() {
+    typeTextInFile(parseKeys("di\""),
+                   "abc\"def\"g<caret>h\"ijk\"l");
+    myFixture.checkResult("abc\"def\"\"ijk\"l");
+  }
+
+  public void testDeleteDoubleQuotedStringOddNumberOfQuotesOnLast() {
+    typeTextInFile(parseKeys("di\""),
+                   "abcdef\"gh\"ij<caret>\"kl");
+    myFixture.checkResult("abcdef\"gh\"ij\"kl");
+  }
+
+  public void testDeleteDoubleQuotedStringEvenNumberOfQuotesOnLast() {
+    typeTextInFile(parseKeys("di\""),
+                   "abc\"def\"gh\"ij<caret>\"kl");
+    myFixture.checkResult("abc\"def\"gh\"\"kl");
+  }
+
 
   // VIM-132 |v_i"|
   public void testInnerDoubleQuotedStringSelection() {
