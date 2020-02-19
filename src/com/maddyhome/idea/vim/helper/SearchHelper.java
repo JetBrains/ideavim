@@ -421,7 +421,7 @@ public class SearchHelper {
     return cnt;
   }
 
-  public static Pair<Character, Integer> findPositionOfFirstCharacter(
+  public static @Nullable Pair<Character, Integer> findPositionOfFirstCharacter(
     @NotNull CharSequence chars,
     int pos,
     final Set<Character> needles,

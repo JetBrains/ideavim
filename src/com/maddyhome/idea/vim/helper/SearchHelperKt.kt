@@ -21,14 +21,14 @@ package com.maddyhome.idea.vim.helper
 import com.maddyhome.idea.vim.helper.SearchHelper.Direction
 import com.maddyhome.idea.vim.helper.SearchHelper.findPositionOfFirstCharacter
 
-data class State(val position: Int, val trigger: Char, val inQuote: Boolean?, val lastOpenSingleQuotePos: Int)
+private data class State(val position: Int, val trigger: Char, val inQuote: Boolean?, val lastOpenSingleQuotePos: Int)
 
 // bounds are considered inside corresponding quotes
 fun checkInString(chars: CharSequence, currentPos: Int, str: Boolean): Boolean {
   val begin = findPositionOfFirstCharacter(chars, currentPos, setOf('\n'), false, Direction.BACK)?.second ?: 0
   val changes = quoteChanges(chars, begin)
   // TODO: here we need to keep only the latest element in beforePos (if any) and
-  // don't need atAndAfterPos to be eagerly collected
+  //   don't need atAndAfterPos to be eagerly collected
   var (beforePos, atAndAfterPos) = changes.partition { it.position < currentPos }
 
   var (atPos, afterPos) = atAndAfterPos.partition { it.position == currentPos }
@@ -91,10 +91,10 @@ fun checkInString(chars: CharSequence, currentPos: Int, str: Boolean): Boolean {
 
 // yields changes of inQuote and lastOpenSingleQuotePos during while iterating over chars
 // rules are that:
-// escaped quotes are skipped
-// single quoted group may enclose only one character, maybe escaped,
-// so distance between opening and closing single quotes cannot be more than 3
-// bounds are considered inside corresponding quotes
+// - escaped quotes are skipped
+// - single quoted group may enclose only one character, maybe escaped,
+// - so distance between opening and closing single quotes cannot be more than 3
+// - bounds are considered inside corresponding quotes
 private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
   // position of last found unpaired single quote
   var lastOpenSingleQuotePos = -1
@@ -102,7 +102,7 @@ private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
   // true - definitely yes
   // false - definitely no
   // null - maybe yes, in case we found such combination: '"
-  // in that situation it may be double quote inside single quotes, so we cannot threat it as double quote pair open/close
+  //   in that situation it may be double quote inside single quotes, so we cannot threat it as double quote pair open/close
   var inQuote: Boolean? = false
   val charsToSearch = setOf('\'', '"', '\n')
   var found = findPositionOfFirstCharacter(chars, begin, charsToSearch, false, Direction.FORWARD)
