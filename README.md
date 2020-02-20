@@ -98,6 +98,7 @@ Emulated Vim plugins:
 * vim-multiple-cursors
 * vim-commentary
 * argtextobj.vim   [To Be Released]
+* vim-entire-textobj [To Be Released]
 
 Not supported (yet):
 
@@ -170,6 +171,11 @@ Available extensions:
     * Setup: `set argtextobj`
     * Emulates [argtextobj.vim](https://www.vim.org/scripts/script.php?script_id=2699)
     * Additional text objects: `aa`, `ia`
+    
+* entiretextobj [To Be Released]
+    * Setup: `set entiretextobj`
+    * Emulates [vim-textobj-entire](https://github.com/kana/vim-textobj-entire)
+    * Additional text objects: `ae`, `ie`
 
 
 Changes to the IDE

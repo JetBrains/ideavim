@@ -275,6 +275,10 @@ Contributors:
   [![icon][github]](https://github.com/fan-tom)
   &nbsp;
   Alexey Gerasimov
+* [![icon][mail]](mailto:a.grison+github@gmail.com)
+  [![icon][github]](https://github.com/agrison)
+  &nbsp;
+  Alexandre Grison
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
