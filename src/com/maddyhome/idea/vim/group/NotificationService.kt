@@ -48,6 +48,9 @@ import javax.swing.event.HyperlinkEvent
 
 /**
  * @author Alex Plate
+ *
+ * This service is can be used as application level and as project level service.
+ * If project is null, this means that this is an application level service and notification will be shown for all projects
  */
 class NotificationService(private val project: Project?) {
   // This constructor is used to create an applicationService
