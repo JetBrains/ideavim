@@ -98,7 +98,7 @@ Emulated Vim plugins:
 * vim-multiple-cursors
 * vim-commentary
 * argtextobj.vim   [To Be Released]
-* vim-entire-textobj [To Be Released]
+* vim-textobj-entire [To Be Released]
 
 Not supported (yet):
 
