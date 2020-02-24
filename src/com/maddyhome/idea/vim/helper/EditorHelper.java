@@ -851,4 +851,21 @@ public class EditorHelper {
   public static boolean isDiffEditor(@NotNull Editor editor) {
     return editor.getEditorKind() == EditorKind.DIFF;
   }
+
+  /**
+   * Checks if the document in the editor is modified.
+   */
+  public static boolean hasUnsavedChanges(@NotNull Editor editor) {
+    int line = 0;
+    Document document = editor.getDocument();
+
+    while (line < document.getLineCount()) {
+      if (document.isLineModified(line)) {
+        return true;
+      }
+      line++;
+    }
+
+    return false;
+  }
 }
