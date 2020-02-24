@@ -96,8 +96,8 @@ class BufferListHandler : CommandHandler.SingleExecution() {
             bufferList.add(String.format(
               "   %${bufNumPad}s %s %s%${lineNumPad}s line: %d", index, bufStatus, displayFileName, "", lineNum)
             )
-            index++
           }
+          index++
         }
       }
     }
