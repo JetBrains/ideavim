@@ -24,6 +24,9 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
@@ -60,8 +63,9 @@ import static java.util.stream.Collectors.toList;
 /**
  * @author vlan
  */
-public class KeyGroup {
-  private static final String SHORTCUT_CONFLICTS_ELEMENT = "shortcut-conflicts";
+@State(name = "VimKeySettings", storages = {@Storage(value = "$APP_CONFIG$/vim_settings.xml")})
+public class KeyGroup implements PersistentStateComponent<Element> {
+  public static final String SHORTCUT_CONFLICTS_ELEMENT = "shortcut-conflicts";
   private static final String SHORTCUT_CONFLICT_ELEMENT = "shortcut-conflict";
   private static final String OWNER_ATTRIBUTE = "owner";
   private static final String TEXT_ELEMENT = "text";
@@ -524,5 +528,18 @@ public class KeyGroup {
       }
     }
     return results;
+  }
+
+  @Nullable
+  @Override
+  public Element getState() {
+    Element element = new Element("key");
+    saveData(element);
+    return element;
+  }
+
+  @Override
+  public void loadState(@NotNull Element state) {
+    readData(state);
   }
 }

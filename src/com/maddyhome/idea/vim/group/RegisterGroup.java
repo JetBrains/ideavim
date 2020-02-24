@@ -23,6 +23,10 @@ import com.intellij.codeInsight.editorActions.CopyPastePostProcessor;
 import com.intellij.codeInsight.editorActions.CopyPastePreProcessor;
 import com.intellij.codeInsight.editorActions.TextBlockTransferable;
 import com.intellij.codeInsight.editorActions.TextBlockTransferableData;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.RoamingType;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.CaretStateTransferableData;
 import com.intellij.openapi.editor.Editor;
@@ -72,7 +76,10 @@ import java.util.stream.Collectors;
 /**
  * This group works with command associated with copying and pasting text
  */
-public class RegisterGroup {
+@State(name = "VimRegisterSettings", storages = {
+  @Storage(value = "$APP_CONFIG$/vim_settings.xml", roamingType = RoamingType.DISABLED)
+})
+public class RegisterGroup implements PersistentStateComponent<Element> {
   private static final String WRITABLE_REGISTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-*+_/\"";
   private static final String READONLY_REGISTERS = ":.%#=/";
   private static final String RECORDABLE_REGISTER = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -507,5 +514,18 @@ public class RegisterGroup {
     else {
       return SelectionType.CHARACTER_WISE;
     }
+  }
+
+  @Nullable
+  @Override
+  public Element getState() {
+    Element element = new Element("registers");
+    saveData(element);
+    return element;
+  }
+
+  @Override
+  public void loadState(@NotNull Element state) {
+    readData(state);
   }
 }

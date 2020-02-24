@@ -30,9 +30,8 @@ import static java.util.Collections.emptyList;
 
 public class VimArgTextObjExtension implements VimExtension {
 
-  @NotNull
   @Override
-  public String getName() {
+  public @NotNull String getName() {
     return "argtextobj";
   }
 
@@ -65,9 +64,8 @@ public class VimArgTextObjExtension implements VimExtension {
         this.isInner = isInner;
       }
 
-      @Nullable
       @Override
-      public TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
+      public @Nullable TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
         final ArgBoundsFinder finder = new ArgBoundsFinder(editor.getDocument());
         int pos = caret.getOffset();
 
@@ -128,23 +126,23 @@ public class VimArgTextObjExtension implements VimExtension {
    * position
    */
   private static class ArgBoundsFinder {
-    final private CharSequence text;
-    final private Document document;
+    private final CharSequence text;
+    private final Document document;
     private int leftBound = Integer.MAX_VALUE;
     private int rightBound = Integer.MIN_VALUE;
     private int leftBracket;
     private int rightBracket;
     private String error = null;
-    final private static String QUOTES = "\"'";
+    private static final String QUOTES = "\"'";
 
     // NOTE: brackets must match by the position, and ordered by rank.
     // NOTE2: The original implementation worked for ], } and > as well, but because of some broken cases this feature
     //   was removed.
-    final private static String OPEN_BRACKETS = "(";   // "[{(<"
-    final private static String CLOSE_BRACKETS = ")";  // "]})>"
+    private static final String OPEN_BRACKETS = "(";   // "[{(<"
+    private static final String CLOSE_BRACKETS = ")";  // "]})>"
 
-    final private static int MAX_SEARCH_LINES = 10;
-    final private static int MAX_SEARCH_OFFSET = MAX_SEARCH_LINES * 80;
+    private static final int MAX_SEARCH_LINES = 10;
+    private static final int MAX_SEARCH_OFFSET = MAX_SEARCH_LINES * 80;
 
     ArgBoundsFinder(@NotNull Document document) {
       this.text = document.getImmutableCharSequence();
@@ -309,7 +307,7 @@ public class VimArgTextObjExtension implements VimExtension {
       }
     }
 
-    static private char matchingBracket(char ch) {
+    private static char matchingBracket(char ch) {
       int idx = CLOSE_BRACKETS.indexOf(ch);
       if (idx != -1) {
         return OPEN_BRACKETS.charAt(idx);
@@ -320,11 +318,11 @@ public class VimArgTextObjExtension implements VimExtension {
       }
     }
 
-    static private boolean isCloseBracket(final int ch) {
+    private static boolean isCloseBracket(final int ch) {
       return CLOSE_BRACKETS.indexOf(ch) != -1;
     }
 
-    static private boolean isOpenBracket(final int ch) {
+    private static boolean isOpenBracket(final int ch) {
       return OPEN_BRACKETS.indexOf(ch) != -1;
     }
 
@@ -349,7 +347,7 @@ public class VimArgTextObjExtension implements VimExtension {
       return QUOTES.indexOf(getCharAt(i)) != -1;
     }
 
-    static private boolean isQuoteChar(final int ch) {
+    private static boolean isQuoteChar(final int ch) {
       return QUOTES.indexOf(ch) != -1;
     }
 

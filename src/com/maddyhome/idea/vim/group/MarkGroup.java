@@ -21,6 +21,10 @@ package com.maddyhome.idea.vim.group;
 import com.intellij.ide.bookmarks.Bookmark;
 import com.intellij.ide.bookmarks.BookmarkManager;
 import com.intellij.ide.bookmarks.BookmarksListener;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.RoamingType;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -53,7 +57,10 @@ import java.util.stream.Collectors;
 /**
  * This class contains all the mark related functionality
  */
-public class MarkGroup {
+@State(name = "VimMarksSettings", storages = {
+  @Storage(value = "$APP_CONFIG$/vim_settings.xml", roamingType = RoamingType.DISABLED)
+})
+public class MarkGroup implements PersistentStateComponent<Element> {
   public static final char MARK_VISUAL_START = '<';
   public static final char MARK_VISUAL_END = '>';
   public static final char MARK_CHANGE_START = '[';
@@ -646,6 +653,19 @@ public class MarkGroup {
         }
       }
     }
+  }
+
+  @Nullable
+  @Override
+  public Element getState() {
+    Element element = new Element("marks");
+    saveData(element);
+    return element;
+  }
+
+  @Override
+  public void loadState(@NotNull Element state) {
+    readData(state);
   }
 
   private static class FileMarks<K, V> extends HashMap<K, V> {

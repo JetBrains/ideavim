@@ -19,6 +19,10 @@ package com.maddyhome.idea.vim.group;
 
 import com.google.common.collect.Lists;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.RoamingType;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.colors.EditorColors;
@@ -60,7 +64,10 @@ import java.text.ParsePosition;
 import java.util.List;
 import java.util.*;
 
-public class SearchGroup {
+@State(name = "VimSearchSettings", storages = {
+  @Storage(value = "$APP_CONFIG$/vim_settings.xml", roamingType = RoamingType.DISABLED)
+})
+public class SearchGroup implements PersistentStateComponent<Element> {
   public SearchGroup() {
     final OptionsManager options = OptionsManager.INSTANCE;
     options.getHlsearch().addOptionChangeListener((oldValue, newValue) -> {
@@ -1442,6 +1449,19 @@ public class SearchGroup {
   @SuppressWarnings("unused")
   public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
     VimPlugin.getSearch().updateSearchHighlights();
+  }
+
+  @Nullable
+  @Override
+  public Element getState() {
+    Element element = new Element("search");
+    saveData(element);
+    return element;
+  }
+
+  @Override
+  public void loadState(@NotNull Element state) {
+    readData(state);
   }
 
   public static class DocumentSearchListener implements DocumentListener {
