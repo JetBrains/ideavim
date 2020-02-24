@@ -68,13 +68,14 @@ class BufferListHandlerTest : VimTestCase() {
   }
 
   fun testBuffersActionWithSupportedFilterMatch() {
-    configureByText("\n")
+    configureByFileName("aaa.txt")
+    configureByFileName("bbb.txt")
     typeText(StringHelper.parseKeys("aa<esc>:buffers +<enter>"))
 
     val output = getInstance(myFixture.editor).text
     TestCase.assertNotNull(output)
     val displayedLines = output!!.split("\n".toRegex()).toTypedArray()
-    TestCase.assertEquals("   1 %a + \"/src/aaa.txt\"                 line: 1", displayedLines[0])
+    TestCase.assertEquals("   2 %a + \"/src/bbb.txt\"                 line: 1", displayedLines[0])
 
     assertPluginError(false)
   }
