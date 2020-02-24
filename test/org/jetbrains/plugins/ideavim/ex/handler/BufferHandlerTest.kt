@@ -69,6 +69,14 @@ class BufferHandlerTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  fun testBufferActionWithModificationsOverride() {
+    configureByFileName("aaa.txt")
+    configureByFileName("bbb.txt")
+    typeText(StringHelper.parseKeys("aa<esc>:buffer! aaa<enter>"))
+
+    assertPluginError(false)
+  }
+
   fun testBufferActionWithMultipleMatches() {
     configureByFileName("aaa.txt")
     configureByFileName("aaa2.txt")
