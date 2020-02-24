@@ -37,6 +37,9 @@ _To Be Released:_
 **Changes:**
 * Replace `ideastatusbar` option with `ideastatusicon`. Now you can make the icon gray.
 
+**Fixes:**
+* [VIM-1008](https://youtrack.jetbrains.com/issue/VIM-1008) Correct `ci{` behavior
+
 0.55, 2020-01-20
 --------------
 

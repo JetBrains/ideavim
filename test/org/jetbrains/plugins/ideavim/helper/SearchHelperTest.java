@@ -19,6 +19,7 @@
 package org.jetbrains.plugins.ideavim.helper;
 
 import com.maddyhome.idea.vim.helper.SearchHelper;
+import com.maddyhome.idea.vim.helper.SearchHelperKtKt;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -76,5 +77,101 @@ public class SearchHelperTest extends VimTestCase {
   public void testMotionOuterWordAction() {
     typeTextInFile(parseKeys("v", "a("), "((int) nu<caret>m)");
     myFixture.checkResult("<selection>((int) num)</selection>");
+  }
+
+  public void testCheckInStringInsideDoubleQuotes() {
+    String text = "abc\"def\"ghi";
+    boolean inString = SearchHelperKtKt.checkInString(text, 5, true);
+    assertTrue(inString);
+  }
+
+  public void testCheckInStringWithoutClosingDoubleQuote() {
+    String text = "abcdef\"ghi";
+    boolean inString = SearchHelperKtKt.checkInString(text, 5, true);
+    assertFalse(inString);
+  }
+
+  public void testCheckInStringOnUnpairedSingleQuote() {
+    String text = "abc\"d'ef\"ghi";
+    boolean inString = SearchHelperKtKt.checkInString(text, 5, true);
+    assertTrue(inString);
+  }
+
+  public void testCheckInStringOutsideOfDoubleQuotesPair() {
+    String text = "abc\"def\"ghi";
+    boolean inString = SearchHelperKtKt.checkInString(text, 2, true);
+    assertFalse(inString);
+  }
+
+  public void testCheckInStringEscapedDoubleQuote() {
+    String text = "abc\\\"def\"ghi";
+    boolean inString = SearchHelperKtKt.checkInString(text, 5, true);
+    assertFalse(inString);
+  }
+
+  public void testCheckInStringOddNumberOfDoubleQuotes() {
+    String text = "abc\"def\"gh\"i";
+    boolean inString = SearchHelperKtKt.checkInString(text, 5, true);
+    assertFalse(inString);
+  }
+
+  public void testCheckInStringInsideSingleQuotesPair() {
+    String text = "abc\"d'e'f\"ghi";
+    boolean inString = SearchHelperKtKt.checkInString(text, 6, false);
+    assertTrue(inString);
+  }
+
+  public void testCheckInStringOnOpeningDoubleQuote() {
+    String text = "abc\"def\"ghi";
+    boolean inString = SearchHelperKtKt.checkInString(text, 3, true);
+    assertTrue(inString);
+  }
+
+  public void testCheckInStringOnClosingDoubleQuote() {
+    String text = "abc\"def\"ghi";
+    boolean inString = SearchHelperKtKt.checkInString(text, 7, true);
+    assertTrue(inString);
+  }
+
+  public void testCheckInStringWithoutQuotes() {
+    String text = "abcdefghi";
+    boolean inString = SearchHelperKtKt.checkInString(text, 5, true);
+    assertFalse(inString);
+  }
+
+  public void testCheckInStringDoubleQuoteInsideSingleQuotes() {
+    String text = "abc'\"'ef\"ghi";
+    boolean inString = SearchHelperKtKt.checkInString(text, 5, true);
+    assertFalse(inString);
+  }
+
+  public void testCheckInStringSingleQuotesAreTooFarFromEachOtherToMakePair() {
+    String text = "abc'\"de'f\"ghi";
+    boolean inString = SearchHelperKtKt.checkInString(text, 5, true);
+    assertTrue(inString);
+  }
+
+  public void testCheckInStringDoubleQuoteInsideSingleQuotesIsInsideSingleQuotedString() {
+    String text = "abc'\"'def\"ghi";
+    boolean inString = SearchHelperKtKt.checkInString(text, 4, false);
+    assertTrue(inString);
+  }
+
+  public void testCheckInStringAfterClosingDoubleQuote() {
+    String text = "abc\"def\"ghi";
+    boolean inString = SearchHelperKtKt.checkInString(text, 9, true);
+    assertFalse(inString);
+  }
+
+  public void testCheckInStringOnMiddleDoubleQuote() {
+    String text = "abc\"def\"gh\"i";
+    boolean inString = SearchHelperKtKt.checkInString(text, 7, true);
+    assertFalse(inString);
+  }
+
+  public void testCheckInStringBetweenPairs() {
+    String text = "abc\"def\"gh\"ij\"k";
+    boolean inString = SearchHelperKtKt.checkInString(text, 8, true);
+    assertFalse(inString);
   }
 }

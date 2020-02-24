@@ -271,6 +271,10 @@ Contributors:
   [![icon][github]](https://github.com/igrekster)
   &nbsp;
   igrekster
+* [![icon][mail]](mailto:lokomot476@gmail.com)
+  [![icon][github]](https://github.com/fan-tom)
+  &nbsp;
+  Alexey Gerasimov
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.

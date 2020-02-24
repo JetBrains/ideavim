@@ -35,9 +35,6 @@
     <component>
       <implementation-class>com.maddyhome.idea.vim.VimPlugin</implementation-class>
     </component>
-    <component>
-      <implementation-class>com.maddyhome.idea.vim.VimLocalConfig</implementation-class>
-    </component>
   </application-components>
   <project-components>
     <component>
@@ -60,6 +57,8 @@
     <applicationConfigurable groupId="editor" instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
     <statusBarWidgetProvider implementation="com.maddyhome.idea.vim.StatusBarIconProvider"/>
+
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.VimLocalConfig"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>

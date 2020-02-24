@@ -66,6 +66,9 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
 
+import static com.maddyhome.idea.vim.group.EditorGroup.EDITOR_STORE_ELEMENT;
+import static com.maddyhome.idea.vim.group.KeyGroup.SHORTCUT_CONFLICTS_ELEMENT;
+
 /**
  * This plugin attempts to emulate the key binding and general functionality of Vim and gVim. See the supplied
  * documentation for a complete list of supported and unsupported Vim emulation. The code base contains some debugging
@@ -79,7 +82,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   private static final String IDEAVIM_COMPONENT_NAME = "VimPlugin";
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
   private static final String IDEAVIM_STATISTICS_TIMESTAMP_KEY = "ideavim.statistics.timestamp";
-  public static final int STATE_VERSION = 5;
+  public static final int STATE_VERSION = 6;
 
   private static long lastBeepTimeMillis;
 
@@ -107,6 +110,11 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   public void initComponent() {
     LOG.debug("initComponent");
 
+    // Initialize legacy local config.
+    if (previousStateVersion == 5) {
+      //noinspection deprecation
+      VimLocalConfig.Companion.initialize();
+    }
     if (enabled) turnOnPlugin();
 
     LOG.debug("done");
@@ -262,8 +270,6 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     state.setAttribute("enabled", Boolean.toString(enabled));
     element.addContent(state);
 
-    getKey().saveData(element);
-    getEditor().saveData(element);
     this.state.saveData(element);
 
     return element;
@@ -476,6 +482,11 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
       previousKeyMap = state.getAttributeValue("keymap");
     }
 
+    legacyStateLoading(element);
+    this.state.readData(element);
+  }
+
+  private void legacyStateLoading(@NotNull Element element) {
     if (previousStateVersion > 0 && previousStateVersion < 5) {
       // Migrate settings from 4 to 5 version
       getMark().readData(element);
@@ -483,8 +494,11 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
       getSearch().readData(element);
       getHistory().readData(element);
     }
-    getKey().readData(element);
-    getEditor().readData(element);
-    this.state.readData(element);
+    if (element.getChild(SHORTCUT_CONFLICTS_ELEMENT) != null) {
+      getKey().readData(element);
+    }
+    if (element.getChild(EDITOR_STORE_ELEMENT) != null) {
+      getEditor().readData(element);
+    }
   }
 }

@@ -21,6 +21,9 @@ package com.maddyhome.idea.vim.group;
 import com.intellij.find.EditorSearchSession;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.colors.ColorKey;
 import com.intellij.openapi.editor.colors.EditorColors;
@@ -47,9 +50,11 @@ import java.util.List;
 /**
  * @author vlan
  */
-public class EditorGroup {
+@State(name = "VimEditorSettings", storages = {@Storage(value = "$APP_CONFIG$/vim_settings.xml")})
+public class EditorGroup implements PersistentStateComponent<Element> {
   private static final boolean ANIMATED_SCROLLING_VIM_VALUE = false;
   private static final boolean REFRAIN_FROM_SCROLLING_VIM_VALUE = true;
+  public static final String EDITOR_STORE_ELEMENT = "editor";
 
   private boolean isBlockCursor = false;
   private boolean isAnimatedScrolling = false;
@@ -210,7 +215,7 @@ public class EditorGroup {
   }
 
   public void readData(@NotNull Element element) {
-    final Element editor = element.getChild("editor");
+    final Element editor = element.getChild(EDITOR_STORE_ELEMENT);
     if (editor != null) {
       final Element keyRepeat = editor.getChild("key-repeat");
       if (keyRepeat != null) {
@@ -272,6 +277,19 @@ public class EditorGroup {
 
     VimPlugin.getVimState().setIdeaJoinNotified(true);
     VimPlugin.getNotifications(project).notifyAboutIdeaJoin();
+  }
+
+  @Nullable
+  @Override
+  public Element getState() {
+    Element element = new Element("editor");
+    saveData(element);
+    return element;
+  }
+
+  @Override
+  public void loadState(@NotNull Element state) {
+    readData(state);
   }
 
   public static class NumberChangeListener implements OptionChangeListener<Boolean> {
