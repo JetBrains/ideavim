@@ -25,10 +25,10 @@ import org.jetbrains.plugins.ideavim.JavaVimTestCase
 /**
  * @author Alexandre Grison (@agrison)
  */
-class VimEntireTextObjExtensionTest : JavaVimTestCase() {
+class VimTextObjEntireExtensionTest : JavaVimTestCase() {
   override fun setUp() {
     super.setUp()
-    enableExtensions("entiretextobj")
+    enableExtensions("textobj-entire")
   }
 
   // |gU| |ae|

@@ -172,8 +172,8 @@ Available extensions:
     * Emulates [argtextobj.vim](https://www.vim.org/scripts/script.php?script_id=2699)
     * Additional text objects: `aa`, `ia`
     
-* entiretextobj [To Be Released]
-    * Setup: `set entiretextobj`
+* textobj-entire [To Be Released]
+    * Setup: `set textobj-entire`
     * Emulates [vim-textobj-entire](https://github.com/kana/vim-textobj-entire)
     * Additional text objects: `ae`, `ie`
 

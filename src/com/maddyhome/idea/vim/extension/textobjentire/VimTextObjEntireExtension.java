@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.extension.entiretextobj;
+package com.maddyhome.idea.vim.extension.textobjentire;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
@@ -35,7 +35,6 @@ import java.util.EnumSet;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
-import static com.maddyhome.idea.vim.extension.entiretextobj.VimEntireTextObjExtension.EntireHandler.*;
 import static com.maddyhome.idea.vim.group.visual.VisualGroupKt.vimSetSelection;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 import static java.util.Collections.emptyList;
@@ -61,22 +60,22 @@ import static java.util.Collections.emptyList;
  *
  * @author Alexandre Grison (@agrison)
  */
-public class VimEntireTextObjExtension implements VimExtension {
+public class VimTextObjEntireExtension implements VimExtension {
   @Override
   public @NotNull
   String getName() {
-    return "entiretextobj";
+    return "textobj-entire";
   }
 
   @Override
   public void init() {
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>IncludingLeadingTrailing"), getOwner(),
-      new VimEntireTextObjExtension.EntireHandler(false), false);
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>IgnoringLeadingTrailing"), getOwner(),
-      new VimEntireTextObjExtension.EntireHandler(true), false);
+    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>textobj-entire-a"), getOwner(),
+      new VimTextObjEntireExtension.EntireHandler(false), false);
+    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>textobj-entire-i"), getOwner(),
+      new VimTextObjEntireExtension.EntireHandler(true), false);
 
-    putKeyMapping(MappingMode.XO, parseKeys("ae"), getOwner(), parseKeys("<Plug>IncludingLeadingTrailing"), true);
-    putKeyMapping(MappingMode.XO, parseKeys("ie"), getOwner(), parseKeys("<Plug>IgnoringLeadingTrailing"), true);
+    putKeyMapping(MappingMode.XO, parseKeys("ae"), getOwner(), parseKeys("<Plug>textobj-entire-a"), true);
+    putKeyMapping(MappingMode.XO, parseKeys("ie"), getOwner(), parseKeys("<Plug>textobj-entire-i"), true);
   }
 
   static class EntireHandler implements VimExtensionHandler {
@@ -110,7 +109,7 @@ public class VimEntireTextObjExtension implements VimExtension {
             }
           }
 
-          for (int i = content.length() - 1; i >= 0; --i) {
+          for (int i = content.length() - 1; i >= start; --i) {
             if (!Character.isWhitespace(content.charAt(i))) {
               end = i + 1;
               break;
