@@ -33,15 +33,7 @@
     <component>
       <implementation-class>com.maddyhome.idea.vim.DynamicLoaderStopper</implementation-class>
     </component>
-    <component>
-      <implementation-class>com.maddyhome.idea.vim.VimPlugin</implementation-class>
-    </component>
   </application-components>
-  <project-components>
-    <component>
-      <implementation-class>com.maddyhome.idea.vim.VimProjectComponent</implementation-class>
-    </component>
-  </project-components>
 
   <extensionPoints>
     <extensionPoint name="vimExtension" interface="com.maddyhome.idea.vim.extension.VimExtension" dynamic="true"/>
@@ -62,6 +54,9 @@
     <statusBarWidgetProvider implementation="com.maddyhome.idea.vim.StatusBarIconProvider"/>
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.VimLocalConfig"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.VimPlugin"/>
+
+    <postStartupActivity implementation="com.maddyhome.idea.vim.PluginStartup"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>

@@ -18,17 +18,31 @@
 
 package com.maddyhome.idea.vim
 
-import com.intellij.openapi.components.ProjectComponent
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.startup.StartupActivity
 import com.maddyhome.idea.vim.listener.VimListenerManager
 
 /**
  * @author Alex Plate
+ *
+ * [VERSION UPDATE] 193+ Use StartupActivity.DumbAware
  */
-class VimProjectComponent(private val project: Project) : ProjectComponent {
-  override fun projectOpened() {
-    if (!VimPlugin.isEnabled()) return
-    // Project listeners are self-disposable, so there is no need to unregister them on project close
-    VimListenerManager.ProjectListeners.add(project)
+class PluginStartup : StartupActivity, DumbAware {
+
+  private var firstInitialization = false
+
+  override fun runActivity(project: Project) {
+    if (firstInitialization && VimPlugin.isEnabled()) {
+      // This code should be executed on every project open
+      // Project listeners are self-disposable, so there is no need to unregister them on project close
+      VimListenerManager.ProjectListeners.add(project)
+    }
+
+    if (firstInitialization) return
+    firstInitialization = true
+
+    // This code should be executed once
+    VimPlugin.getInstance().initialize()
   }
 }
