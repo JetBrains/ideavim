@@ -259,22 +259,6 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     return ServiceManager.getService(PutGroup.class);
   }
 
-  @Override
-  public Element getState() {
-    LOG.debug("Saving state");
-
-    final Element element = new Element("ideavim");
-    // Save whether the plugin is enabled or not
-    final Element state = new Element("state");
-    state.setAttribute("version", Integer.toString(STATE_VERSION));
-    state.setAttribute("enabled", Boolean.toString(enabled));
-    element.addContent(state);
-
-    this.state.saveData(element);
-
-    return element;
-  }
-
   private static @NotNull NotificationService getNotifications() {
     return getNotifications(null);
   }
@@ -484,6 +468,22 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
     legacyStateLoading(element);
     this.state.readData(element);
+  }
+
+  @Override
+  public Element getState() {
+    LOG.debug("Saving state");
+
+    final Element element = new Element("ideavim");
+    // Save whether the plugin is enabled or not
+    final Element state = new Element("state");
+    state.setAttribute("version", Integer.toString(STATE_VERSION));
+    state.setAttribute("enabled", Boolean.toString(enabled));
+    element.addContent(state);
+
+    this.state.saveData(element);
+
+    return element;
   }
 
   private void legacyStateLoading(@NotNull Element element) {
