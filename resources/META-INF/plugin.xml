@@ -46,9 +46,11 @@
   <extensionPoints>
     <extensionPoint name="vimExtension" interface="com.maddyhome.idea.vim.extension.VimExtension" dynamic="true"/>
 
+    <!--    For internal use only -->
     <extensionPoint name="vimExCommand" beanClass="com.maddyhome.idea.vim.ex.ExBeanClass" dynamic="true">
       <with attribute="implementation" implements="com.maddyhome.idea.vim.ex.CommandHandler"/>
     </extensionPoint>
+    <!--    For internal use only -->
     <extensionPoint name="vimAction" beanClass="com.maddyhome.idea.vim.handler.ActionBeanClass" dynamic="true">
       <with attribute="implementation" implements="com.maddyhome.idea.vim.handler.EditorActionHandlerBase"/>
     </extensionPoint>
