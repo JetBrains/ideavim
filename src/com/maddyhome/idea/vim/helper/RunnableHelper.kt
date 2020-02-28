@@ -15,62 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.helper
 
-package com.maddyhome.idea.vim.helper;
-
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.command.CommandProcessor;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.Project;
-import com.maddyhome.idea.vim.KeyHandler;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.command.CommandProcessor
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.project.Project
 
 /**
  * This provides some helper methods to run code as a command and an application write action
  */
-public class RunnableHelper {
-  private static final Logger logger = Logger.getInstance(KeyHandler.class.getName());
+object RunnableHelper {
+  private val logger = logger<RunnableHelper>()
 
-  private RunnableHelper() {}
-
-  public static void runReadCommand(@Nullable Project project, @NotNull Runnable cmd, @Nullable String name, @Nullable Object groupId) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Run read command: " + name);
-    }
-    CommandProcessor.getInstance().executeCommand(project, new ReadAction(cmd), name, groupId);
+  @JvmStatic
+  fun runReadCommand(project: Project?, cmd: Runnable, name: String?, groupId: Any?) {
+    logger.debug { "Run read command: $name" }
+    CommandProcessor.getInstance().executeCommand(project, { ApplicationManager.getApplication().runReadAction(cmd) }, name, groupId)
   }
 
-  public static void runWriteCommand(@Nullable Project project, @NotNull Runnable cmd, @Nullable String name, @Nullable Object groupId) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("Run write command " + name);
-    }
-    CommandProcessor.getInstance().executeCommand(project, new WriteAction(cmd), name, groupId);
-  }
-
-  static class ReadAction implements Runnable {
-    private final @NotNull Runnable cmd;
-
-    ReadAction(@NotNull Runnable cmd) {
-      this.cmd = cmd;
-    }
-
-    @Override
-    public void run() {
-      ApplicationManager.getApplication().runReadAction(cmd);
-    }
-  }
-
-  static class WriteAction implements Runnable {
-    private final @NotNull Runnable cmd;
-
-    WriteAction(@NotNull Runnable cmd) {
-      this.cmd = cmd;
-    }
-
-    @Override
-    public void run() {
-      ApplicationManager.getApplication().runWriteAction(cmd);
-    }
+  @JvmStatic
+  fun runWriteCommand(project: Project?, cmd: Runnable, name: String?, groupId: Any?) {
+    logger.debug { "Run write command: $name" }
+    CommandProcessor.getInstance().executeCommand(project, { ApplicationManager.getApplication().runWriteAction(cmd) }, name, groupId)
   }
 }
