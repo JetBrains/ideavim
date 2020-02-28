@@ -30,17 +30,17 @@ import com.maddyhome.idea.vim.listener.VimListenerManager
  */
 class PluginStartup : StartupActivity, DumbAware {
 
-  private var firstInitialization = false
+  private var firstInitializationOccurred = false
 
   override fun runActivity(project: Project) {
-    if (firstInitialization && VimPlugin.isEnabled()) {
+    if (firstInitializationOccurred && VimPlugin.isEnabled()) {
       // This code should be executed on every project open
       // Project listeners are self-disposable, so there is no need to unregister them on project close
       VimListenerManager.ProjectListeners.add(project)
     }
 
-    if (firstInitialization) return
-    firstInitialization = true
+    if (firstInitializationOccurred) return
+    firstInitializationOccurred = true
 
     // This code should be executed once
     VimPlugin.getInstance().initialize()
