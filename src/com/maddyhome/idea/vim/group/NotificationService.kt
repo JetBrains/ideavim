@@ -33,6 +33,7 @@ import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.keymap.Keymap
 import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.options.ShowSettingsUtil
+import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
@@ -146,7 +147,7 @@ class NotificationService(private val project: Project?) {
       NotificationType.INFORMATION).notify(project)
   }
 
-  class OpenIdeaVimRcAction(private val notification: Notification?) : AnAction("Open ~/.ideavimrc") {
+  class OpenIdeaVimRcAction(private val notification: Notification?) : DumbAwareAction("Open ~/.ideavimrc") {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project
       if (eventProject != null) {
