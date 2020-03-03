@@ -60,5 +60,6 @@
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.NextTabHandler" names="tabn[ext]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PreviousTabHandler" names="tabp[revious],tabN[ext]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.TabOnlyHandler" names="tabo[nly]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.BufferListHandler" names="buffers,ls,files"/>
   </extensions>
 </idea-plugin>
