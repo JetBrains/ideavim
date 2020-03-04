@@ -44,7 +44,7 @@ class BufferListHandlerTest : VimTestCase() {
   }
 
   fun testLsActionWithLongFileName() {
-    configureByFileName( "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa.txt")
+    configureByFileName("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa.txt")
     typeText(commandToKeys("ls"))
 
     val output = getInstance(myFixture.editor).text
@@ -75,7 +75,10 @@ class BufferListHandlerTest : VimTestCase() {
     val output = getInstance(myFixture.editor).text
     TestCase.assertNotNull(output)
     val displayedLines = output!!.split("\n".toRegex()).toTypedArray()
-    TestCase.assertEquals("   2 %a + \"/src/bbb.txt\"                 line: 1", displayedLines[0])
+
+    // Ignore buffer number because IJ sometimes returns different order of buffers
+    val line = displayedLines[0].replaceRange(3, 4, "_")
+    TestCase.assertEquals("   _ %a + \"/src/bbb.txt\"                 line: 1", line)
 
     assertPluginError(false)
   }

@@ -76,7 +76,7 @@ public class CommandParser {
     //noinspection deprecation
     EX_COMMAND_EP.getPoint(null).addExtensionPointListener(new ExtensionPointListener<ExBeanClass>() {
       @Override
-      public void extensionAdded(@NotNull ExBeanClass extension, @NotNull PluginDescriptor pluginDescriptor) {
+      public void extensionAdded(@NotNull ExBeanClass extension, PluginDescriptor pluginDescriptor) {
         // Suppress listener before the `VimPlugin.turnOn()` function execution. This logic should be rewritten after
         //   version update (or earlier).
         if (!initialRegistration) return;
@@ -85,7 +85,7 @@ public class CommandParser {
       }
 
       @Override
-      public void extensionRemoved(@NotNull ExBeanClass extension, @NotNull PluginDescriptor pluginDescriptor) {
+      public void extensionRemoved(@NotNull ExBeanClass extension, PluginDescriptor pluginDescriptor) {
         if (!initialRegistration) return;
         unregisterHandlers();
         registerHandlers();

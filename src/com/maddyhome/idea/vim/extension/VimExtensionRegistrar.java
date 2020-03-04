@@ -49,12 +49,12 @@ public class VimExtensionRegistrar {
     //noinspection deprecation
     VimExtension.EP_NAME.getPoint(null).addExtensionPointListener(new ExtensionPointListener<VimExtension>() {
       @Override
-      public void extensionAdded(@NotNull VimExtension extension, @NotNull PluginDescriptor pluginDescriptor) {
+      public void extensionAdded(@NotNull VimExtension extension, PluginDescriptor pluginDescriptor) {
         registerExtension(extension);
       }
 
       @Override
-      public void extensionRemoved(@NotNull VimExtension extension, @NotNull PluginDescriptor pluginDescriptor) {
+      public void extensionRemoved(@NotNull VimExtension extension, PluginDescriptor pluginDescriptor) {
         unregisterExtension(extension);
       }
     });
