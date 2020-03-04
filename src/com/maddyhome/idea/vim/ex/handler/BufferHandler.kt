@@ -58,9 +58,12 @@ class BufferHandler : CommandHandler.SingleExecution() {
       } else {
         val editors = findPartialMatch(context, buffer)
 
-        when {
-          editors.size == 1 -> {
-
+        when(editors.size) {
+          0 -> {
+            VimPlugin.showMessage("No matching buffer for $buffer")
+            result = false
+          }
+          1 -> {
             if (EditorHelper.hasUnsavedChanges(editor) && !overrideModified) {
               VimPlugin.showMessage("No write since last change (add ! to override)")
               result = false
@@ -69,11 +72,7 @@ class BufferHandler : CommandHandler.SingleExecution() {
               VimPlugin.getFile().openFile(EditorHelper.getVirtualFile(editors[0])!!.name, context)
             }
           }
-          editors.isEmpty() -> {
-            VimPlugin.showMessage("No matching buffer for $buffer")
-            result = false
-          }
-          editors.size > 1 -> {
+          else -> {
             VimPlugin.showMessage("More than one match for $buffer")
             result = false
           }
@@ -85,20 +84,13 @@ class BufferHandler : CommandHandler.SingleExecution() {
   }
 
   private fun findPartialMatch(context: DataContext, fileName: String): List<Editor> {
-    val project = PlatformDataKeys.PROJECT.getData(context)
     val matchedFiles = mutableListOf<Editor>()
+    val project = PlatformDataKeys.PROJECT.getData(context) ?: return matchedFiles
 
-    if (project != null) {
-      val fem = FileEditorManager.getInstance(project)
-
-      for (file in fem.openFiles) {
-        if (file.name.contains(Regex.fromLiteral(fileName))) {
-          val editor = EditorHelper.getEditor(file)
-
-          if (editor != null) {
-            matchedFiles.add(editor)
-          }
-        }
+    for (file in FileEditorManager.getInstance(project).openFiles) {
+      if (file.name.contains(fileName)) {
+        val editor = EditorHelper.getEditor(file) ?: continue
+        matchedFiles.add(editor)
       }
     }
 
