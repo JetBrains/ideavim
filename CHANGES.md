@@ -29,7 +29,7 @@ _Available since 0.55.1 EAP:_
 * [VIM-1835](https://youtrack.jetbrains.com/issue/VIM-1835) Macros record input keystrokes instead of mapped keystrokes
 * [VIM-1900](https://youtrack.jetbrains.com/issue/VIM-1900) Ensure non-printable output for `:registers`, `:marks` and `:jumps` is encoded correctly
 
-_To Be Released:_
+_Available since 0.55.2 EAP:_
 
 **Features:**
 * `argtextobj.vim` plugin emulation ([argtextobj.vim](https://vim.sourceforge.io/scripts/script.php?script_id=2699))
