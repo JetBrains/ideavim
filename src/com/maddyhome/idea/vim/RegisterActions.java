@@ -83,7 +83,10 @@ public class RegisterActions {
   }
 
   public static void unregisterActions() {
-    VimPlugin.getKey().unregisterCommandActions();
+    KeyGroup keyGroup = VimPlugin.getKeyIfCreated();
+    if (keyGroup != null) {
+      keyGroup.unregisterCommandActions();
+    }
   }
 
   private static void registerVimCommandActions() {

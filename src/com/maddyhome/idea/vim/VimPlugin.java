@@ -23,10 +23,14 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationListener;
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.PermanentInstallationID;
-import com.intellij.openapi.components.*;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.keymap.Keymap;
@@ -78,11 +82,10 @@ import static com.maddyhome.idea.vim.group.KeyGroup.SHORTCUT_CONFLICTS_ELEMENT;
  * Registers and marks are shared across open projects so you can copy and paste between files of different projects.
  */
 @State(name = "VimSettings", storages = {@Storage("$APP_CONFIG$/vim_settings.xml")})
-public class VimPlugin implements BaseComponent, PersistentStateComponent<Element>, Disposable {
-  private static final String IDEAVIM_COMPONENT_NAME = "VimPlugin";
+public class VimPlugin implements PersistentStateComponent<Element>, Disposable {
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
   private static final String IDEAVIM_STATISTICS_TIMESTAMP_KEY = "ideavim.statistics.timestamp";
-  public static final int STATE_VERSION = 6;
+  private static final int STATE_VERSION = 6;
 
   private static long lastBeepTimeMillis;
 
@@ -97,25 +100,24 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
   private static final Logger LOG = Logger.getInstance(VimPlugin.class);
 
-  @Override
-  public @NotNull String getComponentName() {
-    return IDEAVIM_COMPONENT_NAME;
-  }
-
-
   private final @NotNull VimState state = new VimState();
 
-  // [VERSION UPDATE] 193+ replace with com.intellij.openapi.components.PersistentStateComponent.initializeComponent
-  @Override
-  public void initComponent() {
+  public void initialize() {
     LOG.debug("initComponent");
 
-    // Initialize legacy local config.
+    // Initialize a legacy local config.
     if (previousStateVersion == 5) {
       //noinspection deprecation
       VimLocalConfig.Companion.initialize();
     }
-    if (enabled) turnOnPlugin();
+    if (enabled) {
+      Application application = ApplicationManager.getApplication();
+      if (application.isUnitTestMode()) {
+        application.invokeAndWait(this::turnOnPlugin);
+      } else {
+        application.invokeLater(this::turnOnPlugin);
+      }
+    }
 
     LOG.debug("done");
   }
@@ -133,7 +135,8 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   public static @NotNull NotificationService getNotifications(@Nullable Project project) {
     if (project == null) {
       return ServiceManager.getService(NotificationService.class);
-    } else {
+    }
+    else {
       return ServiceManager.getService(project, NotificationService.class);
     }
   }
@@ -155,18 +158,17 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   public static void statisticReport() {
     final PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
     final long lastUpdate = propertiesComponent.getOrInitLong(IDEAVIM_STATISTICS_TIMESTAMP_KEY, 0);
-    final boolean outOfDate =
-      lastUpdate == 0 || System.currentTimeMillis() - lastUpdate > TimeUnit.DAYS.toMillis(1);
+    final boolean outOfDate = lastUpdate == 0 || System.currentTimeMillis() - lastUpdate > TimeUnit.DAYS.toMillis(1);
     if (outOfDate && isEnabled()) {
       ApplicationManager.getApplication().executeOnPooledThread(() -> {
         try {
           final String buildNumber = ApplicationInfo.getInstance().getBuild().asString();
           final String version = URLEncoder.encode(getVersion(), CharsetToolkit.UTF8);
-          final String os =
-            URLEncoder.encode(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION, CharsetToolkit.UTF8);
+          final String os = URLEncoder.encode(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION, CharsetToolkit.UTF8);
           final String uid = PermanentInstallationID.get();
           final String url = "https://plugins.jetbrains.com/plugins/list" +
-                             "?pluginId=" + IDEAVIM_PLUGIN_ID +
+                             "?pluginId=" +
+                             IDEAVIM_PLUGIN_ID +
                              "&build=" +
                              buildNumber +
                              "&pluginVersion=" +
@@ -211,12 +213,20 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     return ServiceManager.getService(RegisterGroup.class);
   }
 
+  public static @Nullable RegisterGroup getRegisterIfCreated() {
+    return ServiceManager.getServiceIfCreated(RegisterGroup.class);
+  }
+
   public static @NotNull FileGroup getFile() {
     return ServiceManager.getService(FileGroup.class);
   }
 
   public static @NotNull SearchGroup getSearch() {
     return ServiceManager.getService(SearchGroup.class);
+  }
+
+  public static @Nullable SearchGroup getSearchIfCreated() {
+    return ServiceManager.getServiceIfCreated(SearchGroup.class);
   }
 
   public static @NotNull ProcessGroup getProcess() {
@@ -239,12 +249,20 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     return ServiceManager.getService(KeyGroup.class);
   }
 
+  public static @Nullable KeyGroup getKeyIfCreated() {
+    return ServiceManager.getServiceIfCreated(KeyGroup.class);
+  }
+
   public static @NotNull WindowGroup getWindow() {
     return ServiceManager.getService(WindowGroup.class);
   }
 
   public static @NotNull EditorGroup getEditor() {
     return ServiceManager.getService(EditorGroup.class);
+  }
+
+  public static @Nullable EditorGroup getEditorIfCreated() {
+    return ServiceManager.getServiceIfCreated(EditorGroup.class);
   }
 
   public static @NotNull VisualMotionGroup getVisualMotion() {
@@ -257,22 +275,6 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
   public static @NotNull PutGroup getPut() {
     return ServiceManager.getService(PutGroup.class);
-  }
-
-  @Override
-  public Element getState() {
-    LOG.debug("Saving state");
-
-    final Element element = new Element("ideavim");
-    // Save whether the plugin is enabled or not
-    final Element state = new Element("state");
-    state.setAttribute("version", Integer.toString(STATE_VERSION));
-    state.setAttribute("enabled", Boolean.toString(enabled));
-    element.addContent(state);
-
-    this.state.saveData(element);
-
-    return element;
   }
 
   private static @NotNull NotificationService getNotifications() {
@@ -383,8 +385,8 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     }
   }
 
-  private static @NotNull VimPlugin getInstance() {
-    return ApplicationManager.getApplication().getComponent(VimPlugin.class);
+  public static @NotNull VimPlugin getInstance() {
+    return ServiceManager.getService(VimPlugin.class);
   }
 
   private void turnOnPlugin() {
@@ -416,8 +418,14 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     // Unregister ex handlers
     CommandParser.getInstance().unregisterHandlers();
 
-    getEditor().turnOff();
-    getSearch().turnOff();
+    EditorGroup editorGroup = getEditorIfCreated();
+    if (editorGroup != null) {
+      editorGroup.turnOff();
+    }
+    SearchGroup searchGroup = getSearchIfCreated();
+    if (searchGroup != null) {
+      searchGroup.turnOff();
+    }
     VimListenerManager.INSTANCE.turnOff();
     ExEntryPanel.fullReset();
   }
@@ -484,6 +492,22 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
     legacyStateLoading(element);
     this.state.readData(element);
+  }
+
+  @Override
+  public Element getState() {
+    LOG.debug("Saving state");
+
+    final Element element = new Element("ideavim");
+    // Save whether the plugin is enabled or not
+    final Element state = new Element("state");
+    state.setAttribute("version", Integer.toString(STATE_VERSION));
+    state.setAttribute("enabled", Boolean.toString(enabled));
+    element.addContent(state);
+
+    this.state.saveData(element);
+
+    return element;
   }
 
   private void legacyStateLoading(@NotNull Element element) {

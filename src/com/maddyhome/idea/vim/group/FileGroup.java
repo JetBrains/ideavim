@@ -225,7 +225,7 @@ public class FileGroup {
   /**
    * Returns the previous tab.
    */
-  public VirtualFile getPreviousTab(@NotNull DataContext context) {
+  public @Nullable VirtualFile getPreviousTab(@NotNull DataContext context) {
     Project project = PlatformDataKeys.PROJECT.getData(context);
     if (project == null) return null;
     FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge

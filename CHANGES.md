@@ -33,6 +33,8 @@ _To Be Released:_
 
 **Features:**
 * `argtextobj.vim` plugin emulation ([argtextobj.vim](https://vim.sourceforge.io/scripts/script.php?script_id=2699))
+* `vim-textobj-entire` plugin emulation ([vim-textobj-entire](https://github.com/kana/vim-textobj-entire))
+* Support `ls/buffers/files` commands
 
 **Changes:**
 * Replace `ideastatusbar` option with `ideastatusicon`. Now you can make the icon gray.

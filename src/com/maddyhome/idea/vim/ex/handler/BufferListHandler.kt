@@ -56,50 +56,34 @@ class BufferListHandler : CommandHandler.SingleExecution() {
     return true
   }
 
-  private fun pruneUnsupportedFilters(filter: String): String {
-    val sb = StringBuilder()
-
-    for (f in filter.asIterable()) {
-      if (SUPPORTED_FILTERS.contains(f)) {
-        sb.append(f)
-      }
-    }
-
-    return sb.toString()
-  }
+  private fun pruneUnsupportedFilters(filter: String) = filter.filter { it in SUPPORTED_FILTERS }
 
   private fun getBufferList(context: DataContext, filter: String): List<String> {
     val bufferList = mutableListOf<String>()
-    val project = PlatformDataKeys.PROJECT.getData(context)
+    val project = PlatformDataKeys.PROJECT.getData(context) ?: return emptyList()
 
-    if (project != null) {
-      val fem = FileEditorManager.getInstance(project)
-      val openFiles = fem.openFiles
-      val bufNumPad = openFiles.size.toString().length
-      val currentFile = fem.selectedFiles[0]
-      val previousFile = VimPlugin.getFile().getPreviousTab(context)
-      val virtualFileDisplayMap = buildVirtualFileDisplayMap(project)
+    val fem = FileEditorManager.getInstance(project)
+    val openFiles = fem.openFiles
+    val bufNumPad = openFiles.size.toString().length
+    val currentFile = fem.selectedFiles[0]
+    val previousFile = VimPlugin.getFile().getPreviousTab(context)
+    val virtualFileDisplayMap = buildVirtualFileDisplayMap(project)
 
-      var index = 1
-      for (entry in virtualFileDisplayMap.entries) {
-        val file = entry.key
-        val displayFileName = entry.value
-        val editor = EditorHelper.getEditor(file)
+    var index = 1
+    for ((file, displayFileName) in virtualFileDisplayMap) {
+      val editor = EditorHelper.getEditor(file) ?: continue
 
-        if (editor != null) {
-          val bufStatus = getBufferStatus(editor, file, currentFile, previousFile)
+      val bufStatus = getBufferStatus(editor, file, currentFile, previousFile)
 
-          if (bufStatusMatchesFilter(filter, bufStatus)) {
-            val lineNum = editor.caretModel.currentCaret.logicalPosition.line + 1
-            val lineNumPad = if (displayFileName.length < FILE_NAME_PAD) (FILE_NAME_PAD - displayFileName.length).toString() else ""
+      if (bufStatusMatchesFilter(filter, bufStatus)) {
+        val lineNum = editor.caretModel.currentCaret.logicalPosition.line + 1
+        val lineNumPad = if (displayFileName.length < FILE_NAME_PAD) (FILE_NAME_PAD - displayFileName.length).toString() else ""
 
-            bufferList.add(String.format(
-              "   %${bufNumPad}s %s %s%${lineNumPad}s line: %d", index, bufStatus, displayFileName, "", lineNum)
-            )
-          }
-          index++
-        }
+        bufferList.add(String.format(
+          "   %${bufNumPad}s %s %s%${lineNumPad}s line: %d", index, bufStatus, displayFileName, "", lineNum)
+        )
       }
+      index++
     }
 
     return bufferList
@@ -127,32 +111,16 @@ class BufferListHandler : CommandHandler.SingleExecution() {
     return filePaths
   }
 
-  private fun bufStatusMatchesFilter(filter: String, bufStatus: String): Boolean {
-    if (filter.isNotEmpty()) {
-      for (f in filter.asIterable()) {
-        if (!bufStatus.contains(f)) {
-          return false
-        }
-      }
-    }
-
-    return true
-  }
+  private fun bufStatusMatchesFilter(filter: String, bufStatus: String) = filter.all { it in bufStatus }
 }
 
 private fun getBufferStatus(editor: Editor, file: VirtualFile, currentFile: VirtualFile, previousFile: VirtualFile?): String {
   val bufStatus = StringBuilder()
 
-  when {
-    currentFile == file -> {
-      bufStatus.append("%a  ")
-    }
-    previousFile == file -> {
-      bufStatus.append("#   ")
-    }
-    else -> {
-      bufStatus.append("    ")
-    }
+  when(file) {
+    currentFile -> bufStatus.append("%a  ")
+    previousFile -> bufStatus.append("#   ")
+    else -> bufStatus.append("    ")
   }
 
   if (!file.isWritable) {

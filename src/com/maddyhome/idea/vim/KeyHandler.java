@@ -56,8 +56,10 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -822,7 +824,10 @@ public class KeyHandler {
     VimPlugin.clearError();
     CommandState.getInstance(editor).reset();
     reset(editor);
-    VimPlugin.getRegister().resetRegister();
+    RegisterGroup registerGroup = VimPlugin.getRegisterIfCreated();
+    if (registerGroup != null) {
+      registerGroup.resetRegister();
+    }
     if (editor != null) {
       VisualGroupKt.updateCaretState(editor);
       editor.getSelectionModel().removeSelection();

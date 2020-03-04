@@ -4,6 +4,8 @@
   <change-notes><![CDATA[
       <ul>
         <li>Support argtextobj.vim plugin emulation</li>
+        <li>Support vim-textobj-entire plugin emulation</li>
+        <li>Support ls/buffers/files command</li>
         <li>Various bug fixes</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
@@ -32,22 +34,16 @@
     <component>
       <implementation-class>com.maddyhome.idea.vim.DynamicLoaderStopper</implementation-class>
     </component>
-    <component>
-      <implementation-class>com.maddyhome.idea.vim.VimPlugin</implementation-class>
-    </component>
   </application-components>
-  <project-components>
-    <component>
-      <implementation-class>com.maddyhome.idea.vim.VimProjectComponent</implementation-class>
-    </component>
-  </project-components>
 
   <extensionPoints>
     <extensionPoint name="vimExtension" interface="com.maddyhome.idea.vim.extension.VimExtension" dynamic="true"/>
 
+    <!--    For internal use only -->
     <extensionPoint name="vimExCommand" beanClass="com.maddyhome.idea.vim.ex.ExBeanClass" dynamic="true">
       <with attribute="implementation" implements="com.maddyhome.idea.vim.ex.CommandHandler"/>
     </extensionPoint>
+    <!--    For internal use only -->
     <extensionPoint name="vimAction" beanClass="com.maddyhome.idea.vim.handler.ActionBeanClass" dynamic="true">
       <with attribute="implementation" implements="com.maddyhome.idea.vim.handler.EditorActionHandlerBase"/>
     </extensionPoint>
@@ -59,6 +55,9 @@
     <statusBarWidgetProvider implementation="com.maddyhome.idea.vim.StatusBarIconProvider"/>
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.VimLocalConfig"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.VimPlugin"/>
+
+    <postStartupActivity implementation="com.maddyhome.idea.vim.PluginStartup"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
