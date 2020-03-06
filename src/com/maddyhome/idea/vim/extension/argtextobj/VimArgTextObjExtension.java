@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
 import com.maddyhome.idea.vim.extension.VimExtension;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
@@ -47,6 +48,117 @@ public class VimArgTextObjExtension implements VimExtension {
   }
 
   /**
+   * The pairs of brackets that delimit different types of argument lists.
+   */
+  static private class BracketPairs {
+    // NOTE: brackets must match by the position, and ordered by rank (highest to lowest).
+    @NotNull private final String openBrackets;
+    @NotNull private final String closeBrackets;
+
+    static class ParseError extends Exception {
+      public ParseError(@NotNull String message) {
+        super(message);
+      }
+    }
+
+    private enum ParseState {
+      OPEN,
+      COLON,
+      CLOSE,
+      COMMA,
+    }
+
+    /**
+     * Constructs @ref BracketPair from a string of bracket pairs with the same syntax
+     * as VIM's @c matchpairs option: "(:),{:},[:]"
+     *
+     * @param bracketPairs comma-separated list of colon-separated bracket pairs.
+     * @throws ParseError if a syntax error is detected.
+     */
+    @NotNull
+    static BracketPairs fromBracketPairList(@NotNull final String bracketPairs) throws ParseError {
+      StringBuilder openBrackets = new StringBuilder();
+      StringBuilder closeBrackets = new StringBuilder();
+      ParseState state = ParseState.OPEN;
+      for (char ch : bracketPairs.toCharArray()) {
+        switch (state) {
+          case OPEN:
+            openBrackets.append(ch);
+            state = ParseState.COLON;
+            break;
+          case COLON:
+            if (ch == ':') {
+              state = ParseState.CLOSE;
+            } else {
+              throw new ParseError("expecting ':', but got '" + ch + "' instead");
+            }
+            break;
+          case CLOSE:
+            final char lastOpenBracket = openBrackets.charAt(openBrackets.length() - 1);
+            if (lastOpenBracket == ch) {
+              throw new ParseError("open and close brackets must be different");
+            }
+            closeBrackets.append(ch);
+            state = ParseState.COMMA;
+            break;
+          case COMMA:
+            if (ch == ',') {
+              state = ParseState.OPEN;
+            } else {
+              throw new ParseError("expecting ',', but got '" + ch + "' instead");
+            }
+            break;
+        }
+      }
+      if (state != ParseState.COMMA) {
+        throw new ParseError("list of pairs is incomplete");
+      }
+      return new BracketPairs(openBrackets.toString(), closeBrackets.toString());
+    }
+
+    BracketPairs(@NotNull final String openBrackets, @NotNull final String closeBrackets) {
+      assert openBrackets.length() == closeBrackets.length();
+      this.openBrackets = openBrackets;
+      this.closeBrackets = closeBrackets;
+    }
+
+    int getBracketPrio(char ch) {
+      return Math.max(openBrackets.toString().indexOf(ch), closeBrackets.indexOf(ch));
+    }
+
+    char matchingBracket(char ch) {
+      int idx = closeBrackets.indexOf(ch);
+      if (idx != -1) {
+        return openBrackets.charAt(idx);
+      } else {
+        assert isOpenBracket(ch);
+        idx = openBrackets.toString().indexOf(ch);
+        return closeBrackets.charAt(idx);
+      }
+    }
+
+    boolean isCloseBracket(final int ch) {
+      return closeBrackets.indexOf(ch) != -1;
+    }
+
+    boolean isOpenBracket(final int ch) {
+      return openBrackets.toString().indexOf(ch) != -1;
+    }
+  }
+
+  public static final BracketPairs DEFAULT_BRACKET_PAIRS = new BracketPairs("(", ")");
+
+  @Nullable
+  private static String bracketPairsVariable() {
+    final VimScriptGlobalEnvironment env = VimScriptGlobalEnvironment.getInstance();
+    final Object value = env.getVariables().get("g:argtextobj_pairs");
+    if (value instanceof String) {
+      return (String) value;
+    }
+    return null;
+  }
+
+  /**
    * A text object for an argument to a function definition or a call.
    */
   static class ArgumentHandler implements VimExtensionHandler {
@@ -66,7 +178,18 @@ public class VimArgTextObjExtension implements VimExtension {
 
       @Override
       public @Nullable TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
-        final ArgBoundsFinder finder = new ArgBoundsFinder(editor.getDocument());
+        BracketPairs bracketPairs = DEFAULT_BRACKET_PAIRS;
+        final String bracketPairsVar = bracketPairsVariable();
+        if (bracketPairsVar != null) {
+          try {
+            bracketPairs = BracketPairs.fromBracketPairList(bracketPairsVar);
+          } catch (BracketPairs.ParseError parseError) {
+            VimPlugin.showMessage("argtextobj: Invalid value of g:argtextobj_pairs -- " + parseError.getMessage());
+            VimPlugin.indicateError();
+            return null;
+          }
+        }
+        final ArgBoundsFinder finder = new ArgBoundsFinder(editor.getDocument(), bracketPairs);
         int pos = caret.getOffset();
 
         for (int i = 0; i < count; ++i) {
@@ -126,8 +249,9 @@ public class VimArgTextObjExtension implements VimExtension {
    * position
    */
   private static class ArgBoundsFinder {
-    private final CharSequence text;
-    private final Document document;
+    @NotNull private final CharSequence text;
+    @NotNull private final Document document;
+    @NotNull private final BracketPairs brackets;
     private int leftBound = Integer.MAX_VALUE;
     private int rightBound = Integer.MIN_VALUE;
     private int leftBracket;
@@ -135,18 +259,13 @@ public class VimArgTextObjExtension implements VimExtension {
     private String error = null;
     private static final String QUOTES = "\"'";
 
-    // NOTE: brackets must match by the position, and ordered by rank.
-    // NOTE2: The original implementation worked for ], } and > as well, but because of some broken cases this feature
-    //   was removed.
-    private static final String OPEN_BRACKETS = "(";   // "[{(<"
-    private static final String CLOSE_BRACKETS = ")";  // "]})>"
-
     private static final int MAX_SEARCH_LINES = 10;
     private static final int MAX_SEARCH_OFFSET = MAX_SEARCH_LINES * 80;
 
-    ArgBoundsFinder(@NotNull Document document) {
+    ArgBoundsFinder(@NotNull Document document, @NotNull BracketPairs bracketPairs) {
       this.text = document.getImmutableCharSequence();
       this.document = document;
+      this.brackets = bracketPairs;
     }
 
     /**
@@ -167,7 +286,7 @@ public class VimArgTextObjExtension implements VimExtension {
       rightBound = Math.max(position, rightBound);
       getOutOfQuotedText();
       if (rightBound == leftBound) {
-        if (isCloseBracket(getCharAt(rightBound))) {
+        if (brackets.isCloseBracket(getCharAt(rightBound))) {
           --leftBound;
         } else {
           ++rightBound;
@@ -196,14 +315,15 @@ public class VimArgTextObjExtension implements VimExtension {
         findRightBound();
         nextRight = rightBound + 1;
         //
-        // If reached text boundaries or there is nothing between delimiters.
+        // If reached text boundaries
         //
-        if (nextLeft < leftLimit || nextRight > rightLimit || (rightBound - leftBound) == 1) {
+        if (nextLeft < leftLimit || nextRight > rightLimit) {
           error = "not an argument";
           return false;
         }
         bothBrackets = getCharAt(leftBound) != ',' && getCharAt(rightBound) != ',';
-        if (bothBrackets && isIdentPreceding()) {
+        final boolean nonEmptyArg = (rightBound - leftBound) > 1;
+        if (bothBrackets && nonEmptyArg && isIdentPreceding()) {
           // Looking at a pair of brackets preceded by an
           // identifier -- single argument function call.
           break;
@@ -257,7 +377,7 @@ public class VimArgTextObjExtension implements VimExtension {
     private boolean isIdentPreceding() {
       int i = leftBound - 1;
       final int idEnd = i;
-      while (i > 0 && Character.isJavaIdentifierPart(getCharAt(i))) {
+      while (i >= 0 && Character.isJavaIdentifierPart(getCharAt(i))) {
         --i;
       }
       return (idEnd - i) > 0 && Character.isJavaIdentifierStart(getCharAt(i + 1));
@@ -296,8 +416,8 @@ public class VimArgTextObjExtension implements VimExtension {
         if (ch == ',') {
           break;
         }
-        if (isOpenBracket(ch)) {
-          rightBound = skipSexp(rightBound, rightBracket, SexpDirection.FORWARD);
+        if (brackets.isOpenBracket(ch)) {
+          rightBound = skipSexp(rightBound, rightBracket, SexpDirection.forward(brackets));
         } else {
           if (isQuoteChar(ch)) {
             rightBound = skipQuotedTextForward(rightBound, rightBracket);
@@ -307,33 +427,14 @@ public class VimArgTextObjExtension implements VimExtension {
       }
     }
 
-    private static char matchingBracket(char ch) {
-      int idx = CLOSE_BRACKETS.indexOf(ch);
-      if (idx != -1) {
-        return OPEN_BRACKETS.charAt(idx);
-      } else {
-        assert isOpenBracket(ch);
-        idx = OPEN_BRACKETS.indexOf(ch);
-        return CLOSE_BRACKETS.charAt(idx);
-      }
-    }
-
-    private static boolean isCloseBracket(final int ch) {
-      return CLOSE_BRACKETS.indexOf(ch) != -1;
-    }
-
-    private static boolean isOpenBracket(final int ch) {
-      return OPEN_BRACKETS.indexOf(ch) != -1;
-    }
-
     private void findLeftBound() {
       while (leftBound > leftBracket) {
         final char ch = getCharAt(leftBound);
         if (ch == ',') {
           break;
         }
-        if (isCloseBracket(ch)) {
-          leftBound = skipSexp(leftBound, leftBracket, SexpDirection.BACKWARD);
+        if (brackets.isCloseBracket(ch)) {
+          leftBound = skipSexp(leftBound, leftBracket, SexpDirection.backward(brackets));
         } else {
           if (isQuoteChar(ch)) {
             leftBound = skipQuotedTextBackward(leftBound, leftBracket);
@@ -365,7 +466,7 @@ public class VimArgTextObjExtension implements VimExtension {
       while (i <= end) {
         final char ch = getCharAt(i);
         if (ch == quoteChar && !backSlash) {
-          // Found matching quote and it's not escaped.
+          // Found a matching quote, and it's not escaped.
           break;
         } else {
           backSlash = ch == '\\' && !backSlash;
@@ -386,7 +487,7 @@ public class VimArgTextObjExtension implements VimExtension {
         // NOTE: doesn't handle cases like \\"str", but they make no
         //       sense anyway.
         if (ch == quoteChar && prevChar != '\\') {
-          // Found matching quote and it's not escaped.
+          // Found a matching quote, and it's not escaped.
           break;
         }
         --i;
@@ -424,48 +525,53 @@ public class VimArgTextObjExtension implements VimExtension {
 
       abstract int skipQuotedText(int pos, int end, ArgBoundsFinder self);
 
-      static final SexpDirection FORWARD = new SexpDirection() {
-        @Override
-        int delta() {
-          return 1;
-        }
+      static SexpDirection forward(BracketPairs brackets) {
+        return new SexpDirection() {
+          @Override
+          int delta() {
+            return 1;
+          }
 
-        @Override
-        boolean isOpenBracket(char ch) {
-          return ArgBoundsFinder.isOpenBracket(ch);
-        }
+          @Override
+          boolean isOpenBracket(char ch) {
+            return brackets.isOpenBracket(ch);
+          }
 
-        @Override
-        boolean isCloseBracket(char ch) {
-          return ArgBoundsFinder.isCloseBracket(ch);
-        }
+          @Override
+          boolean isCloseBracket(char ch) {
+            return brackets.isCloseBracket(ch);
+          }
 
-        @Override
-        int skipQuotedText(int pos, int end, ArgBoundsFinder self) {
-          return self.skipQuotedTextForward(pos, end);
-        }
-      };
-      static final SexpDirection BACKWARD = new SexpDirection() {
-        @Override
-        int delta() {
-          return -1;
-        }
+          @Override
+          int skipQuotedText(int pos, int end, ArgBoundsFinder self) {
+            return self.skipQuotedTextForward(pos, end);
+          }
+        };
+      }
 
-        @Override
-        boolean isOpenBracket(char ch) {
-          return ArgBoundsFinder.isCloseBracket(ch);
-        }
+      static SexpDirection backward(BracketPairs brackets) {
+        return new SexpDirection() {
+          @Override
+          int delta() {
+            return -1;
+          }
 
-        @Override
-        boolean isCloseBracket(char ch) {
-          return ArgBoundsFinder.isOpenBracket(ch);
-        }
+          @Override
+          boolean isOpenBracket(char ch) {
+            return brackets.isCloseBracket(ch);
+          }
 
-        @Override
-        int skipQuotedText(int pos, int end, ArgBoundsFinder self) {
-          return self.skipQuotedTextBackward(pos, end);
-        }
-      };
+          @Override
+          boolean isCloseBracket(char ch) {
+            return brackets.isOpenBracket(ch);
+          }
+
+          @Override
+          int skipQuotedText(int pos, int end, ArgBoundsFinder self) {
+            return self.skipQuotedTextBackward(pos, end);
+          }
+        };
+      }
     }
 
     /**
@@ -489,11 +595,11 @@ public class VimArgTextObjExtension implements VimExtension {
           bracketStack.push(ch);
         } else {
           if (dir.isCloseBracket(ch)) {
-            if (bracketStack.lastElement() == matchingBracket(ch)) {
+            if (bracketStack.lastElement() == brackets.matchingBracket(ch)) {
               bracketStack.pop();
             } else {
               //noinspection StatementWithEmptyBody
-              if (getBracketPrio(ch) < getBracketPrio(bracketStack.lastElement())) {
+              if (brackets.getBracketPrio(ch) < brackets.getBracketPrio(bracketStack.lastElement())) {
                 // (<...) ->  (...)
                 bracketStack.pop();
                 // Retry the same character again for cases like (...<<...).
@@ -519,13 +625,6 @@ public class VimArgTextObjExtension implements VimExtension {
     }
 
     /**
-     * @return rank of a bracket.
-     */
-    static int getBracketPrio(char ch) {
-      return Math.max(OPEN_BRACKETS.indexOf(ch), CLOSE_BRACKETS.indexOf(ch));
-    }
-
-    /**
      * Find a pair of brackets surrounding (leftBracket..rightBracket) block.
      *
      * @param start minimum position to look for
@@ -535,8 +634,8 @@ public class VimArgTextObjExtension implements VimExtension {
     boolean findOuterBrackets(final int start, final int end) {
       boolean hasNewBracket = findPrevOpenBracket(start) && findNextCloseBracket(end);
       while (hasNewBracket) {
-        final int leftPrio = getBracketPrio(getCharAt(leftBracket));
-        final int rightPrio = getBracketPrio(getCharAt(rightBracket));
+        final int leftPrio = brackets.getBracketPrio(getCharAt(leftBracket));
+        final int rightPrio = brackets.getBracketPrio(getCharAt(rightBracket));
         if (leftPrio == rightPrio) {
           // matching brackets
           return true;
@@ -569,9 +668,9 @@ public class VimArgTextObjExtension implements VimExtension {
      */
     private boolean findPrevOpenBracket(final int start) {
       char ch;
-      while (!isOpenBracket(ch = getCharAt(leftBracket))) {
-        if (isCloseBracket(ch)) {
-          leftBracket = skipSexp(leftBracket, start, SexpDirection.BACKWARD);
+      while (!brackets.isOpenBracket(ch = getCharAt(leftBracket))) {
+        if (brackets.isCloseBracket(ch)) {
+          leftBracket = skipSexp(leftBracket, start, SexpDirection.backward(brackets));
         } else {
           if (isQuoteChar(ch)) {
             leftBracket = skipQuotedTextBackward(leftBracket, start);
@@ -594,9 +693,9 @@ public class VimArgTextObjExtension implements VimExtension {
      */
     private boolean findNextCloseBracket(final int end) {
       char ch;
-      while (!isCloseBracket(ch = getCharAt(rightBracket))) {
-        if (isOpenBracket(ch)) {
-          rightBracket = skipSexp(rightBracket, end, SexpDirection.FORWARD);
+      while (!brackets.isCloseBracket(ch = getCharAt(rightBracket))) {
+        if (brackets.isOpenBracket(ch)) {
+          rightBracket = skipSexp(rightBracket, end, SexpDirection.forward(brackets));
         } else {
           if (isQuoteChar(ch)) {
             rightBracket = skipQuotedTextForward(rightBracket, end);

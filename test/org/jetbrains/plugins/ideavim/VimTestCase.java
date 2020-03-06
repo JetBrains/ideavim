@@ -249,6 +249,10 @@ public abstract class VimTestCase extends UsefulTestCase {
     assertEquals(isError, VimPlugin.isError());
   }
 
+  public void assertPluginErrorMessageContains(@NotNull String message) {
+    assertTrue(VimPlugin.getMessage().contains(message));
+  }
+
   protected void assertCaretsColour() {
     Color selectionColour = myFixture.getEditor().getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR);
     Color caretColour = myFixture.getEditor().getColorsScheme().getColor(EditorColors.CARET_COLOR);
