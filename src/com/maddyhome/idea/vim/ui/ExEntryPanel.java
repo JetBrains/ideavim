@@ -123,14 +123,16 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
    */
   public void activate(@NotNull Editor editor, DataContext context, @NotNull String label, String initText, int count) {
     this.label.setText(label);
+    this.label.setFont(UiHelper.selectFont(label));
     this.count = count;
-    setFontForElements();
     entry.reset();
     entry.setEditor(editor, context);
     entry.setText(initText);
+    entry.setFont(UiHelper.selectFont(initText));
     entry.setType(label);
     parent = editor.getContentComponent();
 
+    entry.getDocument().addDocumentListener(fontListener);
     if (isIncSearchEnabled()) {
       entry.getDocument().addDocumentListener(incSearchDocumentListener);
       caretOffset = editor.getCaretModel().getOffset();
@@ -177,6 +179,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     active = false;
 
     try {
+      entry.getDocument().removeDocumentListener(fontListener);
       // incsearch won't change in the lifetime of this activation
       if (isIncSearchEnabled()) {
         entry.getDocument().removeDocumentListener(incSearchDocumentListener);
@@ -235,6 +238,17 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       scrollingModel.scroll(horizontalOffset, verticalOffset);
     }
   }
+
+  private final @NotNull DocumentListener fontListener = new DocumentAdapter() {
+    @Override
+    protected void textChanged(@NotNull DocumentEvent e) {
+      String text = entry.getActualText();
+      Font newFont = UiHelper.selectFont(text);
+      if (newFont != entry.getFont()) {
+        entry.setFont(newFont);
+      }
+    }
+  };
 
   private final @NotNull DocumentListener incSearchDocumentListener = new DocumentAdapter() {
     @Override
@@ -389,9 +403,8 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   }
 
   private void setFontForElements() {
-    final Font font = UiHelper.getEditorFont();
-    label.setFont(font);
-    entry.setFont(font);
+    label.setFont(UiHelper.selectFont(label.getText()));
+    entry.setFont(UiHelper.selectFont(entry.getActualText()));
   }
 
   private void positionPanel() {

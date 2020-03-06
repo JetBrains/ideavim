@@ -42,9 +42,8 @@ public class ModalEntryDialog extends JDialog {
 
     myEntry.setBorder(null);
 
-    final Font font = UiHelper.getEditorFont();
-    myLabel.setFont(font);
-    myEntry.setFont(font);
+    myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
+    myEntry.setFont(UiHelper.selectFont(myEntry.getText()));
 
     setForeground(myEntry.getForeground());
     setBackground(myEntry.getBackground());

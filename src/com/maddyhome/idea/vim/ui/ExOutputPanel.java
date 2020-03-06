@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.ui;
 
+import com.intellij.ide.IdeTooltip;
 import com.intellij.ide.ui.LafManager;
 import com.intellij.ide.ui.LafManagerListener;
 import com.intellij.openapi.application.ApplicationManager;
@@ -133,6 +134,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     }
 
     myText.setText(data);
+    myText.setFont(UiHelper.selectFont(data));
     myText.setCaretPosition(0);
     if (data.length() > 0) {
       activate();
@@ -197,9 +199,8 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
   }
 
   private void setFontForElements() {
-    final Font font = UiHelper.getEditorFont();
-    myText.setFont(font);
-    myLabel.setFont(font);
+    myText.setFont(UiHelper.selectFont(myText.getText()));
+    myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
   }
 
   private static int countLines(@NotNull String text) {
@@ -245,6 +246,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
 
   private void badKey() {
     myLabel.setText("-- MORE -- (RET: line, SPACE: page, d: half page, q: quit)");
+    myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
   }
 
   private void scrollOffset(int more) {
@@ -256,9 +258,11 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
         myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount()) {
       myAtEnd = true;
       myLabel.setText("Hit ENTER or type command to continue");
+      myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
     }
     else {
       myLabel.setText("-- MORE --");
+      myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
     }
   }
 

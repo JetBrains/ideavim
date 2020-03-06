@@ -42,6 +42,11 @@ _Available since 0.55.2 EAP:_
 **Fixes:**
 * [VIM-1008](https://youtrack.jetbrains.com/issue/VIM-1008) Correct `ci{` behavior
 
+_To Be Released..._
+
+**Fixes:**
+* [VIM-570](https://youtrack.jetbrains.com/issue/VIM-570) Print non-ascii characters in ex panel
+
 0.55, 2020-01-20
 --------------
 

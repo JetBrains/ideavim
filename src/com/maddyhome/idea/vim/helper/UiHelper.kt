@@ -42,8 +42,11 @@ fun runAfterGotFocus(runnable: Runnable) {
   IdeFocusManager.findInstance().doWhenFocusSettlesDown(runnable, ModalityState.defaultModalityState())
 }
 
-val editorFont: Font
-  get() {
-    val scheme = EditorColorsManager.getInstance().globalScheme
-    return Font(scheme.editorFontName, Font.PLAIN, scheme.editorFontSize)
-  }
+fun selectFont(forStr: String): Font {
+  val scheme = EditorColorsManager.getInstance().globalScheme
+
+  val fontName = scheme.fontPreferences.realFontFamilies.firstOrNull {
+    Font(it, Font.PLAIN, scheme.editorFontSize).canDisplayUpTo(forStr) == -1
+  } ?: return Font(scheme.editorFontName, Font.PLAIN, scheme.editorFontSize)
+  return Font(fontName, Font.PLAIN, scheme.editorFontSize)
+}
