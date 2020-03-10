@@ -197,8 +197,8 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertSingleCommandAction" mappingModes="I" keys="«C-O»"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.VisualBlockInsertAction" mappingModes="X" keys="I"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.VisualBlockAppendAction" mappingModes="X" keys="A"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.StartInsertDigraphAction" mappingModes="IC" keys="«C-K»"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.StartInsertLiteralAction" mappingModes="IC" keys="«C-V»,«C-Q»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction" mappingModes="IC" keys="«C-K»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction" mappingModes="IC" keys="«C-V»,«C-Q»"/>
 
     <!-- Delete -->
     <vimAction implementation="com.maddyhome.idea.vim.action.change.delete.DeleteCharacterAction" mappingModes="N" keys="«DEL»"/>
@@ -260,14 +260,16 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction" mappingModes="N" keys="[P,]P,[p"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutTextAfterCursorActionMoveCursor" mappingModes="N" keys="gp"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorActionMoveCursor" mappingModes="N" keys="gP"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.copy.SelectRegisterAction" mappingModes="NXO" keys='"'/>
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.YankLineAction" mappingModes="N" keys="Y"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.YankMotionAction" mappingModes="N" keys="y"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.YankVisualAction" mappingModes="X" keys="y"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.copy.YankVisualLinesAction" mappingModes="X" keys="Y"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutVisualTextAction" mappingModes="X" keys="p,P"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction" mappingModes="X" keys="[p,]p,]P,[P"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutVisualTextMoveCursorAction" mappingModes="X" keys="gp,gP"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorAction" mappingModes="X" keys="P"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorAction" mappingModes="X" keys="p"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorNoIndentAction" mappingModes="X" keys="]P,[P"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorNoIndentAction" mappingModes="X" keys="[p,]p"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorMoveCursorAction" mappingModes="X" keys="gP"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorMoveCursorAction" mappingModes="X" keys="gp"/>
 
     <!-- File -->
     <vimAction implementation="com.maddyhome.idea.vim.action.file.FileSaveCloseAction" mappingModes="N" keys="ZQ,ZZ"/>

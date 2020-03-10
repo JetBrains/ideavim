@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.helper;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -201,7 +202,11 @@ public class DigraphSequence {
           digraphState = DIG_STATE_PENDING;
           KeyStroke code = KeyStroke.getKeyStroke((char)val);
 
-          VimPlugin.getMacro().postKey(key, editor);
+          if (!ApplicationManager.getApplication().isUnitTestMode()) {
+            // The key we received isn't part of the literal, so post it to be handled after we've handled the literal.
+            // This requires swing, so we can't run it in tests.
+            VimPlugin.getMacro().postKey(key, editor);
+          }
 
           return DigraphResult.done(code);
         }

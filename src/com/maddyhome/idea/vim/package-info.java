@@ -40,7 +40,7 @@
  * |i_CTRL-I|             IntelliJ editor tab
  * |i_<NL>|               {@link com.maddyhome.idea.vim.action.change.insert.InsertEnterAction}
  * |i_CTRL-J|             TO BE IMPLEMENTED
- * |i_CTRL-K|             {@link com.maddyhome.idea.vim.action.change.insert.StartInsertDigraphAction}
+ * |i_CTRL-K|             {@link com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction}
  * |i_CTRL-L|             TO BE IMPLEMENTED
  * |i_<CR>|               {@link com.maddyhome.idea.vim.action.change.insert.InsertEnterAction}
  * |i_CTRL-M|             {@link com.maddyhome.idea.vim.action.change.insert.InsertEnterAction}
@@ -54,8 +54,8 @@
  * |i_CTRL-R_CTRL-P|      TO BE IMPLEMENTED
  * |i_CTRL-T|             {@link com.maddyhome.idea.vim.action.change.shift.ShiftRightLinesAction}
  * |i_CTRL-U|             {@link com.maddyhome.idea.vim.action.change.insert.InsertDeleteInsertedTextAction}
- * |i_CTRL-V|             {@link com.maddyhome.idea.vim.action.change.insert.StartInsertLiteralAction}
- * |i_CTRL-V_digit|       {@link com.maddyhome.idea.vim.action.change.insert.StartInsertLiteralAction}
+ * |i_CTRL-V|             {@link com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction}
+ * |i_CTRL-V_digit|       {@link com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction}
  * |i_CTRL-W|             {@link com.maddyhome.idea.vim.action.change.insert.InsertDeletePreviousWordAction}
  * |i_CTRL-X|             TO BE IMPLEMENTED
  * |i_CTRL-Y|             {@link com.maddyhome.idea.vim.action.change.insert.InsertCharacterAboveCursorAction}
@@ -130,7 +130,7 @@
  * |<Space>|              {@link com.maddyhome.idea.vim.action.motion.leftright.MotionRightWrapAction}
  * |!|                    {@link com.maddyhome.idea.vim.action.change.change.FilterMotionAction}
  * |!!|                   translated to !_
- * |quote|                {@link com.maddyhome.idea.vim.action.copy.SelectRegisterAction}
+ * |quote|                handled by command key parser
  * |#|                    {@link com.maddyhome.idea.vim.action.motion.search.SearchWholeWordBackwardAction}
  * |$|                    {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction}
  * |%|                    {@link com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction}
@@ -330,7 +330,7 @@
  * |[D|                   TO BE IMPLEMENTED
  * |[I|                   TO BE IMPLEMENTED
  * |[M|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousEndAction}
- * |[P|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
+ * |[P|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorNoIndentAction}
  * |[P|                   {@link com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction}
  * |[[|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardStartAction}
  * |[]|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardEndAction}
@@ -339,7 +339,7 @@
  * |[f|                   TO BE IMPLEMENTED
  * |[i|                   TO BE IMPLEMENTED
  * |[m|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousStartAction}
- * |[p|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
+ * |[p|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorNoIndentAction}
  * |[p|                   {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction}
  * |[s|                   TO BE IMPLEMENTED
  * |[z|                   TO BE IMPLEMENTED
@@ -355,7 +355,7 @@
  * |]D|                   TO BE IMPLEMENTED
  * |]I|                   TO BE IMPLEMENTED
  * |]M|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodNextEndAction}
- * |]P|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
+ * |]P|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorNoIndentAction}
  * |]P|                   {@link com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction}
  * |][|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardStartAction}
  * |]]|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardEndAction}
@@ -364,7 +364,7 @@
  * |]f|                   TO BE IMPLEMENTED
  * |]i|                   TO BE IMPLEMENTED
  * |]m|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodNextStartAction}
- * |]p|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
+ * |]p|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorNoIndentAction}
  * |]p|                   {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction}
  * |]s|                   TO BE IMPLEMENTED
  * |]z|                   TO BE IMPLEMENTED
@@ -404,6 +404,7 @@
  * |gJ|                   {@link com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesAction}
  * |gN|                   {@link com.maddyhome.idea.vim.action.motion.gn.VisualSelectPreviousSearch}
  * |gN|                   {@link com.maddyhome.idea.vim.action.motion.gn.GnPreviousTextObject}
+ * |gP|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorMoveCursorAction}
  * |gP|                   {@link com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorActionMoveCursor}
  * |gQ|                   TO BE IMPLEMENTED
  * |gR|                   TO BE IMPLEMENTED
@@ -426,7 +427,7 @@
  * |gn|                   {@link com.maddyhome.idea.vim.action.motion.gn.GnNextTextObject}
  * |gm|                   {@link com.maddyhome.idea.vim.action.motion.leftright.MotionMiddleColumnAction}
  * |go|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionNthCharacterAction}
- * |gp|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextMoveCursorAction}
+ * |gp|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorMoveCursorAction}
  * |gp|                   {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorActionMoveCursor}
  * |gq|                   {@link com.maddyhome.idea.vim.action.change.change.ReformatCodeMotionAction}
  * |gr|                   TO BE IMPLEMENTED
@@ -522,7 +523,7 @@
  * |v_J|                  {@link com.maddyhome.idea.vim.action.change.delete.DeleteJoinVisualLinesSpacesAction}
  * |v_K|                  TO BE IMPLEMENTED
  * |v_O|                  {@link com.maddyhome.idea.vim.action.motion.visual.VisualSwapEndsBlockAction}
- * |v_P|                  {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAction}
+ * |v_P|                  {@link com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorAction}
  * |v_R|                  {@link com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesAction}
  * |v_S|                  {@link com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesAction}
  * |v_U|                  {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperVisualAction}
@@ -574,7 +575,7 @@
  * |v_i{|                 {@link com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBraceAction}
  * |v_i}|                 {@link com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBraceAction}
  * |v_o|                  {@link com.maddyhome.idea.vim.action.motion.visual.VisualSwapEndsAction}
- * |v_p|                  {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAction}
+ * |v_p|                  {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorAction}
  * |v_r|                  {@link com.maddyhome.idea.vim.action.change.change.ChangeVisualCharacterAction}
  * |v_s|                  {@link com.maddyhome.idea.vim.action.change.change.ChangeVisualAction}
  * |v_u|                  {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerVisualAction}

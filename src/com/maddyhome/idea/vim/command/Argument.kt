@@ -50,6 +50,6 @@ class Argument private constructor(
       override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean = true
 
       override val type: Command.Type = Command.Type.UNDEFINED
-    }, Command.Type.UNDEFINED, EnumSet.noneOf(CommandFlags::class.java), emptyList())
+    }, Command.Type.UNDEFINED, EnumSet.noneOf(CommandFlags::class.java))
   }
 }

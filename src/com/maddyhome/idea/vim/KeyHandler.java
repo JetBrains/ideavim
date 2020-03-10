@@ -35,6 +35,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
 import com.maddyhome.idea.vim.action.change.VimRepeater;
+import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction;
+import com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction;
 import com.maddyhome.idea.vim.action.macro.ToggleRecordingAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
@@ -48,6 +50,7 @@ import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import com.maddyhome.idea.vim.ui.ShowCmd;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -155,16 +158,6 @@ public class KeyHandler {
     return false;
   }
 
-  public void startDigraphSequence(@NotNull Editor editor) {
-    final CommandState editorState = CommandState.getInstance(editor);
-    editorState.startDigraphSequence();
-  }
-
-  public void startLiteralSequence(@NotNull Editor editor) {
-    final CommandState editorState = CommandState.getInstance(editor);
-    editorState.startLiteralSequence();
-  }
-
   /**
    * This is the main key handler for the Vim plugin. Every keystroke not handled directly by Idea is sent here for
    * processing.
@@ -221,7 +214,7 @@ public class KeyHandler {
     try {
       if (!allowKeyMappings || !handleKeyMapping(editor, key, context)) {
         if (isCommandCountKey(chKey, editorState)) {
-          commandBuilder.addCountCharacter(chKey);
+          commandBuilder.addCountCharacter(key);
         } else if (isDeleteCommandCountKey(key, editorState)) {
           commandBuilder.deleteCountCharacter();
         } else if (isEditorReset(key, editorState)) {
@@ -232,21 +225,29 @@ public class KeyHandler {
         else if (isExpectingCharArgument(commandBuilder)) {
           handleCharArgument(key, chKey, editorState);
         }
+        else if (editorState.getSubMode() == CommandState.SubMode.REGISTER_PENDING) {
+          commandBuilder.addKey(key);
+          handleSelectRegister(editorState, chKey);
+        }
         // If we are this far, then the user must be entering a command or a non-single-character argument
         // to an entered command. Let's figure out which it is.
         else if (!handleDigraph(editor, key, context, editorState)) {
-
-          commandBuilder.addKey(key);
-
           // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
           // return the node matching this keystroke
           final Node node = mapOpCommand(key, commandBuilder.getChildNode(key), editorState);
 
           if (node instanceof CommandNode) {
             handleCommandNode(editor, context, key, (CommandNode) node, editorState);
+            commandBuilder.addKey(key);
           } else if (node instanceof CommandPartNode) {
             commandBuilder.setCurrentCommandPartNode((CommandPartNode) node);
-          } else {
+            commandBuilder.addKey(key);
+          } else if (isSelectRegister(key, editorState)) {
+            editorState.pushModes(CommandState.Mode.COMMAND, CommandState.SubMode.REGISTER_PENDING);
+            commandBuilder.addKey(key);
+          }
+          else { // node == null
+
             // If we are in insert/replace mode send this key in for processing
             if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
               shouldRecord &= VimPlugin.getChange().processKey(editor, context, key);
@@ -271,10 +272,11 @@ public class KeyHandler {
 
     // Do we have a fully entered command at this point? If so, let's execute it.
     if (commandBuilder.isReady()) {
-      executeCommand(editor, key, context, editorState);
+      executeCommand(editor, context, editorState);
     }
     else if (commandBuilder.isBad()) {
       editorState.resetOpPending();
+      editorState.resetRegisterPending();
       VimPlugin.indicateError();
       reset(editor);
     }
@@ -283,6 +285,9 @@ public class KeyHandler {
     if (shouldRecord && editorState.isRecording()) {
       VimPlugin.getRegister().recordKeyStroke(key);
     }
+
+    // This will update immediately, if we're on the EDT (which we are)
+    ShowCmd.INSTANCE.update();
   }
 
   /**
@@ -570,7 +575,29 @@ public class KeyHandler {
   }
 
   private boolean isEditorReset(@NotNull KeyStroke key, @NotNull CommandState editorState) {
-    return (editorState.getMode() == CommandState.Mode.COMMAND) && StringHelper.isCloseKeyStroke(key);
+    return editorState.getMode() == CommandState.Mode.COMMAND && StringHelper.isCloseKeyStroke(key);
+  }
+
+  private boolean isSelectRegister(@NotNull KeyStroke key, @NotNull CommandState editorState) {
+    if (editorState.getMode() != CommandState.Mode.COMMAND && editorState.getMode() != CommandState.Mode.VISUAL) {
+      return false;
+    }
+
+    if (editorState.getSubMode() == CommandState.SubMode.REGISTER_PENDING) {
+      return true;
+    }
+
+    return key.getKeyChar() == '"' && !editorState.isOperatorPending() && editorState.getCommandBuilder().getExpectedArgumentType() == null;
+  }
+
+  private void handleSelectRegister(@NotNull CommandState commandState, char chKey) {
+    commandState.resetRegisterPending();
+    if (VimPlugin.getRegister().isValid(chKey)) {
+      commandState.getCommandBuilder().pushCommandPart(chKey);
+    }
+    else {
+      commandState.getCommandBuilder().setCommandState(CurrentCommandState.BAD_COMMAND);
+    }
   }
 
   private boolean isExpectingCharArgument(@NotNull CommandBuilder commandBuilder) {
@@ -615,10 +642,12 @@ public class KeyHandler {
     if (commandBuilder.getExpectedArgumentType() == Argument.Type.DIGRAPH) {
       if (DigraphSequence.isDigraphStart(key)) {
         editorState.startDigraphSequence();
+        editorState.getCommandBuilder().addKey(key);
         return true;
       }
       if (DigraphSequence.isLiteralStart(key)) {
         editorState.startLiteralSequence();
+        editorState.getCommandBuilder().addKey(key);
         return true;
       }
     }
@@ -626,7 +655,7 @@ public class KeyHandler {
     DigraphResult res = editorState.processDigraphKey(key, editor);
     switch (res.getResult()) {
       case DigraphResult.RES_HANDLED:
-      case DigraphResult.RES_BAD:
+        editorState.getCommandBuilder().addKey(key);
         return true;
 
       case DigraphResult.RES_DONE:
@@ -637,10 +666,20 @@ public class KeyHandler {
         if (stroke == null) {
           return false;
         }
+        editorState.getCommandBuilder().addKey(key);
         handleKey(editor, stroke, context);
         return true;
 
+      case DigraphResult.RES_BAD:
+        // BAD is an error. We were expecting a valid character, and we didn't get it.
+        if (commandBuilder.getExpectedArgumentType() != null) {
+          commandBuilder.setCommandState(CurrentCommandState.BAD_COMMAND);
+        }
+        return true;
+
       case DigraphResult.RES_UNHANDLED:
+        // UNHANDLED means the key stroke made no sense in the context of a digraph, but isn't an error in the current
+        // state. E.g. waiting for {char} <BS> {char}. Let the key handler have a go at it.
         if (commandBuilder.getExpectedArgumentType() == Argument.Type.DIGRAPH) {
           commandBuilder.fallbackToCharacterArgument();
           handleKey(editor, key, context);
@@ -653,7 +692,6 @@ public class KeyHandler {
   }
 
   private void executeCommand(@NotNull Editor editor,
-                              @NotNull KeyStroke key,
                               @NotNull DataContext context,
                               @NotNull CommandState editorState) {
     final Command command = editorState.getCommandBuilder().buildCommand();
@@ -676,7 +714,7 @@ public class KeyHandler {
     }
 
     if (ApplicationManager.getApplication().isDispatchThread()) {
-      Runnable action = new ActionRunner(editor, context, command, key);
+      Runnable action = new ActionRunner(editor, context, command);
       EditorActionHandlerBase cmdAction = command.getAction();
       String name = cmdAction.getId();
 
@@ -714,7 +752,7 @@ public class KeyHandler {
     }
     else {
       final Argument.Type argumentType = action.getArgumentType();
-      startWaitingForArgument(editor, context, key.getKeyChar(), argumentType, editorState);
+      startWaitingForArgument(editor, context, key.getKeyChar(), action, argumentType, editorState);
       partialReset(editor);
     }
 
@@ -751,6 +789,7 @@ public class KeyHandler {
   private void startWaitingForArgument(Editor editor,
                                        DataContext context,
                                        char key,
+                                       @NotNull EditorActionHandlerBase action,
                                        @NotNull Argument.Type argument,
                                        CommandState editorState) {
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
@@ -760,6 +799,17 @@ public class KeyHandler {
           commandBuilder.completeCommandPart(VimRepeater.Extension.INSTANCE.getArgumentCaptured());
         }
         editorState.pushModes(editorState.getMode(), CommandState.SubMode.OP_PENDING);
+        break;
+      case DIGRAPH:
+        // Command actions represent the completion of a command. Showcmd relies on this - if the action represents a
+        // part of a command, the showcmd output is reset part way through. This means we need to special case entering
+        // digraph/literal input mode. We have an action that takes a digraph as an argument, and pushes it back through
+        // the key handler when it's complete.
+        if (action instanceof InsertCompletedDigraphAction) {
+          editorState.startDigraphSequence();
+        } else if (action instanceof InsertCompletedLiteralAction) {
+          editorState.startLiteralSequence();
+        }
         break;
       case EX_STRING:
         // The current Command expects an EX_STRING argument. E.g. SearchEntry(Fwd|Rev)Action. This won't execute until
@@ -884,11 +934,10 @@ public class KeyHandler {
    */
   static class ActionRunner implements Runnable {
     @Contract(pure = true)
-    ActionRunner(Editor editor, DataContext context, Command cmd, KeyStroke key) {
+    ActionRunner(Editor editor, DataContext context, Command cmd) {
       this.editor = editor;
       this.context = context;
       this.cmd = cmd;
-      this.key = key;
     }
 
     @Override
@@ -896,6 +945,11 @@ public class KeyHandler {
       CommandState editorState = CommandState.getInstance(editor);
 
       editorState.getCommandBuilder().setCommandState(CurrentCommandState.NEW_COMMAND);
+
+      final Character register = cmd.getRegister();
+      if (register != null) {
+        VimPlugin.getRegister().selectRegister(register);
+      }
 
       executeVimAction(editor, cmd.getAction(), context);
       if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
@@ -905,10 +959,8 @@ public class KeyHandler {
       // Now the command has been executed let's clean up a few things.
 
       // By default, the "empty" register is used by all commands, so we want to reset whatever the last register
-      // selected by the user was to the empty register - unless we just executed the "select register" command.
-      if (cmd.getType() != Command.Type.SELECT_REGISTER) {
-        VimPlugin.getRegister().resetRegister();
-      }
+      // selected by the user was to the empty register
+      VimPlugin.getRegister().resetRegister();
 
       // If, at this point, we are not in insert, replace, or visual modes, we need to restore the previous
       // mode we were in. This handles commands in those modes that temporarily allow us to execute normal
@@ -925,7 +977,6 @@ public class KeyHandler {
     private final Editor editor;
     private final DataContext context;
     private final Command cmd;
-    private final KeyStroke key;
   }
 
   private TypedActionHandler origHandler;

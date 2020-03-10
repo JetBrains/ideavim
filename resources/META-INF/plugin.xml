@@ -53,6 +53,7 @@
     <applicationConfigurable groupId="editor" instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
     <projectService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
     <statusBarWidgetProvider implementation="com.maddyhome.idea.vim.StatusBarIconProvider"/>
+    <statusBarWidgetProvider implementation="com.maddyhome.idea.vim.ui.ShowCmdStatusBarWidget"/>
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.VimLocalConfig"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.VimPlugin"/>

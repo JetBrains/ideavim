@@ -64,7 +64,7 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
         }
         state.setExecutingCommand(lastCommand)
 
-        KeyHandler.executeVimAction(editor, lastCommand.action, context)
+        KeyHandler.executeVimAction(editor, lastCommand.action!!, context)
 
         VimRepeater.saveLastChange(lastCommand)
       }

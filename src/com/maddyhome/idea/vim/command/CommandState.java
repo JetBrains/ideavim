@@ -164,6 +164,12 @@ public class CommandState {
     }
   }
 
+  public void resetRegisterPending() {
+    if (getSubMode() == SubMode.REGISTER_PENDING) {
+      popModes();
+    }
+  }
+
   private void resetModes() {
     modeStates.clear();
     setMappingMode();
@@ -343,7 +349,7 @@ public class CommandState {
   }
 
   public enum SubMode {
-    NONE, SINGLE_COMMAND, OP_PENDING, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
+    NONE, SINGLE_COMMAND, OP_PENDING, REGISTER_PENDING, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
   }
 
   private static class ModeState {

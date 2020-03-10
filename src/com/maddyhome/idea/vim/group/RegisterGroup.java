@@ -117,6 +117,10 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     return READONLY_REGISTERS.indexOf(lastRegister) < 0;
   }
 
+  public boolean isValid(char reg) {
+    return VALID_REGISTERS.indexOf(reg) != -1;
+  }
+
   /**
    * Store which register the user wishes to work with.
    *
@@ -124,7 +128,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
    * @return true if a valid register name, false if not
    */
   public boolean selectRegister(char reg) {
-    if (VALID_REGISTERS.indexOf(reg) != -1) {
+    if (isValid(reg)) {
       lastRegister = reg;
       if (logger.isDebugEnabled()) logger.debug("register selected: " + lastRegister);
 
