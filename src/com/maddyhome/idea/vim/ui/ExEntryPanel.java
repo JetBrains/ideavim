@@ -260,6 +260,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       char separator = label.getText().charAt(0);
       String searchText = entry.getActualText();
       if (label.getText().equals(":")) {
+        if (searchText.isEmpty()) return;
         final ExCommand command = getIncsearchCommand(searchText);
         if (command == null) {
           return;
