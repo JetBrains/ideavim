@@ -28,7 +28,6 @@ _Available since 0.55.1 EAP:_
 * [VIM-1899](https://youtrack.jetbrains.com/issue/VIM-1899) Add argument to `:registers` command
 * [VIM-1835](https://youtrack.jetbrains.com/issue/VIM-1835) Macros record input keystrokes instead of mapped keystrokes
 * [VIM-1900](https://youtrack.jetbrains.com/issue/VIM-1900) Ensure non-printable output for `:registers`, `:marks` and `:jumps` is encoded correctly
-* [VIM-434](https://youtrack.jetbrains.com/issue/VIM-434) Add `'showcmd'` support, on by default
 
 _Available since 0.55.2 EAP:_
 
@@ -44,6 +43,9 @@ _Available since 0.55.2 EAP:_
 * [VIM-1008](https://youtrack.jetbrains.com/issue/VIM-1008) Correct `ci{` behavior
 
 _To Be Released..._
+
+**Features:**
+* [VIM-434](https://youtrack.jetbrains.com/issue/VIM-434) Add `'showcmd'` support, on by default
 
 **Fixes:**
 * [VIM-570](https://youtrack.jetbrains.com/issue/VIM-570) Print non-ascii characters in ex panel
