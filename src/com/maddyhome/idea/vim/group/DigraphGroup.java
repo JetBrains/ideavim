@@ -1748,8 +1748,8 @@ public class DigraphGroup {
     'f', 't', '\ufb05', // LATIN SMALL LIGATURE FT
     's', 't', '\ufb06', // LATIN SMALL LIGATURE ST
   };
-  @NotNull private final HashMap<String, Character> digraphs = new HashMap<>(defaultDigraphs.length);
-  @NotNull private final TreeMap<Character, String> keys = new TreeMap<>();
+  private final @NotNull HashMap<String, Character> digraphs = new HashMap<>(defaultDigraphs.length);
+  private final @NotNull TreeMap<Character, String> keys = new TreeMap<>();
 
   private static final Logger logger = Logger.getInstance(DigraphGroup.class.getName());
 }

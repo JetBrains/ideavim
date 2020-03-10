@@ -123,14 +123,16 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
    */
   public void activate(@NotNull Editor editor, DataContext context, @NotNull String label, String initText, int count) {
     this.label.setText(label);
+    this.label.setFont(UiHelper.selectFont(label));
     this.count = count;
-    setFontForElements();
     entry.reset();
     entry.setEditor(editor, context);
     entry.setText(initText);
+    entry.setFont(UiHelper.selectFont(initText));
     entry.setType(label);
     parent = editor.getContentComponent();
 
+    entry.getDocument().addDocumentListener(fontListener);
     if (isIncSearchEnabled()) {
       entry.getDocument().addDocumentListener(incSearchDocumentListener);
       caretOffset = editor.getCaretModel().getOffset();
@@ -177,6 +179,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     active = false;
 
     try {
+      entry.getDocument().removeDocumentListener(fontListener);
       // incsearch won't change in the lifetime of this activation
       if (isIncSearchEnabled()) {
         entry.getDocument().removeDocumentListener(incSearchDocumentListener);
@@ -236,7 +239,18 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     }
   }
 
-  @NotNull private final DocumentListener incSearchDocumentListener = new DocumentAdapter() {
+  private final @NotNull DocumentListener fontListener = new DocumentAdapter() {
+    @Override
+    protected void textChanged(@NotNull DocumentEvent e) {
+      String text = entry.getActualText();
+      Font newFont = UiHelper.selectFont(text);
+      if (newFont != entry.getFont()) {
+        entry.setFont(newFont);
+      }
+    }
+  };
+
+  private final @NotNull DocumentListener incSearchDocumentListener = new DocumentAdapter() {
     @Override
     protected void textChanged(@NotNull DocumentEvent e) {
       final Editor editor = entry.getEditor();
@@ -284,8 +298,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     }
 
     @Contract("null -> null")
-    @Nullable
-    private ExCommand getIncsearchCommand(@Nullable String commandText) {
+    private @Nullable ExCommand getIncsearchCommand(@Nullable String commandText) {
       if (commandText == null) return null;
       try {
         final ExCommand exCommand = CommandParser.getInstance().parse(commandText);
@@ -335,13 +348,11 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
    *
    * @return The user entered text
    */
-  @NotNull
-  public String getText() {
+  public @NotNull String getText() {
     return entry.getActualText();
   }
 
-  @NotNull
-  public ExTextField getEntry() {
+  public @NotNull ExTextField getEntry() {
     return entry;
   }
 
@@ -392,9 +403,8 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   }
 
   private void setFontForElements() {
-    final Font font = UiHelper.getEditorFont();
-    label.setFont(font);
-    entry.setFont(font);
+    label.setFont(UiHelper.selectFont(label.getText()));
+    entry.setFont(UiHelper.selectFont(entry.getActualText()));
   }
 
   private void positionPanel() {
@@ -421,9 +431,9 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   private int count;
 
   // UI stuff
-  @Nullable private JComponent parent;
-  @NotNull private final JLabel label;
-  @NotNull private final ExTextField entry;
+  private @Nullable JComponent parent;
+  private final @NotNull JLabel label;
+  private final @NotNull ExTextField entry;
   private JComponent oldGlass;
   private LayoutManager oldLayout;
   private boolean wasOpaque;
@@ -433,7 +443,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   private int horizontalOffset;
   private int caretOffset;
 
-  @NotNull private final ComponentListener resizePanelListener = new ComponentAdapter() {
+  private final @NotNull ComponentListener resizePanelListener = new ComponentAdapter() {
     @Override
     public void componentResized(ComponentEvent e) {
       positionPanel();

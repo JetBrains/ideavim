@@ -1,4 +1,4 @@
-<img src="resources/META-INF/pluginIcon.svg" width="80" height="80" alt="icon"  align="left"/>
+<img src="resources/META-INF/pluginIcon.svg" width="80" height="80" alt="icon" align="left"/>
 
 IdeaVim
 ===
@@ -7,8 +7,8 @@ IdeaVim
   <a href="https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub">
     <img src="https://jb.gg/badges/official.svg" alt="official JetBrains project"/>
   </a>
-  <a href="https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20191&guest=1">
-    <img src="https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20191)/statusIcon.svg?guest=1"/>
+  <a href="https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20201&guest=1">
+    <img src="https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20201)/statusIcon.svg?guest=1" alt="TeamCity Build"/>
   </a>
 </div>
 
@@ -97,6 +97,8 @@ Emulated Vim plugins:
 * vim-surround
 * vim-multiple-cursors
 * vim-commentary
+* argtextobj.vim   [To Be Released]
+* vim-textobj-entire [To Be Released]
 
 Not supported (yet):
 
@@ -164,6 +166,23 @@ Available extensions:
     * Setup: `set commentary`
     * Emulates [commentary.vim](https://github.com/tpope/vim-commentary)
     * Commands: `gcc`, `gc + motion`, `v_gc`
+
+* argtextobj   [To Be Released]
+    * Setup:
+        * `set argtextobj`
+        * By default, only the arguments inside parenthesis are considered. To extend the functionality
+          to other types of brackets, set `g:argtextobj_pairs` variable to a comma-separated
+          list of colon-separated pairs (same as VIM's `matchpairs` option), like
+          `let g:argtextobj_pairs="(:),{:},<:>"`. The order of pairs matters when
+          handling symbols that can also be operators: `func(x << 5, 20) >> 17`. To handle
+          this syntax parenthesis, must come before angle brackets in the list.
+    * Emulates [argtextobj.vim](https://www.vim.org/scripts/script.php?script_id=2699)
+    * Additional text objects: `aa`, `ia`
+    
+* textobj-entire [To Be Released]
+    * Setup: `set textobj-entire`
+    * Emulates [vim-textobj-entire](https://github.com/kana/vim-textobj-entire)
+    * Additional text objects: `ae`, `ie`
 
 
 Changes to the IDE

@@ -30,9 +30,9 @@ import java.awt.event.KeyListener;
  * @author vlan
  */
 public class ModalEntryDialog extends JDialog {
-  @NotNull private final JTextField myEntry;
-  @NotNull private final JLabel myLabel;
-  @NotNull private final JComponent myParent;
+  private final @NotNull JTextField myEntry;
+  private final @NotNull JLabel myLabel;
+  private final @NotNull JComponent myParent;
 
   public ModalEntryDialog(@NotNull Editor editor, @NotNull String prompt) {
     super((Frame)null, true);
@@ -42,9 +42,8 @@ public class ModalEntryDialog extends JDialog {
 
     myEntry.setBorder(null);
 
-    final Font font = UiHelper.getEditorFont();
-    myLabel.setFont(font);
-    myEntry.setFont(font);
+    myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
+    myEntry.setFont(UiHelper.selectFont(myEntry.getText()));
 
     setForeground(myEntry.getForeground());
     setBackground(myEntry.getBackground());
@@ -89,8 +88,7 @@ public class ModalEntryDialog extends JDialog {
     myEntry.addKeyListener(listener);
   }
 
-  @NotNull
-  public String getText() {
+  public @NotNull String getText() {
     return myEntry.getText();
   }
 }

@@ -139,8 +139,7 @@ public class StringOption extends TextOption {
    *
    * @return The option as a string for display
    */
-  @NotNull
-  public String toString() {
+  public @NotNull String toString() {
 
     return "  " + getName() + "=" + value;
   }

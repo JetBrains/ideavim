@@ -59,8 +59,10 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -77,8 +79,7 @@ public class KeyHandler {
    *
    * @return A reference to the singleton
    */
-  @NotNull
-  public static KeyHandler getInstance() {
+  public static @NotNull KeyHandler getInstance() {
     if (instance == null) {
       instance = new KeyHandler();
     }
@@ -311,7 +312,7 @@ public class KeyHandler {
     return true;
   }
 
-  private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull final DataContext context, @NotNull CommandState editorState) {
+  private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, final @NotNull DataContext context, @NotNull CommandState editorState) {
     if (editorState.getCommandBuilder().isAtDefaultState()) {
       RegisterGroup register = VimPlugin.getRegister();
       if (register.getCurrentRegister() == register.getDefaultRegister()) {
@@ -326,9 +327,9 @@ public class KeyHandler {
     ChangeGroup.resetCaret(editor, false);
   }
 
-  private boolean handleKeyMapping(@NotNull final Editor editor,
-                                   @NotNull final KeyStroke key,
-                                   @NotNull final DataContext context) {
+  private boolean handleKeyMapping(final @NotNull Editor editor,
+                                   final @NotNull KeyStroke key,
+                                   final @NotNull DataContext context) {
 
     final CommandState commandState = CommandState.getInstance(editor);
     final MappingState mappingState = commandState.getMappingState();
@@ -859,8 +860,7 @@ public class KeyHandler {
     editorState.getCommandBuilder().resetAll(getKeyRoot(editorState.getMappingState().getMappingMode()));
   }
 
-  @NotNull
-  private CommandPartNode getKeyRoot(MappingMode mappingMode) {
+  private @NotNull CommandPartNode getKeyRoot(MappingMode mappingMode) {
     return VimPlugin.getKey().getKeyRoot(mappingMode);
   }
 
@@ -874,7 +874,10 @@ public class KeyHandler {
     VimPlugin.clearError();
     CommandState.getInstance(editor).reset();
     reset(editor);
-    VimPlugin.getRegister().resetRegister();
+    RegisterGroup registerGroup = VimPlugin.getRegisterIfCreated();
+    if (registerGroup != null) {
+      registerGroup.resetRegister();
+    }
     if (editor != null) {
       VisualGroupKt.updateCaretState(editor);
       editor.getSelectionModel().removeSelection();
@@ -882,9 +885,8 @@ public class KeyHandler {
   }
 
   // This method is copied from com.intellij.openapi.editor.actionSystem.EditorAction.getProjectAwareDataContext
-  @NotNull
-  private static DataContext getProjectAwareDataContext(@NotNull final Editor editor,
-                                                        @NotNull final DataContext original) {
+  private static @NotNull DataContext getProjectAwareDataContext(final @NotNull Editor editor,
+                                                                 final @NotNull DataContext original) {
     if (PROJECT.getData(original) == editor.getProject()) {
       return new DialogAwareDataContext(original);
     }
@@ -902,7 +904,7 @@ public class KeyHandler {
   }
 
   // This class is copied from com.intellij.openapi.editor.actionSystem.DialogAwareDataContext.DialogAwareDataContext
-  private final static class DialogAwareDataContext implements DataContext {
+  private static final class DialogAwareDataContext implements DataContext {
     @SuppressWarnings("rawtypes")
     private static final DataKey[] keys = {PROJECT, PROJECT_FILE_DIRECTORY, EDITOR, VIRTUAL_FILE, PSI_FILE};
     private final Map<String, Object> values = new HashMap<>();
@@ -914,9 +916,8 @@ public class KeyHandler {
       }
     }
 
-    @Nullable
     @Override
-    public Object getData(@NotNull @NonNls String dataId) {
+    public @Nullable Object getData(@NotNull @NonNls String dataId) {
       if (values.containsKey(dataId)) {
         return values.get(dataId);
       }

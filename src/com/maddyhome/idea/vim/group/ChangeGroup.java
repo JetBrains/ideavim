@@ -85,7 +85,7 @@ public class ChangeGroup {
   private static final String VIM_MOTION_BIG_WORD_END_RIGHT = "VimMotionBigWordEndRightAction";
   private static final String VIM_MOTION_CAMEL_END_RIGHT = "VimMotionCamelEndRightAction";
 
-  @Nullable private Command lastInsert;
+  private @Nullable Command lastInsert;
 
   private void setInsertRepeat(int lines, int column, boolean append) {
     repeatLines = lines;
@@ -154,7 +154,7 @@ public class ChangeGroup {
    *
    * @param editor The editor to insert into
    */
-  public void insertNewLineAbove(@NotNull final Editor editor, @NotNull DataContext context) {
+  public void insertNewLineAbove(final @NotNull Editor editor, @NotNull DataContext context) {
     if (editor.isOneLineMode()) return;
 
     Set<Caret> firstLiners = new HashSet<>();
@@ -214,7 +214,7 @@ public class ChangeGroup {
    * @param editor  The editor to insert into
    * @param context The data context
    */
-  public void insertNewLineBelow(@NotNull final Editor editor, @NotNull final DataContext context) {
+  public void insertNewLineBelow(final @NotNull Editor editor, final @NotNull DataContext context) {
     if (editor.isOneLineMode()) return;
 
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
@@ -308,7 +308,7 @@ public class ChangeGroup {
     return false;
   }
 
-  @Nullable private DocumentListener documentListener;
+  private @Nullable DocumentListener documentListener;
 
   /**
    * If the cursor is currently after the start of the current insert this deletes all the newly inserted text.
@@ -421,7 +421,7 @@ public class ChangeGroup {
   // Workaround for VIM-1546. Another solution is highly appreciated.
   public boolean tabAction = false;
 
-  @NotNull private final EditorMouseListener listener = new EditorMouseListener() {
+  private final @NotNull EditorMouseListener listener = new EditorMouseListener() {
     @Override
     public void mouseClicked(@NotNull EditorMouseEvent event) {
       Editor editor = event.getEditor();
@@ -737,9 +737,9 @@ public class ChangeGroup {
    * @param key     The user entered keystroke
    * @param plan    the current action plan draft
    */
-  public void beforeProcessKey(@NotNull final Editor editor,
-                               @NotNull final DataContext context,
-                               @NotNull final KeyStroke key,
+  public void beforeProcessKey(final @NotNull Editor editor,
+                               final @NotNull DataContext context,
+                               final @NotNull KeyStroke key,
                                @NotNull ActionPlan plan) {
 
     final TypedActionHandler originalHandler = KeyHandler.getInstance().getOriginalHandler();
@@ -805,9 +805,9 @@ public class ChangeGroup {
    * @param key     The user entered keystroke
    * @return true if this was a regular character, false if not
    */
-  public boolean processKey(@NotNull final Editor editor,
-                            @NotNull final DataContext context,
-                            @NotNull final KeyStroke key) {
+  public boolean processKey(final @NotNull Editor editor,
+                            final @NotNull DataContext context,
+                            final @NotNull KeyStroke key) {
     if (logger.isDebugEnabled()) {
       logger.debug("processKey(" + key + ")");
     }
@@ -824,9 +824,9 @@ public class ChangeGroup {
     return false;
   }
 
-  public boolean processKeyInSelectMode(@NotNull final Editor editor,
-                                        @NotNull final DataContext context,
-                                        @NotNull final KeyStroke key) {
+  public boolean processKeyInSelectMode(final @NotNull Editor editor,
+                                        final @NotNull DataContext context,
+                                        final @NotNull KeyStroke key) {
     boolean res;
     try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
       res = processKey(editor, context, key);
@@ -1061,14 +1061,13 @@ public class ChangeGroup {
     return true;
   }
 
-  @Nullable
-  public Pair<TextRange, SelectionType> getDeleteRangeAndType(@NotNull Editor editor,
-                                                              @NotNull Caret caret,
-                                                              @NotNull DataContext context,
-                                                              int count,
-                                                              int rawCount,
-                                                              @NotNull final Argument argument,
-                                                              boolean isChange) {
+  public @Nullable Pair<TextRange, SelectionType> getDeleteRangeAndType(@NotNull Editor editor,
+                                                                        @NotNull Caret caret,
+                                                                        @NotNull DataContext context,
+                                                                        int count,
+                                                                        int rawCount,
+                                                                        final @NotNull Argument argument,
+                                                                        boolean isChange) {
     final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
     if (range == null) return null;
 
@@ -1163,7 +1162,8 @@ public class ChangeGroup {
     final LogicalPosition lp =
       editor.offsetToLogicalPosition(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret));
 
-    if (editor.getDocument().getText().isEmpty()) {
+    // Please don't use `getDocument().getText().isEmpty()`
+    if (editor.getDocument().getTextLength() == 0) {
       insertBeforeCursor(editor, context);
       return true;
     }
@@ -1456,7 +1456,8 @@ public class ChangeGroup {
     boolean res = deleteRange(editor, caret, range, type, true);
     if (res) {
       if (type == SelectionType.LINE_WISE) {
-        if (editor.getDocument().getText().isEmpty()) {
+        // Please don't use `getDocument().getText().isEmpty()`
+        if (editor.getDocument().getTextLength() == 0) {
           insertBeforeCursor(editor, context);
         }
         else if (after) {
@@ -1729,8 +1730,8 @@ public class ChangeGroup {
    * @param type   The type of deletion
    * @return true if able to delete the text, false if not
    */
-  private boolean deleteText(@NotNull final Editor editor,
-                             @NotNull final TextRange range,
+  private boolean deleteText(final @NotNull Editor editor,
+                             final @NotNull TextRange range,
                              @Nullable SelectionType type) {
     // Fix for https://youtrack.jetbrains.net/issue/VIM-35
     if (!range.normalize(EditorHelper.getFileSize(editor, true))) {
@@ -1838,7 +1839,7 @@ public class ChangeGroup {
    *
    * @return true
    */
-  public boolean changeNumberVisualMode(@NotNull final Editor editor,
+  public boolean changeNumberVisualMode(final @NotNull Editor editor,
                                         @NotNull Caret caret,
                                         @NotNull TextRange selectedRange,
                                         final int count,
@@ -1882,7 +1883,7 @@ public class ChangeGroup {
   private int repeatCharsCount;
   private List<Object> lastStrokes;
 
-  public boolean changeNumber(@NotNull final Editor editor, @NotNull Caret caret, final int count) {
+  public boolean changeNumber(final @NotNull Editor editor, @NotNull Caret caret, final int count) {
     final BoundListOption nf = OptionsManager.INSTANCE.getNrformats();
     final boolean alpha = nf.contains("alpha");
     final boolean hex = nf.contains("hex");
@@ -1911,13 +1912,12 @@ public class ChangeGroup {
   private boolean lastLower = true;
   private Document document;
 
-  @Nullable
-  public String changeNumberInRange(@NotNull final Editor editor,
-                                    @NotNull TextRange range,
-                                    final int count,
-                                    boolean alpha,
-                                    boolean hex,
-                                    boolean octal) {
+  public @Nullable String changeNumberInRange(final @NotNull Editor editor,
+                                              @NotNull TextRange range,
+                                              final int count,
+                                              boolean alpha,
+                                              boolean hex,
+                                              boolean octal) {
     String text = EditorHelper.getText(editor, range);
     if (logger.isDebugEnabled()) {
       logger.debug("found range " + range);
@@ -2035,8 +2035,7 @@ public class ChangeGroup {
       oldOffset = e.getOffset() + newFragmentLength;
     }
 
-    @NotNull
-    private List<EditorActionHandlerBase> getAdjustCaretActions(@NotNull DocumentEvent e) {
+    private @NotNull List<EditorActionHandlerBase> getAdjustCaretActions(@NotNull DocumentEvent e) {
       final int delta = e.getOffset() - oldOffset;
       if (oldOffset >= 0 && delta != 0) {
         final List<EditorActionHandlerBase> positionCaretActions = new ArrayList<>();

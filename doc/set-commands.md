@@ -110,7 +110,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                   If false, IdeaVim icon won't be shown in the status bar.
                   Works only from `~/.ideavimrc` after the IDE restart.
                   
-    `ideastatusicon`  `ideastatusicon` String(default "enabled")
+    `ideastatusicon`  `ideastatusicon` String(default "enabled")    [To Be Released]
     
                  Define the behavior of IdeaVim icon in the status bar.
                  

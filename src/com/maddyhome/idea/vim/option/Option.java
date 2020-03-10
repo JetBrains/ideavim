@@ -113,5 +113,5 @@ public abstract class Option<T> {
 
   protected final String name;
   protected final String abbrev;
-  @NotNull private final List<OptionChangeListener<T>> listeners = new ArrayList<>();
+  private final @NotNull List<OptionChangeListener<T>> listeners = new ArrayList<>();
 }

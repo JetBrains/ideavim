@@ -90,8 +90,8 @@ public class MacroGroup {
    * @param cnt     count
    * @param total   total
    */
-  public void playbackKeys(@NotNull final Editor editor, @NotNull final DataContext context, @Nullable final Project project,
-                           @NotNull final List<KeyStroke> keys, final int pos, final int cnt, final int total) {
+  public void playbackKeys(final @NotNull Editor editor, final @NotNull DataContext context, final @Nullable Project project,
+                           final @NotNull List<KeyStroke> keys, final int pos, final int cnt, final int total) {
     if (logger.isDebugEnabled()) {
       logger.debug("playbackKeys " + pos);
     }
@@ -138,8 +138,7 @@ public class MacroGroup {
     });
   }
 
-  @NotNull
-  private KeyEvent createKeyEvent(@NotNull KeyStroke stroke, Component component) {
+  private @NotNull KeyEvent createKeyEvent(@NotNull KeyStroke stroke, Component component) {
     return new KeyEvent(component,
                         stroke.getKeyChar() == KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_PRESSED : KeyEvent.KEY_TYPED,
                         System.currentTimeMillis(), stroke.getModifiers(), stroke.getKeyCode(), stroke.getKeyChar());

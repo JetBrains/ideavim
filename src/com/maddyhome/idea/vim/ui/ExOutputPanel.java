@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.ui;
 
+import com.intellij.ide.IdeTooltip;
 import com.intellij.ide.ui.LafManager;
 import com.intellij.ide.ui.LafManagerListener;
 import com.intellij.openapi.application.ApplicationManager;
@@ -46,18 +47,18 @@ import java.util.List;
  * This panel displays text in a <code>more</code> like window.
  */
 public class ExOutputPanel extends JPanel implements LafManagerListener {
-  @NotNull private final Editor myEditor;
+  private final @NotNull Editor myEditor;
 
-  @NotNull private final JLabel myLabel = new JLabel("more");
-  @NotNull private final JTextArea myText = new JTextArea();
-  @NotNull private final JScrollPane myScrollPane =
+  private final @NotNull JLabel myLabel = new JLabel("more");
+  private final @NotNull JTextArea myText = new JTextArea();
+  private final @NotNull JScrollPane myScrollPane =
     new JBScrollPane(myText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-  @NotNull private final ComponentAdapter myAdapter;
+  private final @NotNull ComponentAdapter myAdapter;
   private boolean myAtEnd = false;
   private int myLineHeight = 0;
 
-  @Nullable private JComponent myOldGlass = null;
-  @Nullable private LayoutManager myOldLayout = null;
+  private @Nullable JComponent myOldGlass = null;
+  private @Nullable LayoutManager myOldLayout = null;
   private boolean myWasOpaque = false;
 
   private boolean myActive = false;
@@ -95,8 +96,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     updateUI();
   }
 
-  @NotNull
-  public static ExOutputPanel getInstance(@NotNull Editor editor) {
+  public static @NotNull ExOutputPanel getInstance(@NotNull Editor editor) {
     ExOutputPanel panel = UserDataManager.getVimMorePanel(editor);
     if (panel == null) {
       panel = new ExOutputPanel(editor);
@@ -134,6 +134,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     }
 
     myText.setText(data);
+    myText.setFont(UiHelper.selectFont(data));
     myText.setCaretPosition(0);
     if (data.length() > 0) {
       activate();
@@ -198,9 +199,8 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
   }
 
   private void setFontForElements() {
-    final Font font = UiHelper.getEditorFont();
-    myText.setFont(font);
-    myLabel.setFont(font);
+    myText.setFont(UiHelper.selectFont(myText.getText()));
+    myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
   }
 
   private static int countLines(@NotNull String text) {
@@ -246,6 +246,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
 
   private void badKey() {
     myLabel.setText("-- MORE -- (RET: line, SPACE: page, d: half page, q: quit)");
+    myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
   }
 
   private void scrollOffset(int more) {
@@ -257,9 +258,11 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
         myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount()) {
       myAtEnd = true;
       myLabel.setText("Hit ENTER or type command to continue");
+      myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
     }
     else {
       myLabel.setText("-- MORE --");
+      myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
     }
   }
 
@@ -298,7 +301,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     close(null);
   }
 
-  private void close(@Nullable final KeyEvent e) {
+  private void close(final @Nullable KeyEvent e) {
     ApplicationManager.getApplication().invokeLater(() -> {
       deactivate(true);
 

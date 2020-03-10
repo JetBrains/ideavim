@@ -49,18 +49,18 @@ public class VimExtensionRegistrar {
     //noinspection deprecation
     VimExtension.EP_NAME.getPoint(null).addExtensionPointListener(new ExtensionPointListener<VimExtension>() {
       @Override
-      public void extensionAdded(@NotNull VimExtension extension, @NotNull PluginDescriptor pluginDescriptor) {
+      public void extensionAdded(@NotNull VimExtension extension, PluginDescriptor pluginDescriptor) {
         registerExtension(extension);
       }
 
       @Override
-      public void extensionRemoved(@NotNull VimExtension extension, @NotNull PluginDescriptor pluginDescriptor) {
+      public void extensionRemoved(@NotNull VimExtension extension, PluginDescriptor pluginDescriptor) {
         unregisterExtension(extension);
       }
     });
   }
 
-  synchronized private static void registerExtension(@NotNull VimExtension extension) {
+  private static synchronized void registerExtension(@NotNull VimExtension extension) {
     String name = extension.getName();
 
     if (registeredExtensions.contains(name)) return;
@@ -83,7 +83,7 @@ public class VimExtensionRegistrar {
     OptionsManager.INSTANCE.addOption(option);
   }
 
-  synchronized private static void unregisterExtension(@NotNull VimExtension extension) {
+  private static synchronized void unregisterExtension(@NotNull VimExtension extension) {
     String name = extension.getName();
 
     if (!registeredExtensions.contains(name)) return;

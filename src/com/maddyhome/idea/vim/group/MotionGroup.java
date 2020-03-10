@@ -102,8 +102,7 @@ public class MotionGroup {
    * @param argument   Any argument needed by the motion
    * @return The motion's range
    */
-  @Nullable
-  public static TextRange getMotionRange(@NotNull Editor editor,
+  public static @Nullable TextRange getMotionRange(@NotNull Editor editor,
                                          @NotNull Caret caret,
                                          DataContext context,
                                          int count,
@@ -239,32 +238,27 @@ public class MotionGroup {
     }
   }
 
-  @Nullable
-  public TextRange getBlockQuoteRange(@NotNull Editor editor, @NotNull Caret caret, char quote, boolean isOuter) {
+  public @Nullable TextRange getBlockQuoteRange(@NotNull Editor editor, @NotNull Caret caret, char quote, boolean isOuter) {
     return SearchHelper.findBlockQuoteInLineRange(editor, caret, quote, isOuter);
   }
 
-  @Nullable
-  public TextRange getBlockRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter, char type) {
+  public @Nullable TextRange getBlockRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter, char type) {
     return SearchHelper.findBlockRange(editor, caret, type, count, isOuter);
   }
 
-  @Nullable
-  public TextRange getBlockTagRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
+  public @Nullable TextRange getBlockTagRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
     return SearchHelper.findBlockTagRange(editor, caret, count, isOuter);
   }
 
-  @NotNull
-  public TextRange getSentenceRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
+  public @NotNull TextRange getSentenceRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
     return SearchHelper.findSentenceRange(editor, caret, count, isOuter);
   }
 
-  @Nullable
-  public TextRange getParagraphRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
+  public @Nullable TextRange getParagraphRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
     return SearchHelper.findParagraphRange(editor, caret, count, isOuter);
   }
 
-  private static int getScrollScreenTargetCaretVisualLine(@NotNull final Editor editor, int rawCount, boolean down) {
+  private static int getScrollScreenTargetCaretVisualLine(final @NotNull Editor editor, int rawCount, boolean down) {
     final Rectangle visibleArea = editor.getScrollingModel().getVisibleArea();
     final int caretVisualLine = editor.getCaretModel().getVisualPosition().line;
     final int scrollOption = getScrollOption(rawCount);
@@ -296,7 +290,7 @@ public class MotionGroup {
     return rawCount;
   }
 
-  private static int getNormalizedScrollOffset(@NotNull final Editor editor) {
+  private static int getNormalizedScrollOffset(final @NotNull Editor editor) {
     int scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();
     return EditorHelper.normalizeScrollOffset(editor, scrollOffset);
   }
@@ -328,8 +322,7 @@ public class MotionGroup {
     }
   }
 
-  @Nullable
-  private Editor selectEditor(@NotNull Editor editor, @NotNull Mark mark) {
+  private @Nullable Editor selectEditor(@NotNull Editor editor, @NotNull Mark mark) {
     final VirtualFile virtualFile = markToVirtualFile(mark);
     if (virtualFile != null) {
       return selectEditor(editor, virtualFile);
@@ -339,15 +332,13 @@ public class MotionGroup {
     }
   }
 
-  @Nullable
-  private VirtualFile markToVirtualFile(@NotNull Mark mark) {
+  private @Nullable VirtualFile markToVirtualFile(@NotNull Mark mark) {
     String protocol = mark.getProtocol();
     VirtualFileSystem fileSystem = VirtualFileManager.getInstance().getFileSystem(protocol);
     return fileSystem.findFileByPath(mark.getFilename());
   }
 
-  @Nullable
-  private Editor selectEditor(@NotNull Editor editor, @NotNull VirtualFile file) {
+  private @Nullable Editor selectEditor(@NotNull Editor editor, @NotNull VirtualFile file) {
     return VimPlugin.getFile().selectEditor(editor.getProject(), file);
   }
 
@@ -778,12 +769,11 @@ public class MotionGroup {
     return true;
   }
 
-  @NotNull
-  public TextRange getWordRange(@NotNull Editor editor,
-                                @NotNull Caret caret,
-                                int count,
-                                boolean isOuter,
-                                boolean isBig) {
+  public @NotNull TextRange getWordRange(@NotNull Editor editor,
+                                         @NotNull Caret caret,
+                                         int count,
+                                         boolean isOuter,
+                                         boolean isBig) {
     int dir = 1;
     boolean selection = false;
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
@@ -1035,13 +1025,13 @@ public class MotionGroup {
   public int moveCaretHorizontal(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowPastEnd) {
     int oldOffset = caret.getOffset();
     int diff = 0;
-    String text = editor.getDocument().getText();
+    CharSequence text = editor.getDocument().getCharsSequence();
     int sign = (int)Math.signum(count);
     for (Integer pointer : new IntProgression(0, count - sign, sign)) {
       int textPointer = oldOffset + pointer;
       if (textPointer < text.length() && textPointer >= 0) {
         // Actual char size can differ from 1 if unicode characters are used (like 🐔)
-        diff += Character.charCount(text.codePointAt(textPointer));
+        diff += Character.charCount(Character.codePointAt(text, textPointer));
       }
       else {
         diff += 1;
@@ -1108,7 +1098,7 @@ public class MotionGroup {
     return editor.logicalPositionToOffset(newPos);
   }
 
-  public boolean scrollScreen(@NotNull final Editor editor, int rawCount, boolean down) {
+  public boolean scrollScreen(final @NotNull Editor editor, int rawCount, boolean down) {
     final CaretModel caretModel = editor.getCaretModel();
     final int currentLogicalLine = caretModel.getLogicalPosition().line;
 

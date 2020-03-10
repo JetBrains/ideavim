@@ -23,6 +23,10 @@ import com.intellij.codeInsight.editorActions.CopyPastePostProcessor;
 import com.intellij.codeInsight.editorActions.CopyPastePreProcessor;
 import com.intellij.codeInsight.editorActions.TextBlockTransferable;
 import com.intellij.codeInsight.editorActions.TextBlockTransferableData;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.RoamingType;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.CaretStateTransferableData;
 import com.intellij.openapi.editor.Editor;
@@ -72,7 +76,10 @@ import java.util.stream.Collectors;
 /**
  * This group works with command associated with copying and pasting text
  */
-public class RegisterGroup {
+@State(name = "VimRegisterSettings", storages = {
+  @Storage(value = "$APP_CONFIG$/vim_settings.xml", roamingType = RoamingType.DISABLED)
+})
+public class RegisterGroup implements PersistentStateComponent<Element> {
   private static final String WRITABLE_REGISTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-*+_/\"";
   private static final String READONLY_REGISTERS = ":.%#=/";
   private static final String RECORDABLE_REGISTER = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -83,9 +90,9 @@ public class RegisterGroup {
 
   private char defaultRegister = '"';
   private char lastRegister = defaultRegister;
-  @NotNull private final HashMap<Character, Register> registers = new HashMap<>();
+  private final @NotNull HashMap<Character, Register> registers = new HashMap<>();
   private char recordRegister = 0;
-  @Nullable private List<KeyStroke> recordList = null;
+  private @Nullable List<KeyStroke> recordList = null;
 
   public RegisterGroup() {
     final ListOption clipboardOption = OptionsManager.INSTANCE.getClipboard();
@@ -250,10 +257,9 @@ public class RegisterGroup {
     return true;
   }
 
-  @NotNull
-  public List<TextBlockTransferableData> getTransferableData(@NotNull Editor editor,
-                                                              @NotNull TextRange textRange,
-                                                              String text) {
+  public @NotNull List<TextBlockTransferableData> getTransferableData(@NotNull Editor editor,
+                                                                      @NotNull TextRange textRange,
+                                                                      String text) {
     final List<TextBlockTransferableData> transferableDatas = new ArrayList<>();
     final Project project = editor.getProject();
     if (project == null) return new ArrayList<>();
@@ -320,13 +326,11 @@ public class RegisterGroup {
    *
    * @return The register, null if no such register
    */
-  @Nullable
-  public Register getLastRegister() {
+  public @Nullable Register getLastRegister() {
     return getRegister(lastRegister);
   }
 
-  @Nullable
-  public Register getPlaybackRegister(char r) {
+  public @Nullable Register getPlaybackRegister(char r) {
     if (PLAYBACK_REGISTER.indexOf(r) != 0) {
       return getRegister(r);
     }
@@ -335,8 +339,7 @@ public class RegisterGroup {
     }
   }
 
-  @Nullable
-  public Register getRegister(char r) {
+  public @Nullable Register getRegister(char r) {
     // Uppercase registers actually get the lowercase register
     if (Character.isUpperCase(r)) {
       r = Character.toLowerCase(r);
@@ -360,8 +363,7 @@ public class RegisterGroup {
     return defaultRegister;
   }
 
-  @NotNull
-  public List<Register> getRegisters() {
+  public @NotNull List<Register> getRegisters() {
     final List<Register> res = new ArrayList<>(registers.values());
     for (Character r : CLIPBOARD_REGISTERS) {
       final Register register = refreshClipboardRegister(r);
@@ -423,7 +425,7 @@ public class RegisterGroup {
     recordRegister = 0;
   }
 
-  public void saveData(@NotNull final Element element) {
+  public void saveData(final @NotNull Element element) {
     logger.debug("saveData");
     final Element registersElement = new Element("registers");
     for (Character key : registers.keySet()) {
@@ -455,7 +457,7 @@ public class RegisterGroup {
     element.addContent(registersElement);
   }
 
-  public void readData(@NotNull final Element element) {
+  public void readData(final @NotNull Element element) {
     logger.debug("readData");
     final Element registersElement = element.getChild("registers");
     if (registersElement != null) {
@@ -495,8 +497,7 @@ public class RegisterGroup {
     }
   }
 
-  @Nullable
-  private Register refreshClipboardRegister(char r) {
+  private @Nullable Register refreshClipboardRegister(char r) {
     final Pair<String, List<TextBlockTransferableData>> clipboardData = ClipboardHandler.getClipboardTextAndTransferableData();
     final Register currentRegister = registers.get(r);
     final String text = clipboardData.getFirst();
@@ -510,13 +511,25 @@ public class RegisterGroup {
     return null;
   }
 
-  @NotNull
-  private SelectionType guessSelectionType(@NotNull String text) {
+  private @NotNull SelectionType guessSelectionType(@NotNull String text) {
     if (text.endsWith("\n")) {
       return SelectionType.LINE_WISE;
     }
     else {
       return SelectionType.CHARACTER_WISE;
     }
+  }
+
+  @Nullable
+  @Override
+  public Element getState() {
+    Element element = new Element("registers");
+    saveData(element);
+    return element;
+  }
+
+  @Override
+  public void loadState(@NotNull Element state) {
+    readData(state);
   }
 }

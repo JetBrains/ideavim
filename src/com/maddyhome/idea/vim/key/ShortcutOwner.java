@@ -28,27 +28,24 @@ public enum ShortcutOwner {
   IDE("ide", "IDE"),
   VIM("vim", "Vim");
 
-  @NotNull private final String name;
-  @NotNull private final String title;
+  private final @NotNull String name;
+  private final @NotNull String title;
 
   ShortcutOwner(@NotNull String name, @NotNull String title) {
     this.name = name;
     this.title = title;
   }
 
-  @NotNull
   @Override
-  public String toString() {
+  public @NotNull String toString() {
     return title;
   }
 
-  @NotNull
-  public String getName() {
+  public @NotNull String getName() {
     return name;
   }
 
-  @NotNull
-  public static ShortcutOwner fromString(@NotNull String s) {
+  public static @NotNull ShortcutOwner fromString(@NotNull String s) {
     if ("ide".equals(s)) {
       return IDE;
     }

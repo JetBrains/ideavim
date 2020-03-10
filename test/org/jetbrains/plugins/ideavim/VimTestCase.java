@@ -137,6 +137,12 @@ public abstract class VimTestCase extends UsefulTestCase {
   }
 
   @NotNull
+  protected Editor configureByFileName(@NotNull String fileName) {
+    myFixture.configureByText(fileName, "\n");
+    return myFixture.getEditor();
+  }
+
+  @NotNull
   protected Editor configureByJavaText(@NotNull String content) {
     myFixture.configureByText(JavaFileType.INSTANCE, content);
     return myFixture.getEditor();
@@ -241,6 +247,10 @@ public abstract class VimTestCase extends UsefulTestCase {
 
   public void assertPluginError(boolean isError) {
     assertEquals(isError, VimPlugin.isError());
+  }
+
+  public void assertPluginErrorMessageContains(@NotNull String message) {
+    assertTrue(VimPlugin.getMessage().contains(message));
   }
 
   protected void assertCaretsColour() {

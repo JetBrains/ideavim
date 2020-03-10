@@ -20,9 +20,9 @@ package com.maddyhome.idea.vim
 
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.RoamingType
+import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
-import com.maddyhome.idea.vim.VimPlugin.STATE_VERSION
 import org.jdom.Element
 
 /**
@@ -30,29 +30,27 @@ import org.jdom.Element
  */
 
 @State(name = "VimLocalSettings", storages = [
-    Storage("\$APP_CONFIG$$/vim_local_settings.xml", roamingType = RoamingType.DISABLED, deprecated = true),
-    Storage("\$APP_CONFIG$/vim_local_settings.xml", roamingType = RoamingType.DISABLED)
-  ])
+  Storage("\$APP_CONFIG$$/vim_local_settings.xml", roamingType = RoamingType.DISABLED, deprecated = true),
+  Storage("\$APP_CONFIG$/vim_local_settings.xml", roamingType = RoamingType.DISABLED, deprecated = true)
+])
 // TODO: 27.01.2020 [VERSION UPDATE] 2019.3 https://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/plugin_services.html#light-services
+@Deprecated("The data from this class will be stored in vim_settings")
 class VimLocalConfig : PersistentStateComponent<Element> {
-  override fun getState(): Element {
-    val element = Element("ideavim-local")
-
-    val state = Element("state")
-    state.setAttribute("version", STATE_VERSION.toString())
-    element.addContent(state)
-
-    VimPlugin.getMark().saveData(element)
-    VimPlugin.getRegister().saveData(element)
-    VimPlugin.getSearch().saveData(element)
-    VimPlugin.getHistory().saveData(element)
-    return element
-  }
+  override fun getState(): Element? = null
 
   override fun loadState(state: Element) {
+    // This is initialization of state from the legacy configuration structure.
+    // This code should be performed only once on settings migration.
+    //   After the migration is done, the file with settings gets removed and this method won't be called again.
     VimPlugin.getMark().readData(state)
     VimPlugin.getRegister().readData(state)
     VimPlugin.getSearch().readData(state)
     VimPlugin.getHistory().readData(state)
+  }
+
+  companion object {
+    fun initialize() {
+      ServiceManager.getService(VimLocalConfig::class.java)
+    }
   }
 }

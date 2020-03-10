@@ -21,6 +21,10 @@ package com.maddyhome.idea.vim.group;
 import com.intellij.ide.bookmarks.Bookmark;
 import com.intellij.ide.bookmarks.BookmarkManager;
 import com.intellij.ide.bookmarks.BookmarksListener;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.RoamingType;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -53,7 +57,10 @@ import java.util.stream.Collectors;
 /**
  * This class contains all the mark related functionality
  */
-public class MarkGroup {
+@State(name = "VimMarksSettings", storages = {
+  @Storage(value = "$APP_CONFIG$/vim_settings.xml", roamingType = RoamingType.DISABLED)
+})
+public class MarkGroup implements PersistentStateComponent<Element> {
   public static final char MARK_VISUAL_START = '<';
   public static final char MARK_VISUAL_END = '>';
   public static final char MARK_CHANGE_START = '[';
@@ -83,8 +90,7 @@ public class MarkGroup {
    * @param ch     The desired mark
    * @return The requested mark if set, null if not set
    */
-  @Nullable
-  public Mark getMark(@NotNull Editor editor, char ch) {
+  public @Nullable Mark getMark(@NotNull Editor editor, char ch) {
     Mark mark = null;
     if (ch == '`') ch = '\'';
 
@@ -135,8 +141,7 @@ public class MarkGroup {
    * @param count Postive for next jump (Ctrl-I), negative for previous jump (Ctrl-O).
    * @return The jump or null if out of range.
    */
-  @Nullable
-  public Jump getJump(int count) {
+  public @Nullable Jump getJump(int count) {
     int index = jumps.size() - 1 - (jumpSpot - count);
     if (index < 0 || index >= jumps.size()) {
       return null;
@@ -154,8 +159,7 @@ public class MarkGroup {
    * @param ch     The mark to get
    * @return The mark in the current file, if set, null if no such mark
    */
-  @Nullable
-  public Mark getFileMark(@NotNull Editor editor, char ch) {
+  public @Nullable Mark getFileMark(@NotNull Editor editor, char ch) {
     if (ch == '`') ch = '\'';
     final HashMap fmarks = getFileMarks(editor.getDocument());
     if (fmarks == null) {
@@ -228,8 +232,7 @@ public class MarkGroup {
     return true;
   }
 
-  @Nullable
-  private Bookmark createOrGetSystemMark(char ch, int line, @NotNull Editor editor) {
+  private @Nullable Bookmark createOrGetSystemMark(char ch, int line, @NotNull Editor editor) {
     if (!OptionsManager.INSTANCE.getIdeamarks().isSet()) return null;
     final Project project = editor.getProject();
     if (project == null) return null;
@@ -259,18 +262,15 @@ public class MarkGroup {
     setMark(editor, MARK_CHANGE_END, range.getEndOffset());
   }
 
-  @Nullable
-  public TextRange getChangeMarks(@NotNull Editor editor) {
+  public @Nullable TextRange getChangeMarks(@NotNull Editor editor) {
     return getMarksRange(editor, MARK_CHANGE_START, MARK_CHANGE_END);
   }
 
-  @Nullable
-  public TextRange getVisualSelectionMarks(@NotNull Editor editor) {
+  public @Nullable TextRange getVisualSelectionMarks(@NotNull Editor editor) {
     return getMarksRange(editor, MARK_VISUAL_START, MARK_VISUAL_END);
   }
 
-  @Nullable
-  private TextRange getMarksRange(@NotNull Editor editor, char startMark, char endMark) {
+  private @Nullable TextRange getMarksRange(@NotNull Editor editor, char startMark, char endMark) {
     final Mark start = getMark(editor, startMark);
     final Mark end = getMark(editor, endMark);
     if (start != null && end != null) {
@@ -338,8 +338,7 @@ public class MarkGroup {
     mark.clear();
   }
 
-  @NotNull
-  public List<Mark> getMarks(@NotNull Editor editor) {
+  public @NotNull List<Mark> getMarks(@NotNull Editor editor) {
     HashSet<Mark> res = new HashSet<>();
 
     final FileMarks<Character, Mark> marks = getFileMarks(editor.getDocument());
@@ -355,8 +354,7 @@ public class MarkGroup {
     return list;
   }
 
-  @NotNull
-  public List<Jump> getJumps() {
+  public @NotNull List<Jump> getJumps() {
     return jumps;
   }
 
@@ -371,8 +369,7 @@ public class MarkGroup {
    * @return The map of marks. The keys are <code>Character</code>s of the mark names, the values are
    *         <code>Mark</code>s.
    */
-  @Nullable
-  private FileMarks<Character, Mark> getFileMarks(@NotNull final Document doc) {
+  private @Nullable FileMarks<Character, Mark> getFileMarks(final @NotNull Document doc) {
     VirtualFile vf = FileDocumentManager.getInstance().getFile(doc);
     if (vf == null) {
       return null;
@@ -381,8 +378,7 @@ public class MarkGroup {
     return getFileMarks(vf.getPath());
   }
 
-  @Nullable
-  private HashMap<Character, Mark> getAllFileMarks(@NotNull final Document doc) {
+  private @Nullable HashMap<Character, Mark> getAllFileMarks(final @NotNull Document doc) {
     VirtualFile vf = FileDocumentManager.getInstance().getFile(doc);
     if (vf == null) {
       return null;
@@ -659,6 +655,19 @@ public class MarkGroup {
     }
   }
 
+  @Nullable
+  @Override
+  public Element getState() {
+    Element element = new Element("marks");
+    saveData(element);
+    return element;
+  }
+
+  @Override
+  public void loadState(@NotNull Element state) {
+    readData(state);
+  }
+
   private static class FileMarks<K, V> extends HashMap<K, V> {
     public void setTimestamp(Date timestamp) {
       this.timestamp = timestamp;
@@ -723,8 +732,7 @@ public class MarkGroup {
       // TODO - update jumps
     }
 
-    @Nullable
-    private Editor getAnEditor(@NotNull Document doc) {
+    private @Nullable Editor getAnEditor(@NotNull Document doc) {
       Editor[] editors = EditorFactory.getInstance().getEditors(doc);
 
       if (editors.length > 0) {
@@ -785,9 +793,9 @@ public class MarkGroup {
     }
   }
 
-  @NotNull private final HashMap<String, FileMarks<Character, Mark>> fileMarks = new HashMap<>();
-  @NotNull private final HashMap<Character, Mark> globalMarks = new HashMap<>();
-  @NotNull private final List<Jump> jumps = new ArrayList<>();
+  private final @NotNull HashMap<String, FileMarks<Character, Mark>> fileMarks = new HashMap<>();
+  private final @NotNull HashMap<Character, Mark> globalMarks = new HashMap<>();
+  private final @NotNull List<Jump> jumps = new ArrayList<>();
   private int jumpSpot = -1;
 
   private static final int SAVE_MARK_COUNT = 20;

@@ -118,8 +118,7 @@ public class FileGroup {
     return found;
   }
 
-  @Nullable
-  private VirtualFile findFile(@NotNull VirtualFile root, @NotNull String filename) {
+  private @Nullable VirtualFile findFile(@NotNull VirtualFile root, @NotNull String filename) {
     VirtualFile res = root.findFileByRelativePath(filename);
     if (res != null) {
       return res;
@@ -221,6 +220,20 @@ public class FileGroup {
     else {
       VimPlugin.indicateError();
     }
+  }
+
+  /**
+   * Returns the previous tab.
+   */
+  public @Nullable VirtualFile getPreviousTab(@NotNull DataContext context) {
+    Project project = PlatformDataKeys.PROJECT.getData(context);
+    if (project == null) return null;
+    FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
+    VirtualFile vf = lastSelections.get(fem);
+    if (vf != null && vf.isValid()) {
+      return vf;
+    }
+    return null;
   }
 
   @Nullable
@@ -382,10 +395,10 @@ public class FileGroup {
     VimPlugin.showMessage(msg.toString());
   }
 
-  @NotNull private static final String disposableKey = "VimFileGroupDisposable";
+  private static final @NotNull String disposableKey = "VimFileGroupDisposable";
 
-  @NotNull private static final HashMap<FileEditorManager, VirtualFile> lastSelections = new HashMap<>();
-  @NotNull private static final Logger logger = Logger.getInstance(FileGroup.class.getName());
+  private static final @NotNull HashMap<FileEditorManager, VirtualFile> lastSelections = new HashMap<>();
+  private static final @NotNull Logger logger = Logger.getInstance(FileGroup.class.getName());
 
   /**
    * This method listens for editor tab changes so any insert/replace modes that need to be reset can be.

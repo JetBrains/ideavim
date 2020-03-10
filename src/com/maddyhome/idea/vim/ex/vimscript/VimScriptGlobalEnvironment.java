@@ -33,13 +33,11 @@ public class VimScriptGlobalEnvironment {
 
   private VimScriptGlobalEnvironment() {}
 
-  @NotNull
-  public static VimScriptGlobalEnvironment getInstance() {
+  public static @NotNull VimScriptGlobalEnvironment getInstance() {
     return ourInstance;
   }
 
-  @NotNull
-  public Map<String, Object> getVariables() {
+  public @NotNull Map<String, Object> getVariables() {
     return myVariables;
   }
 }

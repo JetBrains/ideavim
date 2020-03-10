@@ -18,19 +18,27 @@
 
 package com.maddyhome.idea.vim.group;
 
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.RoamingType;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HistoryGroup {
+@State(name = "VimHistorySettings", storages = {
+  @Storage(value = "$APP_CONFIG$/vim_settings.xml", roamingType = RoamingType.DISABLED)
+})
+public class HistoryGroup implements PersistentStateComponent<Element> {
   public static final String SEARCH = "search";
   public static final String COMMAND = "cmd";
   public static final String EXPRESSION = "expr";
@@ -45,8 +53,7 @@ public class HistoryGroup {
     block.addEntry(text);
   }
 
-  @NotNull
-  public List<HistoryEntry> getEntries(String key, int first, int last) {
+  public @NotNull List<HistoryEntry> getEntries(String key, int first, int last) {
     HistoryBlock block = blocks(key);
 
     List<HistoryEntry> entries = block.getEntries();
@@ -167,6 +174,19 @@ public class HistoryGroup {
     return opt.value();
   }
 
+  @Nullable
+  @Override
+  public Element getState() {
+    Element element = new Element("history");
+    saveData(element);
+    return element;
+  }
+
+  @Override
+  public void loadState(@NotNull Element state) {
+    readData(state);
+  }
+
   private static class HistoryBlock {
     public void addEntry(@NotNull String text) {
       for (int i = 0; i < entries.size(); i++) {
@@ -184,12 +204,11 @@ public class HistoryGroup {
       }
     }
 
-    @NotNull
-    public List<HistoryEntry> getEntries() {
+    public @NotNull List<HistoryEntry> getEntries() {
       return entries;
     }
 
-    @NotNull private final List<HistoryEntry> entries = new ArrayList<>();
+    private final @NotNull List<HistoryEntry> entries = new ArrayList<>();
     private int counter;
   }
 
@@ -203,16 +222,15 @@ public class HistoryGroup {
       return number;
     }
 
-    @NotNull
-    public String getEntry() {
+    public @NotNull String getEntry() {
       return entry;
     }
 
     private final int number;
-    @NotNull private final String entry;
+    private final @NotNull String entry;
   }
 
-  @NotNull private final Map<String, HistoryBlock> histories = new HashMap<>();
+  private final @NotNull Map<String, HistoryBlock> histories = new HashMap<>();
 
   private static final Logger logger = Logger.getInstance(HistoryGroup.class.getName());
 }

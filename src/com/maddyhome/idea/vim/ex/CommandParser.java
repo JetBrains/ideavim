@@ -59,7 +59,7 @@ public class CommandParser {
    *
    * @return The singleton instance
    */
-  public synchronized static CommandParser getInstance() {
+  public static synchronized CommandParser getInstance() {
     return CommandParserHolder.INSTANCE;
   }
 
@@ -76,7 +76,7 @@ public class CommandParser {
     //noinspection deprecation
     EX_COMMAND_EP.getPoint(null).addExtensionPointListener(new ExtensionPointListener<ExBeanClass>() {
       @Override
-      public void extensionAdded(@NotNull ExBeanClass extension, @NotNull PluginDescriptor pluginDescriptor) {
+      public void extensionAdded(@NotNull ExBeanClass extension, PluginDescriptor pluginDescriptor) {
         // Suppress listener before the `VimPlugin.turnOn()` function execution. This logic should be rewritten after
         //   version update (or earlier).
         if (!initialRegistration) return;
@@ -85,7 +85,7 @@ public class CommandParser {
       }
 
       @Override
-      public void extensionRemoved(@NotNull ExBeanClass extension, @NotNull PluginDescriptor pluginDescriptor) {
+      public void extensionRemoved(@NotNull ExBeanClass extension, PluginDescriptor pluginDescriptor) {
         if (!initialRegistration) return;
         unregisterHandlers();
         registerHandlers();
@@ -215,8 +215,7 @@ public class CommandParser {
     }
   }
 
-  @Nullable
-  public CommandHandler getCommandHandler(@NotNull ExCommand command) {
+  public @Nullable CommandHandler getCommandHandler(@NotNull ExCommand command) {
     final String cmd = command.getCommand();
     // If there is no command, just a range, use the 'goto line' handler
     if (cmd.length() == 0) {
@@ -241,8 +240,7 @@ public class CommandParser {
    * @return The parse result
    * @throws ExException if the text is syntactically incorrect
    */
-  @NotNull
-  public ExCommand parse(@NotNull String cmd) throws ExException {
+  public @NotNull ExCommand parse(@NotNull String cmd) throws ExException {
     // This is a complicated state machine that should probably be rewritten
     if (logger.isDebugEnabled()) {
       logger.debug("processing `" + cmd + "'");
@@ -622,7 +620,7 @@ public class CommandParser {
     }
   }
 
-  @NotNull private final CommandNode root = new CommandNode();
+  private final @NotNull CommandNode root = new CommandNode();
 
   private enum State {
     START,

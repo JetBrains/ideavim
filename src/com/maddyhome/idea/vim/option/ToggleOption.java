@@ -86,8 +86,7 @@ public class ToggleOption extends Option<Boolean> {
    *
    * @return The option's display value
    */
-  @NotNull
-  public String toString() {
+  public @NotNull String toString() {
     StringBuilder res = new StringBuilder();
     if (!value) {
       res.append("no");

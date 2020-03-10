@@ -30,7 +30,7 @@ import java.util.StringTokenizer;
  * This is an option that accepts an arbitrary list of values
  */
 public class ListOption extends TextOption {
-  @NotNull public final static ListOption empty = new ListOption("", "", new String[0], "");
+  public static final @NotNull ListOption empty = new ListOption("", "", new String[0], "");
 
   /**
    * Gets the value of the option as a comma separated list of values
@@ -38,8 +38,7 @@ public class ListOption extends TextOption {
    * @return The option's value
    */
   @Override
-  @NotNull
-  public String getValue() {
+  public @NotNull String getValue() {
     StringBuilder res = new StringBuilder();
     int cnt = 0;
     for (String s : value) {
@@ -59,8 +58,7 @@ public class ListOption extends TextOption {
    *
    * @return The option's values
    */
-  @NotNull
-  public List<String> values() {
+  public @NotNull List<String> values() {
     return value;
   }
 
@@ -197,8 +195,7 @@ public class ListOption extends TextOption {
     return dflt.equals(value);
   }
 
-  @Nullable
-  protected List<String> parseVals(String val) {
+  protected @Nullable List<String> parseVals(String val) {
     List<String> res = new ArrayList<>();
     StringTokenizer tokenizer = new StringTokenizer(val, ",");
     while (tokenizer.hasMoreTokens()) {
@@ -219,13 +216,12 @@ public class ListOption extends TextOption {
    *
    * @return The option as a string {name}={value list}
    */
-  @NotNull
-  public String toString() {
+  public @NotNull String toString() {
     return "  " + getName() + "=" + getValue();
   }
 
-  @NotNull protected final List<String> dflt;
-  @NotNull protected List<String> value;
+  protected final @NotNull List<String> dflt;
+  protected @NotNull List<String> value;
   protected final String pattern;
 
   /**

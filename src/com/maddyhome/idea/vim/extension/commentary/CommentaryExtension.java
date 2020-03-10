@@ -47,9 +47,8 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
  */
 public class CommentaryExtension implements VimExtension {
 
-  @NotNull
   @Override
-  public String getName() {
+  public @NotNull String getName() {
     return "commentary";
   }
 
@@ -135,8 +134,7 @@ public class CommentaryExtension implements VimExtension {
       });
     }
 
-    @Nullable
-    private TextRange getCommentRange(@NotNull Editor editor) {
+    private @Nullable TextRange getCommentRange(@NotNull Editor editor) {
       final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
       switch (mode) {
         case COMMAND:

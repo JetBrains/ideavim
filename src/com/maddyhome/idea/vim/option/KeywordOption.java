@@ -30,10 +30,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public final class KeywordOption extends ListOption {
-  @NotNull private final Pattern validationPattern;
+  private final @NotNull Pattern validationPattern;
 
   // KeywordSpecs are the option values in reverse order
-  @NotNull private List<KeywordSpec> keywordSpecs = new ArrayList<>();
+  private @NotNull List<KeywordSpec> keywordSpecs = new ArrayList<>();
 
   public KeywordOption(@NotNull String name, @NotNull String abbrev, @NotNull String[] defaultValue) {
     super(name, abbrev, defaultValue,
@@ -116,8 +116,7 @@ public final class KeywordOption extends ListOption {
     }
   }
 
-  @NotNull
-  private List<KeywordSpec> valsToReversedSpecs(@NotNull List<String> vals) {
+  private @NotNull List<KeywordSpec> valsToReversedSpecs(@NotNull List<String> vals) {
     final ArrayList<KeywordSpec> res = new ArrayList<>();
     for (int i = vals.size() - 1; i >= 0; i--) {
       res.add(new KeywordSpec(vals.get(i)));
@@ -125,8 +124,7 @@ public final class KeywordOption extends ListOption {
     return res;
   }
 
-  @Nullable
-  private List<KeywordSpec> valsToValidatedAndReversedSpecs(@Nullable List<String> vals) {
+  private @Nullable List<KeywordSpec> valsToValidatedAndReversedSpecs(@Nullable List<String> vals) {
     final List<KeywordSpec> specs = new ArrayList<>();
     if (vals != null) {
       for (String val : vals) {
@@ -141,9 +139,8 @@ public final class KeywordOption extends ListOption {
     return specs;
   }
 
-  @Nullable
   @Override
-  protected List<String> parseVals(@NotNull String content) {
+  protected @Nullable List<String> parseVals(@NotNull String content) {
     if (!validationPattern.matcher(content).matches()) {
       return null;
     }

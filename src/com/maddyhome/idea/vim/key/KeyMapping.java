@@ -39,22 +39,20 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
   /**
    * Contains all key mapping for some mode.
    */
-  @NotNull private final Map<List<KeyStroke>, MappingInfo> myKeys = new HashMap<>();
+  private final @NotNull Map<List<KeyStroke>, MappingInfo> myKeys = new HashMap<>();
   /**
    * Set the contains all possible prefixes for mappings.
    * E.g. if there is mapping for "hello", this set will contain "h", "he", "hel", etc.
    * Multiset is used to correctly remove the mappings.
    */
-  @NotNull private final Multiset<List<KeyStroke>> myPrefixes = HashMultiset.create();
+  private final @NotNull Multiset<List<KeyStroke>> myPrefixes = HashMultiset.create();
 
-  @NotNull
   @Override
-  public Iterator<List<KeyStroke>> iterator() {
+  public @NotNull Iterator<List<KeyStroke>> iterator() {
     return new ArrayList<>(myKeys.keySet()).iterator();
   }
 
-  @Nullable
-  public MappingInfo get(@NotNull Iterable<KeyStroke> keys) {
+  public @Nullable MappingInfo get(@NotNull Iterable<KeyStroke> keys) {
     // Having a parameter of Iterable allows for a nicer API, because we know when a given list is immutable.
     // TODO: Should we change this to be a trie?
     assert (keys instanceof List) : "keys must be of type List<KeyStroke>";

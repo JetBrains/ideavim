@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
 
 
 public class MessageHelper {
-  @Nullable private static Reference<ResourceBundle> ourBundle;
+  private static @Nullable Reference<ResourceBundle> ourBundle;
 
   @NonNls
   private static final String BUNDLE = "messages";
@@ -38,21 +38,18 @@ public class MessageHelper {
   private MessageHelper() {
   }
 
-  @NotNull
-  public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE)String key, Object... params) {
+  public static @NotNull String message(@NotNull @PropertyKey(resourceBundle = BUNDLE)String key, Object... params) {
     return CommonBundle.message(getBundle(), key, params);
   }
 
   /*
    * This method added for jruby access
    */
-  @NotNull
-  public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE)String key) {
+  public static @NotNull String message(@NotNull @PropertyKey(resourceBundle = BUNDLE)String key) {
     return CommonBundle.message(getBundle(), key);
   }
 
-  @NotNull
-  protected static ResourceBundle getBundle() {
+  protected static @NotNull ResourceBundle getBundle() {
     ResourceBundle bundle = null;
     if (ourBundle != null) bundle = ourBundle.get();
     if (bundle == null) {
