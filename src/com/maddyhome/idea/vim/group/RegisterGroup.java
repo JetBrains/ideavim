@@ -411,6 +411,10 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     registers.put(register, new Register(register, SelectionType.CHARACTER_WISE, keys));
   }
 
+  public void setKeys(char register, @NotNull List<KeyStroke> keys, SelectionType type) {
+    registers.put(register, new Register(register, type, keys));
+  }
+
   public void finishRecording(Editor editor) {
     if (recordRegister != 0) {
       Register reg = null;
