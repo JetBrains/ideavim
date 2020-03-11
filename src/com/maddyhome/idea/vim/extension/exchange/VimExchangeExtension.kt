@@ -52,18 +52,21 @@ class VimExchangeExtension: VimExtension {
   override fun getName() = "exchange"
 
   override fun init() {
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>Exchange"), owner, ExchangeHandler(false), false)
-    putExtensionHandlerMapping(MappingMode.X, parseKeys("<Plug>Exchange"), owner, VExchangeHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>ExchangeClear"), owner, ExchangeClearHandler(), false)
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>ExchangeLine"), owner, ExchangeHandler(true), false)
+    putExtensionHandlerMapping(MappingMode.N, parseKeys(EXCHANGE_CMD), owner, ExchangeHandler(false), false)
+    putExtensionHandlerMapping(MappingMode.X, parseKeys(EXCHANGE_CMD), owner, VExchangeHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, parseKeys(EXCHANGE_CLEAR_CMD), owner, ExchangeClearHandler(), false)
+    putExtensionHandlerMapping(MappingMode.N, parseKeys(EXCHANGE_LINE_CMD), owner, ExchangeHandler(true), false)
 
-    putKeyMapping(MappingMode.N, parseKeys("cx"), getOwner(), parseKeys("<Plug>Exchange"), true)
-    putKeyMapping(MappingMode.X, parseKeys("X"), getOwner(), parseKeys("<Plug>Exchange"), true)
-    putKeyMapping(MappingMode.N, parseKeys("cxc"), getOwner(), parseKeys("<Plug>ExchangeClear"), true)
-    putKeyMapping(MappingMode.N, parseKeys("cxx"), getOwner(), parseKeys("<Plug>ExchangeLine"), true)
+    putKeyMapping(MappingMode.N, parseKeys("cx"), owner, parseKeys(EXCHANGE_CMD), true)
+    putKeyMapping(MappingMode.X, parseKeys("X"), owner, parseKeys(EXCHANGE_CMD), true)
+    putKeyMapping(MappingMode.N, parseKeys("cxc"), owner, parseKeys(EXCHANGE_CLEAR_CMD), true)
+    putKeyMapping(MappingMode.N, parseKeys("cxx"), owner, parseKeys(EXCHANGE_LINE_CMD), true)
   }
 
   private companion object {
+    const val EXCHANGE_CMD = "<Plug>Exchange"
+    const val EXCHANGE_CLEAR_CMD = "<Plug>ExchangeClear"
+    const val EXCHANGE_LINE_CMD = "<Plug>ExchangeLine"
     val EXCHANGE_KEY = Key<Exchange>("exchange");
     class Exchange(val type: CommandState.SubMode, val start: Mark, val end: Mark, val text: String)
     fun clearExchange(editor: Editor) {
@@ -71,15 +74,11 @@ class VimExchangeExtension: VimExtension {
     }
   }
 
-
   private class ExchangeHandler(private val isLine: Boolean): VimExtensionHandler {
-
-
     override fun execute(editor: Editor, context: DataContext) {
       setOperatorFunction(Operator(false))
       executeNormal(parseKeys(if(isLine) "g@_" else "g@"), editor)
     }
-
   }
 
   private class ExchangeClearHandler: VimExtensionHandler {
@@ -100,7 +99,6 @@ class VimExchangeExtension: VimExtension {
 
   private class Operator(private val isVisual: Boolean): OperatorFunction {
     fun Editor.getMarkOffset(mark: Mark) = EditorHelper.getOffset(this, mark.logicalLine, mark.col)
-//    fun Exchange.getRange(editor: Editor) = TextRange(editor.getMarkOffset(this.start), editor.getMarkOffset(this.end))
     fun CommandState.SubMode.getString() = when(this) {
       CommandState.SubMode.VISUAL_CHARACTER -> "v"
       CommandState.SubMode.VISUAL_LINE -> "V"
@@ -112,7 +110,7 @@ class VimExchangeExtension: VimExtension {
       fun highlightExchange(ex: Exchange) {
         val attributes = editor.colorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES)
         val hlArea = when(ex.type) {
-          CommandState.SubMode.VISUAL_LINE -> HighlighterTargetArea.EXACT_RANGE
+          CommandState.SubMode.VISUAL_LINE -> HighlighterTargetArea.LINES_IN_RANGE
           // TODO: handle other modes
           else -> HighlighterTargetArea.EXACT_RANGE
         }
@@ -164,16 +162,7 @@ class VimExchangeExtension: VimExtension {
       fun pasteExchange(sourceExchange: Exchange, targetExchange: Exchange) {
         VimPlugin.getMark().setChangeMarks(editor, TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end)+1))
         // do this instead of direct text manipulation to set change marks
-//        setRegister('z', stringToKeys(sourceExchange.text))
-        VimPlugin.getRegister().storeTextInternal(
-          editor,
-//          sourceExchange.getRange(editor),
-          TextRange(-1, 0),
-          sourceExchange.text,
-          SelectionType.fromSubMode(sourceExchange.type),
-          'z',
-          false
-        )
+        setRegister('z', stringToKeys(sourceExchange.text), SelectionType.fromSubMode(sourceExchange.type))
         executeNormal(stringToKeys("""`[${targetExchange.type.getString()}`]"zp"""), editor)
       }
       fun fixCursor(ex1: Exchange, ex2: Exchange, reverse: Boolean) {
@@ -275,33 +264,29 @@ class VimExchangeExtension: VimExtension {
       }
       // TODO: improve KeyStroke list to sting conversion
       fun getRegisterText(reg: Char): String = getRegister(reg)?.map { it.keyChar }?.joinToString("") ?: ""
+      fun getMarks(isVisual: Boolean): Pair<Mark, Mark> {
+        val (startMark, endMark) =
+          if (isVisual) {
+            Pair(MarkGroup.MARK_VISUAL_START, MarkGroup.MARK_VISUAL_END)
+          } else {
+            Pair(MarkGroup.MARK_CHANGE_START, MarkGroup.MARK_CHANGE_END)
+          }
+        val marks = VimPlugin.getMark()
+        return Pair(marks.getMark(editor, startMark)!!, marks.getMark(editor, endMark)!!)
+      }
 
       val unnRegText = getRegister('"')
       val starRegText = getRegister('*')
       val plusRegText = getRegister('+')
 
-      val text = if (isVisual) {
-        // TODO: improve
-        val selectionStart = VimPlugin.getMark().getMark(editor, MarkGroup.MARK_VISUAL_START)!!
-        val selectionEnd = VimPlugin.getMark().getMark(editor, MarkGroup.MARK_VISUAL_END)!!
-
+      var (selectionStart, selectionEnd) = getMarks(isVisual)
+      if (isVisual) {
         executeNormal(parseKeys("gvy"), editor)
-
-        val text = getRegisterText('"')
         // TODO: handle
         //if &selection ==# 'exclusive' && start != end
         //			let end.column -= len(matchstr(@@, '\_.$'))
-        Exchange(
-          selectionType.toSubMode(),
-          selectionStart,
-          selectionEnd,
-//          getSelectionText(selectionType)
-//          EditorHelper.getText(editor, editor.getMarkOffset(selectionStart), editor.getMarkOffset(selectionEnd)+1)
-          text
-        )
       } else {
-        val selectionStart = VimPlugin.getMark().getMark(editor, MarkGroup.MARK_CHANGE_START)!!
-        val selectionEnd = VimPlugin.getMark().getMark(editor, MarkGroup.MARK_CHANGE_END)!!.let {
+        selectionEnd = selectionEnd.let {
           VimMark.create(
             it.key,
             it.logicalLine,
@@ -315,22 +300,20 @@ class VimExchangeExtension: VimExtension {
           SelectionType.BLOCK_WISE -> executeNormal(stringToKeys("""`[<C-V>`]y"""), editor)
           SelectionType.CHARACTER_WISE -> executeNormal(stringToKeys("`[v`]y"), editor)
         }
-        val text = getRegisterText('"')
-        Exchange(
-          selectionType.toSubMode(),
-          selectionStart,
-          selectionEnd,
-//          getSelectionText(selectionType)
-//          EditorHelper.getText(editor, editor.getMarkOffset(selectionStart), editor.getMarkOffset(selectionEnd)+1)
-        text
-        )
       }
+
+      val text = getRegisterText('"')
 
       setRegister('"', unnRegText)
       setRegister('*', starRegText)
       setRegister('+', plusRegText)
 
-      return text
+      return Exchange(
+        selectionType.toSubMode(),
+        selectionStart,
+        selectionEnd,
+        text
+      )
     }
   }
 }
