@@ -251,7 +251,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     }
 
     if (start != -1) {
-      VimPlugin.getMark().setChangeMarks(editor, new TextRange(start, Math.max(end - 1, 0)));
+      VimPlugin.getMark().setChangeMarks(editor, new TextRange(start, end));
     }
 
     return true;

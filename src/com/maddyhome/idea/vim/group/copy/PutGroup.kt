@@ -135,7 +135,7 @@ class PutGroup {
       if (data.visualSelection != null) {
         val offset = editor.caretModel.primaryCaret.offset
         VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, offset)
-        VimPlugin.getMark().setChangeMarks(editor, TextRange(offset, offset))
+        VimPlugin.getMark().setChangeMarks(editor, TextRange(offset, offset+1))
       }
       return null
     }
