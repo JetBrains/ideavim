@@ -536,7 +536,7 @@ public class StringHelper {
       return getKeyStroke(c);
     }
     else if (modifiers == SHIFT_MASK) {
-      return getKeyStroke(Character.toUpperCase(c));
+      return getKeyStroke(Character.toUpperCase(c), modifiers);
     }
     else {
       return getKeyStroke(Character.toUpperCase(c), modifiers);

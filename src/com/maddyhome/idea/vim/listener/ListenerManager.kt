@@ -40,6 +40,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.VimKeyListener
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimTypedActionHandler
 import com.maddyhome.idea.vim.command.CommandState
@@ -226,6 +227,7 @@ object VimListenerManager {
 
     @JvmStatic
     fun add(editor: Editor) {
+      editor.contentComponent.addKeyListener(VimKeyListener)
       val eventFacade = EventFacade.getInstance()
       eventFacade.addEditorMouseListener(editor, EditorMouseHandler)
       eventFacade.addEditorMouseMotionListener(editor, EditorMouseHandler)
@@ -235,6 +237,7 @@ object VimListenerManager {
 
     @JvmStatic
     fun remove(editor: Editor) {
+      editor.contentComponent.removeKeyListener(VimKeyListener)
       val eventFacade = EventFacade.getInstance()
       eventFacade.removeEditorMouseListener(editor, EditorMouseHandler)
       eventFacade.removeEditorMouseMotionListener(editor, EditorMouseHandler)

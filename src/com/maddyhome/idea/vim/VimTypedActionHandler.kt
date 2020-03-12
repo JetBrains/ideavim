@@ -24,6 +24,8 @@ import com.intellij.openapi.editor.actionSystem.ActionPlan
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler
 import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx
 import com.maddyhome.idea.vim.helper.EditorDataContext
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 /**
@@ -39,12 +41,16 @@ class VimTypedActionHandler(origHandler: TypedActionHandler?) : TypedActionHandl
   }
 
   override fun beforeExecute(editor: Editor, charTyped: Char, context: DataContext, plan: ActionPlan) {
-    handler.beforeHandleKey(editor, KeyStroke.getKeyStroke(charTyped), context, plan)
+    val modifiers = if (charTyped == ' ' && VimKeyListener.isSpaceShift) KeyEvent.SHIFT_MASK else 0
+    val keyStroke = KeyStroke.getKeyStroke(charTyped, modifiers)
+    handler.beforeHandleKey(editor, keyStroke, context, plan)
   }
 
   override fun execute(editor: Editor, charTyped: Char, context: DataContext) {
     try {
-      handler.handleKey(editor, KeyStroke.getKeyStroke(charTyped), EditorDataContext(editor))
+      val modifiers = if (charTyped == ' ' && VimKeyListener.isSpaceShift) KeyEvent.SHIFT_MASK else 0
+      val keyStroke = KeyStroke.getKeyStroke(charTyped, modifiers)
+      handler.handleKey(editor, keyStroke, EditorDataContext(editor))
     } catch (e: Throwable) {
       logger.error(e)
     }
@@ -52,5 +58,17 @@ class VimTypedActionHandler(origHandler: TypedActionHandler?) : TypedActionHandl
 
   companion object {
     private val logger = logger<VimTypedActionHandler>()
+  }
+}
+
+/**
+ * A nasty workaround to handle `<S-Space>` events. Probably all the key events should go trough this listener.
+ */
+object VimKeyListener : KeyAdapter() {
+
+  var isSpaceShift = false
+
+  override fun keyPressed(e: KeyEvent) {
+    isSpaceShift = e.modifiersEx and KeyEvent.SHIFT_DOWN_MASK != 0 && e.keyChar == ' '
   }
 }
