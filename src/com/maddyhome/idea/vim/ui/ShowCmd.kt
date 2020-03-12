@@ -78,7 +78,7 @@ class ShowCmdStatusBarWidget: StatusBarWidgetProvider {
     override fun getPresentation(type: StatusBarWidget.PlatformType): StatusBarWidget.WidgetPresentation? = this
 
     override fun getClickConsumer(): Consumer<MouseEvent>? = null
-    override fun getTooltipText() = "IdeaVim: " + ShowCmd.getFullText(this.editor)
+    override fun getTooltipText() = "IdeaVim showcmd"
     override fun getText(): String = ShowCmd.getWidgetText(editor)
     override fun getAlignment() = Component.CENTER_ALIGNMENT
 
