@@ -15,47 +15,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim
 
-package com.maddyhome.idea.vim;
-
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.ActionPlan;
-import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
-import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx;
-import com.maddyhome.idea.vim.helper.EditorDataContext;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.actionSystem.ActionPlan
+import com.intellij.openapi.editor.actionSystem.TypedActionHandler
+import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx
+import com.maddyhome.idea.vim.helper.EditorDataContext
+import javax.swing.KeyStroke
 
 /**
  * Accepts all regular keystrokes and passes them on to the Vim key handler.
  *
- * IDE shortcut keys used by Vim commands are handled by {@link com.maddyhome.idea.vim.action.VimShortcutKeyAction}.
+ * IDE shortcut keys used by Vim commands are handled by [com.maddyhome.idea.vim.action.VimShortcutKeyAction].
  */
-public class VimTypedActionHandler implements TypedActionHandlerEx {
-  private static final Logger logger = Logger.getInstance(VimTypedActionHandler.class.getName());
+class VimTypedActionHandler(origHandler: TypedActionHandler?) : TypedActionHandlerEx {
+  private val handler = KeyHandler.getInstance()
 
-  private final @NotNull KeyHandler handler;
-
-  public VimTypedActionHandler(TypedActionHandler origHandler) {
-    handler = KeyHandler.getInstance();
-    handler.setOriginalHandler(origHandler);
+  init {
+    handler.originalHandler = origHandler
   }
 
-  @Override
-  public void beforeExecute(@NotNull Editor editor, char charTyped, @NotNull DataContext context, @NotNull ActionPlan plan) {
-    handler.beforeHandleKey(editor, KeyStroke.getKeyStroke(charTyped), context, plan);
+  override fun beforeExecute(editor: Editor, charTyped: Char, context: DataContext, plan: ActionPlan) {
+    handler.beforeHandleKey(editor, KeyStroke.getKeyStroke(charTyped), context, plan)
   }
 
-  @Override
-  public void execute(final @NotNull Editor editor, final char charTyped, final @NotNull DataContext context) {
+  override fun execute(editor: Editor, charTyped: Char, context: DataContext) {
     try {
-      handler.handleKey(editor, KeyStroke.getKeyStroke(charTyped), new EditorDataContext(editor));
+      handler.handleKey(editor, KeyStroke.getKeyStroke(charTyped), EditorDataContext(editor))
+    } catch (e: Throwable) {
+      logger.error(e)
     }
-    catch (Throwable e) {
-      logger.error(e);
-    }
+  }
+
+  companion object {
+    private val logger = logger<VimTypedActionHandler>()
   }
 }
