@@ -29,7 +29,7 @@ class NextFileHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-    val count = cmd.getCount(editor, context, 1, true)
+    val count = cmd.getCount(editor, 1, true)
     VimPlugin.getMark().saveJumpLocation(editor)
     VimPlugin.getFile().selectNextFile(count, context)
     return true

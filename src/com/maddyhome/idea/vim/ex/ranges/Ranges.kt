@@ -17,7 +17,6 @@
  */
 package com.maddyhome.idea.vim.ex.ranges
 
-import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
@@ -59,13 +58,13 @@ class Ranges {
     return endLine
   }
 
-  fun getLine(editor: Editor, caret: Caret, context: DataContext): Int {
-    processRange(editor, caret, context)
+  fun getLine(editor: Editor, caret: Caret): Int {
+    processRange(editor, caret)
     return endLine
   }
 
-  fun getFirstLine(editor: Editor, caret: Caret, context: DataContext): Int {
-    processRange(editor, caret, context)
+  fun getFirstLine(editor: Editor, caret: Caret): Int {
+    processRange(editor, caret)
     return startLine
   }
 
@@ -79,8 +78,8 @@ class Ranges {
    */
   fun getCount(editor: Editor, count: Int): Int = if (count == -1) getLine(editor) else count
 
-  fun getCount(editor: Editor, caret: Caret, context: DataContext, count: Int): Int {
-    return if (count == -1) getLine(editor, caret, context) else count
+  fun getCount(editor: Editor, caret: Caret, count: Int): Int {
+    return if (count == -1) getLine(editor, caret) else count
   }
 
   /**
@@ -105,8 +104,8 @@ class Ranges {
     return LineRange(start, end)
   }
 
-  fun getLineRange(editor: Editor, caret: Caret, context: DataContext, count: Int): LineRange {
-    processRange(editor, caret, context)
+  fun getLineRange(editor: Editor, caret: Caret, count: Int): LineRange {
+    processRange(editor, caret)
     return if (count == -1) LineRange(startLine, endLine) else LineRange(endLine, endLine + count - 1)
   }
 
@@ -120,15 +119,15 @@ class Ranges {
    * @param count   The count given at the end of the command or -1 if no such count
    * @return The text range
    */
-  fun getTextRange(editor: Editor, context: DataContext?, count: Int): TextRange {
+  fun getTextRange(editor: Editor, count: Int): TextRange {
     val lr = getLineRange(editor, count)
     val start = EditorHelper.getLineStartOffset(editor, lr.startLine)
     val end = EditorHelper.getLineEndOffset(editor, lr.endLine, true) + 1
     return TextRange(start, min(end, EditorHelper.getFileSize(editor)))
   }
 
-  fun getTextRange(editor: Editor, caret: Caret, context: DataContext, count: Int): TextRange {
-    val lineRange = getLineRange(editor, caret, context, count)
+  fun getTextRange(editor: Editor, caret: Caret, count: Int): TextRange {
+    val lineRange = getLineRange(editor, caret, count)
     val start = EditorHelper.getLineStartOffset(editor, lineRange.startLine)
     val end = EditorHelper.getLineEndOffset(editor, lineRange.endLine, true) + 1
     return TextRange(start, min(end, EditorHelper.getFileSize(editor)))
@@ -165,7 +164,7 @@ class Ranges {
     done = true
   }
 
-  private fun processRange(editor: Editor, caret: Caret, context: DataContext) {
+  private fun processRange(editor: Editor, caret: Caret) {
     startLine = if (defaultLine == -1) caret.logicalPosition.line else defaultLine
     endLine = startLine
     var lastZero = false

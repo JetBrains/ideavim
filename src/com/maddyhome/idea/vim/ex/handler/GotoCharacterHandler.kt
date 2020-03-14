@@ -32,7 +32,7 @@ class GotoCharacterHandler : CommandHandler.ForEachCaret() {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
-    val count = cmd.getCount(editor, caret, context, 1, true)
+    val count = cmd.getCount(editor, caret, 1, true)
     if (count <= 0) return false
 
     val offset = VimPlugin.getMotion().moveCaretToNthCharacter(editor, count - 1)

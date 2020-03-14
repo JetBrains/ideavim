@@ -161,6 +161,8 @@ object VimListenerManager {
 
   object GlobalListeners {
     fun enable() {
+      @Suppress("DEPRECATION")
+      // [VERSION UPDATE] 193+ com.intellij.openapi.editor.actionSystem.TypedAction.getInstance
       val typedAction = EditorActionManager.getInstance().typedAction
       if (typedAction.rawHandler !is VimTypedActionHandler) {
         // Actually this if should always be true, but just as protection

@@ -23,7 +23,10 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.ex.*
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import java.util.*
@@ -46,7 +49,7 @@ class SortHandler : CommandHandler.SingleExecution() {
     val lineComparator = LineComparator(ignoreCase, number, reverse)
     if (editor.inBlockSubMode) {
       val primaryCaret = editor.caretModel.primaryCaret
-      val range = getLineRange(editor, primaryCaret, context, cmd)
+      val range = getLineRange(editor, primaryCaret, cmd)
       val worked = VimPlugin.getChange().sortRange(editor, range, lineComparator)
       primaryCaret.moveToOffset(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, range.startLine))
       return worked
@@ -54,7 +57,7 @@ class SortHandler : CommandHandler.SingleExecution() {
 
     var worked = true
     for (caret in editor.caretModel.allCarets) {
-      val range = getLineRange(editor, caret, context, cmd)
+      val range = getLineRange(editor, caret, cmd)
       if (!VimPlugin.getChange().sortRange(editor, range, lineComparator)) {
         worked = false
       }
@@ -64,8 +67,8 @@ class SortHandler : CommandHandler.SingleExecution() {
     return worked
   }
 
-  private fun getLineRange(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): LineRange {
-    val range = cmd.getLineRange(editor, caret, context)
+  private fun getLineRange(editor: Editor, caret: Caret, cmd: ExCommand): LineRange {
+    val range = cmd.getLineRange(editor, caret)
 
     // Something like "30,20sort" gets converted to "20,30sort"
     val normalizedRange = if (range.endLine < range.startLine) LineRange(range.endLine, range.startLine) else range

@@ -36,7 +36,7 @@ class ShiftLeftHandler : CommandHandler.ForEachCaret(), ComplicatedNameExCommand
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
   override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
-    val range = cmd.getTextRange(editor, caret, context, true)
+    val range = cmd.getTextRange(editor, caret, true)
     val endOffsets = range.endOffsets.map { it - 1 }.toIntArray()
     VimPlugin.getChange().indentRange(editor, caret, context,
       TextRange(range.startOffsets, endOffsets),

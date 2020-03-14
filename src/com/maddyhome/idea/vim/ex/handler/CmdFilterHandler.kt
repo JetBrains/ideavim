@@ -22,7 +22,11 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.ex.*
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.ExOutputModel
+import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import java.io.IOException
@@ -54,7 +58,7 @@ class CmdFilterHandler : CommandHandler.SingleExecution() {
         true
       } else {
         // Filter
-        val range = cmd.getTextRange(editor, context, false)
+        val range = cmd.getTextRange(editor, false)
         VimPlugin.getProcess().executeFilter(editor, range, command)
       }
     } catch (e: IOException) {

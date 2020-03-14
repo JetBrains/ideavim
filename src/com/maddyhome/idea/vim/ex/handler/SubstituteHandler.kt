@@ -30,7 +30,7 @@ class SubstituteHandler : CommandHandler.SingleExecution() {
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     var result = true
     for (caret in editor.caretModel.allCarets) {
-      val lineRange = cmd.getLineRange(editor, caret, context)
+      val lineRange = cmd.getLineRange(editor, caret)
       if (!VimPlugin.getSearch().searchAndReplace(editor, caret, lineRange, cmd.command, cmd.argument)) {
         result = false
       }

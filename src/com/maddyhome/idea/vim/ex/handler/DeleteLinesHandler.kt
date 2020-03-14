@@ -40,7 +40,7 @@ class DeleteLinesHandler : CommandHandler.ForEachCaret() {
 
     if (!VimPlugin.getRegister().selectRegister(register)) return false
 
-    val textRange = cmd.getTextRange(editor, caret, context, true)
+    val textRange = cmd.getTextRange(editor, caret, true)
     return VimPlugin.getChange().deleteRange(editor, caret, textRange, SelectionType.LINE_WISE, false)
   }
 }

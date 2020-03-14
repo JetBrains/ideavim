@@ -37,7 +37,7 @@ class RepeatHandler : CommandHandler.ForEachCaret() {
     if (arg == '@') arg = lastArg
     lastArg = arg
 
-    val line = cmd.getLine(editor, caret, context)
+    val line = cmd.getLine(editor, caret)
     MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLine(editor, line, editor.caretModel.primaryCaret))
 
     if (arg == ':') {

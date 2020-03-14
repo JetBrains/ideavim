@@ -50,6 +50,7 @@ class VimLocalConfig : PersistentStateComponent<Element> {
 
   companion object {
     fun initialize() {
+      @Suppress("DEPRECATION")
       ServiceManager.getService(VimLocalConfig::class.java)
     }
   }

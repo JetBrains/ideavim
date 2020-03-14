@@ -47,7 +47,7 @@ class GotoLineHandler : CommandHandler.ForEachCaret() {
    * @return True if able to perform the command, false if not
    */
   override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
-    val line = min(cmd.getLine(editor, caret, context), EditorHelper.getLineCount(editor) - 1)
+    val line = min(cmd.getLine(editor, caret), EditorHelper.getLineCount(editor) - 1)
 
     if (line >= 0) {
       MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, line))

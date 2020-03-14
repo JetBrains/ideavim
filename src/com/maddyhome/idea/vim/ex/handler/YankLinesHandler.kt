@@ -45,7 +45,7 @@ class YankLinesHandler : CommandHandler.SingleExecution() {
     val starts = ArrayList<Int>(caretModel.caretCount)
     val ends = ArrayList<Int>(caretModel.caretCount)
     for (caret in caretModel.allCarets) {
-      val range = cmd.getTextRange(editor, caret, context, true)
+      val range = cmd.getTextRange(editor, caret, true)
       starts.add(range.startOffset)
       ends.add(range.endOffset)
     }
