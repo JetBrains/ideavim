@@ -23,14 +23,12 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandState.SubMode
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.helper.subMode
 import java.util.*
 
 /**
@@ -46,15 +44,18 @@ class DeleteVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
                              context: DataContext,
                              cmd: Command,
                              range: VimSelection): Boolean {
-    val mode = editor.subMode
     val textRange = range.toVimTextRange(false)
-    return if (mode == SubMode.VISUAL_BLOCK) {
-      VimPlugin.getChange()
-        .deleteRange(editor, editor.caretModel.primaryCaret, textRange, SelectionType.fromSubMode(mode), false)
-    } else {
-      val lineRange = TextRange(EditorHelper.getLineStartForOffset(editor, textRange.startOffset),
-        EditorHelper.getLineEndForOffset(editor, textRange.endOffset) + 1)
-      VimPlugin.getChange().deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false)
+    val (usedCaret, usedRange, usedType) = when (range.type) {
+      SelectionType.BLOCK_WISE -> Triple(editor.caretModel.primaryCaret, textRange, range.type)
+      SelectionType.LINE_WISE -> Triple(caret, textRange, SelectionType.LINE_WISE)
+      SelectionType.CHARACTER_WISE -> {
+        val lineRange = TextRange(
+          EditorHelper.getLineStartForOffset(editor, textRange.startOffset),
+          EditorHelper.getLineEndForOffset(editor, textRange.endOffset) + 1
+        )
+        Triple(caret, lineRange, SelectionType.LINE_WISE)
+      }
     }
+    return VimPlugin.getChange().deleteRange(editor, usedCaret, usedRange, usedType, false)
   }
 }
