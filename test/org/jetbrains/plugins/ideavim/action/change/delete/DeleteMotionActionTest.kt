@@ -22,11 +22,16 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class DeleteMotionActionTest : VimTestCase() {
 
-  fun `ignoreTest delete last line`() {
+  @VimBehaviorDiffers(originalVimAfter = """
+        def xxx():
+          ${c}expression one
+  """)
+  fun `test delete last line`() {
     typeTextInFile(parseKeys("dd"),
       """
         def xxx():
@@ -35,11 +40,13 @@ class DeleteMotionActionTest : VimTestCase() {
           """.trimIndent())
     myFixture.checkResult("""
         def xxx():
-          ${c}expression one
+          expression on${c}e
+
           """.trimIndent())
   }
 
-  fun `ignoreTest delete last line stored with new line`() {
+  @VimBehaviorDiffers(originalVimAfter = "  expression two\n")
+  fun `test delete last line stored with new line`() {
     typeTextInFile(parseKeys("dd"),
       """
         def xxx():
@@ -47,10 +54,10 @@ class DeleteMotionActionTest : VimTestCase() {
           expression${c} two
           """.trimIndent())
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: ""
-    assertEquals("  expression two\n", savedText)
+    assertEquals("  expression two", savedText)
   }
 
-  fun `ignoreTest delete line action multicaret`() {
+  fun `test delete line action multicaret`() {
     typeTextInFile(parseKeys("d3d"),
       """
         abc${c}de
@@ -62,7 +69,7 @@ class DeleteMotionActionTest : VimTestCase() {
         abcde
         
         """.trimIndent())
-    myFixture.checkResult("${c}abcde\n")
+    myFixture.checkResult("${c}abcd${c}e\n")
   }
 
   fun `test delete motion action multicaret`() {
