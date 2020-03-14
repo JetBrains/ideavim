@@ -33,11 +33,11 @@ public class DigraphSequence {
   }
 
   public static boolean isDigraphStart(@NotNull KeyStroke key) {
-    return key.getKeyCode() == KeyEvent.VK_K && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0;
+    return key.getKeyCode() == KeyEvent.VK_K && (key.getModifiers() & KeyEvent.CTRL_DOWN_MASK) != 0;
   }
 
   public static boolean isLiteralStart(@NotNull KeyStroke key) {
-    return (key.getKeyCode() == KeyEvent.VK_V || key.getKeyCode() == KeyEvent.VK_Q) && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0;
+    return (key.getKeyCode() == KeyEvent.VK_V || key.getKeyCode() == KeyEvent.VK_Q) && (key.getModifiers() & KeyEvent.CTRL_DOWN_MASK) != 0;
   }
 
   public DigraphResult startDigraphSequence() {

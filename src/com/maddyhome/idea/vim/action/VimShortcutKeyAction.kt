@@ -191,15 +191,15 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
   companion object {
     @JvmField
     val VIM_ONLY_EDITOR_KEYS: Set<KeyStroke> = ImmutableSet.builder<KeyStroke>().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0)).addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0))
-      .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0)).addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_MASK))
-      .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0)).addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_MASK))
-      .addAll(getKeyStrokes(KeyEvent.VK_UP, 0, InputEvent.CTRL_MASK, InputEvent.SHIFT_MASK)).addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0, InputEvent.CTRL_MASK, InputEvent.SHIFT_MASK))
-      .addAll(getKeyStrokes(KeyEvent.VK_LEFT, 0, InputEvent.CTRL_MASK, InputEvent.SHIFT_MASK, InputEvent.CTRL_MASK or InputEvent.SHIFT_MASK))
-      .addAll(getKeyStrokes(KeyEvent.VK_RIGHT, 0, InputEvent.CTRL_MASK, InputEvent.SHIFT_MASK, InputEvent.CTRL_MASK or InputEvent.SHIFT_MASK))
-      .addAll(getKeyStrokes(KeyEvent.VK_HOME, 0, InputEvent.CTRL_MASK, InputEvent.SHIFT_MASK, InputEvent.CTRL_MASK or InputEvent.SHIFT_MASK))
-      .addAll(getKeyStrokes(KeyEvent.VK_END, 0, InputEvent.CTRL_MASK, InputEvent.SHIFT_MASK, InputEvent.CTRL_MASK or InputEvent.SHIFT_MASK))
-      .addAll(getKeyStrokes(KeyEvent.VK_PAGE_UP, 0, InputEvent.SHIFT_MASK, InputEvent.CTRL_MASK or InputEvent.SHIFT_MASK))
-      .addAll(getKeyStrokes(KeyEvent.VK_PAGE_DOWN, 0, InputEvent.SHIFT_MASK, InputEvent.CTRL_MASK or InputEvent.SHIFT_MASK)).build()
+      .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0)).addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK))
+      .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0)).addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_DOWN_MASK))
+      .addAll(getKeyStrokes(KeyEvent.VK_UP, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)).addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK))
+      .addAll(getKeyStrokes(KeyEvent.VK_LEFT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))
+      .addAll(getKeyStrokes(KeyEvent.VK_RIGHT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))
+      .addAll(getKeyStrokes(KeyEvent.VK_HOME, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))
+      .addAll(getKeyStrokes(KeyEvent.VK_END, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))
+      .addAll(getKeyStrokes(KeyEvent.VK_PAGE_UP, 0, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))
+      .addAll(getKeyStrokes(KeyEvent.VK_PAGE_DOWN, 0, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)).build()
 
     private const val ACTION_ID = "VimShortcutKeyAction"
 

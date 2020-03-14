@@ -34,7 +34,7 @@ class VimEditorBackSpace : VimActionHandler.SingleExecution(), ComplicatedKeysAc
   private val actionName: String = "EditorBackSpace"
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_DOWN_MASK)),
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0))
   )
 
@@ -85,7 +85,7 @@ class VimEditorTab : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
   private val actionName: String = "EditorTab"
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_MASK)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK)),
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0))
   )
 

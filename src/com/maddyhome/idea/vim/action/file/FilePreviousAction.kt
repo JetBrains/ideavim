@@ -28,8 +28,8 @@ import javax.swing.KeyStroke
 
 class FilePreviousAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_6, KeyEvent.CTRL_MASK or KeyEvent.SHIFT_MASK)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_CIRCUMFLEX, KeyEvent.CTRL_MASK))
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_6, KeyEvent.CTRL_DOWN_MASK or KeyEvent.SHIFT_DOWN_MASK)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_CIRCUMFLEX, KeyEvent.CTRL_DOWN_MASK))
   )
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

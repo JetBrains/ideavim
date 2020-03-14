@@ -44,10 +44,10 @@ class MotionScrollPageUpInsertModeAction : VimActionHandler.SingleExecution(), C
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_MASK)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, KeyEvent.CTRL_MASK)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_MASK)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, KeyEvent.SHIFT_MASK))
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_DOWN_MASK)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, KeyEvent.CTRL_DOWN_MASK)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_DOWN_MASK)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, KeyEvent.SHIFT_DOWN_MASK))
   )
 
   override val type: Command.Type = Command.Type.OTHER_READONLY

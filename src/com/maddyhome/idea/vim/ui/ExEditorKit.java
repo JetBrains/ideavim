@@ -86,7 +86,7 @@ public class ExEditorKit extends DefaultEditorKit {
     if (cmd != null && cmd.length() > 0) {
       char ch = cmd.charAt(0);
       if (ch < ' ') {
-        if ((mods & KeyEvent.CTRL_MASK) != 0) {
+        if ((mods & ActionEvent.CTRL_MASK) != 0) {
           return KeyStroke.getKeyStroke(KeyEvent.VK_A + ch - 1, mods);
         }
       }
@@ -246,7 +246,7 @@ public class ExEditorKit extends DefaultEditorKit {
                   target.setCaretPosition(offset + text.length());
                 }
               }
-            } else if ((key.getModifiers() & KeyEvent.CTRL_MASK) != 0 && key.getKeyCode() == KeyEvent.VK_C) {
+            } else if ((key.getModifiers() & KeyEvent.CTRL_DOWN_MASK) != 0 && key.getKeyCode() == KeyEvent.VK_C) {
               // Eat any unused keys, unless it's <C-C>, in which case forward on and cancel entry
               target.handleKey(key);
             }
@@ -507,7 +507,7 @@ public class ExEditorKit extends DefaultEditorKit {
             target.clearCurrentAction();
             // Eat the character, unless it's <C-C>, in which case, forward on and cancel entry. Note that at some point
             // we should support input of control characters
-            if ((key.getModifiers() & KeyEvent.CTRL_MASK) != 0 && key.getKeyCode() == KeyEvent.VK_C) {
+            if ((key.getModifiers() & KeyEvent.CTRL_DOWN_MASK) != 0 && key.getKeyCode() == KeyEvent.VK_C) {
               target.handleKey(key);
             }
             break;

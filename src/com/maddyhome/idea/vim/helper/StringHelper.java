@@ -101,7 +101,7 @@ public class StringHelper {
                 stroke = getKeyStroke(c, 0);
               }
               else if (isControlCharacter(c)) {
-                stroke = getKeyStroke(c + 'A' - 1, CTRL_MASK);
+                stroke = getKeyStroke(c + 'A' - 1, CTRL_DOWN_MASK);
               }
               else {
                 stroke = getKeyStroke(c);
@@ -205,16 +205,16 @@ public class StringHelper {
     }
 
     String prefix = "";
-    if ((modifiers & META_MASK) != 0) {
+    if ((modifiers & META_DOWN_MASK) != 0) {
       prefix += "M-";
     }
-    if ((modifiers & ALT_MASK) != 0) {
+    if ((modifiers & ALT_DOWN_MASK) != 0) {
       prefix += "A-";
     }
-    if ((modifiers & CTRL_MASK) != 0) {
+    if ((modifiers & CTRL_DOWN_MASK) != 0) {
       prefix += "C-";
     }
-    if ((modifiers & SHIFT_MASK) != 0) {
+    if ((modifiers & SHIFT_DOWN_MASK) != 0) {
       prefix += "S-";
     }
 
@@ -268,7 +268,7 @@ public class StringHelper {
     if (c == CHAR_UNDEFINED && key.getModifiers() == 0) {
       c = (char)key.getKeyCode();
     }
-    else if (c == CHAR_UNDEFINED && (key.getModifiers() & CTRL_MASK) != 0) {
+    else if (c == CHAR_UNDEFINED && (key.getModifiers() & CTRL_DOWN_MASK) != 0) {
       c = (char)(key.getKeyCode() - 'A' + 1);
     }
 
@@ -304,8 +304,8 @@ public class StringHelper {
   public static boolean isCloseKeyStroke(@NotNull KeyStroke key) {
     return key.getKeyCode() == VK_ESCAPE ||
            key.getKeyChar() == VK_ESCAPE ||
-           key.getKeyCode() == VK_C && (key.getModifiers() & CTRL_MASK) != 0 ||
-           key.getKeyCode() == '[' && (key.getModifiers() & CTRL_MASK) != 0;
+           key.getKeyCode() == VK_C && (key.getModifiers() & CTRL_DOWN_MASK) != 0 ||
+           key.getKeyCode() == '[' && (key.getModifiers() & CTRL_DOWN_MASK) != 0;
   }
 
   /**
@@ -367,16 +367,16 @@ public class StringHelper {
       return getTypedOrPressedKeyStroke(typedChar, modifiers);
     }
     else if (lower.startsWith(META_PREFIX)) {
-      return parseSpecialKey(s.substring(META_PREFIX.length()), modifiers | META_MASK);
+      return parseSpecialKey(s.substring(META_PREFIX.length()), modifiers | META_DOWN_MASK);
     }
     else if (lower.startsWith(ALT_PREFIX)) {
-      return parseSpecialKey(s.substring(ALT_PREFIX.length()), modifiers | ALT_MASK);
+      return parseSpecialKey(s.substring(ALT_PREFIX.length()), modifiers | ALT_DOWN_MASK);
     }
     else if (lower.startsWith(CTRL_PREFIX)) {
-      return parseSpecialKey(s.substring(CTRL_PREFIX.length()), modifiers | CTRL_MASK);
+      return parseSpecialKey(s.substring(CTRL_PREFIX.length()), modifiers | CTRL_DOWN_MASK);
     }
     else if (lower.startsWith(SHIFT_PREFIX)) {
-      return parseSpecialKey(s.substring(SHIFT_PREFIX.length()), modifiers | SHIFT_MASK);
+      return parseSpecialKey(s.substring(SHIFT_PREFIX.length()), modifiers | SHIFT_DOWN_MASK);
     }
     else if (s.length() == 1) {
       return getTypedOrPressedKeyStroke(s.charAt(0), modifiers);
@@ -535,7 +535,7 @@ public class StringHelper {
     if (modifiers == 0) {
       return getKeyStroke(c);
     }
-    else if (modifiers == SHIFT_MASK) {
+    else if (modifiers == SHIFT_DOWN_MASK) {
       return getKeyStroke(Character.toUpperCase(c), modifiers);
     }
     else {

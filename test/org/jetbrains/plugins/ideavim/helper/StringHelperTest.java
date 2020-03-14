@@ -95,8 +95,8 @@ public class StringHelperTest extends VimTestCase {
   }
 
   public void testControlBoundCharacters() {
-    assertKeyStroke(KeyStroke.getKeyStroke('@', InputEvent.CTRL_MASK), "\u0000");
-    assertKeyStroke(KeyStroke.getKeyStroke('_', InputEvent.CTRL_MASK), "\u001F");
+    assertKeyStroke(KeyStroke.getKeyStroke('@', InputEvent.CTRL_DOWN_MASK), "\u0000");
+    assertKeyStroke(KeyStroke.getKeyStroke('_', InputEvent.CTRL_DOWN_MASK), "\u001F");
   }
 
   public void testControlExceptionCharacters() {
@@ -114,7 +114,7 @@ public class StringHelperTest extends VimTestCase {
 
   private void assertTypedKeyStroke(char expected, @NotNull String actual) {
     if (Character.isUpperCase(expected)) {
-      assertEquals(KeyStroke.getKeyStroke(expected, KeyEvent.SHIFT_MASK), parseKeyStroke(actual));
+      assertEquals(KeyStroke.getKeyStroke(expected, KeyEvent.SHIFT_DOWN_MASK), parseKeyStroke(actual));
     }
     else {
       assertEquals(KeyStroke.getKeyStroke(expected), parseKeyStroke(actual));

@@ -245,7 +245,7 @@ public class ExTextField extends JTextField {
     char c = keyChar;
     final int modifiers = stroke.getModifiers();
     final int keyCode = stroke.getKeyCode();
-    if ((modifiers & KeyEvent.CTRL_MASK) != 0) {
+    if ((modifiers & KeyEvent.CTRL_DOWN_MASK) != 0) {
       final int codePoint = keyCode - KeyEvent.VK_A + 1;
       if (codePoint > 0) {
         c = Character.toChars(codePoint)[0];

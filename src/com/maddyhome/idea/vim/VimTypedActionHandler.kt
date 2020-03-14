@@ -41,14 +41,14 @@ class VimTypedActionHandler(origHandler: TypedActionHandler?) : TypedActionHandl
   }
 
   override fun beforeExecute(editor: Editor, charTyped: Char, context: DataContext, plan: ActionPlan) {
-    val modifiers = if (charTyped == ' ' && VimKeyListener.isSpaceShift) KeyEvent.SHIFT_MASK else 0
+    val modifiers = if (charTyped == ' ' && VimKeyListener.isSpaceShift) KeyEvent.SHIFT_DOWN_MASK else 0
     val keyStroke = KeyStroke.getKeyStroke(charTyped, modifiers)
     handler.beforeHandleKey(editor, keyStroke, context, plan)
   }
 
   override fun execute(editor: Editor, charTyped: Char, context: DataContext) {
     try {
-      val modifiers = if (charTyped == ' ' && VimKeyListener.isSpaceShift) KeyEvent.SHIFT_MASK else 0
+      val modifiers = if (charTyped == ' ' && VimKeyListener.isSpaceShift) KeyEvent.SHIFT_DOWN_MASK else 0
       val keyStroke = KeyStroke.getKeyStroke(charTyped, modifiers)
       handler.handleKey(editor, keyStroke, EditorDataContext(editor))
     } catch (e: Throwable) {
