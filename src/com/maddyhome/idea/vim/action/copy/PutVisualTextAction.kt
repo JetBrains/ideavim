@@ -33,8 +33,11 @@ import java.util.*
 /**
  * @author vlan
  */
-abstract class PutVisualTextBaseAction(private val insertTextBeforeCaret: Boolean, private val indent: Boolean, private val caretAfterInsertedText: Boolean)
-  : VisualOperatorActionHandler.SingleExecution() {
+sealed class PutVisualTextBaseAction(
+  private val insertTextBeforeCaret: Boolean,
+  private val indent: Boolean,
+  private val caretAfterInsertedText: Boolean
+) : VisualOperatorActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

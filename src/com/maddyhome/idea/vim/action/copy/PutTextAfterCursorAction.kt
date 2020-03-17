@@ -26,17 +26,27 @@ import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.group.copy.PutData.TextData
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-class PutTextAfterCursorAction : ChangeEditorActionHandler.SingleExecution() {
+sealed class PutTextBaseAction(
+  private val insertTextBeforeCaret: Boolean,
+  private val indent: Boolean,
+  private val caretAfterInsertedText: Boolean
+) : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
-  override fun execute(editor: Editor,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
+  override fun execute(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean {
     val lastRegister = VimPlugin.getRegister().lastRegister
     val textData = if (lastRegister != null) TextData(lastRegister.text, lastRegister.type, lastRegister.transferableData) else null
-    val putData = PutData(textData, null, count, insertTextBeforeCaret = false, _indent = true, caretAfterInsertedText = false, putToLine = -1)
+    val putData = PutData(textData, null, count, insertTextBeforeCaret = insertTextBeforeCaret, _indent = indent, caretAfterInsertedText = caretAfterInsertedText, putToLine = -1)
     return VimPlugin.getPut().putText(editor, context, putData)
   }
 }
+
+class PutTextAfterCursorAction : PutTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = false)
+class PutTextAfterCursorActionMoveCursor : PutTextBaseAction(insertTextBeforeCaret = false, indent = true, caretAfterInsertedText = true)
+
+class PutTextAfterCursorNoIndentAction : PutTextBaseAction(insertTextBeforeCaret = false, indent = false, caretAfterInsertedText = false)
+class PutTextBeforeCursorNoIndentAction : PutTextBaseAction(insertTextBeforeCaret = true, indent = false, caretAfterInsertedText = false)
+
+class PutTextBeforeCursorAction : PutTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = false)
+class PutTextBeforeCursorActionMoveCursor : PutTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = true)
+
