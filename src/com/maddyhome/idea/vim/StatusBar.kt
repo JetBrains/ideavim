@@ -70,6 +70,10 @@ private class StatusBarIconProvider : StatusBarWidgetProvider {
 
 object VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
 
+  init {
+    OptionsManager.ideastatusicon.addOptionChangeListener { _, _ -> this.update() }
+  }
+
   private var statusBar: StatusBar? = null
 
   override fun ID(): String = "IdeaVim-Icon"
