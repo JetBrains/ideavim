@@ -61,3 +61,7 @@ enum class SelectionType(val value: Int) {
     }
   }
 }
+
+val SelectionType.isLine get() = this == SelectionType.LINE_WISE
+val SelectionType.isChar get() = this == SelectionType.CHARACTER_WISE
+val SelectionType.isBlock get() = this == SelectionType.BLOCK_WISE

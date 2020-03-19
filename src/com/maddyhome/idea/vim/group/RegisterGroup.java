@@ -347,6 +347,14 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     return CLIPBOARD_REGISTERS.contains(r) ? refreshClipboardRegister(r) : registers.get(r);
   }
 
+  public void saveRegister(char r, Register register) {
+    // Uppercase registers actually get the lowercase register
+    if (Character.isUpperCase(r)) {
+      r = Character.toLowerCase(r);
+    }
+    registers.put(r, register);
+  }
+
   /**
    * Gets the last register name selected by the user
    *

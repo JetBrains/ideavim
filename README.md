@@ -99,6 +99,7 @@ Emulated Vim plugins:
 * vim-commentary
 * argtextobj.vim   [To Be Released]
 * vim-textobj-entire [To Be Released]
+* ReplaceWithRegister [To Be Released]
 
 Not supported (yet):
 
@@ -166,6 +167,11 @@ Available extensions:
     * Setup: `set commentary`
     * Emulates [commentary.vim](https://github.com/tpope/vim-commentary)
     * Commands: `gcc`, `gc + motion`, `v_gc`
+
+* ReplaceWithRegister   [To Be Released]
+    * Setup: `set ReplaceWithRegister`
+    * Emulates [ReplaceWithRegister](https://github.com/vim-scripts/ReplaceWithRegister)
+    * Commands: `gr`, `grr`
 
 * argtextobj   [To Be Released]
     * Setup:
