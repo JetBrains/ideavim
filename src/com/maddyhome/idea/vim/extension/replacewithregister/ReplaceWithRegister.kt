@@ -91,7 +91,7 @@ class ReplaceWithRegister : VimExtension {
         val lineStart = editor.document.getLineStartOffset(logicalLine)
         val lineEnd = editor.document.getLineEndOffset(logicalLine)
 
-        caretsAndSelections += caret to VimSelection.create(lineStart, lineEnd - 1, SelectionType.LINE_WISE, editor)
+        caretsAndSelections += caret to VimSelection.create(lineStart, lineEnd, SelectionType.LINE_WISE, editor)
       }
 
       val visualSelection = PutData.VisualSelection(caretsAndSelections, SelectionType.LINE_WISE)

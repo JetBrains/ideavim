@@ -191,6 +191,26 @@ class ReplaceWithRegisterTest : VimTestCase() {
     """.trimIndent())
   }
 
+  fun `test line replace with line empty line`() {
+    val text = """
+            I found it in ${c}a legendary land
+            
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+
+    configureByText(text)
+    typeText(parseKeys("yyj", "grr"))
+    myFixture.checkResult("""
+            I found it in a legendary land
+            ${c}I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+    """.trimIndent())
+  }
+
   @VimBehaviorDiffers(description = "Where is the new line comes from?...")
   fun `test line replace with block`() {
     val text = """
