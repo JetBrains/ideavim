@@ -74,15 +74,56 @@ tasks.register("slackEapNotification") {
   doLast {
     if (!slackUrl) return
     def post = new URL(slackUrl).openConnection()
-    def message = "{\"text\":\"New EAP released: $version\"}"
+    def changeLog = extractChangelog()
+    changeLog = changeLog.replace("* ", "• ") // Replace stars with bullets
+    changeLog = changeLog.replace("**", "*") // Enable bold text
+    changeLog = changeLog.replaceAll("\\[(.+)]\\(([^)]+)\\)", '<$2|$1>') // Enable links
+    def message ="""
+      {
+          "text": "Danny Torrence left a 1 star review for your property.",
+          "blocks": [
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "New EAP released: $version\\n$changeLog"
+                    }
+                  }
+          ]
+      }
+   """
     post.setRequestMethod("POST")
     post.setDoOutput(true)
     post.setRequestProperty("Content-Type", "application/json")
     post.getOutputStream().write(message.getBytes("UTF-8"))
     def postRC = post.getResponseCode()
     println(postRC)
-    if(postRC.equals(200)) {
+    if(postRC == 200) {
       println(post.getInputStream().getText())
     }
   }
+}
+
+// Very primitive changelog extraction code
+def extractChangelog() {
+  def startLine = "_Available since $version EAP:_"
+  def endLine = "_To Be Released..._"
+  def startSaving = false
+  def res = new StringBuilder()
+  new File("./CHANGES.md").eachLine { line ->
+    if (startSaving) {
+      if (line == endLine) {
+        startSaving = false
+      }
+      else {
+        res.append(line).append('\n')
+      }
+    }
+    else {
+      if (line == startLine) {
+        startSaving = true
+      }
+    }
+  }
+  return res.toString()
 }
