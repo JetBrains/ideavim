@@ -42,7 +42,7 @@ _Available since 0.55.2 EAP:_
 **Fixes:**
 * [VIM-1008](https://youtrack.jetbrains.com/issue/VIM-1008) Correct `ci{` behavior
 
-_To Be Released..._
+_Available since 0.55.3 EAP:_
 
 **Features:**
 * [VIM-434](https://youtrack.jetbrains.com/issue/VIM-434) Add `'showcmd'` support, on by default
@@ -53,6 +53,8 @@ _To Be Released..._
 * [VIM-926](https://youtrack.jetbrains.com/issue/VIM-926) Fix `<S-Space>` mapping
 * [VIM-1958](https://youtrack.jetbrains.com/issue/VIM-1958) Fix `X` command for linewise selection
 * [VIM-1911](https://youtrack.jetbrains.com/issue/VIM-1911) Lookup keys respect `IDE` handler
+
+_To Be Released..._
 
 0.55, 2020-01-20
 --------------
