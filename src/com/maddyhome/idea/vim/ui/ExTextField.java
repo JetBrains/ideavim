@@ -26,6 +26,7 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.HistoryGroup;
+import com.maddyhome.idea.vim.helper.UiHelper;
 import kotlin.text.StringsKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -188,8 +189,15 @@ public class ExTextField extends JTextField {
     }
   }
 
+  // fix https://youtrack.jetbrains.com/issue/VIM-570
+  private void resetFont(String string) {
+    super.setFont(UiHelper.selectFont(string));
+  }
+
   private void updateText(String string) {
     super.setText(string);
+
+    resetFont(string);
   }
 
   @Override
@@ -197,6 +205,7 @@ public class ExTextField extends JTextField {
     super.setText(string);
 
     saveLastEntry();
+    resetFont(string);
   }
 
   /**
