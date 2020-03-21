@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
+import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
@@ -68,8 +69,18 @@ class VimExchangeExtension: VimExtension {
     const val EXCHANGE_CLEAR_CMD = "<Plug>ExchangeClear"
     const val EXCHANGE_LINE_CMD = "<Plug>ExchangeLine"
     val EXCHANGE_KEY = Key<Exchange>("exchange");
-    class Exchange(val type: CommandState.SubMode, val start: Mark, val end: Mark, val text: String)
+    class Exchange(val type: CommandState.SubMode, val start: Mark, val end: Mark, val text: String) {
+      private var myHighlighter: RangeHighlighter? = null
+      fun setHighlighter(highlighter: RangeHighlighter) {
+        myHighlighter = highlighter
+      }
+      fun getHighlighter(): RangeHighlighter? = myHighlighter
+
+    }
     fun clearExchange(editor: Editor) {
+      editor.getUserData(EXCHANGE_KEY)?.getHighlighter()?.let {
+        editor.markupModel.removeHighlighter(it)
+      }
       editor.putUserData(EXCHANGE_KEY, null)
     }
   }
@@ -107,14 +118,14 @@ class VimExchangeExtension: VimExtension {
     }
 
     override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
-      fun highlightExchange(ex: Exchange) {
+      fun highlightExchange(ex: Exchange): RangeHighlighter {
         val attributes = editor.colorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES)
         val hlArea = when(ex.type) {
           CommandState.SubMode.VISUAL_LINE -> HighlighterTargetArea.LINES_IN_RANGE
           // TODO: handle other modes
           else -> HighlighterTargetArea.EXACT_RANGE
         }
-        editor.markupModel.addRangeHighlighter(
+        return editor.markupModel.addRangeHighlighter(
           editor.getMarkOffset(ex.start),
           // normalize end offset to remain in line on linewise mode
           EditorHelper.normalizeOffset(editor, ex.end.logicalLine, editor.getMarkOffset(ex.end) + 1, false),
@@ -126,8 +137,9 @@ class VimExchangeExtension: VimExtension {
       val currentExchange = getExchange(editor, isVisual, selectionType)
       val exchange1 = editor.getUserData(EXCHANGE_KEY)
       if (exchange1 == null) {
+        val highlighter = highlightExchange(currentExchange)
+        currentExchange.setHighlighter(highlighter)
         editor.putUserData(EXCHANGE_KEY, currentExchange)
-        highlightExchange(currentExchange)
         return true
       } else {
         val cmp = compareExchanges(exchange1, currentExchange)
