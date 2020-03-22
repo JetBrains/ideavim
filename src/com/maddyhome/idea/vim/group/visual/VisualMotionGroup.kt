@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.group.visual
 
+import com.intellij.find.FindManager
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
@@ -216,20 +217,22 @@ class VisualMotionGroup {
   }
 
   fun autodetectVisualSubmode(editor: Editor): CommandState.SubMode {
-    if (editor.caretModel.caretCount > 1 && seemsLikeBlockMode(editor)) {
-      return CommandState.SubMode.VISUAL_BLOCK
+    if (!FindManager.getInstance(editor.project).selectNextOccurrenceWasPerformed()) {
+      if (editor.caretModel.caretCount > 1 && seemsLikeBlockMode(editor)) {
+        return CommandState.SubMode.VISUAL_BLOCK
+      }
+      if (editor.caretModel.allCarets.all { caret ->
+          // Detect if visual mode is character wise or line wise
+          val selectionStart = caret.selectionStart
+          val selectionEnd = caret.selectionEnd
+          val logicalStartLine = editor.offsetToLogicalPosition(selectionStart).line
+          val logicalEnd = editor.offsetToLogicalPosition(selectionEnd)
+          val logicalEndLine = if (logicalEnd.column == 0) (logicalEnd.line - 1).coerceAtLeast(0) else logicalEnd.line
+          val lineStartOfSelectionStart = EditorHelper.getLineStartOffset(editor, logicalStartLine)
+          val lineEndOfSelectionEnd = EditorHelper.getLineEndOffset(editor, logicalEndLine, true)
+          lineStartOfSelectionStart == selectionStart && (lineEndOfSelectionEnd + 1 == selectionEnd || lineEndOfSelectionEnd == selectionEnd)
+        }) return CommandState.SubMode.VISUAL_LINE
     }
-    if (editor.caretModel.allCarets.all { caret ->
-        // Detect if visual mode is character wise or line wise
-        val selectionStart = caret.selectionStart
-        val selectionEnd = caret.selectionEnd
-        val logicalStartLine = editor.offsetToLogicalPosition(selectionStart).line
-        val logicalEnd = editor.offsetToLogicalPosition(selectionEnd)
-        val logicalEndLine = if (logicalEnd.column == 0) (logicalEnd.line - 1).coerceAtLeast(0) else logicalEnd.line
-        val lineStartOfSelectionStart = EditorHelper.getLineStartOffset(editor, logicalStartLine)
-        val lineEndOfSelectionEnd = EditorHelper.getLineEndOffset(editor, logicalEndLine, true)
-        lineStartOfSelectionStart == selectionStart && (lineEndOfSelectionEnd + 1 == selectionEnd || lineEndOfSelectionEnd == selectionEnd)
-      }) return CommandState.SubMode.VISUAL_LINE
     return CommandState.SubMode.VISUAL_CHARACTER
   }
 
