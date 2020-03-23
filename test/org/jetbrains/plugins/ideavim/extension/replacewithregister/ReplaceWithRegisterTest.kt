@@ -73,11 +73,24 @@ class ReplaceWithRegisterTest : VimTestCase() {
   }
 
   fun `test replace use different register`() {
-    val text = "one ${c}two three"
+    val text = "one ${c}two three four"
 
     configureByText(text)
     typeText(parseKeys("\"ayiw", "w", "\"agriw"))
-    myFixture.checkResult("one two tw${c}o")
+    myFixture.checkResult("one two tw${c}o four")
+    Assert.assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
+    typeText(parseKeys("w", "griw"))
+    myFixture.checkResult("one two two tw${c}o")
+    Assert.assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
+  }
+
+  fun `test replace use clipboard register`() {
+    val text = "one ${c}two three four"
+
+    configureByText(text)
+    typeText(parseKeys("\"+yiw", "w", "\"+griw", "w", "\"+griw"))
+    myFixture.checkResult("one two two tw${c}o")
+    Assert.assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
   }
 
   fun `test replace use wrong register`() {

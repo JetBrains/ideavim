@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.helper.EditorDataContext
@@ -143,6 +144,7 @@ class ReplaceWithRegister : VimExtension {
       VimPlugin.getPut().putText(editor, EditorDataContext(editor), putData)
 
       VimPlugin.getRegister().saveRegister(savedRegister.name, savedRegister)
+      VimPlugin.getRegister().saveRegister(RegisterGroup.DEFAULT_REGISTER, savedRegister)
     }
   }
 }

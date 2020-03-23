@@ -29,12 +29,14 @@ class Register {
   val type: SelectionType
   val keys: MutableList<KeyStroke>
   val transferableData: MutableList<out TextBlockTransferableData>
+  val rawText: String?
 
   constructor(name: Char, type: SelectionType, keys: MutableList<KeyStroke>) {
     this.name = name
     this.type = type
     this.keys = keys
     this.transferableData = mutableListOf()
+    this.rawText = text
   }
 
   constructor(name: Char, type: SelectionType, text: String, transferableData: MutableList<out TextBlockTransferableData>) {
@@ -42,6 +44,15 @@ class Register {
     this.type = type
     this.keys = StringHelper.stringToKeys(text)
     this.transferableData = transferableData
+    this.rawText = text
+  }
+
+  constructor(name: Char, type: SelectionType, text: String, transferableData: MutableList<out TextBlockTransferableData>, rawText: String) {
+    this.name = name
+    this.type = type
+    this.keys = StringHelper.stringToKeys(text)
+    this.transferableData = transferableData
+    this.rawText = rawText
   }
 
   val text: String?
