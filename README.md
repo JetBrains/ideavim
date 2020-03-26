@@ -25,23 +25,20 @@ Resources:
 * [@IdeaVim](https://twitter.com/ideavim) in Twitter
 
 
-Installation
+Setup
 ------------
 
-Use the IDE's plugin manager to install the latest version of the plugin.
-Start the IDE normally and enable the Vim emulation using "Tools | Vim
-Emulator" menu item. At this point you must use Vim keystrokes in all editors.
+- IdeaVim can be installed via `Settings | Plugins`.
+See [detailed instructions](https://www.jetbrains.com/help/idea/managing-plugins.html#).
 
-If you wish to disable the plugin, select the "Tools | Vim Emulator" menu so
-it is unchecked. At this point your IDE will work with its regular keyboard
-shortcuts.
+- Use `Tools | Vim Emulator` to enable or disable emulation.
 
-Keyboard shortcut conflicts between the Vim emulation and the IDE can be
-resolved via "File | Settings | Editor | Vim Emulation", "File | Settings |
-Keymap" on Linux & Windows, and via "Preferences | Editor | Vim Emulation",
-"Preferences | Keymap" on macOS. They can also be resolved by key-mapping
-commands in your ~/.ideavimrc file.
+- Use `~/.ideavimrc` file as an analog of `~/.vimrc` ([details](#Files)). XGD standard is supported as well.
 
+- Shortcut conflicts can be resolved using:
+     - Linux & Windows: `File | Settings | Editor | Vim Emulation` & `File | Settings | Keymap`,
+     - macOS: `Preferences | Editor | Vim Emulation` & `Preferences | Keymap`,
+     - regular vim mappings in the  `~/.ideavimrc` file.
 
 Get Early Access
 -------------------
@@ -49,7 +46,9 @@ Get Early Access
 Would you like to try new features and fixes? Join the Early Access Program and
 receive EAP builds as updates!  
 
-1. Click the IdeaVim icon in the status bar | `EAP` | `Get Early Access...`
+1. Click the <img src="resources/META-INF/pluginIcon_noBorders.svg" width="16" height="16" alt="icon"/> IdeaVim
+icon in the status bar  | `EAP` | `Get Early Access...`
+
 
 Or subscribe to EAP updates manually:
 
@@ -57,7 +56,7 @@ Or subscribe to EAP updates manually:
 2. Click the gear icon :gear:, select `Manage Plugin Repositories`, and add the following url:
  `https://plugins.jetbrains.com/plugins/eap/ideavim`
 
-See [the changelog](CHANGES.md) for the list of hot unreleased features.
+See [the changelog](CHANGES.md) for the list of unreleased features.
 
 It is important to distinguish EAP builds from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
@@ -91,7 +90,7 @@ Supported:
 * Vim web help
 * Select mode
 
-Emulated Vim plugins:
+[Emulated Vim plugins](doc/emulated-plugins.md):
 
 * vim-easymotion
 * vim-surround
@@ -115,19 +114,19 @@ See also:
 Files
 -----
 
-* ~/.ideavimrc
+* `~/.ideavimrc`
     * Your IdeaVim-specific Vim initialization commands
 
-You can read your ~/.vimrc file from ~/.ideavimrc with this command:
+You can read your `~/.vimrc` file from `~/.ideavimrc` with this command:
 
     source ~/.vimrc
 
-Note, that IdeaVim currently parses ~/.ideavimrc file via simple pattern matching.
+Note, that IdeaVim currently parses `~/.ideavimrc` file via simple pattern matching.
 See [VIM-669](https://youtrack.jetbrains.com/issue/VIM-669) for proper parsing
 of VimL files.
 
 Also note that if you have overridden the `user.home` JVM option, this
-will affect where IdeaVim looks for your .ideavimrc file. For example, if you
+will affect where IdeaVim looks for your `.ideavimrc` file. For example, if you
 have `-Duser.home=/my/alternate/home` then IdeaVim will source
 `/my/alternate/home/.ideavimrc` instead of `~/.ideavimrc`.
 
@@ -138,61 +137,24 @@ Put your settings to `$XDG_CONFIG_HOME$/ideavim/ideavimrc` file.
 Emulated Vim Plugins
 --------------------
 
-IdeaVim extensions emulate some plugins of the original Vim. In order to use
-IdeaVim extensions, you have to enable them via this command in your `~/.ideavimrc`:
-
-    set <extension-name>
-
-Available extensions:
-
-* easymotion
-    * Setup:  
-        * Install [IdeaVim-EasyMotion](https://plugins.jetbrains.com/plugin/13360-ideavim-easymotion/)
-        and [AceJump](https://plugins.jetbrains.com/plugin/7086-acejump/) plugins.
-        * `set easymotion`
-    * Emulates [vim-easymotion](https://github.com/easymotion/vim-easymotion)
-    * Commands: All commands with the mappings are supported. See the [full list of supported commands](https://github.com/AlexPl292/IdeaVim-EasyMotion#supported-commands).
-
-* surround
-    * Setup: `set surround`
-    * Emulates [vim-surround](https://github.com/tpope/vim-surround)
-    * Commands: `ys`, `cs`, `ds`, `S`
-
-* multiple-cursors
-    * Setup: `set multiple-cursors`
-    * Emulates [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors)
-    * Commands: `<A-n>`, `<A-x>`, `<A-p>`, `g<A-n>`
-
-* commentary
-    * Setup: `set commentary`
-    * Emulates [commentary.vim](https://github.com/tpope/vim-commentary)
-    * Commands: `gcc`, `gc + motion`, `v_gc`
-
-* ReplaceWithRegister
-    * Setup: `set ReplaceWithRegister`
-    * Emulates [ReplaceWithRegister](https://github.com/vim-scripts/ReplaceWithRegister)
-    * Commands: `gr`, `grr`
-
-* argtextobj
-    * Setup:
-        * `set argtextobj`
-        * By default, only the arguments inside parenthesis are considered. To extend the functionality
-          to other types of brackets, set `g:argtextobj_pairs` variable to a comma-separated
-          list of colon-separated pairs (same as VIM's `matchpairs` option), like
-          `let g:argtextobj_pairs="(:),{:},<:>"`. The order of pairs matters when
-          handling symbols that can also be operators: `func(x << 5, 20) >> 17`. To handle
-          this syntax parenthesis, must come before angle brackets in the list.
-    * Emulates [argtextobj.vim](https://www.vim.org/scripts/script.php?script_id=2699)
-    * Additional text objects: `aa`, `ia`
-    
-* textobj-entire
-    * Setup: `set textobj-entire`
-    * Emulates [vim-textobj-entire](https://github.com/kana/vim-textobj-entire)
-    * Additional text objects: `ae`, `ie`
-
+See [doc/emulated-plugins.md](doc/emulated-plugins.md)
 
 Changes to the IDE
 ------------------
+
+### Executing IDE Actions
+
+IdeaVim adds two commands for listing and executing arbitrary IDE actions as
+Ex commands or via `:map` command mappings:
+
+* `:actionlist [pattern]`
+    * Find IDE actions by name or keymap pattern (E.g. `:actionlist extract`, `:actionlist <C-D`)
+* `:action {name}`
+    * Execute an action named `NAME`
+
+For example, here `\r` is mapped to the Reformat Code action:
+
+    :map \r :action ReformatCode<CR>
 
 ### Undo/Redo
 
@@ -211,21 +173,6 @@ switched by default. The usage of the Vim emulator in dialog windows is an area 
 improvement.
 
 See also [unresolved escape issues](https://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+i_Esc).
-
-### Executing IDE Actions
-
-IdeaVim adds two commands for listing and executing arbitrary IDE actions as
-Ex commands or via `:map` command mappings:
-
-* `:actionlist [pattern]`
-    * Find IDE actions by name or keymap pattern (E.g. `:actionlist extract`, `:actionlist <C-D`)
-* `:action {name}`
-    * Execute an action named `NAME`
-
-For example, here `\r` is mapped to the Reformat Code action:
-
-    :map \r :action ReformatCode<CR>
-
 
 Contributing
 ------------
