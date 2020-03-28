@@ -84,6 +84,8 @@ public class ChangeGroup {
   private static final String VIM_MOTION_WORD_END_RIGHT = "VimMotionWordEndRightAction";
   private static final String VIM_MOTION_BIG_WORD_END_RIGHT = "VimMotionBigWordEndRightAction";
   private static final String VIM_MOTION_CAMEL_END_RIGHT = "VimMotionCamelEndRightAction";
+  private static final ImmutableSet<String> wordMotions =
+    ImmutableSet.of(VIM_MOTION_WORD_RIGHT, VIM_MOTION_BIG_WORD_RIGHT, VIM_MOTION_CAMEL_RIGHT);
 
   private @Nullable Command lastInsert;
 
@@ -1223,13 +1225,12 @@ public class ChangeGroup {
     boolean bigWord = id.equals(VIM_MOTION_BIG_WORD_RIGHT);
     final CharSequence chars = editor.getDocument().getCharsSequence();
     final int offset = caret.getOffset();
-    if (EditorHelper.getFileSize(editor) > 0) {
+    int fileSize = EditorHelper.getFileSize(editor);
+    if (fileSize > 0) {
       final CharacterHelper.CharacterType charType = CharacterHelper.charType(chars.charAt(offset), bigWord);
       if (charType != CharacterHelper.CharacterType.WHITESPACE) {
-        final boolean lastWordChar = offset > EditorHelper.getFileSize(editor) ||
+        final boolean lastWordChar = offset >= fileSize - 1 ||
                                      CharacterHelper.charType(chars.charAt(offset + 1), bigWord) != charType;
-        final ImmutableSet<String> wordMotions =
-          ImmutableSet.of(VIM_MOTION_WORD_RIGHT, VIM_MOTION_BIG_WORD_RIGHT, VIM_MOTION_CAMEL_RIGHT);
         if (wordMotions.contains(id) && lastWordChar && motion.getCount() == 1) {
           final boolean res = deleteCharacter(editor, caret, 1, true);
           if (res) {
@@ -1258,7 +1259,7 @@ public class ChangeGroup {
     }
 
     if (kludge) {
-      int size = EditorHelper.getFileSize(editor);
+      int size = fileSize;
       int cnt = count * motion.getCount();
       int pos1 = SearchHelper.findNextWordEnd(chars, offset, size, cnt, bigWord, false);
       int pos2 = SearchHelper.findNextWordEnd(chars, pos1, size, -cnt, bigWord, false);

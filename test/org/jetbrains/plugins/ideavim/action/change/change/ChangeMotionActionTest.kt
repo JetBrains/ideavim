@@ -125,4 +125,8 @@ class ChangeMotionActionTest : VimTestCase() {
   fun testChangeLastCharInLine() {
     doTest(parseKeys("cw"), "fo${c}o\n", "fo${c}\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
+
+  fun testLastSymbolInWord() {
+    doTest(parseKeys("cw"), "fo${c}o", "fo${c}", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
 }
