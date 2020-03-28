@@ -21,6 +21,7 @@ package org.jetbrains.plugins.ideavim.extension.replacewithregister
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import junit.framework.Assert
@@ -52,7 +53,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     Assert.assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
-/*
   fun `test empty text`() {
     val text = ""
 
@@ -61,7 +61,6 @@ class ReplaceWithRegisterTest : VimTestCase() {
     typeText(parseKeys("griw"))
     myFixture.checkResult("on${c}e")
   }
-*/
 
   fun `test replace with empty text`() {
     val text = "${c}one"
