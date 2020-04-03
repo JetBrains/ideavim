@@ -122,6 +122,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
    * @param count    A holder for the ex entry count
    */
   public void activate(@NotNull Editor editor, DataContext context, @NotNull String label, String initText, int count) {
+    logger.info("Activate ex entry panel");
     this.label.setText(label);
     this.label.setFont(UiHelper.selectFont(label));
     this.count = count;
