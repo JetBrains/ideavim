@@ -3,6 +3,12 @@ The Changelog
 
 History of changes in IdeaVim for the IntelliJ platform.
 
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project DOES NOT adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+Stable versions use X.Y format.
+EAP versions use X.Y.Z format.
+
 
 Get an Early Access
 -------------------
