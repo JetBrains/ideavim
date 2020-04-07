@@ -114,7 +114,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
       Application application = ApplicationManager.getApplication();
       if (application.isUnitTestMode()) {
         application.invokeAndWait(this::turnOnPlugin);
-      } else {
+      }
+      else {
         application.invokeLater(this::turnOnPlugin);
       }
     }
@@ -392,10 +393,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   private void turnOnPlugin() {
     ApplicationManager.getApplication().invokeLater(this::updateState);
 
-    getEditor().turnOn();
-    getSearch().turnOn();
-    VimListenerManager.INSTANCE.turnOn();
-
     // Register vim actions in command mode
     RegisterActions.registerActions();
 
@@ -407,16 +404,15 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
     // Execute ~/.ideavimrc
     registerIdeavimrc();
+
+    // Turing on should be performed after all commands registration
+    getEditor().turnOn();
+    getSearch().turnOn();
+    VimListenerManager.INSTANCE.turnOn();
   }
 
   private void turnOffPlugin() {
     KeyHandler.getInstance().fullReset(null);
-
-    // Unregister vim actions in command mode
-    RegisterActions.unregisterActions();
-
-    // Unregister ex handlers
-    CommandParser.getInstance().unregisterHandlers();
 
     EditorGroup editorGroup = getEditorIfCreated();
     if (editorGroup != null) {
@@ -428,6 +424,12 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     }
     VimListenerManager.INSTANCE.turnOff();
     ExEntryPanel.fullReset();
+
+    // Unregister vim actions in command mode
+    RegisterActions.unregisterActions();
+
+    // Unregister ex handlers
+    CommandParser.getInstance().unregisterHandlers();
   }
 
   private boolean stateUpdated = false;
