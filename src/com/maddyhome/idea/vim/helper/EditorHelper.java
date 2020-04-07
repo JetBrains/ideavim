@@ -42,19 +42,35 @@ import static java.lang.Integer.max;
  * This is a set of helper methods for working with editors. All line and column values are zero based.
  */
 public class EditorHelper {
+  public static @NotNull Rectangle getVisibleArea(final @NotNull Editor editor) {
+    return editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
+  }
+
+  public static boolean scrollVertically(@NotNull Editor editor, int verticalOffset) {
+    final ScrollingModel scrollingModel = editor.getScrollingModel();
+    final Rectangle area = scrollingModel.getVisibleAreaOnScrollingFinished();
+    scrollingModel.scroll(area.x, verticalOffset);
+    return scrollingModel.getVisibleAreaOnScrollingFinished().y != area.y;
+  }
+
+  public static void scrollHorizontally(@NotNull Editor editor, int horizontalOffset) {
+    final ScrollingModel scrollingModel = editor.getScrollingModel();
+    final Rectangle area = scrollingModel.getVisibleAreaOnScrollingFinished();
+    scrollingModel.scroll(horizontalOffset, area.y);
+  }
+
   public static int getVisualLineAtTopOfScreen(final @NotNull Editor editor) {
-    final Rectangle visibleArea = editor.getScrollingModel().getVisibleArea();
+    final Rectangle visibleArea = getVisibleArea(editor);
     return getFullVisualLine(editor, visibleArea.y, visibleArea.y, visibleArea.y + visibleArea.height);
   }
 
   public static int getVisualLineAtMiddleOfScreen(final @NotNull Editor editor) {
-    final ScrollingModel scrollingModel = editor.getScrollingModel();
-    final Rectangle visibleArea = scrollingModel.getVisibleArea();
+    final Rectangle visibleArea = getVisibleArea(editor);
     return editor.yToVisualLine(visibleArea.y + (visibleArea.height / 2));
   }
 
   public static int getVisualLineAtBottomOfScreen(final @NotNull Editor editor) {
-    final Rectangle visibleArea = editor.getScrollingModel().getVisibleArea();
+    final Rectangle visibleArea = getVisibleArea(editor);
     return getFullVisualLine(editor, visibleArea.y + visibleArea.height, visibleArea.y, visibleArea.y + visibleArea.height);
   }
 
@@ -178,9 +194,8 @@ public class EditorHelper {
    */
   private static int getApproximateScreenHeight(final @NotNull Editor editor) {
     int lh = editor.getLineHeight();
-    int height = editor.getScrollingModel().getVisibleArea().y +
-                 editor.getScrollingModel().getVisibleArea().height -
-                 getVisualLineAtTopOfScreen(editor) * lh;
+    Rectangle area = getVisibleArea(editor);
+    int height = area.y + area.height - getVisualLineAtTopOfScreen(editor) * lh;
     return height / lh;
   }
 
@@ -191,7 +206,7 @@ public class EditorHelper {
    * @return The number of screen columns
    */
   public static int getScreenWidth(final @NotNull Editor editor) {
-    Rectangle rect = editor.getScrollingModel().getVisibleArea();
+    Rectangle rect = getVisibleArea(editor);
     Point pt = new Point(rect.width, 0);
     VisualPosition vp = editor.xyToVisualPosition(pt);
 
@@ -205,7 +220,7 @@ public class EditorHelper {
    * @return The number of pixels
    */
   public static int getColumnWidth(final @NotNull Editor editor) {
-    Rectangle rect = editor.getScrollingModel().getVisibleArea();
+    Rectangle rect = getVisibleArea(editor);
     if (rect.width == 0) return 0;
     Point pt = new Point(rect.width, 0);
     VisualPosition vp = editor.xyToVisualPosition(pt);
@@ -223,7 +238,7 @@ public class EditorHelper {
   public static int getVisualColumnAtLeftOfScreen(final @NotNull Editor editor) {
     int cw = getColumnWidth(editor);
     if (cw == 0) return 0;
-    return (editor.getScrollingModel().getHorizontalScrollOffset() + cw - 1) / cw;
+    return (getVisibleArea(editor).x + cw - 1) / cw;
   }
 
   /**
@@ -596,8 +611,7 @@ public class EditorHelper {
    * @param visualLine The visual line to scroll to the current caret location
    */
   public static void scrollVisualLineToCaretLocation(final @NotNull Editor editor, int visualLine) {
-    final ScrollingModel scrollingModel = editor.getScrollingModel();
-    final Rectangle visibleArea = scrollingModel.getVisibleArea();
+    final Rectangle visibleArea = getVisibleArea(editor);
     final int caretScreenOffset = editor.visualLineToY(editor.getCaretModel().getVisualPosition().line) - visibleArea.y;
 
     final int yVisualLine = editor.visualLineToY(visualLine);
@@ -615,7 +629,7 @@ public class EditorHelper {
       inlayOffset = -bottomInlayHeight;
     }
 
-    scrollingModel.scrollVertically(yVisualLine - caretScreenOffset - inlayOffset);
+    scrollVertically(editor, yVisualLine - caretScreenOffset - inlayOffset);
   }
 
   /**
@@ -627,13 +641,9 @@ public class EditorHelper {
    * @return Returns true if the window was moved
    */
   public static boolean scrollVisualLineToTopOfScreen(final @NotNull Editor editor, int visualLine) {
-    final ScrollingModel scrollingModel = editor.getScrollingModel();
     int inlayHeight = getHeightOfVisualLineInlays(editor, visualLine, true);
     int y = editor.visualLineToY(visualLine) - inlayHeight;
-    int verticalPos = scrollingModel.getVerticalScrollOffset();
-    scrollingModel.scrollVertically(y);
-
-    return verticalPos != scrollingModel.getVerticalScrollOffset();
+    return scrollVertically(editor, y);
   }
 
   /**
@@ -643,11 +653,10 @@ public class EditorHelper {
    * @param visualLine The visual line to place in the middle of the current window
    */
   public static void scrollVisualLineToMiddleOfScreen(@NotNull Editor editor, int visualLine) {
-    final ScrollingModel scrollingModel = editor.getScrollingModel();
     int y = editor.visualLineToY(visualLine);
     int lineHeight = editor.getLineHeight();
-    int height = scrollingModel.getVisibleArea().height;
-    scrollingModel.scrollVertically(y - ((height - lineHeight) / 2));
+    int height = getVisibleArea(editor).height;
+    scrollVertically(editor, y - ((height - lineHeight) / 2));
   }
 
   /**
@@ -661,7 +670,6 @@ public class EditorHelper {
    * @return True if the editor was scrolled
    */
   public static boolean scrollVisualLineToBottomOfScreen(@NotNull Editor editor, int visualLine) {
-    final ScrollingModel scrollingModel = editor.getScrollingModel();
     int inlayHeight = getHeightOfVisualLineInlays(editor, visualLine, false);
     int exPanelHeight = 0;
     int exPanelWithoutShortcutsHeight = 0;
@@ -672,14 +680,9 @@ public class EditorHelper {
       exPanelWithoutShortcutsHeight = ExEntryPanel.getInstanceWithoutShortcuts().getHeight();
     }
     int y = editor.visualLineToY(visualLine);
-    int verticalPos = scrollingModel.getVerticalScrollOffset();
     int height = inlayHeight + editor.getLineHeight() + exPanelHeight + exPanelWithoutShortcutsHeight;
-
-    Rectangle visibleArea = scrollingModel.getVisibleArea();
-
-    scrollingModel.scrollVertically(y - visibleArea.height + height);
-
-    return verticalPos != scrollingModel.getVerticalScrollOffset();
+    Rectangle visibleArea = getVisibleArea(editor);
+    return scrollVertically(editor, y - visibleArea.height + height);
   }
 
   /**
@@ -734,7 +737,7 @@ public class EditorHelper {
   }
 
   private static int scrollFullPageDown(final @NotNull Editor editor, int pages) {
-    final Rectangle visibleArea = editor.getScrollingModel().getVisibleArea();
+    final Rectangle visibleArea = getVisibleArea(editor);
     final int lineCount = getVisualLineCount(editor);
 
     if (editor.getCaretModel().getVisualPosition().line == lineCount - 1)
@@ -777,7 +780,7 @@ public class EditorHelper {
   }
 
   private static int scrollFullPageUp(final @NotNull Editor editor, int pages) {
-    final Rectangle visibleArea = editor.getScrollingModel().getVisibleArea();
+    final Rectangle visibleArea = getVisibleArea(editor);
     final int lineHeight = editor.getLineHeight();
 
     int y = visibleArea.y;

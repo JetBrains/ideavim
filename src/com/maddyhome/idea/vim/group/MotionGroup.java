@@ -259,7 +259,7 @@ public class MotionGroup {
   }
 
   private static int getScrollScreenTargetCaretVisualLine(final @NotNull Editor editor, int rawCount, boolean down) {
-    final Rectangle visibleArea = editor.getScrollingModel().getVisibleArea();
+    final Rectangle visibleArea = EditorHelper.getVisibleArea(editor);
     final int caretVisualLine = editor.getCaretModel().getVisualPosition().line;
     final int scrollOption = getScrollOption(rawCount);
 
@@ -890,7 +890,7 @@ public class MotionGroup {
   }
 
   private static void scrollColumnToLeftOfScreen(@NotNull Editor editor, int column) {
-    editor.getScrollingModel().scrollHorizontally(column * EditorHelper.getColumnWidth(editor));
+    EditorHelper.scrollHorizontally(editor, column * EditorHelper.getColumnWidth(editor));
   }
 
   public int moveCaretToMiddleColumn(@NotNull Editor editor, @NotNull Caret caret) {
@@ -1106,8 +1106,7 @@ public class MotionGroup {
       return false;
     }
 
-    final ScrollingModel scrollingModel = editor.getScrollingModel();
-    final Rectangle visibleArea = scrollingModel.getVisibleArea();
+    final Rectangle visibleArea = EditorHelper.getVisibleArea(editor);
 
     int targetCaretVisualLine = getScrollScreenTargetCaretVisualLine(editor, rawCount, down);
 
@@ -1128,7 +1127,7 @@ public class MotionGroup {
       }
       if (moved) {
         // We'll keep the caret at the same position, although that might not be the same line offset as previously
-        targetCaretVisualLine = editor.yToVisualLine(yInitialCaret + scrollingModel.getVisibleArea().y - yPrevious);
+        targetCaretVisualLine = editor.yToVisualLine(yInitialCaret + EditorHelper.getVisibleArea(editor).y - yPrevious);
       }
     }
     else {
