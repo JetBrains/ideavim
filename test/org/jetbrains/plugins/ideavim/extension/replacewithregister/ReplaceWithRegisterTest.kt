@@ -114,6 +114,20 @@ class ReplaceWithRegisterTest : VimTestCase() {
         """.trimIndent())
   }
 
+  fun `test replace with line with clipboard register`() {
+    val text = """
+            |I fou${c}nd it in a legendary land|
+            all rocks and lavender and tufted grass,
+        """.trimIndent()
+
+    configureByText(text)
+    typeText(parseKeys("\"+yy", "j", "\"+griw"))
+    myFixture.checkResult("""
+            |I found it in a legendary land|
+            all |I found it in a legendary land${c}| and lavender and tufted grass,
+        """.trimIndent())
+  }
+
   fun `test replace block selection`() {
     val text = """
             ${c}one two three

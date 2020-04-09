@@ -352,6 +352,9 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     if (Character.isUpperCase(r)) {
       r = Character.toLowerCase(r);
     }
+    if (CLIPBOARD_REGISTERS.contains(r)) {
+      ClipboardHandler.setClipboardText(register.getText(), new ArrayList<>(register.getTransferableData()), register.getRawText());
+    }
     registers.put(r, register);
   }
 
