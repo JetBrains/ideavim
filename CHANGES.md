@@ -22,45 +22,34 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-To Be Released
+0.56, 2020-04-09
 --------------
 
-_Available since 0.55.1 EAP:_
-
-**Fixes:**
-* [VIM-1284](https://youtrack.jetbrains.com/issue/VIM-1284) Fix mapping of digits
-* Fix handling of counts on both operator and motion, e.g. `3d2w` deletes 6 words, instead of 32
-* Allow mapping of `<C-K>` and `<C-V>`/`<C-Q>`
-* [VIM-1899](https://youtrack.jetbrains.com/issue/VIM-1899) Add argument to `:registers` command
-* [VIM-1835](https://youtrack.jetbrains.com/issue/VIM-1835) Macros record input keystrokes instead of mapped keystrokes
-* [VIM-1900](https://youtrack.jetbrains.com/issue/VIM-1900) Ensure non-printable output for `:registers`, `:marks` and `:jumps` is encoded correctly
-
-_Available since 0.55.2 EAP:_
-
 **Features:**
-* `argtextobj.vim` plugin emulation ([argtextobj.vim](https://vim.sourceforge.io/scripts/script.php?script_id=2699))
-* `vim-textobj-entire` plugin emulation ([vim-textobj-entire](https://github.com/kana/vim-textobj-entire))
-* Support `ls/buffers/files` commands
+* `ReplaceWithRegister` plugin emulation ([ReplaceWithRegister](https://www.vim.org/scripts/script.php?script_id=2703)).
+* `argtextobj.vim` plugin emulation ([argtextobj.vim](https://vim.sourceforge.io/scripts/script.php?script_id=2699)).
+* `vim-textobj-entire` plugin emulation ([vim-textobj-entire](https://github.com/kana/vim-textobj-entire)).
+* [VIM-434](https://youtrack.jetbrains.com/issue/VIM-434) Add `'showcmd'` support, on by default.
+* Support `ls/buffers/files` commands.
 
 **Changes:**
 * Replace `ideastatusbar` option with `ideastatusicon`. Now you can make the icon gray.
 
-**Fixes:**
-* [VIM-1008](https://youtrack.jetbrains.com/issue/VIM-1008) Correct `ci{` behavior
-
-_Available since 0.55.3 EAP:_
-
-**Features:**
-* [VIM-434](https://youtrack.jetbrains.com/issue/VIM-434) Add `'showcmd'` support, on by default
-* `ReplaceWithRegister` plugin emulation ([ReplaceWithRegister](https://www.vim.org/scripts/script.php?script_id=2703))
+**Deprecations:**
+* `ideastatusbar` option is deprecated now. See `ideastatusicon`.
 
 **Fixes:**
-* [VIM-570](https://youtrack.jetbrains.com/issue/VIM-570) Print non-ascii characters in ex panel
-* [VIM-926](https://youtrack.jetbrains.com/issue/VIM-926) Fix `<S-Space>` mapping
-* [VIM-1958](https://youtrack.jetbrains.com/issue/VIM-1958) Fix `X` command for linewise selection
-* [VIM-1911](https://youtrack.jetbrains.com/issue/VIM-1911) Lookup keys respect `IDE` handler
-
-_To Be Released..._
+* [VIM-1284](https://youtrack.jetbrains.com/issue/VIM-1284) Fix mapping of digits.
+* Fix handling of counts on both operator and motion, e.g. `3d2w` deletes 6 words, instead of 32.
+* Allow mapping of `<C-K>` and `<C-V>`/`<C-Q>`.
+* [VIM-1899](https://youtrack.jetbrains.com/issue/VIM-1899) Add argument to `:registers` command.
+* [VIM-1835](https://youtrack.jetbrains.com/issue/VIM-1835) Macros record input keystrokes instead of mapped keystrokes.
+* [VIM-1900](https://youtrack.jetbrains.com/issue/VIM-1900) Ensure non-printable output for `:registers`, `:marks` and `:jumps` is encoded correctly.
+* [VIM-570](https://youtrack.jetbrains.com/issue/VIM-570) Print non-ascii characters in ex panel.
+* [VIM-926](https://youtrack.jetbrains.com/issue/VIM-926) Fix `<S-Space>` mapping.
+* [VIM-1958](https://youtrack.jetbrains.com/issue/VIM-1958) Fix `X` command for linewise selection.
+* [VIM-1911](https://youtrack.jetbrains.com/issue/VIM-1911) Lookup keys respect `IDE` handler.
+* [VIM-1008](https://youtrack.jetbrains.com/issue/VIM-1008) Correct `ci{` behavior.
 
 0.55, 2020-01-20
 --------------

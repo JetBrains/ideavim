@@ -65,7 +65,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                                    same as ideaselection          - IdeaVim ONLY
 
     'showmode'       'smd'       message on the status line to show current mode
-    'showcmd'        'sc'        show (partial) command in the status bar   [To Be Released]
+    'showcmd'        'sc'        show (partial) command in the status bar
     'sidescroll'     'ss'        minimum number of columns to scroll horizontally
     'sidescrolloff'  'siso'      min. number of columns to left and right of cursor
     'smartcase'      'scs'       no ignore case when pattern is uppercase
@@ -110,7 +110,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                   If false, IdeaVim icon won't be shown in the status bar.
                   Works only from `~/.ideavimrc` after the IDE restart.
                   
-    `ideastatusicon`  `ideastatusicon` String(default "enabled")    [To Be Released]
+    `ideastatusicon`  `ideastatusicon` String(default "enabled")
     
                  Define the behavior of IdeaVim icon in the status bar.
                  

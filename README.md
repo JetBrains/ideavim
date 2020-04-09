@@ -97,9 +97,9 @@ Emulated Vim plugins:
 * vim-surround
 * vim-multiple-cursors
 * vim-commentary
-* argtextobj.vim   [To Be Released]
-* vim-textobj-entire [To Be Released]
-* ReplaceWithRegister [To Be Released]
+* argtextobj.vim
+* vim-textobj-entire
+* ReplaceWithRegister
 
 Not supported (yet):
 
@@ -168,12 +168,12 @@ Available extensions:
     * Emulates [commentary.vim](https://github.com/tpope/vim-commentary)
     * Commands: `gcc`, `gc + motion`, `v_gc`
 
-* ReplaceWithRegister   [To Be Released]
+* ReplaceWithRegister
     * Setup: `set ReplaceWithRegister`
     * Emulates [ReplaceWithRegister](https://github.com/vim-scripts/ReplaceWithRegister)
     * Commands: `gr`, `grr`
 
-* argtextobj   [To Be Released]
+* argtextobj
     * Setup:
         * `set argtextobj`
         * By default, only the arguments inside parenthesis are considered. To extend the functionality
@@ -185,7 +185,7 @@ Available extensions:
     * Emulates [argtextobj.vim](https://www.vim.org/scripts/script.php?script_id=2699)
     * Additional text objects: `aa`, `ia`
     
-* textobj-entire [To Be Released]
+* textobj-entire
     * Setup: `set textobj-entire`
     * Emulates [vim-textobj-entire](https://github.com/kana/vim-textobj-entire)
     * Additional text objects: `ae`, `ie`
