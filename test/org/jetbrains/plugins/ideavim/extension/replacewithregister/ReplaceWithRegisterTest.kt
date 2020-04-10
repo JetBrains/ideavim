@@ -37,6 +37,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
   fun `test replace with empty register`() {
     val text = "one ${c}two three"
+    VimPlugin.getRegister().resetRegisters()
 
     configureByText(text)
     typeText(parseKeys("griw"))
