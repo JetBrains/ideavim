@@ -9,7 +9,7 @@ buildscript {
 }
 
 plugins {
-  id 'org.jetbrains.intellij' version '0.4.16'
+  id 'org.jetbrains.intellij' version '0.4.18'
 }
 
 apply plugin: 'java'
@@ -80,13 +80,13 @@ tasks.register("slackEapNotification") {
     changeLog = changeLog.replaceAll("\\[(.+)]\\(([^)]+)\\)", '<$2|$1>') // Enable links
     def message ="""
       {
-          "text": "Danny Torrence left a 1 star review for your property.",
+          "text": "New version of IdeaVim",
           "blocks": [
                   {
                     "type": "section",
                     "text": {
                       "type": "mrkdwn",
-                      "text": "New EAP released: $version\\n$changeLog"
+                      "text": "IdeaVim EAP $version has been relesed\\n$changeLog"
                     }
                   }
           ]
