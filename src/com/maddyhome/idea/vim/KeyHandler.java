@@ -204,6 +204,11 @@ public class KeyHandler {
     final CommandState editorState = CommandState.getInstance(editor);
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
 
+    // If escape is pressed, reset the current operation-pending command
+    if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
+      editorState.resetOpPending();
+    }
+
     // If this is a "regular" character keystroke, get the character
     char chKey = key.getKeyChar() == KeyEvent.CHAR_UNDEFINED ? 0 : key.getKeyChar();
 
