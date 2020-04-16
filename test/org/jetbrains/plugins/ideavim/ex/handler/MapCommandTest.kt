@@ -392,4 +392,35 @@ n  ,f            <Plug>Foo
     typeText(StringHelper.parseKeys("92"))
     assertOffset(45)
   }
+
+  fun testShiftSpace() {
+    configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+    typeText(commandToKeys("nmap <S-Space> w"))
+    typeText(StringHelper.parseKeys("<S-Space>"))
+    myFixture.checkResult("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+  }
+
+  fun testShiftLetter() {
+    configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+    typeText(commandToKeys("nmap <S-D> w"))
+    typeText(StringHelper.parseKeys("<S-D>"))
+    myFixture.checkResult("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+  }
+
+  fun testUppercaseLetter() {
+    configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+    typeText(commandToKeys("nmap D w"))
+    typeText(StringHelper.parseKeys("D"))
+    myFixture.checkResult("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+  }
+
+  fun `test shift letter doesn't break insert mode`() {
+    configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+    typeText(commandToKeys("nmap <S-D> w"))
+    typeText(StringHelper.parseKeys("<S-D>"))
+    myFixture.checkResult("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+
+    typeText(StringHelper.parseKeys("iD<Esc>"))
+    myFixture.checkResult("A quick brown ${c}Dfox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+  }
 }
