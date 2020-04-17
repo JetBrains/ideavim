@@ -1,6 +1,10 @@
 *.swp
 /.gradle/
+
 /.idea/
+!/.idea/scopes
+!/.idea/copyright
+
 /build/
 /out/
 /tmp/
