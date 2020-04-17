@@ -27,6 +27,10 @@ usual beta standards.
 
 **Fixes:**
 * [VIM-1992](https://youtrack.jetbrains.com/issue/VIM-1992) Fix mappings to `<S-Letter>`
+* [VIM-1991](https://youtrack.jetbrains.com/issue/VIM-1991) Fix working with number registers
+
+**Merged PRs:**
+* [234](https://github.com/JetBrains/ideavim/pull/234) by [runforprogram](https://github.com/runforprogram): [VIM-1991] fix >0 number register not work
 
 0.56, 2020-04-09
 --------------
