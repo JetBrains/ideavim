@@ -46,8 +46,8 @@ Get Early Access
 Would you like to try new features and fixes? Join the Early Access Program and
 receive EAP builds as updates!  
 
-1. Click the <img src="resources/META-INF/pluginIcon_noBorders.svg" width="16" height="16" alt="icon"/> IdeaVim
-icon in the status bar  | `EAP` | `Get Early Access...`
+1. Click the  IdeaVim icon <img src="resources/META-INF/pluginIcon_noBorders.svg" width="16" height="16" alt="icon"/>
+in the status bar  | `EAP` | `Get Early Access...`
 
 
 Or subscribe to EAP updates manually:
