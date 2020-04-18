@@ -41,10 +41,16 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
  *
  * This handler gets executed for each caret.
  */
-abstract class TextObjectActionHandler : EditorActionHandlerBase.ForEachCaret() {
+abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
+
   final override val type: Command.Type = Command.Type.MOTION
+
   abstract fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange?
-  override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+
+  /**
+   * This code is called when user executes text object in visual mode. E.g. `va(a(a(`
+   */
+  final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
     if (!editor.inVisualMode) return true
 
     val range = getRange(editor, caret, context, cmd.count, cmd.rawCount, cmd.argument) ?: return false
