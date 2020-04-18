@@ -73,9 +73,9 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
     abstract fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean
   }
 
-  final override fun baseExecute(editor: Editor, caret: Caret?, context: DataContext, cmd: Command): Boolean {
+  final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
     return when (this) {
-      is ForEachCaret -> caret == null || execute(editor, caret, context, cmd)
+      is ForEachCaret -> execute(editor, caret, context, cmd)
       is SingleExecution -> execute(editor, context, cmd)
     }
   }
@@ -101,8 +101,7 @@ sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   abstract class ForEachCaret : EditorActionHandlerBase(true) {
     abstract fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean
 
-    final override fun baseExecute(editor: Editor, caret: Caret?, context: DataContext, cmd: Command): Boolean {
-      if (caret == null) return false
+    final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
       return execute(editor, caret, context, cmd)
     }
   }
@@ -110,12 +109,12 @@ sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   abstract class SingleExecution : EditorActionHandlerBase(false) {
     abstract fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean
 
-    final override fun baseExecute(editor: Editor, caret: Caret?, context: DataContext, cmd: Command): Boolean {
+    final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
       return execute(editor, context, cmd)
     }
   }
 
-  abstract fun baseExecute(editor: Editor, caret: Caret?, context: DataContext, cmd: Command): Boolean
+  abstract fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean
 
   fun execute(editor: Editor, context: DataContext) {
     val hostEditor: Editor = CommonDataKeys.HOST_EDITOR.getData(context) ?: editor
