@@ -36,52 +36,22 @@ import java.util.*
 import javax.swing.KeyStroke
 
 /**
- * Structure of handlers
- * `~` - this symbol means that this handler cannot be used directly (only its children)
- * Almost each handler isn't usable by itself and has two children - "SingleExecution" and "ForEachCaret"
- *      which should be used
+ * All the commands in IdeaVim should implement one of the following handlers and be registered in VimActions.xml
+ * Check the KtDocs of handlers for the details.
  *
- *                                         ~ EditorActionHandlerBase ~
- *                                                     |
- *               ----------------------------------------------------------------------------
- *                 |                                   |                                    |
- *          ~ ForEachCaret ~                   ~ SingleExecution ~                  ~ VimActionHandler ~
- *                 |                                   |                                /         \
- *       TextObjectActionHandler               MotionActionHandler                    /            \
- *                                                                             SingleExecution   ForEachCaret
- *                                                                                  |
- *                      -------------------------------------------------------------
- *                      |                                   |
- *        ~ ChangeEditorActionHandler ~         ~ VisualOperatorActionHandler ~
- *              /           \                         /         \
- *    SingleExecution    ForEachCaret         SingleExecution    ForEachCaret
+ * Structure of handlers:
  *
+ * - [EditorActionHandlerBase]: Base handler for all handlers. Please don't use it directly.
+ *  - [VimActionHandler]: .............. Common vim commands.. E.g.: u, <C-W>s, <C-D>.
+ *  - [TextObjectActionHandler]: ....... Text objects. ....... E.g.: iw, a(, i>
+ *  - [MotionActionHandler]: ........... Motion commands. .... E.g.: k, w, <Up>
+ *  - [ChangeEditorActionHandler]: ..... Change commands. .... E.g.: s, r, gU
+ *  - [VisualOperatorActionHandler]: ... Visual commands.
  *
  *  SpecialKeyHandlers are not presented here because these handlers are created to a limited set of commands and they
- *    are already implemented
+ *    are already implemented.
  */
-
-/**
- * Handler for common usage
- */
-sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerBase(myRunForEachCaret) {
-  abstract class ForEachCaret : VimActionHandler(true) {
-    abstract fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean
-  }
-
-  abstract class SingleExecution : VimActionHandler(false) {
-    abstract fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean
-  }
-
-  final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
-    return when (this) {
-      is ForEachCaret -> execute(editor, caret, context, cmd)
-      is SingleExecution -> execute(editor, context, cmd)
-    }
-  }
-}
-
-sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
+abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
   val id: String = getActionId(this::class.java.name)
 
   abstract val type: Command.Type
@@ -96,23 +66,6 @@ sealed class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
    * @see com.maddyhome.idea.vim.command.Command
    */
   open val flags: EnumSet<CommandFlags> = noneOfEnum()
-
-
-  abstract class ForEachCaret : EditorActionHandlerBase(true) {
-    abstract fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean
-
-    final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
-      return execute(editor, caret, context, cmd)
-    }
-  }
-
-  abstract class SingleExecution : EditorActionHandlerBase(false) {
-    abstract fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean
-
-    final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
-      return execute(editor, context, cmd)
-    }
-  }
 
   abstract fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean
 

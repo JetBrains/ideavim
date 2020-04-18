@@ -42,7 +42,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
  * Base class for motion handlers.
  * @see [MotionActionHandler.SingleExecution] and [MotionActionHandler.ForEachCaret]
  */
-sealed class MotionActionHandler : EditorActionHandlerBase.SingleExecution() {
+sealed class MotionActionHandler : EditorActionHandlerBase(false) {
 
   /**
    * Base class for motion handlers.
@@ -127,7 +127,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase.SingleExecution() {
     }
   }
 
-  final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+  final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
     val blockSubmodeActive = editor.inBlockSubMode
 
     when (this) {
