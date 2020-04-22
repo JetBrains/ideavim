@@ -48,6 +48,8 @@ import static java.lang.Math.min;
  */
 public class ExTextField extends JTextField {
 
+  public final static String KEYMAP_NAME = "ex";
+
   ExTextField() {
     // We need to store this in a field, because we can't trust getCaret(), as it will return an instance of
     // ComposedTextCaret when working with dead keys or input methods
@@ -112,7 +114,7 @@ public class ExTextField extends JTextField {
     }
 
     setInputMap(WHEN_FOCUSED, new InputMap());
-    Keymap map = addKeymap("ex", getKeymap());
+    Keymap map = addKeymap(KEYMAP_NAME, getKeymap());
     loadKeymap(map, ExKeyBindings.INSTANCE.getBindings(), actions);
     map.setDefaultAction(new ExEditorKit.DefaultExKeyHandler());
     setKeymap(map);
