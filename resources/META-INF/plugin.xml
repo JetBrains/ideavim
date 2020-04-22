@@ -3,12 +3,8 @@
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
       <ul>
-        <li>Support ReplaceWithRegister plugin emulation</li>
-        <li>Support argtextobj.vim plugin emulation</li>
-        <li>Support vim-textobj-entire plugin emulation</li>
-        <li>Support showcmd command</li>
-        <li>Support ls/buffers/files command</li>
-        <li>Control the icon in the status bar using an `ideastatusicon` option</li>
+        <li>Fix mappings for `<S-Letter>`</li>
+        <li>Fix yank/paste with number registers</li>
         <li>Various bug fixes</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
