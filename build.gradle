@@ -77,7 +77,7 @@ tasks.register("slackEapNotification") {
     def changeLog = extractChangelog()
     changeLog = changeLog.replace("* ", "• ") // Replace stars with bullets
     changeLog = changeLog.replace("**", "*") // Enable bold text
-    changeLog = changeLog.replaceAll("\\[(.+)]\\(([^)]+)\\)", '<$2|$1>') // Enable links
+    changeLog = changeLog.replaceAll("\\[([^]]+)]\\(([^)]+)\\)", '<$2|$1>') // Enable links
     def message ="""
       {
           "text": "New version of IdeaVim",
