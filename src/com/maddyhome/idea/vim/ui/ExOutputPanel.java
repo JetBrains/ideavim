@@ -18,11 +18,11 @@
 
 package com.maddyhome.idea.vim.ui;
 
-import com.intellij.ide.IdeTooltip;
 import com.intellij.ide.ui.LafManager;
 import com.intellij.ide.ui.LafManagerListener;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.IJSwingUtilities;
@@ -46,7 +46,7 @@ import java.util.List;
 /**
  * This panel displays text in a <code>more</code> like window.
  */
-public class ExOutputPanel extends JPanel implements LafManagerListener {
+public class ExOutputPanel extends JPanel {
   private final @NotNull Editor myEditor;
 
   private final @NotNull JLabel myLabel = new JLabel("more");
@@ -86,14 +86,11 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     addKeyListener(moreKeyListener);
     myText.addKeyListener(moreKeyListener);
 
-    final Project project = editor.getProject();
-    if (project != null) {
-      // [VERSION UPDATE] 193+
-      //noinspection deprecation
-      LafManager.getInstance().addLafManagerListener(this, project);
-    }
-
     updateUI();
+  }
+
+  public static boolean isPanelActive(@NotNull Editor editor) {
+    return UserDataManager.getVimMorePanel(editor) != null;
   }
 
   public static @NotNull ExOutputPanel getInstance(@NotNull Editor editor) {
@@ -103,12 +100,6 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
       UserDataManager.setVimMorePanel(editor, panel);
     }
     return panel;
-  }
-
-  @Override
-  public void lookAndFeelChanged(@NotNull LafManager source) {
-    // Calls updateUI on this and child components
-    IJSwingUtilities.updateComponentTreeUI(this);
   }
 
   // Called automatically when the LAF is changed and the component is visible, and manually by the LAF listener handler
@@ -363,6 +354,18 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
           default:
             myExOutputPanel.badKey();
         }
+      }
+    }
+  }
+
+  public static class LafListener implements LafManagerListener {
+    @Override
+    public void lookAndFeelChanged(@NotNull LafManager source) {
+      if (!VimPlugin.isEnabled()) return;
+      // Calls updateUI on this and child components
+      for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
+        if (!ExOutputPanel.isPanelActive(editor)) continue;
+        IJSwingUtilities.updateComponentTreeUI(ExOutputPanel.getInstance(editor));
       }
     }
   }

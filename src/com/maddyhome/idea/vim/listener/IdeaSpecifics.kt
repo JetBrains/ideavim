@@ -55,9 +55,6 @@ import java.beans.PropertyChangeListener
  */
 object IdeaSpecifics {
   fun addIdeaSpecificsListeners(project: Project) {
-    EventFacade.getInstance().connectAnActionListener(project, VimActionListener)
-    EventFacade.getInstance().connectTemplateStartedListener(project, VimTemplateManagerListener)
-    EventFacade.getInstance().connectFindModelListener(project, VimFindModelListener)
     EventFacade.getInstance().registerLookupListener(project, LookupListener)
   }
 
@@ -65,15 +62,17 @@ object IdeaSpecifics {
     EventFacade.getInstance().removeLookupListener(project, LookupListener)
   }
 
-  private object VimActionListener : AnActionListener {
+  class VimActionListener : AnActionListener {
     private val surrounderItems = listOf("if", "if / else", "for")
     private val surrounderAction = "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
     private var editor: Editor? = null
     override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
+      if (!VimPlugin.isEnabled()) return
       editor = dataContext.getData(CommonDataKeys.EDITOR) ?: return
     }
 
     override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
+      if (!VimPlugin.isEnabled()) return
       //region Extend Selection for Rider
       when (ActionManager.getInstance().getId(action)) {
         IdeActions.ACTION_EDITOR_SELECT_WORD_AT_CARET, IdeActions.ACTION_EDITOR_UNSELECT_WORD_AT_CARET -> {
@@ -107,8 +106,9 @@ object IdeaSpecifics {
   }
 
   //region Enter insert mode for surround templates without selection
-  private object VimTemplateManagerListener : TemplateManagerListener {
+  class VimTemplateManagerListener : TemplateManagerListener {
     override fun templateStarted(state: TemplateState) {
+      if (!VimPlugin.isEnabled()) return
       val editor = state.editor ?: return
 
       state.addTemplateStateListener(object : TemplateEditingAdapter() {
@@ -157,8 +157,9 @@ object IdeaSpecifics {
   //endregion
 
   //region Hide Vim search highlights when showing IntelliJ search results
-  private object VimFindModelListener : FindModelListener {
+  class VimFindModelListener : FindModelListener {
     override fun findNextModelChanged() {
+      if (!VimPlugin.isEnabled()) return
       VimPlugin.getSearch().clearSearchHighlight()
     }
   }

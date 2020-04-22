@@ -48,7 +48,6 @@ import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.FileGroup
-import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SearchGroup
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
@@ -189,15 +188,11 @@ object VimListenerManager {
 
   object ProjectListeners {
     fun add(project: Project) {
-      val eventFacade = EventFacade.getInstance()
-      eventFacade.connectBookmarkListener(project, MarkGroup.MarkListener(project))
-      eventFacade.connectFileEditorManagerListener(project, VimFileEditorManagerListener)
       IdeaSpecifics.addIdeaSpecificsListeners(project)
     }
 
     fun removeAll() {
       // Project listeners are self-disposable, so there is no need to unregister them on project close
-      EventFacade.getInstance().disableBusConnection()
       ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }.forEach { IdeaSpecifics.removeIdeaSpecificsListeners(it) }
     }
 
@@ -248,8 +243,9 @@ object VimListenerManager {
     }
   }
 
-  object VimFileEditorManagerListener : FileEditorManagerListener {
+  class VimFileEditorManagerListener : FileEditorManagerListener {
     override fun selectionChanged(event: FileEditorManagerEvent) {
+      if (!VimPlugin.isEnabled()) return
       MotionGroup.fileEditorManagerSelectionChangedCallback(event)
       FileGroup.fileEditorManagerSelectionChangedCallback(event)
       SearchGroup.fileEditorManagerSelectionChangedCallback(event)

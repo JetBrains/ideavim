@@ -56,7 +56,6 @@ public class EventFacade {
   private static final @NotNull EventFacade ourInstance = new EventFacade();
 
   private @Nullable TypedActionHandler myOriginalTypedActionHandler;
-  private Map<Project, MessageBusConnection> connections = new HashMap<>();
 
   private EventFacade() {
   }
@@ -90,31 +89,6 @@ public class EventFacade {
 
   public void unregisterCustomShortcutSet(@NotNull AnAction action, @Nullable JComponent component) {
     action.unregisterCustomShortcutSet(component);
-  }
-
-  public void connectFileEditorManagerListener(@NotNull Project project, @NotNull FileEditorManagerListener listener) {
-    final MessageBusConnection connection = getConnection(project);
-    connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, listener);
-  }
-
-  public void connectAnActionListener(@NotNull Project project, @NotNull AnActionListener listener) {
-    final MessageBusConnection connection = getConnection(project);
-    connection.subscribe(AnActionListener.TOPIC, listener);
-  }
-
-  public void connectTemplateStartedListener(@NotNull Project project, @NotNull TemplateManagerListener listener) {
-    final MessageBusConnection connection = getConnection(project);
-    connection.subscribe(TemplateManager.TEMPLATE_STARTED_TOPIC, listener);
-  }
-
-  public void connectBookmarkListener(@NotNull Project project, @NotNull BookmarksListener bookmarksListener) {
-    final MessageBusConnection connection = getConnection(project);
-    connection.subscribe(BookmarksListener.TOPIC, bookmarksListener);
-  }
-
-  public void connectFindModelListener(@NotNull Project project, @NotNull FindModelListener findModelListener) {
-    final MessageBusConnection connection = getConnection(project);
-    connection.subscribe(FindManager.FIND_MODEL_TOPIC, findModelListener);
   }
 
   public void addDocumentListener(@NotNull Document document, @NotNull DocumentListener listener) {
@@ -173,23 +147,6 @@ public class EventFacade {
 
   public void removeLookupListener(@NotNull Project project, @NotNull PropertyChangeListener propertyChangeListener) {
     LookupManager.getInstance(project).removePropertyChangeListener(propertyChangeListener);
-  }
-
-  public void disableBusConnection() {
-    connections.values().forEach(MessageBusConnection::disconnect);
-    connections.clear();
-  }
-
-  private MessageBusConnection getConnection(Project project) {
-    if (!connections.containsKey(project)) {
-      final MessageBusConnection connection = project.getMessageBus().connect();
-      connections.put(project, connection);
-      Disposer.register(project, () -> {
-        connection.disconnect();
-        connections.remove(project);
-      });
-    }
-    return connections.get(project);
   }
 
   private @NotNull TypedAction getTypedAction() {
