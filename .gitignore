@@ -4,6 +4,7 @@
 /.idea/
 !/.idea/scopes
 !/.idea/copyright
+!/.idea/icon.png
 
 /build/
 /out/
