@@ -756,12 +756,14 @@ public class MarkGroup implements PersistentStateComponent<Element> {
 
     @Override
     public void bookmarkAdded(@NotNull Bookmark b) {
+      if (!VimPlugin.isEnabled()) return;
       if (!OptionsManager.INSTANCE.getIdeamarks().isSet()) return;
       bookmarkTemplate = b;
     }
 
     @Override
     public void bookmarkRemoved(@NotNull Bookmark b) {
+      if (!VimPlugin.isEnabled()) return;
       if (!OptionsManager.INSTANCE.getIdeamarks().isSet()) return;
 
       char ch = b.getMnemonic();
@@ -775,6 +777,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
 
     @Override
     public void bookmarkChanged(@NotNull Bookmark b) {
+      if (!VimPlugin.isEnabled()) return;
       /* IJ sets named marks in two steps. Firstly it creates an unnamed mark, then adds a mnemonic */
       if (!OptionsManager.INSTANCE.getIdeamarks().isSet()) return;
       if (b != bookmarkTemplate) return;

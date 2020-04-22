@@ -1,0 +1,25 @@
+<idea-plugin>
+  <applicationListeners>
+    <listener class="com.maddyhome.idea.vim.ui.ExEntryPanel$LafListener"
+              topic="com.intellij.ide.ui.LafManagerListener"/>
+  </applicationListeners>
+  <projectListeners>
+    <listener class="com.maddyhome.idea.vim.ui.ExOutputPanel$LafListener"
+              topic="com.intellij.ide.ui.LafManagerListener"/>
+
+    <listener class="com.maddyhome.idea.vim.listener.VimListenerManager$VimFileEditorManagerListener"
+              topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+
+    <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$VimActionListener"
+              topic="com.intellij.openapi.actionSystem.ex.AnActionListener"/>
+
+    <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$VimTemplateManagerListener"
+              topic="com.intellij.codeInsight.template.TemplateManagerListener"/>
+
+    <listener class="com.maddyhome.idea.vim.group.MarkGroup$MarkListener"
+              topic="com.intellij.ide.bookmarks.BookmarksListener"/>
+
+    <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$VimFindModelListener"
+              topic="com.intellij.find.FindModelListener"/>
+  </projectListeners>
+</idea-plugin>
