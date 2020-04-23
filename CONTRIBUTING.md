@@ -46,6 +46,8 @@ You can start by:
 in the issue tracker.
  - Read about the `@VimBehaviorDiffers` annotation and fix the corresponding functionality.
 
+Also join the brand new [![Join the chat at https://gitter.im/JetBrains/ideavim](https://badges.gitter.im/JetBrains/ideavim.svg)](https://gitter.im/JetBrains/ideavim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) for IdeaVim developers! 
+
 
 ### Development Environment
 
@@ -54,11 +56,10 @@ in the issue tracker.
 2. Import the project from the existing sources in IntelliJ IDEA 2018.1 or newer (Community or
    Ultimate), by selecting "File | New | Project from Existing Sources..." or selecting "Import
    Project" from the Welcome screen.
-
-    * In the project wizard, select "Import project from external model | Gradle".
-
-    * Select your Java 8+ JDK as the Gradle JVM; leave other parameters unchanged.
-
+ * In the project wizard, select "Import project from external model | Gradle".
+   
+ * Select your Java 8+ JDK as the Gradle JVM; leave other parameters unchanged.
+   
 3. Run your IdeaVim plugin within IntelliJ via a Gradle task:
 
     * Select the "View | Tool Windows | Gradle" tool window.
@@ -78,7 +79,7 @@ in the issue tracker.
 
     * You can install this file by selecting "Settings | Plugins | Install plugin
       from disk...".
-       
+      
 ### Testing
 
 1. Read about the `@VimBehaviorDiffers` annotation.
