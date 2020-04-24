@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.option;
 
+import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -113,5 +114,5 @@ public abstract class Option<T> {
 
   protected final String name;
   protected final String abbrev;
-  private final @NotNull List<OptionChangeListener<T>> listeners = new ArrayList<>();
+  private final @NotNull List<OptionChangeListener<T>> listeners = ContainerUtil.createLockFreeCopyOnWriteList();
 }
