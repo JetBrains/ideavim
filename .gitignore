@@ -9,3 +9,5 @@
 /build/
 /out/
 /tmp/
+
+*.DS_Store
