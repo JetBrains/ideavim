@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.ui
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.DataManager
+import com.intellij.ide.lightEdit.LightEditCompatible
 import com.intellij.ide.plugins.InstalledPluginsState
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.ide.plugins.PluginManagerMain
@@ -35,6 +36,7 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.ListPopup
@@ -45,7 +47,9 @@ import com.intellij.openapi.updateSettings.impl.UpdateSettings
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.wm.StatusBar
 import com.intellij.openapi.wm.StatusBarWidget
-import com.intellij.openapi.wm.StatusBarWidgetProvider
+import com.intellij.openapi.wm.StatusBarWidgetFactory
+import com.intellij.openapi.wm.WindowManager
+import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.Consumer
 import com.intellij.util.text.VersionComparatorUtil
@@ -59,32 +63,63 @@ import java.awt.event.MouseEvent
 import javax.swing.Icon
 import javax.swing.SwingConstants
 
-private class StatusBarIconProvider : StatusBarWidgetProvider {
-  override fun getWidget(project: Project): VimStatusBar? {
+const val STATUS_BAR_ICON_ID = "IdeaVim-Icon"
+const val STATUS_BAR_DISPLAY_NAME = "IdeaVim"
+
+class StatusBarIconFactory : StatusBarWidgetFactory, LightEditCompatible {
+
+  override fun getId(): String = STATUS_BAR_ICON_ID
+
+  override fun getDisplayName(): String = STATUS_BAR_DISPLAY_NAME
+
+  override fun disposeWidget(widget: StatusBarWidget) {}
+
+  override fun isAvailable(project: Project): Boolean {
     @Suppress("DEPRECATION")
-    if (!OptionsManager.ideastatusbar.isSet) return null
-    if (OptionsManager.ideastatusicon.value == IdeaStatusIcon.disabled) return null
-    return VimStatusBar
+    if (!OptionsManager.ideastatusbar.isSet) return false
+    if (OptionsManager.ideastatusicon.value == IdeaStatusIcon.disabled) return false
+    return true
+  }
+
+  override fun createWidget(project: Project): StatusBarWidget {
+    OptionsManager.ideastatusicon.addOptionChangeListener { _, _ -> updateAll() }
+    return VimStatusBar()
+  }
+
+  override fun canBeEnabledOn(statusBar: StatusBar): Boolean = true
+
+  override fun isConfigurable(): Boolean = false
+
+  private fun updateAll() {
+    val projectManager = ProjectManager.getInstanceIfCreated() ?: return
+    for (project in projectManager.openProjects) {
+      val statusBarWidgetsManager = project.getService(StatusBarWidgetsManager::class.java) ?: continue
+      statusBarWidgetsManager.updateWidget(this)
+    }
+
+    updateIcon()
+  }
+
+  companion object {
+    fun updateIcon() {
+      val projectManager = ProjectManager.getInstanceIfCreated() ?: return
+      for (project in projectManager.openProjects) {
+        val statusBar = WindowManager.getInstance().getStatusBar(project) ?: continue
+        statusBar.updateWidget(STATUS_BAR_ICON_ID)
+      }
+    }
   }
 }
 
-object VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
+class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
 
-  init {
-    OptionsManager.ideastatusicon.addOptionChangeListener { _, _ -> update() }
-  }
+  override fun ID(): String = STATUS_BAR_ICON_ID
 
-  private var statusBar: StatusBar? = null
-
-  override fun ID(): String = "IdeaVim-Icon"
-
-  override fun install(statusBar: StatusBar) {
-    VimStatusBar.statusBar = statusBar
-  }
+  override fun install(statusBar: StatusBar) {}
 
   override fun dispose() {}
 
-  override fun getTooltipText() = "IdeaVim"
+  override fun getTooltipText() = STATUS_BAR_DISPLAY_NAME
 
   override fun getIcon(): Icon {
     if (OptionsManager.ideastatusicon.value == IdeaStatusIcon.gray) return VimIcons.IDEAVIM_DISABLED
@@ -100,13 +135,7 @@ object VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
     popup.show(RelativePoint(component, at))
   }
 
-  // TODO [VERSION UPDATE] After 193 use `getPresentation()`
-  @Suppress("DEPRECATION", "UnstableApiUsage")
-  override fun getPresentation(type: StatusBarWidget.PlatformType): StatusBarWidget.WidgetPresentation? = this
-
-  fun update() {
-    statusBar?.updateWidget(ID())
-  }
+  override fun getPresentation(): StatusBarWidget.WidgetPresentation? = this
 }
 
 class VimActions : DumbAwareAction() {
@@ -130,7 +159,7 @@ private object VimActionsPopup {
   fun getPopup(dataContext: DataContext): ListPopup {
     val actions = getActions()
     val popup = JBPopupFactory.getInstance()
-      .createActionGroupPopup("IdeaVim", actions,
+      .createActionGroupPopup(STATUS_BAR_DISPLAY_NAME, actions,
         dataContext, JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, false,
         VimActions.actionPlace)
     popup.setAdText("Version ${VimPlugin.getVersion()}", SwingConstants.CENTER)
@@ -241,6 +270,7 @@ private object JoinEap : DumbAwareAction() {
 
         val version = downloader.pluginVersion
         val message = "Do you want to install the EAP version of IdeaVim?"
+
         @Suppress("MoveVariableDeclarationIntoWhen")
         val res = Messages.showYesNoCancelDialog(project, message, "IdeaVim $version", null)
         when (res) {

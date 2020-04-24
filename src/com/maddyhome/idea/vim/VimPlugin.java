@@ -57,8 +57,8 @@ import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
+import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
-import com.maddyhome.idea.vim.ui.VimStatusBar;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
@@ -330,7 +330,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
       getInstance().turnOnPlugin();
     }
 
-    VimStatusBar.INSTANCE.update();
+    StatusBarIconFactory.Companion.updateIcon();
   }
 
   public static boolean isError() {
