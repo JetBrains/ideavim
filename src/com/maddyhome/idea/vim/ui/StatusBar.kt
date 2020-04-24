@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim
+package com.maddyhome.idea.vim.ui
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.DataManager
@@ -49,10 +49,10 @@ import com.intellij.openapi.wm.StatusBarWidgetProvider
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.Consumer
 import com.intellij.util.text.VersionComparatorUtil
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.option.IdeaStatusIcon
 import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import icons.VimIcons
 import java.awt.Point
 import java.awt.event.MouseEvent
@@ -71,7 +71,7 @@ private class StatusBarIconProvider : StatusBarWidgetProvider {
 object VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
 
   init {
-    OptionsManager.ideastatusicon.addOptionChangeListener { _, _ -> this.update() }
+    OptionsManager.ideastatusicon.addOptionChangeListener { _, _ -> update() }
   }
 
   private var statusBar: StatusBar? = null
@@ -79,7 +79,7 @@ object VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
   override fun ID(): String = "IdeaVim-Icon"
 
   override fun install(statusBar: StatusBar) {
-    this.statusBar = statusBar
+    VimStatusBar.statusBar = statusBar
   }
 
   override fun dispose() {}
@@ -105,7 +105,7 @@ object VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
   override fun getPresentation(type: StatusBarWidget.PlatformType): StatusBarWidget.WidgetPresentation? = this
 
   fun update() {
-    statusBar?.updateWidget(this.ID())
+    statusBar?.updateWidget(ID())
   }
 }
 
