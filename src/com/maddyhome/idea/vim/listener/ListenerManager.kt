@@ -180,7 +180,7 @@ object VimListenerManager {
 
       OptionsManager.number.removeOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
       OptionsManager.relativenumber.removeOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
-      OptionsManager.showcmd.addOptionChangeListener(ShowCmdOptionChangeListener)
+      OptionsManager.showcmd.removeOptionChangeListener(ShowCmdOptionChangeListener)
 
       EventFacade.getInstance().removeEditorFactoryListener(VimEditorFactoryListener)
     }
