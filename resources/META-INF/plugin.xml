@@ -69,6 +69,6 @@
     <action id="VimInternalAddInlays" class="com.maddyhome.idea.vim.action.internal.AddInlaysAction" text="Add Test Inlays | IdeaVim Internal" internal="true"/>
 
     <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction" text="Shortcuts"/>
-    <action id="VimActions" class="com.maddyhome.idea.vim.VimActions" text="Vim Actions"/>
+    <action id="VimActions" class="com.maddyhome.idea.vim.ui.VimActions" text="Vim Actions"/>
   </actions>
 </idea-plugin>

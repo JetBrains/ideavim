@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.action
 
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAwareToggleAction
-import com.maddyhome.idea.vim.VimActions
+import com.maddyhome.idea.vim.ui.VimActions
 import com.maddyhome.idea.vim.VimPlugin
 
 /**
