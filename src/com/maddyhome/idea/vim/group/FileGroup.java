@@ -39,6 +39,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.VimProjectService;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -410,9 +411,8 @@ public class FileGroup {
       lastSelections.put(event.getManager(), event.getOldFile());
       String disposableKey = FileGroup.disposableKey + event.getManager().hashCode();
       if (Disposer.get(disposableKey) == null) {
-        Disposer.register(event.getManager().getProject(), () -> {
-          lastSelections.remove(event.getManager());
-        }, disposableKey);
+        VimProjectService parentDisposable = VimProjectService.getInstance(event.getManager().getProject());
+        Disposer.register(parentDisposable, () -> lastSelections.remove(event.getManager()), disposableKey);
       }
     }
   }

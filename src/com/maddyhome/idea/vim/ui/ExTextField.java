@@ -25,6 +25,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.VimProjectService;
 import com.maddyhome.idea.vim.group.HistoryGroup;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import kotlin.text.StringsKt;
@@ -235,7 +236,8 @@ public class ExTextField extends JTextField {
     String disposeKey = vimExTextFieldDisposeKey + editor.hashCode();
     Project project = editor.getProject();
     if (Disposer.get(disposeKey) == null && project != null) {
-      Disposer.register(project, () -> {
+      VimProjectService parentDisposable = VimProjectService.getInstance(project);
+      Disposer.register(parentDisposable, () -> {
         this.editor = null;
         this.context = null;
       }, disposeKey);

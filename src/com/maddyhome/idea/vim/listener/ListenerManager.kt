@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.listener
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
@@ -172,7 +171,7 @@ object VimListenerManager {
       OptionsManager.relativenumber.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
       OptionsManager.showcmd.addOptionChangeListener(ShowCmdOptionChangeListener)
 
-      EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, ApplicationManager.getApplication())
+      EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance())
     }
 
     fun disable() {
