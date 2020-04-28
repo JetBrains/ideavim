@@ -407,7 +407,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     registerIdeavimrc();
 
     // Turing on should be performed after all commands registration
-    getEditor().turnOn();
     getSearch().turnOn();
     VimListenerManager.INSTANCE.turnOn();
   }
@@ -415,10 +414,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   private void turnOffPlugin() {
     KeyHandler.getInstance().fullReset(null);
 
-    EditorGroup editorGroup = getEditorIfCreated();
-    if (editorGroup != null) {
-      editorGroup.turnOff();
-    }
     SearchGroup searchGroup = getSearchIfCreated();
     if (searchGroup != null) {
       searchGroup.turnOff();

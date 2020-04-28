@@ -69,18 +69,6 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     }
   };
 
-  public void turnOn() {
-    for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
-      VimPlugin.getEditor().editorCreated(editor);
-    }
-  }
-
-  public void turnOff() {
-    for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
-      VimPlugin.getEditor().editorDeinit(editor, false);
-    }
-  }
-
   private void initLineNumbers(final @NotNull Editor editor) {
     if (!supportsVimLineNumbers(editor) || UserDataManager.getVimEditorGroup(editor)) {
       return;
