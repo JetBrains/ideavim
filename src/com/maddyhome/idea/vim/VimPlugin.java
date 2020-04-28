@@ -85,7 +85,6 @@ import static com.maddyhome.idea.vim.group.KeyGroup.SHORTCUT_CONFLICTS_ELEMENT;
 @State(name = "VimSettings", storages = {@Storage("$APP_CONFIG$/vim_settings.xml")})
 public class VimPlugin implements PersistentStateComponent<Element>, Disposable {
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
-  private static final String IDEAVIM_STATISTICS_TIMESTAMP_KEY = "ideavim.statistics.timestamp";
   private static final int STATE_VERSION = 6;
 
   private static long lastBeepTimeMillis;
@@ -150,53 +149,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
   public static @NotNull MotionGroup getMotion() {
     return ServiceManager.getService(MotionGroup.class);
-  }
-
-  /**
-   * Reports statistics about installed IdeaVim and enabled Vim emulation.
-   * <p>
-   * See https://github.com/go-lang-plugin-org/go-lang-idea-plugin/commit/5182ab4a1d01ad37f6786268a2fe5e908575a217
-   */
-  public static void statisticReport() {
-    final PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
-    final long lastUpdate = propertiesComponent.getOrInitLong(IDEAVIM_STATISTICS_TIMESTAMP_KEY, 0);
-    final boolean outOfDate = lastUpdate == 0 || System.currentTimeMillis() - lastUpdate > TimeUnit.DAYS.toMillis(1);
-    if (outOfDate && isEnabled()) {
-      ApplicationManager.getApplication().executeOnPooledThread(() -> {
-        try {
-          final String buildNumber = ApplicationInfo.getInstance().getBuild().asString();
-          final String version = URLEncoder.encode(getVersion(), CharsetToolkit.UTF8);
-          final String os = URLEncoder.encode(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION, CharsetToolkit.UTF8);
-          final String uid = PermanentInstallationID.get();
-          final String url = "https://plugins.jetbrains.com/plugins/list" +
-                             "?pluginId=" +
-                             IDEAVIM_PLUGIN_ID +
-                             "&build=" +
-                             buildNumber +
-                             "&pluginVersion=" +
-                             version +
-                             "&os=" +
-                             os +
-                             "&uuid=" +
-                             uid;
-          PropertiesComponent.getInstance()
-            .setValue(IDEAVIM_STATISTICS_TIMESTAMP_KEY, String.valueOf(System.currentTimeMillis()));
-          HttpRequests.request(url).connect(request -> {
-            LOG.info("Sending statistics: " + url);
-            try {
-              JDOMUtil.load(request.getInputStream());
-            }
-            catch (JDOMException e) {
-              LOG.warn(e);
-            }
-            return null;
-          });
-        }
-        catch (IOException e) {
-          LOG.warn(e);
-        }
-      });
-    }
   }
 
   public static @NotNull ChangeGroup getChange() {
