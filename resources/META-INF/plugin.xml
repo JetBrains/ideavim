@@ -3,7 +3,7 @@
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
       <ul>
-        <li>Fix mappings for `<S-Letter>`</li>
+        <li>Fix mappings for uppercase letters</li>
         <li>Fix yank/paste with number registers</li>
         <li>Various bug fixes</li>
       </ul>

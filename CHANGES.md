@@ -22,10 +22,8 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-[To Be Released]
+0.57, 2020-04-28
 -------------
-
-_Available since 0.56.1 EAP:_
 
 **Fixes:**
 * [VIM-1992](https://youtrack.jetbrains.com/issue/VIM-1992) Fix mappings to `<S-Letter>`
@@ -33,8 +31,6 @@ _Available since 0.56.1 EAP:_
 
 **Merged PRs:**
 * [234](https://github.com/JetBrains/ideavim/pull/234) by [runforprogram](https://github.com/runforprogram): [VIM-1991] fix >0 number register not work
-
-_To Be Released..._
 
 0.56, 2020-04-09
 --------------
