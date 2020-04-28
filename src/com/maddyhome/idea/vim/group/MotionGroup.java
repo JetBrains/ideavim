@@ -68,28 +68,6 @@ public class MotionGroup {
   public static final int LAST_t = 4;
   public static final int LAST_COLUMN = 9999;
 
-  public void editorCreated(@NotNull EditorFactoryEvent event) {
-    final Editor editor = event.getEditor();
-    // This ridiculous code ensures that a lot of events are processed BEFORE we finally start listening
-    // to visible area changes. The primary reason for this change is to fix the cursor position bug
-    // using the gd and gD commands (Goto Declaration). This bug has been around since Idea 6.0.4?
-    // Prior to this change the visible area code was moving the cursor around during file load and messing
-    // with the cursor position of the Goto Declaration processing.
-    ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication()
-      .invokeLater(() -> ApplicationManager.getApplication().invokeLater(() -> {
-        VimListenerManager.EditorListeners.add(editor);
-        UserDataManager.setVimMotionGroup(editor, true);
-      })));
-  }
-
-  public void editorReleased(@NotNull EditorFactoryEvent event) {
-    Editor editor = event.getEditor();
-    if (UserDataManager.getVimMotionGroup(editor)) {
-      VimListenerManager.EditorListeners.remove(editor);
-      UserDataManager.setVimMotionGroup(editor, false);
-    }
-  }
-
   /**
    * This helper method calculates the complete range a motion will move over taking into account whether
    * the motion is FLAG_MOT_LINEWISE or FLAG_MOT_CHARACTERWISE (FLAG_MOT_INCLUSIVE or FLAG_MOT_EXCLUSIVE).

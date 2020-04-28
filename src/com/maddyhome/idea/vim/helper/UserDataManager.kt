@@ -87,7 +87,6 @@ var Editor.vimIncsearchCurrentMatchOffset: Int? by userData()
 var Editor.vimLastSelectionType: SelectionType? by userData()
 var Editor.vimCommandState: CommandState? by userData()
 var Editor.vimChangeGroup: Boolean by userDataOr { false }
-var Editor.vimMotionGroup: Boolean by userDataOr { false }
 var Editor.vimEditorGroup: Boolean by userDataOr { false }
 var Editor.vimLineNumbersInitialState: Boolean by userDataOr { false }
 var Editor.vimHasRelativeLineNumbersInstalled: Boolean by userDataOr { false }

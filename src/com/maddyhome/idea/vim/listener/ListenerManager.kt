@@ -61,7 +61,8 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.helper.vimMotionGroup
+import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
+import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.remove
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.ExEntryPanel
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
@@ -202,26 +203,13 @@ object VimListenerManager {
 
   object EditorListeners {
     fun addAll() {
-      val editors = EditorFactory.getInstance().allEditors
-      for (editor in editors) {
-        if (!editor.vimMotionGroup) {
-          add(editor)
-          editor.vimMotionGroup = true
-        }
-      }
+      EditorFactory.getInstance().allEditors.forEach(this::add)
     }
 
     fun removeAll() {
-      val editors = EditorFactory.getInstance().allEditors
-      for (editor in editors) {
-        if (editor.vimMotionGroup) {
-          remove(editor)
-          editor.vimMotionGroup = false
-        }
-      }
+      EditorFactory.getInstance().allEditors.forEach(this::remove)
     }
 
-    @JvmStatic
     fun add(editor: Editor) {
       editor.contentComponent.addKeyListener(VimKeyListener)
       val eventFacade = EventFacade.getInstance()
@@ -231,7 +219,6 @@ object VimListenerManager {
       eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener)
     }
 
-    @JvmStatic
     fun remove(editor: Editor) {
       editor.contentComponent.removeKeyListener(VimKeyListener)
       val eventFacade = EventFacade.getInstance()
@@ -254,14 +241,14 @@ object VimListenerManager {
   private object VimEditorFactoryListener : EditorFactoryListener {
     override fun editorCreated(event: EditorFactoryEvent) {
       VimPlugin.getEditor().editorCreated(event.editor)
-      VimPlugin.getMotion().editorCreated(event)
+      add(event.editor)
       VimPlugin.getChange().editorCreated(event)
       VimPlugin.statisticReport()
     }
 
     override fun editorReleased(event: EditorFactoryEvent) {
       VimPlugin.getEditor().editorDeinit(event.editor, true)
-      VimPlugin.getMotion().editorReleased(event)
+      remove(event.editor)
       VimPlugin.getChange().editorReleased(event)
       VimPlugin.getMark().editorReleased(event)
     }
