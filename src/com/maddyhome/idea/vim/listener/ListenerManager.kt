@@ -203,11 +203,15 @@ object VimListenerManager {
 
   object EditorListeners {
     fun addAll() {
-      EditorFactory.getInstance().allEditors.forEach(this::add)
+      EditorFactory.getInstance().allEditors.forEach { editor ->
+        this.add(editor)
+      }
     }
 
     fun removeAll() {
-      EditorFactory.getInstance().allEditors.forEach(this::remove)
+      EditorFactory.getInstance().allEditors.forEach { editor ->
+        this.remove(editor, false)
+      }
     }
 
     fun add(editor: Editor) {
@@ -217,15 +221,19 @@ object VimListenerManager {
       eventFacade.addEditorMouseMotionListener(editor, EditorMouseHandler)
       eventFacade.addEditorSelectionListener(editor, EditorSelectionHandler)
       eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener)
+
+      VimPlugin.getEditor().editorCreated(editor)
     }
 
-    fun remove(editor: Editor) {
+    fun remove(editor: Editor, isReleased: Boolean) {
       editor.contentComponent.removeKeyListener(VimKeyListener)
       val eventFacade = EventFacade.getInstance()
       eventFacade.removeEditorMouseListener(editor, EditorMouseHandler)
       eventFacade.removeEditorMouseMotionListener(editor, EditorMouseHandler)
       eventFacade.removeEditorSelectionListener(editor, EditorSelectionHandler)
       eventFacade.removeComponentMouseListener(editor.contentComponent, ComponentMouseListener)
+
+      VimPlugin.getEditorIfCreated()?.editorDeinit(editor, isReleased)
     }
   }
 
@@ -240,15 +248,13 @@ object VimListenerManager {
 
   private object VimEditorFactoryListener : EditorFactoryListener {
     override fun editorCreated(event: EditorFactoryEvent) {
-      VimPlugin.getEditor().editorCreated(event.editor)
       add(event.editor)
       VimPlugin.getChange().editorCreated(event)
       VimPlugin.statisticReport()
     }
 
     override fun editorReleased(event: EditorFactoryEvent) {
-      VimPlugin.getEditor().editorDeinit(event.editor, true)
-      remove(event.editor)
+      remove(event.editor, true)
       VimPlugin.getChange().editorReleased(event)
       VimPlugin.getMark().editorReleased(event)
     }
