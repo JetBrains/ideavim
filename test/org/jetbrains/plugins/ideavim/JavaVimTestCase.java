@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
+import com.maddyhome.idea.vim.group.visual.VimVisualTimer;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.helper.TestInputModel;
@@ -57,6 +58,10 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
   protected void tearDown() throws Exception {
     ExEntryPanel.getInstance().deactivate(false);
     VimScriptGlobalEnvironment.getInstance().getVariables().clear();
+    Timer swingTimer = VimVisualTimer.INSTANCE.getSwingTimer();
+    if (swingTimer != null) {
+      swingTimer.stop();
+    }
     super.tearDown();
   }
 
