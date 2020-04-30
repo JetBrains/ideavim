@@ -22,7 +22,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
-import com.intellij.openapi.editor.actionSystem.EditorActionManager
+import com.intellij.openapi.editor.actionSystem.TypedAction
 import com.intellij.openapi.editor.event.EditorFactoryEvent
 import com.intellij.openapi.editor.event.EditorFactoryListener
 import com.intellij.openapi.editor.event.EditorMouseEvent
@@ -161,9 +161,7 @@ object VimListenerManager {
 
   object GlobalListeners {
     fun enable() {
-      @Suppress("DEPRECATION")
-      // [VERSION UPDATE] 193+ com.intellij.openapi.editor.actionSystem.TypedAction.getInstance
-      val typedAction = EditorActionManager.getInstance().typedAction
+      val typedAction = TypedAction.getInstance()
       if (typedAction.rawHandler !is VimTypedActionHandler) {
         // Actually this if should always be true, but just as protection
         EventFacade.getInstance().setupTypedActionHandler(VimTypedActionHandler(typedAction.rawHandler))

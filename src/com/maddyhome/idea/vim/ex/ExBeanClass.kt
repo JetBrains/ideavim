@@ -32,9 +32,7 @@ class ExBeanClass : AbstractExtensionPointBean() {
   var names: String? = null
 
   val handler: CommandHandler by lazy {
-    // FIXME. [VERSION UPDATE] change to instantiateClass for 193+
-    @Suppress("DEPRECATION")
-    this.instantiate<CommandHandler>(
+    this.instantiateClass<CommandHandler>(
       implementation ?: "", ApplicationManager.getApplication().picoContainer)
   }
 

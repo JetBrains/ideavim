@@ -18,17 +18,14 @@
 
 package com.maddyhome.idea.vim
 
-import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.maddyhome.idea.vim.listener.VimListenerManager
 
 /**
  * @author Alex Plate
- *
- * [VERSION UPDATE] 193+ Use StartupActivity.DumbAware
  */
-class PluginStartup : StartupActivity, DumbAware {
+class PluginStartup : StartupActivity.DumbAware {
 
   private var firstInitializationOccurred = false
 

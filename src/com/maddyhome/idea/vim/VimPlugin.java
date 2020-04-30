@@ -253,8 +253,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return PluginId.getId(IDEAVIM_PLUGIN_ID);
   }
 
-  // [VERSION UPDATE] 193+ remove suppress
-  @SuppressWarnings({"MissingRecentApi", "UnstableApiUsage"})
   public static @NotNull String getVersion() {
     final IdeaPluginDescriptor plugin = PluginManager.getPlugin(getPluginId());
     if (!ApplicationManager.getApplication().isInternal()) {
