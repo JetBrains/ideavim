@@ -396,7 +396,9 @@ public class SearchGroup implements PersistentStateComponent<Element> {
                                      int initialOffset, @Nullable LineRange searchRange, boolean forwards, boolean forceUpdate) {
     int currentMatchOffset = -1;
 
-    Project[] projects = ProjectManager.getInstance().getOpenProjects();
+    ProjectManager projectManager = ProjectManager.getInstanceIfCreated();
+    if (projectManager == null) return currentMatchOffset;
+    Project[] projects = projectManager.getOpenProjects();
     for (Project project : projects) {
       Editor current = FileEditorManager.getInstance(project).getSelectedTextEditor();
       Editor[] editors = current == null ? null : EditorFactory.getInstance().getEditors(current.getDocument(), project);
