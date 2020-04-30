@@ -32,7 +32,10 @@ import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx;
-import com.intellij.openapi.editor.event.*;
+import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.editor.event.EditorMouseEvent;
+import com.intellij.openapi.editor.event.EditorMouseListener;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.impl.TextRangeInterval;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -433,18 +436,12 @@ public class ChangeGroup {
     }
   };
 
-  public void editorCreated(@NotNull EditorFactoryEvent event) {
-    final Editor editor = event.getEditor();
+  public void editorCreated(Editor editor) {
     EventFacade.getInstance().addEditorMouseListener(editor, listener);
-    UserDataManager.setVimChangeGroup(editor, true);
   }
 
-  public void editorReleased(@NotNull EditorFactoryEvent event) {
-    final Editor editor = event.getEditor();
-    if (UserDataManager.getVimChangeGroup(editor)) {
-      EventFacade.getInstance().removeEditorMouseListener(editor, listener);
-      UserDataManager.setVimChangeGroup(editor, false);
-    }
+  public void editorReleased(Editor editor) {
+    EventFacade.getInstance().removeEditorMouseListener(editor, listener);
   }
 
   /**

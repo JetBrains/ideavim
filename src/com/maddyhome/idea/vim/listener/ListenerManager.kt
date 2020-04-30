@@ -224,6 +224,8 @@ object VimListenerManager {
       eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener)
 
       VimPlugin.getEditor().editorCreated(editor)
+
+      VimPlugin.getChange().editorCreated(editor)
     }
 
     fun remove(editor: Editor, isReleased: Boolean) {
@@ -235,6 +237,8 @@ object VimListenerManager {
       eventFacade.removeComponentMouseListener(editor.contentComponent, ComponentMouseListener)
 
       VimPlugin.getEditorIfCreated()?.editorDeinit(editor, isReleased)
+
+      VimPlugin.getChange().editorReleased(editor)
     }
   }
 
@@ -250,13 +254,11 @@ object VimListenerManager {
   private object VimEditorFactoryListener : EditorFactoryListener {
     override fun editorCreated(event: EditorFactoryEvent) {
       add(event.editor)
-      VimPlugin.getChange().editorCreated(event)
       StatisticReporter.report()
     }
 
     override fun editorReleased(event: EditorFactoryEvent) {
       remove(event.editor, true)
-      VimPlugin.getChange().editorReleased(event)
       VimPlugin.getMark().editorReleased(event)
     }
   }
