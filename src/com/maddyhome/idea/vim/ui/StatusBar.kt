@@ -236,8 +236,6 @@ private object JoinEap : DumbAwareAction() {
 
     val pluginRef = Ref.create<PluginDownloader>()
 
-    // [VERSION UPDATE] 193+ remove suppressing
-    @Suppress("UnstableApiUsage")
     object : Task.Backgroundable(null, "Checking for IdeaVim EAP version", true) {
       override fun run(indicator: ProgressIndicator) {
         val downloaders = mutableListOf<PluginDownloader>()
@@ -255,8 +253,6 @@ private object JoinEap : DumbAwareAction() {
         pluginRef.set(plugin)
       }
 
-      // [VERSION UPDATE] 193+ remove suppressing
-      @Suppress("MissingRecentApi", "UnstableApiUsage")
       override fun onSuccess() {
         val downloader: PluginDownloader = pluginRef.get() ?: run {
           notificator.notifySubscribedToEap()

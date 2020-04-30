@@ -26,10 +26,8 @@ import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.ide.DataManager
 import com.intellij.injected.editor.EditorWindow
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.util.Key
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler
 import com.intellij.testFramework.PlatformTestUtil
-import com.intellij.testFramework.TestModeFlags
 import com.intellij.testFramework.fixtures.CodeInsightTestUtil.doInlineRename
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
@@ -55,10 +53,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
 
   override fun setUp() {
     super.setUp()
-    // TODO: 24.10.2019 [VERSION UPDATE] 2019.1
-    //     TemplateManagerImpl.setTemplateTesting(myFixture.testRootDisposable)
-    @Suppress("DEPRECATION", "UNCHECKED_CAST")
-    TestModeFlags.set(Key.findKeyByName("TemplateTesting") as Key<Boolean>, true, myFixture.testRootDisposable)
+    TemplateManagerImpl.setTemplateTesting(myFixture.testRootDisposable)
   }
 
   @VimOptionDefaultAll

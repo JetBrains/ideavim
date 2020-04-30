@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.group
 
 import com.intellij.icons.AllIcons
 import com.intellij.ide.actions.OpenFileAction
-import com.intellij.ide.actions.ShowFilePathAction
+import com.intellij.ide.actions.RevealFileAction
 import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationDisplayType
@@ -198,18 +198,14 @@ class NotificationService(private val project: Project?) {
 
     private fun createIdeaVimRcManually(message: String, project: Project?) {
       val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, message, NotificationType.WARNING)
-      @Suppress("UnstableApiUsage", "DEPRECATION")
-      // [VERSION UPDATE] 193+ com.intellij.ide.actions.RevealFileAction.openDirectory
-      var actionName = if (SystemInfo.isMac) "Reveal Home in Finder" else "Show Home in " + ShowFilePathAction.getFileManagerName()
+      var actionName = if (SystemInfo.isMac) "Reveal Home in Finder" else "Show Home in " + RevealFileAction.getFileManagerName()
       if (!File(System.getProperty("user.home")).exists()) {
         actionName = ""
       }
       notification.addAction(object : AnAction(actionName) {
         override fun actionPerformed(e: AnActionEvent) {
           val homeDir = File(System.getProperty("user.home"))
-          @Suppress("DEPRECATION", "UnstableApiUsage")
-          // [VERSION UPDATE] 193+ com.intellij.ide.actions.RevealFileAction.openDirectory
-          ShowFilePathAction.openDirectory(homeDir)
+          RevealFileAction.openDirectory(homeDir)
           notification.expire()
         }
       })

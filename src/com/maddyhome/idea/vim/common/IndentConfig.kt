@@ -59,9 +59,7 @@ class IndentConfig private constructor(indentOptions: IndentOptions) {
       val indentOptions = if (project != null) {
         CodeStyle.getIndentOptions(project, editor.document)
       } else {
-        // [VERSION UPDATE] 191+
-        @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
-        CodeStyle.getDefaultSettings().indentOptions!!
+        CodeStyle.getDefaultSettings().indentOptions
       }
       return IndentConfig(indentOptions)
     }
