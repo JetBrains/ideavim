@@ -88,7 +88,9 @@ class StatusBarIconFactory : StatusBarWidgetFactory, LightEditCompatible {
 
   override fun canBeEnabledOn(statusBar: StatusBar): Boolean = true
 
-  override fun isConfigurable(): Boolean = false
+  /* Use can configure this icon using ideastatusicon option, but we should still keep the option to remove
+  * the icon via IJ because this option is hard to discover */
+  override fun isConfigurable(): Boolean = true
 
   private fun updateAll() {
     val projectManager = ProjectManager.getInstanceIfCreated() ?: return

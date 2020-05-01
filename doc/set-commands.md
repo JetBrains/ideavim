@@ -118,8 +118,6 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                  - enabled - icon is shown in the status bar
                  - gray - use the gray version of the icon
                  - disabled - hide the icon
-                 
-                  Works only from `~/.ideavimrc` after the IDE restart.
                   
     `lookupkeys`    `lookupkeys`   List of strings
     
