@@ -15,81 +15,68 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.extension
 
-package com.maddyhome.idea.vim.extension;
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.extensions.ExtensionPointListener
+import com.intellij.openapi.extensions.PluginDescriptor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
+import com.maddyhome.idea.vim.option.OptionsManager.addOption
+import com.maddyhome.idea.vim.option.OptionsManager.isSet
+import com.maddyhome.idea.vim.option.OptionsManager.removeOption
+import com.maddyhome.idea.vim.option.ToggleOption
+import java.util.*
 
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.extensions.ExtensionPointListener;
-import com.intellij.openapi.extensions.PluginDescriptor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.key.MappingOwner;
-import com.maddyhome.idea.vim.option.OptionsManager;
-import com.maddyhome.idea.vim.option.ToggleOption;
-import org.jetbrains.annotations.NotNull;
+object VimExtensionRegistrar {
+  private val registeredExtensions: MutableSet<String> = HashSet()
+  private var extensionRegistered = false
+  private val logger = logger<VimExtensionRegistrar>()
 
-import java.util.HashSet;
-import java.util.Set;
-
-/**
- * TODO [VERSION UPDATE] this file cannot be converted to kt before 192 because of nullabilities problems in
- * [ExtensionPointListener]. (In previous versions of IJ pluginDescriptor was nullable)
- */
-public class VimExtensionRegistrar {
-
-  private static final Set<String> registeredExtensions = new HashSet<>();
-  private static boolean extensionRegistered = false;
-
-  private static final Logger logger = Logger.getInstance(VimExtensionRegistrar.class);
-
-  public static void registerExtensions() {
-    if (extensionRegistered) return;
-    extensionRegistered = true;
-
-    VimExtension.EP_NAME.getPoint(null).addExtensionPointListener(new ExtensionPointListener<VimExtension>() {
-      @Override
-      public void extensionAdded(@NotNull VimExtension extension, PluginDescriptor pluginDescriptor) {
-        registerExtension(extension);
+  @JvmStatic
+  fun registerExtensions() {
+    if (extensionRegistered) return
+    extensionRegistered = true
+    VimExtension.EP_NAME.getPoint(null).addExtensionPointListener(object : ExtensionPointListener<VimExtension> {
+      override fun extensionAdded(extension: VimExtension, pluginDescriptor: PluginDescriptor) {
+        registerExtension(extension)
       }
 
-      @Override
-      public void extensionRemoved(@NotNull VimExtension extension, PluginDescriptor pluginDescriptor) {
-        unregisterExtension(extension);
+      override fun extensionRemoved(extension: VimExtension, pluginDescriptor: PluginDescriptor) {
+        unregisterExtension(extension)
       }
-    }, true, VimPlugin.getInstance());
+    }, true, VimPlugin.getInstance())
   }
 
-  private static synchronized void registerExtension(@NotNull VimExtension extension) {
-    String name = extension.getName();
+  @Synchronized
+  private fun registerExtension(extension: VimExtension) {
+    val name = extension.name
+    if (name in registeredExtensions) return
 
-    if (registeredExtensions.contains(name)) return;
-
-    registeredExtensions.add(name);
-    ToggleOption option = new ToggleOption(name, name, false);
-    option.addOptionChangeListener((oldValue, newValue) -> {
-      for (VimExtension extensionInListener : VimExtension.EP_NAME.getExtensionList()) {
-        if (name.equals(extensionInListener.getName())) {
-          if (OptionsManager.INSTANCE.isSet(name)) {
-            extensionInListener.init();
-            logger.info("IdeaVim extension '" + name + "' initialized");
-          }
-          else {
-            extensionInListener.dispose();
-          }
+    registeredExtensions.add(name)
+    val option = ToggleOption(name, name, false)
+    option.addOptionChangeListener { _, _ ->
+      for (extensionInListener in VimExtension.EP_NAME.extensionList) {
+        if (name != extensionInListener.name) continue
+        if (isSet(name)) {
+          extensionInListener.init()
+          logger.info("IdeaVim extension '$name' initialized")
+        } else {
+          extensionInListener.dispose()
         }
       }
-    });
-    OptionsManager.INSTANCE.addOption(option);
+    }
+    addOption(option)
   }
 
-  private static synchronized void unregisterExtension(@NotNull VimExtension extension) {
-    String name = extension.getName();
-
-    if (!registeredExtensions.contains(name)) return;
-
-    registeredExtensions.remove(name);
-    extension.dispose();
-    OptionsManager.INSTANCE.removeOption(name);
-    MappingOwner.Plugin.Companion.remove(name);
-    logger.info("IdeaVim extension '" + name + "' disposed");
+  @Synchronized
+  private fun unregisterExtension(extension: VimExtension) {
+    val name = extension.name
+    if (name !in registeredExtensions) return
+    registeredExtensions.remove(name)
+    extension.dispose()
+    removeOption(name)
+    remove(name)
+    logger.info("IdeaVim extension '$name' disposed")
   }
 }
