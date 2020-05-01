@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.extension;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.ExtensionPointListener;
 import com.intellij.openapi.extensions.PluginDescriptor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.key.MappingOwner;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.option.ToggleOption;
@@ -44,9 +45,6 @@ public class VimExtensionRegistrar {
     if (extensionRegistered) return;
     extensionRegistered = true;
 
-    // TODO: [VERSION UPDATE] since 191 use
-    //  ExtensionPoint.addExtensionPointListener(ExtensionPointListener<T>, boolean, Disposable)
-    //noinspection deprecation
     VimExtension.EP_NAME.getPoint(null).addExtensionPointListener(new ExtensionPointListener<VimExtension>() {
       @Override
       public void extensionAdded(@NotNull VimExtension extension, PluginDescriptor pluginDescriptor) {
@@ -57,7 +55,7 @@ public class VimExtensionRegistrar {
       public void extensionRemoved(@NotNull VimExtension extension, PluginDescriptor pluginDescriptor) {
         unregisterExtension(extension);
       }
-    });
+    }, true, VimPlugin.getInstance());
   }
 
   private static synchronized void registerExtension(@NotNull VimExtension extension) {

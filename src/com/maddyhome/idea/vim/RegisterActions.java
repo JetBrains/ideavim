@@ -34,33 +34,6 @@ public class RegisterActions {
 
   public static final ExtensionPointName<ActionBeanClass> VIM_ACTIONS_EP =
     ExtensionPointName.create("IdeaVIM.vimAction");
-  private static boolean initialRegistration = false;
-
-  static {
-    // IdeaVim doesn't support contribution to VIM_ACTIONS_EP extension point, so technically we can skip this update,
-    //   but let's support dynamic plugins in a more classic way and reload actions on every EP change.
-    // TODO: [VERSION UPDATE] since 191 use
-    //  ExtensionPoint.addExtensionPointListener(ExtensionPointListener<T>, boolean, Disposable)
-    // TODO: [VERSION UPDATE] since 201 use
-    //  ExtensionPoint.addExtensionPointListener(ExtensionPointChangeListener, boolean, Disposable)
-    VIM_ACTIONS_EP.getPoint(null).addExtensionPointListener(new ExtensionPointListener<ActionBeanClass>() {
-      @Override
-      public void extensionAdded(@NotNull ActionBeanClass extension, PluginDescriptor pluginDescriptor) {
-        // Suppress listener before the `VimPlugin.turnOn()` function execution. This logic should be rewritten after
-        //   version update (or earlier).
-        if (!initialRegistration) return;
-        unregisterActions();
-        registerActions();
-      }
-
-      @Override
-      public void extensionRemoved(@NotNull ActionBeanClass extension, PluginDescriptor pluginDescriptor) {
-        if (!initialRegistration) return;
-        unregisterActions();
-        registerActions();
-      }
-    });
-  }
 
   /**
    * Register all the key/action mappings for the plugin.
@@ -68,7 +41,16 @@ public class RegisterActions {
   public static void registerActions() {
     registerVimCommandActions();
     registerEmptyShortcuts();
-    initialRegistration = true;
+    registerEpListener();
+  }
+
+  private static void registerEpListener() {
+    // IdeaVim doesn't support contribution to VIM_ACTIONS_EP extension point, so technically we can skip this update,
+    //   but let's support dynamic plugins in a more classic way and reload actions on every EP change.
+    VIM_ACTIONS_EP.getPoint(null).addExtensionPointListener(() -> {
+      unregisterActions();
+      registerActions();
+    }, false, VimPlugin.getInstance());
   }
 
   public static @Nullable EditorActionHandlerBase findAction(@NotNull String id) {

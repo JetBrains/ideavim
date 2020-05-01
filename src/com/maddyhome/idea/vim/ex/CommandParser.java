@@ -67,33 +67,7 @@ public class CommandParser {
    * Don't let anyone create one of these.
    */
   private CommandParser() {
-    // IdeaVim doesn't support contribution to ex_command_ep extension point, so technically we can skip this update,
-    //   but let's support dynamic plugins in a more classic way and reload handlers on every EP change.
-    // TODO: [VERSION UPDATE] since 191 use
-    //  ExtensionPoint.addExtensionPointListener(ExtensionPointListener<T>, boolean, Disposable)
-    // TODO: [VERSION UPDATE] since 201 use
-    //  ExtensionPoint.addExtensionPointListener(ExtensionPointChangeListener, boolean, Disposable)
-    //noinspection deprecation
-    EX_COMMAND_EP.getPoint(null).addExtensionPointListener(new ExtensionPointListener<ExBeanClass>() {
-      @Override
-      public void extensionAdded(@NotNull ExBeanClass extension, PluginDescriptor pluginDescriptor) {
-        // Suppress listener before the `VimPlugin.turnOn()` function execution. This logic should be rewritten after
-        //   version update (or earlier).
-        if (!initialRegistration) return;
-        unregisterHandlers();
-        registerHandlers();
-      }
-
-      @Override
-      public void extensionRemoved(@NotNull ExBeanClass extension, PluginDescriptor pluginDescriptor) {
-        if (!initialRegistration) return;
-        unregisterHandlers();
-        registerHandlers();
-      }
-    });
   }
-
-  private static boolean initialRegistration = false;
 
   public void unregisterHandlers() {
     root.clear();
@@ -104,7 +78,16 @@ public class CommandParser {
    */
   public void registerHandlers() {
     EX_COMMAND_EP.extensions().forEach(ExBeanClass::register);
-    initialRegistration = true;
+    registerEpListener();
+  }
+
+  private void registerEpListener() {
+    // IdeaVim doesn't support contribution to ex_command_ep extension point, so technically we can skip this update,
+    //   but let's support dynamic plugins in a more classic way and reload handlers on every EP change.
+    EX_COMMAND_EP.getPoint(null).addExtensionPointListener(() -> {
+      unregisterHandlers();
+      registerHandlers();
+    }, false, VimPlugin.getInstance());
   }
 
   /**
