@@ -24,7 +24,7 @@ import org.jetbrains.annotations.ApiStatus;
  * @author vlan
  */
 
-@ApiStatus.ScheduledForRemoval(inVersion = "0.57")
+@ApiStatus.ScheduledForRemoval(inVersion = "0.58")
 @Deprecated
 public abstract class VimNonDisposableExtension implements VimExtension {
   @Override

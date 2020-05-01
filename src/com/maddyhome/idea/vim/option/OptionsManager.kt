@@ -86,7 +86,7 @@ object OptionsManager {
   val idearefactormode = addOption(BoundStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues))
   val ideastatusicon = addOption(BoundStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues))
 
-  @ApiStatus.ScheduledForRemoval(inVersion = "0.58")
+  @ApiStatus.ScheduledForRemoval(inVersion = "0.59")
   @Deprecated("please use ideastatusicon")
   val ideastatusbar = addOption(ToggleOption("ideastatusbar", "ideastatusbar", true))
 
@@ -390,11 +390,11 @@ object SelectModeOptionData {
   const val key = "key"
   const val cmd = "cmd"
 
-  @ApiStatus.ScheduledForRemoval(inVersion = "0.57")
+  @ApiStatus.ScheduledForRemoval(inVersion = "0.58")
   @Deprecated("Please, use `idearefactormode` option")
   const val template = "template"
 
-  @ApiStatus.ScheduledForRemoval(inVersion = "0.57")
+  @ApiStatus.ScheduledForRemoval(inVersion = "0.58")
   @Deprecated("Please, use `ideaselection`")
   const val refactoring = "refactoring"
 

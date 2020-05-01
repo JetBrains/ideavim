@@ -45,13 +45,13 @@ import javax.swing.KeyStroke
 object VimExtensionFacade {
   /** The 'map' command for mapping keys to handlers defined in extensions. */
   @JvmStatic
-  @ScheduledForRemoval(inVersion = "0.57")
+  @ScheduledForRemoval(inVersion = "0.58")
   @Deprecated("Only for EasyMotion support")
   fun putExtensionHandlerMapping(modes: Set<MappingMode>, fromKeys: List<KeyStroke>, extensionHandler: VimExtensionHandler, recursive: Boolean) {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, MappingOwner.Plugin.get("easymotion"), extensionHandler, recursive)
   }
 
-  @ScheduledForRemoval(inVersion = "0.57")
+  @ScheduledForRemoval(inVersion = "0.58")
   @Deprecated("Only for EasyMotion support")
   @JvmStatic
   fun putKeyMapping(modes: Set<MappingMode>, fromKeys: List<KeyStroke>,

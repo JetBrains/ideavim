@@ -86,7 +86,7 @@ public class CommandState {
   }
 
   // Keep the compatibility with the IdeaVim-EasyMotion plugin before the stable release
-  @ApiStatus.ScheduledForRemoval(inVersion = "0.56")
+  @ApiStatus.ScheduledForRemoval(inVersion = "0.58")
   @Deprecated
   public MappingMode getMappingMode() {
     return mappingState.getMappingMode();
