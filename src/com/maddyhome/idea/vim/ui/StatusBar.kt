@@ -22,7 +22,7 @@ import com.intellij.ide.BrowserUtil
 import com.intellij.ide.DataManager
 import com.intellij.ide.lightEdit.LightEditCompatible
 import com.intellij.ide.plugins.InstalledPluginsState
-import com.intellij.ide.plugins.PluginManager
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.ide.plugins.PluginManagerMain
 import com.intellij.ide.plugins.RepositoryHelper
 import com.intellij.openapi.actionSystem.ActionManager
@@ -260,7 +260,7 @@ private object JoinEap : DumbAwareAction() {
           notificator.notifySubscribedToEap()
           return
         }
-        val currentVersion = PluginManager.getPlugin(VimPlugin.getPluginId())?.version ?: ""
+        val currentVersion = PluginManagerCore.getPlugin(VimPlugin.getPluginId())?.version ?: ""
         if (VersionComparatorUtil.compare(downloader.pluginVersion, currentVersion) <= 0) {
           notificator.notifySubscribedToEap()
           return
