@@ -59,6 +59,7 @@ import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
+import com.maddyhome.idea.vim.ui.VimRcFileState;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
@@ -242,10 +243,15 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     ideavimrcRegistered = true;
 
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      final File ideaVimRc = VimScriptParser.findIdeaVimRc();
-      if (ideaVimRc != null) {
-        VimScriptParser.executeFile(ideaVimRc);
-      }
+      executeIdeaVimRc();
+    }
+  }
+
+  public void executeIdeaVimRc() {
+    final File ideaVimRc = VimScriptParser.findIdeaVimRc();
+    if (ideaVimRc != null) {
+      VimRcFileState.INSTANCE.saveFile(ideaVimRc);
+      VimScriptParser.executeFile(ideaVimRc);
     }
   }
 

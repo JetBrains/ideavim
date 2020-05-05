@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.ui.VimRcFileState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,7 +44,7 @@ public class VimScriptParser {
   public static final String[] HOME_VIMRC_PATHS = {"." + VIMRC_FILE_NAME, "_" + VIMRC_FILE_NAME};
   public static final String XDG_VIMRC_PATH = "ideavim" + File.separator + VIMRC_FILE_NAME;
   public static final int BUFSIZE = 4096;
-  private static final Pattern EOL_SPLIT_PATTERN = Pattern.compile(" *(\r\n|\n)+ *");
+  public static final Pattern EOL_SPLIT_PATTERN = Pattern.compile(" *(\r\n|\n)+ *");
   private static final Pattern DOUBLE_QUOTED_STRING = Pattern.compile("\"([^\"]*)\"");
   private static final Pattern SINGLE_QUOTED_STRING = Pattern.compile("'([^']*)'");
   private static final Pattern REFERENCE_EXPR = Pattern.compile("([A-Za-z_][A-Za-z_0-9]*)");
@@ -92,6 +93,7 @@ public class VimScriptParser {
           final File file = new File(homeDirName, fileName);
           //noinspection ResultOfMethodCallIgnored
           file.createNewFile();
+          VimRcFileState.INSTANCE.setFileName(file.getName());
           return file;
         } catch (IOException ignored) {
           // Try to create one of two files
@@ -175,7 +177,7 @@ public class VimScriptParser {
     throw new ExException(String.format("Cannot convert '%s' to string", value));
   }
 
-  private static @NotNull String readFile(@NotNull File file) throws IOException {
+  public static @NotNull String readFile(@NotNull File file) throws IOException {
     final BufferedReader reader = new BufferedReader(new FileReader(file));
     final StringBuilder builder = new StringBuilder();
     final char[] buffer = new char[BUFSIZE];
