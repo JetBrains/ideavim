@@ -159,7 +159,7 @@ public class CommandState {
   }
 
   public void resetOpPending() {
-    if (getSubMode() == SubMode.OP_PENDING) {
+    if (getMode() == Mode.OP_PENDING) {
       popModes();
     }
   }
@@ -177,7 +177,7 @@ public class CommandState {
 
   private void setMappingMode() {
     final ModeState modeState = currentModeState();
-    if (modeState.getSubMode() == SubMode.OP_PENDING) {
+    if (modeState.getMode() == Mode.OP_PENDING) {
       mappingState.setMappingMode(MappingMode.OP_PENDING);
     }
     else {
@@ -349,11 +349,15 @@ public class CommandState {
   }
 
   public enum Mode {
-    COMMAND, INSERT, REPLACE, VISUAL, SELECT, CMD_LINE
+    // Basic modes
+    COMMAND, VISUAL, SELECT, INSERT, CMD_LINE, /*EX*/
+
+    // Additional modes
+    OP_PENDING, REPLACE /*, VISUAL_REPLACE, INSERT_NORMAL, INSERT_VISUAL, INSERT_SELECT */
   }
 
   public enum SubMode {
-    NONE, SINGLE_COMMAND, OP_PENDING, REGISTER_PENDING, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
+    NONE, SINGLE_COMMAND, REGISTER_PENDING, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
   }
 
   private static class ModeState {

@@ -26,19 +26,19 @@ import com.maddyhome.idea.vim.command.CommandState
 val CommandState.Mode.isEndAllowed
   get() = when (this) {
     CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
-    CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE -> false
+    CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -> false
   }
 
 val CommandState.Mode.isBlockCaret
   get() = when (this) {
-    CommandState.Mode.VISUAL, CommandState.Mode.COMMAND -> true
+    CommandState.Mode.VISUAL, CommandState.Mode.COMMAND, CommandState.Mode.OP_PENDING -> true
     CommandState.Mode.INSERT, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.SELECT -> false
   }
 
 val CommandState.Mode.hasVisualSelection
   get() = when (this) {
     CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
-    CommandState.Mode.REPLACE, CommandState.Mode.CMD_LINE, CommandState.Mode.COMMAND, CommandState.Mode.INSERT -> false
+    CommandState.Mode.REPLACE, CommandState.Mode.CMD_LINE, CommandState.Mode.COMMAND, CommandState.Mode.INSERT, CommandState.Mode.OP_PENDING -> false
   }
 
 val Editor.mode

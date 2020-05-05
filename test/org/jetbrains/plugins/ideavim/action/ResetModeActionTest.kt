@@ -120,4 +120,12 @@ class ResetModeActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
+
+  fun `test delete after escaping t`() {
+    val keys = StringHelper.parseKeys("dt<esc>D")
+    val before = "A ${c}Discovery"
+    val after = "A "
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
+  }
 }

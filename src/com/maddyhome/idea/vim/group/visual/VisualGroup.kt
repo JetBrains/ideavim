@@ -165,7 +165,7 @@ fun updateCaretState(editor: Editor) {
 fun CommandState.Mode.resetShape(editor: Editor) = when (this) {
   CommandState.Mode.COMMAND, CommandState.Mode.VISUAL, CommandState.Mode.REPLACE -> ChangeGroup.resetCaret(editor, false)
   CommandState.Mode.SELECT, CommandState.Mode.INSERT -> ChangeGroup.resetCaret(editor, true)
-  CommandState.Mode.CMD_LINE -> Unit
+  CommandState.Mode.CMD_LINE, CommandState.Mode.OP_PENDING -> Unit
 }
 
 fun charToNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.Mode): Pair<Int, Int> {

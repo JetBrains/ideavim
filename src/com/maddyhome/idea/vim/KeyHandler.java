@@ -212,15 +212,13 @@ public class KeyHandler {
     handleKeyRecursionCount++;
 
     try {
-      if (isEditorReset(key, editorState)) {
-        handleEditorReset(editor, key, context, editorState);
-      }
-
       if (!allowKeyMappings || !handleKeyMapping(editor, key, context)) {
         if (isCommandCountKey(chKey, editorState)) {
           commandBuilder.addCountCharacter(key);
         } else if (isDeleteCommandCountKey(key, editorState)) {
           commandBuilder.deleteCountCharacter();
+        } else if (isEditorReset(key, editorState)) {
+          handleEditorReset(editor, key, context, editorState);
         }
         // If we got this far the user is entering a command or supplying an argument to an entered command.
         // First let's check to see if we are at the point of expecting a single character argument to a command.
@@ -562,20 +560,33 @@ public class KeyHandler {
     return true;
   }
 
+  @SuppressWarnings("RedundantIfStatement")
   private boolean isCommandCountKey(char chKey, @NotNull CommandState editorState) {
     // Make sure to avoid handling '0' as the start of a count.
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
-    return ((editorState.getMode() == CommandState.Mode.COMMAND
-             &&editorState.getSubMode()!=CommandState.SubMode.REGISTER_PENDING)
-            || editorState.getMode() == CommandState.Mode.VISUAL)
-      && commandBuilder.isExpectingCount() && Character.isDigit(chKey) && (commandBuilder.getCount() > 0 || chKey != '0');
+    boolean notRegisterPendingCommand = editorState.getMode() == CommandState.Mode.COMMAND &&
+                                        editorState.getSubMode() != CommandState.SubMode.REGISTER_PENDING;
+    boolean visualMode = editorState.getMode() == CommandState.Mode.VISUAL;
+    boolean opPendingMode = editorState.getMode() == CommandState.Mode.OP_PENDING;
+    if (notRegisterPendingCommand || visualMode || opPendingMode) {
+      if (commandBuilder.isExpectingCount() &&
+          Character.isDigit(chKey) &&
+          (commandBuilder.getCount() > 0 || chKey != '0')) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private boolean isDeleteCommandCountKey(@NotNull KeyStroke key, @NotNull CommandState editorState) {
     // See `:help N<Del>`
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
-    return (editorState.getMode() == CommandState.Mode.COMMAND || editorState.getMode() == CommandState.Mode.VISUAL)
-      && commandBuilder.isExpectingCount() && commandBuilder.getCount() > 0 && key.getKeyCode() == KeyEvent.VK_DELETE;
+    return (editorState.getMode() == CommandState.Mode.COMMAND ||
+            editorState.getMode() == CommandState.Mode.VISUAL ||
+            editorState.getMode() == CommandState.Mode.OP_PENDING) &&
+           commandBuilder.isExpectingCount() &&
+           commandBuilder.getCount() > 0 &&
+           key.getKeyCode() == KeyEvent.VK_DELETE;
   }
 
   private boolean isEditorReset(@NotNull KeyStroke key, @NotNull CommandState editorState) {
@@ -802,7 +813,7 @@ public class KeyHandler {
         if (editorState.isDotRepeatInProgress() && VimRepeater.Extension.INSTANCE.getArgumentCaptured() != null) {
           commandBuilder.completeCommandPart(VimRepeater.Extension.INSTANCE.getArgumentCaptured());
         }
-        editorState.pushModes(editorState.getMode(), CommandState.SubMode.OP_PENDING);
+        editorState.pushModes(CommandState.Mode.OP_PENDING, CommandState.SubMode.NONE);
         break;
       case DIGRAPH:
         // Command actions represent the completion of a command. Showcmd relies on this - if the action represents a
