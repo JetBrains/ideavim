@@ -120,3 +120,7 @@ Expression is wrapped, vim in insert mode.
 
 ![](resources/manualTests/9.gif)
 
+## #10 [Last run: 2020-05-06]
+
+_Action:_
+Test dynamic plugin loading/unloading.
