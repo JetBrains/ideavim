@@ -31,6 +31,7 @@ To Be Released
 
 **Merged PRs:**
 * [233](https://github.com/JetBrains/ideavim/pull/233) by [valis](https://github.com/valis): [VIM-1994] Correct paste after `y}P` command
+* [224](https://github.com/JetBrains/ideavim/pull/224) by [pmnoxx](https://github.com/pmnoxx): Populate intelij navigation history together with ideavim jumplist
 
 
 0.57, 2020-04-28

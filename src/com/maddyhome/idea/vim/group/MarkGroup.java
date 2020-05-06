@@ -82,7 +82,11 @@ public class MarkGroup implements PersistentStateComponent<Element> {
   public void saveJumpLocation(@NotNull Editor editor) {
     addJump(editor, true);
     setMark(editor, '\'');
-    IdeDocumentHistory.getInstance(editor.getProject()).includeCurrentCommandAsNavigation();
+
+    Project project = editor.getProject();
+    if (project != null) {
+      IdeDocumentHistory.getInstance(project).includeCurrentCommandAsNavigation();
+    }
   }
 
   /**
