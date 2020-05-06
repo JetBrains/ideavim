@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import junit.framework.Assert
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 
@@ -51,7 +50,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("griw"))
     myFixture.checkResult("one on${c}e three")
-    Assert.assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
   fun `test empty text`() {
@@ -78,10 +77,10 @@ class ReplaceWithRegisterTest : VimTestCase() {
     configureByText(text)
     typeText(parseKeys("\"ayiw", "w", "\"agriw"))
     myFixture.checkResult("one two tw${c}o four")
-    Assert.assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
     typeText(parseKeys("w", "griw"))
     myFixture.checkResult("one two two tw${c}o")
-    Assert.assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
   }
 
   fun `test replace use clipboard register`() {
@@ -90,7 +89,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     configureByText(text)
     typeText(parseKeys("\"+yiw", "w", "\"+griw", "w", "\"+griw"))
     myFixture.checkResult("one two two tw${c}o")
-    Assert.assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
   }
 
   fun `test replace use wrong register`() {
@@ -154,7 +153,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("3griw"))
     myFixture.checkResult("one on${c}e four")
-    Assert.assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
   @VimBehaviorDiffers("one on${c}e on${c}e four")
@@ -165,7 +164,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("griw"))
     myFixture.checkResult("one two one four")
-    Assert.assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
   fun `test dot repeat`() {
@@ -175,7 +174,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("griw", "w", "."))
     myFixture.checkResult("one one on${c}e four")
-    Assert.assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
   // --------------------------------------- grr --------------------------
@@ -197,7 +196,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent())
-    Assert.assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
   }
 
   fun `test line replace with line`() {
@@ -347,7 +346,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent())
-    Assert.assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
+    assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
     assertMode(CommandState.Mode.COMMAND)
   }
 

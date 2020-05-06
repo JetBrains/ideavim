@@ -20,7 +20,6 @@ package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import junit.framework.Assert
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class YankLineActionTest : VimTestCase() {
@@ -32,6 +31,6 @@ class YankLineActionTest : VimTestCase() {
     configureByText(before)
     typeText(parseKeys("\"4yy"))
     val register = VimPlugin.getRegister().getRegister('4')!!
-    Assert.assertEquals("I found it in a legendary land\n", register.text)
+    assertEquals("I found it in a legendary land\n", register.text)
   }
 }
