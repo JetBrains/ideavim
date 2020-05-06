@@ -144,7 +144,7 @@ class PutGroup {
 
     if (data.textData.typeInRegister.isLine && text.isNotEmpty() && text.last() != '\n') text += '\n'
 
-    if (data.textData.typeInRegister.isChar && text.lastOrNull() == '\n' && data.visualSelection?.typeInEditor?.isLine != true) text = text.dropLast(1)
+    if (data.textData.typeInRegister.isChar && text.lastOrNull() == '\n' && data.visualSelection?.typeInEditor?.isLine == false) text = text.dropLast(1)
 
     return ProcessedTextData(text, data.textData.typeInRegister, data.textData.transferableData)
   }

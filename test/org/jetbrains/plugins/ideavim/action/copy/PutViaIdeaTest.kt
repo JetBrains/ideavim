@@ -83,4 +83,29 @@ class PutViaIdeaTest : VimTestCase() {
     typeText(StringHelper.parseKeys("ve", "p"))
     assertEquals(sizeBefore, CopyPasteManager.getInstance().allContents.size)
   }
+
+  fun `test insert block with newline`() {
+    val before = """
+            A Discovery
+            $c
+            I found it in a legendary land
+            
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+    configureByText(before)
+
+    VimPlugin.getRegister().storeText(myFixture.editor, before rangeOf "\nI found it in a legendary land\n", SelectionType.CHARACTER_WISE, false)
+
+    typeText(StringHelper.parseKeys("p"))
+    val after = """
+            A Discovery
+            
+            I found it in a legendary land
+            
+            I found it in a legendary land
+            
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+    myFixture.checkResult(after)
+  }
 }
