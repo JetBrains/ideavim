@@ -22,6 +22,17 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+To Be Released
+-------------
+
+**Fixes:**
+* [VIM-1994](https://youtrack.jetbrains.com/issue/VIM-1994) Correct paste after `y}P` command
+
+
+**Merged PRs:**
+* [233](https://github.com/JetBrains/ideavim/pull/233) by [valis](https://github.com/valis): [VIM-1994] Correct paste after `y}P` command
+
+
 0.57, 2020-04-28
 -------------
 
