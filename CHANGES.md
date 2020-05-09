@@ -27,6 +27,9 @@ To Be Released
 
 **Features:**
 * Add `:buffer` command
+* `~/.ideavimrc` file can be reloaded using new floating action
+
+![IdeaVimRc reload](resources/changes/0.58/reload_ideavimrc.png)
 
 **Changes:**
 * Support IntelliJ's smooth scrolling. Use "Enable smooth scrolling" checkbox in _Preferences | Editor | General_ to disable.
