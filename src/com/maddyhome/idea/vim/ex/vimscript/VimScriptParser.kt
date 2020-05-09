@@ -15,176 +15,146 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.ex.vimscript
 
-package com.maddyhome.idea.vim.ex.vimscript;
-
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.CommandParser;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.ui.VimRcFileState;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.maddyhome.idea.vim.ex.CommandParser
+import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ui.VimRcFileState
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileReader
+import java.io.IOException
+import java.nio.file.Paths
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 /**
  * @author vlan
  */
-public class VimScriptParser {
-  public static final String VIMRC_FILE_NAME = "ideavimrc";
-  public static final String[] HOME_VIMRC_PATHS = {"." + VIMRC_FILE_NAME, "_" + VIMRC_FILE_NAME};
-  public static final String XDG_VIMRC_PATH = "ideavim" + File.separator + VIMRC_FILE_NAME;
-  public static final int BUFSIZE = 4096;
-  public static final Pattern EOL_SPLIT_PATTERN = Pattern.compile(" *(\r\n|\n)+ *");
-  private static final Pattern DOUBLE_QUOTED_STRING = Pattern.compile("\"([^\"]*)\"");
-  private static final Pattern SINGLE_QUOTED_STRING = Pattern.compile("'([^']*)'");
-  private static final Pattern REFERENCE_EXPR = Pattern.compile("([A-Za-z_][A-Za-z_0-9]*)");
-  private static final Pattern DEC_NUMBER = Pattern.compile("(\\d+)");
+object VimScriptParser {
+  const val VIMRC_FILE_NAME = "ideavimrc"
+  val HOME_VIMRC_PATHS = arrayOf(".$VIMRC_FILE_NAME", "_$VIMRC_FILE_NAME")
+  val XDG_VIMRC_PATH = "ideavim" + File.separator + VIMRC_FILE_NAME
+  const val BUFSIZE = 4096
+  val EOL_SPLIT_PATTERN = Pattern.compile(" *(\r\n|\n)+ *")
+  private val DOUBLE_QUOTED_STRING = Pattern.compile("\"([^\"]*)\"")
+  private val SINGLE_QUOTED_STRING = Pattern.compile("'([^']*)'")
+  private val REFERENCE_EXPR = Pattern.compile("([A-Za-z_][A-Za-z_0-9]*)")
+  private val DEC_NUMBER = Pattern.compile("(\\d+)")
 
-  private VimScriptParser() {
-  }
-
-  public static @Nullable File findIdeaVimRc() {
-    final String homeDirName = System.getProperty("user.home");
+  @JvmStatic
+  fun findIdeaVimRc(): File? {
+    val homeDirName = System.getProperty("user.home")
     // Check whether file exists in home dir
     if (homeDirName != null) {
-      for (String fileName : HOME_VIMRC_PATHS) {
-        final File file = new File(homeDirName, fileName);
+      for (fileName in HOME_VIMRC_PATHS) {
+        val file = File(homeDirName, fileName)
         if (file.exists()) {
-          return file;
+          return file
         }
       }
     }
 
     // Check in XDG config directory
-    final String xdgConfigHomeProperty = System.getenv("XDG_CONFIG_HOME");
-    File xdgConfig = null;
-    if (xdgConfigHomeProperty == null || Objects.equals(xdgConfigHomeProperty, "")) {
-      if (homeDirName != null) {
-        xdgConfig = Paths.get(homeDirName, ".config", XDG_VIMRC_PATH).toFile();
-      }
+    val xdgConfigHomeProperty = System.getenv("XDG_CONFIG_HOME")
+    val xdgConfig = if (xdgConfigHomeProperty == null || xdgConfigHomeProperty == "") {
+      if (homeDirName != null) Paths.get(homeDirName, ".config", XDG_VIMRC_PATH).toFile() else null
     } else {
-      xdgConfig = new File(xdgConfigHomeProperty, XDG_VIMRC_PATH);
+      File(xdgConfigHomeProperty, XDG_VIMRC_PATH)
     }
-    if (xdgConfig != null && xdgConfig.exists()) {
-      return xdgConfig;
-    }
-
-    return null;
+    return if (xdgConfig != null && xdgConfig.exists()) xdgConfig else null
   }
 
-  public static @Nullable File findOrCreateIdeaVimRc() {
-    final File found = findIdeaVimRc();
-    if (found != null) return found;
+  fun findOrCreateIdeaVimRc(): File? {
+    val found = findIdeaVimRc()
+    if (found != null) return found
 
-    final String homeDirName = System.getProperty("user.home");
+    val homeDirName = System.getProperty("user.home")
     if (homeDirName != null) {
-      for (String fileName : HOME_VIMRC_PATHS) {
+      for (fileName in HOME_VIMRC_PATHS) {
         try {
-          final File file = new File(homeDirName, fileName);
-          //noinspection ResultOfMethodCallIgnored
-          file.createNewFile();
-          VimRcFileState.INSTANCE.setFileName(file.getName());
-          return file;
-        } catch (IOException ignored) {
+          val file = File(homeDirName, fileName)
+          file.createNewFile()
+          VimRcFileState.fileName = file.name
+          return file
+        } catch (ignored: IOException) {
           // Try to create one of two files
         }
       }
     }
-    return null;
+    return null
   }
 
-  public static void executeFile(@NotNull File file) {
-    final String data;
-    try {
-      data = readFile(file);
+  @JvmStatic
+  fun executeFile(file: File) {
+    val data = try {
+      readFile(file)
+    } catch (ignored: IOException) {
+      return
     }
-    catch (IOException ignored) {
-      return;
-    }
-    executeText(data);
+    executeText(data)
   }
 
-  public static void executeText(@NotNull String text) {
-    for (String line : EOL_SPLIT_PATTERN.split(text)) {
+  fun executeText(text: String) {
+    for (line in EOL_SPLIT_PATTERN.split(text)) {
       // TODO: Build a proper parse tree for a VimL file instead of ignoring potentially nested lines (VIM-669)
-      if (line.startsWith(" ") || line.startsWith("\t")) {
-        continue;
-      }
-      if (line.startsWith(":")) {
-        line = line.substring(1);
-      }
-      final CommandParser commandParser = CommandParser.getInstance();
+      if (line.startsWith(" ") || line.startsWith("\t")) continue
+
+      val lineToExecute = if (line.startsWith(":")) line.substring(1) else line
+      val commandParser = CommandParser.getInstance()
       try {
-        final ExCommand command = commandParser.parse(line);
-        final CommandHandler commandHandler = commandParser.getCommandHandler(command);
-        if (commandHandler instanceof VimScriptCommandHandler) {
-          final VimScriptCommandHandler handler = (VimScriptCommandHandler)commandHandler;
-          handler.execute(command);
+        val command = commandParser.parse(lineToExecute)
+        val commandHandler = commandParser.getCommandHandler(command)
+        if (commandHandler is VimScriptCommandHandler) {
+          commandHandler.execute(command)
         }
-      }
-      catch (ExException ignored) {
+      } catch (ignored: ExException) {
       }
     }
   }
 
-  public static @NotNull Object evaluate(@NotNull String expression, @NotNull Map<String, Object> globals) throws ExException {
+  @Throws(ExException::class)
+  fun evaluate(expression: String, globals: Map<String?, Any?>): Any {
     // This evaluator is very basic, no proper parsing whatsoever. It is here as the very first step necessary to
     // support mapleader, VIM-650. See also VIM-669.
-    Matcher m;
-    m = DOUBLE_QUOTED_STRING.matcher(expression);
+    var m: Matcher = DOUBLE_QUOTED_STRING.matcher(expression)
+    if (m.matches()) return m.group(1)
+
+    m = SINGLE_QUOTED_STRING.matcher(expression)
+    if (m.matches()) return m.group(1)
+
+    m = REFERENCE_EXPR.matcher(expression)
     if (m.matches()) {
-      return m.group(1);
+      val name = m.group(1)
+      val value = globals[name]
+      return value ?: throw ExException("Undefined variable: $name")
     }
-    m = SINGLE_QUOTED_STRING.matcher(expression);
-    if (m.matches()) {
-      return m.group(1);
-    }
-    m = REFERENCE_EXPR.matcher(expression);
-    if (m.matches()) {
-      final String name = m.group(1);
-      final Object value = globals.get(name);
-      if (value != null) {
-        return value;
-      }
-      else {
-        throw new ExException(String.format("Undefined variable: %s", name));
-      }
-    }
-    m = DEC_NUMBER.matcher(expression);
-    if (m.matches()) {
-      return Integer.parseInt(m.group(1));
-    }
-    throw new ExException(String.format("Invalid expression: %s", expression));
+
+    m = DEC_NUMBER.matcher(expression)
+    if (m.matches()) return m.group(1).toInt()
+
+    throw ExException("Invalid expression: $expression")
   }
 
-  public static @NotNull String expressionToString(@NotNull Object value) throws ExException {
+  @Throws(ExException::class)
+  fun expressionToString(value: Any): String {
     // TODO: Return meaningful value representations
-    if (value instanceof String) {
-      return (String)value;
-    } else if (value instanceof Integer) {
-      return value.toString();
+    return when (value) {
+      is String -> value
+      is Int -> value.toString()
+      else -> throw ExException("Cannot convert '$value' to string")
     }
-    throw new ExException(String.format("Cannot convert '%s' to string", value));
   }
 
-  public static @NotNull String readFile(@NotNull File file) throws IOException {
-    final BufferedReader reader = new BufferedReader(new FileReader(file));
-    final StringBuilder builder = new StringBuilder();
-    final char[] buffer = new char[BUFSIZE];
-    int n;
-    while ((n = reader.read(buffer)) > 0) {
-      builder.append(buffer, 0, n);
+  @Throws(IOException::class)
+  fun readFile(file: File): String {
+    val reader = BufferedReader(FileReader(file))
+    val builder = StringBuilder()
+    val buffer = CharArray(BUFSIZE)
+    var n: Int
+    while (reader.read(buffer).also { n = it } > 0) {
+      builder.append(buffer, 0, n)
     }
-    return builder.toString();
+    return builder.toString()
   }
 }
