@@ -20,9 +20,7 @@ package com.maddyhome.idea.vim.ex.vimscript
 import com.maddyhome.idea.vim.ex.CommandParser
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ui.VimRcFileState
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileReader
 import java.io.IOException
 import java.nio.file.Paths
 import java.util.regex.Matcher
@@ -35,8 +33,6 @@ object VimScriptParser {
   const val VIMRC_FILE_NAME = "ideavimrc"
   val HOME_VIMRC_PATHS = arrayOf(".$VIMRC_FILE_NAME", "_$VIMRC_FILE_NAME")
   val XDG_VIMRC_PATH = "ideavim" + File.separator + VIMRC_FILE_NAME
-  const val BUFSIZE = 4096
-  val EOL_SPLIT_PATTERN = Pattern.compile(" *(\r\n|\n)+ *")
   private val DOUBLE_QUOTED_STRING = Pattern.compile("\"([^\"]*)\"")
   private val SINGLE_QUOTED_STRING = Pattern.compile("'([^']*)'")
   private val REFERENCE_EXPR = Pattern.compile("([A-Za-z_][A-Za-z_0-9]*)")
@@ -75,7 +71,7 @@ object VimScriptParser {
         try {
           val file = File(homeDirName, fileName)
           file.createNewFile()
-          VimRcFileState.fileName = file.name
+          VimRcFileState.filePath = file.absolutePath
           return file
         } catch (ignored: IOException) {
           // Try to create one of two files
@@ -86,17 +82,18 @@ object VimScriptParser {
   }
 
   @JvmStatic
-  fun executeFile(file: File) {
+  fun executeFile(file: File): List<String> {
     val data = try {
       readFile(file)
     } catch (ignored: IOException) {
-      return
+      return emptyList()
     }
     executeText(data)
+    return data
   }
 
-  fun executeText(text: String) {
-    for (line in EOL_SPLIT_PATTERN.split(text)) {
+  fun executeText(text: List<String>) {
+    for (line in text) {
       // TODO: Build a proper parse tree for a VimL file instead of ignoring potentially nested lines (VIM-669)
       if (line.startsWith(" ") || line.startsWith("\t")) continue
 
@@ -147,14 +144,15 @@ object VimScriptParser {
   }
 
   @Throws(IOException::class)
-  fun readFile(file: File): String {
-    val reader = BufferedReader(FileReader(file))
-    val builder = StringBuilder()
-    val buffer = CharArray(BUFSIZE)
-    var n: Int
-    while (reader.read(buffer).also { n = it } > 0) {
-      builder.append(buffer, 0, n)
-    }
-    return builder.toString()
+  fun readFile(file: File): List<String> {
+    val lines = ArrayList<String>()
+    file.forEachLine { line -> lineProcessor(line, lines) }
+    return lines
+  }
+
+  fun lineProcessor(line: String, lines: ArrayList<String>) {
+    val trimmedLine = line.trim()
+    if (trimmedLine.isBlank()) return
+    lines += trimmedLine
   }
 }

@@ -232,7 +232,7 @@ n  ,f            <Plug>Foo
   // VIM-676 |:map|
   fun testBackspaceCharacterInVimRc() {
     configureByText("\n")
-    VimScriptParser.executeText("inoremap # X\u0008#\n")
+    VimScriptParser.executeText(listOf("inoremap # X\u0008#\n"))
     typeText(StringHelper.parseKeys("i", "#", "<Esc>"))
     myFixture.checkResult("#\n")
     assertMode(CommandState.Mode.COMMAND)
@@ -247,7 +247,7 @@ n  ,f            <Plug>Foo
   bar
   
   """.trimIndent())
-    VimScriptParser.executeText("map \u0018i dd\n")
+    VimScriptParser.executeText(listOf("map \u0018i dd\n"))
     typeText(StringHelper.parseKeys("i", "#", "<Esc>"))
     myFixture.checkResult("""
   #foo
@@ -264,7 +264,7 @@ n  ,f            <Plug>Foo
   // VIM-679 |:map|
   fun testBarCtrlVEscaped() {
     configureByText("${c}foo\n")
-    VimScriptParser.executeText("imap a b \u0016|\u0016| c |\n")
+    VimScriptParser.executeText(listOf("imap a b \u0016|\u0016| c |\n"))
     typeText(StringHelper.parseKeys("ia"))
     myFixture.checkResult("b || c foo\n")
   }
@@ -272,7 +272,7 @@ n  ,f            <Plug>Foo
   // VIM-679 |:map|
   fun testCtrlMCtrlLAsNewLine() {
     configureByText("${c}foo\n")
-    VimScriptParser.executeText("map A :%s/foo/bar/g\r\u000C\n")
+    VimScriptParser.executeText(listOf("map A :%s/foo/bar/g\r\u000C\n"))
     typeText(StringHelper.parseKeys("A"))
     myFixture.checkResult("bar\n")
   }
@@ -280,7 +280,7 @@ n  ,f            <Plug>Foo
   // VIM-700 |:map|
   fun testRemappingZero() {
     configureByText("x${c}yz\n")
-    VimScriptParser.executeText("map 0 ~")
+    VimScriptParser.executeText(listOf("map 0 ~"))
     typeText(StringHelper.parseKeys("0"))
     myFixture.checkResult("xYz\n")
   }
@@ -288,7 +288,7 @@ n  ,f            <Plug>Foo
   // VIM-700 |:map|
   fun testRemappingZeroStillAllowsZeroToBeUsedInCount() {
     configureByText("a${c}bcdefghijklmnop\n")
-    VimScriptParser.executeText("map 0 ^")
+    VimScriptParser.executeText(listOf("map 0 ^"))
     typeText(StringHelper.parseKeys("10~"))
     myFixture.checkResult("aBCDEFGHIJKlmnop\n")
   }
@@ -296,7 +296,7 @@ n  ,f            <Plug>Foo
   // VIM-700 |:map|
   fun testRemappingDeleteOverridesRemovingLastDigitFromCount() {
     configureByText("a${c}bcdefghijklmnop\n")
-    VimScriptParser.executeText("map <Del> ~")
+    VimScriptParser.executeText(listOf("map <Del> ~"))
     typeText(StringHelper.parseKeys("10<Del>"))
     myFixture.checkResult("aBCDEFGHIJKlmnop\n")
   }

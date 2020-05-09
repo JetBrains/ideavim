@@ -27,44 +27,67 @@ import com.intellij.openapi.editor.toolbar.floating.AbstractFloatingToolbarProvi
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.containers.IntArrayList
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup.Companion.ACTION_GROUP
 import icons.VimIcons
-import java.io.File
+import org.jetbrains.annotations.TestOnly
+import java.util.regex.Pattern
+
+/**
+ * This file contains a "reload ~/.ideavimrc file" action functionality.
+ * This is small floating action in the top right corner of the editor that appears if user edits configuration file.
+ *
+ * Here you can find:
+ * - Simplified snapshot of config file
+ * - Floating bar
+ * - Action / action group
+ */
 
 object VimRcFileState {
+  // List of hashes of non-empty trimmed lines
   private val state = IntArrayList()
+
+  // ModificationStamp. Can be taken only from document. Doesn't play a big role, but can help speed up [equalTo]
   private var modificationStamp = 0L
-  var fileName = ".ideavimrc"
 
-  fun saveFile(file: File) {
-    fileName = file.name
+  // This is a pattern used in ideavimrc parsing for a long time. It removes all trailing/leading spaced and blank lines
+  private val EOL_SPLIT_PATTERN = Pattern.compile(" *(\r\n|\n)+ *")
 
-    val data = VimScriptParser.readFile(file)
-    hash(data)
-  }
+  var filePath: String? = null
 
-  private fun hash(charSequence: CharSequence) {
+  fun saveFileState(filePath: String, data: List<String>) {
+    this.filePath = FileUtil.toSystemDependentName(filePath)
+
     state.clear()
-    for (line in VimScriptParser.EOL_SPLIT_PATTERN.split(charSequence)) {
-      if (line.isBlank()) continue
+    for (line in data) {
       state.add(line.hashCode())
     }
   }
 
-  fun equalTo(file: Document): Boolean {
-    if (file.modificationStamp == modificationStamp) return true
+  fun equalTo(document: Document): Boolean {
+    val fileModificationStamp = document.modificationStamp
+    if (fileModificationStamp == modificationStamp) return true
 
+    val stateSize = state.size()
     var i = 0
-    for (line in VimScriptParser.EOL_SPLIT_PATTERN.split(file.charsSequence)) {
-      if (line.isBlank()) continue
+    for (line in EOL_SPLIT_PATTERN.split(document.immutableCharSequence)) {
+      if (i >= stateSize) return false
       if (state.get(i) != line.hashCode()) return false
       i++
     }
-    modificationStamp = file.modificationStamp
+    if (i < stateSize) return false
+
+    modificationStamp = fileModificationStamp
     return true
+  }
+
+  @TestOnly
+  fun clear() {
+    state.clear()
+    modificationStamp = 0
+    filePath = null
   }
 }
 
@@ -73,8 +96,9 @@ class ReloadVimRc : DumbAwareAction() {
     val editor = e.getData(PlatformDataKeys.EDITOR) ?: return
 
     // XXX: Actually, it worth to add e.presentation.description, but it doesn't work because of some reason
-    e.presentation.icon = if (VimRcFileState.equalTo(editor.document)) VimIcons.IDEAVIM else AllIcons.Actions.BuildLoadChanges
-    e.presentation.text = if (VimRcFileState.equalTo(editor.document)) "No Changes" else "Reload"
+    val sameDoc = VimRcFileState.equalTo(editor.document)
+    e.presentation.icon = if (sameDoc) VimIcons.IDEAVIM else AllIcons.Actions.BuildLoadChanges
+    e.presentation.text = if (sameDoc) "No Changes" else "Reload"
 
     e.presentation.isEnabledAndVisible = true
   }
@@ -96,12 +120,10 @@ class ReloadFloatingToolbar : AbstractFloatingToolbarProvider(ACTION_GROUP) {
 
 class ReloadFloatingToolbarActionGroup : DefaultActionGroup() {
   override fun update(e: AnActionEvent) {
-    val toolbarComponent = e.getData(FloatingToolbarComponent.KEY) ?: return
-
     val virtualFile = e.getData(PlatformDataKeys.VIRTUAL_FILE) ?: return
 
-    if (virtualFile.name == VimRcFileState.fileName) {
-      toolbarComponent.scheduleShow()
+    if (virtualFile.path == VimRcFileState.filePath) {
+      e.getData(FloatingToolbarComponent.KEY)?.scheduleShow()
     }
   }
 

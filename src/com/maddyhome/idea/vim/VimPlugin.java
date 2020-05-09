@@ -19,14 +19,11 @@ package com.maddyhome.idea.vim;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationListener;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.Application;
-import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.PermanentInstallationID;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
@@ -40,12 +37,9 @@ import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.util.SystemInfo;
-import com.intellij.openapi.vfs.CharsetToolkit;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
-import com.intellij.util.io.HttpRequests;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser;
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar;
@@ -61,16 +55,13 @@ import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import com.maddyhome.idea.vim.ui.VimRcFileState;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 import static com.maddyhome.idea.vim.group.EditorGroup.EDITOR_STORE_ELEMENT;
 import static com.maddyhome.idea.vim.group.KeyGroup.SHORTCUT_CONFLICTS_ELEMENT;
@@ -250,8 +241,8 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   public void executeIdeaVimRc() {
     final File ideaVimRc = VimScriptParser.findIdeaVimRc();
     if (ideaVimRc != null) {
-      VimRcFileState.INSTANCE.saveFile(ideaVimRc);
-      VimScriptParser.executeFile(ideaVimRc);
+      List<String> parsedLines = VimScriptParser.executeFile(ideaVimRc);
+      VimRcFileState.INSTANCE.saveFileState(ideaVimRc.getAbsolutePath(), parsedLines);
     }
   }
 
