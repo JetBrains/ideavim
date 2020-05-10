@@ -32,8 +32,8 @@ class VimExchangeExtensionTest: VimTestCase() {
   // |cx|
   fun `test exchange words left to right`() {
     doTest(StringHelper.parseKeys("cxe", "w", "cxe"),
-      "The quick <caret>brown fox catch over the lazy dog",
-      "The quick fox <caret>brown catch over the lazy dog",
+      "The quick ${c}brown fox catch over the lazy dog",
+      "The quick fox ${c}brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE
     )
@@ -42,8 +42,8 @@ class VimExchangeExtensionTest: VimTestCase() {
   // |cx|
   fun `test exchange words right to left`() {
     doTest(StringHelper.parseKeys("cxe", "b", "cxe"),
-      "The quick brown <caret>fox catch over the lazy dog",
-      "The quick <caret>fox brown catch over the lazy dog",
+      "The quick brown ${c}fox catch over the lazy dog",
+      "The quick ${c}fox brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE
     )
@@ -52,8 +52,8 @@ class VimExchangeExtensionTest: VimTestCase() {
   // |X|
   fun `test visual exchange words left to right`() {
     doTest(StringHelper.parseKeys("veX", "w", "veX"),
-      "The quick <caret>brown fox catch over the lazy dog",
-      "The quick fox <caret>brown catch over the lazy dog",
+      "The quick ${c}brown fox catch over the lazy dog",
+      "The quick fox ${c}brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE
     )
@@ -61,13 +61,13 @@ class VimExchangeExtensionTest: VimTestCase() {
 
   // |X|
   @VimBehaviorDiffers(
-    originalVimAfter = "The <caret>brown catch over the lazy dog",
+    originalVimAfter = "The ${c}brown catch over the lazy dog",
     shouldBeFixed = true
   )
   fun `test visual exchange words from inside`() {
     doTest(StringHelper.parseKeys("veX", "b", "v3e", "X"),
-      "The quick <caret>brown fox catch over the lazy dog",
-      "The brow<caret>n catch over the lazy dog",
+      "The quick ${c}brown fox catch over the lazy dog",
+      "The brow${c}n catch over the lazy dog",
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE
     )
@@ -75,13 +75,13 @@ class VimExchangeExtensionTest: VimTestCase() {
 
   // |X|
   @VimBehaviorDiffers(
-    originalVimAfter = "The brown <caret>catch over the lazy dog",
+    originalVimAfter = "The brown ${c}catch over the lazy dog",
     shouldBeFixed = true
   )
   fun `test visual exchange words from outside`() {
     doTest(StringHelper.parseKeys("v3e", "X", "w", "veX"),
-      "The <caret>quick brown fox catch over the lazy dog",
-      "The brow<caret>n catch over the lazy dog",
+      "The ${c}quick brown fox catch over the lazy dog",
+      "The brow${c}n catch over the lazy dog",
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE
     )
@@ -92,18 +92,18 @@ class VimExchangeExtensionTest: VimTestCase() {
     originalVimAfter =
     """The quick
 catch over
-<caret>brown fox
+${c}brown fox
 the lazy dog""",
     shouldBeFixed = true
   )
   fun `test exchange lines top down`() {
     doTest(StringHelper.parseKeys("cxx", "j", "cxx"),
       """The quick
-brown <caret>fox
+brown ${c}fox
 catch over
 the lazy dog""",
       """The quick
-<caret>catch over
+${c}catch over
 brown fox
 the lazy dog""",
       CommandState.Mode.COMMAND,
