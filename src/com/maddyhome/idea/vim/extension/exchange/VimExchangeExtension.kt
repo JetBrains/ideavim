@@ -65,9 +65,9 @@ class VimExchangeExtension: VimExtension {
   }
 
   private companion object {
-    const val EXCHANGE_CMD = "<Plug>Exchange"
-    const val EXCHANGE_CLEAR_CMD = "<Plug>ExchangeClear"
-    const val EXCHANGE_LINE_CMD = "<Plug>ExchangeLine"
+    const val EXCHANGE_CMD = "<Plug>(Exchange)"
+    const val EXCHANGE_CLEAR_CMD = "<Plug>(ExchangeClear)"
+    const val EXCHANGE_LINE_CMD = "<Plug>(ExchangeLine)"
     val EXCHANGE_KEY = Key<Exchange>("exchange");
     class Exchange(val type: CommandState.SubMode, val start: Mark, val end: Mark, val text: String) {
       private var myHighlighter: RangeHighlighter? = null
