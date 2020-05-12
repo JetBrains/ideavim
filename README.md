@@ -99,6 +99,7 @@ Supported:
 * argtextobj.vim
 * vim-textobj-entire
 * ReplaceWithRegister
+* vim-exchange [To Be Released]
 
 Not supported (yet):
 

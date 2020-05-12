@@ -53,6 +53,12 @@ Available extensions:
       this syntax parenthesis, must come before angle brackets in the list.
 * Emulates [argtextobj.vim](https://www.vim.org/scripts/script.php?script_id=2699)
 * Additional text objects: `aa`, `ia`
+
+## exchange [To Be Released]
+
+* Setup: `set exchange`
+* Emulates [vim-exchange](https://github.com/tommcdo/vim-exchange)
+* Commands: `cx`, `cxx`, `X`, `cxc`
     
 ## textobj-entire
 

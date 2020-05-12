@@ -3,8 +3,7 @@
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
       <ul>
-        <li>Fix mappings for uppercase letters</li>
-        <li>Fix yank/paste with number registers</li>
+        <li>vim-exchange plugin emulation</li>
         <li>Various bug fixes</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
