@@ -251,7 +251,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     }
 
     if (start != -1) {
-      VimPlugin.getMark().setChangeMarks(editor, new TextRange(start, Math.max(end - 1, 0)));
+      VimPlugin.getMark().setChangeMarks(editor, new TextRange(start, end));
     }
 
     return true;
@@ -412,6 +412,10 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
 
   public void setKeys(char register, @NotNull List<KeyStroke> keys) {
     registers.put(register, new Register(register, SelectionType.CHARACTER_WISE, keys));
+  }
+
+  public void setKeys(char register, @NotNull List<KeyStroke> keys, SelectionType type) {
+    registers.put(register, new Register(register, type, keys));
   }
 
   public void finishRecording(Editor editor) {

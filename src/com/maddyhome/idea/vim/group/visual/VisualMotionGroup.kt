@@ -54,7 +54,7 @@ class VisualMotionGroup {
     editor.commandState.pushModes(CommandState.Mode.VISUAL, lastSelectionType.toSubMode())
 
     val primaryCaret = editor.caretModel.primaryCaret
-    primaryCaret.vimSetSelection(visualMarks.startOffset, visualMarks.endOffset, true)
+    primaryCaret.vimSetSelection(visualMarks.startOffset, visualMarks.endOffset-1, true)
 
     editor.scrollingModel.scrollToCaret(ScrollType.CENTER)
 

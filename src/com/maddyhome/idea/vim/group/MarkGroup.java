@@ -265,7 +265,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
 
   public void setChangeMarks(@NotNull Editor editor, @NotNull TextRange range) {
     setMark(editor, MARK_CHANGE_START, range.getStartOffset());
-    setMark(editor, MARK_CHANGE_END, range.getEndOffset());
+    setMark(editor, MARK_CHANGE_END, range.getEndOffset()-1);
   }
 
   public @Nullable TextRange getChangeMarks(@NotNull Editor editor) {
@@ -282,7 +282,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     if (start != null && end != null) {
       final int startOffset = EditorHelper.getOffset(editor, start.getLogicalLine(), start.getCol());
       final int endOffset = EditorHelper.getOffset(editor, end.getLogicalLine(), end.getCol());
-      return new TextRange(startOffset, endOffset);
+      return new TextRange(startOffset, endOffset+1);
     }
     return null;
   }

@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.change.VimRepeater
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.TestInputModel
@@ -185,5 +186,11 @@ object VimExtensionFacade {
   @JvmStatic
   fun setRegister(register: Char, keys: List<KeyStroke?>?) {
     VimPlugin.getRegister().setKeys(register, keys ?: emptyList())
+  }
+
+  /** Set the current contents of the given register */
+  @JvmStatic
+  fun setRegister(register: Char, keys: List<KeyStroke?>?, type: SelectionType) {
+    VimPlugin.getRegister().setKeys(register, keys ?: emptyList(), type)
   }
 }

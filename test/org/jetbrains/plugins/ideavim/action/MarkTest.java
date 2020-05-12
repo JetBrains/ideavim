@@ -19,6 +19,7 @@
 package org.jetbrains.plugins.ideavim.action;
 
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Mark;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
@@ -172,5 +173,18 @@ public class MarkTest extends VimTestCase {
                                                      "<caret>three\n" +
                                                      "four five\n");
     assertOffset(14);
+  }
+
+  // |i| |`]|
+  public void testGotoLastChangePositionEnd() {
+    doTest(parseKeys("yiw", "P", "gg", "`]"), "one two\n" +
+                                                     "<caret>three\n" +
+                                                     "four five\n",
+      "one two\n" +
+        "thre<caret>ethree\n" +
+        "four five\n",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    );
   }
 }
