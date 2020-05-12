@@ -30,6 +30,7 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.containers.IntArrayList
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup.Companion.ACTION_GROUP
 import icons.VimIcons
 import org.jetbrains.annotations.TestOnly
@@ -72,7 +73,7 @@ object VimRcFileState {
 
     val stateSize = state.size()
     var i = 0
-    for (line in EOL_SPLIT_PATTERN.split(document.immutableCharSequence)) {
+    VimScriptParser.readText(document.charsSequence).forEach { line ->
       if (i >= stateSize) return false
       if (state.get(i) != line.hashCode()) return false
       i++

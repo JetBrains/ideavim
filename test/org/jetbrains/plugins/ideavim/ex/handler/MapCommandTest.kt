@@ -232,7 +232,7 @@ n  ,f            <Plug>Foo
   // VIM-676 |:map|
   fun testBackspaceCharacterInVimRc() {
     configureByText("\n")
-    VimScriptParser.executeText(listOf("inoremap # X\u0008#\n"))
+    VimScriptParser.executeText(VimScriptParser.readText("inoremap # X\u0008#\n"))
     typeText(StringHelper.parseKeys("i", "#", "<Esc>"))
     myFixture.checkResult("#\n")
     assertMode(CommandState.Mode.COMMAND)
@@ -247,7 +247,7 @@ n  ,f            <Plug>Foo
   bar
   
   """.trimIndent())
-    VimScriptParser.executeText(listOf("map \u0018i dd\n"))
+    VimScriptParser.executeText(VimScriptParser.readText("map \u0018i dd\n"))
     typeText(StringHelper.parseKeys("i", "#", "<Esc>"))
     myFixture.checkResult("""
   #foo

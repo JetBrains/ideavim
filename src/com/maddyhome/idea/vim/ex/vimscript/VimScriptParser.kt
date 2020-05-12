@@ -38,6 +38,9 @@ object VimScriptParser {
   private val REFERENCE_EXPR = Pattern.compile("([A-Za-z_][A-Za-z_0-9]*)")
   private val DEC_NUMBER = Pattern.compile("(\\d+)")
 
+  // This is a pattern used in ideavimrc parsing for a long time. It removes all trailing/leading spaced and blank lines
+  private val EOL_SPLIT_PATTERN = Pattern.compile(" *(\r\n|\n)+ *")
+
   @JvmStatic
   fun findIdeaVimRc(): File? {
     val homeDirName = System.getProperty("user.home")
@@ -147,6 +150,12 @@ object VimScriptParser {
   fun readFile(file: File): List<String> {
     val lines = ArrayList<String>()
     file.forEachLine { line -> lineProcessor(line, lines) }
+    return lines
+  }
+
+  fun readText(data: CharSequence): List<String> {
+    val lines = ArrayList<String>()
+    EOL_SPLIT_PATTERN.split(data).forEach { line -> lineProcessor(line, lines) }
     return lines
   }
 
