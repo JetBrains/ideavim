@@ -50,7 +50,10 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.VimLocalConfig"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.VimPlugin"/>
 
-    <postStartupActivity implementation="com.maddyhome.idea.vim.PluginStartup"/>
+    <!-- Initialise as early as possible so that we're ready to edit quickly. This is especially important for Rider,
+         which (at least for 2020.1) has some long running activities that block other startup extensions. None of the
+         core platform activities have IDs, so we can't use "before ID". We have to use "first" -->
+    <postStartupActivity implementation="com.maddyhome.idea.vim.PluginStartup" order="first"/>
 
     <editorFloatingToolbarProvider implementation="com.maddyhome.idea.vim.ui.ReloadFloatingToolbar"/>
   </extensions>
