@@ -63,4 +63,12 @@ class ResetModeActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
+
+  fun `test reset from operator-pending mode with delete`() {
+    val keys = StringHelper.parseKeys("d<Esc>dw")
+    val before = "A Discovery"
+    val after = "Discovery"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
+  }
 }
