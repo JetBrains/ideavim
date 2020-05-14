@@ -23,12 +23,13 @@ import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class VimExchangeExtensionTest: VimTestCase() {
+class VimExchangeExtensionTest : VimTestCase() {
   @Throws(Exception::class)
   override fun setUp() {
     super.setUp()
     enableExtensions("exchange")
   }
+
   // |cx|
   fun `test exchange words left to right`() {
     doTest(StringHelper.parseKeys("cxe", "w", "cxe"),
@@ -40,8 +41,28 @@ class VimExchangeExtensionTest: VimTestCase() {
   }
 
   // |cx|
+  fun `test exchange words dot repeat`() {
+    doTest(StringHelper.parseKeys("cxiw", "w", "."),
+      "The quick ${c}brown fox catch over the lazy dog",
+      "The quick fox ${c}brown catch over the lazy dog",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    )
+  }
+
+  // |cx|
   fun `test exchange words right to left`() {
     doTest(StringHelper.parseKeys("cxe", "b", "cxe"),
+      "The quick brown ${c}fox catch over the lazy dog",
+      "The quick ${c}fox brown catch over the lazy dog",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    )
+  }
+
+  // |cx|
+  fun `test exchange words right to left with dot`() {
+    doTest(StringHelper.parseKeys("cxe", "b", "."),
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -91,21 +112,47 @@ class VimExchangeExtensionTest: VimTestCase() {
   @VimBehaviorDiffers(
     originalVimAfter =
     """The quick
-catch over
-${c}brown fox
-the lazy dog""",
+       catch over
+       ${c}brown fox
+       the lazy dog
+       """,
     shouldBeFixed = true
   )
   fun `test exchange lines top down`() {
     doTest(StringHelper.parseKeys("cxx", "j", "cxx"),
       """The quick
-brown ${c}fox
-catch over
-the lazy dog""",
+         brown ${c}fox
+         catch over
+         the lazy dog""".trimIndent(),
       """The quick
-${c}catch over
-brown fox
-the lazy dog""",
+         ${c}catch over
+         brown fox
+         the lazy dog""".trimIndent(),
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    )
+  }
+
+  // |cxx|
+  @VimBehaviorDiffers(
+    originalVimAfter =
+    """The quick
+       catch over
+       ${c}brown fox
+       the lazy dog
+       """,
+    shouldBeFixed = true
+  )
+  fun `test exchange lines top down with dot`() {
+    doTest(StringHelper.parseKeys("cxx", "j", "."),
+      """The quick
+         brown ${c}fox
+         catch over
+         the lazy dog""".trimIndent(),
+      """The quick
+         ${c}catch over
+         brown fox
+         the lazy dog""".trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE
     )

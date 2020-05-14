@@ -45,6 +45,7 @@ class OperatorAction : VimActionHandler.SingleExecution() {
         if (!editor.commandState.isDotRepeatInProgress) {
           VimRepeater.Extension.argumentCaptured = argument
         }
+        val saveRepeatHandler = VimRepeater.repeatHandler
         val motion = argument.motion
         val range = MotionGroup
           .getMotionRange(editor, editor.caretModel.primaryCaret, context, cmd.count, cmd.rawCount, argument)
@@ -52,7 +53,9 @@ class OperatorAction : VimActionHandler.SingleExecution() {
           VimPlugin.getMark().setChangeMarks(editor, range)
           val selectionType = SelectionType.fromCommandFlags(motion.flags)
           KeyHandler.getInstance().reset(editor)
-          return operatorFunction.apply(editor, context, selectionType)
+          val result = operatorFunction.apply(editor, context, selectionType)
+          VimRepeater.repeatHandler = saveRepeatHandler
+          return result
         }
       }
       return false

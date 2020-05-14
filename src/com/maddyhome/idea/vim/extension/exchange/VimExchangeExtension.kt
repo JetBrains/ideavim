@@ -85,7 +85,10 @@ class VimExchangeExtension: VimExtension {
     }
   }
 
-  private class ExchangeHandler(private val isLine: Boolean): VimExtensionHandler {
+  private class ExchangeHandler(private val isLine: Boolean) : VimExtensionHandler {
+
+    override fun isRepeatable() = true
+
     override fun execute(editor: Editor, context: DataContext) {
       setOperatorFunction(Operator(false))
       executeNormal(parseKeys(if(isLine) "g@_" else "g@"), editor)
