@@ -156,9 +156,8 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
   }
 
   private fun Editor.collectSelections(): Map<Caret, VimSelection>? {
-
     return when {
-      this.inRepeatMode -> {
+      !this.inVisualMode && this.inRepeatMode -> {
         if (this.vimLastSelectionType == SelectionType.BLOCK_WISE) {
           val primaryCaret = caretModel.primaryCaret
           val range = primaryCaret.vimLastVisualOperatorRange ?: return null
@@ -232,7 +231,12 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
       if (res) {
         VimRepeater.saveLastChange(cmd)
         VimRepeater.repeatHandler = false
-        editor.vimForEachCaret { caret -> visualChanges[caret]?.let { caret.vimLastVisualOperatorRange = it } }
+        editor.vimForEachCaret { caret ->
+          val visualChange = visualChanges[caret]
+          if (visualChange != null) {
+            caret.vimLastVisualOperatorRange = visualChange
+          }
+        }
         editor.caretModel.allCarets.forEach { it.vimLastColumn = it.visualPosition.column }
       }
 
