@@ -28,6 +28,12 @@
   <depends>com.intellij.modules.lang</depends>
   <resource-bundle xmlns="">messages</resource-bundle>
 
+  <application-components>
+    <component>
+      <implementation-class>com.maddyhome.idea.vim.DynamicLoaderStopper</implementation-class>
+    </component>
+  </application-components>
+
   <extensionPoints>
     <extensionPoint name="vimExtension" interface="com.maddyhome.idea.vim.extension.VimExtension" dynamic="true"/>
 
