@@ -1,9 +1,4 @@
-<div>
-  <a href="https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20201&guest=1">
-    <img src="https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20201)/statusIcon.svg?guest=1"/>
-  </a>
-  <span>2020.1 Tests</span>
-</div>
+[![TeamCity Build][teamcity-build-status-svg]][teamcity-build-status]
 
 
 ### Where to Start
@@ -69,3 +64,8 @@ For example, take a few lines from your favorite poem, or use
 3. Test your functionality properly.
 Especially check whether your command works with:
 line start, line end, file start, file end, empty line, multiple carets, dollar motion, etc.
+
+<!-- Badges -->
+
+[teamcity-build-status]: https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20201&guest=1
+[teamcity-build-status-svg]: https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20201)/statusIcon.svg?guest=1

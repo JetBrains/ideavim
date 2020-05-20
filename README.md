@@ -3,14 +3,12 @@
 IdeaVim
 ===
 
-<div>
-  <a href="https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub">
-    <img src="https://jb.gg/badges/official.svg" alt="official JetBrains project"/>
-  </a>
-  <a href="https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20201&guest=1">
-    <img src="https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20201)/statusIcon.svg?guest=1" alt="TeamCity Build"/>
-  </a>
-</div>
+[![Official JetBrains Project][jb-official-svg]][jb-official]
+[![Downloads][plugin-downloads-svg]][plugin-repo]
+[![Rating][plugin-rating-svg]][plugin-repo]
+[![Version][plugin-version-svg]][plugin-repo]
+[![Gitter][gitter-svg]][gitter]
+[![Twitter][twitter-svg]][twitter]
 
 IdeaVim is a Vim emulation plugin for IDEs based on the IntelliJ Platform.
 IdeaVim can be used with IntelliJ IDEA, PyCharm, CLion, PhpStorm, WebStorm,
@@ -23,7 +21,6 @@ Resources:
 * [Bug tracker](https://youtrack.jetbrains.com/issues/VIM)
 * [Continuous integration builds](https://teamcity.jetbrains.com/project.html?projectId=IdeaVim&guest=1)
 * [@IdeaVim](https://twitter.com/ideavim) in Twitter
-
 
 Setup
 ------------
@@ -192,3 +189,19 @@ License
 
 IdeaVim is licensed under the terms of the GNU Public License version 2
 or any later version.
+
+
+<!-- Badges -->
+[jb-official]: https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub
+[jb-official-svg]: https://jb.gg/badges/official.svg
+
+[plugin-repo]: https://plugins.jetbrains.com/plugin/164-ideavim
+[plugin-downloads-svg]: http://img.shields.io/jetbrains/plugin/d/IdeaVIM
+[plugin-rating-svg]: http://img.shields.io/jetbrains/plugin/r/rating/IdeaVIM
+[plugin-version-svg]: https://img.shields.io/jetbrains/plugin/v/ideavim?label=version
+
+[gitter-svg]: https://badges.gitter.im/JetBrains/ideavim.svg
+[gitter]: https://gitter.im/JetBrains/ideavim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
+[twitter]: https://twitter.com/ideavim
+[twitter-svg]: https://img.shields.io/twitter/follow/ideavim?label=twitter%20%40ideavim
