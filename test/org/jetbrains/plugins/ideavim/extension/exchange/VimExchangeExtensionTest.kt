@@ -157,4 +157,23 @@ class VimExchangeExtensionTest : VimTestCase() {
       CommandState.SubMode.NONE
     )
   }
+
+  fun `test exchange visual lines`() {
+    doTest(StringHelper.parseKeys("Vj", "X", "jj", "Vj", "X"),
+      """
+         The quick
+         brown ${c}fox
+         catch over
+         the lazy dog
+         """.trimIndent(),
+      """
+         catch over
+         the lazy dog
+         The quick
+         brown${c}fox
+         """.trimIndent(),
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    )
+  }
 }
