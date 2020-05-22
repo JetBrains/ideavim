@@ -223,7 +223,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     configureByText(before)
     typeText(StringHelper.parseKeys("vlll", "X"))
 
-    assertHighlighter(4, 8, HighlighterTargetArea.LINES_IN_RANGE)
+    assertHighlighter(4, 8, HighlighterTargetArea.EXACT_RANGE)
 
     // Exit vim-exchange
     exitExchange()
