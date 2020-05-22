@@ -18,7 +18,9 @@
 
 package org.jetbrains.plugins.ideavim.extension.exchange
 
+import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -158,22 +160,171 @@ class VimExchangeExtensionTest : VimTestCase() {
     )
   }
 
+  @VimBehaviorDiffers(
+    originalVimAfter = """
+         The quick
+         brown thecatch over
+         fox
+          lazy dog
+    """
+  )
+  fun `test exchange to the line end`() {
+    doTest(StringHelper.parseKeys("v$", "X", "jj^ve", "X"),
+      """The quick
+         brown ${c}fox
+         catch over
+         the lazy dog""".trimIndent(),
+      """The quick
+         brown the
+         catch over
+         fox lazy dog""".trimIndent(),
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    )
+  }
+
+  @VimBehaviorDiffers(
+    originalVimAfter =
+    """
+         catch over
+         the lazy dog
+         ${c}The quick
+         brown fox
+      """,
+    shouldBeFixed = true
+  )
   fun `test exchange visual lines`() {
     doTest(StringHelper.parseKeys("Vj", "X", "jj", "Vj", "X"),
       """
-         The quick
-         brown ${c}fox
+         The ${c}quick
+         brown fox
          catch over
          the lazy dog
          """.trimIndent(),
       """
-         catch over
+         ${c}catch over
          the lazy dog
          The quick
-         brown${c}fox
+         brown fox
+         
          """.trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE
     )
+  }
+
+  fun `test visual char highlighter`() {
+    val before = """
+         The ${c}quick
+         brown fox
+         catch over
+         the lazy dog
+         """.trimIndent()
+    configureByText(before)
+    typeText(StringHelper.parseKeys("vlll", "X"))
+
+    assertHighlighter(4, 8, HighlighterTargetArea.LINES_IN_RANGE)
+
+    // Exit vim-exchange
+    exitExchange()
+  }
+
+  fun `test visual line highdhitligthhter`() {
+    val before = """
+         The ${c}quick
+         brown fox
+         catch over
+         the lazy dog
+         """.trimIndent()
+    configureByText(before)
+    typeText(StringHelper.parseKeys("Vj", "X"))
+
+    assertHighlighter(4, 15, HighlighterTargetArea.LINES_IN_RANGE)
+
+    // Exit vim-exchange
+    exitExchange()
+  }
+
+  fun `test till the line end highlighter`() {
+    val before = """
+         The ${c}quick
+         brown fox
+         """.trimIndent()
+    configureByText(before)
+    typeText(StringHelper.parseKeys("v$", "X"))
+
+    assertHighlighter(4, 10, HighlighterTargetArea.EXACT_RANGE)
+
+    // Exit vim-exchange
+    exitExchange()
+  }
+
+  fun `test pre line end highlighter`() {
+    val before = """
+         The ${c}quick
+         brown fox
+         """.trimIndent()
+    configureByText(before)
+    typeText(StringHelper.parseKeys("v\$h", "X"))
+
+    assertHighlighter(4, 9, HighlighterTargetArea.EXACT_RANGE)
+
+    // Exit vim-exchange
+    exitExchange()
+  }
+
+  fun `test pre pre line end highlighter`() {
+    val before = """
+         The ${c}quick
+         brown fox
+         """.trimIndent()
+    configureByText(before)
+    typeText(StringHelper.parseKeys("v\$hh", "X"))
+
+    assertHighlighter(4, 8, HighlighterTargetArea.EXACT_RANGE)
+
+    // Exit vim-exchange
+    exitExchange()
+  }
+
+  fun `test to file end highlighter`() {
+    val before = """
+         The quick
+         brown ${c}fox
+         """.trimIndent()
+    configureByText(before)
+    typeText(StringHelper.parseKeys("v\$", "X"))
+
+    assertHighlighter(16, 19, HighlighterTargetArea.EXACT_RANGE)
+
+    // Exit vim-exchange
+    exitExchange()
+  }
+
+  fun `test to file end with new line highlighter`() {
+    val before = """
+         The quick
+         brown ${c}fox
+         
+         """.trimIndent()
+    configureByText(before)
+    typeText(StringHelper.parseKeys("v\$", "X"))
+
+    assertHighlighter(16, 20, HighlighterTargetArea.EXACT_RANGE)
+
+    // Exit vim-exchange
+    exitExchange()
+  }
+
+  private fun exitExchange() {
+    typeText(StringHelper.parseKeys("cxc"))
+  }
+
+  private fun assertHighlighter(start: Int, end: Int, area: HighlighterTargetArea) {
+    val currentExchange = myFixture.editor.getUserData(VimExchangeExtension.EXCHANGE_KEY)!!
+    val highlighter = currentExchange.getHighlighter()!!
+    assertEquals(start, highlighter.startOffset)
+    assertEquals(end, highlighter.endOffset)
+    assertEquals(area, highlighter.targetArea)
   }
 }
