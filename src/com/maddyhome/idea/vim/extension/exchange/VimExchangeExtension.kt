@@ -49,6 +49,17 @@ import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.OperatorFunction
 
+/**
+ * This emulation misses:
+ *  - `:ExchangeClear` command
+ *  - `g:exchange_no_mappings` variable
+ *  - `g:exchange_indent` variable (?)
+ *  - Default mappings should not be applied if there is a mapping defined in `~/.ideavimrc`.
+ *      This functionality requires rewriting of IdeaVim initialization, so that plugins would be
+ *        loaded after `~/.ideavimrc` is executed (as vim works). But the `if no bindings` can be added even now.
+ *        It just won't work if the binding is defined after `set exchange`.
+ */
+
 class VimExchangeExtension: VimExtension {
   override fun getName() = "exchange"
 
