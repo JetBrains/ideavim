@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim
+package com.maddyhome.idea.vim.config
 
 import org.jdom.Element
 import kotlin.properties.ReadWriteProperty

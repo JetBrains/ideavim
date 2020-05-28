@@ -54,7 +54,7 @@
     <statusBarWidgetFactory implementation="com.maddyhome.idea.vim.ui.StatusBarIconFactory"/>
     <statusBarWidgetFactory implementation="com.maddyhome.idea.vim.ui.ShowCmdStatusBarWidgetFactory" order="first"/>
 
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.VimLocalConfig"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.config.VimLocalConfig"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.VimPlugin"/>
 
     <!-- Initialise as early as possible so that we're ready to edit quickly. This is especially important for Rider,
