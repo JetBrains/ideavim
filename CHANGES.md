@@ -25,11 +25,16 @@ usual beta standards.
 To Be Released
 -------------
 
+_Available since 0.57.1 EAP:_
+
 **Features:**
 * `exchange` plugin emulation ([vim-exchange](https://github.com/tommcdo/vim-exchange)).
-* `~/.ideavimrc` file can be reloaded using new floating action.
+* `~/.ideavimrc` file can be reloaded using the new floating action.
 
-![IdeaVimRc reload](resources/changes/0.58/reload_ideavimrc.png)
+    * <details>
+            <summary><strong>Click to see details</strong></summary>
+            <img src="resources/changes/0.58/reload_ideavimrc.png" alt="IdeaVimRc reload"/>
+      </details>
 
 * Add `:buffer` command.
 
@@ -46,6 +51,10 @@ To Be Released
 * [227](https://github.com/JetBrains/ideavim/pull/227) by [angelbot](https://github.com/angelbot): Add support for buffer command.
 * [230](https://github.com/JetBrains/ideavim/pull/230) by [fan-tom](https://github.com/fan-tom): VIM-1924.
 * [231](https://github.com/JetBrains/ideavim/pull/231) by [citizenmatt](https://github.com/citizenmatt): Support smooth scrolling.
+
+_To Be Released..._
+
+...
 
 
 0.57, 2020-04-28
