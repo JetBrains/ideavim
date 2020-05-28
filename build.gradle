@@ -82,7 +82,7 @@ tasks.register("slackEapNotification") {
                     "type": "section",
                     "text": {
                       "type": "mrkdwn",
-                      "text": "IdeaVim EAP $version has been relesed\\n$changeLog"
+                      "text": "IdeaVim EAP $version has been released\\n$changeLog"
                     }
                   }
           ]
