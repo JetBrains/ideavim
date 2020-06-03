@@ -54,7 +54,9 @@ _Available since 0.57.1 EAP:_
 
 _To Be Released..._
 
-...
+**Fixes:**
+* Fix mappings to `"\<SPACE>"` including `let mapleader="\<SPACE>"`
+
 
 
 0.57, 2020-04-28

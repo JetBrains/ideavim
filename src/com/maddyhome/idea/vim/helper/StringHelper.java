@@ -27,8 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static java.awt.event.KeyEvent.*;
 import static javax.swing.KeyStroke.getKeyStroke;
@@ -58,6 +57,8 @@ public class StringHelper {
   }
 
   public static @NotNull List<KeyStroke> stringToKeys(@NotNull String s) {
+    // The following if is a dirty hack to finally support `let mapleader = "\<space>"`
+    if ("\\<SPACE>".equalsIgnoreCase(s)) return Collections.singletonList(getKeyStroke(' '));
     final List<KeyStroke> res = new ArrayList<>();
     for (int i = 0; i < s.length(); i++) {
       res.add(getKeyStroke(s.charAt(i)));

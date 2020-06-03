@@ -310,6 +310,24 @@ n  ,f            <Plug>Foo
     myFixture.checkResult("zzz\n")
   }
 
+  // VIM-650 |mapleader|
+  fun testMapLeaderToSpace() {
+    configureByText("\n")
+    typeText(commandToKeys("let mapleader = \"\\<SPACE>\""))
+    typeText(commandToKeys("nmap <Leader>z izzz<Esc>"))
+    typeText(StringHelper.parseKeys(" z"))
+    myFixture.checkResult("zzz\n")
+  }
+
+  // VIM-650 |mapleader|
+  fun testMapLeaderToSpaceWithWhitespace() {
+    configureByText("\n")
+    typeText(commandToKeys("let mapleader = \" \""))
+    typeText(commandToKeys("nmap <Leader>z izzz<Esc>"))
+    typeText(StringHelper.parseKeys(" z"))
+    myFixture.checkResult("zzz\n")
+  }
+
   fun testAmbiguousMapping() {
     configureByText("\n")
     typeText(commandToKeys("nmap ,f iHello<Esc>"))
