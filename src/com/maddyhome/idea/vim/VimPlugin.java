@@ -40,6 +40,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
+import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator;
 import com.maddyhome.idea.vim.config.VimLocalConfig;
 import com.maddyhome.idea.vim.config.VimState;
 import com.maddyhome.idea.vim.ex.CommandParser;
@@ -79,7 +80,7 @@ import static com.maddyhome.idea.vim.group.KeyGroup.SHORTCUT_CONFLICTS_ELEMENT;
 @State(name = "VimSettings", storages = {@Storage("$APP_CONFIG$/vim_settings.xml")})
 public class VimPlugin implements PersistentStateComponent<Element>, Disposable {
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
-  private static final int STATE_VERSION = 6;
+  public static final int STATE_VERSION = 7;
 
   private static long lastBeepTimeMillis;
 
@@ -95,6 +96,10 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   private static final Logger LOG = Logger.getInstance(VimPlugin.class);
 
   private final @NotNull VimState state = new VimState();
+
+  VimPlugin() {
+    ApplicationConfigurationMigrator.getInstance().migrate();
+  }
 
   public void initialize() {
     LOG.debug("initComponent");
