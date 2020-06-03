@@ -59,7 +59,7 @@ import java.util.stream.Collectors;
  * This class contains all the mark related functionality
  */
 @State(name = "VimMarksSettings", storages = {
-  @Storage(value = "$APP_CONFIG$/vim_settings.xml", roamingType = RoamingType.DISABLED)
+  @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
 public class MarkGroup implements PersistentStateComponent<Element> {
   public static final char MARK_VISUAL_START = '<';

@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 @State(name = "VimHistorySettings", storages = {
-  @Storage(value = "$APP_CONFIG$/vim_settings.xml", roamingType = RoamingType.DISABLED)
+  @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
 public class HistoryGroup implements PersistentStateComponent<Element> {
   public static final String SEARCH = "search";

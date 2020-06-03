@@ -77,7 +77,7 @@ import java.util.stream.Collectors;
  * This group works with command associated with copying and pasting text
  */
 @State(name = "VimRegisterSettings", storages = {
-  @Storage(value = "$APP_CONFIG$/vim_settings.xml", roamingType = RoamingType.DISABLED)
+  @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
 public class RegisterGroup implements PersistentStateComponent<Element> {
   private static final String WRITABLE_REGISTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-*+_/\"";

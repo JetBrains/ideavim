@@ -65,7 +65,7 @@ import java.util.List;
 import java.util.*;
 
 @State(name = "VimSearchSettings", storages = {
-  @Storage(value = "$APP_CONFIG$/vim_settings.xml", roamingType = RoamingType.DISABLED)
+  @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
 public class SearchGroup implements PersistentStateComponent<Element> {
   public SearchGroup() {
