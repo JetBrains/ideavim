@@ -218,7 +218,8 @@ class VisualMotionGroup {
 
   fun autodetectVisualSubmode(editor: Editor): CommandState.SubMode {
     // IJ specific. See https://youtrack.jetbrains.com/issue/VIM-1924.
-    if (FindManager.getInstance(editor.project).selectNextOccurrenceWasPerformed()) return CommandState.SubMode.VISUAL_CHARACTER
+    val project = editor.project
+    if (project != null && FindManager.getInstance(project).selectNextOccurrenceWasPerformed()) return CommandState.SubMode.VISUAL_CHARACTER
 
     if (editor.caretModel.caretCount > 1 && seemsLikeBlockMode(editor)) {
       return CommandState.SubMode.VISUAL_BLOCK
