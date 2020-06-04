@@ -1223,7 +1223,7 @@ public class ChangeGroup {
     final CharSequence chars = editor.getDocument().getCharsSequence();
     final int offset = caret.getOffset();
     int fileSize = EditorHelper.getFileSize(editor);
-    if (fileSize > 0) {
+    if (fileSize > 0 && offset < fileSize) {
       final CharacterHelper.CharacterType charType = CharacterHelper.charType(chars.charAt(offset), bigWord);
       if (charType != CharacterHelper.CharacterType.WHITESPACE) {
         final boolean lastWordChar = offset >= fileSize - 1 ||
