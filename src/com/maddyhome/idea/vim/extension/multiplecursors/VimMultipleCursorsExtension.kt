@@ -129,8 +129,10 @@ class VimMultipleCursorsExtension : VimExtension {
 
           val newNextOffset = VimPlugin.getSearch().search(editor, pattern, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
 
-          val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(newNextOffset)) ?: return
-          selectWord(caret, pattern, newNextOffset)
+          if (newNextOffset != -1) {
+            val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(newNextOffset)) ?: return
+            selectWord(caret, pattern, newNextOffset)
+          }
 
           return
         }
@@ -216,6 +218,7 @@ class VimMultipleCursorsExtension : VimExtension {
   }
 
   private fun selectWord(caret: Caret, pattern: String, offset: Int) {
+    if (pattern.isEmpty()) return
     caret.vimSetSelection(offset, offset + pattern.length - 1, true)
     if (caret == caret.editor.caretModel.primaryCaret) MotionGroup.scrollCaretIntoView(caret.editor)
   }
