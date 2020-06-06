@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.fileSize
 import org.jetbrains.annotations.Contract
 import java.util.*
 import kotlin.math.min
@@ -84,7 +85,7 @@ class YankGroup {
     val ranges = ArrayList<Pair<Int, Int>>(caretModel.caretCount)
     for (caret in caretModel.allCarets) {
       val start = VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
-      val end = min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, true) + 1, EditorHelper.getFileSize(editor, true))
+      val end = min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, true) + 1, editor.fileSize)
 
       if (end == -1) continue
 

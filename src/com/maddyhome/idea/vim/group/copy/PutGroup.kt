@@ -47,6 +47,7 @@ import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
 import java.util.*
@@ -342,7 +343,7 @@ class PutGroup {
     if (currentLine + lineCount >= EditorHelper.getLineCount(editor)) {
       val limit = currentLine + lineCount - EditorHelper.getLineCount(editor)
       for (i in 0 until limit) {
-        MotionGroup.moveCaret(editor, caret, EditorHelper.getFileSize(editor, true))
+        MotionGroup.moveCaret(editor, caret, editor.fileSize)
         VimPlugin.getChange().insertText(editor, caret, "\n")
       }
     }

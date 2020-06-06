@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
+import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.OperatorFunction
 
@@ -146,7 +147,7 @@ class VimExchangeExtension: VimExtension {
         }
         return editor.markupModel.addRangeHighlighter(
           editor.getMarkOffset(ex.start),
-          (editor.getMarkOffset(ex.end) + 1).coerceAtMost(EditorHelper.getFileSize(editor, true)),
+          (editor.getMarkOffset(ex.end) + 1).coerceAtMost(editor.fileSize),
           HighlighterLayer.SELECTION - 1,
           attributes,
           hlArea

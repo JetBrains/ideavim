@@ -865,7 +865,7 @@ public class ChangeGroup {
   public boolean deleteLine(@NotNull Editor editor, @NotNull Caret caret, int count) {
     int start = VimPlugin.getMotion().moveCaretToLineStart(editor, caret);
     int offset = Math.min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, true) + 1,
-                          EditorHelper.getFileSize(editor, true));
+                          EditorHelperRt.getFileSize(editor));
     if (logger.isDebugEnabled()) {
       logger.debug("start=" + start);
       logger.debug("offset=" + offset);
@@ -1732,7 +1732,7 @@ public class ChangeGroup {
                              final @NotNull TextRange range,
                              @Nullable SelectionType type) {
     // Fix for https://youtrack.jetbrains.net/issue/VIM-35
-    if (!range.normalize(EditorHelper.getFileSize(editor, true))) {
+    if (!range.normalize(EditorHelperRt.getFileSize(editor))) {
       return false;
     }
 

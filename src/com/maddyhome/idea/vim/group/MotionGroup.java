@@ -146,7 +146,7 @@ public class MotionGroup {
       EnumSet<CommandFlags> flags = cmd.getFlags();
       if (flags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
         start = EditorHelper.getLineStartForOffset(editor, start);
-        end = Math.min(EditorHelper.getLineEndForOffset(editor, end) + 1, EditorHelper.getFileSize(editor, true));
+        end = Math.min(EditorHelper.getLineEndForOffset(editor, end) + 1, EditorHelperRt.getFileSize(editor));
       }
     }
 

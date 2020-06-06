@@ -158,7 +158,9 @@ public class EditorHelper {
    * @param editor            The editor
    * @param includeEndNewLine True include newline
    * @return The file's character count
+   * @deprecated please use the extension in EditorHelper.kt
    */
+  @Deprecated
   public static int getFileSize(final @NotNull Editor editor, final boolean includeEndNewLine) {
     final int len = editor.getDocument().getTextLength();
     return includeEndNewLine || len == 0 || editor.getDocument().getCharsSequence().charAt(len - 1) != '\n' ? len : len - 1;

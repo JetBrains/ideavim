@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
@@ -184,7 +185,7 @@ fun lineToNativeSelection(editor: Editor, start: Int, end: Int): Pair<Int, Int> 
   val (nativeStart, nativeEnd) = sort(start, end)
   val lineStart = EditorHelper.getLineStartForOffset(editor, nativeStart)
   // Extend to \n char of line to fill full line with selection
-  val lineEnd = (EditorHelper.getLineEndForOffset(editor, nativeEnd) + 1).coerceAtMost(EditorHelper.getFileSize(editor, true))
+  val lineEnd = (EditorHelper.getLineEndForOffset(editor, nativeEnd) + 1).coerceAtMost(editor.fileSize)
   return lineStart to lineEnd
 }
 
