@@ -20,10 +20,42 @@ package org.jetbrains.plugins.ideavim.action.change.change
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ChangeLineActionTest : VimTestCase() {
   fun `test on empty file`() {
     doTest(parseKeys("cc"), "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  fun `test on empty file with S`() {
+    doTest(parseKeys("S"), "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  @VimBehaviorDiffers(originalVimAfter = """
+            I found it in a legendary land
+            $c
+  """)
+  fun `test on last line with S`() {
+    doTest(parseKeys("S"), """
+            I found it in a legendary land
+            all ${c}rocks and lavender and tufted grass,
+    """.trimIndent(), """
+            I found it in a legendary land
+            $c
+            
+    """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  fun `test on last line with new line with S`() {
+    doTest(parseKeys("S"), """
+            I found it in a legendary land
+            all ${c}rocks and lavender and tufted grass,
+            
+    """.trimIndent(), """
+            I found it in a legendary land
+            $c
+            
+    """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 }

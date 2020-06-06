@@ -872,7 +872,7 @@ public class ChangeGroup {
     }
     if (offset != -1) {
       boolean res = deleteText(editor, new TextRange(start, offset), SelectionType.LINE_WISE);
-      if (res && caret.getOffset() >= EditorHelper.getFileSize(editor) && caret.getOffset() != 0) {
+      if (res && caret.getOffset() >= EditorHelperRt.getFileSize(editor) && caret.getOffset() != 0) {
         MotionGroup
           .moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, -1));
       }
