@@ -287,7 +287,7 @@ public class EditorHelper {
       return 0;
     }
     else if (line >= getLineCount(editor)) {
-      return getFileSize(editor);
+      return EditorHelperRt.getFileSize(editor);
     }
     else {
       return editor.getDocument().getLineStartOffset(line);

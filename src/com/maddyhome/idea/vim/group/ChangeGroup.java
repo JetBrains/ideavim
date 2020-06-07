@@ -1222,7 +1222,7 @@ public class ChangeGroup {
     boolean bigWord = id.equals(VIM_MOTION_BIG_WORD_RIGHT);
     final CharSequence chars = editor.getDocument().getCharsSequence();
     final int offset = caret.getOffset();
-    int fileSize = EditorHelper.getFileSize(editor);
+    int fileSize = EditorHelperRt.getFileSize(editor);
     if (fileSize > 0 && offset < fileSize) {
       final CharacterHelper.CharacterType charType = CharacterHelper.charType(chars.charAt(offset), bigWord);
       if (charType != CharacterHelper.CharacterType.WHITESPACE) {
