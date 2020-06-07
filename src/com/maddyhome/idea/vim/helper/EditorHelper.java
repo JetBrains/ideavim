@@ -147,7 +147,9 @@ public class EditorHelper {
    *
    * @param editor The editor
    * @return The file's character count
+   * @deprecated please use the extension in EditorHelper.kt
    */
+  @Deprecated
   public static int getFileSize(final @NotNull Editor editor) {
     return getFileSize(editor, false);
   }
