@@ -172,7 +172,7 @@ fun charToNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandSta
   val (nativeStart, nativeEnd) = sort(start, end)
   val lineEnd = EditorHelper.getLineEndForOffset(editor, nativeEnd)
   val adj = if (VimPlugin.getVisualMotion().exclusiveSelection || nativeEnd == lineEnd || mode == CommandState.Mode.SELECT) 0 else 1
-  val adjEnd = (nativeEnd + adj).coerceAtMost(EditorHelper.getFileSize(editor))
+  val adjEnd = (nativeEnd + adj).coerceAtMost(editor.fileSize)
   return nativeStart to adjEnd
 }
 

@@ -115,7 +115,7 @@ class YankGroup {
           range.startOffsets[i] = EditorHelper.getLineStartForOffset(editor, range.startOffsets[i])
         }
         if (editor.offsetToLogicalPosition(range.endOffsets[i]).column != 0) {
-          range.endOffsets[i] = (EditorHelper.getLineEndForOffset(editor, range.endOffsets[i]) + 1).coerceAtMost(EditorHelper.getFileSize(editor))
+          range.endOffsets[i] = (EditorHelper.getLineEndForOffset(editor, range.endOffsets[i]) + 1).coerceAtMost(editor.fileSize)
         }
       }
     }
