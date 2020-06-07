@@ -49,6 +49,7 @@ import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import kotlin.Pair;
 import kotlin.ranges.IntProgression;
+import kotlin.ranges.RangesKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -255,7 +256,7 @@ public class MotionGroup {
   }
 
   public int moveCaretToNthCharacter(@NotNull Editor editor, int count) {
-    return Math.max(0, Math.min(count, EditorHelper.getFileSize(editor) - 1));
+    return Math.max(0, Math.min(count, EditorHelperRt.getFileSize(editor) - 1));
   }
 
   private static int getScrollOption(int rawCount) {
