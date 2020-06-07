@@ -40,6 +40,7 @@ import kotlin.math.min
 
 class MoveTextHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
+
   @Throws(ExException::class)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val carets = EditorHelper.getOrderedCaretsList(editor)
