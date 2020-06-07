@@ -719,7 +719,7 @@ public class SearchHelper {
   public static int findNextCamelStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = caret.getOffset();
-    int size = EditorHelper.getFileSize(editor);
+    int size = EditorHelperRt.getFileSize(editor);
 
     int found = 0;
     int step = count >= 0 ? 1 : -1;
@@ -763,7 +763,7 @@ public class SearchHelper {
   public static int findNextCamelEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = caret.getOffset();
-    int size = EditorHelper.getFileSize(editor);
+    int size = EditorHelperRt.getFileSize(editor);
 
     int found = 0;
     int step = count >= 0 ? 1 : -1;
@@ -811,7 +811,7 @@ public class SearchHelper {
    * This counts all the words in the file.
    */
   public static @NotNull CountPosition countWords(@NotNull Editor editor) {
-    int size = EditorHelper.getFileSize(editor);
+    int size = EditorHelperRt.getFileSize(editor);
 
     return countWords(editor, 0, size);
   }
@@ -863,7 +863,7 @@ public class SearchHelper {
 
   public static int findNextWord(@NotNull Editor editor, int searchFrom, int count, boolean bigWord) {
     CharSequence chars = editor.getDocument().getCharsSequence();
-    final int size = EditorHelper.getFileSize(editor);
+    final int size = EditorHelperRt.getFileSize(editor);
 
     return findNextWord(chars, searchFrom, size, count, bigWord, false);
   }
@@ -1224,7 +1224,7 @@ public class SearchHelper {
     //int min = EditorHelper.getLineStartOffset(editor, EditorHelper.getCurrentLogicalLine(editor));
     //int max = EditorHelper.getLineEndOffset(editor, EditorHelper.getCurrentLogicalLine(editor), true);
     int min = 0;
-    int max = EditorHelper.getFileSize(editor);
+    int max = EditorHelperRt.getFileSize(editor);
     if (max == 0) return new TextRange(0, 0);
 
     if (logger.isDebugEnabled()) {
@@ -1364,7 +1364,7 @@ public class SearchHelper {
   public static int findNextWordEnd(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = caret.getOffset();
-    int size = EditorHelper.getFileSize(editor);
+    int size = EditorHelperRt.getFileSize(editor);
 
     return findNextWordEnd(chars, pos, size, count, bigWord, false);
   }
@@ -1526,7 +1526,7 @@ public class SearchHelper {
     int total = count;
     CharSequence chars = editor.getDocument().getCharsSequence();
     int start = caret.getOffset();
-    int max = EditorHelper.getFileSize(editor);
+    int max = EditorHelperRt.getFileSize(editor);
 
     int res = start;
     for (; count > 0 && res >= 0 && res <= max - 1; count--) {
@@ -1567,7 +1567,7 @@ public class SearchHelper {
     int total = count;
     CharSequence chars = editor.getDocument().getCharsSequence();
     int start = caret.getOffset();
-    int max = EditorHelper.getFileSize(editor);
+    int max = EditorHelperRt.getFileSize(editor);
 
     int res = start;
     for (; count > 0 && res >= 0 && res <= max - 1; count--) {
@@ -1689,7 +1689,7 @@ public class SearchHelper {
                                      int dir,
                                      boolean countCurrent,
                                      boolean multiple) {
-    if (dir > 0 && start >= EditorHelper.getFileSize(editor) - 1) {
+    if (dir > 0 && start >= EditorHelperRt.getFileSize(editor) - 1) {
       return -1;
     }
     else if (dir < 0 && start <= 0) {
@@ -1976,7 +1976,7 @@ public class SearchHelper {
                                                      boolean isOuter) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     if (chars.length() == 0) return new TextRange(0, 0);
-    int max = EditorHelper.getFileSize(editor);
+    int max = EditorHelperRt.getFileSize(editor);
     int offset = caret.getOffset();
     int ssel = caret.getSelectionStart();
     int esel = caret.getSelectionEnd();
@@ -2020,7 +2020,7 @@ public class SearchHelper {
       return EditorHelper.getLineStartOffset(editor, line);
     }
     else if (line == maxline) {
-      return count > 0 ? EditorHelper.getFileSize(editor) - 1 : 0;
+      return count > 0 ? EditorHelperRt.getFileSize(editor) - 1 : 0;
     }
     else {
       return -1;
@@ -2045,7 +2045,7 @@ public class SearchHelper {
       return EditorHelper.getLineStartOffset(editor, line);
     }
     else {
-      return dir > 0 ? EditorHelper.getFileSize(editor) - 1 : 0;
+      return dir > 0 ? EditorHelperRt.getFileSize(editor) - 1 : 0;
     }
   }
 

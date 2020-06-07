@@ -54,7 +54,7 @@ class FileGetLocationInfoActionTest : VimTestCase() {
         """.trimIndent()
     configureByText(before)
     typeText(keys)
-    assertEquals("Col 1 of 11; Line 1 of 6; Word 1 of 34; Character 1 of 166", VimPlugin.getMessage())
+    assertEquals("Col 1 of 11; Line 1 of 6; Word 1 of 35; Character 1 of 166", VimPlugin.getMessage())
   }
 
   @VimBehaviorDiffers(originalVimAfter = "Col 1 of 40; Line 4 of 7; Word 12 of 32; Byte 55 of 167")
@@ -71,7 +71,7 @@ class FileGetLocationInfoActionTest : VimTestCase() {
         """.trimIndent()
     configureByText(before)
     typeText(keys)
-    assertEquals("Col 11 of 40; Line 4 of 6; Word 13 of 34; Character 55 of 166", VimPlugin.getMessage())
+    assertEquals("Col 11 of 40; Line 4 of 6; Word 13 of 35; Character 55 of 166", VimPlugin.getMessage())
   }
 
   @VimBehaviorDiffers(originalVimAfter = "Col 1 of 0; Line 7 of 7; Word 32 of 32; Byte 167 of 167")
@@ -88,6 +88,6 @@ class FileGetLocationInfoActionTest : VimTestCase() {
         """.trimIndent()
     configureByText(before)
     typeText(keys)
-    assertEquals("Col 1 of 1; Line 7 of 6; Word 0 of 34; Character 167 of 166", VimPlugin.getMessage())
+    assertEquals("Col 1 of 1; Line 7 of 6; Word 35 of 35; Character 167 of 166", VimPlugin.getMessage())
   }
 }
