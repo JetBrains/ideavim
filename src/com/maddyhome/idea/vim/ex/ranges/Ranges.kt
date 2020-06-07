@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.fileSize
 import kotlin.math.min
 
 /**
@@ -115,7 +116,6 @@ class Ranges {
    * on the line range but this is character based from the start of the first line to the end of the last line.
    *
    * @param editor  The editor to get the range for
-   * @param context The data context
    * @param count   The count given at the end of the command or -1 if no such count
    * @return The text range
    */
@@ -123,14 +123,14 @@ class Ranges {
     val lr = getLineRange(editor, count)
     val start = EditorHelper.getLineStartOffset(editor, lr.startLine)
     val end = EditorHelper.getLineEndOffset(editor, lr.endLine, true) + 1
-    return TextRange(start, min(end, EditorHelper.getFileSize(editor)))
+    return TextRange(start, min(end, editor.fileSize))
   }
 
   fun getTextRange(editor: Editor, caret: Caret, count: Int): TextRange {
     val lineRange = getLineRange(editor, caret, count)
     val start = EditorHelper.getLineStartOffset(editor, lineRange.startLine)
     val end = EditorHelper.getLineEndOffset(editor, lineRange.endLine, true) + 1
-    return TextRange(start, min(end, EditorHelper.getFileSize(editor)))
+    return TextRange(start, min(end, editor.fileSize))
   }
 
   /**

@@ -99,7 +99,7 @@ public class RangeTest extends VimTestCase {
   public void testAllLinesRange() {
     myFixture.configureByText("a.txt", "1\n2\n3\n4\n5\n");
     typeText(commandToKeys("%d"));
-    myFixture.checkResult("\n");
+    myFixture.checkResult("");
   }
 
   public void testMultipleLineNumbersRange() {

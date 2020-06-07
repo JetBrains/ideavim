@@ -502,7 +502,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
       return -1;
     }
 
-    final int size = EditorHelper.getFileSize(editor);
+    final int size = EditorHelperRt.getFileSize(editor);
     final TextRange max = Collections.max(results, (r1, r2) -> {
       final int d1 = distance(r1, initialOffset, forwards, size);
       final int d2 = distance(r2, initialOffset, forwards, size);
@@ -569,7 +569,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     final TextRange foundBackward = findIt(editor, lastSearch, offset, count, searchOptions);
     if (foundBackward == null) return null;
     int startOffset = foundBackward.getStartOffset() - 1;
-    if (startOffset < 0) startOffset = EditorHelper.getFileSize(editor);
+    if (startOffset < 0) startOffset = EditorHelperRt.getFileSize(editor);
     searchOptions.remove(SearchOptions.BACKWARDS);
     return findIt(editor, lastSearch, startOffset, 1, searchOptions);
   }
@@ -931,7 +931,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
      * compatible.
      */
     if (!offsetIsLineOffset && offset != 0) {
-      startOffset = Math.max(0, Math.min(startOffset - offset, EditorHelper.getFileSize(editor) - 1));
+      startOffset = Math.max(0, Math.min(startOffset - offset, EditorHelperRt.getFileSize(editor) - 1));
     }
 
     EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.SHOW_MESSAGES, SearchOptions.WHOLE_FILE);
@@ -955,7 +955,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     }
     else if (hasEndOffset || offset != 0) {
       int base = hasEndOffset ? range.getEndOffset() - 1 : range.getStartOffset();
-      res = Math.max(0, Math.min(base + offset, EditorHelper.getFileSize(editor) - 1));
+      res = Math.max(0, Math.min(base + offset, EditorHelperRt.getFileSize(editor) - 1));
     }
 
     int ppos = pp.getIndex();
