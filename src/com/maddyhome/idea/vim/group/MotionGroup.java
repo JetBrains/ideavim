@@ -341,7 +341,7 @@ public class MotionGroup {
    */
   public int moveCaretToNextCamel(@NotNull Editor editor, @NotNull Caret caret, int count) {
     if ((caret.getOffset() == 0 && count < 0) ||
-        (caret.getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
+        (caret.getOffset() >= EditorHelperRt.getFileSize(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
@@ -359,7 +359,7 @@ public class MotionGroup {
    */
   public int moveCaretToNextCamelEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
     if ((caret.getOffset() == 0 && count < 0) ||
-        (caret.getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
+        (caret.getOffset() >= EditorHelperRt.getFileSize(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
@@ -376,7 +376,7 @@ public class MotionGroup {
    * @return position
    */
   public int findOffsetOfNextWord(@NotNull Editor editor, int searchFrom, int count, boolean bigWord) {
-    final int size = EditorHelper.getFileSize(editor);
+    final int size = EditorHelperRt.getFileSize(editor);
     if ((searchFrom == 0 && count < 0) || (searchFrom >= size - 1 && count > 0)) {
       return -1;
     }
@@ -394,7 +394,7 @@ public class MotionGroup {
    */
   public int moveCaretToNextWordEnd(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
     if ((caret.getOffset() == 0 && count < 0) ||
-        (caret.getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
+        (caret.getOffset() >= EditorHelperRt.getFileSize(editor) - 1 && count > 0)) {
       return -1;
     }
 
@@ -461,7 +461,7 @@ public class MotionGroup {
 
   public int moveCaretToUnmatchedBlock(@NotNull Editor editor, @NotNull Caret caret, int count, char type) {
     if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
-        (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
+        (editor.getCaretModel().getOffset() >= EditorHelperRt.getFileSize(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
@@ -476,7 +476,7 @@ public class MotionGroup {
 
   public int moveCaretToSection(@NotNull Editor editor, @NotNull Caret caret, char type, int dir, int count) {
     if ((caret.getOffset() == 0 && count < 0) ||
-        (caret.getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
+        (caret.getOffset() >= EditorHelperRt.getFileSize(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
@@ -968,7 +968,7 @@ public class MotionGroup {
 
   public int moveCaretToLineStart(@NotNull Editor editor, int line) {
     if (line >= EditorHelper.getLineCount(editor)) {
-      return EditorHelper.getFileSize(editor);
+      return EditorHelperRt.getFileSize(editor);
     }
     return EditorHelper.getLineStartOffset(editor, line);
   }
@@ -992,7 +992,7 @@ public class MotionGroup {
   public int moveCaretHorizontalWrap(@NotNull Editor editor, @NotNull Caret caret, int count) {
     // FIX - allows cursor over newlines
     int oldOffset = caret.getOffset();
-    int offset = Math.min(Math.max(0, caret.getOffset() + count), EditorHelper.getFileSize(editor));
+    int offset = Math.min(Math.max(0, caret.getOffset() + count), EditorHelperRt.getFileSize(editor));
     if (offset == oldOffset) {
       return -1;
     }
