@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.helper.fileSize
 import java.util.*
 import kotlin.math.min
 
@@ -49,7 +50,7 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
 
     val texts = ArrayList<String>(caretCount)
     val ranges = ArrayList<TextRange>(caretCount)
-    var line = EditorHelper.getFileSize(editor)
+    var line = editor.fileSize
     val command = CommandParser.getInstance().parse(cmd.argument)
 
     var lastRange: TextRange? = null
