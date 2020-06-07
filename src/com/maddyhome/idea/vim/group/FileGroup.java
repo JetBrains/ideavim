@@ -43,6 +43,7 @@ import com.maddyhome.idea.vim.VimProjectService;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.EditorHelperRt;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -268,7 +269,7 @@ public class FileGroup {
       LogicalPosition lp = editor.getCaretModel().getLogicalPosition();
       int col = editor.getCaretModel().getOffset() - doc.getLineStartOffset(lp.line);
       int endoff = doc.getLineEndOffset(lp.line);
-      if (doc.getCharsSequence().charAt(endoff) == '\n') {
+      if (endoff < EditorHelperRt.getFileSize(editor) && doc.getCharsSequence().charAt(endoff) == '\n') {
         endoff--;
       }
       int ecol = endoff - doc.getLineStartOffset(lp.line);
@@ -294,7 +295,7 @@ public class FileGroup {
       msg.append("; Word ").append(cp.getPosition()).append(" of ").append(cp.getCount());
 
       int offset = editor.getCaretModel().getOffset();
-      int size = EditorHelper.getFileSize(editor);
+      int size = EditorHelperRt.getFileSize(editor);
 
       msg.append("; Character ").append(offset + 1).append(" of ").append(size);
     }
@@ -336,7 +337,7 @@ public class FileGroup {
       msg.append("; ").append(word).append(" of ").append(words).append(" Words");
 
       int chars = vr.getSelectionCount();
-      int size = EditorHelper.getFileSize(editor);
+      int size = EditorHelperRt.getFileSize(editor);
 
       msg.append("; ").append(chars).append(" of ").append(size).append(" Characters");
     }
