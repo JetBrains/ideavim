@@ -58,4 +58,41 @@ class ChangeLineActionTest : VimTestCase() {
             
     """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
+
+  @VimBehaviorDiffers(originalVimAfter = """
+            I found it in a legendary land
+            $c
+  """)
+  fun `test on very last line with new line with S`() {
+    doTest(parseKeys("S"), """
+            I found it in a legendary land
+            all ${c}rocks and lavender and tufted grass,
+    """.trimIndent(), """
+            I found it in a legendary land
+            $c
+            
+    """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  fun `test on first line with new line with S`() {
+    doTest(parseKeys("S"), """
+            I ${c}found it in a legendary land
+            all rocks and lavender and tufted grass,
+    """.trimIndent(), """
+            $c
+            all rocks and lavender and tufted grass,
+    """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  fun `test on last line with new line with cc`() {
+    doTest(parseKeys("cc"), """
+            I found it in a legendary land
+            all ${c}rocks and lavender and tufted grass,
+            
+    """.trimIndent(), """
+            I found it in a legendary land
+            $c
+            
+    """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
 }

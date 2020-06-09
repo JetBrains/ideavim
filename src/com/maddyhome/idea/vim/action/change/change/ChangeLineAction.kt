@@ -21,6 +21,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -39,6 +40,9 @@ class ChangeLineAction : ChangeEditorActionHandler.ForEachCaret() {
                        count: Int,
                        rawCount: Int,
                        argument: Argument?): Boolean {
-    return VimPlugin.getChange().changeLine(editor, caret, count, context)
+    // `S` command is a synonym of `cc`
+    val motion = MotionDownLess1FirstNonSpaceAction()
+    val command = Command(rawCount, motion, motion.type, motion.flags)
+    return VimPlugin.getChange().changeMotion(editor, caret, context, count, rawCount, Argument(command))
   }
 }

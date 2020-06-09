@@ -1147,39 +1147,6 @@ public class ChangeGroup {
   }
 
   /**
-   * Delete count lines and then enter insert mode
-   *
-   * @param editor The editor to change
-   * @param caret  The caret on the line to be changed
-   * @param count  The number of lines to change
-   * @return true if able to delete count lines, false if not
-   */
-  public boolean changeLine(@NotNull Editor editor, @NotNull Caret caret, int count, DataContext context) {
-    final LogicalPosition pos = editor.offsetToLogicalPosition(caret.getOffset());
-    final boolean insertBelow = pos.line + count >= EditorHelper.getLineCount(editor);
-
-    final LogicalPosition lp =
-      editor.offsetToLogicalPosition(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret));
-
-    // Please don't use `getDocument().getText().isEmpty()`
-    if (editor.getDocument().getTextLength() == 0) {
-      insertBeforeCursor(editor, context);
-      return true;
-    }
-    boolean res = deleteLine(editor, caret, count);
-    if (res) {
-      if (insertBelow) {
-        insertNewLineBelow(editor, caret, lp.column);
-      }
-      else {
-        insertNewLineAbove(editor, caret, lp.column);
-      }
-    }
-
-    return res;
-  }
-
-  /**
    * Delete from the cursor to the end of count - 1 lines down and enter insert mode
    *
    * @param editor The editor to change
