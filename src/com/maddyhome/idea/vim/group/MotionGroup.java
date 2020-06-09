@@ -146,8 +146,14 @@ public class MotionGroup {
       // of the line and move the end to the end of the line.
       EnumSet<CommandFlags> flags = cmd.getFlags();
       if (flags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
-        start = EditorHelper.getLineStartForOffset(editor, start);
-        end = Math.min(EditorHelper.getLineEndForOffset(editor, end) + 1, EditorHelperRt.getFileSize(editor));
+        if (caret.getLogicalPosition().line != EditorHelper.getLineCount(editor) - 1) {
+          start = EditorHelper.getLineStartForOffset(editor, start);
+          end = Math.min(EditorHelper.getLineEndForOffset(editor, end) + 1, EditorHelperRt.getFileSize(editor));
+        }
+        else {
+          start = Math.max(EditorHelper.getLineStartForOffset(editor, start) -1 , 0);
+          end = EditorHelper.getLineEndForOffset(editor, end);
+        }
       }
     }
 

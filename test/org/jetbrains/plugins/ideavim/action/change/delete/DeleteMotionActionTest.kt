@@ -21,6 +21,7 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -40,8 +41,7 @@ class DeleteMotionActionTest : VimTestCase() {
           """.trimIndent())
     myFixture.checkResult("""
         def xxx():
-          expression on${c}e
-
+        ${c}  expression one
           """.trimIndent())
   }
 
@@ -54,7 +54,7 @@ class DeleteMotionActionTest : VimTestCase() {
           expression${c} two
           """.trimIndent())
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: ""
-    assertEquals("  expression two", savedText)
+    assertEquals("\n  expression two", savedText)
   }
 
   fun `test delete line action multicaret`() {
@@ -121,5 +121,24 @@ class DeleteMotionActionTest : VimTestCase() {
         """.trimIndent()
     typeTextInFile(parseKeys("dd"), file)
     myFixture.checkResult(newFile)
+  }
+
+  fun `test delete on last line`() {
+    doTest(parseKeys("dd"),
+      """
+            A Discovery
+            
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            $c
+        """.trimIndent(),
+      """
+            A Discovery
+            
+            I found it in a legendary land
+            ${c}all rocks and lavender and tufted grass,
+        """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 }
