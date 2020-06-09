@@ -852,7 +852,6 @@ class PutVisualTextActionTest : VimTestCase() {
 
 
 
-
             """.trimIndent()
     myFixture.checkResult(after)
   }
@@ -907,7 +906,6 @@ class PutVisualTextActionTest : VimTestCase() {
             |found||found|
             |l roc||l roc|
             |ere i||ere i|
-
 
 
 
@@ -966,7 +964,6 @@ class PutVisualTextActionTest : VimTestCase() {
             $c|found|
             |l roc|
             |ere i|
-
 
 
 

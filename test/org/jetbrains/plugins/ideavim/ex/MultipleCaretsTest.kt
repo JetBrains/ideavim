@@ -42,10 +42,26 @@ class MultipleCaretsTest : VimTestCase() {
   }
 
   fun testGotoLineInc() {
-    val before = "qwe\n" + "rt${c}y\n" + "asd\n" + "fgh\n" + "zxc\n" + "v${c}bn\n"
+    val before = """
+      qwe
+      rt${c}y
+      asd
+      fgh
+      zxc
+      v${c}bn
+      
+      """.trimIndent()
     configureByText(before)
     typeText(commandToKeys("+2"))
-    val after = "qwe\n" + "rty\n" + "asd\n" + "${c}fgh\n" + "zxc\n" + "${c}vbn\n"
+    val after = """
+      qwe
+      rty
+      asd
+      ${c}fgh
+      zxc
+      vbn
+      $c
+      """.trimIndent()
     myFixture.checkResult(after)
   }
 

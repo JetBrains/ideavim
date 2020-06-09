@@ -129,16 +129,44 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
   @VimOptionDefaultAll
   fun `test end of line to nl`() {
     doTest("%s/$/\\r/g",
-      "${c}one\ntwo\nthree\n",
-      "one\n\ntwo\n\nthree\n\n")
+      """
+        ${c}one
+        two
+        three
+        
+        """.trimIndent(),
+      """
+        one
+        
+        two
+        
+        three
+        
+        
+        
+        """.trimIndent())
   }
 
   // VIM-702
   @VimOptionDefaultAll
   fun `test start of line to nl`() {
     doTest("%s/^/\\r/g",
-      "${c}one\ntwo\nthree\n",
-      "\none\n\ntwo\n\nthree\n")
+      """
+        ${c}one
+        two
+        three
+        
+        """.trimIndent(),
+      """
+        
+        one
+        
+        two
+        
+        three
+        
+        
+        """.trimIndent())
   }
 
   @VimOptionTestConfiguration(VimTestOption(IgnoreCaseOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))

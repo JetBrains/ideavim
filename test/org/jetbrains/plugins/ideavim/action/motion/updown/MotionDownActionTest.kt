@@ -212,4 +212,18 @@ class MotionDownActionTest : VimTestCase() {
     typeText(keys)
     myFixture.checkResult(after)
   }
+
+  fun `test motion to the last empty line`() {
+    doTest(parseKeys("j"),
+      """
+            I found it in a legendary ${c}land
+            
+        """.trimIndent(),
+      """
+            I found it in a legendary land
+            ${c}
+        """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
+  }
 }

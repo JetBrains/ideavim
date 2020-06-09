@@ -100,12 +100,14 @@ class YankVisualActionTest : VimTestCase() {
     TestCase.assertNotNull(text)
 
     typeText(parseKeys("G", "$", "p"))
-    val after = """qwerty
-asdfgh
-zxcvbn${c}werty
+    val after = """
+      qwerty
+      asdfgh
+      zxcvbn
+      ${c}werty
       gh
       zxcvbn
-"""
+      """.trimIndent()
     myFixture.checkResult(after)
   }
 

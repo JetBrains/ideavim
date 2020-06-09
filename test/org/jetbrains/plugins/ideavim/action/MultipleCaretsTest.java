@@ -1153,7 +1153,7 @@ public class MultipleCaretsTest extends VimTestCase {
                    "a<caret>bcd<caret>e\n" +
                    "abc<caret>de\n");
     myFixture.checkResult("ab\n" +
-                          "abcd\n");
+                          "abcd");
   }
 
   public void testDeleteJoinLinesAction() {
@@ -1476,7 +1476,7 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("    sdfdsfadsf fg dsfg sdfjgkfdgl jsdf\n" +
                     "nflgj sd\n" +
                     " dflgj dfdsfg\n" +
-                    " hdfsgj sdfklg<caret>j\n");
+                    " hdfsgj sdfklgj\n<caret>");
   }
 
   public void testMotionGotoLineLastEndInsertMode() {
@@ -1488,7 +1488,7 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("    sdfdsfadsf fg dsfg sdfjgkfdgl jsdf\n" +
                     "nflgj sd\n" +
                     " dflgj dfdsfg\n" +
-                    " hdfsgj sdfklgj<caret>\n");
+                    " hdfsgj sdfklgj\n<caret>");
   }
 
   @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction")
@@ -1517,7 +1517,7 @@ public class MultipleCaretsTest extends VimTestCase {
                     "dflgjdfsgk<caret>d<caret>flgjdfsklg\n\n");
     myFixture.checkResult("dfgdfsggfdfgdfs dasgdfsk dfghsdfkj gh\n" +
                     "lsdjf lsj flk gjdlsadlsfj lksdgfj \n" +
-                    "dflgjdfsgkdflgjdfsklg\n<caret>\n");
+                    "dflgjdfsgkdflgjdfsklg\n\n<caret>");
   }
 
   public void testMotionGotoLineLastWithArgumentAction() {

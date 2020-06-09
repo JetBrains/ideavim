@@ -37,9 +37,9 @@ public class RangeTest extends VimTestCase {
   }
 
   public void testLastLine() {
-    myFixture.configureByText("a.txt", "1\n2\n3\n4\n5\n");
+    myFixture.configureByText("a.txt", "1\n2\n3\n4\n5");
     typeText(commandToKeys("$s/5/x/"));
-    myFixture.checkResult("1\n2\n3\n4\nx\n");
+    myFixture.checkResult("1\n2\n3\n4\nx");
   }
 
   public void testOneLineNumber() {
@@ -57,7 +57,7 @@ public class RangeTest extends VimTestCase {
   public void testNegativeOffset() {
     myFixture.configureByText("a.txt", "1\n2\n3\n4\n5\n");
     typeText(commandToKeys("$-2d"));
-    myFixture.checkResult("1\n2\n4\n5\n");
+    myFixture.checkResult("1\n2\n3\n5\n");
   }
 
   public void testOffsetWithNoNumber() {
@@ -117,7 +117,7 @@ public class RangeTest extends VimTestCase {
   public void testMultipleLineNumbersWithOffsetInSecond() {
     myFixture.configureByText("a.txt", "1\n2\n3\n4\n5\n");
     typeText(commandToKeys("2,$-1d"));
-    myFixture.checkResult("1\n5\n");
+    myFixture.checkResult("1\n");
   }
 
   public void testSearchStartPositionWithComma() {

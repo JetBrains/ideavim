@@ -480,7 +480,7 @@ public class ChangeActionTest extends VimTestCase {
                         " * a little more text\n" +
                         " * and final fold\n" +
                         " */\n" +
-                        "and some text after\n");
+                        "and some text after");
     typeText(parseKeys("zc", "G", "O"));
     myFixture.checkResult("/**\n" +
                           " * I should be fold\n" +
@@ -488,7 +488,7 @@ public class ChangeActionTest extends VimTestCase {
                           " * and final fold\n" +
                           " */\n" +
                           "<caret>\n" +
-                          "and some text after\n");
+                          "and some text after");
   }
 
   // VIM-287 |zc| |o|
