@@ -34,12 +34,14 @@ Available extensions:
 * Setup: `set commentary`
 * Emulates [commentary.vim](https://github.com/tpope/vim-commentary)
 * Commands: `gcc`, `gc + motion`, `v_gc`
+* By [Daniel Leong](https://github.com/dhleong)
 
 ## ReplaceWithRegister
 
 * Setup: `set ReplaceWithRegister`
 * Emulates [ReplaceWithRegister](https://github.com/vim-scripts/ReplaceWithRegister)
 * Commands: `gr`, `grr`
+* By [igrekster](https://github.com/igrekster)
 
 ## argtextobj
 
@@ -59,10 +61,11 @@ Available extensions:
 * Setup: `set exchange`
 * Emulates [vim-exchange](https://github.com/tommcdo/vim-exchange)
 * Commands: `cx`, `cxx`, `X`, `cxc`
-    
+* By [fan-tom](https://github.com/fan-tom)
+
 ## textobj-entire
 
 * Setup: `set textobj-entire`
 * Emulates [vim-textobj-entire](https://github.com/kana/vim-textobj-entire)
 * Additional text objects: `ae`, `ie`
-
+* By [Alexandre Grison](https://github.com/agrison)

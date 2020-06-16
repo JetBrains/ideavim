@@ -1,71 +1,119 @@
 [![TeamCity Build][teamcity-build-status-svg]][teamcity-build-status]
 
+IdeaVim is an open source project created by 60+ contributors. Would you like to make it even better? That’s wonderful!
 
-### Where to Start
+This page is created to help you start contributing. And who knows, maybe in a few days this project will be brighter than ever!
 
-In order to contribute to IdeaVim, you should have some understanding of [Kotlin](https://kotlinlang.org/) or Java.
+## Before you begin
 
-See also these docs on the IntelliJ API:
+- The project is written in Kotlin and Java. Choose whichever language you feel more comfortable with,
+or maybe one that you’d like to get to know better (why not start [learning Kotlin](https://kotlinlang.org/docs/tutorials/) right now?).
 
-* [IntelliJ architectural overview](https://www.jetbrains.org/intellij/sdk/docs/platform/fundamentals.html)
-* [IntelliJ plugin development resources](https://www.jetbrains.org/intellij/sdk/docs/welcome.html)
+- If you come across some IntelliJ Platform code, these links may prove helpful:
 
-You can start by:
+    * [IntelliJ architectural overview](https://www.jetbrains.org/intellij/sdk/docs/platform/fundamentals.html)
+    * [IntelliJ plugin development resources](https://www.jetbrains.org/intellij/sdk/docs/welcome.html)
 
- - Picking relatively simple tasks that are tagged with
+- Having any difficulties?
+Join the brand new
+[![Join the chat at https://gitter.im/JetBrains/ideavim](https://badges.gitter.im/JetBrains/ideavim.svg)](https://gitter.im/JetBrains/ideavim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+for IdeaVim developers and contributors! 
+
+OK, ready to do some coding?
+
+## Yes, I'm ready for some coding
+
+* Fork the repository and clone it to the local machine.
+* Open the project with IntelliJ IDEA.
+
+Yoo hoo! You’re all set to begin contributing. Here are some useful gradle commands:
+
+* `./gradlew runIde` — start the dev version of IntelliJ IDEA with IdeaVim installed.
+* `./gradlew test` — run tests.
+* `./gradlew buildPlugin` — build the plugin. The result will be located in `build/distributions`. This file can be
+installed by using `Settings | Plugin | >Gear Icon< | Install Plugin from Disk...`. You can stay with your personal build
+for a few days or send it to a friend for testing.
+
+## Warmup
+
+ - Pick a few relatively simple tasks that are tagged with 
 [#patch_welcome](https://youtrack.jetbrains.com/issues/VIM?q=%23patch_welcome%20%23Unresolved%20sort%20by:%20votes%20)
-in the issue tracker.
- - Read about the `@VimBehaviorDiffers` annotation and fix the corresponding functionality.
+ in the issue tracker.
+ - Read the javadoc for the `@VimBehaviorDiffers` annotation in the source code and fix the corresponding functionality.
+ - Implement one of the requested [#vim plugin](https://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved%20tag:%20%7Bvim%20plugin%7D%20sort%20by:%20votes%20)s.
 
-Also join the brand new [![Join the chat at https://gitter.im/JetBrains/ideavim](https://badges.gitter.im/JetBrains/ideavim.svg)](https://gitter.im/JetBrains/ideavim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) for IdeaVim developers! 
+> :small_orange_diamond: Selected an issue to work on? Leave a comment in a YouTrack ticket or create a draft PR
+> to indicate that you've started working on it so that you might get additional guidance and feedback from the maintainers.
+
+## Where to start in the codebase
+
+If you are looking for:
+
+- Vim commands (`w`, `<C-O>`, `p`, etc.):
+    - Any particular command: `package-info.java`.
+    - How commands are executed in common: `EditorActionHandlerBase`.
+    - Key mapping: `KeyHandler.handleKey()`.
+
+- Ex commands (`:set`, `:s`, `:nohlsearch`):
+    - Any particular ex command: package `com.maddyhome.idea.vim.ex.handler`.
+    - Ex command executor: `CommandHandler`.
+
+- Extensions:
+    - Extensions handler: `VimExtensionHandler`.
+    - Available extensions: package `com/maddyhome/idea/vim/extension`.
+
+- Common features:
+    - State machine. How every particular keystroke is parsed in IdeaVim: `KeyHandler.handleKey()`.
+    - Options (`incsearch`, `iskeyword`, `relativenumber`): `OptionsManager`.
+    - Plugin startup: `PluginStartup`.
+    - Notifications: `NotificationService`.
+    - Status bar icon: `StatusBar.kt`.
+    - On/off switch: `VimPlugin.setEnabled()`.
 
 
-### Development Environment
+## Testing
 
-1. Fork IdeaVim on GitHub and clone the repository on your local machine.
+Here are some guides for testing:
 
-2. Import the project from the existing sources in IntelliJ IDEA 2018.1 or newer (Community or
-   Ultimate), by selecting "File | New | Project from Existing Sources..." or selecting "Import
-   Project" from the Welcome screen.
- * In the project wizard, select "Import project from external model | Gradle".
-   
- * Select your Java 8+ JDK as the Gradle JVM; leave other parameters unchanged.
-   
-3. Run your IdeaVim plugin within IntelliJ via a Gradle task:
+1. Read the javadoc for the `@VimBehaviorDiffers` annotation in the source code.
 
-    * Select the "View | Tool Windows | Gradle" tool window.
-    
-    * Launch "ideavim | intellij | runIde" from the tool window.
+2. Please avoid senseless text like "dhjkwaldjwa", "asdasdasd", "123 123 123 123", etc. Try to choose an example
+text that is easy to read and understand what is wrong if the test fails. For example, take a few lines from your
+favorite poem, or use Vladimir Nabokov’s “A Discovery" if you don't have one.
 
-4. Run IdeaVim tests via a Gradle task:
+3. Don't forget to test your functionality with line start, line end, file start, file end, empty line, multiple
+carets, dollar motion, etc.
 
-    * Select the "View | Tool Windows | Gradle" tool window.
-    
-    * Launch "ideavim | verification | test" from the tool window.
 
-5. Build the plugin distribution by running `./gradlew clean buildPlugin` in the
-   terminal in your project root.
+## A common direction
 
-    * The resulting distribution file will be located at build/distributions/IdeaVim-VERSION.zip
+We’re trying to make IdeaVim close to the original Vim both in terms of functionality and architecture.
 
-    * You can install this file by selecting "Settings | Plugins | Install plugin
-      from disk...".
-      
-### Testing
+- Vim motions can be [either inclusive or exclusive](http://vimdoc.sourceforge.net/htmldoc/motion.html#inclusive).
+In IdeaVim, you can use `MotionType` for that.
+- Have you read the [interesting things](https://github.com/AlexPl292/ideavim#some-facts-about-vim) about IdeaVim?
+Do you remember how `dd`, `yy`, and other similar commands work? `DuplicableOperatorAction` will help you with that.
+And we also translate it to `d_` and `y_`: `KeyHandler.mapOpCommand()`.
+- All IdeaVim extensions use the same command names as the originals (e.g. `<Plug>(CommentMotion)`, `<Plug>ReplaceWithRegisterLine`),
+so you can reuse your `.vimrc` settings. 
+We also support proper command mappings (functions are mapped to `<Plug>...`), the operator function (`OperatorFunction`), and so on.
+- Magic is supported as well. See `Magic`.
 
-1. Read about the `@VimBehaviorDiffers` annotation.
+-----
 
-2. Please avoid senseless text like "dhjkwaldjwa", "asdasdasd",
-"123 123 123 123", etc. Try to choose an example text that is easy to
-read and understand what is wrong if the test fails.
-For example, take a few lines from your favorite poem, or use
-"Vladimir Nabokov – A Discovery" if you don't have one.
+### I read the whole page but something is still unclear.
 
-3. Test your functionality properly.
-Especially check whether your command works with:
-line start, line end, file start, file end, empty line, multiple carets, dollar motion, etc.
+Oh no! No cookies for the maintainers today! Please [tell us](https://github.com/AlexPl292/ideavim#contact-maintainers) about it so we can help.
 
-<!-- Badges -->
+
+### I’ve found a bug in this documentation.
+
+No beer in the bar for us unless it's fixed. [Let us know](https://github.com/AlexPl292/ideavim#contact-maintainers) situation so we might be able to fix it.
+
+
+### The lack of documentation or a javadoc/ktdoc makes it difficult to start contributing.
+
+This is just terrible. [You know what to do](https://github.com/AlexPl292/ideavim#contact-maintainers).
 
 [teamcity-build-status]: https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20201&guest=1
 [teamcity-build-status-svg]: https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20201)/statusIcon.svg?guest=1
