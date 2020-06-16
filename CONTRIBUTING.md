@@ -91,7 +91,7 @@ We’re trying to make IdeaVim close to the original Vim both in terms of functi
 
 - Vim motions can be [either inclusive or exclusive](http://vimdoc.sourceforge.net/htmldoc/motion.html#inclusive).
 In IdeaVim, you can use `MotionType` for that.
-- Have you read the [interesting things](https://github.com/AlexPl292/ideavim#some-facts-about-vim) about IdeaVim?
+- Have you read the [interesting things](https://github.com/JetBrains/ideavim#some-facts-about-vim) about IdeaVim?
 Do you remember how `dd`, `yy`, and other similar commands work? `DuplicableOperatorAction` will help you with that.
 And we also translate it to `d_` and `y_`: `KeyHandler.mapOpCommand()`.
 - All IdeaVim extensions use the same command names as the originals (e.g. `<Plug>(CommentMotion)`, `<Plug>ReplaceWithRegisterLine`),
@@ -103,17 +103,17 @@ We also support proper command mappings (functions are mapped to `<Plug>...`), t
 
 ### I read the whole page but something is still unclear.
 
-Oh no! No cookies for the maintainers today! Please [tell us](https://github.com/AlexPl292/ideavim#contact-maintainers) about it so we can help.
+Oh no! No cookies for the maintainers today! Please [tell us](https://github.com/JetBrains/ideavim#contact-maintainers) about it so we can help.
 
 
 ### I’ve found a bug in this documentation.
 
-No beer in the bar for us unless it's fixed. [Let us know](https://github.com/AlexPl292/ideavim#contact-maintainers) situation so we might be able to fix it.
+No beer in the bar for us unless it's fixed. [Let us know](https://github.com/JetBrains/ideavim#contact-maintainers) situation so we might be able to fix it.
 
 
 ### The lack of documentation or a javadoc/ktdoc makes it difficult to start contributing.
 
-This is just terrible. [You know what to do](https://github.com/AlexPl292/ideavim#contact-maintainers).
+This is just terrible. [You know what to do](https://github.com/JetBrains/ideavim#contact-maintainers).
 
 [teamcity-build-status]: https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20201&guest=1
 [teamcity-build-status-svg]: https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20201)/statusIcon.svg?guest=1
