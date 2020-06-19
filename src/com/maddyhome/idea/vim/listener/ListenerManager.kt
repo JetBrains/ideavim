@@ -60,6 +60,7 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.helper.isOneLineDisable
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
@@ -149,6 +150,9 @@ object VimListenerManager {
     }
 
     fun add(editor: Editor) {
+
+      if (editor.isOneLineDisable()) return
+
       editor.contentComponent.addKeyListener(VimKeyListener)
       val eventFacade = EventFacade.getInstance()
       eventFacade.addEditorMouseListener(editor, EditorMouseHandler)
@@ -203,6 +207,7 @@ object VimListenerManager {
      * This event is executed for each caret using [com.intellij.openapi.editor.CaretModel.runForEachCaret]
      */
     override fun selectionChanged(selectionEvent: SelectionEvent) {
+      if (selectionEvent.editor.isOneLineDisable()) return
       val editor = selectionEvent.editor
       val document = editor.document
 
@@ -236,6 +241,7 @@ object VimListenerManager {
     private var cutOffFixed = false
 
     override fun mouseDragged(e: EditorMouseEvent) {
+      if (e.editor.isOneLineDisable()) return
       if (!mouseDragging) {
         logger.debug("Mouse dragging")
         SelectionVimListenerSuppressor.lock()
@@ -276,6 +282,7 @@ object VimListenerManager {
     }
 
     override fun mouseReleased(event: EditorMouseEvent) {
+      if (event.editor.isOneLineDisable()) return
       if (mouseDragging) {
         logger.debug("Release mouse after dragging")
         val editor = event.editor
@@ -293,6 +300,7 @@ object VimListenerManager {
     }
 
     override fun mouseClicked(event: EditorMouseEvent) {
+      if (event.editor.isOneLineDisable()) return
       logger.debug("Mouse clicked")
 
       if (event.area == EditorMouseEventArea.EDITING_AREA) {
@@ -338,6 +346,7 @@ object VimListenerManager {
 
     override fun mousePressed(e: MouseEvent?) {
       val editor = (e?.component as? EditorComponentImpl)?.editor ?: return
+      if (editor.isOneLineDisable()) return
       val predictedMode = IdeaSelectionControl.predictMode(editor, VimListenerManager.SelectionSource.MOUSE)
       when (e.clickCount) {
         1 -> {

@@ -87,6 +87,10 @@ object OptionsManager {
   val ideastatusicon = addOption(BoundStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues))
   val ideastrictmode = addOption(ToggleOption("ideastrictmode", "ideastrictmode", false))
 
+  // Dev only experimental options
+  val dialogescape = addOption(BoundStringOption("dialogescape", "de", "legacy", arrayOf("legacy", "on")))
+  val oneline = addOption(ToggleOption("oneline", "oneline", true))
+
   @ApiStatus.ScheduledForRemoval(inVersion = "0.59")
   @Deprecated("please use ideastatusicon")
   val ideastatusbar = addOption(ToggleOption("ideastatusbar", "ideastatusbar", true))

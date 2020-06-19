@@ -21,6 +21,12 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.option.OptionsManager
 
 val Editor.fileSize: Int
   get() = document.textLength
+
+// true if the editor is one-line and we prohibit IdeaVim in one-line editors
+fun Editor.isOneLineDisable(): Boolean {
+  return this.isOneLineMode && !OptionsManager.oneline.isSet
+}
