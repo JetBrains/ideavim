@@ -39,7 +39,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
-import com.maddyhome.idea.vim.helper.isOneLineDisable
+import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.listener.IdeaSpecifics.aceJumpActive
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -83,7 +83,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
     val editor = getEditor(e)
     val keyStroke = getKeyStroke(e)
     if (editor != null && keyStroke != null) {
-      if (editor.isOneLineDisable()) return false
+      if (editor.isIdeaVimDisabledHere) return false
       // Workaround for smart step into
       @Suppress("DEPRECATION")
       val SMART_STEP_INPLACE_DATA = Key.findKeyByName("SMART_STEP_INPLACE_DATA")

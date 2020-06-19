@@ -20,13 +20,15 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.ide.scratch.ScratchFileService
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.option.OptionsManager
 
 val Editor.fileSize: Int
   get() = document.textLength
 
-// true if the editor is one-line and we prohibit IdeaVim in one-line editors
-fun Editor.isOneLineDisable(): Boolean {
-  return this.isOneLineMode && !OptionsManager.oneline.isSet
-}
+private val Editor.isDatabaseCell: Boolean
+  get() = ScratchFileService.findRootType(EditorHelper.getVirtualFile(this))?.id == "consoles/.datagrid"
+
+val Editor.isIdeaVimDisabledHere: Boolean
+  get() = (isOneLineMode || isDatabaseCell) && !OptionsManager.oneline.isSet
