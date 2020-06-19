@@ -85,6 +85,7 @@ object OptionsManager {
   val visualEnterDelay = addOption(NumberOption("visualdelay", "visualdelay", 100, 0, Int.MAX_VALUE))
   val idearefactormode = addOption(BoundStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues))
   val ideastatusicon = addOption(BoundStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues))
+  val ideastrictmode = addOption(ToggleOption("ideastrictmode", "ideastrictmode", false))
 
   @ApiStatus.ScheduledForRemoval(inVersion = "0.59")
   @Deprecated("please use ideastatusicon")
@@ -542,4 +543,13 @@ object IdeaStatusIcon {
 
   val name = "ideastatusicon"
   val allValues = arrayOf(enabled, gray, disabled)
+}
+
+object StrictMode {
+  val on: Boolean
+    get() = OptionsManager.ideastrictmode.isSet
+
+  fun fail(message: String): Nothing {
+    error(message)
+  }
 }

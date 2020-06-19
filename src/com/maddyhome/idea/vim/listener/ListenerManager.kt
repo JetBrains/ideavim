@@ -65,6 +65,7 @@ import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.remove
 import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.option.StrictMode
 import com.maddyhome.idea.vim.ui.ExEntryPanel
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import java.awt.event.MouseAdapter
@@ -96,6 +97,9 @@ object VimListenerManager {
       if (typedAction.rawHandler !is VimTypedActionHandler) {
         // Actually this if should always be true, but just as protection
         EventFacade.getInstance().setupTypedActionHandler(VimTypedActionHandler(typedAction.rawHandler))
+      }
+      else {
+        StrictMode.fail("typeAction expected to be non-vim.")
       }
 
       OptionsManager.number.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
