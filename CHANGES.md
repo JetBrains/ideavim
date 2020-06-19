@@ -56,8 +56,7 @@ _To Be Released..._
 
 **Fixes:**
 * Fix mappings to `"\<SPACE>"` including `let mapleader="\<SPACE>"`
-
-
+* [VIM-2038](https://youtrack.jetbrains.com/issue/VIM-2038) Last line is now accessible in normal mode
 
 0.57, 2020-04-28
 -------------
