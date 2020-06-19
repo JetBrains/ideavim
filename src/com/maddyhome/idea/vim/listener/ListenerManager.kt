@@ -69,79 +69,10 @@ import com.maddyhome.idea.vim.ui.ExEntryPanel
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.io.Closeable
 
 /**
  * @author Alex Plate
  */
-
-/**
- * Base class for listener suppressors.
- * Children of this class have an ability to suppress editor listeners
- *
- * E.g.
- * ```
- *  CaretVimListenerSuppressor.lock()
- *  caret.moveToOffset(10) // vim's caret listener will not be executed
- *  CaretVimListenerSuppressor.unlock()
- * ````
- *
- *  Locks can be nested:
- * ```
- *      CaretVimListenerSuppressor.lock()
- *      moveCaret(caret) // vim's caret listener will not be executed
- *      CaretVimListenerSuppressor.unlock()
- *
- *  fun moveCaret(caret: Caret) {
- *      CaretVimListenerSuppressor.lock()
- *      caret.moveToOffset(10)
- *      CaretVimListenerSuppressor.unlock()
- *  }
- * ```
- *
- * [Locked] implements [Closeable], so you can use try-with-resources block
- *
- * java
- * ```
- * try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
- *     ....
- * }
- * ```
- *
- * Kotlin
- * ```
- * SelectionVimListenerSuppressor.lock().use { ... }
- * ```
- */
-sealed class VimListenerSuppressor{
-  private var caretListenerSuppressor = 0
-
-  fun lock(): Locked {
-    caretListenerSuppressor++
-    return Locked()
-  }
-
-  fun unlock(action: (() -> Unit)? = null) {
-    if (action != null) {
-      try {
-        action()
-      } finally {
-          caretListenerSuppressor--
-      }
-    } else {
-      caretListenerSuppressor--
-    }
-  }
-
-  val isNotLocked: Boolean
-    get() = caretListenerSuppressor == 0
-
-  inner class Locked : Closeable  {
-    override fun close() = unlock()
-  }
-}
-
-object SelectionVimListenerSuppressor : VimListenerSuppressor()
 
 object VimListenerManager {
 
