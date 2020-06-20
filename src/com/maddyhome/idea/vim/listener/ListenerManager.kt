@@ -60,6 +60,7 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.helper.disabledForThisEditor
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -151,7 +152,7 @@ object VimListenerManager {
 
     fun add(editor: Editor) {
 
-      if (editor.isIdeaVimDisabledHere) return
+      if (editor.disabledForThisEditor) return
 
       editor.contentComponent.addKeyListener(VimKeyListener)
       val eventFacade = EventFacade.getInstance()
@@ -166,6 +167,9 @@ object VimListenerManager {
     }
 
     fun remove(editor: Editor, isReleased: Boolean) {
+
+      if (editor.disabledForThisEditor) return
+
       editor.contentComponent.removeKeyListener(VimKeyListener)
       val eventFacade = EventFacade.getInstance()
       eventFacade.removeEditorMouseListener(editor, EditorMouseHandler)

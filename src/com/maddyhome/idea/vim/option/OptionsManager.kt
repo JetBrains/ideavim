@@ -88,7 +88,7 @@ object OptionsManager {
   val ideastrictmode = addOption(ToggleOption("ideastrictmode", "ideastrictmode", false))
 
   // Dev only experimental options
-  val dialogescape = addOption(BoundStringOption("dialogescape", "de", "legacy", arrayOf("legacy", "on")))
+  val dialogescape = addOption(BoundStringOption("dialogescape", "de", "legacy", arrayOf("legacy", "on", "off")))
   val oneline = addOption(ToggleOption("oneline", "oneline", true))
 
   @ApiStatus.ScheduledForRemoval(inVersion = "0.59")

@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
+import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.listener.IdeaSpecifics.aceJumpActive
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -124,17 +125,8 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
   }
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
-    return (isPrimaryEditor(editor) || EditorHelper.isFileEditor(editor) && !editor.inNormalMode) ||
+    return (editor.isPrimaryEditor() || EditorHelper.isFileEditor(editor) && !editor.inNormalMode) ||
       (OptionsManager.dialogescape.value == "on" && !editor.inNormalMode)
-  }
-
-  /**
-   * Checks if the editor is a primary editor in the main editing area.
-   */
-  private fun isPrimaryEditor(editor: Editor): Boolean {
-    val project = editor.project ?: return false
-    val fileEditorManager = FileEditorManagerEx.getInstanceEx(project) ?: return false
-    return fileEditorManager.allEditors.any { fileEditor -> editor == EditorUtil.getEditorEx(fileEditor) }
   }
 
   private fun isShortcutConflict(keyStroke: KeyStroke): Boolean {

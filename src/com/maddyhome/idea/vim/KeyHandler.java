@@ -201,13 +201,6 @@ public class KeyHandler {
     // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
     editor = HelperKt.getTopLevelEditor(editor);
 
-    if (EditorHelperRt.isIdeaVimDisabledHere(editor)) {
-      if (!CommandStateHelper.inInsertMode(editor) && !CommandStateHelper.inSelectMode(editor)) {
-        VimPlugin.getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
-        KeyHandler.getInstance().reset(editor);
-      }
-    }
-
     final CommandState editorState = CommandState.getInstance(editor);
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
 
