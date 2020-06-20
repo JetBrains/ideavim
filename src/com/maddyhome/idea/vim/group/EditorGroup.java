@@ -54,7 +54,9 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     @Override
     public void caretPositionChanged(@NotNull CaretEvent e) {
       final boolean requiresRepaint = e.getNewPosition().line != e.getOldPosition().line;
-      updateLineNumbers(e.getEditor(), requiresRepaint);
+      if (requiresRepaint && OptionsManager.INSTANCE.getRelativenumber().isSet()) {
+        repaintRelativeLineNumbers(e.getEditor());
+      }
     }
   };
 
@@ -67,7 +69,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     UserDataManager.setVimEditorGroup(editor, true);
 
     UserDataManager.setVimLineNumbersInitialState(editor, editor.getSettings().isLineNumbersShown());
-    updateLineNumbers(editor, true);
+    updateLineNumbers(editor);
   }
 
   private void deinitLineNumbers(@NotNull Editor editor, boolean isReleasing) {
@@ -95,7 +97,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     return EditorHelper.isFileEditor(editor) && !EditorHelper.isDiffEditor(editor);
   }
 
-  private static void updateLineNumbers(final @NotNull Editor editor, final boolean requiresRepaint) {
+  private static void updateLineNumbers(final @NotNull Editor editor) {
     final boolean relativeNumber = OptionsManager.INSTANCE.getRelativenumber().isSet();
     final boolean number = OptionsManager.INSTANCE.getNumber().isSet();
 
@@ -114,9 +116,6 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     if (relativeNumber) {
       if (!hasRelativeLineNumbersInstalled(editor)) {
         installRelativeLineNumbers(editor);
-      }
-      else if (requiresRepaint) {
-        repaintRelativeLineNumbers(editor);
       }
     }
     else if (hasRelativeLineNumbersInstalled(editor)) {
@@ -258,7 +257,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     public void valueChange(Boolean oldValue, Boolean newValue) {
       for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
         if (UserDataManager.getVimEditorGroup(editor) && supportsVimLineNumbers(editor)) {
-          updateLineNumbers(editor, true);
+          updateLineNumbers(editor);
         }
       }
     }
