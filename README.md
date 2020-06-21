@@ -12,8 +12,6 @@ IdeaVim
 [![Twitter][twitter-svg]][twitter]
 
 IdeaVim is a Vim emulation plugin for IDEs based on the IntelliJ Platform.
-IdeaVim can be used with IntelliJ IDEA, PyCharm, CLion, PhpStorm, WebStorm,
-RubyMine, AppCode, DataGrip, GoLand, Rider, Cursive, and Android Studio.
 
 ##### Contact maintainers:
 * [Bug tracker](https://youtrack.jetbrains.com/issues/VIM)
@@ -26,6 +24,11 @@ RubyMine, AppCode, DataGrip, GoLand, Rider, Cursive, and Android Studio.
 * [Plugin homepage](https://plugins.jetbrains.com/plugin/164-ideavim)
 * [Changelog](CHANGES.md)
 * [Continuous integration builds](https://teamcity.jetbrains.com/project.html?projectId=IdeaVim&guest=1)
+
+#### Compatibility
+
+IntelliJ IDEA, PyCharm, CLion, PhpStorm, WebStorm, RubyMine, AppCode, DataGrip, GoLand, Rider, Cursive,
+Android Studio and other IntelliJ platform based IDEs.
 
 Setup
 ------------
