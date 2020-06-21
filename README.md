@@ -4,6 +4,7 @@ IdeaVim
 ===
 
 [![Official JetBrains Project][jb-official-svg]][jb-official]
+[![Contributions welcome][contributions-welcome-svg]][contributions-welcome]
 [![Downloads][plugin-downloads-svg]][plugin-repo]
 [![Rating][plugin-rating-svg]][plugin-repo]
 [![Version][plugin-version-svg]][plugin-repo]
@@ -304,3 +305,6 @@ or any later version.
 
 [twitter]: https://twitter.com/ideavim
 [twitter-svg]: https://img.shields.io/twitter/follow/ideavim?label=twitter%20%40ideavim
+
+[contributions-welcome-svg]: http://img.shields.io/badge/contributions-welcome-brightgreen
+[contributions-welcome]: https://github.com/JetBrains/ideavim/blob/master/CONTRIBUTING.md
