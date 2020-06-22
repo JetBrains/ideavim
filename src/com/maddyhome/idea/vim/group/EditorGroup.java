@@ -19,15 +19,11 @@
 package com.maddyhome.idea.vim.group;
 
 import com.intellij.find.EditorSearchSession;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.editor.*;
-import com.intellij.openapi.editor.colors.ColorKey;
-import com.intellij.openapi.editor.colors.EditorColors;
-import com.intellij.openapi.editor.colors.EditorFontType;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
@@ -37,15 +33,10 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.OptionsManager;
-import gnu.trove.TIntFunction;
-import kotlin.text.StringsKt;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.awt.*;
-import java.util.List;
 
 /**
  * @author vlan
@@ -63,7 +54,9 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     @Override
     public void caretPositionChanged(@NotNull CaretEvent e) {
       final boolean requiresRepaint = e.getNewPosition().line != e.getOldPosition().line;
-      updateLineNumbers(e.getEditor(), requiresRepaint);
+      if (requiresRepaint && OptionsManager.INSTANCE.getRelativenumber().isSet()) {
+        repaintRelativeLineNumbers(e.getEditor());
+      }
     }
   };
 
@@ -76,7 +69,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     UserDataManager.setVimEditorGroup(editor, true);
 
     UserDataManager.setVimLineNumbersInitialState(editor, editor.getSettings().isLineNumbersShown());
-    updateLineNumbers(editor, true);
+    updateLineNumbers(editor);
   }
 
   private void deinitLineNumbers(@NotNull Editor editor, boolean isReleasing) {
@@ -100,11 +93,11 @@ public class EditorGroup implements PersistentStateComponent<Element> {
 
   private static boolean supportsVimLineNumbers(final @NotNull Editor editor) {
     // We only support line numbers in editors that are file based, and that aren't for diffs, which control their
-    // own line numbers, often using EditorGutterComponentEx#setLineNumberConvertor
+    // own line numbers, often using EditorGutter#setLineNumberConverter
     return EditorHelper.isFileEditor(editor) && !EditorHelper.isDiffEditor(editor);
   }
 
-  private static void updateLineNumbers(final @NotNull Editor editor, final boolean requiresRepaint) {
+  private static void updateLineNumbers(final @NotNull Editor editor) {
     final boolean relativeNumber = OptionsManager.INSTANCE.getRelativenumber().isSet();
     final boolean number = OptionsManager.INSTANCE.getNumber().isSet();
 
@@ -124,9 +117,6 @@ public class EditorGroup implements PersistentStateComponent<Element> {
       if (!hasRelativeLineNumbersInstalled(editor)) {
         installRelativeLineNumbers(editor);
       }
-      else if (requiresRepaint) {
-        repaintRelativeLineNumbers(editor);
-      }
     }
     else if (hasRelativeLineNumbersInstalled(editor)) {
       removeRelativeLineNumbers(editor);
@@ -135,15 +125,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
 
   private static boolean shouldShowBuiltinLineNumbers(final @NotNull Editor editor, boolean number, boolean relativeNumber) {
     final boolean initialState = UserDataManager.getVimLineNumbersInitialState(editor);
-
-    // Builtin relative line numbers requires EditorGutterComponentEx#setLineNumberConvertor. If we don't have that,
-    // fall back to the text annotation provider, which replaces the builtin line numbers
-    // AFAICT, this will always be true, but I can't guarantee it
-    if (editor.getGutter() instanceof EditorGutterComponentEx) {
-      return initialState || number || relativeNumber;
-    }
-
-    return (initialState || number) && !relativeNumber;
+    return initialState || number || relativeNumber;
   }
 
   private static void setBuiltinLineNumbers(final @NotNull Editor editor, boolean show) {
@@ -157,12 +139,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
   private static void installRelativeLineNumbers(final @NotNull Editor editor) {
     if (!hasRelativeLineNumbersInstalled(editor)) {
       final EditorGutter gutter = editor.getGutter();
-      if (gutter instanceof EditorGutterComponentEx) {
-        ((EditorGutterComponentEx) gutter).setLineNumberConvertor(new RelativeLineNumberConverter(editor));
-      }
-      else {
-        gutter.registerTextAnnotation(new RelativeLineNumberGutterProvider(editor));
-      }
+      gutter.setLineNumberConverter(new RelativeLineNumberConverter());
       UserDataManager.setVimHasRelativeLineNumbersInstalled(editor, true);
     }
   }
@@ -170,13 +147,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
   private static void removeRelativeLineNumbers(final @NotNull Editor editor) {
     if (hasRelativeLineNumbersInstalled(editor)) {
       final EditorGutter gutter = editor.getGutter();
-      if (gutter instanceof EditorGutterComponentEx) {
-        ((EditorGutterComponentEx) gutter).setLineNumberConvertor(null);
-      }
-      else {
-        // TODO:[VERSION UPDATE] 192 gives us an API to close just one annotation provider
-        gutter.closeAllAnnotations();
-      }
+      gutter.setLineNumberConverter(LineNumberConverter.DEFAULT);
       UserDataManager.setVimHasRelativeLineNumbersInstalled(editor, false);
     }
   }
@@ -286,105 +257,32 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     public void valueChange(Boolean oldValue, Boolean newValue) {
       for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
         if (UserDataManager.getVimEditorGroup(editor) && supportsVimLineNumbers(editor)) {
-          updateLineNumbers(editor, true);
+          updateLineNumbers(editor);
         }
       }
     }
   }
 
-  private static class RelativeLineNumberConverter implements TIntFunction {
-    private final @NotNull Editor editor;
-
-    @Contract(pure = true)
-    RelativeLineNumberConverter(final @NotNull Editor editor) {
-      this.editor = editor;
-    }
-
+  private static class RelativeLineNumberConverter implements LineNumberConverter {
     @Override
-    public int execute(int line) {
+    public Integer convert(@NotNull Editor editor, int lineNumber) {
       final boolean number = OptionsManager.INSTANCE.getNumber().isSet();
       final int caretLine = editor.getCaretModel().getLogicalPosition().line;
 
-      if (number && line == caretLine) {
-        return line;
+      // lineNumber is 1 based
+      if (number && (lineNumber - 1) == caretLine) {
+        return lineNumber;
       }
       else {
-        return getRelativeLineNumber(line, editor, caretLine);
+        final int visualLine = EditorHelper.logicalLineToVisualLine(editor, lineNumber - 1);
+        final int currentVisualLine = EditorHelper.logicalLineToVisualLine(editor, caretLine);
+        return Math.abs(currentVisualLine - visualLine);
       }
     }
 
-    private int getRelativeLineNumber(int line, @NotNull Editor editor, int caretLine) {
-      final int visualLine = EditorHelper.logicalLineToVisualLine(editor, line);
-      final int currentVisualLine = EditorHelper.logicalLineToVisualLine(editor, caretLine);
-      return Math.abs(currentVisualLine - visualLine) - 1;
-    }
-  }
-
-  private static class RelativeLineNumberGutterProvider implements TextAnnotationGutterProvider {
-    private final @NotNull Editor editor;
-
-    @Contract(pure = true)
-    RelativeLineNumberGutterProvider(final @NotNull Editor editor) {
-      this.editor = editor;
-    }
-
     @Override
-    public @Nullable String getLineText(int line, @NotNull Editor editor) {
-      final boolean number = OptionsManager.INSTANCE.getNumber().isSet();
-      if (number && isCaretLine(line, editor)) {
-        return lineNumberToString(line + 1, editor, true);
-      } else {
-        return lineNumberToString(getRelativeLineNumber(line, editor), editor, false);
-      }
-    }
-
-    private boolean isCaretLine(int line, @NotNull Editor editor) {
-      return line == editor.getCaretModel().getLogicalPosition().line;
-    }
-
-    private int getRelativeLineNumber(int line, @NotNull Editor editor) {
-      final int visualLine = EditorHelper.logicalLineToVisualLine(editor, line);
-      final int currentLine = editor.getCaretModel().getLogicalPosition().line;
-      final int currentVisualLine = EditorHelper.logicalLineToVisualLine(editor, currentLine);
-      return Math.abs(currentVisualLine - visualLine);
-    }
-
-    private String lineNumberToString(int lineNumber, @NotNull Editor editor, boolean leftJustify) {
-      final int lineCount = editor.getDocument().getLineCount();
-      final int digitsCount = lineCount == 0 ? 1 : (int)Math.ceil(Math.log10(lineCount));
-      return leftJustify
-        ? StringsKt.padEnd(Integer.toString(lineNumber), digitsCount, ' ')
-        : StringsKt.padStart(Integer.toString(lineNumber), digitsCount, ' ');
-    }
-
-    @Override
-    public @Nullable String getToolTip(int line, Editor editor) {
-      return null;
-    }
-
-    @Override
-    public EditorFontType getStyle(int line, Editor editor) {
-      return isCaretLine(line, editor) ? EditorFontType.BOLD: null;
-    }
-
-    @Override
-    public @Nullable ColorKey getColor(int line, Editor editor) {
-      return isCaretLine(line, editor) ? EditorColors.LINE_NUMBER_ON_CARET_ROW_COLOR : EditorColors.LINE_NUMBERS_COLOR;
-    }
-
-    @Override
-    public @Nullable Color getBgColor(int line, Editor editor) {
-      return null;
-    }
-
-    @Override
-    public List<AnAction> getPopupActions(int line, Editor editor) {
-      return null;
-    }
-
-    @Override
-    public void gutterClosed() {
-      UserDataManager.setVimHasRelativeLineNumbersInstalled(this.editor, false);
+    public Integer getMaxLineNumber(@NotNull Editor editor) {
+      return editor.getDocument().getLineCount();
     }
   }
 }
