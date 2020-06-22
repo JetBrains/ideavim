@@ -31,6 +31,7 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
@@ -38,6 +39,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.*;
@@ -1150,7 +1152,7 @@ public class MotionGroup {
       else {
         offset = moveCaretVertical(editor, editor.getCaretModel().getPrimaryCaret(),
                                    EditorHelper.visualLineToLogicalLine(editor, visualLine) -
-                                   editor.getCaretModel().getLogicalPosition().line);
+                                   editor.getCaretModel().getLogicalPosition().line, false);
       }
 
       moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
@@ -1184,7 +1186,7 @@ public class MotionGroup {
     return editor.getCaretModel().getOffset();
   }
 
-  public int moveCaretVertical(@NotNull Editor editor, @NotNull Caret caret, int count) {
+  public int moveCaretVertical(@NotNull Editor editor, @NotNull Caret caret, int count, boolean useEndOfLineTracking) {
     VisualPosition pos = caret.getVisualPosition();
     final LogicalPosition logicalPosition = caret.getLogicalPosition();
     if ((pos.line == 0 && count < 0) || (pos.line >= EditorHelper.getVisualLineCount(editor) - 1 && count > 0)) {
@@ -1217,10 +1219,26 @@ public class MotionGroup {
       col = EditorHelper
         .normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
       col += newInlineElements;
-      VisualPosition newPos = new VisualPosition(line, col);
 
+      if (useEndOfLineTracking && InLastColumnMode(editor) && !caret.hasSelection()) {
+          // we're in 'last column' mode (after pressing '$'); Run to last column
+          int newLastColumn = EditorHelper.lastColumnForLine(editor, line, CommandStateHelper.isEndAllowed(mode));
+          col = newLastColumn;
+      }
+
+      VisualPosition newPos = new VisualPosition(line, col);
       return EditorHelper.visualPositionToOffset(editor, newPos);
     }
+  }
+
+  private boolean InLastColumnMode(@NotNull Editor editor) {
+    Command state = CommandStateHelper.getPreviousCommand(editor);
+    if (state == null) return false;
+
+    EditorActionHandlerBase action = state.getAction();
+    if (action == null) return false;
+
+    return action instanceof MotionLastColumnAction;
   }
 
   public int moveCaretToLinePercent(@NotNull Editor editor, int count) {

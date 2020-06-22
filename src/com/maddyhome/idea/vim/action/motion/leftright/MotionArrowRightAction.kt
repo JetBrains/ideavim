@@ -27,6 +27,8 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.isEndAllowed
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -39,7 +41,8 @@ class MotionArrowRightAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAct
   )
 
   override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-    return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, count, false)
+    val allowPastEnd = editor.commandState.isEndAllowed
+    return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, count, allowPastEnd)
   }
 }
 

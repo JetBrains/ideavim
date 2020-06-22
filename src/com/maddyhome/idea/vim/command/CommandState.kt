@@ -21,11 +21,8 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.DigraphResult
-import com.maddyhome.idea.vim.helper.DigraphSequence
-import com.maddyhome.idea.vim.helper.noneOfEnum
-import com.maddyhome.idea.vim.helper.vimCommandState
+import com.maddyhome.idea.vim.action.motion.updown.*
+import com.maddyhome.idea.vim.helper.*
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.option.OptionsManager.showmode
 import org.jetbrains.annotations.ApiStatus
@@ -61,6 +58,8 @@ class CommandState private constructor() {
   var executingCommand: Command? = null
     private set
 
+  var previousCommand: Command? = null
+
   // Keep the compatibility with the IdeaVim-EasyMotion plugin before the stable release
   @get:Deprecated("")
   @get:ApiStatus.ScheduledForRemoval(inVersion = "0.58")
@@ -75,6 +74,9 @@ class CommandState private constructor() {
   }
 
   fun setExecutingCommand(cmd: Command) {
+    if (previousCommand != null && !cmd.isUpDownMotion){
+      previousCommand = executingCommand // track the previous motion command for some edge cases around '$'
+    }
     executingCommand = cmd
   }
 

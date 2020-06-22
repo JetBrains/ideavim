@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.inNormalMode
 
 sealed class MotionDownBase : MotionActionHandler.ForEachCaret() {
   private var col: Int = 0
@@ -50,7 +51,7 @@ open class MotionDownAction : MotionDownBase() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)
+    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count, editor.inNormalMode)
   }
 }
 
@@ -75,6 +76,6 @@ class MotionDownNotLineWiseAction : MotionDownBase() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)
+    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count, editor.inNormalMode)
   }
 }

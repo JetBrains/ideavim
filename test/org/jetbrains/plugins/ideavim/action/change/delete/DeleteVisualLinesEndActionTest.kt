@@ -23,6 +23,7 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class DeleteVisualLinesEndActionTest : VimTestCase() {
@@ -44,6 +45,45 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun `test virtual edit delete middle to end`() {
+    OptionsManager.virtualedit.set("onemore")
+    doTest("D", """
+            Yesterday it w${c}orked
+            Today it is not working
+            The test is like that.
+        """.trimIndent(), """
+            Yesterday it w${c}
+            Today it is not working
+            The test is like that.
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun `test virtual edit delete end to end`() {
+    OptionsManager.virtualedit.set("onemore")
+    doTest("D", """
+            Yesterday it worke${c}d
+            Today it is not working
+            The test is like that.
+        """.trimIndent(), """
+            Yesterday it worke${c}
+            Today it is not working
+            The test is like that.
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun `test virtual edit delete to end from virtual space`() {
+    OptionsManager.virtualedit.set("onemore")
+    doTest("D", """
+            Yesterday it worked${c}
+            Today it is not working
+            The test is like that.
+        """.trimIndent(), """
+            Yesterday it worke${c}
+            Today it is not working
+            The test is like that.
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers(originalVimAfter = """

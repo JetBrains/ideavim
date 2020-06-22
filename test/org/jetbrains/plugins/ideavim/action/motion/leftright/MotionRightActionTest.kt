@@ -23,6 +23,7 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 import com.maddyhome.idea.vim.command.CommandState
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionRightActionTest : VimTestCase() {
@@ -77,6 +78,19 @@ class MotionRightActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun `test virtual edit motion to the end`() {
+    OptionsManager.virtualedit.set("onemore")
+    doTest("3l", """
+            Yesterday it worke${c}d
+            Today it is not working
+            The test is like that.
+        """.trimIndent(), """
+            Yesterday it worked${c}
+            Today it is not working
+            The test is like that.
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 

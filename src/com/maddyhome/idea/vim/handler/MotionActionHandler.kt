@@ -24,17 +24,13 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.motion.updown.*
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.helper.isEndAllowed
-import com.maddyhome.idea.vim.helper.mode
-import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.helper.*
 
 /**
  * @author Alex Plate
@@ -140,7 +136,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
           if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
             VimPlugin.getMark().saveJumpLocation(editor)
           }
-          if (!editor.mode.isEndAllowed) {
+          if (!editor.commandState.isEndAllowed) {
             offset = EditorHelper.normalizeOffset(editor, offset, false)
           }
           preMove(editor, context, cmd)
@@ -179,7 +175,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
         VimPlugin.getMark().saveJumpLocation(editor)
       }
-      if (!editor.mode.isEndAllowed) {
+      if (!editor.commandState.isEndAllowed) {
         offset = EditorHelper.normalizeOffset(editor, offset, false)
       }
       preMove(editor, caret, context, cmd)

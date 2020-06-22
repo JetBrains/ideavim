@@ -29,6 +29,8 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.inNormalMode
+import com.maddyhome.idea.vim.helper.inSingleCommandMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.mode
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -192,7 +194,7 @@ private class TestExtension : VimExtension {
     override fun execute(editor: Editor, context: DataContext) {
       VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_LINE)
       val caret = editor.caretModel.currentCaret
-      val newOffset = VimPlugin.getMotion().moveCaretVertical(editor, caret, 1)
+      val newOffset = VimPlugin.getMotion().moveCaretVertical(editor, caret, 1, editor.inNormalMode)
       MotionGroup.moveCaret(editor, caret, newOffset)
     }
   }
