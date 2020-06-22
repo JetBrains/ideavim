@@ -23,7 +23,7 @@
 
   <!-- Please search for "[VERSION UPDATE]" in project in case you update the since-build version -->
   <!-- Check for [Version Update] tag in YouTrack as well -->
-  <idea-version since-build="201.5985"/>
+  <idea-version since-build="201.5985.32"/>
 
   <!-- Mark the plugin as compatible with RubyMine and other products based on the IntelliJ platform -->
   <depends>com.intellij.modules.lang</depends>

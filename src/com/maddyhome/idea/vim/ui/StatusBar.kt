@@ -21,30 +21,17 @@ package com.maddyhome.idea.vim.ui
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.DataManager
 import com.intellij.ide.lightEdit.LightEditCompatible
-import com.intellij.ide.plugins.InstalledPluginsState
-import com.intellij.ide.plugins.PluginManagerCore
-import com.intellij.ide.plugins.PluginManagerMain
-import com.intellij.ide.plugins.RepositoryHelper
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.options.ShowSettingsUtil
-import com.intellij.openapi.progress.PerformInBackgroundOption
-import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
-import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.ListPopup
-import com.intellij.openapi.updateSettings.impl.PluginDownloader
-import com.intellij.openapi.updateSettings.impl.UpdateChecker
-import com.intellij.openapi.updateSettings.impl.UpdateInstaller
 import com.intellij.openapi.updateSettings.impl.UpdateSettings
-import com.intellij.openapi.util.Ref
 import com.intellij.openapi.wm.StatusBar
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
@@ -52,7 +39,6 @@ import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.Consumer
-import com.intellij.util.text.VersionComparatorUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.option.IdeaStatusIcon
@@ -221,7 +207,7 @@ private object JoinEap : DumbAwareAction() {
       VimPlugin.getNotifications(e.project).notifyEapFinished()
     } else {
       UpdateSettings.getInstance().storedPluginHosts += EAP_LINK
-      checkForUpdates(e.project)
+      VimPlugin.getNotifications(e.project).notifySubscribedToEap()
     }
   }
 
@@ -229,91 +215,7 @@ private object JoinEap : DumbAwareAction() {
     if (eapActive()) {
       e.presentation.text = "Finish EAP"
     } else {
-      e.presentation.text = "Get Early Access..."
+      e.presentation.text = "Subscribe to EAP"
     }
-  }
-
-  private fun checkForUpdates(project: Project?) {
-    val notificator = VimPlugin.getNotifications(project)
-
-    val pluginRef = Ref.create<PluginDownloader>()
-
-    object : Task.Backgroundable(null, "Checking for IdeaVim EAP version", true) {
-      override fun run(indicator: ProgressIndicator) {
-        val downloaders = mutableListOf<PluginDownloader>()
-        val build = ApplicationInfo.getInstance().build
-        for (host in RepositoryHelper.getPluginHosts()) {
-          val newPluginDescriptor = RepositoryHelper
-            .loadPlugins(host, null, indicator)
-            .filter { it.pluginId == VimPlugin.getPluginId() }
-            .maxWith(java.util.Comparator { o1, o2 -> VersionComparatorUtil.compare(o1.version, o2.version) })
-            ?: continue
-
-          downloaders += PluginDownloader.createDownloader(newPluginDescriptor, host, build)
-        }
-        val plugin = downloaders.maxWith(java.util.Comparator { o1, o2 -> VersionComparatorUtil.compare(o1.pluginVersion, o2.pluginVersion) })
-        pluginRef.set(plugin)
-      }
-
-      override fun onSuccess() {
-        val downloader: PluginDownloader = pluginRef.get() ?: run {
-          notificator.notifySubscribedToEap()
-          return
-        }
-        val currentVersion = PluginManagerCore.getPlugin(VimPlugin.getPluginId())?.version ?: ""
-        if (VersionComparatorUtil.compare(downloader.pluginVersion, currentVersion) <= 0) {
-          notificator.notifySubscribedToEap()
-          return
-        }
-
-        val version = downloader.pluginVersion
-        val message = "Do you want to install the EAP version of IdeaVim?"
-
-        @Suppress("MoveVariableDeclarationIntoWhen")
-        val res = Messages.showYesNoCancelDialog(project, message, "IdeaVim $version", null)
-        when (res) {
-          Messages.YES -> updatePlugin(project, downloader)
-          Messages.NO -> notificator.notifySubscribedToEap()
-          Messages.CANCEL -> if (eapActive()) UpdateSettings.getInstance().storedPluginHosts -= EAP_LINK
-        }
-      }
-
-      override fun onCancel() {
-        notificator.notifySubscribedToEap()
-      }
-
-      override fun onThrowable(error: Throwable) {
-        notificator.notifySubscribedToEap()
-      }
-    }.queue()
-  }
-
-  private fun updatePlugin(project: Project?, downloader: PluginDownloader) {
-    val notificator = VimPlugin.getNotifications(project)
-    return object : Task.Backgroundable(null, "Plugin Updates", true, PerformInBackgroundOption.DEAF) {
-      private var updated = false
-      override fun run(indicator: ProgressIndicator) {
-        val state = InstalledPluginsState.getInstance()
-        state.onDescriptorDownload(downloader.descriptor)
-        UpdateChecker.checkAndPrepareToInstall(downloader, state, mutableMapOf(VimPlugin.getPluginId() to downloader), mutableListOf(), indicator)
-        updated = UpdateInstaller.installPluginUpdates(listOf(downloader), indicator)
-      }
-
-      override fun onSuccess() {
-        if (updated) {
-          PluginManagerMain.notifyPluginsUpdated(null)
-        } else {
-          notificator.notifyFailedToDownloadEap()
-        }
-      }
-
-      override fun onCancel() {
-        notificator.notifyFailedToDownloadEap()
-      }
-
-      override fun onThrowable(error: Throwable) {
-        notificator.notifyFailedToDownloadEap()
-      }
-    }.queue()
   }
 }

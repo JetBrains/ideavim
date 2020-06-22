@@ -129,12 +129,6 @@ class NotificationService(private val project: Project?) {
       listener).notify(project)
   }
 
-  fun notifyFailedToDownloadEap() {
-    Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
-      """Failed to update IdeaVim to the EAP version. Please update the plugin manually.""",
-      NotificationType.ERROR).notify(project)
-  }
-
   fun notifySubscribedToEap() {
     Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
       """You are successfully subscribed to IdeaVim EAP releases.""",
