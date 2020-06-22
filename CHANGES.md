@@ -57,6 +57,12 @@ _To Be Released..._
 **Fixes:**
 * Fix mappings to `"\<SPACE>"` including `let mapleader="\<SPACE>"`
 * [VIM-2038](https://youtrack.jetbrains.com/issue/VIM-2038) Last line is now accessible in normal mode
+* [VIM-1934](https://youtrack.jetbrains.com/issue/VIM-1934) Line number is not clipped for relative line numbers
+* [VIM-1852](https://youtrack.jetbrains.com/issue/VIM-1852) Line number doesn't flickers for relative line numbers
+* [VIM-2021](https://youtrack.jetbrains.com/issue/VIM-2021) Line numbers don't reactivating
+
+**Merged PRs:**
+* [239](https://github.com/JetBrains/ideavim/pull/239) by [citizenmatt](https://github.com/citizenmatt): Use new API for relative line numbers
 
 0.57, 2020-04-28
 -------------
