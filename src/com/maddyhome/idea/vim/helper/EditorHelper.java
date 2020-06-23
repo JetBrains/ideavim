@@ -820,9 +820,10 @@ public class EditorHelper {
 
   private static int getHeightOfVisualLineInlays(final @NotNull Editor editor, int visualLine, boolean above) {
     InlayModel inlayModel = editor.getInlayModel();
-    List<Inlay> inlays = inlayModel.getBlockElementsForVisualLine(visualLine, above);
     int inlayHeight = 0;
-    for (Inlay inlay : inlays) {
+    // [Version Update] 202+ Inlay is parametrized
+    //noinspection rawtypes
+    for (Inlay inlay : inlayModel.getBlockElementsForVisualLine(visualLine, above)) {
       inlayHeight += inlay.getHeightInPixels();
     }
     return inlayHeight;
