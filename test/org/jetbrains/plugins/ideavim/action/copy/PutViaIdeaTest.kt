@@ -34,7 +34,7 @@ import java.util.*
  */
 class PutViaIdeaTest : VimTestCase() {
 
-  var optionsBefore: String = ""
+  private var optionsBefore: String = ""
 
   override fun setUp() {
     super.setUp()
@@ -43,8 +43,8 @@ class PutViaIdeaTest : VimTestCase() {
   }
 
   override fun tearDown() {
-    super.tearDown()
     OptionsManager.clipboard.set(optionsBefore)
+    super.tearDown()
   }
 
   fun `test simple insert via idea`() {
