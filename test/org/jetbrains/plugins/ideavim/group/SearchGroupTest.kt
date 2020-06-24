@@ -1227,7 +1227,7 @@ class SearchGroupTest : VimTestCase() {
     // <C-K><< → « + <C-K>>> → » (normal match)
     allHighlighters.forEach {
       // TODO: This is not the nicest way to check for current match. Add something to the highlight's user data?
-      if (it.getTextAttributes(null)?.effectType == EffectType.ROUNDED_BOX) {
+      if (it.textAttributes?.effectType == EffectType.ROUNDED_BOX) {
         inserts.compute(it.startOffset) { _, v -> if (v == null) "‷" else "$v‷" }
         inserts.compute(it.endOffset) { _, v -> if (v == null) "‴" else "$v‴" }
       } else {
@@ -1251,15 +1251,15 @@ class SearchGroupTest : VimTestCase() {
     allHighlighters.forEach {
       val offsets = "(${it.startOffset}, ${it.endOffset})"
       assertEquals("Incorrect tooltip for highlighter at $offsets", tooltip, it.errorStripeTooltip)
-      assertEquals("Incorrect background colour for highlighter at $offsets", attributes.backgroundColor, it.getTextAttributes(null)?.backgroundColor)
-      assertEquals("Incorrect foreground colour for highlighter at $offsets", attributes.foregroundColor, it.getTextAttributes(null)?.foregroundColor)
+      assertEquals("Incorrect background colour for highlighter at $offsets", attributes.backgroundColor, it.textAttributes?.backgroundColor)
+      assertEquals("Incorrect foreground colour for highlighter at $offsets", attributes.foregroundColor, it.textAttributes?.foregroundColor)
       // TODO: Find a better way to identify the current match
-      if (it.getTextAttributes(null)?.effectType == EffectType.ROUNDED_BOX) {
-        assertEquals("Incorrect effect type for highlighter at $offsets", EffectType.ROUNDED_BOX, it.getTextAttributes(null)?.effectType)
-        assertEquals("Incorrect effect colour for highlighter at $offsets", caretColour, it.getTextAttributes(null)?.effectColor)
+      if (it.textAttributes?.effectType == EffectType.ROUNDED_BOX) {
+        assertEquals("Incorrect effect type for highlighter at $offsets", EffectType.ROUNDED_BOX, it.textAttributes?.effectType)
+        assertEquals("Incorrect effect colour for highlighter at $offsets", caretColour, it.textAttributes?.effectColor)
       } else {
-        assertEquals("Incorrect effect type for highlighter at $offsets", attributes.effectType, it.getTextAttributes(null)?.effectType)
-        assertEquals("Incorrect effect colour for highlighter at $offsets", attributes.effectColor, it.getTextAttributes(null)?.effectColor)
+        assertEquals("Incorrect effect type for highlighter at $offsets", attributes.effectType, it.textAttributes?.effectType)
+        assertEquals("Incorrect effect colour for highlighter at $offsets", attributes.effectColor, it.textAttributes?.effectColor)
       }
     }
   }
