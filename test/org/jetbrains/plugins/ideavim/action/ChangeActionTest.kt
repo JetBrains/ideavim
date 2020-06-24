@@ -17,6 +17,8 @@
  */
 package org.jetbrains.plugins.ideavim.action
 
+import com.intellij.codeInsight.folding.CodeFoldingManager
+import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
@@ -669,7 +671,13 @@ and some text after""")
            */
           and some text after
         """.trimIndent())
-    typeText(StringHelper.parseKeys("zc", "o"))
+
+    myFixture.editor.foldingModel.runBatchFoldingOperation {
+      CodeFoldingManager.getInstance(myFixture.project).updateFoldRegions(myFixture.editor)
+      FoldingUtil.findFoldRegionStartingAtLine(myFixture.editor, 0)!!.isExpanded = false
+    }
+
+    typeText(StringHelper.parseKeys("o"))
     myFixture.checkResult("""
             /**
              * I should be fold

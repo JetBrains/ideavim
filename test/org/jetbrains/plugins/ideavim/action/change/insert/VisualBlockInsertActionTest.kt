@@ -18,6 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
+import com.intellij.codeInsight.folding.CodeFoldingManager
+import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -32,7 +34,13 @@ class VisualBlockInsertActionTest : VimTestCase() {
 foo
 bar
 """)
-    typeText(parseKeys("zc", "j", "<C-V>", "j", "I", "X", "<Esc>"))
+
+    myFixture.editor.foldingModel.runBatchFoldingOperation {
+      CodeFoldingManager.getInstance(myFixture.project).updateFoldRegions(myFixture.editor)
+      FoldingUtil.findFoldRegionStartingAtLine(myFixture.editor, 0)!!.isExpanded = false
+    }
+
+    typeText(parseKeys("j", "<C-V>", "j", "I", "X", "<Esc>"))
     myFixture.checkResult("""/**
  * Something to fold.
  */
