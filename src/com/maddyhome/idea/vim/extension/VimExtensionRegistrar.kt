@@ -37,6 +37,8 @@ object VimExtensionRegistrar {
   fun registerExtensions() {
     if (extensionRegistered) return
     extensionRegistered = true
+    // [VERSION UPDATE] 202+
+    @Suppress("DEPRECATION")
     VimExtension.EP_NAME.getPoint(null).addExtensionPointListener(object : ExtensionPointListener<VimExtension> {
       override fun extensionAdded(extension: VimExtension, pluginDescriptor: PluginDescriptor) {
         registerExtension(extension)

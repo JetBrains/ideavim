@@ -24,6 +24,8 @@ import com.intellij.openapi.extensions.AbstractExtensionPointBean
 import com.intellij.util.xmlb.annotations.Attribute
 import com.maddyhome.idea.vim.VimPlugin
 
+// [Version Update] 202+
+@Suppress("DEPRECATION")
 class ExBeanClass : AbstractExtensionPointBean() {
   @Attribute("implementation")
   var implementation: String? = null

@@ -48,6 +48,8 @@ import java.util.regex.Pattern
 
 object VimRcFileState {
   // List of hashes of non-empty trimmed lines
+  // [VERSION UPDATE] 202+
+  @Suppress("DEPRECATION")
   private val state = IntArrayList()
 
   // ModificationStamp. Can be taken only from document. Doesn't play a big role, but can help speed up [equalTo]

@@ -43,6 +43,7 @@ class OpMappingTest : VimTestCase() {
     super.setUp()
     if (!initialized) {
       initialized = true
+      @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
       VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
       enableExtensions("TestExtension")
     }
@@ -111,11 +112,13 @@ class OpMappingTest : VimTestCase() {
     typeText(parseKeys("Q"))
     myFixture.checkResult("I${c} found it in a legendary land")
 
+    @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
     VimExtension.EP_NAME.getPoint(null).unregisterExtension(TestExtension::class.java)
     UsefulTestCase.assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.owner))
     typeText(parseKeys("Q"))
     myFixture.checkResult("I${c} found it in a legendary land")
 
+    @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
     VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
     UsefulTestCase.assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.owner))
     enableExtensions("TestExtension")
@@ -129,10 +132,12 @@ class OpMappingTest : VimTestCase() {
     myFixture.checkResult("I${c} found it in a legendary land")
 
     enterCommand("set noTestExtension")
+    @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
     VimExtension.EP_NAME.getPoint(null).unregisterExtension(TestExtension::class.java)
     typeText(parseKeys("Q"))
     myFixture.checkResult("I${c} found it in a legendary land")
 
+    @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
     VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
     enableExtensions("TestExtension")
     typeText(parseKeys("Q"))

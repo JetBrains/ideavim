@@ -47,6 +47,8 @@ import javax.swing.KeyStroke
  *   The reason is startup performance. Using the extension points you don't even have to load classes of actions.
  *   So, all actions are loaded on demand, including classes in classloader.
  */
+// [VERSION UPDATE] 202+
+@Suppress("DEPRECATION")
 class ActionBeanClass : AbstractExtensionPointBean() {
   @Attribute("implementation")
   var implementation: String? = null
