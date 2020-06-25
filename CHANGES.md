@@ -28,7 +28,7 @@ To Be Released
 _Available since 0.57.1 EAP:_
 
 **Features:**
-* `exchange` plugin emulation ([vim-exchange](https://github.com/tommcdo/vim-exchange)).
+* `exchange` plugin emulation ([VIM-921](https://youtrack.jetbrains.com/issue/VIM-921) | [vim-exchange](https://github.com/tommcdo/vim-exchange)).
 * `~/.ideavimrc` file can be reloaded using the new floating action.
 
     * <details>
