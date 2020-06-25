@@ -212,13 +212,15 @@ public class KeyHandler {
     handleKeyRecursionCount++;
 
     try {
+      if (isEditorReset(key, editorState)) {
+        handleEditorReset(editor, key, context, editorState);
+      }
+
       if (!allowKeyMappings || !handleKeyMapping(editor, key, context)) {
         if (isCommandCountKey(chKey, editorState)) {
           commandBuilder.addCountCharacter(key);
         } else if (isDeleteCommandCountKey(key, editorState)) {
           commandBuilder.deleteCountCharacter();
-        } else if (isEditorReset(key, editorState)) {
-          handleEditorReset(editor, key, context, editorState);
         }
         // If we got this far the user is entering a command or supplying an argument to an entered command.
         // First let's check to see if we are at the point of expecting a single character argument to a command.
