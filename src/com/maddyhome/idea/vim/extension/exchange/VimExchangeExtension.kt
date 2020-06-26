@@ -194,7 +194,7 @@ class VimExchangeExtension: VimExtension {
         VimPlugin.getMark().setChangeMarks(editor, TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end)+1))
         // do this instead of direct text manipulation to set change marks
         setRegister('z', stringToKeys(sourceExchange.text), SelectionType.fromSubMode(sourceExchange.type))
-        executeNormal(stringToKeys("""`[${targetExchange.type.getString()}`]"zp"""), editor)
+        executeNormal(stringToKeys("`[${targetExchange.type.getString()}`]\"zp"), editor)
       }
       fun fixCursor(ex1: Exchange, ex2: Exchange, reverse: Boolean) {
         val primaryCaret = editor.caretModel.primaryCaret
