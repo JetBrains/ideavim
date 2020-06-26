@@ -52,7 +52,7 @@ _Available since 0.57.1 EAP:_
 * [230](https://github.com/JetBrains/ideavim/pull/230) by [fan-tom](https://github.com/fan-tom): VIM-1924.
 * [231](https://github.com/JetBrains/ideavim/pull/231) by [citizenmatt](https://github.com/citizenmatt): Support smooth scrolling.
 
-_To Be Released..._
+_Available since 0.57.2 EAP:_
 
 **Fixes:**
 * Fix mappings to `"\<SPACE>"` including `let mapleader="\<SPACE>"`
@@ -63,6 +63,8 @@ _To Be Released..._
 
 **Merged PRs:**
 * [239](https://github.com/JetBrains/ideavim/pull/239) by [citizenmatt](https://github.com/citizenmatt): Use new API for relative line numbers
+
+_To Be Released..._
 
 0.57, 2020-04-28
 -------------
