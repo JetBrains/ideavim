@@ -20,6 +20,10 @@ package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.option.ClipboardOptionsData
+import com.maddyhome.idea.vim.option.OptionsManager
+import junit.framework.Assert
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -54,5 +58,42 @@ class YankMotionActionTest : VimTestCase() {
     typeText(StringHelper.parseKeys("yy"))
 
     TestCase.assertEquals(initialOffset, myFixture.editor.caretModel.offset)
+  }
+
+  fun `test unnamed saved to " register`() {
+    val clipboardValue = OptionsManager.clipboard.value
+    OptionsManager.clipboard.set(ClipboardOptionsData.unnamed)
+
+    try {
+      configureByText("I found it in a ${c}legendary land");
+      typeText(parseKeys("yiw"));
+
+      val starRegister = VimPlugin.getRegister().getRegister('*') ?: kotlin.test.fail("Register * is empty")
+      Assert.assertEquals("legendary", starRegister.text)
+
+      val quoteRegister = VimPlugin.getRegister().getRegister('"') ?: kotlin.test.fail("Register \" is empty")
+      Assert.assertEquals("legendary", quoteRegister.text)
+    } finally {
+      OptionsManager.clipboard.set(clipboardValue)
+    }
+  }
+
+  fun `test z saved to " register`() {
+    configureByText("I found it in a ${c}legendary land");
+    typeText(parseKeys("\"zyiw"));
+
+    val starRegister = VimPlugin.getRegister().getRegister('z') ?: kotlin.test.fail("Register z is empty")
+    Assert.assertEquals("legendary", starRegister.text)
+
+    val quoteRegister = VimPlugin.getRegister().getRegister('"') ?: kotlin.test.fail("Register \" is empty")
+    Assert.assertEquals("legendary", quoteRegister.text)
+  }
+
+  fun `test " saved to " register`() {
+    configureByText("I found it in a ${c}legendary land");
+    typeText(parseKeys("\"zyiw"));
+
+    val quoteRegister = VimPlugin.getRegister().getRegister('"') ?: kotlin.test.fail("Register \" is empty")
+    Assert.assertEquals("legendary", quoteRegister.text)
   }
 }

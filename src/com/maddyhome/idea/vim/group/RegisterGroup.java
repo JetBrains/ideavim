@@ -88,7 +88,8 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
   private static final List<Character> CLIPBOARD_REGISTERS = ImmutableList.of('*', '+');
   private static final Logger logger = Logger.getInstance(RegisterGroup.class.getName());
 
-  public static char DEFAULT_REGISTER = '"';
+  public final static char UNNAMED_REGISTER = '"';
+  public static char DEFAULT_REGISTER = UNNAMED_REGISTER;
   private char lastRegister = DEFAULT_REGISTER;
   private final @NotNull HashMap<Character, Register> registers = new HashMap<>();
   private char recordRegister = 0;
@@ -104,7 +105,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
         DEFAULT_REGISTER = '+';
       }
       else {
-        DEFAULT_REGISTER = '"';
+        DEFAULT_REGISTER = UNNAMED_REGISTER;
       }
       lastRegister = DEFAULT_REGISTER;
     });
@@ -216,10 +217,10 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
       ClipboardHandler.setClipboardText(processedText, new ArrayList<>(transferableData), text);
     }
 
-    // Also add it to the default register if the default wasn't specified
-    if (register != DEFAULT_REGISTER && ".:/".indexOf(register) == -1) {
-      registers.put(DEFAULT_REGISTER, new Register(DEFAULT_REGISTER, type, processedText, new ArrayList<>(transferableData)));
-      if (logger.isDebugEnabled()) logger.debug("register '" + register + "' contains: \"" + processedText + "\"");
+    // Also add it to the unnamed register if the default wasn't specified
+    if (register != UNNAMED_REGISTER && ".:/".indexOf(register) == -1) {
+      registers.put(UNNAMED_REGISTER, new Register(UNNAMED_REGISTER, type, processedText, new ArrayList<>(transferableData)));
+      if (logger.isDebugEnabled()) logger.debug("register '" + UNNAMED_REGISTER + "' contains: \"" + processedText + "\"");
     }
 
     if (isDelete) {

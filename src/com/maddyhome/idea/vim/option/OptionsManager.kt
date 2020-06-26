@@ -421,6 +421,7 @@ object ClipboardOptionsData {
   const val abbr = "cb"
 
   const val ideaput = "ideaput"
+  const val unnamed = "unnamed"
   var ideaputDisabled = false
     private set
 
