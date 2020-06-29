@@ -19,12 +19,13 @@
 package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.ide.highlighter.JavaFileType;
+import com.intellij.idea.TestFor;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.helper.VimTestFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
@@ -1491,7 +1492,7 @@ public class MultipleCaretsTest extends VimTestCase {
                     " hdfsgj sdfklgj\n<caret>");
   }
 
-  @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction")
+  @TestFor(classes = {SearchWholeWordForwardAction.class})
   public void testSearchWholeWordForwardAction() {
     typeTextInFile(parseKeys("2*"),
             "q<caret>we as<caret>d zxc qwe asd zxc qwe asd zxc qwe asd zxc qwe asd zxc ");

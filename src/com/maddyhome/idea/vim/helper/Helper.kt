@@ -63,29 +63,6 @@ annotation class VimBehaviorDiffers(
   val shouldBeFixed: Boolean = true
 )
 
-/**
- * [VimFunctionMark] and [VimTestFunction] are the simple annotations that simplify to bind test
- *   and functions that are used in that test, but aren't targets of this test
- *
- *   E.g. if you test `n` command and you want to use next command sequence `*n` you can put this test in
- *     SearchAgainNextActionTest test class (because main test target is `n` command) and annotate this function
- *     with @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction") to mark that
- *     this test also uses `*` command.
- *
- * [VimFunctionMark] should annotate some method or class and provide and unique label for it
- * [VimTestFunction] provides marks that point to commands that are tested with this function. Full class name or values
- *   of [VimFunctionMark] can be used as marks.
- *
- * These annotations doesn't affect code behavior, but created only for development purposes
- */
-@Retention(AnnotationRetention.SOURCE)
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
-annotation class VimFunctionMark(val value: String)
-
-@Retention(AnnotationRetention.SOURCE)
-@Target(AnnotationTarget.FUNCTION)
-annotation class VimTestFunction(vararg val value: String)
-
 fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
 
 inline fun <reified T : Enum<T>> noneOfEnum(): EnumSet<T> = EnumSet.noneOf(T::class.java)
