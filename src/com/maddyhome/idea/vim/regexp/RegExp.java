@@ -121,6 +121,7 @@ public class RegExp {
   private static final int RE_COL = 205;     /* nr cmp  Match column number */
   private static final int RE_VCOL = 206;     /* nr cmp  Match virtual column number */
 
+  @SuppressWarnings("OctalInteger")
   private static final int REGMAGIC = 0234;
 
   private static final int REX_SET = 1;
@@ -1751,7 +1752,7 @@ public class RegExp {
         case '~':
           /* magic when 'magic' is on */
           if (reg_magic >= MAGIC_ON) {
-            curchr = Magic.Magic(curchr);
+            curchr = Magic.magic(curchr);
           }
           break;
         case '(':
@@ -1778,7 +1779,7 @@ public class RegExp {
         case '/':       /* Can't be used in / command */
           /* magic only after "\v" */
           if (reg_magic == MAGIC_ALL) {
-            curchr = Magic.Magic(curchr);
+            curchr = Magic.magic(curchr);
           }
           break;
         case '*':
@@ -4200,7 +4201,7 @@ public class RegExp {
     int op = EXACTLY;       /* Arbitrary non-END op. */
     CharPointer next;
     CharPointer end = null;
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
 
     res.append("\nregcomp(").append(pattern).append("):\n");
 
@@ -4274,7 +4275,7 @@ public class RegExp {
 */
   private @NotNull String regprop(@NotNull CharPointer op) {
     String p;
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
 
     buf.append(':');
 

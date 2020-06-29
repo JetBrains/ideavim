@@ -1480,7 +1480,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
         final Document document = event.getDocument();
 
         for (Editor editor : EditorFactory.getInstance().getEditors(document, project)) {
-          Collection hls = UserDataManager.getVimLastHighlighters(editor);
+          Collection<RangeHighlighter> hls = UserDataManager.getVimLastHighlighters(editor);
           if (hls == null) {
             continue;
           }
@@ -1496,9 +1496,9 @@ public class SearchGroup implements PersistentStateComponent<Element> {
           final int startLineOffset = document.getLineStartOffset(startPosition.line);
           final int endLineOffset = document.getLineEndOffset(endPosition.line);
 
-          final Iterator iter = hls.iterator();
+          final Iterator<RangeHighlighter> iter = hls.iterator();
           while (iter.hasNext()) {
-            final RangeHighlighter highlighter = (RangeHighlighter) iter.next();
+            final RangeHighlighter highlighter = iter.next();
             if (!highlighter.isValid() || (highlighter.getStartOffset() >= startLineOffset && highlighter.getEndOffset() <= endLineOffset)) {
               iter.remove();
               editor.getMarkupModel().removeHighlighter(highlighter);

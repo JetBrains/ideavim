@@ -120,7 +120,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     }
     // If this is a file mark, get the mark from this file
     else if (FILE_MARKS.indexOf(ch) >= 0) {
-      final HashMap fmarks = getFileMarks(editor.getDocument());
+      final HashMap<Character, Mark> fmarks = getFileMarks(editor.getDocument());
       if (fmarks != null) {
         mark = (Mark)fmarks.get(ch);
         if (mark != null && mark.isClear()) {
@@ -167,7 +167,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
    */
   public @Nullable Mark getFileMark(@NotNull Editor editor, char ch) {
     if (ch == '`') ch = '\'';
-    final HashMap fmarks = getFileMarks(editor.getDocument());
+    final HashMap<Character, Mark> fmarks = getFileMarks(editor.getDocument());
     if (fmarks == null) {
       return null;
     }
@@ -331,12 +331,12 @@ public class MarkGroup implements PersistentStateComponent<Element> {
 
   public void removeMark(char ch, @NotNull Mark mark) {
     if (FILE_MARKS.indexOf(ch) >= 0) {
-      HashMap fmarks = getFileMarks(mark.getFilename());
+      HashMap<Character, Mark> fmarks = getFileMarks(mark.getFilename());
       fmarks.remove(ch);
     }
     else if (GLOBAL_MARKS.indexOf(ch) >= 0) {
       // Global marks are added to global and file marks
-      HashMap fmarks = getFileMarks(mark.getFilename());
+      HashMap<Character, Mark> fmarks = getFileMarks(mark.getFilename());
       fmarks.remove(ch);
       globalMarks.remove(ch);
     }
@@ -499,7 +499,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
 
     Element marksElem = element.getChild("globalmarks");
     if (marksElem != null && !OptionsManager.INSTANCE.getIdeamarks().isSet()) {
-      List markList = marksElem.getChildren("mark");
+      List<Element> markList = marksElem.getChildren("mark");
       for (Object aMarkList : markList) {
         Element markElem = (Element)aMarkList;
         Mark mark = VimMark.create(markElem.getAttributeValue("key").charAt(0),
@@ -522,7 +522,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
 
     Element fileMarksElem = element.getChild("filemarks");
     if (fileMarksElem != null) {
-      List fileList = fileMarksElem.getChildren("file");
+      List<Element> fileList = fileMarksElem.getChildren("file");
       for (Object aFileList : fileList) {
         Element fileElem = (Element)aFileList;
         String filename = fileElem.getAttributeValue("name");
@@ -535,7 +535,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
           // ignore
         }
         FileMarks<Character, Mark> fmarks = getFileMarks(filename);
-        List markList = fileElem.getChildren("mark");
+        List<Element> markList = fileElem.getChildren("mark");
         for (Object aMarkList : markList) {
           Element markElem = (Element)aMarkList;
           Mark mark = VimMark.create(markElem.getAttributeValue("key").charAt(0),
@@ -557,7 +557,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     jumps.clear();
     Element jumpsElem = element.getChild("jumps");
     if (jumpsElem != null) {
-      List jumpList = jumpsElem.getChildren("jump");
+      List<Element> jumpList = jumpsElem.getChildren("jump");
       for (Object aJumpList : jumpList) {
         Element jumpElem = (Element)aJumpList;
         Jump jump = new Jump(Integer.parseInt(jumpElem.getAttributeValue("line")),

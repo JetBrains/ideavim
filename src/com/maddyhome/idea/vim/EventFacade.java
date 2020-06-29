@@ -76,7 +76,7 @@ public class EventFacade {
     action.registerCustomShortcutSet(shortcutSet, component, disposable);
   }
 
-  public void unregisterCustomShortcutSet(@NotNull AnAction action, @Nullable JComponent component) {
+  public void unregisterCustomShortcutSet(@NotNull AnAction action, @NotNull JComponent component) {
     action.unregisterCustomShortcutSet(component);
   }
 

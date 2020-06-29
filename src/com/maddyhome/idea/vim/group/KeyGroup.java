@@ -376,7 +376,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
   }
 
   private void checkIdentity(MappingMode mappingMode, String actName, List<KeyStroke> keys) {
-    Set<List<KeyStroke>> keySets = identityChecker.computeIfAbsent(mappingMode, k -> new HashSet<>());
+    Set<List<KeyStroke>> keySets = Objects.requireNonNull(identityChecker).computeIfAbsent(mappingMode, k -> new HashSet<>());
     if (keySets.contains(keys)) {
       throw new RuntimeException(
         "This keymap already exists: " + mappingMode + " keys: " + keys + " action:" + actName);
@@ -385,7 +385,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
   }
 
   private void checkCorrectCombination(EditorActionHandlerBase action, List<KeyStroke> keys) {
-    for (Map.Entry<List<KeyStroke>, String> entry : prefixes.entrySet()) {
+    for (Map.Entry<List<KeyStroke>, String> entry : Objects.requireNonNull(prefixes).entrySet()) {
       List<KeyStroke> prefix = entry.getKey();
       if (prefix.size() == keys.size()) continue;
       int shortOne = Math.min(prefix.size(), keys.size());

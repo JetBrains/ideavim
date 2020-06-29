@@ -43,7 +43,7 @@ public class MacKeyRepeat {
       final Process process = Runtime.getRuntime().exec(command);
       final String data = read(process.getInputStream()).trim();
       try {
-        return Integer.valueOf(data) == 0;
+        return Integer.parseInt(data) == 0;
       } catch (NumberFormatException e) {
         return null;
       }
@@ -69,9 +69,7 @@ public class MacKeyRepeat {
       final Process restartSystemUI = runtime.exec("launchctl stop com.apple.SystemUIServer.agent");
       restartSystemUI.waitFor();
     }
-    catch (IOException ignored) {
-    }
-    catch (InterruptedException ignored) {
+    catch (IOException | InterruptedException ignored) {
     }
   }
 
