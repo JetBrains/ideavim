@@ -28,6 +28,8 @@ import com.maddyhome.idea.vim.helper.Msg;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+
 public class RegExp {
   public static @Nullable reg_extmatch_T re_extmatch_out = null;
   public static @Nullable reg_extmatch_T re_extmatch_in = null;
@@ -559,9 +561,7 @@ public class RegExp {
     }
     num_complex_braces = 0;
     regnpar = 1;
-    for (int i = 0; i < had_endbrace.length; i++) {
-      had_endbrace[i] = false;
-    }
+    Arrays.fill(had_endbrace, false);
     regnzpar = 1;
     re_has_z = 0;
     regflags = 0;

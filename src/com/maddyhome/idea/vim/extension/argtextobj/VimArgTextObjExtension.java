@@ -122,7 +122,7 @@ public class VimArgTextObjExtension implements VimExtension {
     }
 
     int getBracketPrio(char ch) {
-      return Math.max(openBrackets.toString().indexOf(ch), closeBrackets.indexOf(ch));
+      return Math.max(openBrackets.indexOf(ch), closeBrackets.indexOf(ch));
     }
 
     char matchingBracket(char ch) {
@@ -131,7 +131,7 @@ public class VimArgTextObjExtension implements VimExtension {
         return openBrackets.charAt(idx);
       } else {
         assert isOpenBracket(ch);
-        idx = openBrackets.toString().indexOf(ch);
+        idx = openBrackets.indexOf(ch);
         return closeBrackets.charAt(idx);
       }
     }
@@ -141,7 +141,7 @@ public class VimArgTextObjExtension implements VimExtension {
     }
 
     boolean isOpenBracket(final int ch) {
-      return openBrackets.toString().indexOf(ch) != -1;
+      return openBrackets.indexOf(ch) != -1;
     }
   }
 

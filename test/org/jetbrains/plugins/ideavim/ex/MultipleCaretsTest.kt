@@ -259,7 +259,7 @@ class MultipleCaretsTest : VimTestCase() {
 
     typeText(commandToKeys("sor"))
 
-    val after = "$c" + before.replace("$c", "").split('\n').sorted().joinToString(separator = "\n")
+    val after = c + before.replace(c, "").split('\n').sorted().joinToString(separator = "\n")
     myFixture.checkResult(after)
   }
 
@@ -297,9 +297,9 @@ class MultipleCaretsTest : VimTestCase() {
 
     typeText(commandToKeys("sor!"))
 
-    val after = "$c" +
+    val after = c +
       before
-        .replace("$c", "")
+        .replace(c, "")
         .split('\n')
         .sortedWith(reverseOrder())
         .joinToString(separator = "\n")

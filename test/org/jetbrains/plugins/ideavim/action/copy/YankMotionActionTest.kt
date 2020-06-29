@@ -37,7 +37,7 @@ class YankMotionActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    typeTextInFile(StringHelper.parseKeys("yW"), file)
+    typeTextInFile(parseKeys("yW"), file)
     val text = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
 
     TestCase.assertEquals("and", text)
@@ -55,7 +55,7 @@ class YankMotionActionTest : VimTestCase() {
     configureByText(file)
 
     val initialOffset = myFixture.editor.caretModel.offset
-    typeText(StringHelper.parseKeys("yy"))
+    typeText(parseKeys("yy"))
 
     TestCase.assertEquals(initialOffset, myFixture.editor.caretModel.offset)
   }
@@ -65,8 +65,8 @@ class YankMotionActionTest : VimTestCase() {
     OptionsManager.clipboard.set(ClipboardOptionsData.unnamed)
 
     try {
-      configureByText("I found it in a ${c}legendary land");
-      typeText(parseKeys("yiw"));
+      configureByText("I found it in a ${c}legendary land")
+      typeText(parseKeys("yiw"))
 
       val starRegister = VimPlugin.getRegister().getRegister('*') ?: kotlin.test.fail("Register * is empty")
       Assert.assertEquals("legendary", starRegister.text)
@@ -79,8 +79,8 @@ class YankMotionActionTest : VimTestCase() {
   }
 
   fun `test z saved to " register`() {
-    configureByText("I found it in a ${c}legendary land");
-    typeText(parseKeys("\"zyiw"));
+    configureByText("I found it in a ${c}legendary land")
+    typeText(parseKeys("\"zyiw"))
 
     val starRegister = VimPlugin.getRegister().getRegister('z') ?: kotlin.test.fail("Register z is empty")
     Assert.assertEquals("legendary", starRegister.text)
@@ -90,8 +90,8 @@ class YankMotionActionTest : VimTestCase() {
   }
 
   fun `test " saved to " register`() {
-    configureByText("I found it in a ${c}legendary land");
-    typeText(parseKeys("\"zyiw"));
+    configureByText("I found it in a ${c}legendary land")
+    typeText(parseKeys("\"zyiw"))
 
     val quoteRegister = VimPlugin.getRegister().getRegister('"') ?: kotlin.test.fail("Register \" is empty")
     Assert.assertEquals("legendary", quoteRegister.text)

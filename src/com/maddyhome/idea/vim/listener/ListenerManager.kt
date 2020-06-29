@@ -292,8 +292,8 @@ object VimListenerManager {
         val editor = event.editor
         val caret = editor.caretModel.primaryCaret
         SelectionVimListenerSuppressor.unlock {
-          val predictedMode = IdeaSelectionControl.predictMode(editor, VimListenerManager.SelectionSource.MOUSE)
-          IdeaSelectionControl.controlNonVimSelectionChange(editor, VimListenerManager.SelectionSource.MOUSE)
+          val predictedMode = IdeaSelectionControl.predictMode(editor, SelectionSource.MOUSE)
+          IdeaSelectionControl.controlNonVimSelectionChange(editor, SelectionSource.MOUSE)
           moveCaretOneCharLeftFromSelectionEnd(editor, predictedMode)
           caret.vimLastColumn = editor.caretModel.visualPosition.column
         }
@@ -351,7 +351,7 @@ object VimListenerManager {
     override fun mousePressed(e: MouseEvent?) {
       val editor = (e?.component as? EditorComponentImpl)?.editor ?: return
       if (editor.isIdeaVimDisabledHere) return
-      val predictedMode = IdeaSelectionControl.predictMode(editor, VimListenerManager.SelectionSource.MOUSE)
+      val predictedMode = IdeaSelectionControl.predictMode(editor, SelectionSource.MOUSE)
       when (e.clickCount) {
         1 -> {
           if (!predictedMode.isEndAllowed) {

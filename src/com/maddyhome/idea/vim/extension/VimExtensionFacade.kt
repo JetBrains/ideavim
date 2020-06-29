@@ -171,7 +171,7 @@ object VimExtensionFacade {
         }
       }
       VimRepeater.Extension.addString(text)
-      return text;
+      return text
     }
   }
 

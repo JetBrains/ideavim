@@ -40,31 +40,31 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
 
   // |gu| |ae|
   fun testLowerCaseEntireBuffer() {
-    doTest(StringHelper.parseKeys("guae"), poem, "<caret>${poemLC}");
+    doTest(StringHelper.parseKeys("guae"), poem, "<caret>${poemLC}")
     assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |c| |ae|
   fun testChangeEntireBuffer() {
-    doTest(StringHelper.parseKeys("cae"), poem, "<caret>");
-    assertMode(CommandState.Mode.INSERT);
-    assertSelection(null);
+    doTest(StringHelper.parseKeys("cae"), poem, "<caret>")
+    assertMode(CommandState.Mode.INSERT)
+    assertSelection(null)
   }
 
   // |d| |ae|
   fun testDeleteEntireBuffer() {
-    doTest(StringHelper.parseKeys("dae"), poem, "<caret>");
-    assertMode(CommandState.Mode.COMMAND);
-    assertSelection(null);
+    doTest(StringHelper.parseKeys("dae"), poem, "<caret>")
+    assertMode(CommandState.Mode.COMMAND)
+    assertSelection(null)
   }
 
   // |y| |ae|
   fun testYankEntireBuffer() {
-    doTest(StringHelper.parseKeys("yae"), poem, "<caret>${poemNoCaret}");
-    assertMode(CommandState.Mode.COMMAND);
-    myFixture.checkResult(poemNoCaret);
-    assertSelection(null);
+    doTest(StringHelper.parseKeys("yae"), poem, "<caret>${poemNoCaret}")
+    assertMode(CommandState.Mode.COMMAND)
+    myFixture.checkResult(poemNoCaret)
+    assertSelection(null)
   }
 
 
@@ -90,28 +90,28 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
   fun testChangeEntireBufferIgnoreLeadingTrailing() {
     doTest(StringHelper.parseKeys("cie"),
       "\n  \n \n${poem}\n  \n \n",
-      "\n  \n \n<caret>\n\n  \n \n"); // additional \n because poem ends with a \n
-    assertMode(CommandState.Mode.INSERT);
-    assertSelection(null);
+      "\n  \n \n<caret>\n\n  \n \n") // additional \n because poem ends with a \n
+    assertMode(CommandState.Mode.INSERT)
+    assertSelection(null)
   }
 
   // |d| |ae|
   fun testDeleteEntireBufferIgnoreLeadingTrailing() {
     doTest(StringHelper.parseKeys("die"),
       "\n  \n \n${poem}\n  \n \n",
-      "\n  \n \n<caret>\n\n  \n \n"); // additional \n because poem ends with a \n
-    assertMode(CommandState.Mode.COMMAND);
-    assertSelection(null);
+      "\n  \n \n<caret>\n\n  \n \n") // additional \n because poem ends with a \n
+    assertMode(CommandState.Mode.COMMAND)
+    assertSelection(null)
   }
 
   // |y| |ae|
   fun testYankEntireBufferIgnoreLeadingTrailing() {
     doTest(StringHelper.parseKeys("yie"),
       "\n  \n \n${poem}\n  \n \n",
-      "\n  \n \n<caret>${poemNoCaret}\n  \n \n");
-    assertMode(CommandState.Mode.COMMAND);
-    myFixture.checkResult("\n  \n \n${poemNoCaret}\n  \n \n");
-    assertSelection(null);
+      "\n  \n \n<caret>${poemNoCaret}\n  \n \n")
+    assertMode(CommandState.Mode.COMMAND)
+    myFixture.checkResult("\n  \n \n${poemNoCaret}\n  \n \n")
+    assertSelection(null)
   }
 
   val poem: String = """Two roads diverged in a yellow wood,

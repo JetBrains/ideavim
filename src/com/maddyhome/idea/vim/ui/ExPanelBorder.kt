@@ -24,7 +24,7 @@ import com.intellij.util.ui.JBInsets
 import java.awt.Component
 import java.awt.Insets
 
-class ExPanelBorder internal constructor() : SideBorder(JBColor.border(), SideBorder.TOP) {
+class ExPanelBorder internal constructor() : SideBorder(JBColor.border(), TOP) {
 
   override fun getBorderInsets(component: Component?): Insets {
     return JBInsets(getThickness() + 2, 0, 2, 2)

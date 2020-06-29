@@ -86,7 +86,7 @@ class VimMultipleCursorsExtension : VimExtension {
   inner class NextOccurrenceHandler(val whole: Boolean = true) : WriteActionHandler() {
     override fun executeInWriteAction(editor: Editor, context: DataContext) {
       val caretModel = editor.caretModel
-      val patternComparator = if (OptionsManager.ignorecase.isSet) String.CASE_INSENSITIVE_ORDER else Comparator(String::compareTo);
+      val patternComparator = if (OptionsManager.ignorecase.isSet) String.CASE_INSENSITIVE_ORDER else Comparator(String::compareTo)
 
       if (!editor.inVisualMode) {
         if (caretModel.caretCount > 1) return
@@ -99,7 +99,7 @@ class VimMultipleCursorsExtension : VimExtension {
         if (nextOffset == caret.selectionStart) VimPlugin.showMessage("No more matches")
       } else {
         val newPositions = arrayListOf<VisualPosition>()
-        val patterns = sortedSetOf<String>(patternComparator)
+        val patterns = sortedSetOf(patternComparator)
         for (caret in caretModel.allCarets) {
           val selectedText = caret.selectedText ?: return
           patterns += selectedText

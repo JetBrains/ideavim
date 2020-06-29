@@ -132,7 +132,7 @@ class MarksHandlerTest : VimTestCase() {
   fun `test list trims and truncates`() {
     val indent = " ".repeat(100)
     val text = "Really long line ".repeat(1000)
-    configureByText(indent + "$c" + text)
+    configureByText(indent + c + text)
     typeText(parseKeys("ma"))
     enterCommand("marks a")
     assertExOutput("""mark line  col file/text

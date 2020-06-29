@@ -283,13 +283,6 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
     private val logger = logger<SearchRange>()
   }
 
-  /**
-   * Create the pattern range
-   *
-   * @param pattern The text of the pattern. Each subpattern must be separated by the nul character (\\u0000)
-   * @param offset  The range offset
-   * @param move    True if the cursor should be moved
-   */
   init {
     setPattern(pattern)
   }

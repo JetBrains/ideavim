@@ -61,7 +61,7 @@ object CharacterHelper {
   fun isInvisibleControlCharacter(ch: Char): Boolean {
     val type = Character.getType(ch).toByte()
     return type == Character.CONTROL || type == Character.FORMAT || type == Character.PRIVATE_USE
-      || type == Character.SURROGATE || type == Character.UNASSIGNED;
+      || type == Character.SURROGATE || type == Character.UNASSIGNED
   }
 
   @JvmStatic
