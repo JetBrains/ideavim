@@ -18,6 +18,9 @@
 
 package com.maddyhome.idea.vim.command
 
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import java.util.*
 
@@ -27,17 +30,17 @@ import java.util.*
  */
 data class Command(
   var rawCount: Int,
-  var action: EditorActionHandlerBase?,
+  var action: EditorActionHandlerBase,
   val type: Type,
   var flags: EnumSet<CommandFlags>
 ) {
 
-  constructor(rawCount: Int, register: Char): this(rawCount, null, Type.SELECT_REGISTER, EnumSet.of(CommandFlags.FLAG_EXPECT_MORE)) {
+  constructor(rawCount: Int, register: Char): this(rawCount, NonExecutableActionHandler, Type.SELECT_REGISTER, EnumSet.of(CommandFlags.FLAG_EXPECT_MORE)) {
     this.register = register
   }
 
   init {
-    action?.process(this)
+    action.process(this)
   }
 
   var count: Int
@@ -100,5 +103,14 @@ data class Command(
         INSERT, DELETE, CHANGE, PASTE, RESET, OTHER_WRITABLE -> true
         else -> false
       }
+  }
+}
+
+private object NonExecutableActionHandler : EditorActionHandlerBase(false) {
+  override val type: Command.Type
+    get() = error("This action should not be executed")
+
+  override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+    error("This action should not be executed")
   }
 }

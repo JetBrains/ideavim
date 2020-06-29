@@ -51,7 +51,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
 
   fun popCommandPart(): Command {
     val command = commandParts.removeLast()
-    expectedArgumentType = if (commandParts.size > 0) commandParts.peekLast().action?.argumentType else null
+    expectedArgumentType = if (commandParts.size > 0) commandParts.peekLast().action.argumentType else null
     return command
   }
 
@@ -92,7 +92,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
 
   fun isAwaitingCharOrDigraphArgument(): Boolean {
     if (commandParts.size == 0) return false
-    val argumentType = commandParts.peekLast().action?.argumentType
+    val argumentType = commandParts.peekLast().action.argumentType
     return argumentType == Argument.Type.CHARACTER || argumentType == Argument.Type.DIGRAPH
   }
 
@@ -111,7 +111,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
   }
 
   fun isDuplicateOperatorKeyStroke(key: KeyStroke): Boolean {
-    val action = commandParts.peekLast()?.action as? DuplicableOperatorAction
+    val action = commandParts.peekLast().action as? DuplicableOperatorAction
     return action?.duplicateWith == key.keyChar
   }
 
