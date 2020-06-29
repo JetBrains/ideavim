@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.ui.VimRcFileState
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ReloadVimRcTest : VimTestCase() {
-  val editorFactory = MockEditorFactory()
+  private val editorFactory = MockEditorFactory()
 
   override fun setUp() {
     super.setUp()

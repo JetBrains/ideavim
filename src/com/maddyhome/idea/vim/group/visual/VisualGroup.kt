@@ -123,12 +123,12 @@ val Caret.vimLeadSelectionOffset: Int
       } else if (editor.inBlockSubMode) {
         val selections = editor.caretModel.allCarets.map { it.selectionStart to it.selectionEnd }.sortedBy { it.first }
         val pCaret = editor.caretModel.primaryCaret
-        when {
-          pCaret.offset == selections.first().first -> (selections.last().second - selectionAdj).coerceAtLeast(0)
-          pCaret.offset == selections.first().second -> selections.last().first
-          pCaret.offset == selections.last().first -> (selections.first().second - selectionAdj).coerceAtLeast(0)
-          pCaret.offset == selections.last().second -> selections.first().first
-          else -> selections.first().first
+        when (pCaret.offset) {
+            selections.first().first -> (selections.last().second - selectionAdj).coerceAtLeast(0)
+            selections.first().second -> selections.last().first
+            selections.last().first -> (selections.first().second - selectionAdj).coerceAtLeast(0)
+            selections.last().second -> selections.first().first
+            else -> selections.first().first
         }
       } else {
         if (caretOffset == selectionStart) (selectionEnd - selectionAdj).coerceAtLeast(0) else selectionStart

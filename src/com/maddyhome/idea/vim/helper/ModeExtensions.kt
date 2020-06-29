@@ -40,23 +40,6 @@ fun Editor.popAllModes() {
   }
 }
 
-fun Editor.hardResetAllModes() {
-  val commandState = this.commandState
-  while (!this.inNormalMode) {
-    val statesBefore = commandState.toSimpleString()
-    when (mode) {
-      CommandState.Mode.VISUAL -> exitVisualMode()
-      CommandState.Mode.SELECT -> exitSelectMode(true)
-      CommandState.Mode.INSERT -> exitInsertModeHardReset()
-      else -> commandState.popModes()
-    }
-    if (statesBefore == commandState.toSimpleString()) {
-      // This is just a protection against infinite loop
-      commandState.popModes()
-    }
-  }
-}
-
 @RWLockLabel.NoLockRequired
 fun Editor.exitVisualMode() {
   val selectionType = SelectionType.fromSubMode(this.subMode)

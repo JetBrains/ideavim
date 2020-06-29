@@ -528,7 +528,7 @@ object IdeaRefactorMode {
 }
 
 object LookupKeysData {
-  val name = "lookupkeys"
+  const val name = "lookupkeys"
   val defaultValues = arrayOf(
     "<Tab>", "<Down>", "<Up>", "<Enter>", "<Left>", "<Right>",
     "<C-Down>", "<C-Up>",
@@ -546,7 +546,7 @@ object IdeaStatusIcon {
   const val gray = "gray"
   const val disabled = "disabled"
 
-  val name = "ideastatusicon"
+  const val name = "ideastatusicon"
   val allValues = arrayOf(enabled, gray, disabled)
 }
 

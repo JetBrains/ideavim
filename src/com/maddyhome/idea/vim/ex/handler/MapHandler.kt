@@ -84,6 +84,7 @@ class MapHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler, Co
     return false
   }
 
+  @Suppress("unused")
   private enum class SpecialArgument(val myName: String) {
     BUFFER("<buffer>"),
     NOWAIT("<nowait>"),

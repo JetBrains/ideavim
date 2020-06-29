@@ -19,7 +19,6 @@
 package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager

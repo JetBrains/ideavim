@@ -30,9 +30,9 @@ import java.util.regex.Pattern
  * @author vlan
  */
 object VimScriptParser {
-  const val VIMRC_FILE_NAME = "ideavimrc"
-  val HOME_VIMRC_PATHS = arrayOf(".$VIMRC_FILE_NAME", "_$VIMRC_FILE_NAME")
-  val XDG_VIMRC_PATH = "ideavim" + File.separator + VIMRC_FILE_NAME
+  private const val VIMRC_FILE_NAME = "ideavimrc"
+  private val HOME_VIMRC_PATHS = arrayOf(".$VIMRC_FILE_NAME", "_$VIMRC_FILE_NAME")
+  private val XDG_VIMRC_PATH = "ideavim" + File.separator + VIMRC_FILE_NAME
   private val DOUBLE_QUOTED_STRING = Pattern.compile("\"([^\"]*)\"")
   private val SINGLE_QUOTED_STRING = Pattern.compile("'([^']*)'")
   private val REFERENCE_EXPR = Pattern.compile("([A-Za-z_][A-Za-z_0-9]*)")

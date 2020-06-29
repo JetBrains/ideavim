@@ -39,6 +39,7 @@ import java.awt.RenderingHints
 import java.awt.font.FontRenderContext
 import java.util.*
 import javax.swing.UIManager
+import kotlin.math.max
 
 class AddInlaysAction : AnAction() {
   override fun actionPerformed(e: AnActionEvent) {
@@ -94,7 +95,7 @@ class AddInlaysAction : AnAction() {
 
     private fun getFontMetrics(editor: Editor): MyFontMetrics {
       val familyName = UIManager.getFont("Label.font").family
-      val size = (Math.max(1, editor.colorsScheme.editorFontSize - 1) * factor).toInt()
+      val size = (max(1, editor.colorsScheme.editorFontSize - 1) * factor).toInt()
       var metrics = editor.getUserData(HINT_FONT_METRICS)
       if (metrics != null && !metrics.isActual(editor, familyName, size)) {
         metrics = null
