@@ -37,7 +37,6 @@ import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHa
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
 import static com.maddyhome.idea.vim.group.visual.VisualGroupKt.vimSetSelection;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
-import static java.util.Collections.emptyList;
 
 /**
  * Port of vim-entire:

@@ -19,15 +19,9 @@
 package com.maddyhome.idea.vim;
 
 import com.intellij.codeInsight.lookup.LookupManager;
-import com.intellij.codeInsight.template.TemplateManager;
-import com.intellij.codeInsight.template.TemplateManagerListener;
-import com.intellij.find.FindManager;
-import com.intellij.find.FindModelListener;
-import com.intellij.ide.bookmarks.BookmarksListener;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.ShortcutSet;
-import com.intellij.openapi.actionSystem.ex.AnActionListener;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
@@ -35,10 +29,7 @@ import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.editor.actionSystem.TypedAction;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.event.*;
-import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
-import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,8 +37,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeListener;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author vlan

@@ -51,7 +51,6 @@ public class DigraphGroup {
     }
   }
 
-  @SuppressWarnings("GrazieInspection")
   public void displayAsciiInfo(@NotNull Editor editor) {
     int offset = editor.getCaretModel().getOffset();
     CharSequence charsSequence = editor.getDocument().getCharsSequence();

@@ -17,9 +17,7 @@
  */
 package com.maddyhome.idea.vim;
 
-import com.intellij.openapi.extensions.ExtensionPointListener;
 import com.intellij.openapi.extensions.ExtensionPointName;
-import com.intellij.openapi.extensions.PluginDescriptor;
 import com.maddyhome.idea.vim.group.KeyGroup;
 import com.maddyhome.idea.vim.handler.ActionBeanClass;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;

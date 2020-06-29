@@ -157,7 +157,6 @@ public class HistoryGroup implements PersistentStateComponent<Element> {
 
     final Element root = element.getChild("history-" + key);
     if (root != null) {
-      //noinspection unchecked
       List<Element> items = root.getChildren("entry");
       for (Element item : items) {
         final String text = StringHelper.getSafeXmlText(item);

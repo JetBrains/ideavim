@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.option;
 import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
