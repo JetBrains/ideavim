@@ -95,4 +95,18 @@ class YankMotionActionTest : VimTestCase() {
     val quoteRegister = VimPlugin.getRegister().getRegister('"') ?: kotlin.test.fail("Register \" is empty")
     Assert.assertEquals("legendary", quoteRegister.text)
   }
+
+  fun `test yank up`() {
+    val file = """
+            A ${c}Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+    typeTextInFile(parseKeys("yk"), file)
+
+    Assert.assertTrue(VimPlugin.isError())
+  }
 }

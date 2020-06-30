@@ -65,7 +65,7 @@ class YankGroup {
     }
 
     val type = SelectionType.fromCommandFlags(motion.flags)
-    val range = getTextRange(ranges, type)
+    val range = getTextRange(ranges, type) ?: return false
 
     if (range.size() == 0) return false
 
@@ -92,7 +92,7 @@ class YankGroup {
       ranges.add(start to end)
     }
 
-    val range = getTextRange(ranges, SelectionType.LINE_WISE)
+    val range = getTextRange(ranges, SelectionType.LINE_WISE) ?: return false
     return yankRange(editor, range, SelectionType.LINE_WISE, null)
   }
 
@@ -142,7 +142,9 @@ class YankGroup {
   }
 
   @Contract("_, _ -> new")
-  private fun getTextRange(ranges: List<Pair<Int, Int>>, type: SelectionType): TextRange {
+  private fun getTextRange(ranges: List<Pair<Int, Int>>, type: SelectionType): TextRange? {
+    if (ranges.isEmpty()) return null
+
     val size = ranges.size
     val starts = IntArray(size)
     val ends = IntArray(size)
