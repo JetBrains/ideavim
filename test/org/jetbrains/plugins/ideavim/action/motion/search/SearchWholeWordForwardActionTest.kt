@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim.action.motion.search
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class SearchWholeWordForwardActionTest : VimTestCase() {
@@ -41,5 +42,45 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
   fun `test backward search on empty string`() {
     doTest(parseKeys("*"), "", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     assertPluginError(false)
+  }
+
+  @VimBehaviorDiffers(originalVimAfter =
+        """
+          I found it in a legendary land
+          all rocks and lavender and tufted grass,
+          where it was settled on some sodden sand
+          hard by the torrent of a mountain pass${c}.
+        """
+  )
+  fun `test last dot`() {
+    doTest(parseKeys("*"),
+      """
+          I found it in a legendary land
+          all rocks and lavender and tufted grass,
+          where it was settled on some sodden sand
+          hard by the torrent of a mountain pass${c}.
+        """.trimIndent(),
+      """
+          ${c}I found it in a legendary land
+          all rocks and lavender and tufted grass,
+          where it was settled on some sodden sand
+          hard by the torrent of a mountain pass.
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun `test last word`() {
+    doTest(parseKeys("*"),
+      """
+          I found it in a legendary land
+          all |pass| rocks and lavender and tufted grass,
+          where it was settled on some sodden sand
+          hard by the torrent of a mountain pas${c}s
+        """.trimIndent(),
+      """
+          I found it in a legendary land
+          all |${c}pass| rocks and lavender and tufted grass,
+          where it was settled on some sodden sand
+          hard by the torrent of a mountain pass
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 }

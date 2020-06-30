@@ -1162,6 +1162,7 @@ public class SearchHelper {
     int pos = caret.getOffset();
     // Technically the first condition is covered by the second one, but let it be
     if (chars.length() == 0 || chars.length() <= pos) return null;
+    //if (pos == chars.length() - 1) return new TextRange(chars.length() - 1, chars.length());
 
     int start = pos;
     CharacterHelper.CharacterType[] types = new CharacterHelper.CharacterType[]{CharacterHelper.CharacterType.KEYWORD,
@@ -1194,7 +1195,8 @@ public class SearchHelper {
     int end;
     // Special case 1 character words because 'findNextWordEnd' returns one to many chars
     if (start < stop &&
-        CharacterHelper.charType(chars.charAt(start + 1), false) != CharacterHelper.CharacterType.KEYWORD) {
+        (start >= chars.length() - 1 ||
+         CharacterHelper.charType(chars.charAt(start + 1), false) != CharacterHelper.CharacterType.KEYWORD)) {
       end = start + 1;
     }
     else {
