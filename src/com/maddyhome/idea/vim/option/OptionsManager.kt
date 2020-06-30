@@ -554,7 +554,7 @@ object StrictMode {
   val on: Boolean
     get() = OptionsManager.ideastrictmode.isSet
 
-  fun fail(message: String): Nothing {
-    error(message)
+  fun fail(message: String) {
+    if (on) error(message)
   }
 }

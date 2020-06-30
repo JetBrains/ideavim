@@ -26,6 +26,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.option.StrictMode;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,7 +47,7 @@ public class EditorHelper {
     return editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
   }
 
-  public static boolean scrollVertically(@NotNull Editor editor, int verticalOffset) {
+  private static boolean scrollVertically(@NotNull Editor editor, int verticalOffset) {
     final ScrollingModel scrollingModel = editor.getScrollingModel();
     final Rectangle area = scrollingModel.getVisibleAreaOnScrollingFinished();
     scrollingModel.scroll(area.x, verticalOffset);
@@ -321,7 +322,9 @@ public class EditorHelper {
    * @return The normalized visual line number
    */
   public static int normalizeVisualLine(final @NotNull Editor editor, final int line) {
-    return Math.max(0, Math.min(line, getVisualLineCount(editor) - 1));
+    int res = Math.max(0, Math.min(line, getVisualLineCount(editor) - 1));
+    if (res != line) StrictMode.INSTANCE.fail("Visual line normalized. Initial line: " + line + ". Resulting line: " + res);
+    return res;
   }
 
   /**
@@ -333,7 +336,9 @@ public class EditorHelper {
    * @return The normalized logical line number
    */
   public static int normalizeLine(final @NotNull Editor editor, final int line) {
-    return Math.max(0, Math.min(line, getLineCount(editor) - 1));
+    int res = Math.max(0, Math.min(line, getLineCount(editor) - 1));
+    if (res != line) StrictMode.INSTANCE.fail("Line normalized. Initial line: " + line + ". Resulting line: " + res);
+    return res;
   }
 
   /**
@@ -347,7 +352,11 @@ public class EditorHelper {
    * @return The normalized column number
    */
   public static int normalizeVisualColumn(final @NotNull Editor editor, final int line, final int col, final boolean allowEnd) {
-    return Math.max(0, Math.min(col, getVisualLineLength(editor, line) - (allowEnd ? 0 : 1)));
+    int res = Math.max(0, Math.min(col, getVisualLineLength(editor, line) - (allowEnd ? 0 : 1)));
+    if (res != col) {
+      StrictMode.INSTANCE.fail("Visual column normalized. Initial column: " + col + ". Resulting column: " + res + " Line: " + line);
+    }
+    return res;
   }
 
   /**
@@ -361,7 +370,11 @@ public class EditorHelper {
    * @return The normalized column number
    */
   public static int normalizeColumn(final @NotNull Editor editor, final int line, final int col, final boolean allowEnd) {
-    return Math.min(Math.max(0, getLineLength(editor, line) - (allowEnd ? 0 : 1)), col);
+    int res = Math.min(Math.max(0, getLineLength(editor, line) - (allowEnd ? 0 : 1)), col);
+    if (res != col) {
+      StrictMode.INSTANCE.fail("Visual column normalized. Initial column: " + col + ". Resulting column: " + res + " Line: " + line);
+    }
+    return res;
   }
 
   /**
@@ -381,7 +394,12 @@ public class EditorHelper {
 
     int min = getLineStartOffset(editor, line);
     int max = getLineEndOffset(editor, line, allowEnd);
-    return Math.max(Math.min(offset, max), min);
+    int res = Math.max(Math.min(offset, max), min);
+    if (res != offset) {
+      StrictMode.INSTANCE.fail("Offset normalized. Initial offset: " + offset + ". Resulting offset: " +
+                               res + " Line: " + line + " AllowEnd: " + allowEnd);
+    }
+    return res;
   }
 
   public static int normalizeOffset(final @NotNull Editor editor, final int offset) {
