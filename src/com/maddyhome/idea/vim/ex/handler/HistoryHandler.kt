@@ -23,20 +23,21 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.ex.*
-import com.maddyhome.idea.vim.group.HistoryGroup.*
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.ExOutputModel
+import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.group.HistoryGroup.COMMAND
+import com.maddyhome.idea.vim.group.HistoryGroup.EXPRESSION
+import com.maddyhome.idea.vim.group.HistoryGroup.INPUT
+import com.maddyhome.idea.vim.group.HistoryGroup.SEARCH
 
 class HistoryHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     logger.debug("execute")
 
-    var arg = cmd.argument.trim()
-
-    if (arg.isEmpty()) {
-      arg = "cmd"
-      logger.debug("default to cmd")
-    }
+    var arg = cmd.argument.trim().ifEmpty { "cmd" }
 
     var key: String
     val spos = arg.indexOf(' ')
