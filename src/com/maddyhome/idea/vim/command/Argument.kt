@@ -49,7 +49,7 @@ class Argument private constructor(
     val EMPTY_COMMAND = Command(0, object : VimActionHandler.SingleExecution() {
       override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean = true
 
-      override val type: Command.Type = Command.Type.UNDEFINED
-    }, Command.Type.UNDEFINED, EnumSet.noneOf(CommandFlags::class.java))
+      override val type: Command.Type = Command.Type.MOTION
+    }, Command.Type.MOTION, EnumSet.noneOf(CommandFlags::class.java))
   }
 }

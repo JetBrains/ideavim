@@ -54,10 +54,6 @@ data class Command(
 
   enum class Type {
     /**
-     * Represents undefined commands.
-     */
-    UNDEFINED,
-    /**
      * Represents commands that actually move the cursor and can be arguments to operators.
      */
     MOTION,
@@ -82,25 +78,22 @@ data class Command(
      * Represents commands that select the register.
      */
     SELECT_REGISTER,
-    // TODO REMOVE?
-    RESET,
     OTHER_READONLY,
     OTHER_WRITABLE,
     /**
      * Represent commands that don't require an outer read or write action for synchronization.
      */
-    OTHER_SELF_SYNCHRONIZED,
-    COMPLETION;
+    OTHER_SELF_SYNCHRONIZED;
 
     val isRead: Boolean
       get() = when (this) {
-        MOTION, COPY, OTHER_READONLY, COMPLETION -> true
+        MOTION, COPY, OTHER_READONLY -> true
         else -> false
       }
 
     val isWrite: Boolean
       get() = when (this) {
-        INSERT, DELETE, CHANGE, PASTE, RESET, OTHER_WRITABLE -> true
+        INSERT, DELETE, CHANGE, PASTE, OTHER_WRITABLE -> true
         else -> false
       }
   }

@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 
 class ResetModeAction : VimActionHandler.SingleExecution() {
-  override val type: Command.Type = Command.Type.RESET
+  override val type: Command.Type = Command.Type.OTHER_WRITABLE
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     KeyHandler.getInstance().fullReset(editor.getTopLevelEditor())
