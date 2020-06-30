@@ -58,6 +58,7 @@ import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import com.maddyhome.idea.vim.ui.VimRcFileState;
 import org.jdom.Element;
+import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -322,7 +323,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     showMessage(msg);
   }
 
-  public static void showMessage(@Nullable String msg) {
+  public static void showMessage(@Nls @Nullable String msg) {
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       getInstance().message = msg;
     }
