@@ -72,15 +72,15 @@
   <xi:include href="/META-INF/includes/VimListeners.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
   <actions>
-    <action id="VimPluginToggle" class="com.maddyhome.idea.vim.action.VimPluginToggleAction" text="Vim Emulator" description="Toggle the vim plugin On/off">
+    <action id="VimPluginToggle" class="com.maddyhome.idea.vim.action.VimPluginToggleAction">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>
 
     <!-- Internal -->
     <action id="VimInternalAddInlays" class="com.maddyhome.idea.vim.action.internal.AddInlaysAction" text="Add Test Inlays | IdeaVim Internal" internal="true"/>
 
-    <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction" text="Shortcuts"/>
-    <action id="VimActions" class="com.maddyhome.idea.vim.ui.VimActions" text="Vim Actions"/>
+    <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction"/>
+    <action id="VimActions" class="com.maddyhome.idea.vim.ui.VimActions"/>
 
     <!--    [Version Update] 202+ use-shortcut-of="ExternalSystem.ProjectRefreshAction" -->
     <group id="IdeaVim.ReloadVimRc.group" class="com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup">
