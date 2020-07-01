@@ -32,7 +32,6 @@ import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.junit.Ignore
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -55,8 +54,7 @@ class TestPropertyBased : VimTestCase() {
     }
   }
 
-  @Ignore
-  fun testRandomActions() {
+  fun ignoretestRandomActions() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
         val editor = configureByText("""
