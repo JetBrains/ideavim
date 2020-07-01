@@ -1263,7 +1263,7 @@ public class SearchHelper {
     if (logger.isDebugEnabled()) logger.debug("start=" + start);
 
     // Find word end
-    boolean onWordEnd = pos == max ||
+    boolean onWordEnd = pos >= max - 1 ||
                         CharacterHelper.charType(chars.charAt(pos + 1), isBig) !=
                         CharacterHelper.charType(chars.charAt(pos), isBig);
 
