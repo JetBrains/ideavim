@@ -89,6 +89,12 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 
+  // Ignore the failture - issue in the platform
+  fun `test on empty file`() {
+    doTest(parseKeys("<C-V>"), "", "",
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+  }
+
   fun `test selectmode option`() {
     configureByText("""
                     A Discovery
