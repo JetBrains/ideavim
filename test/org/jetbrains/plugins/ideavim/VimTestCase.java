@@ -157,9 +157,14 @@ public abstract class VimTestCase extends UsefulTestCase {
   @NotNull
   protected Editor typeText(@NotNull List<KeyStroke> keys) {
     final Editor editor = myFixture.getEditor();
+    final Project project = myFixture.getProject();
+    typeText(keys, editor, project);
+    return editor;
+  }
+
+  public static void typeText(@NotNull List<KeyStroke> keys, Editor editor, Project project) {
     final KeyHandler keyHandler = KeyHandler.getInstance();
     final EditorDataContext dataContext = new EditorDataContext(editor);
-    final Project project = myFixture.getProject();
     TestInputModel.getInstance(editor).setKeyStrokes(keys);
     RunnableHelper.runWriteCommand(project, () -> {
       final TestInputModel inputModel = TestInputModel.getInstance(editor);
@@ -173,7 +178,6 @@ public abstract class VimTestCase extends UsefulTestCase {
         }
       }
     }, null, null);
-    return editor;
   }
 
   @NotNull
