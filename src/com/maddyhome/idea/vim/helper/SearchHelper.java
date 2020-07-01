@@ -1783,7 +1783,7 @@ public class SearchHelper {
         else {
           if (offset > 0) {
             offset--;
-            while (offset >= 0) {
+            while (offset > 0) {
               ch = chars.charAt(offset);
               if (ch != '\n') {
                 offset++;
