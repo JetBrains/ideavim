@@ -5,6 +5,7 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.RootNode
+import org.jetbrains.annotations.TestOnly
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -152,4 +153,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     count = 0
     setCurrentCommandPartNode(commandPartNode)
   }
+
+  @TestOnly
+  fun getCurrentTrie(): CommandPartNode = currentCommandPartNode
 }
