@@ -217,6 +217,11 @@ public class DigraphSequence {
     }
   }
 
+  public void reset() {
+    digraphState = DIG_STATE_PENDING;
+    codeChars = new char[8];
+  }
+
   private int digraphState = DIG_STATE_PENDING;
   private char digraphChar;
   private char[] codeChars;

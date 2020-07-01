@@ -231,6 +231,10 @@ public class CommandState {
     return digraphSequence.processKey(key, editor);
   }
 
+  public void resetDigraph() {
+    digraphSequence.reset();
+  }
+
   /**
    * Toggles the insert/overwrite state. If currently insert, goto replace mode. If currently replace, goto insert
    * mode.
