@@ -57,7 +57,7 @@ public class SearchHelper {
     }
     else {
       start = EditorHelper.getLineStartForOffset(editor, offset);
-      end = offset - 1;
+      end = Math.max(offset - 1, 0);
     }
 
     CharSequence chars = editor.getDocument().getCharsSequence();
