@@ -112,7 +112,8 @@ public class MotionGroup {
 
         // If inclusive, add the last character to the range
         if (action.getMotionType() == MotionType.INCLUSIVE &&
-            !cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE)) {
+            !cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE) &&
+            end < EditorHelperRt.getFileSize(editor)) {
           end++;
         }
       }

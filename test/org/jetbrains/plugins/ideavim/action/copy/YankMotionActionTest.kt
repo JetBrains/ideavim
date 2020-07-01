@@ -109,4 +109,20 @@ class YankMotionActionTest : VimTestCase() {
 
     Assert.assertTrue(VimPlugin.isError())
   }
+
+  fun `test yank dollar at last empty line`() {
+    val file = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+            $c
+        """.trimIndent()
+    typeTextInFile(parseKeys("y$"), file)
+    val text = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
+
+    TestCase.assertEquals("", text)
+  }
 }
