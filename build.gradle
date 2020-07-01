@@ -48,16 +48,11 @@ intellij {
 
 repositories {
   mavenCentral()
-
-  // For JetCheck
-  maven { url 'https://jitpack.io' }
 }
 
 dependencies {
   compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
   compileOnly "org.jetbrains:annotations:19.0.0"
-
-  testCompileOnly("com.github.jetbrains:jetCheck:0.2.1")
 }
 
 compileKotlin {
