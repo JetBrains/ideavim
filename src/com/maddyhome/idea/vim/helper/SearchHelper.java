@@ -78,10 +78,12 @@ public class SearchHelper {
 
     while (line > 0 && line < maxline && count > 0) {
       int offset = EditorHelper.getLineStartOffset(editor, line);
-      char ch = chars.charAt(offset);
-      if (ch == type || ch == '\u000C') {
-        res = offset;
-        count--;
+      if (offset < chars.length()) { // This if was added because of exception and here might be different logic
+        char ch = chars.charAt(offset);
+        if (ch == type || ch == '\u000C') {
+          res = offset;
+          count--;
+        }
       }
 
       line += dir;
