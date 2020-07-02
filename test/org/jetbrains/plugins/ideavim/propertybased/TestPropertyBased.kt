@@ -24,9 +24,7 @@ import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.CommandNode
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
@@ -36,24 +34,6 @@ import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
 class TestPropertyBased : VimTestCase() {
-  fun testMovingAround() {
-    PropertyChecker.checkScenarios {
-      ImperativeCommand { env ->
-        val editor = configureByText("""
-          I found it in a legendary land
-          all rocks and lavender and tufted grass,
-          where it was settled on some sodden sand
-          hard by the torrent of a mountain pass.
-        """.trimIndent())
-        try {
-          env.executeCommands(Generator.sampledFrom(VimCommand(editor)))
-        } finally {
-          reset(editor)
-        }
-      }
-    }
-  }
-
   fun ignoretestRandomActions() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
@@ -64,7 +44,7 @@ class TestPropertyBased : VimTestCase() {
           hard by the torrent of a mountain pass.
         """.trimIndent())
         try {
-          env.executeCommands(Generator.sampledFrom(TrieBasedActions(editor)))
+          env.executeCommands(Generator.sampledFrom(AvailableActions(editor)))
         } finally {
           reset(editor)
         }
@@ -81,20 +61,18 @@ class TestPropertyBased : VimTestCase() {
   }
 }
 
-private class VimCommand(private val editor: Editor) : ImperativeCommand {
-  override fun performCommand(env: ImperativeCommand.Environment) {
-    val motion = env.generateValue(Generator.sampledFrom("h", "j", "k", "l").map { parseKeys(it).single() }, "Generator motion: %s")
-    KeyHandler.getInstance().handleKey(editor, motion, EditorDataContext(editor))
-  }
-}
-
-private class TrieBasedActions(private val editor: Editor) : ImperativeCommand {
+private class AvailableActions(private val editor: Editor) : ImperativeCommand {
   override fun performCommand(env: ImperativeCommand.Environment) {
     val currentNode = CommandState.getInstance(editor).commandBuilder.getCurrentTrie()
+
     val possibleKeys = currentNode.keys.toList().sortedBy { StringHelper.toKeyNotation(it) }
-    val keyGenerator = Generator.integers(0, possibleKeys.lastIndex).suchThat { StringHelper.toKeyNotation(possibleKeys[it]) !in stinkyKeysList }.map { possibleKeys[it] }
+    val keyGenerator = Generator.integers(0, possibleKeys.lastIndex)
+      .suchThat { StringHelper.toKeyNotation(possibleKeys[it]) !in stinkyKeysList }
+      .map { possibleKeys[it] }
+
     val usedKey = env.generateValue(keyGenerator, null)
     val node = currentNode[usedKey]
+
     env.logMessage("Use command: ${StringHelper.toKeyNotation(usedKey)}. ${if (node is CommandNode) "Action: ${node.actionHolder.actionId}" else ""}")
     VimTestCase.typeText(listOf(usedKey), editor, editor.project)
 
