@@ -33,7 +33,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class TestPropertyBased : VimTestCase() {
+class IdeaVimSanityCheck : VimTestCase() {
   fun ignoretestRandomActions() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
