@@ -33,6 +33,9 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
+/**
+ * Property based tests based of JetCheck framework
+ */
 class IdeaVimSanityCheck : VimTestCase() {
   fun ignoretestRandomActions() {
     PropertyChecker.checkScenarios {
