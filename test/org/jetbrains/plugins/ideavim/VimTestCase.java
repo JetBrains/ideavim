@@ -61,6 +61,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+
 /**
  * @author vlan
  */
@@ -184,9 +186,9 @@ public abstract class VimTestCase extends UsefulTestCase {
   @NotNull
   protected static List<KeyStroke> commandToKeys(@NotNull String command) {
     List<KeyStroke> keys = new ArrayList<>();
-    keys.addAll(StringHelper.parseKeys(":"));
+    keys.addAll(parseKeys(":"));
     keys.addAll(StringHelper.stringToKeys(command));
-    keys.addAll(StringHelper.parseKeys("<Enter>"));
+    keys.addAll(parseKeys("<Enter>"));
     return keys;
   }
 
@@ -197,9 +199,9 @@ public abstract class VimTestCase extends UsefulTestCase {
 
   protected static List<KeyStroke> searchToKeys(@NotNull String pattern, boolean forwards) {
     List<KeyStroke> keys = new ArrayList<>();
-    keys.addAll(StringHelper.parseKeys(forwards ? "/" : "?"));
+    keys.addAll(parseKeys(forwards ? "/" : "?"));
     keys.addAll(StringHelper.stringToKeys(pattern));
-    keys.addAll(StringHelper.parseKeys("<Enter>"));
+    keys.addAll(parseKeys("<Enter>"));
     return keys;
   }
 
@@ -287,6 +289,16 @@ public abstract class VimTestCase extends UsefulTestCase {
                      CommandState.Mode modeAfter, CommandState.SubMode subModeAfter) {
     configureByText(before);
     typeText(keys);
+    myFixture.checkResult(after);
+    assertState(modeAfter, subModeAfter);
+  }
+
+  public void doTest(final String keys,
+                     String before,
+                     String after,
+                     CommandState.Mode modeAfter, CommandState.SubMode subModeAfter) {
+    configureByText(before);
+    typeText(parseKeys(keys));
     myFixture.checkResult(after);
     assertState(modeAfter, subModeAfter);
   }
