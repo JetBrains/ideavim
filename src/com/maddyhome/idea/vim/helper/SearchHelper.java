@@ -1294,7 +1294,7 @@ public class SearchHelper {
       if (count > 1) {
         firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, false);
       }
-      if (firstEnd < max) {
+      if (firstEnd < max - 1) {
         if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
           goBack = true;
         }
@@ -1315,14 +1315,14 @@ public class SearchHelper {
       if (count > 1) {
         firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, false);
       }
-      if (firstEnd < max) {
+      if (firstEnd < max - 1) {
         if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
           goForward = true;
         }
       }
     }
     if (!goForward && dir == 1 && isOuter && !startSpace && !hasSelection) {
-      if (end < max) {
+      if (end < max - 1) {
         if (CharacterHelper.charType(chars.charAt(end + 1), !isBig) !=
             CharacterHelper.charType(chars.charAt(end), !isBig)) {
           goForward = true;
