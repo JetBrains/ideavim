@@ -1608,7 +1608,8 @@ public class SearchHelper {
     int np = findNextParagraph(editor, lline, dir, false, multiple);
 
     int end;
-    if (chars.charAt(start) == '\n' && !countCurrent) {
+    // start < max was added to avoid exception and it may be incorrect
+    if (start < max && chars.charAt(start) == '\n' && !countCurrent) {
       end = findSentenceEnd(editor, chars, start, max, -1, false, multiple);
     }
     else {
