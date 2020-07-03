@@ -54,6 +54,34 @@ class IdeaVimSanityCheck : VimTestCase() {
     }
   }
 
+  fun testRandomActionsOnLoremIpsum() {
+    PropertyChecker.customized().withIterationCount(1_000).checkScenarios {
+      ImperativeCommand { env ->
+        val editor = configureByText(loremText)
+        try {
+          moveCaretToRandomPlace(env, editor)
+          env.executeCommands(Generator.sampledFrom(AvailableActions(editor)))
+        } finally {
+          reset(editor)
+        }
+      }
+    }
+  }
+
+  fun testRandomActionsOnJavaCode() {
+    PropertyChecker.customized().withIterationCount(1_000).checkScenarios {
+      ImperativeCommand { env ->
+        val editor = configureByJavaText(javaText)
+        try {
+          moveCaretToRandomPlace(env, editor)
+          env.executeCommands(Generator.sampledFrom(AvailableActions(editor)))
+        } finally {
+          reset(editor)
+        }
+      }
+    }
+  }
+
   private fun moveCaretToRandomPlace(env: ImperativeCommand.Environment, editor: Editor) {
     val pos = env.generateValue(Generator.integers(0, editor.document.textLength - 1), "Put caret at position %s")
     MotionGroup.moveCaret(editor, editor.caretModel.currentCaret, pos)
@@ -104,5 +132,7 @@ private val stinkyKeysList = arrayListOf("K", "u", "H", "<C-Y>",
   "g", "<C-U>",
 
   // Temporally disabled due to issues in the platform
-  "<C-V>", "<C-Q>"
+  "<C-V>", "<C-Q>",
+
+  "<C-]>"
 )
