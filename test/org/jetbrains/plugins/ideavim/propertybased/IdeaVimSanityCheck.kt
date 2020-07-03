@@ -61,6 +61,8 @@ class IdeaVimSanityCheck : VimTestCase() {
     editor.caretModel.runForEachCaret { it.moveToOffset(0) }
 
     CommandState.getInstance(editor).resetDigraph()
+    VimPlugin.getSearch().resetState()
+    VimPlugin.getChange().reset()
   }
 }
 

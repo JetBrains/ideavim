@@ -1846,7 +1846,7 @@ public class ChangeGroup {
 
   private final List<Object> strokes = new ArrayList<>();
   private int repeatCharsCount;
-  private List<Object> lastStrokes;
+  private @Nullable List<Object> lastStrokes;
 
   public boolean changeNumber(final @NotNull Editor editor, @NotNull Caret caret, final int count) {
     final BoundListOption nf = OptionsManager.INSTANCE.getNrformats();
@@ -1868,6 +1868,14 @@ public class ChangeGroup {
       replaceText(editor, range.getStartOffset(), range.getEndOffset(), newNumber);
       caret.moveToOffset(range.getStartOffset() + newNumber.length() - 1);
       return true;
+    }
+  }
+
+  public void reset() {
+    strokes.clear();
+    repeatCharsCount = 0;
+    if (lastStrokes != null) {
+      lastStrokes.clear();
     }
   }
 
