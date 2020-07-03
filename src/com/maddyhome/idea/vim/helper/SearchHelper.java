@@ -51,9 +51,10 @@ public class SearchHelper {
   public static boolean anyNonWhitespace(@NotNull Editor editor, int offset, int dir) {
     int start;
     int end;
+    int fileSize = EditorHelperRt.getFileSize(editor);
     if (dir > 0) {
-      start = offset + 1;
-      end = EditorHelper.getLineEndForOffset(editor, offset);
+      start = Math.min(offset + 1, fileSize - 1);
+      end = Math.min(EditorHelper.getLineEndForOffset(editor, offset), fileSize - 1);
     }
     else {
       start = EditorHelper.getLineStartForOffset(editor, offset);
