@@ -24,6 +24,7 @@ import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.key.CommandNode
 import org.jetbrains.jetCheck.Generator
@@ -42,19 +43,20 @@ class IdeaVimSanityCheck : VimTestCase() {
   fun testRandomActions() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
-        val editor = configureByText("""
-          ${c}I found it in a legendary land
-          all rocks and lavender and tufted grass,
-          where it was settled on some sodden sand
-          hard by the torrent of a mountain pass.
-        """.trimIndent())
+        val editor = configureByText(text)
         try {
+          moveCaretToRandomPlace(env, editor)
           env.executeCommands(Generator.sampledFrom(AvailableActions(editor)))
         } finally {
           reset(editor)
         }
       }
     }
+  }
+
+  private fun moveCaretToRandomPlace(env: ImperativeCommand.Environment, editor: Editor) {
+    val pos = env.generateValue(Generator.integers(0, editor.document.textLength - 1), "Put caret at position %s")
+    MotionGroup.moveCaret(editor, editor.caretModel.currentCaret, pos)
   }
 
   private fun reset(editor: Editor) {
@@ -65,6 +67,15 @@ class IdeaVimSanityCheck : VimTestCase() {
     CommandState.getInstance(editor).resetDigraph()
     VimPlugin.getSearch().resetState()
     VimPlugin.getChange().reset()
+  }
+
+  companion object {
+    private val text = """
+              ${c}I found it in a legendary land
+              all rocks and lavender and tufted grass,
+              where it was settled on some sodden sand
+              hard by the torrent of a mountain pass.
+            """.trimIndent()
   }
 }
 
