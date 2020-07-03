@@ -35,9 +35,11 @@ import javax.swing.KeyStroke
 
 /**
  * Property based tests based of JetCheck framework
+ *
+ * See the log if this test fails, it contains the instructions on how to reproduce the test.
  */
 class IdeaVimSanityCheck : VimTestCase() {
-  fun ignoretestRandomActions() {
+  fun testRandomActions() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
         val editor = configureByText("""
