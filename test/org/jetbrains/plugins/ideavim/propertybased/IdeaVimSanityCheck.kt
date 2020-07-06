@@ -55,7 +55,7 @@ class IdeaVimSanityCheck : VimTestCase() {
   }
 
   fun testRandomActionsOnLoremIpsum() {
-    PropertyChecker.customized().withIterationCount(1_000).checkScenarios {
+    PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
         val editor = configureByText(loremText)
         try {
@@ -69,7 +69,7 @@ class IdeaVimSanityCheck : VimTestCase() {
   }
 
   fun testRandomActionsOnJavaCode() {
-    PropertyChecker.customized().withIterationCount(1_000).checkScenarios {
+    PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
         val editor = configureByJavaText(javaText)
         try {
