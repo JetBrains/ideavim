@@ -52,7 +52,6 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
-import com.maddyhome.idea.vim.neovim.NeovimHelper;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
@@ -328,13 +327,9 @@ public abstract class VimTestCase extends UsefulTestCase {
         justTest(keys, after, modeAfter, subModeAfter);
 
         VimCoords vimCoords = api.getCurrentWindow().get().getCursor().get();
-        VimCoords resultVimCoords = NeovimHelper.toVimCoords(editor.getCaretModel().getLogicalPosition());
-
-        assertTrue(NeovimHelper.equalsTo(vimCoords, resultVimCoords));
-
-        List<String> lines = api.getCurrentBuffer().get().getLines(0, -1, false).get();
-        String neovimContent = String.join("\n", lines);
-        assertEquals(neovimContent, myFixture.getEditor().getDocument().getText());
+        LogicalPosition resultLogicalPosition = editor.getCaretModel().getLogicalPosition();
+        assertEquals(vimCoords.getRow(), resultLogicalPosition.line + 1);
+        assertEquals(vimCoords.getCol(), resultLogicalPosition.column);
       }
       catch (InterruptedException | ExecutionException e) {
         justTest(keys, after, modeAfter, subModeAfter);
