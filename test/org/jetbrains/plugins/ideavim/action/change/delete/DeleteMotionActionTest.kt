@@ -124,13 +124,13 @@ class DeleteMotionActionTest : VimTestCase() {
   }
 
   fun `test delete on last line`() {
-    doTest(parseKeys("dd"),
+    doTestWithNeovim("dd",
       """
             A Discovery
             
             I found it in a legendary land
             all rocks and lavender and tufted grass,
-            $c
+            ${c}
         """.trimIndent(),
       """
             A Discovery

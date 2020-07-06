@@ -28,7 +28,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
  */
 public class ChangeNumberActionTest extends VimTestCase {
   public void testIncrementDecimalZero() {
-    doTest(parseKeys("<C-A>"), "0", "1", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestWithNeovim("<C-A>", "0", "1", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testIncrementHexZero() {

@@ -18,6 +18,11 @@
 
 package org.jetbrains.plugins.ideavim;
 
+import com.ensarsarajcic.neovim.java.api.NeovimApi;
+import com.ensarsarajcic.neovim.java.api.NeovimApis;
+import com.ensarsarajcic.neovim.java.api.types.api.VimCoords;
+import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRPCConnection;
+import com.ensarsarajcic.neovim.java.corerpc.client.RPCConnection;
 import com.intellij.ide.bookmarks.BookmarkManager;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.ide.highlighter.XmlFileType;
@@ -47,6 +52,7 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
+import com.maddyhome.idea.vim.neovim.NeovimHelper;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
@@ -56,9 +62,11 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -289,6 +297,61 @@ public abstract class VimTestCase extends UsefulTestCase {
                      CommandState.Mode modeAfter, CommandState.SubMode subModeAfter) {
     configureByText(before);
     typeText(keys);
+    myFixture.checkResult(after);
+    assertState(modeAfter, subModeAfter);
+  }
+
+  public void doTestWithNeovim(final String keys,
+                               String before,
+                               String after,
+                               CommandState.Mode modeAfter,
+                               CommandState.SubMode subModeAfter) {
+
+    configureByText(before);
+
+    // Prepare a connection to neovim
+    ProcessBuilder pb = new ProcessBuilder("nvim", "-u", "NONE", "--embed", "--headless");
+    try {
+      Process neovim = pb.start();
+
+      try(RPCConnection neovimConnection  = new ProcessRPCConnection(neovim, true)) {
+        NeovimApi api = NeovimApis.getApiForConnection(neovimConnection);
+
+        Editor editor = myFixture.getEditor();
+        String text = api.replaceTermcodes("i" + editor.getDocument().getText() + "<ESC>", true, false, true).get();
+        api.input(text).get();
+        LogicalPosition logicalPosition = editor.getCaretModel().getLogicalPosition();
+        api.getCurrentWindow().get().setCursor(new VimCoords(logicalPosition.line + 1, logicalPosition.column)).get();
+
+        api.input(api.replaceTermcodes(keys, true, false, true).get()).get();
+
+        justTest(keys, after, modeAfter, subModeAfter);
+
+        VimCoords vimCoords = api.getCurrentWindow().get().getCursor().get();
+        VimCoords resultVimCoords = NeovimHelper.toVimCoords(editor.getCaretModel().getLogicalPosition());
+
+        // Check caret position
+        assertTrue(NeovimHelper.equalsTo(vimCoords, resultVimCoords));
+
+        // Check content
+        List<String> lines = api.getCurrentBuffer().get().getLines(0, -1, false).get();
+        String neovimContent = String.join("\n", lines);
+        assertEquals(neovimContent, myFixture.getEditor().getDocument().getText());
+      }
+      catch (InterruptedException | ExecutionException e) {
+        justTest(keys, after, modeAfter, subModeAfter);
+      }
+      finally {
+        neovim.destroy();
+      }
+    }
+    catch (IOException e) {
+      justTest(keys, after, modeAfter, subModeAfter);
+    }
+  }
+
+  private void justTest(String keys, String after, CommandState.Mode modeAfter, CommandState.SubMode subModeAfter) {
+    typeText(parseKeys(keys));
     myFixture.checkResult(after);
     assertState(modeAfter, subModeAfter);
   }
