@@ -26,7 +26,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionRightActionTest : VimTestCase() {
   fun `test simple motion`() {
-    doTestWithNeovim("l", """
+    doTest(parseKeys("l"), """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -44,7 +44,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test simple motion with repeat`() {
-    doTestWithNeovim("3l", """
+    doTest(parseKeys("3l"), """
             A Discovery
 
             I found ${c}it in a legendary land
