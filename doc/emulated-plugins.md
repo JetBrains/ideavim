@@ -56,7 +56,7 @@ Available extensions:
 * Emulates [argtextobj.vim](https://www.vim.org/scripts/script.php?script_id=2699)
 * Additional text objects: `aa`, `ia`
 
-## exchange [To Be Released]
+## exchange
 
 * Setup: `set exchange`
 * Emulates [vim-exchange](https://github.com/tommcdo/vim-exchange)

@@ -95,7 +95,7 @@ Here are some examples of supported vim features and commands:
 * argtextobj.vim
 * vim-textobj-entire
 * ReplaceWithRegister
-* vim-exchange [To Be Released]
+* vim-exchange
 
 See also:
 
