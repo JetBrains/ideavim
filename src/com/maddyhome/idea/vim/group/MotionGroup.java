@@ -889,13 +889,6 @@ public class MotionGroup {
     return editor.logicalPositionToOffset(new LogicalPosition(line, pos));
   }
 
-  /**
-   * @deprecated To move the caret, use {@link #moveCaretToColumn(Editor, Caret, int, boolean)}
-   */
-  public int moveCaretToColumn(@NotNull Editor editor, int count, boolean allowEnd) {
-    return moveCaretToColumn(editor, editor.getCaretModel().getPrimaryCaret(), count, allowEnd);
-  }
-
   public int moveCaretToLineStartSkipLeading(@NotNull Editor editor, @NotNull Caret caret) {
     int logicalLine = caret.getLogicalPosition().line;
     return moveCaretToLineStartSkipLeading(editor, logicalLine);
@@ -905,30 +898,9 @@ public class MotionGroup {
     return EditorHelper.getLeadingCharacterOffset(editor, line);
   }
 
-  /**
-   * @deprecated To move the caret, use {@link #moveCaretToLineStartSkipLeading(Editor, Caret)}
-   */
-  public int moveCaretToLineStartSkipLeading(@NotNull Editor editor) {
-    return moveCaretToLineStartSkipLeading(editor, editor.getCaretModel().getPrimaryCaret());
-  }
-
   public int moveCaretToLineStartSkipLeadingOffset(@NotNull Editor editor, @NotNull Caret caret, int linesOffset) {
     int line = EditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset);
     return moveCaretToLineStartSkipLeading(editor, EditorHelper.visualLineToLogicalLine(editor, line));
-  }
-
-  /**
-   * @deprecated To move the caret, use {@link #moveCaretToLineStartSkipLeadingOffset(Editor, Caret, int)}
-   */
-  public int moveCaretToLineStartSkipLeadingOffset(@NotNull Editor editor, int linesOffset) {
-    return moveCaretToLineStartSkipLeadingOffset(editor, editor.getCaretModel().getPrimaryCaret(), linesOffset);
-  }
-
-  /**
-   * @deprecated Use {@link #moveCaretToLineEnd(Editor, Caret)}
-   */
-  public int moveCaretToLineEnd(@NotNull Editor editor) {
-    return moveCaretToLineEnd(editor, editor.getCaretModel().getPrimaryCaret());
   }
 
   public int moveCaretToLineEnd(@NotNull Editor editor, @NotNull Caret caret) {
@@ -950,23 +922,9 @@ public class MotionGroup {
     return true;
   }
 
-  /**
-   * @deprecated To move the caret, use {@link #moveCaretToLineEndOffset(Editor, Caret, int, boolean)}
-   */
-  public int moveCaretToLineEndOffset(@NotNull Editor editor, int cntForward, boolean allowPastEnd) {
-    return moveCaretToLineEndOffset(editor, editor.getCaretModel().getPrimaryCaret(), cntForward, allowPastEnd);
-  }
-
   public int moveCaretToLineStart(@NotNull Editor editor, @NotNull Caret caret) {
     int logicalLine = caret.getLogicalPosition().line;
     return moveCaretToLineStart(editor, logicalLine);
-  }
-
-  /**
-   * @deprecated To move the caret, use {@link #moveCaretToLineStart(Editor, Caret)}
-   */
-  public int moveCaretToLineStart(@NotNull Editor editor) {
-    return moveCaretToLineStart(editor, editor.getCaretModel().getPrimaryCaret());
   }
 
   public int moveCaretToLineStart(@NotNull Editor editor, int line) {
