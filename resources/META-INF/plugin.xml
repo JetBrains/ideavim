@@ -3,8 +3,10 @@
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
       <ul>
-        <li>Fix mapping to "\<SPACE>"</li>
-        <li>Various fixes of line numbers</li>
+        <li>vim-exchange plugin emulation</li>
+        <li>~/.ideavimrc can be reloaded using floating action</li>
+        <li>Add :buffer command</li>
+        <li>Support IntelliJ's smooth scrolling</li>
         <li>Various bug fixes</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>

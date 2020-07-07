@@ -22,10 +22,8 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-To Be Released
+0.58, 2020-07-07
 -------------
-
-_Available since 0.57.1 EAP:_
 
 **Features:**
 * `exchange` plugin emulation ([VIM-921](https://youtrack.jetbrains.com/issue/VIM-921) | [vim-exchange](https://github.com/tommcdo/vim-exchange)).
@@ -44,6 +42,12 @@ _Available since 0.57.1 EAP:_
 **Fixes:**
 * [VIM-1994](https://youtrack.jetbrains.com/issue/VIM-1994) Correct paste after `y}P` command.
 * [VIM-1924](https://youtrack.jetbrains.com/issue/VIM-1924) Select next occurrence doesn't become block selection.
+* [VIM-2038](https://youtrack.jetbrains.com/issue/VIM-2038) Last line is now accessible in normal mode
+* [VIM-1934](https://youtrack.jetbrains.com/issue/VIM-1934) Line number is not clipped for relative line numbers
+* [VIM-1852](https://youtrack.jetbrains.com/issue/VIM-1852) Line number doesn't flickers for relative line numbers
+* [VIM-2021](https://youtrack.jetbrains.com/issue/VIM-2021) Line numbers don't reactivating
+* Fix mappings to `"\<SPACE>"` including `let mapleader="\<SPACE>"`
+
 
 **Merged PRs:**
 * [233](https://github.com/JetBrains/ideavim/pull/233) by [valis](https://github.com/valis): [VIM-1994] Correct paste after `y}P` command.
@@ -51,20 +55,7 @@ _Available since 0.57.1 EAP:_
 * [227](https://github.com/JetBrains/ideavim/pull/227) by [angelbot](https://github.com/angelbot): Add support for buffer command.
 * [230](https://github.com/JetBrains/ideavim/pull/230) by [fan-tom](https://github.com/fan-tom): VIM-1924.
 * [231](https://github.com/JetBrains/ideavim/pull/231) by [citizenmatt](https://github.com/citizenmatt): Support smooth scrolling.
-
-_Available since 0.57.2 EAP:_
-
-**Fixes:**
-* Fix mappings to `"\<SPACE>"` including `let mapleader="\<SPACE>"`
-* [VIM-2038](https://youtrack.jetbrains.com/issue/VIM-2038) Last line is now accessible in normal mode
-* [VIM-1934](https://youtrack.jetbrains.com/issue/VIM-1934) Line number is not clipped for relative line numbers
-* [VIM-1852](https://youtrack.jetbrains.com/issue/VIM-1852) Line number doesn't flickers for relative line numbers
-* [VIM-2021](https://youtrack.jetbrains.com/issue/VIM-2021) Line numbers don't reactivating
-
-**Merged PRs:**
 * [239](https://github.com/JetBrains/ideavim/pull/239) by [citizenmatt](https://github.com/citizenmatt): Use new API for relative line numbers
-
-_To Be Released..._
 
 0.57, 2020-04-28
 -------------
