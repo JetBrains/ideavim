@@ -112,7 +112,7 @@ Files
 <details>
 <summary><strong>Example</strong> (click to see)</summary>
 
-```
+```vim
 """ Map leader to space ---------------------
 let mapleader=" "
 
@@ -197,15 +197,16 @@ Ex commands or via `:map` command mappings:
 
 Examples:
 
-    " Map \r to the Reformat Code action
-    :map \r :action ReformatCode<CR>
-    
-    " Map <leader>d to start debug
-    :map <leader>d :action Debug<CR>
-    
-    " Map \b to toggle the breakpoint on the current line
-    :map \b :action ToggleLineBreakpoint<CR>
+```vim
+" Map \r to the Reformat Code action
+:map \r :action ReformatCode<CR>
 
+" Map <leader>d to start debug
+:map <leader>d :action Debug<CR>
+
+" Map \b to toggle the breakpoint on the current line
+:map \b :action ToggleLineBreakpoint<CR>
+```
 
 ### Undo/Redo
 

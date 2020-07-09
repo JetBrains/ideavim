@@ -566,7 +566,7 @@ public class KeyHandler {
     // Make sure to avoid handling '0' as the start of a count.
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
     return ((editorState.getMode() == CommandState.Mode.COMMAND
-             &&editorState.getSubMode()!=CommandState.SubMode.REGISTER_PENDING) 
+             &&editorState.getSubMode()!=CommandState.SubMode.REGISTER_PENDING)
             || editorState.getMode() == CommandState.Mode.VISUAL)
       && commandBuilder.isExpectingCount() && Character.isDigit(chKey) && (commandBuilder.getCount() > 0 || chKey != '0');
   }
