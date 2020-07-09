@@ -18,12 +18,18 @@
 
 package org.jetbrains.plugins.ideavim.action
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.key.MappingOwner
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ResetModeActionTest : VimTestCase() {
+  private val owner = MappingOwner.Plugin.get("ResetModeActionTest")
+
   fun `test reset from normal mode`() {
     val keys = StringHelper.parseKeys("<C-\\><C-N>")
     val before = "A Discovery"
@@ -69,6 +75,49 @@ class ResetModeActionTest : VimTestCase() {
     val before = "A Discovery"
     val after = "Discovery"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
+  }
+
+  fun `test delete command after resetting operator-pending mode`() {
+    val keys = StringHelper.parseKeys("d", "<C-\\><C-N>", "dw")
+    val before = "A Discovery"
+    val after = "Discovery"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
+  }
+
+  fun `test delete command after resetting operator-pending mode with esc`() {
+    val keys = StringHelper.parseKeys("d", "<Esc>", "dw")
+    val before = "A Discovery"
+    val after = "Discovery"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
+  }
+
+  fun `test delete command after resetting operator-pending mode with ctrl open bracket`() {
+    val keys = StringHelper.parseKeys("d", "<C-[>", "dw")
+    val before = "A Discovery"
+    val after = "Discovery"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
+  }
+
+  fun `test delete command after resetting operator-pending mode with mapping`() {
+    VimPlugin.getKey()
+      .putKeyMapping(MappingMode.NVO, parseKeys("<C-D>"), owner, parseKeys("<Esc>"), false)
+
+    val keys = StringHelper.parseKeys("d", "<C-D>", "dw")
+    val before = "A Discovery"
+    val after = "Discovery"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
+  }
+
+  fun `test non-delete commands after resetting operator-pending mode`() {
+    val keys = StringHelper.parseKeys("c", "<C-\\><C-N>", "another")
+    val before = "A Discovery"
+    val after = "Another Discovery"
+    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 }
