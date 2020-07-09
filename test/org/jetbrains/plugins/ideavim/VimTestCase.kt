@@ -15,388 +15,357 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package org.jetbrains.plugins.ideavim
 
-package org.jetbrains.plugins.ideavim;
-
-import com.ensarsarajcic.neovim.java.api.NeovimApi;
-import com.ensarsarajcic.neovim.java.api.NeovimApis;
-import com.ensarsarajcic.neovim.java.api.types.api.VimCoords;
-import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRPCConnection;
-import com.ensarsarajcic.neovim.java.corerpc.client.RPCConnection;
-import com.intellij.ide.bookmarks.BookmarkManager;
-import com.intellij.ide.highlighter.JavaFileType;
-import com.intellij.ide.highlighter.XmlFileType;
-import com.intellij.openapi.application.PathManager;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.CaretModel;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.LogicalPosition;
-import com.intellij.openapi.editor.colors.EditorColors;
-import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
-import com.intellij.openapi.fileTypes.PlainTextFileType;
-import com.intellij.openapi.project.Project;
-import com.intellij.testFramework.EditorTestUtil;
-import com.intellij.testFramework.LightProjectDescriptor;
-import com.intellij.testFramework.UsefulTestCase;
-import com.intellij.testFramework.fixtures.CodeInsightTestFixture;
-import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
-import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
-import com.intellij.testFramework.fixtures.TestFixtureBuilder;
-import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl;
-import com.maddyhome.idea.vim.KeyHandler;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.ex.ExOutputModel;
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
-import com.maddyhome.idea.vim.group.visual.VimVisualTimer;
-import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
-import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
-import com.maddyhome.idea.vim.neovim.NeovimHelper;
-import com.maddyhome.idea.vim.option.OptionsManager;
-import com.maddyhome.idea.vim.option.ToggleOption;
-import com.maddyhome.idea.vim.ui.ExEntryPanel;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
-
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+import com.ensarsarajcic.neovim.java.api.NeovimApis
+import com.ensarsarajcic.neovim.java.api.types.api.VimCoords
+import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRPCConnection
+import com.intellij.ide.bookmarks.Bookmark
+import com.intellij.ide.bookmarks.BookmarkManager
+import com.intellij.ide.highlighter.JavaFileType
+import com.intellij.ide.highlighter.XmlFileType
+import com.intellij.openapi.application.PathManager
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.colors.EditorColors
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
+import com.intellij.openapi.fileTypes.PlainTextFileType
+import com.intellij.openapi.project.Project
+import com.intellij.testFramework.EditorTestUtil
+import com.intellij.testFramework.LightProjectDescriptor
+import com.intellij.testFramework.UsefulTestCase
+import com.intellij.testFramework.fixtures.CodeInsightTestFixture
+import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
+import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
+import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.CommandState.SubMode
+import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
+import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
+import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
+import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.TestInputModel
+import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.neovim.equalsTo
+import com.maddyhome.idea.vim.neovim.toVimCoords
+import com.maddyhome.idea.vim.option.OptionsManager.getOption
+import com.maddyhome.idea.vim.option.OptionsManager.ideastrictmode
+import com.maddyhome.idea.vim.option.OptionsManager.resetAllOptions
+import com.maddyhome.idea.vim.option.ToggleOption
+import com.maddyhome.idea.vim.ui.ExEntryPanel
+import junit.framework.Assert
+import org.jetbrains.annotations.Contract
+import java.io.IOException
+import java.util.*
+import java.util.concurrent.ExecutionException
+import java.util.function.Consumer
+import javax.swing.KeyStroke
 
 /**
  * @author vlan
  */
-public abstract class VimTestCase extends UsefulTestCase {
-  protected CodeInsightTestFixture myFixture;
+abstract class VimTestCase : UsefulTestCase() {
+  protected lateinit var myFixture: CodeInsightTestFixture
 
-  protected static final String c = EditorTestUtil.CARET_TAG;
-  protected static final String s = EditorTestUtil.SELECTION_START_TAG;
-  protected static final String se = EditorTestUtil.SELECTION_END_TAG;
-
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-    final IdeaTestFixtureFactory factory = IdeaTestFixtureFactory.getFixtureFactory();
-    final LightProjectDescriptor projectDescriptor = LightProjectDescriptor.EMPTY_PROJECT_DESCRIPTOR;
-    final TestFixtureBuilder<IdeaProjectTestFixture> fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor);
-    final IdeaProjectTestFixture fixture = fixtureBuilder.getFixture();
+  @Throws(Exception::class)
+  override fun setUp() {
+    super.setUp()
+    val factory = IdeaTestFixtureFactory.getFixtureFactory()
+    val projectDescriptor = LightProjectDescriptor.EMPTY_PROJECT_DESCRIPTOR
+    val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor)
+    val fixture = fixtureBuilder.fixture
     myFixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(fixture,
-                                                                                    new LightTempDirTestFixtureImpl(true));
-    myFixture.setUp();
-    myFixture.setTestDataPath(getTestDataPath());
-    KeyHandler.getInstance().fullReset(myFixture.getEditor());
-    OptionsManager.INSTANCE.resetAllOptions();
-    VimPlugin.getKey().resetKeyMappings();
-    VimPlugin.getSearch().resetState();
-
-    if (!VimPlugin.isEnabled()) VimPlugin.setEnabled(true);
-    OptionsManager.INSTANCE.getIdeastrictmode().set();
+      LightTempDirTestFixtureImpl(true))
+    myFixture.setUp()
+    myFixture.testDataPath = testDataPath
+    KeyHandler.getInstance().fullReset(myFixture.editor)
+    resetAllOptions()
+    VimPlugin.getKey().resetKeyMappings()
+    VimPlugin.getSearch().resetState()
+    if (!VimPlugin.isEnabled()) VimPlugin.setEnabled(true)
+    ideastrictmode.set()
 
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
-    ExEntryPanel.getInstance().getEntry().setBounds(0,0, 100, 25);
+    ExEntryPanel.getInstance().entry.setBounds(0, 0, 100, 25)
   }
 
-  protected String getTestDataPath() {
-    return PathManager.getHomePath() + "/community/plugins/ideavim/testData";
+  protected val testDataPath: String
+    get() = PathManager.getHomePath() + "/community/plugins/ideavim/testData"
+
+  @Throws(Exception::class)
+  override fun tearDown() {
+    val swingTimer = swingTimer
+    swingTimer?.stop()
+    val bookmarkManager = BookmarkManager.getInstance(myFixture.project)
+    bookmarkManager.validBookmarks.forEach(Consumer { bookmark: Bookmark? -> bookmarkManager.removeBookmark(bookmark!!) })
+    SelectionVimListenerSuppressor.lock().use { myFixture.tearDown() }
+    ExEntryPanel.getInstance().deactivate(false)
+    VimScriptGlobalEnvironment.getInstance().variables.clear()
+    VimPlugin.getRegister().resetRegisters()
+    VimPlugin.getSearch().resetState()
+    VimPlugin.getMark().resetAllMarks()
+    super.tearDown()
   }
 
-  @Override
-  protected void tearDown() throws Exception {
-    Timer swingTimer = VimVisualTimer.INSTANCE.getSwingTimer();
-    if (swingTimer != null) {
-      swingTimer.stop();
-    }
-    BookmarkManager bookmarkManager = BookmarkManager.getInstance(myFixture.getProject());
-    bookmarkManager.getValidBookmarks().forEach(bookmarkManager::removeBookmark);
-    try(VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
-      myFixture.tearDown();
-    }
-    myFixture = null;
-    ExEntryPanel.getInstance().deactivate(false);
-    VimScriptGlobalEnvironment.getInstance().getVariables().clear();
-    VimPlugin.getRegister().resetRegisters();
-    VimPlugin.getSearch().resetState();
-    VimPlugin.getMark().resetAllMarks();
-    super.tearDown();
-  }
-
-  protected void enableExtensions(@NotNull String... extensionNames) {
-    for (String name : extensionNames) {
-      ToggleOption option = (ToggleOption) OptionsManager.INSTANCE.getOption(name);
-      Objects.requireNonNull(option).set();
+  protected fun enableExtensions(vararg extensionNames: String) {
+    for (name in extensionNames) {
+      (getOption(name) as ToggleOption).set()
     }
   }
 
-  @NotNull
-  protected Editor typeTextInFile(@NotNull final List<KeyStroke> keys, @NotNull String fileContents) {
-    configureByText(fileContents);
-    return typeText(keys);
+  protected fun typeTextInFile(keys: List<KeyStroke?>, fileContents: String): Editor {
+    configureByText(fileContents)
+    return typeText(keys)
   }
 
-  @NotNull
-  protected Editor configureByText(@NotNull String content) {
-    myFixture.configureByText(PlainTextFileType.INSTANCE, content);
-    return myFixture.getEditor();
+  protected fun configureByText(content: String): Editor {
+    myFixture.configureByText(PlainTextFileType.INSTANCE, content)
+    return myFixture.editor
   }
 
-  @NotNull
-  protected Editor configureByFileName(@NotNull String fileName) {
-    myFixture.configureByText(fileName, "\n");
-    return myFixture.getEditor();
+  protected fun configureByFileName(fileName: String): Editor {
+    myFixture.configureByText(fileName, "\n")
+    return myFixture.editor
   }
 
-  @NotNull
-  protected Editor configureByJavaText(@NotNull String content) {
-    myFixture.configureByText(JavaFileType.INSTANCE, content);
-    return myFixture.getEditor();
+  protected fun configureByJavaText(content: String): Editor {
+    myFixture.configureByText(JavaFileType.INSTANCE, content)
+    return myFixture.editor
   }
 
-  @NotNull
-  protected Editor configureByXmlText(@NotNull String content) {
-    myFixture.configureByText(XmlFileType.INSTANCE, content);
-    return myFixture.getEditor();
+  protected fun configureByXmlText(content: String): Editor {
+    myFixture.configureByText(XmlFileType.INSTANCE, content)
+    return myFixture.editor
   }
 
-  @NotNull
-  protected Editor typeText(@NotNull List<KeyStroke> keys) {
-    final Editor editor = myFixture.getEditor();
-    final Project project = myFixture.getProject();
-    typeText(keys, editor, project);
-    return editor;
+  protected fun typeText(keys: List<KeyStroke?>): Editor {
+    val editor = myFixture.editor
+    val project = myFixture.project
+    typeText(keys, editor, project)
+    return editor
   }
 
-  public static void typeText(@NotNull List<KeyStroke> keys, Editor editor, Project project) {
-    final KeyHandler keyHandler = KeyHandler.getInstance();
-    final EditorDataContext dataContext = new EditorDataContext(editor);
-    TestInputModel.getInstance(editor).setKeyStrokes(keys);
-    RunnableHelper.runWriteCommand(project, () -> {
-      final TestInputModel inputModel = TestInputModel.getInstance(editor);
-      for (KeyStroke key = inputModel.nextKeyStroke(); key != null; key = inputModel.nextKeyStroke()) {
-        final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
-        if (exEntryPanel.isActive()) {
-          exEntryPanel.handleKey(key);
-        }
-        else {
-          keyHandler.handleKey(editor, key, dataContext);
+  protected fun enterCommand(command: String): Editor {
+    return typeText(commandToKeys(command))
+  }
+
+  protected fun enterSearch(pattern: String, forwards: Boolean = true): Editor {
+    return typeText(searchToKeys(pattern, forwards))
+  }
+
+  fun assertPosition(line: Int, column: Int) {
+    val carets = myFixture.editor.caretModel.allCarets
+    Assert.assertEquals("Wrong amount of carets", 1, carets.size)
+    val actualPosition = carets[0].logicalPosition
+    Assert.assertEquals(LogicalPosition(line, column), actualPosition)
+  }
+
+  fun assertOffset(vararg expectedOffsets: Int) {
+    val carets = myFixture.editor.caretModel.allCarets
+    if (expectedOffsets.size == 2 && carets.size == 1) {
+      Assert.assertEquals("Wrong amount of carets. Did you mean to use assertPosition?", expectedOffsets.size, carets.size)
+    }
+    Assert.assertEquals("Wrong amount of carets", expectedOffsets.size, carets.size)
+    for (i in expectedOffsets.indices) {
+      Assert.assertEquals(expectedOffsets[i], carets[i].offset)
+    }
+  }
+
+  fun assertMode(expectedMode: CommandState.Mode) {
+    val mode = CommandState.getInstance(myFixture.editor).mode
+    Assert.assertEquals(expectedMode, mode)
+  }
+
+  fun assertSubMode(expectedSubMode: SubMode) {
+    val subMode = CommandState.getInstance(myFixture.editor).subMode
+    Assert.assertEquals(expectedSubMode, subMode)
+  }
+
+  fun assertSelection(expected: String?) {
+    val selected = myFixture.editor.selectionModel.selectedText
+    Assert.assertEquals(expected, selected)
+  }
+
+  fun assertExOutput(expected: String) {
+    val actual = getInstance(myFixture.editor).text
+    Assert.assertNotNull("No Ex output", actual)
+    Assert.assertEquals(expected, actual)
+  }
+
+  fun assertPluginError(isError: Boolean) {
+    Assert.assertEquals(isError, VimPlugin.isError())
+  }
+
+  fun assertPluginErrorMessageContains(message: String) {
+    Assert.assertTrue(VimPlugin.getMessage().contains(message))
+  }
+
+  protected fun assertCaretsColour() {
+    val selectionColour = myFixture.editor.colorsScheme.getColor(EditorColors.SELECTION_BACKGROUND_COLOR)
+    val caretColour = myFixture.editor.colorsScheme.getColor(EditorColors.CARET_COLOR)
+    if (myFixture.editor.inBlockSubMode) {
+      val caretModel = myFixture.editor.caretModel
+      caretModel.allCarets.forEach { caret: Caret ->
+        if (caret !== caretModel.primaryCaret) {
+          Assert.assertEquals(selectionColour, caret.visualAttributes.color)
+        } else {
+          val color = caret.visualAttributes.color
+          if (color != null) Assert.assertEquals(caretColour, color)
         }
       }
-    }, null, null);
-  }
-
-  @NotNull
-  protected static List<KeyStroke> commandToKeys(@NotNull String command) {
-    List<KeyStroke> keys = new ArrayList<>();
-    keys.addAll(parseKeys(":"));
-    keys.addAll(StringHelper.stringToKeys(command));
-    keys.addAll(parseKeys("<Enter>"));
-    return keys;
-  }
-
-  @NotNull
-  protected Editor enterCommand(@NotNull String command) {
-    return typeText(commandToKeys(command));
-  }
-
-  protected static List<KeyStroke> searchToKeys(@NotNull String pattern, boolean forwards) {
-    List<KeyStroke> keys = new ArrayList<>();
-    keys.addAll(parseKeys(forwards ? "/" : "?"));
-    keys.addAll(StringHelper.stringToKeys(pattern));
-    keys.addAll(parseKeys("<Enter>"));
-    return keys;
-  }
-
-  protected Editor enterSearch(@NotNull String pattern) {
-    return enterSearch(pattern, true);
-  }
-
-  protected Editor enterSearch(@NotNull String pattern, boolean forwards) {
-    return typeText(searchToKeys(pattern, forwards));
-  }
-
-  public void assertPosition(int line, int column) {
-    final List<Caret> carets = myFixture.getEditor().getCaretModel().getAllCarets();
-    assertEquals("Wrong amount of carets", 1, carets.size());
-    final LogicalPosition actualPosition = carets.get(0).getLogicalPosition();
-    assertEquals(new LogicalPosition(line, column), actualPosition);
-  }
-
-  public void assertOffset(int... expectedOffsets) {
-    final List<Caret> carets = myFixture.getEditor().getCaretModel().getAllCarets();
-    if (expectedOffsets.length == 2 && carets.size() == 1) {
-      assertEquals("Wrong amount of carets. Did you mean to use assertPosition?", expectedOffsets.length, carets.size());
-    }
-    assertEquals("Wrong amount of carets", expectedOffsets.length, carets.size());
-    for (int i = 0; i < expectedOffsets.length; i++) {
-      assertEquals(expectedOffsets[i], carets.get(i).getOffset());
+    } else {
+      myFixture.editor.caretModel.allCarets.forEach { caret: Caret ->
+        val color = caret.visualAttributes.color
+        if (color != null) Assert.assertEquals(caretColour, color)
+      }
     }
   }
 
-  public void assertMode(@NotNull CommandState.Mode expectedMode) {
-    final CommandState.Mode mode = CommandState.getInstance(myFixture.getEditor()).getMode();
-    assertEquals(expectedMode, mode);
+  fun doTest(keys: List<KeyStroke?>,
+             before: String,
+             after: String,
+             modeAfter: CommandState.Mode, subModeAfter: SubMode) {
+    configureByText(before)
+    typeText(keys)
+    myFixture.checkResult(after)
+    assertState(modeAfter, subModeAfter)
   }
 
-  public void assertSubMode(@NotNull CommandState.SubMode expectedSubMode) {
-    CommandState.SubMode subMode = CommandState.getInstance(myFixture.getEditor()).getSubMode();
-    assertEquals(expectedSubMode, subMode);
-  }
-
-  public void assertSelection(@Nullable String expected) {
-    final String selected = myFixture.getEditor().getSelectionModel().getSelectedText();
-    assertEquals(expected, selected);
-  }
-
-  public void assertExOutput(@NotNull String expected) {
-    final String actual = ExOutputModel.getInstance(myFixture.getEditor()).getText();
-    assertNotNull("No Ex output", actual);
-    assertEquals(expected, actual);
-  }
-
-  public void assertPluginError(boolean isError) {
-    assertEquals(isError, VimPlugin.isError());
-  }
-
-  public void assertPluginErrorMessageContains(@NotNull String message) {
-    assertTrue(VimPlugin.getMessage().contains(message));
-  }
-
-  protected void assertCaretsColour() {
-    Color selectionColour = myFixture.getEditor().getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR);
-    Color caretColour = myFixture.getEditor().getColorsScheme().getColor(EditorColors.CARET_COLOR);
-    if (CommandStateHelper.inBlockSubMode(myFixture.getEditor())) {
-      CaretModel caretModel = myFixture.getEditor().getCaretModel();
-      caretModel.getAllCarets().forEach(caret -> {
-        if (caret != caretModel.getPrimaryCaret()) {
-          assertEquals(selectionColour, caret.getVisualAttributes().getColor());
-        }
-        else {
-          Color color = caret.getVisualAttributes().getColor();
-          if (color != null) assertEquals(caretColour, color);
-        }
-      });
-    }
-    else {
-      myFixture.getEditor().getCaretModel().getAllCarets().forEach(caret -> {
-        Color color = caret.getVisualAttributes().getColor();
-        if (color != null) assertEquals(caretColour, color);
-      });
-    }
-  }
-
-  public void doTest(final List<KeyStroke> keys,
-                     String before,
-                     String after,
-                     CommandState.Mode modeAfter, CommandState.SubMode subModeAfter) {
-    configureByText(before);
-    typeText(keys);
-    myFixture.checkResult(after);
-    assertState(modeAfter, subModeAfter);
-  }
-
-  public void doTestWithNeovim(final String keys,
-                               String before,
-                               String after,
-                               CommandState.Mode modeAfter,
-                               CommandState.SubMode subModeAfter) {
-
-    configureByText(before);
+  fun doTestWithNeovim(keys: String,
+                       before: String,
+                       after: String,
+                       modeAfter: CommandState.Mode,
+                       subModeAfter: SubMode) {
+    configureByText(before)
 
     // Prepare a connection to neovim
-    ProcessBuilder pb = new ProcessBuilder("nvim", "-u", "NONE", "--embed", "--headless");
+    val pb = ProcessBuilder("nvim", "-u", "NONE", "--embed", "--headless")
     try {
-      Process neovim = pb.start();
+      val neovim = pb.start()
+      try {
+        ProcessRPCConnection(neovim, true).use { neovimConnection ->
+          val api = NeovimApis.getApiForConnection(neovimConnection)
+          val editor = myFixture.editor
+          val text = api.replaceTermcodes("i" + editor.document.text + "<ESC>", true, false, true).get()
+          api.input(text).get()
+          val logicalPosition = editor.caretModel.logicalPosition
+          api.currentWindow.get().setCursor(VimCoords(logicalPosition.line + 1, logicalPosition.column)).get()
+          api.input(api.replaceTermcodes(keys, true, false, true).get()).get()
+          justTest(keys, after, modeAfter, subModeAfter)
+          val vimCoords = api.currentWindow.get().cursor.get()
+          val resultVimCoords = editor.caretModel.logicalPosition.toVimCoords()
 
-      try(RPCConnection neovimConnection  = new ProcessRPCConnection(neovim, true)) {
-        NeovimApi api = NeovimApis.getApiForConnection(neovimConnection);
+          // Check caret position
+          Assert.assertTrue(vimCoords.equalsTo(resultVimCoords))
 
-        Editor editor = myFixture.getEditor();
-        String text = api.replaceTermcodes("i" + editor.getDocument().getText() + "<ESC>", true, false, true).get();
-        api.input(text).get();
-        LogicalPosition logicalPosition = editor.getCaretModel().getLogicalPosition();
-        api.getCurrentWindow().get().setCursor(new VimCoords(logicalPosition.line + 1, logicalPosition.column)).get();
-
-        api.input(api.replaceTermcodes(keys, true, false, true).get()).get();
-
-        justTest(keys, after, modeAfter, subModeAfter);
-
-        VimCoords vimCoords = api.getCurrentWindow().get().getCursor().get();
-        VimCoords resultVimCoords = NeovimHelper.toVimCoords(editor.getCaretModel().getLogicalPosition());
-
-        // Check caret position
-        assertTrue(NeovimHelper.equalsTo(vimCoords, resultVimCoords));
-
-        // Check content
-        List<String> lines = api.getCurrentBuffer().get().getLines(0, -1, false).get();
-        String neovimContent = String.join("\n", lines);
-        assertEquals(neovimContent, myFixture.getEditor().getDocument().getText());
+          // Check content
+          val lines = api.currentBuffer.get().getLines(0, -1, false).get()
+          val neovimContent = java.lang.String.join("\n", lines)
+          Assert.assertEquals(neovimContent, myFixture.editor.document.text)
+        }
+      } catch (e: InterruptedException) {
+        justTest(keys, after, modeAfter, subModeAfter)
+      } catch (e: ExecutionException) {
+        justTest(keys, after, modeAfter, subModeAfter)
+      } finally {
+        neovim.destroy()
       }
-      catch (InterruptedException | ExecutionException e) {
-        justTest(keys, after, modeAfter, subModeAfter);
-      }
-      finally {
-        neovim.destroy();
-      }
-    }
-    catch (IOException e) {
-      justTest(keys, after, modeAfter, subModeAfter);
+    } catch (e: IOException) {
+      justTest(keys, after, modeAfter, subModeAfter)
     }
   }
 
-  private void justTest(String keys, String after, CommandState.Mode modeAfter, CommandState.SubMode subModeAfter) {
-    typeText(parseKeys(keys));
-    myFixture.checkResult(after);
-    assertState(modeAfter, subModeAfter);
+  private fun justTest(keys: String, after: String, modeAfter: CommandState.Mode, subModeAfter: SubMode) {
+    typeText(StringHelper.parseKeys(keys))
+    myFixture.checkResult(after)
+    assertState(modeAfter, subModeAfter)
   }
 
-  public void doTest(final String keys,
-                     String before,
-                     String after,
-                     CommandState.Mode modeAfter, CommandState.SubMode subModeAfter) {
-    configureByText(before);
-    typeText(parseKeys(keys));
-    myFixture.checkResult(after);
-    assertState(modeAfter, subModeAfter);
+  fun doTest(keys: String,
+             before: String,
+             after: String,
+             modeAfter: CommandState.Mode, subModeAfter: SubMode) {
+    configureByText(before)
+    typeText(StringHelper.parseKeys(keys))
+    myFixture.checkResult(after)
+    assertState(modeAfter, subModeAfter)
   }
 
-  public void doTest(final List<KeyStroke> keys,
-                     String before,
-                     String after,
-                     CommandState.Mode modeAfter, CommandState.SubMode subModeAfter,
-                     @NotNull Consumer<Editor> afterEditorInitialized) {
-    configureByText(before);
-    afterEditorInitialized.accept(myFixture.getEditor());
-    typeText(keys);
-    myFixture.checkResult(after);
-    assertState(modeAfter, subModeAfter);
+  fun doTest(keys: List<KeyStroke>,
+             before: String,
+             after: String?,
+             modeAfter: CommandState.Mode, subModeAfter: SubMode,
+             afterEditorInitialized: (Editor) -> Unit) {
+    configureByText(before)
+    afterEditorInitialized(myFixture.editor)
+    typeText(keys)
+    myFixture.checkResult(after!!)
+    assertState(modeAfter, subModeAfter)
   }
 
-  protected void assertState(CommandState.Mode modeAfter, CommandState.SubMode subModeAfter) {
-    assertCaretsColour();
-    assertMode(modeAfter);
-    assertSubMode(subModeAfter);
+  protected fun assertState(modeAfter: CommandState.Mode, subModeAfter: SubMode) {
+    assertCaretsColour()
+    assertMode(modeAfter)
+    assertSubMode(subModeAfter)
   }
 
-  protected FileEditorManagerEx getFileManager() {
-    return FileEditorManagerEx.getInstanceEx(myFixture.getProject());
-  }
+  protected val fileManager: FileEditorManagerEx
+    get() = FileEditorManagerEx.getInstanceEx(myFixture.project)
 
-  @NotNull
-  @Contract(pure = true)
-  protected static String toTab(@NotNull String str, char ch) {
-    return str.replace(ch, '\t');
-  }
+  companion object {
+    const val c = EditorTestUtil.CARET_TAG
+    const val s = EditorTestUtil.SELECTION_START_TAG
+    const val se = EditorTestUtil.SELECTION_END_TAG
 
-  @NotNull
-  @Contract(pure = true)
-  protected static String dotToTab(@NotNull String str) {
-    return str.replace('.', '\t');
+    fun typeText(keys: List<KeyStroke?>, editor: Editor, project: Project?) {
+      val keyHandler = KeyHandler.getInstance()
+      val dataContext = EditorDataContext(editor)
+      TestInputModel.getInstance(editor).setKeyStrokes(keys)
+      runWriteCommand(project, Runnable {
+        val inputModel = TestInputModel.getInstance(editor)
+        var key = inputModel.nextKeyStroke()
+        while (key != null) {
+          val exEntryPanel = ExEntryPanel.getInstance()
+          if (exEntryPanel.isActive) {
+            exEntryPanel.handleKey(key)
+          } else {
+            keyHandler.handleKey(editor, key, dataContext)
+          }
+          key = inputModel.nextKeyStroke()
+        }
+      }, null, null)
+    }
+
+    @JvmStatic
+    fun commandToKeys(command: String): List<KeyStroke> {
+      val keys: MutableList<KeyStroke> = ArrayList()
+      keys.addAll(StringHelper.parseKeys(":"))
+      keys.addAll(StringHelper.stringToKeys(command))
+      keys.addAll(StringHelper.parseKeys("<Enter>"))
+      return keys
+    }
+
+    fun searchToKeys(pattern: String, forwards: Boolean): List<KeyStroke> {
+      val keys: MutableList<KeyStroke> = ArrayList()
+      keys.addAll(StringHelper.parseKeys(if (forwards) "/" else "?"))
+      keys.addAll(StringHelper.stringToKeys(pattern))
+      keys.addAll(StringHelper.parseKeys("<Enter>"))
+      return keys
+    }
+
+    @Contract(pure = true)
+    fun toTab(str: String, ch: Char): String {
+      return str.replace(ch, '\t')
+    }
+
+    @Contract(pure = true)
+    fun dotToTab(str: String): String {
+      return str.replace('.', '\t')
+    }
   }
 }
