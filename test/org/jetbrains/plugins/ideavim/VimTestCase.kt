@@ -60,9 +60,7 @@ import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.ui.ExEntryPanel
 import junit.framework.Assert
 import org.jetbrains.annotations.Contract
-import java.io.IOException
 import java.util.*
-import java.util.concurrent.ExecutionException
 import java.util.function.Consumer
 import javax.swing.KeyStroke
 
@@ -236,6 +234,14 @@ abstract class VimTestCase : UsefulTestCase() {
     assertState(modeAfter, subModeAfter)
   }
 
+  fun doTestWithNeovim(keys: List<String>,
+                       before: String,
+                       after: String,
+                       modeAfter: CommandState.Mode,
+                       subModeAfter: SubMode) {
+    doTestWithNeovim(keys.joinToString(separator = ""), before, after, modeAfter, subModeAfter)
+  }
+
   fun doTestWithNeovim(keys: String,
                        before: String,
                        after: String,
@@ -245,38 +251,29 @@ abstract class VimTestCase : UsefulTestCase() {
 
     // Prepare a connection to neovim
     val pb = ProcessBuilder("nvim", "-u", "NONE", "--embed", "--headless")
+    val neovim = pb.start()
     try {
-      val neovim = pb.start()
-      try {
-        ProcessRPCConnection(neovim, true).use { neovimConnection ->
-          val api = NeovimApis.getApiForConnection(neovimConnection)
-          val editor = myFixture.editor
-          val text = api.replaceTermcodes("i" + editor.document.text + "<ESC>", true, false, true).get()
-          api.input(text).get()
-          val logicalPosition = editor.caretModel.logicalPosition
-          api.currentWindow.get().setCursor(VimCoords(logicalPosition.line + 1, logicalPosition.column)).get()
-          api.input(api.replaceTermcodes(keys, true, false, true).get()).get()
-          justTest(keys, after, modeAfter, subModeAfter)
-          val vimCoords = api.currentWindow.get().cursor.get()
-          val resultVimCoords = editor.caretModel.logicalPosition.toVimCoords()
-
-          // Check caret position
-          Assert.assertTrue("Expected: $vimCoords, actual: $resultVimCoords", vimCoords.equalsTo(resultVimCoords))
-
-          // Check content
-          val lines = api.currentBuffer.get().getLines(0, -1, false).get()
-          val neovimContent = java.lang.String.join("\n", lines)
-          Assert.assertEquals(neovimContent, myFixture.editor.document.text)
-        }
-      } catch (e: InterruptedException) {
+      ProcessRPCConnection(neovim, true).use { neovimConnection ->
+        val api = NeovimApis.getApiForConnection(neovimConnection)
+        val editor = myFixture.editor
+        api.currentBuffer.get().setLines(0, -1, false, editor.document.text.split("\n")).get()
+        val logicalPosition = editor.caretModel.logicalPosition
+        api.currentWindow.get().setCursor(VimCoords(logicalPosition.line + 1, logicalPosition.column)).get()
+        api.input(api.replaceTermcodes(keys, true, false, true).get()).get()
         justTest(keys, after, modeAfter, subModeAfter)
-      } catch (e: ExecutionException) {
-        justTest(keys, after, modeAfter, subModeAfter)
-      } finally {
-        neovim.destroy()
+        val vimCoords = api.currentWindow.get().cursor.get()
+        val resultVimCoords = editor.caretModel.logicalPosition.toVimCoords()
+
+        // Check caret position
+        Assert.assertTrue("Expected: $vimCoords, actual: $resultVimCoords", vimCoords.equalsTo(resultVimCoords))
+
+        // Check content
+        val lines = api.currentBuffer.get().getLines(0, -1, false).get()
+        val neovimContent = java.lang.String.join("\n", lines)
+        Assert.assertEquals(neovimContent, myFixture.editor.document.text)
       }
-    } catch (e: IOException) {
-      justTest(keys, after, modeAfter, subModeAfter)
+    } finally {
+      neovim.destroy()
     }
   }
 

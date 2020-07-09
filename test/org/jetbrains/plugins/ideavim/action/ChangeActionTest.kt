@@ -30,72 +30,68 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class ChangeActionTest : VimTestCase() {
   // VIM-620 |i_CTRL-O|
   fun testInsertSingleCommandAndInserting() {
-    doTest(StringHelper.parseKeys("i", "<C-O>", "a", "123", "<Esc>", "x"), "abc${c}d\n", "abcd12\n", CommandState.Mode.COMMAND,
+    doTestWithNeovim(listOf("i", "<C-O>", "a", "123", "<Esc>", "x"), "abc${c}d\n", "abcd12\n", CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }
 
   // VIM-620 |i_CTRL-O|
   fun testInsertSingleCommandAndNewLineInserting() {
-    doTest(StringHelper.parseKeys("i", "<C-O>", "o", "123", "<Esc>", "x"),
+    doTestWithNeovim(listOf("i", "<C-O>", "o", "123", "<Esc>", "x"),
       "abc${c}d\n", "abcd\n12\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-311 |i_CTRL-O|
   fun testInsertSingleCommand() {
-    doTest(StringHelper.parseKeys("i", "def", "<C-O>", "d2h", "x"),
+    doTestWithNeovim(listOf("i", "def", "<C-O>", "d2h", "x"),
       "abc${c}.\n", "abcdx.\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   // VIM-321 |d| |count|
   fun testDeleteEmptyRange() {
-    doTest(StringHelper.parseKeys("d0"), "${c}hello\n", "hello\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim("d0", "${c}hello\n", "hello\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-157 |~|
   fun testToggleCharCase() {
-    doTest(StringHelper.parseKeys("~~"), "${c}hello world\n", "HEllo world\n", CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+    doTestWithNeovim("~~", "${c}hello world\n", "HEllo world\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-157 |~|
   fun testToggleCharCaseLineEnd() {
-    doTest(StringHelper.parseKeys("~~"),
-      "hello wor${c}ld\n", "hello worLD\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim("~~", "hello wor${c}ld\n", "hello worLD\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testToggleCaseMotion() {
-    doTest(StringHelper.parseKeys("g~w"), "${c}FooBar Baz\n", "fOObAR Baz\n", CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+    doTestWithNeovim("g~w", "${c}FooBar Baz\n", "fOObAR Baz\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testChangeUpperCase() {
-    doTest(StringHelper.parseKeys("gUw"), "${c}FooBar Baz\n", "FOOBAR Baz\n", CommandState.Mode.COMMAND,
+    doTestWithNeovim("gUw", "${c}FooBar Baz\n", "FOOBAR Baz\n", CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }
 
   fun testChangeLowerCase() {
-    doTest(StringHelper.parseKeys("guw"), "${c}FooBar Baz\n", "foobar Baz\n", CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+    doTestWithNeovim("guw", "${c}FooBar Baz\n", "foobar Baz\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testToggleCaseVisual() {
-    doTest(StringHelper.parseKeys("ve~"), "${c}FooBar Baz\n", "fOObAR Baz\n", CommandState.Mode.COMMAND,
+    doTestWithNeovim("ve~", "${c}FooBar Baz\n", "fOObAR Baz\n", CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }
 
   fun testChangeUpperCaseVisual() {
-    doTest(StringHelper.parseKeys("veU"), "${c}FooBar Baz\n", "FOOBAR Baz\n", CommandState.Mode.COMMAND,
+    doTestWithNeovim("veU", "${c}FooBar Baz\n", "FOOBAR Baz\n", CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }
 
   fun testChangeLowerCaseVisual() {
-    doTest(StringHelper.parseKeys("veu"), "${c}FooBar Baz\n", "foobar Baz\n", CommandState.Mode.COMMAND,
+    doTestWithNeovim("veu", "${c}FooBar Baz\n", "foobar Baz\n", CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }
 
   // VIM-85 |i| |gi| |gg|
   fun testInsertAtPreviousAction() {
-    doTest(StringHelper.parseKeys("i", "hello", "<Esc>", "gg", "gi", " world! "), """
+    doTestWithNeovim(listOf("i", "hello", "<Esc>", "gg", "gi", " world! "), """
    one
    two ${c}three
    four
@@ -111,7 +107,7 @@ class ChangeActionTest : VimTestCase() {
 
   // VIM-312 |d| |w|
   fun testDeleteLastWordInFile() {
-    doTest(StringHelper.parseKeys("dw"),
+    doTestWithNeovim("dw",
       """
         one
         ${c}two
@@ -127,7 +123,7 @@ class ChangeActionTest : VimTestCase() {
 
   // |d| |w|
   fun testDeleteLastWordBeforeEOL() {
-    doTest(StringHelper.parseKeys("dw"), """
+    doTestWithNeovim("dw", """
    one ${c}two
    three
    
@@ -141,7 +137,7 @@ class ChangeActionTest : VimTestCase() {
 
   // VIM-105 |d| |w|
   fun testDeleteLastWordBeforeEOLs() {
-    doTest(StringHelper.parseKeys("dw"), """
+    doTestWithNeovim("dw", """
    one ${c}two
    
    three
@@ -156,7 +152,7 @@ class ChangeActionTest : VimTestCase() {
 
   // VIM-105 |d| |w|
   fun testDeleteLastWordBeforeEOLAndWhitespace() {
-    doTest(StringHelper.parseKeys("dw"),
+    doTestWithNeovim("dw",
       """one ${c}two
  three
 """,
@@ -168,7 +164,7 @@ class ChangeActionTest : VimTestCase() {
 
   // VIM-105 |d| |w| |count|
   fun testDeleteTwoWordsOnTwoLines() {
-    doTest(StringHelper.parseKeys("d2w"), """
+    doTestWithNeovim("d2w", """
    one ${c}two
    three four
    
@@ -178,13 +174,13 @@ class ChangeActionTest : VimTestCase() {
 
   // VIM-1380 |d| |w| |count|
   fun testDeleteTwoWordsAtLastChar() {
-    doTest(StringHelper.parseKeys("d2w"), "on${c}e two three\n", "on${c}three\n", CommandState.Mode.COMMAND,
+    doTestWithNeovim("d2w", "on${c}e two three\n", "on${c}three\n", CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }
 
   // VIM-394 |d| |v_aw|
   fun testDeleteIndentedWordBeforePunctuation() {
-    doTest(StringHelper.parseKeys("daw"), """foo
+    doTestWithNeovim("daw", """foo
   ${c}bar, baz
 """, """foo
   , baz
@@ -194,7 +190,7 @@ class ChangeActionTest : VimTestCase() {
 
   // |d| |v_aw|
   fun testDeleteLastWordAfterPunctuation() {
-    doTest(StringHelper.parseKeys("daw"), """
+    doTestWithNeovim("daw", """
    foo(${c}bar
    baz
    
@@ -208,7 +204,7 @@ class ChangeActionTest : VimTestCase() {
 
   // VIM-244 |d| |l|
   fun testDeleteLastCharInLine() {
-    doTest(StringHelper.parseKeys("dl"),
+    doTestWithNeovim("dl",
       """
         fo${c}o
         bar
@@ -224,7 +220,7 @@ class ChangeActionTest : VimTestCase() {
 
   // VIM-393 |d|
   fun testDeleteBadArgument() {
-    doTest(StringHelper.parseKeys("dD", "dd"), """
+    doTestWithNeovim(listOf("dD", "dd"), """
    one
    two
    
@@ -240,19 +236,19 @@ class ChangeActionTest : VimTestCase() {
 
   // VIM-404 |O|
   fun testInsertNewLineAboveFirstLine() {
-    doTest(StringHelper.parseKeys("O", "bar"),
+    doTestWithNeovim(listOf("O", "bar"),
       "fo${c}o\n", "bar\nfoo\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   // VIM-472 |v|
   fun testVisualSelectionRightMargin() {
-    doTest(StringHelper.parseKeys("v", "k\$d"),
+    doTestWithNeovim(listOf("v", "k\$d"),
       "foo\n${c}bar\n", "fooar\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-632 |CTRL-V| |v_d|
   fun testDeleteVisualBlock() {
-    doTest(StringHelper.parseKeys("<C-V>", "jjl", "d"),
+    doTestWithNeovim(listOf("<C-V>", "jjl", "d"),
       """
         ${c}foo
         bar
@@ -270,7 +266,7 @@ class ChangeActionTest : VimTestCase() {
   }
 
   fun testDeleteCharVisualBlock() {
-    doTest(StringHelper.parseKeys("<C-V>", "jjl", "x"),
+    doTestWithNeovim(listOf("<C-V>", "jjl", "x"),
       """
         ${c}foo
         bar
@@ -288,7 +284,7 @@ class ChangeActionTest : VimTestCase() {
   }
 
   fun testDeleteJoinLinesSpaces() {
-    doTest(StringHelper.parseKeys("3J"),
+    doTestWithNeovim("3J",
       """    a${c} 1
     b 2
     c 3
@@ -300,7 +296,7 @@ quux
   }
 
   fun testDeleteJoinLines() {
-    doTest(StringHelper.parseKeys("3gJ"),
+    doTestWithNeovim("3gJ",
       """    a${c} 1
     b 2
     c 3
@@ -312,7 +308,7 @@ quux
   }
 
   fun testDeleteJoinLinesWithTrailingSpaceThenEmptyLine() {
-    doTest(StringHelper.parseKeys("3J"),
+    doTestWithNeovim("3J",
       """
         foo 
         
@@ -321,7 +317,7 @@ quux
   }
 
   fun testDeleteJoinLinesWithTwoTrailingSpaces() {
-    doTest(StringHelper.parseKeys("J"),
+    doTestWithNeovim("J",
       """
         foo  
         bar
@@ -329,7 +325,7 @@ quux
   }
 
   fun testDeleteJoinVisualLinesSpaces() {
-    doTest(StringHelper.parseKeys("v2jJ"),
+    doTestWithNeovim("v2jJ",
       """    a${c} 1
     b 2
     c 3
@@ -341,7 +337,7 @@ quux
   }
 
   fun testDeleteJoinVisualLines() {
-    doTest(StringHelper.parseKeys("v2jgJ"),
+    doTestWithNeovim("v2jgJ",
       """    a${c} 1
     b 2
     c 3
@@ -353,18 +349,18 @@ quux
   }
 
   fun testDeleteCharVisualBlockOnLastCharOfLine() {
-    doTest(StringHelper.parseKeys("<C-V>", "x"),
+    doTestWithNeovim(listOf("<C-V>", "x"),
       "fo${c}o\n", "fo\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testDeleteCharVisualBlockOnEmptyLinesDoesntDeleteAnything() {
-    doTest(StringHelper.parseKeys("<C-V>", "j", "x"),
+    doTestWithNeovim(listOf("<C-V>", "j", "x"),
       "\n\n", "\n\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-781 |CTRL-V| |j|
   fun testDeleteCharVisualBlockWithEmptyLineInTheMiddle() {
-    doTest(StringHelper.parseKeys("l", "<C-V>", "jj", "x"),
+    doTestWithNeovim(listOf("l", "<C-V>", "jj", "x"),
       """
         foo
         
@@ -381,7 +377,7 @@ quux
 
   // VIM-781 |CTRL-V| |j|
   fun testDeleteCharVisualBlockWithShorterLineInTheMiddle() {
-    doTest(StringHelper.parseKeys("l", "<C-V>", "jj", "x"),
+    doTestWithNeovim(listOf("l", "<C-V>", "jj", "x"),
       """
         foo
         x
@@ -413,20 +409,17 @@ quux
 
   // |r|
   fun testReplaceOneChar() {
-    doTest(StringHelper.parseKeys("rx"),
-      "b${c}ar\n", "b${c}xr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim("rx", "b${c}ar\n", "b${c}xr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |r|
   fun testReplaceMultipleCharsWithCount() {
-    doTest(StringHelper.parseKeys("3rX"),
-      "fo${c}obar\n", "fo${c}XXXr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("3rX", "fo${c}obar\n", "fo${c}XXXr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |r|
   fun testReplaceMultipleCharsWithCountPastEndOfLine() {
-    doTest(StringHelper.parseKeys("6rX"),
-      "fo${c}obar\n", "fo${c}obar\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim("6rX", "fo${c}obar\n", "fo${c}obar\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |r|
@@ -446,7 +439,7 @@ quux
 
   // |r|
   fun testReplaceOneCharWithNewline() {
-    doTest(StringHelper.parseKeys("r<Enter>"),
+    doTestWithNeovim("r<Enter>",
       """    fo${c}obar
 foobaz
 """,
@@ -470,19 +463,18 @@ foobaz
 
   // |s|
   fun testReplaceOneCharWithText() {
-    doTest(StringHelper.parseKeys("sxy<Esc>"),
-      "b${c}ar\n", "bx${c}yr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim("sxy<Esc>", "b${c}ar\n", "bx${c}yr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |s|
   fun testReplaceMultipleCharsWithTextWithCount() {
-    doTest(StringHelper.parseKeys("3sxy<Esc>"),
+    doTestWithNeovim("3sxy<Esc>",
       "fo${c}obar\n", "fox${c}yr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |s|
   fun testReplaceMultipleCharsWithTextWithCountPastEndOfLine() {
-    doTest(StringHelper.parseKeys("99sxyz<Esc>"),
+    doTestWithNeovim("99sxyz<Esc>",
       """
         foo${c}bar
         biff
@@ -497,8 +489,7 @@ foobaz
 
   // |R|
   fun testReplaceMode() {
-    doTest(StringHelper.parseKeys("Rbaz<Esc>"),
-      "foo${c}bar\n", "fooba${c}z\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim("Rbaz<Esc>", "foo${c}bar\n", "fooba${c}z\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |R| |i_<Insert>|
@@ -690,7 +681,7 @@ and some text after""")
   }
 
   fun testRepeatChangeWordDoesNotBreakNextRepeatFind() {
-    doTest(StringHelper.parseKeys("fXcfYPATATA<Esc>fX.;."), "${c}aaaaXBBBBYaaaaaaaXBBBBYaaaaaaXBBBBYaaaaaaaa\n",
+    doTestWithNeovim("fXcfYPATATA<Esc>fX.;.", "${c}aaaaXBBBBYaaaaaaaXBBBBYaaaaaaXBBBBYaaaaaaaa\n",
       "aaaaPATATAaaaaaaaPATATAaaaaaaPATATAaaaaaaaa\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -704,7 +695,7 @@ and some text after""")
   }
 
   fun testDownMovementAfterDeletionToStart() {
-    doTest(StringHelper.parseKeys("ld^j"),
+    doTestWithNeovim("ld^j",
       """
         lorem ${c}ipsum dolor sit amet
         lorem ipsum dolor sit amet
@@ -717,7 +708,7 @@ and some text after""")
   }
 
   fun testDownMovementAfterDeletionToPrevWord() {
-    doTest(StringHelper.parseKeys("ldbj"),
+    doTestWithNeovim("ldbj",
       """
         lorem${c} ipsum dolor sit amet
         lorem ipsum dolor sit amet
@@ -730,7 +721,7 @@ and some text after""")
   }
 
   fun testDownMovementAfterChangeToPrevWord() {
-    doTest(StringHelper.parseKeys("lcb<Esc>j"),
+    doTestWithNeovim("lcb<Esc>j",
       """
         lorem${c} ipsum dolor sit amet
         lorem ipsum dolor sit amet
@@ -743,7 +734,7 @@ and some text after""")
   }
 
   fun testDownMovementAfterChangeToLineStart() {
-    doTest(StringHelper.parseKeys("lc^<Esc>j"),
+    doTestWithNeovim("lc^<Esc>j",
       """
         lorem${c} ipsum dolor sit amet
         lorem ipsum dolor sit amet
@@ -756,7 +747,7 @@ and some text after""")
   }
 
   fun testUpMovementAfterDeletionToStart() {
-    doTest(StringHelper.parseKeys("ld^k"),
+    doTestWithNeovim("ld^k",
       """
         lorem ipsum dolor sit amet
         lorem ${c}ipsum dolor sit amet
@@ -769,7 +760,7 @@ and some text after""")
   }
 
   fun testUpMovementAfterChangeToPrevWord() {
-    doTest(StringHelper.parseKeys("lcb<Esc>k"),
+    doTestWithNeovim("lcb<Esc>k",
       """
         lorem ipsum dolor sit amet
         lorem${c} ipsum dolor sit amet
@@ -783,7 +774,7 @@ and some text after""")
 
   // VIM-714 |v|
   fun testDeleteVisualColumnPositionOneLine() {
-    doTest(StringHelper.parseKeys("vwxj"),
+    doTestWithNeovim("vwxj",
       """
         ${c}lorem ipsum dolor sit amet
         lorem ipsum dolor sit amet
@@ -798,7 +789,7 @@ and some text after""")
 
   // VIM-714 |v|
   fun testDeleteVisualColumnPositionMultiLine() {
-    doTest(StringHelper.parseKeys("v3wfixj"),
+    doTestWithNeovim("v3wfixj",
       """
         gaganis ${c}gaganis gaganis
         gaganis gaganis gaganis
@@ -813,7 +804,7 @@ and some text after""")
   }
 
   fun testChangeSameLine() {
-    doTest(StringHelper.parseKeys("d_"),
+    doTestWithNeovim("d_",
       """
         line 1
         line${c} 2
