@@ -23,10 +23,10 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertExitModeActionTest : VimTestCase() {
   fun `test exit visual mode`() {
-    doTest("i<Esc>", "12${c}3", "1${c}23", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim("i<Esc>", "12${c}3", "1${c}23", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test exit visual mode on line start`() {
-    doTest("i<Esc>", "${c}123", "${c}123", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim("i<Esc>", "${c}123", "${c}123", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 }

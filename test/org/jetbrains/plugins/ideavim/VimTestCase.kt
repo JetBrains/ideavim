@@ -261,7 +261,7 @@ abstract class VimTestCase : UsefulTestCase() {
           val resultVimCoords = editor.caretModel.logicalPosition.toVimCoords()
 
           // Check caret position
-          Assert.assertTrue(vimCoords.equalsTo(resultVimCoords))
+          Assert.assertTrue("Expected: $vimCoords, actual: $resultVimCoords", vimCoords.equalsTo(resultVimCoords))
 
           // Check content
           val lines = api.currentBuffer.get().getLines(0, -1, false).get()
