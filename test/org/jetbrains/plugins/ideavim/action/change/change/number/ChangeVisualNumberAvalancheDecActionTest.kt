@@ -19,7 +19,6 @@
 package org.jetbrains.plugins.ideavim.action.change.change.number
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -27,7 +26,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 class ChangeVisualNumberAvalancheDecActionTest : VimTestCase() {
   fun `test dec visual avalanche`() {
-    doTest(parseKeys("VGg<C-X>"),
+    doTestWithNeovim("VGg<C-X>",
       """
                     ${c}number 2
                     number 3
@@ -43,7 +42,7 @@ class ChangeVisualNumberAvalancheDecActionTest : VimTestCase() {
   }
 
   fun `test dec visual avalanche multiple times`() {
-    doTest(parseKeys("VG2g<C-X>"),
+    doTestWithNeovim("VG2g<C-X>",
       """
                     ${c}number 3
                     number 5

@@ -24,7 +24,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionInnerBigWordActionTest : VimTestCase() {
   fun `test at last dot`() {
-    doTest(parseKeys("diW"),
+    doTestWithNeovim("diW",
       """
           I found it in a legendary land
           all rocks and lavender and tufted grass,

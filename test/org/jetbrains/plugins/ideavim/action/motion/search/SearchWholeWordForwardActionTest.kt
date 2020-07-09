@@ -40,7 +40,7 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
   }
 
   fun `test backward search on empty string`() {
-    doTest(parseKeys("*"), "", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim("*", "", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     assertPluginError(false)
   }
 
@@ -69,7 +69,7 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
   }
 
   fun `test last word`() {
-    doTest(parseKeys("*"),
+    doTestWithNeovim("*",
       """
           I found it in a legendary land
           all |pass| rocks and lavender and tufted grass,

@@ -25,7 +25,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class DeleteVisualLinesActionTest : VimTestCase() {
   fun `test remove line in char visual mode`() {
-    doTest(StringHelper.parseKeys("vlllX"),
+    doTestWithNeovim("vlllX",
       """
                 I found ${c}it in a legendary land
                 all rocks and lavender and tufted grass,
@@ -63,7 +63,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
   }
 
   fun `test remove line in line visual mode`() {
-    doTest(StringHelper.parseKeys("VX"),
+    doTestWithNeovim("VX",
       """
                 I found ${c}it in a legendary land
                 all rocks and lavender and tufted grass,

@@ -66,7 +66,7 @@ class SelectEnableCharacterModeActionHandlerTest : VimTestCase() {
   }
 
   fun `test entering select mode on empty line`() {
-    doTest(parseKeys("gh"),
+    doTestWithNeovim("gh",
       """
                 A Discovery
                 $c

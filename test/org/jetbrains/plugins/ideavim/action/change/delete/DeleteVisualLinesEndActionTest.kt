@@ -27,7 +27,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class DeleteVisualLinesEndActionTest : VimTestCase() {
   fun `test simple deletion`() {
-    val keys = parseKeys("v", "D")
+    val keys = listOf("v", "D")
     val before = """
             A Discovery
 
@@ -43,7 +43,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers(originalVimAfter = """
@@ -74,7 +74,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   }
 
   fun `test simple deletion empty line`() {
-    val keys = parseKeys("v", "D")
+    val keys = listOf("v", "D")
     val before = """
             A Discovery
             ${c}
@@ -90,7 +90,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers("""
@@ -124,7 +124,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   }
 
   fun `test simple deletion first line`() {
-    val keys = parseKeys("v", "D")
+    val keys = listOf("v", "D")
     val before = """
             A ${c}Discovery
 
@@ -140,11 +140,11 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test simple deletion before empty`() {
-    val keys = parseKeys("v", "D")
+    val keys = listOf("v", "D")
     val before = """
             A Discovery
 
@@ -162,7 +162,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers("""
@@ -193,7 +193,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   }
 
   fun `test simple deletion multiline`() {
-    val keys = parseKeys("vj", "D")
+    val keys = listOf("vj", "D")
     val before = """
             A Discovery
 
@@ -208,11 +208,11 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             ${c}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test simple deletion multiline motion up`() {
-    val keys = parseKeys("vk", "D")
+    val keys = listOf("vk", "D")
     val before = """
             A Discovery
 
@@ -227,7 +227,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             ${c}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test delete visual lines end action`() {
@@ -246,7 +246,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   }
 
   fun `test line simple deletion`() {
-    val keys = parseKeys("V", "D")
+    val keys = listOf("V", "D")
     val before = """
             A Discovery
 
@@ -262,7 +262,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers(originalVimAfter = """
@@ -293,7 +293,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   }
 
   fun `test line deletion empty line`() {
-    val keys = parseKeys("V", "D")
+    val keys = listOf("V", "D")
     val before = """
             A Discovery
             ${c}
@@ -309,7 +309,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers("""
@@ -370,7 +370,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   }
 
   fun `test line deletion multiline`() {
-    val keys = parseKeys("Vj", "D")
+    val keys = listOf("Vj", "D")
     val before = """
             A Discovery
 
@@ -385,11 +385,11 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             ${c}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test line deletion multiline motion up`() {
-    val keys = parseKeys("Vk", "D")
+    val keys = listOf("Vk", "D")
     val before = """
             A Discovery
 
@@ -404,7 +404,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             ${c}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test line delete visual lines end action`() {
@@ -423,7 +423,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
   }
 
   fun `test block simple deletion`() {
-    val keys = parseKeys("<C-V>", "D")
+    val keys = listOf("<C-V>", "D")
     val before = """
             A Discovery
 
@@ -440,11 +440,11 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test block deletion empty line`() {
-    val keys = parseKeys("<C-V>", "D")
+    val keys = listOf("<C-V>", "D")
     val before = """
             A Discovery
             ${c}
@@ -461,11 +461,11 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test block deletion last line`() {
-    val keys = parseKeys("<C-V>", "D")
+    val keys = listOf("<C-V>", "D")
     val before = """
             A Discovery
 
@@ -484,11 +484,11 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             hard by the
 
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test block deletion last line without empty line`() {
-    val keys = parseKeys("<C-V>", "D")
+    val keys = listOf("<C-V>", "D")
     val before = """
             A Discovery
 
@@ -503,11 +503,11 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the""".trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test block deletion multiline`() {
-    val keys = parseKeys("<C-V>j", "D")
+    val keys = listOf("<C-V>j", "D")
     val before = """
             A Discovery
 
@@ -524,11 +524,11 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test block deletion multiline motion up`() {
-    val keys = parseKeys("<C-V>k", "D")
+    val keys = listOf("<C-V>k", "D")
     val before = """
             A Discovery
 
@@ -545,7 +545,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test delete visual block line end action`() {

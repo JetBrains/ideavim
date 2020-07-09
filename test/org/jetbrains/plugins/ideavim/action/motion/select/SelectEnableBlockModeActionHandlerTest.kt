@@ -66,7 +66,7 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
   }
 
   fun `test entering select mode on empty line`() {
-    doTest(parseKeys("g<C-H>"),
+    doTestWithNeovim("g<C-H>",
       """
                 A Discovery
                 $c

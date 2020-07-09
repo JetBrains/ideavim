@@ -27,7 +27,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ChangeVisualActionTest : VimTestCase() {
   fun `test multiple line change`() {
-    val keys = parseKeys("VjcHello<esc>")
+    val keys = "VjcHello<esc>"
     val before = """
             ${c}A Discovery
 
@@ -43,11 +43,11 @@ class ChangeVisualActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test multiple line change in text middle`() {
-    val keys = parseKeys("Vjc")
+    val keys = "Vjc"
     val before = """
             A Discovery
 
@@ -63,7 +63,7 @@ class ChangeVisualActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers(originalVimAfter = """
@@ -156,10 +156,10 @@ class ChangeVisualActionTest : VimTestCase() {
   }
 
   fun `test replace first line`() {
-    val keys = parseKeys("VcHello<esc>")
+    val keys = "VcHello<esc>"
     val before = "${c}A Discovery"
     val after = "Hello"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test change visual action`() {

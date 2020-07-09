@@ -30,7 +30,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 class MotionDownActionTest : VimTestCase() {
   fun `test motion down in visual block mode`() {
-    val keys = parseKeys("<C-V>2kjjj")
+    val keys = "<C-V>2kjjj"
     val before = """
             A Discovery
 
@@ -47,11 +47,11 @@ class MotionDownActionTest : VimTestCase() {
             wh|${s}e${se}re i|t was settled on some sodden sand
             ha|${s}r${se}d by| the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 
   fun `test motion down in visual block mode with dollar motion`() {
-    val keys = parseKeys("<C-V>\$jj")
+    val keys = "<C-V>\$jj"
     val before = """
             A Discovery
 
@@ -68,11 +68,11 @@ class MotionDownActionTest : VimTestCase() {
             wh|${s}ere it was settled on some sodden sand[additional Chars]${c}${se}
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 
   fun `test last column after line deletion`() {
-    val keys = parseKeys("Vd", "j")
+    val keys = listOf("Vd", "j")
     val before = """
             I found it in a ${c}legendary land
             
@@ -82,7 +82,7 @@ class MotionDownActionTest : VimTestCase() {
             
             ${c}all rocks and lavender and tufted grass,
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test with inlays`() {
@@ -214,7 +214,7 @@ class MotionDownActionTest : VimTestCase() {
   }
 
   fun `test motion to the last empty line`() {
-    doTest(parseKeys("j"),
+    doTestWithNeovim("j",
       """
             I found it in a legendary ${c}land
             

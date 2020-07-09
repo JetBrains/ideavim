@@ -29,7 +29,7 @@ import org.jetbrains.plugins.ideavim.VimTestOptionType
 class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(IdeaJoinOptionsData.name) {
   @VimOptionTestConfiguration(VimTestOption(IdeaJoinOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
   fun `test join with idea`() {
-    doTest(StringHelper.parseKeys("J"),
+    doTestWithNeovim("J",
       """
                 A Discovery
 
@@ -51,7 +51,7 @@ class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(IdeaJoinOptionsData.na
 
   @VimOptionTestConfiguration(VimTestOption(IdeaJoinOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
   fun `test join with idea with count`() {
-    doTest(StringHelper.parseKeys("3J"),
+    doTestWithNeovim("3J",
       """
                 A Discovery
 

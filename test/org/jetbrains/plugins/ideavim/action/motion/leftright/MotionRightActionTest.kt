@@ -62,7 +62,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test simple motion to the end`() {
-    doTest(parseKeys("3l"), """
+    doTestWithNeovim("3l", """
             A Discovery
 
             I found it in a legendary lan${c}d

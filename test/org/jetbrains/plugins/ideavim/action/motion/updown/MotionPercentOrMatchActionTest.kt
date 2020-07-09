@@ -135,7 +135,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   fun `test motion with quote on the way`() {
-    doTest(parseKeys("%"), """
+    doTestWithNeovim("%", """
             for (; c!= cj;c = it.next()) ${c}{
              if (dsa) {
                if (c == '\\') {
@@ -156,7 +156,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   fun `test motion outside text`() {
-    doTest(parseKeys("%"), """
+    doTestWithNeovim("%", """
             (
             ""${'"'}
             ""${'"'} + ${c}title("Display")
@@ -175,22 +175,22 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   fun `test motion in text`() {
-    doTest(parseKeys("%"), """ "I found ${c}it in a (legendary) land" """,
+    doTestWithNeovim("%", """ "I found ${c}it in a (legendary) land" """,
       """ "I found it in a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test motion in text with quotes`() {
-    doTest(parseKeys("%"), """ "I found ${c}it in \"a (legendary) land" """,
+    doTestWithNeovim("%", """ "I found ${c}it in \"a (legendary) land" """,
       """ "I found it in \"a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test motion in text with quotes start before quote`() {
-    doTest(parseKeys("%"), """ ${c} "I found it in \"a (legendary) land" """,
+    doTestWithNeovim("%", """ ${c} "I found it in \"a (legendary) land" """,
       """  "I found it in \"a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test motion in text with quotes and double escape`() {
-    doTest(parseKeys("%"), """ "I found ${c}it in \\\"a (legendary) land" """,
+    doTestWithNeovim("%", """ "I found ${c}it in \\\"a (legendary) land" """,
       """ "I found it in \\\"a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 }

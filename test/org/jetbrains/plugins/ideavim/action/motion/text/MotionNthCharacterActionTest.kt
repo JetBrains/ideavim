@@ -25,7 +25,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionNthCharacterActionTest : VimTestCase() {
   fun `test goto without count`() {
-    doTest(StringHelper.parseKeys("go"),
+    doTestWithNeovim("go",
       """
             A Discovery
 
@@ -47,7 +47,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
   }
 
   fun `test goto with 0`() {
-    doTest(StringHelper.parseKeys("0go"),
+    doTestWithNeovim("0go",
       """
             A Discovery
 
@@ -69,7 +69,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
   }
 
   fun `test goto with 1`() {
-    doTest(StringHelper.parseKeys("1go"),
+    doTestWithNeovim("1go",
       """
             A Discovery
 
@@ -91,7 +91,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
   }
 
   fun `test goto with 2`() {
-    doTest(StringHelper.parseKeys("2go"),
+    doTestWithNeovim("2go",
       """
             A Discovery
 
@@ -113,7 +113,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
   }
 
   fun `test goto with 10`() {
-    doTest(StringHelper.parseKeys("10go"),
+    doTestWithNeovim("10go",
       """
             A Discovery
 
@@ -135,7 +135,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
   }
 
   fun `test goto with 1000`() {
-    doTest(StringHelper.parseKeys("1000go"),
+    doTestWithNeovim("1000go",
       """
             A Discovery
 

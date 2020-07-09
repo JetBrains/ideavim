@@ -24,7 +24,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionInnerWordActionTest : VimTestCase() {
   fun `test empty text`() {
-    doTest(parseKeys("viw"), "", "",
+    doTestWithNeovim("viw", "", "",
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 }

@@ -19,12 +19,11 @@
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionGotoLineLastActionTest : VimTestCase() {
   fun `test simple motion`() {
-    doTest(parseKeys("G"),
+    doTestWithNeovim("G",
       """
                 A Discovery
 
@@ -44,7 +43,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
   fun `test with last empty line`() {
-    doTest(parseKeys("G"),
+    doTestWithNeovim("G",
       """
                 A Discovery
 

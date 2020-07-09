@@ -19,20 +19,19 @@
 package org.jetbrains.plugins.ideavim.action.change.change
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ChangeLineActionTest : VimTestCase() {
   fun `test on empty file`() {
-    doTest(parseKeys("cc"), "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTestWithNeovim("cc", "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   fun `test on empty file with S`() {
-    doTest(parseKeys("S"), "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTestWithNeovim("S", "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   fun `test on last line with S`() {
-    doTest(parseKeys("S"), """
+    doTestWithNeovim("S", """
             I found it in a legendary land
             all ${c}rocks and lavender and tufted grass,
     """.trimIndent(), """
@@ -42,7 +41,7 @@ class ChangeLineActionTest : VimTestCase() {
   }
 
   fun `test on last line with new line with S`() {
-    doTest(parseKeys("S"), """
+    doTestWithNeovim("S", """
             I found it in a legendary land
             all ${c}rocks and lavender and tufted grass,
             
@@ -54,7 +53,7 @@ class ChangeLineActionTest : VimTestCase() {
   }
 
   fun `test on very last line with new line with S`() {
-    doTest(parseKeys("S"), """
+    doTestWithNeovim("S", """
             I found it in a legendary land
             all ${c}rocks and lavender and tufted grass,
     """.trimIndent(), """
@@ -64,7 +63,7 @@ class ChangeLineActionTest : VimTestCase() {
   }
 
   fun `test on first line with new line with S`() {
-    doTest(parseKeys("S"), """
+    doTestWithNeovim("S", """
             I ${c}found it in a legendary land
             all rocks and lavender and tufted grass,
     """.trimIndent(), """
@@ -74,7 +73,7 @@ class ChangeLineActionTest : VimTestCase() {
   }
 
   fun `test on last line with new line with cc`() {
-    doTest(parseKeys("cc"), """
+    doTestWithNeovim("cc", """
             I found it in a legendary land
             all ${c}rocks and lavender and tufted grass,
             
@@ -86,7 +85,7 @@ class ChangeLineActionTest : VimTestCase() {
   }
 
   fun `test on last line`() {
-    doTest(parseKeys("cc"), """
+    doTestWithNeovim("cc", """
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             $c

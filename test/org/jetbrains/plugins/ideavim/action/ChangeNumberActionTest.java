@@ -32,19 +32,19 @@ public class ChangeNumberActionTest extends VimTestCase {
   }
 
   public void testIncrementHexZero() {
-    doTest(parseKeys("<C-A>"), "0x0", "0x1", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestWithNeovim("<C-A>", "0x0", "0x1", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDecrementZero() {
-    doTest(parseKeys("<C-X>"), "0", "-1", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestWithNeovim("<C-X>", "0", "-1", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testIncrementDecimal() {
-    doTest(parseKeys("<C-A>"), "199", "200", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestWithNeovim("<C-A>", "199", "200", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDecrementDecimal() {
-    doTest(parseKeys("<C-X>"), "1000", "999", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestWithNeovim("<C-X>", "1000", "999", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testIncrementOctal() {
@@ -56,19 +56,19 @@ public class ChangeNumberActionTest extends VimTestCase {
   }
 
   public void testIncrementHex() {
-    doTest(parseKeys("<C-A>"), "0xff", "0x100", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestWithNeovim("<C-A>", "0xff", "0x100", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDecrementHex() {
-    doTest(parseKeys("<C-X>"), "0xa100", "0xa0ff", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestWithNeovim("<C-X>", "0xa100", "0xa0ff", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testIncrementNegativeDecimal() {
-    doTest(parseKeys("<C-A>"), "-199", "-198", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestWithNeovim("<C-A>", "-199", "-198", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDecrementNegativeDecimal() {
-    doTest(parseKeys("<C-X>"), "-1000", "-1001", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestWithNeovim("<C-X>", "-1000", "-1001", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testIncrementNegativeOctal() {
@@ -80,23 +80,23 @@ public class ChangeNumberActionTest extends VimTestCase {
   }
 
   public void testIncrementNegativeHex() {
-    doTest(parseKeys("<C-A>"), "-0xff", "-0x100", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestWithNeovim("<C-A>", "-0xff", "-0x100", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDecrementNegativeHex() {
-    doTest(parseKeys("<C-X>"), "-0xa100", "-0xa0ff", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestWithNeovim("<C-X>", "-0xa100", "-0xa0ff", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testIncrementWithCount() {
-    doTest(parseKeys("123<C-A>"), "456", "579", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestWithNeovim("123<C-A>", "456", "579", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDecrementWithCount() {
-    doTest(parseKeys("200<C-X>"), "100", "-100", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestWithNeovim("200<C-X>", "100", "-100", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testIncrementAlphaWithoutNumberFormatAlpha() {
-    doTest(parseKeys("<C-A>"), "foo", "foo", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestWithNeovim("<C-A>", "foo", "foo", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testIncrementAlphaWithNumberFormatAlpha() {
@@ -135,15 +135,15 @@ public class ChangeNumberActionTest extends VimTestCase {
   }
 
   public void testIncrementHexPreservesCaseOfX() {
-    doTest(parseKeys("<C-A>"), "0X88", "0X89", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestWithNeovim("<C-A>", "0X88", "0X89", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testIncrementHexTakesCaseFromLastLetter() {
-    doTest(parseKeys("<C-A>"), "0xaB0", "0xAB1", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestWithNeovim("<C-A>", "0xaB0", "0xAB1", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testIncrementLocatesNumberOnTheSameLine() {
-    doTest(parseKeys("<C-A>"), "foo ->* bar 123\n", "foo ->* bar 12<caret>4\n", CommandState.Mode.COMMAND,
+    doTestWithNeovim("<C-A>", "foo ->* bar 123\n", "foo ->* bar 12<caret>4\n", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 }

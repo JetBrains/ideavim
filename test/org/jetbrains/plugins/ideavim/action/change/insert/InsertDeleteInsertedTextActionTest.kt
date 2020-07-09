@@ -25,7 +25,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class InsertDeleteInsertedTextActionTest : VimTestCase() {
   // VIM-1655
   fun `test deleted text is not yanked`() {
-    doTest(parseKeys("yiw", "ea", "Hello", "<C-U>", "<ESC>p"), """
+    doTestWithNeovim(listOf("yiw", "ea", "Hello", "<C-U>", "<ESC>p"), """
             A Discovery
 
             I found ${c}it in a legendary land

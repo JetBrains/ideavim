@@ -27,7 +27,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VisualToggleLineModeActionTest : VimTestCase() {
   fun `test enter visual with count`() {
-    doTest(parseKeys("1V"),
+    doTestWithNeovim("1V",
       """
                     A Discovery
 
@@ -48,7 +48,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count multicaret`() {
-    doTest(parseKeys("1V"),
+    doTestWithNeovim("1V",
       """
                     A Discovery
 
@@ -69,7 +69,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with 3 count`() {
-    doTest(parseKeys("3V"),
+    doTestWithNeovim("3V",
       """
                     A Discovery
 
@@ -90,7 +90,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with 100 count`() {
-    doTest(parseKeys("100V"),
+    doTestWithNeovim("100V",
       """
                     A Discovery
 

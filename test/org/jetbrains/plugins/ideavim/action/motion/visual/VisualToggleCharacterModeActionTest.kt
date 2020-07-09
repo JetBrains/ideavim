@@ -110,7 +110,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count`() {
-    doTest(parseKeys("1v"),
+    doTestWithNeovim("1v",
       """
                     A Discovery
 
@@ -131,7 +131,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count multicaret`() {
-    doTest(parseKeys("1v"),
+    doTestWithNeovim("1v",
       """
                     A Discovery
 
@@ -152,7 +152,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with five count`() {
-    doTest(parseKeys("5v"),
+    doTestWithNeovim("5v",
       """
                     A Discovery
 
@@ -173,7 +173,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with 100 count`() {
-    doTest(parseKeys("100v"),
+    doTestWithNeovim("100v",
       """
                     A Discovery
 

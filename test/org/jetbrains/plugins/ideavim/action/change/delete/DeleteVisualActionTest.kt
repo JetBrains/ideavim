@@ -29,7 +29,7 @@ import org.jetbrains.plugins.ideavim.waitAndAssertMode
  */
 class DeleteVisualActionTest : VimTestCase() {
   fun `test delete block SE direction`() {
-    val keys = parseKeys("<C-V>e2j", "d")
+    val keys = listOf("<C-V>e2j", "d")
     val before = """
             A Discovery
 
@@ -46,11 +46,11 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test delete block SW direction`() {
-    val keys = parseKeys("<C-V>b2j", "d")
+    val keys = listOf("<C-V>b2j", "d")
     val before = """
             A Discovery
 
@@ -67,11 +67,11 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test delete block NW direction`() {
-    val keys = parseKeys("<C-V>b2k", "d")
+    val keys = listOf("<C-V>b2k", "d")
     val before = """
             A Discovery
 
@@ -88,11 +88,11 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test delete block NE direction`() {
-    val keys = parseKeys("<C-V>2e2k", "d")
+    val keys = listOf("<C-V>2e2k", "d")
     val before = """
             A Discovery
 
@@ -109,7 +109,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test delete after extend selection`() {
@@ -135,7 +135,7 @@ class DeleteVisualActionTest : VimTestCase() {
   }
 
   fun `test delete with dollar motion`() {
-    val keys = parseKeys("<C-V>3j$", "d")
+    val keys = listOf("<C-V>3j$", "d")
     val before = """
             A Discovery
 
@@ -152,6 +152,6 @@ class DeleteVisualActionTest : VimTestCase() {
             wh|
             ha|
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 }
