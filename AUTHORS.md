@@ -299,6 +299,14 @@ Contributors:
   [![icon][github]](https://github.com/pmnoxx)
   &nbsp;
   Piotr Mikulski
+* [![icon][mail]](mailto:14farresa@gmail.com)
+  [![icon][github]](https://github.com/adriafarres)
+  &nbsp;
+  Adrià Farrés
+* [![icon][mail]](mailto:patrick.j.elmquist@gmail.com)
+  [![icon][github]](https://github.com/patrick-elmquist)
+  &nbsp;
+  Patrick Elmquist
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
