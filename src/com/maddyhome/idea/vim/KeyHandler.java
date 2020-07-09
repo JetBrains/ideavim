@@ -212,13 +212,15 @@ public class KeyHandler {
     handleKeyRecursionCount++;
 
     try {
+      if (isEditorReset(key, editorState)) {
+        handleEditorReset(editor, key, context, editorState);
+      }
+
       if (!allowKeyMappings || !handleKeyMapping(editor, key, context)) {
         if (isCommandCountKey(chKey, editorState)) {
           commandBuilder.addCountCharacter(key);
         } else if (isDeleteCommandCountKey(key, editorState)) {
           commandBuilder.deleteCountCharacter();
-        } else if (isEditorReset(key, editorState)) {
-          handleEditorReset(editor, key, context, editorState);
         }
         // If we got this far the user is entering a command or supplying an argument to an entered command.
         // First let's check to see if we are at the point of expecting a single character argument to a command.
@@ -564,7 +566,7 @@ public class KeyHandler {
     // Make sure to avoid handling '0' as the start of a count.
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
     return ((editorState.getMode() == CommandState.Mode.COMMAND
-             &&editorState.getSubMode()!=CommandState.SubMode.REGISTER_PENDING) 
+             &&editorState.getSubMode()!=CommandState.SubMode.REGISTER_PENDING)
             || editorState.getMode() == CommandState.Mode.VISUAL)
       && commandBuilder.isExpectingCount() && Character.isDigit(chKey) && (commandBuilder.getCount() > 0 || chKey != '0');
   }
