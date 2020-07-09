@@ -21,7 +21,6 @@ package org.jetbrains.plugins.ideavim.action
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.MappingOwner
 import junit.framework.TestCase
@@ -31,7 +30,7 @@ class ResetModeActionTest : VimTestCase() {
   private val owner = MappingOwner.Plugin.get("ResetModeActionTest")
 
   fun `test reset from normal mode`() {
-    val keys = StringHelper.parseKeys("<C-\\><C-N>")
+    val keys = parseKeys("<C-\\><C-N>")
     val before = "A Discovery"
     val after = "A Discovery"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
@@ -39,7 +38,7 @@ class ResetModeActionTest : VimTestCase() {
   }
 
   fun `test reset from insert mode`() {
-    val keys = StringHelper.parseKeys("i", "<C-\\><C-N>")
+    val keys = parseKeys("i", "<C-\\><C-N>")
     val before = "A Discovery"
     val after = "A Discovery"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
@@ -47,7 +46,7 @@ class ResetModeActionTest : VimTestCase() {
   }
 
   fun `test reset from visual mode`() {
-    val keys = StringHelper.parseKeys("V", "<C-\\><C-N>")
+    val keys = parseKeys("V", "<C-\\><C-N>")
     val before = "A Discovery"
     val after = "A Discovery"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
@@ -55,7 +54,7 @@ class ResetModeActionTest : VimTestCase() {
   }
 
   fun `test reset from select mode`() {
-    val keys = StringHelper.parseKeys("gH", "<C-\\><C-N>")
+    val keys = parseKeys("gH", "<C-\\><C-N>")
     val before = "A Discovery"
     val after = "A Discovery"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
@@ -63,7 +62,7 @@ class ResetModeActionTest : VimTestCase() {
   }
 
   fun `test reset from operator-pending mode`() {
-    val keys = StringHelper.parseKeys("d", "<C-\\><C-N>")
+    val keys = parseKeys("d", "<C-\\><C-N>")
     val before = "A Discovery"
     val after = "A Discovery"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
@@ -71,7 +70,7 @@ class ResetModeActionTest : VimTestCase() {
   }
 
   fun `test reset from operator-pending mode with delete`() {
-    val keys = StringHelper.parseKeys("d<Esc>dw")
+    val keys = parseKeys("d<Esc>dw")
     val before = "A Discovery"
     val after = "Discovery"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
@@ -79,7 +78,7 @@ class ResetModeActionTest : VimTestCase() {
   }
 
   fun `test delete command after resetting operator-pending mode`() {
-    val keys = StringHelper.parseKeys("d", "<C-\\><C-N>", "dw")
+    val keys = parseKeys("d", "<C-\\><C-N>", "dw")
     val before = "A Discovery"
     val after = "Discovery"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
@@ -87,7 +86,7 @@ class ResetModeActionTest : VimTestCase() {
   }
 
   fun `test delete command after resetting operator-pending mode with esc`() {
-    val keys = StringHelper.parseKeys("d", "<Esc>", "dw")
+    val keys = parseKeys("d", "<Esc>", "dw")
     val before = "A Discovery"
     val after = "Discovery"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
@@ -95,7 +94,7 @@ class ResetModeActionTest : VimTestCase() {
   }
 
   fun `test delete command after resetting operator-pending mode with ctrl open bracket`() {
-    val keys = StringHelper.parseKeys("d", "<C-[>", "dw")
+    val keys = parseKeys("d", "<C-[>", "dw")
     val before = "A Discovery"
     val after = "Discovery"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
@@ -106,7 +105,7 @@ class ResetModeActionTest : VimTestCase() {
     VimPlugin.getKey()
       .putKeyMapping(MappingMode.NVO, parseKeys("<C-D>"), owner, parseKeys("<Esc>"), false)
 
-    val keys = StringHelper.parseKeys("d", "<C-D>", "dw")
+    val keys = parseKeys("d", "<C-D>", "dw")
     val before = "A Discovery"
     val after = "Discovery"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
@@ -114,7 +113,7 @@ class ResetModeActionTest : VimTestCase() {
   }
 
   fun `test non-delete commands after resetting operator-pending mode`() {
-    val keys = StringHelper.parseKeys("c", "<C-\\><C-N>", "another")
+    val keys = parseKeys("c", "<C-\\><C-N>", "another")
     val before = "A Discovery"
     val after = "Another Discovery"
     doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
@@ -122,7 +121,7 @@ class ResetModeActionTest : VimTestCase() {
   }
 
   fun `test delete after escaping t`() {
-    val keys = StringHelper.parseKeys("dt<esc>D")
+    val keys = parseKeys("dt<esc>D")
     val before = "A ${c}Discovery"
     val after = "A "
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
