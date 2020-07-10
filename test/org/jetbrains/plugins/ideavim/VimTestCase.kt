@@ -71,7 +71,7 @@ import javax.swing.KeyStroke
  */
 abstract class VimTestCase : UsefulTestCase() {
   protected lateinit var myFixture: CodeInsightTestFixture
-  protected lateinit var api: NeovimApi
+  protected lateinit var neovimApi: NeovimApi
   private lateinit var neovim: Process
 
   @Throws(Exception::class)
@@ -99,7 +99,7 @@ abstract class VimTestCase : UsefulTestCase() {
     val pb = ProcessBuilder("nvim", "-u", "NONE", "--embed", "--headless")
     neovim = pb.start()
     val neovimConnection = ProcessRPCConnection(neovim, true)
-    api = NeovimApis.getApiForConnection(neovimConnection)
+    neovimApi = NeovimApis.getApiForConnection(neovimConnection)
   }
 
   protected val testDataPath: String
@@ -264,19 +264,19 @@ abstract class VimTestCase : UsefulTestCase() {
     configureByText(before)
 
     val editor = myFixture.editor
-    api.currentBuffer.get().setLines(0, -1, false, editor.document.text.split("\n")).get()
+    neovimApi.currentBuffer.get().setLines(0, -1, false, editor.document.text.split("\n")).get()
     val logicalPosition = editor.caretModel.logicalPosition
-    api.currentWindow.get().setCursor(VimCoords(logicalPosition.line + 1, logicalPosition.column)).get()
-    api.input(api.replaceTermcodes(keys, true, false, true).get()).get()
+    neovimApi.currentWindow.get().setCursor(VimCoords(logicalPosition.line + 1, logicalPosition.column)).get()
+    neovimApi.input(neovimApi.replaceTermcodes(keys, true, false, true).get()).get()
     justTest(keys, after, modeAfter, subModeAfter)
-    val vimCoords = api.currentWindow.get().cursor.get()
+    val vimCoords = neovimApi.currentWindow.get().cursor.get()
     val resultVimCoords = editor.caretModel.logicalPosition.toVimCoords()
 
     // Check caret position
     Assert.assertTrue("Expected: $vimCoords, actual: $resultVimCoords", vimCoords.equalsTo(resultVimCoords))
 
     // Check content
-    val lines = api.currentBuffer.get().getLines(0, -1, false).get()
+    val lines = neovimApi.currentBuffer.get().getLines(0, -1, false).get()
     val neovimContent = java.lang.String.join("\n", lines)
     Assert.assertEquals(neovimContent, myFixture.editor.document.text)
   }
@@ -311,7 +311,7 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected fun setRegister(register: Char, keys: String) {
     VimPlugin.getRegister().setKeys(register, stringToKeys(keys))
-    api.callFunction("setreg", listOf(register, keys, 'c'))
+    neovimApi.callFunction("setreg", listOf(register, keys, 'c'))
   }
 
   protected fun assertState(modeAfter: CommandState.Mode, subModeAfter: SubMode) {
