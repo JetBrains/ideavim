@@ -39,7 +39,7 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
   // VIM-1655
   // VimBehaviorDiffers. Inserted text is not deleted after <C-U>
   fun `test deleted text is not yanked after replace`() {
-    doTest(parseKeys("yiw", "eR", "Hello", "<C-U>", "<ESC>p"), """
+    doTestNoNeovim("Beh diff", parseKeys("yiw", "eR", "Hello", "<C-U>", "<ESC>p"), """
             A Discovery
 
             I found ${c}it in a legendary land

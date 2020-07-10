@@ -38,7 +38,7 @@ class InsertAfterLineEndActionTest : VimTestCase() {
   }
 
   fun `test multiple carets`() {
-    doTest(parseKeys("AHello<esc>"),
+    doTestNoNeovim("multicaret", parseKeys("AHello<esc>"),
       """
                 ${c}A Discovery
 

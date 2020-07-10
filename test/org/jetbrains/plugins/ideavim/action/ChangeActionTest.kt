@@ -423,7 +423,7 @@ quux
 
   // |r|
   fun testReplaceMultipleCharsWithVisual() {
-    doTest(StringHelper.parseKeys("v", "ll", "j", "rZ"),
+    doTestNoNeovim("r works different", StringHelper.parseKeys("v", "ll", "j", "rZ"),
       """
         fo${c}obar
         foobaz
@@ -450,7 +450,7 @@ foobaz
 
   // |r|
   fun testReplaceCharWithNewlineAndCountAddsOnlySingleNewline() {
-    doTest(StringHelper.parseKeys("3r<Enter>"),
+    doTestNoNeovim("r works different", StringHelper.parseKeys("3r<Enter>"),
       """    fo${c}obar
 foobaz
 """,
@@ -493,20 +493,20 @@ foobaz
 
   // |R| |i_<Insert>|
   fun testReplaceModeSwitchToInsertModeAndBack() {
-    doTest(StringHelper.parseKeys("RXXX<Ins>YYY<Ins>ZZZ<Esc>"),
+    doTestNoNeovim("r works different", StringHelper.parseKeys("RXXX<Ins>YYY<Ins>ZZZ<Esc>"),
       "aaa${c}bbbcccddd\n", "aaaXXXYYYZZ${c}Zddd\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |i| |i_<Insert>|
   fun testInsertModeSwitchToReplaceModeAndBack() {
-    doTest(StringHelper.parseKeys("iXXX<Ins>YYY<Ins>ZZZ<Esc>"),
+    doTestNoNeovim("<INS> works strange", StringHelper.parseKeys("iXXX<Ins>YYY<Ins>ZZZ<Esc>"),
       "aaa${c}bbbcccddd\n", "aaaXXXYYYZZ${c}Zcccddd\n", CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }
 
   // VIM-511 |.|
   fun testRepeatWithBackspaces() {
-    doTest(StringHelper.parseKeys("ce", "foo", "<BS><BS><BS>", "foo", "<Esc>", "j0", "."),
+    doTestNoNeovim("Backspace workspace strange", StringHelper.parseKeys("ce", "foo", "<BS><BS><BS>", "foo", "<Esc>", "j0", "."),
       """
         ${c}foo baz
         baz quux

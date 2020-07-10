@@ -24,7 +24,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class JoinLinesHandlerTest : VimTestCase() {
   fun `test simple join`() {
-    doTest(commandToKeys("j"),
+    doTestNoNeovim("ex command", commandToKeys("j"),
       """
                 A Discovery
 
@@ -45,7 +45,7 @@ class JoinLinesHandlerTest : VimTestCase() {
   }
 
   fun `test simple join full command`() {
-    doTest(commandToKeys("join"),
+    doTestNoNeovim("Ex command", commandToKeys("join"),
       """
                 A Discovery
 
@@ -66,7 +66,7 @@ class JoinLinesHandlerTest : VimTestCase() {
   }
 
   fun `test join with range`() {
-    doTest(commandToKeys("4,6j"),
+    doTestNoNeovim("Ex command", commandToKeys("4,6j"),
       """
                 A Discovery
 

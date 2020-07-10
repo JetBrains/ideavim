@@ -29,7 +29,7 @@ import org.jetbrains.plugins.ideavim.VimTestOptionType
 class DeleteJoinVisualLinesSpacesActionTest : VimOptionTestCase(IdeaJoinOptionsData.name) {
   @VimOptionTestConfiguration(VimTestOption(IdeaJoinOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
   fun `test join via idea`() {
-    doTest(parseKeys("VjJ"),
+    doTestNoNeovim("With option", parseKeys("VjJ"),
       """
                 A Discovery
 

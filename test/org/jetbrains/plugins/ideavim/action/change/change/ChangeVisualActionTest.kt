@@ -94,7 +94,7 @@ class ChangeVisualActionTest : VimTestCase() {
             
             
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTestNoNeovim("beh differs", keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
 
@@ -131,9 +131,10 @@ class ChangeVisualActionTest : VimTestCase() {
             ${c}
             
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTestNoNeovim("beh differs", keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
+  @VimBehaviorDiffers(description = "Wrong caret position")
   fun `test change with dollar motion`() {
     val keys = parseKeys("<C-V>3j$", "c", "Hello<Esc>")
     val before = """
@@ -152,7 +153,7 @@ class ChangeVisualActionTest : VimTestCase() {
             wh|Hello
             ha|Hello
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("beh differs", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test replace first line`() {
@@ -171,13 +172,19 @@ class ChangeVisualActionTest : VimTestCase() {
 
   // VIM-1379 |CTRL-V| |j| |v_b_c|
   fun `test change visual block with empty line in the middle`() {
-    doTest(parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
-      "foo foo\n" +
-        "\n" +
-        "bar bar\n",
-      ("fo_quux_foo\n" +
-        "\n" +
-        "ba_quux_bar\n"),
+    doTestNoNeovim("Just differs", parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
+      """
+        foo foo
+        
+        bar bar
+        
+        """.trimIndent(),
+      """
+        fo_quux_foo
+        
+        ba_quux_bar
+        
+        """.trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }
@@ -185,7 +192,7 @@ class ChangeVisualActionTest : VimTestCase() {
 
   // VIM-1379 |CTRL-V| |j| |v_b_c|
   fun `test change visual block with shorter line in the middle`() {
-    doTest(parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
+    doTestNoNeovim("Just differs", parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
       "foo foo\n" +
         "x\n" +
         "bar bar\n",

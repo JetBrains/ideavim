@@ -21,7 +21,6 @@
 package org.jetbrains.plugins.ideavim.action.change.change
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ChangeMotionActionTest : VimTestCase() {
@@ -97,7 +96,7 @@ class ChangeMotionActionTest : VimTestCase() {
 
   // VIM-276 |c| |T|
   fun testChangeLinesTillBackwards() {
-    doTest(parseKeys("cT("), "if (condition) {${c}\n" + "}\n", "if (\n" + "}\n", CommandState.Mode.INSERT,
+    doTestWithNeovim("cT(", "if (condition) ${c}{\n" + "}\n", "if ({\n" + "}\n", CommandState.Mode.INSERT,
       CommandState.SubMode.NONE)
   }
 

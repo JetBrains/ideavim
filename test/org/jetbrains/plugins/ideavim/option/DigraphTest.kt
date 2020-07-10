@@ -31,7 +31,7 @@ class DigraphTest : VimTestCase() {
   fun `test digraph`() {
     OptionsManager.digraph.set()
 
-    doTest(parseKeys("i B<BS>B"), """
+    doTestNoNeovim("backspace works strange", parseKeys("i B<BS>B"), """
             A Discovery
 
             I found it${c} in a legendary land
@@ -51,7 +51,7 @@ class DigraphTest : VimTestCase() {
   fun `test digraph stops`() {
     OptionsManager.digraph.set()
 
-    doTest(parseKeys("i B<BS>BHello"), """
+    doTestNoNeovim("backspace works strange", parseKeys("i B<BS>BHello"), """
             A Discovery
 
             I found it${c} in a legendary land
@@ -71,7 +71,7 @@ class DigraphTest : VimTestCase() {
   fun `test digraph double backspace`() {
     OptionsManager.digraph.set()
 
-    doTest(parseKeys("i B<BS><BS>B"), """
+    doTestNoNeovim("backspace works strange", parseKeys("i B<BS><BS>B"), """
             A Discovery
 
             I found it${c} in a legendary land
@@ -91,7 +91,7 @@ class DigraphTest : VimTestCase() {
   fun `test digraph backspace digraph`() {
     OptionsManager.digraph.set()
 
-    doTest(parseKeys("i B<BS>B<BS>B"), """
+    doTestNoNeovim("backspace works strange", parseKeys("i B<BS>B<BS>B"), """
             A Discovery
 
             I found it${c} in a legendary land

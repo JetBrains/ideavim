@@ -27,7 +27,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionLastColumnActionTest : VimTestCase() {
   fun `test dollar motion`() {
-    val keys = parseKeys("$")
+    val keys = "$"
     val before = """
             A Discovery
 
@@ -44,11 +44,11 @@ class MotionLastColumnActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test dollar motion with motion to longer line`() {
-    val keys = parseKeys("\$j")
+    val keys = "\$j"
     val before = """
             A Discovery
 
@@ -65,11 +65,11 @@ class MotionLastColumnActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test dollar motion in visual block mode`() {
-    val keys = parseKeys("<C-V>jj\$")
+    val keys = "<C-V>jj\$"
     val before = """
             A Discovery
 
@@ -86,7 +86,7 @@ class MotionLastColumnActionTest : VimTestCase() {
             wh${s}ere it was settled on some sodden sand${c}${se}
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 
   @VimBehaviorDiffers(originalVimAfter = """
@@ -115,6 +115,6 @@ class MotionLastColumnActionTest : VimTestCase() {
             wh${s}ere it was settled on some sodden san${c}d${se}
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTestNoNeovim("beh diff", keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 }

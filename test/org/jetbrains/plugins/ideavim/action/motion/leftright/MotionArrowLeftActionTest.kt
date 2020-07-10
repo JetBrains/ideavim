@@ -32,7 +32,7 @@ import org.jetbrains.plugins.ideavim.VimTestOptionType
 class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionDefaultAll
   fun `test visual default options`() {
-    doTest(parseKeys("v", "<Left>"),
+    doTestNoNeovim("Vim option", parseKeys("v", "<Left>"),
       """
                 A Discovery
 
@@ -54,7 +54,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
 
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopsel]))
   fun `test visual stopsel`() {
-    doTest(parseKeys("v", "<Left>"),
+    doTestNoNeovim("Vim option", parseKeys("v", "<Left>"),
       """
                 A Discovery
 
@@ -76,7 +76,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
 
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
   fun `test visual stopselect`() {
-    doTest(parseKeys("v", "<Left>"),
+    doTestNoNeovim("Vim option", parseKeys("v", "<Left>"),
       """
                 A Discovery
 
@@ -98,7 +98,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
 
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
   fun `test visual stopvisual`() {
-    doTest(parseKeys("v", "<Left>"),
+    doTestNoNeovim("Vim option", parseKeys("v", "<Left>"),
       """
                 A Discovery
 
@@ -120,7 +120,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
 
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
   fun `test visual stopvisual multicaret`() {
-    doTest(parseKeys("v", "<Left>"),
+    doTestNoNeovim("Vim option", parseKeys("v", "<Left>"),
       """
                 A Discovery
 

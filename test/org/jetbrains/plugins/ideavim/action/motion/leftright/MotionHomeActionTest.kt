@@ -50,7 +50,7 @@ class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Vim option", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -77,7 +77,7 @@ class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    doTestNoNeovim("Vim option", keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []))
@@ -99,7 +99,7 @@ class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    doTestNoNeovim("Vim option", keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
@@ -121,7 +121,7 @@ class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Vim option", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
@@ -143,6 +143,6 @@ class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Vim option", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 }

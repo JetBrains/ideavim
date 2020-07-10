@@ -24,7 +24,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertBeforeFirstNonBlankActionTest : VimTestCase() {
   fun `test insert multiple carets`() {
-    doTest(parseKeys("IHello<esc>"),
+    doTestNoNeovim("multicaret", parseKeys("IHello<esc>"),
       """
                 ${c}A Discovery
 

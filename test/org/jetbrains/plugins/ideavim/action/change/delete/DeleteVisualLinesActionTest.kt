@@ -46,7 +46,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 ${c}where it was settled on some sodden sand""")
   fun `test remove line in char visual mode last line`() {
-    doTest(StringHelper.parseKeys("vlllX"),
+    doTestNoNeovim("beh diff", StringHelper.parseKeys("vlllX"),
       """
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
@@ -84,7 +84,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 ${c}where it was settled on some sodden sand""")
   fun `test remove line in line visual mode line end`() {
-    doTest(StringHelper.parseKeys("VX"),
+    doTestNoNeovim("beh diff", StringHelper.parseKeys("VX"),
       """
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,

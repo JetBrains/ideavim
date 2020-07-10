@@ -50,7 +50,7 @@ class OpMappingTest : VimTestCase() {
   }
 
   fun `test simple delete`() {
-    doTest(parseKeys("dI"),
+    doTestNoNeovim("extension", parseKeys("dI"),
       "${c}I found it in a legendary land",
       "${c}nd it in a legendary land",
       CommandState.Mode.COMMAND,
@@ -58,7 +58,7 @@ class OpMappingTest : VimTestCase() {
   }
 
   fun `test simple delete backwards`() {
-    doTest(parseKeys("dP"),
+    doTestNoNeovim("extension", parseKeys("dP"),
       "I found ${c}it in a legendary land",
       "I f${c}it in a legendary land",
       CommandState.Mode.COMMAND,
@@ -66,7 +66,7 @@ class OpMappingTest : VimTestCase() {
   }
 
   fun `test delete emulate inclusive`() {
-    doTest(parseKeys("dU"),
+    doTestNoNeovim("extension", parseKeys("dU"),
       "${c}I found it in a legendary land",
       "${c}d it in a legendary land",
       CommandState.Mode.COMMAND,
@@ -74,7 +74,7 @@ class OpMappingTest : VimTestCase() {
   }
 
   fun `test linewise delete`() {
-    doTest(parseKeys("dO"),
+    doTestNoNeovim("extension", parseKeys("dO"),
       """
                 A Discovery
 
