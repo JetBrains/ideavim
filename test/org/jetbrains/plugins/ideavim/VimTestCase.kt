@@ -56,7 +56,6 @@ import com.maddyhome.idea.vim.option.OptionsManager.resetAllOptions
 import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.ui.ExEntryPanel
 import junit.framework.Assert
-import org.jetbrains.annotations.Contract
 import java.util.*
 import java.util.function.Consumer
 import javax.swing.KeyStroke
@@ -354,14 +353,6 @@ abstract class VimTestCase : UsefulTestCase() {
       return keys
     }
 
-    @Contract(pure = true)
-    fun toTab(str: String, ch: Char): String {
-      return str.replace(ch, '\t')
-    }
-
-    @Contract(pure = true)
-    fun dotToTab(str: String): String {
-      return str.replace('.', '\t')
-    }
+    fun String.dotToTab(): String = replace('.', '\t')
   }
 }

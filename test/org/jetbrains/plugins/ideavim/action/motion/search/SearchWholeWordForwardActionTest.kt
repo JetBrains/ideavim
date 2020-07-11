@@ -24,17 +24,17 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class SearchWholeWordForwardActionTest : VimTestCase() {
   fun `test with tabs`() {
-    val before = dotToTab("""
-      .he${c}llo 1
-      .hello 2
-      .hello 3
-    """.trimIndent())
+    val before = """
+  .he${c}llo 1
+  .hello 2
+  .hello 3
+""".trimIndent().dotToTab()
     val keys = "**"
-    val after = dotToTab("""
-      .hello 1
-      .hello 2
-      .${c}hello 3
-    """.trimIndent())
+    val after = """
+  .hello 1
+  .hello 2
+  .${c}hello 3
+""".trimIndent().dotToTab()
     doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 

@@ -134,21 +134,21 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test simple motion tab`() {
-    doTestNoNeovim("Strange chars", parseKeys("l"), dotToTab("""
-            A Discovery
+    doTestNoNeovim("Strange chars", parseKeys("l"), """
+        A Discovery
 
-            I found it in a legendar${c}. land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass
-        """.trimIndent()), dotToTab("""
-            A Discovery
+        I found it in a legendar${c}. land
+        all rocks and lavender and tufted grass,
+        where it was settled on some sodden sand
+        hard by the torrent of a mountain pass
+    """.trimIndent().dotToTab(), """
+        A Discovery
 
-            I found it in a legendar.${c} land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass
-        """.trimIndent()), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+        I found it in a legendar.${c} land
+        all rocks and lavender and tufted grass,
+        where it was settled on some sodden sand
+        hard by the torrent of a mountain pass
+    """.trimIndent().dotToTab(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test char visual mode`() {

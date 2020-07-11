@@ -492,19 +492,19 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   }
 
   fun `test with tabs`() {
-    val before = dotToTab("""
-      I found it in a legendary land
-      ...${c}all rocks and lavender and tufted grass,
-      ...all it was settled on some sodden sand
-      ...all by the torrent of a mountain pass
-    """.trimIndent())
+    val before = """
+  I found it in a legendary land
+  ...${c}all rocks and lavender and tufted grass,
+  ...all it was settled on some sodden sand
+  ...all by the torrent of a mountain pass
+""".trimIndent().dotToTab()
     val keys = parseKeys("vll", "<A-N>", "<A-N>")
-    val after = dotToTab("""
-      I found it in a legendary land
-      ...${s}al${c}l${se} rocks and lavender and tufted grass,
-      ...${s}al${c}l${se} it was settled on some sodden sand
-      ...${s}al${c}l${se} by the torrent of a mountain pass
-    """.trimIndent())
+    val after = """
+  I found it in a legendary land
+  ...${s}al${c}l${se} rocks and lavender and tufted grass,
+  ...${s}al${c}l${se} it was settled on some sodden sand
+  ...${s}al${c}l${se} by the torrent of a mountain pass
+""".trimIndent().dotToTab()
     doTestNoNeovim("Multiple carets", keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
