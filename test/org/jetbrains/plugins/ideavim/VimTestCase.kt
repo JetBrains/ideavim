@@ -47,6 +47,7 @@ import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.TestInputModel
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.option.OptionsManager.getOption
@@ -65,6 +66,7 @@ import javax.swing.KeyStroke
  */
 abstract class VimTestCase : UsefulTestCase() {
   protected lateinit var myFixture: CodeInsightTestFixture
+  private var neovimTestingEnabled = true
 
   @Throws(Exception::class)
   override fun setUp() {
@@ -87,7 +89,10 @@ abstract class VimTestCase : UsefulTestCase() {
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
     ExEntryPanel.getInstance().entry.setBounds(0, 0, 100, 25)
 
-    NeovimTesting.setUp()
+    val testMethod = this.javaClass.getMethod(this.name)
+    neovimTestingEnabled = neovimTestingEnabled && !testMethod.isAnnotationPresent(VimBehaviorDiffers::class.java)
+
+    if (neovimTestingEnabled) NeovimTesting.setUp()
   }
 
   protected val testDataPath: String
@@ -107,7 +112,7 @@ abstract class VimTestCase : UsefulTestCase() {
     VimPlugin.getMark().resetAllMarks()
 
     // Tear down neovim
-    NeovimTesting.tearDown()
+    if (neovimTestingEnabled) NeovimTesting.tearDown()
 
     super.tearDown()
   }
@@ -259,11 +264,11 @@ abstract class VimTestCase : UsefulTestCase() {
                        subModeAfter: SubMode) {
     configureByText(before)
 
-    NeovimTesting.setupEditorAndType(myFixture.editor, keys)
+    if (neovimTestingEnabled) NeovimTesting.setupEditorAndType(myFixture.editor, keys)
 
     performTest(keys, after, modeAfter, subModeAfter)
 
-    NeovimTesting.assertState(myFixture.editor)
+    if (neovimTestingEnabled) NeovimTesting.assertState(myFixture.editor)
   }
 
   private fun performTest(keys: String, after: String, modeAfter: CommandState.Mode, subModeAfter: SubMode) {
@@ -296,7 +301,7 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected fun setRegister(register: Char, keys: String) {
     VimPlugin.getRegister().setKeys(register, stringToKeys(keys))
-    NeovimTesting.setRegister(register, keys)
+    if (neovimTestingEnabled) NeovimTesting.setRegister(register, keys)
   }
 
   protected fun assertState(modeAfter: CommandState.Mode, subModeAfter: SubMode) {

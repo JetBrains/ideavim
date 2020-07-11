@@ -56,7 +56,6 @@ import java.util.*
  * Note that using this annotation should be avoided as much as possible and behavior of IdeaVim should be as close
  *   to vim as possible.
  */
-@Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.FUNCTION)
 annotation class VimBehaviorDiffers(
   val originalVimAfter: String = "",
