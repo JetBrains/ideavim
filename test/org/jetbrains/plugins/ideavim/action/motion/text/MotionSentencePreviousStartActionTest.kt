@@ -19,7 +19,6 @@
 package org.jetbrains.plugins.ideavim.action.motion.text
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -33,7 +32,7 @@ class MotionSentencePreviousStartActionTest : VimTestCase() {
       """
   )
   fun `test with two empty lines`() {
-    doTestNoNeovim("Beh diff", parseKeys("("),
+    doTestWithNeovim("(",
       """
         
         

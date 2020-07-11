@@ -19,7 +19,6 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -46,7 +45,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 ${c}where it was settled on some sodden sand""")
   fun `test remove line in char visual mode last line`() {
-    doTestNoNeovim("beh diff", StringHelper.parseKeys("vlllX"),
+    doTestWithNeovim("vlllX",
       """
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
@@ -84,7 +83,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 ${c}where it was settled on some sodden sand""")
   fun `test remove line in line visual mode line end`() {
-    doTestNoNeovim("beh diff", StringHelper.parseKeys("VX"),
+    doTestWithNeovim("VX",
       """
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,

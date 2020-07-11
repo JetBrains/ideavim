@@ -19,14 +19,13 @@
 package org.jetbrains.plugins.ideavim.action.motion.text
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionSectionForwardEndActionTest : VimTestCase() {
   @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
   fun `test remove full text`() {
-    doTestNoNeovim("Beh diff", parseKeys("d]]"),
+    doTestWithNeovim("d]]",
       """
           ${c}I found it in a legendary land
           all rocks and lavender and tufted grass,
@@ -39,7 +38,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
 
   @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
   fun `test remove full text with new line at the end`() {
-    doTestNoNeovim("Beh diff", parseKeys("d]]"),
+    doTestWithNeovim("d]]",
       """
           ${c}I found it in a legendary land
           all rocks and lavender and tufted grass,

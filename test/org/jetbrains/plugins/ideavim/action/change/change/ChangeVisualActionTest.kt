@@ -75,7 +75,7 @@ class ChangeVisualActionTest : VimTestCase() {
             ${c}
   """)
   fun `test multiple line change till the end`() {
-    val keys = parseKeys("Vjc")
+    val keys = "Vjc"
     val before = """
             A Discovery
 
@@ -94,7 +94,7 @@ class ChangeVisualActionTest : VimTestCase() {
             
             
         """.trimIndent()
-    doTestNoNeovim("beh differs", keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
 
@@ -109,7 +109,7 @@ class ChangeVisualActionTest : VimTestCase() {
             
   """)
   fun `test multiple line change till the end with two new lines`() {
-    val keys = parseKeys("Vjc")
+    val keys = "Vjc"
     val before = """
             A Discovery
 
@@ -131,12 +131,12 @@ class ChangeVisualActionTest : VimTestCase() {
             ${c}
             
         """.trimIndent()
-    doTestNoNeovim("beh differs", keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers(description = "Wrong caret position")
   fun `test change with dollar motion`() {
-    val keys = parseKeys("<C-V>3j$", "c", "Hello<Esc>")
+    val keys = listOf("<C-V>3j$", "c", "Hello<Esc>")
     val before = """
             A Discovery
 
@@ -153,7 +153,7 @@ class ChangeVisualActionTest : VimTestCase() {
             wh|Hello
             ha|Hello
         """.trimIndent()
-    doTestNoNeovim("beh differs", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test replace first line`() {

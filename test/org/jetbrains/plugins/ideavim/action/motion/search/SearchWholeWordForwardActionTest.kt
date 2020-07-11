@@ -19,7 +19,6 @@
 package org.jetbrains.plugins.ideavim.action.motion.search
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -53,7 +52,7 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
         """
   )
   fun `test last dot`() {
-    doTestNoNeovim("Beh diff", parseKeys("*"),
+    doTestWithNeovim("*",
       """
           I found it in a legendary land
           all rocks and lavender and tufted grass,

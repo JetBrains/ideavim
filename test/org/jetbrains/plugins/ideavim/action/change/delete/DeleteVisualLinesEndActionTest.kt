@@ -54,7 +54,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """)
   fun `test simple deletion with indent`() {
-    val keys = parseKeys("v", "D")
+    val keys = listOf("v", "D")
     val before = """
             A Discovery
 
@@ -70,7 +70,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestNoNeovim("beh diff", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test simple deletion empty line`() {
@@ -102,7 +102,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             ${c}
     """)
   fun `test simple deletion last line`() {
-    val keys = parseKeys("v", "D")
+    val keys = listOf("v", "D")
     val before = """
             A Discovery
 
@@ -120,7 +120,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden san${c}d
 
         """.trimIndent()
-    doTestNoNeovim("beh diff", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test simple deletion first line`() {
@@ -173,7 +173,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             ${c}where it was settled on some sodden sand"""
   )
   fun `test simple deletion last line without empty line`() {
-    val keys = parseKeys("v", "D")
+    val keys = listOf("v", "D")
     val before = """
             A Discovery
 
@@ -189,7 +189,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden san${c}d
 
             """.trimIndent()
-    doTestNoNeovim("beh diff", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test simple deletion multiline`() {
@@ -273,7 +273,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """)
   fun `test line deletion with indent`() {
-    val keys = parseKeys("V", "D")
+    val keys = listOf("V", "D")
     val before = """
             A Discovery
 
@@ -289,7 +289,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestNoNeovim("beh diff", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test line deletion empty line`() {
@@ -321,7 +321,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             ${c}
     """)
   fun `test line deletion last line`() {
-    val keys = parseKeys("V", "D")
+    val keys = listOf("V", "D")
     val before = """
             A Discovery
 
@@ -339,7 +339,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden san${c}d
 
         """.trimIndent()
-    doTestNoNeovim("beh diff", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers("""
@@ -350,7 +350,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             ${c}where it was settled on some sodden sand"""
   )
   fun `test line deletion last line without empty line`() {
-    val keys = parseKeys("V", "D")
+    val keys = listOf("V", "D")
     val before = """
             A Discovery
 
@@ -366,7 +366,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
 
             """.trimIndent()
-    doTestNoNeovim("beh diff", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test line deletion multiline`() {

@@ -69,7 +69,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
             ${c}
   """)
   fun `test delete starting from the line end`() {
-    doTestNoNeovim("beh diff", parseKeys("i", "<C-W>"), """
+    doTestWithNeovim(listOf("i", "<C-W>"), """
             If (found) {
                if (it) {
                   legendary

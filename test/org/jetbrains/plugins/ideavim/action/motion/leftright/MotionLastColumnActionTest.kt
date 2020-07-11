@@ -21,7 +21,6 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -98,7 +97,7 @@ class MotionLastColumnActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """)
   fun `test dollar motion in visual block mode with left motion`() {
-    val keys = parseKeys("<C-V>jj\$h")
+    val keys = "<C-V>jj\$h"
     val before = """
             A Discovery
 
@@ -115,6 +114,6 @@ class MotionLastColumnActionTest : VimTestCase() {
             wh${s}ere it was settled on some sodden san${c}d${se}
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestNoNeovim("beh diff", keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 }

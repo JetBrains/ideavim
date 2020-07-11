@@ -242,7 +242,7 @@ class RepeatChangeActionTest : VimTestCase() {
 
     """)
   fun `test block motion to end`() {
-    val keys = parseKeys("<C-V>jjerXjl", ".")
+    val keys = listOf("<C-V>jjerXjl", ".")
     val before = """
                 A Discovery
 
@@ -261,7 +261,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 XXXXX${c}Xy the torrent of a mountain pass.
 
                 """.trimIndent()
-    doTestNoNeovim("Beh diff", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test block with dollar motion`() {

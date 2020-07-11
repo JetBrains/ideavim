@@ -19,7 +19,6 @@
 package org.jetbrains.plugins.ideavim.action.motion.text
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -165,7 +164,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.${c}
   """)
   fun `test goto with 1000 in visual mode`() {
-    doTestNoNeovim("Beh diff", StringHelper.parseKeys("v1000go"),
+    doTestWithNeovim("v1000go",
       """
             A Discovery
 
@@ -196,7 +195,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
             $c
   """)
   fun `test goto with 1000 and new line`() {
-    doTestNoNeovim("Beh diff", StringHelper.parseKeys("1000go"),
+    doTestWithNeovim("1000go",
       """
             A Discovery
 
