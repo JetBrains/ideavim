@@ -48,11 +48,13 @@ public class ChangeNumberActionTest extends VimTestCase {
   }
 
   public void testIncrementOctal() {
-    doTest(parseKeys("<C-A>"), "0477", "0500", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestNoNeovim("Doesn't work for octal in neovim", parseKeys("<C-A>"), "0477", "0500", CommandState.Mode.COMMAND,
+                   CommandState.SubMode.NONE);
   }
 
   public void testDecrementOctal() {
-    doTest(parseKeys("<C-X>"), "010", "007", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestNoNeovim("Doesn't work for octal in neovim", parseKeys("<C-X>"), "010", "007", CommandState.Mode.COMMAND,
+                   CommandState.SubMode.NONE);
   }
 
   public void testIncrementHex() {
@@ -72,11 +74,13 @@ public class ChangeNumberActionTest extends VimTestCase {
   }
 
   public void testIncrementNegativeOctal() {
-    doTest(parseKeys("<C-A>"), "-0477", "-0500", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestNoNeovim("Doesn't work for octal in neovim", parseKeys("<C-A>"), "-0477", "-0500", CommandState.Mode.COMMAND,
+                   CommandState.SubMode.NONE);
   }
 
   public void testDecrementNegativeOctal() {
-    doTest(parseKeys("<C-X>"), "-010", "-007", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTestNoNeovim("Doesn't work for octal in neovim", parseKeys("<C-X>"), "-010", "-007", CommandState.Mode.COMMAND,
+                   CommandState.SubMode.NONE);
   }
 
   public void testIncrementNegativeHex() {
@@ -100,37 +104,37 @@ public class ChangeNumberActionTest extends VimTestCase {
   }
 
   public void testIncrementAlphaWithNumberFormatAlpha() {
-    doTest(parseKeys(":set nf=alpha<Enter>", "<C-A>"), "foo", "goo", CommandState.Mode.COMMAND,
+    doTestNoNeovim("Ex command", parseKeys(":set nf=alpha<Enter>", "<C-A>"), "foo", "goo", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
   public void testIncrementZWithNumberFormatAlpha() {
-    doTest(parseKeys(":set nf=alpha<Enter>", "<C-A>"), "zzz", "zzz", CommandState.Mode.COMMAND,
+    doTestNoNeovim("Ex command", parseKeys(":set nf=alpha<Enter>", "<C-A>"), "zzz", "zzz", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
   public void testIncrementXInHexNumberWithNumberFormatAlphaButNotHex() {
-    doTest(parseKeys(":set nf=alpha<Enter>", "<C-A>"), "0<caret>x1", "0y1", CommandState.Mode.COMMAND,
+    doTestNoNeovim("Ex command", parseKeys(":set nf=alpha<Enter>", "<C-A>"), "0<caret>x1", "0y1", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
   public void testIncrementXInHexNumberWithNumberFormatHexAlpha() {
-    doTest(parseKeys(":set nf=alpha,hex<Enter>", "<C-A>"), "0<caret>x1", "0x2", CommandState.Mode.COMMAND,
+    doTestNoNeovim("Ex command", parseKeys(":set nf=alpha,hex<Enter>", "<C-A>"), "0<caret>x1", "0x2", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
   public void testIncrementHexNumberWithoutNumberFormatHex() {
-    doTest(parseKeys(":set nf=octal<Enter>", "<C-A>"), "0x42", "1x42", CommandState.Mode.COMMAND,
+    doTestNoNeovim("Ex command", parseKeys(":set nf=octal<Enter>", "<C-A>"), "0x42", "1x42", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
   public void testIncrementOctalNumberWithoutNumberFormatOctal() {
-    doTest(parseKeys(":set nf=hex<Enter>", "<C-A>"), "077", "078", CommandState.Mode.COMMAND,
+    doTestNoNeovim("Ex command", parseKeys(":set nf=hex<Enter>", "<C-A>"), "077", "078", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
   public void testIncrementNegativeOctalNumberWithoutNumberFormatOctal() {
-    doTest(parseKeys(":set nf=hex<Enter>", "<C-A>"), "-077", "-076", CommandState.Mode.COMMAND,
+    doTestNoNeovim("Ex command", parseKeys(":set nf=hex<Enter>", "<C-A>"), "-077", "-076", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 

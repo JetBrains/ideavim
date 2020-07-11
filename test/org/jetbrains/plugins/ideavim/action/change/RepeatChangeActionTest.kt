@@ -25,7 +25,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class RepeatChangeActionTest : VimTestCase() {
   fun `test simple repeat`() {
-    val keys = parseKeys("v2erXj^", ".")
+    val keys = listOf("v2erXj^", ".")
     val before = """
                 A Discovery
 
@@ -42,11 +42,11 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test simple repeat with dollar motion`() {
-    val keys = parseKeys("v\$rXj^", ".")
+    val keys = listOf("v\$rXj^", ".")
     val before = """
                 A Discovery
 
@@ -63,11 +63,11 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test repeat to line end`() {
-    val keys = parseKeys("v2erXj\$b", ".")
+    val keys = listOf("v2erXj\$b", ".")
     val before = """
                 A Discovery
 
@@ -84,7 +84,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test repeat multiline`() {
@@ -105,11 +105,11 @@ class RepeatChangeActionTest : VimTestCase() {
                 whe${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 XXXX by the torrent of a mountain pass.
                     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("I don't know", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test count doesn't affect repeat`() {
-    val keys = parseKeys("v2erXj^", "10.")
+    val keys = listOf("v2erXj^", "10.")
     val before = """
                 A Discovery
 
@@ -126,7 +126,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test multicaret`() {
@@ -147,11 +147,11 @@ class RepeatChangeActionTest : VimTestCase() {
                 where XXXXXX settled on some sodden sand
                 ${c}XXXXXXy the torrent of a mountain pass.
                     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Multicaret", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test line motion`() {
-    val keys = parseKeys("VrXj^", ".")
+    val keys = listOf("VrXj^", ".")
     val before = """
                 A Discovery
 
@@ -168,7 +168,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test line motion to end`() {
@@ -187,7 +187,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 where it was settled on some sodden sand
                 ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX""".trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Doesn't work", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test line motion shift`() {
@@ -208,7 +208,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 |where it was settled on some sodden sand
                 |hard by the torrent of a mountain pass.
                 """.trimMargin()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Doesn't work", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test block motion`() {
@@ -229,7 +229,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 wherXXXt was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Dowsn't work", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers("""
@@ -261,7 +261,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 XXXXX${c}Xy the torrent of a mountain pass.
 
                 """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Beh diff", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test block with dollar motion`() {
@@ -282,6 +282,6 @@ class RepeatChangeActionTest : VimTestCase() {
                 ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Doesn't work", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 }

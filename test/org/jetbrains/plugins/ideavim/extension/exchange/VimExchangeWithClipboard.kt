@@ -21,7 +21,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   // |cx|
   @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
   fun `test exchange words left to right`() {
-    doTest(StringHelper.parseKeys("cxe", "w", "cxe"),
+    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("cxe", "w", "cxe"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -32,7 +32,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   // |cx|
   @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
   fun `test exchange words dot repeat`() {
-    doTest(StringHelper.parseKeys("cxiw", "w", "."),
+    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("cxiw", "w", "."),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -43,7 +43,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   // |cx|
   @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
   fun `test exchange words right to left`() {
-    doTest(StringHelper.parseKeys("cxe", "b", "cxe"),
+    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("cxe", "b", "cxe"),
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -54,7 +54,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   // |cx|
   @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
   fun `test exchange words right to left with dot`() {
-    doTest(StringHelper.parseKeys("cxe", "b", "."),
+    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("cxe", "b", "."),
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -65,7 +65,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   // |X|
   @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
   fun `test visual exchange words left to right`() {
-    doTest(StringHelper.parseKeys("veX", "w", "veX"),
+    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("veX", "w", "veX"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -80,7 +80,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
     shouldBeFixed = true
   )
   fun `test visual exchange words from inside`() {
-    doTest(StringHelper.parseKeys("veX", "b", "v3e", "X"),
+    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("veX", "b", "v3e", "X"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -95,7 +95,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
     shouldBeFixed = true
   )
   fun `test visual exchange words from outside`() {
-    doTest(StringHelper.parseKeys("v3e", "X", "w", "veX"),
+    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("v3e", "X", "w", "veX"),
       "The ${c}quick brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -115,7 +115,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
     shouldBeFixed = true
   )
   fun `test exchange lines top down`() {
-    doTest(StringHelper.parseKeys("cxx", "j", "cxx"),
+    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("cxx", "j", "cxx"),
       """The quick
          brown ${c}fox
          catch over
@@ -141,7 +141,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
     shouldBeFixed = true
   )
   fun `test exchange lines top down with dot`() {
-    doTest(StringHelper.parseKeys("cxx", "j", "."),
+    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("cxx", "j", "."),
       """The quick
          brown ${c}fox
          catch over
@@ -165,7 +165,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
     """
   )
   fun `test exchange to the line end`() {
-    doTest(StringHelper.parseKeys("v$", "X", "jj^ve", "X"),
+    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("v$", "X", "jj^ve", "X"),
       """The quick
          brown ${c}fox
          catch over
@@ -191,7 +191,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
     shouldBeFixed = true
   )
   fun `test exchange visual lines`() {
-    doTest(StringHelper.parseKeys("Vj", "X", "jj", "Vj", "X"),
+    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("Vj", "X", "jj", "Vj", "X"),
       """
          The ${c}quick
          brown fox

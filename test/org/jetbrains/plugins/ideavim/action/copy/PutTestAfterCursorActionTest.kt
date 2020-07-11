@@ -18,16 +18,12 @@
 
 package org.jetbrains.plugins.ideavim.action.copy
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.common.Register
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class PutTestAfterCursorActionTest : VimTestCase() {
   fun `test put from number register`() {
-    VimPlugin.getRegister().saveRegister('4', Register('4', SelectionType.CHARACTER_WISE, "XXX ", ArrayList()))
-    doTest(parseKeys("\"4p"), "This is my${c} text", "This is my XXX${c} text", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    setRegister('4', "XXX ")
+    doTestWithNeovim("\"4p", "This is my${c} text", "This is my XXX${c} text", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 }

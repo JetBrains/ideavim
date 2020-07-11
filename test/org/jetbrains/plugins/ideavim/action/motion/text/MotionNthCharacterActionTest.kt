@@ -165,7 +165,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.${c}
   """)
   fun `test goto with 1000 in visual mode`() {
-    doTest(StringHelper.parseKeys("v1000go"),
+    doTestNoNeovim("Beh diff", StringHelper.parseKeys("v1000go"),
       """
             A Discovery
 
@@ -196,7 +196,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
             $c
   """)
   fun `test goto with 1000 and new line`() {
-    doTest(StringHelper.parseKeys("1000go"),
+    doTestNoNeovim("Beh diff", StringHelper.parseKeys("1000go"),
       """
             A Discovery
 

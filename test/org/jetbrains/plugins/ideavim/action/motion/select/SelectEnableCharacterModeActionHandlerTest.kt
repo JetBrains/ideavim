@@ -24,7 +24,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class SelectEnableCharacterModeActionHandlerTest : VimTestCase() {
   fun `test entering select mode`() {
-    doTest(parseKeys("gh"),
+    doTestNoNeovim("Select mode", parseKeys("gh"),
       """
                 A Discovery
 
@@ -46,7 +46,7 @@ class SelectEnableCharacterModeActionHandlerTest : VimTestCase() {
   }
 
   fun `test entering select mode at the end of file`() {
-    doTest(parseKeys("gh"),
+    doTestNoNeovim("Select mode", parseKeys("gh"),
       """
                 A Discovery
 
@@ -86,7 +86,7 @@ class SelectEnableCharacterModeActionHandlerTest : VimTestCase() {
   }
 
   fun `test entering select mode multicaret`() {
-    doTest(parseKeys("gh"),
+    doTestNoNeovim("Select mode", parseKeys("gh"),
       """
                 A Discovery
                 $c

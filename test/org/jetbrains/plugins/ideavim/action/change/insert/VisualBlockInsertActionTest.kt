@@ -51,7 +51,7 @@ Xbar
 
   // VIM-1379 |CTRL-V| |j| |v_b_I|
   fun `test insert visual block with empty line in the middle`() {
-    doTest(parseKeys("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
+    doTestNoNeovim("Block mode", parseKeys("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
       """
                     foo
 
@@ -70,7 +70,7 @@ Xbar
 
   // VIM-632 |CTRL-V| |v_b_I|
   fun `test change visual block`() {
-    doTest(parseKeys("<C-V>", "j", "I", "quux ", "<Esc>"),
+    doTestNoNeovim("Block mode", parseKeys("<C-V>", "j", "I", "quux ", "<Esc>"),
       """
                     foo bar
                     ${c}baz quux
@@ -105,7 +105,7 @@ Xbar
 
   // VIM-1379 |CTRL-V| |j| |v_b_I|
   fun `test insert visual block with shorter line in the middle`() {
-    doTest(parseKeys("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
+    doTestNoNeovim("Block mode", parseKeys("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
       """
                     foo
                     x
@@ -123,7 +123,7 @@ Xbar
   }
 
   fun `test insert in non block mode`() {
-    doTest(parseKeys("vwIHello<esc>"),
+    doTestNoNeovim("Block mode", parseKeys("vwIHello<esc>"),
       """
                 ${c}A Discovery
 

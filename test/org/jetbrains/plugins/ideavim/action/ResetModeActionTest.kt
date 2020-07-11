@@ -30,74 +30,74 @@ class ResetModeActionTest : VimTestCase() {
   private val owner = MappingOwner.Plugin.get("ResetModeActionTest")
 
   fun `test reset from normal mode`() {
-    val keys = parseKeys("<C-\\><C-N>")
+    val keys = "<C-\\><C-N>"
     val before = "A Discovery"
     val after = "A Discovery"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
   fun `test reset from insert mode`() {
-    val keys = parseKeys("i", "<C-\\><C-N>")
+    val keys = listOf("i", "<C-\\><C-N>")
     val before = "A Discovery"
     val after = "A Discovery"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
   fun `test reset from visual mode`() {
-    val keys = parseKeys("V", "<C-\\><C-N>")
+    val keys = listOf("V", "<C-\\><C-N>")
     val before = "A Discovery"
     val after = "A Discovery"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
   fun `test reset from select mode`() {
-    val keys = parseKeys("gH", "<C-\\><C-N>")
+    val keys = listOf("gH", "<C-\\><C-N>")
     val before = "A Discovery"
     val after = "A Discovery"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
   fun `test reset from operator-pending mode`() {
-    val keys = parseKeys("d", "<C-\\><C-N>")
+    val keys = listOf("d", "<C-\\><C-N>")
     val before = "A Discovery"
     val after = "A Discovery"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
   fun `test reset from operator-pending mode with delete`() {
-    val keys = parseKeys("d<Esc>dw")
+    val keys = "d<Esc>dw"
     val before = "A Discovery"
     val after = "Discovery"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
   fun `test delete command after resetting operator-pending mode`() {
-    val keys = parseKeys("d", "<C-\\><C-N>", "dw")
+    val keys = listOf("d", "<C-\\><C-N>", "dw")
     val before = "A Discovery"
     val after = "Discovery"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
   fun `test delete command after resetting operator-pending mode with esc`() {
-    val keys = parseKeys("d", "<Esc>", "dw")
+    val keys = listOf("d", "<Esc>", "dw")
     val before = "A Discovery"
     val after = "Discovery"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
   fun `test delete command after resetting operator-pending mode with ctrl open bracket`() {
-    val keys = parseKeys("d", "<C-[>", "dw")
+    val keys = listOf("d", "<C-[>", "dw")
     val before = "A Discovery"
     val after = "Discovery"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
@@ -108,23 +108,23 @@ class ResetModeActionTest : VimTestCase() {
     val keys = parseKeys("d", "<C-D>", "dw")
     val before = "A Discovery"
     val after = "Discovery"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("mapping", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
   fun `test non-delete commands after resetting operator-pending mode`() {
-    val keys = parseKeys("c", "<C-\\><C-N>", "another")
+    val keys = listOf("c", "<C-\\><C-N>", "another")
     val before = "A Discovery"
     val after = "Another Discovery"
-    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
   fun `test delete after escaping t`() {
-    val keys = parseKeys("dt<esc>D")
+    val keys = "dt<esc>D"
     val before = "A ${c}Discovery"
     val after = "A "
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 }

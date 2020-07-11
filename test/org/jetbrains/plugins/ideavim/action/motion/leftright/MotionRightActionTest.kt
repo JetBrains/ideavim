@@ -80,7 +80,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test simple motion non-ascii`() {
-    doTest(parseKeys("l"), """
+    doTestNoNeovim("Strange chars", parseKeys("l"), """
             A Discovery
 
             I found it in a legendar${c}𝛁 land
@@ -98,7 +98,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test simple motion emoji`() {
-    doTest(parseKeys("l"), """
+    doTestNoNeovim("Strange chars", parseKeys("l"), """
             A Discovery
 
             I found it in a legendar${c}🐔 land
@@ -116,7 +116,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test simple motion czech`() {
-    doTest(parseKeys("l"), """
+    doTestNoNeovim("Strange chars", parseKeys("l"), """
             A Discovery
 
             I found it in a legendar${c}ž land
@@ -134,7 +134,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test simple motion tab`() {
-    doTest(parseKeys("l"), dotToTab("""
+    doTestNoNeovim("Strange chars", parseKeys("l"), dotToTab("""
             A Discovery
 
             I found it in a legendar${c}. land
@@ -152,7 +152,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test char visual mode`() {
-    doTest(parseKeys("v", "ll"), """
+    doTestNoNeovim("Strange chars", parseKeys("v", "ll"), """
             A Discovery
 
             I found it in a legendary lan${c}d
@@ -170,7 +170,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test block visual mode`() {
-    doTest(parseKeys("<C-V>", "ll"), """
+    doTestNoNeovim("Strange chars", parseKeys("<C-V>", "ll"), """
             A Discovery
 
             I found it in a legendary lan${c}d

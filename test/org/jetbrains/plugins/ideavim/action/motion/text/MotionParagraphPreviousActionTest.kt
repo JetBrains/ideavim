@@ -19,13 +19,14 @@
 package org.jetbrains.plugins.ideavim.action.motion.text
 
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionParagraphPreviousActionTest : VimTestCase() {
   @VimBehaviorDiffers("")
   fun `test delete till start with empty line`() {
-    doTest("d{", """
+    doTestNoNeovim("Beh differs", parseKeys("d{"), """
       
       I found it in a legendary land
       all rocks and lavender and tufted grass,

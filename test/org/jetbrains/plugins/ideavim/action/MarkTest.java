@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action;
 
+import com.google.common.collect.Lists;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Mark;
@@ -177,9 +178,9 @@ public class MarkTest extends VimTestCase {
 
   // |i| |`]|
   public void testGotoLastChangePositionEnd() {
-    doTest(parseKeys("yiw", "P", "gg", "`]"), "one two\n" +
-                                                     "<caret>three\n" +
-                                                     "four five\n",
+    doTestWithNeovim(Lists.newArrayList("yiw", "P", "gg", "`]"), "one two\n" +
+                                                    "<caret>three\n" +
+                                                    "four five\n",
       "one two\n" +
         "thre<caret>ethree\n" +
         "four five\n",

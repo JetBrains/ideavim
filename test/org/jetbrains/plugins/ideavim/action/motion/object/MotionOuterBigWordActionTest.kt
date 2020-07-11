@@ -19,11 +19,12 @@
 package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionOuterBigWordActionTest : VimTestCase() {
   fun `test on last dot`() {
-    doTest("<aW", """
+    doTestNoNeovim("I don't know", parseKeys("<aW"), """
       I found it in a legendary land
       all rocks and lavender and tufted grass,
       where it was settled on some sodden sand

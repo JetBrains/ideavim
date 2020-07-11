@@ -35,7 +35,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test visual up`() {
-    doTest(parseKeys("<S-Up>"),
+    doTestNoNeovim("Options", parseKeys("<S-Up>"),
       """
                 A Discovery
 
@@ -61,7 +61,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test visual up twice`() {
-    doTest(parseKeys("<S-Up><S-Up>"),
+    doTestNoNeovim("Options", parseKeys("<S-Up><S-Up>"),
       """
                 A Discovery
 
@@ -87,7 +87,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test save column`() {
-    doTest(parseKeys("<S-Up><S-Up><S-Up>"),
+    doTestNoNeovim("Options", parseKeys("<S-Up><S-Up><S-Up>"),
       """
                 A Discovery
 
@@ -113,7 +113,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
   )
   fun `test select up`() {
-    doTest(parseKeys("<S-Up>"),
+    doTestNoNeovim("Options", parseKeys("<S-Up>"),
       """
                 A Discovery
 
@@ -139,7 +139,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
   )
   fun `test select up twice`() {
-    doTest(parseKeys("<S-Up><S-Up>"),
+    doTestNoNeovim("Options", parseKeys("<S-Up><S-Up>"),
       """
                 A Discovery
 
@@ -165,7 +165,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test char mode simple motion`() {
-    doTest(parseKeys("gh", "<S-Up>"),
+    doTestNoNeovim("Options", parseKeys("gh", "<S-Up>"),
       """
                 A Discovery
 
@@ -191,7 +191,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test char mode to empty line`() {
-    doTest(parseKeys("gh", "<S-Up>"),
+    doTestNoNeovim("Options", parseKeys("gh", "<S-Up>"),
       """
                 A Discovery
 
@@ -217,7 +217,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test char mode from empty line`() {
-    doTest(parseKeys("gh", "<S-Up>"),
+    doTestNoNeovim("Options", parseKeys("gh", "<S-Up>"),
       """
                 A Discovery
                 $c
@@ -243,7 +243,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test char mode on file start`() {
-    doTest(parseKeys("gh", "<S-Up>"),
+    doTestNoNeovim("Options", parseKeys("gh", "<S-Up>"),
       """
                 A ${c}Discovery
 
@@ -269,7 +269,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test char mode multicaret`() {
-    doTest(parseKeys("gh", "<S-Up>"),
+    doTestNoNeovim("Options", parseKeys("gh", "<S-Up>"),
       """
                 A ${c}Discovery
 
@@ -295,7 +295,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line mode simple motion`() {
-    doTest(parseKeys("gH", "<S-Up>"),
+    doTestNoNeovim("Options", parseKeys("gH", "<S-Up>"),
       """
                 A Discovery
 
@@ -321,7 +321,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line mode to empty line`() {
-    doTest(parseKeys("gH", "<S-Up>"),
+    doTestNoNeovim("Options", parseKeys("gH", "<S-Up>"),
       """
                 A Discovery
 
@@ -347,7 +347,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line mode from empty line`() {
-    doTest(parseKeys("gH", "<S-Up>"),
+    doTestNoNeovim("Options", parseKeys("gH", "<S-Up>"),
       """
                 A Discovery
                 $c
@@ -373,7 +373,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line mode to line start`() {
-    doTest(parseKeys("gH", "<S-Up>"),
+    doTestNoNeovim("Options", parseKeys("gH", "<S-Up>"),
       """
                 A ${c}Discovery
 
@@ -399,7 +399,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line mode multicaret`() {
-    doTest(parseKeys("gH", "<S-Up>"),
+    doTestNoNeovim("Options", parseKeys("gH", "<S-Up>"),
       """
                 A ${c}Discovery
 
@@ -425,7 +425,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test block mode simple motion`() {
-    doTest(parseKeys("g<C-H>", "<S-Up>"),
+    doTestNoNeovim("Options", parseKeys("g<C-H>", "<S-Up>"),
       """
                 A Discovery
 
@@ -451,7 +451,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test block mode to empty line`() {
-    doTest(parseKeys("g<C-H>", "<S-Up>"),
+    doTestNoNeovim("Options", parseKeys("g<C-H>", "<S-Up>"),
       """
                 A Discovery
 
@@ -477,7 +477,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test block mode from empty line`() {
-    doTest(parseKeys("g<C-H>", "<S-Up>"),
+    doTestNoNeovim("Options", parseKeys("g<C-H>", "<S-Up>"),
       """
                 A Discovery
                 $c
@@ -503,7 +503,7 @@ class MotionShiftUpActionHandlerTest : VimOptionTestCase(SelectModeOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test block mode to line start`() {
-    doTest(parseKeys("g<C-H>", "<S-Up>"),
+    doTestNoNeovim("Options", parseKeys("g<C-H>", "<S-Up>"),
       """
                 A ${c}Discovery
 

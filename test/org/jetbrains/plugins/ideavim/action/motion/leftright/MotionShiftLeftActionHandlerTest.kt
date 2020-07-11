@@ -35,7 +35,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test visual left`() {
-    doTest(parseKeys("<S-Left>"),
+    doTestNoNeovim("Options", parseKeys("<S-Left>"),
       """
                 A Discovery
 
@@ -61,7 +61,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test visual left twice`() {
-    doTest(parseKeys("<S-Left><S-Left>"),
+    doTestNoNeovim("Options", parseKeys("<S-Left><S-Left>"),
       """
                 A Discovery
 
@@ -87,7 +87,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
   )
   fun `test select left`() {
-    doTest(parseKeys("<S-Left>"),
+    doTestNoNeovim("Options", parseKeys("<S-Left>"),
       """
                 A Discovery
 
@@ -113,7 +113,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
   )
   fun `test select left twice`() {
-    doTest(parseKeys("<S-Left><S-Left>"),
+    doTestNoNeovim("Options", parseKeys("<S-Left><S-Left>"),
       """
                 A Discovery
 
@@ -139,7 +139,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test simple motion char mode`() {
-    doTest(parseKeys("gh", "<S-Left>"),
+    doTestNoNeovim("Options", parseKeys("gh", "<S-Left>"),
       """
                 A Discovery
 
@@ -165,7 +165,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test double motion char mode`() {
-    doTest(parseKeys("gh", "<S-Left>".repeat(2)),
+    doTestNoNeovim("Options", parseKeys("gh", "<S-Left>".repeat(2)),
       """
                 A Discovery
 
@@ -191,7 +191,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test at line start char mode`() {
-    doTest(parseKeys("gh", "<S-Left>".repeat(2)),
+    doTestNoNeovim("Options", parseKeys("gh", "<S-Left>".repeat(2)),
       """
                 A Discovery
 
@@ -217,7 +217,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test at file start char mode`() {
-    doTest(parseKeys("gh", "<S-Left>".repeat(2)),
+    doTestNoNeovim("Options", parseKeys("gh", "<S-Left>".repeat(2)),
       """
                 ${c}A Discovery
 
@@ -243,7 +243,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test char mode multicaret`() {
-    doTest(parseKeys("gh", "<S-Left>".repeat(2)),
+    doTestNoNeovim("Options", parseKeys("gh", "<S-Left>".repeat(2)),
       """
                 ${c}A Discovery
 
@@ -269,7 +269,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test simple motion line mode`() {
-    doTest(parseKeys("gH", "<S-Left>"),
+    doTestNoNeovim("Options", parseKeys("gH", "<S-Left>"),
       """
                 A Discovery
 
@@ -295,7 +295,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test to line start line mode`() {
-    doTest(parseKeys("gH", "<S-Left>".repeat(5)),
+    doTestNoNeovim("Options", parseKeys("gH", "<S-Left>".repeat(5)),
       """
                 A Discovery
 
@@ -321,7 +321,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test to file start line mode`() {
-    doTest(parseKeys("gH", "<S-Left>".repeat(5)),
+    doTestNoNeovim("Options", parseKeys("gH", "<S-Left>".repeat(5)),
       """
                 A ${c}Discovery
 
@@ -347,7 +347,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line mode multicaret`() {
-    doTest(parseKeys("gH", "<S-Left>".repeat(5)),
+    doTestNoNeovim("Options", parseKeys("gH", "<S-Left>".repeat(5)),
       """
                 A ${c}Discovery
 
@@ -373,7 +373,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test simple motion block mode`() {
-    doTest(parseKeys("g<C-H>", "<S-Left>"),
+    doTestNoNeovim("Options", parseKeys("g<C-H>", "<S-Left>"),
       """
                 A Discovery
 
@@ -399,7 +399,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test twice motion block mode`() {
-    doTest(parseKeys("g<C-H>", "<S-Left>".repeat(2)),
+    doTestNoNeovim("Options", parseKeys("g<C-H>", "<S-Left>".repeat(2)),
       """
                 A Discovery
 
@@ -425,7 +425,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test at line start block mode`() {
-    doTest(parseKeys("g<C-H>", "<S-Left>".repeat(2)),
+    doTestNoNeovim("Options", parseKeys("g<C-H>", "<S-Left>".repeat(2)),
       """
                 A Discovery
 
@@ -451,7 +451,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test at file start block mode`() {
-    doTest(parseKeys("g<C-H>", "<S-Left>".repeat(2)),
+    doTestNoNeovim("Options", parseKeys("g<C-H>", "<S-Left>".repeat(2)),
       """
                 ${c}A Discovery
 
@@ -477,7 +477,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test multiline with empty line block mode`() {
-    doTest(parseKeys("g<C-H>", "<S-Down>", "<S-Left>".repeat(2)),
+    doTestNoNeovim("Options", parseKeys("g<C-H>", "<S-Down>", "<S-Left>".repeat(2)),
       """
                 A ${c}Discovery
 
@@ -504,7 +504,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test multiline block mode`() {
-    doTest(parseKeys("g<C-H>", "<S-Down>".repeat(2), "<S-Left>".repeat(3)),
+    doTestNoNeovim("Options", parseKeys("g<C-H>", "<S-Down>".repeat(2), "<S-Left>".repeat(3)),
       """
                 A Discovery
 
@@ -531,7 +531,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test continuevisual`() {
-    doTest(parseKeys("v", "<S-Left>".repeat(3)),
+    doTestNoNeovim("Options", parseKeys("v", "<S-Left>".repeat(3)),
       """
                 A Discovery
 
@@ -555,7 +555,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test no continueselect`() {
-    doTest(parseKeys("gh", "<S-Left>".repeat(3)),
+    doTestNoNeovim("Options", parseKeys("gh", "<S-Left>".repeat(3)),
       """
                 A Discovery
 
@@ -579,7 +579,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test no continuevisual`() {
-    doTest(parseKeys("v", "<S-Left>".repeat(3)),
+    doTestNoNeovim("Options", parseKeys("v", "<S-Left>".repeat(3)),
       """
                 A Discovery
 

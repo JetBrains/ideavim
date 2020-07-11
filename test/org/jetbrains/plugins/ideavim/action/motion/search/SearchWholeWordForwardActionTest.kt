@@ -30,13 +30,13 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
       .hello 2
       .hello 3
     """.trimIndent())
-    val keys = parseKeys("**")
+    val keys = "**"
     val after = dotToTab("""
       .hello 1
       .hello 2
       .${c}hello 3
     """.trimIndent())
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test backward search on empty string`() {
@@ -53,7 +53,7 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
         """
   )
   fun `test last dot`() {
-    doTest(parseKeys("*"),
+    doTestNoNeovim("Beh diff", parseKeys("*"),
       """
           I found it in a legendary land
           all rocks and lavender and tufted grass,

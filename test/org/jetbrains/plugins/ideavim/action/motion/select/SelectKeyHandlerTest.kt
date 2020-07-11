@@ -29,7 +29,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class SelectKeyHandlerTest : VimTestCase() {
   fun `test type in select mode`() {
     val typed = "Hello"
-    this.doTest(parseKeys("gh", "<S-Right>", typed),
+    this.doTestNoNeovim("Select mode", parseKeys("gh", "<S-Right>", typed),
       """
                 A Discovery
 
@@ -52,7 +52,7 @@ class SelectKeyHandlerTest : VimTestCase() {
 
   fun `test char mode on empty line`() {
     val typed = "Hello"
-    this.doTest(parseKeys("gh", typed),
+    this.doTestNoNeovim("Select mode", parseKeys("gh", typed),
       """
                 A Discovery
                 $c
@@ -74,7 +74,7 @@ class SelectKeyHandlerTest : VimTestCase() {
   }
 
   fun `test char mode backspace`() {
-    this.doTest(parseKeys("gh", "<BS>"),
+    this.doTestNoNeovim("Select mode", parseKeys("gh", "<BS>"),
       """
                 A Discovery
 
@@ -96,7 +96,7 @@ class SelectKeyHandlerTest : VimTestCase() {
   }
 
   fun `test char mode delete`() {
-    this.doTest(parseKeys("gh", "<DEL>"),
+    this.doTestNoNeovim("Select mode", parseKeys("gh", "<DEL>"),
       """
                 A Discovery
 
@@ -119,7 +119,7 @@ class SelectKeyHandlerTest : VimTestCase() {
 
   fun `test char mode multicaret`() {
     val typed = "Hello"
-    this.doTest(parseKeys("gh", "<S-Right>", typed),
+    this.doTestNoNeovim("Select mode", parseKeys("gh", "<S-Right>", typed),
       """
                 A Discovery
 
@@ -142,7 +142,7 @@ class SelectKeyHandlerTest : VimTestCase() {
 
   fun `test line mode`() {
     val typed = "Hello"
-    this.doTest(parseKeys("gH", typed),
+    this.doTestNoNeovim("Select mode", parseKeys("gH", typed),
       """
                 A Discovery
 
@@ -165,7 +165,7 @@ class SelectKeyHandlerTest : VimTestCase() {
 
   fun `test line mode empty line`() {
     val typed = "Hello"
-    this.doTest(parseKeys("gH", typed),
+    this.doTestNoNeovim("Select mode", parseKeys("gH", typed),
       """
                 A Discovery
                 $c
@@ -188,7 +188,7 @@ class SelectKeyHandlerTest : VimTestCase() {
 
   fun `test line mode multicaret`() {
     val typed = "Hello"
-    this.doTest(parseKeys("gH", typed),
+    this.doTestNoNeovim("Select mode", parseKeys("gH", typed),
       """
                 A Discovery
 
@@ -211,7 +211,7 @@ class SelectKeyHandlerTest : VimTestCase() {
 
   fun `test type in select block mode`() {
     val typed = "Hello"
-    this.doTest(parseKeys("g<C-H>", "<S-Down>", "<S-Right>", typed),
+    this.doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<S-Down>", "<S-Right>", typed),
       """
                 A Discovery
 
@@ -242,7 +242,7 @@ class SelectKeyHandlerTest : VimTestCase() {
     """)
   fun `test block mode empty line`() {
     val typed = "Hello"
-    this.doTest(parseKeys("g<C-H>", "<S-Down>".repeat(2), "<S-Right>", typed),
+    this.doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<S-Down>".repeat(2), "<S-Right>", typed),
       """
                 A Discovery
                 $c
@@ -265,7 +265,7 @@ class SelectKeyHandlerTest : VimTestCase() {
 
   fun `test block mode longer line`() {
     val typed = "Hello"
-    this.doTest(parseKeys("g<C-H>", "<S-Down>", "<S-Right>".repeat(2), typed),
+    this.doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<S-Down>", "<S-Right>".repeat(2), typed),
       """
                 A Discovery
 
@@ -288,7 +288,7 @@ class SelectKeyHandlerTest : VimTestCase() {
 
   fun `test block mode longer line with esc`() {
     val typed = "Hello"
-    this.doTest(parseKeys("g<C-H>", "<S-Down>", "<S-Right>".repeat(2), typed, "<esc>"),
+    this.doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<S-Down>", "<S-Right>".repeat(2), typed, "<esc>"),
       """
                 A Discovery
 

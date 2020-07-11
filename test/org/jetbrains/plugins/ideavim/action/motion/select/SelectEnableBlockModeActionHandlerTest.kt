@@ -24,7 +24,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
   fun `test entering select mode`() {
-    doTest(parseKeys("g<C-H>"),
+    doTestNoNeovim("Select Mode", parseKeys("g<C-H>"),
       """
                 A Discovery
 
@@ -46,7 +46,7 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
   }
 
   fun `test entering select mode at the end of file`() {
-    doTest(parseKeys("g<C-H>"),
+    doTestNoNeovim("Select mode", parseKeys("g<C-H>"),
       """
                 A Discovery
 
@@ -86,7 +86,7 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
   }
 
   fun `test entering select mode multicaret`() {
-    doTest(parseKeys("g<C-H>"),
+    doTestNoNeovim("Select mode", parseKeys("g<C-H>"),
       """
                 A Discovery
                 $c

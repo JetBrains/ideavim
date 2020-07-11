@@ -194,7 +194,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count after visual operation`() {
-    doTest(parseKeys("vedx", "1v"),
+    doTestWithNeovim(listOf("vedx", "1v"),
       """
                     A Discovery
 
@@ -215,7 +215,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count after visual operation multicaret`() {
-    doTest(parseKeys("vedx", "1v"),
+    doTestNoNeovim("different caret pos", parseKeys("vedx", "1v"),
       """
                     A Discovery
 
@@ -236,7 +236,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count after visual operation multiple time`() {
-    doTest(parseKeys("vedx", "1v", "<ESC>bb", "1v"),
+    doTestWithNeovim(listOf("vedx", "1v", "<ESC>bb", "1v"),
       """
                     A Discovery
 
@@ -257,7 +257,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with double count after visual operation`() {
-    doTest(parseKeys("vedx", "2v"),
+    doTestWithNeovim(listOf("vedx", "2v"),
       """
                     A Discovery
 
@@ -278,7 +278,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with ten count after visual operation`() {
-    doTest(parseKeys("vedx", "10v"),
+    doTestWithNeovim(listOf("vedx", "10v"),
       """
                     A Discovery
 
@@ -299,7 +299,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with double count after visual operation multiline`() {
-    doTest(parseKeys("vjld", "2v"),
+    doTestWithNeovim(listOf("vjld", "2v"),
       """
                     A Discovery
 
@@ -319,7 +319,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with ten count after visual operation multiline`() {
-    doTest(parseKeys("vjld", "10v"),
+    doTestWithNeovim(listOf("vjld", "10v"),
       """
                     A Discovery
 
@@ -339,7 +339,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count after multiline visual operation`() {
-    doTest(parseKeys("vjld", "1v"),
+    doTestWithNeovim(listOf("vjld", "1v"),
       """
                     A Discovery
 
@@ -359,7 +359,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count with dollar motion`() {
-    doTest(parseKeys("v\$dj", "1v"),
+    doTestNoNeovim("different caret pos", parseKeys("v\$dj", "1v"),
       """
                     A Discovery
 
@@ -380,7 +380,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count with dollar motion and down movement`() {
-    doTest(parseKeys("v\$dj", "1v", "j"),
+    doTestNoNeovim("Different caret pos", parseKeys("v\$dj", "1v", "j"),
       """
                     A Discovery
 
@@ -401,7 +401,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count after line visual operation`() {
-    doTest(parseKeys("Vd", "1v"),
+    doTestWithNeovim(listOf("Vd", "1v"),
       """
                     A Discovery
 
@@ -421,7 +421,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count after line visual operation to line end`() {
-    doTest(parseKeys("V3jd3k", "1v"),
+    doTestNoNeovim("different caret pos", parseKeys("V3jd3k", "1v"),
       """
                     A Discovery
 
@@ -449,7 +449,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count after line visual operation multicaret`() {
-    doTest(parseKeys("Vd", "1v"),
+    doTestNoNeovim("Different caret pos", parseKeys("Vd", "1v"),
       """
                     A ${c}Discovery
 
@@ -466,7 +466,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with double count after line visual operation`() {
-    doTest(parseKeys("Vd", "2v"),
+    doTestWithNeovim(listOf("Vd", "2v"),
       """
                     A Discovery
 
@@ -486,7 +486,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with ten count after line visual operation`() {
-    doTest(parseKeys("Vd", "10v"),
+    doTestWithNeovim(listOf("Vd", "10v"),
       """
                     A Discovery
 
@@ -504,7 +504,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count after line visual operation with dollar motion`() {
-    doTest(parseKeys("V\$d", "1v"),
+    doTestNoNeovim("different caret pos", parseKeys("V\$d", "1v"),
       """
                     A Discovery
 
@@ -524,7 +524,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count after block visual operation`() {
-    doTest(parseKeys("<C-V>jld", "1v"),
+    doTestWithNeovim(listOf("<C-V>jld", "1v"),
       """
                     A Discovery
 
@@ -545,7 +545,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count after block visual operation multiple time`() {
-    doTest(parseKeys("<C-V>jld", "1v", "<ESC>kh", "1v"),
+    doTestWithNeovim(listOf("<C-V>jld", "1v", "<ESC>kh", "1v"),
       """
                     A Discovery
 
@@ -566,7 +566,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with double count after block visual operation`() {
-    doTest(parseKeys("<C-V>jld", "2v"),
+    doTestWithNeovim(listOf("<C-V>jld", "2v"),
       """
                     A Discovery
 
@@ -587,7 +587,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with ten count after block visual operation`() {
-    doTest(parseKeys("<C-V>jld", "20v"),
+    doTestWithNeovim(listOf("<C-V>jld", "20v"),
       """
                     A Discovery
 
@@ -608,7 +608,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with dollar motion count after block visual operation`() {
-    doTest(parseKeys("<C-V>j\$d2j", "1v"),
+    doTestWithNeovim(listOf("<C-V>j\$d2j", "1v"),
       """
                     A Discovery
 

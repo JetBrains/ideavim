@@ -86,7 +86,7 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
   }
 
   fun `test entering select mode multicaret`() {
-    doTest(parseKeys("gH"),
+    doTestNoNeovim("Select mode", parseKeys("gH"),
       """
                 A Discovery
                 $c

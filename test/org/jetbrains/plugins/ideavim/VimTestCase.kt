@@ -43,6 +43,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.CommandState.SubMode
+import com.maddyhome.idea.vim.common.CharacterPosition
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
@@ -273,12 +274,12 @@ abstract class VimTestCase : UsefulTestCase() {
 
     val editor = myFixture.editor
     neovimApi.currentBuffer.get().setLines(0, -1, false, editor.document.text.split("\n")).get()
-    val logicalPosition = editor.caretModel.logicalPosition
-    neovimApi.currentWindow.get().setCursor(VimCoords(logicalPosition.line + 1, logicalPosition.column)).get()
+    val charPosition = CharacterPosition.fromOffset(editor, editor.caretModel.offset)
+    neovimApi.currentWindow.get().setCursor(VimCoords(charPosition.line + 1, charPosition.column)).get()
     neovimApi.input(neovimApi.replaceTermcodes(keys, true, false, true).get()).get()
     justTest(keys, after, modeAfter, subModeAfter)
     val vimCoords = neovimApi.currentWindow.get().cursor.get()
-    val resultVimCoords = editor.caretModel.logicalPosition.toVimCoords()
+    val resultVimCoords = CharacterPosition.fromOffset(editor, editor.caretModel.offset).toVimCoords()
 
     // Check caret position
     Assert.assertTrue("Expected: $vimCoords, actual: $resultVimCoords", vimCoords.equalsTo(resultVimCoords))

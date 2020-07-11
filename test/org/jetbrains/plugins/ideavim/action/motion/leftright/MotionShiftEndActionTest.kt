@@ -50,7 +50,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Options", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimOptionTestConfiguration(
@@ -75,7 +75,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    doTestNoNeovim("Options", keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
 
@@ -101,7 +101,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTest(keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    doTestNoNeovim("Options", keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
   @VimOptionTestConfiguration(

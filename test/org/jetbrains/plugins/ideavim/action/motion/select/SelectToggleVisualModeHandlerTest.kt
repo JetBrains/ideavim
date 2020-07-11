@@ -27,7 +27,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class SelectToggleVisualModeHandlerTest : VimTestCase() {
   fun `test switch to select mode characterwise`() {
-    doTest(parseKeys("ve", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("ve", "<C-G>"),
       """
                 A Discovery
 
@@ -47,7 +47,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to select mode characterwise left motion`() {
-    doTest(parseKeys("vb", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("vb", "<C-G>"),
       """
                 A Discovery
 
@@ -67,7 +67,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to select mode characterwise empty line`() {
-    doTest(parseKeys("v", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("v", "<C-G>"),
       """
                 A Discovery
                 $c
@@ -87,7 +87,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to select mode characterwise to line end`() {
-    doTest(parseKeys("vel", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("vel", "<C-G>"),
       """
                 A Discovery
 
@@ -107,7 +107,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to select mode characterwise one letter`() {
-    doTest(parseKeys("v", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("v", "<C-G>"),
       """
                 A Discovery
 
@@ -127,7 +127,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to select mode characterwise multicaret`() {
-    doTest(parseKeys("ve", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("ve", "<C-G>"),
       """
                 A Discovery
 
@@ -147,7 +147,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to visual mode characterwise`() {
-    doTest(parseKeys("gh", "<S-Right>".repeat(4), "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("gh", "<S-Right>".repeat(4), "<C-G>"),
       """
                 A Discovery
 
@@ -167,7 +167,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to visual mode characterwise left motion`() {
-    doTest(parseKeys("gh", "<S-Left>".repeat(5), "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("gh", "<S-Left>".repeat(5), "<C-G>"),
       """
                 A Discovery
 
@@ -187,7 +187,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to visual mode characterwise empty line`() {
-    doTest(parseKeys("gh", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("gh", "<C-G>"),
       """
                 A Discovery
                 ${c}
@@ -207,7 +207,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to visual mode characterwise line end`() {
-    doTest(parseKeys("gh", "<S-Right>".repeat(5), "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("gh", "<S-Right>".repeat(5), "<C-G>"),
       """
                 A Discovery
 
@@ -227,7 +227,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to visual mode characterwise one letter`() {
-    doTest(parseKeys("gh", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("gh", "<C-G>"),
       """
                 A Discovery
 
@@ -255,7 +255,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
     """)
   fun `test switch to visual mode characterwise line start`() {
-    doTest(parseKeys("gh", "<S-Left>", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("gh", "<S-Left>", "<C-G>"),
       """
                 A Discovery
 
@@ -283,7 +283,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
     """)
   fun `test switch to visual mode characterwise end on line start`() {
-    doTest(parseKeys("gh", "<S-Left>", "<S-Down>", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("gh", "<S-Left>", "<S-Down>", "<C-G>"),
       """
                 A Discovery
 
@@ -303,7 +303,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to visual mode characterwise multicaret`() {
-    doTest(parseKeys("gh", "<S-Right>".repeat(4), "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("gh", "<S-Right>".repeat(4), "<C-G>"),
       """
                 A Discovery
 
@@ -323,7 +323,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to select mode linewise`() {
-    doTest(parseKeys("Ve", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("Ve", "<C-G>"),
       """
                 A Discovery
 
@@ -343,7 +343,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to select mode linewise up motion`() {
-    doTest(parseKeys("V", "k", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("V", "k", "<C-G>"),
       """
                 A Discovery
 
@@ -363,7 +363,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to select mode linewise empty line`() {
-    doTest(parseKeys("V", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("V", "<C-G>"),
       """
                 A Discovery
                 ${c}
@@ -383,7 +383,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to select mode linewise multicaret`() {
-    doTest(parseKeys("Ve", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("Ve", "<C-G>"),
       """
                 A Discovery
 
@@ -403,7 +403,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to visual mode linewise`() {
-    doTest(parseKeys("gH", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("gH", "<C-G>"),
       """
                 A Discovery
 
@@ -423,7 +423,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to visual mode linewise empty line`() {
-    doTest(parseKeys("gH", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("gH", "<C-G>"),
       """
                 A Discovery
                 ${c}
@@ -443,7 +443,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to visual mode linewise multicaret`() {
-    doTest(parseKeys("gH", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("gH", "<C-G>"),
       """
                 A Discovery
 
@@ -463,7 +463,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to select mode blockwise`() {
-    doTest(parseKeys("<C-V>ejj", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("<C-V>ejj", "<C-G>"),
       """
                 A Discovery
 
@@ -483,7 +483,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to select mode blockwise left motion`() {
-    doTest(parseKeys("<C-V>bjj", "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("<C-V>bjj", "<C-G>"),
       """
                 A Discovery
 
@@ -503,7 +503,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to visual mode blockwise`() {
-    doTest(parseKeys("g<C-H>", "<S-Right>".repeat(4), "<S-Down>".repeat(2), "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<S-Right>".repeat(4), "<S-Down>".repeat(2), "<C-G>"),
       """
                 A Discovery
 
@@ -523,7 +523,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
   }
 
   fun `test switch to visual mode blockwise to left`() {
-    doTest(parseKeys("g<C-H>", "<S-Left>".repeat(4), "<S-Down>".repeat(2), "<C-G>"),
+    doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<S-Left>".repeat(4), "<S-Down>".repeat(2), "<C-G>"),
       """
                 A Discovery
 

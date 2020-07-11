@@ -54,7 +54,7 @@ class VisualBlockAppendActionTest : VimTestCase() {
   }
 
   fun `test append in non block mode`() {
-    doTest(parseKeys("vwAHello<esc>"),
+    doTestNoNeovim("I don't know", parseKeys("vwAHello<esc>"),
       """
                 ${c}A Discovery
 

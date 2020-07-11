@@ -25,7 +25,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class SelectEscapeActionTest : VimTestCase() {
   fun `test exit char mode`() {
-    this.doTest(parseKeys("gh", "<esc>"),
+    this.doTestNoNeovim("Select mode", parseKeys("gh", "<esc>"),
       """
                 A Discovery
 
@@ -48,7 +48,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   fun `test exit char mode on line start`() {
-    this.doTest(parseKeys("gh", "<esc>"),
+    this.doTestNoNeovim("Select mode", parseKeys("gh", "<esc>"),
       """
                 A Discovery
 
@@ -71,7 +71,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   fun `test exit char mode on line end`() {
-    this.doTest(parseKeys("gh", "<esc>"),
+    this.doTestNoNeovim("Select mode", parseKeys("gh", "<esc>"),
       """
                 A Discovery
 
@@ -94,7 +94,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   fun `test exit char mode on file start`() {
-    this.doTest(parseKeys("gh", "<S-Left>", "<esc>"),
+    this.doTestNoNeovim("Select mode", parseKeys("gh", "<S-Left>", "<esc>"),
       """
                 ${c}A Discovery
 
@@ -117,7 +117,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   fun `test exit char mode on empty line`() {
-    this.doTest(parseKeys("gh", "<esc>"),
+    this.doTestNoNeovim("Select mode", parseKeys("gh", "<esc>"),
       """
                 A Discovery
                 $c
@@ -140,7 +140,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   fun `test exit char mode multicaret`() {
-    this.doTest(parseKeys("gh", "<esc>"),
+    this.doTestNoNeovim("Select mode", parseKeys("gh", "<esc>"),
       """
                 A Discovery
 
@@ -163,7 +163,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   fun `test exit in select line mode`() {
-    this.doTest(parseKeys("gH", "<esc>"),
+    this.doTestNoNeovim("Select mode", parseKeys("gH", "<esc>"),
       """
                 A Discovery
 
@@ -186,7 +186,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   fun `test exit line mode line end`() {
-    this.doTest(parseKeys("gH", "<esc>"),
+    this.doTestNoNeovim("Select mode", parseKeys("gH", "<esc>"),
       """
                 A Discovery
 
@@ -209,7 +209,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   fun `test exit line mode file start`() {
-    this.doTest(parseKeys("gH", "<esc>"),
+    this.doTestNoNeovim("Select mode", parseKeys("gH", "<esc>"),
       """
                 ${c}A Discovery
 
@@ -232,7 +232,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   fun `test exit line mode empty line`() {
-    this.doTest(parseKeys("gH", "<esc>"),
+    this.doTestNoNeovim("Select mode", parseKeys("gH", "<esc>"),
       """
                 A Discovery
                 $c
@@ -255,7 +255,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   fun `test exit line mode multicaret`() {
-    this.doTest(parseKeys("gH", "<esc>"),
+    this.doTestNoNeovim("Select mode", parseKeys("gH", "<esc>"),
       """
                 A Discovery
 
@@ -278,7 +278,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   fun `test exit in select block mode`() {
-    this.doTest(parseKeys("g<C-H>", "<esc>"),
+    this.doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<esc>"),
       """
                 A Discovery
 
@@ -304,7 +304,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   fun `test exit block mode with motion`() {
-    this.doTest(parseKeys("g<C-H>", "<S-Down>", "<S-Right>", "<esc>"),
+    this.doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<S-Down>", "<S-Right>", "<esc>"),
       """
                 A Discovery
 
@@ -330,7 +330,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   fun `test exit block mode on longer line`() {
-    this.doTest(parseKeys("g<C-H>", "<S-Down>", "<S-Right>".repeat(3), "<esc>"),
+    this.doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<S-Down>", "<S-Right>".repeat(3), "<esc>"),
       """
                 A Discovery
 
@@ -356,7 +356,7 @@ class SelectEscapeActionTest : VimTestCase() {
   }
 
   fun `test exit block mode on longer line till end`() {
-    this.doTest(parseKeys("g<C-H>", "<S-Down>", "<S-Right>".repeat(5), "<esc>"),
+    this.doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<S-Down>", "<S-Right>".repeat(5), "<esc>"),
       """
                 A Discovery
 

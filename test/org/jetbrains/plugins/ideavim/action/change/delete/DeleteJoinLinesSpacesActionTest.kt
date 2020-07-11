@@ -72,7 +72,7 @@ class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(IdeaJoinOptionsData.na
 
   @VimOptionTestConfiguration(VimTestOption(IdeaJoinOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
   fun `test join with idea with large count`() {
-    doTest(StringHelper.parseKeys("10J"),
+    doTestNoNeovim("Config", StringHelper.parseKeys("10J"),
       """
                 A Discovery
 

@@ -58,7 +58,7 @@ class CommandParserTest : VimTestCase() {
     val keys = commandToKeys(">>")
     val before = "I ${c}found it in a legendary land"
     val after = "        ${c}I found it in a legendary land"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Different indent", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test execute in disabled state`() {

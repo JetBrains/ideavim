@@ -31,7 +31,7 @@ import org.jetbrains.plugins.ideavim.VimTestOptionType
 class SelectMotionLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
   fun `test char select simple move`() {
-    doTest(parseKeys("viw", "<C-G>", "<Left>"),
+    doTestNoNeovim("Options", parseKeys("viw", "<C-G>", "<Left>"),
       """
                 A Discovery
 
@@ -54,7 +54,7 @@ class SelectMotionLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
 
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
   fun `test select multiple carets`() {
-    doTest(parseKeys("viwo", "<C-G>", "<Left>"),
+    doTestNoNeovim("Options", parseKeys("viwo", "<C-G>", "<Left>"),
       """
                 A Discovery
 
@@ -75,7 +75,7 @@ class SelectMotionLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
 
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []))
   fun `test without stopsel`() {
-    doTest(parseKeys("viw", "<C-G>", "<Left>"),
+    doTestNoNeovim("Options", parseKeys("viw", "<C-G>", "<Left>"),
       """
                 A Discovery
 

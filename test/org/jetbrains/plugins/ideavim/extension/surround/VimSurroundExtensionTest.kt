@@ -41,9 +41,9 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if ${c}condition {\n" + "}\n"
     val after = "if ${c}(condition) {\n" + "}\n"
 
-    doTest(parseKeys("yseb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest(parseKeys("yse)"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest(parseKeys("yse("), before,
+    doTestNoNeovim("Surround extension", parseKeys("yseb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("yse)"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("yse("), before,
       "if ( condition ) {\n" + "}\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -51,9 +51,9 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if (condition) ${c}return;\n"
     val after = "if (condition) {return;}\n"
 
-    doTest(parseKeys("ysEB"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest(parseKeys("ysE}"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest(parseKeys("ysE{"), before, "if (condition) { return; }\n", CommandState.Mode.COMMAND,
+    doTestNoNeovim("Surround extension", parseKeys("ysEB"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ysE}"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ysE{"), before, "if (condition) { return; }\n", CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }
 
@@ -61,25 +61,25 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "int foo = bar${c}index;"
     val after = "int foo = bar[index];"
 
-    doTest(parseKeys("yser"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest(parseKeys("yse]"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest(parseKeys("yse["), before, "int foo = bar[ index ];", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("yser"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("yse]"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("yse["), before, "int foo = bar[ index ];", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testSurroundWordAngle() {
     val before = "foo = new Bar${c}Baz();"
     val after = "foo = new Bar<Baz>();"
 
-    doTest(parseKeys("ysea"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest(parseKeys("yse>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ysea"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("yse>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testSurroundQuotes() {
     val before = "foo = ${c}new Bar.Baz;"
     val after = "foo = \"new Bar.Baz\";"
 
-    doTest(parseKeys("yst;\""), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest(parseKeys("ys4w\""), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("yst;\""), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ys4w\""), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testSurroundTag() {
@@ -132,14 +132,14 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if ${c}condition {\n}\n"
     val after = "if ((condition)) {\n}\n"
 
-    doTest(parseKeys("ysiw)", "l", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ysiw)", "l", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testRepeatSurroundDouble() {
     val before = "if ${c}condition {\n}\n"
     val after = "if (((condition))) {\n}\n"
 
-    doTest(parseKeys("ysiw)", "l", ".", "l", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ysiw)", "l", ".", "l", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testRepeatDifferentChanges() {
@@ -152,7 +152,7 @@ class VimSurroundExtensionTest : VimTestCase() {
                   if 'condition' { }
                     """
 
-    doTest(parseKeys("ysiw)", "cs\"'", "j", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ysiw)", "cs\"'", "j", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testRepeatWrapWithFunction() {
@@ -165,7 +165,7 @@ class VimSurroundExtensionTest : VimTestCase() {
                   if "myFunction(condition)" { }
                     """
 
-    doTest(parseKeys("ysiwf", "myFunction<CR>", "j", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ysiwf", "myFunction<CR>", "j", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testRepeatWrapWithTag() {
@@ -178,7 +178,7 @@ class VimSurroundExtensionTest : VimTestCase() {
                   <myTag>abc</myTag>
                     """
 
-    doTest(parseKeys("ysiwt", "myTag>", "j", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ysiwt", "myTag>", "j", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   /* visual surround */
@@ -187,11 +187,11 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if ${c}condition {\n" + "}\n"
     val after = "if ${c}(condition) {\n" + "}\n"
 
-    doTest(parseKeys("veSb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("veSb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     assertMode(CommandState.Mode.COMMAND)
-    doTest(parseKeys("veS)"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("veS)"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     assertMode(CommandState.Mode.COMMAND)
-    doTest(parseKeys("veS("), before,
+    doTestNoNeovim("Surround extension", parseKeys("veS("), before,
       "if ( condition ) {\n" + "}\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     assertMode(CommandState.Mode.COMMAND)
   }
@@ -202,50 +202,50 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if (${c}condition) {\n" + "}\n"
     val after = "if condition {\n" + "}\n"
 
-    doTest(parseKeys("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest(parseKeys("ds("), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest(parseKeys("ds)"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ds("), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ds)"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testDeleteSurroundingQuote() {
     val before = "if (\"${c}foo\".equals(foo)) {\n" + "}\n"
     val after = "if (${c}foo.equals(foo)) {\n" + "}\n"
 
-    doTest(parseKeys("ds\""), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ds\""), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testDeleteSurroundingBlock() {
     val before = "if (condition) {${c}return;}\n"
     val after = "if (condition) return;\n"
 
-    doTest(parseKeys("dsB"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest(parseKeys("ds}"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest(parseKeys("ds{"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("dsB"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ds}"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ds{"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testDeleteSurroundingArray() {
     val before = "int foo = bar[${c}index];"
     val after = "int foo = barindex;"
 
-    doTest(parseKeys("dsr"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest(parseKeys("ds]"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest(parseKeys("ds["), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("dsr"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ds]"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ds["), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testDeleteSurroundingAngle() {
     val before = "foo = new Bar<${c}Baz>();"
     val after = "foo = new BarBaz();"
 
-    doTest(parseKeys("dsa"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest(parseKeys("ds>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    doTest(parseKeys("ds<"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("dsa"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ds>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ds<"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testDeleteSurroundingTag() {
     val before = "<div><p>${c}Foo</p></div>"
     val after = "<div>${c}Foo</div>"
 
-    doTest(parseKeys("dst"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("dst"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-1085
@@ -253,7 +253,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "Foo\n" + "Seq(\"-${c}Yrangepos\")\n"
     val after = "Foo\n" + "Seq\"-Yrangepos\"\n"
 
-    doTest(parseKeys("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-1085
@@ -269,21 +269,21 @@ class VimSurroundExtensionTest : VimTestCase() {
       "    other\n" +
       "Baz\n"
 
-    doTest(parseKeys("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testRepeatDeleteSurroundParens() {
     val before = "if ((${c}condition)) {\n}\n"
     val after = "if condition {\n}\n"
 
-    doTest(parseKeys("dsb."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("dsb."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testRepeatDeleteSurroundQuotes() {
     val before = "if (\"${c}condition\") {\n}\n"
     val after = "if (condition) {\n}\n"
 
-    doTest(parseKeys("ds\"."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("ds\"."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   /* Change surroundings */
@@ -292,35 +292,35 @@ class VimSurroundExtensionTest : VimTestCase() {
     val before = "if (${c}condition) {\n" + "}\n"
     val after = "if [condition] {\n" + "}\n"
 
-    doTest(parseKeys("csbr"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("csbr"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testChangeSurroundingBlock() {
     val before = "if (condition) {${c}return;}"
     val after = "if (condition) (return;)"
 
-    doTest(parseKeys("csBb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("csBb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testChangeSurroundingTagSimple() {
     val before = "<div><p>${c}Foo</p></div>"
     val after = "<div>${c}(Foo)</div>"
 
-    doTest(parseKeys("cstb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("cstb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testChangeSurroundingTagAnotherTag() {
     val before = "<div><p>${c}Foo</p></div>"
     val after = "<div>${c}<b>Foo</b></div>"
 
-    doTest(parseKeys("cst\\<b>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("cst\\<b>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testRepeatChangeSurroundingParens() {
     val before = "foo(${c}index)(index2) = bar;"
     val after = "foo[index][index2] = bar;"
 
-    doTest(parseKeys("csbrE."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestNoNeovim("Surround extension", parseKeys("csbrE."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers("""
@@ -333,7 +333,7 @@ class VimSurroundExtensionTest : VimTestCase() {
       <p>Some text</p>
   """)
   fun `test wrap with tag full line`() {
-    doTest(parseKeys("VS\\<p>"), """
+    doTestNoNeovim("Surround extension", parseKeys("VS\\<p>"), """
       <h1>Title</h1>
       
       Sur${c}roundThis
@@ -358,7 +358,7 @@ class VimSurroundExtensionTest : VimTestCase() {
       </div>
   """)
   fun `test wrap with tag full line in middle`() {
-    doTest(parseKeys("VS\\<p>"), """
+    doTestNoNeovim("Surround extension", parseKeys("VS\\<p>"), """
       <div>
           <p>Some paragraph</p>
           Sur${c}round This
@@ -374,7 +374,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   }
 
   fun `test wrap line with char selection`() {
-    doTest(parseKeys("vawES\\<p>"), """
+    doTestNoNeovim("Surround extension", parseKeys("vawES\\<p>"), """
       <div>
           <p>Some paragraph</p>
           Sur${c}round This
