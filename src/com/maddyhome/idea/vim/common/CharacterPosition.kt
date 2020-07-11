@@ -33,5 +33,9 @@ class CharacterPosition(line: Int, col: Int) : LogicalPosition(line, col) {
       val lineStartOffset = getLineStartOffset(editor, logicalPosition.line)
       return CharacterPosition(logicalPosition.line, offset - lineStartOffset)
     }
+
+    fun atCaret(editor: Editor): CharacterPosition {
+      return fromOffset(editor, editor.caretModel.offset)
+    }
   }
 }

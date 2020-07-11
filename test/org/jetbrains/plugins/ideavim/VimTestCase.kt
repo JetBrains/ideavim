@@ -17,10 +17,6 @@
  */
 package org.jetbrains.plugins.ideavim
 
-import com.ensarsarajcic.neovim.java.api.NeovimApi
-import com.ensarsarajcic.neovim.java.api.NeovimApis
-import com.ensarsarajcic.neovim.java.api.types.api.VimCoords
-import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRPCConnection
 import com.intellij.ide.bookmarks.Bookmark
 import com.intellij.ide.bookmarks.BookmarkManager
 import com.intellij.ide.highlighter.JavaFileType
@@ -43,7 +39,6 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.CommandState.SubMode
-import com.maddyhome.idea.vim.common.CharacterPosition
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
@@ -54,8 +49,6 @@ import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
-import com.maddyhome.idea.vim.neovim.equalsTo
-import com.maddyhome.idea.vim.neovim.toVimCoords
 import com.maddyhome.idea.vim.option.OptionsManager.getOption
 import com.maddyhome.idea.vim.option.OptionsManager.ideastrictmode
 import com.maddyhome.idea.vim.option.OptionsManager.resetAllOptions
@@ -72,8 +65,6 @@ import javax.swing.KeyStroke
  */
 abstract class VimTestCase : UsefulTestCase() {
   protected lateinit var myFixture: CodeInsightTestFixture
-  protected lateinit var neovimApi: NeovimApi
-  private lateinit var neovim: Process
 
   @Throws(Exception::class)
   override fun setUp() {
@@ -96,11 +87,7 @@ abstract class VimTestCase : UsefulTestCase() {
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
     ExEntryPanel.getInstance().entry.setBounds(0, 0, 100, 25)
 
-    // Set up neovim
-    val pb = ProcessBuilder("nvim", "-u", "NONE", "--embed", "--headless")
-    neovim = pb.start()
-    val neovimConnection = ProcessRPCConnection(neovim, true)
-    neovimApi = NeovimApis.getApiForConnection(neovimConnection)
+    NeovimTesting.setUp()
   }
 
   protected val testDataPath: String
@@ -120,7 +107,7 @@ abstract class VimTestCase : UsefulTestCase() {
     VimPlugin.getMark().resetAllMarks()
 
     // Tear down neovim
-    neovim.destroy()
+    NeovimTesting.tearDown()
 
     super.tearDown()
   }
@@ -272,25 +259,14 @@ abstract class VimTestCase : UsefulTestCase() {
                        subModeAfter: SubMode) {
     configureByText(before)
 
-    val editor = myFixture.editor
-    neovimApi.currentBuffer.get().setLines(0, -1, false, editor.document.text.split("\n")).get()
-    val charPosition = CharacterPosition.fromOffset(editor, editor.caretModel.offset)
-    neovimApi.currentWindow.get().setCursor(VimCoords(charPosition.line + 1, charPosition.column)).get()
-    neovimApi.input(neovimApi.replaceTermcodes(keys, true, false, true).get()).get()
-    justTest(keys, after, modeAfter, subModeAfter)
-    val vimCoords = neovimApi.currentWindow.get().cursor.get()
-    val resultVimCoords = CharacterPosition.fromOffset(editor, editor.caretModel.offset).toVimCoords()
+    NeovimTesting.setupEditorAndType(myFixture.editor, keys)
 
-    // Check caret position
-    Assert.assertTrue("Expected: $vimCoords, actual: $resultVimCoords", vimCoords.equalsTo(resultVimCoords))
+    performTest(keys, after, modeAfter, subModeAfter)
 
-    // Check content
-    val lines = neovimApi.currentBuffer.get().getLines(0, -1, false).get()
-    val neovimContent = java.lang.String.join("\n", lines)
-    Assert.assertEquals(neovimContent, myFixture.editor.document.text)
+    NeovimTesting.assertState(myFixture.editor)
   }
 
-  private fun justTest(keys: String, after: String, modeAfter: CommandState.Mode, subModeAfter: SubMode) {
+  private fun performTest(keys: String, after: String, modeAfter: CommandState.Mode, subModeAfter: SubMode) {
     typeText(StringHelper.parseKeys(keys))
     myFixture.checkResult(after)
     assertState(modeAfter, subModeAfter)
@@ -320,7 +296,7 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected fun setRegister(register: Char, keys: String) {
     VimPlugin.getRegister().setKeys(register, stringToKeys(keys))
-    neovimApi.callFunction("setreg", listOf(register, keys, 'c'))
+    NeovimTesting.setRegister(register, keys)
   }
 
   protected fun assertState(modeAfter: CommandState.Mode, subModeAfter: SubMode) {
