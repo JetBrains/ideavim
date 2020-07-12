@@ -20,11 +20,13 @@ package org.jetbrains.plugins.ideavim.ex.handler
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class JoinLinesHandlerTest : VimTestCase() {
+  @VimBehaviorDiffers(description = "Different caret position")
   fun `test simple join`() {
-    doTestNoNeovim("ex command", commandToKeys("j"),
+    doTestWithNeovim(exCommand("j"),
       """
                 A Discovery
 
@@ -44,8 +46,9 @@ class JoinLinesHandlerTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
+  @VimBehaviorDiffers(description = "Different caret position")
   fun `test simple join full command`() {
-    doTestNoNeovim("Ex command", commandToKeys("join"),
+    doTestWithNeovim(exCommand("join"),
       """
                 A Discovery
 
@@ -65,8 +68,9 @@ class JoinLinesHandlerTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
+  @VimBehaviorDiffers(description = "Different caret position")
   fun `test join with range`() {
-    doTestNoNeovim("Ex command", commandToKeys("4,6j"),
+    doTestWithNeovim(exCommand("4,6j"),
       """
                 A Discovery
 

@@ -21,7 +21,8 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionRightActionTest : VimTestCase() {
@@ -79,8 +80,9 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
   fun `test simple motion non-ascii`() {
-    doTestNoNeovim("Strange chars", parseKeys("l"), """
+    doTestWithNeovim("l", """
             A Discovery
 
             I found it in a legendar${c}𝛁 land
@@ -97,8 +99,9 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
   fun `test simple motion emoji`() {
-    doTestNoNeovim("Strange chars", parseKeys("l"), """
+    doTestWithNeovim("l", """
             A Discovery
 
             I found it in a legendar${c}🐔 land
@@ -115,8 +118,9 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
   fun `test simple motion czech`() {
-    doTestNoNeovim("Strange chars", parseKeys("l"), """
+    doTestWithNeovim("l", """
             A Discovery
 
             I found it in a legendar${c}ž land
@@ -134,7 +138,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test simple motion tab`() {
-    doTestNoNeovim("Strange chars", parseKeys("l"), """
+    doTestWithNeovim("l", """
         A Discovery
 
         I found it in a legendar${c}. land
@@ -152,7 +156,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test char visual mode`() {
-    doTestNoNeovim("Strange chars", parseKeys("v", "ll"), """
+    doTestWithNeovim(listOf("v", "ll"), """
             A Discovery
 
             I found it in a legendary lan${c}d
@@ -170,7 +174,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test block visual mode`() {
-    doTestNoNeovim("Strange chars", parseKeys("<C-V>", "ll"), """
+    doTestWithNeovim(listOf("<C-V>", "ll"), """
             A Discovery
 
             I found it in a legendary lan${c}d

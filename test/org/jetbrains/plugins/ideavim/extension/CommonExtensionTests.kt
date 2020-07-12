@@ -20,7 +20,6 @@ package org.jetbrains.plugins.ideavim.extension
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.intellij.testFramework.UsefulTestCase
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
@@ -32,6 +31,8 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.mode
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class OpMappingTest : VimTestCase() {
@@ -49,32 +50,36 @@ class OpMappingTest : VimTestCase() {
     }
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test simple delete`() {
-    doTestNoNeovim("extension", parseKeys("dI"),
+    doTestWithNeovim("dI",
       "${c}I found it in a legendary land",
       "${c}nd it in a legendary land",
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test simple delete backwards`() {
-    doTestNoNeovim("extension", parseKeys("dP"),
+    doTestWithNeovim("dP",
       "I found ${c}it in a legendary land",
       "I f${c}it in a legendary land",
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test delete emulate inclusive`() {
-    doTestNoNeovim("extension", parseKeys("dU"),
+    doTestWithNeovim("dU",
       "${c}I found it in a legendary land",
       "${c}d it in a legendary land",
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test linewise delete`() {
-    doTestNoNeovim("extension", parseKeys("dO"),
+    doTestWithNeovim("dO",
       """
                 A Discovery
 
@@ -114,13 +119,13 @@ class OpMappingTest : VimTestCase() {
 
     @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
     VimExtension.EP_NAME.getPoint(null).unregisterExtension(TestExtension::class.java)
-    UsefulTestCase.assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.owner))
+    assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.owner))
     typeText(parseKeys("Q"))
     myFixture.checkResult("I${c} found it in a legendary land")
 
     @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
     VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
-    UsefulTestCase.assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.owner))
+    assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.owner))
     enableExtensions("TestExtension")
     typeText(parseKeys("Q"))
     myFixture.checkResult("I ${c}found it in a legendary land")

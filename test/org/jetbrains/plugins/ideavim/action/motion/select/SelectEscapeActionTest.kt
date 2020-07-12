@@ -20,12 +20,14 @@ package org.jetbrains.plugins.ideavim.action.motion.select
 
 import com.intellij.openapi.editor.Caret
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class SelectEscapeActionTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit char mode`() {
-    this.doTestNoNeovim("Select mode", parseKeys("gh", "<esc>"),
+    this.doTestWithNeovim(listOf("gh", "<esc>"),
       """
                 A Discovery
 
@@ -47,8 +49,9 @@ class SelectEscapeActionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit char mode on line start`() {
-    this.doTestNoNeovim("Select mode", parseKeys("gh", "<esc>"),
+    this.doTestWithNeovim(listOf("gh", "<esc>"),
       """
                 A Discovery
 
@@ -70,8 +73,9 @@ class SelectEscapeActionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit char mode on line end`() {
-    this.doTestNoNeovim("Select mode", parseKeys("gh", "<esc>"),
+    this.doTestWithNeovim(listOf("gh", "<esc>"),
       """
                 A Discovery
 
@@ -93,8 +97,9 @@ class SelectEscapeActionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit char mode on file start`() {
-    this.doTestNoNeovim("Select mode", parseKeys("gh", "<S-Left>", "<esc>"),
+    this.doTestWithNeovim(listOf("gh", "<S-Left>", "<esc>"),
       """
                 ${c}A Discovery
 
@@ -116,8 +121,9 @@ class SelectEscapeActionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit char mode on empty line`() {
-    this.doTestNoNeovim("Select mode", parseKeys("gh", "<esc>"),
+    this.doTestWithNeovim(listOf("gh", "<esc>"),
       """
                 A Discovery
                 $c
@@ -139,8 +145,9 @@ class SelectEscapeActionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit char mode multicaret`() {
-    this.doTestNoNeovim("Select mode", parseKeys("gh", "<esc>"),
+    this.doTestWithNeovim(listOf("gh", "<esc>"),
       """
                 A Discovery
 
@@ -162,8 +169,9 @@ class SelectEscapeActionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit in select line mode`() {
-    this.doTestNoNeovim("Select mode", parseKeys("gH", "<esc>"),
+    this.doTestWithNeovim(listOf("gH", "<esc>"),
       """
                 A Discovery
 
@@ -185,8 +193,9 @@ class SelectEscapeActionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit line mode line end`() {
-    this.doTestNoNeovim("Select mode", parseKeys("gH", "<esc>"),
+    this.doTestWithNeovim(listOf("gH", "<esc>"),
       """
                 A Discovery
 
@@ -208,8 +217,9 @@ class SelectEscapeActionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit line mode file start`() {
-    this.doTestNoNeovim("Select mode", parseKeys("gH", "<esc>"),
+    this.doTestWithNeovim(listOf("gH", "<esc>"),
       """
                 ${c}A Discovery
 
@@ -231,8 +241,9 @@ class SelectEscapeActionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit line mode empty line`() {
-    this.doTestNoNeovim("Select mode", parseKeys("gH", "<esc>"),
+    this.doTestWithNeovim(listOf("gH", "<esc>"),
       """
                 A Discovery
                 $c
@@ -254,8 +265,9 @@ class SelectEscapeActionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit line mode multicaret`() {
-    this.doTestNoNeovim("Select mode", parseKeys("gH", "<esc>"),
+    this.doTestWithNeovim(listOf("gH", "<esc>"),
       """
                 A Discovery
 
@@ -277,8 +289,9 @@ class SelectEscapeActionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit in select block mode`() {
-    this.doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<esc>"),
+    this.doTestWithNeovim(listOf("g<C-H>", "<esc>"),
       """
                 A Discovery
 
@@ -303,8 +316,9 @@ class SelectEscapeActionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit block mode with motion`() {
-    this.doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<S-Down>", "<S-Right>", "<esc>"),
+    this.doTestWithNeovim(listOf("g<C-H>", "<S-Down>", "<S-Right>", "<esc>"),
       """
                 A Discovery
 
@@ -329,8 +343,9 @@ class SelectEscapeActionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit block mode on longer line`() {
-    this.doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<S-Down>", "<S-Right>".repeat(3), "<esc>"),
+    this.doTestWithNeovim(listOf("g<C-H>", "<S-Down>", "<S-Right>".repeat(3), "<esc>"),
       """
                 A Discovery
 
@@ -355,8 +370,9 @@ class SelectEscapeActionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit block mode on longer line till end`() {
-    this.doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<S-Down>", "<S-Right>".repeat(5), "<esc>"),
+    this.doTestWithNeovim(listOf("g<C-H>", "<S-Down>", "<S-Right>".repeat(5), "<esc>"),
       """
                 A Discovery
 

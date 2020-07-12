@@ -27,6 +27,8 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import junit.framework.TestCase
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -54,11 +56,12 @@ class CommandParserTest : VimTestCase() {
     assertEquals("discovery", commands[0].optional)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "Caret different position")
   fun `test simple ex command execution`() {
-    val keys = commandToKeys(">>")
+    val keys = ">>"
     val before = "I ${c}found it in a legendary land"
-    val after = "        ${c}I found it in a legendary land"
-    doTestNoNeovim("Different indent", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    val after = "    ${c}I found it in a legendary land"
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test execute in disabled state`() {

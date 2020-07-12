@@ -19,12 +19,14 @@
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertBeforeFirstNonBlankActionTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test insert multiple carets`() {
-    doTestNoNeovim("multicaret", parseKeys("IHello<esc>"),
+    doTestWithNeovim("IHello<esc>",
       """
                 ${c}A Discovery
 

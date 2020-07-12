@@ -20,6 +20,8 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VisualBlockAppendActionTest : VimTestCase() {
@@ -53,8 +55,9 @@ class VisualBlockAppendActionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test append in non block mode`() {
-    doTestNoNeovim("I don't know", parseKeys("vwAHello<esc>"),
+    doTestWithNeovim("vwAHello<esc>",
       """
                 ${c}A Discovery
 

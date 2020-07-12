@@ -19,12 +19,14 @@
 package org.jetbrains.plugins.ideavim.action.motion.select
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class SelectEnableCharacterModeActionHandlerTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test entering select mode`() {
-    doTestNoNeovim("Select mode", parseKeys("gh"),
+    doTestWithNeovim(listOf("gh"),
       """
                 A Discovery
 
@@ -45,8 +47,9 @@ class SelectEnableCharacterModeActionHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test entering select mode at the end of file`() {
-    doTestNoNeovim("Select mode", parseKeys("gh"),
+    doTestWithNeovim(listOf("gh"),
       """
                 A Discovery
 
@@ -85,8 +88,9 @@ class SelectEnableCharacterModeActionHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test entering select mode multicaret`() {
-    doTestNoNeovim("Select mode", parseKeys("gh"),
+    doTestWithNeovim(listOf("gh"),
       """
                 A Discovery
                 $c

@@ -25,6 +25,8 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.SelectModeOptionData
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
@@ -32,9 +34,10 @@ import org.jetbrains.plugins.ideavim.VimTestOption
 import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class MotionShiftHomeActionTest : VimOptionTestCase(KeyModelOptionData.name, SelectModeOptionData.name) {
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test simple home`() {
-    val keys = parseKeys("<S-Home>")
+    val keys = listOf("<S-Home>")
     val before = """
             A Discovery
 
@@ -51,7 +54,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(KeyModelOptionData.name, Sel
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestNoNeovim("Options", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -59,12 +62,13 @@ class MotionShiftHomeActionTest : VimOptionTestCase(KeyModelOptionData.name, Sel
     assertTrue(KeyModelOptionData.continueselect in OptionsManager.keymodel)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test start visual`() {
-    val keys = parseKeys("<S-Home>")
+    val keys = listOf("<S-Home>")
     val before = """
             A Discovery
 
@@ -81,16 +85,17 @@ class MotionShiftHomeActionTest : VimOptionTestCase(KeyModelOptionData.name, Sel
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestNoNeovim("Options", keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
   )
   fun `test start select`() {
-    val keys = parseKeys("<S-Home>")
+    val keys = listOf("<S-Home>")
     val before = """
             A Discovery
 
@@ -107,7 +112,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(KeyModelOptionData.name, Sel
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestNoNeovim("Options", keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
   @VimOptionTestConfiguration(

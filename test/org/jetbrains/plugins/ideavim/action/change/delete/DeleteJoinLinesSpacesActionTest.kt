@@ -19,8 +19,9 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.option.IdeaJoinOptionsData
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
@@ -70,9 +71,10 @@ class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(IdeaJoinOptionsData.na
       CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(IdeaJoinOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
   fun `test join with idea with large count`() {
-    doTestNoNeovim("Config", StringHelper.parseKeys("10J"),
+    doTestWithNeovim("10J",
       """
                 A Discovery
 

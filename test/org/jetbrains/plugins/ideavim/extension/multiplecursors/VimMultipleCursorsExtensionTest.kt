@@ -21,6 +21,8 @@ package org.jetbrains.plugins.ideavim.extension.multiplecursors
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.commandState
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VimMultipleCursorsExtensionTest : VimTestCase() {
@@ -491,6 +493,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test with tabs`() {
     val before = """
   I found it in a legendary land
@@ -498,14 +501,14 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   ...all it was settled on some sodden sand
   ...all by the torrent of a mountain pass
 """.trimIndent().dotToTab()
-    val keys = parseKeys("vll", "<A-N>", "<A-N>")
+    val keys = listOf("vll", "<A-N>", "<A-N>")
     val after = """
   I found it in a legendary land
   ...${s}al${c}l${se} rocks and lavender and tufted grass,
   ...${s}al${c}l${se} it was settled on some sodden sand
   ...${s}al${c}l${se} by the torrent of a mountain pass
 """.trimIndent().dotToTab()
-    doTestNoNeovim("Multiple carets", keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
   fun `test multiple capitalized occurrences with ignorecase`() {

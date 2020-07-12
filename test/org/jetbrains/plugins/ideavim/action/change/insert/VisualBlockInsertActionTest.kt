@@ -22,6 +22,8 @@ import com.intellij.codeInsight.folding.CodeFoldingManager
 import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VisualBlockInsertActionTest : VimTestCase() {
@@ -50,8 +52,9 @@ Xbar
   }
 
   // VIM-1379 |CTRL-V| |j| |v_b_I|
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test insert visual block with empty line in the middle`() {
-    doTestNoNeovim("Block mode", parseKeys("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
+    doTestWithNeovim(listOf("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
       """
                     foo
 
@@ -69,8 +72,9 @@ Xbar
   }
 
   // VIM-632 |CTRL-V| |v_b_I|
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test change visual block`() {
-    doTestNoNeovim("Block mode", parseKeys("<C-V>", "j", "I", "quux ", "<Esc>"),
+    doTestWithNeovim(listOf("<C-V>", "j", "I", "quux ", "<Esc>"),
       """
                     foo bar
                     ${c}baz quux
@@ -104,8 +108,9 @@ Xbar
 
 
   // VIM-1379 |CTRL-V| |j| |v_b_I|
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test insert visual block with shorter line in the middle`() {
-    doTestNoNeovim("Block mode", parseKeys("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
+    doTestWithNeovim(listOf("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
       """
                     foo
                     x
@@ -122,8 +127,9 @@ Xbar
       CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test insert in non block mode`() {
-    doTestNoNeovim("Block mode", parseKeys("vwIHello<esc>"),
+    doTestWithNeovim(listOf("vwIHello<esc>"),
       """
                 ${c}A Discovery
 

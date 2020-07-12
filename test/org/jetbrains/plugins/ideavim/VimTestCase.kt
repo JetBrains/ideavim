@@ -47,7 +47,6 @@ import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.TestInputModel
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.option.OptionsManager.getOption
@@ -88,8 +87,7 @@ abstract class VimTestCase : UsefulTestCase() {
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
     ExEntryPanel.getInstance().entry.setBounds(0, 0, 100, 25)
 
-    val testMethod = this.javaClass.getMethod(this.name)
-    neovimTestingEnabled = neovimTestingEnabled && !testMethod.isAnnotationPresent(VimBehaviorDiffers::class.java)
+    neovimTestingEnabled = neovimTestingEnabled && NeovimTesting.neovimEnabled(this)
 
     if (neovimTestingEnabled) NeovimTesting.setUp()
   }
@@ -240,14 +238,6 @@ abstract class VimTestCase : UsefulTestCase() {
     assertState(modeAfter, subModeAfter)
   }
 
-  fun doTestNoNeovim(reason: String,
-                     keys: List<KeyStroke?>,
-                     before: String,
-                     after: String,
-                     modeAfter: CommandState.Mode, subModeAfter: SubMode) {
-    doTest(keys, before, after, modeAfter, subModeAfter)
-  }
-
   fun doTestWithNeovim(keys: List<String>,
                        before: String,
                        after: String,
@@ -340,15 +330,17 @@ abstract class VimTestCase : UsefulTestCase() {
     fun commandToKeys(command: String): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
       keys.addAll(StringHelper.parseKeys(":"))
-      keys.addAll(StringHelper.stringToKeys(command))
+      keys.addAll(stringToKeys(command))
       keys.addAll(StringHelper.parseKeys("<Enter>"))
       return keys
     }
 
+    fun exCommand(command: String) =  ":$command<Enter>"
+
     fun searchToKeys(pattern: String, forwards: Boolean): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
       keys.addAll(StringHelper.parseKeys(if (forwards) "/" else "?"))
-      keys.addAll(StringHelper.stringToKeys(pattern))
+      keys.addAll(stringToKeys(pattern))
       keys.addAll(StringHelper.parseKeys("<Enter>"))
       return keys
     }

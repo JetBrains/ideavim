@@ -18,7 +18,10 @@
 
 package org.jetbrains.plugins.ideavim.action;
 
+import com.google.common.collect.Lists;
 import com.maddyhome.idea.vim.command.CommandState;
+import org.jetbrains.plugins.ideavim.SkipNeovimReason;
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -47,13 +50,15 @@ public class ChangeNumberActionTest extends VimTestCase {
     doTestWithNeovim("<C-X>", "1000", "999", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.COMMON, description = "Doesn't work for octal in neovim")
   public void testIncrementOctal() {
-    doTestNoNeovim("Doesn't work for octal in neovim", parseKeys("<C-A>"), "0477", "0500", CommandState.Mode.COMMAND,
+    doTestWithNeovim("<C-A>", "0477", "0500", CommandState.Mode.COMMAND,
                    CommandState.SubMode.NONE);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.COMMON, description = "Doesn't work for octal in neovim")
   public void testDecrementOctal() {
-    doTestNoNeovim("Doesn't work for octal in neovim", parseKeys("<C-X>"), "010", "007", CommandState.Mode.COMMAND,
+    doTestWithNeovim("<C-X>", "010", "007", CommandState.Mode.COMMAND,
                    CommandState.SubMode.NONE);
   }
 
@@ -73,13 +78,15 @@ public class ChangeNumberActionTest extends VimTestCase {
     doTestWithNeovim("<C-X>", "-1000", "-1001", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.COMMON, description = "Doesn't work for octal in neovim")
   public void testIncrementNegativeOctal() {
-    doTestNoNeovim("Doesn't work for octal in neovim", parseKeys("<C-A>"), "-0477", "-0500", CommandState.Mode.COMMAND,
+    doTestWithNeovim("<C-A>", "-0477", "-0500", CommandState.Mode.COMMAND,
                    CommandState.SubMode.NONE);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.COMMON, description = "Doesn't work for octal in neovim")
   public void testDecrementNegativeOctal() {
-    doTestNoNeovim("Doesn't work for octal in neovim", parseKeys("<C-X>"), "-010", "-007", CommandState.Mode.COMMAND,
+    doTestWithNeovim("<C-X>", "-010", "-007", CommandState.Mode.COMMAND,
                    CommandState.SubMode.NONE);
   }
 
@@ -103,38 +110,45 @@ public class ChangeNumberActionTest extends VimTestCase {
     doTestWithNeovim("<C-A>", "foo", "foo", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.EX_COMMAND)
   public void testIncrementAlphaWithNumberFormatAlpha() {
-    doTestNoNeovim("Ex command", parseKeys(":set nf=alpha<Enter>", "<C-A>"), "foo", "goo", CommandState.Mode.COMMAND,
-           CommandState.SubMode.NONE);
+    doTestWithNeovim(Lists.newArrayList(":set nf=alpha<Enter>", "<C-A>"), "foo", "goo", CommandState.Mode.COMMAND,
+                     CommandState.SubMode.NONE);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.EX_COMMAND)
   public void testIncrementZWithNumberFormatAlpha() {
-    doTestNoNeovim("Ex command", parseKeys(":set nf=alpha<Enter>", "<C-A>"), "zzz", "zzz", CommandState.Mode.COMMAND,
+    doTestWithNeovim(Lists.newArrayList(":set nf=alpha<Enter>", "<C-A>"), "zzz", "zzz", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.EX_COMMAND)
   public void testIncrementXInHexNumberWithNumberFormatAlphaButNotHex() {
-    doTestNoNeovim("Ex command", parseKeys(":set nf=alpha<Enter>", "<C-A>"), "0<caret>x1", "0y1", CommandState.Mode.COMMAND,
+    doTestWithNeovim(Lists.newArrayList(":set nf=alpha<Enter>", "<C-A>"), "0<caret>x1", "0y1", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.EX_COMMAND)
   public void testIncrementXInHexNumberWithNumberFormatHexAlpha() {
-    doTestNoNeovim("Ex command", parseKeys(":set nf=alpha,hex<Enter>", "<C-A>"), "0<caret>x1", "0x2", CommandState.Mode.COMMAND,
+    doTestWithNeovim(Lists.newArrayList(":set nf=alpha,hex<Enter>", "<C-A>"), "0<caret>x1", "0x2", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.EX_COMMAND)
   public void testIncrementHexNumberWithoutNumberFormatHex() {
-    doTestNoNeovim("Ex command", parseKeys(":set nf=octal<Enter>", "<C-A>"), "0x42", "1x42", CommandState.Mode.COMMAND,
+    doTestWithNeovim(Lists.newArrayList(":set nf=octal<Enter>", "<C-A>"), "0x42", "1x42", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.EX_COMMAND)
   public void testIncrementOctalNumberWithoutNumberFormatOctal() {
-    doTestNoNeovim("Ex command", parseKeys(":set nf=hex<Enter>", "<C-A>"), "077", "078", CommandState.Mode.COMMAND,
+    doTestWithNeovim(Lists.newArrayList(":set nf=hex<Enter>", "<C-A>"), "077", "078", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.EX_COMMAND)
   public void testIncrementNegativeOctalNumberWithoutNumberFormatOctal() {
-    doTestNoNeovim("Ex command", parseKeys(":set nf=hex<Enter>", "<C-A>"), "-077", "-076", CommandState.Mode.COMMAND,
+    doTestWithNeovim(Lists.newArrayList(":set nf=hex<Enter>", "<C-A>"), "-077", "-076", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 

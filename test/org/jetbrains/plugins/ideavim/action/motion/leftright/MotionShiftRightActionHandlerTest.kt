@@ -21,21 +21,23 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
 import com.maddyhome.idea.vim.option.SelectModeOptionData
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
 import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.name, SelectModeOptionData.name) {
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test visual right`() {
-    doTestNoNeovim("Options", parseKeys("<S-Right>"),
+    doTestWithNeovim(listOf("<S-Right>"),
       """
                 A Discovery
 
@@ -56,12 +58,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test visual right twice`() {
-    doTestNoNeovim("Options", parseKeys("<S-Right><S-Right>"),
+    doTestWithNeovim(listOf("<S-Right><S-Right>"),
       """
                 A Discovery
 
@@ -82,12 +85,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
   )
   fun `test select right`() {
-    doTestNoNeovim("Options", parseKeys("<S-Right>"),
+    doTestWithNeovim(listOf("<S-Right>"),
       """
                 A Discovery
 
@@ -108,12 +112,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
   )
   fun `test select right twice`() {
-    doTestNoNeovim("Options", parseKeys("<S-Right><S-Right>"),
+    doTestWithNeovim(listOf("<S-Right><S-Right>"),
       """
                 A Discovery
 
@@ -134,12 +139,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test simple motion char mode`() {
-    doTestNoNeovim("Options", parseKeys("gh", "<S-Right>"),
+    doTestWithNeovim(listOf("gh", "<S-Right>"),
       """
                 A Discovery
 
@@ -160,12 +166,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test at the lineend char mode`() {
-    doTestNoNeovim("Options", parseKeys("gh", "<S-Right>"),
+    doTestWithNeovim(listOf("gh", "<S-Right>"),
       """
                 A Discovery
 
@@ -186,12 +193,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test out of line char mode`() {
-    doTestNoNeovim("Options", parseKeys("gh", "<S-Right>".repeat(2)),
+    doTestWithNeovim(listOf("gh", "<S-Right>".repeat(2)),
       """
                 A Discovery
 
@@ -212,12 +220,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test file end char mode`() {
-    doTestNoNeovim("Options", parseKeys("gh", "<S-Right>".repeat(2)),
+    doTestWithNeovim(listOf("gh", "<S-Right>".repeat(2)),
       """
                 A Discovery
 
@@ -236,12 +245,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test file char mode multicaret`() {
-    doTestNoNeovim("Options", parseKeys("gh", "<S-Right>".repeat(2)),
+    doTestWithNeovim(listOf("gh", "<S-Right>".repeat(2)),
       """
                 A Discovery
 
@@ -260,12 +270,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test simple motion line mode`() {
-    doTestNoNeovim("Options", parseKeys("gH", "<S-Right>"),
+    doTestWithNeovim(listOf("gH", "<S-Right>"),
       """
                 A Discovery
 
@@ -286,12 +297,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test lineend line mode`() {
-    doTestNoNeovim("Options", parseKeys("gH", "<S-Right>"),
+    doTestWithNeovim(listOf("gH", "<S-Right>"),
       """
                 A Discovery
 
@@ -312,12 +324,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test out of line line mode`() {
-    doTestNoNeovim("Options", parseKeys("gH", "<S-Right>".repeat(2)),
+    doTestWithNeovim(listOf("gH", "<S-Right>".repeat(2)),
       """
                 A Discovery
 
@@ -338,12 +351,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test fileend line mode`() {
-    doTestNoNeovim("Options", parseKeys("gH", "<S-Right>"),
+    doTestWithNeovim(listOf("gH", "<S-Right>"),
       """
                 A Discovery
 
@@ -362,12 +376,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line mode multicaret`() {
-    doTestNoNeovim("Options", parseKeys("gH", "<S-Right>"),
+    doTestWithNeovim(listOf("gH", "<S-Right>"),
       """
                 A Discovery
 
@@ -386,12 +401,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test simple motion block mode`() {
-    doTestNoNeovim("Options", parseKeys("g<C-H>", "<S-Right>"),
+    doTestWithNeovim(listOf("g<C-H>", "<S-Right>"),
       """
                 A Discovery
 
@@ -412,12 +428,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test at the lineend block mode`() {
-    doTestNoNeovim("Options", parseKeys("g<C-H>", "<S-Right>"),
+    doTestWithNeovim(listOf("g<C-H>", "<S-Right>"),
       """
                 A Discovery
 
@@ -438,12 +455,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test out of line block mode`() {
-    doTestNoNeovim("Options", parseKeys("g<C-H>", "<S-Right>".repeat(2)),
+    doTestWithNeovim(listOf("g<C-H>", "<S-Right>".repeat(2)),
       """
                 A Discovery
 
@@ -464,12 +482,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test file end block mode`() {
-    doTestNoNeovim("Options", parseKeys("g<C-H>", "<S-Right>".repeat(2)),
+    doTestWithNeovim(listOf("g<C-H>", "<S-Right>".repeat(2)),
       """
                 A Discovery
 
@@ -488,12 +507,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test to longer line block mode`() {
-    doTestNoNeovim("Options", parseKeys("g<C-H>", "<S-Down>", "<S-Right>".repeat(3)),
+    doTestWithNeovim(listOf("g<C-H>", "<S-Down>", "<S-Right>".repeat(3)),
       """
                 A Discovery
 
@@ -512,12 +532,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continuevisual]),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test continuevisual`() {
-    doTestNoNeovim("Options", parseKeys("v", "<S-Right>".repeat(3)),
+    doTestWithNeovim(listOf("v", "<S-Right>".repeat(3)),
       """
                 A Discovery
 
@@ -536,12 +557,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test no continueselect`() {
-    doTestNoNeovim("Options", parseKeys("gh", "<S-Right>".repeat(3)),
+    doTestWithNeovim(listOf("gh", "<S-Right>".repeat(3)),
       """
                 A Discovery
 
@@ -560,12 +582,13 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test no continuevisual`() {
-    doTestNoNeovim("Options", parseKeys("v", "<S-Right>".repeat(3)),
+    doTestWithNeovim(listOf("v", "<S-Right>".repeat(3)),
       """
                 A Discovery
 

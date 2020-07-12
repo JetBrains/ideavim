@@ -21,7 +21,9 @@ import com.intellij.codeInsight.folding.CodeFoldingManager
 import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -413,8 +415,9 @@ quux
   }
 
   // |r|
+  @VimBehaviorDiffers(originalVimAfter = "foXX${c}Xr\n")
   fun testReplaceMultipleCharsWithCount() {
-    doTestNoNeovim("Different work for r", parseKeys("3rX"), "fo${c}obar\n", "fo${c}XXXr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim("3rX", "fo${c}obar\n", "fo${c}XXXr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |r|
@@ -423,8 +426,9 @@ quux
   }
 
   // |r|
+  @VimBehaviorDiffers(description = "Different caret position")
   fun testReplaceMultipleCharsWithVisual() {
-    doTestNoNeovim("r works different", StringHelper.parseKeys("v", "ll", "j", "rZ"),
+    doTestWithNeovim(listOf("v", "ll", "j", "rZ"),
       """
         fo${c}obar
         foobaz
@@ -450,8 +454,9 @@ foobaz
   }
 
   // |r|
+  @VimBehaviorDiffers(description = "Different caret position")
   fun testReplaceCharWithNewlineAndCountAddsOnlySingleNewline() {
-    doTestNoNeovim("r works different", StringHelper.parseKeys("3r<Enter>"),
+    doTestWithNeovim("3r<Enter>",
       """    fo${c}obar
 foobaz
 """,
@@ -493,21 +498,24 @@ foobaz
   }
 
   // |R| |i_<Insert>|
+  @VimBehaviorDiffers(description = "Different caret position")
   fun testReplaceModeSwitchToInsertModeAndBack() {
-    doTestNoNeovim("r works different", StringHelper.parseKeys("RXXX<Ins>YYY<Ins>ZZZ<Esc>"),
+    doTestWithNeovim("RXXX<Ins>YYY<Ins>ZZZ<Esc>",
       "aaa${c}bbbcccddd\n", "aaaXXXYYYZZ${c}Zddd\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |i| |i_<Insert>|
+  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "<INS> works strange")
   fun testInsertModeSwitchToReplaceModeAndBack() {
-    doTestNoNeovim("<INS> works strange", StringHelper.parseKeys("iXXX<Ins>YYY<Ins>ZZZ<Esc>"),
+    doTestWithNeovim("iXXX<Ins>YYY<Ins>ZZZ<Esc>",
       "aaa${c}bbbcccddd\n", "aaaXXXYYYZZ${c}Zcccddd\n", CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }
 
   // VIM-511 |.|
+  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "Backspace workspace strange")
   fun testRepeatWithBackspaces() {
-    doTestNoNeovim("Backspace workspace strange", StringHelper.parseKeys("ce", "foo", "<BS><BS><BS>", "foo", "<Esc>", "j0", "."),
+    doTestWithNeovim(listOf("ce", "foo", "<BS><BS><BS>", "foo", "<Esc>", "j0", "."),
       """
         ${c}foo baz
         baz quux

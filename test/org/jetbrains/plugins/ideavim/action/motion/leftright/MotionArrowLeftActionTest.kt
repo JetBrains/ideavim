@@ -21,8 +21,9 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
@@ -30,9 +31,10 @@ import org.jetbrains.plugins.ideavim.VimTestOption
 import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test visual default options`() {
-    doTestNoNeovim("Vim option", parseKeys("v", "<Left>"),
+    doTestWithNeovim(listOf("v", "<Left>"),
       """
                 A Discovery
 
@@ -52,9 +54,10 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopsel]))
   fun `test visual stopsel`() {
-    doTestNoNeovim("Vim option", parseKeys("v", "<Left>"),
+    doTestWithNeovim(listOf("v", "<Left>"),
       """
                 A Discovery
 
@@ -74,9 +77,10 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
   fun `test visual stopselect`() {
-    doTestNoNeovim("Vim option", parseKeys("v", "<Left>"),
+    doTestWithNeovim(listOf("v", "<Left>"),
       """
                 A Discovery
 
@@ -96,9 +100,10 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
   fun `test visual stopvisual`() {
-    doTestNoNeovim("Vim option", parseKeys("v", "<Left>"),
+    doTestWithNeovim(listOf("v", "<Left>"),
       """
                 A Discovery
 
@@ -118,9 +123,10 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
   fun `test visual stopvisual multicaret`() {
-    doTestNoNeovim("Vim option", parseKeys("v", "<Left>"),
+    doTestWithNeovim(listOf("v", "<Left>"),
       """
                 A Discovery
 

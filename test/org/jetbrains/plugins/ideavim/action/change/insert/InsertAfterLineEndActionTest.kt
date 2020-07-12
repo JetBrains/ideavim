@@ -20,6 +20,8 @@ package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertAfterLineEndActionTest : VimTestCase() {
@@ -37,8 +39,9 @@ class InsertAfterLineEndActionTest : VimTestCase() {
     """.trimIndent())
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test multiple carets`() {
-    doTestNoNeovim("multicaret", parseKeys("AHello<esc>"),
+    doTestWithNeovim("AHello<esc>",
       """
                 ${c}A Discovery
 

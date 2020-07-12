@@ -23,6 +23,8 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VimExchangeExtensionTest : VimTestCase() {
@@ -33,8 +35,9 @@ class VimExchangeExtensionTest : VimTestCase() {
   }
 
   // |cx|
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words left to right`() {
-    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("cxe", "w", "cxe"),
+    doTestWithNeovim(listOf("cxe", "w", "cxe"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -43,8 +46,9 @@ class VimExchangeExtensionTest : VimTestCase() {
   }
 
   // |cx|
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words dot repeat`() {
-    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("cxiw", "w", "."),
+    doTestWithNeovim(listOf("cxiw", "w", "."),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -53,8 +57,9 @@ class VimExchangeExtensionTest : VimTestCase() {
   }
 
   // |cx|
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words right to left`() {
-    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("cxe", "b", "cxe"),
+    doTestWithNeovim(listOf("cxe", "b", "cxe"),
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -63,8 +68,9 @@ class VimExchangeExtensionTest : VimTestCase() {
   }
 
   // |cx|
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words right to left with dot`() {
-    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("cxe", "b", "."),
+    doTestWithNeovim(listOf("cxe", "b", "."),
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -73,8 +79,9 @@ class VimExchangeExtensionTest : VimTestCase() {
   }
 
   // |X|
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual exchange words left to right`() {
-    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("veX", "w", "veX"),
+    doTestWithNeovim(listOf("veX", "w", "veX"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -87,8 +94,9 @@ class VimExchangeExtensionTest : VimTestCase() {
     originalVimAfter = "The ${c}brown catch over the lazy dog",
     shouldBeFixed = true
   )
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual exchange words from inside`() {
-    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("veX", "b", "v3e", "X"),
+    doTestWithNeovim(listOf("veX", "b", "v3e", "X"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -101,8 +109,9 @@ class VimExchangeExtensionTest : VimTestCase() {
     originalVimAfter = "The brown ${c}catch over the lazy dog",
     shouldBeFixed = true
   )
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual exchange words from outside`() {
-    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("v3e", "X", "w", "veX"),
+    doTestWithNeovim(listOf("v3e", "X", "w", "veX"),
       "The ${c}quick brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -120,8 +129,9 @@ class VimExchangeExtensionTest : VimTestCase() {
        """,
     shouldBeFixed = true
   )
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange lines top down`() {
-    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("cxx", "j", "cxx"),
+    doTestWithNeovim(listOf("cxx", "j", "cxx"),
       """The quick
          brown ${c}fox
          catch over
@@ -145,8 +155,9 @@ class VimExchangeExtensionTest : VimTestCase() {
        """,
     shouldBeFixed = true
   )
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange lines top down with dot`() {
-    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("cxx", "j", "."),
+    doTestWithNeovim(listOf("cxx", "j", "."),
       """The quick
          brown ${c}fox
          catch over
@@ -168,8 +179,9 @@ class VimExchangeExtensionTest : VimTestCase() {
           lazy dog
     """
   )
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange to the line end`() {
-    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("v$", "X", "jj^ve", "X"),
+    doTestWithNeovim(listOf("v$", "X", "jj^ve", "X"),
       """The quick
          brown ${c}fox
          catch over
@@ -193,8 +205,9 @@ class VimExchangeExtensionTest : VimTestCase() {
       """,
     shouldBeFixed = true
   )
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange visual lines`() {
-    doTestNoNeovim("Exchange plugin", StringHelper.parseKeys("Vj", "X", "jj", "Vj", "X"),
+    doTestWithNeovim(listOf("Vj", "X", "jj", "Vj", "X"),
       """
          The ${c}quick
          brown fox

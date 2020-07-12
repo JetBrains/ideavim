@@ -19,7 +19,6 @@
 package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -31,7 +30,7 @@ class MotionOuterSentenceActionTest : VimTestCase() {
         $c
     """)
   fun `test on empty last line`() {
-    doTestNoNeovim("Beh differs",parseKeys("=as"), """
+    doTestWithNeovim("=as", """
         I found it in a legendary land
         all rocks and lavender and tufted grass,
         where it was settled on some sodden sand
@@ -54,7 +53,7 @@ class MotionOuterSentenceActionTest : VimTestCase() {
         $c
     """)
   fun `test delete on empty last line`() {
-    doTestNoNeovim("Beh differs",parseKeys("das"), """
+    doTestWithNeovim("das", """
         I found it in a legendary land
         all rocks and lavender and tufted grass,
         where it was settled on some sodden sand

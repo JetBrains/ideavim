@@ -23,11 +23,14 @@ package org.jetbrains.plugins.ideavim.action.motion.visual
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VisualSwapEndsBlockActionTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test simple block selection SE`() {
-    val keys = parseKeys("<C-V>2e2j", "O")
+    val keys = listOf("<C-V>2e2j", "O")
     val before = """
             A Discovery
 
@@ -44,12 +47,13 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             wh${s}${c}|ere i|${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestNoNeovim("Block mode", keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
     assertEquals(LogicalPosition(4, 2), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test simple block selection SW`() {
-    val keys = parseKeys("<C-V>2b2j", "O")
+    val keys = listOf("<C-V>2b2j", "O")
     val before = """
             A Discovery
 
@@ -66,12 +70,13 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             wh${s}|ere i${c}|${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestNoNeovim("Block mode", keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
     assertEquals(LogicalPosition(4, 8), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test simple block selection NE`() {
-    val keys = parseKeys("<C-V>3e2k", "O")
+    val keys = listOf("<C-V>3e2k", "O")
     val before = """
             A Discovery
 
@@ -88,12 +93,13 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             wh${s}${c}|ere i|${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestNoNeovim("Block mode", keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
     assertEquals(LogicalPosition(2, 2), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test simple block selection NW`() {
-    val keys = parseKeys("<C-V>3b2k", "O")
+    val keys = listOf("<C-V>3b2k", "O")
     val before = """
             A Discovery
 
@@ -110,12 +116,13 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             wh${s}|ere i${c}|${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestNoNeovim("Block mode", keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
     assertEquals(LogicalPosition(2, 8), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test with short line`() {
-    val keys = parseKeys("<C-V>2j5e", "O")
+    val keys = listOf("<C-V>2j5e", "O")
     val before = """
             A Discovery
 
@@ -132,12 +139,13 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             where it was settled on so${s}${c}me sodden sand{some${se} new symbols}
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestNoNeovim("Block mode", keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
     assertEquals(LogicalPosition(4, 26), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test to long line`() {
-    val keys = parseKeys("<C-V>j5e", "O")
+    val keys = listOf("<C-V>j5e", "O")
     val before = """
             A Discovery
 
@@ -154,7 +162,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestNoNeovim("Block mode", keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
     assertEquals(LogicalPosition(3, 26), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 

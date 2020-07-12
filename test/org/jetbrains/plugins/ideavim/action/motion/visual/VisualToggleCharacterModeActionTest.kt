@@ -22,8 +22,11 @@ package org.jetbrains.plugins.ideavim.action.motion.visual
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 
@@ -214,8 +217,9 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test enter visual with count after visual operation multicaret`() {
-    doTestNoNeovim("different caret pos", parseKeys("vedx", "1v"),
+    doTestWithNeovim(listOf("vedx", "1v"),
       """
                     A Discovery
 
@@ -358,8 +362,9 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @VimBehaviorDiffers(description = "Different caret postion")
   fun `test enter visual with count with dollar motion`() {
-    doTestNoNeovim("different caret pos", parseKeys("v\$dj", "1v"),
+    doTestWithNeovim(listOf("v\$dj", "1v"),
       """
                     A Discovery
 
@@ -379,8 +384,9 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @VimBehaviorDiffers(description = "Different caret position")
   fun `test enter visual with count with dollar motion and down movement`() {
-    doTestNoNeovim("Different caret pos", parseKeys("v\$dj", "1v", "j"),
+    doTestWithNeovim(listOf("v\$dj", "1v", "j"),
       """
                     A Discovery
 
@@ -420,8 +426,9 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE)
   }
 
+  @VimBehaviorDiffers(description = "Different caret position")
   fun `test enter visual with count after line visual operation to line end`() {
-    doTestNoNeovim("different caret pos", parseKeys("V3jd3k", "1v"),
+    doTestWithNeovim(listOf("V3jd3k", "1v"),
       """
                     A Discovery
 
@@ -448,8 +455,9 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE)
   }
 
+  @VimBehaviorDiffers(description = "Different caret position")
   fun `test enter visual with count after line visual operation multicaret`() {
-    doTestNoNeovim("Different caret pos", parseKeys("Vd", "1v"),
+    doTestWithNeovim(listOf("Vd", "1v"),
       """
                     A ${c}Discovery
 
@@ -503,8 +511,9 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE)
   }
 
+  @VimBehaviorDiffers(description = "Different caret position")
   fun `test enter visual with count after line visual operation with dollar motion`() {
-    doTestNoNeovim("different caret pos", parseKeys("V\$d", "1v"),
+    doTestWithNeovim(listOf("V\$d", "1v"),
       """
                     A Discovery
 

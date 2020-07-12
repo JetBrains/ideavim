@@ -19,17 +19,19 @@
 package org.jetbrains.plugins.ideavim.action.motion.select
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
  * @author Alex Plate
  */
 class SelectKeyHandlerTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test type in select mode`() {
     val typed = "Hello"
-    this.doTestNoNeovim("Select mode", parseKeys("gh", "<S-Right>", typed),
+    this.doTestWithNeovim(listOf("gh", "<S-Right>", typed),
       """
                 A Discovery
 
@@ -50,9 +52,10 @@ class SelectKeyHandlerTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test char mode on empty line`() {
     val typed = "Hello"
-    this.doTestNoNeovim("Select mode", parseKeys("gh", typed),
+    this.doTestWithNeovim(listOf("gh", typed),
       """
                 A Discovery
                 $c
@@ -73,8 +76,9 @@ class SelectKeyHandlerTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test char mode backspace`() {
-    this.doTestNoNeovim("Select mode", parseKeys("gh", "<BS>"),
+    this.doTestWithNeovim(listOf("gh", "<BS>"),
       """
                 A Discovery
 
@@ -95,8 +99,9 @@ class SelectKeyHandlerTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test char mode delete`() {
-    this.doTestNoNeovim("Select mode", parseKeys("gh", "<DEL>"),
+    this.doTestWithNeovim(listOf("gh", "<DEL>"),
       """
                 A Discovery
 
@@ -117,9 +122,10 @@ class SelectKeyHandlerTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test char mode multicaret`() {
     val typed = "Hello"
-    this.doTestNoNeovim("Select mode", parseKeys("gh", "<S-Right>", typed),
+    this.doTestWithNeovim(listOf("gh", "<S-Right>", typed),
       """
                 A Discovery
 
@@ -140,9 +146,10 @@ class SelectKeyHandlerTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test line mode`() {
     val typed = "Hello"
-    this.doTestNoNeovim("Select mode", parseKeys("gH", typed),
+    this.doTestWithNeovim(listOf("gH", typed),
       """
                 A Discovery
 
@@ -163,9 +170,10 @@ class SelectKeyHandlerTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test line mode empty line`() {
     val typed = "Hello"
-    this.doTestNoNeovim("Select mode", parseKeys("gH", typed),
+    this.doTestWithNeovim(listOf("gH", typed),
       """
                 A Discovery
                 $c
@@ -186,9 +194,10 @@ class SelectKeyHandlerTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test line mode multicaret`() {
     val typed = "Hello"
-    this.doTestNoNeovim("Select mode", parseKeys("gH", typed),
+    this.doTestWithNeovim(listOf("gH", typed),
       """
                 A Discovery
 
@@ -209,9 +218,10 @@ class SelectKeyHandlerTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test type in select block mode`() {
     val typed = "Hello"
-    this.doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<S-Down>", "<S-Right>", typed),
+    this.doTestWithNeovim(listOf("g<C-H>", "<S-Down>", "<S-Right>", typed),
       """
                 A Discovery
 
@@ -240,9 +250,10 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
     """)
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test block mode empty line`() {
     val typed = "Hello"
-    this.doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<S-Down>".repeat(2), "<S-Right>", typed),
+    this.doTestWithNeovim(listOf("g<C-H>", "<S-Down>".repeat(2), "<S-Right>", typed),
       """
                 A Discovery
                 $c
@@ -263,9 +274,10 @@ class SelectKeyHandlerTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test block mode longer line`() {
     val typed = "Hello"
-    this.doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<S-Down>", "<S-Right>".repeat(2), typed),
+    this.doTestWithNeovim(listOf("g<C-H>", "<S-Down>", "<S-Right>".repeat(2), typed),
       """
                 A Discovery
 
@@ -286,9 +298,10 @@ class SelectKeyHandlerTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test block mode longer line with esc`() {
     val typed = "Hello"
-    this.doTestNoNeovim("Select mode", parseKeys("g<C-H>", "<S-Down>", "<S-Right>".repeat(2), typed, "<esc>"),
+    this.doTestWithNeovim(listOf("g<C-H>", "<S-Down>", "<S-Right>".repeat(2), typed, "<esc>"),
       """
                 A Discovery
 

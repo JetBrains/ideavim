@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.MappingOwner
 import junit.framework.TestCase
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ResetModeActionTest : VimTestCase() {
@@ -101,14 +103,15 @@ class ResetModeActionTest : VimTestCase() {
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.MAPPING)
   fun `test delete command after resetting operator-pending mode with mapping`() {
     VimPlugin.getKey()
       .putKeyMapping(MappingMode.NVO, parseKeys("<C-D>"), owner, parseKeys("<Esc>"), false)
 
-    val keys = parseKeys("d", "<C-D>", "dw")
+    val keys = listOf("d", "<C-D>", "dw")
     val before = "A Discovery"
     val after = "Discovery"
-    doTestNoNeovim("mapping", keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 

@@ -171,8 +171,9 @@ class ChangeVisualActionTest : VimTestCase() {
   }
 
   // VIM-1379 |CTRL-V| |j| |v_b_c|
+  @VimBehaviorDiffers(description = "Different caret position")
   fun `test change visual block with empty line in the middle`() {
-    doTestNoNeovim("Just differs", parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
+    doTestWithNeovim(listOf("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
       """
         foo foo
         
@@ -191,8 +192,9 @@ class ChangeVisualActionTest : VimTestCase() {
 
 
   // VIM-1379 |CTRL-V| |j| |v_b_c|
+  @VimBehaviorDiffers(description = "Different caret position")
   fun `test change visual block with shorter line in the middle`() {
-    doTestNoNeovim("Just differs", parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
+    doTestWithNeovim(listOf("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
       "foo foo\n" +
         "x\n" +
         "bar bar\n",

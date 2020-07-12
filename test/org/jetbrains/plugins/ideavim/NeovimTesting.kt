@@ -24,6 +24,7 @@ import com.ensarsarajcic.neovim.java.api.types.api.VimCoords
 import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRPCConnection
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.common.CharacterPosition
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.neovim.toVimCoords
 import junit.framework.Assert
 
@@ -40,6 +41,12 @@ internal object NeovimTesting {
 
   fun tearDown() {
     neovim.destroy()
+  }
+
+  fun neovimEnabled(test: VimTestCase): Boolean {
+    val method = test.javaClass.getMethod(test.name)
+    return !method.isAnnotationPresent(VimBehaviorDiffers::class.java)
+      && !method.isAnnotationPresent(TestWithoutNeovim::class.java)
   }
 
   fun setupEditorAndType(editor: Editor, keys: String) {
@@ -71,4 +78,19 @@ internal object NeovimTesting {
     val neovimContent = getText()
     Assert.assertEquals(neovimContent, editor.document.text)
   }
+}
+
+annotation class TestWithoutNeovim(val reason: SkipNeovimReason, val description: String = "")
+
+enum class SkipNeovimReason {
+  PLUGIN,
+  MULTICARET,
+  OPTION,
+  UNCLEAR,
+  NON_ASCII,
+  MAPPING,
+  SELECT_MODE,
+  VISUAL_BLOCK_MODE,
+  COMMON,
+  EX_COMMAND
 }

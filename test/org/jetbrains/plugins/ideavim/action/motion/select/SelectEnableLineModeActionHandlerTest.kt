@@ -19,7 +19,8 @@
 package org.jetbrains.plugins.ideavim.action.motion.select
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class SelectEnableLineModeActionHandlerTest : VimTestCase() {
@@ -85,8 +86,9 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test entering select mode multicaret`() {
-    doTestNoNeovim("Select mode", parseKeys("gH"),
+    doTestWithNeovim(listOf("gH"),
       """
                 A Discovery
                 $c
