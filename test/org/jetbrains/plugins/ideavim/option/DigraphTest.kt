@@ -96,7 +96,7 @@ class DigraphTest : VimTestCase() {
   fun `test digraph backspace digraph`() {
     OptionsManager.digraph.set()
 
-    doTest("i B<BS>B<BS>B", """
+    doTestWithNeovim("i B<BS>B<BS>B", """
             A Discovery
 
             I found it${c} in a legendary land

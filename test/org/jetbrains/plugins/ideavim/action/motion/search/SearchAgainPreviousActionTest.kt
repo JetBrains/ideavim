@@ -40,7 +40,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...all it was settled on some sodden sand
   ...all by the torrent of a mountain pass
 """.trimIndent().dotToTab()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch()
         .search(it, it.caretModel.primaryCaret, "all", 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
     }
@@ -60,7 +60,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...${c}all it was .all settled on some sodden sand
   ...all by the torrent of a mountain pass
 """.trimIndent().dotToTab()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch()
         .search(it, it.caretModel.primaryCaret, "all", 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
     }
@@ -80,7 +80,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...all it was .${c}all.all settled on some sodden sand
   ...all by the torrent of a mountain pass
 """.trimIndent().dotToTab()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch()
         .search(it, it.caretModel.primaryCaret, "all", 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
     }
@@ -100,7 +100,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...all it was settled on some sodden sand
   ...${c}all by the torrent of a mountain pass
 """.trimIndent().dotToTab()
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch()
         .search(it, it.caretModel.primaryCaret, "all", 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
     }

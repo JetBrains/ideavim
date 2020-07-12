@@ -40,7 +40,7 @@ class RegisterActionsTest : VimTestCase() {
     val keys = StringHelper.parseKeys("jklwB") // just random keys
     val before = "I ${c}found it in a legendary land"
     val after = "I ${c}found it in a legendary land"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.setEnabled(false)
     }
   }
@@ -49,7 +49,7 @@ class RegisterActionsTest : VimTestCase() {
     val keys = StringHelper.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.setEnabled(false)
       VimPlugin.setEnabled(true)
     }
@@ -59,7 +59,7 @@ class RegisterActionsTest : VimTestCase() {
     val keys = StringHelper.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.setEnabled(false)
       VimPlugin.setEnabled(true)
       VimPlugin.setEnabled(true)
@@ -71,7 +71,7 @@ class RegisterActionsTest : VimTestCase() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
     var motionRightAction: ActionBeanClass? = null
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       motionRightAction = VIM_ACTIONS_EP.extensions().findAny().get()
 
       TestCase.assertNotNull(getCommandNode())

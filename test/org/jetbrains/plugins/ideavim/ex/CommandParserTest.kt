@@ -68,7 +68,7 @@ class CommandParserTest : VimTestCase() {
     val keys = commandToKeys(">>")
     val before = "I ${c}found it in a legendary land"
     val after = "I ${c}found it in a legendary land"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.setEnabled(false)
     }
   }
@@ -77,7 +77,7 @@ class CommandParserTest : VimTestCase() {
     val keys = commandToKeys(">>")
     val before = "I ${c}found it in a legendary land"
     val after = "        ${c}I found it in a legendary land"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.setEnabled(false)
       VimPlugin.setEnabled(true)
     }
@@ -87,7 +87,7 @@ class CommandParserTest : VimTestCase() {
     val keys = commandToKeys(">>")
     val before = "I ${c}found it in a legendary land"
     val after = "        ${c}I found it in a legendary land"
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.setEnabled(false)
       VimPlugin.setEnabled(true)
       VimPlugin.setEnabled(true)
@@ -99,7 +99,7 @@ class CommandParserTest : VimTestCase() {
     val before = "I ${c}found it in a legendary land"
     val after = "        ${c}I found it in a legendary land"
     var extension: ExBeanClass? = null
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       extension = EX_COMMAND_EP.extensions().findFirst().get()
 
       // TODO: 08.02.2020 I'm sorry if your tests have been failed because of this code. Please update it properly

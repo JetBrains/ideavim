@@ -228,16 +228,6 @@ abstract class VimTestCase : UsefulTestCase() {
     }
   }
 
-  fun doTest(keys: List<KeyStroke?>,
-             before: String,
-             after: String,
-             modeAfter: CommandState.Mode, subModeAfter: SubMode) {
-    configureByText(before)
-    typeText(keys)
-    myFixture.checkResult(after)
-    assertState(modeAfter, subModeAfter)
-  }
-
   fun doTestWithNeovim(keys: List<String>,
                        before: String,
                        after: String,
@@ -266,21 +256,11 @@ abstract class VimTestCase : UsefulTestCase() {
     assertState(modeAfter, subModeAfter)
   }
 
-  fun doTest(keys: String,
-             before: String,
-             after: String,
-             modeAfter: CommandState.Mode, subModeAfter: SubMode) {
-    configureByText(before)
-    typeText(StringHelper.parseKeys(keys))
-    myFixture.checkResult(after)
-    assertState(modeAfter, subModeAfter)
-  }
-
-  fun doTest(keys: List<KeyStroke>,
-             before: String,
-             after: String?,
-             modeAfter: CommandState.Mode, subModeAfter: SubMode,
-             afterEditorInitialized: (Editor) -> Unit) {
+  fun doTestWithoutNeovim(keys: List<KeyStroke>,
+                          before: String,
+                          after: String?,
+                          modeAfter: CommandState.Mode, subModeAfter: SubMode,
+                          afterEditorInitialized: (Editor) -> Unit) {
     configureByText(before)
     afterEditorInitialized(myFixture.editor)
     typeText(keys)
