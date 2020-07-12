@@ -47,7 +47,7 @@ class MotionDownActionTest : VimTestCase() {
             wh|${s}e${se}re i|t was settled on some sodden sand
             ha|${s}r${se}d by| the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 
   fun `test motion down in visual block mode with dollar motion`() {
@@ -68,7 +68,7 @@ class MotionDownActionTest : VimTestCase() {
             wh|${s}ere it was settled on some sodden sand[additional Chars]${c}${se}
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 
   fun `test last column after line deletion`() {
@@ -82,7 +82,7 @@ class MotionDownActionTest : VimTestCase() {
             
             ${c}all rocks and lavender and tufted grass,
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test with inlays`() {
@@ -214,7 +214,7 @@ class MotionDownActionTest : VimTestCase() {
   }
 
   fun `test motion to the last empty line`() {
-    doTestWithNeovim("j",
+    doTest("j",
       """
             I found it in a legendary ${c}land
             

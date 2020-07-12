@@ -34,7 +34,7 @@ class MotionUpActionTest : VimTestCase() {
             I found it in a le${c}gendary land
             all rocks and lavender and tufted grass,
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test last column is incorrect`() {
@@ -66,7 +66,7 @@ class MotionUpActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted ${c}grass,
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test last column wrong lastColumn`() {

@@ -37,7 +37,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test visual down`() {
-    doTestWithNeovim(listOf("<S-Down>"),
+    doTest(listOf("<S-Down>"),
       """
                 A Discovery
 
@@ -64,7 +64,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test visual down twice`() {
-    doTestWithNeovim(listOf("<S-Down><S-Down>"),
+    doTest(listOf("<S-Down><S-Down>"),
       """
                 A Discovery
 
@@ -91,7 +91,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test save column`() {
-    doTestWithNeovim(listOf("<S-Down><S-Down><S-Down>"),
+    doTest(listOf("<S-Down><S-Down><S-Down>"),
       """
                 A Discovery
 
@@ -118,7 +118,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
   )
   fun `test select down`() {
-    doTestWithNeovim(listOf("<S-Down>"),
+    doTest(listOf("<S-Down>"),
       """
                 A Discovery
 
@@ -145,7 +145,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
   )
   fun `test select down twice`() {
-    doTestWithNeovim(listOf("<S-Down><S-Down>"),
+    doTest(listOf("<S-Down><S-Down>"),
       """
                 A Discovery
 
@@ -172,7 +172,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test char select simple move`() {
-    doTestWithNeovim(listOf("gh", "<S-Down>"),
+    doTest(listOf("gh", "<S-Down>"),
       """
                 A Discovery
 
@@ -199,7 +199,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test char select move to empty line`() {
-    doTestWithNeovim(listOf("gh", "<S-Down>"),
+    doTest(listOf("gh", "<S-Down>"),
       """
                 A ${c}Discovery
 
@@ -226,7 +226,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test char select move from empty line`() {
-    doTestWithNeovim(listOf("gh", "<S-Down>"),
+    doTest(listOf("gh", "<S-Down>"),
       """
                 A Discovery
                 $c
@@ -253,7 +253,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test char select move to file end`() {
-    doTestWithNeovim(listOf("gh", "<S-Down>"),
+    doTest(listOf("gh", "<S-Down>"),
       """
                 A Discovery
 
@@ -278,7 +278,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test char select move multicaret`() {
-    doTestWithNeovim(listOf("gh", "<S-Down>"),
+    doTest(listOf("gh", "<S-Down>"),
       """
                 A Discovery
 
@@ -303,7 +303,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line select simple move`() {
-    doTestWithNeovim(listOf("gH", "<S-Down>"),
+    doTest(listOf("gH", "<S-Down>"),
       """
                 A Discovery
 
@@ -330,7 +330,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line select to empty line`() {
-    doTestWithNeovim(listOf("gH", "<S-Down>"),
+    doTest(listOf("gH", "<S-Down>"),
       """
                 A ${c}Discovery
 
@@ -357,7 +357,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line select from empty line`() {
-    doTestWithNeovim(listOf("gH", "<S-Down>"),
+    doTest(listOf("gH", "<S-Down>"),
       """
                 A Discovery
                 $c
@@ -384,7 +384,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line select to file end`() {
-    doTestWithNeovim(listOf("gH", "<S-Down>"),
+    doTest(listOf("gH", "<S-Down>"),
       """
                 A Discovery
 
@@ -409,7 +409,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line select multicaret`() {
-    doTestWithNeovim(listOf("gH", "<S-Down>"),
+    doTest(listOf("gH", "<S-Down>"),
       """
                 A Discovery
 
@@ -434,7 +434,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test block select simple move`() {
-    doTestWithNeovim(listOf("g<C-H>", "<S-Down>"),
+    doTest(listOf("g<C-H>", "<S-Down>"),
       """
                 A Discovery
 
@@ -459,7 +459,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test block select to empty line`() {
-    doTestWithNeovim(listOf("g<C-H>", "<S-Down>"),
+    doTest(listOf("g<C-H>", "<S-Down>"),
       """
                 A ${c}Discovery
 
@@ -484,7 +484,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test block select from empty line`() {
-    doTestWithNeovim(listOf("g<C-H>", "<S-Down>"),
+    doTest(listOf("g<C-H>", "<S-Down>"),
       """
                 A Discovery
                 $c
@@ -509,7 +509,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test block select to file end`() {
-    doTestWithNeovim(listOf("g<C-H>", "<S-Down>"),
+    doTest(listOf("g<C-H>", "<S-Down>"),
       """
                 A Discovery
 

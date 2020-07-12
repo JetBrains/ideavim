@@ -26,7 +26,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class JoinLinesHandlerTest : VimTestCase() {
   @VimBehaviorDiffers(description = "Different caret position")
   fun `test simple join`() {
-    doTestWithNeovim(exCommand("j"),
+    doTest(exCommand("j"),
       """
                 A Discovery
 
@@ -48,7 +48,7 @@ class JoinLinesHandlerTest : VimTestCase() {
 
   @VimBehaviorDiffers(description = "Different caret position")
   fun `test simple join full command`() {
-    doTestWithNeovim(exCommand("join"),
+    doTest(exCommand("join"),
       """
                 A Discovery
 
@@ -70,7 +70,7 @@ class JoinLinesHandlerTest : VimTestCase() {
 
   @VimBehaviorDiffers(description = "Different caret position")
   fun `test join with range`() {
-    doTestWithNeovim(exCommand("4,6j"),
+    doTest(exCommand("4,6j"),
       """
                 A Discovery
 

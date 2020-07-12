@@ -31,7 +31,7 @@ class DeleteJoinVisualLinesSpacesActionTest : VimOptionTestCase(IdeaJoinOptionsD
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(IdeaJoinOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
   fun `test join via idea`() {
-    doTestWithNeovim("VjJ",
+    doTest("VjJ",
       """
                 A Discovery
 

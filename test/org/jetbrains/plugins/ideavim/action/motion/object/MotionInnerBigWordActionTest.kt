@@ -19,12 +19,11 @@
 package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionInnerBigWordActionTest : VimTestCase() {
   fun `test at last dot`() {
-    doTestWithNeovim("diW",
+    doTest("diW",
       """
           I found it in a legendary land
           all rocks and lavender and tufted grass,

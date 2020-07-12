@@ -37,7 +37,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test visual right`() {
-    doTestWithNeovim(listOf("<S-Right>"),
+    doTest(listOf("<S-Right>"),
       """
                 A Discovery
 
@@ -64,7 +64,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test visual right twice`() {
-    doTestWithNeovim(listOf("<S-Right><S-Right>"),
+    doTest(listOf("<S-Right><S-Right>"),
       """
                 A Discovery
 
@@ -91,7 +91,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
   )
   fun `test select right`() {
-    doTestWithNeovim(listOf("<S-Right>"),
+    doTest(listOf("<S-Right>"),
       """
                 A Discovery
 
@@ -118,7 +118,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
   )
   fun `test select right twice`() {
-    doTestWithNeovim(listOf("<S-Right><S-Right>"),
+    doTest(listOf("<S-Right><S-Right>"),
       """
                 A Discovery
 
@@ -145,7 +145,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test simple motion char mode`() {
-    doTestWithNeovim(listOf("gh", "<S-Right>"),
+    doTest(listOf("gh", "<S-Right>"),
       """
                 A Discovery
 
@@ -172,7 +172,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test at the lineend char mode`() {
-    doTestWithNeovim(listOf("gh", "<S-Right>"),
+    doTest(listOf("gh", "<S-Right>"),
       """
                 A Discovery
 
@@ -199,7 +199,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test out of line char mode`() {
-    doTestWithNeovim(listOf("gh", "<S-Right>".repeat(2)),
+    doTest(listOf("gh", "<S-Right>".repeat(2)),
       """
                 A Discovery
 
@@ -226,7 +226,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test file end char mode`() {
-    doTestWithNeovim(listOf("gh", "<S-Right>".repeat(2)),
+    doTest(listOf("gh", "<S-Right>".repeat(2)),
       """
                 A Discovery
 
@@ -251,7 +251,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test file char mode multicaret`() {
-    doTestWithNeovim(listOf("gh", "<S-Right>".repeat(2)),
+    doTest(listOf("gh", "<S-Right>".repeat(2)),
       """
                 A Discovery
 
@@ -276,7 +276,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test simple motion line mode`() {
-    doTestWithNeovim(listOf("gH", "<S-Right>"),
+    doTest(listOf("gH", "<S-Right>"),
       """
                 A Discovery
 
@@ -303,7 +303,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test lineend line mode`() {
-    doTestWithNeovim(listOf("gH", "<S-Right>"),
+    doTest(listOf("gH", "<S-Right>"),
       """
                 A Discovery
 
@@ -330,7 +330,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test out of line line mode`() {
-    doTestWithNeovim(listOf("gH", "<S-Right>".repeat(2)),
+    doTest(listOf("gH", "<S-Right>".repeat(2)),
       """
                 A Discovery
 
@@ -357,7 +357,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test fileend line mode`() {
-    doTestWithNeovim(listOf("gH", "<S-Right>"),
+    doTest(listOf("gH", "<S-Right>"),
       """
                 A Discovery
 
@@ -382,7 +382,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line mode multicaret`() {
-    doTestWithNeovim(listOf("gH", "<S-Right>"),
+    doTest(listOf("gH", "<S-Right>"),
       """
                 A Discovery
 
@@ -407,7 +407,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test simple motion block mode`() {
-    doTestWithNeovim(listOf("g<C-H>", "<S-Right>"),
+    doTest(listOf("g<C-H>", "<S-Right>"),
       """
                 A Discovery
 
@@ -434,7 +434,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test at the lineend block mode`() {
-    doTestWithNeovim(listOf("g<C-H>", "<S-Right>"),
+    doTest(listOf("g<C-H>", "<S-Right>"),
       """
                 A Discovery
 
@@ -461,7 +461,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test out of line block mode`() {
-    doTestWithNeovim(listOf("g<C-H>", "<S-Right>".repeat(2)),
+    doTest(listOf("g<C-H>", "<S-Right>".repeat(2)),
       """
                 A Discovery
 
@@ -488,7 +488,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test file end block mode`() {
-    doTestWithNeovim(listOf("g<C-H>", "<S-Right>".repeat(2)),
+    doTest(listOf("g<C-H>", "<S-Right>".repeat(2)),
       """
                 A Discovery
 
@@ -513,7 +513,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test to longer line block mode`() {
-    doTestWithNeovim(listOf("g<C-H>", "<S-Down>", "<S-Right>".repeat(3)),
+    doTest(listOf("g<C-H>", "<S-Down>", "<S-Right>".repeat(3)),
       """
                 A Discovery
 
@@ -538,7 +538,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test continuevisual`() {
-    doTestWithNeovim(listOf("v", "<S-Right>".repeat(3)),
+    doTest(listOf("v", "<S-Right>".repeat(3)),
       """
                 A Discovery
 
@@ -563,7 +563,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test no continueselect`() {
-    doTestWithNeovim(listOf("gh", "<S-Right>".repeat(3)),
+    doTest(listOf("gh", "<S-Right>".repeat(3)),
       """
                 A Discovery
 
@@ -588,7 +588,7 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test no continuevisual`() {
-    doTestWithNeovim(listOf("v", "<S-Right>".repeat(3)),
+    doTest(listOf("v", "<S-Right>".repeat(3)),
       """
                 A Discovery
 

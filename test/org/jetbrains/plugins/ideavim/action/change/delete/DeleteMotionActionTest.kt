@@ -124,7 +124,7 @@ class DeleteMotionActionTest : VimTestCase() {
   }
 
   fun `test delete on last line`() {
-    doTestWithNeovim("dd",
+    doTest("dd",
       """
             A Discovery
             

@@ -23,15 +23,15 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ChangeLineActionTest : VimTestCase() {
   fun `test on empty file`() {
-    doTestWithNeovim("cc", "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("cc", "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   fun `test on empty file with S`() {
-    doTestWithNeovim("S", "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("S", "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   fun `test on last line with S`() {
-    doTestWithNeovim("S", """
+    doTest("S", """
             I found it in a legendary land
             all ${c}rocks and lavender and tufted grass,
     """.trimIndent(), """
@@ -41,7 +41,7 @@ class ChangeLineActionTest : VimTestCase() {
   }
 
   fun `test on last line with new line with S`() {
-    doTestWithNeovim("S", """
+    doTest("S", """
             I found it in a legendary land
             all ${c}rocks and lavender and tufted grass,
             
@@ -53,7 +53,7 @@ class ChangeLineActionTest : VimTestCase() {
   }
 
   fun `test on very last line with new line with S`() {
-    doTestWithNeovim("S", """
+    doTest("S", """
             I found it in a legendary land
             all ${c}rocks and lavender and tufted grass,
     """.trimIndent(), """
@@ -63,7 +63,7 @@ class ChangeLineActionTest : VimTestCase() {
   }
 
   fun `test on first line with new line with S`() {
-    doTestWithNeovim("S", """
+    doTest("S", """
             I ${c}found it in a legendary land
             all rocks and lavender and tufted grass,
     """.trimIndent(), """
@@ -73,7 +73,7 @@ class ChangeLineActionTest : VimTestCase() {
   }
 
   fun `test on last line with new line with cc`() {
-    doTestWithNeovim("cc", """
+    doTest("cc", """
             I found it in a legendary land
             all ${c}rocks and lavender and tufted grass,
             
@@ -85,7 +85,7 @@ class ChangeLineActionTest : VimTestCase() {
   }
 
   fun `test on last line`() {
-    doTestWithNeovim("cc", """
+    doTest("cc", """
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             $c

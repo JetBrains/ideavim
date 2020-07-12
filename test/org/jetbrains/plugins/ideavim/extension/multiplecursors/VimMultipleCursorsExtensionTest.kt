@@ -508,7 +508,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   ...${s}al${c}l${se} it was settled on some sodden sand
   ...${s}al${c}l${se} by the torrent of a mountain pass
 """.trimIndent().dotToTab()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
   fun `test multiple capitalized occurrences with ignorecase`() {

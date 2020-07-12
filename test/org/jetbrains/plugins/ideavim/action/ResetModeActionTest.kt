@@ -35,7 +35,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = "<C-\\><C-N>"
     val before = "A Discovery"
     val after = "A Discovery"
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
@@ -43,7 +43,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("i", "<C-\\><C-N>")
     val before = "A Discovery"
     val after = "A Discovery"
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
@@ -51,7 +51,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("V", "<C-\\><C-N>")
     val before = "A Discovery"
     val after = "A Discovery"
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
@@ -59,7 +59,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("gH", "<C-\\><C-N>")
     val before = "A Discovery"
     val after = "A Discovery"
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
@@ -67,7 +67,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("d", "<C-\\><C-N>")
     val before = "A Discovery"
     val after = "A Discovery"
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
@@ -75,7 +75,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = "d<Esc>dw"
     val before = "A Discovery"
     val after = "Discovery"
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
@@ -83,7 +83,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("d", "<C-\\><C-N>", "dw")
     val before = "A Discovery"
     val after = "Discovery"
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
@@ -91,7 +91,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("d", "<Esc>", "dw")
     val before = "A Discovery"
     val after = "Discovery"
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
@@ -99,7 +99,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("d", "<C-[>", "dw")
     val before = "A Discovery"
     val after = "Discovery"
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
@@ -111,7 +111,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("d", "<C-D>", "dw")
     val before = "A Discovery"
     val after = "Discovery"
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
@@ -119,7 +119,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = listOf("c", "<C-\\><C-N>", "another")
     val before = "A Discovery"
     val after = "Another Discovery"
-    doTestWithNeovim(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
@@ -127,7 +127,7 @@ class ResetModeActionTest : VimTestCase() {
     val keys = "dt<esc>D"
     val before = "A ${c}Discovery"
     val after = "A "
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 }

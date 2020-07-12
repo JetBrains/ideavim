@@ -43,7 +43,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers(originalVimAfter = """
@@ -70,7 +70,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test simple deletion empty line`() {
@@ -90,7 +90,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers("""
@@ -120,7 +120,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden san${c}d
 
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test simple deletion first line`() {
@@ -140,7 +140,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test simple deletion before empty`() {
@@ -162,7 +162,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers("""
@@ -189,7 +189,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden san${c}d
 
             """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test simple deletion multiline`() {
@@ -208,7 +208,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             ${c}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test simple deletion multiline motion up`() {
@@ -227,7 +227,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             ${c}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test delete visual lines end action`() {
@@ -262,7 +262,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers(originalVimAfter = """
@@ -289,7 +289,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test line deletion empty line`() {
@@ -309,7 +309,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers("""
@@ -339,7 +339,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden san${c}d
 
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers("""
@@ -366,7 +366,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
 
             """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test line deletion multiline`() {
@@ -385,7 +385,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             ${c}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test line deletion multiline motion up`() {
@@ -404,7 +404,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             ${c}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test line delete visual lines end action`() {
@@ -440,7 +440,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test block deletion empty line`() {
@@ -461,7 +461,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test block deletion last line`() {
@@ -484,7 +484,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             hard by the
 
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test block deletion last line without empty line`() {
@@ -503,7 +503,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the""".trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test block deletion multiline`() {
@@ -524,7 +524,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test block deletion multiline motion up`() {
@@ -545,7 +545,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test delete visual block line end action`() {

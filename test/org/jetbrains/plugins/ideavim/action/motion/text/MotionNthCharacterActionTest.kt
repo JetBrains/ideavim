@@ -24,7 +24,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionNthCharacterActionTest : VimTestCase() {
   fun `test goto without count`() {
-    doTestWithNeovim("go",
+    doTest("go",
       """
             A Discovery
 
@@ -46,7 +46,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
   }
 
   fun `test goto with 0`() {
-    doTestWithNeovim("0go",
+    doTest("0go",
       """
             A Discovery
 
@@ -68,7 +68,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
   }
 
   fun `test goto with 1`() {
-    doTestWithNeovim("1go",
+    doTest("1go",
       """
             A Discovery
 
@@ -90,7 +90,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
   }
 
   fun `test goto with 2`() {
-    doTestWithNeovim("2go",
+    doTest("2go",
       """
             A Discovery
 
@@ -112,7 +112,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
   }
 
   fun `test goto with 10`() {
-    doTestWithNeovim("10go",
+    doTest("10go",
       """
             A Discovery
 
@@ -134,7 +134,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
   }
 
   fun `test goto with 1000`() {
-    doTestWithNeovim("1000go",
+    doTest("1000go",
       """
             A Discovery
 
@@ -164,7 +164,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.${c}
   """)
   fun `test goto with 1000 in visual mode`() {
-    doTestWithNeovim("v1000go",
+    doTest("v1000go",
       """
             A Discovery
 
@@ -195,7 +195,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
             $c
   """)
   fun `test goto with 1000 and new line`() {
-    doTestWithNeovim("1000go",
+    doTest("1000go",
       """
             A Discovery
 

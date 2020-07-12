@@ -27,7 +27,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionRightActionTest : VimTestCase() {
   fun `test simple motion`() {
-    doTestWithNeovim("l", """
+    doTest("l", """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -45,7 +45,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test simple motion with repeat`() {
-    doTestWithNeovim("3l", """
+    doTest("3l", """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -63,7 +63,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test simple motion to the end`() {
-    doTestWithNeovim("3l", """
+    doTest("3l", """
             A Discovery
 
             I found it in a legendary lan${c}d
@@ -82,7 +82,7 @@ class MotionRightActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
   fun `test simple motion non-ascii`() {
-    doTestWithNeovim("l", """
+    doTest("l", """
             A Discovery
 
             I found it in a legendar${c}𝛁 land
@@ -101,7 +101,7 @@ class MotionRightActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
   fun `test simple motion emoji`() {
-    doTestWithNeovim("l", """
+    doTest("l", """
             A Discovery
 
             I found it in a legendar${c}🐔 land
@@ -120,7 +120,7 @@ class MotionRightActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
   fun `test simple motion czech`() {
-    doTestWithNeovim("l", """
+    doTest("l", """
             A Discovery
 
             I found it in a legendar${c}ž land
@@ -138,7 +138,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test simple motion tab`() {
-    doTestWithNeovim("l", """
+    doTest("l", """
         A Discovery
 
         I found it in a legendar${c}. land
@@ -156,7 +156,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test char visual mode`() {
-    doTestWithNeovim(listOf("v", "ll"), """
+    doTest(listOf("v", "ll"), """
             A Discovery
 
             I found it in a legendary lan${c}d
@@ -174,7 +174,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test block visual mode`() {
-    doTestWithNeovim(listOf("<C-V>", "ll"), """
+    doTest(listOf("<C-V>", "ll"), """
             A Discovery
 
             I found it in a legendary lan${c}d

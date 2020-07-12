@@ -33,7 +33,7 @@ class DigraphTest : VimTestCase() {
   fun `test digraph`() {
     OptionsManager.digraph.set()
 
-    doTestWithNeovim("i B<BS>B", """
+    doTest("i B<BS>B", """
             A Discovery
 
             I found it${c} in a legendary land
@@ -54,7 +54,7 @@ class DigraphTest : VimTestCase() {
   fun `test digraph stops`() {
     OptionsManager.digraph.set()
 
-    doTestWithNeovim("i B<BS>BHello", """
+    doTest("i B<BS>BHello", """
             A Discovery
 
             I found it${c} in a legendary land
@@ -75,7 +75,7 @@ class DigraphTest : VimTestCase() {
   fun `test digraph double backspace`() {
     OptionsManager.digraph.set()
 
-    doTestWithNeovim("i B<BS><BS>B", """
+    doTest("i B<BS><BS>B", """
             A Discovery
 
             I found it${c} in a legendary land
@@ -96,7 +96,7 @@ class DigraphTest : VimTestCase() {
   fun `test digraph backspace digraph`() {
     OptionsManager.digraph.set()
 
-    doTestWithNeovim("i B<BS>B<BS>B", """
+    doTest("i B<BS>B<BS>B", """
             A Discovery
 
             I found it${c} in a legendary land

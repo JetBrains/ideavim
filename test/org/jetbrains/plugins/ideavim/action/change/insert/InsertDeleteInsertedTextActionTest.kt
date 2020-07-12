@@ -25,7 +25,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class InsertDeleteInsertedTextActionTest : VimTestCase() {
   // VIM-1655
   fun `test deleted text is not yanked`() {
-    doTestWithNeovim(listOf("yiw", "ea", "Hello", "<C-U>", "<ESC>p"), """
+    doTest(listOf("yiw", "ea", "Hello", "<C-U>", "<ESC>p"), """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -39,7 +39,7 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
   // VIM-1655
   @VimBehaviorDiffers(description = "Inserted text is not deleted after <C-U>")
   fun `test deleted text is not yanked after replace`() {
-    doTestWithNeovim(listOf("yiw", "eR", "Hello", "<C-U>", "<ESC>p"), """
+    doTest(listOf("yiw", "eR", "Hello", "<C-U>", "<ESC>p"), """
             A Discovery
 
             I found ${c}it in a legendary land

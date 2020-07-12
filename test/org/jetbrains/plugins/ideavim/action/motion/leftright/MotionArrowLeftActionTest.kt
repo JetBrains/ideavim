@@ -34,7 +34,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test visual default options`() {
-    doTestWithNeovim(listOf("v", "<Left>"),
+    doTest(listOf("v", "<Left>"),
       """
                 A Discovery
 
@@ -57,7 +57,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopsel]))
   fun `test visual stopsel`() {
-    doTestWithNeovim(listOf("v", "<Left>"),
+    doTest(listOf("v", "<Left>"),
       """
                 A Discovery
 
@@ -80,7 +80,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
   fun `test visual stopselect`() {
-    doTestWithNeovim(listOf("v", "<Left>"),
+    doTest(listOf("v", "<Left>"),
       """
                 A Discovery
 
@@ -103,7 +103,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
   fun `test visual stopvisual`() {
-    doTestWithNeovim(listOf("v", "<Left>"),
+    doTest(listOf("v", "<Left>"),
       """
                 A Discovery
 
@@ -126,7 +126,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
   fun `test visual stopvisual multicaret`() {
-    doTestWithNeovim(listOf("v", "<Left>"),
+    doTest(listOf("v", "<Left>"),
       """
                 A Discovery
 

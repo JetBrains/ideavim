@@ -47,7 +47,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             wh${s}${c}|ere i|${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
     assertEquals(LogicalPosition(4, 2), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
@@ -70,7 +70,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             wh${s}|ere i${c}|${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
     assertEquals(LogicalPosition(4, 8), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
@@ -93,7 +93,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             wh${s}${c}|ere i|${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
     assertEquals(LogicalPosition(2, 2), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
@@ -116,7 +116,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             wh${s}|ere i${c}|${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
     assertEquals(LogicalPosition(2, 8), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
@@ -139,7 +139,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             where it was settled on so${s}${c}me sodden sand{some${se} new symbols}
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
     assertEquals(LogicalPosition(4, 26), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
@@ -162,7 +162,7 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
     assertEquals(LogicalPosition(3, 26), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 

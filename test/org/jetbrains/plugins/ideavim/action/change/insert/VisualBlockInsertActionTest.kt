@@ -54,7 +54,7 @@ Xbar
   // VIM-1379 |CTRL-V| |j| |v_b_I|
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test insert visual block with empty line in the middle`() {
-    doTestWithNeovim(listOf("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
+    doTest(listOf("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
       """
                     foo
 
@@ -74,7 +74,7 @@ Xbar
   // VIM-632 |CTRL-V| |v_b_I|
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test change visual block`() {
-    doTestWithNeovim(listOf("<C-V>", "j", "I", "quux ", "<Esc>"),
+    doTest(listOf("<C-V>", "j", "I", "quux ", "<Esc>"),
       """
                     foo bar
                     ${c}baz quux
@@ -110,7 +110,7 @@ Xbar
   // VIM-1379 |CTRL-V| |j| |v_b_I|
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test insert visual block with shorter line in the middle`() {
-    doTestWithNeovim(listOf("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
+    doTest(listOf("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
       """
                     foo
                     x
@@ -129,7 +129,7 @@ Xbar
 
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test insert in non block mode`() {
-    doTestWithNeovim(listOf("vwIHello<esc>"),
+    doTest(listOf("vwIHello<esc>"),
       """
                 ${c}A Discovery
 

@@ -25,7 +25,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class SelectEnableLineModeActionHandlerTest : VimTestCase() {
   fun `test entering select mode`() {
-    doTestWithNeovim("gH",
+    doTest("gH",
       """
                 A Discovery
 
@@ -47,7 +47,7 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
   }
 
   fun `test entering select mode at the end of file`() {
-    doTestWithNeovim("gH",
+    doTest("gH",
       """
                 A Discovery
 
@@ -67,7 +67,7 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
   }
 
   fun `test entering select mode on empty line`() {
-    doTestWithNeovim("gH",
+    doTest("gH",
       """
                 A Discovery
                 $c
@@ -88,7 +88,7 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test entering select mode multicaret`() {
-    doTestWithNeovim(listOf("gH"),
+    doTest(listOf("gH"),
       """
                 A Discovery
                 $c

@@ -35,11 +35,11 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
   .hello 2
   .${c}hello 3
 """.trimIndent().dotToTab()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test backward search on empty string`() {
-    doTestWithNeovim("*", "", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("*", "", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     assertPluginError(false)
   }
 
@@ -52,7 +52,7 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
         """
   )
   fun `test last dot`() {
-    doTestWithNeovim("*",
+    doTest("*",
       """
           I found it in a legendary land
           all rocks and lavender and tufted grass,
@@ -68,7 +68,7 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
   }
 
   fun `test last word`() {
-    doTestWithNeovim("*",
+    doTest("*",
       """
           I found it in a legendary land
           all |pass| rocks and lavender and tufted grass,

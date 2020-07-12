@@ -46,7 +46,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test delete block SW direction`() {
@@ -67,7 +67,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test delete block NW direction`() {
@@ -88,7 +88,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test delete block NE direction`() {
@@ -109,7 +109,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test delete after extend selection`() {
@@ -152,6 +152,6 @@ class DeleteVisualActionTest : VimTestCase() {
             wh|
             ha|
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 }

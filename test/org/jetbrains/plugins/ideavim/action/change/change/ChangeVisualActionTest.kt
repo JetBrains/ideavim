@@ -43,7 +43,7 @@ class ChangeVisualActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test multiple line change in text middle`() {
@@ -63,7 +63,7 @@ class ChangeVisualActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers(originalVimAfter = """
@@ -94,7 +94,7 @@ class ChangeVisualActionTest : VimTestCase() {
             
             
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
 
@@ -131,7 +131,7 @@ class ChangeVisualActionTest : VimTestCase() {
             ${c}
             
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   @VimBehaviorDiffers(description = "Wrong caret position")
@@ -153,14 +153,14 @@ class ChangeVisualActionTest : VimTestCase() {
             wh|Hello
             ha|Hello
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test replace first line`() {
     val keys = "VcHello<esc>"
     val before = "${c}A Discovery"
     val after = "Hello"
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test change visual action`() {
@@ -173,7 +173,7 @@ class ChangeVisualActionTest : VimTestCase() {
   // VIM-1379 |CTRL-V| |j| |v_b_c|
   @VimBehaviorDiffers(description = "Different caret position")
   fun `test change visual block with empty line in the middle`() {
-    doTestWithNeovim(listOf("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
+    doTest(listOf("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
       """
         foo foo
         
@@ -194,7 +194,7 @@ class ChangeVisualActionTest : VimTestCase() {
   // VIM-1379 |CTRL-V| |j| |v_b_c|
   @VimBehaviorDiffers(description = "Different caret position")
   fun `test change visual block with shorter line in the middle`() {
-    doTestWithNeovim(listOf("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
+    doTest(listOf("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
       "foo foo\n" +
         "x\n" +
         "bar bar\n",

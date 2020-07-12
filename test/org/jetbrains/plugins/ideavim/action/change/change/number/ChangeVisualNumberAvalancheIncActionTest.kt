@@ -26,7 +26,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 class ChangeVisualNumberAvalancheIncActionTest : VimTestCase() {
   fun `test inc visual avalanche`() {
-    doTestWithNeovim("VGg<C-A>",
+    doTest("VGg<C-A>",
       """
                     ${c}number 1
                     number 1
@@ -42,7 +42,7 @@ class ChangeVisualNumberAvalancheIncActionTest : VimTestCase() {
   }
 
   fun `test inc visual avalanche multiple times`() {
-    doTestWithNeovim("VG2g<C-A>",
+    doTest("VG2g<C-A>",
       """
                     ${c}number 1
                     number 1

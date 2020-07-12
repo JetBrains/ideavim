@@ -19,12 +19,11 @@
 package org.jetbrains.plugins.ideavim.action.motion.`object`
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionInnerWordActionTest : VimTestCase() {
   fun `test empty text`() {
-    doTestWithNeovim("viw", "", "",
+    doTest("viw", "", "",
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 }

@@ -24,7 +24,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class DeleteVisualLinesActionTest : VimTestCase() {
   fun `test remove line in char visual mode`() {
-    doTestWithNeovim("vlllX",
+    doTest("vlllX",
       """
                 I found ${c}it in a legendary land
                 all rocks and lavender and tufted grass,
@@ -45,7 +45,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 ${c}where it was settled on some sodden sand""")
   fun `test remove line in char visual mode last line`() {
-    doTestWithNeovim("vlllX",
+    doTest("vlllX",
       """
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
@@ -62,7 +62,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
   }
 
   fun `test remove line in line visual mode`() {
-    doTestWithNeovim("VX",
+    doTest("VX",
       """
                 I found ${c}it in a legendary land
                 all rocks and lavender and tufted grass,
@@ -83,7 +83,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 ${c}where it was settled on some sodden sand""")
   fun `test remove line in line visual mode line end`() {
-    doTestWithNeovim("VX",
+    doTest("VX",
       """
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,

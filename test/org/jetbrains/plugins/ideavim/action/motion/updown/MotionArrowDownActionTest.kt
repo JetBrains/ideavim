@@ -34,7 +34,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test visual default options`() {
-    doTestWithNeovim(listOf("v", "<Down>"),
+    doTest(listOf("v", "<Down>"),
       """
                 A Discovery
 
@@ -57,7 +57,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopsel]))
   fun `test visual stopsel`() {
-    doTestWithNeovim(listOf("v", "<Down>"),
+    doTest(listOf("v", "<Down>"),
       """
                 A Discovery
 
@@ -80,7 +80,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
   fun `test visual stopselect`() {
-    doTestWithNeovim(listOf("v", "<Down>"),
+    doTest(listOf("v", "<Down>"),
       """
                 A Discovery
 
@@ -103,7 +103,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
   fun `test visual stopvisual`() {
-    doTestWithNeovim(listOf("v", "<Down>"),
+    doTest(listOf("v", "<Down>"),
       """
                 A Discovery
 
@@ -126,7 +126,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
   fun `test visual stopvisual multicaret`() {
-    doTestWithNeovim(listOf("v", "<Down>"),
+    doTest(listOf("v", "<Down>"),
       """
                 A Discovery
 
@@ -149,7 +149,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []))
   fun `test char select stopsel`() {
-    doTestWithNeovim(listOf("gh", "<Down>"),
+    doTest(listOf("gh", "<Down>"),
       """
                 A Discovery
 
@@ -173,7 +173,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
   fun `test char select simple move`() {
-    doTestWithNeovim(listOf("gH", "<Down>"),
+    doTest(listOf("gH", "<Down>"),
       """
                 A Discovery
 
@@ -197,7 +197,7 @@ class MotionArrowDownActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
   fun `test select multiple carets`() {
-    doTestWithNeovim(listOf("gH", "<Down>"),
+    doTest(listOf("gH", "<Down>"),
       """
                 A Discovery
 

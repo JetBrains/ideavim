@@ -27,7 +27,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VisualToggleBlockModeActionTest : VimTestCase() {
   fun `test enter visual with count`() {
-    doTestWithNeovim("1<C-V>",
+    doTest("1<C-V>",
       """
                     A Discovery
 
@@ -48,7 +48,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with five count`() {
-    doTestWithNeovim("5<C-V>",
+    doTest("5<C-V>",
       """
                     A Discovery
 
@@ -69,7 +69,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with 100 count`() {
-    doTestWithNeovim("100<C-V>",
+    doTest("100<C-V>",
       """
                     A Discovery
 
@@ -91,7 +91,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
 
   // Ignore the failture - issue in the platform
   fun `test on empty file`() {
-    doTestWithNeovim("<C-V>", "", "",
+    doTest("<C-V>", "", "",
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 

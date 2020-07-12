@@ -178,14 +178,14 @@ public class MarkTest extends VimTestCase {
 
   // |i| |`]|
   public void testGotoLastChangePositionEnd() {
-    doTestWithNeovim(Lists.newArrayList("yiw", "P", "gg", "`]"), "one two\n" +
-                                                    "<caret>three\n" +
-                                                    "four five\n",
+    doTest(Lists.newArrayList("yiw", "P", "gg", "`]"), "one two\n" +
+                                                       "<caret>three\n" +
+                                                       "four five\n",
       "one two\n" +
         "thre<caret>ethree\n" +
         "four five\n",
-      CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE
+           CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE
     );
   }
 }

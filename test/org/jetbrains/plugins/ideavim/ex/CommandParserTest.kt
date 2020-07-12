@@ -61,7 +61,7 @@ class CommandParserTest : VimTestCase() {
     val keys = ">>"
     val before = "I ${c}found it in a legendary land"
     val after = "    ${c}I found it in a legendary land"
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test execute in disabled state`() {

@@ -30,7 +30,7 @@ class MotionOuterSentenceActionTest : VimTestCase() {
         $c
     """)
   fun `test on empty last line`() {
-    doTestWithNeovim("=as", """
+    doTest("=as", """
         I found it in a legendary land
         all rocks and lavender and tufted grass,
         where it was settled on some sodden sand
@@ -53,7 +53,7 @@ class MotionOuterSentenceActionTest : VimTestCase() {
         $c
     """)
   fun `test delete on empty last line`() {
-    doTestWithNeovim("das", """
+    doTest("das", """
         I found it in a legendary land
         all rocks and lavender and tufted grass,
         where it was settled on some sodden sand

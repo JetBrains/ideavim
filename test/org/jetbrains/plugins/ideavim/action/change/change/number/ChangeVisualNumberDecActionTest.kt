@@ -27,7 +27,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 class ChangeVisualNumberDecActionTest : VimTestCase() {
   fun `test dec visual full number`() {
-    doTestWithNeovim("V<C-X>",
+    doTest("V<C-X>",
       "${c}12345",
       "${c}12344",
       CommandState.Mode.COMMAND,
@@ -35,7 +35,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
   }
 
   fun `test dec visual multiple numbers`() {
-    doTestWithNeovim("v10w<C-X>",
+    doTest("v10w<C-X>",
       "11 <- should not be decremented |${c}11| should not be decremented -> 12",
       "11 <- should not be decremented |${c}10| should not be decremented -> 12",
       CommandState.Mode.COMMAND,
@@ -43,7 +43,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
   }
 
   fun `test dec visual part of number`() {
-    doTestWithNeovim("v4l<C-X>",
+    doTest("v4l<C-X>",
       "11111${c}33333111111",
       "11111${c}33332111111",
       CommandState.Mode.COMMAND,
@@ -51,7 +51,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
   }
 
   fun `test dec visual multiple lines`() {
-    doTestWithNeovim("V2j<C-X>",
+    doTest("V2j<C-X>",
       """
                     no dec 1
                     no dec 1
@@ -78,7 +78,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
   }
 
   fun `test dec visual 1000 multiple lines`() {
-    doTestWithNeovim("V2j<C-X>",
+    doTest("V2j<C-X>",
       """
                     ${c}1000
                     1000
@@ -94,7 +94,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
   }
 
   fun `test dec visual multiple numbers on line`() {
-    doTestWithNeovim("V<C-X>",
+    doTest("V<C-X>",
       "1 should$c not be decremented -> 2",
       "${c}0 should not be decremented -> 2",
       CommandState.Mode.COMMAND,

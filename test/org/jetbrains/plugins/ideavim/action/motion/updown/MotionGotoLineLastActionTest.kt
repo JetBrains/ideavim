@@ -23,7 +23,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionGotoLineLastActionTest : VimTestCase() {
   fun `test simple motion`() {
-    doTestWithNeovim("G",
+    doTest("G",
       """
                 A Discovery
 
@@ -43,7 +43,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
   fun `test with last empty line`() {
-    doTestWithNeovim("G",
+    doTest("G",
       """
                 A Discovery
 

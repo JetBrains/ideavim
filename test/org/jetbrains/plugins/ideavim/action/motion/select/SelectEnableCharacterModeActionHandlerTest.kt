@@ -26,7 +26,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class SelectEnableCharacterModeActionHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test entering select mode`() {
-    doTestWithNeovim(listOf("gh"),
+    doTest(listOf("gh"),
       """
                 A Discovery
 
@@ -49,7 +49,7 @@ class SelectEnableCharacterModeActionHandlerTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test entering select mode at the end of file`() {
-    doTestWithNeovim(listOf("gh"),
+    doTest(listOf("gh"),
       """
                 A Discovery
 
@@ -69,7 +69,7 @@ class SelectEnableCharacterModeActionHandlerTest : VimTestCase() {
   }
 
   fun `test entering select mode on empty line`() {
-    doTestWithNeovim("gh",
+    doTest("gh",
       """
                 A Discovery
                 $c
@@ -90,7 +90,7 @@ class SelectEnableCharacterModeActionHandlerTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test entering select mode multicaret`() {
-    doTestWithNeovim(listOf("gh"),
+    doTest(listOf("gh"),
       """
                 A Discovery
                 $c

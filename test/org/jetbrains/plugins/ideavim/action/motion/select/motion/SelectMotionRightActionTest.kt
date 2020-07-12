@@ -33,7 +33,7 @@ class SelectMotionRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
   fun `test char select simple move`() {
-    doTestWithNeovim(listOf("viw", "<C-G>", "<Right>"),
+    doTest(listOf("viw", "<C-G>", "<Right>"),
       """
                 A Discovery
 
@@ -57,7 +57,7 @@ class SelectMotionRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
   fun `test select multiple carets`() {
-    doTestWithNeovim(listOf("viw", "<C-G>", "<Right>"),
+    doTest(listOf("viw", "<C-G>", "<Right>"),
       """
                 A Discovery
 
@@ -79,7 +79,7 @@ class SelectMotionRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []))
   fun `test without stopsel`() {
-    doTestWithNeovim(listOf("viw", "<C-G>", "<Right>"),
+    doTest(listOf("viw", "<C-G>", "<Right>"),
       """
                 A Discovery
 

@@ -24,6 +24,6 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class PutTestAfterCursorActionTest : VimTestCase() {
   fun `test put from number register`() {
     setRegister('4', "XXX ")
-    doTestWithNeovim("\"4p", "This is my${c} text", "This is my XXX${c} text", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("\"4p", "This is my${c} text", "This is my XXX${c} text", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 }

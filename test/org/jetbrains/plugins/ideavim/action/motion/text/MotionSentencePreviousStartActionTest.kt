@@ -32,7 +32,7 @@ class MotionSentencePreviousStartActionTest : VimTestCase() {
       """
   )
   fun `test with two empty lines`() {
-    doTestWithNeovim("(",
+    doTest("(",
       """
         
         

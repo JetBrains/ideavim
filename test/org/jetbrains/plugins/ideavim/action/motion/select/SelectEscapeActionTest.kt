@@ -27,7 +27,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class SelectEscapeActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit char mode`() {
-    this.doTestWithNeovim(listOf("gh", "<esc>"),
+    this.doTest(listOf("gh", "<esc>"),
       """
                 A Discovery
 
@@ -51,7 +51,7 @@ class SelectEscapeActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit char mode on line start`() {
-    this.doTestWithNeovim(listOf("gh", "<esc>"),
+    this.doTest(listOf("gh", "<esc>"),
       """
                 A Discovery
 
@@ -75,7 +75,7 @@ class SelectEscapeActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit char mode on line end`() {
-    this.doTestWithNeovim(listOf("gh", "<esc>"),
+    this.doTest(listOf("gh", "<esc>"),
       """
                 A Discovery
 
@@ -99,7 +99,7 @@ class SelectEscapeActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit char mode on file start`() {
-    this.doTestWithNeovim(listOf("gh", "<S-Left>", "<esc>"),
+    this.doTest(listOf("gh", "<S-Left>", "<esc>"),
       """
                 ${c}A Discovery
 
@@ -123,7 +123,7 @@ class SelectEscapeActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit char mode on empty line`() {
-    this.doTestWithNeovim(listOf("gh", "<esc>"),
+    this.doTest(listOf("gh", "<esc>"),
       """
                 A Discovery
                 $c
@@ -147,7 +147,7 @@ class SelectEscapeActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit char mode multicaret`() {
-    this.doTestWithNeovim(listOf("gh", "<esc>"),
+    this.doTest(listOf("gh", "<esc>"),
       """
                 A Discovery
 
@@ -171,7 +171,7 @@ class SelectEscapeActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit in select line mode`() {
-    this.doTestWithNeovim(listOf("gH", "<esc>"),
+    this.doTest(listOf("gH", "<esc>"),
       """
                 A Discovery
 
@@ -195,7 +195,7 @@ class SelectEscapeActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit line mode line end`() {
-    this.doTestWithNeovim(listOf("gH", "<esc>"),
+    this.doTest(listOf("gH", "<esc>"),
       """
                 A Discovery
 
@@ -219,7 +219,7 @@ class SelectEscapeActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit line mode file start`() {
-    this.doTestWithNeovim(listOf("gH", "<esc>"),
+    this.doTest(listOf("gH", "<esc>"),
       """
                 ${c}A Discovery
 
@@ -243,7 +243,7 @@ class SelectEscapeActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit line mode empty line`() {
-    this.doTestWithNeovim(listOf("gH", "<esc>"),
+    this.doTest(listOf("gH", "<esc>"),
       """
                 A Discovery
                 $c
@@ -267,7 +267,7 @@ class SelectEscapeActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit line mode multicaret`() {
-    this.doTestWithNeovim(listOf("gH", "<esc>"),
+    this.doTest(listOf("gH", "<esc>"),
       """
                 A Discovery
 
@@ -291,7 +291,7 @@ class SelectEscapeActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit in select block mode`() {
-    this.doTestWithNeovim(listOf("g<C-H>", "<esc>"),
+    this.doTest(listOf("g<C-H>", "<esc>"),
       """
                 A Discovery
 
@@ -318,7 +318,7 @@ class SelectEscapeActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit block mode with motion`() {
-    this.doTestWithNeovim(listOf("g<C-H>", "<S-Down>", "<S-Right>", "<esc>"),
+    this.doTest(listOf("g<C-H>", "<S-Down>", "<S-Right>", "<esc>"),
       """
                 A Discovery
 
@@ -345,7 +345,7 @@ class SelectEscapeActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit block mode on longer line`() {
-    this.doTestWithNeovim(listOf("g<C-H>", "<S-Down>", "<S-Right>".repeat(3), "<esc>"),
+    this.doTest(listOf("g<C-H>", "<S-Down>", "<S-Right>".repeat(3), "<esc>"),
       """
                 A Discovery
 
@@ -372,7 +372,7 @@ class SelectEscapeActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test exit block mode on longer line till end`() {
-    this.doTestWithNeovim(listOf("g<C-H>", "<S-Down>", "<S-Right>".repeat(5), "<esc>"),
+    this.doTest(listOf("g<C-H>", "<S-Down>", "<S-Right>".repeat(5), "<esc>"),
       """
                 A Discovery
 

@@ -25,7 +25,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class MotionParagraphPreviousActionTest : VimTestCase() {
   @VimBehaviorDiffers("")
   fun `test delete till start with empty line`() {
-    doTestWithNeovim("d{", """
+    doTest("d{", """
       
       I found it in a legendary land
       all rocks and lavender and tufted grass,

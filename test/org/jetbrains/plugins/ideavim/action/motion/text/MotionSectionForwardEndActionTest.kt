@@ -25,7 +25,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class MotionSectionForwardEndActionTest : VimTestCase() {
   @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
   fun `test remove full text`() {
-    doTestWithNeovim("d]]",
+    doTest("d]]",
       """
           ${c}I found it in a legendary land
           all rocks and lavender and tufted grass,
@@ -38,7 +38,7 @@ class MotionSectionForwardEndActionTest : VimTestCase() {
 
   @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
   fun `test remove full text with new line at the end`() {
-    doTestWithNeovim("d]]",
+    doTest("d]]",
       """
           ${c}I found it in a legendary land
           all rocks and lavender and tufted grass,

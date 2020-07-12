@@ -658,7 +658,7 @@ public class MotionActionTest extends VimTestCase {
 
   // VIM-564 |g_|
   public void testToLastNonBlankCharacterInLine() {
-    doTestWithNeovim("g_",
+    doTest("g_",
            "one   \n" +
            "two   \n" +
            "th<caret>ree  \n" +
@@ -670,7 +670,7 @@ public class MotionActionTest extends VimTestCase {
 
   // |3g_|
   public void testToLastNonBlankCharacterInLineWithCount3() {
-    doTestWithNeovim("3g_",
+    doTest("3g_",
            "o<caret>ne   \n" +
            "two   \n" +
            "three  \n" +

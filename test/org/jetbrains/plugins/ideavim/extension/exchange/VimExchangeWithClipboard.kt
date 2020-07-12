@@ -24,7 +24,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words left to right`() {
-    doTestWithNeovim(listOf("cxe", "w", "cxe"),
+    doTest(listOf("cxe", "w", "cxe"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -36,7 +36,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words dot repeat`() {
-    doTestWithNeovim(listOf("cxiw", "w", "."),
+    doTest(listOf("cxiw", "w", "."),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -48,7 +48,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words right to left`() {
-    doTestWithNeovim(listOf("cxe", "b", "cxe"),
+    doTest(listOf("cxe", "b", "cxe"),
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -60,7 +60,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words right to left with dot`() {
-    doTestWithNeovim(listOf("cxe", "b", "."),
+    doTest(listOf("cxe", "b", "."),
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -72,7 +72,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual exchange words left to right`() {
-    doTestWithNeovim(listOf("veX", "w", "veX"),
+    doTest(listOf("veX", "w", "veX"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -88,7 +88,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   )
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual exchange words from inside`() {
-    doTestWithNeovim(listOf("veX", "b", "v3e", "X"),
+    doTest(listOf("veX", "b", "v3e", "X"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -104,7 +104,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   )
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual exchange words from outside`() {
-    doTestWithNeovim(listOf("v3e", "X", "w", "veX"),
+    doTest(listOf("v3e", "X", "w", "veX"),
       "The ${c}quick brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -125,7 +125,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   )
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange lines top down`() {
-    doTestWithNeovim(listOf("cxx", "j", "cxx"),
+    doTest(listOf("cxx", "j", "cxx"),
       """The quick
          brown ${c}fox
          catch over
@@ -152,7 +152,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   )
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange lines top down with dot`() {
-    doTestWithNeovim(listOf("cxx", "j", "."),
+    doTest(listOf("cxx", "j", "."),
       """The quick
          brown ${c}fox
          catch over
@@ -177,7 +177,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   )
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange to the line end`() {
-    doTestWithNeovim(listOf("v$", "X", "jj^ve", "X"),
+    doTest(listOf("v$", "X", "jj^ve", "X"),
       """The quick
          brown ${c}fox
          catch over
@@ -204,7 +204,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   )
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange visual lines`() {
-    doTestWithNeovim(listOf("Vj", "X", "jj", "Vj", "X"),
+    doTest(listOf("Vj", "X", "jj", "Vj", "X"),
       """
          The ${c}quick
          brown fox

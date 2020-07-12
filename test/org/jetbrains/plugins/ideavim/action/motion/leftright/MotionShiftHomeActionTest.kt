@@ -54,7 +54,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(KeyModelOptionData.name, Sel
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @VimOptionDefaultAll
@@ -85,7 +85,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(KeyModelOptionData.name, Sel
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
 
@@ -112,7 +112,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(KeyModelOptionData.name, Sel
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-    doTestWithNeovim(keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    doTest(keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
   @VimOptionTestConfiguration(

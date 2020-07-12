@@ -33,7 +33,7 @@ class RegisterActionsTest : VimTestCase() {
   fun `test simple action`() {
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
-    doTestWithNeovim("l", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("l", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test action in disabled plugin`() {

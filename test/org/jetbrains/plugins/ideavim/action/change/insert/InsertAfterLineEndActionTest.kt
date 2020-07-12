@@ -41,7 +41,7 @@ class InsertAfterLineEndActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test multiple carets`() {
-    doTestWithNeovim("AHello<esc>",
+    doTest("AHello<esc>",
       """
                 ${c}A Discovery
 

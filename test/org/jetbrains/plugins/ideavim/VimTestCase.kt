@@ -228,19 +228,19 @@ abstract class VimTestCase : UsefulTestCase() {
     }
   }
 
-  fun doTestWithNeovim(keys: List<String>,
-                       before: String,
-                       after: String,
-                       modeAfter: CommandState.Mode,
-                       subModeAfter: SubMode) {
-    doTestWithNeovim(keys.joinToString(separator = ""), before, after, modeAfter, subModeAfter)
+  fun doTest(keys: List<String>,
+             before: String,
+             after: String,
+             modeAfter: CommandState.Mode,
+             subModeAfter: SubMode) {
+    doTest(keys.joinToString(separator = ""), before, after, modeAfter, subModeAfter)
   }
 
-  fun doTestWithNeovim(keys: String,
-                       before: String,
-                       after: String,
-                       modeAfter: CommandState.Mode,
-                       subModeAfter: SubMode) {
+  fun doTest(keys: String,
+             before: String,
+             after: String,
+             modeAfter: CommandState.Mode,
+             subModeAfter: SubMode) {
     configureByText(before)
 
     if (neovimTestingEnabled) NeovimTesting.setupEditorAndType(myFixture.editor, keys)
