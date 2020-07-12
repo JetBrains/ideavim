@@ -47,6 +47,7 @@ internal object NeovimTesting {
     val method = test.javaClass.getMethod(test.name)
     return !method.isAnnotationPresent(VimBehaviorDiffers::class.java)
       && !method.isAnnotationPresent(TestWithoutNeovim::class.java)
+      && System.getProperty("ideavim.neovim.test", "false")!!.toBoolean()
   }
 
   fun setupEditorAndType(editor: Editor, keys: String) {

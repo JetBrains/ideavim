@@ -69,6 +69,11 @@ compileTestKotlin {
   }
 }
 
+task testWithNeovim(type : Test) {
+  group = "verification"
+  systemProperty "ideavim.neovim.test", 'true'
+}
+
 tasks.register("slackEapNotification") {
   doLast {
     if (!slackUrl) return

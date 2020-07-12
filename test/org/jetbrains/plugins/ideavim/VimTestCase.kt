@@ -87,7 +87,7 @@ abstract class VimTestCase : UsefulTestCase() {
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
     ExEntryPanel.getInstance().entry.setBounds(0, 0, 100, 25)
 
-    neovimTestingEnabled = neovimTestingEnabled && NeovimTesting.neovimEnabled(this)
+    neovimTestingEnabled = NeovimTesting.neovimEnabled(this)
 
     if (neovimTestingEnabled) NeovimTesting.setUp()
   }
