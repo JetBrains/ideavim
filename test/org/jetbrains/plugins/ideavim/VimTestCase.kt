@@ -243,7 +243,8 @@ abstract class VimTestCase : UsefulTestCase() {
              subModeAfter: SubMode) {
     configureByText(before)
 
-    if (neovimTestingEnabled) NeovimTesting.setupEditorAndType(myFixture.editor, keys)
+    if (neovimTestingEnabled) NeovimTesting.setupEditor(myFixture.editor)
+    if (neovimTestingEnabled) NeovimTesting.typeCommand(keys)
 
     performTest(keys, after, modeAfter, subModeAfter)
 

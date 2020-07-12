@@ -50,10 +50,13 @@ internal object NeovimTesting {
       && System.getProperty("ideavim.neovim.test", "false")!!.toBoolean()
   }
 
-  fun setupEditorAndType(editor: Editor, keys: String) {
+  fun setupEditor(editor: Editor) {
     neovimApi.currentBuffer.get().setLines(0, -1, false, editor.document.text.split("\n")).get()
     val charPosition = CharacterPosition.fromOffset(editor, editor.caretModel.offset)
     neovimApi.currentWindow.get().setCursor(VimCoords(charPosition.line + 1, charPosition.column)).get()
+  }
+
+  fun typeCommand(keys: String) {
     neovimApi.input(neovimApi.replaceTermcodes(keys, true, false, true).get()).get()
   }
 
