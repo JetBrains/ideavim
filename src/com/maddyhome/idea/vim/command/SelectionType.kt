@@ -56,7 +56,6 @@ enum class SelectionType(val value: Int) {
     @JvmStatic
     fun fromCommandFlags(flags: EnumSet<CommandFlags>) = when {
       CommandFlags.FLAG_MOT_LINEWISE in flags -> LINE_WISE
-      CommandFlags.FLAG_MOT_BLOCKWISE in flags -> BLOCK_WISE
       else -> CHARACTER_WISE
     }
   }

@@ -32,8 +32,6 @@ import java.util.*
 class VisualToggleBlockModeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_BLOCKWISE)
-
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val listOption: ListOption = selectmode
     return if (listOption.contains("cmd")) {
