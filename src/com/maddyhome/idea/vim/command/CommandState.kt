@@ -15,40 +15,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.command
 
-package com.maddyhome.idea.vim.command;
-
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.helper.DigraphResult;
-import com.maddyhome.idea.vim.helper.DigraphSequence;
-import com.maddyhome.idea.vim.helper.UserDataManager;
-import com.maddyhome.idea.vim.key.CommandPartNode;
-import com.maddyhome.idea.vim.option.OptionsManager;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import java.util.EnumSet;
-import java.util.Stack;
-import java.util.stream.Collectors;
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.DigraphResult
+import com.maddyhome.idea.vim.helper.DigraphSequence
+import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.helper.vimCommandState
+import com.maddyhome.idea.vim.key.CommandPartNode
+import com.maddyhome.idea.vim.option.OptionsManager.showmode
+import org.jetbrains.annotations.ApiStatus
+import org.jetbrains.annotations.Contract
+import java.util.*
+import javax.swing.KeyStroke
 
 /**
  * Used to maintain state while entering a Vim command (operator, motion, text object, etc.)
  */
-public class CommandState {
-  private static final Logger logger = Logger.getInstance(CommandState.class.getName());
-  private static final ModeState defaultModeState = new ModeState(Mode.COMMAND, SubMode.NONE);
-
-  private final CommandBuilder commandBuilder = new CommandBuilder(getKeyRootNode(MappingMode.NORMAL));
-  private final Stack<ModeState> modeStates = new Stack<>();
-  private final MappingState mappingState = new MappingState();
-  private final DigraphSequence digraphSequence = new DigraphSequence();
-  private boolean isRecording = false;
-  private boolean dotRepeatInProgress = false;
+class CommandState private constructor() {
+  val commandBuilder = CommandBuilder(getKeyRootNode(MappingMode.NORMAL))
+  private val modeStates = Stack<ModeState>()
+  val mappingState = MappingState()
+  private val digraphSequence = DigraphSequence()
+  var isRecording = false
+    set(value) {
+      field = value
+      updateStatus()
+    }
+  var isDotRepeatInProgress = false
 
   /**
    * The currently executing command
@@ -60,326 +58,229 @@ public class CommandState {
    *
    * This field is reset after the command has been executed.
    */
-  private @Nullable Command executingCommand;
-
-  private CommandState() {
-    pushModes(defaultModeState.getMode(), defaultModeState.getSubMode());
-  }
-
-  @Contract("null -> new")
-  public static @NotNull CommandState getInstance(@Nullable Editor editor) {
-    if (editor == null) {
-      return new CommandState();
-    }
-
-    CommandState res = UserDataManager.getVimCommandState(editor);
-    if (res == null) {
-      res = new CommandState();
-      UserDataManager.setVimCommandState(editor, res);
-    }
-
-    return res;
-  }
-
-  private static @NotNull CommandPartNode getKeyRootNode(MappingMode mappingMode) {
-    return VimPlugin.getKey().getKeyRoot(mappingMode);
-  }
+  var executingCommand: Command? = null
+    private set
 
   // Keep the compatibility with the IdeaVim-EasyMotion plugin before the stable release
-  @ApiStatus.ScheduledForRemoval(inVersion = "0.58")
-  @Deprecated
-  public MappingMode getMappingMode() {
-    return mappingState.getMappingMode();
+  @get:Deprecated("")
+  @get:ApiStatus.ScheduledForRemoval(inVersion = "0.58")
+  val mappingMode: MappingMode
+    get() = mappingState.mappingMode
+
+  val isOperatorPending: Boolean
+    get() = mappingState.mappingMode == MappingMode.OP_PENDING && !commandBuilder.isEmpty
+
+  fun isDuplicateOperatorKeyStroke(key: KeyStroke?): Boolean {
+    return isOperatorPending && commandBuilder.isDuplicateOperatorKeyStroke(key!!)
   }
 
-  public boolean isOperatorPending() {
-    return mappingState.getMappingMode() == MappingMode.OP_PENDING && !commandBuilder.isEmpty();
+  fun setExecutingCommand(cmd: Command) {
+    executingCommand = cmd
   }
 
-  public boolean isDuplicateOperatorKeyStroke(KeyStroke key) {
-    return isOperatorPending() && commandBuilder.isDuplicateOperatorKeyStroke(key);
+  val executingCommandFlags: EnumSet<CommandFlags>
+    get() = executingCommand?.flags ?: noneOfEnum()
+
+  fun pushModes(mode: Mode, submode: SubMode) {
+    val newModeState = ModeState(mode, submode)
+    logger.info("Push new mode state: ${newModeState.toSimpleString()}")
+    logger.debug { "Stack of mode states before push: ${toSimpleString()}" }
+    modeStates.push(newModeState)
+    setMappingMode()
+    updateStatus()
   }
 
-  public CommandBuilder getCommandBuilder() {
-    return commandBuilder;
+  fun popModes() {
+    val popped = modeStates.pop()
+    setMappingMode()
+    updateStatus()
+    logger.info("Popped mode state: ${popped.toSimpleString()}")
+    logger.debug { "Stack of mode states after pop: ${toSimpleString()}" }
   }
 
-  public @NotNull MappingState getMappingState() {
-    return mappingState;
-  }
-
-  public @Nullable Command getExecutingCommand() {
-    return executingCommand;
-  }
-
-  public void setExecutingCommand(@NotNull Command cmd) {
-    executingCommand = cmd;
-  }
-
-  public EnumSet<CommandFlags> getExecutingCommandFlags() {
-    return executingCommand != null ? executingCommand.getFlags() : EnumSet.noneOf(CommandFlags.class);
-  }
-
-  public boolean isRecording() {
-    return isRecording;
-  }
-
-  public void setRecording(boolean val) {
-    isRecording = val;
-    updateStatus();
-  }
-
-  public boolean isDotRepeatInProgress() {
-    return dotRepeatInProgress;
-  }
-
-  public void setDotRepeatInProgress(boolean dotRepeatInProgress) {
-    this.dotRepeatInProgress = dotRepeatInProgress;
-  }
-
-  public void pushModes(@NotNull Mode mode, @NotNull SubMode submode) {
-    final ModeState newModeState = new ModeState(mode, submode);
-    logger.info("Push new mode state: " + newModeState.toSimpleString());
-    if (logger.isDebugEnabled()) {
-      logger.debug("Stack of mode states before push: " + toSimpleString());
-    }
-    modeStates.push(newModeState);
-    setMappingMode();
-    updateStatus();
-  }
-
-  public void popModes() {
-    final ModeState popped = modeStates.pop();
-    setMappingMode();
-    updateStatus();
-    logger.info("Popped mode state: " + popped.toSimpleString());
-    if (logger.isDebugEnabled()) {
-      logger.debug("Stack of mode states after pop: " + toSimpleString());
+  fun resetOpPending() {
+    if (mode == Mode.OP_PENDING) {
+      popModes()
     }
   }
 
-  public void resetOpPending() {
-    if (getMode() == Mode.OP_PENDING) {
-      popModes();
+  fun resetRegisterPending() {
+    if (subMode == SubMode.REGISTER_PENDING) {
+      popModes()
     }
   }
 
-  public void resetRegisterPending() {
-    if (getSubMode() == SubMode.REGISTER_PENDING) {
-      popModes();
-    }
+  private fun resetModes() {
+    modeStates.clear()
+    setMappingMode()
   }
 
-  private void resetModes() {
-    modeStates.clear();
-    setMappingMode();
-  }
-
-  private void setMappingMode() {
-    final ModeState modeState = currentModeState();
-    if (modeState.getMode() == Mode.OP_PENDING) {
-      mappingState.setMappingMode(MappingMode.OP_PENDING);
-    }
-    else {
-      mappingState.setMappingMode(modeToMappingMode(getMode()));
-    }
+  private fun setMappingMode() {
+    val modeState = currentModeState()
+    mappingState.mappingMode = if (modeState.mode == Mode.OP_PENDING) MappingMode.OP_PENDING else modeToMappingMode(mode)
   }
 
   @Contract(pure = true)
-  private MappingMode modeToMappingMode(@NotNull Mode mode) {
-    switch (mode) {
-      case COMMAND:
-        return MappingMode.NORMAL;
-      case INSERT:
-      case REPLACE:
-        return MappingMode.INSERT;
-      case VISUAL:
-        return MappingMode.VISUAL;
-      case SELECT:
-        return MappingMode.SELECT;
-      case CMD_LINE:
-        return MappingMode.CMD_LINE;
+  private fun modeToMappingMode(mode: Mode): MappingMode {
+    return when (mode) {
+      Mode.COMMAND -> MappingMode.NORMAL
+      Mode.INSERT, Mode.REPLACE -> MappingMode.INSERT
+      Mode.VISUAL -> MappingMode.VISUAL
+      Mode.SELECT -> MappingMode.SELECT
+      Mode.CMD_LINE -> MappingMode.CMD_LINE
+      else -> error("Unexpected mode: $mode")
+    }
+  }
+
+  val mode: Mode
+    get() = currentModeState().mode
+
+  var subMode: SubMode
+    get() = currentModeState().subMode
+    set(submode) {
+      val modeState = currentModeState()
+      popModes()
+      pushModes(modeState.mode, submode)
+      updateStatus()
     }
 
-    throw new IllegalArgumentException("Unexpected mode: " + mode);
+  fun startDigraphSequence() {
+    digraphSequence.startDigraphSequence()
   }
 
-  public @NotNull Mode getMode() {
-    return currentModeState().getMode();
+  fun startLiteralSequence() {
+    digraphSequence.startLiteralSequence()
   }
 
-  public @NotNull SubMode getSubMode() {
-    return currentModeState().getSubMode();
+  fun processDigraphKey(key: KeyStroke, editor: Editor): DigraphResult {
+    return digraphSequence.processKey(key, editor)
   }
 
-  public void setSubMode(@NotNull SubMode submode) {
-    final ModeState modeState = currentModeState();
-    popModes();
-    pushModes(modeState.getMode(), submode);
-    updateStatus();
-  }
-
-  public void startDigraphSequence() {
-    digraphSequence.startDigraphSequence();
-  }
-
-  public void startLiteralSequence() {
-    digraphSequence.startLiteralSequence();
-  }
-
-  public DigraphResult processDigraphKey(KeyStroke key, Editor editor) {
-    return digraphSequence.processKey(key, editor);
-  }
-
-  public void resetDigraph() {
-    digraphSequence.reset();
+  fun resetDigraph() {
+    digraphSequence.reset()
   }
 
   /**
    * Toggles the insert/overwrite state. If currently insert, goto replace mode. If currently replace, goto insert
    * mode.
    */
-  public void toggleInsertOverwrite() {
-    Mode oldMode = getMode();
-    Mode newMode = oldMode;
+  fun toggleInsertOverwrite() {
+    val oldMode = mode
+    var newMode = oldMode
     if (oldMode == Mode.INSERT) {
-      newMode = Mode.REPLACE;
+      newMode = Mode.REPLACE
+    } else if (oldMode == Mode.REPLACE) {
+      newMode = Mode.INSERT
     }
-    else if (oldMode == Mode.REPLACE) {
-      newMode = Mode.INSERT;
-    }
-
     if (oldMode != newMode) {
-      ModeState modeState = currentModeState();
-      popModes();
-      pushModes(newMode, modeState.getSubMode());
+      val modeState = currentModeState()
+      popModes()
+      pushModes(newMode, modeState.subMode)
     }
   }
 
   /**
    * Resets the command, mode, visual mode, and mapping mode to initial values.
    */
-  public void reset() {
-    executingCommand = null;
-    resetModes();
-    commandBuilder.resetInProgressCommandPart(getKeyRootNode(mappingState.getMappingMode()));
-    startDigraphSequence();
-
-    updateStatus();
+  fun reset() {
+    executingCommand = null
+    resetModes()
+    commandBuilder.resetInProgressCommandPart(getKeyRootNode(mappingState.mappingMode))
+    startDigraphSequence()
+    updateStatus()
   }
 
-  public String toSimpleString() {
-    return modeStates.stream().map(ModeState::toSimpleString)
-      .collect(Collectors.joining(", "));
+  fun toSimpleString(): String = modeStates.joinToString { it.toSimpleString() }
+
+  private fun currentModeState(): ModeState {
+    return if (modeStates.size > 0) modeStates.peek() else defaultModeState
   }
 
-  private ModeState currentModeState() {
-    if (modeStates.size() > 0) {
-      return modeStates.peek();
+  private fun updateStatus() {
+    val msg = StringBuilder()
+    if (showmode.isSet) {
+      msg.append(getStatusString(modeStates.size - 1))
     }
-    else {
-      return defaultModeState;
-    }
-  }
-
-  private void updateStatus() {
-    final StringBuilder msg = new StringBuilder();
-    if (OptionsManager.INSTANCE.getShowmode().isSet()) {
-      msg.append(getStatusString(modeStates.size() - 1));
-    }
-
-    if (isRecording()) {
-      if (msg.length() > 0) {
-        msg.append(" - ");
+    if (isRecording) {
+      if (msg.isNotEmpty()) {
+        msg.append(" - ")
       }
-      msg.append("recording");
+      msg.append("recording")
     }
-
-    VimPlugin.showMode(msg.toString());
+    VimPlugin.showMode(msg.toString())
   }
 
-  private @NotNull String getStatusString(int pos) {
-    ModeState modeState;
-    if (pos >= 0 && pos < modeStates.size()) {
-      modeState = modeStates.get(pos);
+  private fun getStatusString(pos: Int): String {
+    val modeState = if (pos >= 0 && pos < modeStates.size) {
+      modeStates[pos]
+    } else if (pos < 0) {
+      defaultModeState
+    } else {
+      return ""
     }
-    else if (pos < 0) {
-      modeState = defaultModeState;
-    }
-    else {
-      return "";
-    }
-
-    final StringBuilder msg = new StringBuilder();
-    switch (modeState.getMode()) {
-      case COMMAND:
-        if (modeState.getSubMode() == SubMode.SINGLE_COMMAND) {
-          msg.append('(').append(getStatusString(pos - 1).toLowerCase()).append(')');
+    return buildString {
+      when (modeState.mode) {
+        Mode.COMMAND -> if (modeState.subMode == SubMode.SINGLE_COMMAND) {
+          append('(').append(getStatusString(pos - 1).toLowerCase()).append(')')
         }
-        break;
-      case INSERT:
-        msg.append("INSERT");
-        break;
-      case REPLACE:
-        msg.append("REPLACE");
-        break;
-      case VISUAL:
-      case SELECT:
-        if (pos > 0) {
-          ModeState tmp = modeStates.get(pos - 1);
-          if (tmp.getMode() == Mode.COMMAND && tmp.getSubMode() == SubMode.SINGLE_COMMAND) {
-            msg.append(getStatusString(pos - 1));
-            msg.append(" - ");
+        Mode.INSERT -> append("INSERT")
+        Mode.REPLACE -> append("REPLACE")
+        Mode.VISUAL, Mode.SELECT -> {
+          if (pos > 0) {
+            val tmp = modeStates[pos - 1]
+            if (tmp.mode == Mode.COMMAND && tmp.subMode == SubMode.SINGLE_COMMAND) {
+              append(getStatusString(pos - 1))
+              append(" - ")
+            }
+          }
+          when (modeState.subMode) {
+            SubMode.VISUAL_LINE -> append(modeState.mode).append(" LINE")
+            SubMode.VISUAL_BLOCK -> append(modeState.mode).append(" BLOCK")
+            else -> append(modeState.mode)
           }
         }
-        switch (modeState.getSubMode()) {
-          case VISUAL_LINE:
-            msg.append(modeState.getMode()).append(" LINE");
-            break;
-          case VISUAL_BLOCK:
-            msg.append(modeState.getMode()).append(" BLOCK");
-            break;
-          default:
-            msg.append(modeState.getMode());
-        }
-        break;
+        else -> Unit
+      }
     }
-
-    return msg.toString();
   }
 
-  public enum Mode {
+  enum class Mode {
     // Basic modes
-    COMMAND, VISUAL, SELECT, INSERT, CMD_LINE, /*EX*/
+    COMMAND, VISUAL, SELECT, INSERT, CMD_LINE,  /*EX*/
 
     // Additional modes
     OP_PENDING, REPLACE /*, VISUAL_REPLACE, INSERT_NORMAL, INSERT_VISUAL, INSERT_SELECT */
   }
 
-  public enum SubMode {
+  enum class SubMode {
     NONE, SINGLE_COMMAND, REGISTER_PENDING, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
   }
 
-  private static class ModeState {
-    private final @NotNull Mode myMode;
-    private final @NotNull SubMode mySubMode;
+  private class ModeState(val mode: Mode, val subMode: SubMode) {
+    fun toSimpleString(): String = "$mode:$subMode"
+  }
 
-    @Contract(pure = true)
-    public ModeState(@NotNull Mode mode, @NotNull SubMode subMode) {
-      this.myMode = mode;
-      this.mySubMode = subMode;
+  companion object {
+    private val logger = Logger.getInstance(CommandState::class.java.name)
+    private val defaultModeState = ModeState(Mode.COMMAND, SubMode.NONE)
+
+    @JvmStatic
+    @Contract("null -> new")
+    fun getInstance(editor: Editor?): CommandState {
+      if (editor == null) return CommandState()
+
+      var res = editor.vimCommandState
+      if (res == null) {
+        res = CommandState()
+        editor.vimCommandState = res
+      }
+      return res
     }
 
-    public @NotNull Mode getMode() {
-      return myMode;
-    }
+    private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode = VimPlugin.getKey().getKeyRoot(mappingMode)
+  }
 
-    public @NotNull SubMode getSubMode() {
-      return mySubMode;
-    }
-
-    public String toSimpleString() {
-      return myMode + ":" + mySubMode;
-    }
+  init {
+    pushModes(defaultModeState.mode, defaultModeState.subMode)
   }
 }
