@@ -211,6 +211,12 @@ public class VimArgTextObjExtension implements VimExtension {
         }
         return new TextRange(finder.getLeftBound(), finder.getRightBound());
       }
+
+      @NotNull
+      @Override
+      public TextObjectVisualType getVisualType() {
+        return TextObjectVisualType.CHARACTER_WISE;
+      }
     }
 
     @Override

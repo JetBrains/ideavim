@@ -23,6 +23,11 @@ enum class MotionType {
   EXCLUSIVE
 }
 
+enum class TextObjectVisualType {
+  CHARACTER_WISE,
+  LINE_WISE
+}
+
 enum class CommandFlags {
   /**
    * Motion flags

@@ -118,6 +118,12 @@ public class VimTextObjEntireExtension implements VimExtension {
 
         return new TextRange(start, end);
       }
+
+      @NotNull
+      @Override
+      public TextObjectVisualType getVisualType() {
+        return TextObjectVisualType.LINE_WISE;
+      }
     }
 
     @Override
