@@ -249,8 +249,12 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   public void executeIdeaVimRc() {
     final File ideaVimRc = VimScriptParser.findIdeaVimRc();
     if (ideaVimRc != null) {
+      LOG.info("Execute ideavimrc file: " + ideaVimRc.getAbsolutePath());
       List<String> parsedLines = VimScriptParser.executeFile(ideaVimRc);
       VimRcFileState.INSTANCE.saveFileState(ideaVimRc.getAbsolutePath(), parsedLines);
+    }
+    else {
+      LOG.info("ideavimrc file isn't found");
     }
   }
 
