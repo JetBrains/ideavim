@@ -25,8 +25,10 @@ import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRPCConnection
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.common.CharacterPosition
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.neovim.toVimCoords
 import junit.framework.Assert
+import kotlin.test.assertEquals
 
 internal object NeovimTesting {
   lateinit var neovimApi: NeovimApi
@@ -63,6 +65,7 @@ internal object NeovimTesting {
   fun assertState(editor: Editor) {
     assertCaret(editor)
     assertText(editor)
+    assertMode(editor)
   }
 
   fun setRegister(register: Char, keys: String) {
@@ -81,6 +84,12 @@ internal object NeovimTesting {
   private fun assertText(editor: Editor) {
     val neovimContent = getText()
     Assert.assertEquals(neovimContent, editor.document.text)
+  }
+
+  private fun assertMode(editor: Editor) {
+    val ideavimState = editor.commandState.toVimNotation()
+    val neovimState = neovimApi.mode.get().mode
+    assertEquals(neovimState, ideavimState)
   }
 }
 
