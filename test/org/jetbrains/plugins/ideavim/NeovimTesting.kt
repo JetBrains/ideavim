@@ -104,6 +104,4 @@ enum class SkipNeovimReason {
   MAPPING,
   SELECT_MODE,
   VISUAL_BLOCK_MODE,
-  COMMON,
-  EX_COMMAND
 }

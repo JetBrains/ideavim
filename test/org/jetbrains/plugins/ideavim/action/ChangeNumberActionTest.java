@@ -48,15 +48,13 @@ public class ChangeNumberActionTest extends VimTestCase {
     doTest("<C-X>", "1000", "999", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.COMMON, description = "Doesn't work for octal in neovim")
   public void testIncrementOctal() {
-    doTest("<C-A>", "0477", "0500", CommandState.Mode.COMMAND,
+    doTest(Lists.newArrayList(":set nf=octal<Enter>", "<C-A>"), "0477", "0500", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.COMMON, description = "Doesn't work for octal in neovim")
   public void testDecrementOctal() {
-    doTest("<C-X>", "010", "007", CommandState.Mode.COMMAND,
+    doTest(Lists.newArrayList(":set nf=octal<Enter>", "<C-X>"), "010", "007", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
@@ -76,15 +74,13 @@ public class ChangeNumberActionTest extends VimTestCase {
     doTest("<C-X>", "-1000", "-1001", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.COMMON, description = "Doesn't work for octal in neovim")
   public void testIncrementNegativeOctal() {
-    doTest("<C-A>", "-0477", "-0500", CommandState.Mode.COMMAND,
+    doTest(Lists.newArrayList(":set nf=octal<Enter>", "<C-A>"), "-0477", "-0500", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.COMMON, description = "Doesn't work for octal in neovim")
   public void testDecrementNegativeOctal() {
-    doTest("<C-X>", "-010", "-007", CommandState.Mode.COMMAND,
+    doTest(Lists.newArrayList(":set nf=octal<Enter>", "<C-X>"), "-010", "-007", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
@@ -108,43 +104,36 @@ public class ChangeNumberActionTest extends VimTestCase {
     doTest("<C-A>", "foo", "foo", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.EX_COMMAND)
   public void testIncrementAlphaWithNumberFormatAlpha() {
     doTest(Lists.newArrayList(":set nf=alpha<Enter>", "<C-A>"), "foo", "goo", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.EX_COMMAND)
   public void testIncrementZWithNumberFormatAlpha() {
     doTest(Lists.newArrayList(":set nf=alpha<Enter>", "<C-A>"), "zzz", "zzz", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.EX_COMMAND)
   public void testIncrementXInHexNumberWithNumberFormatAlphaButNotHex() {
     doTest(Lists.newArrayList(":set nf=alpha<Enter>", "<C-A>"), "0<caret>x1", "0y1", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.EX_COMMAND)
   public void testIncrementXInHexNumberWithNumberFormatHexAlpha() {
     doTest(Lists.newArrayList(":set nf=alpha,hex<Enter>", "<C-A>"), "0<caret>x1", "0x2", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.EX_COMMAND)
   public void testIncrementHexNumberWithoutNumberFormatHex() {
     doTest(Lists.newArrayList(":set nf=octal<Enter>", "<C-A>"), "0x42", "1x42", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.EX_COMMAND)
   public void testIncrementOctalNumberWithoutNumberFormatOctal() {
     doTest(Lists.newArrayList(":set nf=hex<Enter>", "<C-A>"), "077", "078", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.EX_COMMAND)
   public void testIncrementNegativeOctalNumberWithoutNumberFormatOctal() {
     doTest(Lists.newArrayList(":set nf=hex<Enter>", "<C-A>"), "-077", "-076", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
