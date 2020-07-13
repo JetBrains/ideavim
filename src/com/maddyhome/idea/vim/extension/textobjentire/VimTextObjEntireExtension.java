@@ -143,7 +143,7 @@ public class VimTextObjEntireExtension implements VimExtension {
       } else {
         commandState.getCommandBuilder().completeCommandPart(new Argument(new Command(count,
           textObjectHandler, Command.Type.MOTION,
-          EnumSet.of(CommandFlags.FLAG_MOT_CHARACTERWISE))));
+          EnumSet.noneOf(CommandFlags.class))));
       }
     }
   }

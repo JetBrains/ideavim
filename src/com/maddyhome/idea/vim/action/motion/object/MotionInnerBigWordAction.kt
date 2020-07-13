@@ -31,8 +31,6 @@ import java.util.*
 
 class MotionInnerBigWordAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE)
-
   override fun getRange(editor: Editor,
                         caret: Caret,
                         context: DataContext,

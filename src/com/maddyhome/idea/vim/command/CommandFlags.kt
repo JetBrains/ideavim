@@ -30,7 +30,6 @@ enum class CommandFlags {
    * TODO it should be only INCLUSIVE, EXCLUSIVE and LINEWISE motions. Should be moved to [MotionType]
    */
   FLAG_MOT_LINEWISE,
-  FLAG_MOT_CHARACTERWISE,
   /**
    * Indicates that the cursor position should be saved prior to this motion command
    */
