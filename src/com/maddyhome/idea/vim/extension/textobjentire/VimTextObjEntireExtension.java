@@ -122,7 +122,7 @@ public class VimTextObjEntireExtension implements VimExtension {
       @NotNull
       @Override
       public TextObjectVisualType getVisualType() {
-        return TextObjectVisualType.LINE_WISE;
+        return TextObjectVisualType.CHARACTER_WISE;
       }
     }
 

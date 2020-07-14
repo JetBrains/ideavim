@@ -1074,9 +1074,14 @@ public class ChangeGroup {
     // 1) The range is across multiple lines
     // 2) There is only whitespace before the start of the range
     // 3) There is only whitespace after the end of the range
-    SelectionType type = SelectionType.fromCommandFlags(argument.getMotion().getFlags());
+    SelectionType type;
+    if (argument.getMotion().isLinewiseMotion()) {
+      type = SelectionType.LINE_WISE;
+    } else {
+      type = SelectionType.CHARACTER_WISE;
+    }
     final Command motion = argument.getMotion();
-    if (!isChange && !motion.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE)) {
+    if (!isChange && !motion.isLinewiseMotion()) {
       LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
       LogicalPosition end = editor.offsetToLogicalPosition(range.getEndOffset());
       if (start.line != end.line) {

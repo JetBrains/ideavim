@@ -64,7 +64,7 @@ class YankGroup {
       startOffsets?.put(caret, motionRange.normalize().startOffset)
     }
 
-    val type = SelectionType.fromCommandFlags(motion.flags)
+    val type = if (motion.isLinewiseMotion()) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
     val range = getTextRange(ranges, type) ?: return false
 
     if (range.size() == 0) return false

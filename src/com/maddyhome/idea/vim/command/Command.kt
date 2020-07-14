@@ -22,6 +22,8 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import java.util.*
 
 /**
@@ -51,6 +53,14 @@ data class Command(
 
   var argument: Argument? = null
   var register: Char? = null
+
+  fun isLinewiseMotion(): Boolean {
+    return when (action) {
+      is TextObjectActionHandler -> (action as TextObjectActionHandler).visualType == TextObjectVisualType.LINE_WISE
+      is MotionActionHandler -> (action as MotionActionHandler).motionType == MotionType.LINE_WISE
+      else -> error("Command is not a motion: $action")
+    }
+  }
 
   enum class Type {
     /**

@@ -30,9 +30,9 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.INCLUSIVE
+  override val motionType: MotionType = MotionType.LINE_WISE
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(editor: Editor,
                          caret: Caret,

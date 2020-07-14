@@ -29,7 +29,9 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 class MotionMiddleScreenLineAction : MotionActionHandler.ForEachCaret() {
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
+
+  override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(editor: Editor,
                          caret: Caret,
@@ -39,6 +41,4 @@ class MotionMiddleScreenLineAction : MotionActionHandler.ForEachCaret() {
                          argument: Argument?): Int {
     return VimPlugin.getMotion().moveCaretToMiddleScreenLine(editor)
   }
-
-  override val motionType: MotionType = MotionType.INCLUSIVE
 }

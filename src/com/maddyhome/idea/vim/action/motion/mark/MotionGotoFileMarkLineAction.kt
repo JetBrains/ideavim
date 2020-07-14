@@ -29,11 +29,11 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import java.util.*
 
 class MotionGotoFileMarkLineAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.INCLUSIVE
+  override val motionType: MotionType = MotionType.LINE_WISE
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(editor: Editor,
                          caret: Caret,
@@ -49,11 +49,9 @@ class MotionGotoFileMarkLineAction : MotionActionHandler.ForEachCaret() {
 }
 
 class MotionGotoFileMarkLineNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.INCLUSIVE
+  override val motionType: MotionType = MotionType.LINE_WISE
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
-
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
 
   override fun getOffset(editor: Editor,
                          caret: Caret,

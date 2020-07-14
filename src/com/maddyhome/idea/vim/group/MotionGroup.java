@@ -111,9 +111,7 @@ public class MotionGroup {
         if (end == -1) return null;
 
         // If inclusive, add the last character to the range
-        if (action.getMotionType() == MotionType.INCLUSIVE &&
-            !cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE) &&
-            end < EditorHelperRt.getFileSize(editor)) {
+        if (action.getMotionType() == MotionType.INCLUSIVE && end < EditorHelperRt.getFileSize(editor)) {
           end++;
         }
       }
@@ -127,7 +125,7 @@ public class MotionGroup {
         start = range.getStartOffset();
         end = range.getEndOffset();
 
-        if (cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE)) end--;
+        if (cmd.isLinewiseMotion()) end--;
       } else {
         throw new RuntimeException("Commands doesn't take " + cmd.getAction().getClass().getSimpleName() + " as an operator");
       }
@@ -142,7 +140,7 @@ public class MotionGroup {
       // If we are a linewise motion we need to normalize the start and stop then move the start to the beginning
       // of the line and move the end to the end of the line.
       EnumSet<CommandFlags> flags = cmd.getFlags();
-      if (flags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
+      if (cmd.isLinewiseMotion()) {
         if (caret.getLogicalPosition().line != EditorHelper.getLineCount(editor) - 1) {
           start = EditorHelper.getLineStartForOffset(editor, start);
           end = Math.min(EditorHelper.getLineEndForOffset(editor, end) + 1, EditorHelperRt.getFileSize(editor));

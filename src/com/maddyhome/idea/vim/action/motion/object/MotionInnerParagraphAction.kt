@@ -33,7 +33,7 @@ import java.util.*
 
 class MotionInnerParagraphAction : TextObjectActionHandler() {
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_TEXT_BLOCK)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TEXT_BLOCK)
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.LINE_WISE
 

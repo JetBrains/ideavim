@@ -46,10 +46,8 @@ class MotionPercentOrMatchAction : MotionActionHandler.ForEachCaret() {
   }
 
   override fun process(cmd: Command) {
-    if (cmd.rawCount != 0) {
-      cmd.flags = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
-    }
+    motionType = if (cmd.rawCount != 0) MotionType.LINE_WISE else MotionType.INCLUSIVE
   }
 
-  override val motionType: MotionType = MotionType.INCLUSIVE
+  override var motionType: MotionType = MotionType.INCLUSIVE
 }

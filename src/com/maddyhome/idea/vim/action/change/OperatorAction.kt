@@ -51,7 +51,7 @@ class OperatorAction : VimActionHandler.SingleExecution() {
           .getMotionRange(editor, editor.caretModel.primaryCaret, context, cmd.count, cmd.rawCount, argument)
         if (range != null) {
           VimPlugin.getMark().setChangeMarks(editor, range)
-          val selectionType = SelectionType.fromCommandFlags(motion.flags)
+          val selectionType = if (motion.isLinewiseMotion()) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
           KeyHandler.getInstance().reset(editor)
           val result = operatorFunction.apply(editor, context, selectionType)
           VimRepeater.repeatHandler = saveRepeatHandler

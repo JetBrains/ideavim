@@ -18,7 +18,6 @@
 package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.command.CommandState.SubMode
-import java.util.*
 
 /**
  * @author vlan
@@ -50,12 +49,6 @@ enum class SelectionType(val value: Int) {
     fun fromSubMode(subMode: SubMode): SelectionType = when (subMode) {
       SubMode.VISUAL_LINE -> LINE_WISE
       SubMode.VISUAL_BLOCK -> BLOCK_WISE
-      else -> CHARACTER_WISE
-    }
-
-    @JvmStatic
-    fun fromCommandFlags(flags: EnumSet<CommandFlags>) = when {
-      CommandFlags.FLAG_MOT_LINEWISE in flags -> LINE_WISE
       else -> CHARACTER_WISE
     }
   }

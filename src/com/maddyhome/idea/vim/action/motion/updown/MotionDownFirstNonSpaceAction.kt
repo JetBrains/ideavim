@@ -26,16 +26,11 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.*
 
 class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.INCLUSIVE
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
+  override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(editor: Editor,
                          caret: Caret,
@@ -48,9 +43,7 @@ class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
 }
 
 class EnterNormalAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.INCLUSIVE
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
+  override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(editor: Editor,
                          caret: Caret,

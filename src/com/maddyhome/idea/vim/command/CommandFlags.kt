@@ -20,7 +20,8 @@ package com.maddyhome.idea.vim.command
 
 enum class MotionType {
   INCLUSIVE,
-  EXCLUSIVE
+  EXCLUSIVE,
+  LINE_WISE
 }
 
 enum class TextObjectVisualType {

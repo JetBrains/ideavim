@@ -22,14 +22,11 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.*
 
 class MotionDownLess1FirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
+  override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(editor: Editor,
                          caret: Caret,
@@ -39,6 +36,4 @@ class MotionDownLess1FirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
                          argument: Argument?): Int {
     return VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, count - 1)
   }
-
-  override val motionType: MotionType = MotionType.INCLUSIVE
 }
