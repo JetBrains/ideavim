@@ -89,7 +89,7 @@ carets, dollar motion, etc.
 
 We’re trying to make IdeaVim close to the original Vim both in terms of functionality and architecture.
 
-- Vim motions can be [either inclusive or exclusive](http://vimdoc.sourceforge.net/htmldoc/motion.html#inclusive).
+- Vim motions can be [either inclusive, exclusive, or linewise](http://vimdoc.sourceforge.net/htmldoc/motion.html#inclusive).
 In IdeaVim, you can use `MotionType` for that.
 - Have you read the [interesting things](https://github.com/JetBrains/ideavim#some-facts-about-vim) about IdeaVim?
 Do you remember how `dd`, `yy`, and other similar commands work? `DuplicableOperatorAction` will help you with that.
