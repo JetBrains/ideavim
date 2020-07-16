@@ -307,6 +307,10 @@ Contributors:
   [![icon][github]](https://github.com/patrick-elmquist)
   &nbsp;
   Patrick Elmquist
+* [![icon][mail]](mailto:rieon@rieon.cn)
+  [![icon][github]](https://github.com/rieonke)
+  &nbsp;
+  Rieon Ke
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.

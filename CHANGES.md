@@ -25,12 +25,16 @@ usual beta standards.
 To Be Released
 ------------
 
+**Features:**
+* [VIM-2068](https://youtrack.jetbrains.com/issue/VIM-2068) `:tabclose` command
+
 **Fixes:**
 * [VIM-1421](https://youtrack.jetbrains.com/issue/VIM-1421) Escape key finishes `t` and `f` motions
 
 **Merged PRs:**
 * [237](https://github.com/JetBrains/ideavim/pull/237) by [Adrià Farrés](https://github.com/adriafarres): Reset operator-pending commands on escape
 * [241](https://github.com/JetBrains/ideavim/pull/241) by [Patrick Elmquist](https://github.com/patrick-elmquist): Properly reset when pressing Esc in the middle of command
+* [244](https://github.com/JetBrains/ideavim/pull/244) by [Rieon Ke](https://github.com/rieonke): Implement tabc[lose] ex command
 
 0.58, 2020-07-07
 -------------
