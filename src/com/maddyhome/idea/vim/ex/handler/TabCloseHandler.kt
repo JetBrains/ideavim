@@ -71,13 +71,8 @@ class TabCloseHandler : CommandHandler.SingleExecution() {
    */
   private fun getTabIndexToClose(arg: String, current: Int, last: Int): Int? {
 
-    if (arg.isEmpty()) {
-      return current
-    }
-
-    if (last < 0) {
-      return null
-    }
+    if (arg.isEmpty()) return current
+    if (last < 0) return null
 
     val sb = StringBuilder()
     var sign = Char.MIN_VALUE
@@ -85,73 +80,42 @@ class TabCloseHandler : CommandHandler.SingleExecution() {
 
     for (c in arg) {
       when {
-        c in '0'..'9' && !end -> {
-          sb.append(c)
-        }
+        c in '0'..'9' && !end -> sb.append(c)
 
-        (c == '-' || c == '+') && !end && sb.isEmpty() && sign == Char.MIN_VALUE -> {
-          sign = c
-        }
+        (c == '-' || c == '+') && !end && sb.isEmpty() && sign == Char.MIN_VALUE -> sign = c
 
-        c == '$' && sb.isEmpty() && sign == Char.MIN_VALUE -> {
-          end = true
-        }
+        c == '$' && sb.isEmpty() && sign == Char.MIN_VALUE -> end = true
 
         c == ' ' -> {
           //ignore
         }
-        else -> return null
 
+        else -> return null
       }
     }
-
 
     val idxStr = sb.toString()
 
     val index = when {
-      end -> {
-        last
-      }
-      sb.isEmpty() -> {
+      end -> last
+
+      idxStr.isEmpty() -> {
         when (sign) {
-          '+' -> {
-            current + 1
-          }
-          '-' -> {
-            current - 1
-          }
-          else -> {
-            current
-          }
+          '+' -> current + 1
+          '-' -> current - 1
+          else -> current
         }
       }
+
       else -> {
-        try {
-          val idx = Integer.valueOf(idxStr)
-          when (sign) {
-            '+' -> {
-              current + idx
-            }
-
-            '-' -> {
-              current - idx
-            }
-
-            else -> {
-              idx
-            }
-
-          }
-        } catch (e: NumberFormatException) {
-          return null
+        val idx = idxStr.toIntOrNull() ?: return null
+        when (sign) {
+          '+' -> current + idx
+          '-' -> current - idx
+          else -> idx
         }
       }
     }
-    if (index < 0) return 0
-    if (index > last) return last
-    return index
-
+    return index.coerceIn(0, last)
   }
-
-
 }
