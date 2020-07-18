@@ -175,7 +175,6 @@ class YankGroup {
 
     VimHighlightedYank.Handler.highlightYankRange(editor, range)
 
-    return VimPlugin.getRegister().storeText(editor, range, type, true)
+    return VimPlugin.getRegister().storeText(editor, range, type, false)
   }
-
 }

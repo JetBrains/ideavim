@@ -36,18 +36,14 @@ class VimHighlightedYank: VimExtension {
   override fun getName() = "highlightedyank"
 
   override fun init() {
-    println("init yank")
-
     Handler.highlightEnabled = true
   }
 
 
   override fun dispose() {
     super.dispose()
-    println("dispose yank")
     Handler.highlightEnabled = false
   }
-
 
   companion object {
     const val DEFAULT_HIGHLIGHT_DURATION: Long = 300
@@ -66,7 +62,6 @@ class VimHighlightedYank: VimExtension {
       highlightHandler.clearAllYankHighlighters(editor)
     }
   }
-
 
   private class HighlightHandler {
     private val yankHighlighters: MutableSet<RangeHighlighter> = mutableSetOf()
