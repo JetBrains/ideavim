@@ -19,8 +19,14 @@
 package com.maddyhome.idea.vim.group.copy
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.colors.EditorColors
+import com.intellij.openapi.editor.colors.TextAttributesKey
+import com.intellij.openapi.editor.markup.HighlighterLayer
+import com.intellij.openapi.editor.markup.HighlighterTargetArea
+import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction
 import com.maddyhome.idea.vim.command.Argument
@@ -31,6 +37,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
 import org.jetbrains.annotations.Contract
 import java.util.*
+import kotlin.concurrent.schedule
 import kotlin.math.min
 
 class YankGroup {
@@ -172,6 +179,51 @@ class YankGroup {
                         startOffsets: Map<Caret, Int>?): Boolean {
     startOffsets?.forEach { caret, offset -> MotionGroup.moveCaret(editor, caret, offset) }
 
-    return VimPlugin.getRegister().storeText(editor, range, type, false)
+    highlightYankRange(editor, range, false)
+
+    return VimPlugin.getRegister().storeText(editor, range, type, true)
+  }
+
+  private fun highlightYankRange(editor: Editor, range: TextRange, highlightEnabled: Boolean) {
+    if(!highlightEnabled) return
+
+    val color = EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES
+    //from vim-highlightedyank docs: When a new text is yanked or user starts editing, the old highlighting would be deleted
+    yankHighlighters.forEach { editor.markupModel.removeHighlighter(it) }
+
+    if (range.isMultiple) {
+      for (i in 0 until range.size()) {
+        highlightSingleRange(editor, range.startOffsets[i]..range.endOffsets[i], color)
+      }
+    } else {
+      highlightSingleRange(editor, range.startOffset..range.endOffset, color)
+    }
+  }
+
+  private fun highlightSingleRange(editor: Editor, range: ClosedRange<Int>, color: TextAttributesKey) {
+    val highlighter = editor.markupModel.addRangeHighlighter(
+      range.start,
+      range.endInclusive,
+      HighlighterLayer.SELECTION - 1,
+      editor.colorsScheme.getAttributes(color),
+      HighlighterTargetArea.EXACT_RANGE
+    )
+
+    yankHighlighters.add(highlighter)
+
+    setClearHighlightRangeTimer(editor, highlighter, 1500)
+  }
+
+
+  private fun setClearHighlightRangeTimer(editor: Editor, highlighter: RangeHighlighter, timeout: Long) {
+    Timer("yankHighlight", false).schedule(timeout) {
+      ApplicationManager.getApplication().invokeLater {
+        editor.markupModel.removeHighlighter(highlighter)
+      }
+    }
+  }
+
+  companion object {
+    val yankHighlighters: MutableSet<RangeHighlighter> = mutableSetOf()
   }
 }
