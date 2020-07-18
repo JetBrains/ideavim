@@ -55,6 +55,7 @@ import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
+import com.maddyhome.idea.vim.extension.highlightedyank.VimHighlightedYank;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
@@ -421,6 +422,8 @@ public class ChangeGroup {
 
       VisualGroupKt.updateCaretState(editor);
     }
+
+    VimHighlightedYank.Handler.INSTANCE.clearAllYankHighlighters(editor);
   }
 
   // Workaround for VIM-1546. Another solution is highly appreciated.
