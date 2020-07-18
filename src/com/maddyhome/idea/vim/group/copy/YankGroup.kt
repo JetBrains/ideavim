@@ -179,7 +179,7 @@ class YankGroup {
                         startOffsets: Map<Caret, Int>?): Boolean {
     startOffsets?.forEach { caret, offset -> MotionGroup.moveCaret(editor, caret, offset) }
 
-    highlightYankRange(editor, range, false)
+    highlightYankRange(editor, range, true)
 
     return VimPlugin.getRegister().storeText(editor, range, type, true)
   }
@@ -190,6 +190,7 @@ class YankGroup {
     val color = EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES
     //from vim-highlightedyank docs: When a new text is yanked or user starts editing, the old highlighting would be deleted
     yankHighlighters.forEach { editor.markupModel.removeHighlighter(it) }
+    yankHighlighters.clear()
 
     if (range.isMultiple) {
       for (i in 0 until range.size()) {
