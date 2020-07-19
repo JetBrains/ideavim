@@ -54,9 +54,8 @@ class VimHighlightedYankTest : VimTestCase() {
     assertHighlighterRange(40, 59, getFirstHighlighter())
   }
 
-  fun `test removing previous highlight entering insert mode`() {
-    configureByJavaText(code)
-    typeText(StringHelper.parseKeys("yyi"))
+  fun `test removing previous highlight when entering insert mode`() {
+    doTest("yyi", code, code, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
 
     assertAllHighlightersCount(0)
   }
@@ -78,8 +77,7 @@ class VimHighlightedYankTest : VimTestCase() {
   }
 
   fun `test highlighting with multiple cursors`() {
-    configureByJavaText(codeWithMultipleCurors)
-    typeText(StringHelper.parseKeys("yiw"))
+    doTest("yiw", codeWithMultipleCurors, codeWithMultipleCurors, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
 
     val highlighters = myFixture.editor.markupModel.allHighlighters
     assertAllHighlightersCount(3)
@@ -89,8 +87,7 @@ class VimHighlightedYankTest : VimTestCase() {
   }
 
   fun `test clearing all highlighters with multiple cursors`() {
-    configureByJavaText(codeWithMultipleCurors)
-    typeText(StringHelper.parseKeys("yiwi"))
+    doTest("yiwi", codeWithMultipleCurors, codeWithMultipleCurors, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
 
     assertAllHighlightersCount(0)
   }
