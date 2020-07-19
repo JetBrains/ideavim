@@ -173,7 +173,7 @@ class YankGroup {
                         startOffsets: Map<Caret, Int>?): Boolean {
     startOffsets?.forEach { caret, offset -> MotionGroup.moveCaret(editor, caret, offset) }
 
-    VimHighlightedYank.Handler.highlightYankRange(editor, range)
+    VimHighlightedYank.highlightYankRange(editor, range)
 
     return VimPlugin.getRegister().storeText(editor, range, type, false)
   }

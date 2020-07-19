@@ -69,3 +69,14 @@ Available extensions:
 * Emulates [vim-textobj-entire](https://github.com/kana/vim-textobj-entire)
 * Additional text objects: `ae`, `ie`
 * By [Alexandre Grison](https://github.com/agrison)
+
+## highlightedyank
+
+* Setup: 
+    * `set highlightedyank`
+    * if you want to optimize highlight duration, assign a time in milliseconds:  
+       `let g:highlightedyank_highlight_duration = "1000"`  
+       A negative number makes the highlight persistent.  
+       `let g:highlightedyank_highlight_duration = "-1"`
+* Emulates [vim-highlightedyank](https://github.com/machakann/vim-highlightedyank)
+* By [KostkaBrukowa](https://github.com/KostkaBrukowa)

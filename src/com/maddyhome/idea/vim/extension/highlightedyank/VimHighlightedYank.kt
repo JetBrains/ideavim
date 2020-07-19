@@ -32,25 +32,39 @@ import com.maddyhome.idea.vim.extension.VimExtension
 import java.util.*
 import kotlin.concurrent.schedule
 
+private const val DEFAULT_HIGHLIGHT_DURATION: Long = 300
+private const val HIGHLIGHT_DURATION_VARIABLE_NAME = "g:highlightedyank_highlight_duration"
+private val DEFAULT_HIGHLIGHT_COLOR: TextAttributesKey = EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES
+
+/**
+ * @author KostkaBrukowa (@kostkabrukowa)
+ *
+ * Port of vim-highlightedyank
+ * See https://github.com/machakann/vim-highlightedyank
+ *
+ * if you want to optimize highlight duration, use g:highlightedyank_highlight_duration. Assign a time in milliseconds.
+ *
+ * let g:highlightedyank_highlight_duration = "1000"
+
+ * A negative number makes the highlight persistent.
+ * let g:highlightedyank_highlight_duration = "-1"
+ *
+ * When a new text is yanked or user starts editing, the old highlighting would be deleted.
+ */
 class VimHighlightedYank: VimExtension {
   override fun getName() = "highlightedyank"
 
   override fun init() {
-    Handler.highlightEnabled = true
+    highlightEnabled = true
   }
 
 
   override fun dispose() {
     super.dispose()
-    Handler.highlightEnabled = false
+    highlightEnabled = false
   }
 
   companion object {
-    const val DEFAULT_HIGHLIGHT_DURATION: Long = 300
-    val DEFAULT_HIGHLIGHT_COLOR: TextAttributesKey = EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES
-  }
-
-  object Handler {
     var highlightEnabled: Boolean = false
     private val highlightHandler = HighlightHandler()
 
@@ -58,19 +72,19 @@ class VimHighlightedYank: VimExtension {
       highlightHandler.highlightYankRange(editor, range, highlightEnabled)
     }
 
-    fun clearAllYankHighlighters(editor: Editor) {
-      highlightHandler.clearAllYankHighlighters(editor)
+    fun clearAllYankHighlighters() {
+      highlightHandler.clearAllYankHighlighters()
     }
   }
 
   private class HighlightHandler {
-    private val yankHighlighters: MutableSet<RangeHighlighter> = mutableSetOf()
+    private val yankHighlighters: MutableSet<Pair<Editor, RangeHighlighter>> = mutableSetOf()
 
     fun highlightYankRange(editor: Editor, range: TextRange, highlightEnabled: Boolean) {
       if(!highlightEnabled) return
 
       //from vim-highlightedyank docs: When a new text is yanked or user starts editing, the old highlighting would be deleted
-      clearAllYankHighlighters(editor)
+      clearAllYankHighlighters()
 
       if (range.isMultiple) {
         for (i in 0 until range.size()) {
@@ -81,8 +95,11 @@ class VimHighlightedYank: VimExtension {
       }
     }
 
-    fun clearAllYankHighlighters(editor: Editor) {
-      yankHighlighters.forEach { editor.markupModel.removeHighlighter(it) }
+    fun clearAllYankHighlighters() {
+      yankHighlighters.forEach { (editor, highlighter) ->
+          editor.markupModel.removeHighlighter(highlighter)
+      }
+
       yankHighlighters.clear()
     }
 
@@ -96,11 +113,10 @@ class VimHighlightedYank: VimExtension {
         HighlighterTargetArea.EXACT_RANGE
       )
 
-      yankHighlighters.add(highlighter)
+      yankHighlighters.add(Pair(editor, highlighter))
 
       setClearHighlightRangeTimer(editor, highlighter)
     }
-
 
     private fun setClearHighlightRangeTimer(editor: Editor, highlighter: RangeHighlighter) {
       val timeout = extractHighlightDuration()
@@ -117,7 +133,7 @@ class VimHighlightedYank: VimExtension {
 
     private fun extractHighlightDuration(): Long {
       val env = VimScriptGlobalEnvironment.getInstance()
-      val value = env.variables["g:highlightedyank_highlight_duration"]
+      val value = env.variables[HIGHLIGHT_DURATION_VARIABLE_NAME]
 
       if(value is String) {
         return try {

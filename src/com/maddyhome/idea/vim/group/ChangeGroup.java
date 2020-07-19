@@ -423,7 +423,7 @@ public class ChangeGroup {
       VisualGroupKt.updateCaretState(editor);
     }
 
-    VimHighlightedYank.Handler.INSTANCE.clearAllYankHighlighters(editor);
+    VimHighlightedYank.Companion.clearAllYankHighlighters();
   }
 
   // Workaround for VIM-1546. Another solution is highly appreciated.
