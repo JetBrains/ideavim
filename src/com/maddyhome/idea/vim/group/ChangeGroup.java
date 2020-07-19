@@ -1509,7 +1509,90 @@ public class ChangeGroup {
                                     int rawCount,
                                     @NotNull Argument argument) {
     final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
-    return range != null && reformatCodeRange(editor, caret, range);
+    final EditorActionHandlerBase action = argument.getMotion().getAction();
+    if (range != null
+      && action.getId().equals("VimMotionOuterParagraphAction")
+      && action.getFlags().contains(CommandFlags.FLAG_TEXT_BLOCK)) {
+      return reformatParagraph(editor, caret, range);
+    } else {
+      return range != null && reformatCodeRange(editor, caret, range);
+    }
+  }
+
+  private boolean reformatParagraph(Editor editor, Caret caret, TextRange range) {
+    final int startOffset = range.getStartOffset();
+    final int endOffset = range.getEndOffset();
+
+    final int firstLine = editor.offsetToLogicalPosition(range.getStartOffset()).line;
+
+    final com.intellij.openapi.util.TextRange textRange =
+      com.intellij.openapi.util.TextRange.create(startOffset, endOffset);
+
+    final String text = editor.getDocument().getText(textRange);
+    final String formattedText = reformatTextAsParagraph(text);
+
+    editor.getDocument().replaceString(startOffset, endOffset, formattedText);
+
+    final int newOffset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
+    MotionGroup.moveCaret(editor, caret, newOffset);
+    return true;
+  }
+
+  String reformatTextAsParagraph(String inputText) {
+    final int textWidth = 80; //TODO implement corresponding vim option
+    final char[] chars = inputText.toCharArray();
+
+    StringBuilder builder = new StringBuilder();
+
+    int trailingWhitespaceStart = getTrailingWhitespaceStart(chars);
+
+    int charactersInLine = 0;
+    ArrayList<Character> currentToken = new ArrayList<>();
+    for (int i = 0; i < trailingWhitespaceStart; i++) {
+      if (Character.isWhitespace(chars[i])) {
+        if (!currentToken.isEmpty()) {
+          if (charactersInLine + currentToken.size() > textWidth) {
+            builder.append("\n");
+            addTokenToBuilder(builder, currentToken);
+
+            charactersInLine = currentToken.size();
+          } else {
+            if (charactersInLine != 0) {
+              builder.append(" ");
+            }
+            addTokenToBuilder(builder, currentToken);
+
+            charactersInLine += currentToken.size() + 1;
+          }
+          currentToken.clear();
+        }
+      } else {
+        currentToken.add(chars[i]);
+      }
+    }
+
+    if (currentToken.size() != 0) {
+      builder.append(" ");
+      addTokenToBuilder(builder, currentToken);
+    }
+
+    builder.append(inputText.substring(trailingWhitespaceStart));
+
+    return builder.toString();
+  }
+
+  int getTrailingWhitespaceStart(char[] chars) {
+    int i = chars.length - 1;
+    while (i >= 0 && Character.isWhitespace(chars[i])) {
+      i--;
+    }
+    return i + 1;
+  }
+
+  private void addTokenToBuilder(StringBuilder builder, ArrayList<Character> currentToken) {
+    for (int j = 0; j < currentToken.size(); j++) {
+      builder.append((char) currentToken.get(j));
+    }
   }
 
   public void reformatCodeSelection(@NotNull Editor editor, @NotNull Caret caret, @NotNull VimSelection range) {

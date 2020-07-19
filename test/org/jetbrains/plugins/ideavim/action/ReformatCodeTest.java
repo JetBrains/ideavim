@@ -18,9 +18,12 @@
 
 package org.jetbrains.plugins.ideavim.action;
 
+import com.maddyhome.idea.vim.group.ChangeGroup;
 import org.jetbrains.plugins.ideavim.VimTestCase;
+import org.junit.Test;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+import static org.junit.Assert.assertEquals;
 
 public class ReformatCodeTest extends VimTestCase {
 
@@ -184,5 +187,24 @@ public class ReformatCodeTest extends VimTestCase {
         "    int c;\n" +
         "\tint d;\n" +
         "}\n");
+  }
+
+  public void testTextParagraph_gpap() {
+    configureByText(
+      "Please note that daily-run does not attempt to run the backup at exactly the\n" +
+        "time. <caret>It can be up to time adding the interval setting. For the default 4min interval this means that the command can run from 01:00:00 up to 01:04:10.\n" +
+        "    \n" +
+        "     \n" +
+        "\n" +
+        "Next paragraph");
+    typeText(parseKeys("gqap"));
+    myFixture.checkResult(
+      "<caret>Please note that daily-run does not attempt to run the backup at exactly the\n" +
+        "time. It can be up to time adding the interval setting. For the default 4min\n" +
+        "interval this means that the command can run from 01:00:00 up to 01:04:10.\n" +
+        "    \n" +
+        "     \n" +
+        "\n" +
+        "Next paragraph");
   }
 }
