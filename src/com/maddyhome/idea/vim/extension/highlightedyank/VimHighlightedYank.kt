@@ -29,8 +29,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.extension.VimExtension
-import java.util.*
-import kotlin.concurrent.schedule
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 private const val DEFAULT_HIGHLIGHT_DURATION: Long = 300
 private const val HIGHLIGHT_DURATION_VARIABLE_NAME = "g:highlightedyank_highlight_duration"
@@ -122,12 +122,12 @@ class VimHighlightedYank: VimExtension {
       val timeout = extractHighlightDuration()
 
       //from vim-highlightedyank docs: A negative number makes the highlight persistent.
-      if(timeout > 0) {
-        Timer("yankHighlight", false).schedule(timeout) {
+      if(timeout >= 0) {
+        Executors.newSingleThreadScheduledExecutor().schedule({
           ApplicationManager.getApplication().invokeLater {
             editor.markupModel.removeHighlighter(highlighter)
           }
-        }
+        }, timeout, TimeUnit.MILLISECONDS)
       }
     }
 
