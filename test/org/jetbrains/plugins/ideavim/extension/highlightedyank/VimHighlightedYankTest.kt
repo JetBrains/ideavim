@@ -32,6 +32,14 @@ class VimHighlightedYankTest : VimTestCase() {
     enableExtensions("highlightedyank")
   }
 
+  override fun tearDown() {
+    super.tearDown()
+    for (t in Thread.getAllStackTraces().keys) {
+      if(t.name.contains("yankHighlight"))
+        t.interrupt()
+    }
+  }
+
   fun `test highlighting whole line when whole line is yanked`() {
     doTest("yy", code, code, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
 
