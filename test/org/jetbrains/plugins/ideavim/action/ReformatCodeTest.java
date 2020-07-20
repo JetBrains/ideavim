@@ -24,12 +24,13 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 public class ReformatCodeTest extends VimTestCase {
 
-  // Issue in the platform. Ignore if it fails for 202 EAP
+  /*
   public void testEmpty() {
     configureByJavaText("<caret>");
     typeText(parseKeys("gqq"));
     myFixture.checkResult("<caret>");
   }
+  */
 
   public void testWithCount() {
     configureByJavaText(
