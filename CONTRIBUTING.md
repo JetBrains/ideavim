@@ -83,6 +83,12 @@ favorite poem, or use Vladimir Nabokov’s “A Discovery" if you don't have one
 
 3. Don't forget to test your functionality with line start, line end, file start, file end, empty line, multiple
 carets, dollar motion, etc.
+   
+##### Neovim
+IdeaVim has an experimental integration with neovim in tests. Tests that are performed with `doTest` also executed in
+neovim instance, and the state of IdeaVim is asserted to be the same as the state of neovim.
+- Only tests that use `doTest` are checked with neovim.
+- Tests with `@VimBehaviorDiffers` or `@TestWithoutNeovim` annotations don't use neovim.
 
 
 ## A common direction
