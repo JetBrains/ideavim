@@ -22,7 +22,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.SelectionType.*
+import com.maddyhome.idea.vim.command.SelectionType.BLOCK_WISE
+import com.maddyhome.idea.vim.command.SelectionType.CHARACTER_WISE
+import com.maddyhome.idea.vim.command.SelectionType.LINE_WISE
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.EditorHelper
 import kotlin.math.max

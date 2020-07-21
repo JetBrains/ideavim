@@ -22,7 +22,10 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.ex.*
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.ExOutputModel
+import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.StringHelper
 
 class RegistersHandler : CommandHandler.SingleExecution() {
