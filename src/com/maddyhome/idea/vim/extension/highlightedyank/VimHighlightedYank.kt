@@ -22,19 +22,23 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
+import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
+import com.intellij.openapi.editor.markup.TextAttributes
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.extension.VimExtension
+import java.awt.Font
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 private const val DEFAULT_HIGHLIGHT_DURATION: Long = 300
 private const val HIGHLIGHT_DURATION_VARIABLE_NAME = "g:highlightedyank_highlight_duration"
-private val DEFAULT_HIGHLIGHT_COLOR: TextAttributesKey = EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES
+private val DEFAULT_HIGHLIGHT_TEXT_ATTRIBUTES: TextAttributesKey = EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES
+
 
 /**
  * @author KostkaBrukowa (@kostkabrukowa)
@@ -104,12 +108,18 @@ class VimHighlightedYank: VimExtension {
     }
 
     private fun highlightSingleRange(editor: Editor, range: ClosedRange<Int>) {
-      val color = DEFAULT_HIGHLIGHT_COLOR
+      val textAttributes = TextAttributes(
+        DEFAULT_HIGHLIGHT_TEXT_ATTRIBUTES.defaultAttributes.foregroundColor,
+        DEFAULT_HIGHLIGHT_TEXT_ATTRIBUTES.defaultAttributes.backgroundColor,
+        editor.colorsScheme.getColor(EditorColors.CARET_COLOR),
+        EffectType.SEARCH_MATCH, Font.PLAIN
+      )
+
       val highlighter = editor.markupModel.addRangeHighlighter(
         range.start,
         range.endInclusive,
         HighlighterLayer.SELECTION - 1,
-        editor.colorsScheme.getAttributes(color),
+        textAttributes,
         HighlighterTargetArea.EXACT_RANGE
       )
 
