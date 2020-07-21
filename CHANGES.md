@@ -30,6 +30,7 @@ To Be Released
 
 **Fixes:**
 * [VIM-1421](https://youtrack.jetbrains.com/issue/VIM-1421) Escape key finishes `t` and `f` motions
+* [VIM-2075](https://youtrack.jetbrains.com/issue/VIM-2075) Fix zR command
 
 **Merged PRs:**
 * [237](https://github.com/JetBrains/ideavim/pull/237) by [Adrià Farrés](https://github.com/adriafarres): Reset operator-pending commands on escape

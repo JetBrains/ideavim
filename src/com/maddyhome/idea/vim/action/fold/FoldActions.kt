@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.IdeActions.ACTION_COLLAPSE_ALL_REGIONS
 import com.intellij.openapi.actionSystem.IdeActions.ACTION_COLLAPSE_REGION
 import com.intellij.openapi.actionSystem.IdeActions.ACTION_COLLAPSE_REGION_RECURSIVELY
+import com.intellij.openapi.actionSystem.IdeActions.ACTION_EXPAND_ALL_REGIONS
 import com.intellij.openapi.actionSystem.IdeActions.ACTION_EXPAND_REGION
 import com.intellij.openapi.actionSystem.IdeActions.ACTION_EXPAND_REGION_RECURSIVELY
 import com.intellij.openapi.editor.Editor
@@ -50,12 +51,10 @@ class VimCollapseRegion : VimActionHandler.SingleExecution() {
 }
 
 class VimCollapseRegionRecursively : VimActionHandler.SingleExecution() {
-  private val actionName: String = "CollapseRegionRecursively"
-
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    KeyHandler.executeAction(actionName, context)
+    KeyHandler.executeAction(ACTION_COLLAPSE_REGION_RECURSIVELY, context)
     return true
   }
 }
@@ -65,7 +64,7 @@ class VimExpandAllRegions : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    KeyHandler.executeAction(ACTION_COLLAPSE_REGION_RECURSIVELY, context)
+    KeyHandler.executeAction(ACTION_EXPAND_ALL_REGIONS, context)
     return true
   }
 }
