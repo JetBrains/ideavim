@@ -121,5 +121,15 @@ No beer in the bar for us unless it's fixed. [Let us know](https://github.com/Je
 
 This is just terrible. [You know what to do](https://github.com/JetBrains/ideavim#contact-maintainers).
 
+### Resources:
+
+* [Continuous integration builds](https://teamcity.jetbrains.com/project.html?projectId=IdeaVim&guest=1)
+* [Bug tracker](https://youtrack.jetbrains.com/issues/VIM)
+* [Chat on gitter](https://gitter.im/JetBrains/ideavim)
+* [Unofficial discord server](https://jb.gg/bi6zp7)
+* [Plugin homepage](https://plugins.jetbrains.com/plugin/164-ideavim)
+* [Changelog](CHANGES.md)
+* [Contributors listing](AUTHORS.md)
+
 [teamcity-build-status]: https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20201&guest=1
 [teamcity-build-status-svg]: https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20201)/statusIcon.svg?guest=1
