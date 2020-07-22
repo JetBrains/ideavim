@@ -1555,13 +1555,6 @@ public class SearchHelper {
     return res;
   }
 
-  /**
-   * @deprecated Use {@link #findNextParagraphLine(Editor, Caret, int, boolean)}
-   */
-  public static int findNextSentenceStart(@NotNull Editor editor, int count, boolean countCurrent, boolean requireAll) {
-    return findNextSentenceStart(editor, editor.getCaretModel().getPrimaryCaret(), count, countCurrent, requireAll);
-  }
-
   public static int findNextSentenceEnd(@NotNull Editor editor,
                                         @NotNull Caret caret,
                                         int count,
@@ -2033,13 +2026,6 @@ public class SearchHelper {
     }
   }
 
-  /**
-   * @deprecated To find the next paragraph, use {@link #findNextParagraph(Editor, Caret, int, boolean)}
-   */
-  public static int findNextParagraph(@NotNull Editor editor, int count, boolean allowBlanks) {
-    return findNextParagraph(editor, editor.getCaretModel().getPrimaryCaret(), count, allowBlanks);
-  }
-
   private static int findNextParagraph(@NotNull Editor editor,
                                        int lline,
                                        int dir,
@@ -2079,13 +2065,6 @@ public class SearchHelper {
     }
 
     return line;
-  }
-
-  /**
-   * @deprecated Use {@link #findNextParagraphLine(Editor, Caret, int, boolean)}
-   */
-  private static int findNextParagraphLine(@NotNull Editor editor, int count, boolean allowBlanks) {
-    return findNextParagraphLine(editor, editor.getCaretModel().getPrimaryCaret(), count, allowBlanks);
   }
 
   private static int findNextParagraphLine(@NotNull Editor editor,
