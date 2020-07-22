@@ -27,6 +27,7 @@ import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,8 +58,13 @@ public class MacroGroup {
     if (register == null) {
       return false;
     }
-
-    List<KeyStroke> keys = register.getKeys();
+    List<KeyStroke> keys;
+    if (register.getRawText() == null) {
+      keys = register.getKeys();
+    }
+    else {
+      keys = StringHelper.parseKeys(register.getRawText());
+    }
     playbackKeys(editor, context, project, keys, 0, 0, count);
 
     lastRegister = reg;

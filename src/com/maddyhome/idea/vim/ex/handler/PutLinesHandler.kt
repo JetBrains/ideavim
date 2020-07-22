@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.copy.PutData
+import com.maddyhome.idea.vim.helper.StringHelper
 
 class PutLinesHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
@@ -35,14 +36,15 @@ class PutLinesHandler : CommandHandler.SingleExecution() {
 
     val registerGroup = VimPlugin.getRegister()
     val arg = cmd.argument
-    if (arg.isNotEmpty() && !registerGroup.selectRegister(arg[0])) {
-      return false
+    if (arg.isNotEmpty()) {
+      if(!registerGroup.selectRegister(arg[0]))
+        return false
     } else {
       registerGroup.selectRegister(registerGroup.defaultRegister)
     }
 
     val line = if (cmd.ranges.size() == 0) -1 else cmd.getLine(editor)
-    val textData = registerGroup.lastRegister?.let { PutData.TextData(it.text, SelectionType.LINE_WISE, it.transferableData) }
+    val textData = registerGroup.lastRegister?.let { PutData.TextData(it.text ?: StringHelper.toKeyNotation(it.keys), SelectionType.LINE_WISE, it.transferableData) }
     val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, _indent = false, caretAfterInsertedText = false, putToLine = line)
     return VimPlugin.getPut().putText(editor, context, putData)
   }

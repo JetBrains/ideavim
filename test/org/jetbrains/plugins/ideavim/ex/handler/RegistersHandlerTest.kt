@@ -88,7 +88,7 @@ class RegistersHandlerTest : VimTestCase() {
 
     enterCommand("registers")
     assertExOutput("""Type Name Content
-                     |  c  "a   ^IHello World^J^[
+                     |  c  "a   <Tab>Hello World<CR><Esc>
       """.trimMargin())
   }
 
