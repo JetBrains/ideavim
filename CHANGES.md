@@ -31,11 +31,13 @@ To Be Released
 **Fixes:**
 * [VIM-1421](https://youtrack.jetbrains.com/issue/VIM-1421) Escape key finishes `t` and `f` motions
 * [VIM-2075](https://youtrack.jetbrains.com/issue/VIM-2075) Fix zR command
+* [VIM-2059](https://youtrack.jetbrains.com/issue/VIM-2059) Fixed macro editing
 
 **Merged PRs:**
 * [237](https://github.com/JetBrains/ideavim/pull/237) by [Adrià Farrés](https://github.com/adriafarres): Reset operator-pending commands on escape
 * [241](https://github.com/JetBrains/ideavim/pull/241) by [Patrick Elmquist](https://github.com/patrick-elmquist): Properly reset when pressing Esc in the middle of command
 * [244](https://github.com/JetBrains/ideavim/pull/244) by [Rieon Ke](https://github.com/rieonke): Implement tabc[lose] ex command
+* [240](https://github.com/JetBrains/ideavim/pull/240) by [Rieon Ke](https://github.com/rieonke): add support for putting & editing macros
 
 0.58, 2020-07-07
 -------------
