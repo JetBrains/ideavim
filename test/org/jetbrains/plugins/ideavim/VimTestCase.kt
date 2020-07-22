@@ -22,6 +22,7 @@ import com.intellij.ide.bookmarks.BookmarkManager
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.ide.highlighter.XmlFileType
 import com.intellij.openapi.application.PathManager
+import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
@@ -158,6 +159,12 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected fun enterSearch(pattern: String, forwards: Boolean = true): Editor {
     return typeText(searchToKeys(pattern, forwards))
+  }
+
+  protected fun setText(text: String) {
+    WriteAction.runAndWait<RuntimeException> {
+      myFixture.editor.document.setText(text)
+    }
   }
 
   fun assertPosition(line: Int, column: Int) {
@@ -316,7 +323,7 @@ abstract class VimTestCase : UsefulTestCase() {
       return keys
     }
 
-    fun exCommand(command: String) =  ":$command<Enter>"
+    fun exCommand(command: String) = ":$command<Enter>"
 
     fun searchToKeys(pattern: String, forwards: Boolean): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
