@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 
 class RegistersHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
@@ -41,7 +42,8 @@ class RegistersHandler : CommandHandler.SingleExecution() {
           SelectionType.CHARACTER_WISE -> "c"
           SelectionType.BLOCK_WISE -> "b"
         }
-        "  $type  \"${reg.name}   ${StringHelper.toKeyNotation(reg.keys).take(200)}"
+        val text = reg.rawText?.let { parseKeys(it) } ?: reg.keys
+        "  $type  \"${reg.name}   ${StringHelper.toPrintableCharacters(text).take(200)}"
       }
 
     ExOutputModel.getInstance(editor).output(regs)
