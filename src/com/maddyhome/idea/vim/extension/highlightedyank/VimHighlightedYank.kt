@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.extension.highlightedyank
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
-import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
@@ -31,13 +30,15 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.extension.VimExtension
+import java.awt.Color
 import java.awt.Font
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 private const val DEFAULT_HIGHLIGHT_DURATION: Long = 300
 private const val HIGHLIGHT_DURATION_VARIABLE_NAME = "g:highlightedyank_highlight_duration"
-private val DEFAULT_HIGHLIGHT_TEXT_ATTRIBUTES: TextAttributesKey = EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES
+private const val HIGHLIGHT_COLOR_VARIABLE_NAME = "g:highlightedyank_highlight_color"
+private val DEFAULT_HIGHLIGHT_TEXT_COLOR: Color = EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES.defaultAttributes.backgroundColor
 
 
 /**
@@ -52,6 +53,9 @@ private val DEFAULT_HIGHLIGHT_TEXT_ATTRIBUTES: TextAttributesKey = EditorColors.
 
  * A negative number makes the highlight persistent.
  * let g:highlightedyank_highlight_duration = "-1"
+
+ * if you want to change background color of highlight you can provide the rgba of the color you want e.g.
+ * let g:highlightedyank_highlight_color = "rgba(160, 160, 160, 155)"
  *
  * When a new text is yanked or user starts editing, the old highlighting would be deleted.
  */
@@ -109,8 +113,8 @@ class VimHighlightedYank: VimExtension {
 
     private fun highlightSingleRange(editor: Editor, range: ClosedRange<Int>) {
       val textAttributes = TextAttributes(
-        DEFAULT_HIGHLIGHT_TEXT_ATTRIBUTES.defaultAttributes.foregroundColor,
-        DEFAULT_HIGHLIGHT_TEXT_ATTRIBUTES.defaultAttributes.backgroundColor,
+        null,
+        extractUsersHighlightColor(),
         editor.colorsScheme.getColor(EditorColors.CARET_COLOR),
         EffectType.SEARCH_MATCH, Font.PLAIN
       )
@@ -129,7 +133,7 @@ class VimHighlightedYank: VimExtension {
     }
 
     private fun setClearHighlightRangeTimer(editor: Editor, highlighter: RangeHighlighter) {
-      val timeout = extractHighlightDuration()
+      val timeout = extractUsersHighlightDuration()
 
       //from vim-highlightedyank docs: A negative number makes the highlight persistent.
       if(timeout >= 0) {
@@ -141,23 +145,40 @@ class VimHighlightedYank: VimExtension {
       }
     }
 
-    private fun extractHighlightDuration(): Long {
+    private fun extractUsersHighlightDuration(): Long {
+      return extractVariable(HIGHLIGHT_DURATION_VARIABLE_NAME, DEFAULT_HIGHLIGHT_DURATION) {
+        it.toLong()
+      }
+    }
+
+    private fun extractUsersHighlightColor(): Color {
+      return extractVariable(HIGHLIGHT_COLOR_VARIABLE_NAME, DEFAULT_HIGHLIGHT_TEXT_COLOR) { value ->
+        val rgba = value
+          .substring(4)
+          .filter { it != '(' && it != ')' && !it.isWhitespace() }
+          .split(',')
+          .map { it.toInt() }
+
+        Color(rgba[0], rgba[1], rgba[2], rgba[3])
+      }
+    }
+
+    private fun<T> extractVariable(variableName: String, default: T, extractFun: (value: String) -> T): T {
       val env = VimScriptGlobalEnvironment.getInstance()
-      val value = env.variables[HIGHLIGHT_DURATION_VARIABLE_NAME]
+      val value = env.variables[variableName]
 
       if(value is String) {
         return try {
-            value.toLong()
+          extractFun(value)
         }
-        catch (e: NumberFormatException){
-          VimPlugin.showMessage("highlightedyank: Invalid value of g:highlightedyank_highlight_duration -- " + e.message)
-          VimPlugin.indicateError()
+        catch (e: Exception){
+          VimPlugin.showMessage("highlightedyank: Invalid value of $variableName -- ${e.message}")
 
-          DEFAULT_HIGHLIGHT_DURATION
+          default
         }
       }
 
-      return DEFAULT_HIGHLIGHT_DURATION
+      return default
     }
   }
 }

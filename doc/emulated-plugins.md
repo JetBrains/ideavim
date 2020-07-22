@@ -78,5 +78,7 @@ Available extensions:
        `let g:highlightedyank_highlight_duration = "1000"`  
        A negative number makes the highlight persistent.  
        `let g:highlightedyank_highlight_duration = "-1"`
+     * if you want to change background color of highlight you can provide the rgba of the color you want e.g.  
+       `let g:highlightedyank_highlight_color = "rgba(160, 160, 160, 155)"`
 * Emulates [vim-highlightedyank](https://github.com/machakann/vim-highlightedyank)
 * By [KostkaBrukowa](https://github.com/KostkaBrukowa)

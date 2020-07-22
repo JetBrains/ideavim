@@ -67,13 +67,35 @@ class VimHighlightedYankTest : VimTestCase() {
 
     Assert.assertEquals(VimPlugin.getMessage(), "highlightedyank: Invalid value of g:highlightedyank_highlight_duration -- For input string: \"500.15\"")
   }
-
   fun `test not indicating error when correct highlight duration was provided by user`() {
+
     configureByJavaText(code)
     typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_duration = \"-1\"<CR>"))
     typeText(StringHelper.parseKeys("yy"))
 
     Assert.assertEquals(VimPlugin.getMessage(), "")
+  }
+
+  fun `test indicating error when incorrect highlight color was provided by user`() {
+    configureByJavaText(code)
+
+    listOf("rgba(1,2,3)", "rgba(1, 2, 3, 0.1)", "rgb(1,2,3)", "rgba(260, 2, 5, 6)").forEach { color ->
+      typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_color = \"$color\"<CR>"))
+      typeText(StringHelper.parseKeys("yy"))
+
+      Assert.assertTrue(color, VimPlugin.getMessage().contains("highlightedyank: Invalid value of g:highlightedyank_highlight_color"))
+    }
+  }
+
+  fun `test indicating error when correct highlight color was provided by user`() {
+    configureByJavaText(code)
+
+    listOf("rgba(1,2,3,5)", "rgba1, 2, 3, 1", "rgba(1, 2, 3, 4").forEach { color ->
+      typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_color = \"$color\"<CR>"))
+      typeText(StringHelper.parseKeys("yy"))
+
+      Assert.assertEquals("", VimPlugin.getMessage())
+    }
   }
 
   fun `test highlighting with multiple cursors`() {
