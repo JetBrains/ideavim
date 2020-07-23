@@ -19,7 +19,11 @@
 package org.jetbrains.plugins.ideavim.action;
 
 import com.maddyhome.idea.vim.group.ChangeGroup;
+import com.maddyhome.idea.vim.option.OptionsManager;
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration;
 import org.jetbrains.plugins.ideavim.VimTestCase;
+import org.jetbrains.plugins.ideavim.VimTestOption;
+import org.jetbrains.plugins.ideavim.VimTestOptionType;
 import org.junit.Test;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -202,6 +206,31 @@ public class ReformatCodeTest extends VimTestCase {
       "<caret>Please note that daily-run does not attempt to run the backup at exactly the\n" +
         "time. It can be up to time adding the interval setting. For the default 4min\n" +
         "interval this means that the command can run from 01:00:00 up to 01:04:10.\n" +
+        "    \n" +
+        "     \n" +
+        "\n" +
+        "Next paragraph");
+  }
+
+  public void testTextParagraph_gpap_custom_textwidth() {
+
+    configureByText(
+      "Please note that daily-run does not attempt to run the backup at exactly the\n" +
+        "time. <caret>It can be up to time adding the interval setting. For the default 4min interval this means that the command can run from 01:00:00 up to 01:04:10.\n" +
+        "    \n" +
+        "     \n" +
+        "\n" +
+        "Next paragraph");
+    OptionsManager.INSTANCE.getTextwidth().set(40);
+
+    typeText(parseKeys("gqap"));
+    myFixture.checkResult(
+      "<caret>Please note that daily-run does not\n" +
+        "attempt to run the backup at exactly the\n" +
+        "time. It can be up to time adding the\n" +
+        "interval setting. For the default 4min\n" +
+        "interval this means that the command can\n" +
+        "run from 01:00:00 up to 01:04:10.\n" +
         "    \n" +
         "     \n" +
         "\n" +

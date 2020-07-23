@@ -88,6 +88,7 @@ object OptionsManager {
   val ideastatusicon = addOption(BoundStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues))
   val ideastrictmode = addOption(ToggleOption("ideastrictmode", "ideastrictmode", false))
   val ideawrite = addOption(BoundStringOption("ideawrite", "ideawrite", IdeaWriteData.all, IdeaWriteData.allValues))
+  val textwidth = addOption(NumberOption("textwidth", "tw", 80, -1, Int.MAX_VALUE))
 
   // Dev only experimental options
   val dialogescape = addOption(BoundStringOption("dialogescape", "de", "legacy", arrayOf("legacy", "on", "off")))

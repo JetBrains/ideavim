@@ -1539,7 +1539,7 @@ public class ChangeGroup {
   }
 
   String reformatTextAsParagraph(String inputText) {
-    final int textWidth = 80; //TODO implement corresponding vim option
+    final int textWidth = OptionsManager.INSTANCE.getTextwidth().value();
     final char[] chars = inputText.toCharArray();
 
     StringBuilder builder = new StringBuilder();
