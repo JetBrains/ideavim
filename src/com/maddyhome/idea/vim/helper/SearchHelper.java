@@ -969,6 +969,27 @@ public class SearchHelper {
                                                             final boolean hex,
                                                             final boolean octal) {
     List<TextRange> result = new ArrayList<>();
+
+
+    for (int i = 0; i < textRange.size(); i++) {
+      int startOffset = textRange.getStartOffsets()[i];
+      String text = EditorHelper.getText(editor, startOffset, textRange.getEndOffsets()[i]);
+      String[] textChunks = text.split("\\n");
+      int chunkStart = 0;
+      for (String chunk : textChunks) {
+        TextRange number = findNumberInText(chunk, 0, alpha, hex, octal);
+
+        if (number != null) {
+          result.add(new TextRange(number.getStartOffset() + startOffset + chunkStart,
+                                   number.getEndOffset() + startOffset + chunkStart));
+        }
+        chunkStart += 1 + chunk.length();
+      }
+    }
+
+    /*
+
+
     int firstLine = editor.offsetToLogicalPosition(textRange.getStartOffset()).line;
     int lastLine = editor.offsetToLogicalPosition(textRange.getEndOffset()).line;
 
@@ -988,6 +1009,7 @@ public class SearchHelper {
       startOffset = endOffset + 1;
     }
 
+    */
     return result;
   }
 

@@ -119,4 +119,70 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
                     6
                     """.trimIndent())
   }
+
+  fun `test two numbers on the same line`() {
+    doTest("v$<C-A>",
+      "1 <- should$c not be incremented 2",
+      "1 <- should$c not be incremented 3",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
+
+  fun `test two numbers on the same line with two lines`() {
+    doTest("vj<C-A>",
+      """1 <- should$c not be incremented 2
+        |1 should not be incremented -> 2
+      """.trimMargin(),
+      """1 <- should$c not be incremented 3
+        |2 should not be incremented -> 2
+      """.trimMargin(),
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
+
+  fun `test two numbers on the same line with three lines`() {
+    doTest("vjj<C-A>",
+      """1 <- should$c not be incremented 2
+        |1 should not be incremented -> 2
+        |1 should not be incremented -> 2
+      """.trimMargin(),
+      """1 <- should$c not be incremented 3
+        |2 should not be incremented -> 2
+        |2 should not be incremented -> 2
+      """.trimMargin(),
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
+
+  fun `test block nothing increment`() {
+    doTest("<C-V>jjll<C-A>",
+      """
+        |1 <- should$c not be incremented -> 2
+        |1 <- should not be incremented -> 2
+        |1 <- should not be incremented -> 2
+      """.trimMargin(),
+      """
+        |1 <- should$c not be incremented -> 2
+        |1 <- should not be incremented -> 2
+        |1 <- should not be incremented -> 2
+      """.trimMargin(),
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
+
+  fun `test block increment end`() {
+    doTest("<C-V>jj$<C-A>",
+      """
+        |1 <- should$c not be incremented 2
+        |1 <- should not be incremented 2
+        |1 <- should not be incremented 2
+      """.trimMargin(),
+      """
+        |1 <- should$c not be incremented 3
+        |1 <- should not be incremented 3
+        |1 <- should not be incremented 3
+      """.trimMargin(),
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
 }
