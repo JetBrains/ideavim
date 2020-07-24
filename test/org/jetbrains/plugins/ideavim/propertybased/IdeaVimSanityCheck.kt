@@ -21,10 +21,7 @@ package org.jetbrains.plugins.ideavim.propertybased
 import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
-import com.maddyhome.idea.vim.KeyHandler
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.key.CommandNode
 import org.jetbrains.jetCheck.Generator
@@ -39,7 +36,7 @@ import javax.swing.KeyStroke
  *
  * See the log if this test fails, it contains the instructions on how to reproduce the test.
  */
-class IdeaVimSanityCheck : VimTestCase() {
+class IdeaVimSanityCheck : VimPropertyTest() {
   fun testRandomActions() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
@@ -80,21 +77,6 @@ class IdeaVimSanityCheck : VimTestCase() {
         }
       }
     }
-  }
-
-  private fun moveCaretToRandomPlace(env: ImperativeCommand.Environment, editor: Editor) {
-    val pos = env.generateValue(Generator.integers(0, editor.document.textLength - 1), "Put caret at position %s")
-    MotionGroup.moveCaret(editor, editor.caretModel.currentCaret, pos)
-  }
-
-  private fun reset(editor: Editor) {
-    KeyHandler.getInstance().fullReset(editor)
-    VimPlugin.getRegister().resetRegisters()
-    editor.caretModel.runForEachCaret { it.moveToOffset(0) }
-
-    CommandState.getInstance(editor).resetDigraph()
-    VimPlugin.getSearch().resetState()
-    VimPlugin.getChange().reset()
   }
 
   companion object {
