@@ -341,7 +341,7 @@ public class ChangeGroup {
 
   /**
    * Deletes the text from the cursor to the start of the previous word
-   *
+   * <p>
    * TODO This behavior should be configured via the `backspace` option
    *
    * @param editor The editor to delete the text from
@@ -478,7 +478,7 @@ public class ChangeGroup {
 
   /**
    * Terminate insert/replace mode after the user presses Escape or Ctrl-C
-   *
+   * <p>
    * DEPRECATED. Please, don't use this function directly. Use ModeHelper.exitInsert
    */
   public void processEscape(@NotNull Editor editor, @Nullable DataContext context) {
@@ -1916,9 +1916,11 @@ public class ChangeGroup {
         }
       }
 
-
       BigInteger num = new BigInteger(text.substring(2), 16);
       num = num.add(BigInteger.valueOf(count));
+      if (num.compareTo(BigInteger.ZERO) < 0) {
+        num = new BigInteger("ffffffffffffffff", 16).add(BigInteger.ONE).add(num);
+      }
       number = num.toString(16);
       number = StringsKt.padStart(number, text.length() - 2, '0');
 
@@ -1940,8 +1942,15 @@ public class ChangeGroup {
       }
       num = num.add(BigInteger.valueOf(count));
 
-      if (parsedOct) number = num.toString(8);
-      else number = num.toString();
+      if (parsedOct) {
+        if (num.compareTo(BigInteger.ZERO) < 0) {
+          num = new BigInteger("1777777777777777777777", 8).add(BigInteger.ONE).add(num);
+        }
+        number = num.toString(8);
+      }
+      else {
+        number = num.toString();
+      }
 
       number = "0" + StringsKt.padStart(number, text.length() - 1, '0');
     }
