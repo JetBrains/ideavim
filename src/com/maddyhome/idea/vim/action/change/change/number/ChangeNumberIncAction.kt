@@ -25,15 +25,13 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-class ChangeNumberIncAction : ChangeEditorActionHandler.ForEachCaret() {
+sealed class IncAction(val inc: Int) : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
-  override fun execute(editor: Editor,
-                       caret: Caret,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
-    return VimPlugin.getChange().changeNumber(editor, caret, count)
+  override fun execute(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean {
+    return VimPlugin.getChange().changeNumber(editor, caret, inc * count)
   }
 }
+
+class ChangeNumberIncAction : IncAction(1)
+class ChangeNumberDecAction : IncAction(-1)
