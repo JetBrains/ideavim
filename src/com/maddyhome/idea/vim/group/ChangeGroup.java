@@ -1929,9 +1929,20 @@ public class ChangeGroup {
       number = text.substring(0, 2) + number;
     }
     else if (octal && text.startsWith("0") && text.length() > 1) {
-      BigInteger num = new BigInteger(text, 8);
+      boolean parsedOct = true;
+      BigInteger num;
+      try {
+        num = new BigInteger(text, 8);
+      }
+      catch (NumberFormatException e) {
+        parsedOct = false;
+        num = new BigInteger(text);
+      }
       num = num.add(BigInteger.valueOf(count));
-      number = num.toString(8);
+
+      if (parsedOct) number = num.toString(8);
+      else number = num.toString();
+
       number = "0" + StringsKt.padStart(number, text.length() - 1, '0');
     }
     else if (alpha && Character.isLetter(ch)) {
