@@ -21,9 +21,13 @@ package org.jetbrains.plugins.ideavim.extension.highlightedyank
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.extension.highlightedyank.DEFAULT_HIGHLIGHT_DURATION
 import com.maddyhome.idea.vim.helper.StringHelper
 import junit.framework.Assert
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.assertHappened
 
 
 class VimHighlightedYankTest : VimTestCase() {
@@ -32,6 +36,7 @@ class VimHighlightedYankTest : VimTestCase() {
     enableExtensions("highlightedyank")
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test highlighting whole line when whole line is yanked`() {
     doTest("yy", code, code, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
 
@@ -39,6 +44,7 @@ class VimHighlightedYankTest : VimTestCase() {
     assertHighlighterRange(1, 40, getFirstHighlighter())
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test highlighting single word when single word is yanked`() {
     doTest("yiw", code, code, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
 
@@ -54,11 +60,12 @@ class VimHighlightedYankTest : VimTestCase() {
     assertHighlighterRange(40, 59, getFirstHighlighter())
   }
 
-  fun `test removing previous highlight when entering insert mode`() {
-    doTest("yyi", code, code, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-
-    assertAllHighlightersCount(0)
-  }
+//  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
+//  fun `test removing previous highlight when entering insert mode`() {
+//    doTest("yyi", code, code, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+//
+//    assertAllHighlightersCount(0)
+//  }
 
   fun `test indicating error when incorrect highlight duration was provided by user`() {
     configureByJavaText(code)
@@ -98,6 +105,7 @@ class VimHighlightedYankTest : VimTestCase() {
     }
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test highlighting with multiple cursors`() {
     doTest("yiw", codeWithMultipleCurors, codeWithMultipleCurors, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
 
@@ -108,10 +116,30 @@ class VimHighlightedYankTest : VimTestCase() {
     assertHighlighterRange(28, 31, highlighters[2])
   }
 
-  fun `test clearing all highlighters with multiple cursors`() {
-    doTest("yiwi", codeWithMultipleCurors, codeWithMultipleCurors, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+//  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
+//  fun `test clearing all highlighters with multiple cursors`() {
+//    doTest("yiwi", codeWithMultipleCurors, codeWithMultipleCurors, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+//
+//    assertAllHighlightersCount(0)
+//  }
 
-    assertAllHighlightersCount(0)
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
+  fun `test highlighting for a correct default amount of time`() {
+    doTest("yiw", code, code, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+
+    assertHappened(DEFAULT_HIGHLIGHT_DURATION.toInt(), 200) {
+      getAllHighlightersCount() == 0
+    }
+  }
+
+  fun `test highlighting for a correct user provided amount of time`() {
+    configureByJavaText(code)
+    typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_duration = \"1000\"<CR>"))
+    typeText(StringHelper.parseKeys("yiw"))
+
+    assertHappened(1000, 200) {
+      getAllHighlightersCount() == 0
+    }
   }
 
   val code = """
@@ -133,8 +161,10 @@ fun sum(x: ${c}Int, y: ${c}Int, z: ${c}Int): Int {
   }
 
   private fun assertAllHighlightersCount(count: Int) {
-    Assert.assertEquals(count, myFixture.editor.markupModel.allHighlighters.size)
+    Assert.assertEquals(count, getAllHighlightersCount())
   }
+
+  private fun getAllHighlightersCount() = myFixture.editor.markupModel.allHighlighters.size
 
   private fun getFirstHighlighter(): RangeHighlighter {
     return myFixture.editor.markupModel.allHighlighters.first()

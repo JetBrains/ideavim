@@ -70,7 +70,7 @@ Available extensions:
 * Additional text objects: `ae`, `ie`
 * By [Alexandre Grison](https://github.com/agrison)
 
-## highlightedyank
+## highlightedyank [To Be Released]
 
 * Setup: 
     * `set highlightedyank`

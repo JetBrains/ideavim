@@ -26,15 +26,25 @@ import com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceA
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.extension.highlightedyank.VimHighlightedYank
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
+import com.maddyhome.idea.vim.listener.VimYankListener
 import org.jetbrains.annotations.Contract
 import java.util.*
 import kotlin.math.min
 
 class YankGroup {
+  private val listeners: MutableList<VimYankListener> = mutableListOf()
+
+  fun addListener(listener: VimYankListener) = listeners.add(listener)
+
+  fun removeListener(listener: VimYankListener) = listeners.remove(listener)
+
+  private fun notifyListeners(editor: Editor, textRange: TextRange) = listeners.forEach {
+    it.yankPerformed(editor, textRange)
+  }
+
   /**
    * This yanks the text moved over by the motion command argument.
    *
@@ -173,7 +183,7 @@ class YankGroup {
                         startOffsets: Map<Caret, Int>?): Boolean {
     startOffsets?.forEach { caret, offset -> MotionGroup.moveCaret(editor, caret, offset) }
 
-    VimHighlightedYank.highlightYankRange(editor, range)
+    notifyListeners(editor, range)
 
     return VimPlugin.getRegister().storeText(editor, range, type, false)
   }
