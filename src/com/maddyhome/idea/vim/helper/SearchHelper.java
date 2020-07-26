@@ -25,7 +25,6 @@ import com.intellij.lang.LanguageCommenters;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -33,6 +32,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import kotlin.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -335,12 +335,12 @@ public class SearchHelper {
     // Search to start or end of file, as appropriate
     Set<Character> charsToSearch = new HashSet<>(Arrays.asList('\'', '"', '\n', match, found));
     while (pos >= 0 && pos < chars.length() && cnt > 0) {
-      Pair<Character, Integer> ci = findPositionOfFirstCharacter(chars, pos, charsToSearch, false, dir);
+      @Nullable Pair<Character, Integer> ci = findPositionOfFirstCharacter(chars, pos, charsToSearch, false, dir);
       if (ci == null) {
         return -1;
       }
-      Character c = ci.first;
-      pos = ci.second;
+      Character c = ci.getFirst();
+      pos = ci.getSecond();
       // If we found a match and we're not in a string...
       if (c == match && (allowInString ? initialInString == inString : !inString) && !inChar) {
         // We found our match
@@ -445,7 +445,7 @@ public class SearchHelper {
     while (pos >= 0 && pos < chars.length()) {
       final char c = chars.charAt(pos);
       if (needles.contains(c) && (pos == 0 || searchEscaped || isQuoteWithoutEscape(chars, pos, c))) {
-        return Pair.create(c, pos);
+        return new Pair<>(c, pos);
       }
       pos += dir;
     }
@@ -516,7 +516,8 @@ public class SearchHelper {
     }
 
     while (true) {
-      final Pair<TextRange, String> closingTag = findUnmatchedClosingTag(sequence, searchStartPosition, count);
+      final @Nullable Pair<TextRange, String> closingTag =
+        findUnmatchedClosingTag(sequence, searchStartPosition, count);
       if (closingTag == null) {
         return null;
       }
@@ -619,7 +620,7 @@ public class SearchHelper {
         }
         if (openTags.isEmpty()) {
           if (count <= 1) {
-            return Pair.create(new TextRange(position + matcher.start(), position + matcher.end()), tagName);
+            return new Pair<>(new TextRange(position + matcher.start(), position + matcher.end()), tagName);
           }
           else {
             count--;
@@ -967,12 +968,12 @@ public class SearchHelper {
     return res;
   }
 
-  public static @NotNull List<kotlin.Pair<TextRange, NumberType>> findNumbersInRange(final @NotNull Editor editor,
-                                                            @NotNull TextRange textRange,
-                                                            final boolean alpha,
-                                                            final boolean hex,
-                                                            final boolean octal) {
-    List<kotlin.Pair<TextRange, NumberType>> result = new ArrayList<>();
+  public static @NotNull List<Pair<TextRange, NumberType>> findNumbersInRange(final @NotNull Editor editor,
+                                                                              @NotNull TextRange textRange,
+                                                                              final boolean alpha,
+                                                                              final boolean hex,
+                                                                              final boolean octal) {
+    List<Pair<TextRange, NumberType>> result = new ArrayList<>();
 
 
     for (int i = 0; i < textRange.size(); i++) {
@@ -981,11 +982,12 @@ public class SearchHelper {
       String[] textChunks = text.split("\\n");
       int chunkStart = 0;
       for (String chunk : textChunks) {
-        kotlin.Pair<TextRange, NumberType> number = findNumberInText(chunk, 0, alpha, hex, octal);
+        Pair<TextRange, NumberType> number = findNumberInText(chunk, 0, alpha, hex, octal);
 
         if (number != null) {
-          result.add(new kotlin.Pair<>(new TextRange(number.getFirst().getStartOffset() + startOffset + chunkStart,
-                                   number.getFirst().getEndOffset() + startOffset + chunkStart), number.getSecond()));
+          result.add(new Pair<>(new TextRange(number.getFirst().getStartOffset() + startOffset + chunkStart,
+                                              number.getFirst().getEndOffset() + startOffset + chunkStart),
+                                number.getSecond()));
         }
         chunkStart += 1 + chunk.length();
       }
@@ -1017,23 +1019,24 @@ public class SearchHelper {
     return result;
   }
 
-  public static @Nullable kotlin.Pair<TextRange, NumberType> findNumberUnderCursor(final @NotNull Editor editor,
-                                                                                   @NotNull Caret caret,
-                                                                                   final boolean alpha,
-                                                                                   final boolean hex,
-                                                                                   final boolean octal) {
+  public static @Nullable Pair<TextRange, NumberType> findNumberUnderCursor(final @NotNull Editor editor,
+                                                                            @NotNull Caret caret,
+                                                                            final boolean alpha,
+                                                                            final boolean hex,
+                                                                            final boolean octal) {
     int lline = caret.getLogicalPosition().line;
     String text = EditorHelper.getLineText(editor, lline).toLowerCase();
     int startLineOffset = EditorHelper.getLineStartOffset(editor, lline);
     int posOnLine = caret.getOffset() - startLineOffset;
 
-    kotlin.Pair<TextRange, NumberType> numberTextRange = findNumberInText(text, posOnLine, alpha, hex, octal);
+    Pair<TextRange, NumberType> numberTextRange = findNumberInText(text, posOnLine, alpha, hex, octal);
 
     if (numberTextRange == null) {
       return null;
     }
-    return new kotlin.Pair<>(new TextRange(numberTextRange.getFirst().getStartOffset() + startLineOffset,
-                         numberTextRange.getFirst().getEndOffset() + startLineOffset), numberTextRange.getSecond());
+    return new Pair<>(new TextRange(numberTextRange.getFirst().getStartOffset() + startLineOffset,
+                                    numberTextRange.getFirst().getEndOffset() + startLineOffset),
+                      numberTextRange.getSecond());
   }
 
   /**
@@ -1043,11 +1046,11 @@ public class SearchHelper {
    * @param startPosOnLine - start offset to search
    * @return - text range with number
    */
-  public static @Nullable kotlin.Pair<TextRange, NumberType> findNumberInText(final @NotNull String textInRange,
-                                                                              int startPosOnLine,
-                                                                              final boolean alpha,
-                                                                              final boolean hex,
-                                                                              final boolean octal) {
+  public static @Nullable Pair<TextRange, NumberType> findNumberInText(final @NotNull String textInRange,
+                                                                       int startPosOnLine,
+                                                                       final boolean alpha,
+                                                                       final boolean hex,
+                                                                       final boolean octal) {
 
     if (logger.isDebugEnabled()) {
       logger.debug("text=" + textInRange);
@@ -1083,13 +1086,13 @@ public class SearchHelper {
 
         logger.debug("checking hex");
         final Pair<Integer, Integer> range = findRange(textInRange, pos, false, true, false, false);
-        int start = range.first;
-        int end = range.second;
+        int start = range.getFirst();
+        int end = range.getSecond();
 
         // Ox and OX
         if (start >= 2 && textInRange.substring(start - 2, start).equalsIgnoreCase("0x")) {
           logger.debug("found hex");
-          return new kotlin.Pair<>(new TextRange(start - 2, end), NumberType.HEX);
+          return new Pair<>(new TextRange(start - 2, end), NumberType.HEX);
         }
 
         if (!isHexChar || alpha) {
@@ -1107,15 +1110,17 @@ public class SearchHelper {
     if (octal) {
       logger.debug("checking octal");
       final Pair<Integer, Integer> range = findRange(textInRange, pos, false, false, true, false);
-      int start = range.first;
-      int end = range.second;
+      int start = range.getFirst();
+      int end = range.getSecond();
 
-      if (end - start == 1 && textInRange.charAt(start) == '0') return new kotlin.Pair<>(new TextRange(start, end), NumberType.DEC);
+      if (end - start == 1 && textInRange.charAt(start) == '0') {
+        return new Pair<>(new TextRange(start, end), NumberType.DEC);
+      }
       if (textInRange.charAt(start) == '0' &&
           end > start &&
           !(start > 0 && isNumberChar(textInRange.charAt(start - 1), false, false, false, true))) {
         logger.debug("found octal");
-        return new kotlin.Pair<>(new TextRange(start, end), NumberType.OCT);
+        return new Pair<>(new TextRange(start, end), NumberType.OCT);
       }
     }
 
@@ -1123,18 +1128,18 @@ public class SearchHelper {
       if (logger.isDebugEnabled()) logger.debug("checking alpha for " + textInRange.charAt(pos));
       if (isNumberChar(textInRange.charAt(pos), true, false, false, false)) {
         if (logger.isDebugEnabled()) logger.debug("found alpha at " + pos);
-        return new kotlin.Pair<>(new TextRange(pos, pos + 1), NumberType.ALPHA);
+        return new Pair<>(new TextRange(pos, pos + 1), NumberType.ALPHA);
       }
     }
 
     final Pair<Integer, Integer> range = findRange(textInRange, pos, false, false, false, true);
-    int start = range.first;
-    int end = range.second;
+    int start = range.getFirst();
+    int end = range.getSecond();
     if (start > 0 && textInRange.charAt(start - 1) == '-') {
       start--;
     }
 
-    return new kotlin.Pair<>(new TextRange(start, end), NumberType.DEC);
+    return new Pair<>(new TextRange(start, end), NumberType.DEC);
   }
 
   /**
@@ -1156,15 +1161,17 @@ public class SearchHelper {
     }
     if (start < end &&
         (start == -1 ||
-         0 <= start && start < text.length() && !isNumberChar(text.charAt(start), alpha, hex, octal, decimal || octal))) {
+         0 <= start &&
+         start < text.length() &&
+         !isNumberChar(text.charAt(start), alpha, hex, octal, decimal || octal))) {
       start++;
     }
     if (octal) {
       for (int i = start; i < end; i++) {
-        if (!isNumberChar(text.charAt(i), false, false, true, false)) return Pair.create(0, 0);
+        if (!isNumberChar(text.charAt(i), false, false, true, false)) return new Pair<>(0, 0);
       }
     }
-    return Pair.create(start, end);
+    return new Pair<>(start, end);
   }
 
   private static boolean isNumberChar(char ch, boolean alpha, boolean hex, boolean octal, boolean decimal) {
