@@ -75,11 +75,13 @@ public class ChangeNumberActionTest extends VimTestCase {
   }
 
   public void testIncrementNegativeOctal() {
+    // Minus isn't processed
     doTest(Lists.newArrayList(":set nf=octal<Enter>", "<C-A>"), "-0477", "-0500", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }
 
   public void testDecrementNegativeOctal() {
+    // Minus isn't processed
     doTest(Lists.newArrayList(":set nf=octal<Enter>", "<C-X>"), "-010", "-007", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
   }

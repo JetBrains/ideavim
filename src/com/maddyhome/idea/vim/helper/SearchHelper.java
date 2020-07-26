@@ -404,6 +404,10 @@ public class SearchHelper {
     }
   }
 
+  public enum NumberType {
+    BIN, OCT, DEC, HEX, ALPHA
+  }
+
   private static int findNextQuoteInLine(@NotNull CharSequence chars, int pos, char quote) {
     return findQuoteInLine(chars, pos, quote, Direction.FORWARD);
   }
@@ -963,12 +967,12 @@ public class SearchHelper {
     return res;
   }
 
-  public static @NotNull List<TextRange> findNumbersInRange(final @NotNull Editor editor,
+  public static @NotNull List<kotlin.Pair<TextRange, NumberType>> findNumbersInRange(final @NotNull Editor editor,
                                                             @NotNull TextRange textRange,
                                                             final boolean alpha,
                                                             final boolean hex,
                                                             final boolean octal) {
-    List<TextRange> result = new ArrayList<>();
+    List<kotlin.Pair<TextRange, NumberType>> result = new ArrayList<>();
 
 
     for (int i = 0; i < textRange.size(); i++) {
@@ -977,11 +981,11 @@ public class SearchHelper {
       String[] textChunks = text.split("\\n");
       int chunkStart = 0;
       for (String chunk : textChunks) {
-        TextRange number = findNumberInText(chunk, 0, alpha, hex, octal);
+        kotlin.Pair<TextRange, NumberType> number = findNumberInText(chunk, 0, alpha, hex, octal);
 
         if (number != null) {
-          result.add(new TextRange(number.getStartOffset() + startOffset + chunkStart,
-                                   number.getEndOffset() + startOffset + chunkStart));
+          result.add(new kotlin.Pair<>(new TextRange(number.getFirst().getStartOffset() + startOffset + chunkStart,
+                                   number.getFirst().getEndOffset() + startOffset + chunkStart), number.getSecond()));
         }
         chunkStart += 1 + chunk.length();
       }
@@ -1013,23 +1017,23 @@ public class SearchHelper {
     return result;
   }
 
-  public static @Nullable TextRange findNumberUnderCursor(final @NotNull Editor editor,
-                                                          @NotNull Caret caret,
-                                                          final boolean alpha,
-                                                          final boolean hex,
-                                                          final boolean octal) {
+  public static @Nullable kotlin.Pair<TextRange, NumberType> findNumberUnderCursor(final @NotNull Editor editor,
+                                                                                   @NotNull Caret caret,
+                                                                                   final boolean alpha,
+                                                                                   final boolean hex,
+                                                                                   final boolean octal) {
     int lline = caret.getLogicalPosition().line;
     String text = EditorHelper.getLineText(editor, lline).toLowerCase();
     int startLineOffset = EditorHelper.getLineStartOffset(editor, lline);
     int posOnLine = caret.getOffset() - startLineOffset;
 
-    TextRange numberTextRange = findNumberInText(text, posOnLine, alpha, hex, octal);
+    kotlin.Pair<TextRange, NumberType> numberTextRange = findNumberInText(text, posOnLine, alpha, hex, octal);
 
     if (numberTextRange == null) {
       return null;
     }
-    return new TextRange(numberTextRange.getStartOffset() + startLineOffset,
-                         numberTextRange.getEndOffset() + startLineOffset);
+    return new kotlin.Pair<>(new TextRange(numberTextRange.getFirst().getStartOffset() + startLineOffset,
+                         numberTextRange.getFirst().getEndOffset() + startLineOffset), numberTextRange.getSecond());
   }
 
   /**
@@ -1039,11 +1043,11 @@ public class SearchHelper {
    * @param startPosOnLine - start offset to search
    * @return - text range with number
    */
-  public static @Nullable TextRange findNumberInText(final @NotNull String textInRange,
-                                                     int startPosOnLine,
-                                                     final boolean alpha,
-                                                     final boolean hex,
-                                                     final boolean octal) {
+  public static @Nullable kotlin.Pair<TextRange, NumberType> findNumberInText(final @NotNull String textInRange,
+                                                                              int startPosOnLine,
+                                                                              final boolean alpha,
+                                                                              final boolean hex,
+                                                                              final boolean octal) {
 
     if (logger.isDebugEnabled()) {
       logger.debug("text=" + textInRange);
@@ -1083,9 +1087,9 @@ public class SearchHelper {
         int end = range.second;
 
         // Ox and OX
-        if (start >= 2 && textInRange.substring(start - 2, start).toLowerCase().equals("0x")) {
+        if (start >= 2 && textInRange.substring(start - 2, start).equalsIgnoreCase("0x")) {
           logger.debug("found hex");
-          return new TextRange(start - 2, end);
+          return new kotlin.Pair<>(new TextRange(start - 2, end), NumberType.HEX);
         }
 
         if (!isHexChar || alpha) {
@@ -1106,11 +1110,12 @@ public class SearchHelper {
       int start = range.first;
       int end = range.second;
 
+      if (end - start == 1 && textInRange.charAt(start) == '0') return new kotlin.Pair<>(new TextRange(start, end), NumberType.DEC);
       if (textInRange.charAt(start) == '0' &&
           end > start &&
           !(start > 0 && isNumberChar(textInRange.charAt(start - 1), false, false, false, true))) {
         logger.debug("found octal");
-        return new TextRange(start, end);
+        return new kotlin.Pair<>(new TextRange(start, end), NumberType.OCT);
       }
     }
 
@@ -1118,7 +1123,7 @@ public class SearchHelper {
       if (logger.isDebugEnabled()) logger.debug("checking alpha for " + textInRange.charAt(pos));
       if (isNumberChar(textInRange.charAt(pos), true, false, false, false)) {
         if (logger.isDebugEnabled()) logger.debug("found alpha at " + pos);
-        return new TextRange(pos, pos + 1);
+        return new kotlin.Pair<>(new TextRange(pos, pos + 1), NumberType.ALPHA);
       }
     }
 
@@ -1129,7 +1134,7 @@ public class SearchHelper {
       start--;
     }
 
-    return new TextRange(start, end);
+    return new kotlin.Pair<>(new TextRange(start, end), NumberType.DEC);
   }
 
   /**
@@ -1142,17 +1147,22 @@ public class SearchHelper {
                                                            final boolean octal,
                                                            final boolean decimal) {
     int end = pos;
-    while (end < text.length() && isNumberChar(text.charAt(end), alpha, hex, octal, decimal)) {
+    while (end < text.length() && isNumberChar(text.charAt(end), alpha, hex, octal, decimal || octal)) {
       end++;
     }
     int start = pos;
-    while (start >= 0 && isNumberChar(text.charAt(start), alpha, hex, octal, decimal)) {
+    while (start >= 0 && isNumberChar(text.charAt(start), alpha, hex, octal, decimal || octal)) {
       start--;
     }
     if (start < end &&
         (start == -1 ||
-         0 <= start && start < text.length() && !isNumberChar(text.charAt(start), alpha, hex, octal, decimal))) {
+         0 <= start && start < text.length() && !isNumberChar(text.charAt(start), alpha, hex, octal, decimal || octal))) {
       start++;
+    }
+    if (octal) {
+      for (int i = start; i < end; i++) {
+        if (!isNumberChar(text.charAt(i), false, false, true, false)) return Pair.create(0, 0);
+      }
     }
     return Pair.create(start, end);
   }

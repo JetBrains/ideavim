@@ -351,13 +351,15 @@ public class ChangeGroup {
     final int deleteTo;
     if (caret.getLogicalPosition().column == 0) {
       deleteTo = caret.getOffset() - 1;
-    } else {
+    }
+    else {
       int pointer = caret.getOffset() - 1;
       final CharSequence chars = editor.getDocument().getCharsSequence();
       while (pointer >= 0 && chars.charAt(pointer) == ' ' && chars.charAt(pointer) != '\n') pointer--;
       if (chars.charAt(pointer) == '\n') {
         deleteTo = pointer + 1;
-      } else {
+      }
+      else {
         deleteTo = VimPlugin.getMotion().findOffsetOfNextWord(editor, pointer + 1, -1, false);
       }
     }
@@ -381,7 +383,8 @@ public class ChangeGroup {
 
     final CaretModel caretModel = editor.getCaretModel();
     for (Caret caret : caretModel.getAllCarets()) {
-      UserDataManager.setVimInsertStart(caret, editor.getDocument().createRangeMarker(caret.getOffset(), caret.getOffset()));
+      UserDataManager
+        .setVimInsertStart(caret, editor.getDocument().createRangeMarker(caret.getOffset(), caret.getOffset()));
       if (caret == caretModel.getPrimaryCaret()) {
         VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_START, caret.getOffset());
       }
@@ -686,7 +689,8 @@ public class ChangeGroup {
     strokes.clear();
     repeatCharsCount = 0;
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
-      UserDataManager.setVimInsertStart(caret, editor.getDocument().createRangeMarker(caret.getOffset(), caret.getOffset()));
+      UserDataManager
+        .setVimInsertStart(caret, editor.getDocument().createRangeMarker(caret.getOffset(), caret.getOffset()));
     }
   }
 
@@ -721,8 +725,7 @@ public class ChangeGroup {
    * @param editor The editor to put into NORMAL mode for one command
    */
   public void processSingleCommand(@NotNull Editor editor) {
-    CommandState.getInstance(editor)
-      .pushModes(CommandState.Mode.COMMAND, CommandState.SubMode.SINGLE_COMMAND);
+    CommandState.getInstance(editor).pushModes(CommandState.Mode.COMMAND, CommandState.SubMode.SINGLE_COMMAND);
     clearStrokes(editor);
   }
 
@@ -850,8 +853,8 @@ public class ChangeGroup {
   }
 
   private boolean activeTemplateWithLeftRightMotion(Editor editor, KeyStroke keyStroke) {
-    return HelperKt.isTemplateActive(editor)
-      && (keyStroke.getKeyCode() == KeyEvent.VK_LEFT || keyStroke.getKeyCode() == KeyEvent.VK_RIGHT);
+    return HelperKt.isTemplateActive(editor) &&
+           (keyStroke.getKeyCode() == KeyEvent.VK_LEFT || keyStroke.getKeyCode() == KeyEvent.VK_RIGHT);
   }
 
   /**
@@ -958,7 +961,9 @@ public class ChangeGroup {
     return true;
   }
 
-  public void joinViaIdeaBySelections(@NotNull Editor editor, @NotNull DataContext context, @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
+  public void joinViaIdeaBySelections(@NotNull Editor editor,
+                                      @NotNull DataContext context,
+                                      @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
     caretsAndSelections.forEach((caret, range) -> {
       if (!caret.isValid()) return;
       final Pair<Integer, Integer> nativeRange = range.getNativeStartAndEnd();
@@ -969,7 +974,8 @@ public class ChangeGroup {
       caret.removeSelection();
       final VisualPosition currentVisualPosition = caret.getVisualPosition();
       if (currentVisualPosition.line < 1) return;
-      final VisualPosition newVisualPosition = new VisualPosition(currentVisualPosition.line - 1, currentVisualPosition.column);
+      final VisualPosition newVisualPosition =
+        new VisualPosition(currentVisualPosition.line - 1, currentVisualPosition.column);
       caret.moveToVisualPosition(newVisualPosition);
     });
   }
@@ -1077,7 +1083,8 @@ public class ChangeGroup {
     SelectionType type;
     if (argument.getMotion().isLinewiseMotion()) {
       type = SelectionType.LINE_WISE;
-    } else {
+    }
+    else {
       type = SelectionType.CHARACTER_WISE;
     }
     final Command motion = argument.getMotion();
@@ -1198,8 +1205,8 @@ public class ChangeGroup {
     if (fileSize > 0 && offset < fileSize) {
       final CharacterHelper.CharacterType charType = CharacterHelper.charType(chars.charAt(offset), bigWord);
       if (charType != CharacterHelper.CharacterType.WHITESPACE) {
-        final boolean lastWordChar = offset >= fileSize - 1 ||
-                                     CharacterHelper.charType(chars.charAt(offset + 1), bigWord) != charType;
+        final boolean lastWordChar =
+          offset >= fileSize - 1 || CharacterHelper.charType(chars.charAt(offset + 1), bigWord) != charType;
         if (wordMotions.contains(id) && lastWordChar && motion.getCount() == 1) {
           final boolean res = deleteCharacter(editor, caret, 1, true);
           if (res) {
@@ -1479,11 +1486,11 @@ public class ChangeGroup {
   }
 
   public boolean reformatCodeMotion(@NotNull Editor editor,
-                             @NotNull Caret caret,
-                             DataContext context,
-                             int count,
-                             int rawCount,
-                             @NotNull Argument argument) {
+                                    @NotNull Caret caret,
+                                    DataContext context,
+                                    int count,
+                                    int rawCount,
+                                    @NotNull Argument argument) {
     final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
     return range != null && reformatCodeRange(editor, caret, range);
   }
@@ -1512,8 +1519,7 @@ public class ChangeGroup {
     if (project == null) return;
     final PsiFile file = PsiUtilBase.getPsiFileInEditor(editor, project);
     if (file == null) return;
-    final com.intellij.openapi.util.TextRange textRange =
-      com.intellij.openapi.util.TextRange.create(start, end);
+    final com.intellij.openapi.util.TextRange textRange = com.intellij.openapi.util.TextRange.create(start, end);
     CodeStyleManager.getInstance(project).reformatText(file, Collections.singletonList(textRange));
   }
 
@@ -1525,7 +1531,8 @@ public class ChangeGroup {
                                @NotNull Argument argument) {
     final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
     if (range != null) {
-      autoIndentRange(editor, caret, context, new TextRange(range.getStartOffset(), HelperKt.getEndOffsetInclusive(range)));
+      autoIndentRange(editor, caret, context,
+                      new TextRange(range.getStartOffset(), HelperKt.getEndOffsetInclusive(range)));
     }
   }
 
@@ -1685,14 +1692,14 @@ public class ChangeGroup {
   /**
    * Delete text from the document. This will fail if being asked to store the deleted text into a read-only
    * register.
-   *
+   * <p>
    * End offset of range is exclusive
-   *
+   * <p>
    * delete new TextRange(1, 5)
    * 0123456789
    * Hello, xyz
    * .||||....
-   *
+   * <p>
    * end <= text.length
    *
    * @param editor The editor to delete from
@@ -1721,7 +1728,7 @@ public class ChangeGroup {
       if (type != null) {
         final int start = range.getStartOffset();
         VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, start);
-        VimPlugin.getMark().setChangeMarks(editor, new TextRange(start, start+1));
+        VimPlugin.getMark().setChangeMarks(editor, new TextRange(start, start + 1));
       }
 
       return true;
@@ -1819,11 +1826,12 @@ public class ChangeGroup {
     boolean hex = nf.contains("hex");
     boolean octal = nf.contains("octal");
 
-    List<TextRange> numberRanges = SearchHelper.findNumbersInRange(editor, selectedRange, alpha, hex, octal);
+    @NotNull List<Pair<TextRange, SearchHelper.NumberType>>
+      numberRanges = SearchHelper.findNumbersInRange(editor, selectedRange, alpha, hex, octal);
 
     List<String> newNumbers = new ArrayList<>();
     for (int i = 0; i < numberRanges.size(); i++) {
-      TextRange numberRange = numberRanges.get(i);
+      Pair<TextRange, SearchHelper.NumberType> numberRange = numberRanges.get(i);
       int iCount = avalanche ? (i + 1) * count : count;
       String newNumber = changeNumberInRange(editor, numberRange, iCount, alpha, hex, octal);
       newNumbers.add(newNumber);
@@ -1831,9 +1839,9 @@ public class ChangeGroup {
 
     for (int i = newNumbers.size() - 1; i >= 0; i--) {
       // Replace text bottom up. In other direction ranges will be desynchronized after inc numbers like 99
-      TextRange rangeToReplace = numberRanges.get(i);
+      Pair<TextRange, SearchHelper.NumberType> rangeToReplace = numberRanges.get(i);
       String newNumber = newNumbers.get(i);
-      replaceText(editor, rangeToReplace.getStartOffset(), rangeToReplace.getEndOffset(), newNumber);
+      replaceText(editor, rangeToReplace.getFirst().getStartOffset(), rangeToReplace.getFirst().getEndOffset(), newNumber);
     }
 
     caret.moveToOffset(selectedRange.getStartOffset());
@@ -1859,7 +1867,7 @@ public class ChangeGroup {
     final boolean hex = nf.contains("hex");
     final boolean octal = nf.contains("octal");
 
-    final TextRange range = SearchHelper.findNumberUnderCursor(editor, caret, alpha, hex, octal);
+    @Nullable Pair<TextRange, SearchHelper.NumberType> range = SearchHelper.findNumberUnderCursor(editor, caret, alpha, hex, octal);
     if (range == null) {
       logger.debug("no number on line");
       return false;
@@ -1870,8 +1878,8 @@ public class ChangeGroup {
       return false;
     }
     else {
-      replaceText(editor, range.getStartOffset(), range.getEndOffset(), newNumber);
-      caret.moveToOffset(range.getStartOffset() + newNumber.length() - 1);
+      replaceText(editor, range.getFirst().getStartOffset(), range.getFirst().getEndOffset(), newNumber);
+      caret.moveToOffset(range.getFirst().getStartOffset() + newNumber.length() - 1);
       return true;
     }
   }
@@ -1891,12 +1899,13 @@ public class ChangeGroup {
   private Document document;
 
   public @Nullable String changeNumberInRange(final @NotNull Editor editor,
-                                              @NotNull TextRange range,
+                                              Pair<TextRange, SearchHelper.NumberType> range,
                                               final int count,
                                               boolean alpha,
                                               boolean hex,
                                               boolean octal) {
-    String text = EditorHelper.getText(editor, range);
+    String text = EditorHelper.getText(editor, range.getFirst());
+    SearchHelper.NumberType numberType = range.getSecond();
     if (logger.isDebugEnabled()) {
       logger.debug("found range " + range);
       logger.debug("text=" + text);
@@ -1907,7 +1916,8 @@ public class ChangeGroup {
     }
 
     char ch = text.charAt(0);
-    if (hex && text.toLowerCase().startsWith("0x")) {
+    if (hex && SearchHelper.NumberType.HEX.equals(numberType)) {
+      if (!text.toLowerCase().startsWith("0x")) throw new RuntimeException("Hex number should start with 0x: " + text);
       for (int i = text.length() - 1; i >= 2; i--) {
         int index = "abcdefABCDEF".indexOf(text.charAt(i));
         if (index >= 0) {
@@ -1930,37 +1940,25 @@ public class ChangeGroup {
 
       number = text.substring(0, 2) + number;
     }
-    else if (octal && text.startsWith("0") && text.length() > 1) {
-      boolean parsedOct = true;
-      BigInteger num;
-      try {
-        num = new BigInteger(text, 8);
-      }
-      catch (NumberFormatException e) {
-        parsedOct = false;
-        num = new BigInteger(text);
-      }
-      num = num.add(BigInteger.valueOf(count));
+    else if (octal && SearchHelper.NumberType.OCT.equals(numberType) && text.length() > 1) {
+      if (!text.startsWith("0")) throw new RuntimeException("Oct number should start with 0: " + text);
+      BigInteger num = new BigInteger(text, 8).add(BigInteger.valueOf(count));
 
-      if (parsedOct) {
-        if (num.compareTo(BigInteger.ZERO) < 0) {
-          num = new BigInteger("1777777777777777777777", 8).add(BigInteger.ONE).add(num);
-        }
-        number = num.toString(8);
+      if (num.compareTo(BigInteger.ZERO) < 0) {
+        num = new BigInteger("1777777777777777777777", 8).add(BigInteger.ONE).add(num);
       }
-      else {
-        number = num.toString();
-      }
-
+      number = num.toString(8);
       number = "0" + StringsKt.padStart(number, text.length() - 1, '0');
     }
-    else if (alpha && Character.isLetter(ch)) {
+    else if (alpha && SearchHelper.NumberType.ALPHA.equals(numberType)) {
+      if (!Character.isLetter(ch)) throw new RuntimeException("Not alpha number : " + text);
       ch += count;
       if (Character.isLetter(ch)) {
         number = "" + ch;
       }
     }
-    else if (ch == '-' || Character.isDigit(ch)) {
+    else if (SearchHelper.NumberType.DEC.equals(numberType)) {
+      if (ch != '-' && !Character.isDigit(ch)) throw new RuntimeException("Not dec number : " + text);
       boolean pad = ch == '0';
       int len = text.length();
       if (ch == '-' && text.charAt(1) == '0') {
