@@ -34,6 +34,10 @@ class ChangeNumberDecActionTest : VimTestCase() {
     doTest(":set nrformats+=octal<CR><C-X>", "00000", "01777777777777777777777", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  fun `test decrement incorrect octal`() {
+    doTest(":set nrformats+=octal<CR><C-X>", "008", "7", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
   fun `test decrement oct to negative value by 10`() {
     doTest(":set nrformats+=octal<CR>10<C-X>", "00005", "01777777777777777777773", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }

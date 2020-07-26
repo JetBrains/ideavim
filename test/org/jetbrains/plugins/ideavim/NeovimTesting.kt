@@ -63,8 +63,8 @@ internal object NeovimTesting {
   }
 
   fun assertState(editor: Editor) {
-    assertCaret(editor)
     assertText(editor)
+    assertCaret(editor)
     assertMode(editor)
   }
 

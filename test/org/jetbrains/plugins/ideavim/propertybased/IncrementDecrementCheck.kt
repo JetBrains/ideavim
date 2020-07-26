@@ -22,9 +22,11 @@ import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
+import org.jetbrains.plugins.ideavim.NeovimTesting
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class IncrementDecrementTest : VimPropertyTest() {
@@ -41,16 +43,70 @@ class IncrementDecrementTest : VimPropertyTest() {
       }
     }
   }
+
+  fun testPlayingWithNumbersGenerateNumber() {
+    PropertyChecker.checkScenarios {
+      ImperativeCommand { env ->
+        val number = env.generateValue(testNumberGenerator, "Generate %s number")
+        val editor = configureByText(number)
+        try {
+          moveCaretToRandomPlace(env, editor)
+
+          if (NeovimTesting.neovimEnabled(this)) NeovimTesting.setupEditor(editor)
+          NeovimTesting.typeCommand(":set nrformats+=octal<CR>")
+
+          env.executeCommands(Generator.sampledFrom(IncrementDecrementActions(editor, NeovimTesting.neovimEnabled(this))))
+
+          if (NeovimTesting.neovimEnabled(this)) NeovimTesting.assertState(editor)
+        } finally {
+          reset(editor)
+        }
+      }
+    }
+  }
 }
 
-private class IncrementDecrementActions(private val editor: Editor) : ImperativeCommand {
+private class IncrementDecrementActions(private val editor: Editor, private val withNeovim: Boolean = false) : ImperativeCommand {
   override fun performCommand(env: ImperativeCommand.Environment) {
-    val generator = Generator.sampledFrom("<C-A>", "<C-X>").map { StringHelper.parseKeys(it).single() }
-    val action = env.generateValue(generator, null)
+    val generator = Generator.sampledFrom("<C-A>", "<C-X>")
+    val key = env.generateValue(generator, null)
+    val action = parseKeys(key).single()
     env.logMessage("Use command: ${StringHelper.toKeyNotation(action)}.")
     VimTestCase.typeText(listOf(action), editor, editor.project)
+    if (withNeovim) NeovimTesting.typeCommand(key)
 
     IdeEventQueue.getInstance().flushQueue()
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()
   }
 }
+
+val differentFormNumberGenerator = Generator.from { env ->
+  val form = env.generate(Generator.sampledFrom(/*2,*/ 8, 10, 16))
+  env.generate(Generator.integers().map {
+    val str = it.toString(form)
+    val prefix = when (form) {
+      2 -> "0b"
+      8 -> "0"
+      16 -> "0x"
+      else -> ""
+    }
+    if (str[0] == '-') "-$prefix${str.substring(1)}" else "$prefix$str"
+  })
+}
+
+val brokenNumberGenerator = Generator.from { env ->
+  val bigChar = env.generate(Generator.anyOf(Generator.charsInRange('8', '9'), Generator.charsInRange('G', 'Z')))
+  val number = env.generate(differentFormNumberGenerator)
+  if (number.length > 4) {
+    val insertAt = env.generate(Generator.integers(4, number.length - 1))
+    number.take(insertAt) + bigChar + number.substring(insertAt)
+  } else "$number$bigChar"
+}
+
+val testNumberGenerator = Generator.from { env ->
+  env.generate(Generator.frequency(
+    10, differentFormNumberGenerator,
+    1, brokenNumberGenerator
+  ))
+}
+
