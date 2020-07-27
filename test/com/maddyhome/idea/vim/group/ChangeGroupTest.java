@@ -32,7 +32,8 @@ public class ChangeGroupTest {
       "time. It can be up to time adding the interval setting. For the default 4min interval this means that " +
       "the command can run from 01:00:00 up to 01:04:10.\n   \n    \n";
 
-    final String formattedText = changeGroup.reformatTextAsParagraph(inputText);
+    final ChangeGroup.ReformatParagraphResult result = changeGroup.reformatTextAsParagraph(inputText, 0);
+    final String formattedText = result.getText();
 
     final String expected = "Please note that daily-run does not attempt to run the backup at exactly the\n" +
       "time. It can be up to time adding the interval setting. For the default 4min\n" +
@@ -49,7 +50,8 @@ public class ChangeGroupTest {
 
     final String inputText = "Please note";
 
-    final String formattedText = changeGroup.reformatTextAsParagraph(inputText);
+    final String formattedText = changeGroup.reformatTextAsParagraph(inputText, 0)
+      .getText();
 
     final String expected = "Please note";
     assertEquals(expected, formattedText);
@@ -58,7 +60,8 @@ public class ChangeGroupTest {
   public void testTextParagraphReFormattingWhenEmpty() {
     ChangeGroup changeGroup = new ChangeGroup();
 
-    final String formattedText = changeGroup.reformatTextAsParagraph("");
+    final String formattedText = changeGroup.reformatTextAsParagraph("", 0)
+      .getText();
 
     assertEquals("", formattedText);
   }
@@ -67,7 +70,8 @@ public class ChangeGroupTest {
   public void testTextParagraphReFormattingWhenBlank() {
     ChangeGroup changeGroup = new ChangeGroup();
 
-    final String formattedText = changeGroup.reformatTextAsParagraph("    ");
+    final String formattedText = changeGroup.reformatTextAsParagraph("    ", 0)
+      .getText();
 
     assertEquals("    ", formattedText);
   }
@@ -76,7 +80,8 @@ public class ChangeGroupTest {
   public void testTextParagraphReFormattingWhenEmptyLines() {
     ChangeGroup changeGroup = new ChangeGroup();
 
-    final String formattedText = changeGroup.reformatTextAsParagraph(" \n \n \n \n \n");
+    final String formattedText = changeGroup.reformatTextAsParagraph(" \n \n \n \n \n", 0)
+      .getText();
 
     assertEquals(" \n \n \n \n \n", formattedText);
   }

@@ -1513,63 +1513,144 @@ public class ChangeGroup {
     if (range != null
       && action.getId().equals("VimMotionOuterParagraphAction")
       && action.getFlags().contains(CommandFlags.FLAG_TEXT_BLOCK)) {
-      return reformatParagraph(editor, caret, range);
+      return reformatParagraphResetCursor(editor, caret, range);
     } else {
       return range != null && reformatCodeRange(editor, caret, range);
     }
   }
 
-  private boolean reformatParagraph(Editor editor, Caret caret, TextRange range) {
-    final int startOffset = range.getStartOffset();
-    final int endOffset = range.getEndOffset();
+  public boolean reformatPreservingCursor(@NotNull Editor editor,
+                                          @NotNull Caret caret,
+                                          DataContext context,
+                                          int count,
+                                          int rawCount,
+                                          @NotNull Argument argument) {
+    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
+    final EditorActionHandlerBase action = argument.getMotion().getAction();
+    if (range != null
+      && action.getId().equals("VimMotionOuterParagraphAction")
+      && action.getFlags().contains(CommandFlags.FLAG_TEXT_BLOCK)) {
+      return reformatParagraphPreservingCursor(editor, caret, range);
+    }
 
+    return false;
+  }
+
+  private boolean reformatParagraphResetCursor(@NotNull Editor editor,
+                                               @NotNull Caret caret,
+                                               @NotNull TextRange range) {
     final int firstLine = editor.offsetToLogicalPosition(range.getStartOffset()).line;
 
-    final com.intellij.openapi.util.TextRange textRange =
-      com.intellij.openapi.util.TextRange.create(startOffset, endOffset);
-
-    final String text = editor.getDocument().getText(textRange);
-    final String formattedText = reformatTextAsParagraph(text);
-
-    editor.getDocument().replaceString(startOffset, endOffset, formattedText);
+    reformatParagraph(editor, caret, range);
 
     final int newOffset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
     MotionGroup.moveCaret(editor, caret, newOffset);
     return true;
   }
 
-  String reformatTextAsParagraph(String inputText) {
+  private boolean reformatParagraphPreservingCursor(@NotNull Editor editor,
+                                    @NotNull Caret caret,
+                                    @NotNull TextRange range) {
+
+    final int newCaretOffset = reformatParagraph(editor, caret, range);
+
+    MotionGroup.moveCaret(editor, caret, newCaretOffset);
+    return true;
+  }
+
+  private int reformatParagraph(@NotNull Editor editor, @NotNull Caret caret, @NotNull TextRange range) {
+    final int startOffset = range.getStartOffset();
+    final int endOffset = range.getEndOffset();
+
+    final com.intellij.openapi.util.TextRange textRange =
+      com.intellij.openapi.util.TextRange.create(startOffset, endOffset);
+
+    final String text = editor.getDocument().getText(textRange);
+
+    final int oldCaretEditorOffset = caret.getOffset();
+    final int oldCaretParagraphOffset = oldCaretEditorOffset - startOffset;
+
+    final ReformatParagraphResult formatResult = reformatTextAsParagraph(text, oldCaretParagraphOffset);
+
+    editor.getDocument().replaceString(startOffset, endOffset, formatResult.getText());
+
+    return startOffset + formatResult.getNewCursorOffset();
+  }
+
+  static class ReformatParagraphResult {
+    private final String text;
+    private final int newCursorOffset;
+
+    public ReformatParagraphResult(String text, int newCursorOffset) {
+      this.text = text;
+      this.newCursorOffset = newCursorOffset;
+    }
+
+    public String getText() {
+      return text;
+    }
+
+    public int getNewCursorOffset() {
+      return newCursorOffset;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      ReformatParagraphResult that = (ReformatParagraphResult) o;
+      return newCursorOffset == that.newCursorOffset &&
+        Objects.equals(text, that.text);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(text, newCursorOffset);
+    }
+  }
+
+  ReformatParagraphResult reformatTextAsParagraph(String inputText, int oldCaretOffset) {
     final int textWidth = OptionsManager.INSTANCE.getTextwidth().value();
     final char[] chars = inputText.toCharArray();
 
     int firstNonWhitespaceCharIndex = getFirstNonWhitespaceCharIndex(chars);
 
+    int newCaretOffset = 0;
+    if(oldCaretOffset < firstNonWhitespaceCharIndex) {
+      newCaretOffset = oldCaretOffset;
+    }
     //Only whitespace, no need to do any reformatting
     if(firstNonWhitespaceCharIndex == inputText.length()) {
-      return inputText;
+      return new ReformatParagraphResult(inputText, oldCaretOffset);
     }
 
     StringBuilder builder = new StringBuilder();
 
     int trailingWhitespaceStart = getTrailingWhitespaceStart(chars);
 
+    // track the number of characters added so we can calculated the the new offset of the cursor
+    int numberOfAddedCharacters = 0;
     if (firstNonWhitespaceCharIndex > 0) {
       builder.append(inputText, 0, firstNonWhitespaceCharIndex);
+      numberOfAddedCharacters += firstNonWhitespaceCharIndex - 1;
     }
 
     int charactersInLine = 0;
+    int i;
     ArrayList<Character> currentToken = new ArrayList<>();
-    for (int i = firstNonWhitespaceCharIndex; i < trailingWhitespaceStart; i++) {
+    for (i = firstNonWhitespaceCharIndex; i < trailingWhitespaceStart; i++) {
       if (Character.isWhitespace(chars[i])) {
         if (!currentToken.isEmpty()) {
           if (charactersInLine + currentToken.size() > textWidth) {
             builder.append("\n");
             addTokenToBuilder(builder, currentToken);
+            numberOfAddedCharacters++;
 
             charactersInLine = currentToken.size();
           } else {
             if (charactersInLine != 0) {
               builder.append(" ");
+              numberOfAddedCharacters++;
             }
             addTokenToBuilder(builder, currentToken);
 
@@ -1579,17 +1660,22 @@ public class ChangeGroup {
         }
       } else {
         currentToken.add(chars[i]);
+        numberOfAddedCharacters++;
+      }
+      if (i == oldCaretOffset) {
+        newCaretOffset = oldCaretOffset - (i - numberOfAddedCharacters);
       }
     }
 
     if (currentToken.size() != 0) {
       builder.append(" ");
       addTokenToBuilder(builder, currentToken);
+      numberOfAddedCharacters++;
     }
 
     builder.append(inputText.substring(trailingWhitespaceStart));
 
-    return builder.toString();
+    return new ReformatParagraphResult(builder.toString(), newCaretOffset);
   }
 
   private int getFirstNonWhitespaceCharIndex(char[] chars) {

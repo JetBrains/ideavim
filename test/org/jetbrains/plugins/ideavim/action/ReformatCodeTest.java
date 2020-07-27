@@ -252,4 +252,71 @@ public class ReformatCodeTest extends VimTestCase {
         "\n" +
         "Next paragraph");
   }
+
+  public void testTextParagraph_gwap() {
+    configureByText(
+      "Please note that daily-run does not attempt to run the backup at      exactly the\n" +
+        "time. <caret>It can be up to time adding the interval setting. For the default 4min interval this means that the command can run from 01:00:00 up to 01:04:10.\n" +
+        "    \n" +
+        "     \n" +
+        "\n" +
+        "Next paragraph");
+    typeText(parseKeys("gwap"));
+    myFixture.checkResult(
+      "Please note that daily-run does not attempt to run the backup at exactly the\n" +
+        "time. <caret>It can be up to time adding the interval setting. For the default 4min\n" +
+        "interval this means that the command can run from 01:00:00 up to 01:04:10.\n" +
+        "    \n" +
+        "     \n" +
+        "\n" +
+        "Next paragraph");
+  }
+
+  public void testTextParagraph_gwap_when_caret_in_preceding_whitespace() {
+    configureByText(
+      "Please note that daily-run does not attempt to run the backup at      exactly\n" +
+        "    \n" +
+        "   <caret>  \n" +
+        "\n" +
+        "Next paragraph");
+    typeText(parseKeys("gwap"));
+    myFixture.checkResult(
+      "Please note that daily-run does not attempt to run the backup at      exactly\n" +
+        "    \n" +
+        "   <caret>  \n" +
+        "\n" +
+        "Next paragraph");
+  }
+
+  public void testTextParagraph_gwap_when_caret_in_first_char() {
+    configureByText(
+      "Please note that daily-run does not attempt to run the backup at      exactly\n" +
+        "    \n" +
+        "     \n" +
+        "\n" +
+        "<caret>Next paragraph");
+    typeText(parseKeys("gwap"));
+    myFixture.checkResult(
+      "Please note that daily-run does not attempt to run the backup at      exactly\n" +
+        "    \n" +
+        "     \n" +
+        "\n" +
+        "<caret>Next paragraph");
+  }
+
+  public void testTextParagraph_gwap_when_caret_in_second_char() {
+    configureByText(
+      "Please note that daily-run does not attempt to run the backup at      exactly\n" +
+        "    \n" +
+        "     \n" +
+        "\n" +
+        "N<caret>ext paragraph");
+    typeText(parseKeys("gwap"));
+    myFixture.checkResult(
+      "Please note that daily-run does not attempt to run the backup at      exactly\n" +
+        "    \n" +
+        "     \n" +
+        "\n" +
+        "N<caret>ext paragraph");
+  }
 }
