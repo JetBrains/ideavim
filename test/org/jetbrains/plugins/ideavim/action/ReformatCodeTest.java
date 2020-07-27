@@ -212,6 +212,22 @@ public class ReformatCodeTest extends VimTestCase {
         "Next paragraph");
   }
 
+  public void testTextParagraph_gpap_caret_in_heading_whitespace() {
+    configureByText(
+      "Please\n" +
+        "    \n" +
+        "     <caret>\n" +
+        "\n" +
+        "Next paragraph");
+    typeText(parseKeys("gqap"));
+    myFixture.checkResult(
+      "Please\n" +
+        "    <caret>\n" +
+        "     \n" +
+        "\n" +
+        "Next paragraph");
+  }
+
   public void testTextParagraph_gpap_custom_textwidth() {
 
     configureByText(

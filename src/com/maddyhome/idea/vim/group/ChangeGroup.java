@@ -1542,13 +1542,24 @@ public class ChangeGroup {
     final int textWidth = OptionsManager.INSTANCE.getTextwidth().value();
     final char[] chars = inputText.toCharArray();
 
+    int firstNonWhitespaceCharIndex = getFirstNonWhitespaceCharIndex(chars);
+
+    //Only whitespace, no need to do any reformatting
+    if(firstNonWhitespaceCharIndex == inputText.length()) {
+      return inputText;
+    }
+
     StringBuilder builder = new StringBuilder();
 
     int trailingWhitespaceStart = getTrailingWhitespaceStart(chars);
 
+    if (firstNonWhitespaceCharIndex > 0) {
+      builder.append(inputText, 0, firstNonWhitespaceCharIndex);
+    }
+
     int charactersInLine = 0;
     ArrayList<Character> currentToken = new ArrayList<>();
-    for (int i = 0; i < trailingWhitespaceStart; i++) {
+    for (int i = firstNonWhitespaceCharIndex; i < trailingWhitespaceStart; i++) {
       if (Character.isWhitespace(chars[i])) {
         if (!currentToken.isEmpty()) {
           if (charactersInLine + currentToken.size() > textWidth) {
@@ -1579,6 +1590,14 @@ public class ChangeGroup {
     builder.append(inputText.substring(trailingWhitespaceStart));
 
     return builder.toString();
+  }
+
+  private int getFirstNonWhitespaceCharIndex(char[] chars) {
+    int i = 0;
+    while (i < chars.length && Character.isWhitespace(chars[i])) {
+      i++;
+    }
+    return i;
   }
 
   int getTrailingWhitespaceStart(char[] chars) {
