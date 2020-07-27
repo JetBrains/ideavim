@@ -311,6 +311,10 @@ Contributors:
   [![icon][github]](https://github.com/rieonke)
   &nbsp;
   Rieon Ke
+* [![icon][mail]](mailto:jiirra@gmail.com)
+  [![icon][github]](https://github.com/KostkaBrukowa)
+  &nbsp;
+  KostkaBrukowa
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.

@@ -3,11 +3,7 @@
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
       <ul>
-        <li>vim-exchange plugin emulation</li>
-        <li>~/.ideavimrc can be reloaded using floating action</li>
-        <li>Add :buffer command</li>
-        <li>Support IntelliJ's smooth scrolling</li>
-        <li>Various bug fixes</li>
+        <li>vim-highlightedyank plugin emulation</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
     ]]></change-notes>
