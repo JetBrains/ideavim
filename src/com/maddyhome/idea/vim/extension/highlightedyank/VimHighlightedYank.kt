@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.extension.highlightedyank
 
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
@@ -26,11 +27,15 @@ import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.editor.markup.TextAttributes
+import com.intellij.openapi.util.Disposer
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.VimProjectService
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.listener.VimYankListener
+import com.maddyhome.idea.vim.option.StrictMode
 import java.awt.Color
 import java.awt.Font
 import java.util.concurrent.Executors
@@ -60,21 +65,27 @@ private val DEFAULT_HIGHLIGHT_TEXT_COLOR: Color = EditorColors.TEXT_SEARCH_RESUL
  *
  * When a new text is yanked or user starts editing, the old highlighting would be deleted.
  */
-class VimHighlightedYank: VimExtension, VimYankListener {
+class VimHighlightedYank: VimExtension, VimYankListener, VimInsertListener {
   private val highlightHandler = HighlightHandler()
 
   override fun getName() = "highlightedyank"
 
   override fun init() {
     VimPlugin.getYank().addListener(this)
+    VimPlugin.getChange().addInsertListener(this)
   }
 
   override fun dispose() {
     VimPlugin.getYank().removeListener(this)
+    VimPlugin.getChange().removeInsertListener(this)
   }
 
   override fun yankPerformed(editor: Editor, range: TextRange) {
     highlightHandler.highlightYankRange(editor, range)
+  }
+
+  override fun insertModeStarted(editor: Editor) {
+    highlightHandler.clearAllYankHighlighters()
   }
 
   private class HighlightHandler {
@@ -86,6 +97,13 @@ class VimHighlightedYank: VimExtension, VimYankListener {
       clearAllYankHighlighters()
 
       this.editor = editor
+      val project = editor.project
+      if (project != null) {
+        Disposer.register(VimProjectService.getInstance(project), Disposable {
+          this.editor = null
+          yankHighlighters.clear()
+        })
+      }
 
       if (range.isMultiple) {
         for (i in 0 until range.size()) {
@@ -98,7 +116,7 @@ class VimHighlightedYank: VimExtension, VimYankListener {
 
     fun clearAllYankHighlighters() {
       yankHighlighters.forEach { highlighter ->
-          editor?.markupModel?.removeHighlighter(highlighter)
+          editor?.markupModel?.removeHighlighter(highlighter) ?: StrictMode.fail("Highlighters without an editor")
       }
 
       yankHighlighters.clear()
@@ -125,7 +143,7 @@ class VimHighlightedYank: VimExtension, VimYankListener {
       if(timeout >= 0) {
         Executors.newSingleThreadScheduledExecutor().schedule({
           ApplicationManager.getApplication().invokeLater {
-            editor?.markupModel?.removeHighlighter(highlighter)
+            editor?.markupModel?.removeHighlighter(highlighter) ?: StrictMode.fail("Highlighters without an editor")
           }
         }, timeout, TimeUnit.MILLISECONDS)
       }

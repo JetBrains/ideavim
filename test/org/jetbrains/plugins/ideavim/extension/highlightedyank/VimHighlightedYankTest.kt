@@ -60,12 +60,12 @@ class VimHighlightedYankTest : VimTestCase() {
     assertHighlighterRange(40, 59, getFirstHighlighter())
   }
 
-//  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
-//  fun `test removing previous highlight when entering insert mode`() {
-//    doTest("yyi", code, code, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-//
-//    assertAllHighlightersCount(0)
-//  }
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
+  fun `test removing previous highlight when entering insert mode`() {
+    doTest("yyi", code, code, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+
+    assertAllHighlightersCount(0)
+  }
 
   fun `test indicating error when incorrect highlight duration was provided by user`() {
     configureByJavaText(code)
@@ -116,12 +116,12 @@ class VimHighlightedYankTest : VimTestCase() {
     assertHighlighterRange(28, 31, highlighters[2])
   }
 
-//  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
-//  fun `test clearing all highlighters with multiple cursors`() {
-//    doTest("yiwi", codeWithMultipleCurors, codeWithMultipleCurors, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-//
-//    assertAllHighlightersCount(0)
-//  }
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
+  fun `test clearing all highlighters with multiple cursors`() {
+    doTest("yiwi", codeWithMultipleCurors, codeWithMultipleCurors, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+
+    assertAllHighlightersCount(0)
+  }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test highlighting for a correct default amount of time`() {

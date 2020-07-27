@@ -89,11 +89,7 @@ fun assertDoesntChange(timeInMillis: Int = 1000, condition: () -> Boolean) {
 }
 
 fun assertHappened(timeInMillis: Int = 1000, precision: Int, condition: () -> Boolean) {
-  assertDoesntChange(timeInMillis - precision) {
-    return@assertDoesntChange !condition()
-  }
+  assertDoesntChange(timeInMillis - precision) { !condition() }
 
-  waitAndAssert(precision * 2) {
-    return@waitAndAssert condition()
-  }
+  waitAndAssert(precision * 2) { condition() }
 }
