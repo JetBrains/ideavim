@@ -34,14 +34,16 @@ internal object NeovimTesting {
   lateinit var neovimApi: NeovimApi
   lateinit var neovim: Process
 
-  fun setUp() {
+  fun setUp(test: VimTestCase) {
+    if (!neovimEnabled(test)) return
     val pb = ProcessBuilder("nvim", "-u", "NONE", "--embed", "--headless")
     neovim = pb.start()
     val neovimConnection = ProcessRPCConnection(neovim, true)
     neovimApi = NeovimApis.getApiForConnection(neovimConnection)
   }
 
-  fun tearDown() {
+  fun tearDown(test: VimTestCase) {
+    if (!neovimEnabled(test)) return
     neovim.destroy()
   }
 
@@ -52,23 +54,27 @@ internal object NeovimTesting {
       && System.getProperty("ideavim.neovim.test", "false")!!.toBoolean()
   }
 
-  fun setupEditor(editor: Editor) {
+  fun setupEditor(editor: Editor, test: VimTestCase) {
+    if (!neovimEnabled(test)) return
     neovimApi.currentBuffer.get().setLines(0, -1, false, editor.document.text.split("\n")).get()
     val charPosition = CharacterPosition.fromOffset(editor, editor.caretModel.offset)
     neovimApi.currentWindow.get().setCursor(VimCoords(charPosition.line + 1, charPosition.column)).get()
   }
 
-  fun typeCommand(keys: String) {
+  fun typeCommand(keys: String, test: VimTestCase) {
+    if (!neovimEnabled(test)) return
     neovimApi.input(neovimApi.replaceTermcodes(keys, true, false, true).get()).get()
   }
 
-  fun assertState(editor: Editor) {
+  fun assertState(editor: Editor, test: VimTestCase) {
+    if (!neovimEnabled(test)) return
     assertText(editor)
     assertCaret(editor)
     assertMode(editor)
   }
 
-  fun setRegister(register: Char, keys: String) {
+  fun setRegister(register: Char, keys: String, test: VimTestCase) {
+    if (!neovimEnabled(test)) return
     neovimApi.callFunction("setreg", listOf(register, keys, 'c'))
   }
 
@@ -104,4 +110,5 @@ enum class SkipNeovimReason {
   MAPPING,
   SELECT_MODE,
   VISUAL_BLOCK_MODE,
+  DIFFERENT,
 }

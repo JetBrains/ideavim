@@ -27,16 +27,19 @@ import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
 import org.jetbrains.plugins.ideavim.NeovimTesting
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class IncrementDecrementTest : VimPropertyTest() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun testPlayingWithNumbers() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
         val editor = configureByText(numbers)
         try {
           moveCaretToRandomPlace(env, editor)
-          env.executeCommands(Generator.sampledFrom(IncrementDecrementActions(editor)))
+          env.executeCommands(Generator.sampledFrom(IncrementDecrementActions(editor, this)))
         } finally {
           reset(editor)
         }
@@ -52,12 +55,12 @@ class IncrementDecrementTest : VimPropertyTest() {
         try {
           moveCaretToRandomPlace(env, editor)
 
-          if (NeovimTesting.neovimEnabled(this)) NeovimTesting.setupEditor(editor)
-          if (NeovimTesting.neovimEnabled(this)) NeovimTesting.typeCommand(":set nrformats+=octal<CR>")
+          NeovimTesting.setupEditor(editor, this)
+          NeovimTesting.typeCommand(":set nrformats+=octal<CR>", this)
 
-          env.executeCommands(Generator.sampledFrom(IncrementDecrementActions(editor, NeovimTesting.neovimEnabled(this))))
+          env.executeCommands(Generator.sampledFrom(IncrementDecrementActions(editor, this)))
 
-          if (NeovimTesting.neovimEnabled(this)) NeovimTesting.assertState(editor)
+          NeovimTesting.assertState(editor, this)
         } finally {
           reset(editor)
         }
@@ -66,14 +69,14 @@ class IncrementDecrementTest : VimPropertyTest() {
   }
 }
 
-private class IncrementDecrementActions(private val editor: Editor, private val withNeovim: Boolean = false) : ImperativeCommand {
+private class IncrementDecrementActions(private val editor: Editor, val test: VimTestCase) : ImperativeCommand {
   override fun performCommand(env: ImperativeCommand.Environment) {
     val generator = Generator.sampledFrom("<C-A>", "<C-X>")
     val key = env.generateValue(generator, null)
     val action = parseKeys(key).single()
     env.logMessage("Use command: ${StringHelper.toKeyNotation(action)}.")
     VimTestCase.typeText(listOf(action), editor, editor.project)
-    if (withNeovim) NeovimTesting.typeCommand(key)
+    NeovimTesting.typeCommand(key, test)
 
     IdeEventQueue.getInstance().flushQueue()
     PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue()

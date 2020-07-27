@@ -65,7 +65,6 @@ import javax.swing.KeyStroke
  */
 abstract class VimTestCase : UsefulTestCase() {
   protected lateinit var myFixture: CodeInsightTestFixture
-  private var neovimTestingEnabled = true
 
   @Throws(Exception::class)
   override fun setUp() {
@@ -88,9 +87,7 @@ abstract class VimTestCase : UsefulTestCase() {
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
     ExEntryPanel.getInstance().entry.setBounds(0, 0, 100, 25)
 
-    neovimTestingEnabled = NeovimTesting.neovimEnabled(this)
-
-    if (neovimTestingEnabled) NeovimTesting.setUp()
+    NeovimTesting.setUp(this)
   }
 
   protected val testDataPath: String
@@ -110,7 +107,7 @@ abstract class VimTestCase : UsefulTestCase() {
     VimPlugin.getMark().resetAllMarks()
 
     // Tear down neovim
-    if (neovimTestingEnabled) NeovimTesting.tearDown()
+    NeovimTesting.tearDown(this)
 
     super.tearDown()
   }
@@ -250,12 +247,12 @@ abstract class VimTestCase : UsefulTestCase() {
              subModeAfter: SubMode) {
     configureByText(before)
 
-    if (neovimTestingEnabled) NeovimTesting.setupEditor(myFixture.editor)
-    if (neovimTestingEnabled) NeovimTesting.typeCommand(keys)
+    NeovimTesting.setupEditor(myFixture.editor, this)
+    NeovimTesting.typeCommand(keys, this)
 
     performTest(keys, after, modeAfter, subModeAfter)
 
-    if (neovimTestingEnabled) NeovimTesting.assertState(myFixture.editor)
+    NeovimTesting.assertState(myFixture.editor, this)
   }
 
   private fun performTest(keys: String, after: String, modeAfter: CommandState.Mode, subModeAfter: SubMode) {
@@ -278,7 +275,7 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected fun setRegister(register: Char, keys: String) {
     VimPlugin.getRegister().setKeys(register, stringToKeys(keys))
-    if (neovimTestingEnabled) NeovimTesting.setRegister(register, keys)
+    NeovimTesting.setRegister(register, keys, this)
   }
 
   protected fun assertState(modeAfter: CommandState.Mode, subModeAfter: SubMode) {
