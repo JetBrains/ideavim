@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.group.copy
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.util.containers.ContainerUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction
 import com.maddyhome.idea.vim.command.Argument
@@ -29,11 +30,22 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
+import com.maddyhome.idea.vim.listener.VimYankListener
 import org.jetbrains.annotations.Contract
 import java.util.*
 import kotlin.math.min
 
 class YankGroup {
+  private val yankListeners: MutableList<VimYankListener> = ContainerUtil.createLockFreeCopyOnWriteList();
+
+  fun addListener(listener: VimYankListener) = yankListeners.add(listener)
+
+  fun removeListener(listener: VimYankListener) = yankListeners.remove(listener)
+
+  private fun notifyListeners(editor: Editor, textRange: TextRange) = yankListeners.forEach {
+    it.yankPerformed(editor, textRange)
+  }
+
   /**
    * This yanks the text moved over by the motion command argument.
    *
@@ -171,6 +183,8 @@ class YankGroup {
   private fun yankRange(editor: Editor, range: TextRange, type: SelectionType,
                         startOffsets: Map<Caret, Int>?): Boolean {
     startOffsets?.forEach { caret, offset -> MotionGroup.moveCaret(editor, caret, offset) }
+
+    notifyListeners(editor, range)
 
     return VimPlugin.getRegister().storeText(editor, range, type, false)
   }

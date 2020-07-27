@@ -7,5 +7,6 @@
     <vimExtension implementation="com.maddyhome.idea.vim.extension.argtextobj.VimArgTextObjExtension"/>
     <vimExtension implementation="com.maddyhome.idea.vim.extension.replacewithregister.ReplaceWithRegister"/>
     <vimExtension implementation="com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension"/>
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.highlightedyank.VimHighlightedYank"/>
   </extensions>
 </idea-plugin>

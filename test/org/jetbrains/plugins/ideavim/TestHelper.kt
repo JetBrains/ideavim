@@ -79,9 +79,17 @@ fun waitAndAssertMode(fixture: CodeInsightTestFixture, mode: CommandState.Mode, 
 fun assertDoesntChange(timeInMillis: Int = 1000, condition: () -> Boolean) {
   val end = System.currentTimeMillis() + timeInMillis
   while (end > System.currentTimeMillis()) {
-    if (!condition()) fail()
+    if (!condition()) {
+      fail()
+    }
 
     Thread.sleep(10)
     IdeEventQueue.getInstance().flushQueue()
   }
+}
+
+fun assertHappened(timeInMillis: Int = 1000, precision: Int, condition: () -> Boolean) {
+  assertDoesntChange(timeInMillis - precision) { !condition() }
+
+  waitAndAssert(precision * 2) { condition() }
 }

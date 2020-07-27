@@ -46,6 +46,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.util.ObjectUtils;
+import com.intellij.util.containers.ContainerUtil;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.RegisterActions;
@@ -61,6 +62,7 @@ import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
+import com.maddyhome.idea.vim.listener.VimInsertListener;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.option.BoundListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -91,6 +93,8 @@ public class ChangeGroup {
     ImmutableSet.of(VIM_MOTION_WORD_RIGHT, VIM_MOTION_BIG_WORD_RIGHT, VIM_MOTION_CAMEL_RIGHT);
 
   private @Nullable Command lastInsert;
+
+  private List<VimInsertListener> insertListeners = ContainerUtil.createLockFreeCopyOnWriteList();
 
   private void setInsertRepeat(int lines, int column, boolean append) {
     repeatLines = lines;
@@ -424,6 +428,8 @@ public class ChangeGroup {
 
       VisualGroupKt.updateCaretState(editor);
     }
+
+    notifyListeners(editor);
   }
 
   // Workaround for VIM-1546. Another solution is highly appreciated.
@@ -1984,6 +1990,18 @@ public class ChangeGroup {
     }
 
     return number;
+  }
+
+  public void addInsertListener(VimInsertListener listener) {
+    insertListeners.add(listener);
+  }
+
+  public void removeInsertListener(VimInsertListener listener) {
+    insertListeners.remove(listener);
+  }
+
+  private void notifyListeners(Editor editor) {
+    insertListeners.forEach(listener -> listener.insertModeStarted(editor));
   }
 
   private int oldOffset = -1;
