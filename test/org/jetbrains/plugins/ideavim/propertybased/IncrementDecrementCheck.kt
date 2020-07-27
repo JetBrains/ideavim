@@ -53,7 +53,7 @@ class IncrementDecrementTest : VimPropertyTest() {
           moveCaretToRandomPlace(env, editor)
 
           if (NeovimTesting.neovimEnabled(this)) NeovimTesting.setupEditor(editor)
-          NeovimTesting.typeCommand(":set nrformats+=octal<CR>")
+          if (NeovimTesting.neovimEnabled(this)) NeovimTesting.typeCommand(":set nrformats+=octal<CR>")
 
           env.executeCommands(Generator.sampledFrom(IncrementDecrementActions(editor, NeovimTesting.neovimEnabled(this))))
 
