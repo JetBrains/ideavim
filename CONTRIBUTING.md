@@ -90,6 +90,11 @@ neovim instance, and the state of IdeaVim is asserted to be the same as the stat
 - Only tests that use `doTest` are checked with neovim.
 - Tests with `@VimBehaviorDiffers` or `@TestWithoutNeovim` annotations don't use neovim.
 
+#### Property-based tests
+Property-based tests are located under `propertybased` package. These tests a flaky by nature
+although in most cases they are stable. If the test fails on your TeamCity run, try to check the test output and understand 
+if the fail is caused by your changes. If it's not, just ignore the test.
+
 
 ## A common direction
 
