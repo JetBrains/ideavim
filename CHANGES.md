@@ -29,6 +29,12 @@ _Available since 0.58.1 EAP_
 
 **Features:**
 * `vim-highlightedyank` plugin emulation ([VIM-1970](https://youtrack.jetbrains.com/issue/VIM-1970) | [vim-highlightedyank](https://github.com/machakann/vim-highlightedyank)).
+
+    * <details>
+            <summary><strong>Click to see details</strong></summary>
+            <img src="resources/changes/0.59/highlight_yank.gif" alt="highlight yank"/>
+      </details>
+
 * [VIM-2068](https://youtrack.jetbrains.com/issue/VIM-2068) `:tabclose` command
 
 **Fixes:**
