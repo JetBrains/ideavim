@@ -139,7 +139,6 @@ public class MotionGroup {
 
       // If we are a linewise motion we need to normalize the start and stop then move the start to the beginning
       // of the line and move the end to the end of the line.
-      EnumSet<CommandFlags> flags = cmd.getFlags();
       if (cmd.isLinewiseMotion()) {
         if (caret.getLogicalPosition().line != EditorHelper.getLineCount(editor) - 1) {
           start = EditorHelper.getLineStartForOffset(editor, start);
@@ -602,18 +601,23 @@ public class MotionGroup {
   }
 
   public static void scrollCaretIntoView(@NotNull Editor editor) {
-    final EnumSet<CommandFlags> flags = CommandState.getInstance(editor).getExecutingCommandFlags();
-    final boolean scrollJump = !flags.contains(CommandFlags.FLAG_IGNORE_SCROLL_JUMP);
-    scrollPositionIntoView(editor, editor.getCaretModel().getVisualPosition(), scrollJump);
+    scrollPositionIntoView(editor, editor.getCaretModel().getVisualPosition());
   }
 
   public static void scrollPositionIntoView(@NotNull Editor editor,
-                                            @NotNull VisualPosition position,
-                                            boolean scrollJump) {
+                                            @NotNull VisualPosition position) {
+    scrollPositionIntoViewVertically(editor, position);
+    scrollPositionIntoViewHorizontally(editor, position);
+  }
+
+  private static void scrollPositionIntoViewVertically(@NotNull Editor editor,
+                                                       @NotNull VisualPosition position) {
     final int topVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
     final int bottomVisualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor);
     final int visualLine = position.line;
-    final int column = position.column;
+
+    final EnumSet<CommandFlags> flags = CommandState.getInstance(editor).getExecutingCommandFlags();
+    final boolean scrollJump = !flags.contains(CommandFlags.FLAG_IGNORE_SCROLL_JUMP);
 
     // We need the non-normalised value here, so we can handle cases such as so=999 to keep the current line centred
     int scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();
@@ -666,13 +670,19 @@ public class MotionGroup {
         }
       }
     }
+  }
 
-    int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
-    int width = EditorHelper.getScreenWidth(editor);
+  private static void scrollPositionIntoViewHorizontally(@NotNull Editor editor,
+                                                         @NotNull VisualPosition position) {
+    final int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
+    final int column = position.column;
+    final int width = EditorHelper.getScreenWidth(editor);
+
     final EnumSet<CommandFlags> flags = CommandState.getInstance(editor).getExecutingCommandFlags();
-    scrollJump = !flags.contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP);
-    scrollOffset = OptionsManager.INSTANCE.getSidescrolloff().value();
-    scrollJumpSize = 0;
+    final boolean scrollJump = !flags.contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP);
+
+    int scrollOffset = OptionsManager.INSTANCE.getSidescrolloff().value();
+    int scrollJumpSize = 0;
     if (scrollJump) {
       scrollJumpSize = Math.max(0, OptionsManager.INSTANCE.getSidescroll().value() - 1);
       if (scrollJumpSize == 0) {
@@ -693,6 +703,7 @@ public class MotionGroup {
 
     scrollJumpSize = Math.min(scrollJumpSize, width / 2 - scrollOffset);
 
+    int diff;
     if (column < visualLeft) {
       diff = column - visualLeft + 1;
       scrollJumpSize = -scrollJumpSize;
