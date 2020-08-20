@@ -671,7 +671,7 @@ public class MotionGroup {
     int width = EditorHelper.getScreenWidth(editor);
     final EnumSet<CommandFlags> flags = CommandState.getInstance(editor).getExecutingCommandFlags();
     scrollJump = !flags.contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP);
-    scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();
+    scrollOffset = OptionsManager.INSTANCE.getSidescrolloff().value();
     scrollJumpSize = 0;
     if (scrollJump) {
       scrollJumpSize = Math.max(0, OptionsManager.INSTANCE.getSidescroll().value() - 1);
