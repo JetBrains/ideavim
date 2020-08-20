@@ -603,7 +603,7 @@ public class MotionGroup {
 
   public static void scrollCaretIntoView(@NotNull Editor editor) {
     final EnumSet<CommandFlags> flags = CommandState.getInstance(editor).getExecutingCommandFlags();
-    final boolean scrollJump = flags.contains(CommandFlags.FLAG_IGNORE_SCROLL_JUMP);
+    final boolean scrollJump = !flags.contains(CommandFlags.FLAG_IGNORE_SCROLL_JUMP);
     scrollPositionIntoView(editor, editor.getCaretModel().getVisualPosition(), scrollJump);
   }
 

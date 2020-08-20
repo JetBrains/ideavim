@@ -53,6 +53,15 @@ enum class CommandFlags {
    * This keystroke should be saved as part of the current insert
    */
   FLAG_SAVE_STROKE,
+
+  /**
+   * Don't include scrolljump when adjusting the scroll area to ensure the current cursor position is visible.
+   * Should be used for commands that adjust the scroll area (such as <C-D> or <C-E>).
+   * Technically, the current implementation doesn't need these flags, as these commands adjust the scroll area
+   * according to their own rules and then move the cursor to fit (e.g. move cursor down a line with <C-E>). Moving the
+   * cursor always tries to adjust the scroll area to ensure it's visible, which in this case is always a no-op.
+   * This is an implementation detail, so keep the flags for both documentation and in case of refactoring.
+   */
   FLAG_IGNORE_SCROLL_JUMP,
   FLAG_IGNORE_SIDE_SCROLL_JUMP,
 
