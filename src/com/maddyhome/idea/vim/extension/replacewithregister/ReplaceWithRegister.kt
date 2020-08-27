@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.command.isLine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormal
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
@@ -78,7 +78,7 @@ class ReplaceWithRegister : VimExtension {
 
     override fun execute(editor: Editor, context: DataContext) {
       setOperatorFunction(Operator())
-      executeNormal(parseKeys("g@"), editor)
+      executeNormalWithoutMapping(parseKeys("g@"), editor)
     }
   }
 
