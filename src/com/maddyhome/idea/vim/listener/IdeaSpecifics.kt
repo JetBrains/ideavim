@@ -37,6 +37,7 @@ import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
 import com.intellij.openapi.project.Project
+import com.intellij.util.PlatformUtils
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -45,6 +46,7 @@ import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import java.beans.PropertyChangeEvent
@@ -68,22 +70,26 @@ object IdeaSpecifics {
     private var editor: Editor? = null
     override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
       if (!VimPlugin.isEnabled()) return
-      editor = dataContext.getData(CommonDataKeys.EDITOR) ?: return
+      editor = dataContext.getData(CommonDataKeys.HOST_EDITOR) ?: return
     }
 
     override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
       if (!VimPlugin.isEnabled()) return
+
       //region Extend Selection for Rider
-      when (ActionManager.getInstance().getId(action)) {
-        IdeActions.ACTION_EDITOR_SELECT_WORD_AT_CARET, IdeActions.ACTION_EDITOR_UNSELECT_WORD_AT_CARET -> {
-          // Rider moves caret to the end of selection
-          editor?.caretModel?.addCaretListener(object : CaretListener {
-            override fun caretPositionChanged(event: CaretEvent) {
-              val predictedMode = IdeaSelectionControl.predictMode(event.editor, VimListenerManager.SelectionSource.OTHER)
-              moveCaretOneCharLeftFromSelectionEnd(event.editor, predictedMode)
-              event.editor.caretModel.removeCaretListener(this)
-            }
-          })
+      if (PlatformUtils.isRider()) {
+        when (ActionManager.getInstance().getId(action)) {
+          IdeActions.ACTION_EDITOR_SELECT_WORD_AT_CARET, IdeActions.ACTION_EDITOR_UNSELECT_WORD_AT_CARET -> {
+            // Rider moves caret to the end of selection
+            editor?.caretModel?.addCaretListener(object : CaretListener {
+              override fun caretPositionChanged(event: CaretEvent) {
+                val eventEditor = event.editor.getTopLevelEditor()
+                val predictedMode = IdeaSelectionControl.predictMode(eventEditor, VimListenerManager.SelectionSource.OTHER)
+                moveCaretOneCharLeftFromSelectionEnd(eventEditor, predictedMode)
+                eventEditor.caretModel.removeCaretListener(this)
+              }
+            })
+          }
         }
       }
       //endregion
