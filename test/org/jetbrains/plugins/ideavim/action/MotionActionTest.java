@@ -442,6 +442,12 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("<a></a>");
   }
 
+  // VIM-2113
+  public void testReplaceEmptyTagContent() {
+    typeTextInFile(parseKeys("cit"),"<a><c><caret></c></a>");
+    myFixture.checkResult("<a><c></c></a>");
+  }
+
   // |[(|
   public void testUnmatchedOpenParenthesis() {
     typeTextInFile(parseKeys("[("),
