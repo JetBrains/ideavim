@@ -141,6 +141,10 @@ class NotificationService(private val project: Project?) {
       NotificationType.INFORMATION).notify(project)
   }
 
+  fun notifyActionId(id: String) {
+    Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, "Action id: $id", NotificationType.INFORMATION).notify(project)
+  }
+
   class OpenIdeaVimRcAction(private val notification: Notification?) : DumbAwareAction("Open ~/.ideavimrc") {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project

@@ -96,5 +96,9 @@
         <keyboard-shortcut first-keystroke="meta shift I" keymap="Mac OS X 10.5+" replace-all="true"/>
       </action>
     </group>
+
+    <action id="VimFindActionIdAction"
+            class="com.maddyhome.idea.vim.listener.FindActionIdAction" text="Track Action Ids"
+            description="Starts tracking ids of executed actions"/>
   </actions>
 </idea-plugin>

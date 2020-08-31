@@ -36,6 +36,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
+import com.intellij.openapi.project.DumbAwareToggleAction
 import com.intellij.openapi.project.Project
 import com.intellij.util.PlatformUtils
 import com.maddyhome.idea.vim.EventFacade
@@ -70,7 +71,16 @@ object IdeaSpecifics {
     private var editor: Editor? = null
     override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
       if (!VimPlugin.isEnabled()) return
-      editor = dataContext.getData(CommonDataKeys.HOST_EDITOR) ?: return
+
+      val hostEditor = dataContext.getData(CommonDataKeys.HOST_EDITOR)
+      if (hostEditor != null) {
+        editor = hostEditor
+      }
+
+      if (FindActionId.enabled) {
+        val id = ActionManager.getInstance().getId(action) ?: "--NO_ID--"
+        VimPlugin.getNotifications(dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
+      }
     }
 
     override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
@@ -178,4 +188,16 @@ object IdeaSpecifics {
       .javaClass.name.startsWith("org.acejump.")
   }
   //endregion
+}
+
+class FindActionIdAction : DumbAwareToggleAction() {
+  override fun isSelected(e: AnActionEvent): Boolean = FindActionId.enabled
+
+  override fun setSelected(e: AnActionEvent, state: Boolean) {
+    FindActionId.enabled = state
+  }
+}
+
+object FindActionId {
+  var enabled = false
 }
