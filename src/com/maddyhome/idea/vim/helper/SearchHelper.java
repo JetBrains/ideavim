@@ -29,6 +29,7 @@ import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -541,16 +542,19 @@ public class SearchHelper {
         selectionEndWithoutNewline++;
       }
 
-      if (closingTagTextRange.getStartOffset() == selectionEndWithoutNewline &&
+      final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
+      if (mode == CommandState.Mode.VISUAL) {
+        if (closingTagTextRange.getStartOffset() == selectionEndWithoutNewline &&
           openingTag.getEndOffset() == selectionStart) {
-        // Special case: if the inner tag is already selected we should like isOuter is active
-        // Note that we need to ignore newlines, because their selection is lost between multiple "it" invocations
-        isOuter = true;
-      }
-      else if (openingTag.getEndOffset() == closingTagTextRange.getStartOffset() &&
-               selectionStart == openingTag.getEndOffset()) {
-        // Special case: for an empty tag pair (e.g. <a></a>) the whole tag is selected if the caret is in the middle.
-        isOuter = true;
+          // Special case: if the inner tag is already selected we should like isOuter is active
+          // Note that we need to ignore newlines, because their selection is lost between multiple "it" invocations
+          isOuter = true;
+        }
+        else if (openingTag.getEndOffset() == closingTagTextRange.getStartOffset() &&
+          selectionStart == openingTag.getEndOffset()) {
+          // Special case: for an empty tag pair (e.g. <a></a>) the whole tag is selected if the caret is in the middle.
+          isOuter = true;
+        }
       }
 
       if (isOuter) {
