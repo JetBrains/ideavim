@@ -179,6 +179,11 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
 
     int start = range.getStartOffset();
     int end = range.getEndOffset();
+
+    if (isDelete && start == end) {
+      return true;
+    }
+
     // Normalize the start and end
     if (start > end) {
       int t = start;
