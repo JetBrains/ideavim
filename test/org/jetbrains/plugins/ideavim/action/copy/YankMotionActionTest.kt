@@ -125,4 +125,34 @@ class YankMotionActionTest : VimTestCase() {
 
     TestCase.assertEquals("", text)
   }
+
+  fun `test yank to star with mapping`() {
+    val file = """
+            A Discovery
+
+            I found it in a ${c}legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+    typeTextInFile(commandToKeys("map * *zz"), file)
+    typeTextInFile(parseKeys("\"*yiw"), file)
+    val text = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
+
+    TestCase.assertEquals("legendary", text)
+  }
+
+  fun `test yank to star with yank mapping`() {
+    val file = """
+            A Discovery
+
+            I found it in a ${c}legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+    typeTextInFile(commandToKeys("map * *yiw"), file)
+    typeTextInFile(parseKeys("\"*"), file)
+    Assert.assertNull(VimPlugin.getRegister().lastRegister?.text)
+  }
 }
