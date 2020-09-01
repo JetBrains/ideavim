@@ -27,6 +27,7 @@ To Be Released
 
 **Fixes:**
 * [VIM-2097](https://youtrack.jetbrains.com/issue/VIM-2097) Do not apply mappings for register selecting
+* [VIM-2080](https://youtrack.jetbrains.com/issue/VIM-2080) Fix S command with count
 
 0.59, 2020-08-25
 ------------

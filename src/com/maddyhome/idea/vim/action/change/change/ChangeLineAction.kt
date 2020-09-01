@@ -42,7 +42,7 @@ class ChangeLineAction : ChangeEditorActionHandler.ForEachCaret() {
                        argument: Argument?): Boolean {
     // `S` command is a synonym of `cc`
     val motion = MotionDownLess1FirstNonSpaceAction()
-    val command = Command(rawCount, motion, motion.type, motion.flags)
+    val command = Command(1, motion, motion.type, motion.flags)
     return VimPlugin.getChange().changeMotion(editor, caret, context, count, rawCount, Argument(command))
   }
 }

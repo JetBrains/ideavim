@@ -95,4 +95,36 @@ class ChangeLineActionTest : VimTestCase() {
             $c
     """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
+
+  fun `test S with count`() {
+    doTest("3S", """
+            ${c}I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy underside, the checquered fringe.
+
+            My needles have teased out its sculpted sex;
+            corroded tissues could no longer hide
+            that priceless mote now dimpling the convex
+            and limpid teardrop on a lighted slide.
+    """.trimIndent(), """
+            $c
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy underside, the checquered fringe.
+
+            My needles have teased out its sculpted sex;
+            corroded tissues could no longer hide
+            that priceless mote now dimpling the convex
+            and limpid teardrop on a lighted slide.
+    """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
 }
