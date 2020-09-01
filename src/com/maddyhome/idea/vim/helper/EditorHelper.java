@@ -670,15 +670,14 @@ public class EditorHelper {
   public static boolean scrollVisualLineToBottomOfScreen(@NotNull Editor editor, int visualLine) {
     int inlayHeight = getHeightOfVisualLineInlays(editor, visualLine, false);
     int exPanelHeight = 0;
-    int exPanelWithoutShortcutsHeight = 0;
     if (ExEntryPanel.getInstance().isActive()) {
       exPanelHeight = ExEntryPanel.getInstance().getHeight();
     }
     if (ExEntryPanel.getInstanceWithoutShortcuts().isActive()) {
-      exPanelWithoutShortcutsHeight = ExEntryPanel.getInstanceWithoutShortcuts().getHeight();
+      exPanelHeight += ExEntryPanel.getInstanceWithoutShortcuts().getHeight();
     }
     int y = editor.visualLineToY(visualLine);
-    int height = inlayHeight + editor.getLineHeight() + exPanelHeight + exPanelWithoutShortcutsHeight;
+    int height = inlayHeight + editor.getLineHeight() + exPanelHeight;
     Rectangle visibleArea = getVisibleArea(editor);
     return scrollVertically(editor, y - visibleArea.height + height);
   }

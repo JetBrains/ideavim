@@ -28,6 +28,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
+import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.PlainTextFileType
 import com.intellij.openapi.project.Project
 import com.intellij.testFramework.EditorTestUtil
@@ -43,12 +44,9 @@ import com.maddyhome.idea.vim.command.CommandState.SubMode
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
-import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.helper.*
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
-import com.maddyhome.idea.vim.helper.TestInputModel
-import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.option.OptionsManager.getOption
 import com.maddyhome.idea.vim.option.OptionsManager.ideastrictmode
@@ -77,6 +75,7 @@ abstract class VimTestCase : UsefulTestCase() {
       LightTempDirTestFixtureImpl(true))
     myFixture.setUp()
     myFixture.testDataPath = testDataPath
+    // Note that myFixture.editor is usually null here. It's only set once configureByText has been called
     KeyHandler.getInstance().fullReset(myFixture.editor)
     resetAllOptions()
     VimPlugin.getKey().resetKeyMappings()
@@ -123,24 +122,36 @@ abstract class VimTestCase : UsefulTestCase() {
     return typeText(keys)
   }
 
-  protected fun configureByText(content: String): Editor {
-    myFixture.configureByText(PlainTextFileType.INSTANCE, content)
+  protected val screenWidth: Int
+    get() = 80
+  protected val screenHeight: Int
+    get() = 35
+
+  protected fun setEditorVisibleSize() {
+    EditorTestUtil.setEditorVisibleSize(myFixture.editor, screenWidth, screenHeight)
+  }
+  protected fun configureByText(content: String) = configureByText(PlainTextFileType.INSTANCE, content)
+  protected fun configureByJavaText(content: String) = configureByText(JavaFileType.INSTANCE, content)
+  protected fun configureByXmlText(content: String) = configureByText(XmlFileType.INSTANCE, content)
+
+  private fun configureByText(fileType: FileType, content: String): Editor {
+    myFixture.configureByText(fileType, content)
+    setEditorVisibleSize()
     return myFixture.editor
   }
 
   protected fun configureByFileName(fileName: String): Editor {
     myFixture.configureByText(fileName, "\n")
+    setEditorVisibleSize()
     return myFixture.editor
   }
 
-  protected fun configureByJavaText(content: String): Editor {
-    myFixture.configureByText(JavaFileType.INSTANCE, content)
-    return myFixture.editor
-  }
-
-  protected fun configureByXmlText(content: String): Editor {
-    myFixture.configureByText(XmlFileType.INSTANCE, content)
-    return myFixture.editor
+  protected fun configureLargeText(lineCount: Int) {
+    val stringBuilder = StringBuilder()
+    repeat(lineCount) {
+      stringBuilder.appendln("I found it in a legendary land")
+    }
+    configureByText(stringBuilder.toString())
   }
 
   protected fun typeText(keys: List<KeyStroke?>): Editor {
@@ -180,6 +191,17 @@ abstract class VimTestCase : UsefulTestCase() {
     for (i in expectedOffsets.indices) {
       Assert.assertEquals(expectedOffsets[i], carets[i].offset)
     }
+  }
+
+  // Use logical rather than visual lines, so we can correctly test handling of collapsed folds and soft wraps
+  fun assertVisibleArea(topLogicalLine: Int, bottomLogicalLine: Int) {
+    val actualVisualTop = EditorHelper.getVisualLineAtTopOfScreen(myFixture.editor)
+    val actualLogicalTop = EditorHelper.visualLineToLogicalLine(myFixture.editor, actualVisualTop)
+    val actualVisualBottom = EditorHelper.getVisualLineAtBottomOfScreen(myFixture.editor)
+    val actualLogicalBottom = EditorHelper.visualLineToLogicalLine(myFixture.editor, actualVisualBottom)
+
+    Assert.assertEquals("Top logical lines don't match", topLogicalLine, actualLogicalTop)
+    Assert.assertEquals("Bottom logical lines don't match", bottomLogicalLine, actualLogicalBottom)
   }
 
   fun assertMode(expectedMode: CommandState.Mode) {
