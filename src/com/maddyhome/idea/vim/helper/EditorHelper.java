@@ -639,8 +639,22 @@ public class EditorHelper {
    * @return Returns true if the window was moved
    */
   public static boolean scrollVisualLineToTopOfScreen(final @NotNull Editor editor, int visualLine) {
-    int inlayHeight = getHeightOfVisualLineInlays(editor, visualLine, true);
+    final int inlayHeight = getHeightOfVisualLineInlays(editor, normalizeVisualLine(editor, visualLine), true);
     int y = editor.visualLineToY(visualLine) - inlayHeight;
+
+    // Normalise Y so that we don't try to scroll the editor to a location it can't reach. The editor will handle this,
+    // but when we ask for the target location to move the caret to match, we'll get the incorrect value.
+    // E.g. from line 100 of a 175 line, with line 100 at the top of screen, hit 100<C-E>. This should scroll line 175
+    // to the top of the screen. With virtual space enabled, this is fine. If it's not enabled, we end up scrolling line
+    // 146 to the top of the screen, but the caret thinks we're going to 175, and the caret is put in the wrong location
+    // (To complicate things, this issue doesn't show up when running headless for tests)
+    if (!editor.getSettings().isAdditionalPageAtBottom()) {
+      // Get the max line number that can sit at the top of the screen
+      final int editorHeight = getVisibleArea(editor).height;
+      final int virtualSpaceHeight = editor.getSettings().getAdditionalLinesCount() * editor.getLineHeight();
+      final int yLastLine = editor.visualLineToY(EditorHelper.getLineCount(editor));  // last line + 1
+      y = Math.min(y, yLastLine + virtualSpaceHeight - editorHeight);
+    }
     return scrollVertically(editor, y);
   }
 
@@ -651,7 +665,7 @@ public class EditorHelper {
    * @param visualLine The visual line to place in the middle of the current window
    */
   public static void scrollVisualLineToMiddleOfScreen(@NotNull Editor editor, int visualLine) {
-    int y = editor.visualLineToY(visualLine);
+    int y = editor.visualLineToY(normalizeVisualLine(editor, visualLine));
     int lineHeight = editor.getLineHeight();
     int height = getVisibleArea(editor).height;
     scrollVertically(editor, y - ((height - lineHeight) / 2));
@@ -668,7 +682,7 @@ public class EditorHelper {
    * @return True if the editor was scrolled
    */
   public static boolean scrollVisualLineToBottomOfScreen(@NotNull Editor editor, int visualLine) {
-    int inlayHeight = getHeightOfVisualLineInlays(editor, visualLine, false);
+    int inlayHeight = getHeightOfVisualLineInlays(editor, normalizeVisualLine(editor, visualLine), false);
     int exPanelHeight = 0;
     if (ExEntryPanel.getInstance().isActive()) {
       exPanelHeight = ExEntryPanel.getInstance().getHeight();

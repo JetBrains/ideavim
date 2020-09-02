@@ -812,14 +812,12 @@ public class MotionGroup {
     assert lines != 0 : "lines cannot be 0";
 
     if (lines > 0) {
-      int visualLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
-      visualLine = EditorHelper.normalizeVisualLine(editor, visualLine + lines);
-      EditorHelper.scrollVisualLineToTopOfScreen(editor, visualLine);
+      final int visualLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
+      EditorHelper.scrollVisualLineToTopOfScreen(editor, visualLine + lines);
     }
     else {
-      int visualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor);
-      visualLine = EditorHelper.normalizeVisualLine(editor, visualLine + lines);
-      EditorHelper.scrollVisualLineToBottomOfScreen(editor, visualLine);
+      final int visualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor);
+      EditorHelper.scrollVisualLineToBottomOfScreen(editor, visualLine + lines);
     }
 
     moveCaretToView(editor);
