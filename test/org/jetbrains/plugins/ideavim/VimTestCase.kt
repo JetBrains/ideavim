@@ -152,6 +152,7 @@ abstract class VimTestCase : UsefulTestCase() {
     return myFixture.editor
   }
 
+  @Suppress("SameParameterValue")
   protected fun configureByPages(pageCount: Int) {
     val stringBuilder = StringBuilder()
     repeat(pageCount * screenHeight) {
@@ -160,7 +161,16 @@ abstract class VimTestCase : UsefulTestCase() {
     configureByText(stringBuilder.toString())
   }
 
-  protected fun setPositionAndScroll(scrollToLogicalLine: Int, caretLogicalLine: Int) {
+  protected fun configureByLines(lineCount: Int, line: String) {
+    val stringBuilder = StringBuilder()
+    repeat(lineCount) {
+      stringBuilder.appendln(line)
+    }
+    configureByText(stringBuilder.toString())
+  }
+
+  @JvmOverloads
+  protected fun setPositionAndScroll(scrollToLogicalLine: Int, caretLogicalLine: Int, caretLogicalColumn: Int = 0) {
     val scrolloff = min(OptionsManager.scrolloff.value(), screenHeight / 2)
     val scrolljump = OptionsManager.scrolljump.value()
     OptionsManager.scrolljump.set(1)
@@ -171,18 +181,20 @@ abstract class VimTestCase : UsefulTestCase() {
     val bottomLogicalLine = EditorHelper.visualLineToLogicalLine(myFixture.editor, bottomVisualLine)
 
     // Make sure we're not trying to put caret in an invalid location
-    val boundsTop = EditorHelper.visualLineToLogicalLine(myFixture.editor, scrollToVisualLine + scrolloff)
-    val boundsBottom = EditorHelper.visualLineToLogicalLine(myFixture.editor, bottomVisualLine - scrolloff)
+    val boundsTop = EditorHelper.visualLineToLogicalLine(myFixture.editor,
+      if (scrollToVisualLine > scrolloff) scrollToVisualLine + scrolloff else scrollToVisualLine)
+    val boundsBottom = EditorHelper.visualLineToLogicalLine(myFixture.editor,
+      if (bottomVisualLine > EditorHelper.getVisualLineCount(myFixture.editor) - scrolloff - 1) bottomVisualLine - scrolloff else bottomVisualLine)
     Assert.assertTrue("Caret line $caretLogicalLine not inside legal screen bounds (${boundsTop} - ${boundsBottom})",
       caretLogicalLine in boundsTop..boundsBottom)
 
-    typeText(parseKeys("${scrollToLogicalLine+scrolloff+1}z<CR>", "${caretLogicalLine+1}G"))
+    typeText(parseKeys("${scrollToLogicalLine+scrolloff+1}z<CR>", "${caretLogicalLine+1}G", "${caretLogicalColumn+1}|"))
 
     OptionsManager.scrolljump.set(scrolljump)
 
     // Make sure we're where we want to be
     assertVisibleArea(scrollToLogicalLine, bottomLogicalLine)
-    assertPosition(caretLogicalLine, 0)
+    assertPosition(caretLogicalLine, caretLogicalColumn)
   }
 
   protected fun typeText(keys: List<KeyStroke?>): Editor {
