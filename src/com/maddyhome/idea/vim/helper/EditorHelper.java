@@ -679,7 +679,7 @@ public class EditorHelper {
     int y = editor.visualLineToY(visualLine);
     int height = inlayHeight + editor.getLineHeight() + exPanelHeight;
     Rectangle visibleArea = getVisibleArea(editor);
-    return scrollVertically(editor, y - visibleArea.height + height);
+    return scrollVertically(editor, max(0, y - visibleArea.height + height));
   }
 
   /**
