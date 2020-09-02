@@ -26,7 +26,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 @Suppress("ClassName")
 class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
   fun `test moving up causes scrolling up`() {
-    configureLargeText(200)
+    configureByPages(5)
     setPositionAndScroll(19, 24)
 
     typeText(parseKeys("12k"))
@@ -36,7 +36,7 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
 
   fun `test scroll up with scrolljump`() {
     OptionsManager.scrolljump.set(10)
-    configureLargeText(200)
+    configureByPages(5)
     setPositionAndScroll(19, 24)
 
     typeText(parseKeys("12k"))
@@ -46,7 +46,7 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
 
   fun `test scroll up with scrolloff`() {
     OptionsManager.scrolloff.set(5)
-    configureLargeText(200)
+    configureByPages(5)
     setPositionAndScroll(19, 29)
 
     typeText(parseKeys("12k"))
@@ -57,7 +57,7 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
   fun `test scroll up with scrolljump and scrolloff 1`() {
     OptionsManager.scrolljump.set(10)
     OptionsManager.scrolloff.set(5)
-    configureLargeText(200)
+    configureByPages(5)
 
     setPositionAndScroll(19, 29)
     typeText(parseKeys("12k"))
@@ -68,7 +68,7 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
   fun `test scroll up with scrolljump and scrolloff 2`() {
     OptionsManager.scrolljump.set(10)
     OptionsManager.scrolloff.set(5)
-    configureLargeText(200)
+    configureByPages(5)
     setPositionAndScroll(29, 39)
 
     typeText(parseKeys("20k"))
@@ -77,7 +77,7 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
   }
 
   fun `test scroll up with collapsed folds`() {
-    configureLargeText(200)
+    configureByPages(5)
     // TODO: Implement zf
     typeText(parseKeys("40G", "Vjjjj", ":'<,'>action CollapseSelection<CR>", "V"))
     setPositionAndScroll(29, 49)
@@ -92,8 +92,8 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
 //  }
 
   fun `test scroll up more than half height moves caret to middle 1`() {
-    configureLargeText(200)
-    setPositionAndScroll(114, 149)
+    configureByPages(5)
+    setPositionAndScroll(115, 149)
 
     typeText(parseKeys("50k"))
     assertPosition(99, 0)
@@ -101,7 +101,7 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
   }
 
   fun `test scroll up more than half height moves caret to middle with scrolloff`() {
-    configureLargeText(200)
+    configureByPages(5)
     OptionsManager.scrolljump.set(10)
     OptionsManager.scrolloff.set(5)
     setPositionAndScroll(99, 109)
@@ -113,7 +113,7 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
   }
 
   fun `test scroll up with less than half height moves caret to top of screen`() {
-    configureLargeText(200)
+    configureByPages(5)
     OptionsManager.scrolljump.set(10)
     OptionsManager.scrolloff.set(5)
     setPositionAndScroll(99, 109)
@@ -124,7 +124,7 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
   }
 
   fun `test moving down causes scrolling down`() {
-    configureLargeText(200)
+    configureByPages(5)
     setPositionAndScroll(0, 29)
 
     typeText(parseKeys("12j"))
@@ -134,7 +134,7 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
 
   fun `test scroll down with scrolljump`() {
     OptionsManager.scrolljump.set(10)
-    configureLargeText(200)
+    configureByPages(5)
     setPositionAndScroll(0, 29)
 
     typeText(parseKeys("12j"))
@@ -144,7 +144,7 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
 
   fun `test scroll down with scrolloff`() {
     OptionsManager.scrolloff.set(5)
-    configureLargeText(200)
+    configureByPages(5)
     setPositionAndScroll(0, 24)
 
     typeText(parseKeys("12j"))
@@ -155,7 +155,7 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
   fun `test scroll down with scrolljump and scrolloff 1`() {
     OptionsManager.scrolljump.set(10)
     OptionsManager.scrolloff.set(5)
-    configureLargeText(200)
+    configureByPages(5)
     setPositionAndScroll(0, 24)
 
     typeText(parseKeys("12j"))
@@ -166,7 +166,7 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
   fun `test scroll down with scrolljump and scrolloff 2`() {
     OptionsManager.scrolljump.set(15)
     OptionsManager.scrolloff.set(5)
-    configureLargeText(200)
+    configureByPages(5)
     setPositionAndScroll(0, 24)
 
     typeText(parseKeys("20j"))
@@ -177,7 +177,7 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
   fun `test scroll down with scrolljump and scrolloff 3`() {
     OptionsManager.scrolljump.set(20)
     OptionsManager.scrolloff.set(5)
-    configureLargeText(200)
+    configureByPages(5)
     setPositionAndScroll(0, 24)
 
     typeText(parseKeys("25j"))
@@ -188,7 +188,7 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
   fun `test scroll down with scrolljump and scrolloff 4`() {
     OptionsManager.scrolljump.set(11)
     OptionsManager.scrolloff.set(5)
-    configureLargeText(200)
+    configureByPages(5)
     setPositionAndScroll(0, 24)
 
     typeText(parseKeys("12j"))
@@ -199,7 +199,7 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
   fun `test scroll down with scrolljump and scrolloff 5`() {
     OptionsManager.scrolljump.set(10)
     OptionsManager.scrolloff.set(5)
-    configureLargeText(200)
+    configureByPages(5)
     setPositionAndScroll(0, 29)
 
     typeText(parseKeys("12j"))
@@ -210,7 +210,7 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
   fun `test scroll down with scrolljump and scrolloff 6`() {
     OptionsManager.scrolljump.set(10)
     OptionsManager.scrolloff.set(5)
-    configureLargeText(200)
+    configureByPages(5)
     setPositionAndScroll(0, 24)
 
     typeText(parseKeys("20j"))
@@ -221,23 +221,12 @@ class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
   fun `test scroll down too large cursor is centred`() {
     OptionsManager.scrolljump.set(10)
     OptionsManager.scrolloff.set(10)
-    configureLargeText(200)
+    configureByPages(5)
     setPositionAndScroll(0, 19)
 
     typeText(parseKeys("35j"))
     assertPosition(54, 0)
     assertVisualLineAtMiddleOfScreen(54)
-  }
-
-  // 0-based
-  private fun setPositionAndScroll(scrollToLogicalLine: Int, caretLogicalLine: Int) {
-    val scrolloff = OptionsManager.scrolloff.value
-    val scrolljump = OptionsManager.scrolljump.value
-    OptionsManager.scrolloff.set(0)
-    OptionsManager.scrolljump.set(1)
-    typeText(parseKeys("${scrollToLogicalLine+1}z<CR>", "${caretLogicalLine+1}G"))
-    OptionsManager.scrolloff.set(scrolloff)
-    OptionsManager.scrolljump.set(scrolljump)
   }
 
   private fun assertVisualLineAtMiddleOfScreen(expected: Int) {

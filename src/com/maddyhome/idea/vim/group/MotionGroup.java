@@ -601,18 +601,14 @@ public class MotionGroup {
   }
 
   public static void scrollCaretIntoView(@NotNull Editor editor) {
-    scrollPositionIntoView(editor, editor.getCaretModel().getVisualPosition());
-  }
-
-  public static void scrollPositionIntoView(@NotNull Editor editor,
-                                            @NotNull VisualPosition position) {
-    scrollPositionIntoViewVertically(editor, position);
-    scrollPositionIntoViewHorizontally(editor, position);
+    final VisualPosition position = editor.getCaretModel().getVisualPosition();
+    scrollCaretIntoViewVertically(editor, position.line);
+    scrollCaretIntoViewHorizontally(editor, position);
   }
 
   // Vim's version of this method is move.c:update_topline, which will first scroll to fit the current line number at
   // the top of the window and then ensure that the current line fits at the bottom of the window
-  private static void scrollPositionIntoViewVertically(@NotNull Editor editor, @NotNull VisualPosition position) {
+  private static void scrollCaretIntoViewVertically(@NotNull Editor editor, final int caretLine) {
 
     // TODO: Make this work with soft wraps
     // Vim's algorithm works counts line heights for wrapped lines. We're using visual lines, which handles collapsed
@@ -622,7 +618,6 @@ public class MotionGroup {
 
     final int topLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
     final int bottomLine = EditorHelper.getVisualLineAtBottomOfScreen(editor);
-    final int lineToMakeVisible = position.line;
 
     // We need the non-normalised value here, so we can handle cases such as so=999 to keep the current line centred
     final int scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();
@@ -638,49 +633,68 @@ public class MotionGroup {
     final int halfHeight = Math.max(2, (height / 2) - 1);
 
     // Scrolljump isn't handled as you might expect. It is the minimal number of lines to scroll, but that doesn't mean
-    // newLine = lineToMakeVisible +/- MAX(sj, so)
+    // newLine = caretLine +/- MAX(sj, so)
+    //
     // When scrolling up (`k` - scrolling window up in the buffer; more lines are visible at the top of the window), Vim
-    // will select the new top line and repeatedly move it up until it's scrolled at least scrolljump or scroll lines,
-    // whichever is larger. Unintuitively, the initial scroll to set the new top line counts as 1 against scrolljump,
-    // even if it's across several lines, while each subsequent line is a single scrolled line.
-    // This means scrolling up is essentially (lineToMakeVisible + max(so, sj-1))
+    // will start at the new cursor line and repeatedly advance lines above and below. The new top line must be at least
+    // scrolloff above caretLine. If this takes the new top line above the current top line, we must scroll at least
+    // scrolljump. If the new caret line was already above the current top line, this counts as one scroll, and we
+    // scroll from the caret line. Otherwise, we scroll from the current top line.
     // (See move.c:scroll_cursor_top)
-    // When scrolling down (`j` - scrolling window down in the buffer; more lines are visible at the bottom), Vim does
-    // something different, selecting a new bottom line and repeatedly advancing lines above and below. The total
-    // number of lines expanded is at least scrolljump and there must be at least scrolloff lines below.
+    //
+    // When scrolling down (`j` - scrolling window down in the buffer; more lines are visible at the bottom), Vim again
+    // expands lines above and below the new bottom line, but calcualtes things a little differently. The total number
+    // of lines expanded is at least scrolljump and there must be at least scrolloff lines below.
     // Since the lines are advancing simultaneously, it is only possible to get scrolljump/2 above the new cursor line.
     // If there are fewer than scrolljump/2 lines between the current bottom line and the new cursor line, the extra
     // lines are pushed below the new cursor line. Due to the algorithm advancing the "above" line before the "below"
     // line, we can end up with more than just scrolljump/2 lines on the top (hence the sj+1).
     // Therefore, the new top line is (cln + max(so, sj - min(cln-bl, ceiling((sj + 1)/2))))
-    // (where cln is lineToMakeVisible, bl is bottomLine, so is scrolloff and sj is scrolljump)
+    // (where cln is caretLine, bl is bottomLine, so is scrolloff and sj is scrolljump)
     // (See move.c:scroll_cursor_bot)
+    //
     // On top of that, if the scroll distance is "too large", the new cursor line is positioned in the centre of the
-    // screen. What "too large" means depends on scroll direction.
-    final int scrollJump = getScrollJumpSize(editor, height);
+    // screen. What "too large" means depends on scroll direction. There is an initial approximate check before working
+    // out correct scroll locations
+    final int scrollJump = getScrollJump(editor, height);
 
-    if (lineToMakeVisible < topBound) {
+    if (caretLine < topBound) {
       // Scrolling up, put the cursor at the top of the window (minus scrolloff)
-      if (topLine + scrollOffset - lineToMakeVisible >= halfHeight) {
-        EditorHelper.scrollVisualLineToMiddleOfScreen(editor, lineToMakeVisible);
+      // Initial approximation in move.c:update_topline
+      if (topLine + scrollOffset - caretLine >= halfHeight) {
+        EditorHelper.scrollVisualLineToMiddleOfScreen(editor, caretLine);
       }
       else {
-        final int newTopLine = Math.max(0, lineToMakeVisible - Math.max(scrollOffset, (scrollJump - 1)));
-        EditorHelper.scrollVisualLineToTopOfScreen(editor, newTopLine);
+        // New top line must be at least scrolloff above caretLine. If this is above current top line, we must scroll
+        // at least scrolljump. If caretLine was already above topLine, this counts as one scroll, and we scroll from
+        // here. Otherwise, we scroll from topLine
+        final int scrollJumpTopLine = Math.max(0, (caretLine < topLine) ? caretLine - scrollJump + 1 : topLine - scrollJump);
+        final int scrollOffsetTopLine = Math.max(0, caretLine - scrollOffset);
+        final int newTopLine = Math.min(scrollOffsetTopLine, scrollJumpTopLine);
+
+        // Used is set to the line height of caretLine, and then incremented by line height of the lines above and
+        // below caretLine (up to scrolloff or end of file)
+        final int used = 1 + (newTopLine - topLine) + Math.min(scrollOffset, EditorHelper.getVisualLineCount(editor) - topLine);
+        if (used > height) {
+          EditorHelper.scrollVisualLineToMiddleOfScreen(editor, caretLine);
+        }
+        else {
+          EditorHelper.scrollVisualLineToTopOfScreen(editor, newTopLine);
+        }
       }
     }
-    else if (lineToMakeVisible > bottomBound) {
+    else if (caretLine > bottomBound) {
       // Scrolling down, put the cursor at the bottom of the window (minus scrolloff)
       // Vim does a quick approximation before going through the full algorithm. It checks the line below the bottom
       // line in the window (bottomLine + 1). See move.c:update_topline
-      int lineCount = lineToMakeVisible - (bottomLine + 1) + 1 + scrollOffset;
+      int lineCount = caretLine - (bottomLine + 1) + 1 + scrollOffset;
       if (lineCount > height) {
-        EditorHelper.scrollVisualLineToMiddleOfScreen(editor, lineToMakeVisible);
+        EditorHelper.scrollVisualLineToMiddleOfScreen(editor, caretLine);
       } else {
-        // Vim expands out from lineToMakeVisible at least scrolljump lines. It stops expanding above when it hits the
+        // Vim expands out from caretLine at least scrolljump lines. It stops expanding above when it hits the
         // current bottom line, or (because it's expanding above and below) when it's scrolled scrolljump/2. It expands
         // above first, and the initial scroll count is 1, so we used (scrolljump+1)/2
-        final int scrolledAbove = lineToMakeVisible - bottomLine;
+        final int scrolledAbove = caretLine - bottomLine;
         final int extra = Math.max(scrollOffset, scrollJump - Math.min(scrolledAbove, Math.round((scrollJump + 1) / 2.0f)));
         final int scrolled = scrolledAbove + extra;
 
@@ -691,23 +705,23 @@ public class MotionGroup {
         // The minus one is for the current line
         //noinspection UnnecessaryLocalVariable
         final int usedAbove = scrolledAbove;
-        final int usedBelow = Math.min(EditorHelper.getVisualLineCount(editor) - lineToMakeVisible, usedAbove - 1);
+        final int usedBelow = Math.min(EditorHelper.getVisualLineCount(editor) - caretLine, usedAbove - 1);
         final int used = Math.min(height + 1, usedAbove + usedBelow);
 
         // If we've expanded more than a screen full, redraw with the cursor in the middle of the screen. If we're going
         // scroll more than a screen full or more than scrolloff, redraw with the cursor in the middle of the screen.
         lineCount = used > height ? used : scrolled;
         if (lineCount >= height && lineCount > scrollOffset) {
-          EditorHelper.scrollVisualLineToMiddleOfScreen(editor, lineToMakeVisible);
+          EditorHelper.scrollVisualLineToMiddleOfScreen(editor, caretLine);
         }
         else {
-          EditorHelper.scrollVisualLineToBottomOfScreen(editor, lineToMakeVisible + extra);
+          EditorHelper.scrollVisualLineToBottomOfScreen(editor, caretLine + extra);
         }
       }
     }
   }
 
-  private static int getScrollJumpSize(@NotNull Editor editor, int height) {
+  private static int getScrollJump(@NotNull Editor editor, int height) {
     final EnumSet<CommandFlags> flags = CommandState.getInstance(editor).getExecutingCommandFlags();
     final boolean scrollJump = !flags.contains(CommandFlags.FLAG_IGNORE_SCROLL_JUMP);
 
@@ -716,7 +730,7 @@ public class MotionGroup {
     if (scrollJump) {
       final int scrollJumpSize = OptionsManager.INSTANCE.getScrolljump().value();
       if (scrollJumpSize < 0) {
-        return height * (Math.min(100, -scrollJumpSize) / 100);
+        return (int) (height * (Math.min(100, -scrollJumpSize) / 100.0));
       }
       else {
         return Math.max(1, scrollJumpSize);
@@ -725,8 +739,8 @@ public class MotionGroup {
     return 1;
   }
 
-  private static void scrollPositionIntoViewHorizontally(@NotNull Editor editor,
-                                                         @NotNull VisualPosition position) {
+  private static void scrollCaretIntoViewHorizontally(@NotNull Editor editor,
+                                                      @NotNull VisualPosition position) {
     final int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
     final int column = position.column;
     final int width = EditorHelper.getScreenWidth(editor);

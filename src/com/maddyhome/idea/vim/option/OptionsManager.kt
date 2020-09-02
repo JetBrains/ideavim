@@ -66,7 +66,7 @@ object OptionsManager {
   val number = addOption(ToggleOption("number", "nu", false))
   val relativenumber = addOption(ToggleOption("relativenumber", "rnu", false))
   val scroll = addOption(NumberOption("scroll", "scr", 0))
-  val scrolljump = addOption(NumberOption("scrolljump", "sj", 1))
+  val scrolljump = addOption(NumberOption("scrolljump", "sj", 1, -100, Integer.MAX_VALUE))
   val scrolloff = addOption(NumberOption("scrolloff", "so", 0))
   val selection = addOption(BoundStringOption("selection", "sel", "inclusive", arrayOf("old", "inclusive", "exclusive")))
   val selectmode = addOption(SelectModeOptionData.option)

@@ -44,16 +44,22 @@ import com.maddyhome.idea.vim.command.CommandState.SubMode
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
-import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
+import com.maddyhome.idea.vim.helper.TestInputModel
+import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.OptionsManager.getOption
 import com.maddyhome.idea.vim.option.OptionsManager.ideastrictmode
 import com.maddyhome.idea.vim.option.OptionsManager.resetAllOptions
 import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.ui.ExEntryPanel
-import junit.framework.Assert
+import org.junit.Assert
+import java.lang.Integer.min
 import java.util.*
 import java.util.function.Consumer
 import javax.swing.KeyStroke
@@ -146,12 +152,37 @@ abstract class VimTestCase : UsefulTestCase() {
     return myFixture.editor
   }
 
-  protected fun configureLargeText(lineCount: Int) {
+  protected fun configureByPages(pageCount: Int) {
     val stringBuilder = StringBuilder()
-    repeat(lineCount) {
+    repeat(pageCount * screenHeight) {
       stringBuilder.appendln("I found it in a legendary land")
     }
     configureByText(stringBuilder.toString())
+  }
+
+  protected fun setPositionAndScroll(scrollToLogicalLine: Int, caretLogicalLine: Int) {
+    val scrolloff = min(OptionsManager.scrolloff.value(), screenHeight / 2)
+    val scrolljump = OptionsManager.scrolljump.value()
+    OptionsManager.scrolljump.set(1)
+
+    // Convert to visual lines to handle any collapsed folds
+    val scrollToVisualLine = EditorHelper.logicalLineToVisualLine(myFixture.editor, scrollToLogicalLine)
+    val bottomVisualLine = scrollToVisualLine + screenHeight - 1
+    val bottomLogicalLine = EditorHelper.visualLineToLogicalLine(myFixture.editor, bottomVisualLine)
+
+    // Make sure we're not trying to put caret in an invalid location
+    val boundsTop = EditorHelper.visualLineToLogicalLine(myFixture.editor, scrollToVisualLine + scrolloff)
+    val boundsBottom = EditorHelper.visualLineToLogicalLine(myFixture.editor, bottomVisualLine - scrolloff)
+    Assert.assertTrue("Caret line $caretLogicalLine not inside legal screen bounds (${boundsTop} - ${boundsBottom})",
+      caretLogicalLine in boundsTop..boundsBottom)
+
+    typeText(parseKeys("${scrollToLogicalLine+scrolloff+1}z<CR>", "${caretLogicalLine+1}G"))
+
+    OptionsManager.scrolljump.set(scrolljump)
+
+    // Make sure we're where we want to be
+    assertVisibleArea(scrollToLogicalLine, bottomLogicalLine)
+    assertPosition(caretLogicalLine, 0)
   }
 
   protected fun typeText(keys: List<KeyStroke?>): Editor {
@@ -278,7 +309,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   private fun performTest(keys: String, after: String, modeAfter: CommandState.Mode, subModeAfter: SubMode) {
-    typeText(StringHelper.parseKeys(keys))
+    typeText(parseKeys(keys))
     myFixture.checkResult(after)
     assertState(modeAfter, subModeAfter)
   }
@@ -336,9 +367,9 @@ abstract class VimTestCase : UsefulTestCase() {
     @JvmStatic
     fun commandToKeys(command: String): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
-      keys.addAll(StringHelper.parseKeys(":"))
+      keys.addAll(parseKeys(":"))
       keys.addAll(stringToKeys(command))
-      keys.addAll(StringHelper.parseKeys("<Enter>"))
+      keys.addAll(parseKeys("<Enter>"))
       return keys
     }
 
@@ -346,9 +377,9 @@ abstract class VimTestCase : UsefulTestCase() {
 
     fun searchToKeys(pattern: String, forwards: Boolean): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
-      keys.addAll(StringHelper.parseKeys(if (forwards) "/" else "?"))
+      keys.addAll(parseKeys(if (forwards) "/" else "?"))
       keys.addAll(stringToKeys(pattern))
-      keys.addAll(StringHelper.parseKeys("<Enter>"))
+      keys.addAll(parseKeys("<Enter>"))
       return keys
     }
 
