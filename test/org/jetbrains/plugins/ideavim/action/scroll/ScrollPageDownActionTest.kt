@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -134,7 +135,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "IntelliJ does not have virtual space enabled by default")
-  fun `test scroll page down on final page moves cursor to end of file`() {
+  fun `test scroll page down on last page moves cursor to end of file`() {
     configureByPages(5)
     setPositionAndScroll(145, 150)
     typeText(parseKeys("<C-F>"))
@@ -148,5 +149,12 @@ class ScrollPageDownActionTest : VimTestCase() {
     typeText(parseKeys("<C-F>"))
     assertPosition(143, 0)
     assertVisibleArea(143, 175)
+  }
+
+  fun `test scroll page down on last line causes beep`() {
+    configureByPages(5)
+    setPositionAndScroll(146, 175)
+    typeText(parseKeys("<C-F>"))
+    assertTrue(VimPlugin.isError())
   }
 }

@@ -18,8 +18,10 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
+import junit.framework.Assert
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 // |<S-Up>|, |<PageUp>|, |CTRL-B|
@@ -138,6 +140,13 @@ class ScrollPageUpActionTest : VimTestCase() {
     typeText(parseKeys("<C-B>"))
     assertPosition(25, 0)
     assertVisibleArea(0, 34)
+  }
+
+  fun `test scroll page up on first page causes beep`() {
+    configureByPages(5)
+    setPositionAndScroll(0, 25)
+    typeText(parseKeys("<C-B>"))
+    Assert.assertTrue(VimPlugin.isError())
   }
 
   fun `test scroll page up on second page moves cursor to previous top`() {
