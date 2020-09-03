@@ -112,7 +112,12 @@ public class MotionGroup {
 
         // If inclusive, add the last character to the range
         if (action.getMotionType() == MotionType.INCLUSIVE && end < EditorHelperRt.getFileSize(editor)) {
-          end++;
+          if (start > end) {
+            start ++;
+          }
+          else {
+            end++;
+          }
         }
       }
       else if (cmd.getAction() instanceof TextObjectActionHandler) {
