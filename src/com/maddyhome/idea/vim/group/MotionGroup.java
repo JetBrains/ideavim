@@ -572,31 +572,26 @@ public class MotionGroup {
 
   public boolean scrollLineToFirstScreenLine(@NotNull Editor editor, int rawCount, boolean start) {
     scrollLineToScreenLocation(editor, ScreenLocation.TOP, rawCount, start);
-
     return true;
   }
 
   public boolean scrollLineToMiddleScreenLine(@NotNull Editor editor, int rawCount, boolean start) {
     scrollLineToScreenLocation(editor, ScreenLocation.MIDDLE, rawCount, start);
-
     return true;
   }
 
   public boolean scrollLineToLastScreenLine(@NotNull Editor editor, int rawCount, boolean start) {
     scrollLineToScreenLocation(editor, ScreenLocation.BOTTOM, rawCount, start);
-
     return true;
   }
 
   public boolean scrollColumnToFirstScreenColumn(@NotNull Editor editor) {
     scrollColumnToScreenColumn(editor, 0);
-
     return true;
   }
 
   public boolean scrollColumnToLastScreenColumn(@NotNull Editor editor) {
     scrollColumnToScreenColumn(editor, EditorHelper.getScreenWidth(editor));
-
     return true;
   }
 
@@ -1193,17 +1188,16 @@ public class MotionGroup {
   }
 
   // Scrolls current or [count] line to given screen location
-  // In Vim, [count] refers to a file line, so it's a logical line
+  // In Vim, [count] refers to a file line, so it's a one-based logical line
   private void scrollLineToScreenLocation(@NotNull Editor editor,
                                           @NotNull ScreenLocation screenLocation,
-                                          int line,
+                                          int rawCount,
                                           boolean start) {
     final int scrollOffset = getNormalizedScrollOffset(editor);
 
-    line = EditorHelper.normalizeLine(editor, line);
-    int visualLine = line == 0
-                     ? editor.getCaretModel().getVisualPosition().line
-                     : EditorHelper.logicalLineToVisualLine(editor, line - 1);
+    int visualLine = rawCount == 0
+      ? editor.getCaretModel().getVisualPosition().line
+      : EditorHelper.logicalLineToVisualLine(editor, EditorHelper.normalizeLine(editor, rawCount - 1));
 
     // This method moves the current (or [count]) line to the specified screen location
     // Scroll offset is applicable, but scroll jump isn't. Offset is applied to screen lines (visual lines)
@@ -1218,6 +1212,7 @@ public class MotionGroup {
         EditorHelper.scrollVisualLineToBottomOfScreen(editor, visualLine + scrollOffset);
         break;
     }
+
     if (visualLine != editor.getCaretModel().getVisualPosition().line || start) {
       int offset;
       if (start) {

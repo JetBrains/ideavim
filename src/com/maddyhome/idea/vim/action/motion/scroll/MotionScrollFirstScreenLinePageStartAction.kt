@@ -33,11 +33,12 @@ class MotionScrollFirstScreenLinePageStartAction : VimActionHandler.SingleExecut
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP)
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    var line = cmd.rawCount
-    if (line == 0) {
-      val nextVisualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor) + 1
-      line = EditorHelper.visualLineToLogicalLine(editor, nextVisualLine) + 1 // rawCount is 1 based
+    var rawCount = cmd.rawCount
+    if (rawCount == 0) {
+      val nextVisualLine = EditorHelper.normalizeVisualLine(editor,
+        EditorHelper.getVisualLineAtBottomOfScreen(editor) + 1)
+      rawCount = EditorHelper.visualLineToLogicalLine(editor, nextVisualLine) + 1 // rawCount is 1 based
     }
-    return VimPlugin.getMotion().scrollLineToFirstScreenLine(editor, line, true)
+    return VimPlugin.getMotion().scrollLineToFirstScreenLine(editor, rawCount, true)
   }
 }
