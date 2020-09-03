@@ -30,6 +30,7 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
+import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.keymap.Keymap
 import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.options.ShowSettingsUtil
@@ -40,9 +41,11 @@ import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.key.ShortcutOwner
+import com.maddyhome.idea.vim.listener.FindActionId
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
+import java.awt.datatransfer.StringSelection
 import java.io.File
 import javax.swing.KeyStroke
 import javax.swing.event.HyperlinkEvent
@@ -141,8 +144,55 @@ class NotificationService(private val project: Project?) {
       NotificationType.INFORMATION).notify(project)
   }
 
-  fun notifyActionId(id: String) {
-    Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, "Action id: $id", NotificationType.INFORMATION).notify(project)
+  fun notifyActionId(id: String?) {
+    ActionIdNotifier.notifyActionId(id, project)
+  }
+
+  private object ActionIdNotifier {
+    private var notification: Notification? = null
+    private const val NO_ID = "<i>No Action Id</i>"
+
+    fun notifyActionId(id: String?, project: Project?) {
+
+      notification?.expire()
+
+      Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, "Action id: ${id ?: NO_ID}", NotificationType.INFORMATION).let {
+        notification = it
+        it.whenExpired { notification = null }
+        it.setContent(it.content + "<br><br><small>Use Event Log to see previous ids</small>")
+
+        val copyActionId = CopyActionId(id, project)
+        copyActionId.templatePresentation.isEnabled = id != null
+        it.addAction(copyActionId)
+
+        it.addAction(StopTracking())
+        it.notify(project)
+      }
+    }
+
+    class CopyActionId(val id: String?, val project: Project?) : DumbAwareAction("Copy Action Id") {
+      override fun actionPerformed(e: AnActionEvent) {
+        CopyPasteManager.getInstance().setContents(StringSelection(id ?: ""))
+        notification?.expire()
+
+        val content = if (id == null) "No action id" else "Action id copied: $id"
+        Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, content, NotificationType.INFORMATION).let {
+          it.addAction(StopTracking())
+          it.notify(project)
+        }
+      }
+
+      override fun update(e: AnActionEvent) {
+        e.presentation.isEnabled = id != null
+      }
+    }
+
+    class StopTracking : DumbAwareAction("Stop Tracking") {
+      override fun actionPerformed(e: AnActionEvent) {
+        FindActionId.enabled = false
+        notification?.expire()
+      }
+    }
   }
 
   class OpenIdeaVimRcAction(private val notification: Notification?) : DumbAwareAction("Open ~/.ideavimrc") {

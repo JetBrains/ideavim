@@ -78,7 +78,7 @@ object IdeaSpecifics {
       }
 
       if (FindActionId.enabled) {
-        val id = ActionManager.getInstance().getId(action) ?: "--NO_ID--"
+        val id: String? = ActionManager.getInstance().getId(action)
         VimPlugin.getNotifications(dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
       }
     }
