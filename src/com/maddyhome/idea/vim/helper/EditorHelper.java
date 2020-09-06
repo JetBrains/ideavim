@@ -90,15 +90,15 @@ public class EditorHelper {
    * characters if there are "real" tabs in the line.
    *
    * @param editor The editor
-   * @param line   The logical line within the file
+   * @param logicalLine   The logical line within the file
    * @return The number of characters in the specified line
    */
-  public static int getLineLength(final @NotNull Editor editor, final int line) {
+  public static int getLineLength(final @NotNull Editor editor, final int logicalLine) {
     if (getLineCount(editor) == 0) {
       return 0;
     }
     else {
-      return Math.max(0, editor.offsetToLogicalPosition(editor.getDocument().getLineEndOffset(line)).column);
+      return Math.max(0, editor.offsetToLogicalPosition(editor.getDocument().getLineEndOffset(logicalLine)).column);
     }
   }
 
@@ -462,6 +462,7 @@ public class EditorHelper {
    * @return The file offset of the visual position
    */
   public static int visualPositionToOffset(final @NotNull Editor editor, final @NotNull VisualPosition pos) {
+    // [202] return editor.visualPositionToOffset(pos);
     return editor.logicalPositionToOffset(editor.visualToLogicalPosition(pos));
   }
 

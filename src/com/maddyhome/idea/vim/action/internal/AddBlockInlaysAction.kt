@@ -41,7 +41,7 @@ import java.util.*
 import javax.swing.UIManager
 import kotlin.math.max
 
-class AddInlaysAction : AnAction() {
+class AddBlockInlaysAction : AnAction() {
   override fun actionPerformed(e: AnActionEvent) {
     val dataContext = e.dataContext
     val editor = getEditor(dataContext) ?: return
