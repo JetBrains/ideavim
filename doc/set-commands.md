@@ -119,6 +119,12 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                  - enabled - icon is shown in the status bar
                  - gray - use the gray version of the icon
                  - disabled - hide the icon
+
+    `ideawaonw`     `ideawaonw` Boolean (default true) [To Be Released]
+                  Read as "idea wa on w". Enables execution of ":wa" (save all) command on ":w" (save).
+                  This feature exists because some IJ options like "Prettier on save" or "ESlint on save"
+                       work only with "save all" action. If this option is on, these actions work
+                       also with ":w" command.
                   
     `lookupkeys`    `lookupkeys`   List of strings
     

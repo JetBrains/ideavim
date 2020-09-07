@@ -30,6 +30,13 @@ To Be Released
 * [VIM-2080](https://youtrack.jetbrains.com/issue/VIM-2080) Fix S command with count
 * [VIM-2099](https://youtrack.jetbrains.com/issue/VIM-2099) Fix operations with backward inclusive motions
 
+**Changes:**
+* `:w` works as `:wa` by default. This can be disabled with `ideawaonw` option.
+ 
+    Now features like `Prettier on save` or `Run on save for files` would work with `:w` command as well.
+  
+    See [VIM-1968](https://youtrack.jetbrains.com/issue/VIM-1968).
+
 0.59, 2020-08-25
 ------------
 

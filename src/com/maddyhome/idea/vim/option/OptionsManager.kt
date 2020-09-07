@@ -86,6 +86,7 @@ object OptionsManager {
   val idearefactormode = addOption(BoundStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues))
   val ideastatusicon = addOption(BoundStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues))
   val ideastrictmode = addOption(ToggleOption("ideastrictmode", "ideastrictmode", false))
+  val ideawaonw = addOption(ToggleOption("ideawaonw", "ideawaonw", true))
 
   // Dev only experimental options
   val dialogescape = addOption(BoundStringOption("dialogescape", "de", "legacy", arrayOf("legacy", "on", "off")))
