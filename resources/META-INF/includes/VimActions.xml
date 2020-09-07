@@ -28,9 +28,9 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionRightMatchCharAction" mappingModes="NXO" keys="f"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionRightTillMatchCharAction" mappingModes="NXO" keys="t"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionHomeAction" mappingModes="NV" keys="«Home»"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftHomeAction" mappingModes="NV" keys="«S-Home»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftHomeAction" mappingModes="INV" keys="«S-Home»"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionEndAction" mappingModes="NVO" keys="«End»"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftEndAction" mappingModes="NV" keys="«S-End»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftEndAction" mappingModes="INV" keys="«S-End»"/>
     <!-- Up/Down -->
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionDownAction" mappingModes="NXO" keys="j"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionDownCtrlNAction" mappingModes="NXO" keys="«C-N»"/>
@@ -150,10 +150,10 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenColumnAction" mappingModes="NXO" keys="ze"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnLeftAction" mappingModes="NXO" keys="zl,z«Right»"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnRightAction" mappingModes="NXO" keys="zh,z«Left»"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionShiftDownAction" mappingModes="NV" keys="«S-Down»"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionShiftUpAction" mappingModes="NV" keys="«S-Up»"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftRightAction" mappingModes="NV" keys="«S-Right»"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftLeftAction" mappingModes="NV" keys="«S-Left»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionShiftDownAction" mappingModes="INV" keys="«S-Down»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionShiftUpAction" mappingModes="INV" keys="«S-Up»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftRightAction" mappingModes="INV" keys="«S-Right»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftLeftAction" mappingModes="INV" keys="«S-Left»"/>
     <!-- Visual -->
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction" mappingModes="X" keys="«Esc»,«C-[»,«C-C»"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.visual.VisualToggleCharacterModeAction" mappingModes="NX" keys="v"/>
