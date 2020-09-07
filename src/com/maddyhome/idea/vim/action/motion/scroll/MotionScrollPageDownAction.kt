@@ -47,9 +47,7 @@ class MotionScrollPageDownAction : VimActionHandler.SingleExecution() {
 class MotionScrollPageDownInsertModeAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, KeyEvent.SHIFT_DOWN_MASK))
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0))
   )
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
