@@ -69,6 +69,8 @@ public class FileGroup {
       // Can't open a file unless it has a known file type. The next call will return the known type.
       // If unknown, IDEA will prompt the user to pick a type.
       FileType type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found, project);
+
+      //noinspection IfStatementWithIdenticalBranches
       if (type != null) {
         FileEditorManager fem = FileEditorManager.getInstance(project);
         fem.openFile(found, true);
@@ -127,7 +129,7 @@ public class FileGroup {
       return res;
     }
     final Ref<VirtualFile> result = Ref.create();
-    final VirtualFileVisitor<Object> visitor = new VirtualFileVisitor<Object>() {
+    final VirtualFileVisitor<Object> visitor = new VirtualFileVisitor<>() {
       @Override
       public boolean visitFile(@NotNull VirtualFile file) {
         if (file.getName().equals(filename)) {
