@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +18,25 @@
 
 package com.maddyhome.idea.vim.option
 
+import com.intellij.codeInsight.lookup.LookupEvent
+import com.intellij.codeInsight.lookup.LookupListener
+import com.intellij.codeInsight.lookup.LookupManager
+import com.intellij.codeInsight.lookup.impl.LookupImpl
+import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExOutputModel
-import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.helper.hasVisualSelection
+import com.maddyhome.idea.vim.helper.isBlockCaret
+import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.Contract
 import java.util.*
 import kotlin.math.ceil
@@ -36,8 +46,8 @@ import kotlin.math.min
 object OptionsManager {
   private val logger = Logger.getInstance(OptionsManager::class.java)
 
-  private val options: MutableMap<String, Option> = mutableMapOf()
-  private val abbrevs: MutableMap<String, Option> = mutableMapOf()
+  private val options: MutableMap<String, Option<*>> = mutableMapOf()
+  private val abbrevs: MutableMap<String, Option<*>> = mutableMapOf()
 
   val clipboard = addOption(ListOption(ClipboardOptionsData.name, ClipboardOptionsData.abbr, arrayOf(ClipboardOptionsData.ideaput, "autoselect,exclude:cons\\|linux"), null))
   val digraph = addOption(ToggleOption("digraph", "dg", false))
@@ -49,7 +59,7 @@ object OptionsManager {
   val incsearch = addOption(ToggleOption("incsearch", "is", false))
   val iskeyword = addOption(KeywordOption("iskeyword", "isk", arrayOf("@", "48-57", "_")))
   val keymodel = addOption(KeyModelOptionData.option)
-  val lookupActions = addOption(ListOption("lookupactions", "lookupactions", arrayOf("VimLookupUpAction", "VimLookupDownAction"), null))
+  val lookupKeys = addOption(ListOption(LookupKeysData.name, LookupKeysData.name, LookupKeysData.defaultValues, null))
   val matchpairs = addOption(ListOption("matchpairs", "mps", arrayOf("(:)", "{:}", "[:]"), ".:."))
   val more = addOption(ToggleOption("more", "more", true))
   val nrformats = addOption(BoundListOption("nrformats", "nf", arrayOf("octal", "hex"), arrayOf("octal", "hex", "alpha")))
@@ -60,6 +70,7 @@ object OptionsManager {
   val scrolloff = addOption(NumberOption("scrolloff", "so", 0))
   val selection = addOption(BoundStringOption("selection", "sel", "inclusive", arrayOf("old", "inclusive", "exclusive")))
   val selectmode = addOption(SelectModeOptionData.option)
+  val showcmd = addOption(ToggleOption("showcmd", "sc", true))  // Vim: Off by default on platforms with possibly slow tty. On by default elsewhere.
   val showmode = addOption(ToggleOption("showmode", "smd", false))
   val sidescroll = addOption(NumberOption("sidescroll", "ss", 0))
   val sidescrolloff = addOption(NumberOption("sidescrolloff", "siso", 0))
@@ -72,6 +83,18 @@ object OptionsManager {
   val visualbell = addOption(ToggleOption("visualbell", "vb", false))
   val wrapscan = addOption(ToggleOption("wrapscan", "ws", true))
   val visualEnterDelay = addOption(NumberOption("visualdelay", "visualdelay", 100, 0, Int.MAX_VALUE))
+  val idearefactormode = addOption(BoundStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues))
+  val ideastatusicon = addOption(BoundStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues))
+  val ideastrictmode = addOption(ToggleOption("ideastrictmode", "ideastrictmode", false))
+  val ideawaonw = addOption(ToggleOption("ideawaonw", "ideawaonw", true))
+
+  // Dev only experimental options
+  val dialogescape = addOption(BoundStringOption("dialogescape", "de", "legacy", arrayOf("legacy", "on", "off")))
+  val oneline = addOption(ToggleOption("oneline", "oneline", true))
+
+  @ApiStatus.ScheduledForRemoval(inVersion = "0.59")
+  @Deprecated("please use ideastatusicon")
+  val ideastatusbar = addOption(ToggleOption("ideastatusbar", "ideastatusbar", true))
 
   fun isSet(name: String): Boolean {
     val option = getOption(name)
@@ -85,7 +108,7 @@ object OptionsManager {
   /**
    * Gets an option by the supplied name or short name.
    */
-  fun getOption(name: String): Option? = options[name] ?: abbrevs[name]
+  fun getOption(name: String): Option<*>? = options[name] ?: abbrevs[name]
 
   /**
    * This parses a set of :set commands. The following types of commands are supported:
@@ -134,7 +157,7 @@ object OptionsManager {
     var error: String? = null
     var token = ""
     val tokenizer = StringTokenizer(args)
-    val toShow = mutableListOf<Option>()
+    val toShow = mutableListOf<Option<*>>()
     while (tokenizer.hasMoreTokens()) {
       token = tokenizer.nextToken()
       // See if a space has been backslashed, if no get the rest of the text
@@ -280,11 +303,11 @@ object OptionsManager {
    * @param opts      The list of options to display
    * @param showIntro True if intro is displayed, false if not
    */
-  private fun showOptions(editor: Editor?, opts: Collection<Option>, showIntro: Boolean) {
+  private fun showOptions(editor: Editor?, opts: Collection<Option<*>>, showIntro: Boolean) {
     if (editor == null) return
 
-    val cols = mutableListOf<Option>()
-    val extra = mutableListOf<Option>()
+    val cols = mutableListOf<Option<*>>()
+    val extra = mutableListOf<Option<*>>()
     for (option in opts) {
       if (option.toString().length > 19) extra.add(option) else cols.add(option)
     }
@@ -337,10 +360,15 @@ object OptionsManager {
   }
 
   @Contract("_ -> param1")
-  fun <T : Option> addOption(option: T): T {
+  fun <T : Option<*>> addOption(option: T): T {
     options += option.name to option
     abbrevs += option.abbrev to option
     return option
+  }
+
+  fun removeOption(name: String) {
+    options.remove(name)
+    abbrevs.values.find { it.name == name }?.let { option -> abbrevs.remove(option.abbrev) }
   }
 }
 
@@ -367,12 +395,26 @@ object SelectModeOptionData {
   const val mouse = "mouse"
   const val key = "key"
   const val cmd = "cmd"
+
+  @ApiStatus.ScheduledForRemoval(inVersion = "0.58")
+  @Deprecated("Please, use `idearefactormode` option")
   const val template = "template"
+
+  @ApiStatus.ScheduledForRemoval(inVersion = "0.58")
+  @Deprecated("Please, use `ideaselection`")
   const val refactoring = "refactoring"
 
-  val options = arrayOf(mouse, key, cmd, template, refactoring)
-  val default = arrayOf(template)
+  const val ideaselection = "ideaselection"
+
+  @Suppress("DEPRECATION")
+  val options = arrayOf(mouse, key, cmd, template, refactoring, ideaselection)
+  val default = emptyArray<String>()
   val option = BoundListOption(name, abbr, default, options)
+
+  fun ideaselectionEnabled(): Boolean {
+    @Suppress("DEPRECATION")
+    return ideaselection in OptionsManager.selectmode || refactoring in OptionsManager.selectmode
+  }
 }
 
 object ClipboardOptionsData {
@@ -380,6 +422,7 @@ object ClipboardOptionsData {
   const val abbr = "cb"
 
   const val ideaput = "ideaput"
+  const val unnamed = "unnamed"
   var ideaputDisabled = false
     private set
 
@@ -425,4 +468,94 @@ object SmartCaseOptionsData {
 object IgnoreCaseOptionsData {
   const val name = "ignorecase"
   const val abbr = "ic"
+}
+
+object IdeaRefactorMode {
+  const val name = "idearefactormode"
+
+  const val keep = "keep"
+  const val select = "select"
+  const val visual = "visual"
+
+  val availableValues = arrayOf(keep, select, visual)
+
+  fun keepMode(): Boolean = OptionsManager.idearefactormode.value == keep
+  fun selectMode(): Boolean = OptionsManager.idearefactormode.value == select
+  fun visualMode(): Boolean = OptionsManager.idearefactormode.value == visual
+
+  fun correctSelection(editor: Editor) {
+    val action: () -> Unit = {
+      if (!editor.mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
+        SelectionVimListenerSuppressor.lock().use {
+          editor.selectionModel.removeSelection()
+        }
+      }
+      if (editor.mode.hasVisualSelection && editor.selectionModel.hasSelection()) {
+        val autodetectedSubmode = VimPlugin.getVisualMotion().autodetectVisualSubmode(editor)
+        if (editor.subMode != autodetectedSubmode) {
+          // Update the submode
+          editor.subMode = autodetectedSubmode
+        }
+      }
+
+      if (editor.mode.isBlockCaret) {
+        TemplateManagerImpl.getTemplateState(editor)?.currentVariableRange?.let { segmentRange ->
+          if (!segmentRange.isEmpty && segmentRange.endOffset == editor.caretModel.offset && editor.caretModel.offset != 0) {
+            editor.caretModel.moveToOffset(editor.caretModel.offset - 1)
+          }
+        }
+      }
+    }
+
+    val lookup = LookupManager.getActiveLookup(editor) as? LookupImpl
+    if (lookup != null) {
+      val selStart = editor.selectionModel.selectionStart
+      val selEnd = editor.selectionModel.selectionEnd
+      lookup.performGuardedChange(action)
+      lookup.addLookupListener(object : LookupListener {
+        override fun beforeItemSelected(event: LookupEvent): Boolean {
+          // FIXME: 01.11.2019 Nasty workaround because of problems in IJ platform
+          //   Lookup replaces selected text and not the template itself. So, if there is no selection
+          //   in the template, lookup value will not replace the template, but just insert value on the caret position
+          lookup.performGuardedChange { editor.selectionModel.setSelection(selStart, selEnd) }
+          lookup.removeLookupListener(this)
+          return true
+        }
+      })
+    } else {
+      action()
+    }
+  }
+}
+
+object LookupKeysData {
+  const val name = "lookupkeys"
+  val defaultValues = arrayOf(
+    "<Tab>", "<Down>", "<Up>", "<Enter>", "<Left>", "<Right>",
+    "<C-Down>", "<C-Up>",
+    "<PageUp>", "<PageDown>",
+    // New line in vim, but QuickDoc on MacOs
+    "<C-J>",
+    // QuickDoc for non-mac layouts.
+    // Vim: Insert next non-digit literally (same as <Ctrl-V>). Not yet supported (19.01.2020)
+    "<C-Q>"
+  )
+}
+
+object IdeaStatusIcon {
+  const val enabled = "enabled"
+  const val gray = "gray"
+  const val disabled = "disabled"
+
+  const val name = "ideastatusicon"
+  val allValues = arrayOf(enabled, gray, disabled)
+}
+
+object StrictMode {
+  val on: Boolean
+    get() = OptionsManager.ideastrictmode.isSet
+
+  fun fail(message: String) {
+    if (on) error(message)
+  }
 }

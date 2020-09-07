@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,12 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.*
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.flags
 
 class YankLinesHandler : CommandHandler.SingleExecution() {
-  override val names = commands("y[ank]")
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
@@ -46,7 +48,7 @@ class YankLinesHandler : CommandHandler.SingleExecution() {
     val starts = ArrayList<Int>(caretModel.caretCount)
     val ends = ArrayList<Int>(caretModel.caretCount)
     for (caret in caretModel.allCarets) {
-      val range = cmd.getTextRange(editor, caret, context, true)
+      val range = cmd.getTextRange(editor, caret, true)
       starts.add(range.startOffset)
       ends.add(range.endOffset)
     }

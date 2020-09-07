@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import java.util.Objects;
 
 
 public class CharPointer {
-  @NotNull private CharSequence seq;
+  private @NotNull CharSequence seq;
   private int pointer;
   private boolean readonly;
 
@@ -55,13 +55,11 @@ public class CharPointer {
     return pointer;
   }
 
-  @NotNull
-  public CharPointer set(char ch) {
+  public @NotNull CharPointer set(char ch) {
     return set(ch, 0);
   }
 
-  @NotNull
-  public CharPointer set(char ch, int offset) {
+  public @NotNull CharPointer set(char ch, int offset) {
     if (readonly) {
       throw new IllegalStateException("readonly string");
     }
@@ -94,32 +92,27 @@ public class CharPointer {
     return seq.charAt(pointer + offset);
   }
 
-  @NotNull
-  public CharPointer inc() {
+  public @NotNull CharPointer inc() {
     return inc(1);
   }
 
-  @NotNull
-  public CharPointer inc(int cnt) {
+  public @NotNull CharPointer inc(int cnt) {
     pointer += cnt;
 
     return this;
   }
 
-  @NotNull
-  public CharPointer dec() {
+  public @NotNull CharPointer dec() {
     return dec(1);
   }
 
-  @NotNull
-  public CharPointer dec(int cnt) {
+  public @NotNull CharPointer dec(int cnt) {
     pointer -= cnt;
 
     return this;
   }
 
-  @NotNull
-  public CharPointer assign(@NotNull CharPointer ptr) {
+  public @NotNull CharPointer assign(@NotNull CharPointer ptr) {
     seq = ptr.seq;
     pointer = ptr.pointer;
     readonly = ptr.readonly;
@@ -127,13 +120,11 @@ public class CharPointer {
     return this;
   }
 
-  @NotNull
-  public CharPointer ref(int offset) {
+  public @NotNull CharPointer ref(int offset) {
     return new CharPointer(this, offset);
   }
 
-  @NotNull
-  public String substring(int len) {
+  public @NotNull String substring(int len) {
     if (end()) return "";
 
     int start = pointer;
@@ -188,8 +179,7 @@ public class CharPointer {
     return 0;
   }
 
-  @Nullable
-  public CharPointer strchr(char c) {
+  public @Nullable CharPointer strchr(char c) {
     if (end()) {
       return null;
     }
@@ -208,8 +198,7 @@ public class CharPointer {
     return null;
   }
 
-  @Nullable
-  public CharPointer istrchr(char c) {
+  public @Nullable CharPointer istrchr(char c) {
     if (end()) {
       return null;
     }
@@ -247,8 +236,7 @@ public class CharPointer {
     return charAt();
   }
 
-  @NotNull
-  public CharPointer OPERAND() {
+  public @NotNull CharPointer OPERAND() {
     return ref(3);
   }
 
@@ -306,8 +294,7 @@ public class CharPointer {
     return Math.min(seq.length(), pos);
   }
 
-  @NotNull
-  public String toString() {
+  public @NotNull String toString() {
     return substring(strlen());
   }
 }

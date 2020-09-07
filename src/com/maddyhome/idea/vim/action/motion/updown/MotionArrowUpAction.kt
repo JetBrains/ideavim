@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,27 +22,21 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.enumSetOf
 import java.awt.event.KeyEvent
-import java.util.*
 import javax.swing.KeyStroke
 
-class MotionArrowUpAction : NonShiftedSpecialKeyHandler() {
-  override val motionType: MotionType = MotionType.INCLUSIVE
-
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVO
+class MotionArrowUpAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction {
+  override val motionType: MotionType = MotionType.LINE_WISE
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Up>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0)))
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
   private var col: Int = 0
 
   override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {

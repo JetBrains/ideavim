@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class InsertDeletePreviousWordActionTest : VimTestCase() {
   // VIM-1655
   fun `test deleted word is not yanked`() {
-    doTest(parseKeys("yiw", "3wea", "<C-W>", "<ESC>p"), """
+    doTest(listOf("yiw", "3wea", "<C-W>", "<ESC>p"), """
             I found ${c}it in a legendary land
         """.trimIndent(), """
             I found it in a i${c}t land
@@ -36,7 +36,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
   }
 
   fun `test word removed`() {
-    doTest(parseKeys("i", "<C-W>"), """
+    doTest(listOf("i", "<C-W>"), """
             I found${c} it in a legendary land
         """.trimIndent(), """
             I ${c} it in a legendary land
@@ -44,7 +44,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
   }
 
   fun `test non alpha chars`() {
-    doTest(parseKeys("i", "<C-W>", "<C-W>", "<C-W>", "<C-W>"), """
+    doTest(listOf("i", "<C-W>", "<C-W>", "<C-W>", "<C-W>"), """
             I found (it)${c} in a legendary land
         """.trimIndent(), """
             I ${c} in a legendary land
@@ -52,7 +52,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
   }
 
   fun `test indents and spaces`() {
-    doTest(parseKeys("i", "<C-W>", "<C-W>", "<C-W>", "<C-W>"), """
+    doTest(listOf("i", "<C-W>", "<C-W>", "<C-W>", "<C-W>"), """
             A Discovery
             
                  I${c} found it in a legendary land
@@ -69,7 +69,7 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
             ${c}
   """)
   fun `test delete starting from the line end`() {
-    doTest(parseKeys("i", "<C-W>"), """
+    doTest(listOf("i", "<C-W>"), """
             If (found) {
                if (it) {
                   legendary
@@ -85,20 +85,20 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
 
   // VIM-569 |a| |i_CTRL-W|
   fun `test delete previous word dot eol`() {
-    doTest(parseKeys("a", "<C-W>"),
+    doTest(listOf("a", "<C-W>"),
       "this is a sentence<caret>.\n", "this is a sentence<caret>\n", CommandState.Mode.INSERT,
       CommandState.SubMode.NONE)
   }
 
   // VIM-569 |a| |i_CTRL-W|
   fun `test delete previous word last after whitespace`() {
-    doTest(parseKeys("A", "<C-W>"),
+    doTest(listOf("A", "<C-W>"),
       "<caret>this is a sentence\n", "this is a <caret>\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   // VIM-513 |A| |i_CTRL-W|
   fun `test delete previous word eol`() {
-    doTest(parseKeys("A", "<C-W>"),
+    doTest(listOf("A", "<C-W>"),
       "<caret>\$variable\n", "$<caret>\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 

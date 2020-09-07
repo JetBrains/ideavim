@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,8 +94,8 @@ public class StringHelperTest extends VimTestCase {
   }
 
   public void testControlBoundCharacters() {
-    assertKeyStroke(KeyStroke.getKeyStroke('@', InputEvent.CTRL_MASK), "\u0000");
-    assertKeyStroke(KeyStroke.getKeyStroke('_', InputEvent.CTRL_MASK), "\u001F");
+    assertKeyStroke(KeyStroke.getKeyStroke('@', InputEvent.CTRL_DOWN_MASK), "\u0000");
+    assertKeyStroke(KeyStroke.getKeyStroke('_', InputEvent.CTRL_DOWN_MASK), "\u001F");
   }
 
   public void testControlExceptionCharacters() {

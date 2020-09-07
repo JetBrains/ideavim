@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,12 +24,11 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.copy.PutData
+import com.maddyhome.idea.vim.helper.StringHelper
 
 class PutLinesHandler : CommandHandler.SingleExecution() {
-  override val names = commands("pu[t]")
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
@@ -37,14 +36,15 @@ class PutLinesHandler : CommandHandler.SingleExecution() {
 
     val registerGroup = VimPlugin.getRegister()
     val arg = cmd.argument
-    if (arg.isNotEmpty() && !registerGroup.selectRegister(arg[0])) {
-      return false
+    if (arg.isNotEmpty()) {
+      if(!registerGroup.selectRegister(arg[0]))
+        return false
     } else {
       registerGroup.selectRegister(registerGroup.defaultRegister)
     }
 
     val line = if (cmd.ranges.size() == 0) -1 else cmd.getLine(editor)
-    val textData = registerGroup.lastRegister?.let { PutData.TextData(it.text, SelectionType.LINE_WISE, it.transferableData) }
+    val textData = registerGroup.lastRegister?.let { PutData.TextData(it.text ?: StringHelper.toKeyNotation(it.keys), SelectionType.LINE_WISE, it.transferableData) }
     val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, _indent = false, caretAfterInsertedText = false, putToLine = line)
     return VimPlugin.getPut().putText(editor, context, putData)
   }

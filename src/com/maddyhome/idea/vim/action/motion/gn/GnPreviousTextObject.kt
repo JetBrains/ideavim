@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,13 +23,9 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.TextObjectVisualType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.*
-import javax.swing.KeyStroke
 
 /**
  * @author Alex Plate
@@ -37,11 +33,8 @@ import javax.swing.KeyStroke
 
 class GnPreviousTextObject : TextObjectActionHandler() {
 
-  override val mappingModes: Set<MappingMode> = MappingMode.O
+  override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gN")
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE)
   override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
     if (caret != editor.caretModel.primaryCaret) return null
     val range = VimPlugin.getSearch().getNextSearchRange(editor, count, false)

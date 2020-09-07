@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,15 @@
 package org.jetbrains.plugins.ideavim.action.motion.select
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class SelectToggleVisualModeHandlerTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to select mode characterwise`() {
-    doTest(parseKeys("ve", "<C-G>"),
+    doTest(listOf("ve", "<C-G>"),
       """
                 A Discovery
 
@@ -46,8 +48,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to select mode characterwise left motion`() {
-    doTest(parseKeys("vb", "<C-G>"),
+    doTest(listOf("vb", "<C-G>"),
       """
                 A Discovery
 
@@ -66,8 +69,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to select mode characterwise empty line`() {
-    doTest(parseKeys("v", "<C-G>"),
+    doTest(listOf("v", "<C-G>"),
       """
                 A Discovery
                 $c
@@ -86,8 +90,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to select mode characterwise to line end`() {
-    doTest(parseKeys("vel", "<C-G>"),
+    doTest(listOf("vel", "<C-G>"),
       """
                 A Discovery
 
@@ -106,8 +111,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to select mode characterwise one letter`() {
-    doTest(parseKeys("v", "<C-G>"),
+    doTest(listOf("v", "<C-G>"),
       """
                 A Discovery
 
@@ -126,8 +132,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to select mode characterwise multicaret`() {
-    doTest(parseKeys("ve", "<C-G>"),
+    doTest(listOf("ve", "<C-G>"),
       """
                 A Discovery
 
@@ -146,8 +153,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to visual mode characterwise`() {
-    doTest(parseKeys("gh", "<S-Right>".repeat(4), "<C-G>"),
+    doTest(listOf("gh", "<S-Right>".repeat(4), "<C-G>"),
       """
                 A Discovery
 
@@ -166,8 +174,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to visual mode characterwise left motion`() {
-    doTest(parseKeys("gh", "<S-Left>".repeat(5), "<C-G>"),
+    doTest(listOf("gh", "<S-Left>".repeat(5), "<C-G>"),
       """
                 A Discovery
 
@@ -186,8 +195,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to visual mode characterwise empty line`() {
-    doTest(parseKeys("gh", "<C-G>"),
+    doTest(listOf("gh", "<C-G>"),
       """
                 A Discovery
                 ${c}
@@ -206,8 +216,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to visual mode characterwise line end`() {
-    doTest(parseKeys("gh", "<S-Right>".repeat(5), "<C-G>"),
+    doTest(listOf("gh", "<S-Right>".repeat(5), "<C-G>"),
       """
                 A Discovery
 
@@ -226,8 +237,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to visual mode characterwise one letter`() {
-    doTest(parseKeys("gh", "<C-G>"),
+    doTest(listOf("gh", "<C-G>"),
       """
                 A Discovery
 
@@ -254,8 +266,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
     """)
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to visual mode characterwise line start`() {
-    doTest(parseKeys("gh", "<S-Left>", "<C-G>"),
+    doTest(listOf("gh", "<S-Left>", "<C-G>"),
       """
                 A Discovery
 
@@ -282,8 +295,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
     """)
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to visual mode characterwise end on line start`() {
-    doTest(parseKeys("gh", "<S-Left>", "<S-Down>", "<C-G>"),
+    doTest(listOf("gh", "<S-Left>", "<S-Down>", "<C-G>"),
       """
                 A Discovery
 
@@ -302,8 +316,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to visual mode characterwise multicaret`() {
-    doTest(parseKeys("gh", "<S-Right>".repeat(4), "<C-G>"),
+    doTest(listOf("gh", "<S-Right>".repeat(4), "<C-G>"),
       """
                 A Discovery
 
@@ -322,8 +337,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to select mode linewise`() {
-    doTest(parseKeys("Ve", "<C-G>"),
+    doTest(listOf("Ve", "<C-G>"),
       """
                 A Discovery
 
@@ -342,8 +358,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to select mode linewise up motion`() {
-    doTest(parseKeys("V", "k", "<C-G>"),
+    doTest(listOf("V", "k", "<C-G>"),
       """
                 A Discovery
 
@@ -362,8 +379,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to select mode linewise empty line`() {
-    doTest(parseKeys("V", "<C-G>"),
+    doTest(listOf("V", "<C-G>"),
       """
                 A Discovery
                 ${c}
@@ -382,8 +400,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to select mode linewise multicaret`() {
-    doTest(parseKeys("Ve", "<C-G>"),
+    doTest(listOf("Ve", "<C-G>"),
       """
                 A Discovery
 
@@ -402,8 +421,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to visual mode linewise`() {
-    doTest(parseKeys("gH", "<C-G>"),
+    doTest(listOf("gH", "<C-G>"),
       """
                 A Discovery
 
@@ -422,8 +442,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to visual mode linewise empty line`() {
-    doTest(parseKeys("gH", "<C-G>"),
+    doTest(listOf("gH", "<C-G>"),
       """
                 A Discovery
                 ${c}
@@ -442,8 +463,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to visual mode linewise multicaret`() {
-    doTest(parseKeys("gH", "<C-G>"),
+    doTest(listOf("gH", "<C-G>"),
       """
                 A Discovery
 
@@ -462,8 +484,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to select mode blockwise`() {
-    doTest(parseKeys("<C-V>ejj", "<C-G>"),
+    doTest(listOf("<C-V>ejj", "<C-G>"),
       """
                 A Discovery
 
@@ -482,8 +505,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to select mode blockwise left motion`() {
-    doTest(parseKeys("<C-V>bjj", "<C-G>"),
+    doTest(listOf("<C-V>bjj", "<C-G>"),
       """
                 A Discovery
 
@@ -502,8 +526,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to visual mode blockwise`() {
-    doTest(parseKeys("g<C-H>", "<S-Right>".repeat(4), "<S-Down>".repeat(2), "<C-G>"),
+    doTest(listOf("g<C-H>", "<S-Right>".repeat(4), "<S-Down>".repeat(2), "<C-G>"),
       """
                 A Discovery
 
@@ -522,8 +547,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test switch to visual mode blockwise to left`() {
-    doTest(parseKeys("g<C-H>", "<S-Left>".repeat(4), "<S-Down>".repeat(2), "<C-G>"),
+    doTest(listOf("g<C-H>", "<S-Left>".repeat(4), "<S-Down>".repeat(2), "<C-G>"),
       """
                 A Discovery
 

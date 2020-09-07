@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,12 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionLastColumnActionTest : VimTestCase() {
   fun `test dollar motion`() {
-    val keys = parseKeys("$")
+    val keys = "$"
     val before = """
             A Discovery
 
@@ -48,7 +47,7 @@ class MotionLastColumnActionTest : VimTestCase() {
   }
 
   fun `test dollar motion with motion to longer line`() {
-    val keys = parseKeys("\$j")
+    val keys = "\$j"
     val before = """
             A Discovery
 
@@ -69,7 +68,7 @@ class MotionLastColumnActionTest : VimTestCase() {
   }
 
   fun `test dollar motion in visual block mode`() {
-    val keys = parseKeys("<C-V>jj\$")
+    val keys = "<C-V>jj\$"
     val before = """
             A Discovery
 
@@ -98,7 +97,7 @@ class MotionLastColumnActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """)
   fun `test dollar motion in visual block mode with left motion`() {
-    val keys = parseKeys("<C-V>jj\$h")
+    val keys = "<C-V>jj\$h"
     val before = """
             A Discovery
 

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,10 +42,26 @@ class MultipleCaretsTest : VimTestCase() {
   }
 
   fun testGotoLineInc() {
-    val before = "qwe\n" + "rt${c}y\n" + "asd\n" + "fgh\n" + "zxc\n" + "v${c}bn\n"
+    val before = """
+      qwe
+      rt${c}y
+      asd
+      fgh
+      zxc
+      v${c}bn
+      
+      """.trimIndent()
     configureByText(before)
     typeText(commandToKeys("+2"))
-    val after = "qwe\n" + "rty\n" + "asd\n" + "${c}fgh\n" + "zxc\n" + "${c}vbn\n"
+    val after = """
+      qwe
+      rty
+      asd
+      ${c}fgh
+      zxc
+      vbn
+      $c
+      """.trimIndent()
     myFixture.checkResult(after)
   }
 
@@ -53,7 +69,7 @@ class MultipleCaretsTest : VimTestCase() {
     val before = "qwe\n" + "r${c}ty\n" + "asd\n" + "fg${c}h\n" + "zxc\n" + "vbn\n"
     configureByText(before)
     typeText(commandToKeys("j"))
-    val after = "qwe\n" + "rty$c asd\n" + "fgh$c zxc\n" + "vbn\n"
+    val after = "qwe\nrty$c asd\nfgh$c zxc\nvbn\n"
     myFixture.checkResult(after)
   }
 
@@ -243,7 +259,7 @@ class MultipleCaretsTest : VimTestCase() {
 
     typeText(commandToKeys("sor"))
 
-    val after = "$c" + before.replace("$c", "").split('\n').sorted().joinToString(separator = "\n")
+    val after = c + before.replace(c, "").split('\n').sorted().joinToString(separator = "\n")
     myFixture.checkResult(after)
   }
 
@@ -281,9 +297,9 @@ class MultipleCaretsTest : VimTestCase() {
 
     typeText(commandToKeys("sor!"))
 
-    val after = "$c" +
+    val after = c +
       before
-        .replace("$c", "")
+        .replace(c, "")
         .split('\n')
         .sortedWith(reverseOrder())
         .joinToString(separator = "\n")

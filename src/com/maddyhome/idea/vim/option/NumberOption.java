@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -99,8 +99,10 @@ public class NumberOption extends TextOption {
     }
 
     if (inRange(num)) {
-      value = num;
-      fireOptionChangeEvent();
+
+      String oldValue = getValue();
+      this.value = num;
+      fireOptionChangeEvent(oldValue, getValue());
 
       return true;
     }
@@ -125,8 +127,9 @@ public class NumberOption extends TextOption {
     }
 
     if (inRange(value + num)) {
+      String oldValue = getValue();
       value += num;
-      fireOptionChangeEvent();
+      fireOptionChangeEvent(oldValue, getValue());
 
       return true;
     }
@@ -151,8 +154,9 @@ public class NumberOption extends TextOption {
     }
 
     if (inRange(value * num)) {
+      String oldValue = getValue();
       value *= num;
-      fireOptionChangeEvent();
+      fireOptionChangeEvent(oldValue, getValue());
 
       return true;
     }
@@ -177,8 +181,9 @@ public class NumberOption extends TextOption {
     }
 
     if (inRange(value - num)) {
+      String oldValue = getValue();
       value -= num;
-      fireOptionChangeEvent();
+      fireOptionChangeEvent(oldValue, getValue());
 
       return true;
     }
@@ -202,13 +207,13 @@ public class NumberOption extends TextOption {
   @Override
   public void resetDefault() {
     if (dflt != value) {
+      String oldValue = getValue();
       value = dflt;
-      fireOptionChangeEvent();
+      fireOptionChangeEvent(oldValue, getValue());
     }
   }
 
-  @Nullable
-  protected Integer asNumber(String val) {
+  protected @Nullable Integer asNumber(String val) {
     try {
       return Integer.decode(val);
     }
@@ -226,8 +231,7 @@ public class NumberOption extends TextOption {
    *
    * @return The option as a string
    */
-  @NotNull
-  public String toString() {
+  public @NotNull String toString() {
 
     return "  " + getName() + "=" + value;
   }

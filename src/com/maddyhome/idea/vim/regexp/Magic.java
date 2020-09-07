@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ public class Magic {
   * Magic characters are negative.  This separates them from literal characters
   * (possibly multi-byte).  Only ASCII characters can be Magic.
   */
-  public static int Magic(int x) {
+  public static int magic(int x) {
     return (x - 256);
   }
 
@@ -112,6 +112,6 @@ public class Magic {
     if (is_Magic(x)) {
       return un_Magic(x);
     }
-    return Magic(x);
+    return magic(x);
   }
 }

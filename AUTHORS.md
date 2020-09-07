@@ -263,6 +263,58 @@ Contributors:
   [![icon][github]](https://github.com/jorgengranseth)
   &nbsp;
   Jørgen Granseth
+* [![icon][mail]](mailto:rafal@hajdacki.com)
+  [![icon][github]](https://github.com/hajdamak)
+  &nbsp;
+  Rafał Hajdacki
+* [![icon][mail]](mailto:igrek+github@fastem.com)
+  [![icon][github]](https://github.com/igrekster)
+  &nbsp;
+  igrekster
+* [![icon][mail]](mailto:lokomot476@gmail.com)
+  [![icon][github]](https://github.com/fan-tom)
+  &nbsp;
+  Alexey Gerasimov
+* [![icon][mail]](mailto:a.grison+github@gmail.com)
+  [![icon][github]](https://github.com/agrison)
+  &nbsp;
+  Alexandre Grison
+* [![icon][mail]](mailto:angel@knight-industries.com)
+  [![icon][github]](https://github.com/angelbot)
+  &nbsp;
+  John Weigel
+* [![icon][mail]](mailto:kevinz@weghst.com)
+  [![icon][github]](https://github.com/kevin70)
+  &nbsp;
+  kk
+* [![icon][mail]](mailto:runforprogram@163.com)
+  [![icon][github]](https://github.com/runforprogram)
+  &nbsp;
+  runforprogram
+* [![icon][mail]](mailto:valery.isaev@jetbrains.com)
+  [![icon][github]](https://github.com/valis)
+  &nbsp;
+  valis
+* [![icon][mail]](mailto:pmikulski@voleon.com)
+  [![icon][github]](https://github.com/pmnoxx)
+  &nbsp;
+  Piotr Mikulski
+* [![icon][mail]](mailto:14farresa@gmail.com)
+  [![icon][github]](https://github.com/adriafarres)
+  &nbsp;
+  Adrià Farrés
+* [![icon][mail]](mailto:patrick.j.elmquist@gmail.com)
+  [![icon][github]](https://github.com/patrick-elmquist)
+  &nbsp;
+  Patrick Elmquist
+* [![icon][mail]](mailto:rieon@rieon.cn)
+  [![icon][github]](https://github.com/rieonke)
+  &nbsp;
+  Rieon Ke
+* [![icon][mail]](mailto:jiirra@gmail.com)
+  [![icon][github]](https://github.com/KostkaBrukowa)
+  &nbsp;
+  KostkaBrukowa
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.

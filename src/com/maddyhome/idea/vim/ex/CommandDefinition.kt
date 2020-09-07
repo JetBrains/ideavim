@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,9 @@ package com.maddyhome.idea.vim.ex
 data class CommandName(val required: String, val optional: String = "")
 
 fun commands(vararg commands: String) = commands.map { command ->
-  commandPattern.matchEntire(command)?.groupValues?.let { CommandName(it[1], it[2]) }
-    ?: throw RuntimeException("$command is invalid!")
+  val openBracketIndex = command.indexOf('[')
+  if (openBracketIndex < 0) CommandName(command)
+  else CommandName(command.take(openBracketIndex), command.substring(openBracketIndex + 1, command.lastIndex))
 }.toTypedArray()
 
 fun flags(
@@ -31,5 +32,3 @@ fun flags(
   access: CommandHandler.Access,
   vararg flags: CommandHandler.Flag
 ) = CommandHandlerFlags(rangeFlag, argumentFlag, access, flags.toSet())
-
-private val commandPattern: Regex = "^([^\\[]+)(?:\\[([^]]+)])?\$".toRegex()

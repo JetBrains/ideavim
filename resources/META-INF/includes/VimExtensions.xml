@@ -1,0 +1,12 @@
+<idea-plugin>
+  <extensions defaultExtensionNs="IdeaVIM">
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.surround.VimSurroundExtension"/>
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.multiplecursors.VimMultipleCursorsExtension"/>
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.commentary.CommentaryExtension"/>
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.textobjentire.VimTextObjEntireExtension"/>
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.argtextobj.VimArgTextObjExtension"/>
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.replacewithregister.ReplaceWithRegister"/>
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension"/>
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.highlightedyank.VimHighlightedYank"/>
+  </extensions>
+</idea-plugin>

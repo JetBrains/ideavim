@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,16 +18,9 @@
 
 package com.maddyhome.idea.vim.option;
 
-import java.util.EventListener;
-
 /**
  * This interface is used for classes that wish to be notified whenever the value of an option has changed
  */
-public interface OptionChangeListener extends EventListener {
-  /**
-   * The value of the option has changed.
-   *
-   * @param event The change event
-   */
-  void valueChange(OptionChangeEvent event);
+public interface OptionChangeListener<T> {
+  void valueChange(T oldValue, T newValue);
 }

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -135,7 +135,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   fun `test motion with quote on the way`() {
-    doTest(parseKeys("%"), """
+    doTest("%", """
             for (; c!= cj;c = it.next()) ${c}{
              if (dsa) {
                if (c == '\\') {
@@ -156,7 +156,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   fun `test motion outside text`() {
-    doTest(parseKeys("%"), """
+    doTest("%", """
             (
             ""${'"'}
             ""${'"'} + ${c}title("Display")
@@ -175,22 +175,30 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   fun `test motion in text`() {
-    doTest(parseKeys("%"), """ "I found ${c}it in a (legendary) land" """,
+    doTest("%", """ "I found ${c}it in a (legendary) land" """,
       """ "I found it in a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test motion in text with quotes`() {
-    doTest(parseKeys("%"), """ "I found ${c}it in \"a (legendary) land" """,
+    doTest("%", """ "I found ${c}it in \"a (legendary) land" """,
       """ "I found it in \"a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test motion in text with quotes start before quote`() {
-    doTest(parseKeys("%"), """ ${c} "I found it in \"a (legendary) land" """,
+    doTest("%", """ ${c} "I found it in \"a (legendary) land" """,
       """  "I found it in \"a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test motion in text with quotes and double escape`() {
-    doTest(parseKeys("%"), """ "I found ${c}it in \\\"a (legendary) land" """,
+    doTest("%", """ "I found ${c}it in \\\"a (legendary) land" """,
       """ "I found it in \\\"a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun `test deleting with percent motion backward`() {
+    doTest("d%", "(foo bar$c)", c, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun `test deleting with percent motion`() {
+    doTest("d%", "$c(foo bar)", c, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 }

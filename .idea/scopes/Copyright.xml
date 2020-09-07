@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Copyright" pattern="file[IdeaVIM.main]:com//*||file[IdeaVIM.test]:*/" />
+</component>

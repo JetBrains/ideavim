@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,21 +18,28 @@
 
 package com.maddyhome.idea.vim.command
 
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import java.util.*
-import javax.swing.KeyStroke
 
 /**
- * This represents a single Vim command to be executed. It may optionally include an argument if appropriate for
- * the command. The command has a count and a type.
+ * This represents a single Vim command to be executed (operator, motion, text object, etc.). It may optionally include
+ * an argument if appropriate for the command. The command has a count and a type.
  */
 data class Command(
   var rawCount: Int,
   var action: EditorActionHandlerBase,
   val type: Type,
-  var flags: EnumSet<CommandFlags>,
-  var keys: List<KeyStroke>
+  var flags: EnumSet<CommandFlags>
 ) {
+
+  constructor(rawCount: Int, register: Char): this(rawCount, NonExecutableActionHandler, Type.SELECT_REGISTER, EnumSet.of(CommandFlags.FLAG_EXPECT_MORE)) {
+    this.register = register
+  }
 
   init {
     action.process(this)
@@ -45,12 +52,17 @@ data class Command(
     }
 
   var argument: Argument? = null
+  var register: Char? = null
+
+  fun isLinewiseMotion(): Boolean {
+    return when (action) {
+      is TextObjectActionHandler -> (action as TextObjectActionHandler).visualType == TextObjectVisualType.LINE_WISE
+      is MotionActionHandler -> (action as MotionActionHandler).motionType == MotionType.LINE_WISE
+      else -> error("Command is not a motion: $action")
+    }
+  }
 
   enum class Type {
-    /**
-     * Represents undefined commands.
-     */
-    UNDEFINED,
     /**
      * Represents commands that actually move the cursor and can be arguments to operators.
      */
@@ -72,8 +84,6 @@ data class Command(
      */
     COPY,
     PASTE,
-    // TODO REMOVE?
-    RESET,
     /**
      * Represents commands that select the register.
      */
@@ -83,19 +93,27 @@ data class Command(
     /**
      * Represent commands that don't require an outer read or write action for synchronization.
      */
-    OTHER_SELF_SYNCHRONIZED,
-    COMPLETION;
+    OTHER_SELF_SYNCHRONIZED;
 
     val isRead: Boolean
       get() = when (this) {
-        MOTION, COPY, SELECT_REGISTER, OTHER_READONLY, COMPLETION -> true
+        MOTION, COPY, OTHER_READONLY -> true
         else -> false
       }
 
     val isWrite: Boolean
       get() = when (this) {
-        INSERT, DELETE, CHANGE, PASTE, RESET, OTHER_WRITABLE -> true
+        INSERT, DELETE, CHANGE, PASTE, OTHER_WRITABLE -> true
         else -> false
       }
+  }
+}
+
+private object NonExecutableActionHandler : EditorActionHandlerBase(false) {
+  override val type: Command.Type
+    get() = error("This action should not be executed")
+
+  override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+    error("This action should not be executed")
   }
 }

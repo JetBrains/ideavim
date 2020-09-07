@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents a boolean option
  */
-public class ToggleOption extends Option {
+public class ToggleOption extends Option<Boolean> {
   /**
    * Creates the option
    *
@@ -38,12 +38,8 @@ public class ToggleOption extends Option {
     this.value = dflt;
   }
 
-  /**
-   * The option's value
-   *
-   * @return The value
-   */
-  public boolean getValue() {
+  @Override
+  public Boolean getValue() {
     return value;
   }
 
@@ -81,7 +77,7 @@ public class ToggleOption extends Option {
     boolean old = value;
     value = val;
     if (val != old) {
-      fireOptionChangeEvent();
+      fireOptionChangeEvent(old, val);
     }
   }
 
@@ -90,8 +86,7 @@ public class ToggleOption extends Option {
    *
    * @return The option's display value
    */
-  @NotNull
-  public String toString() {
+  public @NotNull String toString() {
     StringBuilder res = new StringBuilder();
     if (!value) {
       res.append("no");

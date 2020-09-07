@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,18 +22,16 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-class MotionArrowLeftAction : NonShiftedSpecialKeyHandler() {
+class MotionArrowLeftAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction {
   override val motionType: MotionType = MotionType.EXCLUSIVE
-
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NXO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Left>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0)))
 

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim.key
 
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.handler.ActionBeanClass
 import javax.swing.KeyStroke
 
 /**
@@ -29,12 +29,13 @@ import javax.swing.KeyStroke
  *
  *              root
  *               |
- *    -----------------------------------
- *    |       |           |             |
- *    j       G           g             f
- *              ----------        ----------------
- *             |        |         |      |       |
- *             c        f         c      o       m
+ *    -------------------------------------------
+ *    |       |           |                     |
+ *    j       G           g                     f
+ *                        |                     |
+ *                   ----------        ----------------
+ *                   |        |         |      |       |
+ *                   c        f         c      o       m
  *
  *
  *  Here j, G, c, f, c, o, m will be presented as a [CommandNode], and g and f as a [CommandPartNode]
@@ -43,10 +44,14 @@ import javax.swing.KeyStroke
  * If the command is complete, it's represented as a [CommandNode]. If this character is a part of command
  *   and the user should complete the sequence, it's [CommandPartNode]
  */
+@Suppress("GrazieInspection")
 interface Node
 
 /** Represents a complete command */
-class CommandNode(val action: EditorActionHandlerBase) : Node
+class CommandNode(val actionHolder: ActionBeanClass) : Node
 
 /** Represents a part of the command */
-class CommandPartNode : Node, HashMap<KeyStroke, Node>()
+open class CommandPartNode : Node, HashMap<KeyStroke, Node>()
+
+/** Represents a root node for the mode */
+class RootNode : CommandPartNode()

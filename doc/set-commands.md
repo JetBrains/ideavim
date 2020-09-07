@@ -13,12 +13,6 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
     'gdefault'       'gd'       the ":substitute" flag 'g' is by default
     'history'        'hi'       number of command-lines that are remembered
     'hlsearch'       'hls'      highlight matches with the last search pattern
-    
-    `ideamarks`      `ideamarks` Boolean (default true)     - IdeaVim ONLY
-    
-                     If true, creation of global mark will trigger creation of IDE's bookmark
-                     and vice versa.
-    
     'ignorecase'     'ic'       ignore case in search patterns
     'iskeyword'      'isk'      defines keywords for commands like 'w', '*', etc.
     'incsearch'      'is'       show where search pattern typed so far matches
@@ -44,14 +38,9 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                                       acts like startsel is enabled
     
     'matchpairs'     'mps'   pairs of characters that "%" can match
+    'more'           'more'  When on, listings pause when the whole screen is filled.
     'nrformats'      'nf'    number formats recognized for CTRL-A command
     'number'         'nu'    print the line number in front of each line
-    
-    `lookupactions`  `lookupactions`  String (default "VimLookupUp,VimLookupDown")  - IdeaVim Only
-             
-                  By default all actions are handled by the IDE if lookup is active.
-                  This list of comma-separated words enables defined vim actions for active lookup.
-    
     'relativenumber' 'rnu'   show the line number relative to the line with
                              the cursor
     'scroll'         'scr'   lines to scroll with CTRL-U and CTRL-D
@@ -59,7 +48,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
     'scrolloff'      'so'    minimum number of lines above and below the cursor
     'selection'      'sel'   what type of selection to use
 
-    `selectmode`     `slm`   String (default "template")
+    `selectmode`     `slm`   String (default "")
 
                  This is a comma-separated list of words, which specify when to start
                  Select mode instead of Visual mode, when a selection is started.
@@ -67,17 +56,17 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                    mouse           when using the mouse
                    key             when using shifted special[1] keys
                    cmd             when using "v", "V", or <C-V>
-                   template        when starting a template       - IdeaVim ONLY
-                   refactoring     when refactoring without      - IdeaVim ONLY
-                                    a template is performed
+                   ideaselection   when IDE sets a selection      - IdeaVim ONLY
+                                   (examples: extend selection, wrap with while, etc.)
+
+                   Deprecated values:
+                   template        ~~please use `idearefactormode` option~~
+                                   when starting a template       - IdeaVim ONLY
+                   refactoring     ~~please use ideaselection~~
+                                   same as ideaselection          - IdeaVim ONLY
 
     'showmode'       'smd'       message on the status line to show current mode
-    
-    `ideajoin`      `ideajoin` Boolean (default false)     - IdeaVim ONLY
-    
-                  If true, join command will be performed via IDE
-                  See wiki/`ideajoin` examples
-    
+    'showcmd'        'sc'        show (partial) command in the status bar
     'sidescroll'     'ss'        minimum number of columns to scroll horizontally
     'sidescrolloff'  'siso'      min. number of columns to left and right of cursor
     'smartcase'      'scs'       no ignore case when pattern is uppercase
@@ -87,6 +76,65 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
     'viminfo'        'vi'        information to remember after restart
     'visualbell'     'vb'        use visual bell instead of beeping
     'wrapscan'       'ws'        searches wrap around the end of file
+    
+    
+    
+    IdeaVim only commands:
+
+    `ideamarks`      `ideamarks` Boolean (default true)
+    
+                     If true, creation of global mark will trigger creation of IDE's bookmark
+                     and vice versa.
+                     
+    `idearefactormode` `idearefactormode` String(default "select")
+    
+                 Define the mode that would be enabled during
+                 the refactoring (renaming, live template, introduce variable, etc)
+                 
+                 Use one of the following values:
+                 - keep  - keep the mode that was enabled before starting a refactoring
+                 - select - start refactoring in select mode
+                 - visual - start refactoring in visual mode
+                 
+                 This option has effect if you are in normal, insert or replace mode before refactoring start.
+                 Visual or select mode are not changed.
+    
+    
+    `ideajoin`      `ideajoin` Boolean (default false)
+    
+                  If true, join command will be performed via IDE
+                  See wiki/`ideajoin` examples
+
+    `ideastatusbar`  `ideastatusbar` Boolean (default true)
+                  DEPRECATED. Please use `ideastatusicon`
+    
+                  If false, IdeaVim icon won't be shown in the status bar.
+                  Works only from `~/.ideavimrc` after the IDE restart.
+                  
+    `ideastatusicon`  `ideastatusicon` String(default "enabled")
+    
+                 Define the behavior of IdeaVim icon in the status bar.
+                 
+                 Use one of the following values:
+                 - enabled - icon is shown in the status bar
+                 - gray - use the gray version of the icon
+                 - disabled - hide the icon
+
+    `ideawaonw`     `ideawaonw` Boolean (default true) [To Be Released]
+                  Read as "idea wa on w". Enables execution of ":wa" (save all) command on ":w" (save).
+                  This feature exists because some IJ options like "Prettier on save" or "ESlint on save"
+                       work only with "save all" action. If this option is on, these actions work
+                       also with ":w" command.
+                  
+    `lookupkeys`    `lookupkeys`   List of strings
+    
+                  List of keys that should be processed by the IDE during the active lookup (autocompletion).
+                  For example, <Tab> and <Enter> are used by the IDE to finish the lookup,
+                        but <C-W> should be passed to IdeaVim.
+                  Default value: 
+                        "<Tab>", "<Down>", "<Up>", "<Enter>", "<Left>", "<Right>",
+                        "<C-Down>", "<C-Up>", "<PageUp>", "<PageDown>",
+                        "<C-J>", "<C-Q>"
 
     ----------
     [1] - cursor keys, <End>, <Home>, <PageUp> and <PageDown>

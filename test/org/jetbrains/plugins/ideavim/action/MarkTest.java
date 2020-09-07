@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,9 @@
 
 package org.jetbrains.plugins.ideavim.action;
 
+import com.google.common.collect.Lists;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Mark;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
@@ -172,5 +174,18 @@ public class MarkTest extends VimTestCase {
                                                      "<caret>three\n" +
                                                      "four five\n");
     assertOffset(14);
+  }
+
+  // |i| |`]|
+  public void testGotoLastChangePositionEnd() {
+    doTest(Lists.newArrayList("yiw", "P", "gg", "`]"), "one two\n" +
+                                                       "<caret>three\n" +
+                                                       "four five\n",
+      "one two\n" +
+        "thre<caret>ethree\n" +
+        "four five\n",
+           CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE
+    );
   }
 }

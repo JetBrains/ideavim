@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.group.copy
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.util.containers.ContainerUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction
 import com.maddyhome.idea.vim.command.Argument
@@ -28,11 +29,23 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.fileSize
+import com.maddyhome.idea.vim.listener.VimYankListener
 import org.jetbrains.annotations.Contract
 import java.util.*
 import kotlin.math.min
 
 class YankGroup {
+  private val yankListeners: MutableList<VimYankListener> = ContainerUtil.createLockFreeCopyOnWriteList();
+
+  fun addListener(listener: VimYankListener) = yankListeners.add(listener)
+
+  fun removeListener(listener: VimYankListener) = yankListeners.remove(listener)
+
+  private fun notifyListeners(editor: Editor, textRange: TextRange) = yankListeners.forEach {
+    it.yankPerformed(editor, textRange)
+  }
+
   /**
    * This yanks the text moved over by the motion command argument.
    *
@@ -63,10 +76,10 @@ class YankGroup {
       startOffsets?.put(caret, motionRange.normalize().startOffset)
     }
 
-    val type = SelectionType.fromCommandFlags(motion.flags)
-    val range = getTextRange(ranges, type)
+    val type = if (motion.isLinewiseMotion()) SelectionType.LINE_WISE else SelectionType.CHARACTER_WISE
+    val range = getTextRange(ranges, type) ?: return false
 
-    if (range.size() == 0) return false;
+    if (range.size() == 0) return false
 
     val selectionType = if (type == SelectionType.CHARACTER_WISE && range.isMultiple) SelectionType.BLOCK_WISE else type
     return yankRange(editor, range, selectionType, startOffsets)
@@ -84,14 +97,14 @@ class YankGroup {
     val ranges = ArrayList<Pair<Int, Int>>(caretModel.caretCount)
     for (caret in caretModel.allCarets) {
       val start = VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
-      val end = min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, true) + 1, EditorHelper.getFileSize(editor, true))
+      val end = min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, true) + 1, editor.fileSize)
 
       if (end == -1) continue
 
       ranges.add(start to end)
     }
 
-    val range = getTextRange(ranges, SelectionType.LINE_WISE)
+    val range = getTextRange(ranges, SelectionType.LINE_WISE) ?: return false
     return yankRange(editor, range, SelectionType.LINE_WISE, null)
   }
 
@@ -114,7 +127,7 @@ class YankGroup {
           range.startOffsets[i] = EditorHelper.getLineStartForOffset(editor, range.startOffsets[i])
         }
         if (editor.offsetToLogicalPosition(range.endOffsets[i]).column != 0) {
-          range.endOffsets[i] = (EditorHelper.getLineEndForOffset(editor, range.endOffsets[i]) + 1).coerceAtMost(EditorHelper.getFileSize(editor))
+          range.endOffsets[i] = (EditorHelper.getLineEndForOffset(editor, range.endOffsets[i]) + 1).coerceAtMost(editor.fileSize)
         }
       }
     }
@@ -141,7 +154,9 @@ class YankGroup {
   }
 
   @Contract("_, _ -> new")
-  private fun getTextRange(ranges: List<Pair<Int, Int>>, type: SelectionType): TextRange {
+  private fun getTextRange(ranges: List<Pair<Int, Int>>, type: SelectionType): TextRange? {
+    if (ranges.isEmpty()) return null
+
     val size = ranges.size
     val starts = IntArray(size)
     val ends = IntArray(size)
@@ -168,6 +183,8 @@ class YankGroup {
   private fun yankRange(editor: Editor, range: TextRange, type: SelectionType,
                         startOffsets: Map<Caret, Int>?): Boolean {
     startOffsets?.forEach { caret, offset -> MotionGroup.moveCaret(editor, caret, offset) }
+
+    notifyListeners(editor, range)
 
     return VimPlugin.getRegister().storeText(editor, range, type, false)
   }

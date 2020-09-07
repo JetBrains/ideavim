@@ -1,3 +1,21 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2020 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.maddyhome.idea.vim.extension.commentary;
 
 import com.intellij.codeInsight.actions.MultiCaretCodeInsightActionHandler;
@@ -15,8 +33,8 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.extension.VimExtension;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
-import com.maddyhome.idea.vim.extension.VimNonDisposableExtension;
 import com.maddyhome.idea.vim.key.OperatorFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,30 +45,34 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 /**
  * @author dhleong
  */
-public class CommentaryExtension extends VimNonDisposableExtension {
+public class CommentaryExtension implements VimExtension {
 
-  @NotNull
   @Override
-  public String getName() {
+  public @NotNull String getName() {
     return "commentary";
   }
 
   @Override
-  protected void initOnce() {
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentMotion)"), new CommentMotionHandler(), false);
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentLine)"), new CommentLineHandler(), false);
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>(CommentMotionV)"), new CommentMotionVHandler(), false);
+  public void init() {
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentMotion)"), getOwner(), new CommentMotionHandler(), false);
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentLine)"), getOwner(), new CommentLineHandler(), false);
+    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>(CommentMotionV)"), getOwner(), new CommentMotionVHandler(), false);
 
-    putKeyMapping(MappingMode.N, parseKeys("gc"), parseKeys("<Plug>(CommentMotion)"), true);
-    putKeyMapping(MappingMode.N, parseKeys("gcc"), parseKeys("<Plug>(CommentLine)"), true);
-    putKeyMapping(MappingMode.XO, parseKeys("gc"), parseKeys("<Plug>(CommentMotionV)"), true);
+    putKeyMapping(MappingMode.N, parseKeys("gc"), getOwner(), parseKeys("<Plug>(CommentMotion)"), true);
+    putKeyMapping(MappingMode.N, parseKeys("gcc"), getOwner(), parseKeys("<Plug>(CommentLine)"), true);
+    putKeyMapping(MappingMode.XO, parseKeys("gc"), getOwner(), parseKeys("<Plug>(CommentMotionV)"), true);
   }
 
   private static class CommentMotionHandler implements VimExtensionHandler {
     @Override
+    public boolean isRepeatable() {
+      return true;
+    }
+
+    @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
       setOperatorFunction(new Operator());
-      executeNormal(parseKeys("g@"), editor);
+      executeNormalWithoutMapping(parseKeys("g@"), editor);
     }
   }
 
@@ -68,7 +90,7 @@ public class CommentaryExtension extends VimNonDisposableExtension {
 
       WriteAction.run(() -> {
         // Leave visual mode
-        executeNormal(parseKeys("<Esc>"), editor);
+        executeNormalWithoutMapping(parseKeys("<Esc>"), editor);
         editor.getCaretModel().moveToOffset(editor.getCaretModel().getPrimaryCaret().getSelectionStart());
       });
     }
@@ -102,7 +124,7 @@ public class CommentaryExtension extends VimNonDisposableExtension {
 
           // Jump back to start if in block mode
           if (selectionType == SelectionType.CHARACTER_WISE) {
-            executeNormal(parseKeys("`["), editor);
+            executeNormalWithoutMapping(parseKeys("`["), editor);
           }
           return true;
         } finally {
@@ -112,8 +134,7 @@ public class CommentaryExtension extends VimNonDisposableExtension {
       });
     }
 
-    @Nullable
-    private TextRange getCommentRange(@NotNull Editor editor) {
+    private @Nullable TextRange getCommentRange(@NotNull Editor editor) {
       final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
       switch (mode) {
         case COMMAND:
@@ -128,6 +149,11 @@ public class CommentaryExtension extends VimNonDisposableExtension {
   }
 
   private static class CommentLineHandler implements VimExtensionHandler {
+    @Override
+    public boolean isRepeatable() {
+      return true;
+    }
+
     @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
       final int offset = editor.getCaretModel().getOffset();

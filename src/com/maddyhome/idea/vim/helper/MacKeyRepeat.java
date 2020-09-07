@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,21 +31,19 @@ import java.io.InputStreamReader;
 */
 public class MacKeyRepeat {
   public static final String FMT = "defaults %s -globalDomain ApplePressAndHoldEnabled";
-  @NotNull private static final MacKeyRepeat INSTANCE = new MacKeyRepeat();
+  private static final @NotNull MacKeyRepeat INSTANCE = new MacKeyRepeat();
 
-  @NotNull
-  public static MacKeyRepeat getInstance() {
+  public static @NotNull MacKeyRepeat getInstance() {
     return INSTANCE;
   }
 
-  @Nullable
-  public Boolean isEnabled() {
+  public @Nullable Boolean isEnabled() {
     final String command = String.format(FMT, "read");
     try {
       final Process process = Runtime.getRuntime().exec(command);
       final String data = read(process.getInputStream()).trim();
       try {
-        return Integer.valueOf(data) == 0;
+        return Integer.parseInt(data) == 0;
       } catch (NumberFormatException e) {
         return null;
       }
@@ -71,14 +69,11 @@ public class MacKeyRepeat {
       final Process restartSystemUI = runtime.exec("launchctl stop com.apple.SystemUIServer.agent");
       restartSystemUI.waitFor();
     }
-    catch (IOException ignored) {
-    }
-    catch (InterruptedException ignored) {
+    catch (IOException | InterruptedException ignored) {
     }
   }
 
-  @NotNull
-  private static String read(@NotNull InputStream stream) throws IOException {
+  private static @NotNull String read(@NotNull InputStream stream) throws IOException {
     return CharStreams.toString(new InputStreamReader(stream));
   }
 }

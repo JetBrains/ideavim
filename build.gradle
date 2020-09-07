@@ -9,7 +9,7 @@ buildscript {
 }
 
 plugins {
-  id 'org.jetbrains.intellij' version '0.4.9'
+  id 'org.jetbrains.intellij' version '0.4.18'
 }
 
 apply plugin: 'java'
@@ -37,11 +37,7 @@ intellij {
   downloadSources Boolean.valueOf(downloadIdeaSources)
   instrumentCode Boolean.valueOf(instrumentPluginCode)
   intellijRepo = "https://www.jetbrains.com/intellij-repository"
-  if (!Boolean.valueOf(legacyNoJavaPlugin)) {
-    // Since 192 version of IJ java plugin should be defined separately
-    // Set `legacyNoJavaPlugin` to true if you are going to run tests under idea version < 192
-    plugins = ['java']
-  }
+  plugins = ['java']
 
   publishPlugin {
     channels publishChannels.split(',')
@@ -55,8 +51,11 @@ repositories {
 }
 
 dependencies {
-  compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-  compile "org.jetbrains:annotations:17.0.0"
+  compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+  compileOnly "org.jetbrains:annotations:19.0.0"
+
+  // https://mvnrepository.com/artifact/com.ensarsarajcic.neovim.java/neovim-api
+  compile group: 'com.ensarsarajcic.neovim.java', name: 'neovim-api', version: '0.1.16'
 }
 
 compileKotlin {
@@ -70,19 +69,65 @@ compileTestKotlin {
   }
 }
 
+task testWithNeovim(type : Test) {
+  group = "verification"
+  systemProperty "ideavim.neovim.test", 'true'
+}
+
 tasks.register("slackEapNotification") {
   doLast {
     if (!slackUrl) return
     def post = new URL(slackUrl).openConnection()
-    def message = "{\"text\":\"New EAP released: $version\"}"
+    def changeLog = extractChangelog()
+    changeLog = changeLog.replace("* ", "• ") // Replace stars with bullets
+    changeLog = changeLog.replace("**", "*") // Enable bold text
+    changeLog = changeLog.replaceAll("\\[([^]]+)]\\(([^)]+)\\)", '<$2|$1>') // Enable links
+    def message ="""
+      {
+          "text": "New version of IdeaVim",
+          "blocks": [
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "IdeaVim EAP $version has been released\\n$changeLog"
+                    }
+                  }
+          ]
+      }
+   """
     post.setRequestMethod("POST")
     post.setDoOutput(true)
     post.setRequestProperty("Content-Type", "application/json")
     post.getOutputStream().write(message.getBytes("UTF-8"))
     def postRC = post.getResponseCode()
     println(postRC)
-    if(postRC.equals(200)) {
+    if(postRC == 200) {
       println(post.getInputStream().getText())
     }
   }
+}
+
+// Very primitive changelog extraction code
+def extractChangelog() {
+  def startLine = "_Available since $version EAP:_"
+  def endLine = "_To Be Released..._"
+  def startSaving = false
+  def res = new StringBuilder()
+  new File("./CHANGES.md").eachLine { line ->
+    if (startSaving) {
+      if (line == endLine) {
+        startSaving = false
+      }
+      else {
+        res.append(line).append('\n')
+      }
+    }
+    else {
+      if (line == startLine) {
+        startSaving = true
+      }
+    }
+  }
+  return res.toString()
 }

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,14 +20,18 @@ package com.maddyhome.idea.vim.ex
 
 import java.util.*
 
-class CommandNode(command: CommandHandler? = null) {
+class CommandNode(command: ExBeanClass? = null) {
 
-  var commandHandler: CommandHandler? = command
+  var commandHandler: ExBeanClass? = command
   private val nodes = HashMap<Char, CommandNode>()
 
-  fun addChild(ch: Char, command: CommandHandler?) = CommandNode(command).also {
+  fun addChild(ch: Char, command: ExBeanClass?) = CommandNode(command).also {
     nodes[ch] = it
   }
 
   fun getChild(ch: Char) = nodes[ch]
+
+  fun clear() {
+    nodes.clear()
+  }
 }

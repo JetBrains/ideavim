@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,14 +24,13 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandler.ArgumentFlag.ARGUMENT_FORBIDDEN
 import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class FileHandler : CommandHandler.SingleExecution() {
-  override val names = commands("f[ile]")
   override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ARGUMENT_FORBIDDEN, Access.READ_ONLY)
+
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-    val count = cmd.getCount(editor, context, 0, false)
+    val count = cmd.getCount(editor, 0, false)
     VimPlugin.getFile().displayFileInfo(editor, count > 0)
     return true
   }

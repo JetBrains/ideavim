@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,23 +25,24 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
-import com.maddyhome.idea.vim.extension.VimNonDisposableExtension
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.SearchHelper.findWordUnderCursor
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
+import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.option.OptionsManager
 import java.lang.Integer.min
 import java.util.*
+import kotlin.Comparator
 
 private const val NEXT_WHOLE_OCCURRENCE = "<Plug>NextWholeOccurrence"
 private const val NEXT_OCCURRENCE = "<Plug>NextOccurrence"
@@ -55,21 +56,21 @@ private const val ALL_OCCURRENCES = "<Plug>AllOccurrences"
  *
  * See https://github.com/terryma/vim-multiple-cursors
  * */
-class VimMultipleCursorsExtension : VimNonDisposableExtension() {
+class VimMultipleCursorsExtension : VimExtension {
   override fun getName() = "multiple-cursors"
 
-  override fun initOnce() {
-    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(NEXT_WHOLE_OCCURRENCE), NextOccurrenceHandler(), false)
-    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(NEXT_OCCURRENCE), NextOccurrenceHandler(whole = false), false)
-    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(ALL_WHOLE_OCCURRENCES), AllOccurrencesHandler(), false)
-    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(ALL_OCCURRENCES), AllOccurrencesHandler(whole = false), false)
-    putExtensionHandlerMapping(MappingMode.X, parseKeys(SKIP_OCCURRENCE), SkipOccurrenceHandler(), false)
-    putExtensionHandlerMapping(MappingMode.X, parseKeys(REMOVE_OCCURRENCE), RemoveOccurrenceHandler(), false)
+  override fun init() {
+    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(NEXT_WHOLE_OCCURRENCE), owner, NextOccurrenceHandler(), false)
+    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(NEXT_OCCURRENCE), owner, NextOccurrenceHandler(whole = false), false)
+    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(ALL_WHOLE_OCCURRENCES), owner, AllOccurrencesHandler(), false )
+    putExtensionHandlerMapping(MappingMode.NXO, parseKeys(ALL_OCCURRENCES), owner, AllOccurrencesHandler(whole = false), false )
+    putExtensionHandlerMapping(MappingMode.X, parseKeys(SKIP_OCCURRENCE), owner, SkipOccurrenceHandler(), false )
+    putExtensionHandlerMapping(MappingMode.X, parseKeys(REMOVE_OCCURRENCE), owner, RemoveOccurrenceHandler(), false )
 
-    putKeyMapping(MappingMode.NXO, parseKeys("<A-n>"), parseKeys(NEXT_WHOLE_OCCURRENCE), true)
-    putKeyMapping(MappingMode.NXO, parseKeys("g<A-n>"), parseKeys(NEXT_OCCURRENCE), true)
-    putKeyMapping(MappingMode.X, parseKeys("<A-x>"), parseKeys(SKIP_OCCURRENCE), true)
-    putKeyMapping(MappingMode.X, parseKeys("<A-p>"), parseKeys(REMOVE_OCCURRENCE), true)
+    putKeyMapping(MappingMode.NXO, parseKeys("<A-n>"), owner, parseKeys(NEXT_WHOLE_OCCURRENCE), true)
+    putKeyMapping(MappingMode.NXO, parseKeys("g<A-n>"), owner, parseKeys(NEXT_OCCURRENCE), true)
+    putKeyMapping(MappingMode.X, parseKeys("<A-x>"), owner, parseKeys(SKIP_OCCURRENCE), true)
+    putKeyMapping(MappingMode.X, parseKeys("<A-p>"), owner, parseKeys(REMOVE_OCCURRENCE), true)
   }
 
   abstract class WriteActionHandler : VimExtensionHandler {
@@ -85,9 +86,9 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
   inner class NextOccurrenceHandler(val whole: Boolean = true) : WriteActionHandler() {
     override fun executeInWriteAction(editor: Editor, context: DataContext) {
       val caretModel = editor.caretModel
-      val commandState = CommandState.getInstance(editor)
+      val patternComparator = if (OptionsManager.ignorecase.isSet) String.CASE_INSENSITIVE_ORDER else Comparator(String::compareTo)
 
-      if (commandState.mode != CommandState.Mode.VISUAL) {
+      if (!editor.inVisualMode) {
         if (caretModel.caretCount > 1) return
 
         val caret = caretModel.primaryCaret
@@ -98,10 +99,10 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
         if (nextOffset == caret.selectionStart) VimPlugin.showMessage("No more matches")
       } else {
         val newPositions = arrayListOf<VisualPosition>()
-        val patterns = sortedSetOf<String>()
+        val patterns = sortedSetOf(patternComparator)
         for (caret in caretModel.allCarets) {
           val selectedText = caret.selectedText ?: return
-          patterns += if (OptionsManager.ignorecase.isSet) selectedText.toLowerCase() else selectedText
+          patterns += selectedText
 
           val lines = selectedText.count { it == '\n' }
           if (lines > 0) {
@@ -114,7 +115,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
           }
         }
         if (newPositions.size > 0) {
-          VimPlugin.getVisualMotion().exitVisual(editor)
+          editor.exitVisualMode()
           newPositions.forEach { editor.caretModel.addCaret(it) ?: return }
           return
         }
@@ -123,13 +124,15 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
         val primaryCaret = editor.caretModel.primaryCaret
         val nextOffset = VimPlugin.getSearch().searchNextFromOffset(editor, primaryCaret.offset + 1, 1)
         val pattern = patterns.first()
-        if (nextOffset == -1 || EditorHelper.getText(editor, nextOffset, nextOffset + pattern.length) != pattern) {
+        if (nextOffset == -1 || patternComparator.compare(EditorHelper.getText(editor, nextOffset, nextOffset + pattern.length), pattern) != 0) {
           if (caretModel.caretCount > 1) return
 
           val newNextOffset = VimPlugin.getSearch().search(editor, pattern, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
 
-          val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(newNextOffset)) ?: return
-          selectWord(caret, pattern, newNextOffset)
+          if (newNextOffset != -1) {
+            val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(newNextOffset)) ?: return
+            selectWord(caret, pattern, newNextOffset)
+          }
 
           return
         }
@@ -209,12 +212,13 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
       if (tryFindNextOccurrence(editor, caret, selectedText) == -1) return
 
       if (!editor.caretModel.removeCaret(caret)) {
-        VimPlugin.getVisualMotion().exitVisual(editor)
+        editor.exitVisualMode()
       }
     }
   }
 
   private fun selectWord(caret: Caret, pattern: String, offset: Int) {
+    if (pattern.isEmpty()) return
     caret.vimSetSelection(offset, offset + pattern.length - 1, true)
     if (caret == caret.editor.caretModel.primaryCaret) MotionGroup.scrollCaretIntoView(caret.editor)
   }

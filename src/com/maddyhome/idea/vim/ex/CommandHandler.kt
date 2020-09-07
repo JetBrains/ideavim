@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,9 +24,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import java.util.*
@@ -36,7 +36,6 @@ import java.util.*
  */
 sealed class CommandHandler {
 
-  abstract val names: Array<CommandName>
   abstract val argFlags: CommandHandlerFlags
   protected open val optFlags: EnumSet<CommandFlags> = noneOfEnum()
 
@@ -46,10 +45,6 @@ sealed class CommandHandler {
 
   abstract class SingleExecution : CommandHandler() {
     abstract fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean
-  }
-
-  fun register() {
-    CommandParser.getInstance().addHandler(this)
   }
 
   enum class RangeFlag {
@@ -151,9 +146,8 @@ sealed class CommandHandler {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_argforb))
       throw NoArgumentAllowedException()
     }
-    CommandState.getInstance(editor).flags = optFlags
     if (editor.inVisualMode && Flag.SAVE_VISUAL !in argFlags.flags) {
-      VimPlugin.getVisualMotion().exitVisual(editor)
+      editor.exitVisualMode()
     }
 
     val res = Ref.create(true)

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.VimProjectService;
 import com.maddyhome.idea.vim.group.HistoryGroup;
+import com.maddyhome.idea.vim.helper.UiHelper;
 import kotlin.text.StringsKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,6 +48,8 @@ import static java.lang.Math.min;
  * Provides a custom keymap for the text field. The keymap is the VIM Ex command keymapping
  */
 public class ExTextField extends JTextField {
+
+  public final static String KEYMAP_NAME = "ex";
 
   ExTextField() {
     // We need to store this in a field, because we can't trust getCaret(), as it will return an instance of
@@ -111,7 +115,7 @@ public class ExTextField extends JTextField {
     }
 
     setInputMap(WHEN_FOCUSED, new InputMap());
-    Keymap map = addKeymap("ex", getKeymap());
+    Keymap map = addKeymap(KEYMAP_NAME, getKeymap());
     loadKeymap(map, ExKeyBindings.INSTANCE.getBindings(), actions);
     map.setDefaultAction(new ExEditorKit.DefaultExKeyHandler());
     setKeymap(map);
@@ -188,8 +192,15 @@ public class ExTextField extends JTextField {
     }
   }
 
+  // fix https://youtrack.jetbrains.com/issue/VIM-570
+  private void resetFont(String string) {
+    super.setFont(UiHelper.selectFont(string));
+  }
+
   private void updateText(String string) {
     super.setText(string);
+
+    resetFont(string);
   }
 
   @Override
@@ -197,6 +208,7 @@ public class ExTextField extends JTextField {
     super.setText(string);
 
     saveLastEntry();
+    resetFont(string);
   }
 
   /**
@@ -209,12 +221,13 @@ public class ExTextField extends JTextField {
     return super.getText();
   }
 
-  @Nullable
+  @NotNull
   String getActualText() {
     if (actualText != null) {
       return actualText;
     }
-    return super.getText();
+    final String text = super.getText();
+    return text == null ? "" : text;
   }
 
   void setEditor(@NotNull Editor editor, DataContext context) {
@@ -223,7 +236,8 @@ public class ExTextField extends JTextField {
     String disposeKey = vimExTextFieldDisposeKey + editor.hashCode();
     Project project = editor.getProject();
     if (Disposer.get(disposeKey) == null && project != null) {
-      Disposer.register(project, () -> {
+      VimProjectService parentDisposable = VimProjectService.getInstance(project);
+      Disposer.register(parentDisposable, () -> {
         this.editor = null;
         this.context = null;
       }, disposeKey);
@@ -244,7 +258,7 @@ public class ExTextField extends JTextField {
     char c = keyChar;
     final int modifiers = stroke.getModifiers();
     final int keyCode = stroke.getKeyCode();
-    if ((modifiers & KeyEvent.CTRL_MASK) != 0) {
+    if ((modifiers & KeyEvent.CTRL_DOWN_MASK) != 0) {
       final int codePoint = keyCode - KeyEvent.VK_A + 1;
       if (codePoint > 0) {
         c = Character.toChars(codePoint)[0];
@@ -285,8 +299,7 @@ public class ExTextField extends JTextField {
    * @return the default model implementation
    */
   @Override
-  @NotNull
-  protected Document createDefaultModel() {
+  protected @NotNull Document createDefaultModel() {
     return new ExDocument();
   }
 
@@ -546,7 +559,7 @@ public class ExTextField extends JTextField {
   private String actualText;
   private List<HistoryGroup.HistoryEntry> history;
   private int histIndex = 0;
-  @Nullable private ExEditorKit.MultiStepAction currentAction;
+  private @Nullable ExEditorKit.MultiStepAction currentAction;
   private char currentActionPromptCharacter;
   private int currentActionPromptCharacterOffset = -1;
 

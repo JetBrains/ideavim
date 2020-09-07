@@ -1,8 +1,26 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2020 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.maddyhome.idea.vim.group
 
 import com.intellij.icons.AllIcons
 import com.intellij.ide.actions.OpenFileAction
-import com.intellij.ide.actions.ShowFilePathAction
+import com.intellij.ide.actions.RevealFileAction
 import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationDisplayType
@@ -12,49 +30,36 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
+import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.keymap.Keymap
 import com.intellij.openapi.keymap.KeymapUtil
 import com.intellij.openapi.options.ShowSettingsUtil
+import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.key.ShortcutOwner
+import com.maddyhome.idea.vim.listener.FindActionId
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.option.SelectModeOptionData
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
+import java.awt.datatransfer.StringSelection
 import java.io.File
 import javax.swing.KeyStroke
 import javax.swing.event.HyperlinkEvent
 
 /**
  * @author Alex Plate
+ *
+ * This service is can be used as application level and as project level service.
+ * If project is null, this means that this is an application level service and notification will be shown for all projects
  */
 class NotificationService(private val project: Project?) {
   // This constructor is used to create an applicationService
   @Suppress("unused")
   constructor() : this(null)
-
-  fun notifyAboutTemplateInSelectMode() {
-    val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
-      "We recommend to add <b><code>template</code></b> to the <b><code>selectmode</code></b> option to enable <a href='#select'>select mode</a> during template editing" +
-        "<br/><code>set selectmode+=template</code></b>",
-      NotificationType.INFORMATION, NotificationListener { _, event ->
-      if (event.description == "#select") {
-        BrowserLauncher.instance.open(selectModeUrl)
-      }
-    })
-
-    notification.addAction(OpenIdeaVimRcAction(notification))
-
-    notification.addAction(AppendToIdeaVimRcAction(notification, "set selectmode+=template", "template") { OptionsManager.selectmode.append(SelectModeOptionData.template) })
-
-    notification.addAction(HelpLink(notification, selectModeUrl))
-
-    notification.notify(project)
-  }
 
   fun notifyAboutIdeaPut() {
     val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
@@ -78,22 +83,6 @@ class NotificationService(private val project: Project?) {
     notification.addAction(AppendToIdeaVimRcAction(notification, "set ideajoin", "ideajoin") { OptionsManager.ideajoin.set() })
 
     notification.addAction(HelpLink(notification, ideajoinExamplesUrl))
-    notification.notify(project)
-  }
-
-  private fun createIdeaVimRcManually(message: String) {
-    val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, message, NotificationType.WARNING)
-    var actionName = if (SystemInfo.isMac) "Reveal Home in Finder" else "Show Home in " + ShowFilePathAction.getFileManagerName()
-    if (!File(System.getProperty("user.home")).exists()) {
-      actionName = ""
-    }
-    notification.addAction(object : AnAction(actionName) {
-      override fun actionPerformed(e: AnActionEvent) {
-        val homeDir = File(System.getProperty("user.home"))
-        ShowFilePathAction.openDirectory(homeDir)
-        notification.expire()
-      }
-    })
     notification.notify(project)
   }
 
@@ -143,7 +132,70 @@ class NotificationService(private val project: Project?) {
       listener).notify(project)
   }
 
-  private inner class OpenIdeaVimRcAction(val notification: Notification) : AnAction("Open ~/.ideavimrc") {
+  fun notifySubscribedToEap() {
+    Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+      """You are successfully subscribed to IdeaVim EAP releases.""",
+      NotificationType.INFORMATION).notify(project)
+  }
+
+  fun notifyEapFinished() {
+    Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+      """You have finished the Early Access Program. Please reinstall IdeaVim to get the stable version.""",
+      NotificationType.INFORMATION).notify(project)
+  }
+
+  fun notifyActionId(id: String?) {
+    ActionIdNotifier.notifyActionId(id, project)
+  }
+
+  private object ActionIdNotifier {
+    private var notification: Notification? = null
+    private const val NO_ID = "<i>No Action Id</i>"
+
+    fun notifyActionId(id: String?, project: Project?) {
+
+      notification?.expire()
+
+      Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, "Action id: ${id ?: NO_ID}", NotificationType.INFORMATION).let {
+        notification = it
+        it.whenExpired { notification = null }
+        it.setContent(it.content + "<br><br><small>Use Event Log to see previous ids</small>")
+
+        val copyActionId = CopyActionId(id, project)
+        copyActionId.templatePresentation.isEnabled = id != null
+        it.addAction(copyActionId)
+
+        it.addAction(StopTracking())
+        it.notify(project)
+      }
+    }
+
+    class CopyActionId(val id: String?, val project: Project?) : DumbAwareAction("Copy Action Id") {
+      override fun actionPerformed(e: AnActionEvent) {
+        CopyPasteManager.getInstance().setContents(StringSelection(id ?: ""))
+        notification?.expire()
+
+        val content = if (id == null) "No action id" else "Action id copied: $id"
+        Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, content, NotificationType.INFORMATION).let {
+          it.addAction(StopTracking())
+          it.notify(project)
+        }
+      }
+
+      override fun update(e: AnActionEvent) {
+        e.presentation.isEnabled = id != null
+      }
+    }
+
+    class StopTracking : DumbAwareAction("Stop Tracking") {
+      override fun actionPerformed(e: AnActionEvent) {
+        FindActionId.enabled = false
+        notification?.expire()
+      }
+    }
+  }
+
+  class OpenIdeaVimRcAction(private val notification: Notification?) : DumbAwareAction("Open ~/.ideavimrc") {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project
       if (eventProject != null) {
@@ -154,8 +206,8 @@ class NotificationService(private val project: Project?) {
           return
         }
       }
-      notification.expire()
-      createIdeaVimRcManually("Cannot create configuration file.<br/>Please create <code>~/.ideavimrc</code> manually")
+      notification?.expire()
+      createIdeaVimRcManually("Cannot create configuration file.<br/>Please create <code>~/.ideavimrc</code> manually", eventProject)
     }
   }
 
@@ -175,7 +227,7 @@ class NotificationService(private val project: Project?) {
         }
       }
       notification.expire()
-      createIdeaVimRcManually("Option is enabled, but the file is not modified<br/>Please modify <code>~/.ideavimrc</code> manually")
+      createIdeaVimRcManually("Option is enabled, but the file is not modified<br/>Please modify <code>~/.ideavimrc</code> manually", project)
     }
   }
 
@@ -191,6 +243,21 @@ class NotificationService(private val project: Project?) {
     const val IDEAVIM_NOTIFICATION_ID = "ideavim"
     const val IDEAVIM_NOTIFICATION_TITLE = "IdeaVim"
     const val ideajoinExamplesUrl = "https://github.com/JetBrains/ideavim/wiki/%60ideajoin%60-examples"
-    const val selectModeUrl = "https://vimhelp.org/visual.txt.html#Select-mode"
+
+    private fun createIdeaVimRcManually(message: String, project: Project?) {
+      val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, message, NotificationType.WARNING)
+      var actionName = if (SystemInfo.isMac) "Reveal Home in Finder" else "Show Home in " + RevealFileAction.getFileManagerName()
+      if (!File(System.getProperty("user.home")).exists()) {
+        actionName = ""
+      }
+      notification.addAction(object : AnAction(actionName) {
+        override fun actionPerformed(e: AnActionEvent) {
+          val homeDir = File(System.getProperty("user.home"))
+          RevealFileAction.openDirectory(homeDir)
+          notification.expire()
+        }
+      })
+      notification.notify(project)
+    }
   }
 }

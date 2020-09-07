@@ -1,6 +1,6 @@
 # Manual Tests
 
-## #1 [Last run: 17-09-2019]
+## #1 [Last run: 2020-08-25]
 
 _Initial mode:_ NORMAL
 
@@ -14,7 +14,7 @@ Word is selected, block-caret is placed on the word end (offset = `word end - 1`
 ![](resources/manualTests/1.png)
 
 
-## #2 [Last run: 17-09-2019]
+## #2 [Last run: 2020-08-25]
 
 _Initial mode:_ NORMAL
 
@@ -26,7 +26,7 @@ Last word is selected, block caret is placed on the word end without bouncing
 
 ![](resources/manualTests/2.png)
 
-## #3 [Last run: 17-09-2019]
+## #3 [Last run: 2020-08-25]
 
 _Initial mode:_ NORMAL
 
@@ -38,7 +38,7 @@ Line is selected. Caret is placed on the line end
 
 ![](resources/manualTests/3.png)
 
-## #4 [Last run: 17-09-2019]
+## #4 [Last run: 2020-08-25]
 
 _Initial mode:_ NORMAL
 
@@ -51,7 +51,7 @@ After mouse release, caret moves one character back and becomes block shape
 
 ![](resources/manualTests/4.gif)
 
-## #5 [Last run: 17-09-2019]
+## #5 [Last run: 2020-08-25]
 
 _Initial mode:_ NORMAL
 
@@ -65,7 +65,7 @@ After mouse release, caret moves one character back and becomes block shape
 
 ![](resources/manualTests/5.gif)
 
-## #6 [Last run: 17-09-2019]
+## #6 [Last run: 2020-08-25]
 
 _Initial mode:_ NORMAL
 
@@ -77,7 +77,7 @@ Line is selected, caret is on the first position
 
 ![](resources/manualTests/6.gif)
 
-## #6 [Last run: 17-09-2019]
+## #6 [Last run: 2020-08-25]
 
 _Initial mode:_ NORMAL
 
@@ -92,3 +92,35 @@ Caret stays in _block_ shape with a normal mode
 
 ![](resources/manualTests/7.1.gif)
 ![](resources/manualTests/7.2.gif)
+
+
+## #7 [Last run: 2020-08-25]
+
+_Action:_  
+Turn emulation off and on
+
+_Result:_  
+Vim emulator works as expected
+
+## #8 [Last run: 2020-08-25
+
+_Action:_  
+Start up IJ with disabled emulator, turn it on
+
+_Result:_  
+Vim emulator works as expected
+
+## #9 [Last run: 2020-08-25]
+
+_Action:_  
+Wrap with if
+
+_Result:_  
+Expression is wrapped, vim in insert mode.
+
+![](resources/manualTests/9.gif)
+
+## #10 [Last run: 2020-05-06]
+
+_Action:_
+Test dynamic plugin loading/unloading.

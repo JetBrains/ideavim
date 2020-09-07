@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <defs>
+    <linearGradient id="ideavim_plugin-a" x1="-6.748%" x2="47.286%" y1="33.61%" y2="85.907%">
+      <stop offset="0%" stop-color="#3BEA62"/>
+      <stop offset="100%" stop-color="#087CFA"/>
+    </linearGradient>
+  </defs>
+  <polygon fill="url(#ideavim_plugin-a)" fill-rule="evenodd" points="29.019 0 13.988 26.119 13.988 0 0 0 0 40 16.953 40 40 0"/>
+</svg>

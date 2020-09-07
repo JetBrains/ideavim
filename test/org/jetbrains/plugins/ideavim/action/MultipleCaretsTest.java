@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +19,13 @@
 package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.ide.highlighter.JavaFileType;
+import com.intellij.idea.TestFor;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.helper.VimTestFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
@@ -1153,7 +1154,7 @@ public class MultipleCaretsTest extends VimTestCase {
                    "a<caret>bcd<caret>e\n" +
                    "abc<caret>de\n");
     myFixture.checkResult("ab\n" +
-                          "abcd\n");
+                          "abcd");
   }
 
   public void testDeleteJoinLinesAction() {
@@ -1476,7 +1477,7 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("    sdfdsfadsf fg dsfg sdfjgkfdgl jsdf\n" +
                     "nflgj sd\n" +
                     " dflgj dfdsfg\n" +
-                    " hdfsgj sdfklg<caret>j\n");
+                    " hdfsgj sdfklgj\n<caret>");
   }
 
   public void testMotionGotoLineLastEndInsertMode() {
@@ -1488,10 +1489,10 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("    sdfdsfadsf fg dsfg sdfjgkfdgl jsdf\n" +
                     "nflgj sd\n" +
                     " dflgj dfdsfg\n" +
-                    " hdfsgj sdfklgj<caret>\n");
+                    " hdfsgj sdfklgj\n<caret>");
   }
 
-  @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction")
+  @TestFor(classes = {SearchWholeWordForwardAction.class})
   public void testSearchWholeWordForwardAction() {
     typeTextInFile(parseKeys("2*"),
             "q<caret>we as<caret>d zxc qwe asd zxc qwe asd zxc qwe asd zxc qwe asd zxc ");
@@ -1517,7 +1518,7 @@ public class MultipleCaretsTest extends VimTestCase {
                     "dflgjdfsgk<caret>d<caret>flgjdfsklg\n\n");
     myFixture.checkResult("dfgdfsggfdfgdfs dasgdfsk dfghsdfkj gh\n" +
                     "lsdjf lsj flk gjdlsadlsfj lksdgfj \n" +
-                    "dflgjdfsgkdflgjdfsklg\n<caret>\n");
+                    "dflgjdfsgkdflgjdfsklg\n\n<caret>");
   }
 
   public void testMotionGotoLineLastWithArgumentAction() {

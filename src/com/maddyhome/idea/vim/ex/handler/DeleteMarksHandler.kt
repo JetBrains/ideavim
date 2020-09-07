@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.maddyhome.idea.vim.ex.handler
@@ -23,9 +23,12 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.group.MarkGroup.*
+import com.maddyhome.idea.vim.group.MarkGroup.DEL_FILE_MARKS
+import com.maddyhome.idea.vim.group.MarkGroup.DEL_MARKS
+import com.maddyhome.idea.vim.group.MarkGroup.RO_GLOBAL_MARKS
+import com.maddyhome.idea.vim.group.MarkGroup.WR_GLOBAL_MARKS
+import com.maddyhome.idea.vim.group.MarkGroup.WR_REGULAR_FILE_MARKS
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 
@@ -41,7 +44,6 @@ private const val UNESCAPED_QUOTE = "\""
  * @author Jørgen Granseth
  */
 class DeleteMarksHandler : CommandHandler.SingleExecution() {
-  override val names = commands("delm[arks]")
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
@@ -73,7 +75,7 @@ private fun deleteMark(editor: Editor, character: Char) {
   if (character != ' ') {
     val markGroup = VimPlugin.getMark()
     val mark = markGroup.getMark(editor, character) ?: return
-    markGroup.removeMark(character, mark, editor)
+    markGroup.removeMark(character, mark)
   }
 }
 

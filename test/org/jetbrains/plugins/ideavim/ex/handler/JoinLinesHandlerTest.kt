@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,11 +20,13 @@ package org.jetbrains.plugins.ideavim.ex.handler
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class JoinLinesHandlerTest : VimTestCase() {
+  @VimBehaviorDiffers(description = "Different caret position")
   fun `test simple join`() {
-    doTest(commandToKeys("j"),
+    doTest(exCommand("j"),
       """
                 A Discovery
 
@@ -44,8 +46,9 @@ class JoinLinesHandlerTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
+  @VimBehaviorDiffers(description = "Different caret position")
   fun `test simple join full command`() {
-    doTest(commandToKeys("join"),
+    doTest(exCommand("join"),
       """
                 A Discovery
 
@@ -65,8 +68,9 @@ class JoinLinesHandlerTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
+  @VimBehaviorDiffers(description = "Different caret position")
   fun `test join with range`() {
-    doTest(commandToKeys("4,6j"),
+    doTest(exCommand("4,6j"),
       """
                 A Discovery
 

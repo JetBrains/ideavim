@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,10 @@
 
 package com.maddyhome.idea.vim.option;
 
-public abstract class TextOption extends Option {
+public abstract class TextOption extends Option<String> {
   TextOption(String name, String abbrev) {
     super(name, abbrev);
   }
-
-  public abstract String getValue();
 
   public abstract boolean set(String val);
 

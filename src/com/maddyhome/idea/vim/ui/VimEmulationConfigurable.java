@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,25 +47,22 @@ import java.util.*;
  * @author vlan
  */
 public class VimEmulationConfigurable implements Configurable {
-  @NotNull private final VimShortcutConflictsTable.Model myConflictsTableModel = new VimShortcutConflictsTable.Model();
-  @NotNull private final VimSettingsPanel myPanel = new VimSettingsPanel(myConflictsTableModel);
+  private final @NotNull VimShortcutConflictsTable.Model myConflictsTableModel = new VimShortcutConflictsTable.Model();
+  private final @NotNull VimSettingsPanel myPanel = new VimSettingsPanel(myConflictsTableModel);
 
-  @NotNull
   @Nls
   @Override
-  public String getDisplayName() {
+  public @NotNull String getDisplayName() {
     return "Vim Emulation";
   }
 
-  @Nullable
   @Override
-  public String getHelpTopic() {
+  public @Nullable String getHelpTopic() {
     return null;
   }
 
-  @Nullable
   @Override
-  public JComponent createComponent() {
+  public @Nullable JComponent createComponent() {
     return myPanel;
   }
 
@@ -89,7 +86,7 @@ public class VimEmulationConfigurable implements Configurable {
   }
 
   private static final class VimSettingsPanel extends JPanel {
-    @NotNull private final VimShortcutConflictsTable myShortcutConflictsTable;
+    private final @NotNull VimShortcutConflictsTable myShortcutConflictsTable;
 
     public VimSettingsPanel(@NotNull VimShortcutConflictsTable.Model model) {
       myShortcutConflictsTable = new VimShortcutConflictsTable(model);
@@ -97,7 +94,7 @@ public class VimEmulationConfigurable implements Configurable {
       final JScrollPane scrollPane = new JBScrollPane(myShortcutConflictsTable);
       scrollPane.setBorder(new LineBorder(JBColor.border()));
       final JPanel conflictsPanel = new JPanel(new BorderLayout());
-      final String title = String.format("Shortcut Conflicts for Active Keymap");
+      final String title = "Shortcut Conflicts for Active Keymap";
       conflictsPanel.setBorder(IdeBorderFactory.createTitledBorder(title, false));
       conflictsPanel.add(scrollPane);
       add(conflictsPanel, BorderLayout.CENTER);
@@ -116,20 +113,17 @@ public class VimEmulationConfigurable implements Configurable {
       ownerColumn.setCellEditor(renderer);
     }
 
-    @NotNull
     @Override
-    public Dimension getMinimumSize() {
+    public @NotNull Dimension getMinimumSize() {
       return calcSize(super.getMinimumSize());
     }
 
-    @NotNull
     @Override
-    public Dimension getPreferredSize() {
+    public @NotNull Dimension getPreferredSize() {
       return calcSize(super.getPreferredSize());
     }
 
-    @NotNull
-    private Dimension calcSize(@NotNull Dimension dimension) {
+    private @NotNull Dimension calcSize(@NotNull Dimension dimension) {
       final Container container = getParent();
       if (container != null) {
         final Dimension size = container.getSize();
@@ -138,8 +132,7 @@ public class VimEmulationConfigurable implements Configurable {
       return dimension;
     }
 
-    @NotNull
-    private TableColumn getTableColumn(@NotNull Column column) {
+    private @NotNull TableColumn getTableColumn(@NotNull Column column) {
       return getColumnModel().getColumn(column.getIndex());
     }
 
@@ -167,7 +160,7 @@ public class VimEmulationConfigurable implements Configurable {
       IDE_ACTION(1, "IDE Action"),
       OWNER(2, "Handler");
 
-      @NotNull private static final Map<Integer, Column> ourMembers = new HashMap<>();
+      private static final @NotNull Map<Integer, Column> ourMembers = new HashMap<>();
 
       static {
         for (Column column : values()) {
@@ -176,15 +169,14 @@ public class VimEmulationConfigurable implements Configurable {
       }
 
       private final int myIndex;
-      @NotNull private final String myTitle;
+      private final @NotNull String myTitle;
 
       Column(int index, @NotNull String title) {
         myIndex = index;
         myTitle = title;
       }
 
-      @Nullable
-      public static Column fromIndex(int index) {
+      public static @Nullable Column fromIndex(int index) {
         return ourMembers.get(index);
       }
 
@@ -192,16 +184,15 @@ public class VimEmulationConfigurable implements Configurable {
         return myIndex;
       }
 
-      @NotNull
-      public String getTitle() {
+      public @NotNull String getTitle() {
         return myTitle;
       }
     }
 
     private static final class Row implements Comparable<Row> {
-      @NotNull private final KeyStroke myKeyStroke;
-      @NotNull private final AnAction myAction;
-      @NotNull private ShortcutOwner myOwner;
+      private final @NotNull KeyStroke myKeyStroke;
+      private final @NotNull AnAction myAction;
+      private @NotNull ShortcutOwner myOwner;
 
       private Row(@NotNull KeyStroke keyStroke, @NotNull AnAction action, @NotNull ShortcutOwner owner) {
         myKeyStroke = keyStroke;
@@ -209,18 +200,15 @@ public class VimEmulationConfigurable implements Configurable {
         myOwner = owner;
       }
 
-      @NotNull
-      public KeyStroke getKeyStroke() {
+      public @NotNull KeyStroke getKeyStroke() {
         return myKeyStroke;
       }
 
-      @NotNull
-      public AnAction getAction() {
+      public @NotNull AnAction getAction() {
         return myAction;
       }
 
-      @NotNull
-      public ShortcutOwner getOwner() {
+      public @NotNull ShortcutOwner getOwner() {
         return myOwner;
       }
 
@@ -237,7 +225,7 @@ public class VimEmulationConfigurable implements Configurable {
     }
 
     private static final class Model extends AbstractTableModel {
-      @NotNull private final List<Row> myRows = new ArrayList<>();
+      private final @NotNull List<Row> myRows = new ArrayList<>();
 
       public Model() {
         reset();
@@ -253,9 +241,8 @@ public class VimEmulationConfigurable implements Configurable {
         return Column.values().length;
       }
 
-      @Nullable
       @Override
-      public Object getValueAt(int rowIndex, int columnIndex) {
+      public @Nullable Object getValueAt(int rowIndex, int columnIndex) {
         final Column column = Column.fromIndex(columnIndex);
         if (column != null && rowIndex >= 0 && rowIndex < myRows.size()) {
           final Row row = myRows.get(rowIndex);
@@ -285,9 +272,8 @@ public class VimEmulationConfigurable implements Configurable {
         return Column.fromIndex(columnIndex) == Column.OWNER;
       }
 
-      @Nullable
       @Override
-      public String getColumnName(int index) {
+      public @Nullable String getColumnName(int index) {
         final Column column = Column.fromIndex(index);
         return column != null ? column.getTitle() : null;
       }
@@ -312,8 +298,7 @@ public class VimEmulationConfigurable implements Configurable {
         Collections.sort(myRows);
       }
 
-      @NotNull
-      private Map<KeyStroke, ShortcutOwner> getCurrentData() {
+      private @NotNull Map<KeyStroke, ShortcutOwner> getCurrentData() {
         final Map<KeyStroke, ShortcutOwner> result = new HashMap<>();
         for (Row row : myRows) {
           result.put(row.getKeyStroke(), row.getOwner());

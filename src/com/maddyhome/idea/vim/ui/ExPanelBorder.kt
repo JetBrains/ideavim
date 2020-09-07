@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import com.intellij.util.ui.JBInsets
 import java.awt.Component
 import java.awt.Insets
 
-class ExPanelBorder internal constructor() : SideBorder(JBColor.border(), SideBorder.TOP) {
+class ExPanelBorder internal constructor() : SideBorder(JBColor.border(), TOP) {
 
   override fun getBorderInsets(component: Component?): Insets {
     return JBInsets(getThickness() + 2, 0, 2, 2)

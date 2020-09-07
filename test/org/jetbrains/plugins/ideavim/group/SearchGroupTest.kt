@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,15 +18,16 @@
 
 package org.jetbrains.plugins.ideavim.group
 
+import com.intellij.idea.TestFor
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.VimTestFunction
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 import java.util.*
@@ -293,21 +294,21 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(6)
   }
 
-  @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction")
+  @TestFor(classes = [SearchWholeWordForwardAction::class])
   fun `test search word matches case`() {
     typeTextInFile(parseKeys("*"),
       "${c}Editor editor Editor")
     assertOffset(14)
   }
 
-  @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction")
+  @TestFor(classes = [SearchWholeWordForwardAction::class])
   fun `test search next word matches case`() {
     typeTextInFile(parseKeys("*", "n"),
       "${c}Editor editor Editor editor Editor")
     assertOffset(28)
   }
 
-  @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction")
+  @TestFor(classes = [SearchWholeWordForwardAction::class])
   fun `test search word honours ignorecase`() {
     setIgnoreCase()
     typeTextInFile(parseKeys("*"),
@@ -315,7 +316,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(7)
   }
 
-  @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction")
+  @TestFor(classes = [SearchWholeWordForwardAction::class])
   fun `test search next word honours ignorecase`() {
     setIgnoreCase()
     typeTextInFile(parseKeys("*", "n"),
@@ -323,7 +324,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(14)
   }
 
-  @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction")
+  @TestFor(classes = [SearchWholeWordForwardAction::class])
   fun `test search word overrides smartcase`() {
     setIgnoreCaseAndSmartCase()
     typeTextInFile(parseKeys("*"),
@@ -331,7 +332,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(7)
   }
 
-  @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction")
+  @TestFor(classes = [SearchWholeWordForwardAction::class])
   fun `test search next word overrides smartcase`() {
     setIgnoreCaseAndSmartCase()
     typeTextInFile(parseKeys("*", "n"),
@@ -1205,7 +1206,7 @@ class SearchGroupTest : VimTestCase() {
     val project = myFixture.project
     val searchGroup = VimPlugin.getSearch()
     val ref = Ref.create(-1)
-    RunnableHelper.runReadCommand(project, {
+    RunnableHelper.runReadCommand(project, Runnable {
       val n = searchGroup.search(editor, pattern, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
       ref.set(n)
     }, null, null)

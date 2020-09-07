@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
@@ -122,12 +123,12 @@ val Caret.vimLeadSelectionOffset: Int
       } else if (editor.inBlockSubMode) {
         val selections = editor.caretModel.allCarets.map { it.selectionStart to it.selectionEnd }.sortedBy { it.first }
         val pCaret = editor.caretModel.primaryCaret
-        when {
-          pCaret.offset == selections.first().first -> (selections.last().second - selectionAdj).coerceAtLeast(0)
-          pCaret.offset == selections.first().second -> selections.last().first
-          pCaret.offset == selections.last().first -> (selections.first().second - selectionAdj).coerceAtLeast(0)
-          pCaret.offset == selections.last().second -> selections.first().first
-          else -> selections.first().first
+        when (pCaret.offset) {
+            selections.first().first -> (selections.last().second - selectionAdj).coerceAtLeast(0)
+            selections.first().second -> selections.last().first
+            selections.last().first -> (selections.first().second - selectionAdj).coerceAtLeast(0)
+            selections.last().second -> selections.first().first
+            else -> selections.first().first
         }
       } else {
         if (caretOffset == selectionStart) (selectionEnd - selectionAdj).coerceAtLeast(0) else selectionStart
@@ -164,14 +165,14 @@ fun updateCaretState(editor: Editor) {
 fun CommandState.Mode.resetShape(editor: Editor) = when (this) {
   CommandState.Mode.COMMAND, CommandState.Mode.VISUAL, CommandState.Mode.REPLACE -> ChangeGroup.resetCaret(editor, false)
   CommandState.Mode.SELECT, CommandState.Mode.INSERT -> ChangeGroup.resetCaret(editor, true)
-  CommandState.Mode.REPEAT, CommandState.Mode.CMD_LINE -> Unit
+  CommandState.Mode.CMD_LINE, CommandState.Mode.OP_PENDING -> Unit
 }
 
 fun charToNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.Mode): Pair<Int, Int> {
   val (nativeStart, nativeEnd) = sort(start, end)
   val lineEnd = EditorHelper.getLineEndForOffset(editor, nativeEnd)
   val adj = if (VimPlugin.getVisualMotion().exclusiveSelection || nativeEnd == lineEnd || mode == CommandState.Mode.SELECT) 0 else 1
-  val adjEnd = (nativeEnd + adj).coerceAtMost(EditorHelper.getFileSize(editor))
+  val adjEnd = (nativeEnd + adj).coerceAtMost(editor.fileSize)
   return nativeStart to adjEnd
 }
 
@@ -184,7 +185,7 @@ fun lineToNativeSelection(editor: Editor, start: Int, end: Int): Pair<Int, Int> 
   val (nativeStart, nativeEnd) = sort(start, end)
   val lineStart = EditorHelper.getLineStartForOffset(editor, nativeStart)
   // Extend to \n char of line to fill full line with selection
-  val lineEnd = (EditorHelper.getLineEndForOffset(editor, nativeEnd) + 1).coerceAtMost(EditorHelper.getFileSize(editor, true))
+  val lineEnd = (EditorHelper.getLineEndForOffset(editor, nativeEnd) + 1).coerceAtMost(editor.fileSize)
   return lineStart to lineEnd
 }
 

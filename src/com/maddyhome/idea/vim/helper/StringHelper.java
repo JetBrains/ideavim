@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,6 @@
 
 package com.maddyhome.idea.vim.helper;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.util.text.StringUtil;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
 import org.apache.commons.codec.binary.Base64;
@@ -29,7 +27,9 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static java.awt.event.KeyEvent.*;
 import static javax.swing.KeyStroke.getKeyStroke;
@@ -45,58 +45,9 @@ public class StringHelper {
    */
   private static final int VK_PLUG = KeyEvent.CHAR_UNDEFINED - 1;
 
-  private static final Map<String, Integer> VIM_KEY_NAMES = ImmutableMap.<String, Integer>builder()
-    .put("cr", VK_ENTER)
-    .put("enter", VK_ENTER)
-    .put("return", VK_ENTER)
-    .put("ins", VK_INSERT)
-    .put("insert", VK_INSERT)
-    .put("home", VK_HOME)
-    .put("end", VK_END)
-    .put("pageup", VK_PAGE_UP)
-    .put("pagedown", VK_PAGE_DOWN)
-    .put("del", VK_DELETE)
-    .put("delete", VK_DELETE)
-    .put("esc", VK_ESCAPE)
-    .put("bs", VK_BACK_SPACE)
-    .put("backspace", VK_BACK_SPACE)
-    .put("tab", VK_TAB)
-    .put("up", VK_UP)
-    .put("down", VK_DOWN)
-    .put("left", VK_LEFT)
-    .put("right", VK_RIGHT)
-    .put("f1", VK_F1)
-    .put("f2", VK_F2)
-    .put("f3", VK_F3)
-    .put("f4", VK_F4)
-    .put("f5", VK_F5)
-    .put("f6", VK_F6)
-    .put("f7", VK_F7)
-    .put("f8", VK_F8)
-    .put("f9", VK_F9)
-    .put("f10", VK_F10)
-    .put("f11", VK_F11)
-    .put("f12", VK_F12)
-    .put("plug", VK_PLUG)
-    .build();
-  private static final Map<Integer, String> VIM_KEY_VALUES = invertMap(VIM_KEY_NAMES);
-
-  private static final Map<String, Character> VIM_TYPED_KEY_NAMES = ImmutableMap.<String, Character>builder()
-    .put("space", ' ')
-    .put("bar", '|')
-    .put("bslash", '\\')
-    .put("lt", '<')
-    .build();
-
-  private static final Set<String> UPPERCASE_DISPLAY_KEY_NAMES = ImmutableSet.<String>builder()
-    .add("cr")
-    .add("bs")
-    .build();
-
   private StringHelper() {}
 
-  @Nullable
-  private static String toEscapeNotation(@NotNull KeyStroke key) {
+  private static @Nullable String toEscapeNotation(@NotNull KeyStroke key) {
     final char c = key.getKeyChar();
     if (isControlCharacter(c)) {
       return "^" + (char)(c + 'A' - 1);
@@ -107,14 +58,17 @@ public class StringHelper {
     return null;
   }
 
-  @NotNull
-  public static List<KeyStroke> stringToKeys(@NotNull String s) {
+  public static @NotNull List<KeyStroke> stringToKeys(@NotNull String s) {
+    // The following if is a dirty hack to finally support `let mapleader = "\<space>"`
+    if ("\\<SPACE>".equalsIgnoreCase(s)) return Collections.singletonList(getKeyStroke(' '));
     final List<KeyStroke> res = new ArrayList<>();
     for (int i = 0; i < s.length(); i++) {
       res.add(getKeyStroke(s.charAt(i)));
     }
     return res;
   }
+
+  public static final @NotNull KeyStroke PlugKeyStroke = parseKeys("<Plug>").get(0);
 
   private enum KeyParserState {
     INIT,
@@ -128,8 +82,7 @@ public class StringHelper {
    * @throws java.lang.IllegalArgumentException if the mapping doesn't make sense for Vim emulation
    * @see :help <>
    */
-  @NotNull
-  public static List<KeyStroke> parseKeys(@NotNull String... strings) {
+  public static @NotNull List<KeyStroke> parseKeys(@NotNull String... strings) {
     final List<KeyStroke> result = new ArrayList<>();
     for (String s : strings) {
       KeyParserState state = KeyParserState.INIT;
@@ -141,7 +94,7 @@ public class StringHelper {
             if (c == '\\') {
               state = KeyParserState.ESCAPE;
             }
-            else if (c == '<') {
+            else if (c == '<' || c == '«') {
               state = KeyParserState.SPECIAL;
               specialKeyBuilder = new StringBuilder();
             }
@@ -151,7 +104,7 @@ public class StringHelper {
                 stroke = getKeyStroke(c, 0);
               }
               else if (isControlCharacter(c)) {
-                stroke = getKeyStroke(c + 'A' - 1, CTRL_MASK);
+                stroke = getKeyStroke(c + 'A' - 1, CTRL_DOWN_MASK);
               }
               else {
                 stroke = getKeyStroke(c);
@@ -170,14 +123,17 @@ public class StringHelper {
             }
             break;
           case SPECIAL:
-            if (c == '>') {
+            if (c == '>' || c == '»') {
               state = KeyParserState.INIT;
               final String specialKeyName = specialKeyBuilder.toString();
               final String lower = specialKeyName.toLowerCase();
               if ("sid".equals(lower)) {
                 throw new IllegalArgumentException("<" + specialKeyName + "> is not supported");
               }
-              if (!"nop".equals(lower)) {
+              if ("comma".equals(lower)) {
+                result.add(KeyStroke.getKeyStroke(','));
+              }
+              else if (!"nop".equals(lower)) {
                 final List<KeyStroke> leader = parseMapLeader(specialKeyName);
                 final KeyStroke specialKey = parseSpecialKey(specialKeyName, 0);
                 if (leader != null) {
@@ -210,8 +166,7 @@ public class StringHelper {
     return result;
   }
 
-  @Nullable
-  private static List<KeyStroke> parseMapLeader(@NotNull String s) {
+  private static @Nullable List<KeyStroke> parseMapLeader(@NotNull String s) {
     if ("leader".equals(s.toLowerCase())) {
       final Object mapLeader = VimScriptGlobalEnvironment.getInstance().getVariables().get("mapleader");
       if (mapLeader instanceof String) {
@@ -232,8 +187,7 @@ public class StringHelper {
     return key.getKeyChar() == CHAR_UNDEFINED && key.getKeyCode() < 0x20 && key.getModifiers() == 0;
   }
 
-  @NotNull
-  public static String toKeyNotation(@NotNull List<KeyStroke> keys) {
+  public static @NotNull String toKeyNotation(@NotNull List<KeyStroke> keys) {
     if (keys.isEmpty()) {
       return "<Nop>";
     }
@@ -244,8 +198,7 @@ public class StringHelper {
     return builder.toString();
   }
 
-  @NotNull
-  public static String toKeyNotation(@NotNull KeyStroke key) {
+  public static @NotNull String toKeyNotation(@NotNull KeyStroke key) {
     final char c = key.getKeyChar();
     final int keyCode = key.getKeyCode();
     final int modifiers = key.getModifiers();
@@ -255,22 +208,22 @@ public class StringHelper {
     }
 
     String prefix = "";
-    if ((modifiers & META_MASK) != 0) {
+    if ((modifiers & META_DOWN_MASK) != 0) {
       prefix += "M-";
     }
-    if ((modifiers & ALT_MASK) != 0) {
+    if ((modifiers & ALT_DOWN_MASK) != 0) {
       prefix += "A-";
     }
-    if ((modifiers & CTRL_MASK) != 0) {
+    if ((modifiers & CTRL_DOWN_MASK) != 0) {
       prefix += "C-";
     }
-    if ((modifiers & SHIFT_MASK) != 0) {
+    if ((modifiers & SHIFT_DOWN_MASK) != 0) {
       prefix += "S-";
     }
 
-    String name = VIM_KEY_VALUES.get(keyCode);
+    String name = getVimKeyValue(keyCode);
     if (name != null) {
-      if (UPPERCASE_DISPLAY_KEY_NAMES.contains(name)) {
+      if (containsDisplayUppercaseKeyNames(name)) {
         name = name.toUpperCase();
       }
       else {
@@ -293,6 +246,54 @@ public class StringHelper {
     return name != null ? "<" + prefix + name + ">" : "<<" + key.toString() + ">>";
   }
 
+  public static String toPrintableCharacters(@NotNull List<KeyStroke> keys) {
+    if (keys.isEmpty()) {
+      return "";
+    }
+    final StringBuilder builder = new StringBuilder();
+    for (KeyStroke key : keys) {
+      builder.append(toPrintableCharacter(key));
+    }
+    return builder.toString();
+  }
+
+  /**
+   * Convert a KeyStroke into the character it represents and return a printable version of the character.
+   *
+   * See :help 'isprint'
+   *
+   * @param key The KeyStroke to represent
+   * @return A printable String of the character represented by the KeyStroke
+   */
+  public static String toPrintableCharacter(@NotNull KeyStroke key) {
+    // TODO: Look at 'isprint', 'display' and 'encoding' settings
+    char c = key.getKeyChar();
+    if (c == CHAR_UNDEFINED && key.getModifiers() == 0) {
+      c = (char)key.getKeyCode();
+    }
+    else if (c == CHAR_UNDEFINED && (key.getModifiers() & CTRL_DOWN_MASK) != 0) {
+      c = (char)(key.getKeyCode() - 'A' + 1);
+    }
+
+    if (c <= 31) {
+      return "^" + (char) (c + 'A' - 1);
+    } else if (c == 127) {
+      return "^" + (char) (c - 'A' + 1);
+      // Vim doesn't use these representations unless :set encoding=latin1. Technically, we could use them if the
+      // encoding of the buffer for the mark, jump or :ascii char is. But what encoding would we use for registers?
+      // Since we support Unicode, just treat everything as Unicode.
+//    } else if (c >= 128 && c <= 159) {
+//      return "~" + (char) (c - 'A' + 1);
+//    } else if (c >= 160 && c <= 254) {
+//      return "|" + (char)(c - (('A' - 1) * 2));
+//    } else if (c == 255) {
+//      return "~" + (char)(c - (('A' - 1) * 3));
+    } else if (CharacterHelper.isInvisibleControlCharacter(c) || CharacterHelper.isZeroWidthCharacter(c)) {
+      return String.format("<%04x>", (int) c);
+    }
+    return "" + c;
+  }
+
   public static boolean containsUpperCase(@NotNull String text) {
     for (int i = 0; i < text.length(); i++) {
       if (Character.isUpperCase(text.charAt(i)) && (i == 0 || text.charAt(i - 1) != '\\')) {
@@ -306,15 +307,14 @@ public class StringHelper {
   public static boolean isCloseKeyStroke(@NotNull KeyStroke key) {
     return key.getKeyCode() == VK_ESCAPE ||
            key.getKeyChar() == VK_ESCAPE ||
-           key.getKeyCode() == VK_C && (key.getModifiers() & CTRL_MASK) != 0 ||
-           key.getKeyCode() == '[' && (key.getModifiers() & CTRL_MASK) != 0;
+           key.getKeyCode() == VK_C && (key.getModifiers() & CTRL_DOWN_MASK) != 0 ||
+           key.getKeyCode() == '[' && (key.getModifiers() & CTRL_DOWN_MASK) != 0;
   }
 
   /**
    * Set the text of an XML element, safely encode it if needed.
    */
-  @NotNull
-  public static Element setSafeXmlText(@NotNull Element element, @NotNull String text) {
+  public static @NotNull Element setSafeXmlText(@NotNull Element element, @NotNull String text) {
     final Character first = firstCharacter(text);
     final Character last = lastCharacter(text);
     if (!StringHelper.isXmlCharacterData(text) ||
@@ -333,8 +333,7 @@ public class StringHelper {
   /**
    * Get the (potentially safely encoded) text of an XML element.
    */
-  @Nullable
-  public static String getSafeXmlText(@NotNull Element element) {
+  public static @Nullable String getSafeXmlText(@NotNull Element element) {
     final String text = element.getText();
     final String encoding = element.getAttributeValue("encoding");
     if (encoding == null) {
@@ -360,23 +359,10 @@ public class StringHelper {
     return true;
   }
 
-  @NotNull
-  private static <K, V> Map<V, K> invertMap(@NotNull Map<K, V> map) {
-    final Map<V, K> inverted = new HashMap<>();
-    for (Map.Entry<K, V> entry : map.entrySet()) {
-      final V value = entry.getValue();
-      if (!inverted.containsKey(value)) {
-        inverted.put(value, entry.getKey());
-      }
-    }
-    return inverted;
-  }
-
-  @Nullable
-  private static KeyStroke parseSpecialKey(@NotNull String s, int modifiers) {
+  private static @Nullable KeyStroke parseSpecialKey(@NotNull String s, int modifiers) {
     final String lower = s.toLowerCase();
-    final Integer keyCode = VIM_KEY_NAMES.get(lower);
-    final Character typedChar = VIM_TYPED_KEY_NAMES.get(lower);
+    final Integer keyCode = getVimKeyName(lower);
+    final Character typedChar = getVimTypedKeyName(lower);
     if (keyCode != null) {
       return getKeyStroke(keyCode, modifiers);
     }
@@ -384,16 +370,16 @@ public class StringHelper {
       return getTypedOrPressedKeyStroke(typedChar, modifiers);
     }
     else if (lower.startsWith(META_PREFIX)) {
-      return parseSpecialKey(s.substring(META_PREFIX.length()), modifiers | META_MASK);
+      return parseSpecialKey(s.substring(META_PREFIX.length()), modifiers | META_DOWN_MASK);
     }
     else if (lower.startsWith(ALT_PREFIX)) {
-      return parseSpecialKey(s.substring(ALT_PREFIX.length()), modifiers | ALT_MASK);
+      return parseSpecialKey(s.substring(ALT_PREFIX.length()), modifiers | ALT_DOWN_MASK);
     }
     else if (lower.startsWith(CTRL_PREFIX)) {
-      return parseSpecialKey(s.substring(CTRL_PREFIX.length()), modifiers | CTRL_MASK);
+      return parseSpecialKey(s.substring(CTRL_PREFIX.length()), modifiers | CTRL_DOWN_MASK);
     }
     else if (lower.startsWith(SHIFT_PREFIX)) {
-      return parseSpecialKey(s.substring(SHIFT_PREFIX.length()), modifiers | SHIFT_MASK);
+      return parseSpecialKey(s.substring(SHIFT_PREFIX.length()), modifiers | SHIFT_DOWN_MASK);
     }
     else if (s.length() == 1) {
       return getTypedOrPressedKeyStroke(s.charAt(0), modifiers);
@@ -401,12 +387,158 @@ public class StringHelper {
     return null;
   }
 
-  @NotNull
-  private static KeyStroke getTypedOrPressedKeyStroke(char c, int modifiers) {
+  private static boolean containsDisplayUppercaseKeyNames(String lower) {
+    return "cr".equals(lower) || "bs".equals(lower);
+  }
+
+  private static Character getVimTypedKeyName(String lower) {
+    switch (lower) {
+      case "space":
+        return ' ';
+      case "bar":
+        return '|';
+      case "bslash":
+        return '\\';
+      case "lt":
+        return '<';
+      default:
+        return null;
+    }
+  }
+
+  private static Integer getVimKeyName(String lower) {
+    switch (lower) {
+      case "cr":
+      case "enter":
+      case "return":
+        return VK_ENTER;
+      case "ins":
+      case "insert":
+        return VK_INSERT;
+      case "home":
+        return VK_HOME;
+      case "end":
+        return VK_END;
+      case "pageup":
+        return VK_PAGE_UP;
+      case "pagedown":
+        return VK_PAGE_DOWN;
+      case "del":
+      case "delete":
+        return VK_DELETE;
+      case "esc":
+        return VK_ESCAPE;
+      case "bs":
+        return VK_BACK_SPACE;
+      case "backspace":
+        return VK_BACK_SPACE;
+      case "tab":
+        return VK_TAB;
+      case "up":
+        return VK_UP;
+      case "down":
+        return VK_DOWN;
+      case "left":
+        return VK_LEFT;
+      case "right":
+        return VK_RIGHT;
+      case "f1":
+        return VK_F1;
+      case "f2":
+        return VK_F2;
+      case "f3":
+        return VK_F3;
+      case "f4":
+        return VK_F4;
+      case "f5":
+        return VK_F5;
+      case "f6":
+        return VK_F6;
+      case "f7":
+        return VK_F7;
+      case "f8":
+        return VK_F8;
+      case "f9":
+        return VK_F9;
+      case "f10":
+        return VK_F10;
+      case "f11":
+        return VK_F11;
+      case "f12":
+        return VK_F12;
+      case "plug":
+        return VK_PLUG;
+      default:
+        return null;
+    }
+  }
+
+  private static String getVimKeyValue(int c) {
+    switch (c) {
+      case VK_ENTER:
+        return "cr";
+      case VK_INSERT:
+        return "ins";
+      case VK_HOME:
+        return "home";
+      case VK_END:
+        return "end";
+      case VK_PAGE_UP:
+        return "pageup";
+      case VK_PAGE_DOWN:
+        return "pagedown";
+      case VK_DELETE:
+        return "del";
+      case VK_ESCAPE:
+        return "esc";
+      case VK_BACK_SPACE:
+        return "bs";
+      case VK_TAB:
+        return "tab";
+      case VK_UP:
+        return "up";
+      case VK_DOWN:
+        return "down";
+      case VK_LEFT:
+        return "left";
+      case VK_RIGHT:
+        return "right";
+      case VK_F1:
+        return "f1";
+      case VK_F2:
+        return "f2";
+      case VK_F3:
+        return "f3";
+      case VK_F4:
+        return "f4";
+      case VK_F5:
+        return "f5";
+      case VK_F6:
+        return "f6";
+      case VK_F7:
+        return "f7";
+      case VK_F8:
+        return "f8";
+      case VK_F9:
+        return "f9";
+      case VK_F10:
+        return "f10";
+      case VK_F11:
+        return "f11";
+      case VK_F12:
+        return "f12";
+      case VK_PLUG:
+        return "plug";
+      default:
+        return null;
+    }
+  }
+
+  private static @NotNull KeyStroke getTypedOrPressedKeyStroke(char c, int modifiers) {
     if (modifiers == 0) {
       return getKeyStroke(c);
     }
-    else if (modifiers == SHIFT_MASK) {
+    else if (modifiers == SHIFT_DOWN_MASK && Character.isLetter(c)) {
       return getKeyStroke(Character.toUpperCase(c));
     }
     else {
@@ -414,13 +546,11 @@ public class StringHelper {
     }
   }
 
-  @Nullable
-  private static Character lastCharacter(@NotNull String text) {
+  private static @Nullable Character lastCharacter(@NotNull String text) {
     return text.length() > 0 ? text.charAt(text.length() - 1) : null;
   }
 
-  @Nullable
-  private static Character firstCharacter(@NotNull String text) {
+  private static @Nullable Character firstCharacter(@NotNull String text) {
     return text.length() > 0 ? text.charAt(0) : null;
   }
 

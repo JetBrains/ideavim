@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VisualToggleLineModeActionTest : VimTestCase() {
   fun `test enter visual with count`() {
-    doTest(parseKeys("1V"),
+    doTest("1V",
       """
                     A Discovery
 
@@ -48,7 +48,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count multicaret`() {
-    doTest(parseKeys("1V"),
+    doTest("1V",
       """
                     A Discovery
 
@@ -69,7 +69,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with 3 count`() {
-    doTest(parseKeys("3V"),
+    doTest("3V",
       """
                     A Discovery
 
@@ -90,7 +90,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with 100 count`() {
-    doTest(parseKeys("100V"),
+    doTest("100V",
       """
                     A Discovery
 

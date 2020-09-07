@@ -1,14 +1,38 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2020 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 @file:Suppress("RemoveCurlyBracesFromTemplate")
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class DeleteMotionActionTest : VimTestCase() {
 
-  fun `ignoreTest delete last line`() {
+  @VimBehaviorDiffers(originalVimAfter = """
+        def xxx():
+          ${c}expression one
+  """)
+  fun `test delete last line`() {
     typeTextInFile(parseKeys("dd"),
       """
         def xxx():
@@ -17,11 +41,12 @@ class DeleteMotionActionTest : VimTestCase() {
           """.trimIndent())
     myFixture.checkResult("""
         def xxx():
-          ${c}expression one
+        ${c}  expression one
           """.trimIndent())
   }
 
-  fun `ignoreTest delete last line stored with new line`() {
+  @VimBehaviorDiffers(originalVimAfter = "  expression two\n")
+  fun `test delete last line stored with new line`() {
     typeTextInFile(parseKeys("dd"),
       """
         def xxx():
@@ -29,10 +54,10 @@ class DeleteMotionActionTest : VimTestCase() {
           expression${c} two
           """.trimIndent())
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: ""
-    assertEquals("  expression two\n", savedText)
+    assertEquals("\n  expression two", savedText)
   }
 
-  fun `ignoreTest delete line action multicaret`() {
+  fun `test delete line action multicaret`() {
     typeTextInFile(parseKeys("d3d"),
       """
         abc${c}de
@@ -44,7 +69,7 @@ class DeleteMotionActionTest : VimTestCase() {
         abcde
         
         """.trimIndent())
-    myFixture.checkResult("${c}abcde\n")
+    myFixture.checkResult("${c}abcd${c}e\n")
   }
 
   fun `test delete motion action multicaret`() {
@@ -96,5 +121,24 @@ class DeleteMotionActionTest : VimTestCase() {
         """.trimIndent()
     typeTextInFile(parseKeys("dd"), file)
     myFixture.checkResult(newFile)
+  }
+
+  fun `test delete on last line`() {
+    doTest("dd",
+      """
+            A Discovery
+            
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            ${c}
+        """.trimIndent(),
+      """
+            A Discovery
+            
+            I found it in a legendary land
+            ${c}all rocks and lavender and tufted grass,
+        """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 }

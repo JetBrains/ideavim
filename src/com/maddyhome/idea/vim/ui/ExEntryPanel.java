@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,13 +23,15 @@ import com.intellij.ide.ui.LafManagerListener;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.ScrollingModel;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.ex.LineRange;
+import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -50,7 +52,7 @@ import java.awt.event.ComponentListener;
 /**
  * This is used to enter ex commands such as searches and "colon" commands
  */
-public class ExEntryPanel extends JPanel implements LafManagerListener {
+public class ExEntryPanel extends JPanel {
   private static ExEntryPanel instance;
   private static ExEntryPanel instanceWithoutShortcuts;
 
@@ -76,8 +78,6 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       new ExShortcutKeyAction(this).registerCustomShortcutSet();
     }
 
-    LafManager.getInstance().addLafManagerListener(this);
-
     updateUI();
   }
 
@@ -97,12 +97,20 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     return instanceWithoutShortcuts;
   }
 
+  public static boolean isInstanceWithShortcutsActive() {
+    return instance != null;
+  }
+
+  public static boolean isInstanceWithoutShortcutsActive() {
+    return instanceWithoutShortcuts != null;
+  }
+
   public static void fullReset() {
-    if (instance != null) {
+    if (isInstanceWithShortcutsActive()) {
       instance.reset();
       instance = null;
     }
-    if (instanceWithoutShortcuts != null) {
+    if (isInstanceWithoutShortcutsActive()) {
       instanceWithoutShortcuts.reset();
       instanceWithoutShortcuts = null;
     }
@@ -118,15 +126,18 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
    * @param count    A holder for the ex entry count
    */
   public void activate(@NotNull Editor editor, DataContext context, @NotNull String label, String initText, int count) {
+    logger.info("Activate ex entry panel");
     this.label.setText(label);
+    this.label.setFont(UiHelper.selectFont(label));
     this.count = count;
-    setFontForElements();
     entry.reset();
     entry.setEditor(editor, context);
     entry.setText(initText);
+    entry.setFont(UiHelper.selectFont(initText));
     entry.setType(label);
     parent = editor.getContentComponent();
 
+    entry.getDocument().addDocumentListener(fontListener);
     if (isIncSearchEnabled()) {
       entry.getDocument().addDocumentListener(incSearchDocumentListener);
       caretOffset = editor.getCaretModel().getOffset();
@@ -173,6 +184,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     active = false;
 
     try {
+      entry.getDocument().removeDocumentListener(fontListener);
       // incsearch won't change in the lifetime of this activation
       if (isIncSearchEnabled()) {
         entry.getDocument().removeDocumentListener(incSearchDocumentListener);
@@ -216,16 +228,34 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
 
   private void reset() {
     deactivate(false);
-    LafManager.getInstance().removeLafManagerListener(this);
+    JTextField.removeKeymap(ExTextField.KEYMAP_NAME);
   }
 
   private void resetCaretOffset(@NotNull Editor editor) {
     // Reset the original caret, with original scroll offsets
-    MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), caretOffset);
-    editor.getScrollingModel().scroll(horizontalOffset, verticalOffset);
+    final Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+    if (primaryCaret.getOffset() != caretOffset) {
+      MotionGroup.moveCaret(editor, primaryCaret, caretOffset);
+    }
+    final ScrollingModel scrollingModel = editor.getScrollingModel();
+    if (scrollingModel.getHorizontalScrollOffset() != horizontalOffset ||
+        scrollingModel.getVerticalScrollOffset() != verticalOffset) {
+      scrollingModel.scroll(horizontalOffset, verticalOffset);
+    }
   }
 
-  @NotNull private final DocumentListener incSearchDocumentListener = new DocumentAdapter() {
+  private final @NotNull DocumentListener fontListener = new DocumentAdapter() {
+    @Override
+    protected void textChanged(@NotNull DocumentEvent e) {
+      String text = entry.getActualText();
+      Font newFont = UiHelper.selectFont(text);
+      if (newFont != entry.getFont()) {
+        entry.setFont(newFont);
+      }
+    }
+  };
+
+  private final @NotNull DocumentListener incSearchDocumentListener = new DocumentAdapter() {
     @Override
     protected void textChanged(@NotNull DocumentEvent e) {
       final Editor editor = entry.getEditor();
@@ -235,6 +265,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       char separator = label.getText().charAt(0);
       String searchText = entry.getActualText();
       if (label.getText().equals(":")) {
+        if (searchText.isEmpty()) return;
         final ExCommand command = getIncsearchCommand(searchText);
         if (command == null) {
           return;
@@ -257,13 +288,9 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       if (labelText.equals("/") || labelText.equals("?") || searchCommand) {
         final boolean forwards = !labelText.equals("?");  // :s, :g, :v are treated as forwards
         final String pattern;
-        if (searchText == null) {
-          pattern = "";
-        } else {
-          final CharPointer p = new CharPointer(searchText);
-          final CharPointer end = RegExp.skip_regexp(new CharPointer(searchText), separator, true);
-          pattern = p.substring(end.pointer() - p.pointer());
-        }
+        final CharPointer p = new CharPointer(searchText);
+        final CharPointer end = RegExp.skip_regexp(new CharPointer(searchText), separator, true);
+        pattern = p.substring(end.pointer() - p.pointer());
 
         VimPlugin.getEditor().closeEditorSearchSession(editor);
         final int matchOffset = VimPlugin.getSearch().updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
@@ -277,8 +304,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     }
 
     @Contract("null -> null")
-    @Nullable
-    private ExCommand getIncsearchCommand(@Nullable String commandText) {
+    private @Nullable ExCommand getIncsearchCommand(@Nullable String commandText) {
       if (commandText == null) return null;
       try {
         final ExCommand exCommand = CommandParser.getInstance().parse(commandText);
@@ -328,13 +354,11 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
    *
    * @return The user entered text
    */
-  @Nullable
-  public String getText() {
+  public @NotNull String getText() {
     return entry.getActualText();
   }
 
-  @NotNull
-  public ExTextField getEntry() {
+  public @NotNull ExTextField getEntry() {
     return entry;
   }
 
@@ -345,12 +369,6 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
    */
   public void handleKey(@NotNull KeyStroke stroke) {
     entry.handleKey(stroke);
-  }
-
-  @Override
-  public void lookAndFeelChanged(@NotNull LafManager source) {
-    // Calls updateUI on this and child components
-    IJSwingUtilities.updateComponentTreeUI(this);
   }
 
   // Called automatically when the LAF is changed and the component is visible, and manually by the LAF listener handler
@@ -385,9 +403,8 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   }
 
   private void setFontForElements() {
-    final Font font = UiHelper.getEditorFont();
-    label.setFont(font);
-    entry.setFont(font);
+    label.setFont(UiHelper.selectFont(label.getText()));
+    entry.setFont(UiHelper.selectFont(entry.getActualText()));
   }
 
   private void positionPanel() {
@@ -414,9 +431,9 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   private int count;
 
   // UI stuff
-  @Nullable private JComponent parent;
-  @NotNull private final JLabel label;
-  @NotNull private final ExTextField entry;
+  private @Nullable JComponent parent;
+  private final @NotNull JLabel label;
+  private final @NotNull ExTextField entry;
   private JComponent oldGlass;
   private LayoutManager oldLayout;
   private boolean wasOpaque;
@@ -426,7 +443,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   private int horizontalOffset;
   private int caretOffset;
 
-  @NotNull private final ComponentListener resizePanelListener = new ComponentAdapter() {
+  private final @NotNull ComponentListener resizePanelListener = new ComponentAdapter() {
     @Override
     public void componentResized(ComponentEvent e) {
       positionPanel();
@@ -434,4 +451,18 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   };
 
   private static final Logger logger = Logger.getInstance(ExEntryPanel.class.getName());
+
+  public static class LafListener implements LafManagerListener {
+    @Override
+    public void lookAndFeelChanged(@NotNull LafManager source) {
+      if (!VimPlugin.isEnabled()) return;
+      // Calls updateUI on this and child components
+      if (ExEntryPanel.isInstanceWithShortcutsActive()) {
+        IJSwingUtilities.updateComponentTreeUI(ExEntryPanel.getInstance());
+      }
+      if (ExEntryPanel.isInstanceWithoutShortcutsActive()) {
+        IJSwingUtilities.updateComponentTreeUI(ExEntryPanel.getInstanceWithoutShortcuts());
+      }
+    }
+  }
 }

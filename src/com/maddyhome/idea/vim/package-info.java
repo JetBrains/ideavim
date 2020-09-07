@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,45 +30,45 @@
  * |i_CTRL-C|             {@link com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction}
  * |i_CTRL-D|             {@link com.maddyhome.idea.vim.action.change.shift.ShiftLeftLinesAction}
  * |i_CTRL-E|             {@link com.maddyhome.idea.vim.action.change.insert.InsertCharacterBelowCursorAction}
- * |i_CTRL-G_j|           TODO
- * |i_CTRL-G_k|           TODO
- * |i_CTRL-G_u|           TODO
+ * |i_CTRL-G_j|           TO BE IMPLEMENTED
+ * |i_CTRL-G_k|           TO BE IMPLEMENTED
+ * |i_CTRL-G_u|           TO BE IMPLEMENTED
  * |i_<BS>|               {@link com.maddyhome.idea.vim.action.editor.VimEditorBackSpace}
  * |i_digraph|            IdeaVim enter digraph
  * |i_CTRL-H|             IntelliJ editor backspace
  * |i_<Tab>|              {@link com.maddyhome.idea.vim.action.editor.VimEditorTab}
  * |i_CTRL-I|             IntelliJ editor tab
  * |i_<NL>|               {@link com.maddyhome.idea.vim.action.change.insert.InsertEnterAction}
- * |i_CTRL-J|             TODO
- * |i_CTRL-K|             IdeaVim enter digraph
- * |i_CTRL-L|             TODO
+ * |i_CTRL-J|             TO BE IMPLEMENTED
+ * |i_CTRL-K|             {@link com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction}
+ * |i_CTRL-L|             TO BE IMPLEMENTED
  * |i_<CR>|               {@link com.maddyhome.idea.vim.action.change.insert.InsertEnterAction}
  * |i_CTRL-M|             {@link com.maddyhome.idea.vim.action.change.insert.InsertEnterAction}
  * |i_CTRL-N|             {@link com.maddyhome.idea.vim.action.window.LookupDownAction}
  * |i_CTRL-O|             {@link com.maddyhome.idea.vim.action.change.insert.InsertSingleCommandAction}
  * |i_CTRL-P|             {@link com.maddyhome.idea.vim.action.window.LookupUpAction}
- * |i_CTRL-Q|             TODO
+ * |i_CTRL-Q|             TO BE IMPLEMENTED
  * |i_CTRL-R|             {@link com.maddyhome.idea.vim.action.change.insert.InsertRegisterAction}
- * |i_CTRL-R_CTRL-R|      TODO
- * |i_CTRL-R_CTRL-O|      TODO
- * |i_CTRL-R_CTRL-P|      TODO
+ * |i_CTRL-R_CTRL-R|      TO BE IMPLEMENTED
+ * |i_CTRL-R_CTRL-O|      TO BE IMPLEMENTED
+ * |i_CTRL-R_CTRL-P|      TO BE IMPLEMENTED
  * |i_CTRL-T|             {@link com.maddyhome.idea.vim.action.change.shift.ShiftRightLinesAction}
  * |i_CTRL-U|             {@link com.maddyhome.idea.vim.action.change.insert.InsertDeleteInsertedTextAction}
- * |i_CTRL-V|             TODO
- * |i_CTRL-V_digit|       TODO
+ * |i_CTRL-V|             {@link com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction}
+ * |i_CTRL-V_digit|       {@link com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction}
  * |i_CTRL-W|             {@link com.maddyhome.idea.vim.action.change.insert.InsertDeletePreviousWordAction}
- * |i_CTRL-X|             TODO
+ * |i_CTRL-X|             TO BE IMPLEMENTED
  * |i_CTRL-Y|             {@link com.maddyhome.idea.vim.action.change.insert.InsertCharacterAboveCursorAction}
- * |i_CTRL-Z|             TODO
+ * |i_CTRL-Z|             TO BE IMPLEMENTED
  * |i_<Esc>|              {@link com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction}
  * |i_CTRL-[|             {@link com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction}
  * |i_CTRL-\_CTRL-N|      {@link com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction}
- * |i_CTRL-\_CTRL-G|      TODO
- * |i_CTRL-]}             TODO
- * |i_CTRL-^|             TODO
- * |i_CTRL-_|             TODO
- * |i_0_CTRL-D|           TODO
- * |i_^_CTRL-D|           TODO
+ * |i_CTRL-\_CTRL-G|      TO BE IMPLEMENTED
+ * |i_CTRL-]}             TO BE IMPLEMENTED
+ * |i_CTRL-^|             TO BE IMPLEMENTED
+ * |i_CTRL-_|             TO BE IMPLEMENTED
+ * |i_0_CTRL-D|           TO BE IMPLEMENTED
+ * |i_^_CTRL-D|           TO BE IMPLEMENTED
  * |i_<Del>|              {@link com.maddyhome.idea.vim.action.editor.VimEditorDelete}
  * |i_<Left>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLeftInsertModeAction}
  * |i_<S-Left>|           {@link com.maddyhome.idea.vim.action.motion.text.MotionWordLeftInsertAction}
@@ -89,7 +89,7 @@
  * |i_<PageDown>|         {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownInsertModeAction}
  * |i_<F1>|               IntelliJ help
  * |i_<Insert>|           IntelliJ editor toggle insert/replace
- * |i_CTRL-X_index|       TODO
+ * |i_CTRL-X_index|       TO BE IMPLEMENTED
  *
  *
  * 2. Normal mode
@@ -99,38 +99,38 @@
  *
  * |CTRL-A|               {@link com.maddyhome.idea.vim.action.change.change.number.ChangeNumberIncAction}
  * |CTRL-B|               {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpAction}
- * |CTRL-C|               TODO
+ * |CTRL-C|               TO BE IMPLEMENTED
  * |CTRL-D|               {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageDownAction}
  * |CTRL-E|               {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineDownAction}
  * |CTRL-F|               {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction}
  * |CTRL-G|               {@link com.maddyhome.idea.vim.action.file.FileGetFileInfoAction}
  * |<BS>|                 {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLeftWrapAction}
  * |CTRL-H|               {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLeftWrapAction}
- * |<Tab>|                TODO
+ * |<Tab>|                TO BE IMPLEMENTED
  * |CTRL-I|               {@link com.maddyhome.idea.vim.action.motion.mark.MotionJumpNextAction}
  * |<NL>|                 {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownNotLineWiseAction}
- * |CTRL-J|               TODO
+ * |CTRL-J|               TO BE IMPLEMENTED
  * |CTRL-L|               not applicable
  * |<CR>|                 {@link com.maddyhome.idea.vim.action.motion.updown.EnterNormalAction}
  * |CTRL-M|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownFirstNonSpaceAction}
- * |CTRL-N|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownAction}
+ * |CTRL-N|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownCtrlNAction}
  * |CTRL-O|               {@link com.maddyhome.idea.vim.action.motion.mark.MotionJumpPreviousAction}
- * |CTRL-P|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionUpAction}
+ * |CTRL-P|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionUpCtrlPAction}
  * |CTRL-R|               {@link com.maddyhome.idea.vim.action.change.RedoAction}
- * |CTRL-T|               TODO
+ * |CTRL-T|               TO BE IMPLEMENTED
  * |CTRL-U|               {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageUpAction}
  * |CTRL-V|               {@link com.maddyhome.idea.vim.action.motion.visual.VisualToggleBlockModeAction}
  * |CTRL-W|               see window commands
  * |CTRL-X|               {@link com.maddyhome.idea.vim.action.change.change.number.ChangeNumberDecAction}
  * |CTRL-Y|               {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineUpAction}
- * |CTRL-Z|               TODO
+ * |CTRL-Z|               TO BE IMPLEMENTED
  * |CTRL-]|               {@link com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction}
  * |CTRL-6|               {@link com.maddyhome.idea.vim.action.file.FilePreviousAction}
  * |CTRL-\CTRL-N|         {@link com.maddyhome.idea.vim.action.ResetModeAction}
  * |<Space>|              {@link com.maddyhome.idea.vim.action.motion.leftright.MotionRightWrapAction}
  * |!|                    {@link com.maddyhome.idea.vim.action.change.change.FilterMotionAction}
  * |!!|                   translated to !_
- * |quote|                {@link com.maddyhome.idea.vim.action.copy.SelectRegisterAction}
+ * |quote|                handled by command key parser
  * |#|                    {@link com.maddyhome.idea.vim.action.motion.search.SearchWholeWordBackwardAction}
  * |$|                    {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction}
  * |%|                    {@link com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction}
@@ -172,7 +172,7 @@
  * |N|                    {@link com.maddyhome.idea.vim.action.motion.search.SearchAgainPreviousAction}
  * |O|                    {@link com.maddyhome.idea.vim.action.change.insert.InsertNewLineAboveAction}
  * |P|                    {@link com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorAction}
- * |Q|                    TODO
+ * |Q|                    TO BE IMPLEMENTED
  * |R|                    {@link com.maddyhome.idea.vim.action.change.change.ChangeReplaceAction}
  * |S|                    {@link com.maddyhome.idea.vim.action.change.change.ChangeLineAction}
  * |T|                    {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLeftTillMatchCharAction}
@@ -197,8 +197,8 @@
  * |cc|                   translated to c_
  * |d|                    {@link com.maddyhome.idea.vim.action.change.delete.DeleteMotionAction}
  * |dd|                   translated to d_
- * |do|                   TODO
- * |dp|                   TODO
+ * |do|                   TO BE IMPLEMENTED
+ * |dp|                   TO BE IMPLEMENTED
  * |e|                    {@link com.maddyhome.idea.vim.action.motion.text.MotionWordEndRightAction}
  * |f|                    {@link com.maddyhome.idea.vim.action.motion.leftright.MotionRightMatchCharAction}
  * |g|                    see commands starting with 'g'
@@ -247,7 +247,7 @@
  * |<S-Right>|            {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftRightAction}
  * |<S-Up>|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionShiftUpAction}
  * |<S-Home>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftHomeAction}
- * |<S-End>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftEndAction}
+ * |<S-End>|              {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftEndAction}
  * |<Up>|                 {@link com.maddyhome.idea.vim.action.motion.updown.MotionArrowUpAction}
  *
  *
@@ -261,50 +261,50 @@
  * tag                    action
  * -------------------------------------------------------------------------------------------------------------------
  *
- * |CTRL-W_+|             TODO
- * |CTRL-W_-|             TODO
- * |CTRL-W_<|             TODO
- * |CTRL-W_=|             TODO
- * |CTRL-W_>|             TODO
- * |CTRL-W_H|             TODO
- * |CTRL-W_J|             TODO
- * |CTRL-W_K|             TODO
- * |CTRL-W_L|             TODO
- * |CTRL-W_P|             TODO
- * |CTRL-W_R|             TODO
+ * |CTRL-W_+|             TO BE IMPLEMENTED
+ * |CTRL-W_-|             TO BE IMPLEMENTED
+ * |CTRL-W_<|             TO BE IMPLEMENTED
+ * |CTRL-W_=|             TO BE IMPLEMENTED
+ * |CTRL-W_>|             TO BE IMPLEMENTED
+ * |CTRL-W_H|             TO BE IMPLEMENTED
+ * |CTRL-W_J|             TO BE IMPLEMENTED
+ * |CTRL-W_K|             TO BE IMPLEMENTED
+ * |CTRL-W_L|             TO BE IMPLEMENTED
+ * |CTRL-W_P|             TO BE IMPLEMENTED
+ * |CTRL-W_R|             TO BE IMPLEMENTED
  * |CTRL-W_S|             {@link com.maddyhome.idea.vim.action.window.HorizontalSplitAction}
- * |CTRL-W_T|             TODO
+ * |CTRL-W_T|             TO BE IMPLEMENTED
  * |CTRL-W_W|             {@link com.maddyhome.idea.vim.action.window.WindowPrevAction}
- * |CTRL-W_]|             TODO
- * |CTRL-W_^|             TODO
- * |CTRL-W__|             TODO
- * |CTRL-W_b|             TODO
+ * |CTRL-W_]|             TO BE IMPLEMENTED
+ * |CTRL-W_^|             TO BE IMPLEMENTED
+ * |CTRL-W__|             TO BE IMPLEMENTED
+ * |CTRL-W_b|             TO BE IMPLEMENTED
  * |CTRL-W_c|             {@link com.maddyhome.idea.vim.action.window.CloseWindowAction}
- * |CTRL-W_d|             TODO
- * |CTRL-W_f|             TODO
- * |CTRL-W-F|             TODO
- * |CTRL-W-g]|            TODO
- * |CTRL-W-g}|            TODO
- * |CTRL-W-gf|            TODO
- * |CTRL-W-gF|            TODO
+ * |CTRL-W_d|             TO BE IMPLEMENTED
+ * |CTRL-W_f|             TO BE IMPLEMENTED
+ * |CTRL-W-F|             TO BE IMPLEMENTED
+ * |CTRL-W-g]|            TO BE IMPLEMENTED
+ * |CTRL-W-g}|            TO BE IMPLEMENTED
+ * |CTRL-W-gf|            TO BE IMPLEMENTED
+ * |CTRL-W-gF|            TO BE IMPLEMENTED
  * |CTRL-W_h|             {@link com.maddyhome.idea.vim.action.window.WindowLeftAction}
- * |CTRL-W_i|             TODO
+ * |CTRL-W_i|             TO BE IMPLEMENTED
  * |CTRL-W_j|             {@link com.maddyhome.idea.vim.action.window.WindowDownAction}
  * |CTRL-W_k|             {@link com.maddyhome.idea.vim.action.window.WindowUpAction}
  * |CTRL-W_l|             {@link com.maddyhome.idea.vim.action.window.WindowRightAction}
- * |CTRL-W_n|             TODO
+ * |CTRL-W_n|             TO BE IMPLEMENTED
  * |CTRL-W_o|             {@link com.maddyhome.idea.vim.action.window.WindowOnlyAction}
- * |CTRL-W_p|             TODO
- * |CTRL-W_q|             TODO
- * |CTRL-W_r|             TODO
+ * |CTRL-W_p|             TO BE IMPLEMENTED
+ * |CTRL-W_q|             TO BE IMPLEMENTED
+ * |CTRL-W_r|             TO BE IMPLEMENTED
  * |CTRL-W_s|             {@link com.maddyhome.idea.vim.action.window.HorizontalSplitAction}
- * |CTRL-W_t|             TODO
+ * |CTRL-W_t|             TO BE IMPLEMENTED
  * |CTRL-W_v|             {@link com.maddyhome.idea.vim.action.window.VerticalSplitAction}
  * |CTRL-W_w|             {@link com.maddyhome.idea.vim.action.window.WindowNextAction}
- * |CTRL-W_x|             TODO
- * |CTRL-W_z|             TODO
- * |CTRL-W_bar|           TODO
- * |CTRL-W_}|             TODO
+ * |CTRL-W_x|             TO BE IMPLEMENTED
+ * |CTRL-W_z|             TO BE IMPLEMENTED
+ * |CTRL-W_bar|           TO BE IMPLEMENTED
+ * |CTRL-W_}|             TO BE IMPLEMENTED
  * |CTRL-W_<Down>|        {@link com.maddyhome.idea.vim.action.window.WindowDownAction}
  * |CTRL-W_<Up>|          {@link com.maddyhome.idea.vim.action.window.WindowUpAction}
  * |CTRL-W_<Left>|        {@link com.maddyhome.idea.vim.action.window.WindowLeftAction}
@@ -319,55 +319,55 @@
  *
  * tag                    action
  * -------------------------------------------------------------------------------------------------------------------
- * |[_CTRL-D|             TODO
- * |[_CTRL-I|             TODO
- * |[#|                   TODO
- * |['|                   TODO
+ * |[_CTRL-D|             TO BE IMPLEMENTED
+ * |[_CTRL-I|             TO BE IMPLEMENTED
+ * |[#|                   TO BE IMPLEMENTED
+ * |['|                   TO BE IMPLEMENTED
  * |[(|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedParenOpenAction}
- * |[star|                TODO
- * |[`|                   TODO
- * |[/|                   TODO
- * |[D|                   TODO
- * |[I|                   TODO
+ * |[star|                TO BE IMPLEMENTED
+ * |[`|                   TO BE IMPLEMENTED
+ * |[/|                   TO BE IMPLEMENTED
+ * |[D|                   TO BE IMPLEMENTED
+ * |[I|                   TO BE IMPLEMENTED
  * |[M|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousEndAction}
- * |[P|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
+ * |[P|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorNoIndentAction}
  * |[P|                   {@link com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction}
  * |[[|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardStartAction}
  * |[]|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardEndAction}
- * |[c|                   TODO
- * |[d|                   TODO
- * |[f|                   TODO
- * |[i|                   TODO
+ * |[c|                   TO BE IMPLEMENTED
+ * |[d|                   TO BE IMPLEMENTED
+ * |[f|                   TO BE IMPLEMENTED
+ * |[i|                   TO BE IMPLEMENTED
  * |[m|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousStartAction}
- * |[p|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
+ * |[p|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorNoIndentAction}
  * |[p|                   {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction}
- * |[s|                   TODO
- * |[z|                   TODO
+ * |[s|                   TO BE IMPLEMENTED
+ * |[z|                   TO BE IMPLEMENTED
  * |[{|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedBraceOpenAction}
- * |]_CTRL-D|             TODO
- * |]_CTRL-I|             TODO
- * |]#|                   TODO
- * |]'|                   TODO
+ * |]_CTRL-D|             TO BE IMPLEMENTED
+ * |]_CTRL-I|             TO BE IMPLEMENTED
+ * |]#|                   TO BE IMPLEMENTED
+ * |]'|                   TO BE IMPLEMENTED
  * |])|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedParenCloseAction}
- * |]star|                TODO
- * |]`|                   TODO
- * |]/|                   TODO
- * |]D|                   TODO
- * |]I|                   TODO
+ * |]star|                TO BE IMPLEMENTED
+ * |]`|                   TO BE IMPLEMENTED
+ * |]/|                   TO BE IMPLEMENTED
+ * |]D|                   TO BE IMPLEMENTED
+ * |]I|                   TO BE IMPLEMENTED
  * |]M|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodNextEndAction}
- * |]P|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
+ * |]P|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorNoIndentAction}
  * |]P|                   {@link com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction}
  * |][|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardStartAction}
  * |]]|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardEndAction}
- * |]c|                   TODO
- * |]d|                   TODO
- * |]f|                   TODO
- * |]i|                   TODO
+ * |]c|                   TO BE IMPLEMENTED
+ * |]d|                   TO BE IMPLEMENTED
+ * |]f|                   TO BE IMPLEMENTED
+ * |]i|                   TO BE IMPLEMENTED
  * |]m|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodNextStartAction}
- * |]p|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
+ * |]p|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorNoIndentAction}
  * |]p|                   {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction}
- * |]s|                   TODO
- * |]z|                   TODO
+ * |]s|                   TO BE IMPLEMENTED
+ * |]z|                   TO BE IMPLEMENTED
  * |]}|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedBraceCloseAction}
  *
  *
@@ -379,7 +379,7 @@
  * |g_CTRL-A|             not applicable
  * |g_CTRL-G|             {@link com.maddyhome.idea.vim.action.file.FileGetLocationInfoAction}
  * |g_CTRL-H|             {@link com.maddyhome.idea.vim.action.motion.select.SelectEnableBlockModeAction}
- * |g_CTRL-]|             TODO
+ * |g_CTRL-]|             TO BE IMPLEMENTED
  * |g#|                   {@link com.maddyhome.idea.vim.action.motion.search.SearchWordBackwardAction}
  * |g$|                   {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastScreenColumnAction}
  * |g&|                   {@link com.maddyhome.idea.vim.action.change.change.ChangeLastGlobalSearchReplaceAction}
@@ -387,57 +387,58 @@
  * |g'|                   {@link com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkLineNoSaveJumpAction}
  * |g`|                   {@link com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkNoSaveJumpAction}
  * |gstar|                {@link com.maddyhome.idea.vim.action.motion.search.SearchWordForwardAction}
- * |g+|                   TODO
- * |g,|                   TODO
- * |g-|                   TODO
+ * |g+|                   TO BE IMPLEMENTED
+ * |g,|                   TO BE IMPLEMENTED
+ * |g-|                   TO BE IMPLEMENTED
  * |g0|                   {@link com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenColumnAction}
  * |g8|                   {@link com.maddyhome.idea.vim.action.file.FileGetHexAction}
- * |g;|                   TODO
- * |g<|                   TODO
- * |g?|                   TODO
- * |g?g?|                 TODO
+ * |g;|                   TO BE IMPLEMENTED
+ * |g<|                   TO BE IMPLEMENTED
+ * |g?|                   TO BE IMPLEMENTED
+ * |g?g?|                 TO BE IMPLEMENTED
  * |gD|                   {@link com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction}
  * |gE|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionBigWordEndLeftAction}
- * |gF|                   TODO
+ * |gF|                   TO BE IMPLEMENTED
  * |gH|                   {@link com.maddyhome.idea.vim.action.motion.select.SelectEnableLineModeAction}
  * |gI|                   {@link com.maddyhome.idea.vim.action.change.insert.InsertLineStartAction}
  * |gJ|                   {@link com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesAction}
  * |gN|                   {@link com.maddyhome.idea.vim.action.motion.gn.VisualSelectPreviousSearch}
  * |gN|                   {@link com.maddyhome.idea.vim.action.motion.gn.GnPreviousTextObject}
+ * |gP|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorMoveCursorAction}
  * |gP|                   {@link com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorActionMoveCursor}
- * |gQ|                   TODO
- * |gR|                   TODO
+ * |gQ|                   TO BE IMPLEMENTED
+ * |gR|                   TO BE IMPLEMENTED
  * |gT|                   {@link com.maddyhome.idea.vim.action.motion.tabs.MotionPreviousTabAction}
  * |gU|                   {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperMotionAction}
- * |gV|                   TODO
- * |g]|                   TODO
+ * |gV|                   TO BE IMPLEMENTED
+ * |g]|                   TO BE IMPLEMENTED
  * |g^|                   {@link com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenNonSpaceAction}
  * |g_|                   {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastNonSpaceAction}
  * |ga|                   {@link com.maddyhome.idea.vim.action.file.FileGetAsciiAction}
  * |gd|                   {@link com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction}
  * |ge|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionWordEndLeftAction}
- * |gf|                   TODO
+ * |gf|                   TO BE IMPLEMENTED
  * |gg|                   {@link com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstAction}
  * |gh|                   {@link com.maddyhome.idea.vim.action.motion.select.SelectEnableCharacterModeAction}
  * |gi|                   {@link com.maddyhome.idea.vim.action.change.insert.InsertAtPreviousInsertAction}
- * |gj|                   TODO
+ * |gj|                   TO BE IMPLEMENTED
  * |gk|                   {@link com.maddyhome.idea.vim.action.motion.updown.MotionUpNotLineWiseAction}
  * |gn|                   {@link com.maddyhome.idea.vim.action.motion.gn.VisualSelectNextSearch}
  * |gn|                   {@link com.maddyhome.idea.vim.action.motion.gn.GnNextTextObject}
  * |gm|                   {@link com.maddyhome.idea.vim.action.motion.leftright.MotionMiddleColumnAction}
  * |go|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionNthCharacterAction}
- * |gp|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextMoveCursorAction}
+ * |gp|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorMoveCursorAction}
  * |gp|                   {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorActionMoveCursor}
- * |gq|                   TODO
- * |gr|                   TODO
- * |gs|                   TODO
+ * |gq|                   {@link com.maddyhome.idea.vim.action.change.change.ReformatCodeMotionAction}
+ * |gr|                   TO BE IMPLEMENTED
+ * |gs|                   TO BE IMPLEMENTED
  * |gt|                   {@link com.maddyhome.idea.vim.action.motion.tabs.MotionNextTabAction}
  * |gu|                   {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerMotionAction}
  * |gv|                   {@link com.maddyhome.idea.vim.action.motion.visual.VisualSelectPreviousAction}
- * |gw|                   TODO
+ * |gw|                   TO BE IMPLEMENTED
  * |g@|                   {@link com.maddyhome.idea.vim.action.change.OperatorAction}
  * |g~|                   {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseToggleMotionAction}
- * |g<Down>|              TODO
+ * |g<Down>|              TO BE IMPLEMENTED
  * |g<End>|               {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastScreenColumnAction}
  * |g<Home>|              {@link com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenColumnAction}
  * |g<Up>|                {@link com.maddyhome.idea.vim.action.motion.updown.MotionUpNotLineWiseAction}
@@ -451,43 +452,43 @@
  * |z+|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLinePageStartAction}
  * |z-|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLineStartAction}
  * |z.|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollMiddleScreenLineStartAction}
- * |z=|                   TODO
- * |zA|                   TODO
+ * |z=|                   TO BE IMPLEMENTED
+ * |zA|                   TO BE IMPLEMENTED
  * |zC|                   {@link com.maddyhome.idea.vim.action.fold.VimCollapseRegionRecursively}
- * |zD|                   TODO
- * |zE|                   TODO
- * |zF|                   TODO
- * |zG|                   TODO
- * |zH|                   TODO
- * |zL|                   TODO
+ * |zD|                   TO BE IMPLEMENTED
+ * |zE|                   TO BE IMPLEMENTED
+ * |zF|                   TO BE IMPLEMENTED
+ * |zG|                   TO BE IMPLEMENTED
+ * |zH|                   TO BE IMPLEMENTED
+ * |zL|                   TO BE IMPLEMENTED
  * |zM|                   {@link com.maddyhome.idea.vim.action.fold.VimCollapseAllRegions}
- * |zN|                   TODO
+ * |zN|                   TO BE IMPLEMENTED
  * |zO|                   {@link com.maddyhome.idea.vim.action.fold.VimExpandRegionRecursively}
  * |zR|                   {@link com.maddyhome.idea.vim.action.fold.VimExpandAllRegions}
- * |zW|                   TODO
- * |zX|                   TODO
+ * |zW|                   TO BE IMPLEMENTED
+ * |zX|                   TO BE IMPLEMENTED
  * |z^|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLinePageStartAction}
- * |za|                   TODO
+ * |za|                   TO BE IMPLEMENTED
  * |zb|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLineAction}
  * |zc|                   {@link com.maddyhome.idea.vim.action.fold.VimCollapseRegion}
  * |zd|                   not applicable
  * |ze|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenColumnAction}
  * |zf|                   not applicable
- * |zg|                   TODO
+ * |zg|                   TO BE IMPLEMENTED
  * |zh|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnRightAction}
- * |zi|                   TODO
- * |zj|                   TODO
- * |zk|                   TODO
+ * |zi|                   TO BE IMPLEMENTED
+ * |zj|                   TO BE IMPLEMENTED
+ * |zk|                   TO BE IMPLEMENTED
  * |zl|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnLeftAction}
- * |zm|                   TODO
- * |zn|                   TODO
+ * |zm|                   TO BE IMPLEMENTED
+ * |zn|                   TO BE IMPLEMENTED
  * |zo|                   {@link com.maddyhome.idea.vim.action.fold.VimExpandRegion}
- * |zr|                   TODO
+ * |zr|                   TO BE IMPLEMENTED
  * |zs|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenColumnAction}
  * |zt|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLineAction}
- * |zv|                   TODO
- * |zw|                   TODO
- * |zx|                   TODO
+ * |zv|                   TO BE IMPLEMENTED
+ * |zw|                   TO BE IMPLEMENTED
+ * |zx|                   TO BE IMPLEMENTED
  * |zz|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollMiddleScreenLineAction}
  * |z<Left>|              {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnRightAction}
  * |z<Right>|             {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnLeftAction}
@@ -499,17 +500,17 @@
  * -------------------------------------------------------------------------------------------------------------------
  *
  * |v_CTRL-\_CTRL-N|      {@link com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction}
- * |v_CTRL-\_CTRL-G|      TODO
+ * |v_CTRL-\_CTRL-G|      TO BE IMPLEMENTED
  * |v_CTRL-A|             {@link com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberIncAction}
  * |v_CTRL-C|             {@link com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction}
  * |v_CTRL-G|             {@link com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode}
  * |v_<BS>|               NVO mapping
  * |v_CTRL-H|             NVO mapping
- * |v_CTRL-O|             TODO
+ * |v_CTRL-O|             TO BE IMPLEMENTED
  * |v_CTRL-V|             NVO mapping
  * |v_<Esc>|              {@link com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction}
  * |v_CTRL-X|             {@link com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberDecAction}
- * |v_CTRL-]|             TODO
+ * |v_CTRL-]|             TO BE IMPLEMENTED
  * |v_!|                  {@link com.maddyhome.idea.vim.action.change.change.FilterVisualLinesAction}
  * |v_:|                  NVO mapping
  * |v_<|                  {@link com.maddyhome.idea.vim.action.change.shift.ShiftLeftVisualAction}
@@ -520,9 +521,9 @@
  * |v_D|                  {@link com.maddyhome.idea.vim.action.change.delete.DeleteVisualLinesEndAction}
  * |v_b_I|                {@link com.maddyhome.idea.vim.action.change.insert.VisualBlockInsertAction}
  * |v_J|                  {@link com.maddyhome.idea.vim.action.change.delete.DeleteJoinVisualLinesSpacesAction}
- * |v_K|                  TODO
+ * |v_K|                  TO BE IMPLEMENTED
  * |v_O|                  {@link com.maddyhome.idea.vim.action.motion.visual.VisualSwapEndsBlockAction}
- * |v_P|                  {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAction}
+ * |v_P|                  {@link com.maddyhome.idea.vim.action.copy.PutVisualTextBeforeCursorAction}
  * |v_R|                  {@link com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesAction}
  * |v_S|                  {@link com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesAction}
  * |v_U|                  {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperVisualAction}
@@ -574,7 +575,7 @@
  * |v_i{|                 {@link com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBraceAction}
  * |v_i}|                 {@link com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBraceAction}
  * |v_o|                  {@link com.maddyhome.idea.vim.action.motion.visual.VisualSwapEndsAction}
- * |v_p|                  {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAction}
+ * |v_p|                  {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAfterCursorAction}
  * |v_r|                  {@link com.maddyhome.idea.vim.action.change.change.ChangeVisualCharacterAction}
  * |v_s|                  {@link com.maddyhome.idea.vim.action.change.change.ChangeVisualAction}
  * |v_u|                  {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerVisualAction}
@@ -609,40 +610,40 @@
  * tag                    action
  * -------------------------------------------------------------------------------------------------------------------
  *
- * |c_CTRL-A|             TODO
+ * |c_CTRL-A|             TO BE IMPLEMENTED
  * |c_CTRL-B|             {@link javax.swing.text.DefaultEditorKit#beginLineAction}
  * |c_CTRL-C|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.CancelEntryAction}
- * |c_CTRL-D|             TODO
+ * |c_CTRL-D|             TO BE IMPLEMENTED
  * |c_CTRL-E|             {@link javax.swing.text.DefaultEditorKit#endLineAction}
- * |c_CTRL-G|             TODO
+ * |c_CTRL-G|             TO BE IMPLEMENTED
  * |c_CTRL-H|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.DeletePreviousCharAction}
- * |c_CTRL-I|             TODO
+ * |c_CTRL-I|             TO BE IMPLEMENTED
  * |c_CTRL-J|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.CompleteEntryAction}
  * |c_CTRL-K|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.StartDigraphAction}
- * |c_CTRL-L|             TODO
+ * |c_CTRL-L|             TO BE IMPLEMENTED
  * |c_CTRL-M|             {@link com.maddyhome.idea.vim.action.ex.ProcessExEntryAction}
- * |c_CTRL-N|             TODO
- * |c_CTRL-P|             TODO
+ * |c_CTRL-N|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryDownAction}
+ * |c_CTRL-P|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryUpAction}
  * |c_CTRL-Q|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.StartDigraphAction}
  * |c_CTRL-R|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.InsertRegisterAction}
- * |c_CTRL-R_CTRL-A|      TODO
- * |c_CTRL-R_CTRL-F|      TODO
- * |c_CTRL-R_CTRL-L|      TODO
- * |c_CTRL-R_CTRL-O|      TODO
- * |c_CTRL-R_CTRL-P|      TODO
- * |c_CTRL-R_CTRL-R|      TODO
- * |c_CTRL-R_CTRL-W|      TODO
- * |c_CTRL-T|             TODO
+ * |c_CTRL-R_CTRL-A|      TO BE IMPLEMENTED
+ * |c_CTRL-R_CTRL-F|      TO BE IMPLEMENTED
+ * |c_CTRL-R_CTRL-L|      TO BE IMPLEMENTED
+ * |c_CTRL-R_CTRL-O|      TO BE IMPLEMENTED
+ * |c_CTRL-R_CTRL-P|      TO BE IMPLEMENTED
+ * |c_CTRL-R_CTRL-R|      TO BE IMPLEMENTED
+ * |c_CTRL-R_CTRL-W|      TO BE IMPLEMENTED
+ * |c_CTRL-T|             TO BE IMPLEMENTED
  * |c_CTRL-U|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.DeleteToCursorAction}
  * |c_CTRL-V|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.StartDigraphAction}
  * |c_CTRL-W|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.DeletePreviousWordAction}
- * |c_CTRL-Y|             TODO
- * |c_CTRL-\_e|           TODO
- * |c_CTRL-\_CTRL-G|      TODO
- * |c_CTRL-\_CTRL-N|      TODO
+ * |c_CTRL-Y|             TO BE IMPLEMENTED
+ * |c_CTRL-\_e|           TO BE IMPLEMENTED
+ * |c_CTRL-\_CTRL-G|      TO BE IMPLEMENTED
+ * |c_CTRL-\_CTRL-N|      TO BE IMPLEMENTED
  * |c_CTRL-_|             not applicable
  * |c_CTRL-^|             not applicable
- * |c_CTRL-]|             TODO
+ * |c_CTRL-]|             TO BE IMPLEMENTED
  * |c_CTRL-[|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.EscapeCharAction}
  * |c_<BS>|               {@link com.maddyhome.idea.vim.ui.ExEditorKit.DeletePreviousCharAction}
  * |c_<CR>|               {@link com.maddyhome.idea.vim.ui.ExEditorKit.CompleteEntryAction}
@@ -656,7 +657,7 @@
  * |c_<Insert>|           {@link com.maddyhome.idea.vim.ui.ExEditorKit.ToggleInsertReplaceAction}
  * |c_<Left>|             {@link javax.swing.text.DefaultEditorKit#backwardAction}
  * |c_<LeftMouse>|        not applicable
- * |c_<MiddleMouse>|      TODO
+ * |c_<MiddleMouse>|      TO BE IMPLEMENTED
  * |c_<NL>|               {@link com.maddyhome.idea.vim.ui.ExEditorKit.CompleteEntryAction}
  * |c_<PageUp>|           {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryUpAction}
  * |c_<PageDown>|         {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryDownAction}
@@ -664,13 +665,13 @@
  * |c_<S-Down>|           {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryDownAction}
  * |c_<S-Left>|           {@link javax.swing.text.DefaultEditorKit#previousWordAction}
  * |c_<S-Right>|          {@link javax.swing.text.DefaultEditorKit#nextWordAction}
- * |c_<S-Tab>|            TODO
+ * |c_<S-Tab>|            TO BE IMPLEMENTED
  * |c_<S-Up>|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryUpAction}
- * |c_<Tab>|              TODO
+ * |c_<Tab>|              TO BE IMPLEMENTED
  * |c_<Up>|               {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryUpFilterAction}
  * |c_digraph|            {char1} <BS> {char2} {@link com.maddyhome.idea.vim.ui.ExEditorKit.StartDigraphAction}
- * |c_wildchar|           TODO
- * |'cedit'|              TODO
+ * |c_wildchar|           TO BE IMPLEMENTED
+ * |'cedit'|              TO BE IMPLEMENTED
  *
  *
  * 6. Ex commands

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -100,6 +100,22 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
     typeTextInFile(parseKeys("di)"),
       "foo(\"b${c}ar\")\n")
     myFixture.checkResult("foo()\n")
+  }
+
+  // VIM-1008 |d| |v_ib|
+  fun testDeleteInnerBlockWithQuote() {
+    typeTextInFile(parseKeys("di)"),
+      "(abc${c}def'ghi)"
+    )
+    myFixture.checkResult("()")
+  }
+
+  // VIM-1008 |d| |v_ib|
+  fun testDeleteInnerBlockWithDoubleQuote() {
+    typeTextInFile(parseKeys("di)"),
+      """(abc${c}def"ghi)"""
+    )
+    myFixture.checkResult("()")
   }
 
   // VIM-326 |d| |v_ib|

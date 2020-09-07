@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,8 +58,13 @@ public class MacroGroup {
     if (register == null) {
       return false;
     }
-
-    List<KeyStroke> keys = register.getKeys();
+    List<KeyStroke> keys;
+    if (register.getRawText() == null) {
+      keys = register.getKeys();
+    }
+    else {
+      keys = StringHelper.parseKeys(register.getRawText());
+    }
     playbackKeys(editor, context, project, keys, 0, 0, count);
 
     lastRegister = reg;
@@ -90,8 +96,8 @@ public class MacroGroup {
    * @param cnt     count
    * @param total   total
    */
-  public void playbackKeys(@NotNull final Editor editor, @NotNull final DataContext context, @Nullable final Project project,
-                           @NotNull final List<KeyStroke> keys, final int pos, final int cnt, final int total) {
+  public void playbackKeys(final @NotNull Editor editor, final @NotNull DataContext context, final @Nullable Project project,
+                           final @NotNull List<KeyStroke> keys, final int pos, final int cnt, final int total) {
     if (logger.isDebugEnabled()) {
       logger.debug("playbackKeys " + pos);
     }
@@ -138,8 +144,7 @@ public class MacroGroup {
     });
   }
 
-  @NotNull
-  private KeyEvent createKeyEvent(@NotNull KeyStroke stroke, Component component) {
+  private @NotNull KeyEvent createKeyEvent(@NotNull KeyStroke stroke, Component component) {
     return new KeyEvent(component,
                         stroke.getKeyChar() == KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_PRESSED : KeyEvent.KEY_TYPED,
                         System.currentTimeMillis(), stroke.getModifiers(), stroke.getKeyCode(), stroke.getKeyChar());

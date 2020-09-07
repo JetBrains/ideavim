@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,8 +42,11 @@ fun runAfterGotFocus(runnable: Runnable) {
   IdeFocusManager.findInstance().doWhenFocusSettlesDown(runnable, ModalityState.defaultModalityState())
 }
 
-val editorFont: Font
-  get() {
-    val scheme = EditorColorsManager.getInstance().globalScheme
-    return Font(scheme.editorFontName, Font.PLAIN, scheme.editorFontSize)
-  }
+fun selectFont(forStr: String): Font {
+  val scheme = EditorColorsManager.getInstance().globalScheme
+
+  val fontName = scheme.fontPreferences.realFontFamilies.firstOrNull {
+    Font(it, Font.PLAIN, scheme.editorFontSize).canDisplayUpTo(forStr) == -1
+  } ?: return Font(scheme.editorFontName, Font.PLAIN, scheme.editorFontSize)
+  return Font(fontName, Font.PLAIN, scheme.editorFontSize)
+}

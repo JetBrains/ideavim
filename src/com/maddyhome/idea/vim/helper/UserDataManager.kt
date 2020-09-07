@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -86,8 +86,6 @@ var Editor.vimIncsearchCurrentMatchOffset: Int? by userData()
  */
 var Editor.vimLastSelectionType: SelectionType? by userData()
 var Editor.vimCommandState: CommandState? by userData()
-var Editor.vimChangeGroup: Boolean by userDataOr { false }
-var Editor.vimMotionGroup: Boolean by userDataOr { false }
 var Editor.vimEditorGroup: Boolean by userDataOr { false }
 var Editor.vimLineNumbersInitialState: Boolean by userDataOr { false }
 var Editor.vimHasRelativeLineNumbersInstalled: Boolean by userDataOr { false }

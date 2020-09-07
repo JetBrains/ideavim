@@ -1,3 +1,21 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2020 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package org.jetbrains.plugins.ideavim.action.copy
 
 import com.intellij.codeInsight.editorActions.TextBlockTransferable
@@ -16,7 +34,7 @@ import java.util.*
  */
 class PutViaIdeaTest : VimTestCase() {
 
-  var optionsBefore: String = ""
+  private var optionsBefore: String = ""
 
   override fun setUp() {
     super.setUp()
@@ -25,8 +43,8 @@ class PutViaIdeaTest : VimTestCase() {
   }
 
   override fun tearDown() {
-    super.tearDown()
     OptionsManager.clipboard.set(optionsBefore)
+    super.tearDown()
   }
 
   fun `test simple insert via idea`() {
@@ -64,5 +82,30 @@ class PutViaIdeaTest : VimTestCase() {
     val sizeBefore = CopyPasteManager.getInstance().allContents.size
     typeText(StringHelper.parseKeys("ve", "p"))
     assertEquals(sizeBefore, CopyPasteManager.getInstance().allContents.size)
+  }
+
+  fun `test insert block with newline`() {
+    val before = """
+            A Discovery
+            $c
+            I found it in a legendary land
+            
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+    configureByText(before)
+
+    VimPlugin.getRegister().storeText(myFixture.editor, before rangeOf "\nI found it in a legendary land\n", SelectionType.CHARACTER_WISE, false)
+
+    typeText(StringHelper.parseKeys("p"))
+    val after = """
+            A Discovery
+            
+            I found it in a legendary land
+            
+            I found it in a legendary land
+            
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+    myFixture.checkResult(after)
   }
 }

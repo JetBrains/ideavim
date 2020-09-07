@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,9 +79,17 @@ fun waitAndAssertMode(fixture: CodeInsightTestFixture, mode: CommandState.Mode, 
 fun assertDoesntChange(timeInMillis: Int = 1000, condition: () -> Boolean) {
   val end = System.currentTimeMillis() + timeInMillis
   while (end > System.currentTimeMillis()) {
-    if (!condition()) fail()
+    if (!condition()) {
+      fail()
+    }
 
     Thread.sleep(10)
     IdeEventQueue.getInstance().flushQueue()
   }
+}
+
+fun assertHappened(timeInMillis: Int = 1000, precision: Int, condition: () -> Boolean) {
+  assertDoesntChange(timeInMillis - precision) { !condition() }
+
+  waitAndAssert(precision * 2) { condition() }
 }

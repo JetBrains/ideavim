@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,12 +21,13 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionRightActionTest : VimTestCase() {
   fun `test simple motion`() {
-    doTest(parseKeys("l"), """
+    doTest("l", """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -44,7 +45,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test simple motion with repeat`() {
-    doTest(parseKeys("3l"), """
+    doTest("3l", """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -62,7 +63,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test simple motion to the end`() {
-    doTest(parseKeys("3l"), """
+    doTest("3l", """
             A Discovery
 
             I found it in a legendary lan${c}d
@@ -79,8 +80,9 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
   fun `test simple motion non-ascii`() {
-    doTest(parseKeys("l"), """
+    doTest("l", """
             A Discovery
 
             I found it in a legendar${c}𝛁 land
@@ -97,8 +99,9 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
   fun `test simple motion emoji`() {
-    doTest(parseKeys("l"), """
+    doTest("l", """
             A Discovery
 
             I found it in a legendar${c}🐔 land
@@ -115,8 +118,9 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
   fun `test simple motion czech`() {
-    doTest(parseKeys("l"), """
+    doTest("l", """
             A Discovery
 
             I found it in a legendar${c}ž land
@@ -134,25 +138,25 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test simple motion tab`() {
-    doTest(parseKeys("l"), dotToTab("""
-            A Discovery
+    doTest("l", """
+        A Discovery
 
-            I found it in a legendar${c}. land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass
-        """.trimIndent()), dotToTab("""
-            A Discovery
+        I found it in a legendar${c}. land
+        all rocks and lavender and tufted grass,
+        where it was settled on some sodden sand
+        hard by the torrent of a mountain pass
+    """.trimIndent().dotToTab(), """
+        A Discovery
 
-            I found it in a legendar.${c} land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass
-        """.trimIndent()), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+        I found it in a legendar.${c} land
+        all rocks and lavender and tufted grass,
+        where it was settled on some sodden sand
+        hard by the torrent of a mountain pass
+    """.trimIndent().dotToTab(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test char visual mode`() {
-    doTest(parseKeys("v", "ll"), """
+    doTest(listOf("v", "ll"), """
             A Discovery
 
             I found it in a legendary lan${c}d
@@ -170,7 +174,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test block visual mode`() {
-    doTest(parseKeys("<C-V>", "ll"), """
+    doTest(listOf("<C-V>", "ll"), """
             A Discovery
 
             I found it in a legendary lan${c}d

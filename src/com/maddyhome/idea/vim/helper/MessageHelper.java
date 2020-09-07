@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
 
 
 public class MessageHelper {
-  @Nullable private static Reference<ResourceBundle> ourBundle;
+  private static @Nullable Reference<ResourceBundle> ourBundle;
 
   @NonNls
   private static final String BUNDLE = "messages";
@@ -38,21 +38,18 @@ public class MessageHelper {
   private MessageHelper() {
   }
 
-  @NotNull
-  public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE)String key, Object... params) {
+  public static @NotNull String message(@NotNull @PropertyKey(resourceBundle = BUNDLE)String key, Object... params) {
     return CommonBundle.message(getBundle(), key, params);
   }
 
   /*
    * This method added for jruby access
    */
-  @NotNull
-  public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE)String key) {
+  public static @NotNull String message(@NotNull @PropertyKey(resourceBundle = BUNDLE)String key) {
     return CommonBundle.message(getBundle(), key);
   }
 
-  @NotNull
-  protected static ResourceBundle getBundle() {
+  protected static @NotNull ResourceBundle getBundle() {
     ResourceBundle bundle = null;
     if (ourBundle != null) bundle = ourBundle.get();
     if (bundle == null) {

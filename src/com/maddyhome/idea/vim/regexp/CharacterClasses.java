@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -147,7 +147,7 @@ public final class CharacterClasses {
   public static boolean isPunct(char ch) {
     return ((ch >= '!' && ch <= '/') ||
             (ch >= ':' && ch <= '@') ||
-            (ch >= '[' && ch <= '\'') ||
+            (ch >= '[' && ch <= '`') ||
             (ch >= '{' && ch <= '~'));
   }
 

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,11 +23,14 @@ package org.jetbrains.plugins.ideavim.action.motion.visual
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VisualSwapEndsBlockActionTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test simple block selection SE`() {
-    val keys = parseKeys("<C-V>2e2j", "O")
+    val keys = listOf("<C-V>2e2j", "O")
     val before = """
             A Discovery
 
@@ -48,8 +51,9 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
     assertEquals(LogicalPosition(4, 2), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test simple block selection SW`() {
-    val keys = parseKeys("<C-V>2b2j", "O")
+    val keys = listOf("<C-V>2b2j", "O")
     val before = """
             A Discovery
 
@@ -70,8 +74,9 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
     assertEquals(LogicalPosition(4, 8), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test simple block selection NE`() {
-    val keys = parseKeys("<C-V>3e2k", "O")
+    val keys = listOf("<C-V>3e2k", "O")
     val before = """
             A Discovery
 
@@ -92,8 +97,9 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
     assertEquals(LogicalPosition(2, 2), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test simple block selection NW`() {
-    val keys = parseKeys("<C-V>3b2k", "O")
+    val keys = listOf("<C-V>3b2k", "O")
     val before = """
             A Discovery
 
@@ -114,8 +120,9 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
     assertEquals(LogicalPosition(2, 8), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test with short line`() {
-    val keys = parseKeys("<C-V>2j5e", "O")
+    val keys = listOf("<C-V>2j5e", "O")
     val before = """
             A Discovery
 
@@ -136,8 +143,9 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
     assertEquals(LogicalPosition(4, 26), myFixture.editor.caretModel.primaryCaret.logicalPosition)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test to long line`() {
-    val keys = parseKeys("<C-V>j5e", "O")
+    val keys = listOf("<C-V>j5e", "O")
     val before = """
             A Discovery
 

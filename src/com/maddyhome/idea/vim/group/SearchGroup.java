@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,10 @@ package com.maddyhome.idea.vim.group;
 
 import com.google.common.collect.Lists;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.RoamingType;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.colors.EditorColors;
@@ -32,13 +36,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
 import com.intellij.ui.ColorUtil;
-import com.intellij.util.Processor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.ex.LineRange;
+import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
@@ -48,6 +51,7 @@ import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import com.maddyhome.idea.vim.ui.ModalEntry;
+import kotlin.jvm.functions.Function1;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -60,15 +64,18 @@ import java.text.ParsePosition;
 import java.util.List;
 import java.util.*;
 
-public class SearchGroup {
+@State(name = "VimSearchSettings", storages = {
+  @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
+})
+public class SearchGroup implements PersistentStateComponent<Element> {
   public SearchGroup() {
     final OptionsManager options = OptionsManager.INSTANCE;
-    options.getHlsearch().addOptionChangeListener(event -> {
+    options.getHlsearch().addOptionChangeListener((oldValue, newValue) -> {
       resetShowSearchHighlight();
       forceUpdateSearchHighlights();
     });
 
-    final OptionChangeListener updateHighlightsIfVisible = event -> {
+    final OptionChangeListener<Boolean> updateHighlightsIfVisible = (oldValue, newValue) -> {
       if (showSearchHighlight) {
         forceUpdateSearchHighlights();
       }
@@ -90,13 +97,17 @@ public class SearchGroup {
     showSearchHighlight = show;
   }
 
-  @Nullable
-  public String getLastSearch() {
+  public @Nullable String getLastSearch() {
     return lastSearch;
   }
 
-  @Nullable
-  public String getLastPattern() {
+  // This method is used in AceJump integration plugin
+  @SuppressWarnings("unused")
+  public int getLastDir() {
+    return lastDir;
+  }
+
+  public @Nullable String getLastPattern() {
     return lastPattern;
   }
 
@@ -115,8 +126,9 @@ public class SearchGroup {
     VimPlugin.getHistory().addEntry(HistoryGroup.SEARCH, lastPattern);
   }
 
-  @NotNull
-  private static List<TextRange> findAll(@NotNull Editor editor,
+  // This method should not be private because it's used in external plugins
+  @SuppressWarnings("WeakerAccess")
+  public static @NotNull List<TextRange> findAll(@NotNull Editor editor,
                                          @NotNull String pattern,
                                          int startLine,
                                          int endLine,
@@ -164,10 +176,9 @@ public class SearchGroup {
     return results;
   }
 
-  @NotNull
-  private static ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match) {
+  private static @NotNull ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match, @NotNull Caret caret, int startoff) {
     final Ref<ReplaceConfirmationChoice> result = Ref.create(ReplaceConfirmationChoice.QUIT);
-    final Processor<KeyStroke> keyStrokeProcessor = key -> {
+    final Function1<KeyStroke, Boolean> keyStrokeProcessor = key -> {
       final ReplaceConfirmationChoice choice;
       final char c = key.getKeyChar();
       if (StringHelper.isCloseKeyStroke(key) || c == 'q') {
@@ -187,9 +198,10 @@ public class SearchGroup {
       return false;
     };
     if (ApplicationManager.getApplication().isUnitTestMode()) {
+      MotionGroup.moveCaret(editor, caret, startoff);
       final TestInputModel inputModel = TestInputModel.getInstance(editor);
       for (KeyStroke key = inputModel.nextKeyStroke(); key != null; key = inputModel.nextKeyStroke()) {
-        if (!keyStrokeProcessor.process(key)) {
+        if (!keyStrokeProcessor.invoke(key)) {
           break;
         }
       }
@@ -198,7 +210,8 @@ public class SearchGroup {
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
       final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
       exEntryPanel.activate(editor, new EditorDataContext(editor), "Replace with " + match + " (y/n/a/q/l)?", "", 1);
-      ModalEntry.activate(keyStrokeProcessor);
+      MotionGroup.moveCaret(editor, caret, startoff);
+      ModalEntry.INSTANCE.activate(keyStrokeProcessor);
       exEntryPanel.deactivate(true, false);
     }
     return result.get();
@@ -367,7 +380,7 @@ public class SearchGroup {
   }
 
   public int updateIncsearchHighlights(@NotNull Editor editor, @NotNull String pattern, boolean forwards, int caretOffset, @Nullable LineRange searchRange) {
-    final int searchStartOffset = searchRange != null ? EditorHelper.getLineStartOffset(editor, searchRange.getStartLine()) : caretOffset;
+    final int searchStartOffset = searchRange != null ? EditorHelper.getLineStartOffset(editor, searchRange.startLine) : caretOffset;
     final boolean showHighlights = OptionsManager.INSTANCE.getHlsearch().isSet();
     return updateSearchHighlights(pattern, false, showHighlights, searchStartOffset, searchRange, forwards, false);
   }
@@ -383,7 +396,9 @@ public class SearchGroup {
                                      int initialOffset, @Nullable LineRange searchRange, boolean forwards, boolean forceUpdate) {
     int currentMatchOffset = -1;
 
-    Project[] projects = ProjectManager.getInstance().getOpenProjects();
+    ProjectManager projectManager = ProjectManager.getInstanceIfCreated();
+    if (projectManager == null) return currentMatchOffset;
+    Project[] projects = projectManager.getOpenProjects();
     for (Project project : projects) {
       Editor current = FileEditorManager.getInstance(project).getSelectedTextEditor();
       Editor[] editors = current == null ? null : EditorFactory.getInstance().getEditors(current.getDocument(), project);
@@ -400,8 +415,8 @@ public class SearchGroup {
         }
 
         if (shouldAddAllSearchHighlights(editor, pattern, showHighlights)) {
-          final int startLine = searchRange == null ? 0 : searchRange.getStartLine();
-          final int endLine = searchRange == null ? -1 : searchRange.getEndLine();
+          final int startLine = searchRange == null ? 0 : searchRange.startLine;
+          final int endLine = searchRange == null ? -1 : searchRange.endLine;
           List<TextRange> results = findAll(editor, pattern, startLine, endLine, shouldIgnoreCase(pattern, shouldIgnoreSmartCase));
           if (!results.isEmpty()) {
             currentMatchOffset = findClosestMatch(editor, results, initialOffset, forwards);
@@ -487,7 +502,7 @@ public class SearchGroup {
       return -1;
     }
 
-    final int size = EditorHelper.getFileSize(editor);
+    final int size = EditorHelperRt.getFileSize(editor);
     final TextRange max = Collections.max(results, (r1, r2) -> {
       final int d1 = distance(r1, initialOffset, forwards, size);
       final int d2 = distance(r2, initialOffset, forwards, size);
@@ -510,8 +525,7 @@ public class SearchGroup {
     return max.getStartOffset();
   }
 
-  @Nullable
-  public TextRange getNextSearchRange(@NotNull Editor editor, int count, boolean forwards) {
+  public @Nullable TextRange getNextSearchRange(@NotNull Editor editor, int count, boolean forwards) {
     editor.getCaretModel().removeSecondaryCarets();
     TextRange current = findUnderCaret(editor);
 
@@ -534,8 +548,7 @@ public class SearchGroup {
     }
   }
 
-  @Nullable
-  private TextRange findNextSearchForGn(@NotNull Editor editor, int count, boolean forwards) {
+  private @Nullable TextRange findNextSearchForGn(@NotNull Editor editor, int count, boolean forwards) {
     if (forwards) {
       final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE);
       return findIt(editor, lastSearch, editor.getCaretModel().getOffset(), count, searchOptions);
@@ -544,21 +557,19 @@ public class SearchGroup {
     }
   }
 
-  @Nullable
-  private TextRange findUnderCaret(@NotNull Editor editor) {
+  private @Nullable TextRange findUnderCaret(@NotNull Editor editor) {
     final TextRange backSearch = searchBackward(editor, editor.getCaretModel().getOffset() + 1, 1);
     if (backSearch == null) return null;
     return backSearch.contains(editor.getCaretModel().getOffset()) ? backSearch : null;
   }
 
-  @Nullable
-  private TextRange searchBackward(@NotNull Editor editor, int offset, int count) {
+  private @Nullable TextRange searchBackward(@NotNull Editor editor, int offset, int count) {
     // Backward search returns wrongs end offset for some cases. That's why we should perform additional forward search
     final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE, SearchOptions.BACKWARDS);
     final TextRange foundBackward = findIt(editor, lastSearch, offset, count, searchOptions);
     if (foundBackward == null) return null;
     int startOffset = foundBackward.getStartOffset() - 1;
-    if (startOffset < 0) startOffset = EditorHelper.getFileSize(editor);
+    if (startOffset < 0) startOffset = EditorHelperRt.getFileSize(editor);
     searchOptions.remove(SearchOptions.BACKWARDS);
     return findIt(editor, lastSearch, startOffset, 1, searchOptions);
   }
@@ -920,7 +931,7 @@ public class SearchGroup {
      * compatible.
      */
     if (!offsetIsLineOffset && offset != 0) {
-      startOffset = Math.max(0, Math.min(startOffset - offset, EditorHelper.getFileSize(editor) - 1));
+      startOffset = Math.max(0, Math.min(startOffset - offset, EditorHelperRt.getFileSize(editor) - 1));
     }
 
     EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.SHOW_MESSAGES, SearchOptions.WHOLE_FILE);
@@ -944,7 +955,7 @@ public class SearchGroup {
     }
     else if (hasEndOffset || offset != 0) {
       int base = hasEndOffset ? range.getEndOffset() - 1 : range.getStartOffset();
-      res = Math.max(0, Math.min(base + offset, EditorHelper.getFileSize(editor) - 1));
+      res = Math.max(0, Math.min(base + offset, EditorHelperRt.getFileSize(editor) - 1));
     }
 
     int ppos = pp.getIndex();
@@ -978,7 +989,7 @@ public class SearchGroup {
                                   @NotNull String excmd, String exarg) {
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
     if (CommandStateHelper.inVisualMode(editor)) {
-      VimPlugin.getVisualMotion().exitVisual(editor);
+      ModeHelper.exitVisualMode(editor);
     }
 
     CharPointer cmd = new CharPointer(new StringBuffer(exarg));
@@ -1104,8 +1115,8 @@ public class SearchGroup {
       cmd.inc();
     }
 
-    int line1 = range.getStartLine();
-    int line2 = range.getEndLine();
+    int line1 = range.startLine;
+    int line2 = range.endLine;
 
     if (line1 < 0 || line2 < 0) {
       return false;
@@ -1240,9 +1251,7 @@ public class SearchGroup {
           boolean doReplace = true;
           if (do_ask) {
             RangeHighlighter hl = highlightConfirm(editor, startoff, endoff);
-            MotionGroup.scrollPositionIntoView(editor, editor.offsetToVisualPosition(startoff), true);
-            MotionGroup.moveCaret(editor, caret, startoff);
-            final ReplaceConfirmationChoice choice = confirmChoice(editor, match);
+            final ReplaceConfirmationChoice choice = confirmChoice(editor, match, caret, startoff);
             editor.getMarkupModel().removeHighlighter(hl);
             switch (choice) {
               case SUBSTITUTE_THIS:
@@ -1312,8 +1321,7 @@ public class SearchGroup {
     return true;
   }
 
-  @NotNull
-  private RangeHighlighter highlightConfirm(@NotNull Editor editor, int start, int end) {
+  private @NotNull RangeHighlighter highlightConfirm(@NotNull Editor editor, int start, int end) {
     TextAttributes color = new TextAttributes(
       editor.getColorsScheme().getColor(EditorColors.SELECTION_FOREGROUND_COLOR),
       editor.getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR),
@@ -1324,8 +1332,7 @@ public class SearchGroup {
                                                        color, HighlighterTargetArea.EXACT_RANGE);
   }
 
-  @NotNull
-  private static RangeHighlighter highlightMatch(@NotNull Editor editor, int start, int end, boolean current, String tooltip) {
+  private static @NotNull RangeHighlighter highlightMatch(@NotNull Editor editor, int start, int end, boolean current, String tooltip) {
     TextAttributes attributes = editor.getColorsScheme().getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES);
     if (current) {
       // This mimics what IntelliJ does with the Find live preview
@@ -1403,8 +1410,7 @@ public class SearchGroup {
     element.addContent(search);
   }
 
-  @NotNull
-  private static Element createElementWithText(@NotNull String name, @NotNull String text) {
+  private static @NotNull Element createElementWithText(@NotNull String name, @NotNull String text) {
     return StringHelper.setSafeXmlText(new Element(name), text);
   }
 
@@ -1434,8 +1440,7 @@ public class SearchGroup {
     }
   }
 
-  @Nullable
-  private static String getSafeChildText(@NotNull Element element, @NotNull String name) {
+  private static @Nullable String getSafeChildText(@NotNull Element element, @NotNull String name) {
     final Element child = element.getChild(name);
     return child != null ? StringHelper.getSafeXmlText(child) : null;
   }
@@ -1446,6 +1451,19 @@ public class SearchGroup {
   @SuppressWarnings("unused")
   public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
     VimPlugin.getSearch().updateSearchHighlights();
+  }
+
+  @Nullable
+  @Override
+  public Element getState() {
+    Element element = new Element("search");
+    saveData(element);
+    return element;
+  }
+
+  @Override
+  public void loadState(@NotNull Element state) {
+    readData(state);
   }
 
   public static class DocumentSearchListener implements DocumentListener {
@@ -1462,7 +1480,7 @@ public class SearchGroup {
         final Document document = event.getDocument();
 
         for (Editor editor : EditorFactory.getInstance().getEditors(document, project)) {
-          Collection hls = UserDataManager.getVimLastHighlighters(editor);
+          Collection<RangeHighlighter> hls = UserDataManager.getVimLastHighlighters(editor);
           if (hls == null) {
             continue;
           }
@@ -1478,9 +1496,9 @@ public class SearchGroup {
           final int startLineOffset = document.getLineStartOffset(startPosition.line);
           final int endLineOffset = document.getLineEndOffset(endPosition.line);
 
-          final Iterator iter = hls.iterator();
+          final Iterator<RangeHighlighter> iter = hls.iterator();
           while (iter.hasNext()) {
-            final RangeHighlighter highlighter = (RangeHighlighter) iter.next();
+            final RangeHighlighter highlighter = iter.next();
             if (!highlighter.isValid() || (highlighter.getStartOffset() >= startLineOffset && highlighter.getEndOffset() <= endLineOffset)) {
               iter.remove();
               editor.getMarkupModel().removeHighlighter(highlighter);
@@ -1516,11 +1534,11 @@ public class SearchGroup {
     IGNORE_SMARTCASE,
   }
 
-  @Nullable private String lastSearch;
-  @Nullable private String lastPattern;
-  @Nullable private String lastSubstitute;
-  @Nullable private String lastReplace;
-  @Nullable private String lastOffset;
+  private @Nullable String lastSearch;
+  private @Nullable String lastPattern;
+  private @Nullable String lastSubstitute;
+  private @Nullable String lastReplace;
+  private @Nullable String lastOffset;
   private boolean lastIgnoreSmartCase;
   private int lastDir;
   private boolean showSearchHighlight = OptionsManager.INSTANCE.getHlsearch().isSet();

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VisualToggleBlockModeActionTest : VimTestCase() {
   fun `test enter visual with count`() {
-    doTest(parseKeys("1<C-V>"),
+    doTest("1<C-V>",
       """
                     A Discovery
 
@@ -48,7 +48,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with five count`() {
-    doTest(parseKeys("5<C-V>"),
+    doTest("5<C-V>",
       """
                     A Discovery
 
@@ -69,7 +69,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with 100 count`() {
-    doTest(parseKeys("100<C-V>"),
+    doTest("100<C-V>",
       """
                     A Discovery
 
@@ -88,6 +88,13 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                 """.trimIndent(),
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
+
+/*
+  fun `test on empty file`() {
+    doTest("<C-V>", "", "",
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+  }
+*/
 
   fun `test selectmode option`() {
     configureByText("""

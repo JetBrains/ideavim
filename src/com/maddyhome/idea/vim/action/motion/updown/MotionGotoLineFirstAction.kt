@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,20 +24,15 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
-import javax.swing.KeyStroke
 
 class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.INCLUSIVE
+  override val motionType: MotionType = MotionType.LINE_WISE
 
-  override val mappingModes: Set<MappingMode> = MappingMode.NXO
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gg", "<C-Home>")
-
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(editor: Editor,
                          caret: Caret,
@@ -52,11 +47,7 @@ class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
 class MotionGotoLineFirstInsertAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override val mappingModes: Set<MappingMode> = MappingMode.I
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-Home>")
-
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
 
   override fun getOffset(editor: Editor,
                          caret: Caret,

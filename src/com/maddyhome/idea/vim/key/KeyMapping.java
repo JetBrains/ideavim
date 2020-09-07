@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +19,15 @@
 package com.maddyhome.idea.vim.key;
 
 import com.google.common.collect.HashMultiset;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multiset;
-import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
+import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Container for key mappings for some mode
@@ -36,52 +36,78 @@ import java.util.*;
  * @author vlan
  */
 public class KeyMapping implements Iterable<List<KeyStroke>> {
-  /** Contains all key mapping for some mode. */
-  @NotNull private final Map<ImmutableList<KeyStroke>, MappingInfo> myKeys = new HashMap<>();
+  /**
+   * Contains all key mapping for some mode.
+   */
+  private final @NotNull Map<List<KeyStroke>, MappingInfo> myKeys = new HashMap<>();
   /**
    * Set the contains all possible prefixes for mappings.
    * E.g. if there is mapping for "hello", this set will contain "h", "he", "hel", etc.
    * Multiset is used to correctly remove the mappings.
    */
-  @NotNull private final Multiset<ImmutableList<KeyStroke>> myPrefixes = HashMultiset.create();
+  private final @NotNull Multiset<List<KeyStroke>> myPrefixes = HashMultiset.create();
 
-  @NotNull
   @Override
-  public Iterator<List<KeyStroke>> iterator() {
-    return new ArrayList<List<KeyStroke>>(myKeys.keySet()).iterator();
+  public @NotNull Iterator<List<KeyStroke>> iterator() {
+    return new ArrayList<>(myKeys.keySet()).iterator();
   }
 
-  @Nullable
-  public MappingInfo get(@NotNull List<KeyStroke> keys) {
-    return myKeys.get(ImmutableList.copyOf(keys));
+  public @Nullable MappingInfo get(@NotNull Iterable<KeyStroke> keys) {
+    // Having a parameter of Iterable allows for a nicer API, because we know when a given list is immutable.
+    // TODO: Should we change this to be a trie?
+    assert (keys instanceof List) : "keys must be of type List<KeyStroke>";
+    return myKeys.get(keys);
   }
 
-  public void put(@NotNull Set<MappingMode> mappingModes,
-                  @NotNull List<KeyStroke> fromKeys,
-                  @Nullable List<KeyStroke> toKeys,
-                  @Nullable VimExtensionHandler extensionHandler,
+  public void put(@NotNull List<KeyStroke> fromKeys,
+                  @NotNull MappingOwner owner,
+                  @NotNull VimExtensionHandler extensionHandler,
                   boolean recursive) {
-    myKeys.put(ImmutableList.copyOf(fromKeys),
-               new MappingInfo(mappingModes, fromKeys, toKeys, extensionHandler, recursive));
+    myKeys.put(new ArrayList<>(fromKeys), new ToHandlerMappingInfo(extensionHandler, fromKeys, recursive, owner));
+    fillPrefixes(fromKeys);
+  }
+
+  public void put(@NotNull List<KeyStroke> fromKeys,
+                  @NotNull List<KeyStroke> toKeys,
+                  @NotNull MappingOwner owner,
+                  boolean recursive) {
+    myKeys.put(new ArrayList<>(fromKeys), new ToKeysMappingInfo(toKeys, fromKeys, recursive, owner));
+    fillPrefixes(fromKeys);
+  }
+
+  private void fillPrefixes(@NotNull List<KeyStroke> fromKeys) {
     List<KeyStroke> prefix = new ArrayList<>();
     final int prefixLength = fromKeys.size() - 1;
     for (int i = 0; i < prefixLength; i++) {
       prefix.add(fromKeys.get(i));
-      myPrefixes.add(ImmutableList.copyOf(prefix));
+      myPrefixes.add(new ArrayList<>(prefix));
     }
   }
 
-  public void delete(@NotNull List<KeyStroke> keys) {
-    myKeys.remove(ImmutableList.copyOf(keys));
-    List<KeyStroke> prefix = new ArrayList<>();
-    final int prefixLength = keys.size() - 1;
-    for (int i = 0; i < prefixLength; i++) {
-      prefix.add(keys.get(i));
-      myPrefixes.remove(ImmutableList.copyOf(prefix));
-    }
+  public void delete(@NotNull MappingOwner owner) {
+    List<Map.Entry<List<KeyStroke>, MappingInfo>> toRemove =
+      myKeys.entrySet().stream().filter(o -> o.getValue().getOwner().equals(owner)).collect(Collectors.toList());
+
+    toRemove.forEach(o -> myKeys.remove(o.getKey(), o.getValue()));
+    toRemove.stream().map(Map.Entry::getKey).forEach(keys -> {
+      List<KeyStroke> prefix = new ArrayList<>();
+      final int prefixLength = keys.size() - 1;
+      for (int i = 0; i < prefixLength; i++) {
+        prefix.add(keys.get(i));
+        myPrefixes.remove(prefix);
+      }
+    });
   }
 
-  public boolean isPrefix(@NotNull List<KeyStroke> keys) {
-    return myPrefixes.contains(ImmutableList.copyOf(keys));
+  public List<Pair<List<KeyStroke>, MappingInfo>> getByOwner(@NotNull MappingOwner owner) {
+    return myKeys.entrySet().stream().filter(o -> o.getValue().getOwner().equals(owner))
+      .map(o -> new Pair<>(o.getKey(), o.getValue())).collect(Collectors.toList());
+  }
+
+  public boolean isPrefix(@NotNull Iterable<KeyStroke> keys) {
+    // Having a parameter of Iterable allows for a nicer API, because we know when a given list is immutable.
+    // Perhaps we should look at changing this to a trie or something?
+    assert (keys instanceof List) : "keys must be of type List<KeyStroke>";
+    return myPrefixes.contains(keys);
   }
 }

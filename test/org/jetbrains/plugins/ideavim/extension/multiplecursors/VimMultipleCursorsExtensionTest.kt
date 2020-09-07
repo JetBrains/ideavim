@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,10 @@
 package org.jetbrains.plugins.ideavim.extension.multiplecursors
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.commandState
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VimMultipleCursorsExtensionTest : VimTestCase() {
@@ -254,8 +256,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |dfkjsg
     """.trimMargin()
     val editor = configureByText(before)
-    CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER,
-      MappingMode.VISUAL)
+    editor.commandState.pushModes(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
 
     typeText(parseKeys("<A-p>"))
     myFixture.checkResult(before)
@@ -441,8 +442,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |dfkjsg
     """.trimMargin()
     val editor = configureByText(before)
-    CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER,
-      MappingMode.VISUAL)
+    editor.commandState.pushModes(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
 
     typeText(parseKeys("<A-x>"))
     assertMode(CommandState.Mode.VISUAL)
@@ -493,20 +493,41 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test with tabs`() {
-    val before = dotToTab("""
-      I found it in a legendary land
-      ...${c}all rocks and lavender and tufted grass,
-      ...all it was settled on some sodden sand
-      ...all by the torrent of a mountain pass
-    """.trimIndent())
-    val keys = parseKeys("vll", "<A-N>", "<A-N>")
-    val after = dotToTab("""
-      I found it in a legendary land
-      ...${s}al${c}l${se} rocks and lavender and tufted grass,
-      ...${s}al${c}l${se} it was settled on some sodden sand
-      ...${s}al${c}l${se} by the torrent of a mountain pass
-    """.trimIndent())
+    val before = """
+  I found it in a legendary land
+  ...${c}all rocks and lavender and tufted grass,
+  ...all it was settled on some sodden sand
+  ...all by the torrent of a mountain pass
+""".trimIndent().dotToTab()
+    val keys = listOf("vll", "<A-N>", "<A-N>")
+    val after = """
+  I found it in a legendary land
+  ...${s}al${c}l${se} rocks and lavender and tufted grass,
+  ...${s}al${c}l${se} it was settled on some sodden sand
+  ...${s}al${c}l${se} by the torrent of a mountain pass
+""".trimIndent().dotToTab()
     doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+  }
+
+  fun `test multiple capitalized occurrences with ignorecase`() {
+    val before = """text ${c}Test text Test text Test text Test text"""
+    configureByText(before)
+
+    typeText(commandToKeys("set ignorecase"))
+    typeText(parseKeys("<A-n><A-n><A-n><A-n>"))
+    val after = """text ${s}Test${se} text ${s}Test${se} text ${s}Test${se} text ${s}Test${se} text"""
+    myFixture.checkResult(after)
+  }
+
+  fun `test multiple mixed case occurrences with ignorecase`() {
+    val before = """text ${c}Test text tesT text TEST text test text"""
+    configureByText(before)
+
+    typeText(commandToKeys("set ignorecase"))
+    typeText(parseKeys("<A-n><A-n><A-n><A-n>"))
+    val after = """text ${s}Test${se} text ${s}tesT${se} text ${s}TEST${se} text ${s}test${se} text"""
+    myFixture.checkResult(after)
   }
 }

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
+import com.intellij.codeInsight.daemon.impl.HintRenderer
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -29,7 +30,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 class MotionDownActionTest : VimTestCase() {
   fun `test motion down in visual block mode`() {
-    val keys = parseKeys("<C-V>2kjjj")
+    val keys = "<C-V>2kjjj"
     val before = """
             A Discovery
 
@@ -50,7 +51,7 @@ class MotionDownActionTest : VimTestCase() {
   }
 
   fun `test motion down in visual block mode with dollar motion`() {
-    val keys = parseKeys("<C-V>\$jj")
+    val keys = "<C-V>\$jj"
     val before = """
             A Discovery
 
@@ -71,7 +72,7 @@ class MotionDownActionTest : VimTestCase() {
   }
 
   fun `test last column after line deletion`() {
-    val keys = parseKeys("Vd", "j")
+    val keys = listOf("Vd", "j")
     val before = """
             I found it in a ${c}legendary land
             
@@ -82,5 +83,147 @@ class MotionDownActionTest : VimTestCase() {
             ${c}all rocks and lavender and tufted grass,
         """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun `test with inlays`() {
+    val keys = parseKeys("j")
+    val before = """
+            I found it in a ${c}legendary land
+            all rocks and lavender and tufted grass,
+        """.trimIndent()
+    val after = """
+            I found it in a legendary land
+            all rocks and la${c}vender and tufted grass,
+        """.trimIndent()
+    configureByText(before)
+    myFixture.editor.inlayModel.addInlineElement(2, HintRenderer("Hello"))
+    typeText(keys)
+    myFixture.checkResult(after)
+  }
+
+  fun `test with inlays 2`() {
+    val keys = parseKeys("j")
+    val before = """
+            I found it in a ${c}legendary land
+            all rocks and lavender and tufted grass,
+        """.trimIndent()
+    val after = """
+            I found it in a legendary land
+            all rocks and la${c}vender and tufted grass,
+        """.trimIndent()
+    configureByText(before)
+    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    typeText(keys)
+    myFixture.checkResult(after)
+  }
+
+  fun `test with inlays 3`() {
+    val keys = parseKeys("j")
+    val before = """
+            I found it in a ${c}legendary land
+            all rocks and lavender and tufted grass,
+        """.trimIndent()
+    val after = """
+            I found it in a legendary land
+            all rocks and la${c}vender and tufted grass,
+        """.trimIndent()
+    configureByText(before)
+    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    typeText(keys)
+    myFixture.checkResult(after)
+  }
+
+  fun `test with inlays 4`() {
+    val keys = parseKeys("j")
+    val before = """
+            I found it in a legendary ${c}land
+            all rocks and lavender
+        """.trimIndent()
+    val after = """
+            I found it in a legendary land
+            all rocks and lavende${c}r
+        """.trimIndent()
+    configureByText(before)
+    myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    typeText(keys)
+    myFixture.checkResult(after)
+  }
+
+  fun `test with inlays 5`() {
+    val keys = parseKeys("jk")
+    val before = """
+            I found it in a legendary ${c}land
+            all rocks and lavender
+        """.trimIndent()
+    val after = """
+            I found it in a legendary ${c}land
+            all rocks and lavender
+        """.trimIndent()
+    configureByText(before)
+    myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    typeText(keys)
+    myFixture.checkResult(after)
+  }
+
+  fun `test motion up down without inlays`() {
+    val keys = parseKeys("jk")
+    val before = """
+            I found ${c}it in a legendary land
+            all rocks and lavender
+        """.trimIndent()
+    val after = """
+            I found ${c}it in a legendary land
+            all rocks and lavender
+        """.trimIndent()
+    configureByText(before)
+    typeText(keys)
+    myFixture.checkResult(after)
+  }
+
+  fun `test with inlays 6`() {
+    val keys = parseKeys("j")
+    val before = """
+            I found it in a legendary ${c}land
+            all rocks and lavender
+        """.trimIndent()
+    val after = """
+            I found it in a legendary land
+            all rocks and lavende${c}r
+        """.trimIndent()
+    configureByText(before)
+    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    typeText(keys)
+    myFixture.checkResult(after)
+  }
+
+  fun `test with inlays 7`() {
+    val keys = parseKeys("jk")
+    val before = """
+            I found it in a legendary ${c}land
+            all rocks and lavender
+        """.trimIndent()
+    val after = """
+            I found it in a legendary ${c}land
+            all rocks and lavender
+        """.trimIndent()
+    configureByText(before)
+    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    typeText(keys)
+    myFixture.checkResult(after)
+  }
+
+  fun `test motion to the last empty line`() {
+    doTest("j",
+      """
+            I found it in a legendary ${c}land
+            
+        """.trimIndent(),
+      """
+            I found it in a legendary land
+            ${c}
+        """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 }

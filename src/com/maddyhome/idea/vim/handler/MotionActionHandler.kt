@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
  * Base class for motion handlers.
  * @see [MotionActionHandler.SingleExecution] and [MotionActionHandler.ForEachCaret]
  */
-sealed class MotionActionHandler : EditorActionHandlerBase.SingleExecution() {
+sealed class MotionActionHandler : EditorActionHandlerBase(false) {
 
   /**
    * Base class for motion handlers.
@@ -127,7 +127,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase.SingleExecution() {
     }
   }
 
-  final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+  final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
     val blockSubmodeActive = editor.inBlockSubMode
 
     when (this) {

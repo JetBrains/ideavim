@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,43 +21,40 @@ package com.maddyhome.idea.vim.ex.handler
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.ex.*
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandlerFlags
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.ExOutputModel
+import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
-import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
+import com.maddyhome.idea.vim.helper.StringHelper.toPrintableCharacters
 
 class MarksHandler : CommandHandler.SingleExecution() {
-  override val names: Array<CommandName> = commands("marks")
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
 
-    val res = VimPlugin.getMark().getMarks(editor).joinToString("\n") { mark ->
+    // Yeah, lower case. Vim uses lower case here, but Title Case in :registers. Go figure.
+    val res = VimPlugin.getMark().getMarks(editor)
+      .filter { cmd.argument.isEmpty() || cmd.argument.contains(it.key) }
+      .joinToString("\n", prefix = "mark line  col file/text\n") { mark ->
 
-      val text = StringBuilder()
-      text.append(" ")
-      text.append(mark.key)
+        // Lines are 1 based, columns zero based. See :help :marks
+        val line = (mark.logicalLine + 1).toString().padStart(5)
+        val column = mark.col.toString().padStart(3)
+        val vf = EditorHelper.getVirtualFile(editor)
+        val text = if (vf != null && vf.path == mark.filename) {
+          val lineText = EditorHelper.getLineText(editor, mark.logicalLine).trim().take(200)
+          toPrintableCharacters(stringToKeys(lineText)).take(200)
+        } else {
+          mark.filename
+        }
 
-      text.append("   ")
-      var num = (mark.logicalLine + 1).toString()
-      text.append(num.padStart(5))
-
-      text.append("  ")
-      num = (mark.col + 1).toString()
-      text.append(num.padStart(3))
-
-      text.append(" ")
-      val vf = EditorHelper.getVirtualFile(editor)
-      if (vf != null && vf.path == mark.filename) {
-        text.append(toKeyNotation(stringToKeys(EditorHelper.getLineText(editor, mark.logicalLine).trim())))
-      } else {
-        text.append(mark.filename)
+        " ${mark.key}  $line  $column $text"
       }
 
-      text.toString()
-    }
-
-    ExOutputModel.getInstance(editor).output("mark  line  col file/text\n$res")
+    ExOutputModel.getInstance(editor).output(res)
 
     return true
   }

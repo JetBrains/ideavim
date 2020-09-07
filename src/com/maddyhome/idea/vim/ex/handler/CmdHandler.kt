@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,11 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.Alias
-import com.maddyhome.idea.vim.ex.*
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandlerFlags
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.ExOutputModel
+import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
 import com.maddyhome.idea.vim.group.CommandGroup.Companion.BLACKLISTED_ALIASES
 
@@ -30,7 +34,6 @@ import com.maddyhome.idea.vim.group.CommandGroup.Companion.BLACKLISTED_ALIASES
  * @author Elliot Courant
  */
 class CmdHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
-  override val names: Array<CommandName> = commands("com[mand]")
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   // Static definitions needed for aliases.

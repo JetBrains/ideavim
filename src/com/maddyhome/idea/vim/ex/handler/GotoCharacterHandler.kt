@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,18 +24,15 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandlerFlags
-import com.maddyhome.idea.vim.ex.CommandName
 import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.MotionGroup
 
 class GotoCharacterHandler : CommandHandler.ForEachCaret() {
-  override val names: Array<CommandName> = commands("go[to]")
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
-    val count = cmd.getCount(editor, caret, context, 1, true)
+    val count = cmd.getCount(editor, caret, 1, true)
     if (count <= 0) return false
 
     val offset = VimPlugin.getMotion().moveCaretToNthCharacter(editor, count - 1)

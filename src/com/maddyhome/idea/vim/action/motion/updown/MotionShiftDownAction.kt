@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,12 +22,10 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimForEachCaret
-import javax.swing.KeyStroke
 
 /**
  * @author Alex Plate
@@ -35,12 +33,8 @@ import javax.swing.KeyStroke
 
 class MotionShiftDownAction : ShiftedArrowKeyHandler() {
 
-
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NV
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Down>")
-
   override val type: Command.Type = Command.Type.OTHER_READONLY
+
   override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
     editor.vimForEachCaret { caret ->
       val vertical = VimPlugin.getMotion().moveCaretVertical(editor, caret, cmd.count)

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,6 +79,25 @@ public class CopyActionTest extends VimTestCase {
     myFixture.checkResult("hellolo world\n");
   }
 
+  // |register| |y| |quote|
+  public void testYankRegisterUsesLastEnteredRegister() {
+    typeTextInFile(parseKeys("\"a\"byl", "\"ap"),
+      "hel<caret>lo world\n");
+    myFixture.checkResult("helllo world\n");
+  }
+
+  public void testYankAppendRegister() {
+    typeTextInFile(parseKeys("\"Ayl", "l", "\"Ayl", "\"Ap"),
+      "hel<caret>lo world\n");
+    myFixture.checkResult("hellolo world\n");
+  }
+
+  public void testYankWithInvalidRegister() {
+    typeTextInFile(parseKeys("\"&"),
+      "hel<caret>lo world\n");
+    assertPluginError(true);
+  }
+
   // |P|
   public void testYankPutBefore() {
     typeTextInFile(parseKeys("y2l", "P"),
@@ -146,6 +165,8 @@ public class CopyActionTest extends VimTestCase {
   }
 
   // VIM-476 |yy| |'clipboard'|
+  // TODO: Review this test
+  // This doesn't use the system clipboard, but the TestClipboardModel
   public void testClipboardUnnamed() {
     assertEquals('\"', VimPlugin.getRegister().getDefaultRegister());
     final ListOption clipboardOption = OptionsManager.INSTANCE.getClipboard();
@@ -157,37 +178,38 @@ public class CopyActionTest extends VimTestCase {
                    "<caret>bar\n" +
                    "baz\n");
     final Register starRegister = VimPlugin.getRegister().getRegister('*');
-    if (starRegister != null) {
-      assertEquals("bar\n", starRegister.getText());
-    }
+    assertNotNull(starRegister);
+    assertEquals("bar\n", starRegister.getText());
   }
 
   // VIM-792 |"*| |yy| |p|
+  // TODO: Review this test
+  // This doesn't use the system clipboard, but the TestClipboardModel
   public void testLineWiseClipboardYankPaste() {
     configureByText("<caret>foo\n");
     typeText(parseKeys("\"*yy", "\"*p"));
     final Register register = VimPlugin.getRegister().getRegister('*');
-    if (register != null) {
-      assertEquals("foo\n", register.getText());
-      myFixture.checkResult("foo\n" +
-                            "<caret>foo\n");
-    }
+    assertNotNull(register);
+    assertEquals("foo\n", register.getText());
+    myFixture.checkResult("foo\n" +
+                          "<caret>foo\n");
   }
 
   // VIM-792 |"*| |CTRL-V| |v_y| |p|
+  // TODO: Review this test
+  // This doesn't use the system clipboard, but the TestClipboardModel
   public void testBlockWiseClipboardYankPaste() {
     configureByText("<caret>foo\n" +
                     "bar\n" +
                     "baz\n");
     typeText(parseKeys("<C-V>j", "\"*y", "\"*p"));
     final Register register = VimPlugin.getRegister().getRegister('*');
-    if (register != null) {
-      assertEquals("f\n" +
-                   "b", register.getText());
-      myFixture.checkResult("ffoo\n" +
-                            "bbar\n" +
-                            "baz\n");
-    }
+    assertNotNull(register);
+    assertEquals("f\n" +
+                 "b", register.getText());
+    myFixture.checkResult("ffoo\n" +
+                          "bbar\n" +
+                          "baz\n");
   }
 
   // VIM-1431

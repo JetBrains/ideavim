@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ChangeVisualActionTest : VimTestCase() {
   fun `test multiple line change`() {
-    val keys = parseKeys("VjcHello<esc>")
+    val keys = "VjcHello<esc>"
     val before = """
             ${c}A Discovery
 
@@ -47,7 +47,7 @@ class ChangeVisualActionTest : VimTestCase() {
   }
 
   fun `test multiple line change in text middle`() {
-    val keys = parseKeys("Vjc")
+    val keys = "Vjc"
     val before = """
             A Discovery
 
@@ -75,7 +75,7 @@ class ChangeVisualActionTest : VimTestCase() {
             ${c}
   """)
   fun `test multiple line change till the end`() {
-    val keys = parseKeys("Vjc")
+    val keys = "Vjc"
     val before = """
             A Discovery
 
@@ -109,7 +109,7 @@ class ChangeVisualActionTest : VimTestCase() {
             
   """)
   fun `test multiple line change till the end with two new lines`() {
-    val keys = parseKeys("Vjc")
+    val keys = "Vjc"
     val before = """
             A Discovery
 
@@ -134,8 +134,9 @@ class ChangeVisualActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
+  @VimBehaviorDiffers(description = "Wrong caret position")
   fun `test change with dollar motion`() {
-    val keys = parseKeys("<C-V>3j$", "c", "Hello<Esc>")
+    val keys = listOf("<C-V>3j$", "c", "Hello<Esc>")
     val before = """
             A Discovery
 
@@ -156,7 +157,7 @@ class ChangeVisualActionTest : VimTestCase() {
   }
 
   fun `test replace first line`() {
-    val keys = parseKeys("VcHello<esc>")
+    val keys = "VcHello<esc>"
     val before = "${c}A Discovery"
     val after = "Hello"
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
@@ -170,22 +171,30 @@ class ChangeVisualActionTest : VimTestCase() {
   }
 
   // VIM-1379 |CTRL-V| |j| |v_b_c|
+  @VimBehaviorDiffers(description = "Different caret position")
   fun `test change visual block with empty line in the middle`() {
-    doTest(parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
-      "foo foo\n" +
-        "\n" +
-        "bar bar\n",
-      ("fo_quux_foo\n" +
-        "\n" +
-        "ba_quux_bar\n"),
+    doTest(listOf("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
+      """
+        foo foo
+        
+        bar bar
+        
+        """.trimIndent(),
+      """
+        fo_quux_foo
+        
+        ba_quux_bar
+        
+        """.trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }
 
 
   // VIM-1379 |CTRL-V| |j| |v_b_c|
+  @VimBehaviorDiffers(description = "Different caret position")
   fun `test change visual block with shorter line in the middle`() {
-    doTest(parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
+    doTest(listOf("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
       "foo foo\n" +
         "x\n" +
         "bar bar\n",

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,25 +20,17 @@ package com.maddyhome.idea.vim.action.motion.updown
 
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import java.util.*
-import javax.swing.KeyStroke
 
 class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.INCLUSIVE
-
-  override val mappingModes: Set<MappingMode> = MappingMode.NXO
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("+", "<C-M>")
-
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
+  override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(editor: Editor,
                          caret: Caret,
@@ -51,13 +43,7 @@ class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
 }
 
 class EnterNormalAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.INCLUSIVE
-
-  override val mappingModes: Set<MappingMode> = MappingMode.NXO
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<CR>")
-
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
+  override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(editor: Editor,
                          caret: Caret,
@@ -67,7 +53,7 @@ class EnterNormalAction : MotionActionHandler.ForEachCaret() {
                          argument: Argument?): Int {
     val templateState = TemplateManagerImpl.getTemplateState(editor)
     return if (templateState != null) {
-      templateState.gotoEnd(false)
+      KeyHandler.executeAction(IdeActions.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE, context)
       -1
     } else {
       VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, count)

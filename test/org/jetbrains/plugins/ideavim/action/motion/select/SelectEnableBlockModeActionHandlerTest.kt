@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +19,14 @@
 package org.jetbrains.plugins.ideavim.action.motion.select
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test entering select mode`() {
-    doTest(parseKeys("g<C-H>"),
+    doTest(listOf("g<C-H>"),
       """
                 A Discovery
 
@@ -45,8 +47,9 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test entering select mode at the end of file`() {
-    doTest(parseKeys("g<C-H>"),
+    doTest("g<C-H>",
       """
                 A Discovery
 
@@ -66,7 +69,7 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
   }
 
   fun `test entering select mode on empty line`() {
-    doTest(parseKeys("g<C-H>"),
+    doTest("g<C-H>",
       """
                 A Discovery
                 $c
@@ -85,8 +88,9 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test entering select mode multicaret`() {
-    doTest(parseKeys("g<C-H>"),
+    doTest(listOf("g<C-H>"),
       """
                 A Discovery
                 $c

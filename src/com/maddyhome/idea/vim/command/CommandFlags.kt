@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,13 @@ package com.maddyhome.idea.vim.command
 
 enum class MotionType {
   INCLUSIVE,
-  EXCLUSIVE
+  EXCLUSIVE,
+  LINE_WISE
+}
+
+enum class TextObjectVisualType {
+  CHARACTER_WISE,
+  LINE_WISE
 }
 
 enum class CommandFlags {
@@ -30,16 +36,15 @@ enum class CommandFlags {
    * TODO it should be only INCLUSIVE, EXCLUSIVE and LINEWISE motions. Should be moved to [MotionType]
    */
   FLAG_MOT_LINEWISE,
-  FLAG_MOT_CHARACTERWISE,
-  FLAG_MOT_BLOCKWISE,
   /**
    * Indicates that the cursor position should be saved prior to this motion command
    */
   FLAG_SAVE_JUMP,
   /**
-   * Special command flag that indicates it is not to be repeated
+   * A special command flag indicating that the inserted text after this command will not be repeated.
+   * Example: `2i123` will insert `123123`, but `2s123` will insert `123`
    */
-  FLAG_NO_REPEAT,
+  FLAG_NO_REPEAT_INSERT,
   /**
    * This insert command should clear all saved keystrokes from the current insert
    */
@@ -88,18 +93,5 @@ enum class CommandFlags {
    *   and [com.maddyhome.idea.vim.action.window.LookupDownAction] because there actions have custom handler
    *   only if lookup is active.
    */
-  FLAG_TYPEAHEAD_SELF_MANAGE,
-
-  /**
-   * There are some double-character commands like `cc`, `dd`, `yy`.
-   * During the execution these commands are replaced with `c_`, `d_`, `y_`, etc.
-   *
-   * This is not any kind of workaround, this is exactly how the original vim works.
-   *   The `dd` command (and others) should not be processed as a monolith command, or it will lead to problems
-   *   like this: https://youtrack.jetbrains.com/issue/VIM-1189
-   *
-   * If some command has this flag, and the user enters motion operator that is the same as the command itself, the
-   *   motion operator will be replaced with `_`.
-   */
-  FLAG_DUPLICABLE_OPERATOR
+  FLAG_TYPEAHEAD_SELF_MANAGE
 }

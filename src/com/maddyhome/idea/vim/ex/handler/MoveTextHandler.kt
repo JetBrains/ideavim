@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,17 +24,24 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.*
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandParser
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.InvalidRangeException
+import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.helper.fileSize
 import java.util.*
 import kotlin.math.min
 
 class MoveTextHandler : CommandHandler.SingleExecution() {
-  override val names = commands("m[ove]")
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
+
   @Throws(ExException::class)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val carets = EditorHelper.getOrderedCaretsList(editor)
@@ -43,15 +50,15 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
 
     val texts = ArrayList<String>(caretCount)
     val ranges = ArrayList<TextRange>(caretCount)
-    var line = EditorHelper.getFileSize(editor)
+    var line = editor.fileSize
     val command = CommandParser.getInstance().parse(cmd.argument)
 
     var lastRange: TextRange? = null
     for (caret in carets) {
-      val range = cmd.getTextRange(editor, caret, context, false)
-      val lineRange = cmd.getLineRange(editor, caret, context)
+      val range = cmd.getTextRange(editor, caret, false)
+      val lineRange = cmd.getLineRange(editor, caret)
 
-      line = min(line, normalizeLine(editor, caret, context, command, lineRange))
+      line = min(line, normalizeLine(editor, caret, command, lineRange))
       texts.add(EditorHelper.getText(editor, range.startOffset, range.endOffset))
 
       if (lastRange == null || lastRange.startOffset != range.startOffset && lastRange.endOffset != range.endOffset) {
@@ -75,9 +82,9 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
   }
 
   @Throws
-  private fun normalizeLine(editor: Editor, caret: Caret, context: DataContext,
-                            command: ExCommand, lineRange: LineRange): Int {
-    var line = command.ranges.getFirstLine(editor, caret, context)
+  private fun normalizeLine(editor: Editor, caret: Caret, command: ExCommand,
+                            lineRange: LineRange): Int {
+    var line = command.ranges.getFirstLine(editor, caret)
     val adj = lineRange.endLine - lineRange.startLine + 1
     if (line >= lineRange.endLine)
       line -= adj

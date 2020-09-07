@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,20 +28,16 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
-import javax.swing.KeyStroke
 
 /**
  * @author Alex Plate
  */
 class LookupDownAction : VimActionHandler.SingleExecution() {
 
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.I
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-N>")
+  private val keySet = parseKeysSet("<C-N>")
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
@@ -53,7 +49,7 @@ class LookupDownAction : VimActionHandler.SingleExecution() {
       EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN)
         .execute(editor, editor.caretModel.primaryCaret, context)
     } else {
-      val keyStroke = keyStrokesSet.first().first()
+      val keyStroke = keySet.first().first()
       val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
       for (action in actions) {
         if (KeyHandler.executeAction(action, context)) break

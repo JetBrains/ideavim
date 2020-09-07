@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,18 +27,27 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
-import com.intellij.openapi.editor.*
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.CaretStateTransferableData
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.RangeMarker
+import com.intellij.openapi.editor.RawText
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.command.isBlock
+import com.maddyhome.idea.vim.command.isChar
+import com.maddyhome.idea.vim.command.isLine
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
 import java.util.*
@@ -96,7 +105,7 @@ class PutGroup {
   }
 
   private fun collectPreModificationData(editor: Editor, data: PutData): Map<String, Any> {
-    return if (data.visualSelection != null && data.visualSelection.typeInEditor == SelectionType.BLOCK_WISE) {
+    return if (data.visualSelection != null && data.visualSelection.typeInEditor.isBlock) {
       val vimSelection = data.visualSelection.caretsAndSelections.getValue(editor.caretModel.primaryCaret)
       val selStart = editor.offsetToLogicalPosition(vimSelection.vimStart)
       val selEnd = editor.offsetToLogicalPosition(vimSelection.vimEnd)
@@ -127,14 +136,16 @@ class PutGroup {
       if (data.visualSelection != null) {
         val offset = editor.caretModel.primaryCaret.offset
         VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, offset)
-        VimPlugin.getMark().setChangeMarks(editor, TextRange(offset, offset))
+        VimPlugin.getMark().setChangeMarks(editor, TextRange(offset, offset+1))
       }
       return null
     }
 
-    if (data.visualSelection?.typeInEditor == SelectionType.LINE_WISE && data.textData.typeInRegister == SelectionType.CHARACTER_WISE) text += "\n"
+    if (data.visualSelection?.typeInEditor?.isLine == true && data.textData.typeInRegister.isChar) text += "\n"
 
-    if (data.textData.typeInRegister == SelectionType.LINE_WISE && text.isNotEmpty() && text.last() != '\n') text += '\n'
+    if (data.textData.typeInRegister.isLine && text.isNotEmpty() && text.last() != '\n') text += '\n'
+
+    if (data.textData.typeInRegister.isChar && text.lastOrNull() == '\n' && data.visualSelection?.typeInEditor?.isLine == false) text = text.dropLast(1)
 
     return ProcessedTextData(text, data.textData.typeInRegister, data.textData.transferableData)
   }
@@ -163,7 +174,7 @@ class PutGroup {
   }
 
   private fun putForCaret(editor: Editor, caret: Caret, data: PutData, additionalData: Map<String, Any>, context: DataContext, text: ProcessedTextData) {
-    if (data.visualSelection?.typeInEditor == SelectionType.LINE_WISE && editor.isOneLineMode) return
+    if (data.visualSelection?.typeInEditor?.isLine == true && editor.isOneLineMode) return
     val startOffsets = prepareDocumentAndGetStartOffsets(editor, caret, text.typeInRegister, data, additionalData)
 
     startOffsets.forEach { startOffset ->
@@ -179,11 +190,11 @@ class PutGroup {
     val application = ApplicationManager.getApplication()
     if (data.visualSelection != null) {
       return when {
-        data.visualSelection.typeInEditor == SelectionType.CHARACTER_WISE && typeInRegister == SelectionType.LINE_WISE -> {
+        data.visualSelection.typeInEditor.isChar && typeInRegister.isLine -> {
           application.runWriteAction { editor.document.insertString(caret.offset, "\n") }
           listOf(caret.offset + 1)
         }
-        data.visualSelection.typeInEditor == SelectionType.BLOCK_WISE -> {
+        data.visualSelection.typeInEditor.isBlock -> {
           val firstSelectedLine = additionalData["firstSelectedLine"] as Int
           val selectedLines = additionalData["selectedLines"] as Int
           val startColumnOfSelection = additionalData["startColumnOfSelection"] as Int
@@ -235,8 +246,8 @@ class PutGroup {
   }
 
   private fun getProviderForPasteViaIde(context: DataContext, typeInRegister: SelectionType, data: PutData): PasteProvider? {
-    if (data.visualSelection != null && data.visualSelection.typeInEditor == SelectionType.BLOCK_WISE) return null
-    if ((typeInRegister == SelectionType.LINE_WISE || typeInRegister == SelectionType.CHARACTER_WISE) && data.count == 1) {
+    if (data.visualSelection != null && data.visualSelection.typeInEditor.isBlock) return null
+    if ((typeInRegister.isLine || typeInRegister.isChar) && data.count == 1) {
       val provider = PlatformDataKeys.PASTE_PROVIDER.getData(context)
       if (provider != null && provider.isPasteEnabled(context)) return provider
     }
@@ -332,7 +343,7 @@ class PutGroup {
     if (currentLine + lineCount >= EditorHelper.getLineCount(editor)) {
       val limit = currentLine + lineCount - EditorHelper.getLineCount(editor)
       for (i in 0 until limit) {
-        MotionGroup.moveCaret(editor, caret, EditorHelper.getFileSize(editor, true))
+        MotionGroup.moveCaret(editor, caret, editor.fileSize)
         VimPlugin.getChange().insertText(editor, caret, "\n")
       }
     }

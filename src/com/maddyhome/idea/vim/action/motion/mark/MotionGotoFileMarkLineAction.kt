@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,22 +24,16 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import java.util.*
-import javax.swing.KeyStroke
 
 class MotionGotoFileMarkLineAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.INCLUSIVE
-
-  override val mappingModes: Set<MappingMode> = MappingMode.XO
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("'")
+  override val motionType: MotionType = MotionType.LINE_WISE
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(editor: Editor,
                          caret: Caret,
@@ -55,15 +49,9 @@ class MotionGotoFileMarkLineAction : MotionActionHandler.ForEachCaret() {
 }
 
 class MotionGotoFileMarkLineNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.INCLUSIVE
-
-  override val mappingModes: Set<MappingMode> = MappingMode.XO
-
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("g'")
+  override val motionType: MotionType = MotionType.LINE_WISE
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
-
-  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
 
   override fun getOffset(editor: Editor,
                          caret: Caret,

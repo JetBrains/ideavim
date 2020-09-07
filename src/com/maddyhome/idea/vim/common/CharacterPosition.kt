@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2019 The IdeaVim authors
+ * Copyright (C) 2003-2020 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,10 @@ class CharacterPosition(line: Int, col: Int) : LogicalPosition(line, col) {
       val logicalPosition = editor.offsetToLogicalPosition(offset)
       val lineStartOffset = getLineStartOffset(editor, logicalPosition.line)
       return CharacterPosition(logicalPosition.line, offset - lineStartOffset)
+    }
+
+    fun atCaret(editor: Editor): CharacterPosition {
+      return fromOffset(editor, editor.caretModel.offset)
     }
   }
 }
