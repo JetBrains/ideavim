@@ -118,6 +118,7 @@ class VisualMotionGroup {
       logger.info("Adjust non-vim selection. Source: $selectionSource")
       if (initialMode?.hasVisualSelection == true || editor.caretModel.allCarets.any(Caret::hasSelection)) {
         if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
+          /*
           val commandState = CommandState.getInstance(editor)
           logger.info("Some carets have selection. State before adjustment: ${commandState.toSimpleString()}")
           while (commandState.mode != CommandState.Mode.COMMAND) {
@@ -145,9 +146,10 @@ class VisualMotionGroup {
             else -> {
               logger.info("Enter visual mode")
               enterVisualMode(editor, autodetectedMode)
-            }
+            }a
           }
           KeyHandler.getInstance().reset(editor)
+           */
         } else {
           val commandState = CommandState.getInstance(editor)
           logger.info("None of carets have selection. State before adjustment: ${commandState.toSimpleString()}")
