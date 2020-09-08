@@ -315,6 +315,10 @@ Contributors:
   [![icon][github]](https://github.com/KostkaBrukowa)
   &nbsp;
   KostkaBrukowa
+* [![icon][mail]](mailto:wangyaohuicn@gmail.com)
+  [![icon][github]](https://github.com/yaohui-wyh)
+  &nbsp;
+  Yaohui Wang
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.

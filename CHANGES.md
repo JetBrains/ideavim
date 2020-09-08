@@ -36,6 +36,9 @@ To Be Released
     Now features like `Prettier on save` or `Run on save for files` would work with `:w` command as well.
   
     See [VIM-1968](https://youtrack.jetbrains.com/issue/VIM-1968).
+  
+**Merged PRs:**
+* [248](https://github.com/JetBrains/ideavim/pull/248) by [Yaohui Wang](https://github.com/yaohui-wyh): Check if project is disposed when editorDeinit
 
 0.59, 2020-08-25
 ------------
