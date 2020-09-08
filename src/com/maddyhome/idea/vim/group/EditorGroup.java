@@ -73,7 +73,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
   }
 
   private void deinitLineNumbers(@NotNull Editor editor, boolean isReleasing) {
-    if (!supportsVimLineNumbers(editor) || !UserDataManager.getVimEditorGroup(editor)) {
+    if (isProjectDisposed(editor) || !supportsVimLineNumbers(editor) || !UserDataManager.getVimEditorGroup(editor)) {
       return;
     }
 
@@ -95,6 +95,10 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     // We only support line numbers in editors that are file based, and that aren't for diffs, which control their
     // own line numbers, often using EditorGutter#setLineNumberConverter
     return EditorHelper.isFileEditor(editor) && !EditorHelper.isDiffEditor(editor);
+  }
+
+  private static boolean isProjectDisposed(final @NotNull Editor editor) {
+    return editor.getProject() == null || editor.getProject().isDisposed();
   }
 
   private static void updateLineNumbers(final @NotNull Editor editor) {
