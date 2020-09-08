@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
@@ -127,7 +128,7 @@ class PutGroup {
       ApplicationManager.getApplication().runWriteAction {
         VimPlugin.getChange().deleteRange(editor, caret, range, selection.type, false)
       }
-      caret.moveToOffset(range.startOffset)
+      caret.moveToInlayAwareOffset(range.startOffset)
     }
   }
 
@@ -259,7 +260,7 @@ class PutGroup {
     EditorHelper.getOrderedCaretsList(editor).forEach { caret ->
       val startOffset = prepareDocumentAndGetStartOffsets(editor, caret, text.typeInRegister, data, additionalData).first()
       val pointMarker = editor.document.createRangeMarker(startOffset, startOffset)
-      caret.moveToOffset(startOffset)
+      caret.moveToInlayAwareOffset(startOffset)
       carets[caret] = pointMarker
     }
 

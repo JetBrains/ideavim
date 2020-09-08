@@ -175,10 +175,8 @@ class VimSurroundExtension : VimExtension {
         val change = VimPlugin.getChange()
         val leftSurround = pair.first
         val primaryCaret = editor.caretModel.primaryCaret
-        primaryCaret.moveToOffset(range.startOffset)
-        change.insertText(editor, primaryCaret, leftSurround)
-        primaryCaret.moveToOffset(range.endOffset + leftSurround.length)
-        change.insertText(editor, primaryCaret, pair.second)
+        change.insertText(editor, primaryCaret, range.startOffset, leftSurround)
+        change.insertText(editor, primaryCaret, range.endOffset + leftSurround.length, pair.second)
         // Jump back to start
         executeNormal(StringHelper.parseKeys("`["), editor)
       }

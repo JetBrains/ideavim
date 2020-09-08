@@ -43,11 +43,9 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.MarkGroup
-import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.*
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
-import com.maddyhome.idea.vim.helper.fileSize
-import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.OperatorFunction
 
 /**
@@ -199,14 +197,14 @@ class VimExchangeExtension: VimExtension {
       fun fixCursor(ex1: Exchange, ex2: Exchange, reverse: Boolean) {
         val primaryCaret = editor.caretModel.primaryCaret
         if(reverse) {
-          primaryCaret.moveToOffset(editor.getMarkOffset(ex1.start))
+          primaryCaret.moveToInlayAwareOffset(editor.getMarkOffset(ex1.start))
         } else {
           if (ex1.start.logicalLine == ex2.start.logicalLine) {
             val horizontalOffset = ex1.end.col - ex2.end.col
-            primaryCaret.moveToLogicalPosition(LogicalPosition(ex1.start.logicalLine, ex1.start.col - horizontalOffset))
+            primaryCaret.moveToInlayAwareLogicalPosition(LogicalPosition(ex1.start.logicalLine, ex1.start.col - horizontalOffset))
           } else if(ex1.end.logicalLine - ex1.start.logicalLine != ex2.end.logicalLine - ex2.start.logicalLine) {
             val verticalOffset = ex1.end.logicalLine - ex2.end.logicalLine
-            primaryCaret.moveToLogicalPosition(LogicalPosition(ex1.start.logicalLine - verticalOffset, ex1.start.col))
+            primaryCaret.moveToInlayAwareLogicalPosition(LogicalPosition(ex1.start.logicalLine - verticalOffset, ex1.start.col))
           }
         }
       }

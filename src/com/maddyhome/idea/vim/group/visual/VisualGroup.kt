@@ -28,17 +28,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.fileSize
-import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.inSelectMode
-import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.helper.isEndAllowed
-import com.maddyhome.idea.vim.helper.mode
-import com.maddyhome.idea.vim.helper.sort
-import com.maddyhome.idea.vim.helper.subMode
-import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.helper.*
 
 /**
  * @author Alex Plate
@@ -52,7 +42,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
   vimSelectionStart = start
   setVisualSelection(start, end, this)
-  if (moveCaretToSelectionEnd && !editor.inBlockSubMode) moveToOffset(end)
+  if (moveCaretToSelectionEnd && !editor.inBlockSubMode) moveToInlayAwareOffset(end)
 }
 
 /**
@@ -213,7 +203,7 @@ fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: CommandS
       editor.caretModel.allCarets.forEach { caret ->
         val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
         val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
-        if (caret.offset == lineEnd && lineEnd != lineStart) caret.moveToOffset(caret.offset - 1)
+        if (caret.offset == lineEnd && lineEnd != lineStart) caret.moveToInlayAwareOffset(caret.offset - 1)
       }
     }
     return
@@ -223,9 +213,9 @@ fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: CommandS
       if (caret.selectionEnd <= 0) return@forEach
       if (EditorHelper.getLineStartForOffset(editor, caret.selectionEnd - 1) != caret.selectionEnd - 1
         && caret.selectionEnd > 1 && editor.document.text[caret.selectionEnd - 1] == '\n') {
-        caret.moveToOffset(caret.selectionEnd - 2)
+        caret.moveToInlayAwareOffset(caret.selectionEnd - 2)
       } else {
-        caret.moveToOffset(caret.selectionEnd - 1)
+        caret.moveToInlayAwareOffset(caret.selectionEnd - 1)
       }
     }
   }
@@ -263,7 +253,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
         if (lastColumn >= MotionGroup.LAST_COLUMN) {
           aCaret.vimSetSystemSelectionSilently(aCaret.selectionStart, lineEndOffset)
           val newOffset = (lineEndOffset - VimPlugin.getVisualMotion().selectionAdj).coerceAtLeast(lineStartOffset)
-          aCaret.moveToOffset(newOffset)
+          aCaret.moveToInlayAwareOffset(newOffset)
         }
         val visualPosition = editor.offsetToVisualPosition(aCaret.selectionEnd)
         if (aCaret.offset == aCaret.selectionEnd && visualPosition != aCaret.visualPosition) {
@@ -280,7 +270,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
         }
       }
 
-      editor.caretModel.primaryCaret.moveToOffset(selectionEnd)
+      editor.caretModel.primaryCaret.moveToInlayAwareOffset(selectionEnd)
     }
     else -> Unit
   }

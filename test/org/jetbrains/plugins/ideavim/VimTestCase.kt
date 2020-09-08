@@ -26,6 +26,7 @@ import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileTypes.FileType
@@ -223,6 +224,13 @@ abstract class VimTestCase : UsefulTestCase() {
     Assert.assertEquals("Wrong amount of carets", 1, carets.size)
     val actualPosition = carets[0].logicalPosition
     Assert.assertEquals(LogicalPosition(line, column), actualPosition)
+  }
+
+  fun assertVisualPosition(visualLine: Int, visualColumn: Int) {
+    val carets = myFixture.editor.caretModel.allCarets
+    Assert.assertEquals("Wrong amount of carets", 1, carets.size)
+    val actualPosition = carets[0].visualPosition
+    Assert.assertEquals(VisualPosition(visualLine, visualColumn), actualPosition)
   }
 
   fun assertOffset(vararg expectedOffsets: Int) {

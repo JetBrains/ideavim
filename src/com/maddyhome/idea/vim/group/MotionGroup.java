@@ -285,8 +285,11 @@ public class MotionGroup {
       return;
     }
 
-    if (caret.getOffset() != offset) {
-      caret.moveToOffset(offset);
+    // Always move the caret. It will be smart enough to not do anything if the offsets are the same, but it will also
+    // ensure that it's in the correct location relative to any inline inlays
+    final int oldOffset = caret.getOffset();
+    InlayHelperKt.moveToInlayAwareOffset(caret, offset);
+    if (oldOffset != offset) {
       UserDataManager.setVimLastColumn(caret, caret.getVisualPosition().column);
       if (caret == editor.getCaretModel().getPrimaryCaret()) {
         scrollCaretIntoView(editor);

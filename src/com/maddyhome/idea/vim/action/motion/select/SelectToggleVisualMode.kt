@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.group.visual.updateCaretState
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.commandState
@@ -45,7 +46,7 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
       if (subMode != CommandState.SubMode.VISUAL_LINE) {
         editor.caretModel.runForEachCaret {
           if (it.offset + VimPlugin.getVisualMotion().selectionAdj == it.selectionEnd) {
-            it.moveToOffset(it.offset + VimPlugin.getVisualMotion().selectionAdj)
+            it.moveToInlayAwareOffset(it.offset + VimPlugin.getVisualMotion().selectionAdj)
           }
         }
       }
@@ -54,7 +55,7 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
       if (subMode != CommandState.SubMode.VISUAL_LINE) {
         editor.caretModel.runForEachCaret {
           if (it.offset == it.selectionEnd && it.visualLineStart <= it.offset - VimPlugin.getVisualMotion().selectionAdj) {
-            it.moveToOffset(it.offset - VimPlugin.getVisualMotion().selectionAdj)
+            it.moveToInlayAwareOffset(it.offset - VimPlugin.getVisualMotion().selectionAdj)
           }
         }
       }
