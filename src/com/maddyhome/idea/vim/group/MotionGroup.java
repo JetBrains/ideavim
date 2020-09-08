@@ -1220,10 +1220,9 @@ public class MotionGroup {
         .normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
       col += newInlineElements;
 
-      if (useEndOfLineTracking && InLastColumnMode(editor) && !caret.hasSelection()) {
-          // we're in 'last column' mode (after pressing '$'); Run to last column
-          int newLastColumn = EditorHelper.lastColumnForLine(editor, line, CommandStateHelper.isEndAllowed(mode));
-          col = newLastColumn;
+      if (useEndOfLineTracking && inLastColumnMode(editor) && !caret.hasSelection()) {
+        // we're in 'last column' mode (after pressing '$'); Run to last column
+        col = EditorHelper.lastColumnForLine(editor, line, CommandStateHelper.isEndAllowed(mode));
       }
 
       VisualPosition newPos = new VisualPosition(line, col);
@@ -1231,12 +1230,11 @@ public class MotionGroup {
     }
   }
 
-  private boolean InLastColumnMode(@NotNull Editor editor) {
-    Command state = CommandStateHelper.getPreviousCommand(editor);
-    if (state == null) return false;
+  private boolean inLastColumnMode(@NotNull Editor editor) {
+    Command previousCommand = CommandStateHelper.getPreviousCommand(editor);
+    if (previousCommand == null) return false;
 
-    EditorActionHandlerBase action = state.getAction();
-    if (action == null) return false;
+    EditorActionHandlerBase action = previousCommand.getAction();
 
     return action instanceof MotionLastColumnAction;
   }

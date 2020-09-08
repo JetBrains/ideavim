@@ -41,7 +41,7 @@ class MotionArrowDownAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysActi
   private var col: Int = 0
 
   override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count, editor.inNormalMode);
+    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count, editor.inNormalMode)
   }
 
   override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
