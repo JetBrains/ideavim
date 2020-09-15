@@ -134,22 +134,23 @@ abstract class VimTestCase : UsefulTestCase() {
   protected val screenHeight: Int
     get() = 35
 
-  protected fun setEditorVisibleSize() {
-    EditorTestUtil.setEditorVisibleSize(myFixture.editor, screenWidth, screenHeight)
+  protected fun setEditorVisibleSize(width: Int, height: Int) {
+    EditorTestUtil.setEditorVisibleSize(myFixture.editor, width, height)
   }
+
   protected fun configureByText(content: String) = configureByText(PlainTextFileType.INSTANCE, content)
   protected fun configureByJavaText(content: String) = configureByText(JavaFileType.INSTANCE, content)
   protected fun configureByXmlText(content: String) = configureByText(XmlFileType.INSTANCE, content)
 
   private fun configureByText(fileType: FileType, content: String): Editor {
     myFixture.configureByText(fileType, content)
-    setEditorVisibleSize()
+    setEditorVisibleSize(screenWidth, screenHeight)
     return myFixture.editor
   }
 
   protected fun configureByFileName(fileName: String): Editor {
     myFixture.configureByText(fileName, "\n")
-    setEditorVisibleSize()
+    setEditorVisibleSize(screenWidth, screenHeight)
     return myFixture.editor
   }
 
@@ -168,6 +169,15 @@ abstract class VimTestCase : UsefulTestCase() {
       stringBuilder.appendln(line)
     }
     configureByText(stringBuilder.toString())
+  }
+
+  protected fun configureByColumns(columnCount: Int) {
+    val content = buildString {
+      repeat(columnCount) {
+        append('0' + (it % 10))
+      }
+    }
+    configureByText(content)
   }
 
   @JvmOverloads
@@ -253,6 +263,17 @@ abstract class VimTestCase : UsefulTestCase() {
 
     Assert.assertEquals("Top logical lines don't match", topLogicalLine, actualLogicalTop)
     Assert.assertEquals("Bottom logical lines don't match", bottomLogicalLine, actualLogicalBottom)
+  }
+
+  fun assertVisibleLineBounds(logicalLine: Int, leftLogicalColumn: Int, rightLogicalColumn: Int) {
+    val visualLine = EditorHelper.logicalLineToVisualLine(myFixture.editor, logicalLine)
+    val actualLeftVisualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(myFixture.editor, visualLine)
+    val actualLeftLogicalColumn = myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualLeftVisualColumn)).column
+    val actualRightVisualColumn = EditorHelper.getVisualColumnAtRightOfScreen(myFixture.editor, visualLine)
+    val actualRightLogicalColumn =  myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualRightVisualColumn)).column
+
+    Assert.assertEquals(leftLogicalColumn, actualLeftLogicalColumn)
+    Assert.assertEquals(rightLogicalColumn, actualRightLogicalColumn)
   }
 
   fun assertMode(expectedMode: CommandState.Mode) {

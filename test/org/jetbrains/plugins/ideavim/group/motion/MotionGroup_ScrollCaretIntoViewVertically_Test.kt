@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 @Suppress("ClassName")
-class MotionGroup_ScrollCaretIntoView_Test : VimTestCase() {
+class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   fun `test moving up causes scrolling up`() {
     configureByPages(5)
     setPositionAndScroll(19, 24)

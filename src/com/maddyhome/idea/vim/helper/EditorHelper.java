@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -212,31 +213,25 @@ public class EditorHelper {
   }
 
   /**
-   * Gets the number of pixels per column of text.
-   *
+   * Gets the visual column at the left of the screen for the given visual line.
    * @param editor The editor
-   * @return The number of pixels
+   * @param visualLine The visual line to use to check for inlays and support non-proportional fonts
+   * @return The visual column number
    */
-  public static int getColumnWidth(final @NotNull Editor editor) {
-    Rectangle rect = getVisibleArea(editor);
-    if (rect.width == 0) return 0;
-    Point pt = new Point(rect.width, 0);
-    VisualPosition vp = editor.xyToVisualPosition(pt);
-    if (vp.column == 0) return 0;
-
-    return rect.width / vp.column;
+  public static int getVisualColumnAtLeftOfScreen(final @NotNull Editor editor, int visualLine) {
+    final Rectangle area = getVisibleArea(editor);
+    return getFullVisualColumn(editor, area.x, editor.visualLineToY(visualLine), area.x, area.x + area.width);
   }
 
   /**
-   * Gets the column currently displayed at the left edge of the editor.
-   *
+   * Gets the visual column at the right of the screen for the given visual line.
    * @param editor The editor
-   * @return The column number
+   * @param visualLine The visual line to use to check for inlays and support non-proportional fonts
+   * @return The visual column number
    */
-  public static int getVisualColumnAtLeftOfScreen(final @NotNull Editor editor) {
-    int cw = getColumnWidth(editor);
-    if (cw == 0) return 0;
-    return (getVisibleArea(editor).x + cw - 1) / cw;
+  public static int getVisualColumnAtRightOfScreen(final @NotNull Editor editor, int visualLine) {
+    final Rectangle area = getVisibleArea(editor);
+    return getFullVisualColumn(editor, area.x + area.width, editor.visualLineToY(visualLine), area.x, area.x + area.width);
   }
 
   /**
@@ -618,8 +613,8 @@ public class EditorHelper {
     // We try to keep the caret in the same location, but only if there's enough space all around for the line's
     // inlays. E.g. caret on top screen line and the line has inlays above, or caret on bottom screen line and has
     // inlays below
-    final int topInlayHeight = EditorHelper.getHeightOfVisualLineInlays(editor, visualLine, true);
-    final int bottomInlayHeight = EditorHelper.getHeightOfVisualLineInlays(editor, visualLine, false);
+    final int topInlayHeight = EditorUtil.getInlaysHeight(editor, visualLine, true);
+    final int bottomInlayHeight = EditorUtil.getInlaysHeight(editor, visualLine, false);
 
     int inlayOffset = 0;
     if (topInlayHeight > caretScreenOffset) {
@@ -640,8 +635,7 @@ public class EditorHelper {
    * @return Returns true if the window was moved
    */
   public static boolean scrollVisualLineToTopOfScreen(final @NotNull Editor editor, int visualLine) {
-    final int inlayHeight = getHeightOfVisualLineInlays(editor, normalizeVisualLine(editor, visualLine), true);
-    int y = editor.visualLineToY(visualLine) - inlayHeight;
+    int y = EditorUtil.getVisualLineAreaStartY(editor, normalizeVisualLine(editor, visualLine));
 
     // Normalise Y so that we don't try to scroll the editor to a location it can't reach. The editor will handle this,
     // but when we ask for the target location to move the caret to match, we'll get the incorrect value.
@@ -683,7 +677,6 @@ public class EditorHelper {
    * @return True if the editor was scrolled
    */
   public static boolean scrollVisualLineToBottomOfScreen(@NotNull Editor editor, int visualLine) {
-    int inlayHeight = getHeightOfVisualLineInlays(editor, normalizeVisualLine(editor, visualLine), false);
     int exPanelHeight = 0;
     if (ExEntryPanel.getInstance().isActive()) {
       exPanelHeight = ExEntryPanel.getInstance().getHeight();
@@ -691,10 +684,39 @@ public class EditorHelper {
     if (ExEntryPanel.getInstanceWithoutShortcuts().isActive()) {
       exPanelHeight += ExEntryPanel.getInstanceWithoutShortcuts().getHeight();
     }
-    int y = editor.visualLineToY(visualLine);
-    int height = inlayHeight + editor.getLineHeight() + exPanelHeight;
-    Rectangle visibleArea = getVisibleArea(editor);
-    return scrollVertically(editor, max(0, y - visibleArea.height + height));
+    final int y = EditorUtil.getVisualLineAreaEndY(editor, normalizeVisualLine(editor, visualLine)) + exPanelHeight;
+    final Rectangle visibleArea = getVisibleArea(editor);
+    return scrollVertically(editor, max(0, y - visibleArea.height));
+  }
+
+  public static void scrollColumnToLeftOfScreen(@NotNull Editor editor, int visualLine, int visualColumn) {
+    int inlayWidth = 0;
+    if (visualColumn > 0) {
+      final var inlay = editor.getInlayModel().getInlineElementAt(new VisualPosition(visualLine, visualColumn - 1));
+      inlayWidth += inlay != null && !inlay.isRelatedToPrecedingText() ? inlay.getWidthInPixels() : 0;
+    }
+    final int columnLeftX = editor.visualPositionToXY(new VisualPosition(visualLine, visualColumn)).x;
+    EditorHelper.scrollHorizontally(editor, columnLeftX - inlayWidth);
+  }
+
+  public static void scrollColumnToMiddleOfScreen(@NotNull Editor editor, int visualLine, int visualColumn) {
+    final Point point = editor.visualPositionToXY(new VisualPosition(visualLine, visualColumn));
+    final int screenWidth = EditorHelper.getVisibleArea(editor).width;
+
+    // Snap the column to the nearest standard column grid. This positions us nicely if there are an odd or even number
+    // of columns. It also works with inline inlays and folds. It is slightly inaccurate for proportional fonts, but is
+    // still a good solution. Besides, what kind of monster uses Vim with proportional fonts?
+    final int standardColumnWidth = EditorUtil.getPlainSpaceWidth(editor);
+    final int something = ((point.x - (screenWidth / 2)) / standardColumnWidth) * standardColumnWidth;
+    EditorHelper.scrollHorizontally(editor, something);
+  }
+
+  public static void scrollColumnToRightOfScreen(@NotNull Editor editor, int visualLine, int visualColumn) {
+    var inlay = editor.getInlayModel().getInlineElementAt(new VisualPosition(visualLine, visualColumn + 1));
+    int inlayWidth = inlay != null && inlay.isRelatedToPrecedingText() ? inlay.getWidthInPixels() : 0;
+    final int columnRightX = editor.visualPositionToXY(new VisualPosition(visualLine, visualColumn + 1)).x;
+    final int screenWidth = EditorHelper.getVisibleArea(editor).width;
+    EditorHelper.scrollHorizontally(editor, columnRightX + inlayWidth - 1 - screenWidth);
   }
 
   /**
@@ -821,6 +843,8 @@ public class EditorHelper {
   }
 
   private static int getFullVisualLine(final @NotNull Editor editor, int y, int topBound, int bottomBound) {
+    // Note that we ignore inlays here. We're interested in the bounds of the text line. Scrolling will handle inlays as
+    // it sees fit (e.g. scrolling a line to the bottom will make sure inlays below the line are visible).
     int line = editor.yToVisualLine(y);
     int yActual = editor.visualLineToY(line);
     if (yActual < topBound) {
@@ -832,15 +856,55 @@ public class EditorHelper {
     return line;
   }
 
-  private static int getHeightOfVisualLineInlays(final @NotNull Editor editor, int visualLine, boolean above) {
-    InlayModel inlayModel = editor.getInlayModel();
-    int inlayHeight = 0;
-    // [Version Update] 202+ Inlay is parametrized
-    //noinspection rawtypes
-    for (Inlay inlay : inlayModel.getBlockElementsForVisualLine(visualLine, above)) {
-      inlayHeight += inlay.getHeightInPixels();
+  private static int getFullVisualColumn(final @NotNull Editor editor, int x, int y, int leftBound, int rightBound) {
+    // Mapping XY to a visual position will return the position of the closest character, rather than the position of
+    // the character grid that contains the XY. This means two things. Firstly, we don't get back the visual position of
+    // an inline inlay, and secondly, we can get the character to the left or right of X. This is the same logic for
+    // positioning the caret when you click in the editor.
+    // Note that visualPos.leansRight will be true for the right half side of the character grid
+    VisualPosition closestVisualPosition = editor.xyToVisualPosition(new Point(x, y));
+
+    // Make sure we get the character that contains this XY, not the editor's decision about closest character. The
+    // editor will give us the next character if X is over half way through the character grid.
+    int xActualLeft = editor.visualPositionToXY(closestVisualPosition).x;
+    if (xActualLeft > x) {
+      closestVisualPosition = getPreviousNonInlayVisualPosition(editor, closestVisualPosition);
+      xActualLeft = editor.visualPositionToXY(closestVisualPosition).x;
     }
-    return inlayHeight;
+
+    if (xActualLeft >= leftBound) {
+      final int xActualRight = editor.visualPositionToXY(new VisualPosition(closestVisualPosition.line, closestVisualPosition.column + 1)).x - 1;
+      if (xActualRight <= rightBound) {
+        return closestVisualPosition.column;
+      }
+
+      return getPreviousNonInlayVisualPosition(editor, closestVisualPosition).column;
+    }
+    else {
+      return getNextNonInlayVisualPosition(editor, closestVisualPosition).column;
+    }
+  }
+
+  private static VisualPosition getNextNonInlayVisualPosition(@NotNull Editor editor, VisualPosition position) {
+    final InlayModel inlayModel = editor.getInlayModel();
+    final int lineLength = EditorHelper.getVisualLineLength(editor, position.line);
+    position = new VisualPosition(position.line, position.column + 1);
+    while (position.column < lineLength && inlayModel.hasInlineElementAt(position)) {
+      position = new VisualPosition(position.line, position.column + 1);
+    }
+    return position;
+  }
+
+  private static VisualPosition getPreviousNonInlayVisualPosition(@NotNull Editor editor, VisualPosition position) {
+    if (position.column == 0) {
+      return position;
+    }
+    final InlayModel inlayModel = editor.getInlayModel();
+    position = new VisualPosition(position.line, position.column - 1);
+    while (position.column >= 0 && inlayModel.hasInlineElementAt(position)) {
+      position = new VisualPosition(position.line, position.column - 1);
+    }
+    return position;
   }
 
   /**

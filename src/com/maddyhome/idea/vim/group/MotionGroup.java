@@ -174,12 +174,12 @@ public class MotionGroup {
     int topVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
     int bottomVisualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor);
     int caretVisualLine = editor.getCaretModel().getVisualPosition().line;
-    int newline = caretVisualLine;
+    int newVisualLine = caretVisualLine;
     if (caretVisualLine < topVisualLine + scrollOffset) {
-      newline = EditorHelper.normalizeVisualLine(editor, topVisualLine + scrollOffset);
+      newVisualLine = EditorHelper.normalizeVisualLine(editor, topVisualLine + scrollOffset);
     }
     else if (caretVisualLine >= bottomVisualLine - scrollOffset) {
-      newline = EditorHelper.normalizeVisualLine(editor, bottomVisualLine - scrollOffset);
+      newVisualLine = EditorHelper.normalizeVisualLine(editor, bottomVisualLine - scrollOffset);
     }
 
     int sideScrollOffset = OptionsManager.INSTANCE.getSidescrolloff().value();
@@ -193,7 +193,7 @@ public class MotionGroup {
     if (col >= EditorHelper.getLineLength(editor) - 1) {
       col = UserDataManager.getVimLastColumn(editor.getCaretModel().getPrimaryCaret());
     }
-    int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
+    int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor, newVisualLine);
     int caretColumn = col;
     int newColumn = caretColumn;
     if (caretColumn < visualColumn + sideScrollOffset) {
@@ -203,14 +203,14 @@ public class MotionGroup {
       newColumn = visualColumn + width - sideScrollOffset - 1;
     }
 
-    if (newline == caretVisualLine && newColumn != caretColumn) {
+    if (newVisualLine == caretVisualLine && newColumn != caretColumn) {
       col = newColumn;
     }
 
-    newColumn = EditorHelper.normalizeVisualColumn(editor, newline, newColumn, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
+    newColumn = EditorHelper.normalizeVisualColumn(editor, newVisualLine, newColumn, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
 
-    if (newline != caretVisualLine || newColumn != oldColumn) {
-      int offset = EditorHelper.visualPositionToOffset(editor, new VisualPosition(newline, newColumn));
+    if (newVisualLine != caretVisualLine || newColumn != oldColumn) {
+      int offset = EditorHelper.visualPositionToOffset(editor, new VisualPosition(newVisualLine, newColumn));
       moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
 
       UserDataManager.setVimLastColumn(editor.getCaretModel().getPrimaryCaret(), col);
@@ -588,13 +588,21 @@ public class MotionGroup {
     return true;
   }
 
-  public boolean scrollColumnToFirstScreenColumn(@NotNull Editor editor) {
-    scrollColumnToScreenColumn(editor, 0);
+  public boolean scrollCaretColumnToFirstScreenColumn(@NotNull Editor editor) {
+    final VisualPosition caretVisualPosition = editor.getCaretModel().getVisualPosition();
+    final int scrollOffset = Math.min(OptionsManager.INSTANCE.getSidescrolloff().value(), EditorHelper.getScreenWidth(editor) / 2);
+    // TODO: Should the offset be applied to visual columns? This includes inline inlays and folds
+    final int column = Math.max(0, caretVisualPosition.column - scrollOffset);
+    EditorHelper.scrollColumnToLeftOfScreen(editor, caretVisualPosition.line, column);
     return true;
   }
 
-  public boolean scrollColumnToLastScreenColumn(@NotNull Editor editor) {
-    scrollColumnToScreenColumn(editor, EditorHelper.getScreenWidth(editor));
+  public boolean scrollCaretColumnToLastScreenColumn(@NotNull Editor editor) {
+    final VisualPosition caretVisualPosition = editor.getCaretModel().getVisualPosition();
+    final int scrollOffset = Math.min(OptionsManager.INSTANCE.getSidescrolloff().value(), EditorHelper.getScreenWidth(editor) / 2);
+    // TODO: Should the offset be applied to visual columns? This includes inline inlays and folds
+    final int column = EditorHelper.normalizeVisualColumn(editor, caretVisualPosition.line, caretVisualPosition.column + scrollOffset, false);
+    EditorHelper.scrollColumnToRightOfScreen(editor, caretVisualPosition.line, column);
     return true;
   }
 
@@ -739,58 +747,36 @@ public class MotionGroup {
 
   private static void scrollCaretIntoViewHorizontally(@NotNull Editor editor,
                                                       @NotNull VisualPosition position) {
-    final int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
-    final int column = position.column;
-    final int width = EditorHelper.getScreenWidth(editor);
+    final int currentVisualLeftColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor, position.line);
+    final int currentVisualRightColumn = EditorHelper.getVisualColumnAtRightOfScreen(editor, position.line);
+    final int caretColumn = position.column;
+
+    final int halfWidth = EditorHelper.getScreenWidth(editor) / 2;
+    final int scrollOffset = Math.min(OptionsManager.INSTANCE.getSidescrolloff().value(), halfWidth);
 
     final EnumSet<CommandFlags> flags = CommandState.getInstance(editor).getExecutingCommandFlags();
-    final boolean scrollJump = !flags.contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP);
+    final boolean allowSidescroll = !flags.contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP);
+    int sidescroll = OptionsManager.INSTANCE.getSidescroll().value();
 
-    int scrollOffset = OptionsManager.INSTANCE.getSidescrolloff().value();
-    int scrollJumpSize = 0;
-    if (scrollJump) {
-      scrollJumpSize = Math.max(0, OptionsManager.INSTANCE.getSidescroll().value() - 1);
-      if (scrollJumpSize == 0) {
-        scrollJumpSize = width / 2;
-      }
-    }
+    final int offsetLeft = caretColumn - currentVisualLeftColumn - scrollOffset;
+    final int offsetRight = caretColumn - (currentVisualRightColumn - scrollOffset);
+    if (offsetLeft < 0 || offsetRight > 0) {
+      int diff = offsetLeft < 0 ? -offsetLeft : offsetRight;
 
-    int visualLeft = visualColumn + scrollOffset;
-    int visualRight = visualColumn + width - scrollOffset;
-    if (scrollOffset >= width / 2) {
-      scrollOffset = width / 2;
-      visualLeft = visualColumn + scrollOffset;
-      visualRight = visualColumn + width - scrollOffset;
-      if (visualLeft == visualRight) {
-        visualRight++;
-      }
-    }
-
-    scrollJumpSize = Math.min(scrollJumpSize, width / 2 - scrollOffset);
-
-    int diff;
-    if (column < visualLeft) {
-      diff = column - visualLeft + 1;
-      scrollJumpSize = -scrollJumpSize;
-    }
-    else {
-      diff = column - visualRight + 1;
-      if (diff < 0) {
-        diff = 0;
-      }
-    }
-
-    if (diff != 0) {
-      int col;
-      if (Math.abs(diff) > width / 2) {
-        col = column - width / 2 - 1;
+      if ((allowSidescroll && sidescroll == 0) || diff >= halfWidth || offsetRight >= offsetLeft) {
+        EditorHelper.scrollColumnToMiddleOfScreen(editor, position.line, caretColumn);
       }
       else {
-        col = visualColumn + diff + scrollJumpSize;
+        if (allowSidescroll && diff < sidescroll) {
+          diff = sidescroll;
+        }
+        if (offsetLeft < 0) {
+          EditorHelper.scrollColumnToLeftOfScreen(editor, position.line, Math.max(0, currentVisualLeftColumn - diff));
+        } else {
+          EditorHelper.scrollColumnToRightOfScreen(editor, position.line,
+            EditorHelper.normalizeVisualColumn(editor, position.line, currentVisualRightColumn + diff, false));
+        }
       }
-
-      col = Math.max(0, col);
-      scrollColumnToLeftOfScreen(editor, col);
     }
   }
 
@@ -920,33 +906,6 @@ public class MotionGroup {
     }
   }
 
-  private void scrollColumnToScreenColumn(@NotNull Editor editor, int column) {
-    int scrollOffset = OptionsManager.INSTANCE.getSidescrolloff().value();
-    int width = EditorHelper.getScreenWidth(editor);
-    if (scrollOffset > width / 2) {
-      scrollOffset = width / 2;
-    }
-    if (column <= width / 2) {
-      if (column < scrollOffset + 1) {
-        column = scrollOffset + 1;
-      }
-    }
-    else {
-      if (column > width - scrollOffset) {
-        column = width - scrollOffset;
-      }
-    }
-
-    int visualColumn = editor.getCaretModel().getVisualPosition().column;
-    scrollColumnToLeftOfScreen(editor, EditorHelper
-      .normalizeVisualColumn(editor, editor.getCaretModel().getVisualPosition().line, visualColumn - column + 1,
-                             false));
-  }
-
-  private static void scrollColumnToLeftOfScreen(@NotNull Editor editor, int column) {
-    EditorHelper.scrollHorizontally(editor, column * EditorHelper.getColumnWidth(editor));
-  }
-
   public int moveCaretToMiddleColumn(@NotNull Editor editor, @NotNull Caret caret) {
     final int width = EditorHelper.getScreenWidth(editor) / 2;
     final int len = EditorHelper.getLineLength(editor);
@@ -982,15 +941,19 @@ public class MotionGroup {
     return moveCaretToLineEnd(editor, editor.visualToLogicalPosition(visualEndOfLine).line, true);
   }
 
-  public boolean scrollColumn(@NotNull Editor editor, int columns) {
-    int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
-    visualColumn = EditorHelper
-      .normalizeVisualColumn(editor, editor.getCaretModel().getVisualPosition().line, visualColumn + columns, false);
-
-    scrollColumnToLeftOfScreen(editor, visualColumn);
-
+  public boolean scrollColumns(@NotNull Editor editor, int columns) {
+    final VisualPosition caretVisualPosition = editor.getCaretModel().getVisualPosition();
+    if (columns > 0) {
+      final int visualColumn = EditorHelper.normalizeVisualColumn(editor, caretVisualPosition.line,
+        EditorHelper.getVisualColumnAtLeftOfScreen(editor, caretVisualPosition.line) + columns, false);
+      EditorHelper.scrollColumnToLeftOfScreen(editor, caretVisualPosition.line, visualColumn);
+    }
+    else {
+      final int visualColumn = EditorHelper.normalizeVisualColumn(editor, caretVisualPosition.line,
+        EditorHelper.getVisualColumnAtRightOfScreen(editor, caretVisualPosition.line) + columns, false);
+      EditorHelper.scrollColumnToRightOfScreen(editor, caretVisualPosition.line, visualColumn);
+    }
     moveCaretToView(editor);
-
     return true;
   }
 
@@ -1007,18 +970,18 @@ public class MotionGroup {
   }
 
   public int moveCaretToLineScreenStart(@NotNull Editor editor, @NotNull Caret caret) {
-    final int col = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
+    final int col = EditorHelper.getVisualColumnAtLeftOfScreen(editor, caret.getVisualPosition().line);
     return moveCaretToColumn(editor, caret, col, false);
   }
 
   public int moveCaretToLineScreenStartSkipLeading(@NotNull Editor editor, @NotNull Caret caret) {
-    final int col = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
+    final int col = EditorHelper.getVisualColumnAtLeftOfScreen(editor, caret.getVisualPosition().line);
     final int logicalLine = caret.getLogicalPosition().line;
     return EditorHelper.getLeadingCharacterOffset(editor, logicalLine, col);
   }
 
   public int moveCaretToLineScreenEnd(@NotNull Editor editor, @NotNull Caret caret, boolean allowEnd) {
-    final int col = EditorHelper.getVisualColumnAtLeftOfScreen(editor) + EditorHelper.getScreenWidth(editor) - 1;
+    final int col = EditorHelper.getVisualColumnAtRightOfScreen(editor, caret.getVisualPosition().line);
     return moveCaretToColumn(editor, caret, col, allowEnd);
   }
 

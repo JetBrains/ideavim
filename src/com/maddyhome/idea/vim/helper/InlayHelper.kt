@@ -39,9 +39,15 @@ import com.intellij.openapi.editor.*
  * appropriately
  */
 fun Caret.moveToInlayAwareOffset(offset: Int) {
-  val newVisualPosition = inlayAwareOffsetToVisualPosition(editor, offset)
-  if (newVisualPosition != visualPosition) {
-    this.moveToVisualPosition(inlayAwareOffsetToVisualPosition(editor, offset))
+  // If the target offset is collapsed inside a fold, move directly to the offset, expanding the fold
+  if (editor.foldingModel.isOffsetCollapsed(offset)) {
+    moveToOffset(offset)
+  }
+  else {
+    val newVisualPosition = inlayAwareOffsetToVisualPosition(editor, offset)
+    if (newVisualPosition != visualPosition) {
+      moveToVisualPosition(newVisualPosition)
+    }
   }
 }
 

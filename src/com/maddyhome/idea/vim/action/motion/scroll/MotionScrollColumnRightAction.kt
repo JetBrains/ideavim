@@ -31,6 +31,6 @@ class MotionScrollColumnRightAction : VimActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP)
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    return VimPlugin.getMotion().scrollColumn(editor, -cmd.count)
+   return VimPlugin.getMotion().scrollColumns(editor, -cmd.count)
   }
 }
