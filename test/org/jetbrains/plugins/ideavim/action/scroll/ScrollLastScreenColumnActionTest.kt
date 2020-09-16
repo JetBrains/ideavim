@@ -111,10 +111,8 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 99 - availableColumns + 1, 99)
 
     // We have to assert the location of the inlay
-    Assert.assertTrue("Inlay bounds must be greater than last text location",
-      inlay.bounds!!.x > (visibleArea.x + textWidth))
-    Assert.assertTrue("Inlay bounds must be less than width of screen",
-      inlay.bounds!!.x + inlay.bounds!!.width <= (visibleArea.x + visibleArea.width + 1))
+    Assert.assertEquals(visibleArea.x + textWidth, inlay.bounds!!.x)
+    Assert.assertEquals(visibleArea.x + visibleArea.width, inlay.bounds!!.x + inlay.bounds!!.width)
   }
 
   fun `test last screen column does not include subsequent inline inlay associated with following text`() {

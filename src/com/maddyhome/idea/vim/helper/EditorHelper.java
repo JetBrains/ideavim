@@ -231,7 +231,7 @@ public class EditorHelper {
    */
   public static int getVisualColumnAtRightOfScreen(final @NotNull Editor editor, int visualLine) {
     final Rectangle area = getVisibleArea(editor);
-    return getFullVisualColumn(editor, area.x + area.width, editor.visualLineToY(visualLine), area.x, area.x + area.width);
+    return getFullVisualColumn(editor, area.x + area.width - 1, editor.visualLineToY(visualLine), area.x, area.x + area.width);
   }
 
   /**
@@ -707,16 +707,18 @@ public class EditorHelper {
     // of columns. It also works with inline inlays and folds. It is slightly inaccurate for proportional fonts, but is
     // still a good solution. Besides, what kind of monster uses Vim with proportional fonts?
     final int standardColumnWidth = EditorUtil.getPlainSpaceWidth(editor);
-    final int something = ((point.x - (screenWidth / 2)) / standardColumnWidth) * standardColumnWidth;
-    EditorHelper.scrollHorizontally(editor, something);
+    final int x = point.x - (screenWidth / standardColumnWidth / 2 * standardColumnWidth);
+    EditorHelper.scrollHorizontally(editor, x);
   }
 
   public static void scrollColumnToRightOfScreen(@NotNull Editor editor, int visualLine, int visualColumn) {
     var inlay = editor.getInlayModel().getInlineElementAt(new VisualPosition(visualLine, visualColumn + 1));
     int inlayWidth = inlay != null && inlay.isRelatedToPrecedingText() ? inlay.getWidthInPixels() : 0;
-    final int columnRightX = editor.visualPositionToXY(new VisualPosition(visualLine, visualColumn + 1)).x;
+
+    // Scroll to the start of the next column, minus a screenwidth
+    final int nextColumnX = editor.visualPositionToXY(new VisualPosition(visualLine, visualColumn + 1)).x;
     final int screenWidth = EditorHelper.getVisibleArea(editor).width;
-    EditorHelper.scrollHorizontally(editor, columnRightX + inlayWidth - 1 - screenWidth);
+    EditorHelper.scrollHorizontally(editor, nextColumnX + inlayWidth - screenWidth);
   }
 
   /**
