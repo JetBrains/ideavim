@@ -712,13 +712,29 @@ public class EditorHelper {
   }
 
   public static void scrollColumnToRightOfScreen(@NotNull Editor editor, int visualLine, int visualColumn) {
-    var inlay = editor.getInlayModel().getInlineElementAt(new VisualPosition(visualLine, visualColumn + 1));
-    int inlayWidth = inlay != null && inlay.isRelatedToPrecedingText() ? inlay.getWidthInPixels() : 0;
+    int targetVisualColumn = visualColumn;
 
-    // Scroll to the start of the next column, minus a screenwidth
-    final int nextColumnX = editor.visualPositionToXY(new VisualPosition(visualLine, visualColumn + 1)).x;
+    // Requested column might be an inlay (because we do simple arithmetic on visual position, and inlays and folds have
+    // a visual position). If it is an inlay and is related to preceding text, we want to display it, so use it as the
+    // target column. If it's an inlay related to following text, we don't want to display it at the right of the
+    // screen, show the previous column
+    var inlay = editor.getInlayModel().getInlineElementAt(new VisualPosition(visualLine, visualColumn));
+    if (inlay != null && !inlay.isRelatedToPrecedingText()) {
+      targetVisualColumn = visualColumn - 1;
+    }
+    else {
+      // If the target column is followed by an inlay which is associated with it, make the inlay the target column so
+      // it is visible
+      inlay = editor.getInlayModel().getInlineElementAt(new VisualPosition(visualLine, visualColumn + 1));
+      if (inlay != null && inlay.isRelatedToPrecedingText()) {
+        targetVisualColumn = visualColumn + 1;
+      }
+    }
+
+    // Scroll to the left edge of the target column, minus a screenwidth, and adjusted for inlays
+    final int targetColumnRightX = editor.visualPositionToXY(new VisualPosition(visualLine, targetVisualColumn + 1)).x;
     final int screenWidth = EditorHelper.getVisibleArea(editor).width;
-    EditorHelper.scrollHorizontally(editor, nextColumnX + inlayWidth - screenWidth);
+    EditorHelper.scrollHorizontally(editor, targetColumnRightX - screenWidth);
   }
 
   /**

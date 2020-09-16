@@ -949,8 +949,8 @@ public class MotionGroup {
       EditorHelper.scrollColumnToLeftOfScreen(editor, caretVisualPosition.line, visualColumn);
     }
     else {
-      final int visualColumn = EditorHelper.normalizeVisualColumn(editor, caretVisualPosition.line,
-        EditorHelper.getVisualColumnAtRightOfScreen(editor, caretVisualPosition.line) + columns, false);
+      // Don't normalise the rightmost column, or we break virtual space
+      final int visualColumn = EditorHelper.getVisualColumnAtRightOfScreen(editor, caretVisualPosition.line) + columns;
       EditorHelper.scrollColumnToRightOfScreen(editor, caretVisualPosition.line, visualColumn);
     }
     moveCaretToView(editor);

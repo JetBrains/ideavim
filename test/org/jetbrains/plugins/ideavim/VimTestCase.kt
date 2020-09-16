@@ -272,8 +272,15 @@ abstract class VimTestCase : UsefulTestCase() {
     val actualRightVisualColumn = EditorHelper.getVisualColumnAtRightOfScreen(myFixture.editor, visualLine)
     val actualRightLogicalColumn =  myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualRightVisualColumn)).column
 
-    Assert.assertEquals(leftLogicalColumn, actualLeftLogicalColumn)
-    Assert.assertEquals(rightLogicalColumn, actualRightLogicalColumn)
+    val expected = ScreenBounds(leftLogicalColumn, rightLogicalColumn)
+    val actual = ScreenBounds(actualLeftLogicalColumn, actualRightLogicalColumn)
+    Assert.assertEquals(expected, actual)
+  }
+
+  private data class ScreenBounds(val leftLogicalColumn: Int, val rightLogicalColumn: Int) {
+    override fun toString(): String {
+      return "[$leftLogicalColumn-$rightLogicalColumn]"
+    }
   }
 
   fun assertMode(expectedMode: CommandState.Mode) {
