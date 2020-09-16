@@ -23,8 +23,11 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-// |zt|
-/* Like "z<CR>", but leave the cursor in the same column. */
+/*
+                                                       *zt*
+zt                      Like "z<CR>", but leave the cursor in the same
+                        column.
+ */
 class ScrollFirstScreenLineActionTest : VimTestCase() {
   fun `test scroll current line to top of screen`() {
     configureByPages(5)

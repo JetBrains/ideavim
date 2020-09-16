@@ -22,7 +22,13 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-// |<C-Y>|
+/*
+                                                       *CTRL-Y*
+CTRL-Y                  Scroll window [count] lines upwards in the buffer.
+                        The text moves downwards on the screen.
+                        Note: When using the MS-Windows key bindings CTRL-Y is
+                        remapped to redo.
+ */
 class ScrollLineUpActionTest : VimTestCase() {
   fun `test scroll single line up`() {
     configureByPages(5)

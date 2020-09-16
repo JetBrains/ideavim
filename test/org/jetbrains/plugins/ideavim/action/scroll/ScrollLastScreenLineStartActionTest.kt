@@ -22,10 +22,12 @@ import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-// |z-|
-/* Redraw, line [count] at bottom of window (default
-   cursor line).  Put cursor at first non-blank in the
-   line. */
+/*
+                                                       *z-*
+z-                      Redraw, line [count] at bottom of window (default
+                        cursor line).  Put cursor at first non-blank in the
+                        line.
+ */
 class ScrollLastScreenLineStartActionTest : VimTestCase() {
   fun `test scroll current line to bottom of screen`() {
     configureByPages(5)

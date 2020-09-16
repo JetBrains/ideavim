@@ -22,8 +22,10 @@ import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-// |zb|
-/* Like "z-", but leave the cursor in the same column. */
+/*
+                                                       *zb*
+zb                      Like "z-", but leave the cursor in the same column.
+ */
 class ScrollLastScreenLineActionTest : VimTestCase() {
   fun `test scroll current line to bottom of screen`() {
     configureByPages(5)

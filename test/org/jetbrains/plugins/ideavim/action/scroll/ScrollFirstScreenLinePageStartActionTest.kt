@@ -23,11 +23,13 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-// |z+|
-/* Without [count]: Redraw with the line just below the
-   window at the top of the window.  Put the cursor in
-   that line, at the first non-blank in the line.
-   With [count]: just like "z<CR>". */
+/*
+                                                       *z+*
+z+                      Without [count]: Redraw with the line just below the
+                        window at the top of the window.  Put the cursor in
+                        that line, at the first non-blank in the line.
+                        With [count]: just like "z<CR>".
+ */
 class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
   fun `test scrolls first line on next page to top of screen`() {
     configureByPages(5)

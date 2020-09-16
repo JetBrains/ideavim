@@ -25,16 +25,18 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import junit.framework.Assert
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-// |<C-U>|
-/* Scroll window Upwards in the buffer.  The number of
-   lines comes from the 'scroll' option (default: half a
-   screen).  If [count] given, first set the 'scroll'
-   option to [count].  The cursor is moved the same
-   number of lines up in the file (if possible; when
-   lines wrap and when hitting the end of the file there
-   may be a difference).  When the cursor is on the first
-   line of the buffer nothing happens and a beep is
-   produced.  See also 'startofline' option. */
+/*
+                                                       *CTRL-U*
+CTRL-U                  Scroll window Upwards in the buffer.  The number of
+                        lines comes from the 'scroll' option (default: half a
+                        screen).  If [count] given, first set the 'scroll'
+                        option to [count].  The cursor is moved the same
+                        number of lines up in the file (if possible; when
+                        lines wrap and when hitting the end of the file there
+                        may be a difference).  When the cursor is on the first
+                        line of the buffer nothing happens and a beep is
+                        produced.  See also 'startofline' option.
+ */
 class ScrollHalfPageUpActionTest : VimTestCase() {
   fun `test scroll half window upwards keeps cursor on same relative line`() {
     configureByPages(5)

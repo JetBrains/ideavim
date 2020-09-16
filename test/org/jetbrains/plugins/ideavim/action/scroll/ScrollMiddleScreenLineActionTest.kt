@@ -23,8 +23,12 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-// |zz|
-/* Like "z.", but leave the cursor in the same column. */
+/*
+                                                       *zz*
+zz                      Like "z.", but leave the cursor in the same column.
+                        Careful: If caps-lock is on, this command becomes
+                        "ZZ": write buffer and exit!
+ */
 class ScrollMiddleScreenLineActionTest : VimTestCase() {
   fun `test scrolls current line to middle of screen`() {
     configureByPages(5)

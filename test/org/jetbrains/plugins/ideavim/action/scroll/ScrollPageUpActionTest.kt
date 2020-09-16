@@ -24,8 +24,17 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import junit.framework.Assert
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-// |<S-Up>|, |<PageUp>|, |CTRL-B|
-// |i_<S-Up>|, |i_<PageUp>|
+/*
+<S-Up>          or                                     *<S-Up>* *<kPageUp>*
+<PageUp>        or                                     *<PageUp>* *CTRL-B*
+CTRL-B                  Scroll window [count] pages Backwards (upwards) in the
+                        buffer.  See also 'startofline' option.
+                        When there is only one window the 'window' option
+                        might be used.
+
+<S-Up>          move window one page up        *i_<S-Up>*
+<PageUp>        move window one page up        *i_<PageUp>*
+ */
 class ScrollPageUpActionTest : VimTestCase() {
   fun `test scroll single page up with S-Up`() {
     configureByPages(5)

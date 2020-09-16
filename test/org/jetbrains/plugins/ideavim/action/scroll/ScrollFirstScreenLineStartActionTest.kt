@@ -23,10 +23,12 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-// |z<CR>|
-/* Redraw, line [count] at top of window (default
-   cursor line).  Put cursor at first non-blank in the
-   line. */
+/*
+                                                       *z<CR>*
+z<CR>                   Redraw, line [count] at top of window (default
+                        cursor line).  Put cursor at first non-blank in the
+                        line.
+ */
 class ScrollFirstScreenLineStartActionTest : VimTestCase() {
   fun `test scroll current line to top of screen`() {
     configureByPages(5)

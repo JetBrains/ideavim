@@ -23,10 +23,12 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-// |z.|
-/* Redraw, line [count] at center of window (default
-   cursor line).  Put cursor at first non-blank in the
-   line. */
+/*
+                                                       *z.*
+z.                      Redraw, line [count] at center of window (default
+                        cursor line).  Put cursor at first non-blank in the
+                        line.
+ */
 class ScrollMiddleScreenLineStartActionTest : VimTestCase() {
   fun `test scrolls current line to middle of screen`() {
     configureByPages(5)

@@ -23,7 +23,12 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-// |<C-E>|
+/*
+                                                       *CTRL-E*
+CTRL-E                  Scroll window [count] lines downwards in the buffer.
+                        The text moves upwards on the screen.
+                        Mnemonic: Extra lines.
+ */
 class ScrollLineDownActionTest : VimTestCase() {
   fun `test scroll single line down`() {
     configureByPages(5)

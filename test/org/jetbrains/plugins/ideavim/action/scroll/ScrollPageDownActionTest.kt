@@ -24,8 +24,17 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-// |<S-Down>|, |<PageDown>|, |CTRL-F|
-// |i_<S-Down>|, |i_<PageDown>|
+/*
+<S-Down>        or                             *<S-Down>* *<kPageDown>*
+<PageDown>      or                             *<PageDown>* *CTRL-F*
+CTRL-F                  Scroll window [count] pages Forwards (downwards) in
+                        the buffer.  See also 'startofline' option.
+                        When there is only one window the 'window' option
+                        might be used.
+
+<S-Down>        move window one page down      *i_<S-Down>*
+<PageDown>      move window one page down      *i_<PageDown>*
+ */
 class ScrollPageDownActionTest : VimTestCase() {
   fun `test scroll single page down with S-Down`() {
     configureByPages(5)

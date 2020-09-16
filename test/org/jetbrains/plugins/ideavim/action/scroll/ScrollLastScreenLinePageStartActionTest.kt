@@ -22,15 +22,17 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-// |z^|
-/* Without [count]: Redraw with the line just above the
-   window at the bottom of the window.  Put the cursor in
-   that line, at the first non-blank in the line.
-   With [count]: First scroll the text to put the [count]
-   line at the bottom of the window, then redraw with the
-   line which is now at the top of the window at the
-   bottom of the window.  Put the cursor in that line, at
-   the first non-blank in the line. */
+/*
+                                                       *z^*
+z^                      Without [count]: Redraw with the line just above the
+                        window at the bottom of the window.  Put the cursor in
+                        that line, at the first non-blank in the line.
+                        With [count]: First scroll the text to put the [count]
+                        line at the bottom of the window, then redraw with the
+                        line which is now at the top of the window at the
+                        bottom of the window.  Put the cursor in that line, at
+                        the first non-blank in the line.
+ */
 class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
   fun `test scrolls last line on previous page to bottom of screen`() {
     configureByPages(5)

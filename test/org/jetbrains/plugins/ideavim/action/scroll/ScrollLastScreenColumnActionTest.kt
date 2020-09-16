@@ -26,9 +26,11 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import org.junit.Assert
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-/* ze   Scroll the text horizontally to position the cursor
-        at the end (right side) of the screen.  This only
-			  works when 'wrap' is off.
+/*
+                                                       *ze*
+ze                      Scroll the text horizontally to position the cursor
+                        at the end (right side) of the screen.  This only
+                        works when 'wrap' is off.
  */
 class ScrollLastScreenColumnActionTest : VimTestCase() {
   fun `test scroll caret column to last screen column`() {

@@ -25,16 +25,18 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import junit.framework.Assert
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-// |<C-D>|
-/* Scroll window Downwards in the buffer.  The number of
-   lines comes from the 'scroll' option (default: half a
-   screen).  If [count] given, first set 'scroll' option
-   to [count].  The cursor is moved the same number of
-   lines down in the file (if possible; when lines wrap
-   and when hitting the end of the file there may be a
-   difference).  When the cursor is on the last line of
-   the buffer nothing happens and a beep is produced.
-   See also 'startofline' option. */
+/*
+                                                       *CTRL-D*
+CTRL-D                  Scroll window Downwards in the buffer.  The number of
+                        lines comes from the 'scroll' option (default: half a
+                        screen).  If [count] given, first set 'scroll' option
+                        to [count].  The cursor is moved the same number of
+                        lines down in the file (if possible; when lines wrap
+                        and when hitting the end of the file there may be a
+                        difference).  When the cursor is on the last line of
+                        the buffer nothing happens and a beep is produced.
+                        See also 'startofline' option.
+ */
 class ScrollHalfPageDownActionTest : VimTestCase() {
   fun `test scroll half window downwards keeps cursor on same relative line`() {
     configureByPages(5)

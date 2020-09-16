@@ -27,9 +27,11 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.Assert
 
-/* zs   Scroll the text horizontally to position the cursor
-        at the start (left side) of the screen.  This only
-        works when 'wrap' is off.
+/*
+                                                       *zs*
+zs                      Scroll the text horizontally to position the cursor
+                        at the start (left side) of the screen.  This only
+                        works when 'wrap' is off.
  */
 class ScrollFirstScreenColumnActionTest : VimTestCase() {
   fun `test scroll caret column to first screen column`() {
