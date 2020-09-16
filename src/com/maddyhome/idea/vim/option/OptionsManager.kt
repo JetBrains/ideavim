@@ -314,7 +314,7 @@ object OptionsManager {
     cols.sortBy { it.name }
     extra.sortBy { it.name }
 
-    var width = EditorHelper.getScreenWidth(editor)
+    var width = EditorHelper.getApproximateScreenWidth(editor)
     if (width < 20) {
       width = 80
     }

@@ -183,8 +183,18 @@ public class EditorHelper {
   }
 
   /**
-   * Gets the number of lines than can be displayed on the screen at one time. This is rounded down to the
-   * nearest whole line if there is a partial line visible at the bottom of the screen.
+   * Best efforts to ensure the side scroll offset doesn't overlap itself and remains a sensible value. Inline inlays
+   * can cause this to work incorrectly.
+   * @param editor The editor to use to normalize the side scroll offset
+   * @param sideScrollOffset The value of the 'sidescroll' option
+   * @return The side scroll offset value to use
+   */
+  public static int normalizeSideScrollOffset(final @NotNull Editor editor, int sideScrollOffset) {
+    return Math.min(sideScrollOffset, getApproximateScreenWidth(editor) / 2);
+  }
+
+  /**
+   * Gets the number of lines than can be displayed on the screen at one time.
    *
    * Note that this value is only approximate and should be avoided whenever possible!
    *
@@ -192,24 +202,20 @@ public class EditorHelper {
    * @return The number of screen lines
    */
   private static int getApproximateScreenHeight(final @NotNull Editor editor) {
-    int lh = editor.getLineHeight();
-    Rectangle area = getVisibleArea(editor);
-    int height = area.y + area.height - getVisualLineAtTopOfScreen(editor) * lh;
-    return height / lh;
+    return getVisibleArea(editor).height / editor.getLineHeight();
   }
 
   /**
-   * Gets the number of characters that are visible on a screen line
+   * Gets the number of characters that are visible on a screen line, based on screen width and assuming a fixed width
+   * font. It does not include inlays or folds.
+   *
+   * Note that this value is only approximate and should be avoided whenever possible!
    *
    * @param editor The editor
    * @return The number of screen columns
    */
-  public static int getScreenWidth(final @NotNull Editor editor) {
-    Rectangle rect = getVisibleArea(editor);
-    Point pt = new Point(rect.width, 0);
-    VisualPosition vp = editor.xyToVisualPosition(pt);
-
-    return vp.column;
+  public static int getApproximateScreenWidth(final @NotNull Editor editor) {
+    return getVisibleArea(editor).width / EditorUtil.getPlainSpaceWidth(editor);
   }
 
   /**

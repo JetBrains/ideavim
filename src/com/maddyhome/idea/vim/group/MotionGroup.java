@@ -171,36 +171,40 @@ public class MotionGroup {
   private static void moveCaretToView(@NotNull Editor editor) {
     final int scrollOffset = getNormalizedScrollOffset(editor);
 
-    int topVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
-    int bottomVisualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor);
-    int caretVisualLine = editor.getCaretModel().getVisualPosition().line;
-    int newVisualLine = caretVisualLine;
+    final int topVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
+    final int bottomVisualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor);
+    final int caretVisualLine = editor.getCaretModel().getVisualPosition().line;
+    final int newVisualLine;
     if (caretVisualLine < topVisualLine + scrollOffset) {
       newVisualLine = EditorHelper.normalizeVisualLine(editor, topVisualLine + scrollOffset);
     }
     else if (caretVisualLine >= bottomVisualLine - scrollOffset) {
       newVisualLine = EditorHelper.normalizeVisualLine(editor, bottomVisualLine - scrollOffset);
     }
-
-    int sideScrollOffset = OptionsManager.INSTANCE.getSidescrolloff().value();
-    int width = EditorHelper.getScreenWidth(editor);
-    if (sideScrollOffset > width / 2) {
-      sideScrollOffset = width / 2;
+    else {
+      newVisualLine = caretVisualLine;
     }
 
-    int col = editor.getCaretModel().getVisualPosition().column;
-    int oldColumn = col;
+    final int sideScrollOffset = getNormalizedSideScrollOffset(editor);
+
+    final int oldColumn = editor.getCaretModel().getVisualPosition().column;
+    int col = oldColumn;
     if (col >= EditorHelper.getLineLength(editor) - 1) {
       col = UserDataManager.getVimLastColumn(editor.getCaretModel().getPrimaryCaret());
     }
-    int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor, newVisualLine);
+
+    final int leftVisualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor, newVisualLine);
+    final int rightVisualColumn = EditorHelper.getVisualColumnAtRightOfScreen(editor, newVisualLine);
+
     int caretColumn = col;
     int newColumn = caretColumn;
-    if (caretColumn < visualColumn + sideScrollOffset) {
-      newColumn = visualColumn + sideScrollOffset;
+
+    // TODO: Visual column arithmetic will be inaccurate as it include columns for inlays and folds
+    if (caretColumn < leftVisualColumn + sideScrollOffset) {
+      newColumn = leftVisualColumn + sideScrollOffset;
     }
-    else if (caretColumn >= visualColumn + width - sideScrollOffset) {
-      newColumn = visualColumn + width - sideScrollOffset - 1;
+    else if (caretColumn > rightVisualColumn - sideScrollOffset) {
+      newColumn = rightVisualColumn - sideScrollOffset;
     }
 
     if (newVisualLine == caretVisualLine && newColumn != caretColumn) {
@@ -270,8 +274,13 @@ public class MotionGroup {
   }
 
   private static int getNormalizedScrollOffset(final @NotNull Editor editor) {
-    int scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();
+    final int scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();
     return EditorHelper.normalizeScrollOffset(editor, scrollOffset);
+  }
+
+  private static int getNormalizedSideScrollOffset(final @NotNull Editor editor) {
+    final int sideScrollOffset = OptionsManager.INSTANCE.getSidescrolloff().value();
+    return EditorHelper.normalizeSideScrollOffset(editor, sideScrollOffset);
   }
 
   public static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset) {
@@ -590,7 +599,7 @@ public class MotionGroup {
 
   public boolean scrollCaretColumnToFirstScreenColumn(@NotNull Editor editor) {
     final VisualPosition caretVisualPosition = editor.getCaretModel().getVisualPosition();
-    final int scrollOffset = Math.min(OptionsManager.INSTANCE.getSidescrolloff().value(), EditorHelper.getScreenWidth(editor) / 2);
+    final int scrollOffset = getNormalizedSideScrollOffset(editor);
     // TODO: Should the offset be applied to visual columns? This includes inline inlays and folds
     final int column = Math.max(0, caretVisualPosition.column - scrollOffset);
     EditorHelper.scrollColumnToLeftOfScreen(editor, caretVisualPosition.line, column);
@@ -599,7 +608,7 @@ public class MotionGroup {
 
   public boolean scrollCaretColumnToLastScreenColumn(@NotNull Editor editor) {
     final VisualPosition caretVisualPosition = editor.getCaretModel().getVisualPosition();
-    final int scrollOffset = Math.min(OptionsManager.INSTANCE.getSidescrolloff().value(), EditorHelper.getScreenWidth(editor) / 2);
+    final int scrollOffset = getNormalizedSideScrollOffset(editor);
     // TODO: Should the offset be applied to visual columns? This includes inline inlays and folds
     final int column = EditorHelper.normalizeVisualColumn(editor, caretVisualPosition.line, caretVisualPosition.column + scrollOffset, false);
     EditorHelper.scrollColumnToRightOfScreen(editor, caretVisualPosition.line, column);
@@ -751,8 +760,8 @@ public class MotionGroup {
     final int currentVisualRightColumn = EditorHelper.getVisualColumnAtRightOfScreen(editor, position.line);
     final int caretColumn = position.column;
 
-    final int halfWidth = EditorHelper.getScreenWidth(editor) / 2;
-    final int scrollOffset = Math.min(OptionsManager.INSTANCE.getSidescrolloff().value(), halfWidth);
+    final int halfWidth = EditorHelper.getApproximateScreenWidth(editor) / 2;
+    final int scrollOffset = getNormalizedSideScrollOffset(editor);
 
     final EnumSet<CommandFlags> flags = CommandState.getInstance(editor).getExecutingCommandFlags();
     final boolean allowSidescroll = !flags.contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP);
@@ -907,7 +916,7 @@ public class MotionGroup {
   }
 
   public int moveCaretToMiddleColumn(@NotNull Editor editor, @NotNull Caret caret) {
-    final int width = EditorHelper.getScreenWidth(editor) / 2;
+    final int width = EditorHelper.getApproximateScreenWidth(editor) / 2;
     final int len = EditorHelper.getLineLength(editor);
 
     return moveCaretToColumn(editor, caret, Math.max(0, Math.min(len - 1, width)), false);

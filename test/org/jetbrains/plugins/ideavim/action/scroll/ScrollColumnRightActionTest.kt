@@ -146,4 +146,21 @@ class ScrollColumnRightActionTest : VimTestCase() {
     typeText(parseKeys("zh"))   //           9
     assertVisibleLineBounds(0, 49, 128) // 80 characters
   }
+
+  fun `test scroll column to right with preceding inline inlay moves cursor at end of screen`() {
+    configureByColumns(200)
+    val inlay = myFixture.editor.inlayModel.addInlineElement(90, false, HintRenderer("test:"))!!
+    typeText(parseKeys("100|", "ze", "zh"))
+    assertPosition(0, 98)
+    assertVisibleLineBounds(0, 24, 98)
+    typeText(parseKeys("zh"))
+    assertPosition(0, 97)
+    assertVisibleLineBounds(0, 23, 97)
+    typeText(parseKeys("zh"))
+    assertPosition(0, 96)
+    assertVisibleLineBounds(0, 22, 96)
+    typeText(parseKeys("zh"))
+    assertPosition(0, 95)
+    assertVisibleLineBounds(0, 21, 95)
+  }
 }
