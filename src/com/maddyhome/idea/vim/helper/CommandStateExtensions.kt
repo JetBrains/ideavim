@@ -36,6 +36,12 @@ val CommandState.Mode.isEndAllowed : Boolean
     CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -> usesVirtualSpace
   }
 
+val CommandState.Mode.isEndAllowedIgnoringOnemore : Boolean
+  get() = when (this) {
+    CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
+    CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -> false
+  }
+
 val CommandState.isEndAllowed:Boolean
   get() {
     val isAllowedByMode = this.mode.isEndAllowed

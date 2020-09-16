@@ -31,18 +31,17 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.inNormalMode
 
 sealed class MotionDownBase : MotionActionHandler.ForEachCaret() {
   private var col: Int = 0
 
   override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
-    col = EditorHelper.prepareLastColumn(editor, caret)
+    col = EditorHelper.prepareLastColumn(caret)
     return true
   }
 
   override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-    EditorHelper.updateLastColumn(editor, caret, col)
+    EditorHelper.updateLastColumn(caret, col)
   }
 }
 
@@ -51,7 +50,7 @@ open class MotionDownAction : MotionDownBase() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
   override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count, editor.inNormalMode)
+    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)
   }
 }
 
@@ -76,6 +75,6 @@ class MotionDownNotLineWiseAction : MotionDownBase() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
   override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count, editor.inNormalMode)
+    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)
   }
 }

@@ -21,6 +21,7 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.ide.scratch.ScratchFileService
+import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
@@ -53,3 +54,9 @@ fun Editor.isPrimaryEditor(): Boolean {
   val fileEditorManager = FileEditorManagerEx.getInstanceEx(project) ?: return false
   return fileEditorManager.allEditors.any { fileEditor -> this == EditorUtil.getEditorEx(fileEditor) }
 }
+
+val Caret.amountOfInlaysBeforeCaret: Int
+  get() {
+    val curLineStartOffset: Int = this.editor.document.getLineStartOffset(logicalPosition.line)
+    return this.editor.inlayModel.getInlineElementsInRange(curLineStartOffset, this.offset).size
+  }

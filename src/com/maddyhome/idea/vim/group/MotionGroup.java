@@ -1152,7 +1152,7 @@ public class MotionGroup {
       else {
         offset = moveCaretVertical(editor, editor.getCaretModel().getPrimaryCaret(),
                                    EditorHelper.visualLineToLogicalLine(editor, visualLine) -
-                                   editor.getCaretModel().getLogicalPosition().line, false);
+                                   editor.getCaretModel().getLogicalPosition().line);
       }
 
       moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
@@ -1186,57 +1186,27 @@ public class MotionGroup {
     return editor.getCaretModel().getOffset();
   }
 
-  public int moveCaretVertical(@NotNull Editor editor, @NotNull Caret caret, int count, boolean useEndOfLineTracking) {
+  public int moveCaretVertical(@NotNull Editor editor, @NotNull Caret caret, int count) {
     VisualPosition pos = caret.getVisualPosition();
-    final LogicalPosition logicalPosition = caret.getLogicalPosition();
     if ((pos.line == 0 && count < 0) || (pos.line >= EditorHelper.getVisualLineCount(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
-      boolean savedColumn = true;
       int col = UserDataManager.getVimLastColumn(caret);
       int line = EditorHelper.normalizeVisualLine(editor, pos.line + count);
-      final CommandState.Mode mode = CommandStateHelper.getMode(editor);
-      final int lastColumnCurrentLine = EditorHelper.lastColumnForLine(editor, logicalPosition.line, CommandStateHelper.isEndAllowed(mode));
-
-      if (lastColumnCurrentLine != pos.column) {
-        col = pos.column;
-        savedColumn = false;
-      }
-
-      // Inline hints are counted as 1 in visual position. So, to keep the correct column
-      //   we decrease the column by the number of inline hints
-      int curLineStartOffset = editor.getDocument().getLineStartOffset(logicalPosition.line);
-      int curInlineElements = editor.getInlayModel().getInlineElementsInRange(curLineStartOffset, caret.getOffset()).size();
 
       VisualPosition newVisualPos = new VisualPosition(line, col);
       int newOffset = EditorHelper.visualPositionToOffset(editor, newVisualPos);
       int lineStartNewOffset = editor.getDocument().getLineStartOffset(editor.visualToLogicalPosition(newVisualPos).line);
       int newInlineElements = editor.getInlayModel().getInlineElementsInRange(lineStartNewOffset, newOffset).size();
 
-      if (!savedColumn) col -= curInlineElements;
-
       col = EditorHelper
         .normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
       col += newInlineElements;
 
-      if (useEndOfLineTracking && inLastColumnMode(editor) && !caret.hasSelection()) {
-        // we're in 'last column' mode (after pressing '$'); Run to last column
-        col = EditorHelper.lastColumnForLine(editor, line, CommandStateHelper.isEndAllowed(mode));
-      }
-
       VisualPosition newPos = new VisualPosition(line, col);
       return EditorHelper.visualPositionToOffset(editor, newPos);
     }
-  }
-
-  private boolean inLastColumnMode(@NotNull Editor editor) {
-    Command previousCommand = CommandStateHelper.getPreviousCommand(editor);
-    if (previousCommand == null) return false;
-
-    EditorActionHandlerBase action = previousCommand.getAction();
-
-    return action instanceof MotionLastColumnAction;
   }
 
   public int moveCaretToLinePercent(@NotNull Editor editor, int count) {
