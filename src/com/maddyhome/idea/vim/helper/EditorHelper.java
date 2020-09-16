@@ -731,8 +731,7 @@ public class EditorHelper {
 
     // Okay here we know that something is definitely wrong. We set vimLastColumn to the current column.
     int updatedCol = visualPosition.column;
-    int startOffset = editor.getDocument().getLineStartOffset(logicalPosition.line);
-    updatedCol -= max(0, editor.getInlayModel().getInlineElementsInRange(startOffset, caret.getOffset()).size());
+    updatedCol -= EditorHelperRt.getAmountOfInlaysBeforeCaret(caret);
     UserDataManager.setVimLastColumn(caret, updatedCol);
     return updatedCol;
   }
