@@ -690,13 +690,25 @@ public class EditorHelper {
   }
 
   public static void scrollColumnToLeftOfScreen(@NotNull Editor editor, int visualLine, int visualColumn) {
-    int inlayWidth = 0;
-    if (visualColumn > 0) {
-      final var inlay = editor.getInlayModel().getInlineElementAt(new VisualPosition(visualLine, visualColumn - 1));
-      inlayWidth += inlay != null && !inlay.isRelatedToPrecedingText() ? inlay.getWidthInPixels() : 0;
+    int targetVisualColumn = visualColumn;
+
+    // Requested column might be an inlay (because we do simple arithmetic on visual position, and inlays and folds have
+    // a visual position). If it is an inlay and is related to following text, we want to display it, so use it as the
+    // target column. If it's an inlay related to preceding text, we don't want to display it at the left of the screen,
+    // show the next column instead
+    Inlay<?> inlay = editor.getInlayModel().getInlineElementAt(new VisualPosition(visualLine, visualColumn));
+    if (inlay != null && inlay.isRelatedToPrecedingText()) {
+      targetVisualColumn = visualColumn + 1;
     }
-    final int columnLeftX = editor.visualPositionToXY(new VisualPosition(visualLine, visualColumn)).x;
-    EditorHelper.scrollHorizontally(editor, columnLeftX - inlayWidth);
+    else if (visualColumn > 0) {
+      inlay = editor.getInlayModel().getInlineElementAt(new VisualPosition(visualLine, visualColumn - 1));
+      if (inlay != null && !inlay.isRelatedToPrecedingText()) {
+        targetVisualColumn = visualColumn - 1;
+      }
+    }
+
+    final int columnLeftX = editor.visualPositionToXY(new VisualPosition(visualLine, targetVisualColumn)).x;
+    EditorHelper.scrollHorizontally(editor, columnLeftX);
   }
 
   public static void scrollColumnToMiddleOfScreen(@NotNull Editor editor, int visualLine, int visualColumn) {

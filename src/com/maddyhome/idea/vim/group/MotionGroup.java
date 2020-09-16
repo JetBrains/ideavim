@@ -944,8 +944,19 @@ public class MotionGroup {
   public boolean scrollColumns(@NotNull Editor editor, int columns) {
     final VisualPosition caretVisualPosition = editor.getCaretModel().getVisualPosition();
     if (columns > 0) {
-      final int visualColumn = EditorHelper.normalizeVisualColumn(editor, caretVisualPosition.line,
+      // TODO: Don't add columns to visual position. This includes inlays and folds
+      int visualColumn = EditorHelper.normalizeVisualColumn(editor, caretVisualPosition.line,
         EditorHelper.getVisualColumnAtLeftOfScreen(editor, caretVisualPosition.line) + columns, false);
+
+      // If the target column has an inlay preceding it, move passed it. This inlay will have been (incorrectly)
+      // included in the simple visual position, so it's ok to step over. If we don't do this, scrollColumnToLeftOfScreen
+      // can get stuck trying to make sure the inlay is visible.
+      // A better solution is to not use VisualPosition everywhere, especially for arithmetic
+      final Inlay<?> inlay = editor.getInlayModel().getInlineElementAt(new VisualPosition(caretVisualPosition.line, visualColumn - 1));
+      if (inlay != null && !inlay.isRelatedToPrecedingText()) {
+        visualColumn++;
+      }
+
       EditorHelper.scrollColumnToLeftOfScreen(editor, caretVisualPosition.line, visualColumn);
     }
     else {
