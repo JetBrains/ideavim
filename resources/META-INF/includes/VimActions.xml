@@ -150,6 +150,7 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenColumnAction" mappingModes="NXO" keys="ze"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnLeftAction" mappingModes="NXO" keys="zl,z«Right»"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnRightAction" mappingModes="NXO" keys="zh,z«Left»"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfWidthLeftAction" mappingModes="NXO" keys="zL"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionShiftDownAction" mappingModes="NV" keys="«S-Down»"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.updown.MotionShiftUpAction" mappingModes="NV" keys="«S-Up»"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftRightAction" mappingModes="NV" keys="«S-Right»"/>
