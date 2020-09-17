@@ -21,10 +21,12 @@ package com.maddyhome.idea.vim.action.change.change;
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
 class ReformatPreservingCursorAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
@@ -40,7 +42,25 @@ class ReformatPreservingCursorAction : ChangeEditorActionHandler.ForEachCaret(),
                        count: Int,
                        rawCount: Int,
                        argument: Argument?): Boolean {
-    return argument != null &&
-      VimPlugin.getChange().reformatPreservingCursor(editor, caret, context, count, rawCount, argument)
+    if (argument == null) {
+      return false
+    }
+
+    val range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument) ?: return false
+    val action = argument.motion.action
+
+    return if (action.id == "VimMotionOuterParagraphAction" && action.flags.contains(CommandFlags.FLAG_TEXT_BLOCK)) {
+      reformatParagraphPreservingCursor(editor, caret, range)
+    } else {
+      false
+    }
+  }
+
+  private fun reformatParagraphPreservingCursor(editor: Editor,
+                                                caret: Caret,
+                                                range: TextRange): Boolean {
+    val newCaretOffset: Int = ReformatCodeMotionAction.reformatParagraph(editor, caret, range)
+    MotionGroup.moveCaret(editor, caret, newCaretOffset)
+    return true
   }
 }
