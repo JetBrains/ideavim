@@ -89,10 +89,6 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     }
 
     if (!baseExecute(editor, caret, CaretSpecificDataContext(context, caret), cmd)) VimPlugin.indicateError()
-
-    if (!cmd.isUpDownMotion){
-      editor.previousCommand = cmd // track the previous motion command for some edge cases
-    }
   }
 
   open fun process(cmd: Command) {

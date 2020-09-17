@@ -21,7 +21,6 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction
 import com.maddyhome.idea.vim.action.motion.updown.*
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
@@ -40,14 +39,6 @@ val CommandState.Mode.isEndAllowedIgnoringOnemore : Boolean
   get() = when (this) {
     CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
     CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -> false
-  }
-
-val CommandState.isEndAllowed:Boolean
-  get() {
-    val isAllowedByMode = this.mode.isEndAllowed
-    val trimCase = (this.mode == CommandState.Mode.COMMAND) && (this.previousCommand?.action is MotionLastColumnAction)
-
-    return isAllowedByMode && !trimCase
   }
 
 val CommandState.Mode.isBlockCaret
@@ -70,22 +61,6 @@ var Editor.subMode
   set(value) {
     this.commandState.subMode = value
   }
-
-var Editor.previousCommand: Command?
-  get() = this.commandState.previousCommand
-  set(value) {
-    this.commandState.previousCommand = value
-  }
-
-val Command.isUpDownMotion: Boolean
-  get() = (
-         this.action is MotionDownBase
-      || this.action is MotionUpBase
-      || this.action is MotionUpAction
-      || this.action is MotionDownAction
-      || this.action is MotionArrowUpAction
-      || this.action is MotionArrowDownAction)
-
 
 @get:JvmName("inNormalMode")
 val Editor.inNormalMode

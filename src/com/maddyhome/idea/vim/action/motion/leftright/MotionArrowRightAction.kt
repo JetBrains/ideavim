@@ -41,7 +41,7 @@ class MotionArrowRightAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAct
   )
 
   override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-    val allowPastEnd = editor.commandState.isEndAllowed
+    val allowPastEnd = editor.commandState.mode.isEndAllowed
     return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, count, allowPastEnd)
   }
 }

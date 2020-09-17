@@ -1190,10 +1190,15 @@ public class MotionGroup {
       int col = UserDataManager.getVimLastColumn(caret);
       int line = normalizeVisualLine(editor, pos.line + count);
 
-      int newInlineElements = EditorHelperRt.amountOfInlaysBeforeVisualPosition(editor, new VisualPosition(line, col));
+      if (col == LAST_COLUMN) {
+        col = normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowedIgnoringOnemore(CommandStateHelper.getMode(editor)));
+      }
+      else {
+        int newInlineElements = EditorHelperRt.amountOfInlaysBeforeVisualPosition(editor, new VisualPosition(line, col));
 
-      col = normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
-      col += newInlineElements;
+        col = normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
+        col += newInlineElements;
+      }
 
       VisualPosition newPos = new VisualPosition(line, col);
       return visualPositionToOffset(editor, newPos);

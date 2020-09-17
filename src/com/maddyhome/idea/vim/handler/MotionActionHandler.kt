@@ -136,7 +136,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
           if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
             VimPlugin.getMark().saveJumpLocation(editor)
           }
-          if (!editor.commandState.isEndAllowed) {
+          if (!editor.commandState.mode.isEndAllowed) {
             offset = EditorHelper.normalizeOffset(editor, offset, false)
           }
           preMove(editor, context, cmd)
@@ -175,7 +175,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
         VimPlugin.getMark().saveJumpLocation(editor)
       }
-      if (!editor.commandState.isEndAllowed) {
+      if (!editor.commandState.mode.isEndAllowed) {
         offset = EditorHelper.normalizeOffset(editor, offset, false)
       }
       preMove(editor, caret, context, cmd)

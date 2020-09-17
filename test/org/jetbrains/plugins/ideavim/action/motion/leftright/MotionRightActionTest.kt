@@ -94,6 +94,19 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  fun `test virtual edit motion after dollar`() {
+    OptionsManager.virtualedit.set("onemore")
+    doTest("\$l", """
+            Yesterday it ${c}worked
+            Today it is not working
+            The test is like that.
+        """.trimIndent(), """
+            Yesterday it worked${c}
+            Today it is not working
+            The test is like that.
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
   fun `test simple motion non-ascii`() {
     doTest("l", """

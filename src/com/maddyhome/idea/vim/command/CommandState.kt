@@ -58,8 +58,6 @@ class CommandState private constructor() {
   var executingCommand: Command? = null
     private set
 
-  var previousCommand: Command? = null
-
   // Keep the compatibility with the IdeaVim-EasyMotion plugin before the stable release
   @get:Deprecated("")
   @get:ApiStatus.ScheduledForRemoval(inVersion = "0.58")
@@ -74,9 +72,6 @@ class CommandState private constructor() {
   }
 
   fun setExecutingCommand(cmd: Command) {
-    if (previousCommand != null && !cmd.isUpDownMotion){
-      previousCommand = executingCommand // track the previous motion command for some edge cases around '$'
-    }
     executingCommand = cmd
   }
 
