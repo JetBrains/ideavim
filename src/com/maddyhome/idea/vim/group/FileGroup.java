@@ -45,6 +45,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.EditorHelperRt;
 import com.maddyhome.idea.vim.helper.SearchHelper;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -68,6 +69,8 @@ public class FileGroup {
       // Can't open a file unless it has a known file type. The next call will return the known type.
       // If unknown, IDEA will prompt the user to pick a type.
       FileType type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found, project);
+
+      //noinspection IfStatementWithIdenticalBranches
       if (type != null) {
         FileEditorManager fem = FileEditorManager.getInstance(project);
         fem.openFile(found, true);
@@ -126,7 +129,7 @@ public class FileGroup {
       return res;
     }
     final Ref<VirtualFile> result = Ref.create();
-    final VirtualFileVisitor<Object> visitor = new VirtualFileVisitor<Object>() {
+    final VirtualFileVisitor<Object> visitor = new VirtualFileVisitor<>() {
       @Override
       public boolean visitFile(@NotNull VirtualFile file) {
         if (file.getName().equals(filename)) {
@@ -160,7 +163,14 @@ public class FileGroup {
    * Saves specific file in the project.
    */
   public void saveFile(DataContext context) {
-    KeyHandler.executeAction("SaveDocument", context);
+    String action;
+    if (OptionsManager.INSTANCE.getIdeawaonw().isSet()) {
+      action = "SaveAll";
+    }
+    else {
+      action = "SaveDocument";
+    }
+    KeyHandler.executeAction(action, context);
   }
 
   /**

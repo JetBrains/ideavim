@@ -21,8 +21,10 @@
 package org.jetbrains.plugins.ideavim.extension.surround
 
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.NeovimTesting
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -416,5 +418,17 @@ class VimSurroundExtensionTest : VimTestCase() {
           <p>Some other paragraph</p>
       </div>
     """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun testWithAnExistingMapping() {
+    val before = "(foo)"
+    val after = "[foo]"
+
+    configureByText(before)
+
+    typeText(commandToKeys("noremap d <C-d>"))
+    typeText(parseKeys("cs(]"))
+    myFixture.checkResult(after)
   }
 }

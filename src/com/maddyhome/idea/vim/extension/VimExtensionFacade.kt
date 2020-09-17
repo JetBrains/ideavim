@@ -81,15 +81,16 @@ object VimExtensionFacade {
   }
 
   /**
-   * Runs normal mode commands similar to ':normal {commands}'.
+   * Runs normal mode commands similar to ':normal! {commands}'.
+   * Mappings doesn't work with this function
    *
    * XXX: Currently it doesn't make the editor enter the normal mode, it doesn't recover from incomplete commands, it
    * leaves the editor in the insert mode if it's been activated.
    */
   @JvmStatic
-  fun executeNormal(keys: List<KeyStroke>, editor: Editor) {
+  fun executeNormalWithoutMapping(keys: List<KeyStroke>, editor: Editor) {
     val context = EditorDataContext(editor)
-    keys.forEach { KeyHandler.getInstance().handleKey(editor, it, context) }
+    keys.forEach { KeyHandler.getInstance().handleKey(editor, it, context, false) }
   }
 
   /** Returns a single key stroke from the user input similar to 'getchar()'. */

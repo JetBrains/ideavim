@@ -21,11 +21,8 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.DigraphResult
-import com.maddyhome.idea.vim.helper.DigraphSequence
-import com.maddyhome.idea.vim.helper.noneOfEnum
-import com.maddyhome.idea.vim.helper.vimCommandState
+import com.maddyhome.idea.vim.action.motion.updown.*
+import com.maddyhome.idea.vim.helper.*
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.option.OptionsManager.showmode
 import org.jetbrains.annotations.ApiStatus

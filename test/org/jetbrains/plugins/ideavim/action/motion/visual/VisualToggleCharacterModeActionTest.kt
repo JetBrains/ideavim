@@ -381,11 +381,20 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
                 """.trimIndent(),
+      // Correct vim behaviour:
+      /*"""
+                    A Discovery
+
+                    Iall rocks and lavender and tufted grass,
+                    w${s}here it was settled on some sodden sand${c}${se}
+                    hard by the torrent of a mountain pass.
+                """.trimIndent(),*/
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
   fun `test enter visual with count with dollar motion and down movement`() {
+    // expect to see switches v, $, d, v.
     doTest(listOf("v\$dj", "1v", "j"),
       """
                     A Discovery
@@ -403,6 +412,15 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand[long line]${c}${se}
                     hard by the torrent of a mountain pass.
                 """.trimIndent(),
+     // Correct vim behaviour:
+     /* """
+                    A Discovery
+
+                    I
+                    all rocks and lavender and tufted grass,
+                    w${s}here it was settled on some sodden sand[long line]
+                    hard by the torrent of a mountain pass.${c}${se}
+                """.trimIndent(),*/
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
@@ -634,6 +652,15 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     ${s}where it was settled on some sodden sand[long line${c}]${se}
                     ${s}hard by the torrent of a mountain pass.${c}${se}
                 """.trimIndent(),
+      // correct vim behaviour
+      /*"""
+                    A Discovery
+
+                    I
+                    a
+                    w${s}here it was settled on some sodden sand[long line${c}]${se}
+                    h${s}ard by the torrent of a mountain pass.${c}${se}
+                """.trimIndent(),*/
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 

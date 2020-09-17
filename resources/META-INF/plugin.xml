@@ -3,10 +3,7 @@
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
       <ul>
-        <li>vim-highlightedyank plugin emulation</li>
-        <li>:tabclose command</li>
-        <li>Fix zR command</li>
-        <li>Fix macro editing</li>
+        <li>Support of `virtualedit=onemore`</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
     ]]></change-notes>
@@ -97,5 +94,9 @@
         <keyboard-shortcut first-keystroke="meta shift I" keymap="Mac OS X 10.5+" replace-all="true"/>
       </action>
     </group>
+
+    <action id="VimFindActionIdAction"
+            class="com.maddyhome.idea.vim.listener.FindActionIdAction" text="Track Action Ids"
+            description="Starts tracking ids of executed actions"/>
   </actions>
 </idea-plugin>

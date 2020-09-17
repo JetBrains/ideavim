@@ -55,7 +55,7 @@ class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
       }
       // No return statement, perform motion to left
     }
-    return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -count, false)
+    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -count, false)
   }
 
   companion object {

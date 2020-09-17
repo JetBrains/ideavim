@@ -80,12 +80,14 @@ object OptionsManager {
   val timeoutlen = addOption(NumberOption("timeoutlen", "tm", 1000, -1, Int.MAX_VALUE))
   val undolevels = addOption(NumberOption("undolevels", "ul", 1000, -1, Int.MAX_VALUE))
   val viminfo = addOption(ListOption("viminfo", "vi", arrayOf("'100", "<50", "s10", "h"), null))
+  val virtualedit = addOption(BoundStringOption(VirtualEditData.name, "ve", "", VirtualEditData.allValues))
   val visualbell = addOption(ToggleOption("visualbell", "vb", false))
   val wrapscan = addOption(ToggleOption("wrapscan", "ws", true))
   val visualEnterDelay = addOption(NumberOption("visualdelay", "visualdelay", 100, 0, Int.MAX_VALUE))
   val idearefactormode = addOption(BoundStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues))
   val ideastatusicon = addOption(BoundStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues))
   val ideastrictmode = addOption(ToggleOption("ideastrictmode", "ideastrictmode", false))
+  val ideawaonw = addOption(ToggleOption("ideawaonw", "ideawaonw", true))
 
   // Dev only experimental options
   val dialogescape = addOption(BoundStringOption("dialogescape", "de", "legacy", arrayOf("legacy", "on", "off")))
@@ -557,4 +559,11 @@ object StrictMode {
   fun fail(message: String) {
     if (on) error(message)
   }
+}
+
+object VirtualEditData {
+  const val name = "virtualedit"
+
+  const val onemore = "onemore"
+  val allValues = arrayOf("block", "insert", "all", onemore)
 }

@@ -38,7 +38,7 @@ class MotionRightAction : MotionActionHandler.ForEachCaret() {
                          count: Int,
                          rawCount: Int,
                          argument: Argument?): Int {
-    return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, count, true)
+    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, true)
   }
 }
 
@@ -56,6 +56,6 @@ class MotionRightInsertAction : MotionActionHandler.ForEachCaret(), ComplicatedK
                          count: Int,
                          rawCount: Int,
                          argument: Argument?): Int {
-    return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, count, true)
+    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, true)
   }
 }

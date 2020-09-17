@@ -35,7 +35,7 @@ import com.maddyhome.idea.vim.common.Mark
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.common.VimMark
 import com.maddyhome.idea.vim.extension.VimExtension
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormal
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegister
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
@@ -105,7 +105,7 @@ class VimExchangeExtension: VimExtension {
 
     override fun execute(editor: Editor, context: DataContext) {
       setOperatorFunction(Operator(false))
-      executeNormal(parseKeys(if(isLine) "g@_" else "g@"), editor)
+      executeNormalWithoutMapping(parseKeys(if(isLine) "g@_" else "g@"), editor)
     }
   }
 
@@ -120,7 +120,7 @@ class VimExchangeExtension: VimExtension {
       runWriteAction {
         val subMode = editor.subMode
         // Leave visual mode to create selection marks
-        executeNormal(parseKeys("<Esc>"), editor)
+        executeNormalWithoutMapping(parseKeys("<Esc>"), editor)
         Operator(true).apply(editor, context, SelectionType.fromSubMode(subMode))
       }
     }
@@ -192,7 +192,7 @@ class VimExchangeExtension: VimExtension {
         VimPlugin.getMark().setChangeMarks(editor, TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end)+1))
         // do this instead of direct text manipulation to set change marks
         setRegister('z', stringToKeys(sourceExchange.text), SelectionType.fromSubMode(sourceExchange.type))
-        executeNormal(stringToKeys("`[${targetExchange.type.getString()}`]\"zp"), editor)
+        executeNormalWithoutMapping(stringToKeys("`[${targetExchange.type.getString()}`]\"zp"), editor)
       }
       fun fixCursor(ex1: Exchange, ex2: Exchange, reverse: Boolean) {
         val primaryCaret = editor.caretModel.primaryCaret
@@ -310,7 +310,7 @@ class VimExchangeExtension: VimExtension {
 
       var (selectionStart, selectionEnd) = getMarks(isVisual)
       if (isVisual) {
-        executeNormal(parseKeys("gvy"), editor)
+        executeNormalWithoutMapping(parseKeys("gvy"), editor)
         // TODO: handle
         //if &selection ==# 'exclusive' && start != end
         //			let end.column -= len(matchstr(@@, '\_.$'))
@@ -325,9 +325,9 @@ class VimExchangeExtension: VimExtension {
           )!!
         }
         when (selectionType) {
-          SelectionType.LINE_WISE -> executeNormal(stringToKeys("`[V`]y"), editor)
-          SelectionType.BLOCK_WISE -> executeNormal(stringToKeys("""`[<C-V>`]y"""), editor)
-          SelectionType.CHARACTER_WISE -> executeNormal(stringToKeys("`[v`]y"), editor)
+          SelectionType.LINE_WISE -> executeNormalWithoutMapping(stringToKeys("`[V`]y"), editor)
+          SelectionType.BLOCK_WISE -> executeNormalWithoutMapping(stringToKeys("""`[<C-V>`]y"""), editor)
+          SelectionType.CHARACTER_WISE -> executeNormalWithoutMapping(stringToKeys("`[v`]y"), editor)
         }
       }
 

@@ -195,12 +195,18 @@ class ChangeVisualActionTest : VimTestCase() {
   @VimBehaviorDiffers(description = "Different caret position")
   fun `test change visual block with shorter line in the middle`() {
     doTest(listOf("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
-      "foo foo\n" +
-        "x\n" +
-        "bar bar\n",
-      ("fo_quux_foo\n" +
-        "x\n" +
-        "ba_quux_bar\n"),
+      """
+        foo foo
+        x
+        bar bar
+        
+        """.trimIndent(),
+      """
+        fo_quux_foo
+        x
+        ba_quux_bar
+        
+        """.trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }

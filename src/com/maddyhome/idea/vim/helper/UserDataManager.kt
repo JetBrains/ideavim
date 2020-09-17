@@ -64,7 +64,7 @@ fun Caret.vimSelectionStartClear() {
 private var Caret._vimSelectionStart: Int? by userDataCaretToEditor()
 //endregion ----------------------------------------------------
 
-var Caret.vimLastColumn: Int by userDataCaretToEditorOr { (this as Caret).visualPosition.column }
+var Caret.vimLastColumn: Int by userDataCaretToEditorOr { (this as Caret).visualPosition.column - this.amountOfInlaysBeforeCaret }
 var Caret.vimLastVisualOperatorRange: VisualChange? by userDataCaretToEditor()
 var Caret.vimInsertStart: RangeMarker by userDataOr { (this as Caret).editor.document.createRangeMarker(this.offset, this.offset) }
 

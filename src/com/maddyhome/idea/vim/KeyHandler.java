@@ -337,7 +337,8 @@ public class KeyHandler {
 
     if (commandBuilder.isAwaitingCharOrDigraphArgument()
       || commandBuilder.isBuildingMultiKeyCommand()
-      || isMappingDisabledForKey(key, commandState)) {
+      || isMappingDisabledForKey(key, commandState)
+      || commandState.getSubMode() == CommandState.SubMode.REGISTER_PENDING) {
       return false;
     }
 

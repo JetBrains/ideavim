@@ -193,4 +193,12 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     doTest("%", """ "I found ${c}it in \\\"a (legendary) land" """,
       """ "I found it in \\\"a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
+
+  fun `test deleting with percent motion backward`() {
+    doTest("d%", "(foo bar$c)", c, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun `test deleting with percent motion`() {
+    doTest("d%", "$c(foo bar)", c, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 }

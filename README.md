@@ -96,6 +96,7 @@ Here are some examples of supported vim features and commands:
 * vim-textobj-entire
 * ReplaceWithRegister
 * vim-exchange
+* vim-highlightedyank
 
 See also:
 

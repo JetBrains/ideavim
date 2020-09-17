@@ -72,7 +72,7 @@ public class CommentaryExtension implements VimExtension {
     @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
       setOperatorFunction(new Operator());
-      executeNormal(parseKeys("g@"), editor);
+      executeNormalWithoutMapping(parseKeys("g@"), editor);
     }
   }
 
@@ -90,7 +90,7 @@ public class CommentaryExtension implements VimExtension {
 
       WriteAction.run(() -> {
         // Leave visual mode
-        executeNormal(parseKeys("<Esc>"), editor);
+        executeNormalWithoutMapping(parseKeys("<Esc>"), editor);
         editor.getCaretModel().moveToOffset(editor.getCaretModel().getPrimaryCaret().getSelectionStart());
       });
     }
@@ -124,7 +124,7 @@ public class CommentaryExtension implements VimExtension {
 
           // Jump back to start if in block mode
           if (selectionType == SelectionType.CHARACTER_WISE) {
-            executeNormal(parseKeys("`["), editor);
+            executeNormalWithoutMapping(parseKeys("`["), editor);
           }
           return true;
         } finally {

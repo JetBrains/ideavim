@@ -25,13 +25,11 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.CaretSpecificDataContext
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.motion.updown.*
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.helper.commandState
-import com.maddyhome.idea.vim.helper.getTopLevelEditor
-import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.helper.*
 import java.util.*
 import javax.swing.KeyStroke
 

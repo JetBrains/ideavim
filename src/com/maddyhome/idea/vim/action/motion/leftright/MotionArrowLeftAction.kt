@@ -36,7 +36,7 @@ class MotionArrowLeftAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysActi
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Left>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0)))
 
   override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-    return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -count, false)
+    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -count, false)
   }
 }
 

@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtension
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormal
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegister
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.inputKeyStroke
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.inputString
@@ -71,7 +71,7 @@ class VimSurroundExtension : VimExtension {
 
     override fun execute(editor: Editor, context: DataContext) {
       setOperatorFunction(Operator())
-      executeNormal(StringHelper.parseKeys("g@"), editor)
+      executeNormalWithoutMapping(StringHelper.parseKeys("g@"), editor)
     }
   }
 
@@ -84,7 +84,7 @@ class VimSurroundExtension : VimExtension {
       }
       runWriteAction {
         // Leave visual mode
-        executeNormal(StringHelper.parseKeys("<Esc>"), editor)
+        executeNormalWithoutMapping(StringHelper.parseKeys("<Esc>"), editor)
         editor.caretModel.moveToOffset(selectionStart)
       }
     }
@@ -122,13 +122,13 @@ class VimSurroundExtension : VimExtension {
         // Restore the old value
         setRegister(REGISTER, oldValue)
         // Jump back to start
-        executeNormal(StringHelper.parseKeys("`["), editor)
+        executeNormalWithoutMapping(StringHelper.parseKeys("`["), editor)
       }
 
       private fun escape(sequence: String): String = sequence.replace("<", "\\<")
 
       private fun perform(sequence: String, editor: Editor) {
-        IdeaputDisabler().use { executeNormal(StringHelper.parseKeys("\"" + REGISTER + sequence), editor) }
+        IdeaputDisabler().use { executeNormalWithoutMapping(StringHelper.parseKeys("\"" + REGISTER + sequence), editor) }
       }
 
       private fun pasteSurround(innerValue: List<KeyStroke?>, editor: Editor) { // This logic is direct from vim-surround
@@ -178,7 +178,7 @@ class VimSurroundExtension : VimExtension {
         change.insertText(editor, primaryCaret, range.startOffset, leftSurround)
         change.insertText(editor, primaryCaret, range.endOffset + leftSurround.length, pair.second)
         // Jump back to start
-        executeNormal(StringHelper.parseKeys("`["), editor)
+        executeNormalWithoutMapping(StringHelper.parseKeys("`["), editor)
       }
       return true
     }
