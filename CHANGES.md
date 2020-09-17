@@ -25,6 +25,9 @@ usual beta standards.
 To Be Released
 -----------
 
+**Features:**
+* Support of `virtualedit=onemore` ([VIM-844](https://youtrack.jetbrains.com/issue/VIM-844))
+
 **Fixes:**
 * [VIM-2097](https://youtrack.jetbrains.com/issue/VIM-2097) Do not apply mappings for register selecting
 * [VIM-2080](https://youtrack.jetbrains.com/issue/VIM-2080) Fix S command with count
@@ -39,6 +42,7 @@ To Be Released
   
 **Merged PRs:**
 * [248](https://github.com/JetBrains/ideavim/pull/248) by [Yaohui Wang](https://github.com/yaohui-wyh): Check if project is disposed when editorDeinit
+* [242](https://github.com/JetBrains/ideavim/pull/242) by [Iain Ballard](https://github.com/i-e-b): Partial implementation of virtualedit config
 
 0.59, 2020-08-25
 ------------
