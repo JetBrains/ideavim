@@ -23,10 +23,17 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.option.OptionsManager
-import org.jetbrains.plugins.ideavim.VimTestCase
+import com.maddyhome.idea.vim.option.VirtualEditData
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
 
-class DeleteVisualLinesEndActionTest : VimTestCase() {
+class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
+  @VimOptionDefaultAll
   fun `test simple deletion`() {
     val keys = listOf("v", "D")
     val before = """
@@ -47,8 +54,9 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, VimTestOptionType.VALUE, [VirtualEditData.onemore]))
   fun `test virtual edit delete middle to end`() {
-    OptionsManager.virtualedit.set("onemore")
     doTest("D", """
             Yesterday it w${c}orked
             Today it is not working
@@ -60,8 +68,9 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, VimTestOptionType.VALUE, [VirtualEditData.onemore]))
   fun `test virtual edit delete end to end`() {
-    OptionsManager.virtualedit.set("onemore")
     doTest("D", """
             Yesterday it worke${c}d
             Today it is not working
@@ -73,8 +82,9 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, VimTestOptionType.VALUE, [VirtualEditData.onemore]))
   fun `test virtual edit delete to end from virtual space`() {
-    OptionsManager.virtualedit.set("onemore")
     doTest("D", """
             Yesterday it worked${c}
             Today it is not working
@@ -93,6 +103,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """)
+  @VimOptionDefaultAll
   fun `test simple deletion with indent`() {
     val keys = listOf("v", "D")
     val before = """
@@ -113,6 +124,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test simple deletion empty line`() {
     val keys = listOf("v", "D")
     val before = """
@@ -141,6 +153,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${c}
     """)
+  @VimOptionDefaultAll
   fun `test simple deletion last line`() {
     val keys = listOf("v", "D")
     val before = """
@@ -163,6 +176,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test simple deletion first line`() {
     val keys = listOf("v", "D")
     val before = """
@@ -183,6 +197,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test simple deletion before empty`() {
     val keys = listOf("v", "D")
     val before = """
@@ -212,6 +227,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             ${c}where it was settled on some sodden sand"""
   )
+  @VimOptionDefaultAll
   fun `test simple deletion last line without empty line`() {
     val keys = listOf("v", "D")
     val before = """
@@ -232,6 +248,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test simple deletion multiline`() {
     val keys = listOf("vj", "D")
     val before = """
@@ -251,6 +268,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test simple deletion multiline motion up`() {
     val keys = listOf("vk", "D")
     val before = """
@@ -270,6 +288,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test delete visual lines end action`() {
     typeTextInFile(parseKeys("v", "2j", "D"),
       """
@@ -285,6 +304,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     myFixture.checkResult("${c}abcd${c}e\n")
   }
 
+  @VimOptionDefaultAll
   fun `test line simple deletion`() {
     val keys = listOf("V", "D")
     val before = """
@@ -312,6 +332,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """)
+  @VimOptionDefaultAll
   fun `test line deletion with indent`() {
     val keys = listOf("V", "D")
     val before = """
@@ -332,6 +353,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test line deletion empty line`() {
     val keys = listOf("V", "D")
     val before = """
@@ -360,6 +382,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${c}
     """)
+  @VimOptionDefaultAll
   fun `test line deletion last line`() {
     val keys = listOf("V", "D")
     val before = """
@@ -389,6 +412,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             ${c}where it was settled on some sodden sand"""
   )
+  @VimOptionDefaultAll
   fun `test line deletion last line without empty line`() {
     val keys = listOf("V", "D")
     val before = """
@@ -409,6 +433,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test line deletion multiline`() {
     val keys = listOf("Vj", "D")
     val before = """
@@ -428,6 +453,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test line deletion multiline motion up`() {
     val keys = listOf("Vk", "D")
     val before = """
@@ -447,6 +473,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test line delete visual lines end action`() {
     typeTextInFile(parseKeys("V", "2j", "D"),
       """
@@ -462,6 +489,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     myFixture.checkResult("${c}abcd${c}e\n")
   }
 
+  @VimOptionDefaultAll
   fun `test block simple deletion`() {
     val keys = listOf("<C-V>", "D")
     val before = """
@@ -483,6 +511,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test block deletion empty line`() {
     val keys = listOf("<C-V>", "D")
     val before = """
@@ -504,6 +533,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test block deletion last line`() {
     val keys = listOf("<C-V>", "D")
     val before = """
@@ -527,6 +557,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test block deletion last line without empty line`() {
     val keys = listOf("<C-V>", "D")
     val before = """
@@ -546,6 +577,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test block deletion multiline`() {
     val keys = listOf("<C-V>j", "D")
     val before = """
@@ -567,6 +599,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test block deletion multiline motion up`() {
     val keys = listOf("<C-V>k", "D")
     val before = """
@@ -588,6 +621,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test delete visual block line end action`() {
     typeTextInFile(parseKeys("<C-V>", "2j", "2l", "D"),
       """
