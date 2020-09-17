@@ -460,7 +460,7 @@
  * |zF|                   TO BE IMPLEMENTED
  * |zG|                   TO BE IMPLEMENTED
  * |zH|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfWidthLeftAction}
- * |zL|                   TO BE IMPLEMENTED
+ * |zL|                   {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfWidthRightAction}
  * |zM|                   {@link com.maddyhome.idea.vim.action.fold.VimCollapseAllRegions}
  * |zN|                   TO BE IMPLEMENTED
  * |zO|                   {@link com.maddyhome.idea.vim.action.fold.VimExpandRegionRecursively}
