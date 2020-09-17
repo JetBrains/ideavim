@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
-import com.intellij.codeInsight.daemon.impl.HintRenderer
+import com.intellij.testFramework.EditorTestUtil
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -78,7 +78,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
     // Hitting 'x' on the character before the inlay should place the cursor after the inlay
     // Before: "I f|o|«:test»und it in a legendary land."
     // After: "I f«:test»|u|nd it in a legendary land."
-    myFixture.editor.inlayModel.addInlineElement(4, true, HintRenderer(":test"))
+    EditorTestUtil.addInlay(myFixture.editor, 4, true, 40)
 
     typeText(keys)
     myFixture.checkResult(after)
@@ -105,7 +105,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
     // Hitting 'x' on the character before the inlay should place the cursor after the inlay
     // Before: "I f|o|«test:»und it in a legendary land."
     // After: "I f«test:»|u|nd it in a legendary land."
-    myFixture.editor.inlayModel.addInlineElement(4, true, HintRenderer("test:"))
+    EditorTestUtil.addInlay(myFixture.editor, 4, true, 40)
 
     typeText(keys)
     myFixture.checkResult(after)

@@ -20,17 +20,11 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
-import com.intellij.codeInsight.daemon.impl.HintRenderer
+import com.intellij.testFramework.EditorTestUtil
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
-import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
-import org.jetbrains.plugins.ideavim.VimTestOptionType
+import org.jetbrains.plugins.ideavim.*
 
 class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionDefaultAll
@@ -46,7 +40,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     // Hitting 'l' on the character before the inlay should place the cursor after the inlay
     // Before: "I f|o|«test:»und it in a legendary land."
     // After: "I f«test:»|u|nd it in a legendary land."
-    myFixture.editor.inlayModel.addInlineElement(4, true, HintRenderer(":test"))
+    EditorTestUtil.addInlay(myFixture.editor, 4, true, 40)
 
     typeText(keys)
     myFixture.checkResult(after)
@@ -69,7 +63,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     // Hitting 'l' on the character before the inlay should place the cursor after the inlay
     // Before: "I f|o|«test:»und it in a legendary land."
     // After: "I fo«test:»|u|nd it in a legendary land."
-    myFixture.editor.inlayModel.addInlineElement(4, false, HintRenderer("test:"))
+    EditorTestUtil.addInlay(myFixture.editor, 4, false, 40)
 
     typeText(keys)
     myFixture.checkResult(after)

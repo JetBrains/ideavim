@@ -18,9 +18,9 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
-import com.intellij.codeInsight.daemon.impl.HintRenderer
 import com.intellij.openapi.editor.Inlay
 import com.intellij.openapi.editor.ex.util.EditorUtil
+import com.intellij.testFramework.EditorTestUtil
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -71,7 +71,7 @@ class ScrollFirstScreenColumnActionTest : VimTestCase() {
   fun `test first screen column includes previous inline inlay associated with following text`() {
     // The inlay is associated with the caret, on the left, so should appear before it when scrolling columns
     configureByColumns(200)
-    val inlay = myFixture.editor.inlayModel.addInlineElement(99, false, HintRenderer("test:"))!!
+    val inlay = EditorTestUtil.addInlay(myFixture.editor, 99, false, 40)
     typeText(parseKeys("100|", "zs"))
     val visibleArea = myFixture.editor.scrollingModel.visibleArea
     val textWidth = visibleArea.width - inlay.widthInPixels
@@ -85,7 +85,7 @@ class ScrollFirstScreenColumnActionTest : VimTestCase() {
   fun `test first screen column does not include previous inline inlay associated with preceding text`() {
     // The inlay is associated with the column before the caret, so should not affect scrolling
     configureByColumns(200)
-    myFixture.editor.inlayModel.addInlineElement(99, true, HintRenderer(":test"))!!
+    EditorTestUtil.addInlay(myFixture.editor, 99, true, 40)
     typeText(parseKeys("100|", "zs"))
     assertVisibleLineBounds(0, 99, 178)
   }
@@ -93,7 +93,7 @@ class ScrollFirstScreenColumnActionTest : VimTestCase() {
   fun `test first screen column does not include subsequent inline inlay associated with following text`() {
     // The inlay is associated with the column after the caret, so should not affect scrolling
     configureByColumns(200)
-    val inlay = myFixture.editor.inlayModel.addInlineElement(100, false, HintRenderer("test:"))!!
+    val inlay = EditorTestUtil.addInlay(myFixture.editor, 100, false, 40)
     typeText(parseKeys("100|", "zs"))
     val availableColumns = getAvailableColumns(inlay)
     assertVisibleLineBounds(0, 99, 99 + availableColumns - 1)
@@ -102,13 +102,13 @@ class ScrollFirstScreenColumnActionTest : VimTestCase() {
   fun `test first screen column does not include subsequent inline inlay associated with preceding text`() {
     // The inlay is associated with the caret column, but appears to the right of the column, so does not affect scrolling
     configureByColumns(200)
-    val inlay = myFixture.editor.inlayModel.addInlineElement(100, true, HintRenderer(":test"))!!
+    val inlay = EditorTestUtil.addInlay(myFixture.editor, 100, true, 40)
     typeText(parseKeys("100|", "zs"))
     val availableColumns = getAvailableColumns(inlay)
     assertVisibleLineBounds(0, 99, 99 + availableColumns - 1)
   }
 
-  private fun getAvailableColumns(inlay: Inlay<HintRenderer>): Int {
+  private fun getAvailableColumns(inlay: Inlay<*>): Int {
     val textWidth = myFixture.editor.scrollingModel.visibleArea.width - inlay.widthInPixels
     return textWidth / EditorUtil.getPlainSpaceWidth(myFixture.editor)
   }

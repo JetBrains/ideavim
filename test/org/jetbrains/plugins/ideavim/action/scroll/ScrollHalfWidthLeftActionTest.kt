@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
-import com.intellij.codeInsight.daemon.impl.HintRenderer
+import com.intellij.testFramework.EditorTestUtil
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -106,7 +106,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
 
   fun `test scroll includes inlay visual column in half page width`() {
     configureByColumns(200)
-    myFixture.editor.inlayModel.addInlineElement(20, true, HintRenderer(":test"))
+    EditorTestUtil.addInlay(myFixture.editor, 20, true, 40)
     typeText(parseKeys("zL"))
     // The inlay is included in the count of scrolled visual columns
     assertPosition(0, 39)
@@ -115,7 +115,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
 
   fun `test scroll with inlay in scrolled area and left of the cursor`() {
     configureByColumns(200)
-    myFixture.editor.inlayModel.addInlineElement(20, true, HintRenderer(":test"))
+    EditorTestUtil.addInlay(myFixture.editor, 20, true, 40)
     typeText(parseKeys("30|", "zL"))
     // The inlay is included in the count of scrolled visual columns
     assertPosition(0, 39)

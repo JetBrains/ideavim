@@ -18,8 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.group.motion
 
-import com.intellij.codeInsight.daemon.impl.HintRenderer
 import com.intellij.openapi.editor.ex.util.EditorUtil
+import com.intellij.testFramework.EditorTestUtil
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -91,12 +91,11 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
   fun `test moving right with inline inlay`() {
     OptionsManager.sidescroll.set(1)
     configureByColumns(200)
-    val inlayRenderer = HintRenderer(":test")
-    val inlay = myFixture.editor.inlayModel.addInlineElement(110, true, inlayRenderer)!!
+    val inlay = EditorTestUtil.addInlay(myFixture.editor, 110, true, 40)
     typeText(parseKeys("100|", "20l"))
     // These columns are hard to calculate, because the visible offset depends on the rendered width of the inlay
     // Also, because we're scrolling right (adding columns to the right) we make the right most column line up
-    val textWidth = myFixture.editor.scrollingModel.visibleArea.width - inlayRenderer.calcWidthInPixels(inlay)
+    val textWidth = myFixture.editor.scrollingModel.visibleArea.width - inlay.widthInPixels
     val availableColumns = textWidth / EditorUtil.getPlainSpaceWidth(myFixture.editor)
     assertVisibleLineBounds(0, 119 - availableColumns + 1, 119)
   }
@@ -159,11 +158,10 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
   fun `test moving left with inline inlay`() {
     OptionsManager.sidescroll.set(1)
     configureByColumns(200)
-    val inlayRenderer = HintRenderer(":test")
-    val inlay = myFixture.editor.inlayModel.addInlineElement(110, true, inlayRenderer)!!
+    val inlay = EditorTestUtil.addInlay(myFixture.editor, 110, true, 40)
     typeText(parseKeys("120|zs", "20h"))
     // These columns are hard to calculate, because the visible offset depends on the rendered width of the inlay
-    val textWidth = myFixture.editor.scrollingModel.visibleArea.width - inlayRenderer.calcWidthInPixels(inlay)
+    val textWidth = myFixture.editor.scrollingModel.visibleArea.width - inlay.widthInPixels
     val availableColumns = textWidth / EditorUtil.getPlainSpaceWidth(myFixture.editor)
     assertVisibleLineBounds(0, 99, 99 + availableColumns - 1)
   }

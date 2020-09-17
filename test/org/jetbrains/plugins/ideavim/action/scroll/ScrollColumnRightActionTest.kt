@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
-import com.intellij.codeInsight.daemon.impl.HintRenderer
+import com.intellij.testFramework.EditorTestUtil
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -121,35 +121,35 @@ class ScrollColumnRightActionTest : VimTestCase() {
 
   fun `test scroll column to right correctly scrolls inline inlay associated with preceding text`() {
     configureByColumns(200)
-    myFixture.editor.inlayModel.addInlineElement(130, true, HintRenderer(":test"))
+    EditorTestUtil.addInlay(myFixture.editor, 130, true, 40)
     typeText(parseKeys("100|"))
-    // Text at end of line is:              89:test0123
+    // Text at end of line is:              89:inlay0123
     assertVisibleLineBounds(0, 59, 133) // 75 characters wide
-    typeText(parseKeys("3zh"))  //    89:test0
+    typeText(parseKeys("3zh"))  //    89:inlay0
     assertVisibleLineBounds(0, 56, 130) // 75 characters
-    typeText(parseKeys("zh"))   //     89:test
+    typeText(parseKeys("zh"))   //     89:inlay
     assertVisibleLineBounds(0, 55, 129) // 75 characters
-    typeText(parseKeys("zh"))   //           8
+    typeText(parseKeys("zh"))   //            8
     assertVisibleLineBounds(0, 49, 128) // 80 characters
   }
 
   fun `test scroll column to right correctly scrolls inline inlay associated with following text`() {
     configureByColumns(200)
-    myFixture.editor.inlayModel.addInlineElement(130, false, HintRenderer("test:"))
+    EditorTestUtil.addInlay(myFixture.editor, 130, false, 40)
     typeText(parseKeys("100|"))
-    // Text at end of line is:              89test:0123
+    // Text at end of line is:              89inlay:0123
     assertVisibleLineBounds(0, 59, 133) // 75 characters wide
-    typeText(parseKeys("3zh"))  //    89test:0
+    typeText(parseKeys("3zh"))  //    89inlay:0
     assertVisibleLineBounds(0, 56, 130) // 75 characters
-    typeText(parseKeys("zh"))   //          89
+    typeText(parseKeys("zh"))   //           89
     assertVisibleLineBounds(0, 50, 129) // 80 characters
-    typeText(parseKeys("zh"))   //           9
+    typeText(parseKeys("zh"))   //            9
     assertVisibleLineBounds(0, 49, 128) // 80 characters
   }
 
   fun `test scroll column to right with preceding inline inlay moves cursor at end of screen`() {
     configureByColumns(200)
-    val inlay = myFixture.editor.inlayModel.addInlineElement(90, false, HintRenderer("test:"))!!
+    EditorTestUtil.addInlay(myFixture.editor, 90, false, 40)
     typeText(parseKeys("100|", "ze", "zh"))
     assertPosition(0, 98)
     assertVisibleLineBounds(0, 24, 98)

@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
-import com.intellij.codeInsight.daemon.impl.HintRenderer
+import com.intellij.testFramework.EditorTestUtil
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -114,7 +114,7 @@ class ScrollColumnLeftActionTest : VimTestCase() {
 
   fun `test scroll column to left correctly scrolls inline inlay associated with preceding text`() {
     configureByColumns(200)
-    myFixture.editor.inlayModel.addInlineElement(67, true, HintRenderer(":test"))
+    EditorTestUtil.addInlay(myFixture.editor, 67, true, 40)
     typeText(parseKeys("100|"))
     // Text at start of line is:            456:test7
     assertVisibleLineBounds(0, 64, 138)
@@ -126,7 +126,7 @@ class ScrollColumnLeftActionTest : VimTestCase() {
 
   fun `test scroll column to left correctly scrolls inline inlay associated with following text`() {
     configureByColumns(200)
-    myFixture.editor.inlayModel.addInlineElement(67, false, HintRenderer("test:"))
+    EditorTestUtil.addInlay(myFixture.editor, 67, false, 40)
     typeText(parseKeys("100|"))
     // Text at start of line is:            456test:78
     assertVisibleLineBounds(0, 64, 138)
