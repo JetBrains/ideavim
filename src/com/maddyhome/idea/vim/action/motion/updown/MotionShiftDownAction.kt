@@ -24,8 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.vimForEachCaret
+import com.maddyhome.idea.vim.helper.*
 
 /**
  * @author Alex Plate
@@ -38,10 +37,10 @@ class MotionShiftDownAction : ShiftedArrowKeyHandler() {
   override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
     editor.vimForEachCaret { caret ->
       val vertical = VimPlugin.getMotion().moveCaretVertical(editor, caret, cmd.count)
-      val col = EditorHelper.prepareLastColumn(editor, caret)
+      val col = EditorHelper.prepareLastColumn(caret)
       MotionGroup.moveCaret(editor, caret, vertical)
 
-      EditorHelper.updateLastColumn(editor, caret, col)
+      EditorHelper.updateLastColumn(caret, col)
     }
   }
 

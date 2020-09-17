@@ -80,6 +80,7 @@ object OptionsManager {
   val timeoutlen = addOption(NumberOption("timeoutlen", "tm", 1000, -1, Int.MAX_VALUE))
   val undolevels = addOption(NumberOption("undolevels", "ul", 1000, -1, Int.MAX_VALUE))
   val viminfo = addOption(ListOption("viminfo", "vi", arrayOf("'100", "<50", "s10", "h"), null))
+  val virtualedit = addOption(BoundStringOption(VirtualEditData.name, "ve", "", VirtualEditData.allValues))
   val visualbell = addOption(ToggleOption("visualbell", "vb", false))
   val wrapscan = addOption(ToggleOption("wrapscan", "ws", true))
   val visualEnterDelay = addOption(NumberOption("visualdelay", "visualdelay", 100, 0, Int.MAX_VALUE))
@@ -558,4 +559,11 @@ object StrictMode {
   fun fail(message: String) {
     if (on) error(message)
   }
+}
+
+object VirtualEditData {
+  const val name = "virtualedit"
+
+  const val onemore = "onemore"
+  val allValues = arrayOf("block", "insert", "all", onemore)
 }

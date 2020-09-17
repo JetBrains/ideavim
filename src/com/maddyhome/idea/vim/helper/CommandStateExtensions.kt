@@ -21,9 +21,21 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.action.motion.updown.*
+import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.option.OptionsManager
 
-val CommandState.Mode.isEndAllowed
+val usesVirtualSpace
+  get() = OptionsManager.virtualedit.value == "onemore"
+
+val CommandState.Mode.isEndAllowed : Boolean
+  get() = when (this) {
+    CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
+    CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -> usesVirtualSpace
+  }
+
+val CommandState.Mode.isEndAllowedIgnoringOnemore : Boolean
   get() = when (this) {
     CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
     CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -> false
@@ -78,5 +90,6 @@ val Editor.inBlockSubMode
 val Editor.inSingleCommandMode
   get() = this.subMode == CommandState.SubMode.SINGLE_COMMAND && this.inNormalMode
 
+@get:JvmName("commandState")
 val Editor?.commandState
   get() = CommandState.getInstance(this)

@@ -36,12 +36,12 @@ sealed class MotionDownBase : MotionActionHandler.ForEachCaret() {
   private var col: Int = 0
 
   override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
-    col = EditorHelper.prepareLastColumn(editor, caret)
+    col = EditorHelper.prepareLastColumn(caret)
     return true
   }
 
   override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-    EditorHelper.updateLastColumn(editor, caret, col)
+    EditorHelper.updateLastColumn(caret, col)
   }
 }
 

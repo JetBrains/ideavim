@@ -43,12 +43,9 @@ import com.maddyhome.idea.vim.command.CommandState.SubMode
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
-import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.helper.*
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
-import com.maddyhome.idea.vim.helper.TestInputModel
-import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.option.OptionsManager.getOption
 import com.maddyhome.idea.vim.option.OptionsManager.ideastrictmode

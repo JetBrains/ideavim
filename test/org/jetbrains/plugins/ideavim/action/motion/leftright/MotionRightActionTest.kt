@@ -21,11 +21,17 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.option.VirtualEditData
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
 
-class MotionRightActionTest : VimTestCase() {
+class MotionRightActionTest : VimOptionTestCase(VirtualEditData.name) {
+  @VimOptionDefaultAll
   fun `test simple motion`() {
     doTest("l", """
             A Discovery
@@ -44,6 +50,7 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test simple motion with repeat`() {
     doTest("3l", """
             A Discovery
@@ -62,6 +69,7 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test simple motion to the end`() {
     doTest("3l", """
             A Discovery
@@ -80,7 +88,36 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, VimTestOptionType.VALUE, [VirtualEditData.onemore]))
+  fun `test virtual edit motion to the end`() {
+    doTest("3l", """
+            Yesterday it worke${c}d
+            Today it is not working
+            The test is like that.
+        """.trimIndent(), """
+            Yesterday it worked${c}
+            Today it is not working
+            The test is like that.
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, VimTestOptionType.VALUE, [VirtualEditData.onemore]))
+  fun `test virtual edit motion after dollar`() {
+    doTest("\$l", """
+            Yesterday it ${c}worked
+            Today it is not working
+            The test is like that.
+        """.trimIndent(), """
+            Yesterday it worked${c}
+            Today it is not working
+            The test is like that.
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
+  @VimOptionDefaultAll
   fun `test simple motion non-ascii`() {
     doTest("l", """
             A Discovery
@@ -100,6 +137,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
+  @VimOptionDefaultAll
   fun `test simple motion emoji`() {
     doTest("l", """
             A Discovery
@@ -119,6 +157,7 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NON_ASCII)
+  @VimOptionDefaultAll
   fun `test simple motion czech`() {
     doTest("l", """
             A Discovery
@@ -137,6 +176,7 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test simple motion tab`() {
     doTest("l", """
         A Discovery
@@ -155,6 +195,7 @@ class MotionRightActionTest : VimTestCase() {
     """.trimIndent().dotToTab(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @VimOptionDefaultAll
   fun `test char visual mode`() {
     doTest(listOf("v", "ll"), """
             A Discovery
@@ -173,6 +214,7 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent(), CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @VimOptionDefaultAll
   fun `test block visual mode`() {
     doTest(listOf("<C-V>", "ll"), """
             A Discovery

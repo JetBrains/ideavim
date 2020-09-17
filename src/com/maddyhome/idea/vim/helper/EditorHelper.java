@@ -704,34 +704,40 @@ public class EditorHelper {
     return editor.offsetToVisualPosition(EditorHelper.getLineEndOffset(editor, line, allowEnd)).column;
   }
 
-  public static int prepareLastColumn(@NotNull Editor editor, @NotNull Caret caret) {
-    VisualPosition pos = caret.getVisualPosition();
+  public static int prepareLastColumn(@NotNull Caret caret) {
+    // In most cases vimLastColumn contains a correct value. But it would be incorrect if IJ will move the caret
+    //   and IdeaVim won't catch that. Here we try to detect and process this case.
+
+    int vimLastColumn = UserDataManager.getVimLastColumn(caret);
+    VisualPosition visualPosition = caret.getVisualPosition();
+
+    // Current column equals to vimLastColumn. It's great, everything is okay.
+    if (visualPosition.column == vimLastColumn) return vimLastColumn;
+
+    Editor editor = caret.getEditor();
+    boolean isEndAllowed = CommandStateHelper.isEndAllowedIgnoringOnemore(CommandStateHelper.getMode(editor));
     final LogicalPosition logicalPosition = caret.getLogicalPosition();
-    final int lastColumn = EditorHelper.lastColumnForLine(editor, logicalPosition.line, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
-    if (pos.column != lastColumn) {
-      int lColumn = pos.column;
-      int startOffset = editor.getDocument().getLineStartOffset(logicalPosition.line);
-      lColumn -= max(0, editor.getInlayModel().getInlineElementsInRange(startOffset, caret.getOffset()).size());
-      return lColumn;
-    } else {
-      return UserDataManager.getVimLastColumn(caret);
+    int lastColumn = EditorHelper.lastColumnForLine(editor, logicalPosition.line, isEndAllowed);
+
+    // Current column is somewhere at the end and vimLastColumn is greater than last column. This might be because
+    //  the previous vertical motion was from a longer line. In this case we just return vimLastColumn. But it
+    //  also might be the case decribed above: IJ did move the caret and IdeaVim didn't catch that. We don't process
+    //  this case and just return vimLastColumn with the hope that this won't be a big pain for the user.
+    // This logic can be polished in the future.
+    if ((lastColumn == visualPosition.column || lastColumn + 1 == visualPosition.column) &&
+        vimLastColumn > visualPosition.column) {
+      return vimLastColumn;
     }
+
+    // Okay here we know that something is definitely wrong. We set vimLastColumn to the current column.
+    int updatedCol = visualPosition.column;
+    updatedCol -= EditorHelperRt.getAmountOfInlaysBeforeCaret(caret);
+    UserDataManager.setVimLastColumn(caret, updatedCol);
+    return updatedCol;
   }
 
-  public static void updateLastColumn(@NotNull Editor editor, @NotNull Caret caret, int prevLastColumn) {
-    VisualPosition pos = caret.getVisualPosition();
-    final LogicalPosition logicalPosition = caret.getLogicalPosition();
-    final int lastColumn = EditorHelper.lastColumnForLine(editor, logicalPosition.line, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
-    int targetColumn;
-    if (pos.column != lastColumn) {
-      targetColumn = pos.column;
-      int startOffset = editor.getDocument().getLineStartOffset(logicalPosition.line);
-      targetColumn -= max(0, editor.getInlayModel().getInlineElementsInRange(startOffset, caret.getOffset()).size());
-    }
-    else {
-      targetColumn = prevLastColumn;
-    }
-    UserDataManager.setVimLastColumn(caret, targetColumn);
+  public static void updateLastColumn(@NotNull Caret caret, int prevLastColumn) {
+    UserDataManager.setVimLastColumn(caret, prevLastColumn);
   }
 
   private static int scrollFullPageDown(final @NotNull Editor editor, int pages) {
