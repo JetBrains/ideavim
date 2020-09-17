@@ -20,7 +20,6 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
-import com.intellij.testFramework.EditorTestUtil
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
@@ -40,7 +39,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     // Hitting 'l' on the character before the inlay should place the cursor after the inlay
     // Before: "I f|o|«test:»und it in a legendary land."
     // After: "I f«test:»|u|nd it in a legendary land."
-    EditorTestUtil.addInlay(myFixture.editor, 4, true, 40)
+    addInlay(4, true, 5)
 
     typeText(keys)
     myFixture.checkResult(after)
@@ -63,7 +62,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     // Hitting 'l' on the character before the inlay should place the cursor after the inlay
     // Before: "I f|o|«test:»und it in a legendary land."
     // After: "I fo«test:»|u|nd it in a legendary land."
-    EditorTestUtil.addInlay(myFixture.editor, 4, false, 40)
+    addInlay(4, false, 5)
 
     typeText(keys)
     myFixture.checkResult(after)

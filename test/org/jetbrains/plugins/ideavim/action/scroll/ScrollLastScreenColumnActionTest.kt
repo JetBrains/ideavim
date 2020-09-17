@@ -20,7 +20,6 @@ package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.intellij.openapi.editor.Inlay
 import com.intellij.openapi.editor.ex.util.EditorUtil
-import com.intellij.testFramework.EditorTestUtil
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -70,7 +69,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
     // The offset should include space for the inlay
     OptionsManager.sidescrolloff.set(10)
     configureByColumns(200)
-    val inlay = EditorTestUtil.addInlay(myFixture.editor, 101, true, 40)
+    val inlay = addInlay(101, true, 5)
     typeText(StringHelper.parseKeys("100|", "ze"))
     val availableColumns = getAvailableColumns(inlay)
     // Rightmost text column will still be the same, even if it's offset by an inlay
@@ -85,7 +84,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
     // The inlay is associated with the column before the caret, appears on the left of the caret, so does not affect
     // the last visible column
     configureByColumns(200)
-    val inlay = EditorTestUtil.addInlay(myFixture.editor, 99, true, 40)
+    val inlay = addInlay(99, true, 5)
     typeText(StringHelper.parseKeys("100|", "ze"))
     val availableColumns = getAvailableColumns(inlay)
     assertVisibleLineBounds(0, 99 - availableColumns + 1, 99)
@@ -94,7 +93,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
   fun `test last screen column does not include previous inline inlay associated with following text`() {
     // The inlay is associated with the caret, but appears on the left, so does not affect the last visible column
     configureByColumns(200)
-    val inlay = EditorTestUtil.addInlay(myFixture.editor, 99, false, 40)
+    val inlay = addInlay(99, false, 5)
     typeText(StringHelper.parseKeys("100|", "ze"))
     val availableColumns = getAvailableColumns(inlay)
     assertVisibleLineBounds(0, 99 - availableColumns + 1, 99)
@@ -103,7 +102,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
   fun `test last screen column includes subsequent inline inlay associated with preceding text`() {
     // The inlay is inserted after the caret and relates to the caret column. It should still be visible
     configureByColumns(200)
-    val inlay = EditorTestUtil.addInlay(myFixture.editor, 100, true, 40)
+    val inlay = addInlay(100, true, 5)
     typeText(StringHelper.parseKeys("100|", "ze"))
     val visibleArea = myFixture.editor.scrollingModel.visibleArea
     val textWidth = visibleArea.width - inlay.widthInPixels
@@ -121,7 +120,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
     // The inlay is inserted after the caret, and relates to text after the caret. It should not affect the last visible
     // column
     configureByColumns(200)
-    EditorTestUtil.addInlay(myFixture.editor, 100, false, 40)
+    addInlay(100, false, 5)
     typeText(StringHelper.parseKeys("100|", "ze"))
     assertVisibleLineBounds(0, 20, 99)
   }

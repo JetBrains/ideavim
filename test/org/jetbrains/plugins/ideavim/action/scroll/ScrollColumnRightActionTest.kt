@@ -18,7 +18,6 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
-import com.intellij.testFramework.EditorTestUtil
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -121,7 +120,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
 
   fun `test scroll column to right correctly scrolls inline inlay associated with preceding text`() {
     configureByColumns(200)
-    EditorTestUtil.addInlay(myFixture.editor, 130, true, 40)
+    addInlay(130, true, 5)
     typeText(parseKeys("100|"))
     // Text at end of line is:              89:inlay0123
     assertVisibleLineBounds(0, 59, 133) // 75 characters wide
@@ -135,7 +134,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
 
   fun `test scroll column to right correctly scrolls inline inlay associated with following text`() {
     configureByColumns(200)
-    EditorTestUtil.addInlay(myFixture.editor, 130, false, 40)
+    addInlay(130, false, 5)
     typeText(parseKeys("100|"))
     // Text at end of line is:              89inlay:0123
     assertVisibleLineBounds(0, 59, 133) // 75 characters wide
@@ -149,7 +148,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
 
   fun `test scroll column to right with preceding inline inlay moves cursor at end of screen`() {
     configureByColumns(200)
-    EditorTestUtil.addInlay(myFixture.editor, 90, false, 40)
+    addInlay(90, false, 5)
     typeText(parseKeys("100|", "ze", "zh"))
     assertPosition(0, 98)
     assertVisibleLineBounds(0, 24, 98)

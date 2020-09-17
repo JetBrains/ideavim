@@ -19,7 +19,6 @@
 package org.jetbrains.plugins.ideavim.group.motion
 
 import com.intellij.openapi.editor.ex.util.EditorUtil
-import com.intellij.testFramework.EditorTestUtil
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -91,7 +90,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
   fun `test moving right with inline inlay`() {
     OptionsManager.sidescroll.set(1)
     configureByColumns(200)
-    val inlay = EditorTestUtil.addInlay(myFixture.editor, 110, true, 40)
+    val inlay = addInlay(110, true, 5)
     typeText(parseKeys("100|", "20l"))
     // These columns are hard to calculate, because the visible offset depends on the rendered width of the inlay
     // Also, because we're scrolling right (adding columns to the right) we make the right most column line up
@@ -158,7 +157,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
   fun `test moving left with inline inlay`() {
     OptionsManager.sidescroll.set(1)
     configureByColumns(200)
-    val inlay = EditorTestUtil.addInlay(myFixture.editor, 110, true, 40)
+    val inlay = addInlay(110, true, 5)
     typeText(parseKeys("120|zs", "20h"))
     // These columns are hard to calculate, because the visible offset depends on the rendered width of the inlay
     val textWidth = myFixture.editor.scrollingModel.visibleArea.width - inlay.widthInPixels

@@ -23,11 +23,9 @@ import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.ide.highlighter.XmlFileType
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.application.WriteAction
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.LogicalPosition
-import com.intellij.openapi.editor.VisualPosition
+import com.intellij.openapi.editor.*
 import com.intellij.openapi.editor.colors.EditorColors
+import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.PlainTextFileType
@@ -387,6 +385,14 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected val fileManager: FileEditorManagerEx
     get() = FileEditorManagerEx.getInstanceEx(myFixture.project)
+
+  protected fun addInlay(offset: Int, relatesToPrecedingText: Boolean, widthInColumns: Int): Inlay<*> {
+    // Enforce deterministic tests for inlays. Default text char width is different per platform (e.g. Windows is 7 and
+    // Mac is 8) and using the same inlay width on all platforms can cause columns to be on or off screen unexpectedly.
+    // If inlay width is related to character width, we will scale correctly across different platforms
+    val columnWidth = EditorUtil.getPlainSpaceWidth(myFixture.editor)
+    return EditorTestUtil.addInlay(myFixture.editor, offset, relatesToPrecedingText, widthInColumns * columnWidth)!!
+  }
 
   companion object {
     const val c = EditorTestUtil.CARET_TAG
