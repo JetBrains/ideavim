@@ -95,7 +95,7 @@
     </group>
 
     <action id="VimFindActionIdAction"
-            class="com.maddyhome.idea.vim.listener.FindActionIdAction" text="Track Action Ids"
+            class="com.maddyhome.idea.vim.listener.FindActionIdAction" text="IdeaVim: Track Action Ids"
             description="Starts tracking ids of executed actions"/>
   </actions>
 </idea-plugin>
