@@ -48,7 +48,7 @@ class AddInlineInlaysAction : AnAction() {
       // We don't need a custom renderer, just use the standard parameter hint renderer
       inlayModel.addInlineElement(offset, relatesToPrecedingText, HintRenderer(if (relatesToPrecedingText) ":$text" else "$text:"))
       // Every 20 chars +/- 5 chars
-      i+= 20 + (random.nextInt(10) - 5)
+      i += 20 + (random.nextInt(10) - 5)
     }
   }
 
