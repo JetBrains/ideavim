@@ -150,13 +150,14 @@ class NotificationService(private val project: Project?) {
 
   private object ActionIdNotifier {
     private var notification: Notification? = null
-    private const val NO_ID = "<i>No Action Id</i>"
+    private const val NO_ID = "<i>Cannot detect action id</i>"
 
     fun notifyActionId(id: String?, project: Project?) {
 
       notification?.expire()
 
-      Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, "Action id: ${id ?: NO_ID}", NotificationType.INFORMATION).let {
+      val content = if (id != null) "Action id: $id" else NO_ID
+      Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, content, NotificationType.INFORMATION).let {
         notification = it
         it.whenExpired { notification = null }
         it.setContent(it.content + "<br><br><small>Use Event Log to see previous ids</small>")
