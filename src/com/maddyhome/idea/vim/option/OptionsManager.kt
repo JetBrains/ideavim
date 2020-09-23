@@ -552,6 +552,14 @@ object IdeaStatusIcon {
   val allValues = arrayOf(enabled, gray, disabled)
 }
 
+object ScrollOffData {
+  const val name = "scrolloff"
+}
+
+object ScrollJumpData {
+  const val name = "scrolljump"
+}
+
 object StrictMode {
   val on: Boolean
     get() = OptionsManager.ideastrictmode.isSet
@@ -566,12 +574,4 @@ object VirtualEditData {
 
   const val onemore = "onemore"
   val allValues = arrayOf("block", "insert", "all", onemore)
-}
-
-object ScrollOffData {
-  const val name = "scrolloff"
-}
-
-object ScrollJumpData {
-  const val name = "scrolljump"
 }
