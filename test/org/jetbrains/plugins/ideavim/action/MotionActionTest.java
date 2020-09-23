@@ -559,6 +559,41 @@ public class MotionActionTest extends VimTestCase {
   }
 
   // |w|
+  public void testCjkToPunctuation() {
+    typeTextInFile(parseKeys("w"),
+      "测试<caret>测试!!!");
+    assertOffset(4);
+  }
+
+  // |w|
+  public void testCjkToFullWidthPunctuation() {
+    typeTextInFile(parseKeys("w"),
+      "测试<caret>测试！！！");
+    assertOffset(4);
+  }
+
+  // |w|
+  public void testCjkToDigits() {
+    typeTextInFile(parseKeys("w"),
+      "测试<caret>测试123");
+    assertOffset(4);
+  }
+
+  // |w|
+  public void testCjkToFullWidthLatin() {
+    typeTextInFile(parseKeys("w"),
+      "测试<caret>测试ＡＡＡ");
+    assertOffset(4);
+  }
+
+  // |w|
+  public void testCjkToFullWidthDigits() {
+    typeTextInFile(parseKeys("w"),
+      "测试<caret>测试３３３");
+    assertOffset(4);
+  }
+
+  // |w|
   public void testEmptyLineIsWord() {
     typeTextInFile(parseKeys("w"),
                    "<caret>one\n" +
