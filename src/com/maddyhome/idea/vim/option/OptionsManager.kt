@@ -87,7 +87,7 @@ object OptionsManager {
   val idearefactormode = addOption(BoundStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues))
   val ideastatusicon = addOption(BoundStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues))
   val ideastrictmode = addOption(ToggleOption("ideastrictmode", "ideastrictmode", false))
-  val ideawaonw = addOption(ToggleOption("ideawaonw", "ideawaonw", true))
+  val ideawrite = addOption(BoundStringOption("ideawrite", "ideawrite", IdeaWriteData.all, IdeaWriteData.allValues))
 
   // Dev only experimental options
   val dialogescape = addOption(BoundStringOption("dialogescape", "de", "legacy", arrayOf("legacy", "on", "off")))
@@ -574,4 +574,10 @@ object VirtualEditData {
 
   const val onemore = "onemore"
   val allValues = arrayOf("block", "insert", "all", onemore)
+}
+
+object IdeaWriteData {
+  const val all = "all"
+
+  val allValues = arrayOf(all, "file")
 }

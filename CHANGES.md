@@ -34,7 +34,7 @@ To Be Released
 * [VIM-2099](https://youtrack.jetbrains.com/issue/VIM-2099) Fix operations with backward inclusive motions
 
 **Changes:**
-* `:w` works as `:wa` by default. This can be disabled with `ideawaonw` option.
+* `:w` works as `:wa` by default. This can be disabled with `ideawrite` option.
  
     Now features like `Prettier on save` or `Run on save for files` would work with `:w` command as well.
   
