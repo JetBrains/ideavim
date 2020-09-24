@@ -43,7 +43,8 @@ import com.maddyhome.idea.vim.option.ToggleOption
 abstract class VimOptionTestCase(option: String, vararg otherOptions: String) : VimTestCase() {
   private val options: Set<String> = setOf(option, *otherOptions)
 
-  override fun runTest() {
+  override fun setUp() {
+    super.setUp()
     val testMethod = this.javaClass.getMethod(this.name)
     if (!testMethod.isAnnotationPresent(VimOptionDefaultAll::class.java)) {
       if (!testMethod.isAnnotationPresent(VimOptionTestConfiguration::class.java)) kotlin.test.fail("You should add VimOptionTestConfiguration with options for this method")
@@ -89,7 +90,6 @@ abstract class VimOptionTestCase(option: String, vararg otherOptions: String) : 
         }
       }
     }
-    super.runTest()
   }
 }
 
