@@ -4,6 +4,7 @@
   <change-notes><![CDATA[
       <ul>
         <li>Support of `virtualedit=onemore`</li>
+        <li>A lot of fixes for scrolling</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
     ]]></change-notes>

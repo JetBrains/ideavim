@@ -32,6 +32,11 @@ To Be Released
 * [VIM-2097](https://youtrack.jetbrains.com/issue/VIM-2097) Do not apply mappings for register selecting
 * [VIM-2080](https://youtrack.jetbrains.com/issue/VIM-2080) Fix S command with count
 * [VIM-2099](https://youtrack.jetbrains.com/issue/VIM-2099) Fix operations with backward inclusive motions
+* [VIM-2104](https://youtrack.jetbrains.com/issue/VIM-2104) Use `sidescrolloff` for horizontal offset
+* [VIM-1080](https://youtrack.jetbrains.com/issue/VIM-1080) Fix `zt` for virtual space enabled
+* [VIM-1556](https://youtrack.jetbrains.com/issue/VIM-1556) Fix horizontal scrolling
+* [VIM-1770](https://youtrack.jetbrains.com/issue/VIM-1770) Fix goto end with large inline hints
+* [VIM-2110](https://youtrack.jetbrains.com/issue/VIM-2110) Fix scrolling for non-monospaced fonts
 
 **Changes:**
 * `:w` works as `:wa` by default. This can be disabled with `ideawrite` option.
@@ -43,6 +48,7 @@ To Be Released
 **Merged PRs:**
 * [248](https://github.com/JetBrains/ideavim/pull/248) by [Yaohui Wang](https://github.com/yaohui-wyh): Check if project is disposed when editorDeinit
 * [242](https://github.com/JetBrains/ideavim/pull/242) by [Iain Ballard](https://github.com/i-e-b): Partial implementation of virtualedit config
+* [252](https://github.com/JetBrains/ideavim/pull/252) by [Matt Ellis](https://github.com/citizenmatt): Fixes for scrolling
 
 0.59, 2020-08-25
 ------------
