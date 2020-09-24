@@ -27,6 +27,6 @@ class MotionScrollFirstScreenColumnAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    return VimPlugin.getMotion().scrollColumnToFirstScreenColumn(editor)
+    return VimPlugin.getMotion().scrollCaretColumnToFirstScreenColumn(editor)
   }
 }

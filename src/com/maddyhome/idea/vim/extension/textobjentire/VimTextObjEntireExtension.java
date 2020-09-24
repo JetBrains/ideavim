@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.extension.VimExtension;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
+import com.maddyhome.idea.vim.helper.InlayHelperKt;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import org.jetbrains.annotations.NotNull;
@@ -140,7 +141,7 @@ public class VimTextObjEntireExtension implements VimExtension {
               if (commandState.getMode() == CommandState.Mode.VISUAL) {
                 vimSetSelection(caret, range.getStartOffset(), range.getEndOffset() - 1, true);
               } else {
-                caret.moveToOffset(range.getStartOffset());
+                InlayHelperKt.moveToInlayAwareOffset(caret, range.getStartOffset());
               }
             }
           }

@@ -41,7 +41,7 @@ import java.util.*
 import javax.swing.UIManager
 import kotlin.math.max
 
-class AddInlaysAction : AnAction() {
+class AddBlockInlaysAction : AnAction() {
   override fun actionPerformed(e: AnActionEvent) {
     val dataContext = e.dataContext
     val editor = getEditor(dataContext) ?: return
@@ -111,7 +111,7 @@ class AddInlaysAction : AnAction() {
       return if (text == null) 0 else fontMetrics.stringWidth(text)
     }
 
-    private inner class MyFontMetrics internal constructor(editor: Editor, familyName: String?, size: Int) {
+    private inner class MyFontMetrics(editor: Editor, familyName: String?, size: Int) {
       val metrics: FontMetrics
       fun isActual(editor: Editor, familyName: String, size: Int): Boolean {
         val font = metrics.font

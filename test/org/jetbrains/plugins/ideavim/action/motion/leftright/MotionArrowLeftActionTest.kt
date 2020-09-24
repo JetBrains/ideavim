@@ -21,16 +21,57 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
-import org.jetbrains.plugins.ideavim.SkipNeovimReason
-import org.jetbrains.plugins.ideavim.TestWithoutNeovim
-import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
-import org.jetbrains.plugins.ideavim.VimTestOptionType
+import org.jetbrains.plugins.ideavim.*
 
 class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
+  @VimOptionDefaultAll
+  fun `test with inlay related to preceding text`() {
+    val keys = parseKeys("h")
+    val before = "I fou${c}nd it in a legendary land"
+    val after = "I fo${c}und it in a legendary land"
+    configureByText(before)
+
+    // The inlay is inserted at offset 4 (0 based) - the 'u' in "found". It occupies visual column 4, and is associated
+    // with the text in visual column 5 ('u' - because the inlay pushes it one visual column to the right).
+    // Kotlin parameter hints are a real world example of inlays related to following text.
+    // Hitting 'l' on the character before the inlay should place the cursor after the inlay
+    // Before: "I f|o|«test:»und it in a legendary land."
+    // After: "I f«test:»|u|nd it in a legendary land."
+    addInlay(4, true, 5)
+
+    typeText(keys)
+    myFixture.checkResult(after)
+
+    // The cursor starts at offset 5 and moves to offset 4. Offset 4 contains both the inlay and the next character, at
+    // visual positions 4 and 5 respectively. We always want the cursor to move to the next character, not the inlay.
+    assertVisualPosition(0, 5)
+  }
+
+  @VimOptionDefaultAll
+  fun `test with inlay related to following text`() {
+    val keys = parseKeys("h")
+    val before = "I fou${c}nd it in a legendary land"
+    val after = "I fo${c}und it in a legendary land"
+    configureByText(before)
+
+    // The inlay is inserted at offset 4 (0 based) - the 'u' in "found". It occupies visual column 4, and is associated
+    // with the text in visual column 5 ('u' - because the inlay pushes it one visual column to the right).
+    // Kotlin parameter hints are a real world example of inlays related to following text.
+    // Hitting 'l' on the character before the inlay should place the cursor after the inlay
+    // Before: "I f|o|«test:»und it in a legendary land."
+    // After: "I fo«test:»|u|nd it in a legendary land."
+    addInlay(4, false, 5)
+
+    typeText(keys)
+    myFixture.checkResult(after)
+
+    // The cursor starts at offset 5 and moves to offset 4. Offset 4 contains both the inlay and the next character, at
+    // visual positions 4 and 5 respectively. We always want the cursor to move to the next character, not the inlay.
+    assertVisualPosition(0, 5)
+  }
+
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test visual default options`() {

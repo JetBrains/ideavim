@@ -27,6 +27,6 @@ class MotionScrollLastScreenColumnAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    return VimPlugin.getMotion().scrollColumnToLastScreenColumn(editor)
+    return VimPlugin.getMotion().scrollCaretColumnToLastScreenColumn(editor)
   }
 }

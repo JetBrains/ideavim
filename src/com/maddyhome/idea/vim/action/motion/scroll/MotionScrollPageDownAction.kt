@@ -35,6 +35,8 @@ class MotionScrollPageDownAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP)
+
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     return VimPlugin.getMotion().scrollFullPage(editor, cmd.count)
   }
@@ -44,15 +46,13 @@ class MotionScrollPageDownInsertModeAction : VimActionHandler.SingleExecution(),
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.CTRL_DOWN_MASK)),
-    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, KeyEvent.CTRL_DOWN_MASK)),
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_DOWN_MASK)),
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, KeyEvent.SHIFT_DOWN_MASK))
   )
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP, CommandFlags.FLAG_CLEAR_STROKES)
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     return VimPlugin.getMotion().scrollFullPage(editor, cmd.count)

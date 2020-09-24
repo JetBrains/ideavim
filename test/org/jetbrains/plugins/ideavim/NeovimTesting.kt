@@ -104,6 +104,7 @@ annotation class TestWithoutNeovim(val reason: SkipNeovimReason, val description
 enum class SkipNeovimReason {
   PLUGIN,
   MULTICARET,
+  INLAYS,
   OPTION,
   UNCLEAR,
   NON_ASCII,

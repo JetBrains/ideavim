@@ -37,6 +37,7 @@ import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.event.EditorMouseEvent;
 import com.intellij.openapi.editor.event.EditorMouseListener;
 import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.editor.impl.TextRangeInterval;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
@@ -627,8 +628,7 @@ public class ChangeGroup {
             final String pad = EditorHelper.pad(editor, context, logicalLine + i, repeatColumn);
             if (pad.length() > 0) {
               final int offset = editor.getDocument().getLineEndOffset(logicalLine + i);
-              caret.moveToOffset(offset);
-              insertText(editor, caret, pad);
+              insertText(editor, caret, offset, pad);
             }
           }
           if (repeatColumn >= MotionGroup.LAST_COLUMN) {
@@ -714,7 +714,7 @@ public class ChangeGroup {
       final boolean res = deleteText(editor, new TextRange(caret.getOffset(), endOffset), SelectionType.CHARACTER_WISE);
       final int pos = caret.getOffset();
       final int norm = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, pos, isChange);
-      if (norm != pos) {
+      if (norm != pos || editor.offsetToVisualPosition(norm) != EditorUtil.inlayAwareOffsetToVisualPosition(editor, norm)) {
         MotionGroup.moveCaret(editor, caret, norm);
       }
 
@@ -1044,13 +1044,12 @@ public class ChangeGroup {
 
     // Indent new line if we replaced with a newline
     if (ch == '\n') {
-      caret.moveToOffset(offset + 1);
-      insertText(editor, caret, space);
+      insertText(editor, caret, offset + 1, space);
       int slen = space.length();
       if (slen == 0) {
         slen++;
       }
-      caret.moveToOffset(offset + slen);
+      InlayHelperKt.moveToInlayAwareOffset(caret, offset + slen);
     }
 
     return true;
@@ -1343,12 +1342,11 @@ public class ChangeGroup {
       if (column < MotionGroup.LAST_COLUMN && lineLength < column) {
         final String pad = EditorHelper.pad(editor, context, line, column);
         final int offset = editor.getDocument().getLineEndOffset(line);
-        caret.moveToOffset(offset);
-        insertText(editor, caret, pad);
+        insertText(editor, caret, offset, pad);
       }
 
       if (range.isMultiple() || !append) {
-        caret.moveToOffset(editor.logicalPositionToOffset(new LogicalPosition(line, column)));
+        InlayHelperKt.moveToInlayAwareLogicalPosition(caret, new LogicalPosition(line, column));
       }
       if (range.isMultiple()) {
         setInsertRepeat(lines, column, append);
@@ -1587,12 +1585,19 @@ public class ChangeGroup {
    * @param caret  The caret to start insertion in
    * @param str    The text to insert
    */
-  public void insertText(@NotNull Editor editor, @NotNull Caret caret, @NotNull String str) {
-    int start = caret.getOffset();
-    editor.getDocument().insertString(start, str);
-    caret.moveToOffset(start + str.length());
+  public void insertText(@NotNull Editor editor, @NotNull Caret caret, int offset, @NotNull String str) {
+    editor.getDocument().insertString(offset, str);
+    InlayHelperKt.moveToInlayAwareOffset(caret, offset + str.length());
 
-    VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, start);
+    VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, offset);
+  }
+
+  public void insertText(@NotNull Editor editor, @NotNull Caret caret, @NotNull String str) {
+    insertText(editor, caret, caret.getOffset(), str);
+  }
+
+  public void insertText(@NotNull Editor editor, @NotNull Caret caret, @NotNull LogicalPosition start, @NotNull String str) {
+    insertText(editor, caret, editor.logicalPositionToOffset(start), str);
   }
 
   public void indentMotion(@NotNull Editor editor,
@@ -1651,8 +1656,7 @@ public class ChangeGroup {
           int len = EditorHelper.getLineLength(editor, l);
           if (len > from) {
             LogicalPosition spos = new LogicalPosition(l, from);
-            caret.moveToOffset(editor.logicalPositionToOffset(spos));
-            insertText(editor, caret, indent);
+            insertText(editor, caret, spos, indent);
           }
         }
       }
@@ -1861,7 +1865,7 @@ public class ChangeGroup {
       replaceText(editor, rangeToReplace.getFirst().getStartOffset(), rangeToReplace.getFirst().getEndOffset(), newNumber);
     }
 
-    caret.moveToOffset(selectedRange.getStartOffset());
+    InlayHelperKt.moveToInlayAwareOffset(caret, selectedRange.getStartOffset());
     return true;
   }
 
@@ -1896,7 +1900,7 @@ public class ChangeGroup {
     }
     else {
       replaceText(editor, range.getFirst().getStartOffset(), range.getFirst().getEndOffset(), newNumber);
-      caret.moveToOffset(range.getFirst().getStartOffset() + newNumber.length() - 1);
+      InlayHelperKt.moveToInlayAwareOffset(caret, range.getFirst().getStartOffset() + newNumber.length() - 1);
       return true;
     }
   }

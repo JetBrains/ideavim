@@ -66,8 +66,8 @@ object OptionsManager {
   val number = addOption(ToggleOption("number", "nu", false))
   val relativenumber = addOption(ToggleOption("relativenumber", "rnu", false))
   val scroll = addOption(NumberOption("scroll", "scr", 0))
-  val scrolljump = addOption(NumberOption("scrolljump", "sj", 1))
-  val scrolloff = addOption(NumberOption("scrolloff", "so", 0))
+  val scrolljump = addOption(NumberOption(ScrollJumpData.name, "sj", 1, -100, Integer.MAX_VALUE))
+  val scrolloff = addOption(NumberOption(ScrollOffData.name, "so", 0))
   val selection = addOption(BoundStringOption("selection", "sel", "inclusive", arrayOf("old", "inclusive", "exclusive")))
   val selectmode = addOption(SelectModeOptionData.option)
   val showcmd = addOption(ToggleOption("showcmd", "sc", true))  // Vim: Off by default on platforms with possibly slow tty. On by default elsewhere.
@@ -316,7 +316,7 @@ object OptionsManager {
     cols.sortBy { it.name }
     extra.sortBy { it.name }
 
-    var width = EditorHelper.getScreenWidth(editor)
+    var width = EditorHelper.getApproximateScreenWidth(editor)
     if (width < 20) {
       width = 80
     }
@@ -550,6 +550,14 @@ object IdeaStatusIcon {
 
   const val name = "ideastatusicon"
   val allValues = arrayOf(enabled, gray, disabled)
+}
+
+object ScrollOffData {
+  const val name = "scrolloff"
+}
+
+object ScrollJumpData {
+  const val name = "scrolljump"
 }
 
 object StrictMode {

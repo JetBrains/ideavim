@@ -75,7 +75,8 @@
     </action>
 
     <!-- Internal -->
-    <action id="VimInternalAddInlays" class="com.maddyhome.idea.vim.action.internal.AddInlaysAction" text="Add Test Inlays | IdeaVim Internal" internal="true"/>
+    <action id="VimInternalAddBlockInlays" class="com.maddyhome.idea.vim.action.internal.AddBlockInlaysAction" text="Add Test Block Inlays | IdeaVim Internal" internal="true"/>
+    <action id="VimInternalAddInlineInlays" class="com.maddyhome.idea.vim.action.internal.AddInlineInlaysAction" text="Add Test Inline Inlays | IdeaVim Internal" internal="true"/>
 
     <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction"/>
     <action id="VimActions" class="com.maddyhome.idea.vim.ui.VimActions"/>

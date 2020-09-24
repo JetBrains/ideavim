@@ -81,7 +81,7 @@ public class DigraphGroup {
   }
 
   private void showDigraphs(@NotNull Editor editor) {
-    int width = EditorHelper.getScreenWidth(editor);
+    int width = EditorHelper.getApproximateScreenWidth(editor);
     if (width < 10) {
       width = 80;
     }

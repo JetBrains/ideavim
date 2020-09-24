@@ -21,18 +21,24 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.enumSetOf
+import java.util.*
 
 class MotionScrollFirstScreenLinePageStartAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP)
+
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    var line = cmd.rawCount
-    if (line == 0) {
-      val nextVisualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor) + 1
-      line = EditorHelper.visualLineToLogicalLine(editor, nextVisualLine) + 1 // rawCount is 1 based
+    var rawCount = cmd.rawCount
+    if (rawCount == 0) {
+      val nextVisualLine = EditorHelper.normalizeVisualLine(editor,
+        EditorHelper.getVisualLineAtBottomOfScreen(editor) + 1)
+      rawCount = EditorHelper.visualLineToLogicalLine(editor, nextVisualLine) + 1 // rawCount is 1 based
     }
-    return VimPlugin.getMotion().scrollLineToFirstScreenLine(editor, line, true)
+    return VimPlugin.getMotion().scrollLineToFirstScreenLine(editor, rawCount, true)
   }
 }

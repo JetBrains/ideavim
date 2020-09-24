@@ -78,7 +78,7 @@ fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
         val lineEnd = EditorHelper.getLineEndForOffset(this, it.offset)
         val lineStart = EditorHelper.getLineStartForOffset(this, it.offset)
         if (it.offset == lineEnd && it.offset != lineStart) {
-          it.moveToOffset(it.offset - 1)
+          it.moveToInlayAwareOffset(it.offset - 1)
         }
       }
     }
