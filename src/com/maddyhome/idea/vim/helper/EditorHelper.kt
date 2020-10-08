@@ -20,7 +20,7 @@
 
 package com.maddyhome.idea.vim.helper
 
-import com.intellij.ide.scratch.ScratchFileService
+import com.intellij.ide.ui.laf.darcula.DarculaUIUtil
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
@@ -36,13 +36,14 @@ val Editor.fileSize: Int
  *   So, we should enable IdeaVim for such editors and disable it on the first interaction
  */
 val Editor.isIdeaVimDisabledHere: Boolean
-  get() = (isOneLineMode || disabledForThisEditor) && !OptionsManager.oneline.isSet
-
-val Editor.disabledForThisEditor: Boolean
-  get() = isDatabaseCell || disabledInDialog
+  get() {
+    return disabledInDialog
+      || isDatabaseCell && !OptionsManager.oneline.isSet
+      || isOneLineMode && !OptionsManager.oneline.isSet
+  }
 
 private val Editor.isDatabaseCell: Boolean
-  get() = ScratchFileService.findRootType(EditorHelper.getVirtualFile(this))?.id == "consoles/.datagrid"
+  get() = DarculaUIUtil.isTableCellEditor(this.component)
 
 private val Editor.disabledInDialog: Boolean
   get() = OptionsManager.dialogescape.value == "off" && (!this.isPrimaryEditor() && !EditorHelper.isFileEditor(this))

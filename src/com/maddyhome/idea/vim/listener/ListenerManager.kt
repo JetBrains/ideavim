@@ -49,8 +49,21 @@ import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.FileGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SearchGroup
-import com.maddyhome.idea.vim.group.visual.*
-import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
+import com.maddyhome.idea.vim.group.visual.VimVisualTimer
+import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
+import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.StatisticReporter
+import com.maddyhome.idea.vim.helper.exitSelectMode
+import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.helper.inSelectMode
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
+import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
+import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.remove
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -139,8 +152,6 @@ object VimListenerManager {
 
     fun add(editor: Editor) {
 
-      if (editor.disabledForThisEditor) return
-
       editor.contentComponent.addKeyListener(VimKeyListener)
       val eventFacade = EventFacade.getInstance()
       eventFacade.addEditorMouseListener(editor, EditorMouseHandler)
@@ -154,8 +165,6 @@ object VimListenerManager {
     }
 
     fun remove(editor: Editor, isReleased: Boolean) {
-
-      if (editor.disabledForThisEditor) return
 
       editor.contentComponent.removeKeyListener(VimKeyListener)
       val eventFacade = EventFacade.getInstance()
