@@ -21,12 +21,14 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.ide.ui.laf.darcula.DarculaUIUtil
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.maddyhome.idea.vim.option.OptionsManager
+import kotlin.system.measureTimeMillis
 
 val Editor.fileSize: Int
   get() = document.textLength
@@ -37,9 +39,16 @@ val Editor.fileSize: Int
  */
 val Editor.isIdeaVimDisabledHere: Boolean
   get() {
-    return disabledInDialog
-      || isDatabaseCell && !OptionsManager.oneline.isSet
-      || isOneLineMode && !OptionsManager.oneline.isSet
+    var res = true
+    val timeForCalculation = measureTimeMillis {
+      res = (disabledInDialog
+        || isDatabaseCell && !OptionsManager.oneline.isSet
+        || isOneLineMode && !OptionsManager.oneline.isSet)
+    }
+    if (timeForCalculation > 10) {
+      logger<Editor>().error("Time for calculation of 'isIdeaVimDisabledHere' took $timeForCalculation ms.")
+    }
+    return res
   }
 
 private val Editor.isDatabaseCell: Boolean
