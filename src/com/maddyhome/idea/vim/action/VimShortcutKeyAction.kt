@@ -123,8 +123,9 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
   }
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
-    return (editor.isPrimaryEditor() || EditorHelper.isFileEditor(editor) && !editor.inNormalMode) ||
-      (OptionsManager.dialogescape.value == "on" && !editor.inNormalMode)
+    return editor.isPrimaryEditor()
+      || EditorHelper.isFileEditor(editor) && !editor.inNormalMode
+      || OptionsManager.dialogescape.value == "on" && !editor.inNormalMode
   }
 
   private fun isShortcutConflict(keyStroke: KeyStroke): Boolean {
