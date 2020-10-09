@@ -130,7 +130,7 @@ public class FileGroup {
       return res;
     }
     final Ref<VirtualFile> result = Ref.create();
-    final VirtualFileVisitor<Object> visitor = new VirtualFileVisitor<>() {
+    final VirtualFileVisitor<Object> visitor = new VirtualFileVisitor<Object>() {
       @Override
       public boolean visitFile(@NotNull VirtualFile file) {
         if (file.getName().equals(filename)) {
