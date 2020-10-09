@@ -120,7 +120,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                  - gray - use the gray version of the icon
                  - disabled - hide the icon
 
-    `ideawrite`     `ideawrite` String (default "all") [To Be Released]
+    `ideawrite`     `ideawrite` String (default "all")
                   "file" or "all". Defines the behaviour of ":w" command.
                   Value "all" enables execution of ":wa" (save all) command on ":w" (save).
                   This feature exists because some IJ options like "Prettier on save" or "ESlint on save"
