@@ -74,6 +74,6 @@ val Caret.amountOfInlaysBeforeCaret: Int
 
 fun Editor.amountOfInlaysBeforeVisualPosition(pos: VisualPosition): Int {
   val newOffset = EditorHelper.visualPositionToOffset(this, pos)
-  val lineStartNewOffset: Int = this.getDocument().getLineStartOffset(this.visualToLogicalPosition(pos).line)
-  return this.getInlayModel().getInlineElementsInRange(lineStartNewOffset, newOffset).size
+  val lineStartNewOffset: Int = this.document.getLineStartOffset(this.visualToLogicalPosition(pos).line)
+  return this.inlayModel.getInlineElementsInRange(lineStartNewOffset, newOffset).size
 }
