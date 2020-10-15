@@ -162,11 +162,10 @@ class NotificationService(private val project: Project?) {
         it.whenExpired { notification = null }
         it.setContent(it.content + "<br><br><small>Use Event Log to see previous ids</small>")
 
-        val copyActionId = CopyActionId(id, project)
-        copyActionId.templatePresentation.isEnabled = id != null
-        it.addAction(copyActionId)
-
         it.addAction(StopTracking())
+
+        if (id != null) it.addAction(CopyActionId(id, project))
+
         it.notify(project)
       }
     }

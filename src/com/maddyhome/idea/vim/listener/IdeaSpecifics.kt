@@ -190,6 +190,7 @@ object IdeaSpecifics {
   //endregion
 }
 
+//region Find action ID
 class FindActionIdAction : DumbAwareToggleAction() {
   override fun isSelected(e: AnActionEvent): Boolean = FindActionId.enabled
 
@@ -201,3 +202,4 @@ class FindActionIdAction : DumbAwareToggleAction() {
 object FindActionId {
   var enabled = false
 }
+//endregion
