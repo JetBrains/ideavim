@@ -18,9 +18,6 @@
 
 package org.jetbrains.plugins.ideavim.propertybased
 
-import org.intellij.lang.annotations.Language
-
-@Language("JAVA")
 internal val javaText = """
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
