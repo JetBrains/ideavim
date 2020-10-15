@@ -22,6 +22,13 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+To Be Released
+-----------
+
+**Features:**
+* `IdeaVim: track action Ids` command to find action ids for the `:action` command.
+  Enable this option in "Search everywhere" (double shift).
+
 0.60, 2020-10-09
 -----------
 

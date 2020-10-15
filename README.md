@@ -195,6 +195,14 @@ Ex commands or via `:map` command mappings:
     * Find IDE actions by name or keymap pattern (E.g. `:actionlist extract`, `:actionlist <C-D`)
 * `:action {name}`
     * Execute an action named `NAME`
+    
+In addition to `:actionlist` command, IdeaVim provides `IdeaVim: track action Ids` option to 
+extract the ids of executed command. This option can be found in "Search everywhere" (double `shift`). **[To Be Released]**
+
+<details>
+    <summary><strong>"Track aciton Ids" Details</strong> (click to see)</summary>
+    <img src="resources/readme/track_action_id.gif" alt="track actioin ids"/>
+</details>
 
 Examples:
 
