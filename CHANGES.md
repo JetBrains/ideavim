@@ -26,6 +26,8 @@ To Be Released
 -----------
 
 **Features:**
+* Ability to map IDE actions via the `<Action>` keyword. E.g. `map <C-K> <Action>(CommentByLineComment)`.
+  Check out `README.md` for the details.
 * `IdeaVim: track action Ids` command to find action ids for the `:action` command.
   Enable this option in "Search everywhere" (double shift).
 

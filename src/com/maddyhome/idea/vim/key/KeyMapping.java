@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.key;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,7 +57,25 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
     // Having a parameter of Iterable allows for a nicer API, because we know when a given list is immutable.
     // TODO: Should we change this to be a trie?
     assert (keys instanceof List) : "keys must be of type List<KeyStroke>";
-    return myKeys.get(keys);
+
+    List<KeyStroke> keyStrokes = (List<KeyStroke>)keys;
+
+    MappingInfo mappingInfo = myKeys.get(keys);
+    if (mappingInfo != null) return mappingInfo;
+
+    if (keyStrokes.size() > 3) {
+      if (keyStrokes.get(0).getKeyCode() == StringHelper.VK_ACTION &&
+          keyStrokes.get(1).getKeyChar() == '(' &&
+          keyStrokes.get(keyStrokes.size() - 1).getKeyChar() == ')') {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 2; i < keyStrokes.size() - 1; i++) {
+          builder.append(keyStrokes.get(i).getKeyChar());
+        }
+        return new ToActionMappingInfo(builder.toString(), keyStrokes, false, MappingOwner.IdeaVim.INSTANCE);
+      }
+    }
+
+    return null;
   }
 
   public void put(@NotNull List<KeyStroke> fromKeys,
@@ -108,6 +127,14 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
     // Having a parameter of Iterable allows for a nicer API, because we know when a given list is immutable.
     // Perhaps we should look at changing this to a trie or something?
     assert (keys instanceof List) : "keys must be of type List<KeyStroke>";
-    return myPrefixes.contains(keys);
+
+    List<KeyStroke> keyList = (List<KeyStroke>)keys;
+    if (keyList.isEmpty()) return false;
+
+    if (myPrefixes.contains(keys)) return true;
+
+    int firstChar = keyList.get(0).getKeyCode();
+    char lastChar = keyList.get(keyList.size() - 1).getKeyChar();
+    return firstChar == StringHelper.VK_ACTION && lastChar != ')';
   }
 }

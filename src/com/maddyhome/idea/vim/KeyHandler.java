@@ -29,6 +29,7 @@ import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.ActionPlan;
+import com.intellij.openapi.editor.actionSystem.CaretSpecificDataContext;
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
@@ -508,6 +509,12 @@ public class KeyHandler {
           commandState.getCommandBuilder().completeCommandPart(new Argument(offsets));
         }
       }
+    }
+    else if (mappingInfo instanceof ToActionMappingInfo) {
+      String action = ((ToActionMappingInfo)mappingInfo).getAction();
+      CaretSpecificDataContext dataContext =
+        new CaretSpecificDataContext(currentContext, editor.getCaretModel().getCurrentCaret());
+      KeyHandler.executeAction(action, dataContext);
     }
 
     // If we've just evaluated the previous key sequence, make sure to also handle the current key

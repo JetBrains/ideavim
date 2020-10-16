@@ -44,6 +44,7 @@ public class StringHelper {
    * Fake key for <Plug> mappings
    */
   private static final int VK_PLUG = KeyEvent.CHAR_UNDEFINED - 1;
+  public static final int VK_ACTION = KeyEvent.CHAR_UNDEFINED - 2;
 
   private StringHelper() {}
 
@@ -468,6 +469,8 @@ public class StringHelper {
         return VK_F12;
       case "plug":
         return VK_PLUG;
+      case "action":
+        return VK_ACTION;
       default:
         return null;
     }
@@ -529,6 +532,8 @@ public class StringHelper {
         return "f12";
       case VK_PLUG:
         return "plug";
+      case VK_ACTION:
+        return "action";
       default:
         return null;
     }

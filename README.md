@@ -204,17 +204,26 @@ extract the ids of executed command. This option can be found in "Search everywh
     <img src="resources/readme/track_action_id.gif" alt="track actioin ids"/>
 </details>
 
+For the mappings you can use a special `<Action>` keyword. Use `<Action>(*action_id*)` to map keys to some action. Don't
+forget the parentheses. **[To Be Released]**
+
 Examples:
 
 ```vim
 " Map \r to the Reformat Code action
-:map \r :action ReformatCode<CR>
+    :map \r :action ReformatCode<CR>
+" or
+    :map \r <Action>(ReformatCode)   " [To Be Released]
 
 " Map <leader>d to start debug
-:map <leader>d :action Debug<CR>
+    :map <leader>d :action Debug<CR>
+" or
+    :map <leader>d <Action>(Debug)   " [To Be Released]
 
 " Map \b to toggle the breakpoint on the current line
-:map \b :action ToggleLineBreakpoint<CR>
+    :map \b :action ToggleLineBreakpoint<CR>
+" or
+    :map \b <Action>(ToggleLineBreakpoint)   " [To Be Released]
 ```
 
 ### Undo/Redo

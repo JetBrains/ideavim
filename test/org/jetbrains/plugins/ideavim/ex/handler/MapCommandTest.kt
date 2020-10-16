@@ -441,4 +441,72 @@ n  ,f            <Plug>Foo
     typeText(StringHelper.parseKeys("iD<Esc>"))
     myFixture.checkResult("A quick brown ${c}Dfox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
+
+  fun `test comment line with action`() {
+    configureByJavaText("""
+        -----
+        1<caret>2345
+        abcde
+        -----
+        """.trimIndent())
+    typeText(commandToKeys("map k <Action>(CommentByLineComment)"))
+    typeText(StringHelper.parseKeys("k"))
+    myFixture.checkResult("""
+        -----
+        //12345
+        abcde
+        -----
+        """.trimIndent())
+  }
+
+  fun `test execute two actions with two mappings`() {
+    configureByJavaText("""
+          -----
+          1<caret>2345
+          abcde
+          -----
+          """.trimIndent())
+    typeText(commandToKeys("map k <Action>(CommentByLineComment)"))
+    typeText(StringHelper.parseKeys("kk"))
+    myFixture.checkResult("""
+          -----
+          //12345
+          //abcde
+          -----
+          """.trimIndent())
+  }
+
+  fun `test execute two actions with single mappings`() {
+    configureByJavaText("""
+          -----
+          1<caret>2345
+          abcde
+          -----
+          """.trimIndent())
+    typeText(commandToKeys("map k <Action>(CommentByLineComment)<Action>(CommentByLineComment)"))
+    typeText(StringHelper.parseKeys("k"))
+    myFixture.checkResult("""
+          -----
+          //12345
+          //abcde
+          -----
+          """.trimIndent())
+  }
+
+  fun `test execute three actions with single mappings`() {
+    configureByJavaText("""
+          -----
+          1<caret>2345
+          abcde
+          -----
+          """.trimIndent())
+    typeText(commandToKeys("map k <Action>(CommentByLineComment)<Action>(CommentByLineComment)<Action>(CommentByLineComment)"))
+    typeText(StringHelper.parseKeys("k"))
+    myFixture.checkResult("""
+          -----
+          //12345
+          //abcde
+          //-----
+          """.trimIndent())
+  }
 }

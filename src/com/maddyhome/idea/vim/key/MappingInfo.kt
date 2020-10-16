@@ -65,3 +65,10 @@ class ToHandlerMappingInfo(
   isRecursive: Boolean,
   owner: MappingOwner
 ) : MappingInfo(fromKeys, isRecursive, owner)
+
+class ToActionMappingInfo(
+  val action: String,
+  fromKeys: List<KeyStroke>,
+  isRecursive: Boolean,
+  owner: MappingOwner
+) : MappingInfo(fromKeys, isRecursive, owner)
