@@ -15,40 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.helper
 
-package com.maddyhome.idea.vim.helper;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.editor.Editor
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.editor.Editor;
-import org.jetbrains.annotations.NotNull;
-
-public class EditorDataContext implements DataContext {
-  public EditorDataContext(Editor editor) {
-    this.editor = editor;
-  }
-
+class EditorDataContext(private val editor: Editor) : DataContext {
   /**
    * Returns the object corresponding to the specified data identifier. Some of the supported data identifiers are
-   * defined in the {@link PlatformDataKeys} class.
+   * defined in the [PlatformDataKeys] class.
    *
    * @param dataId the data identifier for which the value is requested.
    * @return the value, or null if no value is available in the current context for this identifier.
    */
-  @Override
-  public Object getData(@NotNull String dataId) {
-    if (PlatformDataKeys.EDITOR.getName().equals(dataId)) {
-      return editor;
-    }
-    else if (PlatformDataKeys.PROJECT.getName().equals(dataId)) {
-      return editor.getProject();
-    }
-    else if (PlatformDataKeys.VIRTUAL_FILE.getName().equals(dataId)) {
-      return EditorHelper.getVirtualFile(editor);
-    }
-
-    return null;
+  override fun getData(dataId: String): Any? = when {
+    PlatformDataKeys.EDITOR.name == dataId -> editor
+    PlatformDataKeys.PROJECT.name == dataId -> editor.project
+    PlatformDataKeys.VIRTUAL_FILE.name == dataId -> EditorHelper.getVirtualFile(editor)
+    else -> null
   }
-
-  private final Editor editor;
 }
