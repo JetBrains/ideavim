@@ -301,7 +301,7 @@ public class KeyHandler {
     return node;
   }
 
-  private static <T> boolean isPrefix(@NotNull List<T> list1, @NotNull List<T> list2) {
+  public static <T> boolean isPrefix(@NotNull List<T> list1, @NotNull List<T> list2) {
     if (list1.size() > list2.size()) {
       return false;
     }
@@ -438,84 +438,7 @@ public class KeyHandler {
 
     final EditorDataContext currentContext = new EditorDataContext(editor);
 
-    if (mappingInfo instanceof ToKeysMappingInfo) {
-      final List<KeyStroke> toKeys = ((ToKeysMappingInfo)mappingInfo).getToKeys();
-      final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), toKeys);
-      boolean first = true;
-      for (KeyStroke keyStroke : toKeys) {
-        final boolean recursive = mappingInfo.isRecursive() && !(first && fromIsPrefix);
-        handleKey(editor, keyStroke, currentContext, recursive);
-        first = false;
-      }
-    }
-    else if (mappingInfo instanceof ToHandlerMappingInfo) {
-      final VimExtensionHandler extensionHandler = ((ToHandlerMappingInfo)mappingInfo).getExtensionHandler();
-      final CommandProcessor processor = CommandProcessor.getInstance();
-
-      // Cache isOperatorPending in case the extension changes the mode while moving the caret
-      // See CommonExtensionTest
-      // TODO: Is this legal? Should we assert in this case?
-      final boolean shouldCalculateOffsets = commandState.isOperatorPending();
-
-      Map<Caret, Integer> startOffsets =
-        editor.getCaretModel().getAllCarets().stream().collect(Collectors.toMap(Function.identity(), Caret::getOffset));
-
-      if (extensionHandler.isRepeatable()) {
-        VimRepeater.Extension.INSTANCE.clean();
-      }
-
-      processor.executeCommand(editor.getProject(), () -> extensionHandler.execute(editor, context),
-        "Vim " + extensionHandler.getClass().getSimpleName(), null);
-
-      if (extensionHandler.isRepeatable()) {
-        VimRepeater.Extension.INSTANCE.setLastExtensionHandler(extensionHandler);
-        VimRepeater.Extension.INSTANCE.setArgumentCaptured(null);
-        VimRepeater.INSTANCE.setRepeatHandler(true);
-      }
-
-      if (shouldCalculateOffsets && !commandState.getCommandBuilder().hasCurrentCommandPartArgument()) {
-        Map<Caret, VimSelection> offsets = new HashMap<>();
-
-        for (Caret caret : editor.getCaretModel().getAllCarets()) {
-          @Nullable Integer startOffset = startOffsets.get(caret);
-          if (caret.hasSelection()) {
-            final VimSelection vimSelection = VimSelection.Companion
-              .create(UserDataManager.getVimSelectionStart(caret), caret.getOffset(),
-                SelectionType.fromSubMode(CommandStateHelper.getSubMode(editor)), editor);
-            offsets.put(caret, vimSelection);
-            commandState.popModes();
-          }
-          else if (startOffset != null && startOffset != caret.getOffset()) {
-            // Command line motions are always characterwise exclusive
-            int endOffset = caret.getOffset();
-            if (startOffset < endOffset) {
-              endOffset -= 1;
-            } else {
-              startOffset -= 1;
-            }
-            final VimSelection vimSelection = VimSelection.Companion
-              .create(startOffset, endOffset, SelectionType.CHARACTER_WISE, editor);
-            offsets.put(caret, vimSelection);
-
-            try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
-              // Move caret to the initial offset for better undo action
-              //  This is not a necessary thing, but without it undo action look less convenient
-              editor.getCaretModel().moveToOffset(startOffset);
-            }
-          }
-        }
-
-        if (!offsets.isEmpty()) {
-          commandState.getCommandBuilder().completeCommandPart(new Argument(offsets));
-        }
-      }
-    }
-    else if (mappingInfo instanceof ToActionMappingInfo) {
-      String action = ((ToActionMappingInfo)mappingInfo).getAction();
-      CaretSpecificDataContext dataContext =
-        new CaretSpecificDataContext(currentContext, editor.getCaretModel().getCurrentCaret());
-      KeyHandler.executeAction(action, dataContext);
-    }
+    mappingInfo.execute(editor, context);
 
     // If we've just evaluated the previous key sequence, make sure to also handle the current key
     if (mappingInfo != currentMappingInfo) {
