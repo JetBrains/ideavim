@@ -105,15 +105,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
       builder.append(" ");
       builder.append(mappingInfo.isRecursive() ? " " : "*");
       builder.append(" ");
-      if (mappingInfo instanceof ToKeysMappingInfo) {
-        List<KeyStroke> toKeys = ((ToKeysMappingInfo)mappingInfo).getToKeys();
-        builder.append(toKeyNotation(toKeys));
-      }
-      else if (mappingInfo instanceof ToHandlerMappingInfo) {
-        final VimExtensionHandler extensionHandler = ((ToHandlerMappingInfo)mappingInfo).getExtensionHandler();
-        builder.append("call ");
-        builder.append(extensionHandler.getClass().getCanonicalName());
-      }
+      builder.append(mappingInfo.getPresentableString());
       builder.append("\n");
     }
     ExOutputModel.getInstance(editor).output(builder.toString());

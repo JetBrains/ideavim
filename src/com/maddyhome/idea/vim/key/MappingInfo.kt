@@ -18,6 +18,7 @@
 package com.maddyhome.idea.vim.key
 
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 import kotlin.math.min
@@ -26,6 +27,9 @@ import kotlin.math.min
  * @author vlan
  */
 sealed class MappingInfo(val fromKeys: List<KeyStroke>, val isRecursive: Boolean, val owner: MappingOwner) : Comparable<MappingInfo> {
+
+  abstract fun getPresentableString(): String
+
   override fun compareTo(other: MappingInfo): Int {
     val size = fromKeys.size
     val otherSize = other.fromKeys.size
@@ -57,18 +61,24 @@ class ToKeysMappingInfo(
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner
-) : MappingInfo(fromKeys, isRecursive, owner)
+) : MappingInfo(fromKeys, isRecursive, owner) {
+  override fun getPresentableString(): String = toKeyNotation(toKeys)
+}
 
 class ToHandlerMappingInfo(
   val extensionHandler: VimExtensionHandler,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner
-) : MappingInfo(fromKeys, isRecursive, owner)
+) : MappingInfo(fromKeys, isRecursive, owner) {
+  override fun getPresentableString(): String = "call ${this.javaClass.canonicalName}"
+}
 
 class ToActionMappingInfo(
   val action: String,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner
-) : MappingInfo(fromKeys, isRecursive, owner)
+) : MappingInfo(fromKeys, isRecursive, owner) {
+  override fun getPresentableString(): String = "action $action"
+}
