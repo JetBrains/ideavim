@@ -302,7 +302,7 @@ public class ExOutputPanel extends JPanel {
         final KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
         final List<KeyStroke> keys = new ArrayList<>(1);
         keys.add(key);
-        VimPlugin.getMacro().playbackKeys(myEditor, new EditorDataContext(myEditor), project, keys, 0, 0, 1);
+        VimPlugin.getMacro().playbackKeys(myEditor, new EditorDataContext(myEditor, null), project, keys, 0, 0, 1);
       }
     });
   }

@@ -393,7 +393,7 @@ public class KeyHandler {
         }
 
         for (KeyStroke keyStroke : unhandledKeys) {
-          handleKey(editor, keyStroke, new EditorDataContext(editor), false);
+          handleKey(editor, keyStroke, new EditorDataContext(editor, null), false);
         }
       }, ModalityState.stateForComponent(editor.getComponent())));
     }
@@ -436,7 +436,7 @@ public class KeyHandler {
 
     mappingState.resetMappingSequence();
 
-    final EditorDataContext currentContext = new EditorDataContext(editor);
+    final EditorDataContext currentContext = new EditorDataContext(editor, context);
 
     mappingInfo.execute(editor, context);
 

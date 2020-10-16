@@ -214,7 +214,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     if (!EditorHelper.isFileEditor(editor) &&
         editor.getDocument().isWritable() &&
         !CommandStateHelper.inInsertMode(editor)) {
-      VimPlugin.getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
+      VimPlugin.getChange().insertBeforeCursor(editor, new EditorDataContext(editor, null));
       KeyHandler.getInstance().reset(editor);
     }
     editor.getSettings().setBlockCursor(!CommandStateHelper.inInsertMode(editor));

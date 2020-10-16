@@ -88,7 +88,7 @@ class ToKeysMappingInfo(
   override fun getPresentableString(): String = toKeyNotation(toKeys)
 
   override fun execute(editor: Editor, context: DataContext) {
-    val editorDataContext = EditorDataContext(editor)
+    val editorDataContext = EditorDataContext(editor, context)
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     var first = true
     for (keyStroke in toKeys) {
@@ -177,7 +177,7 @@ class ToActionMappingInfo(
   override fun getPresentableString(): String = "action $action"
 
   override fun execute(editor: Editor, context: DataContext) {
-    val editorDataContext = EditorDataContext(editor)
+    val editorDataContext = EditorDataContext(editor, context)
     val dataContext = CaretSpecificDataContext(editorDataContext, editor.caretModel.currentCaret)
     KeyHandler.executeAction(action, dataContext)
   }

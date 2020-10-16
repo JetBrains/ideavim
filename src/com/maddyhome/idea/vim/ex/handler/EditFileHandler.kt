@@ -45,7 +45,7 @@ class EditFileHandler : CommandHandler.SingleExecution() {
     }
 
     // Don't open a choose file dialog under a write action
-    ApplicationManager.getApplication().invokeLater { KeyHandler.executeAction("OpenFile", EditorDataContext(editor)) }
+    ApplicationManager.getApplication().invokeLater { KeyHandler.executeAction("OpenFile", EditorDataContext(editor, context)) }
 
     return true
   }
