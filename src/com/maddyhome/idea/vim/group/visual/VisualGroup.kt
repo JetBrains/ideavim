@@ -28,7 +28,18 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.fileSize
+import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.helper.inSelectMode
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
+import com.maddyhome.idea.vim.helper.sort
+import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.helper.vimSelectionStart
 
 /**
  * @author Alex Plate
@@ -51,10 +62,8 @@ fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd:
  * @see vimMoveBlockSelectionToOffset for blockwise selection
  */
 fun Caret.vimMoveSelectionToCaret() {
-  if (!editor.inVisualMode && !editor.inSelectMode)
-    throw RuntimeException("Attempt to extent selection in non-visual mode")
-  if (editor.inBlockSubMode)
-    throw RuntimeException("Move caret with [vimMoveBlockSelectionToOffset]")
+  if (!editor.inVisualMode && !editor.inSelectMode) error("Attempt to extent selection in non-visual mode")
+  if (editor.inBlockSubMode) error("Move caret with [vimMoveBlockSelectionToOffset]")
 
   val startOffsetMark = vimSelectionStart
 
@@ -114,11 +123,11 @@ val Caret.vimLeadSelectionOffset: Int
         val selections = editor.caretModel.allCarets.map { it.selectionStart to it.selectionEnd }.sortedBy { it.first }
         val pCaret = editor.caretModel.primaryCaret
         when (pCaret.offset) {
-            selections.first().first -> (selections.last().second - selectionAdj).coerceAtLeast(0)
-            selections.first().second -> selections.last().first
-            selections.last().first -> (selections.first().second - selectionAdj).coerceAtLeast(0)
-            selections.last().second -> selections.first().first
-            else -> selections.first().first
+          selections.first().first -> (selections.last().second - selectionAdj).coerceAtLeast(0)
+          selections.first().second -> selections.last().first
+          selections.last().first -> (selections.first().second - selectionAdj).coerceAtLeast(0)
+          selections.last().second -> selections.first().first
+          else -> selections.first().first
         }
       } else {
         if (caretOffset == selectionStart) (selectionEnd - selectionAdj).coerceAtLeast(0) else selectionStart

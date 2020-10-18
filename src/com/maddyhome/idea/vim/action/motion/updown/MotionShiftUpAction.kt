@@ -24,7 +24,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
-import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.vimForEachCaret
 
 /**
  * @author Alex Plate

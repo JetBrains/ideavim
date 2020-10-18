@@ -65,7 +65,9 @@ class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory, LightEditCompatibl
 
   override fun getDisplayName(): String = ShowCmd.displayName
 
-  override fun disposeWidget(widget: StatusBarWidget) {}
+  override fun disposeWidget(widget: StatusBarWidget) {
+    // Nothing
+  }
 
   override fun isAvailable(project: Project): Boolean = OptionsManager.showcmd.isSet
 

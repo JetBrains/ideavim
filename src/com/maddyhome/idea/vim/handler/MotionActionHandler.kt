@@ -24,13 +24,17 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.motion.updown.*
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.helper.vimSelectionStart
 
 /**
  * @author Alex Plate
@@ -191,10 +195,11 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       val caretToDelete = event.caret ?: return
       if (editor.inVisualMode) {
         for (caret in editor.caretModel.allCarets) {
-          if (caretToDelete.selectionStart < caret.selectionEnd &&
-            caretToDelete.selectionStart >= caret.selectionStart ||
-            caretToDelete.selectionEnd <= caret.selectionEnd &&
-            caretToDelete.selectionEnd > caret.selectionStart) {
+          val curCaretStart = caret.selectionStart
+          val curCaretEnd = caret.selectionEnd
+          val caretStartBetweenCur = caretToDelete.selectionStart in curCaretStart until curCaretEnd
+          val caretEndBetweenCur = caretToDelete.selectionEnd in curCaretStart + 1..curCaretEnd
+          if (caretStartBetweenCur || caretEndBetweenCur) {
             // Okay, caret is being removed because of merging
             val vimSelectionStart = caretToDelete.vimSelectionStart
             caret.vimSelectionStart = vimSelectionStart

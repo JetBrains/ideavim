@@ -98,8 +98,7 @@ object VimExtensionFacade {
   fun inputKeyStroke(editor: Editor): KeyStroke {
     if (editor.commandState.isDotRepeatInProgress) {
       val input = VimRepeater.Extension.consumeKeystroke()
-      return input
-        ?: throw RuntimeException("Not enough keystrokes saved: ${VimRepeater.Extension.lastExtensionHandler}")
+      return input ?: error("Not enough keystrokes saved: ${VimRepeater.Extension.lastExtensionHandler}")
     }
 
     val key: KeyStroke? = if (ApplicationManager.getApplication().isUnitTestMode) {
@@ -122,7 +121,7 @@ object VimExtensionFacade {
   fun inputString(editor: Editor, prompt: String, finishOn: Char?): String {
     if (editor.commandState.isDotRepeatInProgress) {
       val input = VimRepeater.Extension.consumeString()
-      return input ?: throw RuntimeException("Not enough strings saved: ${VimRepeater.Extension.lastExtensionHandler}")
+      return input ?: error("Not enough strings saved: ${VimRepeater.Extension.lastExtensionHandler}")
     }
 
     if (ApplicationManager.getApplication().isUnitTestMode) {

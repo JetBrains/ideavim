@@ -45,7 +45,7 @@ class PutLinesHandler : CommandHandler.SingleExecution() {
 
     val line = if (cmd.ranges.size() == 0) -1 else cmd.getLine(editor)
     val textData = registerGroup.lastRegister?.let { PutData.TextData(it.text ?: StringHelper.toKeyNotation(it.keys), SelectionType.LINE_WISE, it.transferableData) }
-    val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, _indent = false, caretAfterInsertedText = false, putToLine = line)
+    val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, rawIndent = false, caretAfterInsertedText = false, putToLine = line)
     return VimPlugin.getPut().putText(editor, context, putData)
   }
 }

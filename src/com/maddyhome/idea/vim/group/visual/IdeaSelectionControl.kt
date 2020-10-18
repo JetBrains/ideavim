@@ -115,7 +115,7 @@ object IdeaSelectionControl {
       CommandState.Mode.SELECT -> VimPlugin.getVisualMotion().enterSelectMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
       CommandState.Mode.INSERT -> VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
       CommandState.Mode.COMMAND -> Unit
-      else -> throw RuntimeException("Unexpected mode: $mode")
+      else -> error("Unexpected mode: $mode")
     }
   }
 

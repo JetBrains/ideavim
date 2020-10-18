@@ -10,6 +10,7 @@ buildscript {
 
 plugins {
   id 'org.jetbrains.intellij' version '0.5.0'
+  id 'io.gitlab.arturbosch.detekt' version '1.14.1'
 }
 
 apply plugin: 'java'
@@ -48,6 +49,7 @@ intellij {
 
 repositories {
   mavenCentral()
+  jcenter()
 }
 
 dependencies {
@@ -69,7 +71,22 @@ compileTestKotlin {
   }
 }
 
-task testWithNeovim(type : Test) {
+detekt {
+  config = files("./detekt-config.yaml")
+  input = files("src")
+
+  buildUponDefaultConfig = true
+
+  reports {
+    html.enabled = false
+    xml.enabled = false
+    txt.enabled = false
+  }
+}
+
+tasks.detekt.jvmTarget = javaVersion
+
+task testWithNeovim(type: Test) {
   group = "verification"
   systemProperty "ideavim.neovim.test", 'true'
 }
@@ -82,7 +99,7 @@ tasks.register("slackEapNotification") {
     changeLog = changeLog.replace("* ", "• ") // Replace stars with bullets
     changeLog = changeLog.replace("**", "*") // Enable bold text
     changeLog = changeLog.replaceAll("\\[([^]]+)]\\(([^)]+)\\)", '<$2|$1>') // Enable links
-    def message ="""
+    def message = """
       {
           "text": "New version of IdeaVim",
           "blocks": [
@@ -102,7 +119,7 @@ tasks.register("slackEapNotification") {
     post.getOutputStream().write(message.getBytes("UTF-8"))
     def postRC = post.getResponseCode()
     println(postRC)
-    if(postRC == 200) {
+    if (postRC == 200) {
       println(post.getInputStream().getText())
     }
   }

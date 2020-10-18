@@ -267,8 +267,7 @@ class VisualMotionGroup {
 
   private fun blockModeStartAndEnd(editor: Editor): Pair<Int, Int> {
     val selections = editor.caretModel.allCarets.map { it.selectionStart to it.selectionEnd }.sortedBy { it.first }
-    val maxColumn = selections.map { editor.offsetToLogicalPosition(it.second).column }.max()
-      ?: throw RuntimeException("No carets")
+    val maxColumn = selections.map { editor.offsetToLogicalPosition(it.second).column }.max() ?: error("No carets")
     val lastLine = editor.offsetToLogicalPosition(selections.last().first).line
     return selections.first().first to editor.logicalPositionToOffset(LogicalPosition(lastLine, maxColumn))
   }

@@ -19,7 +19,10 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.injected.editor.EditorWindow
-import com.intellij.openapi.editor.*
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.VisualPosition
 
 /**
  * Move the caret to the given offset, handling inline inlays
@@ -42,8 +45,7 @@ fun Caret.moveToInlayAwareOffset(offset: Int) {
   // If the target offset is collapsed inside a fold, move directly to the offset, expanding the fold
   if (editor.foldingModel.isOffsetCollapsed(offset)) {
     moveToOffset(offset)
-  }
-  else {
+  } else {
     val newVisualPosition = inlayAwareOffsetToVisualPosition(editor, offset)
     if (newVisualPosition != visualPosition) {
       moveToVisualPosition(newVisualPosition)
@@ -62,8 +64,7 @@ private fun inlayAwareOffsetToVisualPosition(editor: Editor, offset: Int): Visua
   val e = if (editor is EditorWindow) {
     logicalPosition = editor.injectedToHost(logicalPosition)
     editor.delegate
-  }
-  else {
+  } else {
     editor
   }
   var pos = e.logicalToVisualPosition(logicalPosition)

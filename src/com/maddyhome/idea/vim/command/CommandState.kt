@@ -21,8 +21,10 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.motion.updown.*
-import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.helper.DigraphResult
+import com.maddyhome.idea.vim.helper.DigraphSequence
+import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.option.OptionsManager.showmode
 import org.jetbrains.annotations.ApiStatus
@@ -196,11 +198,11 @@ class CommandState private constructor() {
    * :h mode()
    *
    * - mode([expr])          Return a string that indicates the current mode.
-   * 
+   *
    *   If [expr] is supplied and it evaluates to a non-zero Number or
    *   a non-empty String (|non-zero-arg|), then the full mode is
    *   returned, otherwise only the first letter is returned.
-   *  
+   *
    *   n          Normal
    *   no         Operator-pending
    *   nov        Operator-pending (forced characterwise |o_v|)

@@ -154,7 +154,8 @@ object IdeaSpecifics {
   //region Register shortcuts for lookup and perform partial reset
   private object LookupListener : PropertyChangeListener {
     override fun propertyChange(evt: PropertyChangeEvent?) {
-      if (evt != null && evt.propertyName == "activeLookup" && evt.oldValue == null && evt.newValue != null) {
+      if (evt == null) return
+      if (evt.propertyName == "activeLookup" && evt.oldValue == null && evt.newValue != null) {
         val lookup = evt.newValue
         if (lookup is LookupImpl) {
           VimPlugin.getKey().registerShortcutsForLookup(lookup)

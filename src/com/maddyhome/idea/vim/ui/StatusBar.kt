@@ -58,7 +58,9 @@ class StatusBarIconFactory : StatusBarWidgetFactory, LightEditCompatible {
 
   override fun getDisplayName(): String = STATUS_BAR_DISPLAY_NAME
 
-  override fun disposeWidget(widget: StatusBarWidget) {}
+  override fun disposeWidget(widget: StatusBarWidget) {
+    // Nothing
+  }
 
   override fun isAvailable(project: Project): Boolean {
     @Suppress("DEPRECATION")
@@ -103,9 +105,13 @@ class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
 
   override fun ID(): String = STATUS_BAR_ICON_ID
 
-  override fun install(statusBar: StatusBar) {}
+  override fun install(statusBar: StatusBar) {
+    // Nothing
+  }
 
-  override fun dispose() {}
+  override fun dispose() {
+    // Nothing
+  }
 
   override fun getTooltipText() = STATUS_BAR_DISPLAY_NAME
 

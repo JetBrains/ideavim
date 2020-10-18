@@ -25,11 +25,13 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.CaretSpecificDataContext
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.motion.updown.*
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.getTopLevelEditor
+import com.maddyhome.idea.vim.helper.noneOfEnum
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -77,18 +79,18 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     }
   }
 
-  private fun doExecute(_editor: Editor, caret: Caret, context: DataContext) {
+  private fun doExecute(editor: Editor, caret: Caret, context: DataContext) {
     if (!VimPlugin.isEnabled()) return
 
-    val editor = _editor.getTopLevelEditor()
+    val topLevelEditor = editor.getTopLevelEditor()
     logger.debug("Execute command with handler: " + this.javaClass.name)
 
-    val cmd = editor.commandState.executingCommand ?: run {
+    val cmd = topLevelEditor.commandState.executingCommand ?: run {
       VimPlugin.indicateError()
       return
     }
 
-    if (!baseExecute(editor, caret, CaretSpecificDataContext(context, caret), cmd)) VimPlugin.indicateError()
+    if (!baseExecute(topLevelEditor, caret, CaretSpecificDataContext(context, caret), cmd)) VimPlugin.indicateError()
   }
 
   open fun process(cmd: Command) {

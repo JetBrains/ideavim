@@ -110,7 +110,7 @@ sealed class VimSimpleSelection : VimSelection() {
       when (type) {
         CHARACTER_WISE -> VimCharacterSelection(vimStart, vimEnd, nativeStart, nativeEnd, editor)
         LINE_WISE -> VimLineSelection(vimStart, vimEnd, nativeStart, nativeEnd, editor)
-        BLOCK_WISE -> throw RuntimeException("This method works only for line and character selection")
+        BLOCK_WISE -> error("This method works only for line and character selection")
       }
   }
 }

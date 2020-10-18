@@ -90,7 +90,7 @@ class ActionBeanClass : AbstractExtensionPointBean() {
         'O' -> res += MappingMode.OP_PENDING
         'I' -> res += MappingMode.INSERT
         'C' -> res += MappingMode.CMD_LINE
-        else -> throw RuntimeException("Wrong mapping mode: $c")
+        else -> error("Wrong mapping mode: $c")
       }
     }
     return res.toSet()

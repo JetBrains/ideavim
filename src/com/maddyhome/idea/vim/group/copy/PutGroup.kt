@@ -64,12 +64,12 @@ data class PutData(
   val visualSelection: VisualSelection?,
   val count: Int,
   val insertTextBeforeCaret: Boolean,
-  private val _indent: Boolean,
+  private val rawIndent: Boolean,
   val caretAfterInsertedText: Boolean,
   val putToLine: Int = -1
 ) {
   val indent: Boolean =
-    if (_indent && textData?.typeInRegister != SelectionType.LINE_WISE && visualSelection?.typeInEditor != SelectionType.LINE_WISE) false else _indent
+    if (rawIndent && textData?.typeInRegister != SelectionType.LINE_WISE && visualSelection?.typeInEditor != SelectionType.LINE_WISE) false else rawIndent
 
   data class VisualSelection(
     val caretsAndSelections: Map<Caret, VimSelection>,

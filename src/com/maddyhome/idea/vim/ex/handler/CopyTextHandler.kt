@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 
 class CopyTextHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
+
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val carets = EditorHelper.getOrderedCaretsList(editor)
     for (caret in carets) {
@@ -42,7 +43,7 @@ class CopyTextHandler : CommandHandler.SingleExecution() {
 
       val transferableData = VimPlugin.getRegister().getTransferableData(editor, range, text)
       val textData = PutData.TextData(text, SelectionType.LINE_WISE, transferableData)
-      val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, _indent = true, caretAfterInsertedText = false, putToLine = line)
+      val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, rawIndent = true, caretAfterInsertedText = false, putToLine = line)
       VimPlugin.getPut().putTextForCaret(editor, caret, context, putData)
     }
     return true

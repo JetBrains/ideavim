@@ -140,7 +140,7 @@ class ReplaceWithRegister : VimExtension {
 
       val textData = PutData.TextData(usedText, usedType, savedRegister.transferableData)
 
-      val putData = PutData(textData, visualSelection, 1, insertTextBeforeCaret = true, _indent = true, caretAfterInsertedText = false, putToLine = -1)
+      val putData = PutData(textData, visualSelection, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = false, putToLine = -1)
       VimPlugin.getPut().putText(editor, EditorDataContext(editor), putData)
 
       VimPlugin.getRegister().saveRegister(savedRegister.name, savedRegister)
