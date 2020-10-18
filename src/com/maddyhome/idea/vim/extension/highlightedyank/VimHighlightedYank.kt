@@ -183,7 +183,7 @@ class VimHighlightedYank: VimExtension, VimYankListener, VimInsertListener {
         return try {
           extractFun(value)
         }
-        catch (e: NumberFormatException){
+        catch (e: Exception){
           VimPlugin.showMessage("highlightedyank: Invalid value of $variableName -- ${e.message}")
 
           default
