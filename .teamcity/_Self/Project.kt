@@ -2,7 +2,6 @@ package _Self
 
 import _Self.buildTypes.*
 import _Self.vcsRoots.*
-import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 
 object Project : Project({
@@ -10,7 +9,7 @@ object Project : Project({
 
     vcsRoot(HttpsGithubComJetBrainsIdeavimBranch183)
     vcsRoot(HttpsGithubComJetBrainsIdeavim_181)
-    vcsRoot(HttpsGithubComJetBrainsIdeavimPullRequests)
+    vcsRoot(GitHubPullRequest)
     vcsRoot(HttpsGithubComJetBrainsIdeavimBranch191193)
     vcsRoot(HttpsGithubComJetBrainsIdeavimBranchNvim)
 

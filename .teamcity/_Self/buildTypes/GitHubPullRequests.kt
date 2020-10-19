@@ -1,6 +1,6 @@
 package _Self.buildTypes
 
-import _Self.vcsRoots.HttpsGithubComJetBrainsIdeavimPullRequests
+import _Self.vcsRoots.GitHubPullRequest
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.PullRequests
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.commitStatusPublisher
@@ -20,7 +20,7 @@ object GitHubPullRequests : BuildType({
     }
 
     vcs {
-        root(_Self.vcsRoots.HttpsGithubComJetBrainsIdeavimPullRequests)
+        root(_Self.vcsRoots.GitHubPullRequest)
 
         checkoutMode = CheckoutMode.ON_SERVER
         branchFilter = """
@@ -56,7 +56,7 @@ object GitHubPullRequests : BuildType({
             }
         }
         commitStatusPublisher {
-            vcsRootExtId = "${HttpsGithubComJetBrainsIdeavimPullRequests.id}"
+            vcsRootExtId = "${GitHubPullRequest.id}"
             publisher = github {
                 githubUrl = "https://api.github.com"
                 authType = personalToken {
