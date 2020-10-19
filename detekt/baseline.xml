@@ -1,0 +1,374 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>ComplexMethod:CmdHandler.kt$CmdHandler$private fun addAlias(cmd: ExCommand, editor: Editor?): Boolean</ID>
+    <ID>ComplexMethod:CommandHandler.kt$CommandHandler$ @Throws(ExException::class) fun process(editor: Editor, context: DataContext, cmd: ExCommand, count: Int): Boolean</ID>
+    <ID>ComplexMethod:CommandState.kt$CommandState$ fun toVimNotation(): String</ID>
+    <ID>ComplexMethod:CommandState.kt$CommandState$private fun getStatusString(pos: Int): String</ID>
+    <ID>ComplexMethod:HistoryHandler.kt$HistoryHandler$override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean</ID>
+    <ID>ComplexMethod:OptionsManager.kt$OptionsManager$ fun parseOptionLine(editor: Editor?, args: String, failOnBad: Boolean): Boolean</ID>
+    <ID>ComplexMethod:OptionsManager.kt$OptionsManager$ private fun showOptions(editor: Editor?, opts: Collection&lt;Option&lt;*&gt;&gt;, showIntro: Boolean)</ID>
+    <ID>ComplexMethod:PutGroup.kt$PutGroup$private fun moveCaretToEndPosition( editor: Editor, caret: Caret, startOffset: Int, endOffset: Int, typeInRegister: SelectionType, modeInEditor: CommandState.SubMode, caretAfterInsertedText: Boolean )</ID>
+    <ID>ComplexMethod:PutGroup.kt$PutGroup$private fun prepareDocumentAndGetStartOffsets(editor: Editor, caret: Caret, typeInRegister: SelectionType, data: PutData, additionalData: Map&lt;String, Any&gt;): List&lt;Int&gt;</ID>
+    <ID>ComplexMethod:SearchHelperKt.kt$// bounds are considered inside corresponding quotes fun checkInString(chars: CharSequence, currentPos: Int, str: Boolean): Boolean</ID>
+    <ID>ComplexMethod:TabCloseHandler.kt$TabCloseHandler$ private fun getTabIndexToClose(arg: String, current: Int, last: Int): Int?</ID>
+    <ID>ComplexMethod:VimExchangeExtension.kt$VimExchangeExtension.Operator$private fun compareExchanges(x: Exchange, y: Exchange): ExchangeCompareResult</ID>
+    <ID>ComplexMethod:VimExtensionFacade.kt$VimExtensionFacade$ @JvmStatic fun inputString(editor: Editor, prompt: String, finishOn: Char?): String</ID>
+    <ID>ComplexMethod:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension.NextOccurrenceHandler$override fun executeInWriteAction(editor: Editor, context: DataContext)</ID>
+    <ID>ComplexMethod:VimShortcutKeyAction.kt$VimShortcutKeyAction$private fun isEnabled(e: AnActionEvent): Boolean</ID>
+    <ID>ComplexMethod:VisualGroup.kt$private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Caret)</ID>
+    <ID>LongMethod:CmdHandler.kt$CmdHandler$private fun addAlias(cmd: ExCommand, editor: Editor?): Boolean</ID>
+    <ID>LongMethod:HistoryHandler.kt$HistoryHandler$override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean</ID>
+    <ID>LongMethod:OptionsManager.kt$OptionsManager$ fun parseOptionLine(editor: Editor?, args: String, failOnBad: Boolean): Boolean</ID>
+    <ID>MagicNumber:ActionListHandler.kt$ActionListHandler$50</ID>
+    <ID>MagicNumber:AddBlockInlaysAction.kt$AddBlockInlaysAction$0.9f</ID>
+    <ID>MagicNumber:AddBlockInlaysAction.kt$AddBlockInlaysAction$1.75f</ID>
+    <ID>MagicNumber:AddBlockInlaysAction.kt$AddBlockInlaysAction$10</ID>
+    <ID>MagicNumber:AddBlockInlaysAction.kt$AddBlockInlaysAction$3</ID>
+    <ID>MagicNumber:AddBlockInlaysAction.kt$AddBlockInlaysAction$5</ID>
+    <ID>MagicNumber:AddBlockInlaysAction.kt$AddBlockInlaysAction$6</ID>
+    <ID>MagicNumber:AddBlockInlaysAction.kt$AddBlockInlaysAction$7</ID>
+    <ID>MagicNumber:AddInlineInlaysAction.kt$AddInlineInlaysAction$10</ID>
+    <ID>MagicNumber:AddInlineInlaysAction.kt$AddInlineInlaysAction$20</ID>
+    <ID>MagicNumber:AddInlineInlaysAction.kt$AddInlineInlaysAction$5</ID>
+    <ID>MagicNumber:AddInlineInlaysAction.kt$AddInlineInlaysAction$7</ID>
+    <ID>MagicNumber:BufferListHandler.kt$3</ID>
+    <ID>MagicNumber:CmdHandler.kt$CmdHandler$11</ID>
+    <ID>MagicNumber:CmdHandler.kt$CmdHandler$12</ID>
+    <ID>MagicNumber:CommandBuilder.kt$CommandBuilder$10</ID>
+    <ID>MagicNumber:CommandBuilder.kt$CommandBuilder$999999999</ID>
+    <ID>MagicNumber:ConfigurationMigrators.kt$Version 6 to 7 config migration$6</ID>
+    <ID>MagicNumber:ConfigurationMigrators.kt$Version 6 to 7 config migration$7</ID>
+    <ID>MagicNumber:EditorHelper.kt$10</ID>
+    <ID>MagicNumber:ExKeyBindings.kt$ExKeyBindings$0x05</ID>
+    <ID>MagicNumber:ExKeyBindings.kt$ExKeyBindings$0x08</ID>
+    <ID>MagicNumber:HistoryHandler.kt$HistoryHandler$7</ID>
+    <ID>MagicNumber:JumpsHandler.kt$JumpsHandler$200</ID>
+    <ID>MagicNumber:JumpsHandler.kt$JumpsHandler$3</ID>
+    <ID>MagicNumber:JumpsHandler.kt$JumpsHandler$5</ID>
+    <ID>MagicNumber:MarksHandler.kt$MarksHandler$200</ID>
+    <ID>MagicNumber:MarksHandler.kt$MarksHandler$3</ID>
+    <ID>MagicNumber:MarksHandler.kt$MarksHandler$5</ID>
+    <ID>MagicNumber:OptionsManager.kt$OptionsManager$100</ID>
+    <ID>MagicNumber:OptionsManager.kt$OptionsManager$1000</ID>
+    <ID>MagicNumber:OptionsManager.kt$OptionsManager$19</ID>
+    <ID>MagicNumber:OptionsManager.kt$OptionsManager$20</ID>
+    <ID>MagicNumber:OptionsManager.kt$OptionsManager$3</ID>
+    <ID>MagicNumber:OptionsManager.kt$OptionsManager$80</ID>
+    <ID>MagicNumber:ProcessExEntryAction.kt$ProcessExEntryAction$0x0a</ID>
+    <ID>MagicNumber:RegistersHandler.kt$RegistersHandler$200</ID>
+    <ID>MagicNumber:SearchHelperKt.kt$3</ID>
+    <ID>MagicNumber:SelectLastFileHandler.kt$SelectLastFileHandler$999</ID>
+    <ID>MagicNumber:SelectionType.kt$SelectionType.BLOCK_WISE$3</ID>
+    <ID>MagicNumber:ShiftLeftHandler.kt$ShiftLeftHandler$31</ID>
+    <ID>MagicNumber:ShiftRightHandler.kt$ShiftRightHandler$31</ID>
+    <ID>MagicNumber:VimHighlightedYank.kt$VimHighlightedYank.HighlightHandler$3</ID>
+    <ID>MagicNumber:VimHighlightedYank.kt$VimHighlightedYank.HighlightHandler$4</ID>
+    <ID>MatchingDeclarationName:CommandDefinition.kt$CommandName</ID>
+    <ID>MaxLineLength:ActionHandler.kt$ActionHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY, SAVE_VISUAL)</ID>
+    <ID>MaxLineLength:ActionListHandler.kt$ActionListHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)</ID>
+    <ID>MaxLineLength:AddInlineInlaysAction.kt$AddInlineInlaysAction$inlayModel.addInlineElement(offset, relatesToPrecedingText, HintRenderer(if (relatesToPrecedingText) ":$text" else "$text:"))</ID>
+    <ID>MaxLineLength:AsciiHandler.kt$AsciiHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)</ID>
+    <ID>MaxLineLength:BufferListHandler.kt$BufferListHandler$val lineNumPad = if (displayFileName.length &lt; FILE_NAME_PAD) (FILE_NAME_PAD - displayFileName.length).toString() else ""</ID>
+    <ID>MaxLineLength:BufferListHandler.kt$private</ID>
+    <ID>MaxLineLength:ChangeCharactersAction.kt$ChangeCharactersAction$override val flags: EnumSet&lt;CommandFlags&gt; = enumSetOf(CommandFlags.FLAG_NO_REPEAT_INSERT, CommandFlags.FLAG_MULTIKEY_UNDO)</ID>
+    <ID>MaxLineLength:ChangeEditorActionHandler.kt$ChangeEditorActionHandler.ForEachCaret$abstract fun execute(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean</ID>
+    <ID>MaxLineLength:ChangeEndOfLineAction.kt$ChangeEndOfLineAction$override val flags: EnumSet&lt;CommandFlags&gt; = enumSetOf(CommandFlags.FLAG_NO_REPEAT_INSERT, CommandFlags.FLAG_MULTIKEY_UNDO)</ID>
+    <ID>MaxLineLength:ChangeLineAction.kt$ChangeLineAction$override val flags: EnumSet&lt;CommandFlags&gt; = enumSetOf(CommandFlags.FLAG_NO_REPEAT_INSERT, CommandFlags.FLAG_MULTIKEY_UNDO)</ID>
+    <ID>MaxLineLength:ChangeNumberIncAction.kt$IncAction$override</ID>
+    <ID>MaxLineLength:ChangeVisualLinesAction.kt$ChangeVisualLinesAction$override val flags: EnumSet&lt;CommandFlags&gt; = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_MULTIKEY_UNDO, CommandFlags.FLAG_EXIT_VISUAL)</ID>
+    <ID>MaxLineLength:ChangeVisualLinesEndAction.kt$ChangeVisualLinesEndAction$override val flags: EnumSet&lt;CommandFlags&gt; = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_MULTIKEY_UNDO, CommandFlags.FLAG_EXIT_VISUAL)</ID>
+    <ID>MaxLineLength:ChangeVisualNumberIncAction.kt$IncNumber$override</ID>
+    <ID>MaxLineLength:ChangeVisualNumberIncAction.kt$IncNumber$return VimPlugin.getChange().changeNumberVisualMode(editor, caret, range.toVimTextRange(false), inc * cmd.count, avalanche)</ID>
+    <ID>MaxLineLength:CmdClearHandler.kt$CmdClearHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)</ID>
+    <ID>MaxLineLength:CmdHandler.kt$CmdHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)</ID>
+    <ID>MaxLineLength:Command.kt$Command$constructor(rawCount: Int, register: Char): this(rawCount, NonExecutableActionHandler, Type.SELECT_REGISTER, EnumSet.of(CommandFlags.FLAG_EXPECT_MORE)) { this.register = register }</ID>
+    <ID>MaxLineLength:CommandState.kt$CommandState$mappingState.mappingMode = if (modeState.mode == Mode.OP_PENDING) MappingMode.OP_PENDING else modeToMappingMode(mode)</ID>
+    <ID>MaxLineLength:CommandStateExtensions.kt$CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -&gt; false</ID>
+    <ID>MaxLineLength:CommandStateExtensions.kt$CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -&gt; usesVirtualSpace</ID>
+    <ID>MaxLineLength:CommandStateExtensions.kt$CommandState.Mode.REPLACE, CommandState.Mode.CMD_LINE, CommandState.Mode.COMMAND, CommandState.Mode.INSERT, CommandState.Mode.OP_PENDING -&gt; false</ID>
+    <ID>MaxLineLength:CopyTextHandler.kt$CopyTextHandler$val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, rawIndent = true, caretAfterInsertedText = false, putToLine = line)</ID>
+    <ID>MaxLineLength:DeleteJoinLinesAction.kt$DeleteJoinLinesAction$editor.caretModel.runForEachCaret({ caret: Caret -&gt; if (!VimPlugin.getChange().deleteJoinLines(editor, caret, count, false)) res.set(false) }, true)</ID>
+    <ID>MaxLineLength:DeleteJoinLinesSpacesAction.kt$DeleteJoinLinesSpacesAction$editor.caretModel.runForEachCaret({ caret: Caret -&gt; if (!VimPlugin.getChange().deleteJoinLines(editor, caret, count, true)) res.set(false) }, true)</ID>
+    <ID>MaxLineLength:DeleteLinesHandler.kt$DeleteLinesHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)</ID>
+    <ID>MaxLineLength:DumpLineHandler.kt$DumpLineHandler$logger.debug("Offset $i, char=${chars[i]}, lp=${editor.offsetToLogicalPosition(i)}, vp=${editor.offsetToVisualPosition(i)}")</ID>
+    <ID>MaxLineLength:DuplicableOperatorAction.kt$DuplicableOperatorAction</ID>
+    <ID>MaxLineLength:EditFileHandler.kt$EditFileHandler$ApplicationManager.getApplication().invokeLater { KeyHandler.executeAction("OpenFile", EditorDataContext(editor, context)) }</ID>
+    <ID>MaxLineLength:ExBeanClass.kt$ExBeanClass$logger&lt;ExBeanClass&gt;().error("IdeaVim doesn't accept contributions to `vimActions` extension points. Please create a plugin using `VimExtension`. Plugin to blame: $pluginId")</ID>
+    <ID>MaxLineLength:ExKeyBindings.kt$ExKeyBindings$KeyBinding(KeyStroke.getKeyStroke(0x08.toChar().toInt(), KeyEvent.CTRL_DOWN_MASK), ExEditorKit.deletePrevCharAction)</ID>
+    <ID>MaxLineLength:ExRanges.kt$SearchRange$override</ID>
+    <ID>MaxLineLength:GnNextTextObject.kt$GnNextTextObject$override</ID>
+    <ID>MaxLineLength:GnPreviousTextObject.kt$GnPreviousTextObject$override</ID>
+    <ID>MaxLineLength:GotoCharacterHandler.kt$GotoCharacterHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)</ID>
+    <ID>MaxLineLength:GotoLineHandler.kt$GotoLineHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)</ID>
+    <ID>MaxLineLength:IdeaSelectionControl.kt$IdeaSelectionControl$ fun controlNonVimSelectionChange(editor: Editor, selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER)</ID>
+    <ID>MaxLineLength:IdeaSelectionControl.kt$IdeaSelectionControl$CommandState.Mode.SELECT -&gt; VimPlugin.getVisualMotion().enterSelectMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))</ID>
+    <ID>MaxLineLength:IdeaSelectionControl.kt$IdeaSelectionControl$CommandState.Mode.VISUAL -&gt; VimPlugin.getVisualMotion().enterVisualMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))</ID>
+    <ID>MaxLineLength:IdeaSelectionControl.kt$IdeaSelectionControl$private</ID>
+    <ID>MaxLineLength:IdeaSelectionControl.kt$IdeaSelectionControl$private fun dontChangeMode(editor: Editor): Boolean</ID>
+    <ID>MaxLineLength:IdeaSelectionControl.kt$IdeaSelectionControl$selectionSource == VimListenerManager.SelectionSource.MOUSE &amp;&amp; SelectModeOptionData.mouse in OptionsManager.selectmode</ID>
+    <ID>MaxLineLength:IdeaSpecifics.kt$IdeaSpecifics.VimActionListener$if (surrounderAction == action.javaClass.name &amp;&amp; surrounderItems.any { action.templatePresentation.text.endsWith(it) }) { editor?.let { val commandState = editor.commandState while (commandState.mode != CommandState.Mode.COMMAND) { commandState.popModes() } VimPlugin.getChange().insertBeforeCursor(it, dataContext) KeyHandler.getInstance().reset(it) } }</ID>
+    <ID>MaxLineLength:IdeaSpecifics.kt$IdeaSpecifics.VimActionListener$private val surrounderAction = "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"</ID>
+    <ID>MaxLineLength:IdeaSpecifics.kt$IdeaSpecifics.VimActionListener.&lt;no name provided&gt;$val predictedMode = IdeaSelectionControl.predictMode(eventEditor, VimListenerManager.SelectionSource.OTHER)</ID>
+    <ID>MaxLineLength:IdeaSpecifics.kt$IdeaSpecifics.VimTemplateManagerListener${ // Enable insert mode if there is no selection in template // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange] if (editor.inNormalMode) { VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor)) KeyHandler.getInstance().reset(editor) } }</ID>
+    <ID>MaxLineLength:IdeaSpecifics.kt$IdeaSpecifics.VimTemplateManagerListener.&lt;no name provided&gt;$override</ID>
+    <ID>MaxLineLength:JoinLinesHandler.kt$JoinLinesHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)</ID>
+    <ID>MaxLineLength:MapHandler.kt$MapHandler$VimPlugin.getKey().putKeyMapping(modes, arguments.fromKeys, MappingOwner.IdeaVim, arguments.toKeys, commandInfo.isRecursive)</ID>
+    <ID>MaxLineLength:MapHandler.kt$MapHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)</ID>
+    <ID>MaxLineLength:MapHandler.kt$MapHandler.CommandInfo$private</ID>
+    <ID>MaxLineLength:MappingInfo.kt$MappingInfo$sealed</ID>
+    <ID>MaxLineLength:MarksHandler.kt$MarksHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)</ID>
+    <ID>MaxLineLength:MotionActionHandler.kt$MotionActionHandler$fun getHandlerOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int</ID>
+    <ID>MaxLineLength:MotionActionHandler.kt$MotionActionHandler.ForEachCaret$abstract</ID>
+    <ID>MaxLineLength:MotionArrowDownAction.kt$MotionArrowDownAction$override</ID>
+    <ID>MaxLineLength:MotionArrowDownAction.kt$MotionArrowDownAction$override val keyStrokesSet: Set&lt;MutableList&lt;KeyStroke&gt;&gt; = setOf(parseKeys("&lt;Down&gt;"), mutableListOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0)))</ID>
+    <ID>MaxLineLength:MotionArrowLeftAction.kt$MotionArrowLeftAction$override</ID>
+    <ID>MaxLineLength:MotionArrowLeftAction.kt$MotionArrowLeftAction$override val keyStrokesSet: Set&lt;List&lt;KeyStroke&gt;&gt; = setOf(parseKeys("&lt;Left&gt;"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0)))</ID>
+    <ID>MaxLineLength:MotionArrowRightAction.kt$MotionArrowRightAction$override</ID>
+    <ID>MaxLineLength:MotionArrowUpAction.kt$MotionArrowUpAction$override</ID>
+    <ID>MaxLineLength:MotionArrowUpAction.kt$MotionArrowUpAction$override val keyStrokesSet: Set&lt;List&lt;KeyStroke&gt;&gt; = setOf(parseKeys("&lt;Up&gt;"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0)))</ID>
+    <ID>MaxLineLength:MotionDownActions.kt$MotionDownAction$override</ID>
+    <ID>MaxLineLength:MotionDownActions.kt$MotionDownCtrlNAction$EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN).execute(editor, primaryCaret, context)</ID>
+    <ID>MaxLineLength:MotionDownActions.kt$MotionDownCtrlNAction$override</ID>
+    <ID>MaxLineLength:MotionDownActions.kt$MotionDownNotLineWiseAction$override</ID>
+    <ID>MaxLineLength:MotionInnerBlockParenAction.kt$MotionInnerBlockParenAction$override</ID>
+    <ID>MaxLineLength:MotionInnerBlockSingleQuoteAction.kt$MotionInnerBlockSingleQuoteAction$override</ID>
+    <ID>MaxLineLength:MotionInnerBlockTagAction.kt$MotionInnerBlockTagAction$override</ID>
+    <ID>MaxLineLength:MotionInnerParagraphAction.kt$MotionInnerParagraphAction$override</ID>
+    <ID>MaxLineLength:MotionInnerSentenceAction.kt$MotionInnerSentenceAction$override</ID>
+    <ID>MaxLineLength:MotionInnerWordAction.kt$MotionInnerWordAction$override</ID>
+    <ID>MaxLineLength:MotionJumpNextAction.kt$MotionJumpNextAction$override</ID>
+    <ID>MaxLineLength:MotionJumpPreviousAction.kt$MotionJumpPreviousAction$override</ID>
+    <ID>MaxLineLength:MotionOuterBigWordAction.kt$MotionOuterBigWordAction$override</ID>
+    <ID>MaxLineLength:MotionOuterBlockAngleAction.kt$MotionOuterBlockAngleAction$override</ID>
+    <ID>MaxLineLength:MotionOuterBlockBackQuoteAction.kt$MotionOuterBlockBackQuoteAction$override</ID>
+    <ID>MaxLineLength:MotionOuterBlockBraceAction.kt$MotionOuterBlockBraceAction$override</ID>
+    <ID>MaxLineLength:MotionOuterBlockBracketAction.kt$MotionOuterBlockBracketAction$override</ID>
+    <ID>MaxLineLength:MotionOuterBlockDoubleQuoteAction.kt$MotionOuterBlockDoubleQuoteAction$override</ID>
+    <ID>MaxLineLength:MotionOuterBlockParenAction.kt$MotionOuterBlockParenAction$override</ID>
+    <ID>MaxLineLength:MotionOuterBlockSingleQuoteAction.kt$MotionOuterBlockSingleQuoteAction$override</ID>
+    <ID>MaxLineLength:MotionOuterBlockTagAction.kt$MotionOuterBlockTagAction$override</ID>
+    <ID>MaxLineLength:MotionOuterParagraphAction.kt$MotionOuterParagraphAction$override</ID>
+    <ID>MaxLineLength:MotionOuterSentenceAction.kt$MotionOuterSentenceAction$override</ID>
+    <ID>MaxLineLength:MotionOuterWordAction.kt$MotionOuterWordAction$override</ID>
+    <ID>MaxLineLength:MotionScrollHalfWidthLeftAction.kt$MotionScrollHalfWidthLeftAction$return VimPlugin.getMotion().scrollColumns(editor, cmd.count * (EditorHelper.getApproximateScreenWidth(editor) / 2))</ID>
+    <ID>MaxLineLength:MotionScrollHalfWidthRightAction.kt$MotionScrollHalfWidthRightAction$return VimPlugin.getMotion().scrollColumns(editor, -cmd.count * (EditorHelper.getApproximateScreenWidth(editor) / 2))</ID>
+    <ID>MaxLineLength:MotionScrollPageDownAction.kt$MotionScrollPageDownInsertModeAction$override val flags: EnumSet&lt;CommandFlags&gt; = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP, CommandFlags.FLAG_CLEAR_STROKES)</ID>
+    <ID>MaxLineLength:MotionScrollPageUpAction.kt$MotionScrollPageUpInsertModeAction$override val flags: EnumSet&lt;CommandFlags&gt; = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP, CommandFlags.FLAG_CLEAR_STROKES)</ID>
+    <ID>MaxLineLength:MotionUpActions.kt$MotionUpAction$override</ID>
+    <ID>MaxLineLength:MotionUpActions.kt$MotionUpCtrlPAction$EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_UP).execute(editor, primaryCaret, context)</ID>
+    <ID>MaxLineLength:MotionUpActions.kt$MotionUpCtrlPAction$override</ID>
+    <ID>MaxLineLength:MotionUpActions.kt$MotionUpNotLineWiseAction$override</ID>
+    <ID>MaxLineLength:MoveTextHandler.kt$MoveTextHandler$val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, rawIndent = true, caretAfterInsertedText = false, putToLine = line)</ID>
+    <ID>MaxLineLength:NotificationService.kt$NotificationService</ID>
+    <ID>MaxLineLength:NotificationService.kt$NotificationService$"""Add &lt;code&gt;ideaput&lt;/code&gt; to &lt;code&gt;clipboard&lt;/code&gt; option to perform a put via the IDE&lt;br/&gt;&lt;b&gt;&lt;code&gt;set clipboard+=ideaput&lt;/code&gt;&lt;/b&gt;"""</ID>
+    <ID>MaxLineLength:NotificationService.kt$NotificationService$fun enableRepeatingMode()</ID>
+    <ID>MaxLineLength:NotificationService.kt$NotificationService$notification.addAction(AppendToIdeaVimRcAction(notification, "set clipboard+=ideaput", "ideaput") { OptionsManager.clipboard.append(ClipboardOptionsData.ideaput) })</ID>
+    <ID>MaxLineLength:NotificationService.kt$NotificationService$notification.addAction(AppendToIdeaVimRcAction(notification, "set ideajoin", "ideajoin") { OptionsManager.ideajoin.set() })</ID>
+    <ID>MaxLineLength:NotificationService.kt$NotificationService.AppendToIdeaVimRcAction$createIdeaVimRcManually("Option is enabled, but the file is not modified&lt;br/&gt;Please modify &lt;code&gt;~/.ideavimrc&lt;/code&gt; manually", project)</ID>
+    <ID>MaxLineLength:NotificationService.kt$NotificationService.AppendToIdeaVimRcAction$private inner</ID>
+    <ID>MaxLineLength:NotificationService.kt$NotificationService.AppendToIdeaVimRcAction$val successNotification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, "&lt;code&gt;$optionName&lt;/code&gt; is enabled", NotificationType.INFORMATION)</ID>
+    <ID>MaxLineLength:NotificationService.kt$NotificationService.Companion$val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, message, NotificationType.WARNING)</ID>
+    <ID>MaxLineLength:NotificationService.kt$NotificationService.Companion$var actionName = if (SystemInfo.isMac) "Reveal Home in Finder" else "Show Home in " + RevealFileAction.getFileManagerName()</ID>
+    <ID>MaxLineLength:NotificationService.kt$NotificationService.HelpLink$private inner</ID>
+    <ID>MaxLineLength:NotificationService.kt$NotificationService.OpenIdeaVimRcAction$createIdeaVimRcManually("Cannot create configuration file.&lt;br/&gt;Please create &lt;code&gt;~/.ideavimrc&lt;/code&gt; manually", eventProject)</ID>
+    <ID>MaxLineLength:OnlyHandler.kt$OnlyHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)</ID>
+    <ID>MaxLineLength:OptionsManager.kt$IdeaRefactorMode$if (!segmentRange.isEmpty &amp;&amp; segmentRange.endOffset == editor.caretModel.offset &amp;&amp; editor.caretModel.offset != 0) { editor.caretModel.moveToOffset(editor.caretModel.offset - 1) }</ID>
+    <ID>MaxLineLength:OptionsManager.kt$OptionsManager$val clipboard = addOption(ListOption(ClipboardOptionsData.name, ClipboardOptionsData.abbr, arrayOf(ClipboardOptionsData.ideaput, "autoselect,exclude:cons\\|linux"), null))</ID>
+    <ID>MaxLineLength:OptionsManager.kt$OptionsManager$val idearefactormode = addOption(BoundStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues))</ID>
+    <ID>MaxLineLength:OptionsManager.kt$OptionsManager$val ideastatusicon = addOption(BoundStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues))</ID>
+    <ID>MaxLineLength:OptionsManager.kt$OptionsManager$val nrformats = addOption(BoundListOption("nrformats", "nf", arrayOf("octal", "hex"), arrayOf("octal", "hex", "alpha")))</ID>
+    <ID>MaxLineLength:OptionsManager.kt$OptionsManager$val selection = addOption(BoundStringOption("selection", "sel", "inclusive", arrayOf("old", "inclusive", "exclusive")))</ID>
+    <ID>MaxLineLength:OptionsManager.kt$OptionsManager$val showcmd = addOption(ToggleOption("showcmd", "sc", true)) // Vim: Off by default on platforms with possibly slow tty. On by default elsewhere.</ID>
+    <ID>MaxLineLength:PlaybackRegisterAction.kt$PlaybackRegisterAction$application.runWriteAction { res.set(VimPlugin.getMacro().playbackLastRegister(editor, context, project, cmd.count)) }</ID>
+    <ID>MaxLineLength:PlaybackRegisterAction.kt$PlaybackRegisterAction$application.runWriteAction { res.set(VimPlugin.getMacro().playbackRegister(editor, context, project, reg, cmd.count)) }</ID>
+    <ID>MaxLineLength:ProcessExEntryAction.kt$ProcessExEntryAction$override val keyStrokesSet: Set&lt;List&lt;KeyStroke&gt;&gt; = parseKeysSet("&lt;CR&gt;", "&lt;C-M&gt;", 0x0a.toChar().toString(), 0x0d.toChar().toString())</ID>
+    <ID>MaxLineLength:PutGroup.kt$PutData$if (rawIndent &amp;&amp; textData?.typeInRegister != SelectionType.LINE_WISE &amp;&amp; visualSelection?.typeInEditor != SelectionType.LINE_WISE) false else rawIndent</ID>
+    <ID>MaxLineLength:PutGroup.kt$PutGroup$SelectionType.BLOCK_WISE -&gt; listOf(editor.logicalPositionToOffset(LogicalPosition(firstSelectedLine, startColumnOfSelection)))</ID>
+    <ID>MaxLineLength:PutGroup.kt$PutGroup$SelectionType.CHARACTER_WISE -&gt; putTextCharacterwise(editor, caret, context, text, type, mode, startOffset, count, indent, cursorAfter)</ID>
+    <ID>MaxLineLength:PutGroup.kt$PutGroup$SelectionType.LINE_WISE -&gt; putTextLinewise(editor, caret, context, text, type, mode, startOffset, count, indent, cursorAfter)</ID>
+    <ID>MaxLineLength:PutGroup.kt$PutGroup$data.visualSelection.caretsAndSelections.entries.sortedByDescending { it.key.logicalPosition }</ID>
+    <ID>MaxLineLength:PutGroup.kt$PutGroup$if (data.textData.typeInRegister.isChar &amp;&amp; text.lastOrNull() == '\n' &amp;&amp; data.visualSelection?.typeInEditor?.isLine == false) text = text.dropLast(1)</ID>
+    <ID>MaxLineLength:PutGroup.kt$PutGroup$if (startOffset &gt; 0 &amp;&amp; startOffset == editor.document.textLength &amp;&amp; editor.document.charsSequence[startOffset - 1] != '\n') { application.runWriteAction { editor.document.insertString(startOffset, "\n") } startOffset++ }</ID>
+    <ID>MaxLineLength:PutGroup.kt$PutGroup$moveCaretToEndPosition(editor, caret, startOffset, endOffset, text.typeInRegister, subMode, data.caretAfterInsertedText)</ID>
+    <ID>MaxLineLength:PutGroup.kt$PutGroup$private</ID>
+    <ID>MaxLineLength:PutGroup.kt$PutGroup$startOffset = min(editor.document.textLength, VimPlugin.getMotion().moveCaretToLineEnd(editor, line, true) + 1)</ID>
+    <ID>MaxLineLength:PutGroup.kt$PutGroup$val endOffset = if (data.indent) doIndent(editor, caret, context, startOffset, startOffset + text.text.length) else startOffset + text.text.length</ID>
+    <ID>MaxLineLength:PutGroup.kt$PutGroup$val startOffset = prepareDocumentAndGetStartOffsets(editor, caret, text.typeInRegister, data, additionalData).first()</ID>
+    <ID>MaxLineLength:PutLinesHandler.kt$PutLinesHandler$val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, rawIndent = false, caretAfterInsertedText = false, putToLine = line)</ID>
+    <ID>MaxLineLength:PutLinesHandler.kt$PutLinesHandler$val textData = registerGroup.lastRegister?.let { PutData.TextData(it.text ?: StringHelper.toKeyNotation(it.keys), SelectionType.LINE_WISE, it.transferableData) }</ID>
+    <ID>MaxLineLength:PutTextAction.kt$PutTextAfterCursorAction : PutTextBaseAction</ID>
+    <ID>MaxLineLength:PutTextAction.kt$PutTextAfterCursorActionMoveCursor : PutTextBaseAction</ID>
+    <ID>MaxLineLength:PutTextAction.kt$PutTextAfterCursorNoIndentAction : PutTextBaseAction</ID>
+    <ID>MaxLineLength:PutTextAction.kt$PutTextBaseAction$val textData = if (lastRegister != null) TextData(lastRegister.text ?: StringHelper.toKeyNotation(lastRegister.keys), lastRegister.type, lastRegister.transferableData) else null</ID>
+    <ID>MaxLineLength:PutTextAction.kt$PutTextBeforeCursorAction : PutTextBaseAction</ID>
+    <ID>MaxLineLength:PutTextAction.kt$PutTextBeforeCursorActionMoveCursor : PutTextBaseAction</ID>
+    <ID>MaxLineLength:PutTextAction.kt$PutTextBeforeCursorNoIndentAction : PutTextBaseAction</ID>
+    <ID>MaxLineLength:PutVisualTextAction.kt$PutVisualTextAfterCursorAction : PutVisualTextBaseAction</ID>
+    <ID>MaxLineLength:PutVisualTextAction.kt$PutVisualTextAfterCursorMoveCursorAction : PutVisualTextBaseAction</ID>
+    <ID>MaxLineLength:PutVisualTextAction.kt$PutVisualTextAfterCursorNoIndentAction : PutVisualTextBaseAction</ID>
+    <ID>MaxLineLength:PutVisualTextAction.kt$PutVisualTextBaseAction$override</ID>
+    <ID>MaxLineLength:PutVisualTextAction.kt$PutVisualTextBeforeCursorAction : PutVisualTextBaseAction</ID>
+    <ID>MaxLineLength:PutVisualTextAction.kt$PutVisualTextBeforeCursorMoveCursorAction : PutVisualTextBaseAction</ID>
+    <ID>MaxLineLength:PutVisualTextAction.kt$PutVisualTextBeforeCursorNoIndentAction : PutVisualTextBaseAction</ID>
+    <ID>MaxLineLength:Ranges.kt$Ranges$if (range.isMove) MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLine(editor, endLine, editor.caretModel.primaryCaret))</ID>
+    <ID>MaxLineLength:Register.kt$Register$constructor(name: Char, type: SelectionType, text: String, transferableData: MutableList&lt;out TextBlockTransferableData&gt;) { this.name = name this.type = type this.keys = StringHelper.stringToKeys(text) this.transferableData = transferableData this.rawText = text }</ID>
+    <ID>MaxLineLength:Register.kt$Register$constructor(name: Char, type: SelectionType, text: String, transferableData: MutableList&lt;out TextBlockTransferableData&gt;, rawText: String) { this.name = name this.type = type this.keys = StringHelper.stringToKeys(text) this.transferableData = transferableData this.rawText = rawText }</ID>
+    <ID>MaxLineLength:RepeatChangeAction.kt$RepeatChangeAction$processor.executeCommand(editor.project, { lastHandler.execute(editor, context) }, "Vim " + lastHandler.javaClass.simpleName, null)</ID>
+    <ID>MaxLineLength:RepeatHandler.kt$RepeatHandler$MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLine(editor, line, editor.caretModel.primaryCaret))</ID>
+    <ID>MaxLineLength:RepeatHandler.kt$RepeatHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.SELF_SYNCHRONIZED, DONT_SAVE_LAST)</ID>
+    <ID>MaxLineLength:ReplaceWithRegister.kt$ReplaceWithRegister.Companion$val putData = PutData(textData, visualSelection, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = false, putToLine = -1)</ID>
+    <ID>MaxLineLength:ReplaceWithRegister.kt$ReplaceWithRegister.Operator$val visualSelection = PutData.VisualSelection(mapOf(editor.caretModel.primaryCaret to VimSelection.create(range.startOffset, range.endOffset - 1, selectionType, editor)), selectionType)</ID>
+    <ID>MaxLineLength:RunnableHelper.kt$RunnableHelper$CommandProcessor.getInstance().executeCommand(project, { ApplicationManager.getApplication().runReadAction(cmd) }, name, groupId)</ID>
+    <ID>MaxLineLength:RunnableHelper.kt$RunnableHelper$CommandProcessor.getInstance().executeCommand(project, { ApplicationManager.getApplication().runWriteAction(cmd) }, name, groupId)</ID>
+    <ID>MaxLineLength:SearchEntryFwdAction.kt$SearchEntryFwdAction$return VimPlugin.getSearch().search(editor, caret, argument.string, count, enumSetOf(CommandFlags.FLAG_SEARCH_FWD), false)</ID>
+    <ID>MaxLineLength:SearchEntryRevAction.kt$SearchEntryRevAction$return VimPlugin.getSearch().search(editor, caret, argument.string, count, enumSetOf(CommandFlags.FLAG_SEARCH_REV), false)</ID>
+    <ID>MaxLineLength:SearchHelperKt.kt$// position of last found unpaired single quote var lastOpenSingleQuotePos = -1 // whether we are in double quotes // true - definitely yes // false - definitely no // null - maybe yes, in case we found such combination: '" // in that situation it may be double quote inside single quotes, so we cannot threat it as double quote pair open/close var inQuote: Boolean? = false val charsToSearch = setOf('\'', '"', '\n') var found = findPositionOfFirstCharacter(chars, begin, charsToSearch, false, Direction.FORWARD) while (found != null &amp;&amp; found.first != '\n') { val i = found.second val c = found.first when (c) { '"' -&gt; { // if [maybe] in quote, then we know we found closing quote, so now we surely are not in quote if (inQuote == null || inQuote) { // we just found closing double quote inQuote = false // reset last found single quote, as it was in string literal lastOpenSingleQuotePos = -1 // if we previously found unclosed single quote } else if (lastOpenSingleQuotePos &gt;= 0) { // ...but we are too far from it if (i - lastOpenSingleQuotePos &gt; 2) { // then it definitely was not opening single quote lastOpenSingleQuotePos = -1 // and we found opening double quote inQuote = true } else { // else we don't know if we inside double or single quotes or not inQuote = null } // we were not in double nor in single quote, so now we are in double quote } else { inQuote = true } } '\'' -&gt; { // if we previously found unclosed single quote if (lastOpenSingleQuotePos &gt;= 0) { // ...but we are too far from it if (i - lastOpenSingleQuotePos &gt; 3) { // ... forget about it and threat current one as unclosed lastOpenSingleQuotePos = i } else { // else we found closing single quote lastOpenSingleQuotePos = -1 // and if we didn't know whether we are in double quote or not if (inQuote == null) { // then now we are definitely not in inQuote = false } } } else { // we found opening single quote lastOpenSingleQuotePos = i } } } yield(State(i, c, inQuote, lastOpenSingleQuotePos)) found = findPositionOfFirstCharacter(chars, i + Direction.FORWARD.toInt(), charsToSearch, false, Direction.FORWARD) }</ID>
+    <ID>MaxLineLength:SelectMotionLeftAction.kt$SelectMotionLeftAction$override</ID>
+    <ID>MaxLineLength:SelectMotionRightAction.kt$SelectMotionRightAction$override</ID>
+    <ID>MaxLineLength:SelectToggleVisualMode.kt$SelectToggleVisualMode$if (it.offset == it.selectionEnd &amp;&amp; it.visualLineStart &lt;= it.offset - VimPlugin.getVisualMotion().selectionAdj) { it.moveToInlayAwareOffset(it.offset - VimPlugin.getVisualMotion().selectionAdj) }</ID>
+    <ID>MaxLineLength:ShiftLeft.kt$ShiftLeftLinesAction$override</ID>
+    <ID>MaxLineLength:ShiftLeft.kt$ShiftLeftMotionAction$override</ID>
+    <ID>MaxLineLength:ShiftLeft.kt$ShiftLeftVisualAction$override</ID>
+    <ID>MaxLineLength:ShiftLeftHandler.kt$ShiftLeftHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)</ID>
+    <ID>MaxLineLength:ShiftRight.kt$ShiftRightLinesAction$override</ID>
+    <ID>MaxLineLength:ShiftRight.kt$ShiftRightMotionAction$override</ID>
+    <ID>MaxLineLength:ShiftRight.kt$ShiftRightVisualAction$override</ID>
+    <ID>MaxLineLength:ShiftRightHandler.kt$ShiftRightHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)</ID>
+    <ID>MaxLineLength:ShowCmd.kt$Widget : EditorBasedWidgetMultiframeTextPresentation</ID>
+    <ID>MaxLineLength:SortHandler.kt$SortHandler$primaryCaret.moveToInlayAwareOffset(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, range.startLine))</ID>
+    <ID>MaxLineLength:SortHandler.kt$SortHandler.LineComparator$private</ID>
+    <ID>MaxLineLength:SpecialKeyHandlers.kt$NonShiftedSpecialKeyHandler$abstract</ID>
+    <ID>MaxLineLength:SpecialKeyHandlers.kt$NonShiftedSpecialKeyHandler$final override</ID>
+    <ID>MaxLineLength:StatisticReporter.kt$StatisticReporter$PropertiesComponent.getInstance().setValue(IDEAVIM_STATISTICS_TIMESTAMP_KEY, System.currentTimeMillis().toString())</ID>
+    <ID>MaxLineLength:StatisticReporter.kt$StatisticReporter$val url = "https://plugins.jetbrains.com/plugins/list?pluginId=${VimPlugin.getPluginId().idString}&amp;build=$buildNumber&amp;pluginVersion=$version&amp;os=$os&amp;uuid=$uid"</ID>
+    <ID>MaxLineLength:TextObjectActionHandler.kt$TextObjectActionHandler$abstract fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange?</ID>
+    <ID>MaxLineLength:UserDataManager.kt$private</ID>
+    <ID>MaxLineLength:UserDataManager.kt$var Caret.vimInsertStart: RangeMarker by userDataOr { (this as Caret).editor.document.createRangeMarker(this.offset, this.offset) }</ID>
+    <ID>MaxLineLength:UserDataManager.kt$var Caret.vimLastColumn: Int by userDataCaretToEditorOr { (this as Caret).visualPosition.column - this.amountOfInlaysBeforeCaret }</ID>
+    <ID>MaxLineLength:VimExchangeExtension.kt$VimExchangeExtension.Operator$VimPlugin.getMark().setChangeMarks(editor, TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end) + 1))</ID>
+    <ID>MaxLineLength:VimExchangeExtension.kt$VimExchangeExtension.Operator$primaryCaret.moveToInlayAwareLogicalPosition(LogicalPosition(ex1.start.logicalLine - verticalOffset, ex1.start.col))</ID>
+    <ID>MaxLineLength:VimExchangeExtension.kt$VimExchangeExtension.Operator$primaryCaret.moveToInlayAwareLogicalPosition(LogicalPosition(ex1.start.logicalLine, ex1.start.col - horizontalOffset))</ID>
+    <ID>MaxLineLength:VimExtensionFacade.kt$VimExtensionFacade$ @JvmStatic @ScheduledForRemoval(inVersion = "0.58") @Deprecated("Only for EasyMotion support") fun putExtensionHandlerMapping(modes: Set&lt;MappingMode&gt;, fromKeys: List&lt;KeyStroke&gt;, extensionHandler: VimExtensionHandler, recursive: Boolean)</ID>
+    <ID>MaxLineLength:VimExtensionFacade.kt$VimExtensionFacade$VimPlugin.getKey().putKeyMapping(modes, fromKeys, MappingOwner.Plugin.get("easymotion"), extensionHandler, recursive)</ID>
+    <ID>MaxLineLength:VimHighlightedYank.kt$VimHighlightedYank.HighlightHandler${ //from vim-highlightedyank docs: When a new text is yanked or user starts editing, the old highlighting would be deleted clearAllYankHighlighters() this.editor = editor val project = editor.project if (project != null) { Disposer.register(VimProjectService.getInstance(project), Disposable { this.editor = null yankHighlighters.clear() }) } if (range.isMultiple) { for (i in 0 until range.size()) { highlightSingleRange(editor, range.startOffsets[i]..range.endOffsets[i]) } } else { highlightSingleRange(editor, range.startOffset..range.endOffset) } }</ID>
+    <ID>MaxLineLength:VimHighlightedYank.kt$private val DEFAULT_HIGHLIGHT_TEXT_COLOR: Color = EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES.defaultAttributes.backgroundColor</ID>
+    <ID>MaxLineLength:VimListenerManager.kt$VimListenerManager.EditorMouseHandler$return caret.offset == lineEnd &amp;&amp; lineEnd != lineStart &amp;&amp; caret.offset - 1 == caret.selectionStart &amp;&amp; caret.offset == caret.selectionEnd</ID>
+    <ID>MaxLineLength:VimListenerManager.kt$VimListenerManager.ProjectListeners$ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }.forEach { IdeaSpecifics.removeIdeaSpecificsListeners(it) }</ID>
+    <ID>MaxLineLength:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension$putExtensionHandlerMapping(MappingMode.NXO, parseKeys(ALL_OCCURRENCES), owner, AllOccurrencesHandler(whole = false), false )</ID>
+    <ID>MaxLineLength:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension$putExtensionHandlerMapping(MappingMode.NXO, parseKeys(ALL_WHOLE_OCCURRENCES), owner, AllOccurrencesHandler(), false )</ID>
+    <ID>MaxLineLength:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension$putExtensionHandlerMapping(MappingMode.NXO, parseKeys(NEXT_OCCURRENCE), owner, NextOccurrenceHandler(whole = false), false)</ID>
+    <ID>MaxLineLength:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension.AllOccurrencesHandler$val nextOffset = VimPlugin.getSearch().search(editor, selectedText, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)</ID>
+    <ID>MaxLineLength:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension.NextOccurrenceHandler$if (nextOffset == -1 || patternComparator.compare(EditorHelper.getText(editor, nextOffset, nextOffset + pattern.length), pattern) != 0) { if (caretModel.caretCount &gt; 1) return val newNextOffset = VimPlugin.getSearch().search(editor, pattern, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false) if (newNextOffset != -1) { val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(newNextOffset)) ?: return selectWord(caret, pattern, newNextOffset) } return }</ID>
+    <ID>MaxLineLength:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension.NextOccurrenceHandler$val newNextOffset = VimPlugin.getSearch().search(editor, pattern, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)</ID>
+    <ID>MaxLineLength:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension.NextOccurrenceHandler$val patternComparator = if (OptionsManager.ignorecase.isSet) String.CASE_INSENSITIVE_ORDER else Comparator(String::compareTo)</ID>
+    <ID>MaxLineLength:VimSelection.kt$VimBlockSelection$val lineRange = if (logicalStart.line &gt; logicalEnd.line) logicalEnd.line..logicalStart.line else logicalStart.line..logicalEnd.line</ID>
+    <ID>MaxLineLength:VimSelection.kt$VimLineSelection$if (skipNewLineForLineMode &amp;&amp; editor.document.textLength &gt;= normNativeEnd &amp;&amp; normNativeEnd &gt; 0 &amp;&amp; editor.document.text[normNativeEnd - 1] == '\n') { TextRange(normNativeStart, (normNativeEnd - 1).coerceAtLeast(0)) } else { TextRange(normNativeStart, normNativeEnd) }</ID>
+    <ID>MaxLineLength:VimSelection.kt$VimSelection$return "Selection [$type]: vim start[offset: $vimStart : col ${startLogPosition.column} line ${startLogPosition.line}]" + " vim end[offset: $vimEnd : col ${endLogPosition.column} line ${endLogPosition.line}]"</ID>
+    <ID>MaxLineLength:VimSelection.kt$VimSimpleSelection : VimSelection</ID>
+    <ID>MaxLineLength:VimSelection.kt$VimSimpleSelection.Companion$ fun createWithNative(vimStart: Int, vimEnd: Int, nativeStart: Int, nativeEnd: Int, type: SelectionType, editor: Editor)</ID>
+    <ID>MaxLineLength:VimShortcutKeyAction.kt$VimShortcutKeyAction.Companion$@JvmField val VIM_ONLY_EDITOR_KEYS: Set&lt;KeyStroke&gt; = ImmutableSet.builder&lt;KeyStroke&gt;().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0)).addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0)) .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0)).addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0)).addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_UP, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)).addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_LEFT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_RIGHT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_HOME, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_END, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_PAGE_UP, 0, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_PAGE_DOWN, 0, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)).build()</ID>
+    <ID>MaxLineLength:VimShortcutKeyAction.kt$VimShortcutKeyAction.Companion$ImmutableSet.builder&lt;KeyStroke&gt;().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0)).addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0)) .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0))</ID>
+    <ID>MaxLineLength:VimShortcutKeyAction.kt$VimShortcutKeyAction.Companion$ImmutableSet.builder&lt;KeyStroke&gt;().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0)).addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0)) .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0)).addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0))</ID>
+    <ID>MaxLineLength:VimShortcutKeyAction.kt$VimShortcutKeyAction.Companion$ImmutableSet.builder&lt;KeyStroke&gt;().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0)).addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0)) .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0)).addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0)).addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_UP, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK))</ID>
+    <ID>MaxLineLength:VimShortcutKeyAction.kt$VimShortcutKeyAction.Companion$ImmutableSet.builder&lt;KeyStroke&gt;().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0)).addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0)) .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0)).addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0)).addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_UP, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)).addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_LEFT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))</ID>
+    <ID>MaxLineLength:VimShortcutKeyAction.kt$VimShortcutKeyAction.Companion$ImmutableSet.builder&lt;KeyStroke&gt;().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0)).addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0)) .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0)).addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0)).addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_UP, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)).addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_LEFT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_RIGHT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))</ID>
+    <ID>MaxLineLength:VimShortcutKeyAction.kt$VimShortcutKeyAction.Companion$ImmutableSet.builder&lt;KeyStroke&gt;().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0)).addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0)) .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0)).addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0)).addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_UP, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)).addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_LEFT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_RIGHT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_HOME, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))</ID>
+    <ID>MaxLineLength:VimShortcutKeyAction.kt$VimShortcutKeyAction.Companion$ImmutableSet.builder&lt;KeyStroke&gt;().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0)).addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0)) .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0)).addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0)).addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_UP, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)).addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_LEFT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_RIGHT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_HOME, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_END, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))</ID>
+    <ID>MaxLineLength:VimShortcutKeyAction.kt$VimShortcutKeyAction.Companion$ImmutableSet.builder&lt;KeyStroke&gt;().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0)).addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0)) .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0)).addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0)).addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_UP, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)).addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_LEFT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_RIGHT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_HOME, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_END, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_PAGE_UP, 0, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))</ID>
+    <ID>MaxLineLength:VimShortcutKeyAction.kt$VimShortcutKeyAction.Companion$ImmutableSet.builder&lt;KeyStroke&gt;().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0)).addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0)) .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0)).addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0)).addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_UP, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)).addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_LEFT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_RIGHT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_HOME, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_END, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_PAGE_UP, 0, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_PAGE_DOWN, 0, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))</ID>
+    <ID>MaxLineLength:VimShortcutKeyAction.kt$VimShortcutKeyAction.Companion$private fun getKeyStrokes(keyCode: Int, vararg modifiers: Int)</ID>
+    <ID>MaxLineLength:VimSurroundExtension.kt$VimSurroundExtension$putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("&lt;Plug&gt;CSurround"), owner, CSurroundHandler(), false)</ID>
+    <ID>MaxLineLength:VimSurroundExtension.kt$VimSurroundExtension$putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("&lt;Plug&gt;DSurround"), owner, DSurroundHandler(), false)</ID>
+    <ID>MaxLineLength:VimSurroundExtension.kt$VimSurroundExtension$putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("&lt;Plug&gt;YSurround"), owner, YSurroundHandler(), false)</ID>
+    <ID>MaxLineLength:VimSurroundExtension.kt$VimSurroundExtension$putExtensionHandlerMapping(MappingMode.XO, StringHelper.parseKeys("&lt;Plug&gt;VSurround"), owner, VSurroundHandler(), false)</ID>
+    <ID>MaxLineLength:VimSurroundExtension.kt$VimSurroundExtension.CSurroundHandler.Companion$IdeaputDisabler().use { executeNormalWithoutMapping(StringHelper.parseKeys("\"" + REGISTER + sequence), editor) }</ID>
+    <ID>MaxLineLength:VimSurroundExtension.kt$VimSurroundExtension.CSurroundHandler.Companion$private</ID>
+    <ID>MaxLineLength:VisualGroup.kt$CommandState.Mode.COMMAND, CommandState.Mode.VISUAL, CommandState.Mode.REPLACE -&gt; ChangeGroup.resetCaret(editor, false)</ID>
+    <ID>MaxLineLength:VisualGroup.kt$fun blockToNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.Mode): Pair&lt;LogicalPosition, LogicalPosition&gt;</ID>
+    <ID>MaxLineLength:VisualGroup.kt$val (start, end) = if (selectionStart &gt; selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd</ID>
+    <ID>MaxLineLength:VisualGroup.kt$val adj = if (VimPlugin.getVisualMotion().exclusiveSelection || nativeEnd == lineEnd || mode == CommandState.Mode.SELECT) 0 else 1</ID>
+    <ID>MaxLineLength:VisualMotionGroup.kt$VisualMotionGroup$if (project != null &amp;&amp; FindManager.getInstance(project).selectNextOccurrenceWasPerformed()) return CommandState.SubMode.VISUAL_CHARACTER</ID>
+    <ID>MaxLineLength:VisualMotionGroup.kt$VisualMotionGroup$lineStartOfSelectionStart == selectionStart &amp;&amp; (lineEndOfSelectionEnd + 1 == selectionEnd || lineEndOfSelectionEnd == selectionEnd)</ID>
+    <ID>MaxLineLength:VisualMotionGroup.kt$VisualMotionGroup$val lastColumn = if (range.columns == MotionGroup.LAST_COLUMN) MotionGroup.LAST_COLUMN else editor.offsetToLogicalPosition(end).column</ID>
+    <ID>MaxLineLength:VisualOperationChange.kt$VisualOperation$SelectionType.CHARACTER_WISE -&gt; if (lines &gt; 1) ep.column - VimPlugin.getVisualMotion().selectionAdj else ep.column - sp.column</ID>
+    <ID>MaxLineLength:VisualOperationChange.kt$VisualOperation$lines &gt; 1 -&gt; VimPlugin.getMotion().moveCaretToLineStart(editor, endLine) + min(EditorHelper.getLineLength(editor, endLine), chars)</ID>
+    <ID>MaxLineLength:VisualOperatorActionHandler.kt$VisualOperatorActionHandler$selections.keys.size == 1 -&gt; res.set(executeAction(editor, selections.keys.first(), context, cmd, selections.values.first()))</ID>
+    <ID>MaxLineLength:VisualOperatorActionHandler.kt$VisualOperatorActionHandler.ForEachCaret$abstract</ID>
+    <ID>MaxLineLength:VisualOperatorActionHandler.kt$VisualOperatorActionHandler.ForEachCaret$open</ID>
+    <ID>MaxLineLength:VisualOperatorActionHandler.kt$VisualOperatorActionHandler.SingleExecution$abstract</ID>
+    <ID>MaxLineLength:VisualOperatorActionHandler.kt$VisualOperatorActionHandler.VisualStartFinishWrapper$val change = if (this@VisualStartFinishWrapper.editor.inVisualMode &amp;&amp; !this@VisualStartFinishWrapper.editor.inRepeatMode) { VisualOperation.getRange(this@VisualStartFinishWrapper.editor, it, this@VisualStartFinishWrapper.cmd.flags) } else null</ID>
+    <ID>MaxLineLength:VisualSelectPreviousAction.kt$VisualSelectPreviousAction$override</ID>
+    <ID>MaxLineLength:YankGroup.kt$YankGroup$range.endOffsets[i] = (EditorHelper.getLineEndForOffset(editor, range.endOffsets[i]) + 1).coerceAtMost(editor.fileSize)</ID>
+    <ID>MaxLineLength:YankGroup.kt$YankGroup$val startOffsets = if (argument.motion.action is MotionDownLess1FirstNonSpaceAction) null else HashMap&lt;Caret, Int&gt;(caretModel.caretCount)</ID>
+    <ID>MaxLineLength:YankVisualLinesAction.kt$YankVisualLinesAction$val selection = if (vimSelection.type == SelectionType.BLOCK_WISE) SelectionType.BLOCK_WISE else SelectionType.LINE_WISE</ID>
+    <ID>MemberNameEqualsClassName:Ranges.kt$Ranges$private val ranges: MutableList&lt;Range&gt; = mutableListOf()</ID>
+    <ID>NestedBlockDepth:OptionsManager.kt$OptionsManager$ fun parseOptionLine(editor: Editor?, args: String, failOnBad: Boolean): Boolean</ID>
+    <ID>ReturnCount:ActionBeanClass.kt$ActionBeanClass$fun getParsedModes(): Set&lt;MappingMode&gt;?</ID>
+    <ID>ReturnCount:Alias.kt$Alias$fun getCommand(input: String, count: Int): String</ID>
+    <ID>ReturnCount:CmdFilterHandler.kt$CmdFilterHandler$override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean</ID>
+    <ID>ReturnCount:CmdHandler.kt$CmdHandler$private fun addAlias(cmd: ExCommand, editor: Editor?): Boolean</ID>
+    <ID>ReturnCount:CommandGroup.kt$CommandGroup$fun isAlias(command: String): Boolean</ID>
+    <ID>ReturnCount:DeleteJoinLinesAction.kt$DeleteJoinLinesAction$override fun execute(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean</ID>
+    <ID>ReturnCount:DeleteJoinLinesSpacesAction.kt$DeleteJoinLinesSpacesAction$override fun execute(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean</ID>
+    <ID>ReturnCount:DeleteJoinVisualLinesAction.kt$DeleteJoinVisualLinesAction$override fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map&lt;Caret, VimSelection&gt;): Boolean</ID>
+    <ID>ReturnCount:DeleteJoinVisualLinesSpacesAction.kt$DeleteJoinVisualLinesSpacesAction$override fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map&lt;Caret, VimSelection&gt;): Boolean</ID>
+    <ID>ReturnCount:DeleteMotionAction.kt$DeleteMotionAction$override fun execute(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean</ID>
+    <ID>ReturnCount:EditFileHandler.kt$EditFileHandler$override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean</ID>
+    <ID>ReturnCount:EditorHelper.kt$ fun Editor.isPrimaryEditor(): Boolean</ID>
+    <ID>ReturnCount:ExRanges.kt$Range.Companion$ @JvmStatic fun createRange(str: String, offset: Int, move: Boolean): Array&lt;Range&gt;?</ID>
+    <ID>ReturnCount:FilterMotionAction.kt$FilterMotionAction$override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean</ID>
+    <ID>ReturnCount:GotoCharacterHandler.kt$GotoCharacterHandler$override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean</ID>
+    <ID>ReturnCount:Helper.kt$@Suppress("IncorrectParentDisposable") fun Editor.isTemplateActive(): Boolean</ID>
+    <ID>ReturnCount:HistoryHandler.kt$HistoryHandler$override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean</ID>
+    <ID>ReturnCount:IdeaSelectionControl.kt$IdeaSelectionControl$ fun predictMode(editor: Editor, selectionSource: VimListenerManager.SelectionSource): CommandState.Mode</ID>
+    <ID>ReturnCount:MapHandler.kt$MapHandler$@Throws(ExException::class) private fun executeCommand(cmd: ExCommand, editor: Editor?): Boolean</ID>
+    <ID>ReturnCount:Marks.kt$IntellijMark$private fun getProject(): Project?</ID>
+    <ID>ReturnCount:Marks.kt$VimMark.Companion$@JvmStatic fun create(key: Char?, logicalLine: Int?, col: Int?, filename: String?, protocol: String?): VimMark?</ID>
+    <ID>ReturnCount:ModalEntry.kt$ModalEntry.&lt;no name provided&gt;$override fun dispatchKeyEvent(e: KeyEvent): Boolean</ID>
+    <ID>ReturnCount:MotionScrollLastScreenLinePageStartAction.kt$MotionScrollLastScreenLinePageStartAction$override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean</ID>
+    <ID>ReturnCount:OperatorAction.kt$OperatorAction$override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean</ID>
+    <ID>ReturnCount:OptionsManager.kt$OptionsManager$ fun parseOptionLine(editor: Editor?, args: String, failOnBad: Boolean): Boolean</ID>
+    <ID>ReturnCount:PutGroup.kt$PutGroup$private fun getProviderForPasteViaIde(context: DataContext, typeInRegister: SelectionType, data: PutData): PasteProvider?</ID>
+    <ID>ReturnCount:PutGroup.kt$PutGroup$private fun prepareDocumentAndGetStartOffsets(editor: Editor, caret: Caret, typeInRegister: SelectionType, data: PutData, additionalData: Map&lt;String, Any&gt;): List&lt;Int&gt;</ID>
+    <ID>ReturnCount:PutLinesHandler.kt$PutLinesHandler$override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean</ID>
+    <ID>ReturnCount:ReloadVimRc.kt$VimRcFileState$fun equalTo(document: Document): Boolean</ID>
+    <ID>ReturnCount:RepeatHandler.kt$RepeatHandler$@Throws(ExException::class) override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean</ID>
+    <ID>ReturnCount:SelectMotionRightAction.kt$SelectMotionRightAction$override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int</ID>
+    <ID>ReturnCount:ShowCmd.kt$ShowCmd$fun getFullText(editor: Editor?): String</ID>
+    <ID>ReturnCount:StatusBar.kt$StatusBarIconFactory$override fun isAvailable(project: Project): Boolean</ID>
+    <ID>ReturnCount:TabCloseHandler.kt$TabCloseHandler$ private fun getTabIndexToClose(arg: String, current: Int, last: Int): Int?</ID>
+    <ID>ReturnCount:TextObjectActionHandler.kt$TextObjectActionHandler$ final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean</ID>
+    <ID>ReturnCount:UndoRedoHelper.kt$UndoRedoHelper$fun redo(context: DataContext): Boolean</ID>
+    <ID>ReturnCount:UndoRedoHelper.kt$UndoRedoHelper$fun undo(context: DataContext): Boolean</ID>
+    <ID>ReturnCount:VimExchangeExtension.kt$VimExchangeExtension.Operator$override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean</ID>
+    <ID>ReturnCount:VimExtensionFacade.kt$VimExtensionFacade$ @JvmStatic fun inputString(editor: Editor, prompt: String, finishOn: Char?): String</ID>
+    <ID>ReturnCount:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension.AllOccurrencesHandler$override fun executeInWriteAction(editor: Editor, context: DataContext)</ID>
+    <ID>ReturnCount:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension.NextOccurrenceHandler$override fun executeInWriteAction(editor: Editor, context: DataContext)</ID>
+    <ID>ReturnCount:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension.SkipOccurrenceHandler$override fun executeInWriteAction(editor: Editor, context: DataContext)</ID>
+    <ID>ReturnCount:VimScriptParser.kt$VimScriptParser$@Throws(ExException::class) fun evaluate(expression: String, globals: Map&lt;String?, Any?&gt;): Any</ID>
+    <ID>ReturnCount:VimScriptParser.kt$VimScriptParser$fun findOrCreateIdeaVimRc(): File?</ID>
+    <ID>ReturnCount:VimShortcutKeyAction.kt$VimShortcutKeyAction$private fun getKeyStroke(e: AnActionEvent): KeyStroke?</ID>
+    <ID>ReturnCount:VimShortcutKeyAction.kt$VimShortcutKeyAction$private fun isEnabled(e: AnActionEvent): Boolean</ID>
+    <ID>ReturnCount:VimSurroundExtension.kt$VimSurroundExtension.CSurroundHandler$override fun execute(editor: Editor, context: DataContext)</ID>
+    <ID>ReturnCount:VimSurroundExtension.kt$VimSurroundExtension.Operator$override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean</ID>
+    <ID>ReturnCount:VisualBlockAppendAction.kt$VisualBlockAppendAction$override fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map&lt;Caret, VimSelection&gt;): Boolean</ID>
+    <ID>ReturnCount:VisualBlockInsertAction.kt$VisualBlockInsertAction$override fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map&lt;Caret, VimSelection&gt;): Boolean</ID>
+    <ID>ReturnCount:VisualMotionGroup.kt$VisualMotionGroup$ fun toggleVisual(editor: Editor, count: Int, rawCount: Int, subMode: CommandState.SubMode): Boolean</ID>
+    <ID>ReturnCount:VisualMotionGroup.kt$VisualMotionGroup$fun autodetectVisualSubmode(editor: Editor): CommandState.SubMode</ID>
+    <ID>ReturnCount:VisualMotionGroup.kt$VisualMotionGroup$fun selectPreviousVisualMode(editor: Editor): Boolean</ID>
+    <ID>ReturnCount:VisualMotionGroup.kt$VisualMotionGroup$fun swapVisualSelections(editor: Editor): Boolean</ID>
+    <ID>ReturnCount:VisualMotionGroup.kt$VisualMotionGroup$private fun seemsLikeBlockMode(editor: Editor): Boolean</ID>
+    <ID>ReturnCount:VisualOperatorActionHandler.kt$VisualOperatorActionHandler$final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean</ID>
+    <ID>ReturnCount:YankGroup.kt$YankGroup$ fun yankMotion(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument): Boolean</ID>
+    <ID>ThrowsCount:CommandHandler.kt$CommandHandler$ @Throws(ExException::class) fun process(editor: Editor, context: DataContext, cmd: ExCommand, count: Int): Boolean</ID>
+    <ID>TooManyFunctions:CommandBuilder.kt$CommandBuilder</ID>
+    <ID>TooManyFunctions:CommandState.kt$CommandState</ID>
+    <ID>TooManyFunctions:PutGroup.kt$PutGroup</ID>
+    <ID>TooManyFunctions:Ranges.kt$Ranges</ID>
+    <ID>TooManyFunctions:VimExtensionFacade.kt$VimExtensionFacade$VimExtensionFacade</ID>
+    <ID>TooManyFunctions:VisualGroup.kt$com.maddyhome.idea.vim.group.visual.VisualGroup.kt</ID>
+    <ID>TooManyFunctions:VisualMotionGroup.kt$VisualMotionGroup</ID>
+  </CurrentIssues>
+</SmellBaseline>
