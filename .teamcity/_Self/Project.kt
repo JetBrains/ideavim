@@ -23,7 +23,7 @@ object Project : Project({
     buildType(TestsForIntelliJ20182)
     buildType(TestsForIntelliJ20193)
     buildType(TestsForIntelliJ20183)
-    buildType(Nvim)
+//    buildType(Nvim)
     buildType(Build)
     buildType(TestsForIntelliJ20202_2)
     buildType(TestsForIntelliJEAP)
