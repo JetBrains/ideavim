@@ -3,7 +3,7 @@ package _Self.buildTypes
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 
-object Deploy : BuildType({
+object Release : BuildType({
     name = "Publish Release"
     description = "Build and publish IdeaVim plugin"
 

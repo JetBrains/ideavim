@@ -1,6 +1,7 @@
 package _Self.buildTypes
 
-import jetbrains.buildServer.configs.kotlin.v2019_2.*
+import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
+import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
@@ -16,7 +17,7 @@ object Nvim : BuildType({
     }
 
     vcs {
-        root(_Self.vcsRoots.HttpsGithubComJetBrainsIdeavimBranchNvim)
+        root(_Self.vcsRoots.Branch_Nvim)
 
         checkoutMode = CheckoutMode.ON_SERVER
     }

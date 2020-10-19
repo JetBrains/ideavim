@@ -7,14 +7,14 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 object Project : Project({
     description = "Vim emulation plugin for the IntelliJ platform products"
 
-    vcsRoot(HttpsGithubComJetBrainsIdeavimBranch183)
-    vcsRoot(HttpsGithubComJetBrainsIdeavim_181)
+    vcsRoot(Branch_183)
+    vcsRoot(Branch_181)
     vcsRoot(GitHubPullRequest)
-    vcsRoot(HttpsGithubComJetBrainsIdeavimBranch191193)
-    vcsRoot(HttpsGithubComJetBrainsIdeavimBranchNvim)
+    vcsRoot(Branch_191_193)
+    vcsRoot(Branch_Nvim)
 
     buildType(GitHubPullRequests)
-    buildType(Deploy)
+    buildType(Release)
     buildType(TestsForIntelliJ20201)
     buildType(TestsForIntelliJ20191)
     buildType(TestsForIntelliJ20181)
@@ -23,8 +23,8 @@ object Project : Project({
     buildType(TestsForIntelliJ20193)
     buildType(TestsForIntelliJ20183)
 //    buildType(Nvim)
-    buildType(Build)
-    buildType(TestsForIntelliJ20202_2)
+    buildType(ReleaseEap)
+    buildType(TestsForIntelliJ20202)
     buildType(TestsForIntelliJEAP)
 
     features {

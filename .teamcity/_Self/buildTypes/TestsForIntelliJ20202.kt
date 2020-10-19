@@ -4,7 +4,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
-object TestsForIntelliJ20202_2 : BuildType({
+object TestsForIntelliJ20202 : BuildType({
     name = "Tests for IntelliJ 2020.2"
     description = "branch 202"
 

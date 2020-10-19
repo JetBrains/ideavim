@@ -17,7 +17,7 @@ object TestsForIntelliJ20183 : BuildType({
     }
 
     vcs {
-        root(_Self.vcsRoots.HttpsGithubComJetBrainsIdeavimBranch183)
+        root(_Self.vcsRoots.Branch_183)
 
         checkoutMode = CheckoutMode.ON_SERVER
     }
