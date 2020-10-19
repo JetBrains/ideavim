@@ -4,10 +4,10 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
 
 object HttpsGithubComJetBrainsIdeavimPullRequests : GitVcsRoot({
-    name = "https://github.com/JetBrains/ideavim (Pull Requests)"
-    url = "https://github.com/JetBrains/ideavim"
+    name = "IdeaVim Pull Requests"
+    url = "git@github.com:JetBrains/ideavim.git"
     branchSpec = "+:refs/(pull/*/merge)"
-    authMethod = password {
-        userName = "AlexPl292"
+    authMethod = uploadedKey {
+      uploadedKey = "Alex Plate TeamCity key"
     }
 })
