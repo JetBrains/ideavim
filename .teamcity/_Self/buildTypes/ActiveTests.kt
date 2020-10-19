@@ -6,10 +6,11 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
-sealed class ActiveTests(init: BuildType.() -> Unit) : BuildType({
-  init()
+sealed class ActiveTests(buildName: String, ijVersion: String) : BuildType({
+  name = buildName
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
+    param("env.ORG_GRADLE_PROJECT_ideaVersion", ijVersion)
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
   }
 
@@ -39,11 +40,6 @@ sealed class ActiveTests(init: BuildType.() -> Unit) : BuildType({
   }
 })
 
-object TestsForIntelliJ20202 : ActiveTests({
-  name = "Tests for IntelliJ 2020.2"
-  description = "branch 202"
-
-  params {
-    param("env.ORG_GRADLE_PROJECT_ideaVersion", "2020.2")
-  }
-})
+object TestsForIntelliJEAP : ActiveTests("Tests for IntelliJ Latest EAP", "LATEST-EAP-SNAPSHOT")
+object TestsForIntelliJ20202 : ActiveTests("Tests for IntelliJ 2020.2", "2020.2")
+object TestsForIntelliJ20201 : ActiveTests("Tests for IntelliJ 2020.1", "2020.1")
