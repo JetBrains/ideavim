@@ -14,3 +14,4 @@
 
 .teamcity/.idea
 .teamcity/target
+.teamcity/*.iml
