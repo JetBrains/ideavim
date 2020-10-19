@@ -11,3 +11,6 @@
 /tmp/
 
 *.DS_Store
+
+.teamcity/.idea
+.teamcity/target
