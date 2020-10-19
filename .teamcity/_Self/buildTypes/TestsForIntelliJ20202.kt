@@ -6,7 +6,8 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
-sealed class ActiveTests : BuildType({
+sealed class ActiveTests(init: BuildType.() -> Unit) : BuildType({
+  init()
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
@@ -38,13 +39,11 @@ sealed class ActiveTests : BuildType({
   }
 })
 
-object TestsForIntelliJ20202 : ActiveTests() {
-  init {
-    name = "Tests for IntelliJ 2020.2"
-    description = "branch 202"
+object TestsForIntelliJ20202 : ActiveTests({
+  name = "Tests for IntelliJ 2020.2"
+  description = "branch 202"
 
-    params {
-      param("env.ORG_GRADLE_PROJECT_ideaVersion", "2020.2")
-    }
+  params {
+    param("env.ORG_GRADLE_PROJECT_ideaVersion", "2020.2")
   }
-}
+})
