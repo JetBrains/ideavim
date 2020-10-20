@@ -3,8 +3,9 @@
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
       <ul>
-        <li>Support of `virtualedit=onemore`</li>
-        <li>A lot of fixes for scrolling</li>
+        <li>Ability to map IDE actions via the &lt;Action&gt; keyword.</li>
+        <li>"IdeaVim: track action Ids" command to find action ids for the :action command.
+  Enable this option in &quot;Search everywhere&quot; (double shift).</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
     ]]></change-notes>
