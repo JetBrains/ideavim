@@ -64,13 +64,4 @@ object ReleaseEap : BuildType({
             branchFilter = ""
         }
     }
-
-    dependencies {
-        snapshot(TestsForIntelliJ20192) {
-        }
-        snapshot(TestsForIntelliJ20193) {
-        }
-        snapshot(TestsForIntelliJ20201) {
-        }
-    }
 })
