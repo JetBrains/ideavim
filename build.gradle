@@ -11,6 +11,7 @@ buildscript {
 plugins {
   id 'org.jetbrains.intellij' version '0.5.0'
   id 'io.gitlab.arturbosch.detekt' version '1.14.1'
+  id "org.jetbrains.changelog" version "0.6.2"
 }
 
 apply plugin: 'java'
@@ -92,14 +93,21 @@ task testWithNeovim(type: Test) {
   systemProperty "ideavim.neovim.test", 'true'
 }
 
+changelog {
+  groups = ["Features:", "Changes:", "Deprecations:", "Fixes:", "Merged PRs:"]
+  itemPrefix = "*"
+  path = "${project.projectDir}/CHANGES.md"
+  unreleasedTerm = "To Be Released"
+  headerParserRegex = /0\.\d{2}(.\d+)?/
+//  header = { "${project.version}" }
+//  version = "0.60"
+}
+
 tasks.register("slackEapNotification") {
   doLast {
     if (!slackUrl) return
     def post = new URL(slackUrl).openConnection()
-    def changeLog = extractChangelog()
-    changeLog = changeLog.replace("* ", "• ") // Replace stars with bullets
-    changeLog = changeLog.replace("**", "*") // Enable bold text
-    changeLog = changeLog.replaceAll("\\[([^]]+)]\\(([^)]+)\\)", '<$2|$1>') // Enable links
+    def changeLog = changelog.getUnreleased().toPlainText()
     def message = """
       {
           "text": "New version of IdeaVim",
@@ -124,28 +132,4 @@ tasks.register("slackEapNotification") {
       println(post.getInputStream().getText())
     }
   }
-}
-
-// Very primitive changelog extraction code
-def extractChangelog() {
-  def startLine = "_Available since $version EAP:_"
-  def endLine = "_To Be Released..._"
-  def startSaving = false
-  def res = new StringBuilder()
-  new File("./CHANGES.md").eachLine { line ->
-    if (startSaving) {
-      if (line == endLine) {
-        startSaving = false
-      }
-      else {
-        res.append(line).append('\n')
-      }
-    }
-    else {
-      if (line == startLine) {
-        startSaving = true
-      }
-    }
-  }
-  return res.toString()
 }
