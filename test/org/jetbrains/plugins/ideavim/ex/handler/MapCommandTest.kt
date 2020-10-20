@@ -509,4 +509,21 @@ n  ,f            <Plug>Foo
           //-----
           """.trimIndent())
   }
+
+  fun `test execute action from insert mode`() {
+    configureByJavaText("""
+          -----
+          1<caret>2345
+          abcde
+          -----
+          """.trimIndent())
+    typeText(commandToKeys("imap k <Action>(CommentByLineComment)"))
+    typeText(StringHelper.parseKeys("ik"))
+    myFixture.checkResult("""
+          -----
+          //12345
+          abcde
+          -----
+          """.trimIndent())
+  }
 }

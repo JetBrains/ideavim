@@ -205,7 +205,7 @@ extract the ids of executed command. This option can be found in "Search everywh
 </details>
 
 For the mappings you can use a special `<Action>` keyword. Use `<Action>(*action_id*)` to map keys to some action. Don't
-forget the parentheses. **[To Be Released]**
+forget the parentheses. This keyword works for insert mode as well. **[To Be Released]**
 
 Examples:
 
