@@ -768,9 +768,10 @@ public class ChangeGroup {
   public boolean deleteEndOfLine(@NotNull Editor editor, @NotNull Caret caret, int count) {
     int initialOffset = caret.getOffset();
     int offset = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, true);
+    int lineStart = VimPlugin.getMotion().moveCaretToLineStart(editor, caret);
 
     int startOffset = initialOffset;
-    if (offset == initialOffset) startOffset--; // handle delete from virtual space
+    if (offset == initialOffset && offset != lineStart) startOffset--; // handle delete from virtual space
 
     if (offset != -1) {
       final TextRange rangeToDelete = new TextRange(startOffset, offset);

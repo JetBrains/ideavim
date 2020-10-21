@@ -30,6 +30,9 @@ usual beta standards.
 * `IdeaVim: track action Ids` command to find action ids for the `:action` command.
   Enable this option in "Search everywhere" (double shift).
 
+### Fixes:
+* [VIM-2150](https://youtrack.jetbrains.com/issue/VIM-2150) `Shift-D` should not delete an empty line
+
 ## 0.60, 2020-10-09
 
 ### Features:
