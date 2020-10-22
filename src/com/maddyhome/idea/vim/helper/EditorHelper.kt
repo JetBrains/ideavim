@@ -40,13 +40,17 @@ val Editor.fileSize: Int
 val Editor.isIdeaVimDisabledHere: Boolean
   get() {
     var res = true
+    val start = System.currentTimeMillis()
+    val times = mutableListOf<Long>()
     val timeForCalculation = measureTimeMillis {
-      res = (disabledInDialog
-        || isDatabaseCell && !OptionsManager.oneline.isSet
-        || isOneLineMode && !OptionsManager.oneline.isSet)
+      res = (disabledInDialog.apply { times += System.currentTimeMillis() }
+        || (!OptionsManager.oneline.isSet && isDatabaseCell).apply { times += System.currentTimeMillis() }
+        || (!OptionsManager.oneline.isSet && isOneLineMode).apply { times += System.currentTimeMillis() }
+        )
     }
     if (timeForCalculation > 10) {
-      logger<Editor>().error("Time for calculation of 'isIdeaVimDisabledHere' took $timeForCalculation ms.")
+      val timeDiffs = times.map { it - start }
+      logger<Editor>().error("Time for calculation of 'isIdeaVimDisabledHere' took $timeForCalculation ms. Time diffs: $timeDiffs")
     }
     return res
   }
