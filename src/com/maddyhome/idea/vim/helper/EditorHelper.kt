@@ -50,7 +50,8 @@ val Editor.isIdeaVimDisabledHere: Boolean
     }
     if (timeForCalculation > 10) {
       val timeDiffs = times.map { it - start }
-      logger<Editor>().error("Time for calculation of 'isIdeaVimDisabledHere' took $timeForCalculation ms. Time diffs: $timeDiffs")
+      val message = "Time for calculation of 'isIdeaVimDisabledHere' took $timeForCalculation ms. Time diff: $timeDiffs"
+      logger<Editor>().error(message)
     }
     return res
   }
