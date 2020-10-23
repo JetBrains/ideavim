@@ -63,10 +63,7 @@ class StatusBarIconFactory : StatusBarWidgetFactory, LightEditCompatible {
   }
 
   override fun isAvailable(project: Project): Boolean {
-    @Suppress("DEPRECATION")
-    if (!OptionsManager.ideastatusbar.isSet) return false
-    if (OptionsManager.ideastatusicon.value == IdeaStatusIcon.disabled) return false
-    return true
+    return OptionsManager.ideastatusicon.value != IdeaStatusIcon.disabled
   }
 
   override fun createWidget(project: Project): StatusBarWidget {

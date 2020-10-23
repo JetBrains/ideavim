@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.option.OptionsManager.showmode
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.Contract
 import java.util.*
 import javax.swing.KeyStroke
@@ -59,12 +58,6 @@ class CommandState private constructor() {
    */
   var executingCommand: Command? = null
     private set
-
-  // Keep the compatibility with the IdeaVim-EasyMotion plugin before the stable release
-  @get:Deprecated("")
-  @get:ApiStatus.ScheduledForRemoval(inVersion = "0.58")
-  val mappingMode: MappingMode
-    get() = mappingState.mappingMode
 
   val isOperatorPending: Boolean
     get() = mappingState.mappingMode == MappingMode.OP_PENDING && !commandBuilder.isEmpty

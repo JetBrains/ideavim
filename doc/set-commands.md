@@ -59,12 +59,6 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                    ideaselection   when IDE sets a selection      - IdeaVim ONLY
                                    (examples: extend selection, wrap with while, etc.)
 
-                   Deprecated values:
-                   template        ~~please use `idearefactormode` option~~
-                                   when starting a template       - IdeaVim ONLY
-                   refactoring     ~~please use ideaselection~~
-                                   same as ideaselection          - IdeaVim ONLY
-
     'showmode'       'smd'       message on the status line to show current mode
     'showcmd'        'sc'        show (partial) command in the status bar
     'sidescroll'     'ss'        minimum number of columns to scroll horizontally
@@ -104,12 +98,6 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
     
                   If true, join command will be performed via IDE
                   See wiki/`ideajoin` examples
-
-    `ideastatusbar`  `ideastatusbar` Boolean (default true)
-                  DEPRECATED. Please use `ideastatusicon`
-    
-                  If false, IdeaVim icon won't be shown in the status bar.
-                  Works only from `~/.ideavimrc` after the IDE restart.
                   
     `ideastatusicon`  `ideastatusicon` String(default "enabled")
     

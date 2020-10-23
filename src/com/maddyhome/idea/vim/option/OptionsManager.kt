@@ -93,10 +93,6 @@ object OptionsManager {
   val dialogescape = addOption(BoundStringOption("dialogescape", "de", "legacy", arrayOf("legacy", "on", "off")))
   val oneline = addOption(ToggleOption("oneline", "oneline", true))
 
-  @ApiStatus.ScheduledForRemoval(inVersion = "0.59")
-  @Deprecated("please use ideastatusicon")
-  val ideastatusbar = addOption(ToggleOption("ideastatusbar", "ideastatusbar", true))
-
   fun isSet(name: String): Boolean {
     val option = getOption(name)
     return option is ToggleOption && option.getValue()
@@ -397,24 +393,15 @@ object SelectModeOptionData {
   const val key = "key"
   const val cmd = "cmd"
 
-  @ApiStatus.ScheduledForRemoval(inVersion = "0.58")
-  @Deprecated("Please, use `idearefactormode` option")
-  const val template = "template"
-
-  @ApiStatus.ScheduledForRemoval(inVersion = "0.58")
-  @Deprecated("Please, use `ideaselection`")
-  const val refactoring = "refactoring"
-
   const val ideaselection = "ideaselection"
 
   @Suppress("DEPRECATION")
-  val options = arrayOf(mouse, key, cmd, template, refactoring, ideaselection)
+  val options = arrayOf(mouse, key, cmd, ideaselection)
   val default = emptyArray<String>()
   val option = BoundListOption(name, abbr, default, options)
 
   fun ideaselectionEnabled(): Boolean {
-    @Suppress("DEPRECATION")
-    return ideaselection in OptionsManager.selectmode || refactoring in OptionsManager.selectmode
+    return ideaselection in OptionsManager.selectmode
   }
 }
 
