@@ -19,11 +19,13 @@
 package com.maddyhome.idea.vim.ui;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.helper.DigraphResult;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
+import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -143,8 +145,14 @@ public class ExEditorKit extends DefaultEditorKit {
         if (key != null) {
           final char c = key.getKeyChar();
           if (c > 0) {
-            ActionEvent event = new ActionEvent(e.getSource(), e.getID(), String.valueOf(c), e.getWhen(), e.getModifiers());
-            super.actionPerformed(event);
+            if (target.useHandleKeyFromEx) {
+              final ExTextField entry = ExEntryPanel.getInstance().getEntry();
+              final Editor editor = entry.getEditor();
+              KeyHandler.getInstance().handleKey(editor, key, new EditorDataContext(editor, entry.getContext()));
+            } else {
+              ActionEvent event = new ActionEvent(e.getSource(), e.getID(), String.valueOf(c), e.getWhen(), e.getModifiers());
+              super.actionPerformed(event);
+            }
             target.saveLastEntry();
           }
         }

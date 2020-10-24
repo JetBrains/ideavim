@@ -448,6 +448,11 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("<a><c></c></a>");
   }
 
+  public void testDeleteToDigraph() {
+    typeTextInFile(parseKeys("d/<C-K>O:<CR>"),"ab<caret>cdÖef");
+    myFixture.checkResult("abÖef");
+  }
+
   // |[(|
   public void testUnmatchedOpenParenthesis() {
     typeTextInFile(parseKeys("[("),

@@ -453,12 +453,7 @@ abstract class VimTestCase : UsefulTestCase() {
         val inputModel = TestInputModel.getInstance(editor)
         var key = inputModel.nextKeyStroke()
         while (key != null) {
-          val exEntryPanel = ExEntryPanel.getInstance()
-          if (exEntryPanel.isActive) {
-            exEntryPanel.handleKey(key)
-          } else {
-            keyHandler.handleKey(editor, key, dataContext)
-          }
+          keyHandler.handleKey(editor, key, dataContext)
           key = inputModel.nextKeyStroke()
         }
       }, null, null)

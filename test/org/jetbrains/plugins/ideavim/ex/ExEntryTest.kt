@@ -550,6 +550,34 @@ class ExEntryTest : VimTestCase() {
     assertExText("hello")
   }
 
+  fun `test cmap`() {
+    typeExInput(":cmap x z<CR>")
+    typeExInput(":cnoremap w z<CR>")
+    typeExInput(":cmap z y<CR>")
+    typeExInput(":z")
+    assertExText("y")
+    deactivateExEntry()
+
+    typeExInput(":x")
+    assertExText("y")
+    deactivateExEntry()
+
+    typeExInput(":w")
+    assertExText("z")
+  }
+
+  fun `test cmap Ctrl`() {
+    typeExInput(":cmap \\<C-B> b<CR>")
+    typeExInput(":<C-B>")
+    assertExText("b")
+    deactivateExEntry()
+
+    VimPlugin.getRegister().setKeys('e', StringHelper.parseKeys("hello world"))
+    typeExInput(":cmap d \\<C-R><CR>")
+    typeExInput(":de")
+    assertExText("hello world")
+  }
+
   private fun typeExInput(text: String) {
     assertTrue("Ex command must start with ':', '/' or '?'",
       text.startsWith(":") || text.startsWith('/') || text.startsWith('?'))
