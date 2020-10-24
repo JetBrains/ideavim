@@ -45,6 +45,7 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import com.maddyhome.idea.vim.ui.ShowCmd;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
@@ -53,6 +54,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -591,6 +593,22 @@ public class KeyHandler {
     }
 
     DigraphResult res = editorState.processDigraphKey(key, editor);
+    if (ExEntryPanel.getInstance().isActive()) {
+      switch (res.getResult()) {
+        case DigraphResult.RES_HANDLED:
+          setPromptCharacterEx(commandBuilder.isPuttingLiteral() ? '^' : key.getKeyChar());
+          break;
+        case DigraphResult.RES_DONE:
+        case DigraphResult.RES_BAD:
+          if (key.getKeyCode() == KeyEvent.VK_C && (key.getModifiers() & InputEvent.CTRL_DOWN_MASK) != 0) {
+            return false;
+          } else {
+            ExEntryPanel.getInstance().getEntry().clearCurrentAction();
+          }
+          break;
+      }
+    }
+
     switch (res.getResult()) {
       case DigraphResult.RES_HANDLED:
         editorState.getCommandBuilder().addKey(key);
@@ -745,8 +763,10 @@ public class KeyHandler {
         // the key handler when it's complete.
         if (action instanceof InsertCompletedDigraphAction) {
           editorState.startDigraphSequence();
+          setPromptCharacterEx('?');
         } else if (action instanceof InsertCompletedLiteralAction) {
           editorState.startLiteralSequence();
+          setPromptCharacterEx('^');
         }
         break;
       case EX_STRING:
@@ -841,6 +861,13 @@ public class KeyHandler {
 
   }
 
+  private void setPromptCharacterEx(final char promptCharacter) {
+    final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
+    if (exEntryPanel.isActive()) {
+        exEntryPanel.getEntry().setCurrentActionPromptCharacter(promptCharacter);
+    }
+  }
+
   // This class is copied from com.intellij.openapi.editor.actionSystem.DialogAwareDataContext.DialogAwareDataContext
   private static final class DialogAwareDataContext implements DataContext {
     @SuppressWarnings("rawtypes")
@@ -909,7 +936,9 @@ public class KeyHandler {
         editorState.popModes();
       }
 
-      KeyHandler.getInstance().reset(editor);
+      if (editorState.getCommandBuilder().isDone()) {
+        KeyHandler.getInstance().reset(editor);
+      }
     }
 
     private final Editor editor;

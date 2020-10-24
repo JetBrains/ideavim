@@ -52,6 +52,8 @@ public class ExTextField extends JTextField {
 
   public static final @NonNls String KEYMAP_NAME = "ex";
 
+  public boolean useHandleKeyFromEx = true;
+
   ExTextField() {
     // We need to store this in a field, because we can't trust getCaret(), as it will return an instance of
     // ComposedTextCaret when working with dead keys or input methods
@@ -282,7 +284,12 @@ public class ExTextField extends JTextField {
         (stroke.isOnKeyRelease() ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED),
         (new Date()).getTime(), modifiers, keyCode, c);
 
-      super.processKeyEvent(event);
+      useHandleKeyFromEx = false;
+      try {
+        super.processKeyEvent(event);
+      }finally {
+        useHandleKeyFromEx = true;
+      }
     }
   }
 
@@ -329,7 +336,7 @@ public class ExTextField extends JTextField {
     setCurrentActionPromptCharacter(pendingIndicator);
   }
 
-  void clearCurrentAction() {
+  public void clearCurrentAction() {
     if (currentAction != null) {
       currentAction.reset();
     }
@@ -337,7 +344,7 @@ public class ExTextField extends JTextField {
     clearCurrentActionPromptCharacter();
   }
 
-  void setCurrentActionPromptCharacter(char promptCharacter) {
+  public void setCurrentActionPromptCharacter(char promptCharacter) {
     actualText = removePromptCharacter();
     this.currentActionPromptCharacter = promptCharacter;
     currentActionPromptCharacterOffset = currentActionPromptCharacterOffset == -1 ? getCaretPosition() : currentActionPromptCharacterOffset;

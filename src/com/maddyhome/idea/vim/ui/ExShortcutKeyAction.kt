@@ -21,7 +21,8 @@ package com.maddyhome.idea.vim.ui
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.helper.EditorDataContext
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -42,7 +43,8 @@ class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : AnAction() {
   override fun actionPerformed(e: AnActionEvent) {
     val keyStroke = getKeyStroke(e)
     if (keyStroke != null) {
-      VimPlugin.getProcess().processExKey(exEntryPanel.entry.editor, keyStroke)
+      val editor = exEntryPanel.entry.editor
+      KeyHandler.getInstance().handleKey(editor, keyStroke, EditorDataContext(editor, e.dataContext))
     }
   }
 
