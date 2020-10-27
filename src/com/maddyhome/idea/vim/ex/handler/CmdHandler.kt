@@ -23,6 +23,9 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.Alias
 import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandler.Access.READ_ONLY
+import com.maddyhome.idea.vim.ex.CommandHandler.ArgumentFlag.ARGUMENT_OPTIONAL
+import com.maddyhome.idea.vim.ex.CommandHandler.RangeFlag.RANGE_FORBIDDEN
 import com.maddyhome.idea.vim.ex.CommandHandlerFlags
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.ExOutputModel
@@ -34,7 +37,7 @@ import com.maddyhome.idea.vim.group.CommandGroup.Companion.BLACKLISTED_ALIASES
  * @author Elliot Courant
  */
 class CmdHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags = flags(RANGE_FORBIDDEN, ARGUMENT_OPTIONAL, READ_ONLY)
 
   // Static definitions needed for aliases.
   private companion object {

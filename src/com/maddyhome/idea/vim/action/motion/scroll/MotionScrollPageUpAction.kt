@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.CommandFlags.FLAG_CLEAR_STROKES
+import com.maddyhome.idea.vim.command.CommandFlags.FLAG_IGNORE_SCROLL_JUMP
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.awt.event.KeyEvent
@@ -35,7 +37,7 @@ class MotionScrollPageUpAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_IGNORE_SCROLL_JUMP)
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     return VimPlugin.getMotion().scrollFullPage(editor, -cmd.count)
@@ -52,7 +54,7 @@ class MotionScrollPageUpInsertModeAction : VimActionHandler.SingleExecution(), C
 
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP, CommandFlags.FLAG_CLEAR_STROKES)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_IGNORE_SCROLL_JUMP, FLAG_CLEAR_STROKES)
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     return VimPlugin.getMotion().scrollFullPage(editor, -cmd.count)

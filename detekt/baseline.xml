@@ -66,23 +66,13 @@
     <ID>MagicNumber:VimHighlightedYank.kt$VimHighlightedYank.HighlightHandler$3</ID>
     <ID>MagicNumber:VimHighlightedYank.kt$VimHighlightedYank.HighlightHandler$4</ID>
     <ID>MatchingDeclarationName:CommandDefinition.kt$CommandName</ID>
-    <ID>MaxLineLength:ActionHandler.kt$ActionHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY, SAVE_VISUAL)</ID>
-    <ID>MaxLineLength:ActionListHandler.kt$ActionListHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)</ID>
     <ID>MaxLineLength:AddInlineInlaysAction.kt$AddInlineInlaysAction$inlayModel.addInlineElement(offset, relatesToPrecedingText, HintRenderer(if (relatesToPrecedingText) ":$text" else "$text:"))</ID>
-    <ID>MaxLineLength:AsciiHandler.kt$AsciiHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)</ID>
     <ID>MaxLineLength:BufferListHandler.kt$BufferListHandler$val lineNumPad = if (displayFileName.length &lt; FILE_NAME_PAD) (FILE_NAME_PAD - displayFileName.length).toString() else ""</ID>
     <ID>MaxLineLength:BufferListHandler.kt$private</ID>
-    <ID>MaxLineLength:ChangeCharactersAction.kt$ChangeCharactersAction$override val flags: EnumSet&lt;CommandFlags&gt; = enumSetOf(CommandFlags.FLAG_NO_REPEAT_INSERT, CommandFlags.FLAG_MULTIKEY_UNDO)</ID>
     <ID>MaxLineLength:ChangeEditorActionHandler.kt$ChangeEditorActionHandler.ForEachCaret$abstract fun execute(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean</ID>
-    <ID>MaxLineLength:ChangeEndOfLineAction.kt$ChangeEndOfLineAction$override val flags: EnumSet&lt;CommandFlags&gt; = enumSetOf(CommandFlags.FLAG_NO_REPEAT_INSERT, CommandFlags.FLAG_MULTIKEY_UNDO)</ID>
-    <ID>MaxLineLength:ChangeLineAction.kt$ChangeLineAction$override val flags: EnumSet&lt;CommandFlags&gt; = enumSetOf(CommandFlags.FLAG_NO_REPEAT_INSERT, CommandFlags.FLAG_MULTIKEY_UNDO)</ID>
     <ID>MaxLineLength:ChangeNumberIncAction.kt$IncAction$override</ID>
-    <ID>MaxLineLength:ChangeVisualLinesAction.kt$ChangeVisualLinesAction$override val flags: EnumSet&lt;CommandFlags&gt; = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_MULTIKEY_UNDO, CommandFlags.FLAG_EXIT_VISUAL)</ID>
-    <ID>MaxLineLength:ChangeVisualLinesEndAction.kt$ChangeVisualLinesEndAction$override val flags: EnumSet&lt;CommandFlags&gt; = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_MULTIKEY_UNDO, CommandFlags.FLAG_EXIT_VISUAL)</ID>
     <ID>MaxLineLength:ChangeVisualNumberIncAction.kt$IncNumber$override</ID>
     <ID>MaxLineLength:ChangeVisualNumberIncAction.kt$IncNumber$return VimPlugin.getChange().changeNumberVisualMode(editor, caret, range.toVimTextRange(false), inc * cmd.count, avalanche)</ID>
-    <ID>MaxLineLength:CmdClearHandler.kt$CmdClearHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)</ID>
-    <ID>MaxLineLength:CmdHandler.kt$CmdHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)</ID>
     <ID>MaxLineLength:Command.kt$Command$constructor(rawCount: Int, register: Char): this(rawCount, NonExecutableActionHandler, Type.SELECT_REGISTER, EnumSet.of(CommandFlags.FLAG_EXPECT_MORE)) { this.register = register }</ID>
     <ID>MaxLineLength:CommandState.kt$CommandState$mappingState.mappingMode = if (modeState.mode == Mode.OP_PENDING) MappingMode.OP_PENDING else modeToMappingMode(mode)</ID>
     <ID>MaxLineLength:CommandStateExtensions.kt$CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -&gt; false</ID>
@@ -100,8 +90,6 @@
     <ID>MaxLineLength:ExRanges.kt$SearchRange$override</ID>
     <ID>MaxLineLength:GnNextTextObject.kt$GnNextTextObject$override</ID>
     <ID>MaxLineLength:GnPreviousTextObject.kt$GnPreviousTextObject$override</ID>
-    <ID>MaxLineLength:GotoCharacterHandler.kt$GotoCharacterHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)</ID>
-    <ID>MaxLineLength:GotoLineHandler.kt$GotoLineHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)</ID>
     <ID>MaxLineLength:IdeaSelectionControl.kt$IdeaSelectionControl$ fun controlNonVimSelectionChange(editor: Editor, selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER)</ID>
     <ID>MaxLineLength:IdeaSelectionControl.kt$IdeaSelectionControl$CommandState.Mode.SELECT -&gt; VimPlugin.getVisualMotion().enterSelectMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))</ID>
     <ID>MaxLineLength:IdeaSelectionControl.kt$IdeaSelectionControl$CommandState.Mode.VISUAL -&gt; VimPlugin.getVisualMotion().enterVisualMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))</ID>
@@ -118,7 +106,6 @@
     <ID>MaxLineLength:MapHandler.kt$MapHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)</ID>
     <ID>MaxLineLength:MapHandler.kt$MapHandler.CommandInfo$private</ID>
     <ID>MaxLineLength:MappingInfo.kt$MappingInfo$sealed</ID>
-    <ID>MaxLineLength:MarksHandler.kt$MarksHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)</ID>
     <ID>MaxLineLength:MotionActionHandler.kt$MotionActionHandler$fun getHandlerOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int</ID>
     <ID>MaxLineLength:MotionActionHandler.kt$MotionActionHandler.ForEachCaret$abstract</ID>
     <ID>MaxLineLength:MotionArrowDownAction.kt$MotionArrowDownAction$override</ID>
@@ -154,8 +141,6 @@
     <ID>MaxLineLength:MotionOuterWordAction.kt$MotionOuterWordAction$override</ID>
     <ID>MaxLineLength:MotionScrollHalfWidthLeftAction.kt$MotionScrollHalfWidthLeftAction$return VimPlugin.getMotion().scrollColumns(editor, cmd.count * (EditorHelper.getApproximateScreenWidth(editor) / 2))</ID>
     <ID>MaxLineLength:MotionScrollHalfWidthRightAction.kt$MotionScrollHalfWidthRightAction$return VimPlugin.getMotion().scrollColumns(editor, -cmd.count * (EditorHelper.getApproximateScreenWidth(editor) / 2))</ID>
-    <ID>MaxLineLength:MotionScrollPageDownAction.kt$MotionScrollPageDownInsertModeAction$override val flags: EnumSet&lt;CommandFlags&gt; = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP, CommandFlags.FLAG_CLEAR_STROKES)</ID>
-    <ID>MaxLineLength:MotionScrollPageUpAction.kt$MotionScrollPageUpInsertModeAction$override val flags: EnumSet&lt;CommandFlags&gt; = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP, CommandFlags.FLAG_CLEAR_STROKES)</ID>
     <ID>MaxLineLength:MotionUpActions.kt$MotionUpAction$override</ID>
     <ID>MaxLineLength:MotionUpActions.kt$MotionUpCtrlPAction$EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_UP).execute(editor, primaryCaret, context)</ID>
     <ID>MaxLineLength:MotionUpActions.kt$MotionUpCtrlPAction$override</ID>
@@ -173,7 +158,6 @@
     <ID>MaxLineLength:NotificationService.kt$NotificationService.Companion$var actionName = if (SystemInfo.isMac) "Reveal Home in Finder" else "Show Home in " + RevealFileAction.getFileManagerName()</ID>
     <ID>MaxLineLength:NotificationService.kt$NotificationService.HelpLink$private inner</ID>
     <ID>MaxLineLength:NotificationService.kt$NotificationService.OpenIdeaVimRcAction$createIdeaVimRcManually("Cannot create configuration file.&lt;br/&gt;Please create &lt;code&gt;~/.ideavimrc&lt;/code&gt; manually", eventProject)</ID>
-    <ID>MaxLineLength:OnlyHandler.kt$OnlyHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)</ID>
     <ID>MaxLineLength:OptionsManager.kt$IdeaRefactorMode$if (!segmentRange.isEmpty &amp;&amp; segmentRange.endOffset == editor.caretModel.offset &amp;&amp; editor.caretModel.offset != 0) { editor.caretModel.moveToOffset(editor.caretModel.offset - 1) }</ID>
     <ID>MaxLineLength:OptionsManager.kt$OptionsManager$val clipboard = addOption(ListOption(ClipboardOptionsData.name, ClipboardOptionsData.abbr, arrayOf(ClipboardOptionsData.ideaput, "autoselect,exclude:cons\\|linux"), null))</ID>
     <ID>MaxLineLength:OptionsManager.kt$OptionsManager$val idearefactormode = addOption(BoundStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues))</ID>
@@ -231,11 +215,9 @@
     <ID>MaxLineLength:ShiftLeft.kt$ShiftLeftLinesAction$override</ID>
     <ID>MaxLineLength:ShiftLeft.kt$ShiftLeftMotionAction$override</ID>
     <ID>MaxLineLength:ShiftLeft.kt$ShiftLeftVisualAction$override</ID>
-    <ID>MaxLineLength:ShiftLeftHandler.kt$ShiftLeftHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)</ID>
     <ID>MaxLineLength:ShiftRight.kt$ShiftRightLinesAction$override</ID>
     <ID>MaxLineLength:ShiftRight.kt$ShiftRightMotionAction$override</ID>
     <ID>MaxLineLength:ShiftRight.kt$ShiftRightVisualAction$override</ID>
-    <ID>MaxLineLength:ShiftRightHandler.kt$ShiftRightHandler$override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)</ID>
     <ID>MaxLineLength:ShowCmd.kt$Widget : EditorBasedWidgetMultiframeTextPresentation</ID>
     <ID>MaxLineLength:SortHandler.kt$SortHandler$primaryCaret.moveToInlayAwareOffset(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, range.startLine))</ID>
     <ID>MaxLineLength:SortHandler.kt$SortHandler.LineComparator$private</ID>

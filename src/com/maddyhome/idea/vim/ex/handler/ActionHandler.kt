@@ -26,7 +26,10 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandler.Access.READ_ONLY
+import com.maddyhome.idea.vim.ex.CommandHandler.ArgumentFlag.ARGUMENT_OPTIONAL
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.SAVE_VISUAL
+import com.maddyhome.idea.vim.ex.CommandHandler.RangeFlag.RANGE_OPTIONAL
 import com.maddyhome.idea.vim.ex.CommandHandlerFlags
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
@@ -37,7 +40,7 @@ import com.maddyhome.idea.vim.helper.runAfterGotFocus
  */
 class ActionHandler : CommandHandler.SingleExecution() {
 
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY, SAVE_VISUAL)
+  override val argFlags: CommandHandlerFlags = flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, READ_ONLY, SAVE_VISUAL)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val actionName = cmd.argument.trim()

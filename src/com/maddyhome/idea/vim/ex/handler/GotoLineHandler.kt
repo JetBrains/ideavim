@@ -23,6 +23,9 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandler.Access.READ_ONLY
+import com.maddyhome.idea.vim.ex.CommandHandler.ArgumentFlag.ARGUMENT_OPTIONAL
+import com.maddyhome.idea.vim.ex.CommandHandler.RangeFlag.RANGE_REQUIRED
 import com.maddyhome.idea.vim.ex.CommandHandlerFlags
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
@@ -35,7 +38,7 @@ import kotlin.math.min
  * range.
  */
 class GotoLineHandler : CommandHandler.ForEachCaret() {
-    override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+    override val argFlags: CommandHandlerFlags = flags(RANGE_REQUIRED, ARGUMENT_OPTIONAL, READ_ONLY)
 
   /**
    * Moves the cursor to the line entered by the user
