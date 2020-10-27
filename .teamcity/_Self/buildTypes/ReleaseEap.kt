@@ -58,8 +58,8 @@ object ReleaseEap : BuildType({
 
     features {
         vcsLabeling {
-            vcsRootId = "__ALL__"
-            labelingPattern = "EAP-%system.build.number%"
+            vcsRootId = "${DslContext.settingsRoot.id}"
+            labelingPattern = "%system.build.number%-EAP"
             successfulOnly = true
             branchFilter = ""
         }
