@@ -1,10 +1,14 @@
+import dev.feedforward.markdownto.DownParser
+
 buildscript {
   repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
   }
 
   dependencies {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    classpath "com.github.AlexPl292:mark-down-to-slack:1.0.1"
   }
 }
 
@@ -107,7 +111,8 @@ tasks.register("slackEapNotification") {
   doLast {
     if (!slackUrl) return
     def post = new URL(slackUrl).openConnection()
-    def changeLog = changelog.getUnreleased().toPlainText()
+    def changeLog = changelog.getUnreleased().toText()
+    def slackDown = new DownParser(changeLog).toSlack().toString()
     def message = """
       {
           "text": "New version of IdeaVim",
@@ -116,7 +121,7 @@ tasks.register("slackEapNotification") {
                     "type": "section",
                     "text": {
                       "type": "mrkdwn",
-                      "text": "IdeaVim EAP $version has been released\\n$changeLog"
+                      "text": "IdeaVim EAP $version has been released\\n$slackDown"
                     }
                   }
           ]
