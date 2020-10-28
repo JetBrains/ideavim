@@ -32,6 +32,7 @@ usual beta standards.
 
 ### Fixes:
 * [VIM-2150](https://youtrack.jetbrains.com/issue/VIM-2150) `Shift-D` should not delete an empty line
+* [VIM-2157](https://youtrack.jetbrains.com/issue/VIM-2157) Fix tab with an active template
 
 ## 0.60, 2020-10-09
 

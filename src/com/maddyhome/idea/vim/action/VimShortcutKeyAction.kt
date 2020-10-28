@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
+import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.listener.IdeaSpecifics.aceJumpActive
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -95,6 +96,8 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
       if (LookupManager.getActiveLookup(editor) != null && !LookupKeys.isEnabledForLookup(keyStroke)) return false
 
       if (keyCode == KeyEvent.VK_ESCAPE) return isEnabledForEscape(editor)
+
+      if (keyCode == KeyEvent.VK_TAB && editor.isTemplateActive()) return false
 
       if (editor.inInsertMode) { // XXX: <Tab> won't be recorded in macros
         if (keyCode == KeyEvent.VK_TAB) {
