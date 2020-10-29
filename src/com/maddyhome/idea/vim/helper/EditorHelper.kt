@@ -22,9 +22,7 @@ package com.maddyhome.idea.vim.helper
 
 import com.intellij.ide.ui.laf.darcula.DarculaUIUtil
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -41,15 +39,21 @@ val Editor.isIdeaVimDisabledHere: Boolean
   get() {
     var res = true
     val start = System.currentTimeMillis()
-    val times = mutableListOf<Long>()
+    val times = mutableListOf<Pair<Long, String>>()
     val timeForCalculation = measureTimeMillis {
-      res = (disabledInDialog.apply { times += System.currentTimeMillis() }
-        || (!OptionsManager.ideaenabledbufs.contains("singleline") && isDatabaseCell).apply { times += System.currentTimeMillis() }
-        || (!OptionsManager.ideaenabledbufs.contains("singleline") && isOneLineMode).apply { times += System.currentTimeMillis() }
+      res = (disabledInDialog.apply { times += System.currentTimeMillis() to "Disabled in dialog" }
+
+        || (!OptionsManager.ideaenabledbufs.contains("singleline")
+        .apply { times += System.currentTimeMillis() to "first single line check" }
+        && isDatabaseCell.apply { times += System.currentTimeMillis() to "is db cell" })
+
+        || (!OptionsManager.ideaenabledbufs.contains("singleline")
+        .apply { times += System.currentTimeMillis() to "second single line check" }
+        && isOneLineMode.apply { times += System.currentTimeMillis() to "is one line" })
         )
     }
     if (timeForCalculation > 10) {
-      val timeDiffs = times.map { it - start }
+      val timeDiffs = times.map { it.second + ": " + (it.first - start) }
       val message = "Time for calculation of 'isIdeaVimDisabledHere' took $timeForCalculation ms. Time diff: $timeDiffs"
       logger<Editor>().error(message)
     }
