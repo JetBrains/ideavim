@@ -73,3 +73,20 @@ private fun inlayAwareOffsetToVisualPosition(editor: Editor, offset: Int): Visua
   }
   return pos
 }
+
+val Caret.inlayAwareVisualColumn: Int
+  get() = this.visualPosition.column - this.amountOfInlaysBeforeCaret
+
+val Caret.amountOfInlaysBeforeCaret: Int
+  get() {
+    val curLineStartOffset: Int = this.editor.document.getLineStartOffset(logicalPosition.line)
+    return this.editor.inlayModel.getInlineElementsInRange(curLineStartOffset, this.offset).size
+  }
+
+fun Editor.amountOfInlaysBeforeVisualPosition(pos: VisualPosition): Int {
+  val newOffset = EditorHelper.visualPositionToOffset(this, pos)
+  val lineStartNewOffset: Int = this.document.getLineStartOffset(this.visualToLogicalPosition(pos).line)
+  return this.inlayModel.getInlineElementsInRange(lineStartNewOffset, newOffset).size
+}
+
+fun VisualPosition.toInlayAwareOffset(caret: Caret): Int =this.column - caret.amountOfInlaysBeforeCaret

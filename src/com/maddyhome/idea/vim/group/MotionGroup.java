@@ -304,7 +304,7 @@ public class MotionGroup {
     final int oldOffset = caret.getOffset();
     InlayHelperKt.moveToInlayAwareOffset(caret, offset);
     if (oldOffset != offset) {
-      UserDataManager.setVimLastColumn(caret, caret.getVisualPosition().column);
+      UserDataManager.setVimLastColumn(caret, InlayHelperKt.getInlayAwareVisualColumn(caret));
       if (caret == editor.getCaretModel().getPrimaryCaret()) {
         scrollCaretIntoView(editor);
       }
@@ -1257,7 +1257,7 @@ public class MotionGroup {
         col = normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowedIgnoringOnemore(CommandStateHelper.getMode(editor)));
       }
       else {
-        int newInlineElements = EditorHelperRt.amountOfInlaysBeforeVisualPosition(editor, new VisualPosition(line, col));
+        int newInlineElements = InlayHelperKt.amountOfInlaysBeforeVisualPosition(editor, new VisualPosition(line, col));
 
         col = normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
         col += newInlineElements;

@@ -784,7 +784,8 @@ public class EditorHelper {
     VisualPosition visualPosition = caret.getVisualPosition();
 
     // Current column equals to vimLastColumn. It's great, everything is okay.
-    if (visualPosition.column == vimLastColumn) return vimLastColumn;
+    int inlayAwareOffset = InlayHelperKt.toInlayAwareOffset(visualPosition, caret);
+    if (inlayAwareOffset == vimLastColumn) return vimLastColumn;
 
     Editor editor = caret.getEditor();
     boolean isEndAllowed = CommandStateHelper.isEndAllowedIgnoringOnemore(CommandStateHelper.getMode(editor));
@@ -802,8 +803,7 @@ public class EditorHelper {
     }
 
     // Okay here we know that something is definitely wrong. We set vimLastColumn to the current column.
-    int updatedCol = visualPosition.column;
-    updatedCol -= EditorHelperRt.getAmountOfInlaysBeforeCaret(caret);
+    int updatedCol = InlayHelperKt.getInlayAwareVisualColumn(caret);
     UserDataManager.setVimLastColumn(caret, updatedCol);
     return updatedCol;
   }

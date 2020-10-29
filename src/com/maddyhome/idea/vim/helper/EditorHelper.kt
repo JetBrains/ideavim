@@ -71,14 +71,3 @@ fun Editor.isPrimaryEditor(): Boolean {
   return fileEditorManager.allEditors.any { fileEditor -> this == EditorUtil.getEditorEx(fileEditor) }
 }
 
-val Caret.amountOfInlaysBeforeCaret: Int
-  get() {
-    val curLineStartOffset: Int = this.editor.document.getLineStartOffset(logicalPosition.line)
-    return this.editor.inlayModel.getInlineElementsInRange(curLineStartOffset, this.offset).size
-  }
-
-fun Editor.amountOfInlaysBeforeVisualPosition(pos: VisualPosition): Int {
-  val newOffset = EditorHelper.visualPositionToOffset(this, pos)
-  val lineStartNewOffset: Int = this.document.getLineStartOffset(this.visualToLogicalPosition(pos).line)
-  return this.inlayModel.getInlineElementsInRange(lineStartNewOffset, newOffset).size
-}
