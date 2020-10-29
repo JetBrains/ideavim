@@ -44,8 +44,8 @@ val Editor.isIdeaVimDisabledHere: Boolean
     val times = mutableListOf<Long>()
     val timeForCalculation = measureTimeMillis {
       res = (disabledInDialog.apply { times += System.currentTimeMillis() }
-        || (!OptionsManager.oneline.isSet && isDatabaseCell).apply { times += System.currentTimeMillis() }
-        || (!OptionsManager.oneline.isSet && isOneLineMode).apply { times += System.currentTimeMillis() }
+        || (!OptionsManager.ideaenabledbufs.contains("singleline") && isDatabaseCell).apply { times += System.currentTimeMillis() }
+        || (!OptionsManager.ideaenabledbufs.contains("singleline") && isOneLineMode).apply { times += System.currentTimeMillis() }
         )
     }
     if (timeForCalculation > 10) {
@@ -60,7 +60,8 @@ private val Editor.isDatabaseCell: Boolean
   get() = DarculaUIUtil.isTableCellEditor(this.component)
 
 private val Editor.disabledInDialog: Boolean
-  get() = OptionsManager.dialogescape.value == "off" && (!this.isPrimaryEditor() && !EditorHelper.isFileEditor(this))
+  get() = (!OptionsManager.ideaenabledbufs.contains("dialog") && !OptionsManager.ideaenabledbufs.contains("dialoglegacy"))
+    && (!this.isPrimaryEditor() && !EditorHelper.isFileEditor(this))
 
 /**
  * Checks if the editor is a primary editor in the main editing area.

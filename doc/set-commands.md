@@ -124,6 +124,13 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                         "<Tab>", "<Down>", "<Up>", "<Enter>", "<Left>", "<Right>",
                         "<C-Down>", "<C-Up>", "<PageUp>", "<PageDown>",
                         "<C-J>", "<C-Q>"
+                     
+    `ideaenabledbufs`  `ideaenabledbufs`  List of strings (default "dialog")   [To Be Released]
+                  
+                  Define the list of additional buffers where IdeaVim is enabled.
+                  
+                  - dialog - enable IdeaVim in dialogs
+                  - singleline - enable IdeaVim in single line editors (not suggested)
 
     ----------
     [1] - cursor keys, <End>, <Home>, <PageUp> and <PageDown>

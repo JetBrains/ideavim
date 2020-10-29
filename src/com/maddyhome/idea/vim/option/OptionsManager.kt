@@ -88,10 +88,7 @@ object OptionsManager {
   val ideastatusicon = addOption(BoundStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues))
   val ideastrictmode = addOption(ToggleOption("ideastrictmode", "ideastrictmode", false))
   val ideawrite = addOption(BoundStringOption("ideawrite", "ideawrite", IdeaWriteData.all, IdeaWriteData.allValues))
-
-  // Dev only experimental options
-  val dialogescape = addOption(BoundStringOption("dialogescape", "de", "legacy", arrayOf("legacy", "on", "off")))
-  val oneline = addOption(ToggleOption("oneline", "oneline", true))
+  val ideaenabledbufs = addOption(BoundListOption("ideaenabledbufs", "ideaenabledbufs", arrayOf("dialog"), arrayOf("dialog", "singleline", "dialoglegacy")))
 
   fun isSet(name: String): Boolean {
     val option = getOption(name)
