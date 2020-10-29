@@ -11,6 +11,8 @@ complexity:
     threshold: 6
   ComplexCondition:
     threshold: 6
+  ComplexMethod:
+    threshold: 20
 exceptions:
   TooGenericExceptionCaught:
     active: false

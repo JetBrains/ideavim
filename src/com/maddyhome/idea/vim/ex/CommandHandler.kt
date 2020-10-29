@@ -121,31 +121,8 @@ sealed class CommandHandler {
   @Throws(ExException::class)
   fun process(editor: Editor, context: DataContext, cmd: ExCommand, count: Int): Boolean {
 
-    // No range allowed
-    if (RangeFlag.RANGE_FORBIDDEN == argFlags.rangeFlag && cmd.ranges.size() != 0) {
-      VimPlugin.showMessage(MessageHelper.message(Msg.e_norange))
-      throw NoRangeAllowedException()
-    }
+    checkArgs(cmd)
 
-    if (RangeFlag.RANGE_REQUIRED == argFlags.rangeFlag && cmd.ranges.size() == 0) {
-      VimPlugin.showMessage(MessageHelper.message(Msg.e_rangereq))
-      throw MissingRangeException()
-    }
-
-    if (RangeFlag.RANGE_IS_COUNT == argFlags.rangeFlag) {
-      cmd.ranges.setDefaultLine(1)
-    }
-
-    // Argument required
-    if (ArgumentFlag.ARGUMENT_REQUIRED == argFlags.argumentFlag && cmd.argument.isEmpty()) {
-      VimPlugin.showMessage(MessageHelper.message(Msg.e_argreq))
-      throw MissingArgumentException()
-    }
-
-    if (ArgumentFlag.ARGUMENT_FORBIDDEN == argFlags.argumentFlag && cmd.argument.isNotEmpty()) {
-      VimPlugin.showMessage(MessageHelper.message(Msg.e_argforb))
-      throw NoArgumentAllowedException()
-    }
     if (editor.inVisualMode && Flag.SAVE_VISUAL !in argFlags.flags) {
       editor.exitVisualMode()
     }
@@ -177,6 +154,34 @@ sealed class CommandHandler {
       VimPlugin.showMessage(e.message)
       VimPlugin.indicateError()
       return false
+    }
+  }
+
+  private fun checkArgs(cmd: ExCommand) {
+    // No range allowed
+    if (RangeFlag.RANGE_FORBIDDEN == argFlags.rangeFlag && cmd.ranges.size() != 0) {
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_norange))
+      throw NoRangeAllowedException()
+    }
+
+    if (RangeFlag.RANGE_REQUIRED == argFlags.rangeFlag && cmd.ranges.size() == 0) {
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_rangereq))
+      throw MissingRangeException()
+    }
+
+    if (RangeFlag.RANGE_IS_COUNT == argFlags.rangeFlag) {
+      cmd.ranges.setDefaultLine(1)
+    }
+
+    // Argument required
+    if (ArgumentFlag.ARGUMENT_REQUIRED == argFlags.argumentFlag && cmd.argument.isEmpty()) {
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_argreq))
+      throw MissingArgumentException()
+    }
+
+    if (ArgumentFlag.ARGUMENT_FORBIDDEN == argFlags.argumentFlag && cmd.argument.isNotEmpty()) {
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_argforb))
+      throw NoArgumentAllowedException()
     }
   }
 }

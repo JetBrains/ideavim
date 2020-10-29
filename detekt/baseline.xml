@@ -1,23 +1,18 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
-  <ManuallySuppressedIssues></ManuallySuppressedIssues>
-  <CurrentIssues>
+  <ManuallySuppressedIssues>
     <ID>ComplexMethod:CmdHandler.kt$CmdHandler$private fun addAlias(cmd: ExCommand, editor: Editor?): Boolean</ID>
-    <ID>ComplexMethod:CommandHandler.kt$CommandHandler$ @Throws(ExException::class) fun process(editor: Editor, context: DataContext, cmd: ExCommand, count: Int): Boolean</ID>
     <ID>ComplexMethod:CommandState.kt$CommandState$ fun toVimNotation(): String</ID>
-    <ID>ComplexMethod:CommandState.kt$CommandState$private fun getStatusString(pos: Int): String</ID>
+  </ManuallySuppressedIssues>
+  <CurrentIssues>
     <ID>ComplexMethod:HistoryHandler.kt$HistoryHandler$override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean</ID>
     <ID>ComplexMethod:OptionsManager.kt$OptionsManager$ fun parseOptionLine(editor: Editor?, args: String, failOnBad: Boolean): Boolean</ID>
-    <ID>ComplexMethod:OptionsManager.kt$OptionsManager$ private fun showOptions(editor: Editor?, opts: Collection&lt;Option&lt;*&gt;&gt;, showIntro: Boolean)</ID>
-    <ID>ComplexMethod:PutGroup.kt$PutGroup$private fun moveCaretToEndPosition( editor: Editor, caret: Caret, startOffset: Int, endOffset: Int, typeInRegister: SelectionType, modeInEditor: CommandState.SubMode, caretAfterInsertedText: Boolean )</ID>
     <ID>ComplexMethod:PutGroup.kt$PutGroup$private fun prepareDocumentAndGetStartOffsets(editor: Editor, caret: Caret, typeInRegister: SelectionType, data: PutData, additionalData: Map&lt;String, Any&gt;): List&lt;Int&gt;</ID>
     <ID>ComplexMethod:SearchHelperKt.kt$// bounds are considered inside corresponding quotes fun checkInString(chars: CharSequence, currentPos: Int, str: Boolean): Boolean</ID>
     <ID>ComplexMethod:TabCloseHandler.kt$TabCloseHandler$ private fun getTabIndexToClose(arg: String, current: Int, last: Int): Int?</ID>
     <ID>ComplexMethod:VimExchangeExtension.kt$VimExchangeExtension.Operator$private fun compareExchanges(x: Exchange, y: Exchange): ExchangeCompareResult</ID>
-    <ID>ComplexMethod:VimExtensionFacade.kt$VimExtensionFacade$ @JvmStatic fun inputString(editor: Editor, prompt: String, finishOn: Char?): String</ID>
     <ID>ComplexMethod:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension.NextOccurrenceHandler$override fun executeInWriteAction(editor: Editor, context: DataContext)</ID>
     <ID>ComplexMethod:VimShortcutKeyAction.kt$VimShortcutKeyAction$private fun isEnabled(e: AnActionEvent): Boolean</ID>
-    <ID>ComplexMethod:VisualGroup.kt$private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Caret)</ID>
     <ID>LongMethod:CmdHandler.kt$CmdHandler$private fun addAlias(cmd: ExCommand, editor: Editor?): Boolean</ID>
     <ID>LongMethod:HistoryHandler.kt$HistoryHandler$override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean</ID>
     <ID>LongMethod:OptionsManager.kt$OptionsManager$ fun parseOptionLine(editor: Editor?, args: String, failOnBad: Boolean): Boolean</ID>
@@ -140,7 +135,7 @@
     <ID>ReturnCount:VisualMotionGroup.kt$VisualMotionGroup$private fun seemsLikeBlockMode(editor: Editor): Boolean</ID>
     <ID>ReturnCount:VisualOperatorActionHandler.kt$VisualOperatorActionHandler$final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean</ID>
     <ID>ReturnCount:YankGroup.kt$YankGroup$ fun yankMotion(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument): Boolean</ID>
-    <ID>ThrowsCount:CommandHandler.kt$CommandHandler$ @Throws(ExException::class) fun process(editor: Editor, context: DataContext, cmd: ExCommand, count: Int): Boolean</ID>
+    <ID>ThrowsCount:CommandHandler.kt$CommandHandler$private fun checkArgs(cmd: ExCommand)</ID>
     <ID>TooManyFunctions:CommandBuilder.kt$CommandBuilder</ID>
     <ID>TooManyFunctions:CommandState.kt$CommandState</ID>
     <ID>TooManyFunctions:PutGroup.kt$PutGroup</ID>
