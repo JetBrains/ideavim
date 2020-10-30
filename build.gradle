@@ -55,6 +55,7 @@ intellij {
 runPluginVerifier {
   ideVersions = ["IC-2020.1", "IC-2020.2"]
   downloadDirectory = "${project.buildDir}/pluginVerifier/ides"
+  teamCityOutputFormat = true
 }
 
 repositories {
