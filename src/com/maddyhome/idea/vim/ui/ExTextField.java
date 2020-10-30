@@ -178,7 +178,7 @@ public class ExTextField extends JTextField {
       VimPlugin.indicateError();
     }
     else {
-      histIndex = histIndex + dir;
+      histIndex += dir;
       String txt;
       if (histIndex == history.size()) {
         txt = lastEntry;

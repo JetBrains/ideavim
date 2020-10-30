@@ -86,12 +86,11 @@ public class VimEmulationConfigurable implements Configurable {
   }
 
   private static final class VimSettingsPanel extends JPanel {
-    private final @NotNull VimShortcutConflictsTable myShortcutConflictsTable;
 
     public VimSettingsPanel(@NotNull VimShortcutConflictsTable.Model model) {
-      myShortcutConflictsTable = new VimShortcutConflictsTable(model);
+      VimShortcutConflictsTable shortcutConflictsTable = new VimShortcutConflictsTable(model);
       setLayout(new BorderLayout());
-      final JScrollPane scrollPane = new JBScrollPane(myShortcutConflictsTable);
+      final JScrollPane scrollPane = new JBScrollPane(shortcutConflictsTable);
       scrollPane.setBorder(new LineBorder(JBColor.border()));
       final JPanel conflictsPanel = new JPanel(new BorderLayout());
       final String title = "Shortcut Conflicts for Active Keymap";

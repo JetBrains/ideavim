@@ -19,6 +19,7 @@
 package org.jetbrains.plugins.ideavim.ex.handler;
 
 import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.util.ArrayUtil;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
@@ -75,6 +76,6 @@ public class ActionListCommandTest extends VimTestCase {
 
   private String[] parseActionListOutput() {
     String output = ExOutputModel.getInstance(myFixture.getEditor()).getText();
-    return output == null ? new String[]{} : output.split("\n");
+    return output == null ? ArrayUtil.EMPTY_STRING_ARRAY : output.split("\n");
   }
 }

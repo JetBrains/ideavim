@@ -115,13 +115,10 @@ public class StringHelper {
             break;
           case ESCAPE:
             state = KeyParserState.INIT;
-            if (c == '\\' || c == '<') {
-              result.add(getKeyStroke(c));
-            }
-            else {
+            if (c != '\\' && c != '<') {
               result.add(getKeyStroke('\\'));
-              result.add(getKeyStroke(c));
             }
+            result.add(getKeyStroke(c));
             break;
           case SPECIAL:
             if (c == '>' || c == '»') {

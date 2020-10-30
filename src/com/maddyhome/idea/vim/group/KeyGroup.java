@@ -498,8 +498,8 @@ public class KeyGroup implements PersistentStateComponent<Element> {
           if (action instanceof VimShortcutKeyAction) {
             continue;
           }
-          final com.intellij.openapi.actionSystem.Shortcut[] shortcuts = action.getShortcutSet().getShortcuts();
-          for (com.intellij.openapi.actionSystem.Shortcut shortcut : shortcuts) {
+          final Shortcut[] shortcuts = action.getShortcutSet().getShortcuts();
+          for (Shortcut shortcut : shortcuts) {
             if (shortcut.isKeyboard() && shortcut.startsWith(keyStrokeShortcut) && !results.contains(action)) {
               results.add(action);
             }

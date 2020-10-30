@@ -1254,10 +1254,9 @@ public class ChangeGroup {
     }
 
     if (kludge) {
-      int size = fileSize;
       int cnt = count * motion.getCount();
-      int pos1 = SearchHelper.findNextWordEnd(chars, offset, size, cnt, bigWord, false);
-      int pos2 = SearchHelper.findNextWordEnd(chars, pos1, size, -cnt, bigWord, false);
+      int pos1 = SearchHelper.findNextWordEnd(chars, offset, fileSize, cnt, bigWord, false);
+      int pos2 = SearchHelper.findNextWordEnd(chars, pos1, fileSize, -cnt, bigWord, false);
       if (logger.isDebugEnabled()) {
         logger.debug("pos=" + offset);
         logger.debug("pos1=" + pos1);

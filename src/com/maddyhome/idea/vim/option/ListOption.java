@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.option;
 
+import com.intellij.util.ArrayUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +31,7 @@ import java.util.StringTokenizer;
  * This is an option that accepts an arbitrary list of values
  */
 public class ListOption extends TextOption {
-  public static final @NotNull ListOption empty = new ListOption("", "", new String[0], "");
+  public static final @NotNull ListOption empty = new ListOption("", "", ArrayUtil.EMPTY_STRING_ARRAY, "");
 
   /**
    * Gets the value of the option as a comma separated list of values

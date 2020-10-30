@@ -4726,11 +4726,11 @@ public class RegExp {
   private int regnzpar;       /* \z() count. */
   private char re_has_z;       /* \z item detected */
   private CharPointer regcode;       /* Code-emit pointer */
-  private @NotNull boolean[] had_endbrace = new boolean[NSUBEXP];  /* flags, true if end of () found */
+  private boolean[] had_endbrace = new boolean[NSUBEXP];  /* flags, true if end of () found */
   private int regflags;       /* RF_ flags for prog */
-  private @NotNull int[] brace_min = new int[10];  /* Minimums for complex brace repeats */
-  private @NotNull int[] brace_max = new int[10];  /* Maximums for complex brace repeats */
-  private @NotNull int[] brace_count = new int[10]; /* Current counts for complex brace repeats */
+  private int[] brace_min = new int[10];  /* Minimums for complex brace repeats */
+  private int[] brace_max = new int[10];  /* Maximums for complex brace repeats */
+  private int[] brace_count = new int[10]; /* Current counts for complex brace repeats */
   private boolean had_eol;        /* true when EOL found by vim_regcomp() */
   private boolean one_exactly = false;    /* only do one char for EXACTLY */
 

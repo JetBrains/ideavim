@@ -17,6 +17,8 @@ import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.EnumSet;
 import java.util.Stack;
 
@@ -590,20 +592,20 @@ public class VimArgTextObjExtension implements VimExtension {
     private int skipSexp(final int start, final int end, SexpDirection dir) {
       char lastChar = getCharAt(start);
       assert dir.isOpenBracket(lastChar);
-      Stack<Character> bracketStack = new Stack<>();
+      Deque<Character> bracketStack = new ArrayDeque<>();
       bracketStack.push(lastChar);
       int i = start + dir.delta();
-      while (!bracketStack.empty() && i != end) {
+      while (!bracketStack.isEmpty() && i != end) {
         final char ch = getCharAt(i);
         if (dir.isOpenBracket(ch)) {
           bracketStack.push(ch);
         } else {
           if (dir.isCloseBracket(ch)) {
-            if (bracketStack.lastElement() == brackets.matchingBracket(ch)) {
+            if (bracketStack.getLast() == brackets.matchingBracket(ch)) {
               bracketStack.pop();
             } else {
               //noinspection StatementWithEmptyBody
-              if (brackets.getBracketPrio(ch) < brackets.getBracketPrio(bracketStack.lastElement())) {
+              if (brackets.getBracketPrio(ch) < brackets.getBracketPrio(bracketStack.getLast())) {
                 // (<...) ->  (...)
                 bracketStack.pop();
                 // Retry the same character again for cases like (...<<...).
@@ -621,7 +623,7 @@ public class VimArgTextObjExtension implements VimExtension {
         }
         i += dir.delta();
       }
-      if (bracketStack.empty()) {
+      if (bracketStack.isEmpty()) {
         return i;
       } else {
         return start + dir.delta();

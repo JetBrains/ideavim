@@ -977,11 +977,8 @@ public class SearchGroup implements PersistentStateComponent<Element> {
 
       res = search(editor, lastOffset.substring(ppos + 1), res, 1, flags);
 
-      return res;
     }
-    else {
-      return res;
-    }
+    return res;
   }
 
   @RWLockLabel.SelfSynchronized

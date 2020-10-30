@@ -94,7 +94,6 @@ public class KeywordOptionTest extends VimTestCase {
 
   public void testTwoAdjacentLettersAreInvalid() {
     option.set("ab");
-    List<String> v = option.values();
     assertDoesntContain(option.values(), new ArrayList<String>(){{add("ab");}});
   }
 

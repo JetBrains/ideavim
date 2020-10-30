@@ -126,7 +126,6 @@ public class CommandParser {
   private void processCommand(@NotNull Editor editor, @NotNull DataContext context, @NotNull String cmd,
                              int count, int aliasCountdown) throws ExException {
     // Nothing entered
-    int result = 0;
     if (cmd.length() == 0) {
       logger.warn("CMD is empty");
       return;
@@ -326,13 +325,12 @@ public class CommandParser {
             if (ch == '/' || ch == '?' || ch == '&') {
               location.append(ch);
               state = State.RANGE_PATTERN_MAYBE_DONE;
-              reprocess = false;
             }
             else {
               error = MessageHelper.message(Msg.e_backslash);
               state = State.ERROR;
-              reprocess = false;
             }
+            reprocess = false;
             break;
           case RANGE_PATTERN: // Reading a pattern range
             // No trailing / or ? required if there is no command so look for newline to tell us we are done

@@ -138,7 +138,7 @@ public class SearchHelper {
         type == chars.charAt(start - 1) &&
         end < chars.length() &&
         close == chars.charAt(end)) {
-      start = start - 1;
+      start -= 1;
       pos = start;
       rangeSelection = true;
     }
@@ -608,7 +608,7 @@ public class SearchHelper {
     final Pattern tagPattern = Pattern.compile(String.format("(?:%s)|(?:%s)", openingTagPattern, closingTagPattern));
     final Matcher matcher = tagPattern.matcher(sequence.subSequence(position, sequence.length()));
 
-    final Stack<String> openTags = new Stack<>();
+    final Deque<String> openTags = new ArrayDeque<>();
 
     while (matcher.find()) {
       boolean isClosingTag = matcher.group(1) == null;
@@ -655,7 +655,7 @@ public class SearchHelper {
     final Pattern tagPattern =
       Pattern.compile(String.format(patternString, quotedTagName, quotedTagName), Pattern.CASE_INSENSITIVE);
     final Matcher matcher = tagPattern.matcher(sequence.subSequence(0, position + 1));
-    final Stack<TextRange> openTags = new Stack<>();
+    final Deque<TextRange> openTags = new ArrayDeque<>();
 
     while (matcher.find()) {
       final TextRange match = new TextRange(matcher.start(), matcher.end());
