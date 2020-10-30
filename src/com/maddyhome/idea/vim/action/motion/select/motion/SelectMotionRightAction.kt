@@ -42,12 +42,12 @@ class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
     val keymodel = OptionsManager.keymodel
     if (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel) {
-      logger.info("Keymodel option has stopselect. Exiting select mode")
+      logger.debug("Keymodel option has stopselect. Exiting select mode")
       val startSelection = caret.selectionStart
       val endSelection = caret.selectionEnd
       editor.exitSelectMode(false)
       if (editor.isTemplateActive()) {
-        logger.info("Template is active. Activate insert mode")
+        logger.debug("Template is active. Activate insert mode")
         VimPlugin.getChange().insertBeforeCursor(editor, context)
         if (caret.offset in startSelection..endSelection) {
           return endSelection

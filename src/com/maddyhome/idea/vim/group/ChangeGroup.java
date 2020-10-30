@@ -1773,7 +1773,7 @@ public class ChangeGroup {
   }
 
   private static void resetCaret(@NotNull VirtualFile virtualFile, Project proj, boolean insert) {
-    logger.info("Reset caret to a " + (insert ? "non-block" : "block") + " shape");
+    logger.debug("Reset caret to a " + (insert ? "non-block" : "block") + " shape");
     Document doc = FileDocumentManager.getInstance().getDocument(virtualFile);
     if (doc == null) return; // Must be no text editor (such as image)
     Editor[] editors = EditorFactory.getInstance().getEditors(doc, proj);

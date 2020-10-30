@@ -874,7 +874,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
 
   private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir) {
     boolean wrap = OptionsManager.INSTANCE.getWrapscan().isSet();
-    logger.info("Perform search. Direction: " + dir + " wrap: " + wrap);
+    logger.debug("Perform search. Direction: " + dir + " wrap: " + wrap);
 
     int offset = 0;
     boolean offsetIsLineOffset = false;

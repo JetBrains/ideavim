@@ -212,7 +212,7 @@ object VimListenerManager {
       val document = editor.document
 
       if (SelectionVimListenerSuppressor.isNotLocked) {
-        logger.info("Adjust non vim selection change")
+        logger.debug("Adjust non vim selection change")
         IdeaSelectionControl.controlNonVimSelectionChange(editor)
       }
 

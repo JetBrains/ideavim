@@ -75,7 +75,7 @@ class CommandState private constructor() {
 
   fun pushModes(mode: Mode, submode: SubMode) {
     val newModeState = ModeState(mode, submode)
-    logger.info("Push new mode state: ${newModeState.toSimpleString()}")
+    logger.debug("Push new mode state: ${newModeState.toSimpleString()}")
     logger.debug { "Stack of mode states before push: ${toSimpleString()}" }
     modeStates.push(newModeState)
     setMappingMode()
@@ -86,7 +86,7 @@ class CommandState private constructor() {
     val popped = modeStates.pop()
     setMappingMode()
     updateStatus()
-    logger.info("Popped mode state: ${popped.toSimpleString()}")
+    logger.debug("Popped mode state: ${popped.toSimpleString()}")
     logger.debug { "Stack of mode states after pop: ${toSimpleString()}" }
   }
 

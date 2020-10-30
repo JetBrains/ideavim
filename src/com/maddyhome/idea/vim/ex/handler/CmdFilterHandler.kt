@@ -34,7 +34,7 @@ import java.io.IOException
 class CmdFilterHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-    logger.info("execute")
+    logger.debug("execute")
 
     var command = cmd.argument
     if (command.isEmpty()) {
