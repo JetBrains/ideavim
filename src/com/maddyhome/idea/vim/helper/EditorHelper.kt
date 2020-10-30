@@ -20,12 +20,15 @@
 
 package com.maddyhome.idea.vim.helper
 
-import com.intellij.ide.ui.laf.darcula.DarculaUIUtil
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
+import com.intellij.util.ui.table.JBTableRowEditor
 import com.maddyhome.idea.vim.option.OptionsManager
+import java.awt.Component
+import javax.swing.JComponent
+import javax.swing.JTable
 import kotlin.system.measureTimeMillis
 
 val Editor.fileSize: Int
@@ -61,7 +64,7 @@ val Editor.isIdeaVimDisabledHere: Boolean
   }
 
 private val Editor.isDatabaseCell: Boolean
-  get() = DarculaUIUtil.isTableCellEditor(this.component)
+  get() = isTableCellEditor(this.component)
 
 private val Editor.disabledInDialog: Boolean
   get() = (!OptionsManager.ideaenabledbufs.contains("dialog") && !OptionsManager.ideaenabledbufs.contains("dialoglegacy"))
@@ -76,3 +79,21 @@ fun Editor.isPrimaryEditor(): Boolean {
   return fileEditorManager.allEditors.any { fileEditor -> this == EditorUtil.getEditorEx(fileEditor) }
 }
 
+// Optimized clone of com.intellij.ide.ui.laf.darcula.DarculaUIUtil.isTableCellEditor
+private fun isTableCellEditor(c: Component): Boolean {
+  return java.lang.Boolean.TRUE == (c as JComponent).getClientProperty("JComboBox.isTableCellEditor") ||
+    findParentByCondition(c) { it is JBTableRowEditor } == null &&
+    findParentByCondition(c) { it is JTable } != null
+}
+
+private const val PARENT_BY_CONDITION_DEPTH = 10
+
+private fun findParentByCondition(c: Component?, condition: (Component?) -> Boolean): Component? {
+  var eachParent = c
+  var goDeep = PARENT_BY_CONDITION_DEPTH
+  while (eachParent != null && --goDeep > 0) {
+    if (condition(eachParent)) return eachParent
+    eachParent = eachParent.parent
+  }
+  return null
+}
