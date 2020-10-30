@@ -22,7 +22,7 @@ sealed class ActiveTests(buildName: String, ijVersion: String) : BuildType({
 
   steps {
     gradle {
-      tasks = "clean check"
+      tasks = "clean check runPluginVerifier"
       buildFile = ""
       enableStacktrace = true
       param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
