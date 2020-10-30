@@ -144,7 +144,7 @@ class ReplaceWithRegister : VimExtension {
       VimPlugin.getPut().putText(editor, EditorDataContext(editor), putData)
 
       VimPlugin.getRegister().saveRegister(savedRegister.name, savedRegister)
-      VimPlugin.getRegister().saveRegister(RegisterGroup.DEFAULT_REGISTER, savedRegister)
+      VimPlugin.getRegister().saveRegister(VimPlugin.getRegister().defaultRegister, savedRegister)
     }
   }
 }

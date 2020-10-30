@@ -88,9 +88,9 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
   private static final List<Character> CLIPBOARD_REGISTERS = ImmutableList.of('*', '+');
   private static final Logger logger = Logger.getInstance(RegisterGroup.class.getName());
 
-  public final static char UNNAMED_REGISTER = '"';
-  public static char DEFAULT_REGISTER = UNNAMED_REGISTER;
-  private char lastRegister = DEFAULT_REGISTER;
+  public static final char UNNAMED_REGISTER = '"';
+  private char defaultRegister = UNNAMED_REGISTER;
+  private char lastRegister = defaultRegister;
   private final @NotNull HashMap<Character, Register> registers = new HashMap<>();
   private char recordRegister = 0;
   private @Nullable List<KeyStroke> recordList = null;
@@ -99,15 +99,15 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     final ListOption clipboardOption = OptionsManager.INSTANCE.getClipboard();
     clipboardOption.addOptionChangeListenerAndExecute((oldValue, newValue) -> {
       if (clipboardOption.contains("unnamed")) {
-        DEFAULT_REGISTER = '*';
+        defaultRegister = '*';
       }
       else if (clipboardOption.contains("unnamedplus")) {
-        DEFAULT_REGISTER = '+';
+        defaultRegister = '+';
       }
       else {
-        DEFAULT_REGISTER = UNNAMED_REGISTER;
+        defaultRegister = UNNAMED_REGISTER;
       }
-      lastRegister = DEFAULT_REGISTER;
+      lastRegister = defaultRegister;
     });
   }
 
@@ -144,7 +144,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
    * Reset the selected register back to the default register.
    */
   public void resetRegister() {
-    lastRegister = DEFAULT_REGISTER;
+    lastRegister = defaultRegister;
     logger.debug("Last register reset to default register");
   }
 
@@ -228,7 +228,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
                        editor.offsetToLogicalPosition(start).line == editor.offsetToLogicalPosition(end).line;
 
       // Deletes go into numbered registers only if text is smaller than a line, register is used or it's a special case
-      if (!smallInlineDeletion || register != DEFAULT_REGISTER || isSmallDeletionSpecialCase(editor)) {
+      if (!smallInlineDeletion || register != defaultRegister || isSmallDeletionSpecialCase(editor)) {
         // Old 1 goes to 2, etc. Old 8 to 9, old 9 is lost
         for (char d = '8'; d >= '1'; d--) {
           Register t = registers.get(d);
@@ -241,12 +241,12 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
       }
 
       // Deletes smaller than one line and without specified register go the the "-" register
-      if (smallInlineDeletion && register == DEFAULT_REGISTER) {
+      if (smallInlineDeletion && register == defaultRegister) {
         registers.put('-', new Register('-', type, processedText, new ArrayList<>(transferableData)));
       }
     }
     // Yanks also go to register 0 if the default register was used
-    else if (register == DEFAULT_REGISTER) {
+    else if (register == defaultRegister) {
       registers.put('0', new Register('0', type, processedText, new ArrayList<>(transferableData)));
       if (logger.isDebugEnabled()) logger.debug("register '" + '0' + "' contains: \"" + processedText + "\"");
     }
@@ -372,7 +372,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
    * The register key for the default register.
    */
   public char getDefaultRegister() {
-    return DEFAULT_REGISTER;
+    return defaultRegister;
   }
 
   public @NotNull List<Register> getRegisters() {
