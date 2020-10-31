@@ -2,6 +2,8 @@
   <applicationListeners>
     <listener class="com.maddyhome.idea.vim.ui.ExEntryPanel$LafListener"
               topic="com.intellij.ide.ui.LafManagerListener"/>
+    <listener class="com.maddyhome.idea.vim.extension.highlightedyank.HighlightColorResetter"
+              topic="com.intellij.ide.ui.LafManagerListener"/>
   </applicationListeners>
   <projectListeners>
     <listener class="com.maddyhome.idea.vim.ui.ExOutputPanel$LafListener"
