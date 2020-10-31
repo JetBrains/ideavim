@@ -93,7 +93,7 @@ private fun isTableCellEditor(c: Component, times: MutableList<Pair<Long, String
 
 private const val PARENT_BY_CONDITION_DEPTH = 10
 
-private fun findParentByCondition(c: Component?, condition: (Component?) -> Boolean): Component? {
+private inline fun findParentByCondition(c: Component?, condition: (Component?) -> Boolean): Component? {
   var eachParent = c
   var goDeep = PARENT_BY_CONDITION_DEPTH
   while (eachParent != null && --goDeep > 0) {
