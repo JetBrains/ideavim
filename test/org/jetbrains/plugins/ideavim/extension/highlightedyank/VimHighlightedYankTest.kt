@@ -142,13 +142,13 @@ class VimHighlightedYankTest : VimTestCase() {
     }
   }
 
-  val code = """
+  private val code = """
 fun ${c}sum(x: Int, y: Int, z: Int): Int {
   return x + y + z
 }
 """
 
-  val codeWithMultipleCurors = """
+  private val codeWithMultipleCurors = """
 fun sum(x: ${c}Int, y: ${c}Int, z: ${c}Int): Int {
   return x + y + z
 }

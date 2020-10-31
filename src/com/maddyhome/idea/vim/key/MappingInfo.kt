@@ -101,7 +101,7 @@ class ToKeysMappingInfo(
 }
 
 class ToHandlerMappingInfo(
-  val extensionHandler: VimExtensionHandler,
+  private val extensionHandler: VimExtensionHandler,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner

@@ -31,8 +31,8 @@ import junit.framework.Assert
 import kotlin.test.assertEquals
 
 internal object NeovimTesting {
-  lateinit var neovimApi: NeovimApi
-  lateinit var neovim: Process
+  private lateinit var neovimApi: NeovimApi
+  private lateinit var neovim: Process
 
   fun setUp(test: VimTestCase) {
     if (!neovimEnabled(test)) return
@@ -47,7 +47,7 @@ internal object NeovimTesting {
     neovim.destroy()
   }
 
-  fun neovimEnabled(test: VimTestCase): Boolean {
+  private fun neovimEnabled(test: VimTestCase): Boolean {
     val method = test.javaClass.getMethod(test.name)
     return !method.isAnnotationPresent(VimBehaviorDiffers::class.java)
       && !method.isAnnotationPresent(TestWithoutNeovim::class.java)

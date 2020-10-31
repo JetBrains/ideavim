@@ -94,7 +94,7 @@ abstract class VimTestCase : UsefulTestCase() {
     NeovimTesting.setUp(this)
   }
 
-  protected val testDataPath: String
+  private val testDataPath: String
     get() = PathManager.getHomePath() + "/community/plugins/ideavim/testData"
 
   @Throws(Exception::class)

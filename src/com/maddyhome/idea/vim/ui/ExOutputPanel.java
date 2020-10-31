@@ -331,13 +331,11 @@ public class ExOutputPanel extends JPanel {
             myExOutputPanel.scrollHalfPage();
             break;
           case 'q':
+          case '\u001b':
             myExOutputPanel.close();
             break;
           case '\n':
             myExOutputPanel.handleEnter();
-            break;
-          case '\u001b':
-            myExOutputPanel.close();
             break;
           case KeyEvent.CHAR_UNDEFINED: {
             switch (e.getKeyCode()) {

@@ -114,7 +114,7 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
     assertSelection(null)
   }
 
-  val poem: String = """Two roads diverged in a yellow wood,
+  private val poem: String = """Two roads diverged in a yellow wood,
 And sorry I could not travel both
 And be one traveler, long I stood
 And looked down one as far as I could
@@ -138,7 +138,7 @@ Two roads diverged in a wood, and I—
 I took the one less traveled by,
 And that has made all the difference.
 """
-  val poemNoCaret = poem.replace("<caret>", "")
-  val poemUC = poemNoCaret.toUpperCase()
-  val poemLC = poemNoCaret.toLowerCase()
+  private val poemNoCaret = poem.replace("<caret>", "")
+  private val poemUC = poemNoCaret.toUpperCase()
+  private val poemLC = poemNoCaret.toLowerCase()
 }

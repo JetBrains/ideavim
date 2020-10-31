@@ -427,7 +427,6 @@ public class StringHelper {
       case "esc":
         return VK_ESCAPE;
       case "bs":
-        return VK_BACK_SPACE;
       case "backspace":
         return VK_BACK_SPACE;
       case "tab":

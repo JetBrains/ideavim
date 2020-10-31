@@ -100,7 +100,7 @@ class Widget(project: Project) : EditorBasedWidget(project), StatusBarWidget.Mul
 
   override fun getTooltipText(): String {
     var count = ShowCmd.getFullText(this.editor)
-    if (!count.isBlank()) count = ": $count"
+    if (count.isNotBlank()) count = ": $count"
     return "${ShowCmd.displayName}$count"
   }
 

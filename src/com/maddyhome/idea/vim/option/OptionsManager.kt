@@ -368,7 +368,7 @@ object OptionsManager {
 
 object KeyModelOptionData {
   const val name = "keymodel"
-  const val abbr = "km"
+  private const val abbr = "km"
 
   const val startsel = "startsel"
   const val stopsel = "stopsel"
@@ -384,7 +384,7 @@ object KeyModelOptionData {
 
 object SelectModeOptionData {
   const val name = "selectmode"
-  const val abbr = "slm"
+  private const val abbr = "slm"
 
   const val mouse = "mouse"
   const val key = "key"
@@ -433,14 +433,14 @@ object ClipboardOptionsData {
 
 object IdeaJoinOptionsData {
   const val name = "ideajoin"
-  const val defaultValue = false
+  private const val defaultValue = false
 
   val option = ToggleOption(name, name, defaultValue)
 }
 
 object IdeaMarkskOptionsData {
   const val name = "ideamarks"
-  const val defaultValue = true
+  private const val defaultValue = true
 
   val option = ToggleOption(name, name, defaultValue)
 }

@@ -51,7 +51,7 @@ class CommandGroup {
     return name in this.aliases
   }
 
-  fun getAlias(name: String): Alias {
+  private fun getAlias(name: String): Alias {
     return this.aliases[name]!!
   }
 

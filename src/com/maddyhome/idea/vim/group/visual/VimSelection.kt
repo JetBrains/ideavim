@@ -152,7 +152,7 @@ class VimBlockSelection(
   override val vimStart: Int,
   override val vimEnd: Int,
   override val editor: Editor,
-  val toLineEnd: Boolean
+  private val toLineEnd: Boolean
 ) : VimSelection() {
   override fun getNativeStartAndEnd() = blockToNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL).let {
     editor.logicalPositionToOffset(it.first) to editor.logicalPositionToOffset(it.second)
