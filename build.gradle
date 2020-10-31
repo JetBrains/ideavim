@@ -100,7 +100,7 @@ tasks.detekt.jvmTarget = javaVersion
 
 task testWithNeovim(type: Test) {
   group = "verification"
-  systemProperty "ideavim.neovim.test", 'true'
+  systemProperty "ideavim.nvim.test", 'true'
 }
 
 changelog {
