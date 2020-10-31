@@ -85,10 +85,11 @@ private fun isTableCellEditor(c: Component, times: MutableList<Pair<Long, String
   return (java.lang.Boolean.TRUE == (c as JComponent).getClientProperty("JComboBox.isTableCellEditor"))
     .apply { times += System.currentTimeMillis() to "is property tru" } ||
 
-    (findParentByCondition(c) { it is JBTableRowEditor } == null)
-      .apply { times += System.currentTimeMillis() to "is null" } &&
+    (findParentByCondition(c) { it is JTable } != null)
+      .apply { times += System.currentTimeMillis() to "is not null" } &&
 
-    (findParentByCondition(c) { it is JTable } != null).apply { times += System.currentTimeMillis() to "is not null" }
+    (findParentByCondition(c) { it is JBTableRowEditor } == null)
+      .apply { times += System.currentTimeMillis() to "is null" }
 }
 
 private const val PARENT_BY_CONDITION_DEPTH = 10
