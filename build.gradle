@@ -84,8 +84,8 @@ compileTestKotlin {
 }
 
 detekt {
-  config = files("./detekt/config.yaml")
-  baseline = file("${rootProject.projectDir}/detekt/baseline.xml")
+  config = files("${rootProject.projectDir}/.detekt/config.yaml")
+  baseline = file("${rootProject.projectDir}/.detekt/baseline.xml")
   input = files("src")
 
   buildUponDefaultConfig = true
