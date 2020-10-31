@@ -36,7 +36,7 @@ object Nvim : BuildType({
     }
     gradle {
       tasks = "clean testWithNeovim"
-      gradleParams = "-Dideavim.nvim.path=./nvim-linux64/bin/nvim"
+      gradleParams = "-Pideavim.nvim.path=./nvim-linux64/bin/nvim"
       buildFile = ""
       enableStacktrace = true
       param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
