@@ -6,11 +6,10 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
-sealed class ActiveTests(buildName: String, ijVersion: String) : BuildType({
-  name = buildName
+object PluginVerifier : BuildType({
+  name = "Plugin verification"
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
-    param("env.ORG_GRADLE_PROJECT_ideaVersion", ijVersion)
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
   }
 
@@ -22,7 +21,7 @@ sealed class ActiveTests(buildName: String, ijVersion: String) : BuildType({
 
   steps {
     gradle {
-      tasks = "clean check"
+      tasks = "clean runPluginVerifier"
       buildFile = ""
       enableStacktrace = true
       param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
@@ -39,7 +38,3 @@ sealed class ActiveTests(buildName: String, ijVersion: String) : BuildType({
     noLessThanVer("teamcity.agent.jvm.version", "1.8")
   }
 })
-
-object TestsForIntelliJEAP : ActiveTests("Tests for IntelliJ Latest EAP", "LATEST-EAP-SNAPSHOT")
-object TestsForIntelliJ20202 : ActiveTests("Tests for IntelliJ 2020.2", "2020.2")
-object TestsForIntelliJ20201 : ActiveTests("Tests for IntelliJ 2020.1", "2020.1")

@@ -2,6 +2,7 @@ package _Self
 
 import _Self.buildTypes.GitHubPullRequests
 import _Self.buildTypes.Nvim
+import _Self.buildTypes.PluginVerifier
 import _Self.buildTypes.Release
 import _Self.buildTypes.ReleaseEap
 import _Self.buildTypes.TestsForIntelliJ20181
@@ -40,6 +41,7 @@ object Project : Project({
   buildType(ReleaseEap)
   buildType(TestsForIntelliJ20202)
   buildType(TestsForIntelliJEAP)
+  buildType(PluginVerifier)
 
   features {
     feature {
