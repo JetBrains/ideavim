@@ -28,10 +28,12 @@ object Nvim : BuildType({
       name = "Download NeoVim"
       scriptContent = """
               wget https://github.com/neovim/neovim/releases/download/v0.4.4/nvim-linux64.tar.gz
-              tar xzvf nvim-linux64.tar.gz
+              tar xzf nvim-linux64.tar.gz
               cd nvim-linux64/bin
               myPath=readlink -f nvim
+              echo ${'$'}myPath
               PATH=${'$'}PATH:${'$'}myPath
+              echo ${'$'}PATH
               """.trimIndent()
     }
     gradle {
