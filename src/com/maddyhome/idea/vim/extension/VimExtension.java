@@ -40,5 +40,5 @@ public interface VimExtension {
 
   default void dispose() {
     VimPlugin.getKey().removeKeyMapping(getOwner());
-  };
+  }
 }
