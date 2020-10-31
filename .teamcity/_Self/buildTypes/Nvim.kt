@@ -2,6 +2,7 @@ package _Self.buildTypes
 
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
+import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
@@ -17,21 +18,24 @@ object Nvim : BuildType({
     }
 
     vcs {
-        root(_Self.vcsRoots.Branch_Nvim)
+        root(DslContext.settingsRoot)
 
         checkoutMode = CheckoutMode.ON_SERVER
     }
 
     steps {
         script {
-            scriptContent = "apt-get install neovim"
+            name = "Download NeoVim"
+          scriptContent = """
+              wget https://github.com/neovim/neovim/releases/download/v0.4.4/nvim-linux64.tar.gz
+              tar xzvf nvim-linux64.tar.gz
+              cd nvim-linux64/bin
+              myPath=readlink -f nvim
+              PATH=${'$'}PATH:${'$'}myPath
+              """.trimIndent()
         }
         gradle {
-            tasks = "--version"
-            param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
-        }
-        gradle {
-            tasks = "clean test"
+            tasks = "clean testWithNeovim"
             buildFile = ""
             enableStacktrace = true
             param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
