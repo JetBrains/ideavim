@@ -16,7 +16,6 @@ import _Self.buildTypes.TestsForIntelliJEAP
 import _Self.vcsRoots.Branch_181
 import _Self.vcsRoots.Branch_183
 import _Self.vcsRoots.Branch_191_193
-import _Self.vcsRoots.Branch_Nvim
 import _Self.vcsRoots.GitHubPullRequest
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 
@@ -27,7 +26,6 @@ object Project : Project({
   vcsRoot(Branch_181)
   vcsRoot(GitHubPullRequest)
   vcsRoot(Branch_191_193)
-  vcsRoot(Branch_Nvim)
 
   buildType(GitHubPullRequests)
   buildType(Release)
