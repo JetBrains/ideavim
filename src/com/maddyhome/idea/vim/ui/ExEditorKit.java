@@ -142,7 +142,7 @@ public class ExEditorKit extends DefaultEditorKit {
         if (key != null) {
           final char c = key.getKeyChar();
           if (c > 0) {
-            ActionEvent event = new ActionEvent(e.getSource(), e.getID(), "" + c, e.getWhen(), e.getModifiers());
+            ActionEvent event = new ActionEvent(e.getSource(), e.getID(), String.valueOf(c), e.getWhen(), e.getModifiers());
             super.actionPerformed(event);
             target.saveLastEntry();
           }

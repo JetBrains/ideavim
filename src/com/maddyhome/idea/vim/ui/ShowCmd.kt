@@ -94,7 +94,7 @@ class Widget(project: Project) : EditorBasedWidget(project), StatusBarWidget.Mul
 
   override fun ID() = ShowCmd.ID
 
-  override fun getPresentation(): StatusBarWidget.WidgetPresentation? = this
+  override fun getPresentation(): StatusBarWidget.WidgetPresentation = this
 
   override fun getClickConsumer(): Consumer<MouseEvent>? = null
 

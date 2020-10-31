@@ -90,7 +90,7 @@ private class UselessMigration(from: Int) : ConfigMigrator {
 }
 
 private class ConstantVersionDetector(private val version: Int) : VersionDetector {
-  override fun extractVersion(): Int? = version
+  override fun extractVersion(): Int = version
 
   companion object {
     fun of(vararg versions: Int) = versions.map { ConstantVersionDetector(it) }

@@ -213,7 +213,7 @@ public final class KeywordOption extends ListOption {
       } else if (spec.isRange) {
         return "[" + (char)spec.rangeLow.intValue() + "-" + (char)spec.rangeHigh.intValue() + "]";
       } else {
-        return (char)spec.rangeLow.intValue() + "";
+        return String.valueOf((char)spec.rangeLow.intValue());
       }
     }).collect(Collectors.toList());
   }

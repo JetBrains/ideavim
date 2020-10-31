@@ -10,7 +10,7 @@ import javax.swing.KeyStroke
 
 class InsertCompletedDigraphAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
-  override val argumentType: Argument.Type? = Argument.Type.DIGRAPH
+  override val argumentType: Argument.Type = Argument.Type.DIGRAPH
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     // The converted digraph character has been captured as an argument, push it back through key handler

@@ -122,7 +122,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     else if (FILE_MARKS.indexOf(ch) >= 0) {
       final HashMap<Character, Mark> fmarks = getFileMarks(editor.getDocument());
       if (fmarks != null) {
-        mark = (Mark)fmarks.get(ch);
+        mark = fmarks.get(ch);
         if (mark != null && mark.isClear()) {
           fmarks.remove(ch);
           mark = null;
@@ -171,7 +171,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     if (fmarks == null) {
       return null;
     }
-    Mark mark = (Mark)fmarks.get(ch);
+    Mark mark = fmarks.get(ch);
     if (mark != null && mark.isClear()) {
       fmarks.remove(ch);
       mark = null;
@@ -752,7 +752,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
 
   public static class MarkListener implements BookmarksListener {
 
-    private WeakReference<Project> project;
+    private final WeakReference<Project> project;
     private Bookmark bookmarkTemplate = null;
 
     @Contract(pure = true)

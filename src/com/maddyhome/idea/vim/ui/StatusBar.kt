@@ -126,7 +126,7 @@ class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
     popup.show(RelativePoint(component, at))
   }
 
-  override fun getPresentation(): StatusBarWidget.WidgetPresentation? = this
+  override fun getPresentation(): StatusBarWidget.WidgetPresentation = this
 }
 
 class VimActions : DumbAwareAction() {

@@ -1977,7 +1977,7 @@ public class ChangeGroup {
       if (!Character.isLetter(ch)) throw new RuntimeException("Not alpha number : " + text);
       ch += count;
       if (Character.isLetter(ch)) {
-        number = "" + ch;
+        number = String.valueOf(ch);
       }
     }
     else if (SearchHelper.NumberType.DEC.equals(numberType)) {

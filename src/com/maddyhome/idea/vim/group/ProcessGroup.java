@@ -52,7 +52,7 @@ public class ProcessGroup {
     }
 
     String initText = "";
-    String label = "" + leader;
+    String label = String.valueOf(leader);
 
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, label, initText, count);

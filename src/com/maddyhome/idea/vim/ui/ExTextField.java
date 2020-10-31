@@ -49,7 +49,7 @@ import static java.lang.Math.min;
  */
 public class ExTextField extends JTextField {
 
-  public final static String KEYMAP_NAME = "ex";
+  public static final String KEYMAP_NAME = "ex";
 
   ExTextField() {
     // We need to store this in a field, because we can't trust getCaret(), as it will return an instance of
@@ -274,7 +274,7 @@ public class ExTextField extends JTextField {
     // dispatcher that checks that the plugin is enabled, checks that the component with the focus is ExTextField,
     // dispatch to ExEntryPanel#handleKey and if it's processed, mark the event as consumed.
     if (currentAction != null) {
-      currentAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "" + c, modifiers));
+      currentAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, String.valueOf(c), modifiers));
     }
     else {
       KeyEvent event = new KeyEvent(this, keyChar != KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_TYPED :

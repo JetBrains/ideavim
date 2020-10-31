@@ -165,7 +165,7 @@ public class StringHelper {
   }
 
   private static @Nullable List<KeyStroke> parseMapLeader(@NotNull String s) {
-    if ("leader".equals(s.toLowerCase())) {
+    if ("leader".equalsIgnoreCase(s)) {
       final Object mapLeader = VimScriptGlobalEnvironment.getInstance().getVariables().get("mapleader");
       if (mapLeader instanceof String) {
         return stringToKeys((String)mapLeader);
@@ -289,7 +289,7 @@ public class StringHelper {
     } else if (CharacterHelper.isInvisibleControlCharacter(c) || CharacterHelper.isZeroWidthCharacter(c)) {
       return String.format("<%04x>", (int) c);
     }
-    return "" + c;
+    return String.valueOf(c);
   }
 
   public static boolean containsUpperCase(@NotNull String text) {

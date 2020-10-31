@@ -20,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.EnumSet;
-import java.util.Stack;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
@@ -52,13 +51,13 @@ public class VimArgTextObjExtension implements VimExtension {
   /**
    * The pairs of brackets that delimit different types of argument lists.
    */
-  static private class BracketPairs {
+  private static class BracketPairs {
     // NOTE: brackets must match by the position, and ordered by rank (highest to lowest).
     @NotNull private final String openBrackets;
     @NotNull private final String closeBrackets;
 
-    static class ParseError extends Exception {
-      public ParseError(@NotNull String message) {
+    static class ParseException extends Exception {
+      public ParseException(@NotNull String message) {
         super(message);
       }
     }
@@ -75,10 +74,10 @@ public class VimArgTextObjExtension implements VimExtension {
      * as VIM's @c matchpairs option: "(:),{:},[:]"
      *
      * @param bracketPairs comma-separated list of colon-separated bracket pairs.
-     * @throws ParseError if a syntax error is detected.
+     * @throws ParseException if a syntax error is detected.
      */
     @NotNull
-    static BracketPairs fromBracketPairList(@NotNull final String bracketPairs) throws ParseError {
+    static BracketPairs fromBracketPairList(@NotNull final String bracketPairs) throws ParseException {
       StringBuilder openBrackets = new StringBuilder();
       StringBuilder closeBrackets = new StringBuilder();
       ParseState state = ParseState.OPEN;
@@ -92,13 +91,13 @@ public class VimArgTextObjExtension implements VimExtension {
             if (ch == ':') {
               state = ParseState.CLOSE;
             } else {
-              throw new ParseError("expecting ':', but got '" + ch + "' instead");
+              throw new ParseException("expecting ':', but got '" + ch + "' instead");
             }
             break;
           case CLOSE:
             final char lastOpenBracket = openBrackets.charAt(openBrackets.length() - 1);
             if (lastOpenBracket == ch) {
-              throw new ParseError("open and close brackets must be different");
+              throw new ParseException("open and close brackets must be different");
             }
             closeBrackets.append(ch);
             state = ParseState.COMMA;
@@ -107,13 +106,13 @@ public class VimArgTextObjExtension implements VimExtension {
             if (ch == ',') {
               state = ParseState.OPEN;
             } else {
-              throw new ParseError("expecting ',', but got '" + ch + "' instead");
+              throw new ParseException("expecting ',', but got '" + ch + "' instead");
             }
             break;
         }
       }
       if (state != ParseState.COMMA) {
-        throw new ParseError("list of pairs is incomplete");
+        throw new ParseException("list of pairs is incomplete");
       }
       return new BracketPairs(openBrackets.toString(), closeBrackets.toString());
     }
@@ -185,8 +184,8 @@ public class VimArgTextObjExtension implements VimExtension {
         if (bracketPairsVar != null) {
           try {
             bracketPairs = BracketPairs.fromBracketPairList(bracketPairsVar);
-          } catch (BracketPairs.ParseError parseError) {
-            VimPlugin.showMessage("argtextobj: Invalid value of g:argtextobj_pairs -- " + parseError.getMessage());
+          } catch (BracketPairs.ParseException parseException) {
+            VimPlugin.showMessage("argtextobj: Invalid value of g:argtextobj_pairs -- " + parseException.getMessage());
             VimPlugin.indicateError();
             return null;
           }
