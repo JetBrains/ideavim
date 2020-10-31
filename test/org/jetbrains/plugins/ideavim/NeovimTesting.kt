@@ -36,7 +36,8 @@ internal object NeovimTesting {
 
   fun setUp(test: VimTestCase) {
     if (!neovimEnabled(test)) return
-    val pb = ProcessBuilder("nvim", "-u", "NONE", "--embed", "--headless")
+    val nvimPath = System.getenv("IDEAVIM_NVIM_PATH") ?: "nvim"
+    val pb = ProcessBuilder(nvimPath, "-u", "NONE", "--embed", "--headless")
     neovim = pb.start()
     val neovimConnection = ProcessRPCConnection(neovim, true)
     neovimApi = NeovimApis.getApiForConnection(neovimConnection)
