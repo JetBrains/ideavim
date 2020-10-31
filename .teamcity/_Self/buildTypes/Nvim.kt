@@ -30,9 +30,8 @@ object Nvim : BuildType({
               wget https://github.com/neovim/neovim/releases/download/v0.4.4/nvim-linux64.tar.gz
               tar xzf nvim-linux64.tar.gz
               cd nvim-linux64/bin
+              chmod +x nvim
               export IDEAVIM_NVIM_PATH=`readlink -f nvim`
-              echo ---------------------------===
-              echo ${'$'}IDEAVIM_NVIM_PATH
               """.trimIndent()
     }
     gradle {
