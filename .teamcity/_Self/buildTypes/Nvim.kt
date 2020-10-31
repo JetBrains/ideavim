@@ -8,13 +8,14 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object Nvim : BuildType({
-  name = "NVIM"
-  description = "branch EAP"
+  name = "Tests with nvim"
+  description = "Running tests with nvim integration"
 
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
     param("env.ORG_GRADLE_PROJECT_ideaVersion", "LATEST-EAP-SNAPSHOT")
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
+    param("env.ideavim.nvim.path", "./nvim-linux64/bin/nvim")
   }
 
   vcs {
@@ -25,7 +26,7 @@ object Nvim : BuildType({
 
   steps {
     script {
-      name = "Download NeoVim"
+      name = "Set up NeoVim"
       scriptContent = """
               wget https://github.com/neovim/neovim/releases/download/v0.4.4/nvim-linux64.tar.gz
               tar xzf nvim-linux64.tar.gz
@@ -35,7 +36,6 @@ object Nvim : BuildType({
     }
     gradle {
       tasks = "clean testWithNeovim"
-      gradleParams = "-Pideavim.nvim.path=./nvim-linux64/bin/nvim"
       buildFile = ""
       enableStacktrace = true
       param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
