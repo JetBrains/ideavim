@@ -8,47 +8,47 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object Nvim : BuildType({
-    name = "NVIM"
-    description = "branch EAP"
+  name = "NVIM"
+  description = "branch EAP"
 
-    params {
-        param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
-        param("env.ORG_GRADLE_PROJECT_ideaVersion", "LATEST-EAP-SNAPSHOT")
-        param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
-    }
+  params {
+    param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
+    param("env.ORG_GRADLE_PROJECT_ideaVersion", "LATEST-EAP-SNAPSHOT")
+    param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
+  }
 
-    vcs {
-        root(DslContext.settingsRoot)
+  vcs {
+    root(DslContext.settingsRoot)
 
-        checkoutMode = CheckoutMode.ON_SERVER
-    }
+    checkoutMode = CheckoutMode.ON_SERVER
+  }
 
-    steps {
-        script {
-            name = "Download NeoVim"
-          scriptContent = """
+  steps {
+    script {
+      name = "Download NeoVim"
+      scriptContent = """
               wget https://github.com/neovim/neovim/releases/download/v0.4.4/nvim-linux64.tar.gz
               tar xzvf nvim-linux64.tar.gz
               cd nvim-linux64/bin
               myPath=readlink -f nvim
               PATH=${'$'}PATH:${'$'}myPath
               """.trimIndent()
-        }
-        gradle {
-            tasks = "clean testWithNeovim"
-            buildFile = ""
-            enableStacktrace = true
-            param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
-        }
     }
+    gradle {
+      tasks = "clean testWithNeovim"
+      buildFile = ""
+      enableStacktrace = true
+      param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
+    }
+  }
 
-    triggers {
-        vcs {
-            branchFilter = ""
-        }
+  triggers {
+    vcs {
+      branchFilter = ""
     }
+  }
 
-    requirements {
-        noLessThanVer("teamcity.agent.jvm.version", "1.8")
-    }
+  requirements {
+    noLessThanVer("teamcity.agent.jvm.version", "1.8")
+  }
 })
