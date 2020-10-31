@@ -31,11 +31,12 @@ object Nvim : BuildType({
               tar xzf nvim-linux64.tar.gz
               cd nvim-linux64/bin
               chmod +x nvim
-              export IDEAVIM_NVIM_PATH=`readlink -f nvim`
+              export IDEAVIM_NVIM_PATH=${'$'}(pwd)/nvim
               """.trimIndent()
     }
     gradle {
       tasks = "clean testWithNeovim"
+      gradleParams = "-Dideavim.nvim.path=./nvim-linux64/bin/nvim"
       buildFile = ""
       enableStacktrace = true
       param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
