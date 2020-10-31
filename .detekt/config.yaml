@@ -27,3 +27,5 @@ style:
     active: false
   MaxLineLength:
     maxLineLength: 160
+  ReturnCount:
+    max: 5
