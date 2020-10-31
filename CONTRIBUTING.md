@@ -26,7 +26,12 @@ OK, ready to do some coding?
 * Fork the repository and clone it to the local machine.
 * Open the project with IntelliJ IDEA.
 
-Yoo hoo! You’re all set to begin contributing. Here are some useful gradle commands:
+Yoo hoo! You’re all set to begin contributing.
+We've prepared some useful configurations for you:
+
+![Prepared configurations](resources/contributing/configurations.png)
+
+And here are useful gradle commands:
 
 * `./gradlew runIde` — start the dev version of IntelliJ IDEA with IdeaVim installed.
 * `./gradlew test` — run tests.
