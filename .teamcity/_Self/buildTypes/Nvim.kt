@@ -31,7 +31,6 @@ object Nvim : BuildType({
               tar xzf nvim-linux64.tar.gz
               cd nvim-linux64/bin
               chmod +x nvim
-              export IDEAVIM_NVIM_PATH=${'$'}(pwd)/nvim
               """.trimIndent()
     }
     gradle {
