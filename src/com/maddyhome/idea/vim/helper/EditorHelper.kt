@@ -48,7 +48,7 @@ val Editor.isIdeaVimDisabledHere: Boolean
 
         || (!OptionsManager.ideaenabledbufs.contains("singleline")
         .apply { times += System.currentTimeMillis() to "first single line check" }
-        && isDatabaseCell.apply { times += System.currentTimeMillis() to "is db cell" })
+        && isDatabaseCell(times).apply { times += System.currentTimeMillis() to "is db cell" })
 
         || (!OptionsManager.ideaenabledbufs.contains("singleline")
         .apply { times += System.currentTimeMillis() to "second single line check" }
@@ -63,8 +63,9 @@ val Editor.isIdeaVimDisabledHere: Boolean
     return res
   }
 
-private val Editor.isDatabaseCell: Boolean
-  get() = isTableCellEditor(this.component)
+private fun Editor.isDatabaseCell(times: MutableList<Pair<Long, String>>): Boolean {
+  return isTableCellEditor(this.component, times)
+}
 
 private val Editor.disabledInDialog: Boolean
   get() = (!OptionsManager.ideaenabledbufs.contains("dialog") && !OptionsManager.ideaenabledbufs.contains("dialoglegacy"))
@@ -80,10 +81,14 @@ fun Editor.isPrimaryEditor(): Boolean {
 }
 
 // Optimized clone of com.intellij.ide.ui.laf.darcula.DarculaUIUtil.isTableCellEditor
-private fun isTableCellEditor(c: Component): Boolean {
-  return java.lang.Boolean.TRUE == (c as JComponent).getClientProperty("JComboBox.isTableCellEditor") ||
-    findParentByCondition(c) { it is JBTableRowEditor } == null &&
-    findParentByCondition(c) { it is JTable } != null
+private fun isTableCellEditor(c: Component, times: MutableList<Pair<Long, String>>): Boolean {
+  return (java.lang.Boolean.TRUE == (c as JComponent).getClientProperty("JComboBox.isTableCellEditor"))
+    .apply { times += System.currentTimeMillis() to "is property tru" } ||
+
+    (findParentByCondition(c) { it is JBTableRowEditor } == null)
+      .apply { times += System.currentTimeMillis() to "is null" } &&
+
+    (findParentByCondition(c) { it is JTable } != null).apply { times += System.currentTimeMillis() to "is not null" }
 }
 
 private const val PARENT_BY_CONDITION_DEPTH = 10
