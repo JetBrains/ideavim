@@ -29,6 +29,17 @@ usual beta standards.
   Check out `README.md` for the details.
 * `IdeaVim: track action Ids` command to find action ids for the `:action` command.
   Enable this option in "Search everywhere" (double shift).
+* Ability to enable extensions using `vim-plug` or `vundle` syntax.  
+  E.g. to enable commentary extension you can use one of the following commands:
+  ```vim
+  set commentary
+  Plug 'tpope/vim-commentary'
+  Plug 'https://github.com/tpope/vim-commentary'
+  Plugin 'tpope/vim-commentary'
+  ...
+  ```
+  This approach is especially handy if you have `.vimrc` with plugins registered via `vim-plug` or `vundle`.
+
   
 ### Changes:
 * Fix `<Esc>` for dialogs. Now `<Esc>` will exit insert / visual mode and close the dialog from normal mode.

@@ -64,5 +64,6 @@
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.TabCloseHandler" names="tabc[lose]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.BufferListHandler" names="buffers,ls,files"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.BufferHandler" names="b[uffer]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PlugHandler" names="Plug[in]"/>
   </extensions>
 </idea-plugin>

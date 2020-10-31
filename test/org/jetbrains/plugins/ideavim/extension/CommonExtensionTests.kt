@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
@@ -150,10 +151,51 @@ class OpMappingTest : VimTestCase() {
   }
 }
 
+class PlugExtensionsTest : VimTestCase() {
+
+  private val extension = TestExtension()
+
+  override fun setUp() {
+    super.setUp()
+
+    @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
+    VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
+  }
+
+  fun `test enable via plug`() {
+    VimScriptParser.executeText("Plug 'MyTest'")
+
+    assertTrue(extension.initialized)
+  }
+
+  fun `test enable via plugin`() {
+    VimScriptParser.executeText("Plugin 'MyTest'")
+
+    assertTrue(extension.initialized)
+  }
+
+  fun `test enable via plug and disable via set`() {
+    VimScriptParser.executeText(
+      "Plug 'MyTest'",
+      "set noTestExtension"
+    )
+
+    assertTrue(extension.initialized)
+    assertTrue(extension.disposed)
+  }
+}
+
 private class TestExtension : VimExtension {
+
+  var initialized = false
+  var disposed = false
+
   override fun getName(): String = "TestExtension"
 
+  override fun getAliases(): Set<String> = setOf("MyTest")
+
   override fun init() {
+    initialized = true
     putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionEmulateInclusive"), owner, MoveEmulateInclusive(), false)
     putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionBackwardsCharacter"), owner, MoveBackwards(), false)
     putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionCharacter"), owner, Move(), false)
@@ -165,6 +207,11 @@ private class TestExtension : VimExtension {
     putKeyMapping(MappingMode.O, parseKeys("I"), owner, parseKeys("<Plug>TestExtensionCharacter"), true)
     putKeyMapping(MappingMode.O, parseKeys("O"), owner, parseKeys("<Plug>TestExtensionLinewise"), true)
     putKeyMapping(MappingMode.N, parseKeys("Q"), owner, parseKeys("<Plug>TestMotion"), true)
+  }
+
+  override fun dispose() {
+    disposed = true
+    super.dispose()
   }
 
   private class MoveEmulateInclusive : VimExtensionHandler {

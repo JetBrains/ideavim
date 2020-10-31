@@ -66,6 +66,14 @@ import com.maddyhome.idea.vim.key.OperatorFunction
 class VimExchangeExtension : VimExtension {
   override fun getName() = "exchange"
 
+  override fun getAliases(): Set<String> {
+    return setOf(
+      "https://github.com/tommcdo/vim-exchange",
+      "tommcdo/vim-exchange",
+      "vim-exchange"
+    )
+  }
+
   override fun init() {
     putExtensionHandlerMapping(MappingMode.N, parseKeys(EXCHANGE_CMD), owner, ExchangeHandler(false), false)
     putExtensionHandlerMapping(MappingMode.X, parseKeys(EXCHANGE_CMD), owner, VExchangeHandler(), false)

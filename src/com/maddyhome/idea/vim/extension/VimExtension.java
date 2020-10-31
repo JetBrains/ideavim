@@ -23,14 +23,25 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.key.MappingOwner;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
+import java.util.Set;
+
 /**
  * @author vlan
  */
 public interface VimExtension {
   @NotNull ExtensionPointName<VimExtension> EP_NAME = ExtensionPointName.create("IdeaVIM.vimExtension");
 
-  @NotNull
-  String getName();
+  @NotNull String getName();
+
+  /**
+   * List of aliases for the extension. These aliases are used to support `Plug` and `Plugin` commands.
+   * Technically, it would be enough to save here github link and short version of it ('author/plugin'),
+   *   but it may contain more aliases just in case.
+   */
+  default Set<String> getAliases() {
+    return Collections.emptySet();
+  }
 
   default MappingOwner getOwner() {
     return MappingOwner.Plugin.Companion.get(getName());

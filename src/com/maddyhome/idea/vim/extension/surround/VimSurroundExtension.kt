@@ -54,6 +54,15 @@ import javax.swing.KeyStroke
 class VimSurroundExtension : VimExtension {
   override fun getName() = "surround"
 
+  override fun getAliases(): Set<String> {
+    return setOf(
+      "https://github.com/tpope/vim-surround",
+      "tpope/vim-surround",
+      "vim-surround",
+      "https://www.vim.org/scripts/script.php?script_id=1697"
+    )
+  }
+
   override fun init() {
     putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>YSurround"), owner, YSurroundHandler(), false)
     putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>CSurround"), owner, CSurroundHandler(), false)

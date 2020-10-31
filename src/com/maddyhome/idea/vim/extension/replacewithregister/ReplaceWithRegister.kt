@@ -48,6 +48,18 @@ import com.maddyhome.idea.vim.key.OperatorFunction
 class ReplaceWithRegister : VimExtension {
   override fun getName(): String = "ReplaceWithRegister"
 
+  override fun getAliases(): Set<String> {
+    return setOf(
+      "https://github.com/vim-scripts/ReplaceWithRegister",
+      "vim-scripts/ReplaceWithRegister",
+      "ReplaceWithRegister",
+      "https://github.com/inkarkat/vim-ReplaceWithRegister",
+      "inkarkat/vim-ReplaceWithRegister",
+      "vim-ReplaceWithRegister",
+      "https://www.vim.org/scripts/script.php?script_id=2703"
+    )
+  }
+
   override fun init() {
     VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, parseKeys(RWR_OPERATOR), owner, RwrMotion(), false)
     VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, parseKeys(RWR_LINE), owner, RwrLine(), false)

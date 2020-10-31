@@ -95,6 +95,10 @@ object VimScriptParser {
     return data
   }
 
+  fun executeText(vararg text: String) {
+    executeText(listOf(*text))
+  }
+
   fun executeText(text: List<String>) {
     for (line in text) {
       // TODO: Build a proper parse tree for a VimL file instead of ignoring potentially nested lines (VIM-669)

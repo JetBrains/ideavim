@@ -1,9 +1,11 @@
 package com.maddyhome.idea.vim.extension.argtextobj;
 
+import com.google.common.collect.Sets;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.util.containers.ContainerUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -17,9 +19,7 @@ import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.EnumSet;
+import java.util.*;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
@@ -35,6 +35,16 @@ public class VimArgTextObjExtension implements VimExtension {
   @Override
   public @NotNull String getName() {
     return "argtextobj";
+  }
+
+  @Override
+  public Set<String> getAliases() {
+    return ContainerUtil.set(
+      "https://github.com/vim-scripts/argtextobj.vim",
+      "vim-scripts/argtextobj.vim",
+      "argtextobj.vim",
+      "https://www.vim.org/scripts/script.php?script_id=2699"
+    );
   }
 
   @Override
