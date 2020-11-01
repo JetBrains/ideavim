@@ -1,12 +1,84 @@
 <idea-plugin>
   <extensions defaultExtensionNs="IdeaVIM">
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.surround.VimSurroundExtension"/>
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.multiplecursors.VimMultipleCursorsExtension"/>
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.commentary.CommentaryExtension"/>
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.textobjentire.VimTextObjEntireExtension"/>
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.argtextobj.VimArgTextObjExtension"/>
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.replacewithregister.ReplaceWithRegister"/>
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension"/>
-    <vimExtension implementation="com.maddyhome.idea.vim.extension.highlightedyank.VimHighlightedYank"/>
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.surround.VimSurroundExtension" name="surround">
+      <aliases>
+        <alias name="https://github.com/tpope/vim-surround"/>
+        <alias name="tpope/vim-surround"/>
+        <alias name="vim-surround"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=1697"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.multiplecursors.VimMultipleCursorsExtension"
+                  name="multiple-cursors">
+      <aliases>
+        <alias name="https://github.com/terryma/vim-multiple-cursors"/>
+        <alias name="terryma/vim-multiple-cursors"/>
+        <alias name="vim-multiple-cursors"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.commentary.CommentaryExtension" name="commentary">
+      <aliases>
+        <alias name="https://github.com/tpope/vim-commentary"/>
+        <alias name="tpope/vim-commentary"/>
+        <alias name="vim-commentary"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=3695"/>
+        <alias name="https://github.com/tomtom/tcomment_vim"/>
+        <alias name="tomtom/tcomment_vim"/>
+        <alias name="tcomment_vim"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=1173"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.textobjentire.VimTextObjEntireExtension"
+                  name="textobj-entire">
+      <aliases>
+        <alias name="https://github.com/kana/vim-textobj-entire"/>
+        <alias name="kana/vim-textobj-entire"/>
+        <alias name="vim-textobj-entire"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=2610"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.argtextobj.VimArgTextObjExtension"
+                  name="argtextobj">
+      <aliases>
+        <alias name="https://github.com/vim-scripts/argtextobj.vim"/>
+        <alias name="vim-scripts/argtextobj.vim"/>
+        <alias name="argtextobj.vim"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=2699"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.replacewithregister.ReplaceWithRegister"
+                  name="ReplaceWithRegister">
+      <aliases>
+        <alias name="https://github.com/vim-scripts/ReplaceWithRegister"/>
+        <alias name="vim-scripts/ReplaceWithRegister"/>
+        <alias name="ReplaceWithRegister"/>
+        <alias name="https://github.com/inkarkat/vim-ReplaceWithRegister"/>
+        <alias name="inkarkat/vim-ReplaceWithRegister"/>
+        <alias name="vim-ReplaceWithRegister"/>
+        <alias name="https://www.vim.org/scripts/script.php?script_id=2703"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension" name="exchange">
+      <aliases>
+        <alias name="https://github.com/tommcdo/vim-exchange"/>
+        <alias name="tommcdo/vim-exchange"/>
+        <alias name="vim-exchange"/>
+      </aliases>
+    </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.highlightedyank.VimHighlightedYank"
+                  name="highlightedyank">
+      <aliases>
+        <alias name="https://github.com/machakann/vim-highlightedyank"/>
+        <alias name="machakann/vim-highlightedyank"/>
+        <alias name="vim-highlightedyank"/>
+      </aliases>
+    </vimExtension>
   </extensions>
 </idea-plugin>

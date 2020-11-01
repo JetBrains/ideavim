@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.extension.textobjentire;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.util.containers.ContainerUtil;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.extension.VimExtension;
@@ -34,7 +33,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
-import java.util.Set;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
@@ -63,21 +61,13 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
  * @author Alexandre Grison (@agrison)
  */
 public class VimTextObjEntireExtension implements VimExtension {
+
   @Override
   public @NotNull
   String getName() {
     return "textobj-entire";
   }
 
-  @Override
-  public Set<String> getAliases() {
-    return ContainerUtil.set(
-      "https://github.com/kana/vim-textobj-entire",
-      "kana/vim-textobj-entire",
-      "vim-textobj-entire",
-      "https://www.vim.org/scripts/script.php?script_id=2610"
-    );
-  }
 
   @Override
   public void init() {

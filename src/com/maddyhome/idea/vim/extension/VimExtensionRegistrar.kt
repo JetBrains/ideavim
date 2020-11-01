@@ -22,7 +22,6 @@ import com.intellij.openapi.extensions.ExtensionPointListener
 import com.intellij.openapi.extensions.PluginDescriptor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
-import com.maddyhome.idea.vim.option.Option
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.OptionsManager.addOption
 import com.maddyhome.idea.vim.option.OptionsManager.isSet
@@ -39,48 +38,50 @@ object VimExtensionRegistrar {
   fun registerExtensions() {
     if (extensionRegistered) return
     extensionRegistered = true
+
+    VimExtension.EP_NAME.extensions.forEach(this::registerExtension)
+
     // [VERSION UPDATE] 202+
     @Suppress("DEPRECATION")
-    VimExtension.EP_NAME.getPoint(null).addExtensionPointListener(object : ExtensionPointListener<VimExtension> {
-      override fun extensionAdded(extension: VimExtension, pluginDescriptor: PluginDescriptor) {
+    VimExtension.EP_NAME.getPoint(null).addExtensionPointListener(object : ExtensionPointListener<ExtensionBeanClass> {
+      override fun extensionAdded(extension: ExtensionBeanClass, pluginDescriptor: PluginDescriptor) {
         registerExtension(extension)
       }
 
-      override fun extensionRemoved(extension: VimExtension, pluginDescriptor: PluginDescriptor) {
+      override fun extensionRemoved(extension: ExtensionBeanClass, pluginDescriptor: PluginDescriptor) {
         unregisterExtension(extension)
       }
-    }, true, VimPlugin.getInstance())
+    }, false, VimPlugin.getInstance())
   }
 
   @Synchronized
-  private fun registerExtension(extension: VimExtension) {
-    val name = extension.name
+  private fun registerExtension(extensionBean: ExtensionBeanClass) {
+    val name = extensionBean.name ?: extensionBean.handler.name
     if (name in registeredExtensions) return
 
     registeredExtensions.add(name)
-    registerAliases(name)
+    registerAliases(extensionBean)
     val option = ToggleOption(name, name, false)
     option.addOptionChangeListener { _, _ ->
-      for (extensionInListener in VimExtension.EP_NAME.extensionList) {
-        if (name != extensionInListener.name) continue
-        if (isSet(name)) {
-          extensionInListener.init()
-          logger.info("IdeaVim extension '$name' initialized")
-        } else {
-          extensionInListener.dispose()
-        }
+      if (isSet(name)) {
+        extensionBean.handler.init()
+        logger.info("IdeaVim extension '$name' initialized")
+      } else {
+        extensionBean.handler.dispose()
       }
     }
     addOption(option)
   }
 
   @Synchronized
-  private fun unregisterExtension(extension: VimExtension) {
-    val name = extension.name
+  private fun unregisterExtension(extension: ExtensionBeanClass) {
+    val name = extension.name ?: extension.handler.name
     if (name !in registeredExtensions) return
     registeredExtensions.remove(name)
     removeAliases(extension)
-    extension.dispose()
+    if (extension.initialized.get()) {
+      extension.handler.dispose()
+    }
     removeOption(name)
     remove(name)
     logger.info("IdeaVim extension '$name' disposed")
@@ -91,12 +92,13 @@ object VimExtensionRegistrar {
     return OptionsManager.getOption(name) as ToggleOption?
   }
 
-  private fun registerAliases(name: String) {
-    val extension = VimExtension.EP_NAME.findFirstSafe { it.name == name } ?: return
-    extension.aliases.forEach { alias -> extensionAliases[alias] = name }
+  private fun registerAliases(extension: ExtensionBeanClass) {
+    extension.aliases
+      ?.mapNotNull { it.name }
+      ?.forEach { alias -> extensionAliases[alias] = extension.name ?: extension.handler.name }
   }
 
-  private fun removeAliases(extension: VimExtension) {
-    extension.aliases.forEach { extensionAliases.remove(it) }
+  private fun removeAliases(extension: ExtensionBeanClass) {
+    extension.aliases?.mapNotNull { it.name }?.forEach { extensionAliases.remove(it) }
   }
 }

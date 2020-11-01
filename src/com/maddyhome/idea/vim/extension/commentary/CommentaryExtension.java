@@ -28,7 +28,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
-import com.intellij.util.containers.ContainerUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
@@ -39,8 +38,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.key.OperatorFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Set;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -53,20 +50,6 @@ public class CommentaryExtension implements VimExtension {
   @Override
   public @NotNull String getName() {
     return "commentary";
-  }
-
-  @Override
-  public Set<String> getAliases() {
-    return ContainerUtil.set(
-      "https://github.com/tpope/vim-commentary",
-      "tpope/vim-commentary",
-      "vim-commentary",
-      "https://www.vim.org/scripts/script.php?script_id=3695",
-      "https://github.com/tomtom/tcomment_vim",
-      "tomtom/tcomment_vim",
-      "tcomment_vim",
-      "https://www.vim.org/scripts/script.php?script_id=1173"
-    );
   }
 
   @Override

@@ -21,27 +21,21 @@ package com.maddyhome.idea.vim.extension;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.key.MappingOwner;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Collections;
-import java.util.Set;
 
 /**
  * @author vlan
  */
 public interface VimExtension {
-  @NotNull ExtensionPointName<VimExtension> EP_NAME = ExtensionPointName.create("IdeaVIM.vimExtension");
-
-  @NotNull String getName();
+  @NotNull ExtensionPointName<ExtensionBeanClass> EP_NAME = ExtensionPointName.create("IdeaVIM.vimExtension");
 
   /**
-   * List of aliases for the extension. These aliases are used to support `Plug` and `Plugin` commands.
-   * Technically, it would be enough to save here github link and short version of it ('author/plugin'),
-   *   but it may contain more aliases just in case.
+   * @deprecated Please set extension name in <vimExtension> tag
    */
-  default Set<String> getAliases() {
-    return Collections.emptySet();
-  }
+  @Deprecated
+  @ApiStatus.ScheduledForRemoval(inVersion = "0.63")
+  @NotNull String getName();
 
   default MappingOwner getOwner() {
     return MappingOwner.Plugin.Companion.get(getName());

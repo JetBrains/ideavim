@@ -38,7 +38,10 @@
   </application-components>
 
   <extensionPoints>
-    <extensionPoint name="vimExtension" interface="com.maddyhome.idea.vim.extension.VimExtension" dynamic="true"/>
+    <extensionPoint name="vimExtension" beanClass="com.maddyhome.idea.vim.extension.ExtensionBeanClass" dynamic="true">
+      <with attribute="implementation" implements="com.maddyhome.idea.vim.extension.VimExtension"/>
+
+    </extensionPoint>
 
     <!--    For internal use only -->
     <extensionPoint name="vimExCommand" beanClass="com.maddyhome.idea.vim.ex.ExBeanClass" dynamic="true">

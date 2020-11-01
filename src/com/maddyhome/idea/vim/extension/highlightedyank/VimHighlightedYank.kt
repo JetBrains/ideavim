@@ -83,12 +83,6 @@ class VimHighlightedYank: VimExtension, VimYankListener, VimInsertListener {
 
   override fun getName() = "highlightedyank"
 
-  override fun getAliases(): Set<String> = setOf(
-    "https://github.com/machakann/vim-highlightedyank",
-    "machakann/vim-highlightedyank",
-    "vim-highlightedyank"
-  )
-
   override fun init() {
     VimPlugin.getYank().addListener(this)
     VimPlugin.getChange().addInsertListener(this)

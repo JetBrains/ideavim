@@ -57,15 +57,8 @@ private const val ALL_OCCURRENCES = "<Plug>AllOccurrences"
  * See https://github.com/terryma/vim-multiple-cursors
  * */
 class VimMultipleCursorsExtension : VimExtension {
-  override fun getName() = "multiple-cursors"
 
-  override fun getAliases(): Set<String> {
-    return setOf(
-      "https://github.com/terryma/vim-multiple-cursors",
-      "terryma/vim-multiple-cursors",
-      "vim-multiple-cursors"
-    )
-  }
+  override fun getName() = "multiple-cursors"
 
   override fun init() {
     putExtensionHandlerMapping(MappingMode.NXO, parseKeys(NEXT_WHOLE_OCCURRENCE), owner, NextOccurrenceHandler(), false)
