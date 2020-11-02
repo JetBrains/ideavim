@@ -141,5 +141,5 @@ This is just terrible. [You know what to do](https://github.com/JetBrains/ideavi
 * [Changelog](CHANGES.md)
 * [Contributors listing](AUTHORS.md)
 
-[teamcity-build-status]: https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20201&guest=1
-[teamcity-build-status-svg]: https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20201)/statusIcon.svg?guest=1
+[teamcity-build-status]: https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJEAP&guest=1
+[teamcity-build-status-svg]: https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJEAP)/statusIcon.svg?guest=1
