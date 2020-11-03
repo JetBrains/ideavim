@@ -8,7 +8,7 @@ buildscript {
 
   dependencies {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-    classpath "com.github.AlexPl292:mark-down-to-slack:1.1.0"
+    classpath "com.github.AlexPl292:mark-down-to-slack:1.1.2"
   }
 }
 
@@ -118,7 +118,7 @@ tasks.register("slackEapNotification") {
     if (!slackUrl) return
     def post = new URL(slackUrl).openConnection()
     def changeLog = changelog.getUnreleased().toText()
-    def slackDown = new DownParser(changeLog).toSlack().toString()
+    def slackDown = new DownParser(changeLog, true).toSlack().toString()
     def message = """
       {
           "text": "New version of IdeaVim",

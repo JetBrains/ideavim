@@ -43,8 +43,7 @@ usual beta standards.
   
 ### Changes:
 * Fix `<Esc>` for dialogs. Now `<Esc>` will exit insert / visual mode and close the dialog from normal mode.
-* Add option to disable IdeaVim
-in dialogs / single line editors. [VIM-765](https://youtrack.jetbrains.com/issue/VIM-765)  
+* Add option to disable IdeaVim in dialogs / single line editors. [VIM-765](https://youtrack.jetbrains.com/issue/VIM-765)  
 Use `set ideaenabledbufs=` to disable IdeaVim in dialog editors.  
 _Note for EAP users: the option name can be changed for the stable release_
 
