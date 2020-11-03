@@ -7,7 +7,7 @@
         <li>Add option to disable IdeaVim in dialogs and single line editors</li>
         <li>Ability to map IDE actions via the &lt;Action&gt; keyword.</li>
         <li>"IdeaVim: track action Ids" command to find action ids for the :action command.
-  Enable this option in &quot;Search everywhere&quot; (double shift).</li>
+        <li>Add new option to register IdeaVim extensions. Please read the changelog for details</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
     ]]></change-notes>
