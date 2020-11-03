@@ -48,10 +48,7 @@ class OpMappingTest : VimTestCase() {
     if (!initialized) {
       initialized = true
 
-      extension = ExtensionBeanClass().also {
-        it.implementation = TestExtension::class.java.canonicalName
-        it.aliases = listOf(Alias().also { it.name = "MyTest" })
-      }
+      extension = TestExtension.createBean()
 
       @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
       VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
@@ -180,11 +177,7 @@ class PlugExtensionsTest : VimTestCase() {
   override fun setUp() {
     super.setUp()
 
-    extension = ExtensionBeanClass().also {
-      it.implementation = TestExtension::class.java.canonicalName
-      it.aliases = listOf(Alias().also { it.name = "MyTest" })
-    }
-
+    extension = TestExtension.createBean()
     @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
     VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
   }
@@ -295,6 +288,15 @@ private class TestExtension : VimExtension {
       val caret = editor.caretModel.currentCaret
       val newOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, 1, true)
       MotionGroup.moveCaret(editor, caret, newOffset)
+    }
+  }
+
+  companion object {
+    fun createBean(): ExtensionBeanClass {
+      val beanClass = ExtensionBeanClass()
+      beanClass.implementation = TestExtension::class.java.canonicalName
+      beanClass.aliases = listOf(Alias().also { it.name = "MyTest" })
+      return beanClass
     }
   }
 }
