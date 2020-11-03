@@ -8,7 +8,7 @@ buildscript {
 
   dependencies {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-    classpath "com.github.AlexPl292:mark-down-to-slack:1.0.1"
+    classpath "com.github.AlexPl292:mark-down-to-slack:1.1.0"
   }
 }
 
