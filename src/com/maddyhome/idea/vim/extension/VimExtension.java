@@ -31,10 +31,11 @@ public interface VimExtension {
   @NotNull ExtensionPointName<ExtensionBeanClass> EP_NAME = ExtensionPointName.create("IdeaVIM.vimExtension");
 
   /**
-   * @deprecated Please set extension name in <vimExtension> tag
+   * @deprecated This property is not used anymore, but we'll remove it much later to keep the compatibility of IdeaVim
+   *   extensions with previous versions of IdeaVim.
    */
   @Deprecated
-  @ApiStatus.ScheduledForRemoval(inVersion = "0.63")
+  @ApiStatus.ScheduledForRemoval(inVersion = "0.65")
   @NotNull String getName();
 
   default MappingOwner getOwner() {
