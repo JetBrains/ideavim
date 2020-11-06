@@ -26,7 +26,8 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class MotionOuterBigWordActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, description = "Wrong caret position, but in real neovim works fine")
   fun `test on last dot`() {
-    doTest("<aW", """
+    doTest(
+      "<aW", """
       I found it in a legendary land
       all rocks and lavender and tufted grass,
       where it was settled on some sodden sand
@@ -36,6 +37,19 @@ class MotionOuterBigWordActionTest : VimTestCase() {
       all rocks and lavender and tufted grass,
       where it was settled on some sodden sand
       ${c}hard by the torrent of a mountain pass.
-    """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
+  }
+
+  fun `test past end in visual`() {
+    doTest(
+      "v\$aW", """
+      I found it in a ${c}legendary land
+      }
+    """.trimIndent(), """
+      I found it in a ${s}legendary land
+      ${c}}${se}
+    """.trimIndent(), CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 }

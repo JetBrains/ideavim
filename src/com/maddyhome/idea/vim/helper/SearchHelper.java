@@ -1375,7 +1375,7 @@ public class SearchHelper {
     }
 
     if (goForward && anyNonWhitespace(editor, end, 1)) {
-      while (end < max &&
+      while (end + 1 < max &&
              CharacterHelper.charType(chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
         end++;
       }
