@@ -10,11 +10,15 @@
             Enable this option in &quot;Search everywhere&quot; (double shift).</li>
         <li>Add new option to register IdeaVim extensions. Please read the changelog for details</li>
       </ul>
+      <br/>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
     ]]></change-notes>
   <description><![CDATA[
-      <p>Vim emulation plug-in for IDEs based on the IntelliJ platform.</p>
-      <p>IdeaVim supports many Vim features including normal/insert/visual modes, motion keys, deletion/changing, marks, registers, some Ex commands, Vim regexps, configuration via ~/.ideavimrc, macros, window commands, etc.</p>
+      <p>Vim emulation plugin for IntelliJ Platform-based IDEs.</p>
+      <br/>
+      <p>IdeaVim supports many Vim features including normal/insert/visual modes, motion keys, deletion/changing,
+      marks, registers, some Ex commands, Vim regexps, configuration via ~/.ideavimrc, macros, Vim plugins, etc.</p>
+      <br/>
       <p>See also:</p>
       <ul>
         <li><a href="https://github.com/JetBrains/ideavim">GitHub repository</a>: documentation and contributing</li>

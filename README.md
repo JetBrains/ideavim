@@ -11,7 +11,7 @@ IdeaVim
 [![Gitter][gitter-svg]][gitter]
 [![Twitter][twitter-svg]][twitter]
 
-IdeaVim is a Vim emulation plugin for IDEs based on the IntelliJ Platform.
+IdeaVim is a Vim emulation plugin for IntelliJ Platform-based IDEs.
 
 ##### Contact maintainers:
 * [Bug tracker](https://youtrack.jetbrains.com/issues/VIM)
