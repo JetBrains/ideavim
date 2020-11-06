@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.vimForEachCaret
 
 class ResetModeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
@@ -36,7 +37,7 @@ class ResetModeAction : VimActionHandler.SingleExecution() {
     KeyHandler.getInstance().fullReset(editor.getTopLevelEditor())
 
     if (modeBeforeReset == CommandState.Mode.INSERT) {
-      editor.caretModel.runForEachCaret { caret ->
+      editor.vimForEachCaret { caret ->
         val position = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -1, false)
         MotionGroup.moveCaret(editor, caret, position)
       }
