@@ -178,7 +178,7 @@ class CommandState private constructor() {
     executingCommand = null
     resetModes()
     commandBuilder.resetInProgressCommandPart(getKeyRootNode(mappingState.mappingMode))
-    startDigraphSequence()
+    digraphSequence.reset()
     updateStatus()
   }
 

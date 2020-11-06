@@ -62,7 +62,7 @@
  * |i_CTRL-Z|             TO BE IMPLEMENTED
  * |i_<Esc>|              {@link com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction}
  * |i_CTRL-[|             {@link com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction}
- * |i_CTRL-\_CTRL-N|      {@link com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction}
+ * |i_CTRL-\_CTRL-N|      {@link com.maddyhome.idea.vim.action.ResetModeAction}
  * |i_CTRL-\_CTRL-G|      TO BE IMPLEMENTED
  * |i_CTRL-]}             TO BE IMPLEMENTED
  * |i_CTRL-^|             TO BE IMPLEMENTED
