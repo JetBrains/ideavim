@@ -116,5 +116,8 @@ private val stinkyKeysList = arrayListOf("K", "u", "H", "<C-Y>",
   // Temporally disabled due to issues in the platform
   "<C-V>", "<C-Q>",
 
-  "<C-]>"
+  "<C-]>",
+
+  // Next / previous method fails because of vfs sync
+  "]"
 )
