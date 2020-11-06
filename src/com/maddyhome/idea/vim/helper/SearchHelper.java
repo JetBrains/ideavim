@@ -786,7 +786,7 @@ public class SearchHelper {
         if (pos == size - 1 ||
             !Character.isLetter(chars.charAt(pos + 1)) ||
             (Character.isUpperCase(chars.charAt(pos + 1)) &&
-             pos <= size - 2 &&
+             pos < size - 2 &&
              Character.isLowerCase(chars.charAt(pos + 2)))) {
           res = pos;
           found++;
