@@ -22,6 +22,7 @@ package org.jetbrains.plugins.ideavim.group.motion
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.ScrollJumpData
 import com.maddyhome.idea.vim.option.ScrollOffData
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -348,6 +349,18 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(ScrollOffData.name) {
     typeText(parseKeys("k"))
     assertPosition(42, 0)
     assertVisibleArea(26, 59)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(ScrollOffData.name, VimTestOptionType.NUMBER, ["0"]))
+  fun `test reposition cursor when scrolloff is set`() {
+    configureByPages(5)
+    setPositionAndScroll(50, 50)
+
+    OptionsManager.scrolloff.set(999)
+
+    assertPosition(50, 0)
+    assertVisibleArea(33, 67)
   }
 }
 

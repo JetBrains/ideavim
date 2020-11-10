@@ -46,6 +46,7 @@ usual beta standards.
 * Add option to disable IdeaVim in dialogs / single line editors. [VIM-765](https://youtrack.jetbrains.com/issue/VIM-765)  
 Use `set ideaenabledbufs=` to disable IdeaVim in dialog editors.  
 _Note for EAP users: the option name can be changed for the stable release_
+* Reposition cursor when `scrolloff` changes
 
 ### Fixes:
 * [VIM-2150](https://youtrack.jetbrains.com/issue/VIM-2150) `Shift-D` should not delete an empty line
