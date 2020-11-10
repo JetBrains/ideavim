@@ -52,6 +52,7 @@ _Note for EAP users: the option name can be changed for the stable release_
 * [VIM-2157](https://youtrack.jetbrains.com/issue/VIM-2157) Fix tab with an active template
 * [VIM-2156](https://youtrack.jetbrains.com/issue/VIM-2156) Correct up/down motions with inlays
 * [VIM-2144](https://youtrack.jetbrains.com/issue/VIM-2144) Correct text position after block insert with inlays
+* [VIM-2158](https://youtrack.jetbrains.com/issue/VIM-2158) Fix scrolling when `scrolloff` is over half screen height, but less than full height
 
 ## 0.60, 2020-10-09
 
