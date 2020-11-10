@@ -43,6 +43,12 @@ import static java.lang.Integer.max;
  * This is a set of helper methods for working with editors. All line and column values are zero based.
  */
 public class EditorHelper {
+  // Set a max height on block inlays to be made visible at the top/bottom of a line when scrolling up/down. This
+  // mitigates the visible area bouncing around too much and even pushing the cursor line off screen with large
+  // multiline rendered doc comments, while still providing some visibility of the block inlay (e.g. Rider's single line
+  // Code Vision)
+  private static final int BLOCK_INLAY_MAX_LINE_HEIGHT = 3;
+
   public static @NotNull Rectangle getVisibleArea(final @NotNull Editor editor) {
     return editor.getScrollingModel().getVisibleAreaOnScrollingFinished();
   }
@@ -641,7 +647,10 @@ public class EditorHelper {
    * @return Returns true if the window was moved
    */
   public static boolean scrollVisualLineToTopOfScreen(final @NotNull Editor editor, int visualLine) {
-    int y = EditorUtil.getVisualLineAreaStartY(editor, normalizeVisualLine(editor, visualLine));
+
+    final int inlayHeight = EditorUtil.getInlaysHeight(editor, visualLine, true);
+    final int maxInlayHeight = BLOCK_INLAY_MAX_LINE_HEIGHT * editor.getLineHeight();
+    int y = editor.visualLineToY(visualLine) - Math.min(inlayHeight, maxInlayHeight);
 
     // Normalise Y so that we don't try to scroll the editor to a location it can't reach. The editor will handle this,
     // but when we ask for the target location to move the caret to match, we'll get the incorrect value.
@@ -694,7 +703,12 @@ public class EditorHelper {
     if (ExEntryPanel.getInstanceWithoutShortcuts().isActive()) {
       exPanelHeight += ExEntryPanel.getInstanceWithoutShortcuts().getHeight();
     }
-    final int y = EditorUtil.getVisualLineAreaEndY(editor, normalizeVisualLine(editor, visualLine)) + exPanelHeight;
+
+    final int normalizedVisualLine = normalizeVisualLine(editor, visualLine);
+    final int lineHeight = editor.getLineHeight();
+    final int inlayHeight = EditorUtil.getInlaysHeight(editor, normalizedVisualLine, false);
+    final int maxInlayHeight = BLOCK_INLAY_MAX_LINE_HEIGHT * lineHeight;
+    final int y = editor.visualLineToY(normalizedVisualLine) + lineHeight + Math.min(inlayHeight, maxInlayHeight) + exPanelHeight;
     final Rectangle visibleArea = getVisibleArea(editor);
     return scrollVertically(editor, max(0, y - visibleArea.height));
   }
