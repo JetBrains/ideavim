@@ -652,7 +652,6 @@ public class MotionGroup {
     // Note that block inlays means that the pixel height we are scrolling can be larger than half the screen, even if
     // the number of lines is less. I'm not sure what impact this has.
     final int height = bottomLine - topLine + 1;
-    final int halfHeight = height / 2;
 
     // Scrolljump isn't handled as you might expect. It is the minimal number of lines to scroll, but that doesn't mean
     // newLine = caretLine +/- MAX(sj, so)
@@ -680,15 +679,26 @@ public class MotionGroup {
     // out correct scroll locations
     final int scrollJump = getScrollJump(editor, height);
 
+    // Unavoidable fudge value. Multiline rendered doc comments can mean we have very few actual lines, and scrolling
+    // can get stuck in a loop as we re-centre the cursor instead of actually moving it. But if we ignore all inlays
+    // and use the approximate screen height instead of the actual screen height (in lines), we make incorrect
+    // assumptions about the top/bottom line numbers and can scroll to the wrong location. E.g. if there are enough doc
+    // comments (String.java) it's possible to get 12 lines of actual code on screen. Given scrolloff=5, it's very easy
+    // to hit problems, and have (scrolloffset > height / 2) and scroll to the middle of the screen. We'll use this
+    // fudge value to make sure we're working with sensible values. Note that this problem doesn't affect code without
+    // block inlays as positioning the cursor in the middle of the screen always positions it in a deterministic manner,
+    // relative to other text in the file.
+    final int inlayAwareMinHeightFudge = getApproximateScreenHeight(editor) / 2;
+
     // Note that while these calculations do the same thing that Vim does, it processes them differently. E.g. it
     // optionally checks and moves the top line, then optionally checks the bottom line. This gives us the same results
     // via the tests.
-    if (scrollOffset > halfHeight) {
+    if (height > inlayAwareMinHeightFudge && scrollOffset > height / 2) {
       scrollVisualLineToMiddleOfScreen(editor, caretLine);
     } else if (caretLine < topBound) {
       // Scrolling up, put the cursor at the top of the window (minus scrolloff)
       // Initial approximation in move.c:update_topline (including same calculation for halfHeight)
-      if (topLine + scrollOffset - caretLine >= Math.max(2, halfHeight - 1)) {
+      if (topLine + scrollOffset - caretLine >= Math.max(2, (height / 2) - 1)) {
         scrollVisualLineToMiddleOfScreen(editor, caretLine);
       }
       else {
