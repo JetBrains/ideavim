@@ -184,7 +184,7 @@ public class MotionGroup {
     if (caretVisualLine < topVisualLine + scrollOffset) {
       newVisualLine = normalizeVisualLine(editor, topVisualLine + scrollOffset);
     }
-    else if (caretVisualLine >= bottomVisualLine - scrollOffset) {
+    else if (caretVisualLine > bottomVisualLine - scrollOffset) {
       newVisualLine = normalizeVisualLine(editor, bottomVisualLine - scrollOffset);
     }
     else {
@@ -631,10 +631,10 @@ public class MotionGroup {
   private static void scrollCaretIntoViewVertically(@NotNull Editor editor, final int caretLine) {
 
     // TODO: Make this work with soft wraps
-    // Vim's algorithm works counts line heights for wrapped lines. We're using visual lines, which handles collapsed
-    // folds, but treats soft wrapped lines as individual lines.
-    // Ironically, after figuring out how Vim's algorithm works (although not *why*), it looks likely to be rewritten as
-    // a dumb line for line reimplementation.
+    // Vim's algorithm works by counting line heights for wrapped lines. We're using visual lines, which handles
+    // collapsed folds, but treats soft wrapped lines as individual lines.
+    // Ironically, after figuring out how Vim's algorithm works (although not *why*) and reimplementing, it looks likely
+    // that this needs to be replaced as a more or less dumb line for line rewrite.
 
     final int topLine = getVisualLineAtTopOfScreen(editor);
     final int bottomLine = getVisualLineAtBottomOfScreen(editor);
@@ -642,7 +642,7 @@ public class MotionGroup {
     // We need the non-normalised value here, so we can handle cases such as so=999 to keep the current line centred
     final int scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();
     final int topBound = topLine + scrollOffset;
-    final int bottomBound = Math.max(topBound + 1, bottomLine - scrollOffset);
+    final int bottomBound = Math.max(topBound, bottomLine - scrollOffset);
 
     // If we need to scroll the current line more than half a screen worth of lines then we just centre the new
     // current line. This mimics vim behavior of e.g. 100G in a 300 line file with a screen size of 25 centering line
@@ -650,7 +650,7 @@ public class MotionGroup {
     // Note that block inlays means that the pixel height we are scrolling can be larger than half the screen, even if
     // the number of lines is less. I'm not sure what impact this has.
     final int height = bottomLine - topLine + 1;
-    final int halfHeight = Math.max(2, (height / 2) - 1);
+    final int halfHeight = height / 2;
 
     // Scrolljump isn't handled as you might expect. It is the minimal number of lines to scroll, but that doesn't mean
     // newLine = caretLine +/- MAX(sj, so)
@@ -663,7 +663,7 @@ public class MotionGroup {
     // (See move.c:scroll_cursor_top)
     //
     // When scrolling down (`j` - scrolling window down in the buffer; more lines are visible at the bottom), Vim again
-    // expands lines above and below the new bottom line, but calcualtes things a little differently. The total number
+    // expands lines above and below the new bottom line, but calculates things a little differently. The total number
     // of lines expanded is at least scrolljump and there must be at least scrolloff lines below.
     // Since the lines are advancing simultaneously, it is only possible to get scrolljump/2 above the new cursor line.
     // If there are fewer than scrolljump/2 lines between the current bottom line and the new cursor line, the extra
@@ -678,10 +678,15 @@ public class MotionGroup {
     // out correct scroll locations
     final int scrollJump = getScrollJump(editor, height);
 
-    if (caretLine < topBound) {
+    // Note that while these calculations do the same thing that Vim does, it processes them differently. E.g. it
+    // optionally checks and moves the top line, then optionally checks the bottom line. This gives us the same results
+    // via the tests.
+    if (scrollOffset > halfHeight) {
+      scrollVisualLineToMiddleOfScreen(editor, caretLine);
+    } else if (caretLine < topBound) {
       // Scrolling up, put the cursor at the top of the window (minus scrolloff)
-      // Initial approximation in move.c:update_topline
-      if (topLine + scrollOffset - caretLine >= halfHeight) {
+      // Initial approximation in move.c:update_topline (including same calculation for halfHeight)
+      if (topLine + scrollOffset - caretLine >= Math.max(2, halfHeight - 1)) {
         scrollVisualLineToMiddleOfScreen(editor, caretLine);
       }
       else {
@@ -692,9 +697,12 @@ public class MotionGroup {
         final int scrollOffsetTopLine = Math.max(0, caretLine - scrollOffset);
         final int newTopLine = Math.min(scrollOffsetTopLine, scrollJumpTopLine);
 
-        // Used is set to the line height of caretLine, and then incremented by line height of the lines above and
-        // below caretLine (up to scrolloff or end of file)
-        final int used = 1 + (newTopLine - topLine) + Math.min(scrollOffset, getVisualLineCount(editor) - topLine);
+        // Used is set to the line height of caretLine (1 or how many lines soft wraps take up), and then incremented by
+        // the line heights of the lines above and below caretLine (up to scrolloff or end of file).
+        // Our implementation ignores soft wrap line heights. Folds already have a line height of 1.
+        final int usedAbove = caretLine - newTopLine;
+        final int usedBelow = Math.min(scrollOffset, getVisualLineCount(editor) - caretLine);
+        final int used = 1 + usedAbove + usedBelow;
         if (used > height) {
           scrollVisualLineToMiddleOfScreen(editor, caretLine);
         }

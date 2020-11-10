@@ -201,7 +201,7 @@ public class EditorHelper {
    * @param editor The editor
    * @return The number of screen lines
    */
-  private static int getApproximateScreenHeight(final @NotNull Editor editor) {
+  public static int getApproximateScreenHeight(final @NotNull Editor editor) {
     return getVisibleArea(editor).height / editor.getLineHeight();
   }
 
@@ -653,7 +653,7 @@ public class EditorHelper {
       // Get the max line number that can sit at the top of the screen
       final int editorHeight = getVisibleArea(editor).height;
       final int virtualSpaceHeight = editor.getSettings().getAdditionalLinesCount() * editor.getLineHeight();
-      final int yLastLine = editor.visualLineToY(EditorHelper.getLineCount(editor));  // last line + 1
+      final int yLastLine = editor.visualLineToY(getLineCount(editor));  // last line + 1
       y = Math.min(y, yLastLine + virtualSpaceHeight - editorHeight);
     }
     return scrollVertically(editor, y);
@@ -662,21 +662,25 @@ public class EditorHelper {
   /**
    * Scrolls the editor to place the given visual line in the middle of the current window.
    *
+   * <p>Snaps the line to the nearest standard line height grid, which gives a good position for both an odd and even
+   * number of lines and mimics what Vim does.</p>
+   *
    * @param editor The editor to scroll
    * @param visualLine The visual line to place in the middle of the current window
    */
   public static void scrollVisualLineToMiddleOfScreen(@NotNull Editor editor, int visualLine) {
-    int y = editor.visualLineToY(normalizeVisualLine(editor, visualLine));
-    int lineHeight = editor.getLineHeight();
-    int height = getVisibleArea(editor).height;
-    scrollVertically(editor, y - ((height - lineHeight) / 2));
+    final int y = editor.visualLineToY(normalizeVisualLine(editor, visualLine));
+    final int screenHeight = getVisibleArea(editor).height;
+    final int lineHeight = editor.getLineHeight();
+    scrollVertically(editor, y - ((screenHeight - lineHeight) / lineHeight / 2 * lineHeight));
   }
 
   /**
    * Scrolls the editor to place the given visual line at the bottom of the screen.
    *
-   * When we're moving the caret down a few lines and want to scroll to keep this visible, we need to be able to place a
-   * line at the bottom of the screen. Due to block inlays, we can't do this by specifying a top line to scroll to.
+   * <p>When we're moving the caret down a few lines and want to scroll to keep this visible, we need to be able to
+   * place a line at the bottom of the screen. Due to block inlays, we can't do this by specifying a top line to scroll
+   * to.</p>
    *
    * @param editor The editor to scroll
    * @param visualLine The visual line to place at the bottom of the current window
@@ -714,19 +718,19 @@ public class EditorHelper {
     }
 
     final int columnLeftX = editor.visualPositionToXY(new VisualPosition(visualLine, targetVisualColumn)).x;
-    EditorHelper.scrollHorizontally(editor, columnLeftX);
+    scrollHorizontally(editor, columnLeftX);
   }
 
   public static void scrollColumnToMiddleOfScreen(@NotNull Editor editor, int visualLine, int visualColumn) {
     final Point point = editor.visualPositionToXY(new VisualPosition(visualLine, visualColumn));
-    final int screenWidth = EditorHelper.getVisibleArea(editor).width;
+    final int screenWidth = getVisibleArea(editor).width;
 
     // Snap the column to the nearest standard column grid. This positions us nicely if there are an odd or even number
     // of columns. It also works with inline inlays and folds. It is slightly inaccurate for proportional fonts, but is
     // still a good solution. Besides, what kind of monster uses Vim with proportional fonts?
     final int standardColumnWidth = EditorUtil.getPlainSpaceWidth(editor);
     final int x = point.x - (screenWidth / standardColumnWidth / 2 * standardColumnWidth);
-    EditorHelper.scrollHorizontally(editor, x);
+    scrollHorizontally(editor, x);
   }
 
   public static void scrollColumnToRightOfScreen(@NotNull Editor editor, int visualLine, int visualColumn) {
@@ -751,8 +755,8 @@ public class EditorHelper {
 
     // Scroll to the left edge of the target column, minus a screenwidth, and adjusted for inlays
     final int targetColumnRightX = editor.visualPositionToXY(new VisualPosition(visualLine, targetVisualColumn + 1)).x;
-    final int screenWidth = EditorHelper.getVisibleArea(editor).width;
-    EditorHelper.scrollHorizontally(editor, targetColumnRightX - screenWidth);
+    final int screenWidth = getVisibleArea(editor).width;
+    scrollHorizontally(editor, targetColumnRightX - screenWidth);
   }
 
   /**

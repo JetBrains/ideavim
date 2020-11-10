@@ -21,6 +21,7 @@
 package org.jetbrains.plugins.ideavim.group.motion
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.ScrollJumpData
 import com.maddyhome.idea.vim.option.ScrollOffData
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -64,6 +65,119 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(ScrollOffData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(ScrollOffData.name, VimTestOptionType.NUMBER, ["15"]))
+  fun `test move up when scrolloff is slightly less than half screen height`() {
+    // Screen height = 35. scrolloff=15. This gives 5 possible caret lines without scrolling (48, 49, 50, 51 + 52)
+    configureByPages(5)
+    setPositionAndScroll(33, 52)
+
+    typeText(parseKeys("k"))
+    assertPosition(51, 0)
+    assertVisibleArea(33, 67)
+
+    typeText(parseKeys("k"))
+    assertPosition(50, 0)
+    assertVisibleArea(33, 67)
+
+    typeText(parseKeys("k"))
+    assertPosition(49, 0)
+    assertVisibleArea(33, 67)
+
+    typeText(parseKeys("k"))
+    assertPosition(48, 0)
+    assertVisibleArea(33, 67)
+
+    // Scroll
+    typeText(parseKeys("k"))
+    assertPosition(47, 0)
+    assertVisibleArea(32, 66)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(ScrollOffData.name, VimTestOptionType.NUMBER, ["16"]))
+  fun `test move up when scrolloff is slightly less than half screen height 2`() {
+    // Screen height = 35. scrolloff=16. This gives 3 possible caret lines without scrolling (49, 50 + 51)
+    configureByPages(5)
+    setPositionAndScroll(33, 51)
+
+    typeText(parseKeys("k"))
+    assertPosition(50, 0)
+    assertVisibleArea(33, 67)
+
+    typeText(parseKeys("k"))
+    assertPosition(49, 0)
+    assertVisibleArea(33, 67)
+
+    // Scroll
+    typeText(parseKeys("k"))
+    assertPosition(48, 0)
+    assertVisibleArea(32, 66)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(ScrollOffData.name, VimTestOptionType.NUMBER, ["16"]))
+  fun `test move up when scrolloff is slightly less than half screen height 3`() {
+    // Screen height = 34. scrolloff=16
+    // Even numbers. 2 possible caret lines without scrolling (49 + 50)
+    configureByPages(5)
+    setEditorVisibleSize(screenWidth, 34)
+    setPositionAndScroll(33, 50)
+
+    typeText(parseKeys("k"))
+    assertPosition(49, 0)
+    assertVisibleArea(33, 66)
+
+    // Scroll
+    typeText(parseKeys("k"))
+    assertPosition(48, 0)
+    assertVisibleArea(32, 65)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(ScrollOffData.name, VimTestOptionType.NUMBER, ["17"]))
+  @VimBehaviorDiffers(description = "Moving up in Vim will always have 16 lines above the caret line. IdeaVim keeps 17")
+  fun `test move up when scrolloff is exactly screen height`() {
+    // Page height = 34. scrolloff=17
+    // 2 possible caret lines without scrolling (49 + 50)
+    configureByPages(5)
+    setEditorVisibleSize(screenWidth, 34)
+    setPositionAndScroll(33, 50)
+
+    typeText(parseKeys("k"))
+    assertPosition(49, 0)
+    assertVisibleArea(33, 66)
+
+    // Scroll
+    typeText(parseKeys("k"))
+    assertPosition(48, 0)
+    assertVisibleArea(32, 65)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(ScrollOffData.name, VimTestOptionType.NUMBER, ["17"]))
+  fun `test move up when scrolloff is slightly greater than screen height keeps cursor in centre of screen`() {
+    // Page height = 35. scrolloff=17
+    configureByPages(5)
+    setPositionAndScroll(33, 50)
+
+    typeText(parseKeys("k"))
+    assertPosition(49, 0)
+    assertVisibleArea(32, 66)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(ScrollOffData.name, VimTestOptionType.NUMBER, ["22"]))
+  fun `test move up when scrolloff is slightly greater than screen height keeps cursor in centre of screen 2`() {
+    // Page height = 35. scrolloff=17
+    configureByPages(5)
+    setPositionAndScroll(33, 50)
+
+    typeText(parseKeys("k"))
+    assertPosition(49, 0)
+    assertVisibleArea(32, 66)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(ScrollOffData.name, VimTestOptionType.NUMBER, ["0"]))
   fun `test move down shows no context with scrolloff=0`() {
     configureByPages(5)
@@ -94,13 +208,146 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(ScrollOffData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(ScrollOffData.name, VimTestOptionType.NUMBER, ["15"]))
+  fun `test move down when scrolloff is slightly less than half screen height`() {
+    // Screen height = 35. scrolloff=15. This gives 5 possible caret lines without scrolling (48, 49, 50, 51 + 52)
+    configureByPages(5)
+    setPositionAndScroll(33, 48)
+
+    typeText(parseKeys("j"))
+    assertPosition(49, 0)
+    assertVisibleArea(33, 67)
+
+    typeText(parseKeys("j"))
+    assertPosition(50, 0)
+    assertVisibleArea(33, 67)
+
+    typeText(parseKeys("j"))
+    assertPosition(51, 0)
+    assertVisibleArea(33, 67)
+
+    typeText(parseKeys("j"))
+    assertPosition(52, 0)
+    assertVisibleArea(33, 67)
+
+    // Scroll
+    typeText(parseKeys("j"))
+    assertPosition(53, 0)
+    assertVisibleArea(34, 68)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(ScrollOffData.name, VimTestOptionType.NUMBER, ["16"]))
+  fun `test move down when scrolloff is slightly less than half screen height 2`() {
+    // Screen height = 35. scrolloff=16. This gives 3 possible caret lines without scrolling (49, 50 + 51)
+    configureByPages(5)
+    setPositionAndScroll(33, 49)
+
+    typeText(parseKeys("j"))
+    assertPosition(50, 0)
+    assertVisibleArea(33, 67)
+
+    typeText(parseKeys("j"))
+    assertPosition(51, 0)
+    assertVisibleArea(33, 67)
+
+    // Scroll
+    typeText(parseKeys("j"))
+    assertPosition(52, 0)
+    assertVisibleArea(34, 68)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(ScrollOffData.name, VimTestOptionType.NUMBER, ["16"]))
+  fun `test move down when scrolloff is slightly less than half screen height 3`() {
+    // Screen height = 34. scrolloff=16
+    // Even numbers. 2 possible caret lines without scrolling (49 + 50)
+    configureByPages(5)
+    setEditorVisibleSize(screenWidth, 34)
+    setPositionAndScroll(33, 49)
+
+    typeText(parseKeys("j"))
+    assertPosition(50, 0)
+    assertVisibleArea(33, 66)
+
+    // Scroll
+    typeText(parseKeys("j"))
+    assertPosition(51, 0)
+    assertVisibleArea(34, 67)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(ScrollOffData.name, VimTestOptionType.NUMBER, ["17"]))
+  fun `test move down when scrolloff is exactly screen height`() {
+    // Page height = 34. scrolloff=17
+    // 2 possible caret lines without scrolling (49 + 50), but moving to line 51 will scroll 2 lines!
+    configureByPages(5)
+    setEditorVisibleSize(screenWidth, 34)
+    setPositionAndScroll(33, 49)
+
+    typeText(parseKeys("j"))
+    assertPosition(50, 0)
+    assertVisibleArea(33, 66)
+
+    // Scroll. By 2 lines!
+    typeText(parseKeys("j"))
+    assertPosition(51, 0)
+    assertVisibleArea(35, 68)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(ScrollOffData.name, VimTestOptionType.NUMBER, ["17"]))
+  fun `test move down when scrolloff is slightly greater than half screen height keeps cursor in centre of screen`() {
+    // Page height = 35. scrolloff=17
+    configureByPages(5)
+    setPositionAndScroll(33, 50)
+
+    typeText(parseKeys("j"))
+    assertPosition(51, 0)
+    assertVisibleArea(34, 68)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(ScrollOffData.name, VimTestOptionType.NUMBER, ["22"]))
+  fun `test move down when scrolloff is slightly greater than half screen height keeps cursor in centre of screen 2`() {
+    // Page height = 35. scrolloff=17
+    configureByPages(5)
+    setPositionAndScroll(33, 50)
+
+    typeText(parseKeys("j"))
+    assertPosition(51, 0)
+    assertVisibleArea(34, 68)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(ScrollOffData.name, VimTestOptionType.NUMBER, ["999"]))
   fun `test scrolloff=999 keeps cursor in centre of screen`() {
     configureByPages(5)
     setPositionAndScroll(25, 42)
+
     typeText(parseKeys("j"))
     assertPosition(43, 0)
     assertVisibleArea(26, 60)
+
+    typeText(parseKeys("k"))
+    assertPosition(42, 0)
+    assertVisibleArea(25, 59)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(ScrollOffData.name, VimTestOptionType.NUMBER, ["999"]))
+  fun `test scrolloff=999 keeps cursor in centre of screen with even screen height`() {
+    configureByPages(5)
+    setEditorVisibleSize(screenWidth, 34)
+    setPositionAndScroll(26, 42)
+
+    typeText(parseKeys("j"))
+    assertPosition(43, 0)
+    assertVisibleArea(27, 60)
+
+    typeText(parseKeys("k"))
+    assertPosition(42, 0)
+    assertVisibleArea(26, 59)
   }
 }
 
