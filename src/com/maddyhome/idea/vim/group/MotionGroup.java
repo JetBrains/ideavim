@@ -42,10 +42,12 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.NumberOption;
+import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import kotlin.Pair;
 import kotlin.ranges.IntProgression;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -1380,6 +1382,23 @@ public class MotionGroup {
     }
     else {
       return moveCaretToLineEnd(editor, visualLineToLogicalLine(editor, line), allowPastEnd);
+    }
+  }
+
+  public static class ScrollOptionsChangeListener implements OptionChangeListener<String> {
+    public static ScrollOptionsChangeListener INSTANCE = new ScrollOptionsChangeListener();
+
+    @Contract(pure = true)
+    private ScrollOptionsChangeListener() {
+    }
+
+    @Override
+    public void valueChange(String oldValue, String newValue) {
+      for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
+        if (UserDataManager.getVimEditorGroup(editor)) {
+          MotionGroup.scrollCaretIntoView(editor);
+        }
+      }
     }
   }
 }
