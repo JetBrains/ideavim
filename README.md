@@ -188,42 +188,38 @@ Changes to the IDE
 
 ### Executing IDE Actions
 
-IdeaVim adds two commands for listing and executing arbitrary IDE actions as
+IdeaVim adds various commands for listing and executing arbitrary IDE actions as
 Ex commands or via `:map` command mappings:
 
+**Executing actions:**
+* `:action {action_id}`
+    * Execute an action by id. Works from Ex command line.
+* `<Action>(*action_id*)`
+    * For the mappings you can use a special `<Action>` keyword. Don't forget the parentheses.
+
+**Finding actions:**
 * `:actionlist [pattern]`
-    * Find IDE actions by name or keymap pattern (E.g. `:actionlist extract`, `:actionlist <C-D`)
-* `:action {name}`
-    * Execute an action named `NAME`
+    * Find IDE actions by id or keymap pattern (E.g. `:actionlist extract`, `:actionlist <C-D`)
     
-In addition to `:actionlist` command, IdeaVim provides `IdeaVim: track action Ids` option to 
+* In addition to `:actionlist` command, IdeaVim provides `IdeaVim: track action Ids` option to 
 extract the ids of executed command. This option can be found in "Search everywhere" (double `shift`).
 
-<details>
-    <summary><strong>"Track aciton Ids" Details</strong> (click to see)</summary>
-    <img src="resources/readme/track_action_id.gif" alt="track actioin ids"/>
-</details>
-
-For the mappings you can use a special `<Action>` keyword. Use `<Action>(*action_id*)` to map keys to some action. Don't
-forget the parentheses. This keyword works for insert mode as well.
+    <details>
+        <summary><strong>"Track aciton Ids" Details</strong> (click to see)</summary>
+        <img src="resources/readme/track_action_id.gif" alt="track action ids"/>
+    </details>
 
 Examples:
 
 ```vim
 " Map \r to the Reformat Code action
-    :map \r :action ReformatCode<CR>
-" or
-    :map \r <Action>(ReformatCode)
+:map \r <Action>(ReformatCode)
 
 " Map <leader>d to start debug
-    :map <leader>d :action Debug<CR>
-" or
-    :map <leader>d <Action>(Debug)
+:map <leader>d <Action>(Debug)
 
 " Map \b to toggle the breakpoint on the current line
-    :map \b :action ToggleLineBreakpoint<CR>
-" or
-    :map \b <Action>(ToggleLineBreakpoint)
+:map \b <Action>(ToggleLineBreakpoint)
 ```
 
 ### Undo/Redo
