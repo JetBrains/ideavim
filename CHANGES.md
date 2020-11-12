@@ -55,6 +55,9 @@ _Note for EAP users: the option name can be changed for the stable release_
 * [VIM-2144](https://youtrack.jetbrains.com/issue/VIM-2144) Correct text position after block insert with inlays
 * [VIM-2158](https://youtrack.jetbrains.com/issue/VIM-2158) Fix scrolling when `scrolloff` is over half screen height, but less than full height
 
+### Merged PRs:
+* [255](https://github.com/JetBrains/ideavim/pull/255) by [Matt Ellis](https://github.com/citizenmatt): Fix various scrolling issues
+
 ## 0.60, 2020-10-09
 
 ### Features:
