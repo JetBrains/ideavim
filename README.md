@@ -197,7 +197,7 @@ Ex commands or via `:map` command mappings:
     * Execute an action named `NAME`
     
 In addition to `:actionlist` command, IdeaVim provides `IdeaVim: track action Ids` option to 
-extract the ids of executed command. This option can be found in "Search everywhere" (double `shift`). **[To Be Released]**
+extract the ids of executed command. This option can be found in "Search everywhere" (double `shift`).
 
 <details>
     <summary><strong>"Track aciton Ids" Details</strong> (click to see)</summary>
@@ -205,7 +205,7 @@ extract the ids of executed command. This option can be found in "Search everywh
 </details>
 
 For the mappings you can use a special `<Action>` keyword. Use `<Action>(*action_id*)` to map keys to some action. Don't
-forget the parentheses. This keyword works for insert mode as well. **[To Be Released]**
+forget the parentheses. This keyword works for insert mode as well.
 
 Examples:
 
@@ -213,17 +213,17 @@ Examples:
 " Map \r to the Reformat Code action
     :map \r :action ReformatCode<CR>
 " or
-    :map \r <Action>(ReformatCode)   " [To Be Released]
+    :map \r <Action>(ReformatCode)
 
 " Map <leader>d to start debug
     :map <leader>d :action Debug<CR>
 " or
-    :map <leader>d <Action>(Debug)   " [To Be Released]
+    :map <leader>d <Action>(Debug)
 
 " Map \b to toggle the breakpoint on the current line
     :map \b :action ToggleLineBreakpoint<CR>
 " or
-    :map \b <Action>(ToggleLineBreakpoint)   " [To Be Released]
+    :map \b <Action>(ToggleLineBreakpoint)
 ```
 
 ### Undo/Redo
