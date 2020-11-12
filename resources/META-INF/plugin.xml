@@ -1,18 +1,48 @@
 <idea-plugin url="https://plugins.jetbrains.com/plugin/164" xmlns:xi="http://www.w3.org/2001/XInclude">
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
-  <change-notes><![CDATA[
-      <ul>
-        <li>Fix ESC in dialogs</li>
-        <li>Add option to disable IdeaVim in dialogs and single line editors</li>
-        <li>Ability to map IDE actions via the &lt;Action&gt; keyword.</li>
-        <li>"IdeaVim: track action Ids" command to find action ids for the :action command.
-            Enable this option in &quot;Search everywhere&quot; (double shift).</li>
-        <li>Add new option to register IdeaVim extensions. Please read the changelog for details</li>
-      </ul>
-      <br/>
-      <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
-    ]]></change-notes>
+  <change-notes>
+    &lt;h3&gt;Features:&lt;/h3&gt;
+    &lt;br/&gt;
+    &lt;ul&gt;&lt;li&gt;Ability to map IDE actions via the &lt;code&gt;&amp;lt;Action&amp;gt;&lt;/code&gt; keyword. E.g.
+    &lt;code&gt;map &amp;lt;C-K&amp;gt; &amp;lt;Action&amp;gt;(CommentByLineComment)&lt;/code&gt;.
+    Check out &lt;code&gt;README.md&lt;/code&gt; for the details.&lt;/li&gt;&lt;li&gt;&lt;code&gt;IdeaVim: track action
+    Ids&lt;/code&gt; command to find action ids for the &lt;code&gt;:action&lt;/code&gt; command.
+    Enable this option in &amp;quot;Search everywhere&amp;quot; (double shift).&lt;/li&gt;&lt;li&gt;Ability to enable
+    extensions using &lt;code&gt;vim-plug&lt;/code&gt; or &lt;code&gt;vundle&lt;/code&gt; syntax.&lt;br /&gt;
+    E.g. to enable commentary extension you can use one of the following commands:&lt;pre&gt;&lt;code
+    class="language-vim"&gt;set commentary
+    Plug 'tpope/vim-commentary'
+    Plug 'https://github.com/tpope/vim-commentary'
+    Plugin 'tpope/vim-commentary'
+    ...
+    &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;This approach is especially handy if you have &lt;code&gt;.vimrc&lt;/code&gt; with
+    plugins registered via &lt;code&gt;vim-plug&lt;/code&gt; or &lt;code&gt;vundle&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;
+
+
+    &lt;br/&gt;
+    &lt;h3&gt;Changes:&lt;/h3&gt;
+    &lt;br/&gt;
+    &lt;ul&gt;&lt;li&gt;Fix &lt;code&gt;&amp;lt;Esc&amp;gt;&lt;/code&gt; for dialogs. Now &lt;code&gt;&amp;lt;Esc&amp;gt;&lt;/code&gt;
+    will exit insert / visual mode and close the dialog from normal mode.&lt;/li&gt;&lt;li&gt;Add option to disable
+    IdeaVim in dialogs / single line editors. &lt;a href="https://youtrack.jetbrains.com/issue/VIM-765"&gt;VIM-765&lt;/a&gt;&lt;br
+    /&gt;
+    Use &lt;code&gt;set ideavimsupport=&lt;/code&gt; to disable IdeaVim in dialog editors. &lt;/li&gt;&lt;li&gt;Reposition
+    cursor when &lt;code&gt;scrolloff&lt;/code&gt; changes&lt;/li&gt;&lt;/ul&gt;
+
+    &lt;br/&gt;
+    &lt;h3&gt;Fixes:&lt;/h3&gt;
+    &lt;br/&gt;
+    &lt;ul&gt;&lt;li&gt;&lt;a href="https://youtrack.jetbrains.com/issue/VIM-2150"&gt;VIM-2150&lt;/a&gt; &lt;code&gt;Shift-D&lt;/code&gt;
+    should not delete an empty line&lt;/li&gt;&lt;li&gt;&lt;a href="https://youtrack.jetbrains.com/issue/VIM-2157"&gt;VIM-2157&lt;/a&gt;
+    Fix tab with an active template&lt;/li&gt;&lt;li&gt;&lt;a href="https://youtrack.jetbrains.com/issue/VIM-2156"&gt;VIM-2156&lt;/a&gt;
+    Correct up/down motions with inlays&lt;/li&gt;&lt;li&gt;&lt;a href="https://youtrack.jetbrains.com/issue/VIM-2144"&gt;VIM-2144&lt;/a&gt;
+    Correct text position after block insert with inlays&lt;/li&gt;&lt;li&gt;&lt;a
+    href="https://youtrack.jetbrains.com/issue/VIM-2158"&gt;VIM-2158&lt;/a&gt; Fix scrolling when &lt;code&gt;scrolloff&lt;/code&gt;
+    is over half screen height, but less than full height&lt;/li&gt;&lt;/ul&gt;
+    &lt;br/&gt;
+    &lt;p&gt;See also the complete &lt;a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md"&gt;changelog&lt;/a&gt;.&lt;/p&gt;
+  </change-notes>
   <description><![CDATA[
       <p>Vim emulation plugin for IntelliJ Platform-based IDEs.</p>
       <br/>
