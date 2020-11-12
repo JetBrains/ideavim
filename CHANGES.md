@@ -24,6 +24,10 @@ usual beta standards.
 
 ## To Be Released
 
+...
+
+## 0.61, 2020-11-12
+
 ### Features:
 * Ability to map IDE actions via the `<Action>` keyword. E.g. `map <C-K> <Action>(CommentByLineComment)`.
   Check out `README.md` for the details.
