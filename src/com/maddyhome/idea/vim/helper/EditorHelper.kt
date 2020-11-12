@@ -46,11 +46,11 @@ val Editor.isIdeaVimDisabledHere: Boolean
     val timeForCalculation = measureTimeMillis {
       res = (disabledInDialog.apply { times += System.currentTimeMillis() to "Disabled in dialog" }
 
-        || (!OptionsManager.ideaenabledbufs.contains("singleline")
+        || (!OptionsManager.ideavimsupport.contains("singleline")
         .apply { times += System.currentTimeMillis() to "first single line check" }
         && isDatabaseCell(times).apply { times += System.currentTimeMillis() to "is db cell" })
 
-        || (!OptionsManager.ideaenabledbufs.contains("singleline")
+        || (!OptionsManager.ideavimsupport.contains("singleline")
         .apply { times += System.currentTimeMillis() to "second single line check" }
         && isOneLineMode.apply { times += System.currentTimeMillis() to "is one line" })
         )
@@ -68,7 +68,7 @@ private fun Editor.isDatabaseCell(times: MutableList<Pair<Long, String>>): Boole
 }
 
 private val Editor.disabledInDialog: Boolean
-  get() = (!OptionsManager.ideaenabledbufs.contains("dialog") && !OptionsManager.ideaenabledbufs.contains("dialoglegacy"))
+  get() = (!OptionsManager.ideavimsupport.contains("dialog") && !OptionsManager.ideavimsupport.contains("dialoglegacy"))
     && (!this.isPrimaryEditor() && !EditorHelper.isFileEditor(this))
 
 /**

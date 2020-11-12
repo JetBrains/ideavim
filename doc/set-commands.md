@@ -125,7 +125,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                         "<C-Down>", "<C-Up>", "<PageUp>", "<PageDown>",
                         "<C-J>", "<C-Q>"
                      
-    `ideaenabledbufs`  `ideaenabledbufs`  List of strings (default "dialog")   [To Be Released]
+    `ideavimsupport`  `ideavimsupport`  List of strings (default "dialog")   [To Be Released]
                   
                   Define the list of additional buffers where IdeaVim is enabled.
                   
