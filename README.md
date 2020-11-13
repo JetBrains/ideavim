@@ -183,10 +183,8 @@ Emulated Vim Plugins
 
 See [doc/emulated-plugins.md](doc/emulated-plugins.md)
 
-Changes to the IDE
-------------------
-
-### Executing IDE Actions
+Executing IDE Actions
+---------------------
 
 IdeaVim adds various commands for listing and executing arbitrary IDE actions as
 Ex commands or via `:map` command mappings:
@@ -221,24 +219,6 @@ Examples:
 " Map \b to toggle the breakpoint on the current line
 :map \b <Action>(ToggleLineBreakpoint)
 ```
-
-### Undo/Redo
-
-The IdeaVim plugin uses the undo/redo functionality of the IntelliJ Platform,
-so the behavior of the `u` and `<C-R>` commands may differ from the original
-Vim. Vim compatibility of undo/redo may be improved in future releases.
-
-See also [unresolved undo issues](https://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+u).
-
-### Escape
-
-Using `<Esc>` in dialog windows remains problematic. For most dialog windows,
-the Vim emulator is put into insert mode with `<Esc>` not working. You
-should use `<C-c>` or `<C-[>` instead. In some dialog windows, the normal mode is
-switched by default. The usage of the Vim emulator in dialog windows is an area for
-improvement.
-
-See also [unresolved escape issues](https://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+i_Esc).
 
 :gem: Contributing
 ------------
