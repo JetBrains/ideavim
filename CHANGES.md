@@ -24,7 +24,11 @@ usual beta standards.
 
 ## To Be Released
 
-...
+### Fixes:
+* [VIM-2113](https://youtrack.jetbrains.com/issue/VIM-2113) Fix `cit` for empty tags
+
+### Merged PRs:
+* [249](https://github.com/JetBrains/ideavim/pull/249) by [Jan Palus](https://github.com/jpalus): VIM-2113 Increase tag range only in visual mode
 
 ## 0.61, 2020-11-12
 
