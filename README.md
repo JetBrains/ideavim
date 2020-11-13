@@ -165,7 +165,7 @@ You can read your `~/.vimrc` file from `~/.ideavimrc` with this command:
 
     source ~/.vimrc
 
-Please note that IdeaVim currently parses `~/.ideavimrc` & `~/.vimrc` files via simple pattern-matching.
+> :warning: Please note that IdeaVim currently parses `~/.ideavimrc` & `~/.vimrc` files via simple pattern-matching.
 See [VIM-669](https://youtrack.jetbrains.com/issue/VIM-669) for proper parsing
 of VimL files.
 
