@@ -323,6 +323,10 @@ Contributors:
   [![icon][github]](https://github.com/i-e-b)
   &nbsp;
   Iain Ballard
+* [![icon][mail]](mailto:brandoncc@gmail.com)
+  [![icon][github]](https://github.com/brandoncc)
+  &nbsp;
+  Brandon Conway
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
