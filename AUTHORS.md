@@ -327,6 +327,10 @@ Contributors:
   [![icon][github]](https://github.com/brandoncc)
   &nbsp;
   Brandon Conway
+* [![icon][mail]](mailto:ga@anadoxin.org)
+  [![icon][github]](https://github.com/antekone)
+  &nbsp;
+  Grzegorz Antoniak
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
