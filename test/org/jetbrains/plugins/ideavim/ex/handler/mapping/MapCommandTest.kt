@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.handler.mapping
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser

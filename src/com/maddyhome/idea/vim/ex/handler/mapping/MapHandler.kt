@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.ex.handler
+package com.maddyhome.idea.vim.ex.handler.mapping
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
@@ -30,8 +30,8 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.ex.handler.MapHandler.SpecialArgument.EXPR
-import com.maddyhome.idea.vim.ex.handler.MapHandler.SpecialArgument.SCRIPT
+import com.maddyhome.idea.vim.ex.handler.mapping.MapHandler.SpecialArgument.EXPR
+import com.maddyhome.idea.vim.ex.handler.mapping.MapHandler.SpecialArgument.SCRIPT
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.MappingOwner
