@@ -57,31 +57,28 @@ class MapHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler, Co
 
   @Throws(ExException::class)
   private fun executeCommand(cmd: ExCommand, editor: Editor?): Boolean {
-    val commandInfo = COMMAND_INFOS.find { cmd.command.startsWith(it.prefix) }
-    if (commandInfo != null) {
-      val argument = cmd.argument
-      val modes = commandInfo.mappingModes
-      if (argument.isEmpty()) {
-        return editor != null && VimPlugin.getKey().showKeyMappings(modes, editor)
-      } else {
-        val arguments = try {
-          parseCommandArguments(argument)
-        } catch (ignored: IllegalArgumentException) {
-          return false
-        }
+    val commandInfo = COMMAND_INFOS.find { cmd.command.startsWith(it.prefix) } ?: return false
+    val argument = cmd.argument
+    val modes = commandInfo.mappingModes
 
-        if (arguments != null) {
-          for (unsupportedArgument in UNSUPPORTED_SPECIAL_ARGUMENTS) {
-            if (unsupportedArgument in arguments.specialArguments) {
-              throw ExException("Unsupported map argument: $unsupportedArgument")
-            }
-          }
-          VimPlugin.getKey().putKeyMapping(modes, arguments.fromKeys, MappingOwner.IdeaVim, arguments.toKeys, commandInfo.isRecursive)
-          return true
-        }
+    if (argument.isEmpty()) return editor != null && VimPlugin.getKey().showKeyMappings(modes, editor)
+
+    val arguments = try {
+      parseCommandArguments(argument) ?: return false
+    } catch (ignored: IllegalArgumentException) {
+      return false
+    }
+
+    for (unsupportedArgument in UNSUPPORTED_SPECIAL_ARGUMENTS) {
+      if (unsupportedArgument in arguments.specialArguments) {
+        throw ExException("Unsupported map argument: $unsupportedArgument")
       }
     }
-    return false
+
+    VimPlugin.getKey()
+      .putKeyMapping(modes, arguments.fromKeys, MappingOwner.IdeaVim, arguments.toKeys, commandInfo.isRecursive)
+
+    return true
   }
 
   @Suppress("unused")
@@ -112,10 +109,6 @@ class MapHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler, Co
 
   private class CommandArguments(val specialArguments: Set<SpecialArgument>, val fromKeys: List<KeyStroke>,
                                  val toKeys: List<KeyStroke>)
-
-  private class CommandInfo(val prefix: String, suffix: String, val mappingModes: Set<MappingMode>, val isRecursive: Boolean) {
-    val command = if (suffix.isBlank()) prefix else "$prefix[$suffix]"
-  }
 
   companion object {
     private const val CTRL_V = '\u0016'
