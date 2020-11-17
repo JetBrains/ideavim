@@ -121,6 +121,10 @@ public class KeyGroup implements PersistentStateComponent<Element> {
     modes.stream().map(this::getKeyMapping).forEach(o -> o.delete(keys));
   }
 
+  public void removeKeyMapping(@NotNull Set<MappingMode> modes) {
+    modes.stream().map(this::getKeyMapping).forEach(KeyMapping::delete);
+  }
+
   public void putKeyMapping(@NotNull Set<MappingMode> modes,
                             @NotNull List<KeyStroke> fromKeys,
                             @NotNull MappingOwner owner,

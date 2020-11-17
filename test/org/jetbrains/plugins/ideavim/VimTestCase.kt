@@ -302,6 +302,13 @@ abstract class VimTestCase : UsefulTestCase() {
     }
   }
 
+  fun assertNoMapping(from: String, modes: Set<MappingMode>) {
+    val keys = parseKeys(from)
+    for (mode in modes) {
+      assertNull(VimPlugin.getKey().getKeyMapping(mode).get(keys))
+    }
+  }
+
   fun assertMappingExists(from: String, to: String, modes: Set<MappingMode>) {
     val keys = parseKeys(from)
     val toKeys = parseKeys(to)

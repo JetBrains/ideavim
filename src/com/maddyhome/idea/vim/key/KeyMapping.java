@@ -27,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -117,6 +116,11 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
     if (removed == null) return;
 
     removePrefixes(keys);
+  }
+
+  public void delete() {
+    myKeys.clear();
+    myPrefixes.clear();
   }
 
   private void removePrefixes(@NotNull List<KeyStroke> keys) {
