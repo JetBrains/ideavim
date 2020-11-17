@@ -23,7 +23,11 @@ import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.ide.highlighter.XmlFileType
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.application.WriteAction
-import com.intellij.openapi.editor.*
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.Inlay
+import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
@@ -40,6 +44,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.CommandState.SubMode
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
@@ -50,6 +55,8 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.OptionsManager.getOption
@@ -58,7 +65,6 @@ import com.maddyhome.idea.vim.option.OptionsManager.resetAllOptions
 import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.ui.ExEntryPanel
 import org.junit.Assert
-import java.lang.Integer.min
 import java.util.*
 import java.util.function.Consumer
 import javax.swing.KeyStroke
@@ -256,6 +262,12 @@ abstract class VimTestCase : UsefulTestCase() {
     }
   }
 
+  fun assertOffsetAt(text: String) {
+    val indexOf = myFixture.editor.document.charsSequence.indexOf(text)
+    if (indexOf < 0) kotlin.test.fail()
+    assertOffset(indexOf)
+  }
+
   // Use logical rather than visual lines, so we can correctly test handling of collapsed folds and soft wraps
   fun assertVisibleArea(topLogicalLine: Int, bottomLogicalLine: Int) {
     val actualVisualTop = EditorHelper.getVisualLineAtTopOfScreen(myFixture.editor)
@@ -277,6 +289,29 @@ abstract class VimTestCase : UsefulTestCase() {
     val expected = ScreenBounds(leftLogicalColumn, rightLogicalColumn)
     val actual = ScreenBounds(actualLeftLogicalColumn, actualRightLogicalColumn)
     Assert.assertEquals(expected, actual)
+  }
+
+  fun putMapping(modes: Set<MappingMode>, from: String, to: String, recursive: Boolean) {
+    VimPlugin.getKey().putKeyMapping(modes, parseKeys(from), MappingOwner.IdeaVim, parseKeys(to), recursive)
+  }
+
+  fun assertNoMapping(from: String) {
+    val keys = parseKeys(from)
+    for (mode in MappingMode.ALL) {
+      assertNull(VimPlugin.getKey().getKeyMapping(mode).get(keys))
+    }
+  }
+
+  fun assertMappingExists(from: String, to: String, modes: Set<MappingMode>) {
+    val keys = parseKeys(from)
+    val toKeys = parseKeys(to)
+    for (mode in modes) {
+      val info = VimPlugin.getKey().getKeyMapping(mode).get(keys)
+      kotlin.test.assertNotNull(info)
+      if (info is ToKeysMappingInfo) {
+        assertEquals(toKeys, info.toKeys)
+      }
+    }
   }
 
   private data class ScreenBounds(val leftLogicalColumn: Int, val rightLogicalColumn: Int) {

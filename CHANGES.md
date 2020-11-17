@@ -24,6 +24,10 @@ usual beta standards.
 
 ## To Be Released
 
+### Features:
+
+* Support `unmap` commands [VIM-1491](https://youtrack.jetbrains.com/issue/VIM-1491)
+
 ### Fixes:
 * [VIM-2113](https://youtrack.jetbrains.com/issue/VIM-2113) Fix `cit` for empty tags
 * [VIM-2114](https://youtrack.jetbrains.com/issue/VIM-2114) Unnamed register isn't changed after deleting empty tag

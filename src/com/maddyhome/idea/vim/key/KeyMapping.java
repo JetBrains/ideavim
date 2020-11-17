@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.security.Key;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -108,14 +109,23 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
       myKeys.entrySet().stream().filter(o -> o.getValue().getOwner().equals(owner)).collect(Collectors.toList());
 
     toRemove.forEach(o -> myKeys.remove(o.getKey(), o.getValue()));
-    toRemove.stream().map(Map.Entry::getKey).forEach(keys -> {
-      List<KeyStroke> prefix = new ArrayList<>();
-      final int prefixLength = keys.size() - 1;
-      for (int i = 0; i < prefixLength; i++) {
-        prefix.add(keys.get(i));
-        myPrefixes.remove(prefix);
-      }
-    });
+    toRemove.stream().map(Map.Entry::getKey).forEach(this::removePrefixes);
+  }
+
+  public void delete(@NotNull List<KeyStroke> keys) {
+    MappingInfo removed = myKeys.remove(keys);
+    if (removed == null) return;
+
+    removePrefixes(keys);
+  }
+
+  private void removePrefixes(@NotNull List<KeyStroke> keys) {
+    List<KeyStroke> prefix = new ArrayList<>();
+    final int prefixLength = keys.size() - 1;
+    for (int i = 0; i < prefixLength; i++) {
+      prefix.add(keys.get(i));
+      myPrefixes.remove(prefix);
+    }
   }
 
   public List<Pair<List<KeyStroke>, MappingInfo>> getByOwner(@NotNull MappingOwner owner) {
