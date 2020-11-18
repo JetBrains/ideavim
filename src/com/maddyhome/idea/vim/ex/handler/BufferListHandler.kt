@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.EditorHelper
+import org.jetbrains.annotations.NonNls
 import java.io.File
 
 /**
@@ -115,7 +116,7 @@ class BufferListHandler : CommandHandler.SingleExecution() {
 }
 
 private fun getBufferStatus(editor: Editor, file: VirtualFile, currentFile: VirtualFile, previousFile: VirtualFile?): String {
-  val bufStatus = StringBuilder()
+  @NonNls val bufStatus = StringBuilder()
 
   when(file) {
     currentFile -> bufStatus.append("%a  ")

@@ -19,12 +19,16 @@
 package com.maddyhome.idea.vim.option;
 
 import com.intellij.openapi.util.NlsSafe;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a boolean option
  */
 public class ToggleOption extends Option<Boolean> {
+
+  private static final @NonNls String NO_PREFIX = "no";
+
   /**
    * Creates the option
    *
@@ -90,7 +94,7 @@ public class ToggleOption extends Option<Boolean> {
   public @NotNull String toString() {
     StringBuilder res = new StringBuilder();
     if (!value) {
-      res.append("no");
+      res.append(NO_PREFIX);
     }
     else {
       res.append("  ");

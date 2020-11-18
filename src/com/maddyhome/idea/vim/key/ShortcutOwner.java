@@ -26,8 +26,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public enum ShortcutOwner {
   UNDEFINED("undefined", "Undefined"),
-  IDE("ide", "IDE"),
-  VIM("vim", "Vim");
+  IDE(Constants.IDE_STRING, "IDE"),
+  VIM(Constants.VIM_STRING, "Vim");
 
   private final @NotNull @NonNls String name;
   private final @NotNull @NonNls String title;
@@ -47,12 +47,17 @@ public enum ShortcutOwner {
   }
 
   public static @NotNull ShortcutOwner fromString(@NotNull String s) {
-    if ("ide".equals(s)) {
+    if (Constants.IDE_STRING.equals(s)) {
       return IDE;
     }
-    else if ("vim".equals(s)) {
+    else if (Constants.VIM_STRING.equals(s)) {
       return VIM;
     }
     return UNDEFINED;
+  }
+
+  private static class Constants {
+    @NonNls private static final String IDE_STRING = "ide";
+    @NonNls private static final String VIM_STRING = "vim";
   }
 }

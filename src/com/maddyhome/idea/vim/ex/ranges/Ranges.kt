@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
+import org.jetbrains.annotations.NonNls
 import kotlin.math.min
 
 /**
@@ -179,6 +180,7 @@ class Ranges {
     count = 0
   }
 
+  @NonNls
   override fun toString(): String = "Ranges[ranges=$ranges]"
 
   private var startLine = 0

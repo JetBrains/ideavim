@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.SelectionType.CHARACTER_WISE
 import com.maddyhome.idea.vim.command.SelectionType.LINE_WISE
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.EditorHelper
+import org.jetbrains.annotations.NonNls
 import kotlin.math.max
 import kotlin.math.min
 
@@ -68,6 +69,7 @@ sealed class VimSelection {
     }
   }
 
+  @NonNls
   override fun toString(): String {
     val startLogPosition = editor.offsetToLogicalPosition(vimStart)
     val endLogPosition = editor.offsetToLogicalPosition(vimEnd)

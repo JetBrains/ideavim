@@ -18,6 +18,7 @@
 package com.maddyhome.idea.vim.common
 
 import org.jetbrains.annotations.Contract
+import org.jetbrains.annotations.NonNls
 import kotlin.math.max
 import kotlin.math.min
 
@@ -85,7 +86,7 @@ class TextRange(val startOffsets: IntArray, val endOffsets: IntArray) {
   operator fun contains(offset: Int): Boolean = if (isMultiple) false else offset in startOffset until endOffset
 
   override fun toString(): String {
-    val sb = StringBuilder()
+    @NonNls val sb = StringBuilder()
     sb.append("TextRange")
     sb.append("{starts=")
 

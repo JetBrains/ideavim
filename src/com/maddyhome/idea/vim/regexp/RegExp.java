@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -4273,8 +4274,8 @@ public class RegExp {
   /*
 * regprop - printable representation of opcode
 */
-  private @NotNull String regprop(@NotNull CharPointer op) {
-    String p;
+  private @NotNull @NonNls String regprop(@NotNull CharPointer op) {
+    @NonNls String p;
     StringBuilder buf = new StringBuilder();
 
     buf.append(':');

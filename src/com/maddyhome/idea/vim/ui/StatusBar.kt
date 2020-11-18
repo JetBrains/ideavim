@@ -32,6 +32,7 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.ListPopup
 import com.intellij.openapi.updateSettings.impl.UpdateSettings
+import com.intellij.openapi.util.NlsActions.ActionText
 import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.wm.StatusBar
 import com.intellij.openapi.wm.StatusBarWidget
@@ -42,6 +43,7 @@ import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.Consumer
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.group.NotificationService
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.option.IdeaStatusIcon
 import com.maddyhome.idea.vim.option.OptionsManager
 import icons.VimIcons
@@ -155,7 +157,7 @@ private object VimActionsPopup {
       .createActionGroupPopup(STATUS_BAR_DISPLAY_NAME, actions,
         dataContext, JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, false,
         VimActions.actionPlace)
-    popup.setAdText("Version ${VimPlugin.getVersion()}", SwingConstants.CENTER)
+    popup.setAdText(MessageHelper.message("popup.advertisement.version", VimPlugin.getVersion()), SwingConstants.CENTER)
 
     return popup
   }
@@ -170,15 +172,15 @@ private object VimActionsPopup {
     actionGroup.add(ShortcutConflictsSettings)
     actionGroup.addSeparator()
 
-    val eapGroup = DefaultActionGroup("EAP" + if (JoinEap.eapActive()) " (Active)" else "", true)
+    val eapGroup = DefaultActionGroup(MessageHelper.message("action.eap.choice.active.text", if (JoinEap.eapActive()) 0 else 1), true)
     eapGroup.add(JoinEap)
-    eapGroup.add(HelpLink("About EAP...", "https://github.com/JetBrains/ideavim#get-early-access", null))
+    eapGroup.add(HelpLink(MessageHelper.message("action.about.eap.text"), "https://github.com/JetBrains/ideavim#get-early-access", null))
     actionGroup.add(eapGroup)
 
-    val helpGroup = DefaultActionGroup("Contacts && Help", true)
-    helpGroup.add(HelpLink("Contact on Twitter", "https://twitter.com/ideavim", VimIcons.TWITTER))
-    helpGroup.add(HelpLink("Create an Issue", "https://youtrack.jetbrains.com/issues/VIM", VimIcons.YOUTRACK))
-    helpGroup.add(HelpLink("Contribute on GitHub", "https://github.com/JetBrains/ideavim", VimIcons.GITHUB))
+    val helpGroup = DefaultActionGroup(MessageHelper.message("action.contacts.help.text"), true)
+    helpGroup.add(HelpLink(MessageHelper.message("action.contact.on.twitter.text"), "https://twitter.com/ideavim", VimIcons.TWITTER))
+    helpGroup.add(HelpLink(MessageHelper.message("action.create.issue.text"), "https://youtrack.jetbrains.com/issues/VIM", VimIcons.YOUTRACK))
+    helpGroup.add(HelpLink(MessageHelper.message("action.contribute.on.github.text"), "https://github.com/JetBrains/ideavim", VimIcons.GITHUB))
     actionGroup.add(helpGroup)
 
     return actionGroup
@@ -186,7 +188,7 @@ private object VimActionsPopup {
 }
 
 private class HelpLink(
-  name: String,
+  @ActionText name: String,
   val link: String,
   icon: Icon?
 ) : DumbAwareAction(name, null, icon) {
@@ -195,7 +197,7 @@ private class HelpLink(
   }
 }
 
-private object ShortcutConflictsSettings : DumbAwareAction("Settings...") {
+private object ShortcutConflictsSettings : DumbAwareAction(MessageHelper.message("action.settings.text")) {
   override fun actionPerformed(e: AnActionEvent) {
     ShowSettingsUtil.getInstance().editConfigurable(e.project, VimEmulationConfigurable())
   }
@@ -218,9 +220,9 @@ private object JoinEap : DumbAwareAction() {
 
   override fun update(e: AnActionEvent) {
     if (eapActive()) {
-      e.presentation.text = "Finish EAP"
+      e.presentation.text = MessageHelper.message("action.finish.eap.text")
     } else {
-      e.presentation.text = "Subscribe to EAP"
+      e.presentation.text = MessageHelper.message("action.subscribe.to.eap.text")
     }
   }
 }

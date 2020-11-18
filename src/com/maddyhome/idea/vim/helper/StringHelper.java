@@ -405,7 +405,7 @@ public class StringHelper {
     }
   }
 
-  private static Integer getVimKeyName(String lower) {
+  private static Integer getVimKeyName(@NonNls String lower) {
     switch (lower) {
       case "cr":
       case "enter":
@@ -473,7 +473,7 @@ public class StringHelper {
     }
   }
 
-  private static String getVimKeyValue(int c) {
+  private static @NonNls String getVimKeyValue(int c) {
     switch (c) {
       case VK_ENTER:
         return "cr";

@@ -22,6 +22,7 @@ import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.CaretSpecificDataContext
+import com.intellij.openapi.util.NlsSafe
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.argumentCaptured
 import com.maddyhome.idea.vim.action.change.VimRepeater.Extension.clean
@@ -40,7 +41,6 @@ import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import java.awt.event.KeyEvent
-import java.util.*
 import javax.swing.KeyStroke
 import kotlin.math.min
 
@@ -49,6 +49,7 @@ import kotlin.math.min
  */
 sealed class MappingInfo(val fromKeys: List<KeyStroke>, val isRecursive: Boolean, val owner: MappingOwner) : Comparable<MappingInfo> {
 
+  @NlsSafe
   abstract fun getPresentableString(): String
 
   abstract fun execute(editor: Editor, context: DataContext)

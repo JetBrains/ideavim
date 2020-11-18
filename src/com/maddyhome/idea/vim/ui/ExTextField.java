@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.VimProjectService;
 import com.maddyhome.idea.vim.group.HistoryGroup;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import kotlin.text.StringsKt;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
@@ -49,7 +50,7 @@ import static java.lang.Math.min;
  */
 public class ExTextField extends JTextField {
 
-  public static final String KEYMAP_NAME = "ex";
+  public static final @NonNls String KEYMAP_NAME = "ex";
 
   ExTextField() {
     // We need to store this in a field, because we can't trust getCaret(), as it will return an instance of
@@ -547,7 +548,7 @@ public class ExTextField extends JTextField {
   }
 
   @TestOnly
-  public String getCaretShape() {
+  public @NonNls String getCaretShape() {
     CommandLineCaret caret = (CommandLineCaret) getCaret();
     return String.format("%s %d", caret.mode, caret.blockPercentage);
   }

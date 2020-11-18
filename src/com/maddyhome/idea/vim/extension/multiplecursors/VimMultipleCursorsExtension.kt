@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.SearchHelper.findWordUnderCursor
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
@@ -103,7 +104,7 @@ class VimMultipleCursorsExtension : VimExtension {
         if (range.startOffset > caret.offset) return
 
         val nextOffset = findNextOccurrence(editor, caret, range, whole)
-        if (nextOffset == caret.selectionStart) VimPlugin.showMessage("No more matches")
+        if (nextOffset == caret.selectionStart) VimPlugin.showMessage(MessageHelper.message("message.no.more.matches"))
       } else {
         val newPositions = arrayListOf<VisualPosition>()
         val patterns = sortedSetOf(patternComparator)
@@ -146,7 +147,7 @@ class VimMultipleCursorsExtension : VimExtension {
 
         caretModel.allCarets.forEach {
           if (it.selectionStart == nextOffset) {
-            VimPlugin.showMessage("No more matches")
+            VimPlugin.showMessage(MessageHelper.message("message.no.more.matches"))
             return
           }
         }
@@ -200,7 +201,7 @@ class VimMultipleCursorsExtension : VimExtension {
 
       editor.caretModel.allCarets.forEach {
         if (it.selectionStart == nextOffset) {
-          VimPlugin.showMessage("No more matches")
+          VimPlugin.showMessage(MessageHelper.message("message.no.more.matches"))
           return
         }
       }

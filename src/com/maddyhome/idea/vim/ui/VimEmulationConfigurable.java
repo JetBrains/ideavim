@@ -30,7 +30,9 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
+import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,7 +53,7 @@ public class VimEmulationConfigurable implements Configurable {
 
   @Override
   public @NotNull String getDisplayName() {
-    return "Vim Emulation";
+    return MessageHelper.message("configurable.name.vim.emulation");
   }
 
   @Override
@@ -91,7 +93,7 @@ public class VimEmulationConfigurable implements Configurable {
       final JScrollPane scrollPane = new JBScrollPane(shortcutConflictsTable);
       scrollPane.setBorder(new LineBorder(JBColor.border()));
       final JPanel conflictsPanel = new JPanel(new BorderLayout());
-      final String title = "Shortcut Conflicts for Active Keymap";
+      final String title = MessageHelper.message("border.title.shortcut.conflicts.for.active.keymap");
       conflictsPanel.setBorder(IdeBorderFactory.createTitledBorder(title, false));
       conflictsPanel.add(scrollPane);
       add(conflictsPanel, BorderLayout.CENTER);
@@ -168,7 +170,7 @@ public class VimEmulationConfigurable implements Configurable {
       private final int myIndex;
       private final @NotNull String myTitle;
 
-      Column(int index, @NotNull String title) {
+      Column(int index, @NotNull @Nls(capitalization = Nls.Capitalization.Title) String title) {
         myIndex = index;
         myTitle = title;
       }
