@@ -45,11 +45,17 @@ intellij {
   intellijRepo = "https://www.jetbrains.com/intellij-repository"
   plugins = ['java']
 
+  downloadRobotServerPlugin.version = "0.10.0"
+
   publishPlugin {
     channels publishChannels.split(',')
     username publishUsername
     token publishToken
   }
+}
+
+runIdeForUiTests {
+  systemProperty "robot-server.port", "8082"
 }
 
 runPluginVerifier {
@@ -61,6 +67,7 @@ runPluginVerifier {
 repositories {
   mavenCentral()
   jcenter()
+  maven { url = "https://jetbrains.bintray.com/intellij-third-party-dependencies" }
 }
 
 dependencies {
@@ -69,6 +76,9 @@ dependencies {
 
   // https://mvnrepository.com/artifact/com.ensarsarajcic.neovim.java/neovim-api
   compile group: 'com.ensarsarajcic.neovim.java', name: 'neovim-api', version: '0.1.16'
+
+  testImplementation("com.intellij.remoterobot:remote-robot:0.10.0")
+  testImplementation("com.intellij.remoterobot:remote-fixtures:1.1.18")
 }
 
 compileKotlin {
