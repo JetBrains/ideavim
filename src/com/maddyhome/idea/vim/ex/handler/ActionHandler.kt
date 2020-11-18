@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.ex.CommandHandler.RangeFlag.RANGE_OPTIONAL
 import com.maddyhome.idea.vim.ex.CommandHandlerFlags
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
 
 /**
@@ -45,7 +46,7 @@ class ActionHandler : CommandHandler.SingleExecution() {
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val actionName = cmd.argument.trim()
     val action = ActionManager.getInstance().getAction(actionName) ?: run {
-      VimPlugin.showMessage("Action not found: $actionName")
+      VimPlugin.showMessage(MessageHelper.message("action.not.found.0", actionName))
       return false
     }
     val application = ApplicationManager.getApplication()

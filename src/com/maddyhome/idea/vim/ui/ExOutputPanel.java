@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -119,7 +120,7 @@ public class ExOutputPanel extends JPanel {
     }
   }
 
-  public void setText(@NotNull String data) {
+  public void setText(@NotNull @Nls String data) {
     if (data.length() > 0 && data.charAt(data.length() - 1) == '\n') {
       data = data.substring(0, data.length() - 1);
     }

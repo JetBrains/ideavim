@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.ex.CommandHandlerFlags
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.StringHelper
 
 /**
@@ -55,7 +56,7 @@ class ActionListHandler : CommandHandler.SingleExecution() {
       .joinToString(lineSeparator)
 
 
-    ExOutputModel.getInstance(editor).output("--- Actions ---$lineSeparator$actions")
+    ExOutputModel.getInstance(editor).output(MessageHelper.message("ex.show.all.actions", lineSeparator, actions))
     return true
   }
 }
