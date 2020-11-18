@@ -31,7 +31,6 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,7 +49,6 @@ public class VimEmulationConfigurable implements Configurable {
   private final @NotNull VimShortcutConflictsTable.Model myConflictsTableModel = new VimShortcutConflictsTable.Model();
   private final @NotNull VimSettingsPanel myPanel = new VimSettingsPanel(myConflictsTableModel);
 
-  @Nls
   @Override
   public @NotNull String getDisplayName() {
     return "Vim Emulation";

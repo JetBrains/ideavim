@@ -120,7 +120,7 @@ public class ExOutputPanel extends JPanel {
     }
   }
 
-  public void setText(@NotNull @Nls String data) {
+  public void setText(@NotNull @Nls(capitalization = Nls.Capitalization.Sentence) String data) {
     if (data.length() > 0 && data.charAt(data.length() - 1) == '\n') {
       data = data.substring(0, data.length() - 1);
     }

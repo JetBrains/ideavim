@@ -324,7 +324,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     showMessage(msg);
   }
 
-  public static void showMessage(@Nls @Nullable String msg) {
+  public static void showMessage(@Nls(capitalization = Nls.Capitalization.Sentence) @Nullable String msg) {
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       getInstance().message = msg;
     }
