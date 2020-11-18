@@ -60,7 +60,7 @@ class MigrationComponents(
 @Service
 class ApplicationConfigurationMigrator(migrationComponents: MigrationComponents) {
 
-  @Suppress("unused")
+  @Suppress("unused", "HardCodedStringLiteral")
   constructor() : this(productionMigrationComponents)
 
   private val migrators = migrationComponents.groupedMigrators

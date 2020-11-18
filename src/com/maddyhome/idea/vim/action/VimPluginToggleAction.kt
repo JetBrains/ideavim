@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.action
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAwareToggleAction
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.ui.VimActions
 
 /**
@@ -38,7 +39,7 @@ class VimPluginToggleAction : DumbAwareToggleAction() {
     super.update(e)
 
     e.presentation.text = if (VimActions.actionPlace == e.place) {
-      if (VimPlugin.isEnabled()) "Enabled" else "Enable"
-    } else "Vim Emulator"
+      if (VimPlugin.isEnabled()) MessageHelper.message("action.VimPluginToggle.enabled") else MessageHelper.message("action.VimPluginToggle.enable")
+    } else MessageHelper.message("action.VimPluginToggle.text")
   }
 }

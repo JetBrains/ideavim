@@ -25,6 +25,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
+import com.intellij.openapi.util.NlsSafe
 import com.maddyhome.idea.vim.helper.EditorHelper
 import java.util.*
 import kotlin.math.max
@@ -43,7 +44,10 @@ class AddInlineInlaysAction : AnAction() {
     val lineLength = EditorHelper.getLineLength(editor, EditorHelper.visualLineToLogicalLine(editor, currentVisualLine))
     while (i < lineLength) {
       val relatesToPrecedingText = random.nextInt(10) > 7
+
+      @NlsSafe
       val text = "a".repeat(max(1, random.nextInt(7)))
+
       val offset = EditorHelper.visualPositionToOffset(editor, VisualPosition(currentVisualLine, i))
       // We don't need a custom renderer, just use the standard parameter hint renderer
       inlayModel.addInlineElement(offset, relatesToPrecedingText, HintRenderer(if (relatesToPrecedingText) ":$text" else "$text:"))

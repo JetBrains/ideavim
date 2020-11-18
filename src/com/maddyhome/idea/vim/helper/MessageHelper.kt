@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 @NonNls
-private const val BUNDLE = "messages"
+private const val BUNDLE = "messages.IdeaVimBundle"
 
 object MessageHelper : AbstractBundle(BUNDLE) {
 

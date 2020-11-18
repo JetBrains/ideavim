@@ -56,7 +56,7 @@ class ActionListHandler : CommandHandler.SingleExecution() {
       .joinToString(lineSeparator)
 
 
-    ExOutputModel.getInstance(editor).output(MessageHelper.message("ex.show.all.actions", lineSeparator, actions))
+    ExOutputModel.getInstance(editor).output(MessageHelper.message("ex.show.all.actions.0.1", lineSeparator, actions))
     return true
   }
 }

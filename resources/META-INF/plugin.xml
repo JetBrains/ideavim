@@ -64,7 +64,7 @@
 
   <!-- Mark the plugin as compatible with RubyMine and other products based on the IntelliJ platform -->
   <depends>com.intellij.modules.lang</depends>
-  <resource-bundle xmlns="">messages</resource-bundle>
+  <resource-bundle>messages.IdeaVimBundle</resource-bundle>
 
   <application-components>
     <component>
@@ -111,7 +111,7 @@
   <xi:include href="/META-INF/includes/VimExtensions.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/includes/VimListeners.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
-  <actions>
+  <actions resource-bundle="messages.IdeaVimBundle">
     <action id="VimPluginToggle" class="com.maddyhome.idea.vim.action.VimPluginToggleAction">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>
@@ -137,8 +137,6 @@
       </action>
     </group>
 
-    <action id="VimFindActionIdAction"
-            class="com.maddyhome.idea.vim.listener.FindActionIdAction" text="IdeaVim: Track Action Ids"
-            description="Starts tracking ids of executed actions"/>
+    <action id="VimFindActionIdAction" class="com.maddyhome.idea.vim.listener.FindActionIdAction"/>
   </actions>
 </idea-plugin>
