@@ -44,6 +44,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.EditorHelperRt;
+import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.option.IdeaWriteData;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -85,7 +86,7 @@ public class FileGroup {
       }
     }
     else {
-      VimPlugin.showMessage("Unable to find " + filename);
+      VimPlugin.showMessage(MessageHelper.message("unable.to.find.0", filename));
 
       return false;
     }

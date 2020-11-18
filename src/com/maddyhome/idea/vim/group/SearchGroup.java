@@ -54,6 +54,7 @@ import com.maddyhome.idea.vim.ui.ModalEntry;
 import kotlin.jvm.functions.Function1;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -983,7 +984,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
 
   @RWLockLabel.SelfSynchronized
   public boolean searchAndReplace(@NotNull Editor editor, @NotNull Caret caret, @NotNull LineRange range,
-                                  @NotNull String excmd, String exarg) {
+                                  @NotNull @NonNls String excmd, @NonNls String exarg) {
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
     if (CommandStateHelper.inVisualMode(editor)) {
       ModeHelper.exitVisualMode(editor);

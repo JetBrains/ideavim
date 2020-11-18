@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.helper.DigraphResult;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.SearchHelper;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,7 +51,7 @@ public class ExEditorKit extends DefaultEditorKit {
    * @return the type
    */
   @Override
-  public @NotNull String getContentType() {
+  public @NotNull @NonNls String getContentType() {
     return "text/ideavim";
   }
 
@@ -98,18 +99,18 @@ public class ExEditorKit extends DefaultEditorKit {
     return null;
   }
 
-  static final String CancelEntry = "cancel-entry";
-  static final String CompleteEntry = "complete-entry";
-  static final String EscapeChar = "escape";
-  static final String DeleteToCursor = "delete-to-cursor";
-  static final String ToggleInsertReplace = "toggle-insert";
-  static final String InsertRegister = "insert-register";
-  static final String HistoryUp = "history-up";
-  static final String HistoryDown = "history-down";
-  static final String HistoryUpFilter = "history-up-filter";
-  static final String HistoryDownFilter = "history-down-filter";
-  static final String StartDigraph = "start-digraph";
-  static final String StartLiteral = "start-literal";
+  @NonNls static final String CancelEntry = "cancel-entry";
+  @NonNls static final String CompleteEntry = "complete-entry";
+  @NonNls static final String EscapeChar = "escape";
+  @NonNls static final String DeleteToCursor = "delete-to-cursor";
+  @NonNls static final String ToggleInsertReplace = "toggle-insert";
+  @NonNls static final String InsertRegister = "insert-register";
+  @NonNls static final String HistoryUp = "history-up";
+  @NonNls static final String HistoryDown = "history-down";
+  @NonNls static final String HistoryUpFilter = "history-up-filter";
+  @NonNls static final String HistoryDownFilter = "history-down-filter";
+  @NonNls static final String StartDigraph = "start-digraph";
+  @NonNls static final String StartLiteral = "start-literal";
 
   private final @NotNull Action[] exActions = new Action[]{
     new CancelEntryAction(),

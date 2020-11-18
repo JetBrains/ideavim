@@ -20,9 +20,11 @@ package com.maddyhome.idea.vim.command
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.util.NlsSafe
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.DigraphResult
 import com.maddyhome.idea.vim.helper.DigraphSequence
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.key.CommandPartNode
@@ -232,6 +234,7 @@ class CommandState private constructor() {
    *   be added. It's better not to compare the whole string but only
    *   the leading character(s).
    */
+  @NlsSafe
   fun toVimNotation(): String {
     return when (mode) {
       Mode.COMMAND -> "n"
@@ -266,7 +269,7 @@ class CommandState private constructor() {
       if (msg.isNotEmpty()) {
         msg.append(" - ")
       }
-      msg.append("recording")
+      msg.append(MessageHelper.message("show.mode.recording"))
     }
     VimPlugin.showMode(msg.toString())
   }

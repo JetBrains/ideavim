@@ -18,11 +18,13 @@
 
 package com.maddyhome.idea.vim.regexp;
 
+import org.jetbrains.annotations.NonNls;
+
 public final class CharacterClasses {
   private CharacterClasses() {
   }
 
-  public static final String[] CLASS_NAMES = new String[]{
+  public static final String @NonNls [] CLASS_NAMES = new String[]{
     "alnum:]",
     "alpha:]",
     "blank:]",

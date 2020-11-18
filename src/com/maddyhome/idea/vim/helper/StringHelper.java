@@ -22,6 +22,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
 import org.apache.commons.codec.binary.Base64;
 import org.jdom.Element;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -83,7 +84,7 @@ public class StringHelper {
    * @throws java.lang.IllegalArgumentException if the mapping doesn't make sense for Vim emulation
    * @see :help <>
    */
-  public static @NotNull List<KeyStroke> parseKeys(@NotNull String... strings) {
+  public static @NotNull List<KeyStroke> parseKeys(@NotNull @NonNls String... strings) {
     final List<KeyStroke> result = new ArrayList<>();
     for (String s : strings) {
       KeyParserState state = KeyParserState.INIT;

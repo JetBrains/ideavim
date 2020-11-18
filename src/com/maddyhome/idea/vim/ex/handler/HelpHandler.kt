@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
+import org.jetbrains.annotations.NonNls
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 
@@ -37,6 +38,7 @@ class HelpHandler : CommandHandler.SingleExecution() {
     return true
   }
 
+  @NonNls
   private fun helpTopicUrl(topic: String): String {
     if (topic.isBlank()) return HELP_ROOT_URL
 

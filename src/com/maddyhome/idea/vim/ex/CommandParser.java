@@ -150,7 +150,7 @@ public class CommandParser {
         }
         processCommand(editor, context, commandAlias, count, aliasCountdown - 1);
       } else {
-        VimPlugin.showMessage("Recursion detected, maximum alias depth reached.");
+        VimPlugin.showMessage(MessageHelper.message("recursion.detected.maximum.alias.depth.reached"));
         VimPlugin.indicateError();
         logger.warn("Recursion detected, maximum alias depth reached. ");
       }

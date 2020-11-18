@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.noneOfEnum
+import org.jetbrains.annotations.NonNls
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -103,14 +104,17 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     fun parseKeysSet(keyStrings: List<String>) = keyStrings.map { StringHelper.parseKeys(it) }.toSet()
 
     @JvmStatic
-    fun parseKeysSet(vararg keyStrings: String): Set<List<KeyStroke>> = List(keyStrings.size) {
+    fun parseKeysSet(@NonNls vararg keyStrings: String): Set<List<KeyStroke>> = List(keyStrings.size) {
       StringHelper.parseKeys(keyStrings[it])
     }.toSet()
 
+    @NonNls private const val VimActionPrefix = "Vim"
+
+    @NonNls
     fun getActionId(classFullName: String): String {
       return classFullName
         .takeLastWhile { it != '.' }
-        .let { if (it.startsWith("Vim", true)) it else "Vim$it" }
+        .let { if (it.startsWith(VimActionPrefix, true)) it else "$VimActionPrefix$it" }
     }
   }
 }

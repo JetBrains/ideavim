@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.extension;
 
 import com.intellij.openapi.extensions.ExtensionPointName;
+import com.intellij.openapi.util.NlsSafe;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.key.MappingOwner;
 import org.jetbrains.annotations.ApiStatus;
@@ -36,7 +37,7 @@ public interface VimExtension {
    */
   @Deprecated
   @ApiStatus.ScheduledForRemoval(inVersion = "0.65")
-  @NotNull String getName();
+  @NlsSafe @NotNull String getName();
 
   default MappingOwner getOwner() {
     return MappingOwner.Plugin.Companion.get(getName());

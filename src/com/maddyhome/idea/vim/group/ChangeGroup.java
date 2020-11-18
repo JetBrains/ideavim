@@ -69,6 +69,7 @@ import com.maddyhome.idea.vim.option.BoundListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import kotlin.Pair;
 import kotlin.text.StringsKt;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,6 +93,9 @@ public class ChangeGroup {
   private static final String VIM_MOTION_CAMEL_END_RIGHT = "VimMotionCamelEndRightAction";
   private static final ImmutableSet<String> wordMotions =
     ImmutableSet.of(VIM_MOTION_WORD_RIGHT, VIM_MOTION_BIG_WORD_RIGHT, VIM_MOTION_CAMEL_RIGHT);
+
+  @NonNls private static final String HEX_START = "0x";
+  @NonNls private static final String MAX_HEX_INTEGER = "ffffffffffffffff";
 
   private @Nullable Command lastInsert;
 
@@ -1940,7 +1944,7 @@ public class ChangeGroup {
 
     char ch = text.charAt(0);
     if (hex && SearchHelper.NumberType.HEX.equals(numberType)) {
-      if (!text.toLowerCase().startsWith("0x")) throw new RuntimeException("Hex number should start with 0x: " + text);
+      if (!text.toLowerCase().startsWith(HEX_START)) throw new RuntimeException("Hex number should start with 0x: " + text);
       for (int i = text.length() - 1; i >= 2; i--) {
         int index = "abcdefABCDEF".indexOf(text.charAt(i));
         if (index >= 0) {
@@ -1952,7 +1956,7 @@ public class ChangeGroup {
       BigInteger num = new BigInteger(text.substring(2), 16);
       num = num.add(BigInteger.valueOf(count));
       if (num.compareTo(BigInteger.ZERO) < 0) {
-        num = new BigInteger("ffffffffffffffff", 16).add(BigInteger.ONE).add(num);
+        num = new BigInteger(MAX_HEX_INTEGER, 16).add(BigInteger.ONE).add(num);
       }
       number = num.toString(16);
       number = StringsKt.padStart(number, text.length() - 2, '0');

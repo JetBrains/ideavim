@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.option;
 
 import com.intellij.util.ArrayUtil;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -69,7 +70,7 @@ public class ListOption extends TextOption {
    * @param val A comma separated list of values to look for
    * @return True if all the supplied values are set in this option, false if not
    */
-  public boolean contains(String val) {
+  public boolean contains(@NonNls String val) {
     final List<String> vals = parseVals(val);
     return vals != null && value.containsAll(vals);
   }
