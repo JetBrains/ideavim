@@ -5,6 +5,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
+import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.wm.StatusBar
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
@@ -16,14 +17,15 @@ import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.option.OptionChangeListener
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.annotations.NonNls
 import java.awt.Component
 import java.awt.event.MouseEvent
 
 object ShowCmd {
   // https://github.com/vim/vim/blob/b376ace1aeaa7614debc725487d75c8f756dd773/src/vim.h#L1721
   private const val SHOWCMD_COLS = 10
-  internal const val ID = "IdeaVim::ShowCmd"
-  internal const val displayName = "IdeaVim showcmd"
+  @NonNls internal const val ID = "IdeaVim::ShowCmd"
+  @NlsSafe internal const val displayName = "IdeaVim showcmd"
 
   fun update() {
     val windowManager = WindowManager.getInstance()
@@ -98,6 +100,7 @@ class Widget(project: Project) : EditorBasedWidget(project), StatusBarWidget.Mul
 
   override fun getClickConsumer(): Consumer<MouseEvent>? = null
 
+  @NlsSafe
   override fun getTooltipText(): String {
     var count = ShowCmd.getFullText(this.editor)
     if (count.isNotBlank()) count = ": $count"

@@ -42,6 +42,7 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.key.OperatorFunction
+import org.jetbrains.annotations.NonNls
 
 
 class ReplaceWithRegister : VimExtension {
@@ -123,8 +124,11 @@ class ReplaceWithRegister : VimExtension {
   }
 
   companion object {
+    @NonNls
     private const val RWR_OPERATOR = "<Plug>ReplaceWithRegisterOperator"
+    @NonNls
     private const val RWR_LINE = "<Plug>ReplaceWithRegisterLine"
+    @NonNls
     private const val RWR_VISUAL = "<Plug>ReplaceWithRegisterVisual"
 
     private fun doReplace(editor: Editor, visualSelection: PutData.VisualSelection) {

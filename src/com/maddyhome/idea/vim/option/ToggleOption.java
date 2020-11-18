@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.option;
 
+import com.intellij.openapi.util.NlsSafe;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -31,7 +32,7 @@ public class ToggleOption extends Option<Boolean> {
    * @param abbrev The short name
    * @param dflt   The default value
    */
-  public ToggleOption(String name, String abbrev, boolean dflt) {
+  public ToggleOption(@NlsSafe String name, @NlsSafe String abbrev, boolean dflt) {
     super(name, abbrev);
 
     this.dflt = dflt;

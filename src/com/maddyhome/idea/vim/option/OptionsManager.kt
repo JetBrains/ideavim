@@ -36,8 +36,8 @@ import com.maddyhome.idea.vim.helper.isBlockCaret
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.Contract
+import org.jetbrains.annotations.NonNls
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.min
@@ -366,6 +366,7 @@ object OptionsManager {
   }
 }
 
+@NonNls
 object KeyModelOptionData {
   const val name = "keymodel"
   private const val abbr = "km"
@@ -382,6 +383,7 @@ object KeyModelOptionData {
   val option = BoundListOption(name, abbr, default, options)
 }
 
+@NonNls
 object SelectModeOptionData {
   const val name = "selectmode"
   private const val abbr = "slm"
@@ -402,6 +404,7 @@ object SelectModeOptionData {
   }
 }
 
+@NonNls
 object ClipboardOptionsData {
   const val name = "clipboard"
   const val abbr = "cb"
@@ -431,6 +434,7 @@ object ClipboardOptionsData {
   }
 }
 
+@NonNls
 object IdeaJoinOptionsData {
   const val name = "ideajoin"
   private const val defaultValue = false
@@ -438,6 +442,7 @@ object IdeaJoinOptionsData {
   val option = ToggleOption(name, name, defaultValue)
 }
 
+@NonNls
 object IdeaMarkskOptionsData {
   const val name = "ideamarks"
   private const val defaultValue = true
@@ -445,16 +450,19 @@ object IdeaMarkskOptionsData {
   val option = ToggleOption(name, name, defaultValue)
 }
 
+@NonNls
 object SmartCaseOptionsData {
   const val name = "smartcase"
   const val abbr = "scs"
 }
 
+@NonNls
 object IgnoreCaseOptionsData {
   const val name = "ignorecase"
   const val abbr = "ic"
 }
 
+@NonNls
 object IdeaRefactorMode {
   const val name = "idearefactormode"
 
@@ -513,6 +521,7 @@ object IdeaRefactorMode {
   }
 }
 
+@NonNls
 object LookupKeysData {
   const val name = "lookupkeys"
   val defaultValues = arrayOf(
@@ -527,6 +536,7 @@ object LookupKeysData {
   )
 }
 
+@NonNls
 object IdeaStatusIcon {
   const val enabled = "enabled"
   const val gray = "gray"
@@ -536,10 +546,12 @@ object IdeaStatusIcon {
   val allValues = arrayOf(enabled, gray, disabled)
 }
 
+@NonNls
 object ScrollOffData {
   const val name = "scrolloff"
 }
 
+@NonNls
 object ScrollJumpData {
   const val name = "scrolljump"
 }
@@ -548,11 +560,13 @@ object StrictMode {
   val on: Boolean
     get() = OptionsManager.ideastrictmode.isSet
 
-  fun fail(message: String) {
+  @NonNls
+  fun fail(message: @NonNls String) {
     if (on) error(message)
   }
 }
 
+@NonNls
 object VirtualEditData {
   const val name = "virtualedit"
 
@@ -560,6 +574,7 @@ object VirtualEditData {
   val allValues = arrayOf("block", "insert", "all", onemore)
 }
 
+@NonNls
 object IdeaWriteData {
   const val all = "all"
 

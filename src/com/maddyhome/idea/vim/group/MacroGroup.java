@@ -27,6 +27,7 @@ import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -130,7 +131,8 @@ public class MacroGroup {
     };
 
     ApplicationManager.getApplication().invokeLater(
-        () -> CommandProcessor.getInstance().executeCommand(project, run, "Vim Macro Playback", keys.get(pos)));
+        () -> CommandProcessor.getInstance()
+          .executeCommand(project, run, MessageHelper.message("command.name.vim.macro.playback"), keys.get(pos)));
   }
 
   public void postKey(@NotNull KeyStroke stroke, @NotNull Editor editor) {

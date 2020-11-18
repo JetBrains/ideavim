@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.option;
 
 import org.apache.commons.lang.math.NumberUtils;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,12 +31,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public final class KeywordOption extends ListOption {
+  @NonNls private static final String allLettersRegex = "\\p{L}";
   private final @NotNull Pattern validationPattern;
 
   // KeywordSpecs are the option values in reverse order
   private @NotNull List<KeywordSpec> keywordSpecs = new ArrayList<>();
 
-  public KeywordOption(@NotNull String name, @NotNull String abbrev, @NotNull String[] defaultValue) {
+  public KeywordOption(@NotNull @NonNls String name, @NotNull @NonNls String abbrev, @NotNull String[] defaultValue) {
     super(name, abbrev, defaultValue,
           "(\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9^]|[0-9]{1,3})),)*\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9]|[0-9]{1,3})),?$");
     validationPattern = Pattern.compile(pattern);
@@ -209,7 +211,7 @@ public final class KeywordOption extends ListOption {
   public List<String> toRegex() {
     return keywordSpecs.stream().map(spec -> {
       if (spec.isAllLetters) {
-        return "\\p{L}";
+        return allLettersRegex;
       } else if (spec.isRange) {
         return "[" + (char)spec.rangeLow.intValue() + "-" + (char)spec.rangeHigh.intValue() + "]";
       } else {

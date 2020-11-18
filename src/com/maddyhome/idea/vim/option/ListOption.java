@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.option;
 
+import com.intellij.openapi.util.NlsSafe;
 import com.intellij.util.ArrayUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -179,7 +180,7 @@ public class ListOption extends TextOption {
    * @param dflt    The option's default values
    * @param pattern A regular expression that is used to validate new values. null if no check needed
    */
-  ListOption(String name, String abbrev, String[] dflt, String pattern) {
+  ListOption(@NlsSafe String name, @NlsSafe String abbrev, @NlsSafe String[] dflt, @NlsSafe String pattern) {
     super(name, abbrev);
 
     this.dflt = new ArrayList<>(Arrays.asList(dflt));

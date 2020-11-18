@@ -47,6 +47,7 @@ import com.maddyhome.idea.vim.key.*;
 import kotlin.Pair;
 import kotlin.text.StringsKt;
 import org.jdom.Element;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,9 +66,9 @@ import static java.util.stream.Collectors.toList;
  */
 @State(name = "VimKeySettings", storages = {@Storage(value = "$APP_CONFIG$/vim_settings.xml")})
 public class KeyGroup implements PersistentStateComponent<Element> {
-  public static final String SHORTCUT_CONFLICTS_ELEMENT = "shortcut-conflicts";
-  private static final String SHORTCUT_CONFLICT_ELEMENT = "shortcut-conflict";
-  private static final String OWNER_ATTRIBUTE = "owner";
+  public static final @NonNls String SHORTCUT_CONFLICTS_ELEMENT = "shortcut-conflicts";
+  private static final @NonNls String SHORTCUT_CONFLICT_ELEMENT = "shortcut-conflict";
+  private static final @NonNls String OWNER_ATTRIBUTE = "owner";
   private static final String TEXT_ELEMENT = "text";
 
   private static final Logger logger = Logger.getInstance(KeyGroup.class);
@@ -475,7 +476,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
     return rows;
   }
 
-  private static @NotNull String getModesStringCode(@NotNull Set<MappingMode> modes) {
+  private static @NotNull @NonNls String getModesStringCode(@NotNull Set<MappingMode> modes) {
     if (modes.equals(MappingMode.NVO)) {
       return "";
     }
@@ -533,7 +534,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
   @Nullable
   @Override
   public Element getState() {
-    Element element = new Element("key");
+    @NonNls Element element = new Element("key");
     saveData(element);
     return element;
   }

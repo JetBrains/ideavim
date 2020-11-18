@@ -50,6 +50,7 @@ import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.option.IdeaRefactorMode
+import org.jetbrains.annotations.NonNls
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 
@@ -66,6 +67,7 @@ object IdeaSpecifics {
   }
 
   class VimActionListener : AnActionListener {
+    @NonNls
     private val surrounderItems = listOf("if", "if / else", "for")
     private val surrounderAction = "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
     private var editor: Editor? = null

@@ -60,7 +60,7 @@ public class StringHelper {
     return null;
   }
 
-  public static @NotNull List<KeyStroke> stringToKeys(@NotNull String s) {
+  public static @NotNull List<KeyStroke> stringToKeys(@NotNull @NonNls String s) {
     // The following if is a dirty hack to finally support `let mapleader = "\<space>"`
     if ("\\<SPACE>".equalsIgnoreCase(s)) return Collections.singletonList(getKeyStroke(' '));
     final List<KeyStroke> res = new ArrayList<>();

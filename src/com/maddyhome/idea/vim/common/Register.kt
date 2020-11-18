@@ -20,8 +20,8 @@ package com.maddyhome.idea.vim.common
 import com.intellij.codeInsight.editorActions.TextBlockTransferableData
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.StringHelper
+import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
-import java.util.*
 import javax.swing.KeyStroke
 
 class Register {
@@ -81,7 +81,7 @@ class Register {
   }
 
   object KeySorter : Comparator<Register> {
-    private const val ORDER = "\"0123456789abcdefghijklmnopqrstuvwxyz-*+.:%#/="
+    @NonNls private const val ORDER = "\"0123456789abcdefghijklmnopqrstuvwxyz-*+.:%#/="
 
     override fun compare(o1: Register, o2: Register): Int {
       return ORDER.indexOf(o1.name.toLowerCase()) - ORDER.indexOf(o2.name.toLowerCase())

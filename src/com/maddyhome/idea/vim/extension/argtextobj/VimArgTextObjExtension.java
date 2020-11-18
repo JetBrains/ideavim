@@ -12,8 +12,10 @@ import com.maddyhome.idea.vim.extension.VimExtension;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.InlayHelperKt;
+import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
+import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -183,7 +185,8 @@ public class VimArgTextObjExtension implements VimExtension {
           try {
             bracketPairs = BracketPairs.fromBracketPairList(bracketPairsVar);
           } catch (BracketPairs.ParseException parseException) {
-            VimPlugin.showMessage("argtextobj: Invalid value of g:argtextobj_pairs -- " + parseException.getMessage());
+            VimPlugin.showMessage(
+              MessageHelper.message("argtextobj.invalid.value.of.g.argtextobj.pairs.0", parseException.getMessage()));
             VimPlugin.indicateError();
             return null;
           }
@@ -259,7 +262,7 @@ public class VimArgTextObjExtension implements VimExtension {
     private int rightBound = Integer.MIN_VALUE;
     private int leftBracket;
     private int rightBracket;
-    private String error = null;
+    private @Nls String error = null;
     private static final String QUOTES = "\"'";
 
     private static final int MAX_SEARCH_LINES = 10;

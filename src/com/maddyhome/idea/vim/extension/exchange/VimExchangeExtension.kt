@@ -51,6 +51,7 @@ import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.OperatorFunction
+import org.jetbrains.annotations.NonNls
 
 /**
  * This emulation misses:
@@ -80,8 +81,11 @@ class VimExchangeExtension : VimExtension {
   }
 
   companion object {
+    @NonNls
     const val EXCHANGE_CMD = "<Plug>(Exchange)"
+    @NonNls
     const val EXCHANGE_CLEAR_CMD = "<Plug>(ExchangeClear)"
+    @NonNls
     const val EXCHANGE_LINE_CMD = "<Plug>(ExchangeLine)"
 
     val EXCHANGE_KEY = Key<Exchange>("exchange")

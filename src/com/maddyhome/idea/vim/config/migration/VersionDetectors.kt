@@ -21,6 +21,7 @@
 package com.maddyhome.idea.vim.config.migration
 
 import com.intellij.openapi.application.PathManager
+import org.jetbrains.annotations.NonNls
 
 interface VersionDetector {
   fun extractVersion(): Int?
@@ -28,7 +29,7 @@ interface VersionDetector {
 
 object `Detect versions 3, 4, 5, 6` : VersionDetector {
 
-  val pattern = "state version=\"(.)\"".toRegex()
+  @NonNls val pattern = "state version=\"(.)\"".toRegex()
 
   override fun extractVersion(): Int? {
     val configFile = PathManager.getOptionsFile("vim_settings")

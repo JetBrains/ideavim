@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.ex.handler.mapping.MapHandler.SpecialArgument.SCRI
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.MappingOwner
+import org.jetbrains.annotations.NonNls
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -82,6 +83,7 @@ class MapHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler, Co
   }
 
   @Suppress("unused")
+  @NonNls
   private enum class SpecialArgument(val myName: String) {
     BUFFER("<buffer>"),
     NOWAIT("<nowait>"),

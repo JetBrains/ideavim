@@ -24,11 +24,14 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
+import org.jetbrains.annotations.NonNls
 
 class SplitHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  @NonNls private val visualSplitPrefix = "v"
+
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-    if (cmd.command.startsWith("v")) {
+    if (cmd.command.startsWith(visualSplitPrefix)) {
       VimPlugin.getWindow().splitWindowVertical(context, cmd.argument)
     } else {
       VimPlugin.getWindow().splitWindowHorizontal(context, cmd.argument)

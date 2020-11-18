@@ -777,7 +777,7 @@ public class KeyHandler {
    * @param name    The name of the action to execute
    * @param context The context to run it in
    */
-  public static boolean executeAction(@NotNull String name, @NotNull DataContext context) {
+  public static boolean executeAction(@NotNull @NonNls String name, @NotNull DataContext context) {
     ActionManager aMgr = ActionManager.getInstance();
     AnAction action = aMgr.getAction(name);
     return action != null && executeAction(action, context);

@@ -31,6 +31,7 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.containers.IntArrayList
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup.Companion.ACTION_GROUP
 import icons.VimIcons
 import org.jetbrains.annotations.TestOnly
@@ -101,7 +102,8 @@ class ReloadVimRc : DumbAwareAction() {
     // XXX: Actually, it worth to add e.presentation.description, but it doesn't work because of some reason
     val sameDoc = VimRcFileState.equalTo(editor.document)
     e.presentation.icon = if (sameDoc) VimIcons.IDEAVIM else AllIcons.Actions.BuildLoadChanges
-    e.presentation.text = if (sameDoc) "No Changes" else "Reload"
+    e.presentation.text = if (sameDoc) MessageHelper.message("action.no.changes.text")
+    else MessageHelper.message("action.reload.text")
 
     e.presentation.isEnabledAndVisible = true
   }

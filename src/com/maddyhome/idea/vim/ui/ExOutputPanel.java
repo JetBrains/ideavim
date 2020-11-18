@@ -28,6 +28,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
+import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -237,7 +238,7 @@ public class ExOutputPanel extends JPanel {
   }
 
   private void badKey() {
-    myLabel.setText("-- MORE -- (RET: line, SPACE: page, d: half page, q: quit)");
+    myLabel.setText(MessageHelper.message("more.ret.line.space.page.d.half.page.q.quit"));
     myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
   }
 
@@ -249,11 +250,11 @@ public class ExOutputPanel extends JPanel {
     if (val + more >=
         myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount()) {
       myAtEnd = true;
-      myLabel.setText("Hit ENTER or type command to continue");
+      myLabel.setText(MessageHelper.message("hit.enter.or.type.command.to.continue"));
       myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
     }
     else {
-      myLabel.setText("-- MORE --");
+      myLabel.setText(MessageHelper.message("ex.output.panel.more"));
       myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
     }
   }

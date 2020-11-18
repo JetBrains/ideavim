@@ -26,6 +26,7 @@ import com.intellij.openapi.fileEditor.impl.EditorWithProviderComposite;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.RWLockLabel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -158,7 +159,7 @@ public class WindowGroup {
     if (filename.length() > 0) {
       virtualFile = VimPlugin.getFile().findFile(filename, project);
       if (virtualFile == null) {
-        VimPlugin.showMessage("Could not find file: " + filename);
+        VimPlugin.showMessage(MessageHelper.message("could.not.find.file.0", filename));
         return;
       }
     }

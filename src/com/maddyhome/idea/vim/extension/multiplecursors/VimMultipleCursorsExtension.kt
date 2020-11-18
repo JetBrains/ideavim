@@ -23,6 +23,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
+import com.intellij.openapi.util.NlsSafe
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
@@ -42,13 +43,18 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.option.OptionsManager
 import java.lang.Integer.min
 import java.util.*
-import kotlin.Comparator
 
+@NlsSafe
 private const val NEXT_WHOLE_OCCURRENCE = "<Plug>NextWholeOccurrence"
+@NlsSafe
 private const val NEXT_OCCURRENCE = "<Plug>NextOccurrence"
+@NlsSafe
 private const val SKIP_OCCURRENCE = "<Plug>SkipOccurrence"
+@NlsSafe
 private const val REMOVE_OCCURRENCE = "<Plug>RemoveOccurrence"
+@NlsSafe
 private const val ALL_WHOLE_OCCURRENCES = "<Plug>AllWholeOccurrences"
+@NlsSafe
 private const val ALL_OCCURRENCES = "<Plug>AllOccurrences"
 
 /**

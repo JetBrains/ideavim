@@ -19,10 +19,11 @@
 package com.maddyhome.idea.vim.ex.handler.mapping
 
 import com.maddyhome.idea.vim.command.MappingMode
+import org.jetbrains.annotations.NonNls
 
 internal class CommandInfo(
-  val prefix: String,
-  suffix: String,
+  @NonNls val prefix: String,
+  @NonNls suffix: String,
   val mappingModes: Set<MappingMode>,
   val isRecursive: Boolean
 ) {

@@ -32,6 +32,7 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.ListPopup
 import com.intellij.openapi.updateSettings.impl.UpdateSettings
+import com.intellij.openapi.util.NlsSafe
 import com.intellij.openapi.wm.StatusBar
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
@@ -44,13 +45,14 @@ import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.option.IdeaStatusIcon
 import com.maddyhome.idea.vim.option.OptionsManager
 import icons.VimIcons
+import org.jetbrains.annotations.NonNls
 import java.awt.Point
 import java.awt.event.MouseEvent
 import javax.swing.Icon
 import javax.swing.SwingConstants
 
-const val STATUS_BAR_ICON_ID = "IdeaVim-Icon"
-const val STATUS_BAR_DISPLAY_NAME = "IdeaVim"
+@NonNls const val STATUS_BAR_ICON_ID = "IdeaVim-Icon"
+@NlsSafe const val STATUS_BAR_DISPLAY_NAME = "IdeaVim"
 
 class StatusBarIconFactory : StatusBarWidgetFactory, LightEditCompatible {
 

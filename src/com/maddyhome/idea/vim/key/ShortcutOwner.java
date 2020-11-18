@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.key;
 
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -28,10 +29,10 @@ public enum ShortcutOwner {
   IDE("ide", "IDE"),
   VIM("vim", "Vim");
 
-  private final @NotNull String name;
-  private final @NotNull String title;
+  private final @NotNull @NonNls String name;
+  private final @NotNull @NonNls String title;
 
-  ShortcutOwner(@NotNull String name, @NotNull String title) {
+  ShortcutOwner(@NotNull @NonNls String name, @NotNull @NonNls String title) {
     this.name = name;
     this.title = title;
   }

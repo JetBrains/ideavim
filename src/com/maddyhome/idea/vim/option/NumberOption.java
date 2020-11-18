@@ -18,6 +18,8 @@
 
 package com.maddyhome.idea.vim.option;
 
+import com.intellij.openapi.util.NlsSafe;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +34,7 @@ public class NumberOption extends TextOption {
    * @param abbrev The short name
    * @param dflt   The default value
    */
-  NumberOption(String name, String abbrev, int dflt) {
+  NumberOption(@NonNls String name, @NonNls String abbrev, int dflt) {
     this(name, abbrev, dflt, 0, Integer.MAX_VALUE);
   }
 
@@ -45,7 +47,7 @@ public class NumberOption extends TextOption {
    * @param min    The option's minimum value
    * @param max    The option's maximum value
    */
-  NumberOption(String name, String abbrev, int dflt, int min, int max) {
+  NumberOption(@NlsSafe String name, @NlsSafe String abbrev, int dflt, int min, int max) {
     super(name, abbrev);
     this.dflt = dflt;
     this.value = dflt;
