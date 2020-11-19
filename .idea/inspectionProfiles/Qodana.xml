@@ -18,7 +18,7 @@
         <option name="ignoreForPropertyKeyReferences" value="true" />
         <option name="ignoreForNonAlpha" value="true" />
         <option name="ignoreAssignedToConstants" value="false" />
-        <option name="ignoreToString" value="false" />
+        <option name="ignoreToString" value="true" />
         <option name="nonNlsCommentPattern" value="NON-NLS" />
       </scope>
       <option name="ignoreForAssertStatements" value="true" />
