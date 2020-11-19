@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jdom.Element;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,10 +40,10 @@ import java.util.Map;
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
 public class HistoryGroup implements PersistentStateComponent<Element> {
-  public static final String SEARCH = "search";
-  public static final String COMMAND = "cmd";
-  public static final String EXPRESSION = "expr";
-  public static final String INPUT = "input";
+  public static final @NonNls String SEARCH = "search";
+  public static final @NonNls String COMMAND = "cmd";
+  public static final @NonNls String EXPRESSION = "expr";
+  public static final @NonNls String INPUT = "input";
 
   public void addEntry(String key, @NotNull String text) {
     if (logger.isDebugEnabled()) {

@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,7 +45,7 @@ import org.jetbrains.annotations.Nullable;
 @State(name = "VimEditorSettings", storages = {@Storage(value = "$APP_CONFIG$/vim_settings.xml")})
 public class EditorGroup implements PersistentStateComponent<Element> {
   private static final boolean REFRAIN_FROM_SCROLLING_VIM_VALUE = true;
-  public static final String EDITOR_STORE_ELEMENT = "editor";
+  public static final @NonNls String EDITOR_STORE_ELEMENT = "editor";
 
   private boolean isBlockCursor = false;
   private boolean isRefrainFromScrolling = false;

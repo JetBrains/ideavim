@@ -48,6 +48,7 @@ import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -811,7 +812,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
   private static final int SAVE_JUMP_COUNT = 100;
 
   public static final String WR_GLOBAL_MARKS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  public static final String WR_REGULAR_FILE_MARKS = "abcdefghijklmnopqrstuvwxyz";
+  public static final @NonNls String WR_REGULAR_FILE_MARKS = "abcdefghijklmnopqrstuvwxyz";
   /** Marks: abcdefghijklmnopqrstuvwxyz' */
   private static final String WR_FILE_MARKS = WR_REGULAR_FILE_MARKS + "'";
 
