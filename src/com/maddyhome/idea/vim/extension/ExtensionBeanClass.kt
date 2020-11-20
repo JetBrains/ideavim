@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.extension
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.extensions.AbstractExtensionPointBean
 import com.intellij.util.xmlb.annotations.Attribute
-import com.intellij.util.xmlb.annotations.CollectionBean
 import com.intellij.util.xmlb.annotations.Tag
 import com.intellij.util.xmlb.annotations.XCollection
 import java.util.concurrent.atomic.AtomicBoolean

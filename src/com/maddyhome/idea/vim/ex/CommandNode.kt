@@ -18,8 +18,6 @@
 
 package com.maddyhome.idea.vim.ex
 
-import java.util.*
-
 class CommandNode(command: ExBeanClass? = null) {
 
   var commandHandler: ExBeanClass? = command

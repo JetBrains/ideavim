@@ -19,7 +19,6 @@
 package com.maddyhome.idea.vim.helper;
 
 import com.google.common.io.CharStreams;
-import com.intellij.openapi.util.NlsSafe;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

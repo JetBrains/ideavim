@@ -28,9 +28,8 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.inBlockSubMode
-import java.util.*
+import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 
 /**
  * @author Alex Selesse

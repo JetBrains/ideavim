@@ -32,7 +32,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.listener.VimYankListener
 import org.jetbrains.annotations.Contract
-import java.util.*
 import kotlin.math.min
 
 class YankGroup {
