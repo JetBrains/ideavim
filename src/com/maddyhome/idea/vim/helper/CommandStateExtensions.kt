@@ -21,11 +21,10 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.util.NlsSafe
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.option.OptionsManager
 
-@get:NlsSafe
+@get:VimNlsSafe
 val usesVirtualSpace
   get() = OptionsManager.virtualedit.value == "onemore"
 

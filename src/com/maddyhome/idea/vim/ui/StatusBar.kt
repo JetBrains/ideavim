@@ -187,7 +187,8 @@ private object VimActionsPopup {
 }
 
 private class HelpLink(
-  @ActionText name: String,
+  // [VERSION UPDATE] 203+ uncomment
+  /*@ActionText*/ name: String,
   val link: String,
   icon: Icon?
 ) : DumbAwareAction(name, null, icon) {
