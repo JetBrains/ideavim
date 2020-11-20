@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim.option;
 
-import com.intellij.openapi.util.NlsSafe;
+import com.maddyhome.idea.vim.helper.VimNlsSafe;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
