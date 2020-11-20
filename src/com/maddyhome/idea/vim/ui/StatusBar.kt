@@ -44,6 +44,7 @@ import com.intellij.util.Consumer
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.option.IdeaStatusIcon
 import com.maddyhome.idea.vim.option.OptionsManager
 import icons.VimIcons
@@ -54,7 +55,7 @@ import javax.swing.Icon
 import javax.swing.SwingConstants
 
 @NonNls const val STATUS_BAR_ICON_ID = "IdeaVim-Icon"
-@NlsSafe const val STATUS_BAR_DISPLAY_NAME = "IdeaVim"
+const val STATUS_BAR_DISPLAY_NAME = "IdeaVim"
 
 class StatusBarIconFactory : StatusBarWidgetFactory, LightEditCompatible {
 

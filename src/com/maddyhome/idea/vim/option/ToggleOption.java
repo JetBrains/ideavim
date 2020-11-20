@@ -36,7 +36,7 @@ public class ToggleOption extends Option<Boolean> {
    * @param abbrev The short name
    * @param dflt   The default value
    */
-  public ToggleOption(@NlsSafe String name, @NlsSafe String abbrev, boolean dflt) {
+  public ToggleOption(@VimNlsSafe String name, @VimNlsSafe String abbrev, boolean dflt) {
     super(name, abbrev);
 
     this.dflt = dflt;

@@ -32,7 +32,7 @@ import java.io.InputStreamReader;
 * @author vlan
 */
 public class MacKeyRepeat {
-  @NlsSafe public static final String FMT = "defaults %s -globalDomain ApplePressAndHoldEnabled";
+  @VimNlsSafe public static final String FMT = "defaults %s -globalDomain ApplePressAndHoldEnabled";
   @NotNull private static final MacKeyRepeat INSTANCE = new MacKeyRepeat();
   @NonNls private static final String EXEC_COMMAND = "launchctl stop com.apple.SystemUIServer.agent";
   @NonNls private static final String delete = "delete";

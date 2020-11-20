@@ -14,6 +14,7 @@ import com.intellij.openapi.wm.impl.status.EditorBasedWidget
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.util.Consumer
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.option.OptionChangeListener
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -25,7 +26,8 @@ object ShowCmd {
   // https://github.com/vim/vim/blob/b376ace1aeaa7614debc725487d75c8f756dd773/src/vim.h#L1721
   private const val SHOWCMD_COLS = 10
   @NonNls internal const val ID = "IdeaVim::ShowCmd"
-  @NlsSafe internal const val displayName = "IdeaVim showcmd"
+  // [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
+  @NonNls internal const val displayName = "IdeaVim showcmd"
 
   fun update() {
     val windowManager = WindowManager.getInstance()
@@ -100,7 +102,7 @@ class Widget(project: Project) : EditorBasedWidget(project), StatusBarWidget.Mul
 
   override fun getClickConsumer(): Consumer<MouseEvent>? = null
 
-  @NlsSafe
+  @VimNlsSafe
   override fun getTooltipText(): String {
     var count = ShowCmd.getFullText(this.editor)
     if (count.isNotBlank()) count = ": $count"

@@ -25,8 +25,8 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
-import com.intellij.openapi.util.NlsSafe
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.VimNlsSafe
 import java.util.*
 import kotlin.math.max
 
@@ -45,7 +45,7 @@ class AddInlineInlaysAction : AnAction() {
     while (i < lineLength) {
       val relatesToPrecedingText = random.nextInt(10) > 7
 
-      @NlsSafe
+      @VimNlsSafe
       val text = "a".repeat(max(1, random.nextInt(7)))
 
       val offset = EditorHelper.visualPositionToOffset(editor, VisualPosition(currentVisualLine, i))

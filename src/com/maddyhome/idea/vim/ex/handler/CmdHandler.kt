@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim.ex.handler
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.util.NlsSafe
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.Alias
 import com.maddyhome.idea.vim.ex.CommandHandler
@@ -34,6 +33,8 @@ import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
 import com.maddyhome.idea.vim.group.CommandGroup.Companion.BLACKLISTED_ALIASES
 import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.VimNlsSafe
+import org.jetbrains.annotations.NonNls
 
 /**
  * @author Elliot Courant
@@ -44,7 +45,9 @@ class CmdHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
   // Static definitions needed for aliases.
   private companion object {
     const val overridePrefix = "!"
-    @NlsSafe const val argsPrefix = "-nargs"
+
+    // [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
+    @NonNls const val argsPrefix = "-nargs"
 
     const val anyNumberOfArguments = "*"
     const val zeroOrOneArguments = "?"

@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSelection.Companion.create
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
+import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
@@ -49,7 +50,7 @@ import kotlin.math.min
  */
 sealed class MappingInfo(val fromKeys: List<KeyStroke>, val isRecursive: Boolean, val owner: MappingOwner) : Comparable<MappingInfo> {
 
-  @NlsSafe
+  @VimNlsSafe
   abstract fun getPresentableString(): String
 
   abstract fun execute(editor: Editor, context: DataContext)

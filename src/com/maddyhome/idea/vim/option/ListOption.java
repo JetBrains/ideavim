@@ -180,7 +180,7 @@ public class ListOption extends TextOption {
    * @param dflt    The option's default values
    * @param pattern A regular expression that is used to validate new values. null if no check needed
    */
-  ListOption(@NlsSafe String name, @NlsSafe String abbrev, @NlsSafe String[] dflt, @NlsSafe String pattern) {
+  ListOption(@VimNlsSafe String name, @VimNlsSafe String abbrev, @VimNlsSafe String[] dflt, @VimNlsSafe String pattern) {
     super(name, abbrev);
 
     this.dflt = new ArrayList<>(Arrays.asList(dflt));

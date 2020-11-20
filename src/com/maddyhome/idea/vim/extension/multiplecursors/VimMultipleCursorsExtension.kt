@@ -38,24 +38,32 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.SearchHelper.findWordUnderCursor
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.annotations.NonNls
 import java.lang.Integer.min
 import java.util.*
 
-@NlsSafe
+// [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
+@NonNls
 private const val NEXT_WHOLE_OCCURRENCE = "<Plug>NextWholeOccurrence"
-@NlsSafe
+// [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
+@NonNls
 private const val NEXT_OCCURRENCE = "<Plug>NextOccurrence"
-@NlsSafe
+// [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
+@NonNls
 private const val SKIP_OCCURRENCE = "<Plug>SkipOccurrence"
-@NlsSafe
+// [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
+@NonNls
 private const val REMOVE_OCCURRENCE = "<Plug>RemoveOccurrence"
-@NlsSafe
+// [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
+@NonNls
 private const val ALL_WHOLE_OCCURRENCES = "<Plug>AllWholeOccurrences"
-@NlsSafe
+// [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
+@NonNls
 private const val ALL_OCCURRENCES = "<Plug>AllOccurrences"
 
 /**
