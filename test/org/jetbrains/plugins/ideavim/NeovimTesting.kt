@@ -23,11 +23,10 @@ import com.ensarsarajcic.neovim.java.api.NeovimApis
 import com.ensarsarajcic.neovim.java.api.types.api.VimCoords
 import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRPCConnection
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.common.CharacterPosition
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.commandState
-import com.maddyhome.idea.vim.neovim.toVimCoords
-import junit.framework.Assert
 import kotlin.test.assertEquals
 
 internal object NeovimTesting {
@@ -85,12 +84,12 @@ internal object NeovimTesting {
   private fun assertCaret(editor: Editor) {
     val vimCoords = getCaret()
     val resultVimCoords = CharacterPosition.atCaret(editor).toVimCoords()
-    Assert.assertEquals(vimCoords.toString(), resultVimCoords.toString())
+    assertEquals(vimCoords.toString(), resultVimCoords.toString())
   }
 
   private fun assertText(editor: Editor) {
     val neovimContent = getText()
-    Assert.assertEquals(neovimContent, editor.document.text)
+    assertEquals(neovimContent, editor.document.text)
   }
 
   private fun assertMode(editor: Editor) {
@@ -113,4 +112,8 @@ enum class SkipNeovimReason {
   SELECT_MODE,
   VISUAL_BLOCK_MODE,
   DIFFERENT,
+}
+
+fun LogicalPosition.toVimCoords(): VimCoords {
+  return VimCoords(this.line + 1, this.column)
 }
