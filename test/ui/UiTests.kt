@@ -19,6 +19,7 @@
 package ui
 
 import com.intellij.remoterobot.fixtures.ComponentFixture
+import com.intellij.remoterobot.fixtures.ContainerFixture
 import com.intellij.remoterobot.search.locators.byXpath
 import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.keyboard
@@ -27,6 +28,7 @@ import org.assertj.swing.core.MouseButton
 import org.intellij.examples.simple.plugin.steps.JavaExampleSteps
 import org.junit.Ignore
 import org.junit.Test
+import ui.pages.Editor
 import ui.pages.actionMenu
 import ui.pages.actionMenuItem
 import ui.pages.dialog
@@ -36,6 +38,7 @@ import ui.pages.idea
 import ui.pages.welcomeFrame
 import ui.utils.StepsLogger
 import ui.utils.uiTest
+import ui.utils.vimExit
 import java.awt.event.KeyEvent
 import kotlin.test.assertEquals
 
@@ -80,21 +83,51 @@ class UiTests {
             enterText("i")
             enterText(
               """
-                |One
-                |Two
-                |Three
+                |One Two
+                |Three Four
+                |Five
             """.trimMargin()
             )
             escape()
           }
         }
       }
-      gutter() {
-        findText("2").click()
-      }
 
-      assertEquals("Two\n", editor.selectedText)
+      testClickOnWord(editor)
+      testGutterClick(editor)
 
     }
+  }
+
+  private fun ContainerFixture.testClickOnWord(editor: Editor) {
+    editor.findText("One").doubleClick(MouseButton.LEFT_BUTTON)
+
+    assertEquals("One", editor.selectedText)
+    assertEquals(2, editor.caretOffset)
+
+    keyboard { enterText("h") }
+
+    assertEquals("On", editor.selectedText)
+    assertEquals(1, editor.caretOffset)
+
+    vimExit()
+  }
+
+  private fun ContainerFixture.testGutterClick(editor: Editor) {
+    gutter {
+      findText("2").click()
+    }
+
+    assertEquals("Three Four\n", editor.selectedText)
+    assertEquals(8, editor.caretOffset)
+
+    keyboard {
+      enterText("k")
+    }
+
+    assertEquals("One Two\nThree Four\n", editor.selectedText)
+    assertEquals(0, editor.caretOffset)
+
+    vimExit()
   }
 }

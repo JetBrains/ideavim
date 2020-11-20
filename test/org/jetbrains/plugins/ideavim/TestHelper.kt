@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.option.OptionsManager
+import java.time.Duration
 import kotlin.test.fail
 
 /**
@@ -92,4 +93,20 @@ fun assertHappened(timeInMillis: Int = 1000, precision: Int, condition: () -> Bo
   assertDoesntChange(timeInMillis - precision) { !condition() }
 
   waitAndAssert(precision * 2) { condition() }
+}
+
+fun waitCondition(
+  durationMillis: Long,
+  interval: Long = 500,
+  condition: () -> Boolean
+): Boolean {
+  val endTime = System.currentTimeMillis() + durationMillis
+  while (System.currentTimeMillis() < endTime) {
+    if (condition())
+      return true
+    else {
+      Thread.sleep(interval)
+    }
+  }
+  return false
 }
