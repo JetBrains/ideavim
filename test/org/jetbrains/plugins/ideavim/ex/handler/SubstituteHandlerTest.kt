@@ -382,6 +382,44 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     assertPosition(1, 10)
   }
 
+  @VimOptionDefaultAll
+  fun `test alternative range format`() {
+    configureByText(
+      """One
+        |${c}One
+        |One
+        |One
+        |One
+        |One""".trimMargin())
+
+    typeText(parseKeys(":", ",+3s/One/Two/g", "<Enter>"))
+    myFixture.checkResult(      """One
+        |Two
+        |Two
+        |Two
+        |${c}Two
+        |One""".trimMargin())
+  }
+
+  @VimOptionDefaultAll
+  fun `test alternative range format with second dot`() {
+    configureByText(
+      """One
+        |${c}One
+        |One
+        |One
+        |One
+        |One""".trimMargin())
+
+    typeText(parseKeys(":", ",.+3s/One/Two/g", "<Enter>"))
+    myFixture.checkResult(      """One
+        |Two
+        |Two
+        |Two
+        |${c}Two
+        |One""".trimMargin())
+  }
+
   private fun doTest(command: String, before: String, after: String) {
     doTest(commandToKeys(command), before, after)
   }

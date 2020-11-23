@@ -307,6 +307,10 @@ public class CommandParser {
               state = State.RANGE_SHORT_PATTERN;
               reprocess = false;
             }
+            else if (ch == ',') {
+              location.append('.');
+              state = State.RANGE_MAYBE_DONE;
+            }
             else if (ch == '/' || ch == '?') {
               location.append(ch);
               patternType = ch;
