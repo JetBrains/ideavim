@@ -37,6 +37,8 @@ import ui.pages.gutter
 import ui.pages.idea
 import ui.pages.welcomeFrame
 import ui.utils.StepsLogger
+import ui.utils.doubleClickOnRight
+import ui.utils.tripleClickOnRight
 import ui.utils.uiTest
 import ui.utils.vimExit
 import java.awt.event.KeyEvent
@@ -75,9 +77,9 @@ class UiTests {
         }
         actionMenu("New").click()
         actionMenuItem("File").click()
-        keyboard { enterText("MyDocument.txt"); enter() }
+        keyboard { enterText("MyDoc.txt"); enter() }
       }
-      val editor = editor("MyDocument.txt") {
+      val editor = editor("MyDoc.txt") {
         step("Write a text") {
           keyboard {
             enterText("i")
@@ -93,10 +95,45 @@ class UiTests {
         }
       }
 
+      testTripleClickRightFromLineEnd(editor)
+      testClickRightFromLineEnd(editor)
       testClickOnWord(editor)
       testGutterClick(editor)
 
     }
+  }
+
+  private fun ContainerFixture.testTripleClickRightFromLineEnd(editor: Editor) {
+    editor.findText("Two").tripleClickOnRight(40, editor)
+
+    assertEquals("One Two\n", editor.selectedText)
+    assertEquals(7, editor.caretOffset)
+
+    keyboard { enterText("h") }
+
+    assertEquals("One Two\n", editor.selectedText)
+    assertEquals(6, editor.caretOffset)
+
+    keyboard { enterText("j") }
+
+    assertEquals("One Two\nThree Four\n", editor.selectedText)
+    assertEquals(14, editor.caretOffset)
+
+    vimExit()
+  }
+
+  private fun ContainerFixture.testClickRightFromLineEnd(editor: Editor) {
+    editor.findText("Two").doubleClickOnRight(40, editor)
+
+    assertEquals("Two", editor.selectedText)
+    assertEquals(6, editor.caretOffset)
+
+    keyboard { enterText("h") }
+
+    assertEquals("Tw", editor.selectedText)
+    assertEquals(5, editor.caretOffset)
+
+    vimExit()
   }
 
   private fun ContainerFixture.testClickOnWord(editor: Editor) {
