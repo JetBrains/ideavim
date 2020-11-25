@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.ui.ex
 
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
+import javax.swing.text.DefaultEditorKit
 import javax.swing.text.JTextComponent.KeyBinding
 
 object ExKeyBindings {
@@ -40,21 +41,21 @@ object ExKeyBindings {
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.CompleteEntry),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.CompleteEntry),
 
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.beginLineAction),
-      KeyBinding(KeyStroke.getKeyStroke(0x02.toChar().toInt(), KeyEvent.CTRL_DOWN_MASK), ExEditorKit.beginLineAction),
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0), ExEditorKit.beginLineAction),
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.beginLineAction),
+      KeyBinding(KeyStroke.getKeyStroke(0x02.toChar().toInt(), KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.beginLineAction),
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0), DefaultEditorKit.beginLineAction),
 
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.endLineAction),
-      KeyBinding(KeyStroke.getKeyStroke(0x05.toChar().toInt(), KeyEvent.CTRL_DOWN_MASK), ExEditorKit.endLineAction),
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0), ExEditorKit.endLineAction),
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.endLineAction),
+      KeyBinding(KeyStroke.getKeyStroke(0x05.toChar().toInt(), KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.endLineAction),
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0), DefaultEditorKit.endLineAction),
 
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), ExEditorKit.deletePrevCharAction),
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.deletePrevCharAction),
-      KeyBinding(KeyStroke.getKeyStroke(0x08.toChar().toInt(), KeyEvent.CTRL_DOWN_MASK), ExEditorKit.deletePrevCharAction),
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), DefaultEditorKit.deletePrevCharAction),
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.deletePrevCharAction),
+      KeyBinding(KeyStroke.getKeyStroke(0x08.toChar().toInt(), KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.deletePrevCharAction),
 
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), ExEditorKit.deleteNextCharAction),
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), DefaultEditorKit.deleteNextCharAction),
 
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.deletePrevWordAction),
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.deletePrevWordAction),
 
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.DeleteToCursor),
 
@@ -69,12 +70,12 @@ object ExKeyBindings {
 
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0), ExEditorKit.ToggleInsertReplace),
 
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), ExEditorKit.backwardAction),
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK), ExEditorKit.previousWordAction),
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.previousWordAction),
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), ExEditorKit.forwardAction),
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK), ExEditorKit.nextWordAction),
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.nextWordAction),
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), DefaultEditorKit.backwardAction),
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_DOWN_MASK), DefaultEditorKit.previousWordAction),
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.previousWordAction),
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), DefaultEditorKit.forwardAction),
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_DOWN_MASK), DefaultEditorKit.nextWordAction),
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_DOWN_MASK), DefaultEditorKit.nextWordAction),
 
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.StartDigraph),
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.StartLiteral),
@@ -83,8 +84,8 @@ object ExKeyBindings {
       KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK), ExEditorKit.InsertRegister),
 
       // These appear to be non-Vim shortcuts
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK), ExEditorKit.pasteAction),
-      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, KeyEvent.SHIFT_DOWN_MASK), ExEditorKit.pasteAction)
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK), DefaultEditorKit.pasteAction),
+      KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, KeyEvent.SHIFT_DOWN_MASK), DefaultEditorKit.pasteAction)
     )
   }
 }

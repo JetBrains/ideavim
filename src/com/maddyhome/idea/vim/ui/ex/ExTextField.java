@@ -110,7 +110,7 @@ public class ExTextField extends JTextField {
     setBorder(null);
 
     // Do not override getActions() method, because it is has side effect: propagates these actions to defaults.
-    final Action[] actions = ExEditorKit.getInstance().getActions();
+    final Action[] actions = ExEditorKit.INSTANCE.getActions();
     final ActionMap actionMap = getActionMap();
     for (Action a : actions) {
       actionMap.put(a.getValue(Action.NAME), a);
@@ -331,7 +331,7 @@ public class ExTextField extends JTextField {
     VimPlugin.getProcess().cancelExEntry(editor, true);
   }
 
-  void setCurrentAction(@NotNull ExEditorKit.MultiStepAction action, char pendingIndicator) {
+  public void setCurrentAction(@NotNull MultiStepAction action, char pendingIndicator) {
     this.currentAction = action;
     setCurrentActionPromptCharacter(pendingIndicator);
   }
@@ -567,7 +567,7 @@ public class ExTextField extends JTextField {
   private String actualText;
   private List<HistoryGroup.HistoryEntry> history;
   private int histIndex = 0;
-  private @Nullable ExEditorKit.MultiStepAction currentAction;
+  private @Nullable MultiStepAction currentAction;
   private char currentActionPromptCharacter;
   private int currentActionPromptCharacterOffset = -1;
 
