@@ -27,7 +27,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.ui.ExEntryPanel;
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

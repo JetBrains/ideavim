@@ -44,7 +44,7 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.OptionsManager;
-import com.maddyhome.idea.vim.ui.ExEntryPanel;
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import kotlin.Pair;
 import kotlin.ranges.IntProgression;
 import org.jetbrains.annotations.Contract;

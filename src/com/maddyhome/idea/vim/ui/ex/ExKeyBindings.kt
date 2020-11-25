@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.ui
+package com.maddyhome.idea.vim.ui.ex
 
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke

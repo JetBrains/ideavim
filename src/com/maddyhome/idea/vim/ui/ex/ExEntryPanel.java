@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.ui;
+package com.maddyhome.idea.vim.ui.ex;
 
 import com.intellij.ide.ui.LafManager;
 import com.intellij.ide.ui.LafManagerListener;
@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
+import com.maddyhome.idea.vim.ui.ExPanelBorder;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

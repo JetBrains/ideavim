@@ -1,6 +1,6 @@
 <idea-plugin>
   <applicationListeners>
-    <listener class="com.maddyhome.idea.vim.ui.ExEntryPanel$LafListener"
+    <listener class="com.maddyhome.idea.vim.ui.ex.ExEntryPanel$LafListener"
               topic="com.intellij.ide.ui.LafManagerListener"/>
     <listener class="com.maddyhome.idea.vim.extension.highlightedyank.HighlightColorResetter"
               topic="com.intellij.ide.ui.LafManagerListener"/>

@@ -22,8 +22,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.ui.ExDocument
-import com.maddyhome.idea.vim.ui.ExEntryPanel
+import com.maddyhome.idea.vim.ui.ex.ExDocument
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.jetbrains.plugins.ideavim.VimTestCase
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke

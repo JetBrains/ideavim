@@ -32,7 +32,7 @@ import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.helper.TestInputModel;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.option.ToggleOption;
-import com.maddyhome.idea.vim.ui.ExEntryPanel;
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
