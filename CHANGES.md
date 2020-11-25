@@ -26,7 +26,8 @@ usual beta standards.
 
 ### Features:
 
-* Support `unmap` commands [VIM-1491](https://youtrack.jetbrains.com/issue/VIM-1491)
+* Support `unmap` and `mapclear` commands [VIM-1491](https://youtrack.jetbrains.com/issue/VIM-1491)
+* Support mappings in ex panel (`cmap`) [VIM-1227](https://youtrack.jetbrains.com/issue/VIM-1227)
 
 ### Fixes:
 * [VIM-2113](https://youtrack.jetbrains.com/issue/VIM-2113) Fix `cit` for empty tags
@@ -39,6 +40,7 @@ usual beta standards.
 * [250](https://github.com/JetBrains/ideavim/pull/250) by [Jan Palus](https://github.com/jpalus): VIM-2114 Do not override registers when deleting empty range
 * [256](https://github.com/JetBrains/ideavim/pull/256) by [Brandon Conway](https://github.com/brandoncc): Fix typo
 * [254](https://github.com/JetBrains/ideavim/pull/254) by [Grzegorz Antoniak](https://github.com/antekone): VIM-1475: Add an option to use block caret in insert mode
+* [225](https://github.com/JetBrains/ideavim/pull/225) by [sumoooru2](https://github.com/sumoooru2): Implement cmap
 
 ## 0.61, 2020-11-12
 
