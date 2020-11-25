@@ -1,8 +1,8 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="Project Default" />
-    <inspection_tool class="HardCodedStringLiteral" enabled="true" level="WARNING" enabled_by_default="false">
-      <scope name="Production" level="WARNING" enabled="true">
+    <inspection_tool class="HardCodedStringLiteral" enabled="false" level="WARNING" enabled_by_default="false">
+      <scope name="Production" level="WARNING" enabled="false">
         <option name="ignoreForAssertStatements" value="true" />
         <option name="ignoreForExceptionConstructors" value="true" />
         <option name="ignoreForSpecifiedExceptionConstructors" value="" />
