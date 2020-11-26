@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.regexp.CharPointer;
@@ -279,6 +280,9 @@ public class ExEntryPanel extends JPanel {
           searchText = argument.substring(1);
         }
         if (searchText.length() == 0) {
+          // Reset back to the original search highlights after deleting a search from a substitution command.
+          // E.g. Highlight `whatever`, type `:%s/foo` + highlight `foo`, delete back to `:%s/` and reset highlights
+          // back to `whatever`
           VimPlugin.getSearch().resetIncsearchHighlights();
           return;
         }
@@ -294,7 +298,7 @@ public class ExEntryPanel extends JPanel {
         pattern = p.substring(end.pointer() - p.pointer());
 
         VimPlugin.getEditor().closeEditorSearchSession(editor);
-        final int matchOffset = VimPlugin.getSearch().updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
+        final int matchOffset = SearchHighlightsHelper.updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
         if (matchOffset != -1) {
           MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), matchOffset);
         }
