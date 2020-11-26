@@ -52,7 +52,7 @@ object OptionsManager {
   val clipboard = addOption(ListOption(ClipboardOptionsData.name, ClipboardOptionsData.abbr, arrayOf(ClipboardOptionsData.ideaput, "autoselect,exclude:cons\\|linux"), null))
   val digraph = addOption(ToggleOption("digraph", "dg", false))
   val gdefault = addOption(ToggleOption("gdefault", "gd", false))
-  val history = addOption(NumberOption("history", "hi", 20, 1, Int.MAX_VALUE))
+  val history = addOption(NumberOption("history", "hi", 50, 1, Int.MAX_VALUE))
   val hlsearch = addOption(ToggleOption("hlsearch", "hls", false))
   val ideamarks = addOption(IdeaMarkskOptionsData.option)
   val ignorecase = addOption(ToggleOption(IgnoreCaseOptionsData.name, IgnoreCaseOptionsData.abbr, false))
