@@ -2289,6 +2289,13 @@ public class SearchHelper {
     return res.toString();
   }
 
+  public static boolean shouldIgnoreCase(@NotNull String pattern, boolean ignoreSmartCase) {
+    boolean sc = !ignoreSmartCase && OptionsManager.INSTANCE.getSmartcase().isSet();
+    boolean ic = OptionsManager.INSTANCE.getIgnorecase().isSet();
+
+    return ic && !(sc && StringHelper.containsUpperCase(pattern));
+  }
+
   public static class CountPosition {
     public CountPosition(int count, int position) {
       this.count = count;

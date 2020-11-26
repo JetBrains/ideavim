@@ -25,20 +25,15 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
-import com.intellij.openapi.editor.colors.EditorColors;
-import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.markup.*;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
-import com.intellij.ui.ColorUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
@@ -49,8 +44,8 @@ import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.ui.ModalEntry;
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import kotlin.jvm.functions.Function1;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
@@ -59,11 +54,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.*;
 
 @State(name = "VimSearchSettings", storages = {
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
@@ -82,9 +78,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
       }
     };
     options.getIgnorecase().addOptionChangeListener(updateHighlightsIfVisible);
-
-    // It appears that when changing smartcase, Vim only redraws the highlights when the screen is redrawn. We can't
-    // reliably copy that, so do the most intuitive thing
     options.getSmartcase().addOptionChangeListener(updateHighlightsIfVisible);
   }
 
@@ -214,13 +207,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
       exEntryPanel.deactivate(true, false);
     }
     return result.get();
-  }
-
-  private static boolean shouldIgnoreCase(@NotNull String pattern, boolean ignoreSmartCase) {
-    boolean sc = !ignoreSmartCase && OptionsManager.INSTANCE.getSmartcase().isSet();
-    boolean ic = OptionsManager.INSTANCE.getIgnorecase().isSet();
-
-    return ic && !(sc && StringHelper.containsUpperCase(pattern));
   }
 
   public int search(@NotNull Editor editor, @NotNull String command, int count, EnumSet<CommandFlags> flags, boolean moveCursor) {
@@ -367,161 +353,23 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   }
 
   private void forceUpdateSearchHighlights() {
-    updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, true);
+    SearchHighlightsHelper.updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, true);
   }
 
   private void updateSearchHighlights() {
-    updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, false);
+    SearchHighlightsHelper.updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, false);
   }
 
   public void resetIncsearchHighlights() {
-    updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, true);
-  }
-
-  public int updateIncsearchHighlights(@NotNull Editor editor, @NotNull String pattern, boolean forwards, int caretOffset, @Nullable LineRange searchRange) {
-    final int searchStartOffset = searchRange != null ? EditorHelper.getLineStartOffset(editor, searchRange.startLine) : caretOffset;
-    final boolean showHighlights = OptionsManager.INSTANCE.getHlsearch().isSet();
-    return updateSearchHighlights(pattern, false, showHighlights, searchStartOffset, searchRange, forwards, false);
-  }
-
-  private void updateSearchHighlights(@Nullable String pattern, boolean shouldIgnoreSmartCase, boolean showHighlights, boolean forceUpdate) {
-    updateSearchHighlights(pattern, shouldIgnoreSmartCase, showHighlights, -1, null, true, forceUpdate);
-  }
-
-  /**
-   * Refreshes current search highlights for all editors of currently active text editor/document
-   */
-  private int updateSearchHighlights(@Nullable String pattern, boolean shouldIgnoreSmartCase, boolean showHighlights,
-                                     int initialOffset, @Nullable LineRange searchRange, boolean forwards, boolean forceUpdate) {
-    int currentMatchOffset = -1;
-
-    ProjectManager projectManager = ProjectManager.getInstanceIfCreated();
-    if (projectManager == null) return currentMatchOffset;
-    Project[] projects = projectManager.getOpenProjects();
-    for (Project project : projects) {
-      Editor current = FileEditorManager.getInstance(project).getSelectedTextEditor();
-      Editor[] editors = current == null ? null : EditorFactory.getInstance().getEditors(current.getDocument(), project);
-      if (editors == null) {
-        continue;
-      }
-
-      for (final Editor editor : editors) {
-        // Force update for the situations where the text is the same, but the ignore case values have changed.
-        // E.g. Use `*` to search for a word (which ignores smartcase), then use `/<Up>` to search for the same pattern,
-        // which will match smartcase. Or changing the smartcase/ignorecase settings
-        if (shouldRemoveSearchHighlight(editor, pattern, showHighlights) || forceUpdate) {
-          removeSearchHighlight(editor);
-        }
-
-        if (shouldAddAllSearchHighlights(editor, pattern, showHighlights)) {
-          final int startLine = searchRange == null ? 0 : searchRange.startLine;
-          final int endLine = searchRange == null ? -1 : searchRange.endLine;
-          List<TextRange> results = findAll(editor, pattern, startLine, endLine, shouldIgnoreCase(pattern, shouldIgnoreSmartCase));
-          if (!results.isEmpty()) {
-            currentMatchOffset = findClosestMatch(editor, results, initialOffset, forwards);
-            highlightSearchResults(editor, pattern, results, currentMatchOffset);
-          }
-          UserDataManager.setVimLastSearch(editor, pattern);
-        }
-        else if (shouldAddCurrentMatchSearchHighlight(pattern, showHighlights, initialOffset)) {
-          final boolean wrap = OptionsManager.INSTANCE.getWrapscan().isSet();
-          final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE);
-          if (wrap) searchOptions.add(SearchOptions.WRAP);
-          if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE);
-          if (!forwards) searchOptions.add(SearchOptions.BACKWARDS);
-          final TextRange result = findIt(editor, pattern, initialOffset, 1, searchOptions);
-          if (result != null && pattern != null) {
-            currentMatchOffset = result.getStartOffset();
-            final List<TextRange> results = Collections.singletonList(result);
-            highlightSearchResults(editor, pattern, results, currentMatchOffset);
-          }
-        }
-        else if (shouldMaintainCurrentMatchOffset(pattern, initialOffset)) {
-          final Integer offset = UserDataManager.getVimIncsearchCurrentMatchOffset(editor);
-          if (offset != null) {
-            currentMatchOffset = offset;
-          }
-        }
-      }
-    }
-
-    return currentMatchOffset;
-  }
-
-  /**
-   * Remove current search highlights if hlSearch is false, or if the pattern is changed
-   */
-  @Contract("_, _, false -> true; _, null, true -> false")
-  private boolean shouldRemoveSearchHighlight(@NotNull Editor editor, String newPattern, boolean hlSearch) {
-    return !hlSearch || (newPattern != null && !newPattern.equals(UserDataManager.getVimLastSearch(editor)));
-  }
-
-  /**
-   * Add search highlights if hlSearch is true and the pattern is changed
-   */
-  @Contract("_, _, false -> false; _, null, true -> false")
-  private boolean shouldAddAllSearchHighlights(@NotNull Editor editor, @Nullable String newPattern, boolean hlSearch) {
-    return hlSearch && newPattern != null && !newPattern.equals(UserDataManager.getVimLastSearch(editor)) && !Objects.equals(newPattern, "");
-  }
-
-  /**
-   * Add search highlight for current match if hlsearch is false and we're performing incsearch highlights
-   */
-  @Contract("_, true, _ -> false")
-  private boolean shouldAddCurrentMatchSearchHighlight(@Nullable String pattern, boolean hlSearch, int initialOffset) {
-    return !hlSearch && isIncrementalSearchHighlights(initialOffset) && pattern != null && pattern.length() > 0;
-  }
-
-  /**
-   * Keep the current match offset if the pattern is still valid and we're performing incremental search highlights
-   * This will keep the caret position when editing the offset in e.g. `/foo/e+1`
-   */
-  @Contract("null, _ -> false")
-  private boolean shouldMaintainCurrentMatchOffset(@Nullable String pattern, int initialOffset) {
-    return pattern != null && pattern.length() > 0 && isIncrementalSearchHighlights(initialOffset);
-  }
-
-  /**
-   * initialOffset is only valid if we're highlighting incsearch
-   */
-  @Contract(pure = true)
-  private boolean isIncrementalSearchHighlights(int initialOffset) {
-    return initialOffset != -1;
+    SearchHighlightsHelper.updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, true);
   }
 
   private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
     if (lastSearch != null) {
-      final List<TextRange> results = findAll(editor, lastSearch, startLine, endLine, shouldIgnoreCase(lastSearch, lastIgnoreSmartCase));
-      highlightSearchResults(editor, lastSearch, results, -1);
+      final List<TextRange> results = findAll(editor, lastSearch, startLine, endLine,
+        SearchHelper.shouldIgnoreCase(lastSearch, lastIgnoreSmartCase));
+      SearchHighlightsHelper.highlightSearchResults(editor, lastSearch, results, -1);
     }
-  }
-
-  private int findClosestMatch(@NotNull Editor editor, @NotNull List<TextRange> results, int initialOffset, boolean forwards) {
-    if (results.isEmpty() || initialOffset == -1) {
-      return -1;
-    }
-
-    final int size = EditorHelperRt.getFileSize(editor);
-    final TextRange max = Collections.max(results, (r1, r2) -> {
-      final int d1 = distance(r1, initialOffset, forwards, size);
-      final int d2 = distance(r2, initialOffset, forwards, size);
-      if (d1 < 0 && d2 >= 0) {
-        return Integer.MAX_VALUE;
-      }
-      return d2 - d1;
-    });
-
-    if (!OptionsManager.INSTANCE.getWrapscan().isSet()) {
-      final int start = max.getStartOffset();
-      if (forwards && start < initialOffset) {
-        return -1;
-      }
-      else if (start >= initialOffset) {
-        return -1;
-      }
-    }
-
-    return max.getStartOffset();
   }
 
   public @Nullable TextRange getNextSearchRange(@NotNull Editor editor, int count, boolean forwards) {
@@ -573,17 +421,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     return findIt(editor, lastSearch, startOffset, 1, searchOptions);
   }
 
-  private static int distance(@NotNull TextRange range, int pos, boolean forwards, int size) {
-    final int start = range.getStartOffset();
-    if (start <= pos) {
-      return forwards ? size - pos + start : pos - start;
-    }
-    else {
-      return forwards ? start - pos : pos + size - start;
-    }
-  }
-
-  private static TextRange findIt(@NotNull Editor editor, @Nullable String pattern, int startOffset, int count, EnumSet<SearchOptions> searchOptions) {
+  public static TextRange findIt(@NotNull Editor editor, @Nullable String pattern, int startOffset, int count, EnumSet<SearchOptions> searchOptions) {
     if (pattern == null || pattern.length() == 0) {
       logger.warn("Pattern is null or empty. Cannot perform search");
       return null;
@@ -594,7 +432,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     //RE sp;
     RegExp sp;
     RegExp.regmmatch_T regmatch = new RegExp.regmmatch_T();
-    regmatch.rmm_ic = shouldIgnoreCase(pattern, searchOptions.contains(SearchOptions.IGNORE_SMARTCASE));
+    regmatch.rmm_ic = SearchHelper.shouldIgnoreCase(pattern, searchOptions.contains(SearchOptions.IGNORE_SMARTCASE));
     sp = new RegExp();
     regmatch.regprog = sp.vim_regcomp(pattern, 1);
     if (regmatch.regprog == null) {
@@ -852,23 +690,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     //    editor.logicalPositionToOffset(new LogicalPosition(endpos.lnum, 0)) + endpos.col);
     return new TextRange(new CharacterPosition(pos.lnum, pos.col).toOffset(editor),
                          new CharacterPosition(endpos.lnum, endpos.col).toOffset(editor));
-  }
-
-  private static void highlightSearchResults(@NotNull Editor editor, @NotNull String pattern, List<TextRange> results,
-                                             int currentMatchOffset) {
-    Collection<RangeHighlighter> highlighters = UserDataManager.getVimLastHighlighters(editor);
-    if (highlighters == null) {
-      highlighters = new ArrayList<>();
-      UserDataManager.setVimLastHighlighters(editor, highlighters);
-    }
-
-    for (TextRange range : results) {
-      final boolean current = range.getStartOffset() == currentMatchOffset;
-      final RangeHighlighter highlighter = highlightMatch(editor, range.getStartOffset(), range.getEndOffset(), current, pattern);
-      highlighters.add(highlighter);
-    }
-
-    UserDataManager.setVimIncsearchCurrentMatchOffset(editor, currentMatchOffset);
   }
 
   private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir) {
@@ -1181,7 +1002,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     }
 
     /* the 'i' or 'I' flag overrules 'ignorecase' and 'smartcase' */
-    regmatch.rmm_ic = shouldIgnoreCase(pattern != null ? pattern : "", false);
+    regmatch.rmm_ic = SearchHelper.shouldIgnoreCase(pattern != null ? pattern : "", false);
     if (do_ic == 'i') {
       regmatch.rmm_ic = true;
     }
@@ -1246,7 +1067,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
         if (do_all || line != lastLine) {
           boolean doReplace = true;
           if (do_ask) {
-            RangeHighlighter hl = highlightConfirm(editor, startoff, endoff);
+            RangeHighlighter hl = SearchHighlightsHelper.addSubstitutionConfirmationHighlight(editor, startoff, endoff);
             final ReplaceConfirmationChoice choice = confirmChoice(editor, match, caret, startoff);
             editor.getMarkupModel().removeHighlighter(hl);
             switch (choice) {
@@ -1317,65 +1138,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     return true;
   }
 
-  private @NotNull RangeHighlighter highlightConfirm(@NotNull Editor editor, int start, int end) {
-    TextAttributes color = new TextAttributes(
-      editor.getColorsScheme().getColor(EditorColors.SELECTION_FOREGROUND_COLOR),
-      editor.getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR),
-      editor.getColorsScheme().getColor(EditorColors.CARET_COLOR),
-      EffectType.ROUNDED_BOX, Font.PLAIN
-    );
-    return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION,
-                                                       color, HighlighterTargetArea.EXACT_RANGE);
-  }
-
-  private static @NotNull RangeHighlighter highlightMatch(@NotNull Editor editor, int start, int end, boolean current, String tooltip) {
-    TextAttributes attributes = editor.getColorsScheme().getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES);
-    if (current) {
-      // This mimics what IntelliJ does with the Find live preview
-      attributes = attributes.clone();
-      attributes.setEffectType(EffectType.ROUNDED_BOX);
-      attributes.setEffectColor(editor.getColorsScheme().getColor(EditorColors.CARET_COLOR));
-    }
-    if (attributes.getErrorStripeColor() == null) {
-      attributes.setErrorStripeColor(getFallbackErrorStripeColor(attributes, editor.getColorsScheme()));
-    }
-    final RangeHighlighter highlighter = editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION - 1,
-      attributes, HighlighterTargetArea.EXACT_RANGE);
-    highlighter.setErrorStripeTooltip(tooltip);
-    return highlighter;
-  }
-
-  /**
-   * Return a valid error stripe colour based on editor background
-   *
-   * Based on HighlightManager#addRangeHighlight behaviour, which we can't use because it will hide highlights when
-   * hitting Escape
-   */
-  private static @Nullable Color getFallbackErrorStripeColor(TextAttributes attributes, EditorColorsScheme colorsScheme) {
-    if (attributes.getBackgroundColor() != null) {
-      boolean isDark = ColorUtil.isDark(colorsScheme.getDefaultBackground());
-      return isDark ? attributes.getBackgroundColor().brighter() : attributes.getBackgroundColor().darker();
-    }
-    return null;
-  }
-
-  private static void removeSearchHighlight(@NotNull Editor editor) {
-    UserDataManager.setVimLastSearch(editor, null);
-
-    Collection<RangeHighlighter> ehl = UserDataManager.getVimLastHighlighters(editor);
-    if (ehl == null) {
-      return;
-    }
-
-    for (RangeHighlighter rh : ehl) {
-      editor.getMarkupModel().removeHighlighter(rh);
-    }
-
-    ehl.clear();
-
-    UserDataManager.setVimLastHighlighters(editor, null);
-  }
-
   public void saveData(@NotNull Element element) {
     logger.debug("saveData");
     Element search = new Element("search");
@@ -1444,7 +1206,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   /**
    * Updates search highlights when the selected editor changes
    */
-  @SuppressWarnings("unused")
   public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
     VimPlugin.getSearch().updateSearchHighlights();
   }
@@ -1521,7 +1282,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     SUBSTITUTE_ALL,
   }
 
-  private enum SearchOptions {
+  public enum SearchOptions {
     BACKWARDS,
     WANT_ENDPOS,
     WRAP,
