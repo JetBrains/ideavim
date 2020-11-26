@@ -78,8 +78,6 @@ object ExEditorKit : DefaultEditorKit() {
     HistoryUpFilterAction(),
     HistoryDownFilterAction(),
     ToggleInsertReplaceAction(),
-    StartDigraphAction(),
-    StartLiteralAction(),
     InsertRegisterAction()
   )
 

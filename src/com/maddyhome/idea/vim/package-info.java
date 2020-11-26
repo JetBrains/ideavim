@@ -619,12 +619,12 @@
  * |c_CTRL-H|             {@link com.maddyhome.idea.vim.ui.ex.DeletePreviousCharAction}
  * |c_CTRL-I|             TO BE IMPLEMENTED
  * |c_CTRL-J|             {@link com.maddyhome.idea.vim.ui.ex.CompleteEntryAction}
- * |c_CTRL-K|             {@link com.maddyhome.idea.vim.ui.ex.StartDigraphAction}
+ * |c_CTRL-K|             Handled by KeyHandler
  * |c_CTRL-L|             TO BE IMPLEMENTED
  * |c_CTRL-M|             {@link com.maddyhome.idea.vim.action.ex.ProcessExEntryAction}
  * |c_CTRL-N|             {@link com.maddyhome.idea.vim.ui.ex.HistoryDownAction}
  * |c_CTRL-P|             {@link com.maddyhome.idea.vim.ui.ex.HistoryUpAction}
- * |c_CTRL-Q|             {@link com.maddyhome.idea.vim.ui.ex.StartDigraphAction}
+ * |c_CTRL-Q|             Handled by KeyHandler
  * |c_CTRL-R|             {@link com.maddyhome.idea.vim.ui.ex.InsertRegisterAction}
  * |c_CTRL-R_CTRL-A|      TO BE IMPLEMENTED
  * |c_CTRL-R_CTRL-F|      TO BE IMPLEMENTED
@@ -635,7 +635,7 @@
  * |c_CTRL-R_CTRL-W|      TO BE IMPLEMENTED
  * |c_CTRL-T|             TO BE IMPLEMENTED
  * |c_CTRL-U|             {@link com.maddyhome.idea.vim.ui.ex.DeleteToCursorAction}
- * |c_CTRL-V|             {@link com.maddyhome.idea.vim.ui.ex.StartDigraphAction}
+ * |c_CTRL-V|             Handled by KeyHandler
  * |c_CTRL-W|             {@link com.maddyhome.idea.vim.ui.ex.DeletePreviousWordAction}
  * |c_CTRL-Y|             TO BE IMPLEMENTED
  * |c_CTRL-\_e|           TO BE IMPLEMENTED
