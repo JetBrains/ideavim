@@ -612,20 +612,20 @@
  *
  * |c_CTRL-A|             TO BE IMPLEMENTED
  * |c_CTRL-B|             {@link javax.swing.text.DefaultEditorKit#beginLineAction}
- * |c_CTRL-C|             {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.CancelEntryAction}
+ * |c_CTRL-C|             {@link com.maddyhome.idea.vim.ui.ex.CancelEntryAction}
  * |c_CTRL-D|             TO BE IMPLEMENTED
  * |c_CTRL-E|             {@link javax.swing.text.DefaultEditorKit#endLineAction}
  * |c_CTRL-G|             TO BE IMPLEMENTED
- * |c_CTRL-H|             {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.DeletePreviousCharAction}
+ * |c_CTRL-H|             {@link com.maddyhome.idea.vim.ui.ex.DeletePreviousCharAction}
  * |c_CTRL-I|             TO BE IMPLEMENTED
- * |c_CTRL-J|             {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.CompleteEntryAction}
- * |c_CTRL-K|             {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.StartDigraphAction}
+ * |c_CTRL-J|             {@link com.maddyhome.idea.vim.ui.ex.CompleteEntryAction}
+ * |c_CTRL-K|             {@link com.maddyhome.idea.vim.ui.ex.StartDigraphAction}
  * |c_CTRL-L|             TO BE IMPLEMENTED
  * |c_CTRL-M|             {@link com.maddyhome.idea.vim.action.ex.ProcessExEntryAction}
- * |c_CTRL-N|             {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.HistoryDownAction}
- * |c_CTRL-P|             {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.HistoryUpAction}
- * |c_CTRL-Q|             {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.StartDigraphAction}
- * |c_CTRL-R|             {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.InsertRegisterAction}
+ * |c_CTRL-N|             {@link com.maddyhome.idea.vim.ui.ex.HistoryDownAction}
+ * |c_CTRL-P|             {@link com.maddyhome.idea.vim.ui.ex.HistoryUpAction}
+ * |c_CTRL-Q|             {@link com.maddyhome.idea.vim.ui.ex.StartDigraphAction}
+ * |c_CTRL-R|             {@link com.maddyhome.idea.vim.ui.ex.InsertRegisterAction}
  * |c_CTRL-R_CTRL-A|      TO BE IMPLEMENTED
  * |c_CTRL-R_CTRL-F|      TO BE IMPLEMENTED
  * |c_CTRL-R_CTRL-L|      TO BE IMPLEMENTED
@@ -634,9 +634,9 @@
  * |c_CTRL-R_CTRL-R|      TO BE IMPLEMENTED
  * |c_CTRL-R_CTRL-W|      TO BE IMPLEMENTED
  * |c_CTRL-T|             TO BE IMPLEMENTED
- * |c_CTRL-U|             {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.DeleteToCursorAction}
- * |c_CTRL-V|             {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.StartDigraphAction}
- * |c_CTRL-W|             {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.DeletePreviousWordAction}
+ * |c_CTRL-U|             {@link com.maddyhome.idea.vim.ui.ex.DeleteToCursorAction}
+ * |c_CTRL-V|             {@link com.maddyhome.idea.vim.ui.ex.StartDigraphAction}
+ * |c_CTRL-W|             {@link com.maddyhome.idea.vim.ui.ex.DeletePreviousWordAction}
  * |c_CTRL-Y|             TO BE IMPLEMENTED
  * |c_CTRL-\_e|           TO BE IMPLEMENTED
  * |c_CTRL-\_CTRL-G|      TO BE IMPLEMENTED
@@ -644,32 +644,32 @@
  * |c_CTRL-_|             not applicable
  * |c_CTRL-^|             not applicable
  * |c_CTRL-]|             TO BE IMPLEMENTED
- * |c_CTRL-[|             {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.EscapeCharAction}
- * |c_<BS>|               {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.DeletePreviousCharAction}
- * |c_<CR>|               {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.CompleteEntryAction}
+ * |c_CTRL-[|             {@link com.maddyhome.idea.vim.ui.ex.EscapeCharAction}
+ * |c_<BS>|               {@link com.maddyhome.idea.vim.ui.ex.DeletePreviousCharAction}
+ * |c_<CR>|               {@link com.maddyhome.idea.vim.ui.ex.CompleteEntryAction}
  * |c_<C-Left>|           {@link javax.swing.text.DefaultEditorKit#previousWordAction}
  * |c_<C-Right>|          {@link javax.swing.text.DefaultEditorKit#nextWordAction}
  * |c_<Del>|              {@link javax.swing.text.DefaultEditorKit#deleteNextCharAction}
- * |c_<Down>|             {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.HistoryDownFilterAction}
+ * |c_<Down>|             {@link com.maddyhome.idea.vim.ui.ex.HistoryDownFilterAction}
  * |c_<End>|              {@link javax.swing.text.DefaultEditorKit#endLineAction}
- * |c_<Esc>|              {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.EscapeCharAction}
+ * |c_<Esc>|              {@link com.maddyhome.idea.vim.ui.ex.EscapeCharAction}
  * |c_<Home>|             {@link javax.swing.text.DefaultEditorKit#beginLineAction}
- * |c_<Insert>|           {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.ToggleInsertReplaceAction}
+ * |c_<Insert>|           {@link com.maddyhome.idea.vim.ui.ex.ToggleInsertReplaceAction}
  * |c_<Left>|             {@link javax.swing.text.DefaultEditorKit#backwardAction}
  * |c_<LeftMouse>|        not applicable
  * |c_<MiddleMouse>|      TO BE IMPLEMENTED
- * |c_<NL>|               {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.CompleteEntryAction}
- * |c_<PageUp>|           {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.HistoryUpAction}
- * |c_<PageDown>|         {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.HistoryDownAction}
+ * |c_<NL>|               {@link com.maddyhome.idea.vim.ui.ex.CompleteEntryAction}
+ * |c_<PageUp>|           {@link com.maddyhome.idea.vim.ui.ex.HistoryUpAction}
+ * |c_<PageDown>|         {@link com.maddyhome.idea.vim.ui.ex.HistoryDownAction}
  * |c_<Right>|            {@link javax.swing.text.DefaultEditorKit#forwardAction}
- * |c_<S-Down>|           {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.HistoryDownAction}
+ * |c_<S-Down>|           {@link com.maddyhome.idea.vim.ui.ex.HistoryDownAction}
  * |c_<S-Left>|           {@link javax.swing.text.DefaultEditorKit#previousWordAction}
  * |c_<S-Right>|          {@link javax.swing.text.DefaultEditorKit#nextWordAction}
  * |c_<S-Tab>|            TO BE IMPLEMENTED
- * |c_<S-Up>|             {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.HistoryUpAction}
+ * |c_<S-Up>|             {@link com.maddyhome.idea.vim.ui.ex.HistoryUpAction}
  * |c_<Tab>|              TO BE IMPLEMENTED
- * |c_<Up>|               {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.HistoryUpFilterAction}
- * |c_digraph|            {char1} <BS> {char2} {@link com.maddyhome.idea.vim.ui.ex.ExEditorKit.StartDigraphAction}
+ * |c_<Up>|               {@link com.maddyhome.idea.vim.ui.ex.HistoryUpFilterAction}
+ * |c_digraph|            {char1} <BS> {char2} {@link com.maddyhome.idea.vim.ui.ex.StartDigraphAction}
  * |c_wildchar|           TO BE IMPLEMENTED
  * |'cedit'|              TO BE IMPLEMENTED
  *
