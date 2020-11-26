@@ -57,4 +57,22 @@ fun RemoteText.moveMouseTo(goal: RemoteText, fixture: Fixture): Boolean {
   return caretDuringDragging
 }
 
+fun RemoteText.moveMouseForthAndBack(middle: RemoteText, fixture: Fixture) {
+  this.moveMouse()
+  val initialPoint = this.point
+  val middlePoint = middle.point
+
+  fixture.runJs(
+    """
+    const initialPoint = new java.awt.Point(${initialPoint.x}, ${initialPoint.y});
+    const point = new java.awt.Point(${middlePoint.x}, ${middlePoint.y});
+    robot.pressMouseWhileRunning(MouseButton.LEFT_BUTTON, () => {
+      robot.moveMouse(component, point)
+      robot.moveMouse(component, initialPoint)
+    })
+    """
+  )
+  waitFor { fixture.callJs("component.getEditor().getSettings().isBlockCursor()") }
+}
+
 fun String.escape(): String = this.replace("\n", "\\n")

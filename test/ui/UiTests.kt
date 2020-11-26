@@ -38,11 +38,14 @@ import ui.pages.idea
 import ui.pages.welcomeFrame
 import ui.utils.StepsLogger
 import ui.utils.doubleClickOnRight
+import ui.utils.moveMouseForthAndBack
+import ui.utils.moveMouseTo
 import ui.utils.tripleClickOnRight
 import ui.utils.uiTest
 import ui.utils.vimExit
 import java.awt.event.KeyEvent
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 class UiTests {
   init {
@@ -91,12 +94,47 @@ class UiTests {
         }
       }
 
+      testSelectForthAndBack(editor)
+      testSelectTextUsingMouse(editor)
       testTripleClickRightFromLineEnd(editor)
       testClickRightFromLineEnd(editor)
       testClickOnWord(editor)
       testGutterClick(editor)
 
     }
+  }
+
+  private fun ContainerFixture.testSelectTextUsingMouse(editor: Editor) {
+    val from = editor.findText("One")
+    val to = editor.findText("Four")
+
+    val caretIsBlockWhileDragging = from.moveMouseTo(to, editor)
+    assertFalse(caretIsBlockWhileDragging)
+
+    Thread.sleep(1000)
+
+    assertEquals("One Two\nThree ", editor.selectedText)
+
+    keyboard { enterText("l") }
+    assertEquals("One Two\nThree F", editor.selectedText)
+
+    vimExit()
+  }
+
+  private fun ContainerFixture.testSelectForthAndBack(editor: Editor) {
+    val from = editor.findText("Two")
+    val to = editor.findText("Four")
+
+    from.moveMouseForthAndBack(to, editor)
+    Thread.sleep(1000)
+
+    // Currently null can't be serialized, so we cant get empty string as a selected text. So we move caret a bit,
+    //   enter visual mode and check that only the char under the caret is selected.
+    keyboard { enterText("l") }
+    keyboard { enterText("v") }
+    assertEquals("w", editor.selectedText)
+
+    vimExit()
   }
 
   private fun ContainerFixture.testTripleClickRightFromLineEnd(editor: Editor) {
