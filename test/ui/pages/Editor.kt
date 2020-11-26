@@ -25,6 +25,7 @@ import com.intellij.remoterobot.fixtures.ComponentFixture
 import com.intellij.remoterobot.fixtures.ContainerFixture
 import com.intellij.remoterobot.fixtures.FixtureName
 import com.intellij.remoterobot.search.locators.byXpath
+import ui.utils.escape
 import java.awt.Point
 
 @JvmOverloads
@@ -47,6 +48,10 @@ class Editor(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) : Commo
 
   val caretOffset: Int
     get() = callJs("component.getEditor().getCaretModel().getOffset()", runInEdt = true)
+
+  fun injectText(text: String) {
+    runJs("component.getEditor().getDocument().setText('${text.escape()}')", runInEdt = true)
+  }
 
   fun findPointByOffset(offset: Int): Point {
     return callJs("""

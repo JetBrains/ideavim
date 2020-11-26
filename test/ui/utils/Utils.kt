@@ -20,6 +20,7 @@ package ui.utils
 
 import com.intellij.remoterobot.fixtures.Fixture
 import com.intellij.remoterobot.fixtures.dataExtractor.RemoteText
+import com.intellij.remoterobot.utils.waitFor
 import org.assertj.swing.core.MouseButton
 import java.awt.Point
 
@@ -36,3 +37,24 @@ fun RemoteText.tripleClickOnRight(shiftX: Int, fixture: Fixture, button: MouseBu
     robot.click(component, updatedPoint, button, 3)
   }
 }
+
+fun RemoteText.moveMouseTo(goal: RemoteText, fixture: Fixture): Boolean {
+  this.moveMouse()
+  val goalPoint = goal.point
+
+  val caretDuringDragging = fixture.callJs<Boolean>(
+    """
+    const point = new java.awt.Point(${goalPoint.x}, ${goalPoint.y});
+    let isBlock = true;
+    robot.pressMouseWhileRunning(MouseButton.LEFT_BUTTON, () => {
+      robot.moveMouse(component, point)
+      isBlock = component.getEditor().getSettings().isBlockCursor();
+    })
+    isBlock
+    """
+  )
+  waitFor { fixture.callJs("component.getEditor().getSettings().isBlockCursor()") }
+  return caretDuringDragging
+}
+
+fun String.escape(): String = this.replace("\n", "\\n")

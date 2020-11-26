@@ -81,17 +81,13 @@ class UiTests {
       }
       val editor = editor("MyDoc.txt") {
         step("Write a text") {
-          keyboard {
-            enterText("i")
-            enterText(
-              """
+          injectText(
+            """
                 |One Two
                 |Three Four
                 |Five
             """.trimMargin()
-            )
-            escape()
-          }
+          )
         }
       }
 
