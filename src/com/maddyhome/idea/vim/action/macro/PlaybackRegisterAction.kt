@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.ex.CommandParser
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
@@ -44,7 +45,7 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
         '@' -> {
           application.runWriteAction { res.set(VimPlugin.getMacro().playbackLastRegister(editor, context, project, cmd.count)) }
         }
-        ':' -> { // No write action
+        RegisterGroup.LAST_COMMAND_REGISTER -> { // No write action
           try {
             res.set(CommandParser.getInstance().processLastCommand(editor, context, cmd.count))
           } catch (e: ExException) {
