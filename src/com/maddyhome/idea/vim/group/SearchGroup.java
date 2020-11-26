@@ -119,11 +119,9 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     resetShowSearchHighlight();
   }
 
-  private void setLastPattern(@NotNull Editor editor, @NotNull String lastPattern) {
+  private void setLastPattern(@NotNull String lastPattern) {
     this.lastPattern = lastPattern;
-    VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1),
-                                                                lastPattern, SelectionType.CHARACTER_WISE, '/', false);
-
+    VimPlugin.getRegister().storeTextSpecial(RegisterGroup.LAST_SEARCH_REGISTER, lastPattern);
     VimPlugin.getHistory().addEntry(HistoryGroup.SEARCH, lastPattern);
   }
 
@@ -284,7 +282,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     lastSearch = pattern;
     lastIgnoreSmartCase = false;
     if (pattern != null) {
-      setLastPattern(editor, pattern);
+      setLastPattern(pattern);
     }
     lastOffset = offset;
     lastDir = dir;
@@ -321,7 +319,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
 
     lastSearch = pattern.toString();
     lastIgnoreSmartCase = true;
-    setLastPattern(editor, lastSearch);
+    setLastPattern(lastSearch);
     lastOffset = "";
     lastDir = dir;
 
@@ -1165,7 +1163,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     lastSubstitute = pattern;
     lastSearch = pattern;
     if (pattern != null) {
-      setLastPattern(editor, pattern);
+      setLastPattern(pattern);
     }
 
     int start = editor.getDocument().getLineStartOffset(line1);

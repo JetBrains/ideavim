@@ -26,11 +26,11 @@ import com.intellij.openapi.util.ThrowableComputable;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
-import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.handler.GotoLineHandler;
 import com.maddyhome.idea.vim.ex.ranges.Range;
 import com.maddyhome.idea.vim.ex.ranges.Ranges;
 import com.maddyhome.idea.vim.group.HistoryGroup;
+import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import org.jetbrains.annotations.NotNull;
@@ -177,8 +177,7 @@ public class CommandParser {
     ThrowableComputable<Object, ExException> runCommand = () -> {
       boolean ok = handler.process(editor, context, command, count);
       if (ok && !handler.getArgFlags().getFlags().contains(CommandHandler.Flag.DONT_SAVE_LAST)) {
-        VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
-                                                  SelectionType.CHARACTER_WISE, ':', false);
+        VimPlugin.getRegister().storeTextSpecial(RegisterGroup.LAST_COMMAND_REGISTER, cmd);
       }
       return null;
     };

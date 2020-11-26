@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.group;
 
-import com.google.common.collect.ImmutableList;
 import com.intellij.codeInsight.editorActions.CopyPastePostProcessor;
 import com.intellij.codeInsight.editorActions.CopyPastePreProcessor;
 import com.intellij.codeInsight.editorActions.TextBlockTransferable;
@@ -81,18 +80,33 @@ import java.util.stream.Collectors;
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
 public class RegisterGroup implements PersistentStateComponent<Element> {
-  private static final @NonNls String WRITABLE_REGISTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-*+_/\"";
-  private static final String READONLY_REGISTERS = ":.%#=/";
-  private static final @NonNls String RECORDABLE_REGISTER = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  private static final String PLAYBACK_REGISTER = RECORDABLE_REGISTER + "\".*+";
+  public static final char UNNAMED_REGISTER = '"';
+  public static final char LAST_SEARCH_REGISTER = '/';        // IdeaVim does not supporting writing to this register
+  public static final char LAST_COMMAND_REGISTER = ':';
+  private static final char LAST_INSERTED_TEXT_REGISTER = '.';
+  public static final char SMALL_DELETION_REGISTER = '-';
+  private static final char BLACK_HOLE_REGISTER = '_';
+  private static final char ALTERNATE_BUFFER_REGISTER = '#';  // Not supported
+  private static final char EXPRESSION_BUFFER_REGISTER = '='; // Not supported
+  private static final char CURRENT_FILENAME_REGISTER = '%';  // Not supported
+  private static final @NonNls String CLIPBOARD_REGISTERS = "*+";
+  private static final @NonNls String NUMBERED_REGISTERS = "0123456789";
+  private static final @NonNls String NAMED_REGISTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  private static final @NonNls String WRITABLE_REGISTERS = NUMBERED_REGISTERS + NAMED_REGISTERS + CLIPBOARD_REGISTERS
+    + SMALL_DELETION_REGISTER + BLACK_HOLE_REGISTER + UNNAMED_REGISTER + LAST_SEARCH_REGISTER;
+  private static final String READONLY_REGISTERS = ""
+    + CURRENT_FILENAME_REGISTER + LAST_COMMAND_REGISTER + LAST_INSERTED_TEXT_REGISTER + ALTERNATE_BUFFER_REGISTER
+    + EXPRESSION_BUFFER_REGISTER; // Expression buffer is not actually readonly
+  private static final @NonNls String RECORDABLE_REGISTERS = NUMBERED_REGISTERS + NAMED_REGISTERS;
+  private static final String PLAYBACK_REGISTERS = RECORDABLE_REGISTERS + UNNAMED_REGISTER + CLIPBOARD_REGISTERS + LAST_INSERTED_TEXT_REGISTER;
   private static final String VALID_REGISTERS = WRITABLE_REGISTERS + READONLY_REGISTERS;
-  private static final List<Character> CLIPBOARD_REGISTERS = ImmutableList.of('*', '+');
+
   private static final Logger logger = Logger.getInstance(RegisterGroup.class.getName());
 
-  public static final char UNNAMED_REGISTER = '"';
+  private final @NotNull HashMap<Character, Register> registers = new HashMap<>();
   private char defaultRegister = UNNAMED_REGISTER;
   private char lastRegister = defaultRegister;
-  private final @NotNull HashMap<Character, Register> registers = new HashMap<>();
   private char recordRegister = 0;
   private @Nullable List<KeyStroke> recordList = null;
 
@@ -173,10 +187,35 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     return false;
   }
 
-  public boolean storeTextInternal(@NotNull Editor editor, @NotNull TextRange range, @NotNull String text,
-                                   @NotNull SelectionType type, char register, boolean isDelete) {
-    // Null register doesn't get saved
-    if (lastRegister == '_') return true;
+  /**
+   * Stores text, character wise, in the given special register
+   *
+   * <p>This method is intended to support writing to registers when the text cannot be yanked from an editor. This is
+   * expected to only be used to update the search and command registers. It will not update named registers.</p>
+   *
+   * <p>While this method allows setting the unnamed register, this should only be done from tests, and only when it's
+   * not possible to yank or cut from the fixture editor. This method will skip additional text processing, and won't
+   * update other registers such as the small delete register or reorder the numbered registers. It is much more
+   * preferable to yank from the fixture editor.</p>
+   *
+   * @param register  The register to use for storing the text. Cannot be a normal text register
+   * @param text      The text to store, without further processing
+   * @return          True if the text is stored, false if the passed register is not supported
+   */
+  public boolean storeTextSpecial(char register, @NotNull String text) {
+    if (READONLY_REGISTERS.indexOf(register) == -1 && register != LAST_SEARCH_REGISTER
+        && register != UNNAMED_REGISTER) {
+      return false;
+    }
+    registers.put(register, new Register(register, SelectionType.CHARACTER_WISE, text, new ArrayList<>()));
+    if (logger.isDebugEnabled()) logger.debug("register '" + register + "' contains: \"" + text + "\"");
+    return true;
+  }
+
+  private boolean storeTextInternal(@NotNull Editor editor, @NotNull TextRange range, @NotNull String text,
+                                    @NotNull SelectionType type, char register, boolean isDelete) {
+    // Null register doesn't get saved, but acts like it was
+    if (lastRegister == BLACK_HOLE_REGISTER) return true;
 
     int start = range.getStartOffset();
     int end = range.getEndOffset();
@@ -219,7 +258,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
       if (logger.isDebugEnabled()) logger.debug("register '" + register + "' contains: \"" + processedText + "\"");
     }
 
-    if (CLIPBOARD_REGISTERS.contains(register)) {
+    if (CLIPBOARD_REGISTERS.indexOf(register) >= 0) {
       ClipboardHandler.setClipboardText(processedText, new ArrayList<>(transferableData), text);
     }
 
@@ -248,7 +287,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
 
       // Deletes smaller than one line and without specified register go the the "-" register
       if (smallInlineDeletion && register == defaultRegister) {
-        registers.put('-', new Register('-', type, processedText, new ArrayList<>(transferableData)));
+        registers.put(SMALL_DELETION_REGISTER, new Register(SMALL_DELETION_REGISTER, type, processedText, new ArrayList<>(transferableData)));
       }
     }
     // Yanks also go to register 0 if the default register was used
@@ -338,7 +377,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
   }
 
   public @Nullable Register getPlaybackRegister(char r) {
-    if (PLAYBACK_REGISTER.indexOf(r) != 0) {
+    if (PLAYBACK_REGISTERS.indexOf(r) != 0) {
       return getRegister(r);
     }
     else {
@@ -351,7 +390,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     if (Character.isUpperCase(r)) {
       r = Character.toLowerCase(r);
     }
-    return CLIPBOARD_REGISTERS.contains(r) ? refreshClipboardRegister(r) : registers.get(r);
+    return CLIPBOARD_REGISTERS.indexOf(r) >= 0 ? refreshClipboardRegister(r) : registers.get(r);
   }
 
   public void saveRegister(char r, Register register) {
@@ -359,7 +398,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     if (Character.isUpperCase(r)) {
       r = Character.toLowerCase(r);
     }
-    if (CLIPBOARD_REGISTERS.contains(r)) {
+    if (CLIPBOARD_REGISTERS.indexOf(r) >= 0) {
       ClipboardHandler.setClipboardText(register.getText(), new ArrayList<>(register.getTransferableData()), register.getRawText());
     }
     registers.put(r, register);
@@ -383,7 +422,8 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
 
   public @NotNull List<Register> getRegisters() {
     final List<Register> res = new ArrayList<>(registers.values());
-    for (Character r : CLIPBOARD_REGISTERS) {
+    for (int i = 0; i < CLIPBOARD_REGISTERS.length(); i++) {
+      final char r = CLIPBOARD_REGISTERS.charAt(i);
       final Register register = refreshClipboardRegister(r);
       if (register != null) {
         res.add(register);
@@ -394,7 +434,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
   }
 
   public boolean startRecording(Editor editor, char register) {
-    if (RECORDABLE_REGISTER.indexOf(register) != -1) {
+    if (RECORDABLE_REGISTERS.indexOf(register) != -1) {
       CommandState.getInstance(editor).setRecording(true);
       recordRegister = register;
       recordList = new ArrayList<>();
