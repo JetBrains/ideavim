@@ -57,6 +57,20 @@ fun RemoteText.moveMouseTo(goal: RemoteText, fixture: Fixture): Boolean {
   return caretDuringDragging
 }
 
+fun RemoteText.moveMouseInGutterTo(goal: RemoteText, fixture: Fixture) {
+  this.moveMouse()
+  val goalPoint = goal.point
+
+  val caretDuringDragging = fixture.runJs(
+    """
+    const point = new java.awt.Point(${goalPoint.x}, ${goalPoint.y});
+    robot.pressMouseWhileRunning(MouseButton.LEFT_BUTTON, () => {
+      robot.moveMouse(component, point)
+    })
+    """
+  )
+}
+
 fun RemoteText.moveMouseForthAndBack(middle: RemoteText, fixture: Fixture) {
   this.moveMouse()
   val initialPoint = this.point

@@ -39,6 +39,7 @@ import ui.pages.welcomeFrame
 import ui.utils.StepsLogger
 import ui.utils.doubleClickOnRight
 import ui.utils.moveMouseForthAndBack
+import ui.utils.moveMouseInGutterTo
 import ui.utils.moveMouseTo
 import ui.utils.tripleClickOnRight
 import ui.utils.uiTest
@@ -53,7 +54,7 @@ class UiTests {
   }
 
   @Test
-  @Ignore("Please start it manually")
+//  @Ignore("Please start it manually")
   fun ideaVimTest() = uiTest {
     val sharedSteps = JavaExampleSteps(this)
 
@@ -94,6 +95,7 @@ class UiTests {
         }
       }
 
+      testSelectTextWithMouseInGutter(editor)
       testSelectForthAndBack(editor)
       testSelectTextUsingMouse(editor)
       testTripleClickRightFromLineEnd(editor)
@@ -102,6 +104,24 @@ class UiTests {
       testGutterClick(editor)
 
     }
+  }
+
+  private fun ContainerFixture.testSelectTextWithMouseInGutter(editor: Editor) {
+    gutter {
+      val from = findText("1")
+      val to = findText("2")
+
+      from.moveMouseInGutterTo(to, this)
+    }
+
+    Thread.sleep(1000)
+
+    assertEquals("One Two\nThree Four\n", editor.selectedText)
+
+    keyboard { enterText("j") }
+    assertEquals("One Two\nThree Four\nFive", editor.selectedText)
+
+    vimExit()
   }
 
   private fun ContainerFixture.testSelectTextUsingMouse(editor: Editor) {
