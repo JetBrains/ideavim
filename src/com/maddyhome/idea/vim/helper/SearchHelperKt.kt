@@ -18,16 +18,34 @@
 
 package com.maddyhome.idea.vim.helper
 
-import com.maddyhome.idea.vim.helper.SearchHelper.Direction
 import com.maddyhome.idea.vim.helper.SearchHelper.findPositionOfFirstCharacter
 import com.maddyhome.idea.vim.option.OptionsManager.ignorecase
 import com.maddyhome.idea.vim.option.OptionsManager.smartcase
+
+enum class Direction(private val value: Int) {
+  BACKWARDS(-1), FORWARDS(1), UNSET(0);
+
+  fun toInt(): Int = value
+  fun reverse(): Direction = when (this) {
+    BACKWARDS -> FORWARDS
+    FORWARDS -> BACKWARDS
+    UNSET -> UNSET
+  }
+
+  companion object {
+    fun fromInt(value: Int) = when (value) {
+      BACKWARDS.value -> BACKWARDS
+      FORWARDS.value -> FORWARDS
+      else -> UNSET
+    }
+  }
+}
 
 private data class State(val position: Int, val trigger: Char, val inQuote: Boolean?, val lastOpenSingleQuotePos: Int)
 
 // bounds are considered inside corresponding quotes
 fun checkInString(chars: CharSequence, currentPos: Int, str: Boolean): Boolean {
-  val begin = findPositionOfFirstCharacter(chars, currentPos, setOf('\n'), false, Direction.BACK)?.second ?: 0
+  val begin = findPositionOfFirstCharacter(chars, currentPos, setOf('\n'), false, Direction.BACKWARDS)?.second ?: 0
   val changes = quoteChanges(chars, begin)
   // TODO: here we need to keep only the latest element in beforePos (if any) and
   //   don't need atAndAfterPos to be eagerly collected
@@ -107,7 +125,7 @@ private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
   //   in that situation it may be double quote inside single quotes, so we cannot threat it as double quote pair open/close
   var inQuote: Boolean? = false
   val charsToSearch = setOf('\'', '"', '\n')
-  var found = findPositionOfFirstCharacter(chars, begin, charsToSearch, false, Direction.FORWARD)
+  var found = findPositionOfFirstCharacter(chars, begin, charsToSearch, false, Direction.FORWARDS)
   while (found != null && found.first != '\n') {
     val i = found.second
 
@@ -160,7 +178,7 @@ private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
       }
     }
     yield(State(i, c, inQuote, lastOpenSingleQuotePos))
-    found = findPositionOfFirstCharacter(chars, i + Direction.FORWARD.toInt(), charsToSearch, false, Direction.FORWARD)
+    found = findPositionOfFirstCharacter(chars, i + Direction.FORWARDS.toInt(), charsToSearch, false, Direction.FORWARDS)
   }
 }
 

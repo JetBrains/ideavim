@@ -33,13 +33,9 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.*
 import com.maddyhome.idea.vim.helper.SearchHelper.findWordUnderCursor
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.endOffsetInclusive
-import com.maddyhome.idea.vim.helper.exitVisualMode
-import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.annotations.NonNls
 import java.lang.Integer.min
@@ -242,7 +238,7 @@ class VimMultipleCursorsExtension : VimExtension {
     val wordRange = VimPlugin.getMotion().getWordRange(editor, caret, 1, false, false)
     caret.vimSetSelection(wordRange.startOffset, wordRange.endOffsetInclusive, true)
 
-    val offset = VimPlugin.getSearch().searchWord(editor, caret, 1, whole, 1)
+    val offset = VimPlugin.getSearch().searchWord(editor, caret, 1, whole, Direction.FORWARDS)
     MotionGroup.moveCaret(editor, caret, range.endOffset - 1)
 
     return offset

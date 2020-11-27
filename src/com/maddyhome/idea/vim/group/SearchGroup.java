@@ -100,7 +100,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   // This method is used in AceJump integration plugin
   @SuppressWarnings("unused")
   public int getLastDir() {
-    return lastDir;
+    return lastDir.toInt();
   }
 
   public @Nullable String getLastPattern() {
@@ -110,7 +110,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   public void resetState() {
     lastSearch = lastPattern = lastSubstitute = lastReplace = lastOffset = null;
     lastIgnoreSmartCase = false;
-    lastDir = 0;
+    lastDir = Direction.UNSET;
     resetShowSearchHighlight();
   }
 
@@ -228,12 +228,12 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   }
 
   public int search(@NotNull Editor editor, @NotNull String command, int startOffset, int count, @NotNull EnumSet<CommandFlags> flags) {
-    int dir = DIR_FORWARDS;
+    Direction dir = Direction.FORWARDS;
     char type = '/';
     String pattern = lastSearch;
     String offset = lastOffset;
     if (flags.contains(CommandFlags.FLAG_SEARCH_REV)) {
-      dir = DIR_BACKWARDS;
+      dir = Direction.BACKWARDS;
       type = '?';
     }
 
@@ -287,7 +287,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     return findItOffset(editor, startOffset, count, lastDir);
   }
 
-  public int searchWord(@NotNull Editor editor, @NotNull Caret caret, int count, boolean whole, int dir) {
+  public int searchWord(@NotNull Editor editor, @NotNull Caret caret, int count, boolean whole, Direction dir) {
     TextRange range = SearchHelper.findWordUnderCursor(editor, caret);
     if (range == null) {
       logger.warn("No range was found");
@@ -322,16 +322,16 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   }
 
   public int searchPrevious(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    return searchNextWithDirection(editor, caret, count, -lastDir);
+    return searchNextWithDirection(editor, caret, count, lastDir.reverse());
   }
 
   public int searchNextFromOffset(@NotNull Editor editor, int offset, int count) {
     resetShowSearchHighlight();
     updateSearchHighlights();
-    return findItOffset(editor, offset, count, 1);
+    return findItOffset(editor, offset, count, Direction.FORWARDS);
   }
 
-  private int searchNextWithDirection(@NotNull Editor editor, @NotNull Caret caret, int count, int dir) {
+  private int searchNextWithDirection(@NotNull Editor editor, @NotNull Caret caret, int count, Direction dir) {
     resetShowSearchHighlight();
     updateSearchHighlights();
     final int startOffset = caret.getOffset();
@@ -429,7 +429,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
       return null;
     }
 
-    int dir = searchOptions.contains(SearchOptions.BACKWARDS) ? DIR_BACKWARDS : DIR_FORWARDS;
+    Direction dir = searchOptions.contains(SearchOptions.BACKWARDS) ? Direction.BACKWARDS : Direction.FORWARDS;
 
     //RE sp;
     RegExp sp;
@@ -467,7 +467,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     int loop;
     RegExp.lpos_T start_pos;
     boolean at_first_line;
-    int extra_col = dir == DIR_FORWARDS ? 1 : 0;
+    int extra_col = dir == Direction.FORWARDS ? 1 : 0;
     boolean match_ok;
     long nmatched;
     //int         submatch = 0;
@@ -491,7 +491,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
       * Start searching in current line, unless searching backwards and
       * we're in column 0.
       */
-      if (dir == DIR_BACKWARDS && start_pos.col == 0) {
+      if (dir == Direction.BACKWARDS && start_pos.col == 0) {
         lnum = pos.lnum - 1;
         at_first_line = false;
       }
@@ -505,7 +505,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
           startLine = lnum;
           endLine = lnum + 1;
         }
-        for (; lnum >= startLine && lnum < endLine; lnum += dir, at_first_line = false) {
+        for (; lnum >= startLine && lnum < endLine; lnum += dir.toInt(), at_first_line = false) {
           /*
           * Look for a match somewhere in the line.
           */
@@ -522,7 +522,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
             * the start position. If not, continue at the end of the
             * match (this is vi compatible) or on the next char.
             */
-            if (dir == DIR_FORWARDS && at_first_line) {
+            if (dir == Direction.FORWARDS && at_first_line) {
               match_ok = true;
               /*
               * When match lands on a NUL the cursor will be put
@@ -560,7 +560,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
                 continue;
               }
             }
-            if (dir == DIR_BACKWARDS) {
+            if (dir == Direction.BACKWARDS) {
               /*
               * Now, if there are multiple matches on this line,
               * we have to get the last one. Or the last one before
@@ -654,7 +654,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
         * is redrawn. The keep_msg is cleared whenever another message is
         * written.
         */
-        if (dir == DIR_BACKWARDS)    /* start second loop at the other end */ {
+        if (dir == Direction.BACKWARDS)    /* start second loop at the other end */ {
           lnum = lineCount - 1;
           //if (!shortmess(SHM_SEARCH) && (options & SEARCH_MSG))
           //    give_warning((char_u *)_(top_bot_msg), TRUE);
@@ -694,7 +694,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
                          new CharacterPosition(endpos.lnum, endpos.col).toOffset(editor));
   }
 
-  private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir) {
+  private int findItOffset(@NotNull Editor editor, int startOffset, int count, Direction dir) {
     boolean wrap = OptionsManager.INSTANCE.getWrapscan().isSet();
     logger.debug("Perform search. Direction: " + dir + " wrap: " + wrap);
 
@@ -757,7 +757,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     }
 
     EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.SHOW_MESSAGES, SearchOptions.WHOLE_FILE);
-    if (dir == DIR_BACKWARDS) searchOptions.add(SearchOptions.BACKWARDS);
+    if (dir == Direction.BACKWARDS) searchOptions.add(SearchOptions.BACKWARDS);
     if (lastIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE);
     if (wrap) searchOptions.add(SearchOptions.WRAP);
     if (hasEndOffset) searchOptions.add(SearchOptions.WANT_ENDPOS);
@@ -1159,7 +1159,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
       search.addContent(createElementWithText("last-substitute", lastSubstitute));
     }
     Element text = new Element("last-dir");
-    text.addContent(Integer.toString(lastDir));
+    text.addContent(Integer.toString(lastDir.toInt()));
     search.addContent(text);
 
     text = new Element("show-last");
@@ -1188,7 +1188,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     lastSubstitute = getSafeChildText(search, "last-substitute");
 
     Element dir = search.getChild("last-dir");
-    lastDir = Integer.parseInt(dir.getText());
+    lastDir = Direction.Companion.fromInt(Integer.parseInt(dir.getText()));
 
     Element show = search.getChild("show-last");
     final ListOption vimInfo = OptionsManager.INSTANCE.getViminfo();
@@ -1300,7 +1300,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   private @Nullable String lastReplace;
   private @Nullable String lastOffset;
   private boolean lastIgnoreSmartCase;
-  private int lastDir;
+  private Direction lastDir;
   private boolean showSearchHighlight = OptionsManager.INSTANCE.getHlsearch().isSet();
 
   private boolean do_all = false; /* do multiple substitutions per line */
@@ -1312,9 +1312,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   private static final int RE_LAST = 1;
   private static final int RE_SEARCH = 2;
   private static final int RE_SUBST = 3;
-
-  private static final int DIR_FORWARDS = 1;
-  private static final int DIR_BACKWARDS = -1;
 
   private static final Logger logger = Logger.getInstance(SearchGroup.class.getName());
 }
