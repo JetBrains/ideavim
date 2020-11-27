@@ -61,6 +61,8 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
+
 @State(name = "VimSearchSettings", storages = {
   @Storage(value = "$APP_CONFIG$/vim_settings_local.xml", roamingType = RoamingType.DISABLED)
 })
@@ -367,7 +369,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
     if (lastSearch != null) {
       final List<TextRange> results = findAll(editor, lastSearch, startLine, endLine,
-        SearchHelper.shouldIgnoreCase(lastSearch, lastIgnoreSmartCase));
+        shouldIgnoreCase(lastSearch, lastIgnoreSmartCase));
       SearchHighlightsHelper.highlightSearchResults(editor, lastSearch, results, -1);
     }
   }
@@ -432,7 +434,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     //RE sp;
     RegExp sp;
     RegExp.regmmatch_T regmatch = new RegExp.regmmatch_T();
-    regmatch.rmm_ic = SearchHelper.shouldIgnoreCase(pattern, searchOptions.contains(SearchOptions.IGNORE_SMARTCASE));
+    regmatch.rmm_ic = shouldIgnoreCase(pattern, searchOptions.contains(SearchOptions.IGNORE_SMARTCASE));
     sp = new RegExp();
     regmatch.regprog = sp.vim_regcomp(pattern, 1);
     if (regmatch.regprog == null) {
@@ -1002,7 +1004,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     }
 
     /* the 'i' or 'I' flag overrules 'ignorecase' and 'smartcase' */
-    regmatch.rmm_ic = SearchHelper.shouldIgnoreCase(pattern != null ? pattern : "", false);
+    regmatch.rmm_ic = shouldIgnoreCase(pattern != null ? pattern : "", false);
     if (do_ic == 'i') {
       regmatch.rmm_ic = true;
     }
@@ -1206,6 +1208,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   /**
    * Updates search highlights when the selected editor changes
    */
+  @SuppressWarnings("unused")
   public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
     VimPlugin.getSearch().updateSearchHighlights();
   }
