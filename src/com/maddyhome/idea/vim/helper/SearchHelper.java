@@ -103,7 +103,7 @@ public class SearchHelper {
     int pos = caret.getOffset();
     int loc = blockChars.indexOf(type);
     // What direction should we go now (-1 is backward, 1 is forward)
-    Direction dir = loc % 2 == 0 ? Direction.BACK : Direction.FORWARD;
+    Direction dir = loc % 2 == 0 ? Direction.BACKWARDS : Direction.FORWARDS;
     // Which character did we find and which should we now search for
     char match = blockChars.charAt(loc);
     char found = blockChars.charAt(loc - dir.toInt());
@@ -163,10 +163,10 @@ public class SearchHelper {
         int endOffset = quoteRange.getEndOffset();
         CharSequence subSequence = chars.subSequence(startOffset, endOffset);
         int inQuotePos = pos - startOffset;
-        int inQuoteStart = findBlockLocation(subSequence, close, type, Direction.BACK, inQuotePos, count, false);
+        int inQuoteStart = findBlockLocation(subSequence, close, type, Direction.BACKWARDS, inQuotePos, count, false);
         if (inQuoteStart != -1) {
           startPosInStringFound = true;
-          int inQuoteEnd = findBlockLocation(subSequence, type, close, Direction.FORWARD, inQuoteStart, 1, false);
+          int inQuoteEnd = findBlockLocation(subSequence, type, close, Direction.FORWARDS, inQuoteStart, 1, false);
           if (inQuoteEnd != -1) {
             bstart = inQuoteStart + startOffset;
             bend = inQuoteEnd + startOffset;
@@ -176,9 +176,9 @@ public class SearchHelper {
     }
 
     if (!startPosInStringFound) {
-      bstart = findBlockLocation(chars, close, type, Direction.BACK, pos, count, false);
+      bstart = findBlockLocation(chars, close, type, Direction.BACKWARDS, pos, count, false);
       if (bstart != -1) {
-        bend = findBlockLocation(chars, type, close, Direction.FORWARD, bstart, 1, false);
+        bend = findBlockLocation(chars, type, close, Direction.FORWARDS, bstart, 1, false);
       }
     }
 
@@ -294,7 +294,7 @@ public class SearchHelper {
     // If we found one ...
     if (loc >= 0) {
       // What direction should we go now (-1 is backward, 1 is forward)
-      Direction dir = loc % 2 == 0 ? Direction.FORWARD : Direction.BACK;
+      Direction dir = loc % 2 == 0 ? Direction.FORWARDS : Direction.BACKWARDS;
       // Which character did we find and which should we now search for
       char found = getPairChars().charAt(loc);
       char match = getPairChars().charAt(loc + dir.toInt());
@@ -327,7 +327,7 @@ public class SearchHelper {
                                        boolean allowInString) {
     int res = -1;
     int initialPos = pos;
-    Function<Integer, Integer> inCheckPosF = x -> dir == Direction.BACK && x > 0 ? x - 1 : x + 1;
+    Function<Integer, Integer> inCheckPosF = x -> dir == Direction.BACKWARDS && x > 0 ? x - 1 : x + 1;
     final int inCheckPos = inCheckPosF.apply(pos);
     boolean inString = checkInString(chars, inCheckPos, true);
     boolean initialInString = inString;
@@ -391,30 +391,16 @@ public class SearchHelper {
     return backslashCounter % 2 == 0;
   }
 
-  public enum Direction {
-    BACK(-1), FORWARD(1);
-
-    private final int value;
-
-    Direction(int i) {
-      value = i;
-    }
-
-    public int toInt() {
-      return value;
-    }
-  }
-
   public enum NumberType {
     BIN, OCT, DEC, HEX, ALPHA
   }
 
   private static int findNextQuoteInLine(@NotNull CharSequence chars, int pos, char quote) {
-    return findQuoteInLine(chars, pos, quote, Direction.FORWARD);
+    return findQuoteInLine(chars, pos, quote, Direction.FORWARDS);
   }
 
   private static int findPreviousQuoteInLine(@NotNull CharSequence chars, int pos, char quote) {
-    return findQuoteInLine(chars, pos, quote, Direction.BACK);
+    return findQuoteInLine(chars, pos, quote, Direction.BACKWARDS);
   }
 
   private static int findFirstQuoteInLine(@NotNull Editor editor, int pos, char quote) {
@@ -428,8 +414,8 @@ public class SearchHelper {
 
   private static int countCharactersInLine(@NotNull CharSequence chars, int pos, char c) {
     int cnt = 0;
-    while (pos > 0 && (chars.charAt(pos + Direction.BACK.toInt()) != '\n')) {
-      pos = findCharacterPosition(chars, pos + Direction.BACK.toInt(), c, false, true, Direction.BACK);
+    while (pos > 0 && (chars.charAt(pos + Direction.BACKWARDS.toInt()) != '\n')) {
+      pos = findCharacterPosition(chars, pos + Direction.BACKWARDS.toInt(), c, false, true, Direction.BACKWARDS);
       if (pos != -1) {
         cnt++;
       }
