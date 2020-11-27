@@ -20,6 +20,8 @@ package com.maddyhome.idea.vim.helper
 
 import com.maddyhome.idea.vim.helper.SearchHelper.Direction
 import com.maddyhome.idea.vim.helper.SearchHelper.findPositionOfFirstCharacter
+import com.maddyhome.idea.vim.option.OptionsManager.ignorecase
+import com.maddyhome.idea.vim.option.OptionsManager.smartcase
 
 private data class State(val position: Int, val trigger: Char, val inQuote: Boolean?, val lastOpenSingleQuotePos: Int)
 
@@ -160,4 +162,9 @@ private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
     yield(State(i, c, inQuote, lastOpenSingleQuotePos))
     found = findPositionOfFirstCharacter(chars, i + Direction.FORWARD.toInt(), charsToSearch, false, Direction.FORWARD)
   }
+}
+
+fun shouldIgnoreCase(pattern: String, ignoreSmartCase: Boolean): Boolean {
+  val sc = smartcase.isSet && !ignoreSmartCase
+  return ignorecase.isSet && !(sc && StringHelper.containsUpperCase(pattern))
 }
