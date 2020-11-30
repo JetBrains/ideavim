@@ -107,7 +107,7 @@ class ToHandlerMappingInfo(
   isRecursive: Boolean,
   owner: MappingOwner
 ) : MappingInfo(fromKeys, isRecursive, owner) {
-  override fun getPresentableString(): String = "call ${this.javaClass.canonicalName}"
+  override fun getPresentableString(): String = "call ${extensionHandler.javaClass.canonicalName}"
 
   override fun execute(editor: Editor, context: DataContext) {
     val processor = CommandProcessor.getInstance()
