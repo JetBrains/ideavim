@@ -215,7 +215,7 @@ object IdeaSpecifics {
       if (!PlatformUtils.isAppCode()) return
 
       val offset = caret.offset
-      val offsetRightEnd = offset + 5
+      val offsetRightEnd = offset + TEMPLATE_START.length
       val offsetLeftEnd = offset - 1
       val templateRange = caret.getUserData(facedAppCodeTemplate)
       if (templateRange == null) {
@@ -266,12 +266,10 @@ object IdeaSpecifics {
 
     private fun Editor.findTemplateStart(start: Int): Int? {
       val charSequence = this.document.charsSequence
-      for (i in start downTo 4) {
-        if (charSequence[i] == TEMPLATE_START[4] && charSequence[i - 1] == TEMPLATE_START[3]
-          && charSequence[i - 2] == TEMPLATE_START[2] && charSequence[i - 3] == TEMPLATE_START[1]
-          && charSequence[i - 4] == TEMPLATE_START[0]
-        ) {
-          return i -4
+      val templateLastIndex = TEMPLATE_START.length
+      for (i in start downTo templateLastIndex) {
+        if (charSequence.subSequence(i - templateLastIndex, i + 1).toString() == TEMPLATE_START) {
+          return i - templateLastIndex
         }
       }
       return null
