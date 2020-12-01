@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.listener.IdeaSpecifics;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -318,6 +319,8 @@ public class MotionGroup {
     else {
       ModeHelper.exitVisualMode(editor);
     }
+
+    IdeaSpecifics.AppCodeTemplates.onMovement(editor, caret, oldOffset < offset);
   }
 
   private @Nullable Editor selectEditor(@NotNull Editor editor, @NotNull Mark mark) {
