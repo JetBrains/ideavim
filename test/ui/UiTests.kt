@@ -54,7 +54,7 @@ class UiTests {
   }
 
   @Test
-//  @Ignore("Please start it manually")
+  @Ignore("Please start it manually")
   fun ideaVimTest() = uiTest {
     val sharedSteps = JavaExampleSteps(this)
 
