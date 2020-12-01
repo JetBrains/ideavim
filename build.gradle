@@ -123,6 +123,14 @@ changelog {
 //  version = "0.60"
 }
 
+task getUnreleasedChangelog() {
+  group = "changelog"
+  doLast {
+    def log = changelog.getUnreleased().toHTML()
+    println log
+  }
+}
+
 tasks.register("slackEapNotification") {
   doLast {
     if (!slackUrl) return
