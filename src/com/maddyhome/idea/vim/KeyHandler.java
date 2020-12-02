@@ -319,7 +319,7 @@ public class KeyHandler {
       }
     }
     reset(editor);
-    ChangeGroup.resetCaret(editor, false);
+    ChangeGroup.resetCaret(editor, VimPlugin.getEditor().isBarCursor());
   }
 
   private boolean handleKeyMapping(final @NotNull Editor editor,
