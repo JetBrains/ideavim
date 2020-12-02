@@ -163,7 +163,7 @@ fun updateCaretState(editor: Editor) {
 
 fun CommandState.Mode.resetShape(editor: Editor) = when (this) {
   CommandState.Mode.COMMAND, CommandState.Mode.VISUAL, CommandState.Mode.REPLACE -> ChangeGroup.resetCaret(editor, false)
-  CommandState.Mode.SELECT, CommandState.Mode.INSERT -> ChangeGroup.resetCaret(editor, VimPlugin.getEditor().isBarCursor)
+  CommandState.Mode.SELECT, CommandState.Mode.INSERT -> ChangeGroup.resetCaret(editor, VimPlugin.getEditor().isBarCursorSettings)
   CommandState.Mode.CMD_LINE, CommandState.Mode.OP_PENDING -> Unit
 }
 

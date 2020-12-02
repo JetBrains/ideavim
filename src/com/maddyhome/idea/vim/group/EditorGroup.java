@@ -27,9 +27,11 @@ import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
+import com.intellij.openapi.editor.ex.EditorSettingsExternalizable;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -204,8 +206,8 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     }
   }
 
-  public boolean isBarCursor() {
-    return !isBlockCursor;
+  public boolean isBarCursorSettings() {
+    return !EditorSettingsExternalizable.getInstance().isBlockCursor();
   }
 
   public void editorCreated(@NotNull Editor editor) {
@@ -222,7 +224,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
       VimPlugin.getChange().insertBeforeCursor(editor, new EditorDataContext(editor, null));
       KeyHandler.getInstance().reset(editor);
     }
-    editor.getSettings().setBlockCursor(!CommandStateHelper.inInsertMode(editor) || isBlockCursor);
+    VisualGroupKt.resetShape(CommandStateHelper.getMode(editor), editor);
     editor.getSettings().setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
   }
 
