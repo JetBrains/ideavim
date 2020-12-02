@@ -21,7 +21,7 @@ package org.jetbrains.plugins.ideavim.action.motion.visual
 import com.maddyhome.idea.vim.command.CommandState
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class VisualExitModeAction : VimTestCase() {
+class VisualExitModeActionTest : VimTestCase() {
   fun `test exit visual mode after line end`() {
     doTest("vl<Esc>", "12${c}3", "12${c}3", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
