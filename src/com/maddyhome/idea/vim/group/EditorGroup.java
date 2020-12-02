@@ -204,10 +204,6 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     }
   }
 
-  public boolean isBarCursor() {
-    return !isBlockCursor;
-  }
-
   public void editorCreated(@NotNull Editor editor) {
     isBlockCursor = editor.getSettings().isBlockCursor();
     isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
@@ -222,7 +218,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
       VimPlugin.getChange().insertBeforeCursor(editor, new EditorDataContext(editor, null));
       KeyHandler.getInstance().reset(editor);
     }
-    editor.getSettings().setBlockCursor(!CommandStateHelper.inInsertMode(editor) || isBlockCursor);
+    editor.getSettings().setBlockCursor(!CommandStateHelper.inInsertMode(editor));
     editor.getSettings().setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
   }
 

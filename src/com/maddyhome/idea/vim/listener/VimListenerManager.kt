@@ -253,11 +253,11 @@ object VimListenerManager {
         if (onLineEnd(caret)) {
           // UX protection for case when user performs a small dragging while putting caret on line end
           caret.removeSelection()
-          ChangeGroup.resetCaret(e.editor, VimPlugin.getEditor().isBarCursor)
+          ChangeGroup.resetCaret(e.editor, true)
         }
       }
       if (mouseDragging && e.editor.caretModel.primaryCaret.hasSelection()) {
-        ChangeGroup.resetCaret(e.editor, VimPlugin.getEditor().isBarCursor)
+        ChangeGroup.resetCaret(e.editor, true)
 
         if (!cutOffFixed && ComponentMouseListener.cutOffEnd) {
           cutOffFixed = true
