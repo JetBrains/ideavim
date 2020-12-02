@@ -25,4 +25,9 @@ class VisualExitModeActionTest : VimTestCase() {
   fun `test exit visual mode after line end`() {
     doTest("vl<Esc>", "12${c}3", "12${c}3", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
+
+  fun `test double exit`() {
+    doTest("vl<Esc><Esc>", "12${c}3", "12${c}3", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    assertTrue(myFixture.editor.settings.isBlockCursor)
+  }
 }
