@@ -13,6 +13,7 @@ import _Self.buildTypes.TestsForIntelliJ20192
 import _Self.buildTypes.TestsForIntelliJ20193
 import _Self.buildTypes.TestsForIntelliJ20201
 import _Self.buildTypes.TestsForIntelliJ20202
+import _Self.buildTypes.TestsForIntelliJ20203
 import _Self.buildTypes.TestsForIntelliJEAP
 import _Self.vcsRoots.Branch_181
 import _Self.vcsRoots.Branch_183
@@ -29,19 +30,24 @@ object Project : Project({
   vcsRoot(Branch_191_193)
 
   buildType(GitHubPullRequests)
+
   buildType(Release)
+  buildType(ReleaseEap)
+
   buildType(TestsForIntelliJ20201)
+  buildType(TestsForIntelliJ20202)
+  buildType(TestsForIntelliJ20203)
+  buildType(TestsForIntelliJEAP)
+
+  buildType(Nvim)
+  buildType(PluginVerifier)
+
   buildType(TestsForIntelliJ20191)
   buildType(TestsForIntelliJ20181)
   buildType(TestsForIntelliJ20192)
   buildType(TestsForIntelliJ20182)
   buildType(TestsForIntelliJ20193)
   buildType(TestsForIntelliJ20183)
-  buildType(Nvim)
-  buildType(ReleaseEap)
-  buildType(TestsForIntelliJ20202)
-  buildType(TestsForIntelliJEAP)
-  buildType(PluginVerifier)
 
   features {
     feature {
