@@ -159,6 +159,23 @@ map <leader>o <Action>(FileStructurePopup)
 ```
 </details>
 
+<details>
+<summary><strong>Suggested options</strong> (click to see)</summary>
+
+Here is also a list of the suggested options from [defaults.vim](https://github.com/vim/vim/blob/master/runtime/defaults.vim)
+
+```vim
+" Show a few lines of context around the cursor.  Note that this makes the
+" text scroll if you mouse-click near the start or end of the window.
+set scrolloff=5
+
+" Do incremental searching
+set incsearch
+
+" Don't use Ex mode, use Q for formatting.
+map Q gq
+```
+</details>
 
 
 You can read your `~/.vimrc` file from `~/.ideavimrc` with this command:
