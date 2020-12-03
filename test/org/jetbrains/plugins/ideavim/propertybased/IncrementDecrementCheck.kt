@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
@@ -48,6 +49,7 @@ class IncrementDecrementTest : VimPropertyTest() {
   }
 
   fun testPlayingWithNumbersGenerateNumber() {
+    OptionsManager.nrformats.append("octal")
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
         val number = env.generateValue(testNumberGenerator, "Generate %s number")
