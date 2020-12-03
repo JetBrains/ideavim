@@ -25,9 +25,11 @@ usual beta standards.
 ## To Be Released
 
 ### Features:
-
 * Support `unmap` and `mapclear` commands [VIM-1491](https://youtrack.jetbrains.com/issue/VIM-1491)
 * Support mappings in ex panel (`cmap`) [VIM-1227](https://youtrack.jetbrains.com/issue/VIM-1227)
+
+### Changes:
+* `octal` is now disabled by default for `nrformats`. [VIM-2181](https://youtrack.jetbrains.com/issue/VIM-2181)
 
 ### Fixes:
 * [VIM-2113](https://youtrack.jetbrains.com/issue/VIM-2113) Fix `cit` for empty tags
