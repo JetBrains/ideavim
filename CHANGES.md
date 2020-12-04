@@ -36,6 +36,8 @@ usual beta standards.
 * [VIM-2114](https://youtrack.jetbrains.com/issue/VIM-2114) Unnamed register isn't changed after deleting empty tag
 * [VIM-1475](https://youtrack.jetbrains.com/issue/VIM-1475) Enable block caret to be used in insert mode.
 * [VIM-2170](https://youtrack.jetbrains.com/issue/VIM-2170) Fix an alternative range format for `s` command
+* [VIM-1913](https://youtrack.jetbrains.com/issue/VIM-1913)
+  [VIM-2154](https://youtrack.jetbrains.com/issue/VIM-2154) Several fixes for AppCode templates
 
 ### Merged PRs:
 * [249](https://github.com/JetBrains/ideavim/pull/249) by [Jan Palus](https://github.com/jpalus): VIM-2113 Increase tag range only in visual mode
