@@ -24,7 +24,11 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsScheme
-import com.intellij.openapi.editor.markup.*
+import com.intellij.openapi.editor.markup.EffectType
+import com.intellij.openapi.editor.markup.HighlighterLayer
+import com.intellij.openapi.editor.markup.HighlighterTargetArea
+import com.intellij.openapi.editor.markup.RangeHighlighter
+import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.ui.ColorUtil
@@ -39,12 +43,24 @@ import java.awt.Color
 import java.awt.Font
 import java.util.*
 
-fun updateSearchHighlights(pattern: String?, shouldIgnoreSmartCase: Boolean, showHighlights: Boolean, forceUpdate: Boolean) {
+fun updateSearchHighlights(
+  pattern: String?,
+  shouldIgnoreSmartCase: Boolean,
+  showHighlights: Boolean,
+  forceUpdate: Boolean
+) {
   updateSearchHighlights(pattern, shouldIgnoreSmartCase, showHighlights, -1, null, true, forceUpdate)
 }
 
-fun updateIncsearchHighlights(editor: Editor, pattern: String, forwards: Boolean, caretOffset: Int, searchRange: LineRange?): Int {
-  val searchStartOffset = if (searchRange != null) EditorHelper.getLineStartOffset(editor, searchRange.startLine) else caretOffset
+fun updateIncsearchHighlights(
+  editor: Editor,
+  pattern: String,
+  forwards: Boolean,
+  caretOffset: Int,
+  searchRange: LineRange?
+): Int {
+  val searchStartOffset =
+    if (searchRange != null) EditorHelper.getLineStartOffset(editor, searchRange.startLine) else caretOffset
   val showHighlights = hlsearch.isSet
   return updateSearchHighlights(pattern, false, showHighlights, searchStartOffset, searchRange, forwards, false)
 }
@@ -56,15 +72,19 @@ fun addSubstitutionConfirmationHighlight(editor: Editor, start: Int, end: Int): 
     editor.colorsScheme.getColor(EditorColors.CARET_COLOR),
     EffectType.ROUNDED_BOX, Font.PLAIN
   )
-  return editor.markupModel.addRangeHighlighter(start, end, HighlighterLayer.SELECTION,
-    color, HighlighterTargetArea.EXACT_RANGE)
+  return editor.markupModel.addRangeHighlighter(
+    start, end, HighlighterLayer.SELECTION,
+    color, HighlighterTargetArea.EXACT_RANGE
+  )
 }
 
 /**
  * Refreshes current search highlights for all editors of currently active text editor/document
  */
-private fun updateSearchHighlights(pattern: String?, shouldIgnoreSmartCase: Boolean, showHighlights: Boolean,
-                                   initialOffset: Int, searchRange: LineRange?, forwards: Boolean, forceUpdate: Boolean): Int {
+private fun updateSearchHighlights(
+  pattern: String?, shouldIgnoreSmartCase: Boolean, showHighlights: Boolean,
+  initialOffset: Int, searchRange: LineRange?, forwards: Boolean, forceUpdate: Boolean
+): Int {
   var currentMatchOffset = -1
   val projectManager = ProjectManager.getInstanceIfCreated() ?: return currentMatchOffset
   for (project in projectManager.openProjects) {
@@ -86,7 +106,8 @@ private fun updateSearchHighlights(pattern: String?, shouldIgnoreSmartCase: Bool
         // hlsearch (+ incsearch/noincsearch)
         val startLine = searchRange?.startLine ?: 0
         val endLine = searchRange?.endLine ?: -1
-        val results = SearchGroup.findAll(editor, pattern, startLine, endLine, shouldIgnoreCase(pattern, shouldIgnoreSmartCase))
+        val results =
+          SearchGroup.findAll(editor, pattern, startLine, endLine, shouldIgnoreCase(pattern, shouldIgnoreSmartCase))
         if (results.isNotEmpty()) {
           currentMatchOffset = findClosestMatch(editor, results, initialOffset, forwards)
           highlightSearchResults(editor, pattern, results, currentMatchOffset)
@@ -200,8 +221,10 @@ private fun highlightMatch(editor: Editor, start: Int, end: Int, current: Boolea
   if (attributes.errorStripeColor == null) {
     attributes.errorStripeColor = getFallbackErrorStripeColor(attributes, editor.colorsScheme)
   }
-  val highlighter = editor.markupModel.addRangeHighlighter(start, end, HighlighterLayer.SELECTION - 1,
-    attributes, HighlighterTargetArea.EXACT_RANGE)
+  val highlighter = editor.markupModel.addRangeHighlighter(
+    start, end, HighlighterLayer.SELECTION - 1,
+    attributes, HighlighterTargetArea.EXACT_RANGE
+  )
   highlighter.errorStripeTooltip = tooltip
   return highlighter
 }

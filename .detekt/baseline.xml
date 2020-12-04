@@ -9,6 +9,7 @@
     <ID>ComplexMethod:OptionsManager.kt$OptionsManager$ fun parseOptionLine(editor: Editor?, args: String, failOnBad: Boolean): Boolean</ID>
     <ID>ComplexMethod:PutGroup.kt$PutGroup$private fun prepareDocumentAndGetStartOffsets(editor: Editor, caret: Caret, typeInRegister: SelectionType, data: PutData, additionalData: Map&lt;String, Any&gt;): List&lt;Int&gt;</ID>
     <ID>ComplexMethod:SearchHelperKt.kt$// bounds are considered inside corresponding quotes fun checkInString(chars: CharSequence, currentPos: Int, str: Boolean): Boolean</ID>
+    <ID>ComplexMethod:SearchHighlightsHelper.kt$ private fun updateSearchHighlights( pattern: String?, shouldIgnoreSmartCase: Boolean, showHighlights: Boolean, initialOffset: Int, searchRange: LineRange?, forwards: Boolean, forceUpdate: Boolean ): Int</ID>
     <ID>ComplexMethod:TabCloseHandler.kt$TabCloseHandler$ private fun getTabIndexToClose(arg: String, current: Int, last: Int): Int?</ID>
     <ID>ComplexMethod:VimExchangeExtension.kt$VimExchangeExtension.Operator$private fun compareExchanges(x: Exchange, y: Exchange): ExchangeCompareResult</ID>
     <ID>ComplexMethod:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension.NextOccurrenceHandler$override fun executeInWriteAction(editor: Editor, context: DataContext)</ID>
@@ -16,6 +17,8 @@
     <ID>LongMethod:CmdHandler.kt$CmdHandler$private fun addAlias(cmd: ExCommand, editor: Editor?): Boolean</ID>
     <ID>LongMethod:HistoryHandler.kt$HistoryHandler$override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean</ID>
     <ID>LongMethod:OptionsManager.kt$OptionsManager$ fun parseOptionLine(editor: Editor?, args: String, failOnBad: Boolean): Boolean</ID>
+    <ID>LongMethod:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension.NextOccurrenceHandler$override fun executeInWriteAction(editor: Editor, context: DataContext)</ID>
+    <ID>LoopWithTooManyJumpStatements:SearchHighlightsHelper.kt$for (project in projectManager.openProjects) { val current = FileEditorManager.getInstance(project).selectedTextEditor ?: continue // [VERSION UPDATE] 202+ Use editors val editors = EditorFactory.getInstance().getEditors(current.document, project) ?: continue for (editor in editors) { // Try to keep existing highlights if possible. Update if hlsearch has changed or if the pattern has changed. // Force update for the situations where the text is the same, but the ignore case values have changed. // E.g. Use `*` to search for a word (which ignores smartcase), then use `/&lt;Up&gt;` to search for the same pattern, // which will match smartcase. Or changing the smartcase/ignorecase settings if (shouldRemoveSearchHighlights(editor, pattern, showHighlights) || forceUpdate) { removeSearchHighlights(editor) } if (pattern == null) continue if (shouldAddAllSearchHighlights(editor, pattern, showHighlights)) { // hlsearch (+ incsearch/noincsearch) val startLine = searchRange?.startLine ?: 0 val endLine = searchRange?.endLine ?: -1 val results = SearchGroup.findAll(editor, pattern, startLine, endLine, shouldIgnoreCase(pattern, shouldIgnoreSmartCase)) if (results.isNotEmpty()) { currentMatchOffset = findClosestMatch(editor, results, initialOffset, forwards) highlightSearchResults(editor, pattern, results, currentMatchOffset) } editor.vimLastSearch = pattern } else if (shouldAddCurrentMatchSearchHighlight(pattern, showHighlights, initialOffset)) { // nohlsearch + incsearch val searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE) if (wrapscan.isSet) searchOptions.add(SearchOptions.WRAP) if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE) if (!forwards) searchOptions.add(SearchOptions.BACKWARDS) val result = SearchGroup.findIt(editor, pattern, initialOffset, 1, searchOptions) if (result != null) { currentMatchOffset = result.startOffset val results = listOf(result) highlightSearchResults(editor, pattern, results, currentMatchOffset) } } else if (shouldMaintainCurrentMatchOffset(pattern, initialOffset)) { // incsearch. If nothing has changed (e.g. we've edited offset values in `/foo/e+2`) make sure we return the // current match offset so the caret remains at the current incsarch match val offset = editor.vimIncsearchCurrentMatchOffset if (offset != null) { currentMatchOffset = offset } } } }</ID>
     <ID>MagicNumber:ActionListHandler.kt$ActionListHandler$50</ID>
     <ID>MagicNumber:AddBlockInlaysAction.kt$AddBlockInlaysAction$0.9f</ID>
     <ID>MagicNumber:AddBlockInlaysAction.kt$AddBlockInlaysAction$1.75f</ID>
@@ -50,6 +53,7 @@
     <ID>MagicNumber:OptionsManager.kt$OptionsManager$19</ID>
     <ID>MagicNumber:OptionsManager.kt$OptionsManager$20</ID>
     <ID>MagicNumber:OptionsManager.kt$OptionsManager$3</ID>
+    <ID>MagicNumber:OptionsManager.kt$OptionsManager$50</ID>
     <ID>MagicNumber:OptionsManager.kt$OptionsManager$80</ID>
     <ID>MagicNumber:ProcessExEntryAction.kt$ProcessExEntryAction$0x0a</ID>
     <ID>MagicNumber:RegistersHandler.kt$RegistersHandler$200</ID>
@@ -61,6 +65,7 @@
     <ID>MagicNumber:VimHighlightedYank.kt$VimHighlightedYank.HighlightHandler$3</ID>
     <ID>MagicNumber:VimHighlightedYank.kt$VimHighlightedYank.HighlightHandler$4</ID>
     <ID>MatchingDeclarationName:CommandDefinition.kt$CommandName</ID>
+    <ID>MatchingDeclarationName:SearchHelperKt.kt$Direction</ID>
     <ID>MaxLineLength:ExBeanClass.kt$ExBeanClass$logger&lt;ExBeanClass&gt;().error("IdeaVim doesn't accept contributions to `vimActions` extension points. Please create a plugin using `VimExtension`. Plugin to blame: $pluginId")</ID>
     <ID>MaxLineLength:ExRanges.kt$SearchRange$override</ID>
     <ID>MaxLineLength:NotificationService.kt$NotificationService$notification.addAction(AppendToIdeaVimRcAction(notification, "set clipboard+=ideaput", "ideaput") { OptionsManager.clipboard.append(ClipboardOptionsData.ideaput) })</ID>
@@ -79,67 +84,18 @@
     <ID>MaxLineLength:VimShortcutKeyAction.kt$VimShortcutKeyAction.Companion$ImmutableSet.builder&lt;KeyStroke&gt;().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0)).addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0)) .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0)).addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0)).addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_UP, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)).addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_LEFT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_RIGHT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)) .addAll(getKeyStrokes(KeyEvent.VK_HOME, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))</ID>
     <ID>MemberNameEqualsClassName:Ranges.kt$Ranges$private val ranges: MutableList&lt;Range&gt; = mutableListOf()</ID>
     <ID>NestedBlockDepth:OptionsManager.kt$OptionsManager$ fun parseOptionLine(editor: Editor?, args: String, failOnBad: Boolean): Boolean</ID>
-    <ID>ReturnCount:ActionBeanClass.kt$ActionBeanClass$fun getParsedModes(): Set&lt;MappingMode&gt;?</ID>
-    <ID>ReturnCount:Alias.kt$Alias$fun getCommand(input: String, count: Int): String</ID>
-    <ID>ReturnCount:CmdFilterHandler.kt$CmdFilterHandler$override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean</ID>
     <ID>ReturnCount:CmdHandler.kt$CmdHandler$private fun addAlias(cmd: ExCommand, editor: Editor?): Boolean</ID>
-    <ID>ReturnCount:CommandGroup.kt$CommandGroup$fun isAlias(command: String): Boolean</ID>
-    <ID>ReturnCount:DeleteJoinLinesAction.kt$DeleteJoinLinesAction$override fun execute(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean</ID>
-    <ID>ReturnCount:DeleteJoinLinesSpacesAction.kt$DeleteJoinLinesSpacesAction$override fun execute(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean</ID>
-    <ID>ReturnCount:DeleteJoinVisualLinesAction.kt$DeleteJoinVisualLinesAction$override fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map&lt;Caret, VimSelection&gt;): Boolean</ID>
-    <ID>ReturnCount:DeleteJoinVisualLinesSpacesAction.kt$DeleteJoinVisualLinesSpacesAction$override fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map&lt;Caret, VimSelection&gt;): Boolean</ID>
-    <ID>ReturnCount:DeleteMotionAction.kt$DeleteMotionAction$override fun execute(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean</ID>
-    <ID>ReturnCount:EditFileHandler.kt$EditFileHandler$override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean</ID>
-    <ID>ReturnCount:EditorHelper.kt$ fun Editor.isPrimaryEditor(): Boolean</ID>
     <ID>ReturnCount:ExRanges.kt$Range.Companion$ @JvmStatic fun createRange(str: String, offset: Int, move: Boolean): Array&lt;Range&gt;?</ID>
-    <ID>ReturnCount:FilterMotionAction.kt$FilterMotionAction$override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean</ID>
-    <ID>ReturnCount:GotoCharacterHandler.kt$GotoCharacterHandler$override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean</ID>
-    <ID>ReturnCount:Helper.kt$@Suppress("IncorrectParentDisposable") fun Editor.isTemplateActive(): Boolean</ID>
-    <ID>ReturnCount:HistoryHandler.kt$HistoryHandler$override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean</ID>
-    <ID>ReturnCount:IdeaSelectionControl.kt$IdeaSelectionControl$ fun predictMode(editor: Editor, selectionSource: VimListenerManager.SelectionSource): CommandState.Mode</ID>
-    <ID>ReturnCount:MapHandler.kt$MapHandler$@Throws(ExException::class) private fun executeCommand(cmd: ExCommand, editor: Editor?): Boolean</ID>
-    <ID>ReturnCount:Marks.kt$IntellijMark$private fun getProject(): Project?</ID>
-    <ID>ReturnCount:Marks.kt$VimMark.Companion$@JvmStatic fun create(key: Char?, logicalLine: Int?, col: Int?, filename: String?, protocol: String?): VimMark?</ID>
-    <ID>ReturnCount:ModalEntry.kt$ModalEntry.&lt;no name provided&gt;$override fun dispatchKeyEvent(e: KeyEvent): Boolean</ID>
-    <ID>ReturnCount:MotionScrollLastScreenLinePageStartAction.kt$MotionScrollLastScreenLinePageStartAction$override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean</ID>
-    <ID>ReturnCount:OperatorAction.kt$OperatorAction$override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean</ID>
-    <ID>ReturnCount:OptionsManager.kt$OptionsManager$ fun parseOptionLine(editor: Editor?, args: String, failOnBad: Boolean): Boolean</ID>
-    <ID>ReturnCount:PutGroup.kt$PutGroup$private fun getProviderForPasteViaIde(context: DataContext, typeInRegister: SelectionType, data: PutData): PasteProvider?</ID>
-    <ID>ReturnCount:PutGroup.kt$PutGroup$private fun prepareDocumentAndGetStartOffsets(editor: Editor, caret: Caret, typeInRegister: SelectionType, data: PutData, additionalData: Map&lt;String, Any&gt;): List&lt;Int&gt;</ID>
-    <ID>ReturnCount:PutLinesHandler.kt$PutLinesHandler$override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean</ID>
-    <ID>ReturnCount:ReloadVimRc.kt$VimRcFileState$fun equalTo(document: Document): Boolean</ID>
-    <ID>ReturnCount:RepeatHandler.kt$RepeatHandler$@Throws(ExException::class) override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean</ID>
-    <ID>ReturnCount:SelectMotionRightAction.kt$SelectMotionRightAction$override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int</ID>
-    <ID>ReturnCount:ShowCmd.kt$ShowCmd$fun getFullText(editor: Editor?): String</ID>
-    <ID>ReturnCount:TabCloseHandler.kt$TabCloseHandler$ private fun getTabIndexToClose(arg: String, current: Int, last: Int): Int?</ID>
-    <ID>ReturnCount:TextObjectActionHandler.kt$TextObjectActionHandler$ final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean</ID>
-    <ID>ReturnCount:UndoRedoHelper.kt$UndoRedoHelper$fun redo(context: DataContext): Boolean</ID>
-    <ID>ReturnCount:UndoRedoHelper.kt$UndoRedoHelper$fun undo(context: DataContext): Boolean</ID>
-    <ID>ReturnCount:VimExchangeExtension.kt$VimExchangeExtension.Operator$override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean</ID>
-    <ID>ReturnCount:VimExtensionFacade.kt$VimExtensionFacade$ @JvmStatic fun inputString(editor: Editor, prompt: String, finishOn: Char?): String</ID>
     <ID>ReturnCount:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension.AllOccurrencesHandler$override fun executeInWriteAction(editor: Editor, context: DataContext)</ID>
     <ID>ReturnCount:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension.NextOccurrenceHandler$override fun executeInWriteAction(editor: Editor, context: DataContext)</ID>
-    <ID>ReturnCount:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension.SkipOccurrenceHandler$override fun executeInWriteAction(editor: Editor, context: DataContext)</ID>
-    <ID>ReturnCount:VimScriptParser.kt$VimScriptParser$@Throws(ExException::class) fun evaluate(expression: String, globals: Map&lt;String?, Any?&gt;): Any</ID>
-    <ID>ReturnCount:VimScriptParser.kt$VimScriptParser$fun findOrCreateIdeaVimRc(): File?</ID>
-    <ID>ReturnCount:VimShortcutKeyAction.kt$VimShortcutKeyAction$private fun getKeyStroke(e: AnActionEvent): KeyStroke?</ID>
     <ID>ReturnCount:VimShortcutKeyAction.kt$VimShortcutKeyAction$private fun isEnabled(e: AnActionEvent): Boolean</ID>
-    <ID>ReturnCount:VimSurroundExtension.kt$VimSurroundExtension.CSurroundHandler$override fun execute(editor: Editor, context: DataContext)</ID>
-    <ID>ReturnCount:VimSurroundExtension.kt$VimSurroundExtension.Operator$override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean</ID>
-    <ID>ReturnCount:VisualBlockAppendAction.kt$VisualBlockAppendAction$override fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map&lt;Caret, VimSelection&gt;): Boolean</ID>
-    <ID>ReturnCount:VisualBlockInsertAction.kt$VisualBlockInsertAction$override fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map&lt;Caret, VimSelection&gt;): Boolean</ID>
-    <ID>ReturnCount:VisualMotionGroup.kt$VisualMotionGroup$ fun toggleVisual(editor: Editor, count: Int, rawCount: Int, subMode: CommandState.SubMode): Boolean</ID>
-    <ID>ReturnCount:VisualMotionGroup.kt$VisualMotionGroup$fun autodetectVisualSubmode(editor: Editor): CommandState.SubMode</ID>
-    <ID>ReturnCount:VisualMotionGroup.kt$VisualMotionGroup$fun selectPreviousVisualMode(editor: Editor): Boolean</ID>
-    <ID>ReturnCount:VisualMotionGroup.kt$VisualMotionGroup$fun swapVisualSelections(editor: Editor): Boolean</ID>
     <ID>ReturnCount:VisualMotionGroup.kt$VisualMotionGroup$private fun seemsLikeBlockMode(editor: Editor): Boolean</ID>
-    <ID>ReturnCount:VisualOperatorActionHandler.kt$VisualOperatorActionHandler$final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean</ID>
-    <ID>ReturnCount:YankGroup.kt$YankGroup$ fun yankMotion(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument): Boolean</ID>
     <ID>ThrowsCount:CommandHandler.kt$CommandHandler$private fun checkArgs(cmd: ExCommand)</ID>
     <ID>TooManyFunctions:CommandBuilder.kt$CommandBuilder</ID>
     <ID>TooManyFunctions:CommandState.kt$CommandState</ID>
     <ID>TooManyFunctions:PutGroup.kt$PutGroup</ID>
     <ID>TooManyFunctions:Ranges.kt$Ranges</ID>
+    <ID>TooManyFunctions:SearchHighlightsHelper.kt$com.maddyhome.idea.vim.helper.SearchHighlightsHelper.kt</ID>
     <ID>TooManyFunctions:VisualGroup.kt$com.maddyhome.idea.vim.group.visual.VisualGroup.kt</ID>
     <ID>TooManyFunctions:VisualMotionGroup.kt$VisualMotionGroup</ID>
   </CurrentIssues>
