@@ -43,6 +43,8 @@ usual beta standards.
 * [256](https://github.com/JetBrains/ideavim/pull/256) by [Brandon Conway](https://github.com/brandoncc): Fix typo
 * [254](https://github.com/JetBrains/ideavim/pull/254) by [Grzegorz Antoniak](https://github.com/antekone): VIM-1475: Add an option to use block caret in insert mode
 * [225](https://github.com/JetBrains/ideavim/pull/225) by [sumoooru2](https://github.com/sumoooru2): Implement cmap
+* [258](https://github.com/JetBrains/ideavim/pull/258) by [Matt Ellis](https://github.com/citizenmatt): Show the correct handler class in :map
+* [257](https://github.com/JetBrains/ideavim/pull/257) by [Matt Ellis](https://github.com/citizenmatt): Extract SearchHighlightsHelper from SearchGroup
 
 ## 0.61, 2020-11-12
 
