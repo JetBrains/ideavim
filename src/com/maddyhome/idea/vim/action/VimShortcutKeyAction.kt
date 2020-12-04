@@ -98,7 +98,9 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
 
       if (keyCode == KeyEvent.VK_ESCAPE) return isEnabledForEscape(editor)
 
-      if (keyCode == KeyEvent.VK_TAB && (editor.isTemplateActive() || editor.appCodeTemplateCaptured())) return false
+      if (keyCode == KeyEvent.VK_TAB && editor.isTemplateActive()) return false
+
+      if ((keyCode == KeyEvent.VK_TAB || keyCode == KeyEvent.VK_ENTER) && editor.appCodeTemplateCaptured()) return false
 
       if (editor.inInsertMode) { // XXX: <Tab> won't be recorded in macros
         if (keyCode == KeyEvent.VK_TAB) {
