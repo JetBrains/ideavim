@@ -41,6 +41,10 @@ enum class Direction(private val value: Int) {
   }
 }
 
+enum class SearchOptions {
+  BACKWARDS, WANT_ENDPOS, WRAP, SHOW_MESSAGES, WHOLE_FILE, IGNORE_SMARTCASE
+}
+
 private data class State(val position: Int, val trigger: Char, val inQuote: Boolean?, val lastOpenSingleQuotePos: Int)
 
 // bounds are considered inside corresponding quotes

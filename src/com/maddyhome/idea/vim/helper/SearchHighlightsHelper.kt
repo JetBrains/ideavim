@@ -34,8 +34,6 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.ui.ColorUtil
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.group.SearchGroup
-import com.maddyhome.idea.vim.group.SearchGroup.SearchOptions
 import com.maddyhome.idea.vim.option.OptionsManager.hlsearch
 import com.maddyhome.idea.vim.option.OptionsManager.wrapscan
 import org.jetbrains.annotations.Contract
@@ -107,7 +105,7 @@ private fun updateSearchHighlights(
         val startLine = searchRange?.startLine ?: 0
         val endLine = searchRange?.endLine ?: -1
         val results =
-          SearchGroup.findAll(editor, pattern, startLine, endLine, shouldIgnoreCase(pattern, shouldIgnoreSmartCase))
+          SearchHelper.findAll(editor, pattern, startLine, endLine, shouldIgnoreCase(pattern, shouldIgnoreSmartCase))
         if (results.isNotEmpty()) {
           currentMatchOffset = findClosestMatch(editor, results, initialOffset, forwards)
           highlightSearchResults(editor, pattern, results, currentMatchOffset)
@@ -119,7 +117,7 @@ private fun updateSearchHighlights(
         if (wrapscan.isSet) searchOptions.add(SearchOptions.WRAP)
         if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
         if (!forwards) searchOptions.add(SearchOptions.BACKWARDS)
-        val result = SearchGroup.findIt(editor, pattern, initialOffset, 1, searchOptions)
+        val result = SearchHelper.findPattern(editor, pattern, initialOffset, 1, searchOptions)
         if (result != null) {
           currentMatchOffset = result.startOffset
           val results = listOf(result)
