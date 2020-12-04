@@ -248,6 +248,11 @@ object IdeaSpecifics {
       }
     }
 
+    fun Editor.appCodeTemplateCaptured(): Boolean {
+      if (!PlatformUtils.isAppCode()) return false
+      return this.caretModel.allCarets.any { it.getUserData(facedAppCodeTemplate) != null }
+    }
+
     private fun Caret.shake() {
       moveCaretRelatively(1, 0, false, false)
       moveCaretRelatively(-1, 0, false, false)
