@@ -169,34 +169,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   }
 
   /**
-   * Search for the pattern from the given search command, starting at the offset of the current primary caret
-   *
-   * <p>Parse the search command to extract pattern and pattern offset. If the pattern is empty, reuse existing state
-   * for last used (search? substitute?) pattern. Updates state for last used (search? substitute?) pattern, pattern
-   * offset and direction. Updates search history and redraws highlights. scanwrap and ignorecase come from options.</p>
-   *
-   * <p>Optionally moves the caret, as well as returning the found offset. Will save the jump location.</p>
-   *
-   * <ul>
-   * <li>TODO: Document used search pattern</li>
-   * <li>TODO: Document if/when last offset is used</li>
-   * <li>TODO: Can count ever be anything other than 1?</li>
-   * <li>TODO: Pass direction rather than CommandFlags</li>
-   * </ul>
-   *
-   * @param editor      The editor to search in
-   * @param command     The command text entered into the Ex entry panel. Does not include the leading `/` or `?`.
-   *                    Can include a trailing offset, e.g. /{pattern}/{offset}, or multiple commands separated by a semicolon.
-   *                    If the pattern is empty, the last used (search? substitute?) pattern (and offset?) is used.
-   * @param count       Find the nth pattern
-   * @param flags       The command flags, used to specify the direction
-   * @return            Offset to the next occurrence of the pattern or -1 if not found
-   */
-  public int search(@NotNull Editor editor, @NotNull String command, int count, EnumSet<CommandFlags> flags) {
-    return search(editor, command, editor.getCaretModel().getPrimaryCaret().getOffset(), count, flags);
-  }
-
-  /**
    * Search for the pattern from the given search command, starting at the offset of the given caret
    *
    * <p>Existing state is reused if the given command is empty. Updates state with given (search? substitute?) pattern,
@@ -205,7 +177,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
    *
    * <ul>
    * <li>TODO: Document used search pattern</li>
-   * <li>TODO: Document if/when last offset is used</li>
+   * <li>TODO: Document if/when last pattern offset is used</li>
    * <li>TODO: Can count ever be anything other than 1?</li>
    * <li>TODO: Pass direction rather than CommandFlags</li>
    * </ul>
