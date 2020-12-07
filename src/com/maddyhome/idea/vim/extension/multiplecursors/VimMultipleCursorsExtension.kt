@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtension
@@ -164,9 +163,7 @@ class VimMultipleCursorsExtension : VimExtension {
         if (nextOffset == -1 || compareText != 0) {
           if (caretModel.caretCount > 1) return
 
-          val newNextOffset = VimPlugin.getSearch().search(editor, pattern, primaryCaret.offset, 1,
-            EnumSet.of(CommandFlags.FLAG_SEARCH_FWD))
-
+          val newNextOffset = VimPlugin.getSearch().search(editor, pattern, primaryCaret.offset, 1, Direction.FORWARDS)
           if (newNextOffset != -1) {
             val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(newNextOffset)) ?: return
             selectWord(caret, pattern, newNextOffset)
@@ -196,8 +193,7 @@ class VimMultipleCursorsExtension : VimExtension {
       val primaryCaret = caretModel.primaryCaret
       var nextOffset = if (editor.inVisualMode) {
         val selectedText = primaryCaret.selectedText ?: return
-        val nextOffset = VimPlugin.getSearch().search(editor, selectedText, primaryCaret.offset, 1,
-          EnumSet.of(CommandFlags.FLAG_SEARCH_FWD))
+        val nextOffset = VimPlugin.getSearch().search(editor, selectedText, primaryCaret.offset, 1, Direction.FORWARDS)
         nextOffset
       } else {
         val range = findWordUnderCursor(editor, primaryCaret) ?: return

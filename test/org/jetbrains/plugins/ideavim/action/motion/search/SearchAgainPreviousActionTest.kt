@@ -19,11 +19,10 @@
 package org.jetbrains.plugins.ideavim.action.motion.search
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
-import java.util.*
 
 class SearchAgainPreviousActionTest : VimTestCase() {
   fun `test search with tabs`() {
@@ -42,7 +41,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
     """.trimIndent().dotToTab()
     doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch()
-        .search(it, "all", it.caretModel.primaryCaret.offset, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD))
+        .search(it, "all", it.caretModel.primaryCaret.offset, 1, Direction.FORWARDS)
     }
   }
 
@@ -62,7 +61,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
     """.trimIndent().dotToTab()
     doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch()
-        .search(it, "all", it.caretModel.primaryCaret.offset, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD))
+        .search(it, "all", it.caretModel.primaryCaret.offset, 1, Direction.FORWARDS)
     }
   }
 
@@ -82,7 +81,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
     """.trimIndent().dotToTab()
     doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch()
-        .search(it, "all", it.caretModel.primaryCaret.offset, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD))
+        .search(it, "all", it.caretModel.primaryCaret.offset, 1, Direction.FORWARDS)
     }
   }
 
@@ -102,7 +101,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
     """.trimIndent().dotToTab()
     doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch()
-        .search(it, "all", it.caretModel.primaryCaret.offset, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD))
+        .search(it, "all", it.caretModel.primaryCaret.offset, 1, Direction.FORWARDS)
     }
   }
 }

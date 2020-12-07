@@ -32,7 +32,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
@@ -179,7 +178,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
    * <li>TODO: Document used search pattern</li>
    * <li>TODO: Document if/when last pattern offset is used</li>
    * <li>TODO: Can count ever be anything other than 1?</li>
-   * <li>TODO: Pass direction rather than CommandFlags</li>
    * </ul>
    *
    * @param editor      The editor to search in
@@ -188,18 +186,13 @@ public class SearchGroup implements PersistentStateComponent<Element> {
    *                    Can include a trailing offset, e.g. /{pattern}/{offset}, or multiple commands separated by a semicolon.
    *                    If the pattern is empty, the last used (search? substitute?) pattern (and offset?) is used.
    * @param count       Find the nth pattern
-   * @param flags       The command flags, used to specify direction
+   * @param dir         The direction to search
    * @return            Offset to the next occurrence of the pattern or -1 if not found
    */
-  public int search(@NotNull Editor editor, @NotNull String command, int startOffset, int count, @NotNull EnumSet<CommandFlags> flags) {
-    Direction dir = Direction.FORWARDS;
-    char type = '/';
+  public int search(@NotNull Editor editor, @NotNull String command, int startOffset, int count, @NotNull Direction dir) {
+    final char type = dir == Direction.FORWARDS ? '/' : '?';
     String pattern = lastSearch;
     String offset = lastOffset;
-    if (flags.contains(CommandFlags.FLAG_SEARCH_REV)) {
-      dir = Direction.BACKWARDS;
-      type = '?';
-    }
 
     if (command.length() > 0) {
       if (command.charAt(0) != type) {
@@ -1044,12 +1037,12 @@ public class SearchGroup implements PersistentStateComponent<Element> {
 
     int ppos = pp.getIndex();
     if (ppos < lastOffset.length() - 1 && lastOffset.charAt(ppos) == ';') {
-      EnumSet<CommandFlags> flags = EnumSet.noneOf(CommandFlags.class);
+      final Direction nextDir;
       if (lastOffset.charAt(ppos + 1) == '/') {
-        flags.add(CommandFlags.FLAG_SEARCH_FWD);
+        nextDir = Direction.FORWARDS;
       }
       else if (lastOffset.charAt(ppos + 1) == '?') {
-        flags.add(CommandFlags.FLAG_SEARCH_REV);
+        nextDir = Direction.BACKWARDS;
       }
       else {
         return res;
@@ -1059,8 +1052,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
         ppos++;
       }
 
-      res = search(editor, lastOffset.substring(ppos + 1), res, 1, flags);
-
+      res = search(editor, lastOffset.substring(ppos + 1), res, 1, nextDir);
     }
     return res;
   }

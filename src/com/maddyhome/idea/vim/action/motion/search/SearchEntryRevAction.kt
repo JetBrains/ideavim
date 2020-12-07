@@ -25,13 +25,14 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 class SearchEntryRevAction : MotionActionHandler.ForEachCaret() {
   override val argumentType: Argument.Type = Argument.Type.EX_STRING
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SEARCH_REV, CommandFlags.FLAG_SAVE_JUMP)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
   override fun getOffset(
     editor: Editor,
@@ -43,7 +44,7 @@ class SearchEntryRevAction : MotionActionHandler.ForEachCaret() {
   ): Int {
     if (argument == null) return -1
     return VimPlugin.getSearch()
-      .search(editor, argument.string, caret.offset, count, enumSetOf(CommandFlags.FLAG_SEARCH_REV))
+      .search(editor, argument.string, caret.offset, count, Direction.BACKWARDS)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

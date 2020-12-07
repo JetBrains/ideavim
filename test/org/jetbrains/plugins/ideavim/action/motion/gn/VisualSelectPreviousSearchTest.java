@@ -21,11 +21,9 @@ package org.jetbrains.plugins.ideavim.action.motion.gn;
 import com.intellij.idea.TestFor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction;
-import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.helper.Direction;
 import org.jetbrains.plugins.ideavim.VimTestCase;
-
-import java.util.EnumSet;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
@@ -58,7 +56,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
 
   public void testWithoutSpaces() {
     configureByText("tes<caret>ttest");
-    VimPlugin.getSearch().search(myFixture.getEditor(), "test", myFixture.getCaretOffset(), 1, EnumSet.noneOf(CommandFlags.class));
+    VimPlugin.getSearch().search(myFixture.getEditor(), "test", myFixture.getCaretOffset(), 1, Direction.FORWARDS);
     typeText(parseKeys("gN"));
 
     assertOffset(0);

@@ -22,8 +22,8 @@ package org.jetbrains.plugins.ideavim.action.motion.gn
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.noneOfEnum
 import org.jetbrains.plugins.ideavim.VimTestCase
 import javax.swing.KeyStroke
 
@@ -60,7 +60,7 @@ class GnPreviousTextObjectTest : VimTestCase() {
     after: String
   ) {
     configureByText(before)
-    VimPlugin.getSearch().search(myFixture.editor, "test", myFixture.caretOffset, 1, noneOfEnum())
+    VimPlugin.getSearch().search(myFixture.editor, "test", myFixture.caretOffset, 1, Direction.FORWARDS)
     typeText(keys)
     myFixture.checkResult(after)
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)

@@ -22,9 +22,8 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 /**
@@ -202,21 +201,21 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
       when (pat) {
         "\\/" -> {
           patterns.add(VimPlugin.getSearch().lastSearch)
-          flags.add(enumSetOf(CommandFlags.FLAG_SEARCH_FWD))
+          directions.add(Direction.FORWARDS)
         }
         "\\?" -> {
           patterns.add(VimPlugin.getSearch().lastSearch)
-          flags.add(enumSetOf(CommandFlags.FLAG_SEARCH_REV))
+          directions.add(Direction.BACKWARDS)
         }
         "\\&" -> {
           patterns.add(VimPlugin.getSearch().lastPattern)
-          flags.add(enumSetOf(CommandFlags.FLAG_SEARCH_FWD))
+          directions.add(Direction.FORWARDS)
         }
         else -> {
           if (pat[0] == '/') {
-            flags.add(enumSetOf(CommandFlags.FLAG_SEARCH_FWD))
+            directions.add(Direction.FORWARDS)
           } else {
-            flags.add(enumSetOf(CommandFlags.FLAG_SEARCH_REV))
+            directions.add(Direction.BACKWARDS)
           }
           pat = pat.substring(1)
           if (pat.last() == pat[0]) {
@@ -243,13 +242,13 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
     var pos = -1
     for (i in patterns.indices) {
       val pattern = patterns[i]
-      val flag = flags[i]
-      pos = if (CommandFlags.FLAG_SEARCH_FWD in flag && !lastZero) {
+      val direction = directions[i]
+      pos = if (direction == Direction.FORWARDS && !lastZero) {
         VimPlugin.getMotion().moveCaretToLineEnd(editor, line, true)
       } else {
         VimPlugin.getMotion().moveCaretToLineStart(editor, line)
       }
-      pos = VimPlugin.getSearch().search(editor, pattern!!, pos, 1, flag)
+      pos = VimPlugin.getSearch().search(editor, pattern!!, pos, 1, direction)
       line = if (pos == -1) {
         break
       } else {
@@ -268,16 +267,16 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
     var offset = -1
     for (i in patterns.indices) {
       val pattern = patterns[i]
-      val flag = flags[i]
-      offset = VimPlugin.getSearch().search(editor, pattern!!, getSearchOffset(editor, line, flag, lastZero), 1, flag)
+      val direction = directions[i]
+      offset = VimPlugin.getSearch().search(editor, pattern!!, getSearchOffset(editor, line, direction, lastZero), 1, direction)
       if (offset == -1) break
       line = editor.offsetToLogicalPosition(offset).line
     }
     return if (offset != -1) line else -1
   }
 
-  private fun getSearchOffset(editor: Editor, line: Int, flag: EnumSet<CommandFlags>, lastZero: Boolean): Int {
-    return if (flag.contains(CommandFlags.FLAG_SEARCH_FWD) && !lastZero) {
+  private fun getSearchOffset(editor: Editor, line: Int, direction: Direction, lastZero: Boolean): Int {
+    return if (direction == Direction.FORWARDS && !lastZero) {
       VimPlugin.getMotion().moveCaretToLineEnd(editor, line, true)
     } else VimPlugin.getMotion().moveCaretToLineStart(editor, line)
   }
@@ -285,7 +284,7 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
   override fun toString(): String = "SearchRange[patterns=$patterns, ${super.toString()}]"
 
   private val patterns: MutableList<String?> = mutableListOf()
-  private val flags: MutableList<EnumSet<CommandFlags>> = mutableListOf()
+  private val directions: MutableList<Direction> = mutableListOf()
 
   companion object {
     private val logger = logger<SearchRange>()
