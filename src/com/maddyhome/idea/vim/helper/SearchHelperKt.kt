@@ -23,20 +23,19 @@ import com.maddyhome.idea.vim.option.OptionsManager.ignorecase
 import com.maddyhome.idea.vim.option.OptionsManager.smartcase
 
 enum class Direction(private val value: Int) {
-  BACKWARDS(-1), FORWARDS(1), UNSET(0);
+  BACKWARDS(-1), FORWARDS(1);
 
   fun toInt(): Int = value
   fun reverse(): Direction = when (this) {
     BACKWARDS -> FORWARDS
     FORWARDS -> BACKWARDS
-    UNSET -> UNSET
   }
 
   companion object {
     fun fromInt(value: Int) = when (value) {
       BACKWARDS.value -> BACKWARDS
       FORWARDS.value -> FORWARDS
-      else -> UNSET
+      else -> FORWARDS
     }
   }
 }
