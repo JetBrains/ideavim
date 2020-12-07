@@ -42,7 +42,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
     """.trimIndent().dotToTab()
     doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch()
-        .search(it, it.caretModel.primaryCaret, "all", 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD))
+        .search(it, "all", it.caretModel.primaryCaret.offset, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD))
     }
   }
 
@@ -62,7 +62,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
     """.trimIndent().dotToTab()
     doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch()
-        .search(it, it.caretModel.primaryCaret, "all", 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD))
+        .search(it, "all", it.caretModel.primaryCaret.offset, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD))
     }
   }
 
@@ -82,7 +82,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
     """.trimIndent().dotToTab()
     doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch()
-        .search(it, it.caretModel.primaryCaret, "all", 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD))
+        .search(it, "all", it.caretModel.primaryCaret.offset, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD))
     }
   }
 
@@ -102,7 +102,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
     """.trimIndent().dotToTab()
     doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch()
-        .search(it, it.caretModel.primaryCaret, "all", 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD))
+        .search(it, "all", it.caretModel.primaryCaret.offset, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD))
     }
   }
 }
