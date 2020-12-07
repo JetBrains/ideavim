@@ -185,7 +185,19 @@ private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
   }
 }
 
-fun shouldIgnoreCase(pattern: String, ignoreSmartCase: Boolean): Boolean {
-  val sc = smartcase.isSet && !ignoreSmartCase
+/**
+ * Check ignorecase and smartcase options to see if a case insensitive search should be performed with the given pattern.
+ *
+ * When ignorecase is not set, this will always return false - perform a case sensitive search.
+ *
+ * Otherwise, check smartcase. When set, the search will be case insensitive if the pattern contains only lowercase
+ * characters, and case sensitive (returns false) if the pattern contains any lowercase characters.
+ *
+ * The smartcase option can be ignored, e.g. when searching for the whole word under the cursor. This always performs a
+ * case insensitive search, so `\<Work\>` will match `Work` and `work`. But when choosing the same pattern from search
+ * history, the smartcase option is applied, and `\<Work\>` will only match `Work`.
+ */
+fun shouldIgnoreCase(pattern: String, ignoreSmartCaseOption: Boolean): Boolean {
+  val sc = smartcase.isSet && !ignoreSmartCaseOption
   return ignorecase.isSet && !(sc && StringHelper.containsUpperCase(pattern))
 }

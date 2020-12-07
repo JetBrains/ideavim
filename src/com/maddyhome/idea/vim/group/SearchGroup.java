@@ -47,10 +47,7 @@ import com.maddyhome.idea.vim.ui.ModalEntry;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import kotlin.jvm.functions.Function1;
 import org.jdom.Element;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.*;
 
 import javax.swing.*;
 import java.text.NumberFormat;
@@ -92,20 +89,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     showSearchHighlight = show;
   }
 
-  public @Nullable String getLastSearch() {
-    return lastSearch;
-  }
-
-  // This method is used in AceJump integration plugin
-  @SuppressWarnings("unused")
-  public int getLastDir() {
-    return lastDir.toInt();
-  }
-
-  public @Nullable String getLastPattern() {
-    return lastPattern;
-  }
-
+  @TestOnly
   public void resetState() {
     lastSearch = lastPattern = lastSubstitute = lastReplace = lastOffset = null;
     lastIgnoreSmartCase = false;
@@ -113,11 +97,55 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     resetShowSearchHighlight();
   }
 
+  /**
+   * Get the last pattern used for searching. Does not include pattern used in substitution
+   *
+   * @return The pattern used for last search. Can be null
+   */
+  public @Nullable String getLastSearch() {
+    return lastSearch;
+  }
+
+  /**
+   * Get the pattern last used for either searching or substitution.
+   *
+   * @return The pattern last used for either searching or substitution. Can be null
+   */
+  public @Nullable String getLastPattern() {
+    return lastPattern;
+  }
+
+  /**
+   * Get the last used search direction
+   *
+   * <p>This method is used in the AceJump integration plugin</p>
+   *
+   * @return Returns the integer value of Direction. 1 for FORWARDS, -1 for BACKWARDS
+   */
+  @SuppressWarnings("unused")
+  public int getLastDir() {
+    return lastDir.toInt();
+  }
+
+  /**
+   * Set the last used search or substitution pattern.
+   *
+   * <p>Also updates the search register and the search history.</p>
+   *
+   * @param lastPattern The pattern last used for either searching or substitution.
+   */
   private void setLastPattern(@NotNull String lastPattern) {
     this.lastPattern = lastPattern;
     VimPlugin.getRegister().storeTextSpecial(RegisterGroup.LAST_SEARCH_REGISTER, lastPattern);
     VimPlugin.getHistory().addEntry(HistoryGroup.SEARCH, lastPattern);
   }
+
+
+  // *******************************************************************************************************************
+  //
+  // Search
+  //
+  // *******************************************************************************************************************
 
   /**
    * Find all occurrences of the pattern
@@ -140,51 +168,62 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     return SearchHelper.findAll(editor, pattern, startLine, endLine, ignoreCase);
   }
 
-  private static @NotNull ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match, @NotNull Caret caret, int startoff) {
-    final Ref<ReplaceConfirmationChoice> result = Ref.create(ReplaceConfirmationChoice.QUIT);
-    final Function1<KeyStroke, Boolean> keyStrokeProcessor = key -> {
-      final ReplaceConfirmationChoice choice;
-      final char c = key.getKeyChar();
-      if (StringHelper.isCloseKeyStroke(key) || c == 'q') {
-        choice = ReplaceConfirmationChoice.QUIT;
-      } else if (c == 'y') {
-        choice = ReplaceConfirmationChoice.SUBSTITUTE_THIS;
-      } else if (c == 'l') {
-        choice = ReplaceConfirmationChoice.SUBSTITUTE_LAST;
-      } else if (c == 'n') {
-        choice = ReplaceConfirmationChoice.SKIP;
-      } else if (c == 'a') {
-        choice = ReplaceConfirmationChoice.SUBSTITUTE_ALL;
-      } else {
-        return true;
-      }
-      result.set(choice);
-      return false;
-    };
-    if (ApplicationManager.getApplication().isUnitTestMode()) {
-      MotionGroup.moveCaret(editor, caret, startoff);
-      final TestInputModel inputModel = TestInputModel.getInstance(editor);
-      for (KeyStroke key = inputModel.nextKeyStroke(); key != null; key = inputModel.nextKeyStroke()) {
-        if (!keyStrokeProcessor.invoke(key)) {
-          break;
-        }
-      }
-    }
-    else {
-      // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
-      final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
-      exEntryPanel.activate(editor, new EditorDataContext(editor, null), MessageHelper.message("replace.with.0", match), "", 1);
-      MotionGroup.moveCaret(editor, caret, startoff);
-      ModalEntry.INSTANCE.activate(keyStrokeProcessor);
-      exEntryPanel.deactivate(true, false);
-    }
-    return result.get();
-  }
-
+  /**
+   * Search for the pattern from the given search command, starting at the offset of the current primary caret
+   *
+   * <p>Parse the search command to extract pattern and pattern offset. If the pattern is empty, reuse existing state
+   * for last used (search? substitute?) pattern. Updates state for last used (search? substitute?) pattern, pattern
+   * offset and direction. Updates search history and redraws highlights. scanwrap and ignorecase come from options.</p>
+   *
+   * <p>Optionally moves the caret, as well as returning the found offset. Will save the jump location.</p>
+   *
+   * <ul>
+   * <li>TODO: Document used search pattern</li>
+   * <li>TODO: Document if/when last offset is used</li>
+   * <li>TODO: Can count ever be anything other than 1?</li>
+   * <li>TODO: Pass direction rather than CommandFlags</li>
+   * </ul>
+   *
+   * @param editor      The editor to search in
+   * @param command     The command text entered into the Ex entry panel. Does not include the leading `/` or `?`.
+   *                    Can include a trailing offset, e.g. /{pattern}/{offset}, or multiple commands separated by a semicolon.
+   *                    If the pattern is empty, the last used (search? substitute?) pattern (and offset?) is used.
+   * @param count       Find the nth pattern
+   * @param flags       The command flags, used to specify the direction
+   * @param moveCursor  Optionally move the caret and save a jump location, as well as returning offset
+   * @return            Offset to the next occurrence of the pattern or -1 if not found
+   */
   public int search(@NotNull Editor editor, @NotNull String command, int count, EnumSet<CommandFlags> flags, boolean moveCursor) {
     return search(editor, editor.getCaretModel().getPrimaryCaret(), command, count, flags, moveCursor);
   }
 
+  /**
+   * Search for the pattern from the given search command, starting at the offset of the given caret
+   *
+   * <p>Parse the search command to extract pattern and pattern offset. If the pattern is empty, reuse existing state
+   * for last used (search? substitute?) pattern. Updates state for last used (search? substitute?) pattern, pattern
+   * offset and direction. Updates search history and redraws highlights. scanwrap and ignorecase come from options.</p>
+   *
+   * <p>Optionally moves the caret, as well as returning the found offset. Will save the jump location.</p>
+   *
+   * <ul>
+   * <li>TODO: Document used search pattern</li>
+   * <li>TODO: Document if/when last offset is used</li>
+   * <li>TODO: Can count ever be anything other than 1?</li>
+   * <li>TODO: Return offset or move caret, don't do both</li>
+   * <li>TODO: Pass direction rather than CommandFlags</li>
+   * </ul>
+   *
+   * @param editor      The editor to search in
+   * @param caret       Used to get the offset to search from. This caret will be moved if a match is found and moveCursor is true
+   * @param command     The command text entered into the Ex entry panel. Does not include the leading `/` or `?`.
+   *                    Can include a trailing offset, e.g. /{pattern}/{offset}, or multiple commands separated by a semicolon.
+   *                    If the pattern is empty, the last used (search? substitute?) pattern (and offset?) is used.
+   * @param count       Find the nth pattern
+   * @param flags       The command flags, used to specify direction
+   * @param moveCursor  Flag to indicate if caret should be moved and a jump location saved
+   * @return            Offset to the next occurrence of the pattern, or -1 if not found
+   */
   public int search(@NotNull Editor editor, @NotNull Caret caret, @NotNull String command, int count, EnumSet<CommandFlags> flags,
                     boolean moveCursor) {
     final int res = search(editor, command, caret.getOffset(), count, flags);
@@ -197,6 +236,29 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     return res;
   }
 
+  /**
+   * Search for the pattern from the given search command, starting at the offset of the given caret
+   *
+   * <p>Existing state is reused if the given command is empty. Updates state with given (search? substitute?) pattern,
+   * pattern offset and direction. Updates search history and redraws highlights. scanwrap and ignorecase come from
+   * options.</p>
+   *
+   * <ul>
+   * <li>TODO: Document used search pattern</li>
+   * <li>TODO: Document if/when last offset is used</li>
+   * <li>TODO: Can count ever be anything other than 1?</li>
+   * <li>TODO: Pass direction rather than CommandFlags</li>
+   * </ul>
+   *
+   * @param editor      The editor to search in
+   * @param startOffset The offset to start searching from
+   * @param command     The command text entered into the Ex entry panel. Does not include the leading `/` or `?`.
+   *                    Can include a trailing offset, e.g. /{pattern}/{offset}, or multiple commands separated by a semicolon.
+   *                    If the pattern is empty, the last used (search? substitute?) pattern (and offset?) is used.
+   * @param count       Find the nth pattern
+   * @param flags       The command flags, used to specify direction
+   * @return            Offset to the next occurrence of the pattern or -1 if not found
+   */
   public int search(@NotNull Editor editor, @NotNull String command, int startOffset, int count, @NotNull EnumSet<CommandFlags> flags) {
     Direction dir = Direction.FORWARDS;
     char type = '/';
@@ -257,6 +319,19 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     return findItOffset(editor, startOffset, count, lastDir);
   }
 
+  /**
+   * Search for the word under the given caret
+   *
+   * <p>Existing state is reset. The last used search pattern and direction is updated. Highlights are updated.
+   * scanwrap and ignorecase come from options.</p>
+   *
+   * @param editor  The editor to search in
+   * @param caret   The caret to use to look for the current word
+   * @param count   Search for the nth occurrence of the current word
+   * @param whole   Include word boundaries in the search pattern
+   * @param dir     Which direction to search
+   * @return        The offset of the result, or -1 if no result is found
+   */
   public int searchWord(@NotNull Editor editor, @NotNull Caret caret, int count, boolean whole, Direction dir) {
     TextRange range = SearchHelper.findWordUnderCursor(editor, caret);
     if (range == null) {
@@ -287,18 +362,44 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     return findItOffset(editor, caret.getOffset(), count, lastDir);
   }
 
+  /**
+   * Find the next occurrence of the last (search? substitution?) pattern
+   *
+   * <p>Uses existing state for the last pattern, including offset. Next means search in the same direction as last
+   * time, which might be backwards. E.g. `?foo` followed by `n`. scanwrap and ignorecase come from options.</p>
+   *
+   * <ul>
+   * <li>TODO: What should be the correct pattern - search, substitution or last?</li>
+   * <li>TODO: "offset" here is ambiguous</li>
+   * </ul>
+   *
+   * @param editor  The editor to search in
+   * @param caret   Used to get the offset to start searching from
+   * @param count   Find the nth occurrence
+   * @return        The offset of the next match, or -1 if not found
+   */
   public int searchNext(@NotNull Editor editor, @NotNull Caret caret, int count) {
     return searchNextWithDirection(editor, caret, count, lastDir);
   }
 
+  /**
+   * Find the next occurrence of the last (search? substitution?) pattern
+   *
+   * <p>Uses existing state for the last pattern, including offset. Previous means search in the opposite direction as
+   * last time. E.g. `?foo` followed by `N`. scanwrap and ignorecase come from options.</p>
+   *
+   * <ul>
+   * <li>TODO: Document the correct pattern - search, substitution or last?</li>
+   * <li>TODO: "offset" here is ambiguous</li>
+   * </ul>
+   *
+   * @param editor  The editor to search in
+   * @param caret   Used to get the offset to starting searching from
+   * @param count   Find the nth occurrence
+   * @return        The offset of the next match, or -1 if not found
+   */
   public int searchPrevious(@NotNull Editor editor, @NotNull Caret caret, int count) {
     return searchNextWithDirection(editor, caret, count, lastDir.reverse());
-  }
-
-  public int searchNextFromOffset(@NotNull Editor editor, int offset, int count) {
-    resetShowSearchHighlight();
-    updateSearchHighlights();
-    return findItOffset(editor, offset, count, Direction.FORWARDS);
   }
 
   private int searchNextWithDirection(@NotNull Editor editor, @NotNull Caret caret, int count, Direction dir) {
@@ -315,193 +416,55 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     return offset;
   }
 
-  private void resetShowSearchHighlight() {
-    showSearchHighlight = OptionsManager.INSTANCE.getHlsearch().isSet();
-  }
-
-  public void clearSearchHighlight() {
-    showSearchHighlight = false;
+  /**
+   * Find the next occurrence of the (search? substitute? last?) pattern, moving forwards
+   *
+   * <p>Uses existing state for the last pattern and pattern offset. Search is always performed forwards. Wrap depends
+   * on options</p>
+   *
+   * <ul>
+   * <li>TODO: Document the correct last used pattern</li>
+   * </ul>
+   *
+   * @param editor  The editor to search in
+   * @param offset  The offset to search from
+   * @param count   Find the nth occurrence
+   * @return        The offset of the next match, or -1 if not found
+   */
+  public int searchNextFromOffset(@NotNull Editor editor, int offset, int count) {
+    resetShowSearchHighlight();
     updateSearchHighlights();
+    return findItOffset(editor, offset, count, Direction.FORWARDS);
   }
 
-  private void forceUpdateSearchHighlights() {
-    SearchHighlightsHelper.updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, true);
-  }
 
-  private void updateSearchHighlights() {
-    SearchHighlightsHelper.updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, false);
-  }
+  // *******************************************************************************************************************
+  //
+  // Substitute
+  //
+  // *******************************************************************************************************************
 
-  public void resetIncsearchHighlights() {
-    SearchHighlightsHelper.updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, true);
-  }
-
-  private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
-    if (lastSearch != null) {
-      final List<TextRange> results = findAll(editor, lastSearch, startLine, endLine,
-        shouldIgnoreCase(lastSearch, lastIgnoreSmartCase));
-      SearchHighlightsHelper.highlightSearchResults(editor, lastSearch, results, -1);
-    }
-  }
-
-  public @Nullable TextRange getNextSearchRange(@NotNull Editor editor, int count, boolean forwards) {
-    editor.getCaretModel().removeSecondaryCarets();
-    TextRange current = findUnderCaret(editor);
-
-    if (current == null || CommandStateHelper.inVisualMode(editor) && atEdgeOfGnRange(current, editor, forwards)) {
-      current = findNextSearchForGn(editor, count, forwards);
-    }
-    else if (count > 1) {
-      current = findNextSearchForGn(editor, count - 1, forwards);
-    }
-    return current;
-  }
-
-  private boolean atEdgeOfGnRange(@NotNull TextRange nextRange, @NotNull Editor editor, boolean forwards) {
-    int currentPosition = editor.getCaretModel().getOffset();
-    if (forwards) {
-      return nextRange.getEndOffset() - VimPlugin.getVisualMotion().getSelectionAdj() == currentPosition;
-    }
-    else {
-      return nextRange.getStartOffset() == currentPosition;
-    }
-  }
-
-  private @Nullable TextRange findNextSearchForGn(@NotNull Editor editor, int count, boolean forwards) {
-    if (forwards) {
-      final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE);
-      return SearchHelper.findPattern(editor, lastSearch, editor.getCaretModel().getOffset(), count, searchOptions);
-    } else {
-      return searchBackward(editor, editor.getCaretModel().getOffset(), count);
-    }
-  }
-
-  private @Nullable TextRange findUnderCaret(@NotNull Editor editor) {
-    final TextRange backSearch = searchBackward(editor, editor.getCaretModel().getOffset() + 1, 1);
-    if (backSearch == null) return null;
-    return backSearch.contains(editor.getCaretModel().getOffset()) ? backSearch : null;
-  }
-
-  private @Nullable TextRange searchBackward(@NotNull Editor editor, int offset, int count) {
-    // Backward search returns wrongs end offset for some cases. That's why we should perform additional forward search
-    final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE, SearchOptions.BACKWARDS);
-    final TextRange foundBackward = SearchHelper.findPattern(editor, lastSearch, offset, count, searchOptions);
-    if (foundBackward == null) return null;
-    int startOffset = foundBackward.getStartOffset() - 1;
-    if (startOffset < 0) startOffset = EditorHelperRt.getFileSize(editor);
-    searchOptions.remove(SearchOptions.BACKWARDS);
-    return SearchHelper.findPattern(editor, lastSearch, startOffset, 1, searchOptions);
-  }
-
-  private int findItOffset(@NotNull Editor editor, int startOffset, int count, Direction dir) {
-    boolean wrap = OptionsManager.INSTANCE.getWrapscan().isSet();
-    logger.debug("Perform search. Direction: " + dir + " wrap: " + wrap);
-
-    int offset = 0;
-    boolean offsetIsLineOffset = false;
-    boolean hasEndOffset = false;
-
-    ParsePosition pp = new ParsePosition(0);
-
-    if (lastOffset == null) {
-      logger.warn("Last offset is null. Cannot perform search");
-      return -1;
-    }
-
-    if (lastOffset.length() > 0) {
-      if (Character.isDigit(lastOffset.charAt(0)) || lastOffset.charAt(0) == '+' || lastOffset.charAt(0) == '-') {
-        offsetIsLineOffset = true;
-
-        if (lastOffset.equals("+")) {
-          offset = 1;
-        } else if (lastOffset.equals("-")) {
-          offset = -1;
-        } else {
-          if (lastOffset.charAt(0) == '+') {
-            lastOffset = lastOffset.substring(1);
-          }
-          NumberFormat nf = NumberFormat.getIntegerInstance();
-          pp = new ParsePosition(0);
-          Number num = nf.parse(lastOffset, pp);
-          if (num != null) {
-            offset = num.intValue();
-          }
-        }
-      } else if ("ebs".indexOf(lastOffset.charAt(0)) != -1) {
-        if (lastOffset.length() >= 2) {
-          if ("+-".indexOf(lastOffset.charAt(1)) != -1) {
-            offset = 1;
-          }
-          NumberFormat nf = NumberFormat.getIntegerInstance();
-          pp = new ParsePosition(lastOffset.charAt(1) == '+' ? 2 : 1);
-          Number num = nf.parse(lastOffset, pp);
-          if (num != null) {
-            offset = num.intValue();
-          }
-        }
-
-        hasEndOffset = lastOffset.charAt(0) == 'e';
-      }
-    }
-
-    /*
-     * If there is a character offset, subtract it from the current
-     * position, so we don't get stuck at "?pat?e+2" or "/pat/s-2".
-     * Skip this if pos.col is near MAXCOL (closed fold).
-     * This is not done for a line offset, because then we would not be vi
-     * compatible.
-     */
-    if (!offsetIsLineOffset && offset != 0) {
-      startOffset = Math.max(0, Math.min(startOffset - offset, EditorHelperRt.getFileSize(editor) - 1));
-    }
-
-    EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.SHOW_MESSAGES, SearchOptions.WHOLE_FILE);
-    if (dir == Direction.BACKWARDS) searchOptions.add(SearchOptions.BACKWARDS);
-    if (lastIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE);
-    if (wrap) searchOptions.add(SearchOptions.WRAP);
-    if (hasEndOffset) searchOptions.add(SearchOptions.WANT_ENDPOS);
-    TextRange range = SearchHelper.findPattern(editor, lastSearch, startOffset, count, searchOptions);
-    if (range == null) {
-      logger.warn("No range is found");
-      return -1;
-    }
-
-    int res = range.getStartOffset();
-
-    if (offsetIsLineOffset) {
-      int line = editor.offsetToLogicalPosition(range.getStartOffset()).line;
-      int newLine = EditorHelper.normalizeLine(editor, line + offset);
-
-      res = VimPlugin.getMotion().moveCaretToLineStart(editor, newLine);
-    }
-    else if (hasEndOffset || offset != 0) {
-      int base = hasEndOffset ? range.getEndOffset() - 1 : range.getStartOffset();
-      res = Math.max(0, Math.min(base + offset, EditorHelperRt.getFileSize(editor) - 1));
-    }
-
-    int ppos = pp.getIndex();
-    if (ppos < lastOffset.length() - 1 && lastOffset.charAt(ppos) == ';') {
-      EnumSet<CommandFlags> flags = EnumSet.noneOf(CommandFlags.class);
-      if (lastOffset.charAt(ppos + 1) == '/') {
-        flags.add(CommandFlags.FLAG_SEARCH_FWD);
-      }
-      else if (lastOffset.charAt(ppos + 1) == '?') {
-        flags.add(CommandFlags.FLAG_SEARCH_REV);
-      }
-      else {
-        return res;
-      }
-
-      if (lastOffset.length() - ppos > 2) {
-        ppos++;
-      }
-
-      res = search(editor, lastOffset.substring(ppos + 1), res, 1, flags);
-
-    }
-    return res;
-  }
-
+  /**
+   * Parse and execute the substitute command
+   *
+   * <p>Updates state for the last (substitute?) pattern, replacement text. Updates search history and register. Also
+   * updates stored substitution flags.</p>
+   *
+   * <p>Saves the current location as a jump location and restores caret location after completion. If confirmation is
+   * enabled and the substitution is abandoned, the current caret location is kept, and the original location is not
+   * restored.</p>
+   *
+   * <ul>
+   *   <li>TODO: Make sure the right pattern is updated</li>
+   * </ul>
+   *
+   * @param editor  The editor to search in
+   * @param caret   The caret to use for initial search offset, and to move for interactive substitution
+   * @param range   Only search and substitute within the given line range. Must be valid
+   * @param excmd   The command part of the ex command line, e.g. `s` or `substitute`, or `~`
+   * @param exarg   The argument to the substitute command, such as `/{pattern}/{string}/[flags]`
+   * @return        True if the substitution succeeds, false on error. Will succeed even if nothing is modified
+   */
   @RWLockLabel.SelfSynchronized
   public boolean searchAndReplace(@NotNull Editor editor, @NotNull Caret caret, @NotNull LineRange range,
                                   @NotNull @NonNls String excmd, @NonNls String exarg) {
@@ -525,7 +488,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     char delimiter;
     /* new pattern and substitution */
     if (excmd.charAt(0) == 's' && !cmd.isNul() && !Character.isWhitespace(
-        cmd.charAt()) && "0123456789cegriIp|\"".indexOf(cmd.charAt()) == -1) {
+      cmd.charAt()) && "0123456789cegriIp|\"".indexOf(cmd.charAt()) == -1) {
       /* don't accept alphanumeric for separator */
       if (CharacterClasses.isAlpha(cmd.charAt())) {
         VimPlugin.showMessage(MessageHelper.message(Msg.E146));
@@ -839,6 +802,344 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     return true;
   }
 
+  private static @NotNull ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match, @NotNull Caret caret, int startoff) {
+    final Ref<ReplaceConfirmationChoice> result = Ref.create(ReplaceConfirmationChoice.QUIT);
+    final Function1<KeyStroke, Boolean> keyStrokeProcessor = key -> {
+      final ReplaceConfirmationChoice choice;
+      final char c = key.getKeyChar();
+      if (StringHelper.isCloseKeyStroke(key) || c == 'q') {
+        choice = ReplaceConfirmationChoice.QUIT;
+      } else if (c == 'y') {
+        choice = ReplaceConfirmationChoice.SUBSTITUTE_THIS;
+      } else if (c == 'l') {
+        choice = ReplaceConfirmationChoice.SUBSTITUTE_LAST;
+      } else if (c == 'n') {
+        choice = ReplaceConfirmationChoice.SKIP;
+      } else if (c == 'a') {
+        choice = ReplaceConfirmationChoice.SUBSTITUTE_ALL;
+      } else {
+        return true;
+      }
+      result.set(choice);
+      return false;
+    };
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      MotionGroup.moveCaret(editor, caret, startoff);
+      final TestInputModel inputModel = TestInputModel.getInstance(editor);
+      for (KeyStroke key = inputModel.nextKeyStroke(); key != null; key = inputModel.nextKeyStroke()) {
+        if (!keyStrokeProcessor.invoke(key)) {
+          break;
+        }
+      }
+    }
+    else {
+      // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
+      final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
+      exEntryPanel.activate(editor, new EditorDataContext(editor, null), MessageHelper.message("replace.with.0", match), "", 1);
+      MotionGroup.moveCaret(editor, caret, startoff);
+      ModalEntry.INSTANCE.activate(keyStrokeProcessor);
+      exEntryPanel.deactivate(true, false);
+    }
+    return result.get();
+  }
+
+
+  // *******************************************************************************************************************
+  //
+  // gn implementation
+  //
+  // *******************************************************************************************************************
+
+  /**
+   * Find the range of the next occurrence of the last used search pattern
+   *
+   * <p>Used for the implementation of the gn and gN commands.</p>
+   *
+   * <p>Searches for the range of the next occurrence of the last used search pattern. If the current primary caret is
+   * inside the range of an occurrence, will return that instance. Uses the last used search pattern. Does not update
+   * any other state. Direction is explicit, not from state.</p>
+   *
+   * @param editor    The editor to search in
+   * @param count     Find the nth occurrence
+   * @param forwards  Search forwards or backwards
+   * @return          The TextRange of the next occurrence or null if not found
+   */
+  public @Nullable TextRange getNextSearchRange(@NotNull Editor editor, int count, boolean forwards) {
+    editor.getCaretModel().removeSecondaryCarets();
+    TextRange current = findUnderCaret(editor);
+
+    if (current == null || CommandStateHelper.inVisualMode(editor) && atEdgeOfGnRange(current, editor, forwards)) {
+      current = findNextSearchForGn(editor, count, forwards);
+    }
+    else if (count > 1) {
+      current = findNextSearchForGn(editor, count - 1, forwards);
+    }
+    return current;
+  }
+
+  private boolean atEdgeOfGnRange(@NotNull TextRange nextRange, @NotNull Editor editor, boolean forwards) {
+    int currentPosition = editor.getCaretModel().getOffset();
+    if (forwards) {
+      return nextRange.getEndOffset() - VimPlugin.getVisualMotion().getSelectionAdj() == currentPosition;
+    }
+    else {
+      return nextRange.getStartOffset() == currentPosition;
+    }
+  }
+
+  private @Nullable TextRange findNextSearchForGn(@NotNull Editor editor, int count, boolean forwards) {
+    if (forwards) {
+      final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE);
+      return SearchHelper.findPattern(editor, lastSearch, editor.getCaretModel().getOffset(), count, searchOptions);
+    } else {
+      return searchBackward(editor, editor.getCaretModel().getOffset(), count);
+    }
+  }
+
+  private @Nullable TextRange findUnderCaret(@NotNull Editor editor) {
+    final TextRange backSearch = searchBackward(editor, editor.getCaretModel().getOffset() + 1, 1);
+    if (backSearch == null) return null;
+    return backSearch.contains(editor.getCaretModel().getOffset()) ? backSearch : null;
+  }
+
+  private @Nullable TextRange searchBackward(@NotNull Editor editor, int offset, int count) {
+    // Backward search returns wrongs end offset for some cases. That's why we should perform additional forward search
+    final EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.WRAP, SearchOptions.WHOLE_FILE, SearchOptions.BACKWARDS);
+    final TextRange foundBackward = SearchHelper.findPattern(editor, lastSearch, offset, count, searchOptions);
+    if (foundBackward == null) return null;
+    int startOffset = foundBackward.getStartOffset() - 1;
+    if (startOffset < 0) startOffset = EditorHelperRt.getFileSize(editor);
+    searchOptions.remove(SearchOptions.BACKWARDS);
+    return SearchHelper.findPattern(editor, lastSearch, startOffset, 1, searchOptions);
+  }
+
+
+  // *******************************************************************************************************************
+  //
+  // Highlighting
+  //
+  // *******************************************************************************************************************
+  //region Search highlights
+  public void clearSearchHighlight() {
+    showSearchHighlight = false;
+    updateSearchHighlights();
+  }
+
+  private void forceUpdateSearchHighlights() {
+    // Sync the search highlights to the current state, potentially hiding or showing highlights. Will always update,
+    // even if the pattern hasn't changed.
+    SearchHighlightsHelper.updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, true);
+  }
+
+  private void updateSearchHighlights() {
+    // Sync the search highlights to the current state, potentially hiding or showing highlights. Will only update if
+    // the pattern has changed.
+    SearchHighlightsHelper.updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, false);
+  }
+
+  /**
+   * Reset the search highlights to the last searched pattern after highlighting incsearch results.
+   */
+  public void resetIncsearchHighlights() {
+    SearchHighlightsHelper.updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, true);
+  }
+
+  private void resetShowSearchHighlight() {
+    showSearchHighlight = OptionsManager.INSTANCE.getHlsearch().isSet();
+  }
+
+  private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
+    if (lastSearch != null) {
+      final List<TextRange> results = findAll(editor, lastSearch, startLine, endLine,
+        shouldIgnoreCase(lastSearch, lastIgnoreSmartCase));
+      SearchHighlightsHelper.highlightSearchResults(editor, lastSearch, results, -1);
+    }
+  }
+
+  /**
+   * Updates search highlights when the selected editor changes
+   */
+  public static void fileEditorManagerSelectionChangedCallback(@SuppressWarnings("unused") @NotNull FileEditorManagerEvent event) {
+    VimPlugin.getSearch().updateSearchHighlights();
+  }
+
+  /**
+   * Removes and adds highlights for current search pattern when the document is edited
+   */
+  public static class DocumentSearchListener implements DocumentListener {
+
+    public static DocumentSearchListener INSTANCE = new DocumentSearchListener();
+
+    @Contract(pure = true)
+    private DocumentSearchListener () {
+    }
+
+    @Override
+    public void documentChanged(@NotNull DocumentEvent event) {
+      for (Project project : ProjectManager.getInstance().getOpenProjects()) {
+        final Document document = event.getDocument();
+
+        for (Editor editor : EditorFactory.getInstance().getEditors(document, project)) {
+          Collection<RangeHighlighter> hls = UserDataManager.getVimLastHighlighters(editor);
+          if (hls == null) {
+            continue;
+          }
+
+          if (logger.isDebugEnabled()) {
+            logger.debug("hls=" + hls);
+            logger.debug("event=" + event);
+          }
+
+          // We can only re-highlight whole lines, so clear any highlights in the affected lines
+          final LogicalPosition startPosition = editor.offsetToLogicalPosition(event.getOffset());
+          final LogicalPosition endPosition = editor.offsetToLogicalPosition(event.getOffset() + event.getNewLength());
+          final int startLineOffset = document.getLineStartOffset(startPosition.line);
+          final int endLineOffset = document.getLineEndOffset(endPosition.line);
+
+          final Iterator<RangeHighlighter> iter = hls.iterator();
+          while (iter.hasNext()) {
+            final RangeHighlighter highlighter = iter.next();
+            if (!highlighter.isValid() || (highlighter.getStartOffset() >= startLineOffset && highlighter.getEndOffset() <= endLineOffset)) {
+              iter.remove();
+              editor.getMarkupModel().removeHighlighter(highlighter);
+            }
+          }
+
+          VimPlugin.getSearch().highlightSearchLines(editor, startPosition.line, endPosition.line);
+
+          if (logger.isDebugEnabled()) {
+            hls = UserDataManager.getVimLastHighlighters(editor);
+            logger.debug("sl=" + startPosition.line + ", el=" + endPosition.line);
+            logger.debug("hls=" + hls);
+          }
+        }
+      }
+    }
+  }
+  //endregion
+
+
+  // *******************************************************************************************************************
+  //
+  // Implementation details
+  //
+  // *******************************************************************************************************************
+  private int findItOffset(@NotNull Editor editor, int startOffset, int count, Direction dir) {
+    boolean wrap = OptionsManager.INSTANCE.getWrapscan().isSet();
+    logger.debug("Perform search. Direction: " + dir + " wrap: " + wrap);
+
+    int offset = 0;
+    boolean offsetIsLineOffset = false;
+    boolean hasEndOffset = false;
+
+    ParsePosition pp = new ParsePosition(0);
+
+    if (lastOffset == null) {
+      logger.warn("Last offset is null. Cannot perform search");
+      return -1;
+    }
+
+    if (lastOffset.length() > 0) {
+      if (Character.isDigit(lastOffset.charAt(0)) || lastOffset.charAt(0) == '+' || lastOffset.charAt(0) == '-') {
+        offsetIsLineOffset = true;
+
+        if (lastOffset.equals("+")) {
+          offset = 1;
+        } else if (lastOffset.equals("-")) {
+          offset = -1;
+        } else {
+          if (lastOffset.charAt(0) == '+') {
+            lastOffset = lastOffset.substring(1);
+          }
+          NumberFormat nf = NumberFormat.getIntegerInstance();
+          pp = new ParsePosition(0);
+          Number num = nf.parse(lastOffset, pp);
+          if (num != null) {
+            offset = num.intValue();
+          }
+        }
+      } else if ("ebs".indexOf(lastOffset.charAt(0)) != -1) {
+        if (lastOffset.length() >= 2) {
+          if ("+-".indexOf(lastOffset.charAt(1)) != -1) {
+            offset = 1;
+          }
+          NumberFormat nf = NumberFormat.getIntegerInstance();
+          pp = new ParsePosition(lastOffset.charAt(1) == '+' ? 2 : 1);
+          Number num = nf.parse(lastOffset, pp);
+          if (num != null) {
+            offset = num.intValue();
+          }
+        }
+
+        hasEndOffset = lastOffset.charAt(0) == 'e';
+      }
+    }
+
+    /*
+     * If there is a character offset, subtract it from the current
+     * position, so we don't get stuck at "?pat?e+2" or "/pat/s-2".
+     * Skip this if pos.col is near MAXCOL (closed fold).
+     * This is not done for a line offset, because then we would not be vi
+     * compatible.
+     */
+    if (!offsetIsLineOffset && offset != 0) {
+      startOffset = Math.max(0, Math.min(startOffset - offset, EditorHelperRt.getFileSize(editor) - 1));
+    }
+
+    EnumSet<SearchOptions> searchOptions = EnumSet.of(SearchOptions.SHOW_MESSAGES, SearchOptions.WHOLE_FILE);
+    if (dir == Direction.BACKWARDS) searchOptions.add(SearchOptions.BACKWARDS);
+    if (lastIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE);
+    if (wrap) searchOptions.add(SearchOptions.WRAP);
+    if (hasEndOffset) searchOptions.add(SearchOptions.WANT_ENDPOS);
+    TextRange range = SearchHelper.findPattern(editor, lastSearch, startOffset, count, searchOptions);
+    if (range == null) {
+      logger.warn("No range is found");
+      return -1;
+    }
+
+    int res = range.getStartOffset();
+
+    if (offsetIsLineOffset) {
+      int line = editor.offsetToLogicalPosition(range.getStartOffset()).line;
+      int newLine = EditorHelper.normalizeLine(editor, line + offset);
+
+      res = VimPlugin.getMotion().moveCaretToLineStart(editor, newLine);
+    }
+    else if (hasEndOffset || offset != 0) {
+      int base = hasEndOffset ? range.getEndOffset() - 1 : range.getStartOffset();
+      res = Math.max(0, Math.min(base + offset, EditorHelperRt.getFileSize(editor) - 1));
+    }
+
+    int ppos = pp.getIndex();
+    if (ppos < lastOffset.length() - 1 && lastOffset.charAt(ppos) == ';') {
+      EnumSet<CommandFlags> flags = EnumSet.noneOf(CommandFlags.class);
+      if (lastOffset.charAt(ppos + 1) == '/') {
+        flags.add(CommandFlags.FLAG_SEARCH_FWD);
+      }
+      else if (lastOffset.charAt(ppos + 1) == '?') {
+        flags.add(CommandFlags.FLAG_SEARCH_REV);
+      }
+      else {
+        return res;
+      }
+
+      if (lastOffset.length() - ppos > 2) {
+        ppos++;
+      }
+
+      res = search(editor, lastOffset.substring(ppos + 1), res, 1, flags);
+
+    }
+    return res;
+  }
+
+
+  // *******************************************************************************************************************
+  //
+  // Persistent state
+  //
+  // *******************************************************************************************************************
+  //region Persistent state
   public void saveData(@NotNull Element element) {
     logger.debug("saveData");
     Element search = new Element("search");
@@ -904,14 +1205,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     return child != null ? StringHelper.getSafeXmlText(child) : null;
   }
 
-  /**
-   * Updates search highlights when the selected editor changes
-   */
-  @SuppressWarnings("unused")
-  public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
-    VimPlugin.getSearch().updateSearchHighlights();
-  }
-
   @Nullable
   @Override
   public Element getState() {
@@ -924,57 +1217,8 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   public void loadState(@NotNull Element state) {
     readData(state);
   }
+  //endregion
 
-  public static class DocumentSearchListener implements DocumentListener {
-
-    public static DocumentSearchListener INSTANCE = new DocumentSearchListener();
-
-    @Contract(pure = true)
-    private DocumentSearchListener () {
-    }
-
-    @Override
-    public void documentChanged(@NotNull DocumentEvent event) {
-      for (Project project : ProjectManager.getInstance().getOpenProjects()) {
-        final Document document = event.getDocument();
-
-        for (Editor editor : EditorFactory.getInstance().getEditors(document, project)) {
-          Collection<RangeHighlighter> hls = UserDataManager.getVimLastHighlighters(editor);
-          if (hls == null) {
-            continue;
-          }
-
-          if (logger.isDebugEnabled()) {
-            logger.debug("hls=" + hls);
-            logger.debug("event=" + event);
-          }
-
-          // We can only re-highlight whole lines, so clear any highlights in the affected lines
-          final LogicalPosition startPosition = editor.offsetToLogicalPosition(event.getOffset());
-          final LogicalPosition endPosition = editor.offsetToLogicalPosition(event.getOffset() + event.getNewLength());
-          final int startLineOffset = document.getLineStartOffset(startPosition.line);
-          final int endLineOffset = document.getLineEndOffset(endPosition.line);
-
-          final Iterator<RangeHighlighter> iter = hls.iterator();
-          while (iter.hasNext()) {
-            final RangeHighlighter highlighter = iter.next();
-            if (!highlighter.isValid() || (highlighter.getStartOffset() >= startLineOffset && highlighter.getEndOffset() <= endLineOffset)) {
-              iter.remove();
-              editor.getMarkupModel().removeHighlighter(highlighter);
-            }
-          }
-
-          VimPlugin.getSearch().highlightSearchLines(editor, startPosition.line, endPosition.line);
-
-          if (logger.isDebugEnabled()) {
-            hls = UserDataManager.getVimLastHighlighters(editor);
-            logger.debug("sl=" + startPosition.line + ", el=" + endPosition.line);
-            logger.debug("hls=" + hls);
-          }
-        }
-      }
-    }
-  }
 
   private enum ReplaceConfirmationChoice {
     SUBSTITUTE_THIS,
