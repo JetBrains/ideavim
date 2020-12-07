@@ -109,7 +109,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   public void resetState() {
     lastSearch = lastPattern = lastSubstitute = lastReplace = lastOffset = null;
     lastIgnoreSmartCase = false;
-    lastDir = Direction.UNSET;
+    lastDir = Direction.FORWARDS;
     resetShowSearchHighlight();
   }
 
