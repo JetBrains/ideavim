@@ -25,13 +25,11 @@ import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
-import java.util.*
 
 /**
  * @author Alex Plate
@@ -1407,9 +1405,9 @@ class SearchGroupTest : VimTestCase() {
     RunnableHelper.runReadCommand(
       project,
       Runnable {
-        val n = searchGroup.search(editor, pattern, myFixture.caretOffset, 1, Direction.FORWARDS)
-        ref.set(n)
-      },
+        // Does not move the caret!
+      val n = searchGroup.search(editor, pattern, myFixture.caretOffset, Direction.FORWARDS)
+      ref.set(n)},
       null, null
     )
     return ref.get()

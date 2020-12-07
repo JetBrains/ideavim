@@ -174,10 +174,12 @@ public class SearchGroup implements PersistentStateComponent<Element> {
    * pattern offset and direction. Updates search history and redraws highlights. scanwrap and ignorecase come from
    * options.</p>
    *
+   * <p>Note that this method should only be called when the ex command argument should be parsed, and start should be
+   * updated. I.e. only for the search commands. Consider using SearchHelper.findOne to search for text in extensions.</p>
+   *
    * <ul>
    * <li>TODO: Document used search pattern</li>
    * <li>TODO: Document if/when last pattern offset is used</li>
-   * <li>TODO: Can count ever be anything other than 1?</li>
    * </ul>
    *
    * @param editor      The editor to search in
@@ -185,11 +187,10 @@ public class SearchGroup implements PersistentStateComponent<Element> {
    * @param command     The command text entered into the Ex entry panel. Does not include the leading `/` or `?`.
    *                    Can include a trailing offset, e.g. /{pattern}/{offset}, or multiple commands separated by a semicolon.
    *                    If the pattern is empty, the last used (search? substitute?) pattern (and offset?) is used.
-   * @param count       Find the nth pattern
    * @param dir         The direction to search
    * @return            Offset to the next occurrence of the pattern or -1 if not found
    */
-  public int search(@NotNull Editor editor, @NotNull String command, int startOffset, int count, @NotNull Direction dir) {
+  public int search(@NotNull Editor editor, @NotNull String command, int startOffset, @NotNull Direction dir) {
     final char type = dir == Direction.FORWARDS ? '/' : '?';
     String pattern = lastSearch;
     String offset = lastOffset;
@@ -241,7 +242,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     resetShowSearchHighlight();
     forceUpdateSearchHighlights();
 
-    return findItOffset(editor, startOffset, count, lastDir);
+    return findItOffset(editor, startOffset, 1, lastDir);
   }
 
   /**
@@ -1052,7 +1053,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
         ppos++;
       }
 
-      res = search(editor, lastOffset.substring(ppos + 1), res, 1, nextDir);
+      res = search(editor, lastOffset.substring(ppos + 1), res, nextDir);
     }
     return res;
   }

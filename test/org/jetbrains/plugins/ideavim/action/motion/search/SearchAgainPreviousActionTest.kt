@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
+import javax.swing.KeyStroke
 
 class SearchAgainPreviousActionTest : VimTestCase() {
   fun `test search with tabs`() {
@@ -39,10 +40,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...all it was settled on some sodden sand
   ...all by the torrent of a mountain pass
     """.trimIndent().dotToTab()
-    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
-      VimPlugin.getSearch()
-        .search(it, "all", it.caretModel.primaryCaret.offset, 1, Direction.FORWARDS)
-    }
+    doTestWithSearch(keys, before, after)
   }
 
   fun `test search with tabs 2`() {
@@ -59,10 +57,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...${c}all it was .all settled on some sodden sand
   ...all by the torrent of a mountain pass
     """.trimIndent().dotToTab()
-    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
-      VimPlugin.getSearch()
-        .search(it, "all", it.caretModel.primaryCaret.offset, 1, Direction.FORWARDS)
-    }
+    doTestWithSearch(keys, before, after)
   }
 
   fun `test search with tabs 3`() {
@@ -79,10 +74,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...all it was .${c}all.all settled on some sodden sand
   ...all by the torrent of a mountain pass
     """.trimIndent().dotToTab()
-    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
-      VimPlugin.getSearch()
-        .search(it, "all", it.caretModel.primaryCaret.offset, 1, Direction.FORWARDS)
-    }
+    doTestWithSearch(keys, before, after)
   }
 
   fun `test search with tabs with wrap`() {
@@ -99,9 +91,14 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...all it was settled on some sodden sand
   ...${c}all by the torrent of a mountain pass
     """.trimIndent().dotToTab()
+    doTestWithSearch(keys, before, after)
+  }
+
+  private fun doTestWithSearch(keys: List<KeyStroke>, before: String, after: String) {
     doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+      // Note that this does not move the caret, but does set up the last used state
       VimPlugin.getSearch()
-        .search(it, "all", it.caretModel.primaryCaret.offset, 1, Direction.FORWARDS)
+        .search(it, "all", it.caretModel.primaryCaret.offset, Direction.FORWARDS)
     }
   }
 }
