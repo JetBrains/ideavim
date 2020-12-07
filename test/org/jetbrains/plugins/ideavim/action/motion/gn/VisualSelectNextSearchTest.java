@@ -58,7 +58,7 @@ public class VisualSelectNextSearchTest extends VimTestCase {
 
   public void testWithoutSpaces() {
     configureByText("test<caret>test");
-    VimPlugin.getSearch().search(myFixture.getEditor(), "test", 1, EnumSet.noneOf(CommandFlags.class), false);
+    VimPlugin.getSearch().search(myFixture.getEditor(), "test", 1, EnumSet.noneOf(CommandFlags.class));
     typeText(parseKeys("gn"));
 
     assertOffset(7);

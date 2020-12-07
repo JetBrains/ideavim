@@ -60,7 +60,7 @@ class GnPreviousTextObjectTest : VimTestCase() {
     after: String
   ) {
     configureByText(before)
-    VimPlugin.getSearch().search(myFixture.editor, "test", 1, noneOfEnum(), false)
+    VimPlugin.getSearch().search(myFixture.editor, "test", 1, noneOfEnum())
     typeText(keys)
     myFixture.checkResult(after)
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)

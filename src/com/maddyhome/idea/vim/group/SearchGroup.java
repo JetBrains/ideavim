@@ -190,11 +190,10 @@ public class SearchGroup implements PersistentStateComponent<Element> {
    *                    If the pattern is empty, the last used (search? substitute?) pattern (and offset?) is used.
    * @param count       Find the nth pattern
    * @param flags       The command flags, used to specify the direction
-   * @param moveCursor  Optionally move the caret and save a jump location, as well as returning offset
    * @return            Offset to the next occurrence of the pattern or -1 if not found
    */
-  public int search(@NotNull Editor editor, @NotNull String command, int count, EnumSet<CommandFlags> flags, boolean moveCursor) {
-    return search(editor, editor.getCaretModel().getPrimaryCaret(), command, count, flags, moveCursor);
+  public int search(@NotNull Editor editor, @NotNull String command, int count, EnumSet<CommandFlags> flags) {
+    return search(editor, editor.getCaretModel().getPrimaryCaret(), command, count, flags);
   }
 
   /**
@@ -204,13 +203,10 @@ public class SearchGroup implements PersistentStateComponent<Element> {
    * for last used (search? substitute?) pattern. Updates state for last used (search? substitute?) pattern, pattern
    * offset and direction. Updates search history and redraws highlights. scanwrap and ignorecase come from options.</p>
    *
-   * <p>Optionally moves the caret, as well as returning the found offset. Will save the jump location.</p>
-   *
    * <ul>
    * <li>TODO: Document used search pattern</li>
    * <li>TODO: Document if/when last offset is used</li>
    * <li>TODO: Can count ever be anything other than 1?</li>
-   * <li>TODO: Return offset or move caret, don't do both</li>
    * <li>TODO: Pass direction rather than CommandFlags</li>
    * </ul>
    *
@@ -221,19 +217,10 @@ public class SearchGroup implements PersistentStateComponent<Element> {
    *                    If the pattern is empty, the last used (search? substitute?) pattern (and offset?) is used.
    * @param count       Find the nth pattern
    * @param flags       The command flags, used to specify direction
-   * @param moveCursor  Flag to indicate if caret should be moved and a jump location saved
    * @return            Offset to the next occurrence of the pattern, or -1 if not found
    */
-  public int search(@NotNull Editor editor, @NotNull Caret caret, @NotNull String command, int count, EnumSet<CommandFlags> flags,
-                    boolean moveCursor) {
-    final int res = search(editor, command, caret.getOffset(), count, flags);
-
-    if (res != -1 && moveCursor) {
-      VimPlugin.getMark().saveJumpLocation(editor);
-      MotionGroup.moveCaret(editor, caret, res);
-    }
-
-    return res;
+  public int search(@NotNull Editor editor, @NotNull Caret caret, @NotNull String command, int count, EnumSet<CommandFlags> flags) {
+    return search(editor, command, caret.getOffset(), count, flags);
   }
 
   /**

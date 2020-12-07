@@ -1406,7 +1406,7 @@ class SearchGroupTest : VimTestCase() {
     RunnableHelper.runReadCommand(
       project,
       Runnable {
-        val n = searchGroup.search(editor, pattern, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
+        val n = searchGroup.search(editor, pattern, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD))
         ref.set(n)
       },
       null, null
