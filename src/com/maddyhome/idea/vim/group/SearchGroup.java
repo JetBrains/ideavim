@@ -449,8 +449,8 @@ public class SearchGroup implements PersistentStateComponent<Element> {
    * @return        True if the substitution succeeds, false on error. Will succeed even if nothing is modified
    */
   @RWLockLabel.SelfSynchronized
-  public boolean searchAndReplace(@NotNull Editor editor, @NotNull Caret caret, @NotNull LineRange range,
-                                  @NotNull @NonNls String excmd, @NonNls String exarg) {
+  public boolean processSubstituteCommand(@NotNull Editor editor, @NotNull Caret caret, @NotNull LineRange range,
+                                          @NotNull @NonNls String excmd, @NonNls String exarg) {
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
     if (CommandStateHelper.inVisualMode(editor)) {
       ModeHelper.exitVisualMode(editor);

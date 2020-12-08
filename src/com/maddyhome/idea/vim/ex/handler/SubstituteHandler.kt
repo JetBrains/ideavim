@@ -31,7 +31,7 @@ class SubstituteHandler : CommandHandler.SingleExecution() {
     var result = true
     for (caret in editor.caretModel.allCarets) {
       val lineRange = cmd.getLineRange(editor, caret)
-      if (!VimPlugin.getSearch().searchAndReplace(editor, caret, lineRange, cmd.command, cmd.argument)) {
+      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, lineRange, cmd.command, cmd.argument)) {
         result = false
       }
     }
