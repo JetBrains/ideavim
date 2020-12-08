@@ -331,6 +331,10 @@ Contributors:
   [![icon][github]](https://github.com/antekone)
   &nbsp;
   Grzegorz Antoniak
+* [![icon][mail]](mailto:shaunpatterson@gmail.com)
+  [![icon][github]](https://github.com/shaunpatterson)
+  &nbsp;
+  Shaun Patterson
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.

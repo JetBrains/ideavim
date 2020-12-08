@@ -38,6 +38,7 @@ usual beta standards.
 * [VIM-2170](https://youtrack.jetbrains.com/issue/VIM-2170) Fix an alternative range format for `s` command
 * [VIM-1913](https://youtrack.jetbrains.com/issue/VIM-1913)
   [VIM-2154](https://youtrack.jetbrains.com/issue/VIM-2154) Several fixes for AppCode templates
+* [VIM-1756](https://youtrack.jetbrains.com/issue/VIM-1756) Fix startsel from insert mode
 
 ### Merged PRs:
 * [249](https://github.com/JetBrains/ideavim/pull/249) by [Jan Palus](https://github.com/jpalus): VIM-2113 Increase tag range only in visual mode
@@ -47,6 +48,7 @@ usual beta standards.
 * [225](https://github.com/JetBrains/ideavim/pull/225) by [sumoooru2](https://github.com/sumoooru2): Implement cmap
 * [258](https://github.com/JetBrains/ideavim/pull/258) by [Matt Ellis](https://github.com/citizenmatt): Show the correct handler class in :map
 * [257](https://github.com/JetBrains/ideavim/pull/257) by [Matt Ellis](https://github.com/citizenmatt): Extract SearchHighlightsHelper from SearchGroup
+* [251](https://github.com/JetBrains/ideavim/pull/251) by [Shaun Patterson](https://github.com/shaunpatterson): VIM-1756: startSel works in insert mode
 
 ## 0.61, 2020-11-12
 
