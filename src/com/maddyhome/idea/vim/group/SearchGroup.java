@@ -1125,35 +1125,22 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   public void saveData(@NotNull Element element) {
     logger.debug("saveData");
     Element search = new Element("search");
-    if (lastSearch != null) {
-      search.addContent(createElementWithText("last-search", lastSearch));
-    }
-    if (lastOffset != null) {
-      search.addContent(createElementWithText("last-offset", lastOffset));
-    }
-    if (lastPattern != null) {
-      search.addContent(createElementWithText("last-pattern", lastPattern));
-    }
-    if (lastReplace != null) {
-      search.addContent(createElementWithText("last-replace", lastReplace));
-    }
-    if (lastSubstitute != null) {
-      search.addContent(createElementWithText("last-substitute", lastSubstitute));
-    }
-    Element text = new Element("last-dir");
-    text.addContent(Integer.toString(lastDir.toInt()));
-    search.addContent(text);
 
-    text = new Element("show-last");
-    text.addContent(Boolean.toString(showSearchHighlight));
-    if (logger.isDebugEnabled()) logger.debug("text=" + text);
-    search.addContent(text);
+    addOptionalTextElement(search, "last-search", lastSearch);
+    addOptionalTextElement(search, "last-substitute", lastSubstitute);
+    addOptionalTextElement(search, "last-offset", lastOffset);
+    addOptionalTextElement(search, "last-replace", lastReplace);
+    addOptionalTextElement(search, "last-pattern", lastPattern);
+    addOptionalTextElement(search, "last-dir", Integer.toString(lastDir.toInt()));
+    addOptionalTextElement(search, "show-last", Boolean.toString(showSearchHighlight));
 
     element.addContent(search);
   }
 
-  private static @NotNull Element createElementWithText(@NotNull String name, @NotNull String text) {
-    return StringHelper.setSafeXmlText(new Element(name), text);
+  private static void addOptionalTextElement(@NotNull Element element, @NotNull String name, @Nullable String text) {
+    if (text != null) {
+      element.addContent(StringHelper.setSafeXmlText(new Element(name), text));
+    }
   }
 
   public void readData(@NotNull Element element) {
