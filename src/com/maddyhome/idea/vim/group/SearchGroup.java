@@ -139,6 +139,24 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     VimPlugin.getHistory().addEntry(HistoryGroup.SEARCH, lastPattern);
   }
 
+  /**
+   * Sets the last search state, purely for tests
+   *
+   * @param editor          The editor to update
+   * @param pattern         The pattern to save. This is the last search pattern, not the last substitute pattern
+   * @param patternOffset   The pattern offset, e.g. `/{pattern}/{offset}`
+   * @param direction       The direction to search
+   */
+  @TestOnly
+  public void setLastSearchState(@SuppressWarnings("unused") @NotNull Editor editor, @NotNull String pattern,
+                                 String patternOffset, Direction direction) {
+    lastSearch = pattern;
+    setLastPattern(pattern);
+    lastIgnoreSmartCase = false;
+    lastOffset = patternOffset;
+    lastDir = direction;
+  }
+
 
   // *******************************************************************************************************************
   //

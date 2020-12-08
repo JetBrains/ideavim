@@ -54,14 +54,9 @@ class GnPreviousTextObjectTest : VimTestCase() {
     )
   }
 
-  private fun doTestWithSearch(
-    keys: List<KeyStroke>,
-    before: String,
-    after: String
-  ) {
+  private fun doTestWithSearch(keys: List<KeyStroke>, before: String, after: String) {
     configureByText(before)
-    // Note that this does not move the caret, but does set up the last used state
-    VimPlugin.getSearch().processSearchCommand(myFixture.editor, "test", myFixture.caretOffset, Direction.FORWARDS)
+    VimPlugin.getSearch().setLastSearchState(myFixture.editor, "test", "", Direction.FORWARDS)
     typeText(keys)
     myFixture.checkResult(after)
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
