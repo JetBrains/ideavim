@@ -934,6 +934,7 @@ public class KeyHandler {
       if (editorState.getSubMode() == CommandState.SubMode.SINGLE_COMMAND &&
           (!cmd.getFlags().contains(CommandFlags.FLAG_EXPECT_MORE))) {
         editorState.popModes();
+        VisualGroupKt.resetShape(CommandStateHelper.getMode(editor), editor);
       }
 
       if (editorState.getCommandBuilder().isDone()) {
