@@ -20,6 +20,7 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.codeWithMe.ClientId
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
@@ -39,6 +40,7 @@ val Editor.fileSize: Int
 val Editor.isIdeaVimDisabledHere: Boolean
   get() {
     return disabledInDialog
+      || (!ClientId.isCurrentlyUnderLocalId)  // CWM-927
       || (!OptionsManager.ideavimsupport.contains("singleline") && isDatabaseCell())
       || (!OptionsManager.ideavimsupport.contains("singleline") && isOneLineMode)
   }
