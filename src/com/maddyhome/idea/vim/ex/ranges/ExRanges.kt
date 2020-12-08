@@ -248,7 +248,7 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
       } else {
         VimPlugin.getMotion().moveCaretToLineStart(editor, line)
       }
-      pos = VimPlugin.getSearch().search(editor, pattern!!, pos, direction)
+      pos = VimPlugin.getSearch().processSearchCommand(editor, pattern!!, pos, direction)
       line = if (pos == -1) {
         break
       } else {
@@ -268,7 +268,7 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
     for (i in patterns.indices) {
       val pattern = patterns[i]
       val direction = directions[i]
-      offset = VimPlugin.getSearch().search(editor, pattern!!, getSearchOffset(editor, line, direction, lastZero),
+      offset = VimPlugin.getSearch().processSearchCommand(editor, pattern!!, getSearchOffset(editor, line, direction, lastZero),
         direction)
       if (offset == -1) break
       line = editor.offsetToLogicalPosition(offset).line

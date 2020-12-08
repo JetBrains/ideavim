@@ -168,14 +168,14 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   }
 
   /**
-   * Search for the pattern from the given search command, starting at the offset of the given caret
+   * Process the search command, searching for the pattern from the given offset
    *
    * <p>Existing state is reused if the given command is empty. Updates state with given (search? substitute?) pattern,
    * pattern offset and direction. Updates search history and redraws highlights. scanwrap and ignorecase come from
    * options.</p>
    *
    * <p>Note that this method should only be called when the ex command argument should be parsed, and start should be
-   * updated. I.e. only for the search commands. Consider using SearchHelper.findOne to search for text in extensions.</p>
+   * updated. I.e. only for the search commands. Consider using SearchHelper.findPattern to find text.</p>
    *
    * <ul>
    * <li>TODO: Document used search pattern</li>
@@ -190,7 +190,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
    * @param dir         The direction to search
    * @return            Offset to the next occurrence of the pattern or -1 if not found
    */
-  public int search(@NotNull Editor editor, @NotNull String command, int startOffset, @NotNull Direction dir) {
+  public int processSearchCommand(@NotNull Editor editor, @NotNull String command, int startOffset, @NotNull Direction dir) {
     final char type = dir == Direction.FORWARDS ? '/' : '?';
     String pattern = lastSearch;
     String offset = lastOffset;
@@ -1053,7 +1053,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
         ppos++;
       }
 
-      res = search(editor, lastOffset.substring(ppos + 1), res, nextDir);
+      res = processSearchCommand(editor, lastOffset.substring(ppos + 1), res, nextDir);
     }
     return res;
   }

@@ -61,7 +61,7 @@ class GnPreviousTextObjectTest : VimTestCase() {
   ) {
     configureByText(before)
     // Note that this does not move the caret, but does set up the last used state
-    VimPlugin.getSearch().search(myFixture.editor, "test", myFixture.caretOffset, Direction.FORWARDS)
+    VimPlugin.getSearch().processSearchCommand(myFixture.editor, "test", myFixture.caretOffset, Direction.FORWARDS)
     typeText(keys)
     myFixture.checkResult(after)
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)

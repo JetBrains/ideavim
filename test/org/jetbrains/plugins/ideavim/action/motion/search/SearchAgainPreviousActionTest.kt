@@ -98,7 +98,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
     doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       // Note that this does not move the caret, but does set up the last used state
       VimPlugin.getSearch()
-        .search(it, "all", it.caretModel.primaryCaret.offset, Direction.FORWARDS)
+        .processSearchCommand(it, "all", it.caretModel.primaryCaret.offset, Direction.FORWARDS)
     }
   }
 }

@@ -163,7 +163,7 @@ class VimMultipleCursorsExtension : VimExtension {
         if (nextOffset == -1 || compareText != 0) {
           if (caretModel.caretCount > 1) return
 
-          val newNextOffset = VimPlugin.getSearch().search(editor, pattern, primaryCaret.offset, Direction.FORWARDS)
+          val newNextOffset = VimPlugin.getSearch().processSearchCommand(editor, pattern, primaryCaret.offset, Direction.FORWARDS)
           if (newNextOffset != -1) {
             val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(newNextOffset)) ?: return
             selectWord(caret, pattern, newNextOffset)
@@ -193,7 +193,7 @@ class VimMultipleCursorsExtension : VimExtension {
       val primaryCaret = caretModel.primaryCaret
       var nextOffset = if (editor.inVisualMode) {
         val selectedText = primaryCaret.selectedText ?: return
-        val nextOffset = VimPlugin.getSearch().search(editor, selectedText, primaryCaret.offset, Direction.FORWARDS)
+        val nextOffset = VimPlugin.getSearch().processSearchCommand(editor, selectedText, primaryCaret.offset, Direction.FORWARDS)
         nextOffset
       } else {
         val range = findWordUnderCursor(editor, primaryCaret) ?: return

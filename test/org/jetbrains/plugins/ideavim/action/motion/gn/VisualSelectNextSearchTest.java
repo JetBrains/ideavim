@@ -57,7 +57,7 @@ public class VisualSelectNextSearchTest extends VimTestCase {
   public void testWithoutSpaces() {
     configureByText("test<caret>test");
     // Note that this does not move the caret, but does set up the last used state
-    VimPlugin.getSearch().search(myFixture.getEditor(), "test", myFixture.getCaretOffset(), Direction.FORWARDS);
+    VimPlugin.getSearch().processSearchCommand(myFixture.getEditor(), "test", myFixture.getCaretOffset(), Direction.FORWARDS);
     typeText(parseKeys("gn"));
 
     assertOffset(7);
