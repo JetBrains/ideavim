@@ -246,6 +246,45 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   }
 
   /**
+   * Process the pattern being used as a search range
+   *
+   * <p>Find the next offset of the search pattern, without processing the pattern further. This is not a full search
+   * pattern, as handled by processSearchCommand. It does not contain a pattern offset and there are not multiple
+   * patterns separated by `;`. Ranges do support multiple patterns, separation with both `;` and `,` and a `+/-{num}`
+   * suffix, but these are all handled by the range itself.</p>
+   *
+   * <p>This method is essentially a wrapper around SearchHelper.findPattern that updates state and highlighting.</p>
+   *
+   * @param editor        The editor to search in
+   * @param pattern       The pattern to search for. Does not include leading or trailing `/` and `?` characters
+   * @param startOffset   The offset to start searching from
+   * @param direction     The direction to search in
+   * @return              The offset of the match or -1 if not found
+   */
+  public int processSearchRange(@NotNull Editor editor, @NotNull String pattern, int startOffset, @NotNull Direction direction) {
+
+    lastSearch = pattern;
+    setLastPattern(pattern);
+
+    // TODO: Confirm this is correct
+    // Should we reset ignore smart case? Save to search history and register?
+    lastIgnoreSmartCase = false;
+    lastOffset = "";  // Range pattern never has a pattern offset. With something like :/foo/+1d, the +1 is handled by the range
+    lastDir = direction;
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("lastSearch=" + lastSearch);
+      logger.debug("lastOffset=" + lastOffset);
+      logger.debug("lastDir=" + lastDir);
+    }
+
+    resetShowSearchHighlight();
+    forceUpdateSearchHighlights();
+
+    return findItOffset(editor, startOffset, 1, lastDir);
+  }
+
+  /**
    * Search for the word under the given caret
    *
    * <p>Existing state is reset. The last used search pattern and direction is updated. Highlights are updated.

@@ -217,9 +217,10 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
           } else {
             directions.add(Direction.BACKWARDS)
           }
-          pat = pat.substring(1)
-          if (pat.last() == pat[0]) {
-            pat = pat.substring(0, pat.length - 1)
+          pat = if (pat.last() == pat[0]) {
+            pat.substring(1, pat.length - 1)
+          } else {
+            pat.substring(1)
           }
           patterns.add(pat)
         }
@@ -238,38 +239,18 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
     editor: Editor,
     lastZero: Boolean
   ): Int { // Each subsequent pattern is searched for starting in the line after the previous search match
-    var line = editor.caretModel.logicalPosition.line
-    var pos = -1
-    for (i in patterns.indices) {
-      val pattern = patterns[i]
-      val direction = directions[i]
-      pos = if (direction == Direction.FORWARDS && !lastZero) {
-        VimPlugin.getMotion().moveCaretToLineEnd(editor, line, true)
-      } else {
-        VimPlugin.getMotion().moveCaretToLineStart(editor, line)
-      }
-      pos = VimPlugin.getSearch().processSearchCommand(editor, pattern!!, pos, direction)
-      line = if (pos == -1) {
-        break
-      } else {
-        editor.offsetToLogicalPosition(pos).line
-      }
-    }
-    return if (pos != -1) line else -1
+    return getRangeLine(editor, editor.caretModel.currentCaret, lastZero)
   }
 
-  override fun getRangeLine(
-    editor: Editor,
-    caret: Caret,
-    lastZero: Boolean
-  ): Int {
+  override fun getRangeLine(editor: Editor,
+    caret: Caret, lastZero: Boolean): Int {
     var line = caret.logicalPosition.line
     var offset = -1
     for (i in patterns.indices) {
       val pattern = patterns[i]
       val direction = directions[i]
-      offset = VimPlugin.getSearch().processSearchCommand(editor, pattern!!, getSearchOffset(editor, line, direction, lastZero),
-        direction)
+      offset = getSearchOffset(editor, line, direction, lastZero)
+      offset = VimPlugin.getSearch().processSearchRange(editor, pattern!!, offset, direction)
       if (offset == -1) break
       line = editor.offsetToLogicalPosition(offset).line
     }
