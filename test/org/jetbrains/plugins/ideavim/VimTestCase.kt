@@ -55,6 +55,9 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.helper.isBlockCaretBehaviour
+import com.maddyhome.idea.vim.helper.isBlockCaretShape
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
@@ -65,7 +68,6 @@ import com.maddyhome.idea.vim.option.OptionsManager.resetAllOptions
 import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.junit.Assert
-import java.util.*
 import java.util.function.Consumer
 import javax.swing.KeyStroke
 
@@ -93,6 +95,7 @@ abstract class VimTestCase : UsefulTestCase() {
     VimPlugin.getSearch().resetState()
     if (!VimPlugin.isEnabled()) VimPlugin.setEnabled(true)
     ideastrictmode.set()
+    Checks.reset()
 
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
     ExEntryPanel.getInstance().entry.setBounds(0, 0, 100, 25)
@@ -427,6 +430,7 @@ abstract class VimTestCase : UsefulTestCase() {
     assertCaretsColour()
     assertMode(modeAfter)
     assertSubMode(subModeAfter)
+    if (Checks.caretShape) assertEquals(myFixture.editor.mode.isBlockCaretShape, myFixture.editor.settings.isBlockCursor)
   }
 
   protected val fileManager: FileEditorManagerEx
@@ -438,6 +442,11 @@ abstract class VimTestCase : UsefulTestCase() {
     // If inlay width is related to character width, we will scale correctly across different platforms
     val columnWidth = EditorUtil.getPlainSpaceWidth(myFixture.editor)
     return EditorTestUtil.addInlay(myFixture.editor, offset, relatesToPrecedingText, widthInColumns * columnWidth)!!
+  }
+
+  // Disable or enable checks for the particular test
+  protected inline fun setupChecks(setup: Checks.() -> Unit) {
+    Checks.setup()
   }
 
   companion object {
@@ -479,5 +488,13 @@ abstract class VimTestCase : UsefulTestCase() {
     }
 
     fun String.dotToTab(): String = replace('.', '\t')
+  }
+
+  object Checks {
+    var caretShape: Boolean = true
+
+    fun reset() {
+      caretShape = true
+    }
   }
 }

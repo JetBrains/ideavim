@@ -32,7 +32,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.hasVisualSelection
-import com.maddyhome.idea.vim.helper.isBlockCaret
+import com.maddyhome.idea.vim.helper.isBlockCaretBehaviour
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
@@ -491,7 +491,7 @@ object IdeaRefactorMode {
         }
       }
 
-      if (editor.mode.isBlockCaret) {
+      if (editor.mode.isBlockCaretBehaviour) {
         TemplateManagerImpl.getTemplateState(editor)?.currentVariableRange?.let { segmentRange ->
           if (!segmentRange.isEmpty && segmentRange.endOffset == editor.caretModel.offset && editor.caretModel.offset != 0) {
             editor.caretModel.moveToOffset(editor.caretModel.offset - 1)
