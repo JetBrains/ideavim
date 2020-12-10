@@ -16,7 +16,7 @@ object GitHubPullRequests : BuildType({
 
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
-    param("env.ORG_GRADLE_PROJECT_ideaVersion", "2020.1")
+    param("env.ORG_GRADLE_PROJECT_ideaVersion", "2020.3")
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
   }
 
