@@ -669,7 +669,7 @@
  * |c_<S-Up>|             {@link com.maddyhome.idea.vim.ui.ex.HistoryUpAction}
  * |c_<Tab>|              TO BE IMPLEMENTED
  * |c_<Up>|               {@link com.maddyhome.idea.vim.ui.ex.HistoryUpFilterAction}
- * |c_digraph|            {char1} <BS> {char2} {@link com.maddyhome.idea.vim.ui.ex.StartDigraphAction}
+ * |c_digraph|            {char1} <BS> {char2}
  * |c_wildchar|           TO BE IMPLEMENTED
  * |'cedit'|              TO BE IMPLEMENTED
  *
