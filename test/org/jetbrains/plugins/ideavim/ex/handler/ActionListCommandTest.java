@@ -43,8 +43,8 @@ public class ActionListCommandTest extends VimTestCase {
 
     // Action lines
     int displayedActionNum = displayedLines.length - 1;
-    List<String> actionIds = ActionManager.getInstance().getActionIdList("");
-    assertEquals(displayedActionNum, actionIds.size());
+    String[] actionIds = ActionManager.getInstance().getActionIds("");
+    assertEquals(displayedActionNum, actionIds.length);
   }
 
   public void testSearchByActionName() {
