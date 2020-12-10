@@ -20,7 +20,6 @@
 
 package com.maddyhome.idea.vim.helper
 
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
@@ -29,7 +28,6 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import java.awt.Component
 import javax.swing.JComponent
 import javax.swing.JTable
-import kotlin.system.measureTimeMillis
 
 val Editor.fileSize: Int
   get() = document.textLength
@@ -40,31 +38,13 @@ val Editor.fileSize: Int
  */
 val Editor.isIdeaVimDisabledHere: Boolean
   get() {
-    var res = true
-    val start = System.currentTimeMillis()
-    val times = mutableListOf<Pair<Long, String>>()
-    val timeForCalculation = measureTimeMillis {
-      res = (disabledInDialog.apply { times += System.currentTimeMillis() to "Disabled in dialog" }
-
-        || (!OptionsManager.ideavimsupport.contains("singleline")
-        .apply { times += System.currentTimeMillis() to "first single line check" }
-        && isDatabaseCell(times).apply { times += System.currentTimeMillis() to "is db cell" })
-
-        || (!OptionsManager.ideavimsupport.contains("singleline")
-        .apply { times += System.currentTimeMillis() to "second single line check" }
-        && isOneLineMode.apply { times += System.currentTimeMillis() to "is one line" })
-        )
-    }
-    if (timeForCalculation > 10) {
-      val timeDiffs = times.map { it.second + ": " + (it.first - start) }
-      val message = "Time for calculation of 'isIdeaVimDisabledHere' took $timeForCalculation ms. Time diff: $timeDiffs"
-      logger<Editor>().error(message)
-    }
-    return res
+    return disabledInDialog
+      || (!OptionsManager.ideavimsupport.contains("singleline") && isDatabaseCell())
+      || (!OptionsManager.ideavimsupport.contains("singleline") && isOneLineMode)
   }
 
-private fun Editor.isDatabaseCell(times: MutableList<Pair<Long, String>>): Boolean {
-  return isTableCellEditor(this.component, times)
+private fun Editor.isDatabaseCell(): Boolean {
+  return isTableCellEditor(this.component)
 }
 
 private val Editor.disabledInDialog: Boolean
@@ -81,15 +61,10 @@ fun Editor.isPrimaryEditor(): Boolean {
 }
 
 // Optimized clone of com.intellij.ide.ui.laf.darcula.DarculaUIUtil.isTableCellEditor
-private fun isTableCellEditor(c: Component, times: MutableList<Pair<Long, String>>): Boolean {
-  return (java.lang.Boolean.TRUE == (c as JComponent).getClientProperty("JComboBox.isTableCellEditor"))
-    .apply { times += System.currentTimeMillis() to "is property tru" } ||
-
-    (findParentByCondition(c) { it is JTable } != null)
-      .apply { times += System.currentTimeMillis() to "is not null" } &&
-
+private fun isTableCellEditor(c: Component): Boolean {
+  return (java.lang.Boolean.TRUE == (c as JComponent).getClientProperty("JComboBox.isTableCellEditor")) ||
+    (findParentByCondition(c) { it is JTable } != null) &&
     (findParentByCondition(c) { it is JBTableRowEditor } == null)
-      .apply { times += System.currentTimeMillis() to "is null" }
 }
 
 private const val PARENT_BY_CONDITION_DEPTH = 10
