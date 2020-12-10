@@ -447,13 +447,15 @@ public class CommandParser {
             if (ch == '+' || ch == '-') {
               state = State.RANGE_OFFSET;
             }
+            // Start of an offset, without the leading '+'
+            else if (ch >= '0' && ch <= '9') {
+              offsetNumber = 0;
+              offsetSign = 1;
+              state = State.RANGE_OFFSET_MAYBE_DONE;
+            }
             // End of the range - we found a separator
             else if (ch == ',' || ch == ';') {
               state = State.RANGE_SEPARATOR;
-            }
-            // Part of a line number
-            else if (ch >= '0' && ch <= '9') {
-              state = State.RANGE_LINE;
             }
             // No more range
             else {

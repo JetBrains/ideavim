@@ -22,13 +22,7 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.IgnoreCaseOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.SmartCaseOptionsData
-import org.jetbrains.plugins.ideavim.VimOptionDefault
-import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
-import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
-import org.jetbrains.plugins.ideavim.VimTestOption
-import org.jetbrains.plugins.ideavim.VimTestOptionType
-import javax.swing.KeyStroke
+import org.jetbrains.plugins.ideavim.*
 
 /**
  * @author Alex Plate
@@ -344,7 +338,7 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     // Make sure the "a" is added as part of the same parseKeys as the <Enter>, as it needs to be available while the
     // <Enter> is processed
     doTest(
-      parseKeys(":", ".,\$s/and/AND/gc", "<Enter>", "a"),
+      listOf(exCommand(".,\$s/and/AND/gc"), "a"),
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
@@ -361,7 +355,7 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     // Make sure the "a" is added as part of the same parseKeys as the <Enter>, as it needs to be available while the
     // <Enter> is processed
     doTest(
-      parseKeys(":", "%s/and/AND/gc", "<Enter>", "n", "n", "a"),
+      listOf(exCommand("%s/and/AND/gc"), "n", "n", "a"),
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
@@ -378,7 +372,7 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     // Make sure the "a" is added as part of the same parseKeys as the <Enter>, as it needs to be available while the
     // <Enter> is processed
     doTest(
-      parseKeys(":", "%s/and/AND/gc", "<Enter>", "y", "n", "l"),
+      listOf(exCommand("%s/and/AND/gc"), "y", "n", "l"),
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
@@ -395,7 +389,7 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     // Make sure the "a" is added as part of the same parseKeys as the <Enter>, as it needs to be available while the
     // <Enter> is processed
     doTest(
-      parseKeys(":", "%s/and/AND/gc", "<Enter>", "y", "n", "q"),
+      listOf(exCommand("%s/and/AND/gc"), "y", "n", "q"),
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
@@ -416,7 +410,7 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
         |hard by the torrent of a mountain pass.""".trimMargin()
     )
 
-    typeText(parseKeys(":", "%s/and/or/gc", "<Enter>"))
+    enterCommand("%s/and/or/gc")
     assertPosition(0, 27)
   }
 
@@ -429,7 +423,7 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
         |hard by the torrent of a mountain pass.""".trimMargin()
     )
 
-    typeText(parseKeys(":", "%s/and/or/gc", "<Enter>", "n"))
+    typeText(parseKeys(exCommand("%s/and/or/gc"), "n"))
     assertPosition(1, 10)
   }
 
@@ -444,7 +438,7 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
         |One""".trimMargin()
     )
 
-    typeText(parseKeys(":", ",+3s/One/Two/g", "<Enter>"))
+    enterCommand(",+3s/One/Two/g")
     myFixture.checkResult(
       """One
         |Two
@@ -466,7 +460,7 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
         |One""".trimMargin()
     )
 
-    typeText(parseKeys(":", ",.+3s/One/Two/g", "<Enter>"))
+    enterCommand(",.+3s/One/Two/g")
     myFixture.checkResult(
       """One
         |Two
@@ -477,13 +471,264 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     )
   }
 
-  private fun doTest(command: String, before: String, after: String) {
-    doTest(commandToKeys(command), before, after)
+//  val before = """
+//       I found it in a legendary land
+//       ${c}all rocks and lavender and tufted grass,
+//       where it was settled on some sodden sand
+//       hard by the torrent of a mountain pass.
+//
+//       The features it combines mark it as new
+//       to science: shape and shade -- the special tinge,
+//       akin to moonlight, tempering its blue,
+//       the dingy underside, the checquered fringe.""".trimIndent()
+
+  @VimOptionDefaultAll
+  fun `test substitute pattern becomes last used pattern for search next`() {
+    val before = """
+       I found it in a legendary land
+       ${c}all rocks and lavender and tufted grass,
+       where it was settled on some sodden sand
+       hard by the torrent of a mountain pass.""".trimIndent()
+    val after = """
+       I found it in a legendary land
+       all rocks or lavender ${c}and tufted grass,
+       where it was settled on some sodden sand
+       hard by the torrent of a mountain pass.""".trimIndent()
+
+    doTest(listOf(exCommand("s/and/or"), "n"), before, after)
   }
 
-  private fun doTest(keys: List<KeyStroke>, before: String, after: String) {
-    myFixture.configureByText("a.java", before)
-    typeText(keys)
-    myFixture.checkResult(after)
+  @VimOptionDefaultAll
+  fun `test colon-s repeats last substitution`() {
+    val before = """
+       ${c}I found it in a legendary land
+       all rocks and lavender and tufted grass,
+       where it was settled on some sodden sand
+       hard by the torrent of a mountain pass.""".trimIndent()
+    val after = """
+       I found it in a legendary lor
+       ${c}all rocks or lavender and tufted grass,
+       where it was settled on some sodden sand
+       hard by the torrent of a mountain pass.""".trimIndent()
+
+    doTest(listOf(exCommand("s/and/or"), "j", exCommand("s")), before, after)
+  }
+
+  @VimOptionDefaultAll
+  fun `test colon-s repeats last substitution without range`() {
+    val before = """
+       I found it in a legendary land
+       ${c}all rocks and lavender and tufted grass,
+       where it was settled on some sodden sand
+       hard by the torrent of a mountain pass.""".trimIndent()
+    val after = """
+       I founz it in a legendary land
+       ${c}all rocks anz lavenzer and tufted grass,
+       where it was settled on some sodden sand
+       hard by the torrent of a mountain pass.""".trimIndent()
+
+    // Convert the first occurrence of d to z in the first two lines. :s will repeat the substitution on the current line
+    doTest(listOf(exCommand("1,2s/d/z"), exCommand("s")), before, after)
+  }
+
+  @VimOptionDefaultAll
+  fun `test colon-ampersand repeats last substitution without range`() {
+    val before = """
+       I found it in a legendary land
+       ${c}all rocks and lavender and tufted grass,
+       where it was settled on some sodden sand
+       hard by the torrent of a mountain pass.""".trimIndent()
+    val after = """
+       I founz it in a legendary land
+       ${c}all rocks anz lavenzer and tufted grass,
+       where it was settled on some sodden sand
+       hard by the torrent of a mountain pass.""".trimIndent()
+
+    // Convert the first occurrence of d to z in the first two lines. :s will repeat the substitution on the current line
+    doTest(listOf(exCommand("1,2s/d/z"), exCommand("&")), before, after)
+  }
+
+  @VimOptionDefaultAll
+  fun `test colon-s repeats last substitution with new range`() {
+    val before = """
+       I found it in a legendary land
+       ${c}all rocks and lavender and tufted grass,
+       where it was settled on some sodden sand
+       hard by the torrent of a mountain pass.""".trimIndent()
+    val after = """
+       I founz it in a legenzary land
+       all rocks anz lavenzer and tufted grass,
+       where it was settlez on some sodden sand
+       ${c}harz by the torrent of a mountain pass.""".trimIndent()
+
+    // Convert the first occurrence of d to z in the first two lines. :1,4s will repeat the substitution for all lines
+    doTest(listOf(exCommand("1,2s/d/z"), exCommand("1,4s")), before, after)
+  }
+
+  @VimOptionDefaultAll
+  fun `test colon-ampersand repeats last substitution with new range`() {
+    val before = """
+       I found it in a legendary land
+       ${c}all rocks and lavender and tufted grass,
+       where it was settled on some sodden sand
+       hard by the torrent of a mountain pass.""".trimIndent()
+    val after = """
+       I founz it in a legenzary land
+       all rocks anz lavenzer and tufted grass,
+       where it was settlez on some sodden sand
+       ${c}harz by the torrent of a mountain pass.""".trimIndent()
+
+    // Convert the first occurrence of d to z in the first two lines. :1,4s will repeat the substitution for all lines
+    doTest(listOf(exCommand("1,2s/d/z"), exCommand("1,4&")), before, after)
+  }
+
+  @VimOptionDefaultAll
+  fun `test colon-s repeats last substitution with reset flags`() {
+    val before = "${c}I found it in a legendary land"
+    val after = "${c}z found it in a legendary land"
+
+    // Help :&& - "Note that :s and :& don't keep the flags"
+    // Change the first I, ignoring case. :s does not keep the 'i' flag, so there is no match for `I`
+    doTest(listOf(exCommand("s/I/z/i"), exCommand("s")), before, after)
+  }
+
+  @VimOptionDefaultAll
+  fun `test colon-ampersand repeats last substitution with reset flags`() {
+    val before = "${c}I found it in a legendary land"
+    val after = "${c}z found it in a legendary land"
+
+    // Help :&& - "Note that :s and :& don't keep the flags"
+    // Change the first I, ignoring case. :s does not keep the 'i' flag, so there is no match for `I`
+    doTest(listOf(exCommand("s/I/z/i"), exCommand("&")), before, after)
+  }
+
+  @VimOptionDefaultAll
+  fun `test colon-s repeats last substitution with new flags`() {
+    val before = "${c}I found it in a legendary land"
+    val after = "${c}z found zt in a legendary land"
+
+    // Substitute lowercase `i`, then repeat ignoring case, replacing the initial uppercase `I`
+    doTest(listOf(exCommand("s/i/z"), exCommand("s i")), before, after)
+  }
+
+//  @VimBehaviorDiffers(description = "Vim supports :s[flags] but IdeaVim's command parser does not handle this." +
+//    "It tries to find a command called e.g. 'si'")
+//  @VimOptionDefaultAll
+//  fun `test colon-s repeats last substitution with new flags (no spaces)`() {
+//    val before = "${c}I found it in a legendary land"
+//    val after = "${c}z found zt in a legendary land"
+//
+//    doTest(listOf(exCommand("s/i/z"), exCommand("si")), before, after)
+//  }
+
+  @VimOptionDefaultAll
+  fun `test colon-ampersand repeats last substitution with new flags`() {
+    val before = "${c}I found it in a legendary land"
+    val after = "${c}z found zt in a legendary land"
+
+    // Substitute lowercase `i`, then repeat ignoring case, replacing the initial uppercase `I`
+    doTest(listOf(exCommand("s/i/z"), exCommand("& i")), before, after)
+  }
+
+  @VimOptionDefaultAll
+  fun `test colon-s ampersand does NOT repeat last substitution`() {
+    // :s [flag] - & means use previous flags
+    // See :h :& - "Note that after :substitute the '&' flag can't be used, it's recognized as a separator"
+    val before = "${c}I found it in a legendary land"
+    val after = "${c}z found it in a legendary land"
+
+    // Help :&& - "Note that :s and :& don't keep the flags"
+    // Change the first I, ignoring case. `:s &` *does not keep flags* (:s/P/z/& would)
+    doTest(listOf(exCommand("s/I/z/i"), exCommand("s &")), before, after)
+    assertPluginErrorMessageContains("Pattern not found: I")
+  }
+
+  @VimOptionDefaultAll
+  fun `test colon-ampersand-ampersand repeats last substitution with previous flags`() {
+    // :s [flag] - & means use previous flags
+    // See :h :& - "Note that after :substitute the '&' flag can't be used, it's recognized as a separator"
+    val before = "${c}I found it in a legendary land"
+    val after = "${c}z found zt in a legendary land"
+
+    // Help :&& - "Note that :s and :& don't keep the flags"
+    // Change the first I, ignoring case. `:s &` *does not keep flags* (:s/P/z/& would)
+    doTest(listOf(exCommand("s/I/z/i"), exCommand("&&")), before, after)
+  }
+
+  @VimOptionDefaultAll
+  fun `test colon-s repeats last substitution with count acts like line range`() {
+    val before = """
+       ${c}I found it in a legendary land
+       all rocks and lavender and tufted grass,
+       where it was settled on some sodden sand
+       hard by the torrent of a mountain pass.""".trimIndent()
+    val after = """
+       I fouzd it iz a legendary land
+       all rocks azd lavender and tufted grass,
+       ${c}where it was settled oz some sodden sand
+       hard by the torrent of a mountain pass.""".trimIndent()
+
+    // Change the first `n` to `z`. Then repeat 3 times - i.e. first occurrence on 3 lines
+    doTest(listOf(exCommand("s/n/z"), exCommand("s 3")), before, after)
+  }
+
+  @VimOptionDefaultAll
+  fun `test colon-s repeats last substitution after search`() {
+    val before = "${c}I found it in a legendary land"
+    val after = "${c}I found zt zn a legendary land"
+
+    // Change the first `i`. Search for `d`. Repeat substitution to change second `i` (not the `d`!)
+    doTest(listOf(exCommand("s/i/z"), searchCommand("/d"), exCommand("s")), before, after)
+  }
+
+  @VimOptionDefaultAll
+  fun `test colon-tilde repeats last substitution with last search pattern`() {
+    val before = "${c}I found it in a legendary land"
+    val after = "${c}I founz zt in a legendary land"
+
+    // Change the first `i`. Search for `d`. Repeat substitution with the last search pattern (same as `s/d/z/`)
+    doTest(listOf(exCommand("s/i/z"), searchCommand("/d"), exCommand("~")), before, after)
+  }
+
+  @VimOptionDefaultAll
+  fun `test colon-ampersand r repeats last substitution with last search pattern`() {
+    val before = "${c}I found it in a legendary land"
+    val after = "${c}I founz zt in a legendary land"
+
+    // Change the first `i`. Search for `d`. Repeat substitution with the last search pattern (same as `s/d/z/`)
+    doTest(listOf(exCommand("s/i/z"), searchCommand("/d"), exCommand("&r")), before, after)
+  }
+
+  @VimOptionDefaultAll
+  fun `test new substitution using previous flags`() {
+    val before = "${c}I found it in a legendary land"
+    val after = "${c}I fouxd zt zx a legexdary laxd"
+
+    // Change all `i`. Change all `n`, by reusing the `g` flag from the previous substitution
+    doTest(listOf(exCommand("s/i/z/g"), exCommand("s/n/x/&")), before, after)
+  }
+
+  @VimOptionDefaultAll
+  fun `test replace tilde with last replace string`() {
+    val before = "${c}I found it in a legendary land"
+    val after = "${c}I found zzzt in a zzzegendary land"
+
+    // Change `i` to `zzz`. Use `~` to change `l` to `zzz`
+    doTest(listOf(exCommand("s/i/zzz"), exCommand("s/l/~")), before, after)
+  }
+
+  @VimOptionDefaultAll
+  fun `test replace tilde with last replace string 2`() {
+    val before = "${c}I found it in a legendary land"
+    val after = "${c}I found zzzt in a aazzzbbzzzegendary land"
+
+    // Change `i` to `zzz`. Use `~` to change `l` to `zzz`
+    doTest(listOf(exCommand("s/i/zzz"), exCommand("s/l/aa~bb~")), before, after)
+  }
+
+  // Incsearch highlights handled by SearchGroupTest
+
+  private fun doTest(command: String, before: String, after: String) {
+    doTest(listOf(exCommand(command)), before, after)
   }
 }

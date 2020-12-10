@@ -54,6 +54,14 @@ class GnPreviousTextObjectTest : VimTestCase() {
     )
   }
 
+  fun `test gn uses last used pattern not just search pattern`() {
+    doTest(
+      listOf("/is<CR>", ":s/test/tester/<CR>", "$", "dgN"),
+      "Hello, ${c}this is a test here",
+      "Hello, this is a ${c}er here",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
   private fun doTestWithSearch(keys: List<KeyStroke>, before: String, after: String) {
     configureByText(before)
     VimPlugin.getSearch().setLastSearchState(myFixture.editor, "test", "", Direction.FORWARDS)

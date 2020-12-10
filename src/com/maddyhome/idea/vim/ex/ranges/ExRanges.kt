@@ -195,20 +195,22 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
    */
   private fun setPattern(pattern: String) {
     logger.debug { "pattern=$pattern" }
+    // Search range patterns such as `/one//two/` will be separated by a NULL character, rather than handled as separate
+    // ranges. A range with an offset, such as `/one/+3/two/` will be treated as two ranges.
     val tok = StringTokenizer(pattern, "\u0000")
     while (tok.hasMoreTokens()) {
       var pat = tok.nextToken()
       when (pat) {
         "\\/" -> {
-          patterns.add(VimPlugin.getSearch().lastSearch)
+          patterns.add(VimPlugin.getSearch().lastSearchPattern)
           directions.add(Direction.FORWARDS)
         }
         "\\?" -> {
-          patterns.add(VimPlugin.getSearch().lastSearch)
+          patterns.add(VimPlugin.getSearch().lastSearchPattern)
           directions.add(Direction.BACKWARDS)
         }
         "\\&" -> {
-          patterns.add(VimPlugin.getSearch().lastPattern)
+          patterns.add(VimPlugin.getSearch().lastSubstitutePattern)
           directions.add(Direction.FORWARDS)
         }
         else -> {
@@ -245,22 +247,31 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
   override fun getRangeLine(editor: Editor,
     caret: Caret, lastZero: Boolean): Int {
     var line = caret.logicalPosition.line
-    var offset = -1
+    var searchOffset = -1
     for (i in patterns.indices) {
       val pattern = patterns[i]
       val direction = directions[i]
-      offset = getSearchOffset(editor, line, direction, lastZero)
-      offset = VimPlugin.getSearch().processSearchRange(editor, pattern!!, offset, direction)
-      if (offset == -1) break
-      line = editor.offsetToLogicalPosition(offset).line
+
+      // TODO: Handling of line offset is kinda hacky
+      // We pass it in, but don't apply it to the search result. It should only be applied to the last pattern, and so
+      // is applied by the base class in getLine. But we need to pass it into processSearchRange so that
+      // lastPatternOffset is updated for future searches
+      val patternOffset = if (i == patterns.size - 1) offset else 0
+
+      searchOffset = getSearchOffset(editor, line, direction, lastZero)
+      searchOffset = VimPlugin.getSearch().processSearchRange(editor, pattern!!, patternOffset, searchOffset, direction)
+      if (searchOffset == -1) break
+      line = editor.offsetToLogicalPosition(searchOffset).line
     }
-    return if (offset != -1) line else -1
+    return if (searchOffset != -1) line else -1
   }
 
   private fun getSearchOffset(editor: Editor, line: Int, direction: Direction, lastZero: Boolean): Int {
     return if (direction == Direction.FORWARDS && !lastZero) {
       VimPlugin.getMotion().moveCaretToLineEnd(editor, line, true)
-    } else VimPlugin.getMotion().moveCaretToLineStart(editor, line)
+    } else {
+      VimPlugin.getMotion().moveCaretToLineStart(editor, line)
+    }
   }
 
   override fun toString(): String = "SearchRange[patterns=$patterns, ${super.toString()}]"

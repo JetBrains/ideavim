@@ -59,6 +59,8 @@ public class SearchHelper {
   /**
    * Find text matching the given pattern.
    *
+   * <p>See search.c:searchit</p>
+   *
    * @param editor          The editor to search in
    * @param pattern         The pattern to search for
    * @param startOffset     The offset to start searching from
