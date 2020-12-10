@@ -19,6 +19,7 @@ package com.maddyhome.idea.vim;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
+import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationListener;
 import com.intellij.openapi.Disposable;
@@ -162,7 +163,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @Nullable RegisterGroup getRegisterIfCreated() {
-    return ServiceManager.getServiceIfCreated(RegisterGroup.class);
+    return ApplicationManager.getApplication().getServiceIfCreated(RegisterGroup.class);
   }
 
   public static @NotNull FileGroup getFile() {
@@ -174,7 +175,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @Nullable SearchGroup getSearchIfCreated() {
-    return ServiceManager.getServiceIfCreated(SearchGroup.class);
+    return ApplicationManager.getApplication().getServiceIfCreated(SearchGroup.class);
   }
 
   public static @NotNull ProcessGroup getProcess() {
@@ -198,7 +199,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @Nullable KeyGroup getKeyIfCreated() {
-    return ServiceManager.getServiceIfCreated(KeyGroup.class);
+    return ApplicationManager.getApplication().getServiceIfCreated(KeyGroup.class);
   }
 
   public static @NotNull WindowGroup getWindow() {
@@ -210,7 +211,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @Nullable EditorGroup getEditorIfCreated() {
-    return ServiceManager.getServiceIfCreated(EditorGroup.class);
+    return ApplicationManager.getApplication().getServiceIfCreated(EditorGroup.class);
   }
 
   public static @NotNull VisualMotionGroup getVisualMotion() {
@@ -257,7 +258,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull String getVersion() {
-    final IdeaPluginDescriptor plugin = PluginManager.getPlugin(getPluginId());
+    final IdeaPluginDescriptor plugin = PluginManagerCore.getPlugin(getPluginId());
     if (!ApplicationManager.getApplication().isInternal()) {
       return plugin != null ? plugin.getVersion() : "SNAPSHOT";
     }

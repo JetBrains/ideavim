@@ -140,6 +140,6 @@ public class EventFacade {
   }
 
   private @NotNull TypedAction getTypedAction() {
-    return EditorActionManager.getInstance().getTypedAction();
+    return TypedAction.getInstance();
   }
 }

@@ -21,7 +21,10 @@ package org.jetbrains.plugins.ideavim.ex.handler;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.util.ArrayUtil;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.plugins.ideavim.VimTestCase;
+
+import java.util.List;
 
 /**
  * @author Naoto Ikeno
@@ -40,8 +43,8 @@ public class ActionListCommandTest extends VimTestCase {
 
     // Action lines
     int displayedActionNum = displayedLines.length - 1;
-    String[] actionIds = ActionManager.getInstance().getActionIds("");
-    assertEquals(displayedActionNum, actionIds.length);
+    List<String> actionIds = ActionManager.getInstance().getActionIdList("");
+    assertEquals(displayedActionNum, actionIds.size());
   }
 
   public void testSearchByActionName() {
