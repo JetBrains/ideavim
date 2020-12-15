@@ -22,7 +22,7 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## To Be Released
+## 0.62, 2020-12-15
 
 ### Features:
 * Support `unmap` and `mapclear` commands [VIM-1491](https://youtrack.jetbrains.com/issue/VIM-1491)
