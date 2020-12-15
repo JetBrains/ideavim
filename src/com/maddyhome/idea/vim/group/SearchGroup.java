@@ -1300,7 +1300,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   private @Nullable String lastReplace;
   private @Nullable String lastOffset;
   private boolean lastIgnoreSmartCase;
-  private Direction lastDir;
+  private @NotNull Direction lastDir = Direction.FORWARDS;
   private boolean showSearchHighlight = OptionsManager.INSTANCE.getHlsearch().isSet();
 
   private boolean do_all = false; /* do multiple substitutions per line */
