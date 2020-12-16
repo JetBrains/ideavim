@@ -18,19 +18,13 @@
 
 package com.maddyhome.idea.vim.extension
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.extensions.AbstractExtensionPointBean
+import com.intellij.serviceContainer.BaseKeyedLazyInstance
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.Tag
 import com.intellij.util.xmlb.annotations.XCollection
-import java.util.concurrent.atomic.AtomicBoolean
 
-// [Version Update] 202+
-@Suppress("DEPRECATION")
-class ExtensionBeanClass : AbstractExtensionPointBean() {
-  init {
-    println()
-  }
+class ExtensionBeanClass : BaseKeyedLazyInstance<VimExtension>() {
+
   @Attribute("implementation")
   var implementation: String? = null
 
@@ -46,14 +40,7 @@ class ExtensionBeanClass : AbstractExtensionPointBean() {
   @XCollection
   var aliases: List<Alias>? = null
 
-  var initialized = AtomicBoolean(false)
-
-  val handler: VimExtension by lazy {
-    initialized.set(true)
-    this.instantiateClass<VimExtension>(
-      implementation ?: "", ApplicationManager.getApplication().picoContainer
-    )
-  }
+  override fun getImplementationClassName(): String? = implementation
 }
 
 @Tag("alias")

@@ -53,7 +53,7 @@ public class RegisterActions {
 
   public static @Nullable EditorActionHandlerBase findAction(@NotNull String id) {
     return VIM_ACTIONS_EP.extensions().filter(vimActionBean -> vimActionBean.getActionId().equals(id)).findFirst()
-      .map(ActionBeanClass::getAction).orElse(null);
+      .map(ActionBeanClass::getInstance).orElse(null);
   }
 
   public static @NotNull EditorActionHandlerBase findActionOrDie(@NotNull String id) {

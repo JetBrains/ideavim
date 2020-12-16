@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.ex.handler.GotoLineHandler;
 import com.maddyhome.idea.vim.ex.ranges.Range;
@@ -209,7 +208,7 @@ public class CommandParser {
       }
     }
     final ExBeanClass handlerHolder = node.getCommandHandler();
-    return handlerHolder != null ? handlerHolder.getHandler() : null;
+    return handlerHolder != null ? handlerHolder.getInstance() : null;
   }
 
   /**
@@ -557,8 +556,8 @@ public class CommandParser {
     if (handlerHolder.getNames() != null) {
       names = CommandDefinitionKt.commands(handlerHolder.getNames().split(","));
     }
-    else if (handlerHolder.getHandler() instanceof ComplicatedNameExCommand) {
-      names = ((ComplicatedNameExCommand)handlerHolder.getHandler()).getNames();
+    else if (handlerHolder.getInstance() instanceof ComplicatedNameExCommand) {
+      names = ((ComplicatedNameExCommand)handlerHolder.getInstance()).getNames();
     }
     else {
       throw new RuntimeException("Cannot create an ex command: " + handlerHolder);

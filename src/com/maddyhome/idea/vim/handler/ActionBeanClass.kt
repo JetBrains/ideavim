@@ -18,8 +18,7 @@
 
 package com.maddyhome.idea.vim.handler
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.extensions.AbstractExtensionPointBean
+import com.intellij.serviceContainer.BaseKeyedLazyInstance
 import com.intellij.util.SmartList
 import com.intellij.util.xmlb.annotations.Attribute
 import com.maddyhome.idea.vim.command.MappingMode
@@ -47,9 +46,7 @@ import javax.swing.KeyStroke
  *   The reason is startup performance. Using the extension points you don't even have to load classes of actions.
  *   So, all actions are loaded on demand, including classes in classloader.
  */
-// [VERSION UPDATE] 202+
-@Suppress("DEPRECATION")
-class ActionBeanClass : AbstractExtensionPointBean() {
+class ActionBeanClass : BaseKeyedLazyInstance<EditorActionHandlerBase>() {
   @Attribute("implementation")
   var implementation: String? = null
 
@@ -61,16 +58,13 @@ class ActionBeanClass : AbstractExtensionPointBean() {
 
   val actionId: String get() = implementation?.let { EditorActionHandlerBase.getActionId(it) } ?: ""
 
-  val action: EditorActionHandlerBase by lazy {
-    this.instantiateClass<EditorActionHandlerBase>(
-      implementation ?: "", ApplicationManager.getApplication().picoContainer)
-  }
-
   fun getParsedKeys(): Set<List<KeyStroke>>? {
     val myKeys = keys ?: return null
     val escapedKeys = myKeys.splitByComma()
     return EditorActionHandlerBase.parseKeysSet(escapedKeys)
   }
+
+  override fun getImplementationClassName(): String? = implementation
 
   fun getParsedModes(): Set<MappingMode>? {
     val myModes = modes ?: return null

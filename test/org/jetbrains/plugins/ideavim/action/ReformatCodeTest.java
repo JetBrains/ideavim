@@ -24,14 +24,11 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 public class ReformatCodeTest extends VimTestCase {
 
-  /*
-[VERSION UPDATE] 2020.2+
   public void testEmpty() {
     configureByJavaText("<caret>");
     typeText(parseKeys("gqq"));
     myFixture.checkResult("<caret>");
   }
-  */
 
   public void testWithCount() {
     configureByJavaText(

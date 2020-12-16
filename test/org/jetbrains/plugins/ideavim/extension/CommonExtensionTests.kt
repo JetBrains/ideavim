@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.extension
 
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
@@ -50,15 +51,14 @@ class OpMappingTest : VimTestCase() {
 
       extension = TestExtension.createBean()
 
-      @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
-      VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
+      VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
       enableExtensions("TestExtension")
     }
   }
 
   override fun tearDown() {
-    @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
-    VimExtension.EP_NAME.getPoint(null).unregisterExtension(extension)
+    @Suppress("DEPRECATION")
+    VimExtension.EP_NAME.point.unregisterExtension(extension)
     super.tearDown()
   }
 
@@ -137,15 +137,14 @@ class OpMappingTest : VimTestCase() {
     typeText(parseKeys("Q"))
     myFixture.checkResult("I${c} found it in a legendary land")
 
-    @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
-    VimExtension.EP_NAME.getPoint(null).unregisterExtension(extension)
-    assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.handler.owner))
+    @Suppress("DEPRECATION")
+    VimExtension.EP_NAME.point.unregisterExtension(extension)
+    assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
     typeText(parseKeys("Q"))
     myFixture.checkResult("I${c} found it in a legendary land")
 
-    @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
-    VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
-    assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.handler.owner))
+    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
+    assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
     enableExtensions("TestExtension")
     typeText(parseKeys("Q"))
     myFixture.checkResult("I ${c}found it in a legendary land")
@@ -157,13 +156,12 @@ class OpMappingTest : VimTestCase() {
     myFixture.checkResult("I${c} found it in a legendary land")
 
     enterCommand("set noTestExtension")
-    @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
-    VimExtension.EP_NAME.getPoint(null).unregisterExtension(extension)
+    @Suppress("DEPRECATION")
+    VimExtension.EP_NAME.point.unregisterExtension(extension)
     typeText(parseKeys("Q"))
     myFixture.checkResult("I${c} found it in a legendary land")
 
-    @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
-    VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
+    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
     enableExtensions("TestExtension")
     typeText(parseKeys("Q"))
     myFixture.checkResult("I ${c}found it in a legendary land")
@@ -178,13 +176,12 @@ class PlugExtensionsTest : VimTestCase() {
     super.setUp()
 
     extension = TestExtension.createBean()
-    @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
-    VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
+    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
   }
 
   override fun tearDown() {
-    @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
-    VimExtension.EP_NAME.getPoint(null).unregisterExtension(extension)
+    @Suppress("DEPRECATION")
+    VimExtension.EP_NAME.point.unregisterExtension(extension)
     super.tearDown()
   }
 
@@ -212,7 +209,7 @@ class PlugExtensionsTest : VimTestCase() {
 }
 
 private val ExtensionBeanClass.ext: TestExtension
-  get() = this.handler as TestExtension
+  get() = this.instance as TestExtension
 
 private class TestExtension : VimExtension {
 
@@ -296,6 +293,7 @@ private class TestExtension : VimExtension {
       val beanClass = ExtensionBeanClass()
       beanClass.implementation = TestExtension::class.java.canonicalName
       beanClass.aliases = listOf(Alias().also { it.name = "MyTest" })
+      beanClass.pluginDescriptor = PluginManagerCore.getPlugin(VimPlugin.getPluginId())!!
       return beanClass
     }
   }

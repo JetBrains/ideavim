@@ -45,8 +45,8 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.option.OptionsManager;
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.ui.ShowCmd;
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -692,7 +692,7 @@ public class KeyHandler {
                                  @NotNull CommandNode node,
                                  CommandState editorState) {
     // The user entered a valid command. Create the command and add it to the stack.
-    final EditorActionHandlerBase action = node.getActionHolder().getAction();
+    final EditorActionHandlerBase action = node.getActionHolder().getInstance();
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
     final Argument.Type expectedArgumentType = commandBuilder.getExpectedArgumentType();
 
@@ -739,7 +739,7 @@ public class KeyHandler {
   }
 
   private boolean stopMacroRecord(CommandNode node, @NotNull CommandState editorState) {
-    return editorState.isRecording() && node.getActionHolder().getAction() instanceof ToggleRecordingAction;
+    return editorState.isRecording() && node.getActionHolder().getInstance() instanceof ToggleRecordingAction;
   }
 
   private void startWaitingForArgument(Editor editor,

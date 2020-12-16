@@ -307,17 +307,17 @@ public class KeyGroup implements PersistentStateComponent<Element> {
 
   public void registerCommandAction(@NotNull ActionBeanClass actionHolder) {
 
-    if (!VimPlugin.getPluginId().equals(actionHolder.getPluginId())) {
+    if (!VimPlugin.getPluginId().equals(actionHolder.getPluginDescriptor().getPluginId())) {
       logger.error("IdeaVim doesn't accept contributions to `vimActions` extension points. " +
                    "Please create a plugin using `VimExtension`. " +
                    "Plugin to blame: " +
-                   actionHolder.getPluginId());
+                   actionHolder.getPluginDescriptor().getPluginId());
       return;
     }
 
     Set<List<KeyStroke>> actionKeys = actionHolder.getParsedKeys();
     if (actionKeys == null) {
-      final EditorActionHandlerBase action = actionHolder.getAction();
+      final EditorActionHandlerBase action = actionHolder.getInstance();
       if (action instanceof ComplicatedKeysAction) {
         actionKeys = ((ComplicatedKeysAction)action).getKeyStrokesSet();
       }
@@ -337,7 +337,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
         prefixes = new HashMap<>();
       }
       for (List<KeyStroke> keys : actionKeys) {
-        checkCommand(actionModes, actionHolder.getAction(), keys);
+        checkCommand(actionModes, actionHolder.getInstance(), keys);
       }
     }
 

@@ -28,12 +28,12 @@ import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.io.FileUtil
-import com.intellij.util.containers.IntArrayList
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup.Companion.ACTION_GROUP
 import icons.VimIcons
+import it.unimi.dsi.fastutil.ints.IntArrayList
 import org.jetbrains.annotations.TestOnly
 import java.util.regex.Pattern
 
@@ -49,8 +49,6 @@ import java.util.regex.Pattern
 
 object VimRcFileState {
   // List of hashes of non-empty trimmed lines
-  // [VERSION UPDATE] 202+
-  @Suppress("DEPRECATION")
   private val state = IntArrayList()
 
   // ModificationStamp. Can be taken only from document. Doesn't play a big role, but can help speed up [equalTo]
@@ -74,11 +72,11 @@ object VimRcFileState {
     val fileModificationStamp = document.modificationStamp
     if (fileModificationStamp == modificationStamp) return true
 
-    val stateSize = state.size()
+    val stateSize = state.size
     var i = 0
     VimScriptParser.readText(document.charsSequence).forEach { line ->
       if (i >= stateSize) return false
-      if (state.get(i) != line.hashCode()) return false
+      if (state.getInt(i) != line.hashCode()) return false
       i++
     }
     if (i < stateSize) return false

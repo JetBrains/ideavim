@@ -41,9 +41,7 @@ object VimExtensionRegistrar {
 
     VimExtension.EP_NAME.extensions.forEach(this::registerExtension)
 
-    // [VERSION UPDATE] 202+
-    @Suppress("DEPRECATION")
-    VimExtension.EP_NAME.getPoint(null).addExtensionPointListener(object : ExtensionPointListener<ExtensionBeanClass> {
+    VimExtension.EP_NAME.point.addExtensionPointListener(object : ExtensionPointListener<ExtensionBeanClass> {
       override fun extensionAdded(extension: ExtensionBeanClass, pluginDescriptor: PluginDescriptor) {
         registerExtension(extension)
       }
@@ -56,7 +54,7 @@ object VimExtensionRegistrar {
 
   @Synchronized
   private fun registerExtension(extensionBean: ExtensionBeanClass) {
-    val name = extensionBean.name ?: extensionBean.handler.name
+    val name = extensionBean.name ?: extensionBean.instance.name
     if (name in registeredExtensions) return
 
     registeredExtensions.add(name)
@@ -64,10 +62,10 @@ object VimExtensionRegistrar {
     val option = ToggleOption(name, name, false)
     option.addOptionChangeListener { _, _ ->
       if (isSet(name)) {
-        extensionBean.handler.init()
+        extensionBean.instance.init()
         logger.info("IdeaVim extension '$name' initialized")
       } else {
-        extensionBean.handler.dispose()
+        extensionBean.instance.dispose()
       }
     }
     addOption(option)
@@ -75,13 +73,11 @@ object VimExtensionRegistrar {
 
   @Synchronized
   private fun unregisterExtension(extension: ExtensionBeanClass) {
-    val name = extension.name ?: extension.handler.name
+    val name = extension.name ?: extension.instance.name
     if (name !in registeredExtensions) return
     registeredExtensions.remove(name)
     removeAliases(extension)
-    if (extension.initialized.get()) {
-      extension.handler.dispose()
-    }
+    extension.instance.dispose()
     removeOption(name)
     remove(name)
     logger.info("IdeaVim extension '$name' disposed")
@@ -95,7 +91,7 @@ object VimExtensionRegistrar {
   private fun registerAliases(extension: ExtensionBeanClass) {
     extension.aliases
       ?.mapNotNull { it.name }
-      ?.forEach { alias -> extensionAliases[alias] = extension.name ?: extension.handler.name }
+      ?.forEach { alias -> extensionAliases[alias] = extension.name ?: extension.instance.name }
   }
 
   private fun removeAliases(extension: ExtensionBeanClass) {
