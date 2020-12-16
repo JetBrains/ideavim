@@ -10,7 +10,7 @@ object Release : BuildType({
   description = "Build and publish IdeaVim plugin"
 
   artifactRules = "build/distributions/*"
-  buildNumberPattern = "0.62"
+  buildNumberPattern = "0.63"
 
   params {
     param("env.ORG_GRADLE_PROJECT_ideaVersion", "2020.2")

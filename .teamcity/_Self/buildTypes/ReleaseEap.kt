@@ -13,7 +13,7 @@ object ReleaseEap : BuildType({
   description = "Build and publish EAP of IdeaVim plugin"
 
   artifactRules = "build/distributions/*"
-  buildNumberPattern = "0.62.%build.counter%"
+  buildNumberPattern = "0.63.%build.counter%"
 
   params {
     param("env.ORG_GRADLE_PROJECT_ideaVersion", "2020.2")

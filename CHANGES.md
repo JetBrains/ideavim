@@ -22,6 +22,17 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## 0.63, 2020-12-16
+
+### Changes:
+* Update the minimal required IJ version: 2020.2+
+
+### Fixes:
+* [CWM-927](https://youtrack.jetbrains.com/issue/CWM-927) Fix typing for CodeWithMe and IdeaVim
+
+### Merged PRs:
+* [259](https://github.com/JetBrains/ideavim/pull/259) by [Vladimir Petrenko](https://github.com/vladimir-petrenko): CWM-927 disable vim for client's hidden editor on host
+
 ## 0.62, 2020-12-15
 
 ### Features:

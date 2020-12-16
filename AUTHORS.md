@@ -335,6 +335,10 @@ Contributors:
   [![icon][github]](https://github.com/shaunpatterson)
   &nbsp;
   Shaun Patterson
+* [![icon][mail]](mailto:vladimir.petrenko@jetbrains.com)
+  [![icon][github]](https://github.com/vladimir-petrenko)
+  &nbsp;
+  Vladimir Petrenko
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
