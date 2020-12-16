@@ -59,7 +59,7 @@ runIdeForUiTests {
 }
 
 runPluginVerifier {
-  ideVersions = ["IC-2020.1.4", "IC-2020.2.3"]
+  ideVersions = ["IC-2020.2.3", "IC-2020.3"]
   downloadDirectory = "${project.buildDir}/pluginVerifier/ides"
   teamCityOutputFormat = true
 }
