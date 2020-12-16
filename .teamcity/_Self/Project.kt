@@ -18,6 +18,7 @@ import _Self.buildTypes.TestsForIntelliJEAP
 import _Self.vcsRoots.Branch_181
 import _Self.vcsRoots.Branch_183
 import _Self.vcsRoots.Branch_191_193
+import _Self.vcsRoots.Branch_201
 import _Self.vcsRoots.GitHubPullRequest
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 
@@ -26,15 +27,15 @@ object Project : Project({
 
   vcsRoot(Branch_183)
   vcsRoot(Branch_181)
-  vcsRoot(GitHubPullRequest)
   vcsRoot(Branch_191_193)
+  vcsRoot(Branch_201)
+  vcsRoot(GitHubPullRequest)
 
   buildType(GitHubPullRequests)
 
   buildType(Release)
   buildType(ReleaseEap)
 
-  buildType(TestsForIntelliJ20201)
   buildType(TestsForIntelliJ20202)
   buildType(TestsForIntelliJ20203)
   buildType(TestsForIntelliJEAP)
@@ -42,6 +43,7 @@ object Project : Project({
   buildType(Nvim)
   buildType(PluginVerifier)
 
+  buildType(TestsForIntelliJ20201)
   buildType(TestsForIntelliJ20191)
   buildType(TestsForIntelliJ20181)
   buildType(TestsForIntelliJ20192)
