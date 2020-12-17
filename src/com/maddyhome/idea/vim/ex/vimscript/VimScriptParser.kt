@@ -19,6 +19,9 @@ package com.maddyhome.idea.vim.ex.vimscript
 
 import com.maddyhome.idea.vim.ex.CommandParser
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.statistic.OptionActivation
+import com.maddyhome.idea.vim.statistic.OptionsCollector
 import com.maddyhome.idea.vim.ui.VimRcFileState
 import org.jetbrains.annotations.NonNls
 import java.io.File
@@ -107,20 +110,28 @@ object VimScriptParser {
   }
 
   fun executeText(text: List<String>) {
-    for (line in text) {
-      // TODO: Build a proper parse tree for a VimL file instead of ignoring potentially nested lines (VIM-669)
-      if (line.startsWith(" ") || line.startsWith("\t")) continue
+    OptionsCollector.fileExecution = true
+    try {
+      for (line in text) {
+        // TODO: Build a proper parse tree for a VimL file instead of ignoring potentially nested lines (VIM-669)
+        if (line.startsWith(" ") || line.startsWith("\t")) continue
 
-      val lineToExecute = if (line.startsWith(":")) line.substring(1) else line
-      val commandParser = CommandParser.getInstance()
-      try {
-        val command = commandParser.parse(lineToExecute)
-        val commandHandler = commandParser.getCommandHandler(command)
-        if (commandHandler is VimScriptCommandHandler) {
-          commandHandler.execute(command)
+        val lineToExecute = if (line.startsWith(":")) line.substring(1) else line
+        val commandParser = CommandParser.getInstance()
+        try {
+          val command = commandParser.parse(lineToExecute)
+          val commandHandler = commandParser.getCommandHandler(command)
+          if (commandHandler is VimScriptCommandHandler) {
+            commandHandler.execute(command)
+          }
+        } catch (ignored: ExException) {
         }
-      } catch (ignored: ExException) {
       }
+    } finally {
+      OptionsManager.trackedOptions.forEach { option ->
+        option.statisticCollector?.log(option.value, OptionActivation.DEFAULT)
+      }
+      OptionsCollector.fileExecution = false
     }
   }
 

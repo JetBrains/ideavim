@@ -18,19 +18,38 @@
 
 package com.maddyhome.idea.vim.option;
 
+import com.intellij.internal.statistic.eventLog.events.EventId2;
+import com.maddyhome.idea.vim.statistic.OptionActivation;
+import com.maddyhome.idea.vim.statistic.OptionsCollector;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BoundStringOption extends StringOption {
   BoundStringOption(@NonNls String name, @NonNls String abbrev, @NonNls String dflt, String[] values) {
     super(name, abbrev, dflt);
 
     this.values = values;
+    this.statisticCollector = null;
+  }
+
+  BoundStringOption(@NonNls String name, @NonNls String abbrev, @NonNls String dflt, String[] values, @NotNull EventId2<@Nullable String, OptionActivation> statisticCollector) {
+    super(name, abbrev, dflt);
+
+    this.values = values;
+    this.statisticCollector = statisticCollector;
   }
 
   @Override
   public boolean set(String val) {
     if (isValid(val)) {
+      if (statisticCollector != null) {
+        OptionActivation activation = OptionsCollector.Companion.getFileExecution()
+                                      ? OptionActivation.IDEAVIMRC
+                                      : OptionActivation.EX_COMMAND;
+        OptionsManager.INSTANCE.getTrackedOptions().removeIf(o -> o.getName().equals(this.name));
+        statisticCollector.log(val, activation);
+      }
       return super.set(val);
     }
 
@@ -75,4 +94,5 @@ public class BoundStringOption extends StringOption {
   }
 
   protected final String[] values;
+  public final @Nullable EventId2<@Nullable String, OptionActivation> statisticCollector;
 }
