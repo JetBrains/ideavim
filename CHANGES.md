@@ -22,6 +22,11 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## [To Be Released]
+
+### Merged PRs:
+* [260](https://github.com/JetBrains/ideavim/pull/260) by [Matt Ellis](https://github.com/citizenmatt): Refactor SearchGroup
+
 ## 0.63, 2020-12-16
 
 ### Changes:
