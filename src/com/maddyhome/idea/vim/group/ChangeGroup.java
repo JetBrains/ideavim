@@ -1765,27 +1765,7 @@ public class ChangeGroup {
   }
 
   public static void resetCaret(@NotNull Editor editor, boolean insert) {
-    Document doc = editor.getDocument();
-    VirtualFile vf = FileDocumentManager.getInstance().getFile(doc);
-    if (vf != null) {
-      resetCaret(vf, editor.getProject(), insert);
-    }
-    else {
-      editor.getSettings().setBlockCursor(!insert);
-    }
-  }
-
-  private static void resetCaret(@NotNull VirtualFile virtualFile, Project proj, boolean insert) {
-    logger.debug("Reset caret to a " + (insert ? "non-block" : "block") + " shape");
-    Document doc = FileDocumentManager.getInstance().getDocument(virtualFile);
-    if (doc == null) return; // Must be no text editor (such as image)
-    Editor[] editors = EditorFactory.getInstance().getEditors(doc, proj);
-    if (logger.isDebugEnabled()) {
-      logger.debug("There are " + editors.length + " editors for virtual file " + virtualFile.getName());
-    }
-    for (Editor editor : editors) {
-      editor.getSettings().setBlockCursor(!insert);
-    }
+    editor.getSettings().setBlockCursor(!insert);
   }
 
   /**
