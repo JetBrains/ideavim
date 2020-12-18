@@ -27,6 +27,9 @@ usual beta standards.
 ### Merged PRs:
 * [260](https://github.com/JetBrains/ideavim/pull/260) by [Matt Ellis](https://github.com/citizenmatt): Refactor SearchGroup
 
+### Fixes:
+* [VIM-2194](https://youtrack.jetbrains.com/issue/VIM-2194) Fix caret shape during editing a new file
+
 ## 0.63, 2020-12-16
 
 ### Changes:
