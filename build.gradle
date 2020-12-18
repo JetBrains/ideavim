@@ -64,10 +64,6 @@ runPluginVerifier {
   teamCityOutputFormat = true
 }
 
-runIde {
-  jvmArgs '-Dfus.internal.test.mode=true'
-}
-
 repositories {
   mavenCentral()
   jcenter()

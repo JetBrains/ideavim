@@ -36,7 +36,6 @@ import com.maddyhome.idea.vim.helper.isBlockCaretBehaviour
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
-import com.maddyhome.idea.vim.statistic.OptionsCollector
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.NonNls
 import java.util.*
@@ -49,8 +48,6 @@ object OptionsManager {
 
   private val options: MutableMap<String, Option<*>> = mutableMapOf()
   private val abbrevs: MutableMap<String, Option<*>> = mutableMapOf()
-
-  val trackedOptions: MutableList<BoundStringOption> = mutableListOf()
 
   val clipboard = addOption(ListOption(ClipboardOptionsData.name, ClipboardOptionsData.abbr, arrayOf(ClipboardOptionsData.ideaput, "autoselect,exclude:cons\\|linux"), null))
   val digraph = addOption(ToggleOption("digraph", "dg", false))
@@ -87,10 +84,10 @@ object OptionsManager {
   val visualbell = addOption(ToggleOption("visualbell", "vb", false))
   val wrapscan = addOption(ToggleOption("wrapscan", "ws", true))
   val visualEnterDelay = addOption(NumberOption("visualdelay", "visualdelay", 100, 0, Int.MAX_VALUE))
-  val idearefactormode = addOption(BoundStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues, OptionsCollector.IDEA_REFACTOR_MODE))
-  val ideastatusicon = addOption(BoundStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues, OptionsCollector.STATUS_BAR_ICON))
+  val idearefactormode = addOption(BoundStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues))
+  val ideastatusicon = addOption(BoundStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues))
   val ideastrictmode = addOption(ToggleOption("ideastrictmode", "ideastrictmode", false))
-  val ideawrite = addOption(BoundStringOption("ideawrite", "ideawrite", IdeaWriteData.all, IdeaWriteData.allValues, OptionsCollector.IDEA_WRITE))
+  val ideawrite = addOption(BoundStringOption("ideawrite", "ideawrite", IdeaWriteData.all, IdeaWriteData.allValues))
   val ideavimsupport = addOption(BoundListOption("ideavimsupport", "ideavimsupport", arrayOf("dialog"), arrayOf("dialog", "singleline", "dialoglegacy")))
 
   fun isSet(name: String): Boolean {
@@ -360,9 +357,6 @@ object OptionsManager {
   fun <T : Option<*>> addOption(option: T): T {
     options += option.name to option
     abbrevs += option.abbrev to option
-    if (option is BoundStringOption && option.statisticCollector != null) {
-      trackedOptions += option
-    }
     return option
   }
 

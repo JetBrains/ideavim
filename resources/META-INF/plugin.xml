@@ -121,8 +121,6 @@
     <postStartupActivity implementation="com.maddyhome.idea.vim.PluginStartup" order="first"/>
 
     <editorFloatingToolbarProvider implementation="com.maddyhome.idea.vim.ui.ReloadFloatingToolbar"/>
-
-    <statistics.counterUsagesCollector implementationClass="com.maddyhome.idea.vim.statistic.OptionsCollector"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
