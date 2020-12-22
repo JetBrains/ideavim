@@ -65,6 +65,7 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.OptionsManager.getOption
 import com.maddyhome.idea.vim.option.OptionsManager.ideastrictmode
 import com.maddyhome.idea.vim.option.OptionsManager.resetAllOptions
+import com.maddyhome.idea.vim.option.StrictMode
 import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.junit.Assert

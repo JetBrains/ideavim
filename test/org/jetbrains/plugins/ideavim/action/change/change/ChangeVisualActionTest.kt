@@ -92,22 +92,10 @@ class ChangeVisualActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             ${c}
             
-            
         """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
-
-  @VimBehaviorDiffers(originalVimAfter = """
-            A Discovery
-
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-           
-            ${c}
-            
-            
-  """)
   fun `test multiple line change till the end with two new lines`() {
     val keys = "Vjc"
     val before = """
@@ -127,8 +115,8 @@ class ChangeVisualActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
            
-           
             ${c}
+            
             
         """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)

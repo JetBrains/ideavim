@@ -16,6 +16,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+@file:Suppress("RemoveCurlyBracesFromTemplate")
+
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.command.CommandState
@@ -40,10 +42,6 @@ class DeleteVisualLinesActionTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
-  @VimBehaviorDiffers(originalVimAfter = """
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                ${c}where it was settled on some sodden sand""")
   fun `test remove line in char visual mode last line`() {
     doTest("vlllX",
       """
@@ -54,8 +52,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
       """
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
-                where it was settled on some sodden san${c}d
-
+                ${c}where it was settled on some sodden sand
                 """.trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
@@ -78,10 +75,6 @@ class DeleteVisualLinesActionTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
-  @VimBehaviorDiffers(originalVimAfter = """
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                ${c}where it was settled on some sodden sand""")
   fun `test remove line in line visual mode line end`() {
     doTest("VX",
       """
@@ -92,10 +85,53 @@ class DeleteVisualLinesActionTest : VimTestCase() {
       """
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
-                where it was settled on some sodden san${c}d
-                
+                ${c}where it was settled on some sodden sand
                 """.trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
+  }
+
+  fun `test multiple line delete till the end`() {
+    val keys = "Vjd"
+    val before = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            
+            ${c}where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+    val after = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            ${c}
+        """.trimIndent()
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun `test multiple line delete till the end with a new line`() {
+    val keys = "Vjd"
+    val before = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            
+            ${c}where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+            
+        """.trimIndent()
+    val after = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            
+            ${c}
+        """.trimIndent()
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 }

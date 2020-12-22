@@ -214,6 +214,12 @@ class PutGroup {
             SelectionType.BLOCK_WISE -> listOf(editor.logicalPositionToOffset(LogicalPosition(firstSelectedLine, startColumnOfSelection)))
           }
         }
+        data.visualSelection.typeInEditor.isLine -> {
+          if (caret.offset == editor.fileSize && editor.fileSize != 0) {
+            application.runWriteAction { editor.document.insertString(caret.offset, "\n") }
+            listOf(caret.offset + 1)
+          } else listOf(caret.offset)
+        }
         else -> listOf(caret.offset)
       }
     } else {

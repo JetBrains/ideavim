@@ -28,7 +28,9 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.endsWithNewLine
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.helper.fileSize
 import java.util.*
 
 /**
@@ -57,8 +59,10 @@ class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
       VimPlugin.getChange()
         .deleteRange(editor, editor.caretModel.primaryCaret, blockRange, SelectionType.BLOCK_WISE, false)
     } else {
-      val lineRange = TextRange(EditorHelper.getLineStartForOffset(editor, vimTextRange.startOffset),
-        EditorHelper.getLineEndForOffset(editor, vimTextRange.endOffset) + 1)
+      val lineEndForOffset = EditorHelper.getLineEndForOffset(editor, vimTextRange.endOffset)
+      val endsWithNewLine =
+        if (lineEndForOffset == editor.fileSize && (!editor.endsWithNewLine() || vimTextRange.startOffset == vimTextRange.endOffset)) 0 else 1
+      val lineRange = TextRange(EditorHelper.getLineStartForOffset(editor, vimTextRange.startOffset), lineEndForOffset + endsWithNewLine)
       VimPlugin.getChange().deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false)
     }
   }

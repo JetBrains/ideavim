@@ -39,10 +39,8 @@ import com.intellij.openapi.editor.event.EditorMouseListener;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.editor.impl.TextRangeInterval;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiUtilBase;
@@ -67,6 +65,7 @@ import com.maddyhome.idea.vim.listener.VimInsertListener;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.option.BoundListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import com.maddyhome.idea.vim.option.StrictMode;
 import kotlin.Pair;
 import kotlin.text.StringsKt;
 import org.jetbrains.annotations.NonNls;
@@ -1140,22 +1139,34 @@ public class ChangeGroup {
                              @Nullable SelectionType type,
                              boolean isChange) {
 
+    boolean removeLastNewLine = removeLastNewLine(editor, range, type);
     final boolean res = deleteText(editor, range, type);
-    final int size = EditorHelper.getFileSize(editor);
+    if (removeLastNewLine) {
+      int textLength = editor.getDocument().getTextLength();
+      editor.getDocument().deleteString(textLength - 1, textLength);
+    }
+
     if (res) {
-      int pos;
-      if (caret.getOffset() > size) {
-        pos = size - 1;
-      }
-      else {
-        pos = EditorHelper.normalizeOffset(editor, range.getStartOffset(), isChange);
-        if (type == SelectionType.LINE_WISE) {
-          pos = VimPlugin.getMotion().moveCaretToLineStart(editor, editor.offsetToLogicalPosition(pos).line);
-        }
+      int pos = EditorHelper.normalizeOffset(editor, range.getStartOffset(), isChange);
+      if (type == SelectionType.LINE_WISE) {
+        pos = VimPlugin.getMotion().moveCaretToLineStart(editor, editor.offsetToLogicalPosition(pos).line);
       }
       MotionGroup.moveCaret(editor, caret, pos);
     }
     return res;
+  }
+
+  private boolean removeLastNewLine(@NotNull Editor editor, @NotNull TextRange range, @Nullable SelectionType type) {
+    int endOffset = range.getEndOffset();
+    int fileSize = EditorHelperRt.getFileSize(editor);
+    if (endOffset > fileSize){
+      StrictMode.INSTANCE.fail("Incorrect offset. File size: " + fileSize + ", offset: " + endOffset);
+      endOffset = fileSize;
+    }
+    return type == SelectionType.LINE_WISE &&
+           range.getStartOffset() != 0 &&
+           editor.getDocument().getCharsSequence().charAt(endOffset - 1) != '\n' &&
+           endOffset == fileSize;
   }
 
   /**
@@ -1446,7 +1457,7 @@ public class ChangeGroup {
         col = MotionGroup.LAST_COLUMN;
       }
     }
-    boolean after = range.getEndOffset() >= EditorHelper.getFileSize(editor);
+    boolean after = range.getEndOffset() >= EditorHelper.getFileSize(editor, true);
 
     final LogicalPosition lp =
       editor.offsetToLogicalPosition(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret));
@@ -1454,11 +1465,11 @@ public class ChangeGroup {
     boolean res = deleteRange(editor, caret, range, type, true);
     if (res) {
       if (type == SelectionType.LINE_WISE) {
-        // Please don't use `getDocument().getText().isEmpty()`
+        // Please don't use `getDocument().getText().isEmpty()` because it converts CharSequence into String
         if (editor.getDocument().getTextLength() == 0) {
           insertBeforeCursor(editor, context);
         }
-        else if (after) {
+        else if (after && !EditorHelperRt.endsWithNewLine(editor)) {
           insertNewLineBelow(editor, caret, lp.column);
         }
         else {
@@ -1472,8 +1483,11 @@ public class ChangeGroup {
         UserDataManager.setVimChangeActionSwitchMode(editor, CommandState.Mode.INSERT);
       }
     }
+    else {
+      insertBeforeCursor(editor, context);
+    }
 
-    return res;
+    return true;
   }
 
   private void restoreCursor(@NotNull Editor editor, @NotNull Caret caret, int startLine) {
@@ -1737,23 +1751,31 @@ public class ChangeGroup {
   private boolean deleteText(final @NotNull Editor editor,
                              final @NotNull TextRange range,
                              @Nullable SelectionType type) {
+    TextRange updatedRange = range;
     // Fix for https://youtrack.jetbrains.net/issue/VIM-35
     if (!range.normalize(EditorHelperRt.getFileSize(editor))) {
-      return false;
+      if (range.getStartOffset() == range.getEndOffset() &&
+          range.getStartOffset() == EditorHelperRt.getFileSize(editor) &&
+          range.getStartOffset() != 0) {
+        updatedRange = new TextRange(range.getStartOffset() - 1, range.getEndOffset());
+      }
+      else {
+        return false;
+      }
     }
 
     if (type == null ||
         CommandStateHelper.inInsertMode(editor) ||
-        VimPlugin.getRegister().storeText(editor, range, type, true)) {
+        VimPlugin.getRegister().storeText(editor, updatedRange, type, true)) {
       final Document document = editor.getDocument();
-      final int[] startOffsets = range.getStartOffsets();
-      final int[] endOffsets = range.getEndOffsets();
-      for (int i = range.size() - 1; i >= 0; i--) {
+      final int[] startOffsets = updatedRange.getStartOffsets();
+      final int[] endOffsets = updatedRange.getEndOffsets();
+      for (int i = updatedRange.size() - 1; i >= 0; i--) {
         document.deleteString(startOffsets[i], endOffsets[i]);
       }
 
       if (type != null) {
-        final int start = range.getStartOffset();
+        final int start = updatedRange.getStartOffset();
         VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, start);
         VimPlugin.getMark().setChangeMarks(editor, new TextRange(start, start + 1));
       }

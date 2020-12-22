@@ -16,44 +16,46 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.action.copy
+@file:Suppress("RemoveCurlyBracesFromTemplate")
 
-import com.maddyhome.idea.vim.VimPlugin
+package org.jetbrains.plugins.ideavim.action.change.change
+
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
-import org.jetbrains.plugins.ideavim.rangeOf
-import org.junit.Test
 
-class PutTestAfterCursorActionTest : VimTestCase() {
-  fun `test put from number register`() {
-    setRegister('4', "XXX ")
-    doTest("\"4p", "This is my${c} text", "This is my XXX${c} text", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-  }
-
-  @VimBehaviorDiffers(originalVimAfter = """
-            A Discovery
-
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            ${c}A Discovery
-    """)
-  @Test
-  fun `test put visual text line to last line`() {
+class ChangeVisualLinesEndActionTest : VimTestCase() {
+  fun `test change last line`() {
+    val keys = "VC"
     val before = """
             A Discovery
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            hard by the ${c}torrent of a mountain pass.
+            ${c}hard by the torrent of a mountain pass.
         """.trimIndent()
-    val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-    typeText(StringHelper.parseKeys("p"))
+    val after = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            ${c}
+        """.trimIndent()
+    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  fun `test last empty line`() {
+    val keys = "vC"
+    val before = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+            ${c}
+        """.trimIndent()
     val after = """
             A Discovery
 
@@ -61,10 +63,8 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-            ${c}A Discovery
-
-            """.trimIndent()
-    myFixture.checkResult(after)
+            ${c}
+        """.trimIndent()
+    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
-
 }

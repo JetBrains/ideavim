@@ -54,7 +54,7 @@ class DeleteMotionActionTest : VimTestCase() {
           expression${c} two
           """.trimIndent())
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: ""
-    assertEquals("\n  expression two", savedText)
+    assertEquals("  expression two", savedText)
   }
 
   fun `test delete line action multicaret`() {
@@ -69,7 +69,7 @@ class DeleteMotionActionTest : VimTestCase() {
         abcde
         
         """.trimIndent())
-    myFixture.checkResult("${c}abcd${c}e\n")
+    myFixture.checkResult("${c}abcde\n${c}")
   }
 
   fun `test delete motion action multicaret`() {
@@ -137,6 +137,29 @@ class DeleteMotionActionTest : VimTestCase() {
             
             I found it in a legendary land
             ${c}all rocks and lavender and tufted grass,
+        """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
+  }
+
+  fun `test empty line`() {
+    doTest("dd",
+      """
+            A Discovery
+            
+            ${c}
+            
+            
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+        """.trimIndent(),
+      """
+            A Discovery
+            
+            ${c}
+            
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
         """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )

@@ -154,7 +154,7 @@ public class MotionGroup {
           end = Math.min(getLineEndForOffset(editor, end) + 1, EditorHelperRt.getFileSize(editor));
         }
         else {
-          start = Math.max(getLineStartForOffset(editor, start) - 1 , 0);
+          start = getLineStartForOffset(editor, start);
           end = getLineEndForOffset(editor, end);
         }
       }

@@ -31,7 +31,10 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.endsWithNewLine
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.helper.fileSize
+import com.maddyhome.idea.vim.helper.secondLastCharIsNewLine
 import java.util.*
 
 /**
@@ -48,8 +51,13 @@ class ChangeVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
                              cmd: Command,
                              range: VimSelection): Boolean {
     val textRange = range.toVimTextRange(true)
-    val lineRange = TextRange(EditorHelper.getLineStartForOffset(editor, textRange.startOffset),
-      EditorHelper.getLineEndForOffset(editor, textRange.endOffset) + 1)
+    val lineEndForOffset = EditorHelper.getLineEndForOffset(editor, textRange.endOffset)
+    val endsWithNewLine =
+      if (lineEndForOffset == editor.fileSize && (!editor.endsWithNewLine() || textRange.startOffset == textRange.endOffset)) 0 else 1
+    val lineRange = TextRange(
+      EditorHelper.getLineStartForOffset(editor, textRange.startOffset),
+      lineEndForOffset + endsWithNewLine
+    )
     return VimPlugin.getChange().changeRange(editor, caret, lineRange, SelectionType.LINE_WISE, context)
   }
 }

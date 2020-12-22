@@ -145,14 +145,6 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviorDiffers("""
-            A Discovery
-
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            ${c}
-    """)
   @VimOptionDefaultAll
   fun `test simple deletion last line`() {
     val keys = listOf("v", "D")
@@ -170,8 +162,8 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
-            where it was settled on some sodden san${c}d
-
+            where it was settled on some sodden sand
+            ${c}
         """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
@@ -220,13 +212,6 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviorDiffers("""
-            A Discovery
-
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            ${c}where it was settled on some sodden sand"""
-  )
   @VimOptionDefaultAll
   fun `test simple deletion last line without empty line`() {
     val keys = listOf("v", "D")
@@ -242,8 +227,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
-            where it was settled on some sodden san${c}d
-
+            ${c}where it was settled on some sodden sand
             """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
@@ -301,7 +285,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
                     abcde
 
                     """.trimIndent())
-    myFixture.checkResult("${c}abcd${c}e\n")
+    myFixture.checkResult("${c}abcde\n${c}")
   }
 
   @VimOptionDefaultAll
@@ -374,14 +358,6 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviorDiffers("""
-            A Discovery
-
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            ${c}
-    """)
   @VimOptionDefaultAll
   fun `test line deletion last line`() {
     val keys = listOf("V", "D")
@@ -399,19 +375,12 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
-            where it was settled on some sodden san${c}d
-
+            where it was settled on some sodden sand
+            ${c}
         """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviorDiffers("""
-            A Discovery
-
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            ${c}where it was settled on some sodden sand"""
-  )
   @VimOptionDefaultAll
   fun `test line deletion last line without empty line`() {
     val keys = listOf("V", "D")
@@ -427,8 +396,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-
+            ${c}where it was settled on some sodden sand
             """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
@@ -486,7 +454,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
                     abcde
 
                     """.trimIndent())
-    myFixture.checkResult("${c}abcd${c}e\n")
+    myFixture.checkResult("${c}abcde\n${c}")
   }
 
   @VimOptionDefaultAll
