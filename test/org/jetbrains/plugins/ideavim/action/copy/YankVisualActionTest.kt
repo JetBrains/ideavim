@@ -133,7 +133,7 @@ class YankVisualActionTest : VimTestCase() {
                             all rocks and lavender and tufted grass,
                             where it was settled on some sodden sand
                             hard by ${c}the torrent of a mountain pass.""".trimIndent(),
-      "hard by the torrent of a mountain pass.", SelectionType.LINE_WISE)
+      "hard by the torrent of a mountain pass.\n", SelectionType.LINE_WISE)
   }
 
   fun `test yank multicaret line`() {
@@ -145,7 +145,7 @@ class YankVisualActionTest : VimTestCase() {
                             all ${c}rocks and lavender and tufted grass,
                             where it was settled on some sodden sand
                             hard by ${c}the torrent of a mountain pass.""".trimIndent(),
-      "all rocks and lavender and tufted grass,\nhard by the torrent of a mountain pass.", SelectionType.LINE_WISE)
+      "all rocks and lavender and tufted grass,\nhard by the torrent of a mountain pass.\n", SelectionType.LINE_WISE)
   }
 
   fun testYankVisualLines() {

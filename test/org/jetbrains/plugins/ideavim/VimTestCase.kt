@@ -494,8 +494,20 @@ abstract class VimTestCase : UsefulTestCase() {
   object Checks {
     var caretShape: Boolean = true
 
+    val neoVim = NeoVim()
+
     fun reset() {
       caretShape = true
+
+      neoVim.reset()
+    }
+
+    class NeoVim {
+      var ignoredRegisters: Set<Char> = setOf()
+
+      fun reset() {
+        ignoredRegisters = setOf()
+      }
     }
   }
 }

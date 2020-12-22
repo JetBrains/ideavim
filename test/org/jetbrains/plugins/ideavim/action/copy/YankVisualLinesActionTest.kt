@@ -19,6 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -55,11 +56,19 @@ class YankVisualLinesActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was sett${c}led on some sodden sand
             hard by the torrent of a mountain pass.""".trimIndent()
+    val textAfter = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            ${c}where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.""".trimIndent()
+    doTest("vjY", text, textAfter, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     val yankedTest = """
             where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.""".trimIndent()
-    configureByText(text)
-    typeText(parseKeys("vjY"))
+            hard by the torrent of a mountain pass.
+            
+            """.trimIndent()
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
     TestCase.assertEquals(yankedTest, savedText)
   }

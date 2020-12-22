@@ -83,13 +83,13 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
   public static final char UNNAMED_REGISTER = '"';
   public static final char LAST_SEARCH_REGISTER = '/';        // IdeaVim does not supporting writing to this register
   public static final char LAST_COMMAND_REGISTER = ':';
-  private static final char LAST_INSERTED_TEXT_REGISTER = '.';
+  public static final char LAST_INSERTED_TEXT_REGISTER = '.';
   public static final char SMALL_DELETION_REGISTER = '-';
   private static final char BLACK_HOLE_REGISTER = '_';
   private static final char ALTERNATE_BUFFER_REGISTER = '#';  // Not supported
   private static final char EXPRESSION_BUFFER_REGISTER = '='; // Not supported
   private static final char CURRENT_FILENAME_REGISTER = '%';  // Not supported
-  private static final @NonNls String CLIPBOARD_REGISTERS = "*+";
+  public static final @NonNls String CLIPBOARD_REGISTERS = "*+";
   private static final @NonNls String NUMBERED_REGISTERS = "0123456789";
   private static final @NonNls String NAMED_REGISTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -100,7 +100,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     + EXPRESSION_BUFFER_REGISTER; // Expression buffer is not actually readonly
   private static final @NonNls String RECORDABLE_REGISTERS = NUMBERED_REGISTERS + NAMED_REGISTERS;
   private static final String PLAYBACK_REGISTERS = RECORDABLE_REGISTERS + UNNAMED_REGISTER + CLIPBOARD_REGISTERS + LAST_INSERTED_TEXT_REGISTER;
-  private static final String VALID_REGISTERS = WRITABLE_REGISTERS + READONLY_REGISTERS;
+  public static final String VALID_REGISTERS = WRITABLE_REGISTERS + READONLY_REGISTERS;
 
   private static final Logger logger = Logger.getInstance(RegisterGroup.class.getName());
 
@@ -180,6 +180,11 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
                            boolean isDelete) {
     if (isRegisterWritable()) {
       String text = EditorHelper.getText(editor, range);
+
+      if (type == SelectionType.LINE_WISE && (text.length() == 0 || text.charAt(text.length() - 1) != '\n')) {
+        // Linewise selection always has a new line at the end
+        text += '\n';
+      }
 
       return storeTextInternal(editor, range, text, type, lastRegister, isDelete);
     }
@@ -269,7 +274,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     }
 
     if (isDelete) {
-      boolean smallInlineDeletion = type == SelectionType.CHARACTER_WISE &&
+      boolean smallInlineDeletion = (type == SelectionType.CHARACTER_WISE ||  type == SelectionType.BLOCK_WISE ) &&
                        editor.offsetToLogicalPosition(start).line == editor.offsetToLogicalPosition(end).line;
 
       // Deletes go into numbered registers only if text is smaller than a line, register is used or it's a special case

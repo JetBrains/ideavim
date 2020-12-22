@@ -24,10 +24,12 @@ import com.ensarsarajcic.neovim.java.api.types.api.VimCoords
 import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRPCConnection
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.CharacterPosition
+import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.commandState
-import kotlin.test.assertEquals
+import org.junit.Assert.assertEquals
 
 internal object NeovimTesting {
   private lateinit var neovimApi: NeovimApi
@@ -36,7 +38,7 @@ internal object NeovimTesting {
   fun setUp(test: VimTestCase) {
     if (!neovimEnabled(test)) return
     val nvimPath = System.getenv("ideavim.nvim.path") ?: "nvim"
-    val pb = ProcessBuilder(nvimPath, "-u", "NONE", "--embed", "--headless")
+    val pb = ProcessBuilder(nvimPath, "-u", "NONE", "--embed", "--headless", "--clean")
     neovim = pb.start()
     val neovimConnection = ProcessRPCConnection(neovim, true)
     neovimApi = NeovimApis.getApiForConnection(neovimConnection)
@@ -71,6 +73,7 @@ internal object NeovimTesting {
     assertText(editor)
     assertCaret(editor)
     assertMode(editor)
+    assertRegisters()
   }
 
   fun setRegister(register: Char, keys: String, test: VimTestCase) {
@@ -96,6 +99,18 @@ internal object NeovimTesting {
     val ideavimState = editor.commandState.toVimNotation()
     val neovimState = neovimApi.mode.get().mode
     assertEquals(neovimState, ideavimState)
+  }
+
+  private const val nonCheckingRegisters = RegisterGroup.CLIPBOARD_REGISTERS + RegisterGroup.LAST_INSERTED_TEXT_REGISTER
+
+  private fun assertRegisters() {
+    for (register in RegisterGroup.VALID_REGISTERS) {
+      if (register in nonCheckingRegisters) continue
+      if (register in VimTestCase.Checks.neoVim.ignoredRegisters) continue
+      val neovimRegister = neovimApi.callFunction("getreg", listOf(register)).get().toString()
+      val ideavimRegister = VimPlugin.getRegister().getRegister(register)?.text ?: ""
+      assertEquals("Register '$register'", neovimRegister, ideavimRegister)
+    }
   }
 }
 

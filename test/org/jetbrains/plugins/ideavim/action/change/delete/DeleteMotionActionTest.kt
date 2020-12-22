@@ -54,7 +54,7 @@ class DeleteMotionActionTest : VimTestCase() {
           expression${c} two
           """.trimIndent())
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: ""
-    assertEquals("  expression two", savedText)
+    assertEquals("  expression two\n", savedText)
   }
 
   fun `test delete line action multicaret`() {
