@@ -6,7 +6,8 @@ import _Self.buildTypes.Release_201
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 
 object Releases : Project({
-  description = "IdeaVim releases"
+  name = "IdeaVim releases"
+  description = "Stable and EAP releases for IdeaVim"
 
   buildType(Release)
   buildType(Release_201)
