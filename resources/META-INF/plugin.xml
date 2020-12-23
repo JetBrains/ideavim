@@ -2,63 +2,20 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-    <h3>Features:</h3>
+    <h3>Merged PRs:</h3>
     <ul>
-      <li>Support <code>unmap</code> and <code>mapclear</code> commands <a
-          href="https://youtrack.jetbrains.com/issue/VIM-1491">VIM-1491</a></li>
-      <li>Support mappings in ex panel (<code>cmap</code>) <a
-          href="https://youtrack.jetbrains.com/issue/VIM-1227">VIM-1227</a></li>
-    </ul>
-
-    <h3>Changes:</h3>
-    <ul>
-      <li><code>octal</code> is now disabled by default for <code>nrformats</code>. <a
-          href="https://youtrack.jetbrains.com/issue/VIM-2181">VIM-2181</a></li>
+    <li>
+      <a href="https://github.com/JetBrains/ideavim/pull/260">260</a>
+      by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Refactor SearchGroup
+    </li>
     </ul>
 
     <h3>Fixes:</h3>
     <ul>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2113">VIM-2113</a> Fix <code>cit</code> for empty tags</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2114">VIM-2114</a> Unnamed register isn't changed after deleting
-        empty tag
-      </li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1475">VIM-1475</a> Enable block caret to be used in insert mode.
-      </li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2170">VIM-2170</a> Fix an alternative range format for
-        <code>s</code> command
-      </li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1913">VIM-1913</a>
-        <a href="https://youtrack.jetbrains.com/issue/VIM-2154">VIM-2154</a> Several fixes for AppCode templates
-      </li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1756">VIM-1756</a> Fix startsel from insert mode</li>
-    </ul>
-
-    <h3>Merged PRs:</h3>
-    <ul>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/249">249</a> by <a href="https://github.com/jpalus">Jan
-        Palus</a>: VIM-2113 Increase tag range only in visual mode
-      </li>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/250">250</a> by <a href="https://github.com/jpalus">Jan
-        Palus</a>: VIM-2114 Do not override registers when deleting empty range
-      </li>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/256">256</a> by <a href="https://github.com/brandoncc">Brandon
-        Conway</a>: Fix typo
-      </li>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/254">254</a> by <a href="https://github.com/antekone">Grzegorz
-        Antoniak</a>: VIM-1475: Add an option to use block caret in insert mode
-      </li>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/225">225</a> by <a href="https://github.com/sumoooru2">sumoooru2</a>:
-        Implement cmap
-      </li>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/258">258</a> by <a href="https://github.com/citizenmatt">Matt
-        Ellis</a>: Show the correct handler class in :map
-      </li>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/257">257</a> by <a href="https://github.com/citizenmatt">Matt
-        Ellis</a>: Extract SearchHighlightsHelper from SearchGroup
-      </li>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/251">251</a> by <a href="https://github.com/shaunpatterson">Shaun
-        Patterson</a>: VIM-1756: startSel works in insert mode
-      </li>
+    <li>
+      <a href="https://youtrack.jetbrains.com/issue/VIM-2194">VIM-2194</a>
+      Fix caret shape during editing a new file
+    </li>
     </ul>
   ]]>
   </change-notes>
