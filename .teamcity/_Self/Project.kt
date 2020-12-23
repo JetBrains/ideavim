@@ -5,6 +5,7 @@ import _Self.buildTypes.Nvim
 import _Self.buildTypes.PluginVerifier
 import _Self.buildTypes.Release
 import _Self.buildTypes.ReleaseEap
+import _Self.buildTypes.Release_201
 import _Self.buildTypes.TestsForIntelliJ20181
 import _Self.buildTypes.TestsForIntelliJ20182
 import _Self.buildTypes.TestsForIntelliJ20183
@@ -34,6 +35,7 @@ object Project : Project({
   buildType(GitHubPullRequests)
 
   buildType(Release)
+  buildType(Release_201)
   buildType(ReleaseEap)
 
   buildType(TestsForIntelliJ20202)
