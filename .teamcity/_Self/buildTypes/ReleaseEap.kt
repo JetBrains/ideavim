@@ -19,10 +19,10 @@ object ReleaseEap : BuildType({
     param("env.ORG_GRADLE_PROJECT_ideaVersion", "2020.2")
     password(
       "env.ORG_GRADLE_PROJECT_publishToken",
-      "credentialsJSON:ec1dc748-e289-47e1-88b6-f193d7999bf4",
-      label = "Token"
+      "credentialsJSON:61a36031-4da1-4226-a876-b8148bf32bde",
+      label = "Password"
     )
-    param("env.ORG_GRADLE_PROJECT_publishUsername", "vlan")
+    param("env.ORG_GRADLE_PROJECT_publishUsername", "Aleksei.Plate")
     param("env.ORG_GRADLE_PROJECT_version", "%build.number%")
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
     param("env.ORG_GRADLE_PROJECT_publishChannels", "eap")
