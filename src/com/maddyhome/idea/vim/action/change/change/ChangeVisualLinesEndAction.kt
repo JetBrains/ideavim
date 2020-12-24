@@ -63,8 +63,7 @@ class ChangeVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
       VimPlugin.getChange().changeRange(editor, caret, blockRange, SelectionType.BLOCK_WISE, context)
     } else {
       val lineEndForOffset = EditorHelper.getLineEndForOffset(editor, vimTextRange.endOffset)
-      val endsWithNewLine =
-        if (lineEndForOffset == editor.fileSize && (!editor.endsWithNewLine() || vimTextRange.startOffset == vimTextRange.endOffset)) 0 else 1
+      val endsWithNewLine = if (lineEndForOffset == editor.fileSize) 0 else 1
       val lineRange = TextRange(
         EditorHelper.getLineStartForOffset(editor, vimTextRange.startOffset),
         lineEndForOffset + endsWithNewLine

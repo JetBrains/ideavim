@@ -60,8 +60,7 @@ class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
         .deleteRange(editor, editor.caretModel.primaryCaret, blockRange, SelectionType.BLOCK_WISE, false)
     } else {
       val lineEndForOffset = EditorHelper.getLineEndForOffset(editor, vimTextRange.endOffset)
-      val endsWithNewLine =
-        if (lineEndForOffset == editor.fileSize && (!editor.endsWithNewLine() || vimTextRange.startOffset == vimTextRange.endOffset)) 0 else 1
+      val endsWithNewLine = if (lineEndForOffset == editor.fileSize) 0 else 1
       val lineRange = TextRange(EditorHelper.getLineStartForOffset(editor, vimTextRange.startOffset), lineEndForOffset + endsWithNewLine)
       VimPlugin.getChange().deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false)
     }
