@@ -23,7 +23,13 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
-import org.jetbrains.plugins.ideavim.*
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
+import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionDefaultAll

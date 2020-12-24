@@ -21,7 +21,6 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class DeleteVisualLinesActionTest : VimTestCase() {

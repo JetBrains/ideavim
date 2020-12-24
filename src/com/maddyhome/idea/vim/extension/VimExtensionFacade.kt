@@ -30,8 +30,8 @@ import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.ui.ModalEntry
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 

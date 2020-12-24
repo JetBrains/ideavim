@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
 import junit.framework.Assert
 import junit.framework.TestCase
-import org.jetbrains.plugins.ideavim.NeovimTesting
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class YankMotionActionTest : VimTestCase() {

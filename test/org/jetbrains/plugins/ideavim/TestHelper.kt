@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.option.OptionsManager
-import java.time.Duration
 import kotlin.test.fail
 
 /**

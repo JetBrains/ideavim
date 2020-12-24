@@ -27,7 +27,11 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
-import org.jetbrains.plugins.ideavim.*
+import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.assertDoesntChange
+import org.jetbrains.plugins.ideavim.rangeOf
+import org.jetbrains.plugins.ideavim.waitAndAssert
+import org.jetbrains.plugins.ideavim.waitAndAssertMode
 
 /**
  * @author Alex Plate

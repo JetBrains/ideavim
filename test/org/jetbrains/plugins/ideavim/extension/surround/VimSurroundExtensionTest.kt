@@ -21,10 +21,8 @@
 package org.jetbrains.plugins.ideavim.extension.surround
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import org.jetbrains.plugins.ideavim.NeovimTesting
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase

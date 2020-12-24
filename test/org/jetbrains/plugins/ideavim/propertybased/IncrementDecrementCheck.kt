@@ -21,7 +21,6 @@ package org.jetbrains.plugins.ideavim.propertybased
 import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager

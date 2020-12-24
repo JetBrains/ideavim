@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.endsWithNewLine
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.fileSize
 import java.util.*

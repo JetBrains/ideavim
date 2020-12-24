@@ -18,7 +18,6 @@
 package com.maddyhome.idea.vim;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManager;
 import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationListener;
@@ -53,10 +52,10 @@ import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.option.OptionsManager;
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import com.maddyhome.idea.vim.ui.VimRcFileState;
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;

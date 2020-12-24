@@ -55,7 +55,6 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.isBlockCaretBehaviour
 import com.maddyhome.idea.vim.helper.isBlockCaretShape
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.key.MappingOwner
@@ -65,7 +64,6 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.OptionsManager.getOption
 import com.maddyhome.idea.vim.option.OptionsManager.ideastrictmode
 import com.maddyhome.idea.vim.option.OptionsManager.resetAllOptions
-import com.maddyhome.idea.vim.option.StrictMode
 import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.junit.Assert

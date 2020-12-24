@@ -68,8 +68,8 @@ import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.remove
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.StrictMode
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 

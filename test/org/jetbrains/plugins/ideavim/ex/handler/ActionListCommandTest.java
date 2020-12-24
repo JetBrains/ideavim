@@ -21,10 +21,7 @@ package org.jetbrains.plugins.ideavim.ex.handler;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.util.ArrayUtil;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
-import org.jetbrains.annotations.NonNls;
 import org.jetbrains.plugins.ideavim.VimTestCase;
-
-import java.util.List;
 
 /**
  * @author Naoto Ikeno

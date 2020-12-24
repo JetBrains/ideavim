@@ -21,7 +21,6 @@ package org.jetbrains.plugins.ideavim.extension.replacewithregister
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers

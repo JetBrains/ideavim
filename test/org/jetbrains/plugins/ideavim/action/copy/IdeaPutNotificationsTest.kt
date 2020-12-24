@@ -24,7 +24,11 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
-import org.jetbrains.plugins.ideavim.*
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
+import org.jetbrains.plugins.ideavim.rangeOf
 
 /**
  * @author Alex Plate

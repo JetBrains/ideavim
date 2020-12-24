@@ -20,8 +20,6 @@ package org.jetbrains.plugins.ideavim.action;
 
 import com.google.common.collect.Lists;
 import com.maddyhome.idea.vim.command.CommandState;
-import org.jetbrains.plugins.ideavim.SkipNeovimReason;
-import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 /**
