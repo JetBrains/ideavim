@@ -46,7 +46,8 @@ class CmdHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
     const val overridePrefix = "!"
 
     // [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
-    @NonNls const val argsPrefix = "-nargs"
+    @NonNls
+    const val argsPrefix = "-nargs"
 
     const val anyNumberOfArguments = "*"
     const val zeroOrOneArguments = "?"

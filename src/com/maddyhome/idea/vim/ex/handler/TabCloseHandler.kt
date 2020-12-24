@@ -37,8 +37,8 @@ class TabCloseHandler : CommandHandler.SingleExecution() {
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
 
-    val project = PlatformDataKeys.PROJECT.getData(context) ?: return false;
-    val fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
+    val project = PlatformDataKeys.PROJECT.getData(context) ?: return false
+    val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
     val currentWindow = fileEditorManager.currentWindow
     val tabbedPane = currentWindow.tabbedPane
 

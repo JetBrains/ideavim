@@ -50,7 +50,10 @@ object IdeaSelectionControl {
    *
    * See [VimVisualTimer] to more info.
    */
-  fun controlNonVimSelectionChange(editor: Editor, selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER) {
+  fun controlNonVimSelectionChange(
+    editor: Editor,
+    selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER
+  ) {
     VimVisualTimer.singleTask(editor.mode) { initialMode ->
 
       if (editor.isIdeaVimDisabledHere) return@singleTask
@@ -111,15 +114,18 @@ object IdeaSelectionControl {
 
   private fun activateMode(editor: Editor, mode: CommandState.Mode) {
     when (mode) {
-      CommandState.Mode.VISUAL -> VimPlugin.getVisualMotion().enterVisualMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
-      CommandState.Mode.SELECT -> VimPlugin.getVisualMotion().enterSelectMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
+      CommandState.Mode.VISUAL -> VimPlugin.getVisualMotion()
+        .enterVisualMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
+      CommandState.Mode.SELECT -> VimPlugin.getVisualMotion()
+        .enterSelectMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
       CommandState.Mode.INSERT -> VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
       CommandState.Mode.COMMAND -> Unit
       else -> error("Unexpected mode: $mode")
     }
   }
 
-  private fun dontChangeMode(editor: Editor): Boolean = editor.isTemplateActive() && (IdeaRefactorMode.keepMode() || editor.mode.hasVisualSelection)
+  private fun dontChangeMode(editor: Editor): Boolean =
+    editor.isTemplateActive() && (IdeaRefactorMode.keepMode() || editor.mode.hasVisualSelection)
 
   private fun chooseNonSelectionMode(editor: Editor): CommandState.Mode {
     val templateActive = editor.isTemplateActive()
@@ -129,7 +135,11 @@ object IdeaSelectionControl {
     return CommandState.Mode.COMMAND
   }
 
-  private fun chooseSelectionMode(editor: Editor, selectionSource: VimListenerManager.SelectionSource, logReason: Boolean): CommandState.Mode {
+  private fun chooseSelectionMode(
+    editor: Editor,
+    selectionSource: VimListenerManager.SelectionSource,
+    logReason: Boolean
+  ): CommandState.Mode {
     return when {
       editor.isOneLineMode -> {
         if (logReason) logger.debug("Enter select mode. Reason: one line mode")

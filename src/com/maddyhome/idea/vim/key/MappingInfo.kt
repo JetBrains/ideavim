@@ -47,7 +47,8 @@ import kotlin.math.min
 /**
  * @author vlan
  */
-sealed class MappingInfo(val fromKeys: List<KeyStroke>, val isRecursive: Boolean, val owner: MappingOwner) : Comparable<MappingInfo> {
+sealed class MappingInfo(val fromKeys: List<KeyStroke>, val isRecursive: Boolean, val owner: MappingOwner) :
+  Comparable<MappingInfo> {
 
   @VimNlsSafe
   abstract fun getPresentableString(): String
@@ -128,8 +129,10 @@ class ToHandlerMappingInfo(
       clean()
     }
 
-    processor.executeCommand(editor.project, { extensionHandler.execute(editor, context) },
-      "Vim " + extensionHandler.javaClass.simpleName, null)
+    processor.executeCommand(
+      editor.project, { extensionHandler.execute(editor, context) },
+      "Vim " + extensionHandler.javaClass.simpleName, null
+    )
 
     if (extensionHandler.isRepeatable) {
       lastExtensionHandler = extensionHandler

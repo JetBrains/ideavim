@@ -51,7 +51,8 @@ import java.awt.event.MouseEvent
 import javax.swing.Icon
 import javax.swing.SwingConstants
 
-@NonNls const val STATUS_BAR_ICON_ID = "IdeaVim-Icon"
+@NonNls
+const val STATUS_BAR_ICON_ID = "IdeaVim-Icon"
 const val STATUS_BAR_DISPLAY_NAME = "IdeaVim"
 
 class StatusBarIconFactory : StatusBarWidgetFactory, LightEditCompatible {
@@ -152,9 +153,11 @@ private object VimActionsPopup {
   fun getPopup(dataContext: DataContext): ListPopup {
     val actions = getActions()
     val popup = JBPopupFactory.getInstance()
-      .createActionGroupPopup(STATUS_BAR_DISPLAY_NAME, actions,
+      .createActionGroupPopup(
+        STATUS_BAR_DISPLAY_NAME, actions,
         dataContext, JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, false,
-        VimActions.actionPlace)
+        VimActions.actionPlace
+      )
     popup.setAdText(MessageHelper.message("popup.advertisement.version", VimPlugin.getVersion()), SwingConstants.CENTER)
 
     return popup
@@ -170,15 +173,42 @@ private object VimActionsPopup {
     actionGroup.add(ShortcutConflictsSettings)
     actionGroup.addSeparator()
 
-    val eapGroup = DefaultActionGroup(MessageHelper.message("action.eap.choice.active.text", if (JoinEap.eapActive()) 0 else 1), true)
+    val eapGroup = DefaultActionGroup(
+      MessageHelper.message("action.eap.choice.active.text", if (JoinEap.eapActive()) 0 else 1),
+      true
+    )
     eapGroup.add(JoinEap)
-    eapGroup.add(HelpLink(MessageHelper.message("action.about.eap.text"), "https://github.com/JetBrains/ideavim#get-early-access", null))
+    eapGroup.add(
+      HelpLink(
+        MessageHelper.message("action.about.eap.text"),
+        "https://github.com/JetBrains/ideavim#get-early-access",
+        null
+      )
+    )
     actionGroup.add(eapGroup)
 
     val helpGroup = DefaultActionGroup(MessageHelper.message("action.contacts.help.text"), true)
-    helpGroup.add(HelpLink(MessageHelper.message("action.contact.on.twitter.text"), "https://twitter.com/ideavim", VimIcons.TWITTER))
-    helpGroup.add(HelpLink(MessageHelper.message("action.create.issue.text"), "https://youtrack.jetbrains.com/issues/VIM", VimIcons.YOUTRACK))
-    helpGroup.add(HelpLink(MessageHelper.message("action.contribute.on.github.text"), "https://github.com/JetBrains/ideavim", VimIcons.GITHUB))
+    helpGroup.add(
+      HelpLink(
+        MessageHelper.message("action.contact.on.twitter.text"),
+        "https://twitter.com/ideavim",
+        VimIcons.TWITTER
+      )
+    )
+    helpGroup.add(
+      HelpLink(
+        MessageHelper.message("action.create.issue.text"),
+        "https://youtrack.jetbrains.com/issues/VIM",
+        VimIcons.YOUTRACK
+      )
+    )
+    helpGroup.add(
+      HelpLink(
+        MessageHelper.message("action.contribute.on.github.text"),
+        "https://github.com/JetBrains/ideavim",
+        VimIcons.GITHUB
+      )
+    )
     actionGroup.add(helpGroup)
 
     return actionGroup
@@ -188,8 +218,8 @@ private object VimActionsPopup {
 private class HelpLink(
   // [VERSION UPDATE] 203+ uncomment
   /*@ActionText*/ name: String,
-  val link: String,
-  icon: Icon?
+                  val link: String,
+                  icon: Icon?
 ) : DumbAwareAction(name, null, icon) {
   override fun actionPerformed(e: AnActionEvent) {
     BrowserUtil.browse(link)

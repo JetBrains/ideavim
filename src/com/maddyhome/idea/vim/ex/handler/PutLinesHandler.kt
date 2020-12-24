@@ -37,15 +37,29 @@ class PutLinesHandler : CommandHandler.SingleExecution() {
     val registerGroup = VimPlugin.getRegister()
     val arg = cmd.argument
     if (arg.isNotEmpty()) {
-      if(!registerGroup.selectRegister(arg[0]))
+      if (!registerGroup.selectRegister(arg[0]))
         return false
     } else {
       registerGroup.selectRegister(registerGroup.defaultRegister)
     }
 
     val line = if (cmd.ranges.size() == 0) -1 else cmd.getLine(editor)
-    val textData = registerGroup.lastRegister?.let { PutData.TextData(it.text ?: StringHelper.toKeyNotation(it.keys), SelectionType.LINE_WISE, it.transferableData) }
-    val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, rawIndent = false, caretAfterInsertedText = false, putToLine = line)
+    val textData = registerGroup.lastRegister?.let {
+      PutData.TextData(
+        it.text ?: StringHelper.toKeyNotation(it.keys),
+        SelectionType.LINE_WISE,
+        it.transferableData
+      )
+    }
+    val putData = PutData(
+      textData,
+      null,
+      1,
+      insertTextBeforeCaret = false,
+      rawIndent = false,
+      caretAfterInsertedText = false,
+      putToLine = line
+    )
     return VimPlugin.getPut().putText(editor, context, putData)
   }
 }

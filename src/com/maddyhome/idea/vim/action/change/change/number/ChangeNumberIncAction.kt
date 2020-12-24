@@ -28,7 +28,14 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 sealed class IncAction(val inc: Int) : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
-  override fun execute(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     return VimPlugin.getChange().changeNumber(editor, caret, inc * count)
   }
 }

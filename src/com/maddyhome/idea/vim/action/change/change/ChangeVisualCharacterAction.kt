@@ -39,11 +39,13 @@ class ChangeVisualCharacterAction : VisualOperatorActionHandler.ForEachCaret() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_ALLOW_DIGRAPH, CommandFlags.FLAG_EXIT_VISUAL)
 
-  override fun executeAction(editor: Editor,
-                             caret: Caret,
-                             context: DataContext,
-                             cmd: Command,
-                             range: VimSelection): Boolean {
+  override fun executeAction(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    range: VimSelection
+  ): Boolean {
     val argument = cmd.argument
     return argument != null &&
       VimPlugin.getChange().changeCharacterRange(editor, range.toVimTextRange(false), argument.character)

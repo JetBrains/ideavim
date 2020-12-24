@@ -43,11 +43,13 @@ class ChangeVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_MOT_LINEWISE, FLAG_MULTIKEY_UNDO, FLAG_EXIT_VISUAL)
 
-  override fun executeAction(editor: Editor,
-                             caret: Caret,
-                             context: DataContext,
-                             cmd: Command,
-                             range: VimSelection): Boolean {
+  override fun executeAction(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    range: VimSelection
+  ): Boolean {
     val vimTextRange = range.toVimTextRange(true)
     return if (range.type == SelectionType.BLOCK_WISE && vimTextRange.isMultiple) {
       val starts = vimTextRange.startOffsets

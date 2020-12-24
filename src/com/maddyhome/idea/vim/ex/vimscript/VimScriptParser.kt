@@ -34,9 +34,11 @@ object VimScriptParser {
   // [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
   @NonNls
   private const val VIMRC_FILE_NAME = "ideavimrc"
+
   // [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
   @NonNls
   private val HOME_VIMRC_PATHS = arrayOf(".$VIMRC_FILE_NAME", "_$VIMRC_FILE_NAME")
+
   // [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
   @NonNls
   private val XDG_VIMRC_PATH = "ideavim" + File.separator + VIMRC_FILE_NAME

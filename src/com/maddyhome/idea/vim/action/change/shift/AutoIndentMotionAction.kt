@@ -36,12 +36,14 @@ class AutoIndentMotionAction : ChangeEditorActionHandler.ForEachCaret(), Duplica
 
   override val duplicateWith: Char = '='
 
-  override fun execute(editor: Editor,
-                       caret: Caret,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     if (argument == null) {
       return false
     }

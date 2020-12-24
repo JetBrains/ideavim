@@ -33,12 +33,14 @@ class ChangeMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableO
 
   override val duplicateWith: Char = 'c'
 
-  override fun execute(editor: Editor,
-                       caret: Caret,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     return argument != null && VimPlugin.getChange().changeMotion(editor, caret, context, count, rawCount, argument)
   }
 }

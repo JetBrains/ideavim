@@ -54,7 +54,7 @@ class VisualMotionGroup {
     editor.commandState.pushModes(CommandState.Mode.VISUAL, lastSelectionType.toSubMode())
 
     val primaryCaret = editor.caretModel.primaryCaret
-    primaryCaret.vimSetSelection(visualMarks.startOffset, visualMarks.endOffset-1, true)
+    primaryCaret.vimSetSelection(visualMarks.startOffset, visualMarks.endOffset - 1, true)
 
     editor.scrollingModel.scrollToCaret(ScrollType.CENTER)
 
@@ -125,7 +125,10 @@ class VisualMotionGroup {
         editor.vimForEachCaret {
           val range = it.vimLastVisualOperatorRange ?: VisualChange.default(subMode)
           val end = VisualOperation.calculateRange(editor, range, count, it)
-          val lastColumn = if (range.columns == MotionGroup.LAST_COLUMN) MotionGroup.LAST_COLUMN else editor.offsetToLogicalPosition(end).column
+          val lastColumn =
+            if (range.columns == MotionGroup.LAST_COLUMN) MotionGroup.LAST_COLUMN else editor.offsetToLogicalPosition(
+              end
+            ).column
           it.vimLastColumn = lastColumn
           it.vimSetSelection(it.offset, end, true)
         }
@@ -219,7 +222,9 @@ class VisualMotionGroup {
   fun autodetectVisualSubmode(editor: Editor): CommandState.SubMode {
     // IJ specific. See https://youtrack.jetbrains.com/issue/VIM-1924.
     val project = editor.project
-    if (project != null && FindManager.getInstance(project).selectNextOccurrenceWasPerformed()) return CommandState.SubMode.VISUAL_CHARACTER
+    if (project != null && FindManager.getInstance(project)
+        .selectNextOccurrenceWasPerformed()
+    ) return CommandState.SubMode.VISUAL_CHARACTER
 
     if (editor.caretModel.caretCount > 1 && seemsLikeBlockMode(editor)) {
       return CommandState.SubMode.VISUAL_BLOCK

@@ -53,8 +53,10 @@ class YankLinesHandler : CommandHandler.SingleExecution() {
       ends.add(range.endOffset)
     }
 
-    return VimPlugin.getYank().yankRange(editor,
+    return VimPlugin.getYank().yankRange(
+      editor,
       TextRange(starts.toIntArray(), ends.toIntArray()),
-      SelectionType.LINE_WISE, false)
+      SelectionType.LINE_WISE, false
+    )
   }
 }

@@ -43,11 +43,13 @@ class ChangeVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_MOT_LINEWISE, FLAG_MULTIKEY_UNDO, FLAG_EXIT_VISUAL)
 
-  override fun executeAction(editor: Editor,
-                             caret: Caret,
-                             context: DataContext,
-                             cmd: Command,
-                             range: VimSelection): Boolean {
+  override fun executeAction(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    range: VimSelection
+  ): Boolean {
     val textRange = range.toVimTextRange(true)
     val lineEndForOffset = EditorHelper.getLineEndForOffset(editor, textRange.endOffset)
     val endsWithNewLine = if (lineEndForOffset == editor.fileSize) 0 else 1

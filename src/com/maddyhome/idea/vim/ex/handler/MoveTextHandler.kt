@@ -73,7 +73,15 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
       val text = texts[i]
 
       val textData = PutData.TextData(text, SelectionType.LINE_WISE, emptyList())
-      val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, rawIndent = true, caretAfterInsertedText = false, putToLine = line)
+      val putData = PutData(
+        textData,
+        null,
+        1,
+        insertTextBeforeCaret = false,
+        rawIndent = true,
+        caretAfterInsertedText = false,
+        putToLine = line
+      )
       VimPlugin.getPut().putTextForCaret(editor, caret, context, putData)
     }
 
@@ -81,8 +89,10 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
   }
 
   @Throws
-  private fun normalizeLine(editor: Editor, caret: Caret, command: ExCommand,
-                            lineRange: LineRange): Int {
+  private fun normalizeLine(
+    editor: Editor, caret: Caret, command: ExCommand,
+    lineRange: LineRange
+  ): Int {
     var line = command.ranges.getFirstLine(editor, caret)
     val adj = lineRange.endLine - lineRange.startLine + 1
     if (line >= lineRange.endLine)

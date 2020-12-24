@@ -30,18 +30,22 @@ import com.maddyhome.idea.vim.option.OptionsManager.ideajoin
 class DeleteJoinLinesAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.DELETE
 
-  override fun execute(editor: Editor,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     if (editor.isOneLineMode) return false
     if (ideajoin.isSet) {
       return VimPlugin.getChange().joinViaIdeaByCount(editor, context, count)
     }
     VimPlugin.getEditor().notifyIdeaJoin(editor.project)
     val res = Ref.create(true)
-    editor.caretModel.runForEachCaret({ caret: Caret -> if (!VimPlugin.getChange().deleteJoinLines(editor, caret, count, false)) res.set(false) }, true)
+    editor.caretModel.runForEachCaret({ caret: Caret ->
+      if (!VimPlugin.getChange().deleteJoinLines(editor, caret, count, false)) res.set(false)
+    }, true)
     return res.get()
   }
 }

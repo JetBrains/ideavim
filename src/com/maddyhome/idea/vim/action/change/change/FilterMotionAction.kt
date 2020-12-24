@@ -40,8 +40,10 @@ class FilterMotionAction : VimActionHandler.SingleExecution(), DuplicableOperato
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val argument = cmd.argument ?: return false
     val range = MotionGroup
-      .getMotionRange(editor, editor.caretModel.primaryCaret, context, cmd.count, cmd.rawCount,
-        argument)
+      .getMotionRange(
+        editor, editor.caretModel.primaryCaret, context, cmd.count, cmd.rawCount,
+        argument
+      )
       ?: return false
 
     val current = editor.caretModel.logicalPosition

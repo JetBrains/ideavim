@@ -104,6 +104,24 @@ public class ExOutputPanel extends JPanel {
     return panel;
   }
 
+  private static int countLines(@NotNull String text) {
+    if (text.length() == 0) {
+      return 0;
+    }
+
+    int count = 0;
+    int pos = -1;
+    while ((pos = text.indexOf('\n', pos + 1)) != -1) {
+      count++;
+    }
+
+    if (text.charAt(text.length() - 1) != '\n') {
+      count++;
+    }
+
+    return count;
+  }
+
   // Called automatically when the LAF is changed and the component is visible, and manually by the LAF listener handler
   @Override
   public void updateUI() {
@@ -194,24 +212,6 @@ public class ExOutputPanel extends JPanel {
   private void setFontForElements() {
     myText.setFont(UiHelper.selectFont(myText.getText()));
     myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
-  }
-
-  private static int countLines(@NotNull String text) {
-    if (text.length() == 0) {
-      return 0;
-    }
-
-    int count = 0;
-    int pos = -1;
-    while ((pos = text.indexOf('\n', pos + 1)) != -1) {
-      count++;
-    }
-
-    if (text.charAt(text.length() - 1) != '\n') {
-      count++;
-    }
-
-    return count;
   }
 
   private void scrollLine() {

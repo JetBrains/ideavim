@@ -51,7 +51,9 @@ class SortHandler : CommandHandler.SingleExecution() {
       val primaryCaret = editor.caretModel.primaryCaret
       val range = getLineRange(editor, primaryCaret, cmd)
       val worked = VimPlugin.getChange().sortRange(editor, range, lineComparator)
-      primaryCaret.moveToInlayAwareOffset(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, range.startLine))
+      primaryCaret.moveToInlayAwareOffset(
+        VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, range.startLine)
+      )
       return worked
     }
 
@@ -93,7 +95,11 @@ class SortHandler : CommandHandler.SingleExecution() {
     return normalizedRange
   }
 
-  private class LineComparator(private val myIgnoreCase: Boolean, private val myNumber: Boolean, private val myReverse: Boolean) : Comparator<String> {
+  private class LineComparator(
+    private val myIgnoreCase: Boolean,
+    private val myNumber: Boolean,
+    private val myReverse: Boolean
+  ) : Comparator<String> {
 
     override fun compare(o1: String, o2: String): Int {
       var o1ToCompare = o1

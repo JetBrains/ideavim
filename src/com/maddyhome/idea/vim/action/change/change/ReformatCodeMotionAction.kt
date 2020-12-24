@@ -33,12 +33,14 @@ class ReformatCodeMotionAction : ChangeEditorActionHandler.ForEachCaret(), Dupli
 
   override val duplicateWith: Char = 'q'
 
-  override fun execute(editor: Editor,
-                       caret: Caret,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     return argument != null &&
       VimPlugin.getChange().reformatCodeMotion(editor, caret, context, count, rawCount, argument)
   }

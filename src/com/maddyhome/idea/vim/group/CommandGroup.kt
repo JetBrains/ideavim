@@ -26,7 +26,8 @@ import org.jetbrains.annotations.NonNls
  */
 class CommandGroup {
   companion object {
-    @NonNls val BLACKLISTED_ALIASES = arrayOf("X", "Next", "Print")
+    @NonNls
+    val BLACKLISTED_ALIASES = arrayOf("X", "Next", "Print")
     private const val overridePrefix = "!"
   }
 

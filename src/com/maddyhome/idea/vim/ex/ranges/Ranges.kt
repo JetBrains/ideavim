@@ -151,8 +151,10 @@ class Ranges {
       startLine = endLine
       endLine = range.getLine(editor, lastZero)
       if (range.isMove) {
-        MotionGroup.moveCaret(editor, editor.caretModel.primaryCaret,
-          VimPlugin.getMotion().moveCaretToLine(editor, endLine, editor.caretModel.primaryCaret))
+        MotionGroup.moveCaret(
+          editor, editor.caretModel.primaryCaret,
+          VimPlugin.getMotion().moveCaretToLine(editor, endLine, editor.caretModel.primaryCaret)
+        )
       }
       // Did that last range represent the start of the file?
       lastZero = endLine < 0
@@ -172,7 +174,11 @@ class Ranges {
     for (range in ranges) {
       startLine = endLine
       endLine = range.getLine(editor, caret, lastZero)
-      if (range.isMove) MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLine(editor, endLine, editor.caretModel.primaryCaret))
+      if (range.isMove) MotionGroup.moveCaret(
+        editor,
+        caret,
+        VimPlugin.getMotion().moveCaretToLine(editor, endLine, editor.caretModel.primaryCaret)
+      )
       lastZero = endLine < 0
       ++count
     }

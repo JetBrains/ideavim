@@ -63,7 +63,8 @@ class HistoryHandler : CommandHandler.SingleExecution() {
         !"search".startsWith(key) &&
         !"expr".startsWith(key) &&
         !"input".startsWith(key) &&
-        !"all".startsWith(key)) {
+        !"all".startsWith(key)
+      ) {
         // Invalid command
         logger.debug { "invalid command $key" }
         return false

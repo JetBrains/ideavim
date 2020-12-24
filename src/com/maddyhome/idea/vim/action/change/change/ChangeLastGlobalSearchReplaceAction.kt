@@ -29,11 +29,13 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 class ChangeLastGlobalSearchReplaceAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
-  override fun execute(editor: Editor,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     val range = LineRange(0, EditorHelper.getLineCount(editor) - 1)
     return VimPlugin.getSearch()
       .searchAndReplace(editor, editor.caretModel.primaryCaret, range, "s", "//~/&")

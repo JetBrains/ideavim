@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 public interface OperatorFunction {
   /**
    * The value of 'operatorfunc' to be used as the operator function in 'g@'.
-   *
+   * <p>
    * Make sure to synchronize your function properly using read/write actions.
    */
   boolean apply(@NotNull Editor editor, @NotNull DataContext context, @NotNull SelectionType selectionType);

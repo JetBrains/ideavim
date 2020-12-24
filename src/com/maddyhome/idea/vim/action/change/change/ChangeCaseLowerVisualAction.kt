@@ -38,11 +38,13 @@ class ChangeCaseLowerVisualAction : VisualOperatorActionHandler.ForEachCaret() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
-  override fun executeAction(editor: Editor,
-                             caret: Caret,
-                             context: DataContext,
-                             cmd: Command,
-                             range: VimSelection): Boolean {
+  override fun executeAction(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    range: VimSelection
+  ): Boolean {
     val topLevelEditor = editor.getTopLevelEditor()
     return VimPlugin.getChange()
       .changeCaseRange(topLevelEditor, caret, range.toVimTextRange(false), CharacterHelper.CASE_LOWER)

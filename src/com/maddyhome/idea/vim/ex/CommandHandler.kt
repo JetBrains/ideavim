@@ -52,14 +52,17 @@ sealed class CommandHandler {
      * Indicates that a range must be specified with this command
      */
     RANGE_REQUIRED,
+
     /**
      * Indicates that a range is optional for this command
      */
     RANGE_OPTIONAL,
+
     /**
      * Indicates that a range can't be specified for this command
      */
     RANGE_FORBIDDEN,
+
     /**
      * Indicates that the command takes a count, not a range - effects default
      * Works like RANGE_OPTIONAL
@@ -72,10 +75,12 @@ sealed class CommandHandler {
      * Indicates that an argument must be specified with this command
      */
     ARGUMENT_REQUIRED,
+
     /**
      * Indicates that an argument is optional for this command
      */
     ARGUMENT_OPTIONAL,
+
     /**
      * Indicates that an argument can't be specified for this command
      */
@@ -87,10 +92,12 @@ sealed class CommandHandler {
      * Indicates that this is a command that modifies the editor
      */
     WRITABLE,
+
     /**
      * Indicates that this command does not modify the editor
      */
     READ_ONLY,
+
     /**
      * Indicates that this command handles writability by itself
      */

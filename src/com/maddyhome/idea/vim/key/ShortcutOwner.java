@@ -37,15 +37,6 @@ public enum ShortcutOwner {
     this.title = title;
   }
 
-  @Override
-  public @NotNull String toString() {
-    return title;
-  }
-
-  public @NotNull String getName() {
-    return name;
-  }
-
   public static @NotNull ShortcutOwner fromString(@NotNull String s) {
     if (Constants.IDE_STRING.equals(s)) {
       return IDE;
@@ -54,6 +45,15 @@ public enum ShortcutOwner {
       return VIM;
     }
     return UNDEFINED;
+  }
+
+  @Override
+  public @NotNull String toString() {
+    return title;
+  }
+
+  public @NotNull String getName() {
+    return name;
   }
 
   private static class Constants {

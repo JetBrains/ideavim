@@ -35,12 +35,14 @@ class ChangeEndOfLineAction : ChangeEditorActionHandler.ForEachCaret() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_NO_REPEAT_INSERT, FLAG_MULTIKEY_UNDO)
 
-  override fun execute(editor: Editor,
-                       caret: Caret,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     return VimPlugin.getChange().changeEndOfLine(editor, caret, count)
   }
 }

@@ -38,7 +38,7 @@ import kotlin.math.min
  * range.
  */
 class GotoLineHandler : CommandHandler.ForEachCaret() {
-    override val argFlags: CommandHandlerFlags = flags(RANGE_REQUIRED, ARGUMENT_OPTIONAL, READ_ONLY)
+  override val argFlags: CommandHandlerFlags = flags(RANGE_REQUIRED, ARGUMENT_OPTIONAL, READ_ONLY)
 
   /**
    * Moves the cursor to the line entered by the user

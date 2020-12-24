@@ -162,15 +162,22 @@ fun updateCaretState(editor: Editor) {
 }
 
 fun CommandState.Mode.resetShape(editor: Editor) = when (this) {
-  CommandState.Mode.COMMAND, CommandState.Mode.VISUAL, CommandState.Mode.REPLACE -> ChangeGroup.resetCaret(editor, false)
-  CommandState.Mode.SELECT, CommandState.Mode.INSERT -> ChangeGroup.resetCaret(editor, VimPlugin.getEditor().isBarCursorSettings)
+  CommandState.Mode.COMMAND, CommandState.Mode.VISUAL, CommandState.Mode.REPLACE -> ChangeGroup.resetCaret(
+    editor,
+    false
+  )
+  CommandState.Mode.SELECT, CommandState.Mode.INSERT -> ChangeGroup.resetCaret(
+    editor,
+    VimPlugin.getEditor().isBarCursorSettings
+  )
   CommandState.Mode.CMD_LINE, CommandState.Mode.OP_PENDING -> Unit
 }
 
 fun charToNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.Mode): Pair<Int, Int> {
   val (nativeStart, nativeEnd) = sort(start, end)
   val lineEnd = EditorHelper.getLineEndForOffset(editor, nativeEnd)
-  val adj = if (VimPlugin.getVisualMotion().exclusiveSelection || nativeEnd == lineEnd || mode == CommandState.Mode.SELECT) 0 else 1
+  val adj =
+    if (VimPlugin.getVisualMotion().exclusiveSelection || nativeEnd == lineEnd || mode == CommandState.Mode.SELECT) 0 else 1
   val adjEnd = (nativeEnd + adj).coerceAtMost(editor.fileSize)
   return nativeStart to adjEnd
 }
@@ -188,7 +195,12 @@ fun lineToNativeSelection(editor: Editor, start: Int, end: Int): Pair<Int, Int> 
   return lineStart to lineEnd
 }
 
-fun blockToNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.Mode): Pair<LogicalPosition, LogicalPosition> {
+fun blockToNativeSelection(
+  editor: Editor,
+  start: Int,
+  end: Int,
+  mode: CommandState.Mode
+): Pair<LogicalPosition, LogicalPosition> {
   var blockStart = editor.offsetToLogicalPosition(start)
   var blockEnd = editor.offsetToLogicalPosition(end)
   if (!VimPlugin.getVisualMotion().exclusiveSelection && mode != CommandState.Mode.SELECT) {
@@ -221,7 +233,8 @@ fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: CommandS
     if (caret.hasSelection() && caret.selectionEnd == caret.offset) {
       if (caret.selectionEnd <= 0) return@forEach
       if (EditorHelper.getLineStartForOffset(editor, caret.selectionEnd - 1) != caret.selectionEnd - 1
-        && caret.selectionEnd > 1 && editor.document.text[caret.selectionEnd - 1] == '\n') {
+        && caret.selectionEnd > 1 && editor.document.text[caret.selectionEnd - 1] == '\n'
+      ) {
         caret.moveToInlayAwareOffset(caret.selectionEnd - 2)
       } else {
         caret.moveToInlayAwareOffset(caret.selectionEnd - 1)
@@ -273,7 +286,8 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
           && !EditorHelper.isLineEmpty(editor, line, false)
           && aCaret.offset == aCaret.selectionEnd
           && aCaret.selectionEnd - 1 >= lineStartOffset
-          && aCaret.selectionEnd - aCaret.selectionStart != 0) {
+          && aCaret.selectionEnd - aCaret.selectionStart != 0
+        ) {
           // Move all carets one char left in case if it's on selection end
           aCaret.moveToVisualPosition(VisualPosition(visualPosition.line, visualPosition.column - 1))
         }
