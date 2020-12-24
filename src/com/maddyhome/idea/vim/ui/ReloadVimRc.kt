@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.ui
 
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.PlatformDataKeys
@@ -59,6 +60,8 @@ object VimRcFileState {
 
   var filePath: String? = null
 
+  private val saveStateListeners = ArrayList<() -> Unit>()
+
   fun saveFileState(filePath: String, data: List<String>) {
     this.filePath = FileUtil.toSystemDependentName(filePath)
 
@@ -66,6 +69,8 @@ object VimRcFileState {
     for (line in data) {
       state.add(line.hashCode())
     }
+
+    saveStateListeners.forEach { it() }
   }
 
   fun equalTo(document: Document): Boolean {
@@ -91,6 +96,13 @@ object VimRcFileState {
     modificationStamp = 0
     filePath = null
   }
+
+  fun whenFileStateSaved(action: () -> Unit) {
+    if (filePath != null) {
+      action()
+    }
+    saveStateListeners.add(action)
+  }
 }
 
 class ReloadVimRc : DumbAwareAction() {
@@ -103,7 +115,8 @@ class ReloadVimRc : DumbAwareAction() {
     e.presentation.text = if (sameDoc) MessageHelper.message("action.no.changes.text")
     else MessageHelper.message("action.reload.text")
 
-    e.presentation.isEnabledAndVisible = true
+    val virtualFile = e.getData(PlatformDataKeys.VIRTUAL_FILE) ?: return
+    e.presentation.isEnabledAndVisible = virtualFile.path == VimRcFileState.filePath
   }
 
   override fun actionPerformed(e: AnActionEvent) {
@@ -119,17 +132,16 @@ class ReloadFloatingToolbar : AbstractFloatingToolbarProvider(ACTION_GROUP) {
   override val autoHideable: Boolean = false
 
   override val priority: Int = 0
+
+  override fun register(toolbar: FloatingToolbarComponent, parentDisposable: Disposable) {
+    super.register(toolbar, parentDisposable)
+    VimRcFileState.whenFileStateSaved {
+      toolbar.scheduleShow()
+    }
+  }
 }
 
 class ReloadFloatingToolbarActionGroup : DefaultActionGroup() {
-  override fun update(e: AnActionEvent) {
-    val virtualFile = e.getData(PlatformDataKeys.VIRTUAL_FILE) ?: return
-
-    if (virtualFile.path == VimRcFileState.filePath) {
-      e.getData(FloatingToolbarComponent.KEY)?.scheduleShow()
-    }
-  }
-
   companion object {
     const val ACTION_GROUP = "IdeaVim.ReloadVimRc.group"
   }
