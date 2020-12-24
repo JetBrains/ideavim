@@ -80,5 +80,13 @@
         <alias name="vim-highlightedyank"/>
       </aliases>
     </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.textobjindent.VimIndentObject" name="textobjindent">
+      <aliases>
+        <alias name="https://github.com/michaeljsmith/vim-indent-object"/>
+        <alias name="michaeljsmith/vim-indent-object"/>
+        <alias name="vim-indent-object"/>
+      </aliases>
+    </vimExtension>
   </extensions>
 </idea-plugin>
