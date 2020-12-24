@@ -75,31 +75,31 @@ public class VimIndentObject implements VimExtension {
   @Override
   public void init() {
     putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>textobj-indent-ai"), getOwner(),
-      new VimIndentObject.EntireHandler(true, false), false);
+      new IndentObject(true, false), false);
     putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>textobj-indent-aI"), getOwner(),
-      new VimIndentObject.EntireHandler(true, true), false);
+      new IndentObject(true, true), false);
     putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>textobj-indent-ii"), getOwner(),
-      new VimIndentObject.EntireHandler(false, false), false);
+      new IndentObject(false, false), false);
 
     putKeyMapping(MappingMode.XO, parseKeys("ai"), getOwner(), parseKeys("<Plug>textobj-indent-ai"), true);
     putKeyMapping(MappingMode.XO, parseKeys("aI"), getOwner(), parseKeys("<Plug>textobj-indent-aI"), true);
     putKeyMapping(MappingMode.XO, parseKeys("ii"), getOwner(), parseKeys("<Plug>textobj-indent-ii"), true);
   }
 
-  static class EntireHandler implements VimExtensionHandler {
+  static class IndentObject implements VimExtensionHandler {
     final boolean includeAbove;
     final boolean includeBelow;
 
-    EntireHandler(boolean includeAbove, boolean includeBelow) {
+    IndentObject(boolean includeAbove, boolean includeBelow) {
       this.includeAbove = includeAbove;
       this.includeBelow = includeBelow;
     }
 
-    static class EntireTextObjectHandler extends TextObjectActionHandler {
+    static class IndentObjectHandler extends TextObjectActionHandler {
       final boolean includeAbove;
       final boolean includeBelow;
 
-      EntireTextObjectHandler(boolean includeAbove, boolean includeBelow) {
+      IndentObjectHandler(boolean includeAbove, boolean includeBelow) {
         this.includeAbove = includeAbove;
         this.includeBelow = includeBelow;
       }
@@ -112,9 +112,16 @@ public class VimIndentObject implements VimExtension {
         String content = editor.getDocument().getText();
         String[] lines = content.split("\n");
         String caretLine = lines[caretLineNum];
+
         Pattern indentPattern = Pattern.compile("^\\s+");
         Matcher matcher = indentPattern.matcher(caretLine);
-        matcher.find();
+        if (!matcher.find()) {
+          return new TextRange(
+            editor.getDocument().getLineStartOffset(caretLineNum),
+            editor.getDocument().getLineEndOffset(caretLineNum)
+          );
+        }
+
         int indentSize = matcher.end();
         int startLineNum = caretLineNum;
         int endLineNum = caretLineNum;
@@ -187,7 +194,7 @@ public class VimIndentObject implements VimExtension {
       @NotNull CommandState commandState = CommandState.getInstance(editor);
       int count = Math.max(1, commandState.getCommandBuilder().getCount());
 
-      final EntireTextObjectHandler textObjectHandler = new EntireTextObjectHandler(includeAbove, includeBelow);
+      final IndentObjectHandler textObjectHandler = new IndentObjectHandler(includeAbove, includeBelow);
 
       if (!commandState.isOperatorPending()) {
         editor.getCaretModel().runForEachCaret((Caret caret) -> {
