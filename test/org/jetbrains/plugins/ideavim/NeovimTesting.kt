@@ -21,7 +21,7 @@ package org.jetbrains.plugins.ideavim
 import com.ensarsarajcic.neovim.java.api.NeovimApi
 import com.ensarsarajcic.neovim.java.api.NeovimApis
 import com.ensarsarajcic.neovim.java.api.types.api.VimCoords
-import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRPCConnection
+import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRpcConnection
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.VimPlugin
@@ -40,7 +40,7 @@ internal object NeovimTesting {
     val nvimPath = System.getenv("ideavim.nvim.path") ?: "nvim"
     val pb = ProcessBuilder(nvimPath, "-u", "NONE", "--embed", "--headless", "--clean")
     neovim = pb.start()
-    val neovimConnection = ProcessRPCConnection(neovim, true)
+    val neovimConnection = ProcessRpcConnection(neovim, true)
     neovimApi = NeovimApis.getApiForConnection(neovimConnection)
   }
 
