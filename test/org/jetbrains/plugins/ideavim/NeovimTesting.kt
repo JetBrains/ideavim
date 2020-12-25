@@ -35,6 +35,8 @@ internal object NeovimTesting {
   private lateinit var neovimApi: NeovimApi
   private lateinit var neovim: Process
 
+  private var neovimTestsCounter = 0
+
   fun setUp(test: VimTestCase) {
     if (!neovimEnabled(test)) return
     val nvimPath = System.getenv("ideavim.nvim.path") ?: "nvim"
@@ -46,6 +48,7 @@ internal object NeovimTesting {
 
   fun tearDown(test: VimTestCase) {
     if (!neovimEnabled(test)) return
+    println("Tested with neovim: $neovimTestsCounter")
     neovim.destroy()
   }
 
@@ -70,6 +73,7 @@ internal object NeovimTesting {
 
   fun assertState(editor: Editor, test: VimTestCase) {
     if (!neovimEnabled(test)) return
+    neovimTestsCounter++
     assertText(editor)
     assertCaret(editor)
     assertMode(editor)
