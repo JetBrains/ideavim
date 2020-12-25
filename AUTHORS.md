@@ -339,6 +339,10 @@ Contributors:
   [![icon][github]](https://github.com/vladimir-petrenko)
   &nbsp;
   Vladimir Petrenko
+* [![icon][mail]](mailto:sergey.vorobyov@jetbrains.com)
+  [![icon][github]](https://github.com/DeveloperHacker)
+  &nbsp;
+  Sergei Vorobyov
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
