@@ -85,10 +85,10 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
   public static final char LAST_COMMAND_REGISTER = ':';
   public static final char LAST_INSERTED_TEXT_REGISTER = '.';
   public static final char SMALL_DELETION_REGISTER = '-';
-  private static final char BLACK_HOLE_REGISTER = '_';
-  private static final char ALTERNATE_BUFFER_REGISTER = '#';  // Not supported
-  private static final char EXPRESSION_BUFFER_REGISTER = '='; // Not supported
-  private static final char CURRENT_FILENAME_REGISTER = '%';  // Not supported
+  public static final char BLACK_HOLE_REGISTER = '_';
+  public static final char ALTERNATE_BUFFER_REGISTER = '#';  // Not supported
+  public static final char EXPRESSION_BUFFER_REGISTER = '='; // Not supported
+  public static final char CURRENT_FILENAME_REGISTER = '%';  // Not supported
   public static final @NonNls String CLIPBOARD_REGISTERS = "*+";
   private static final @NonNls String NUMBERED_REGISTERS = "0123456789";
   private static final @NonNls String NAMED_REGISTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

@@ -25,6 +25,7 @@ import com.ensarsarajcic.neovim.java.corerpc.client.ProcessRpcConnection
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.CharacterPosition
 import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
@@ -105,15 +106,37 @@ internal object NeovimTesting {
     assertEquals(neovimState, ideavimState)
   }
 
-  private const val nonCheckingRegisters = RegisterGroup.CLIPBOARD_REGISTERS + RegisterGroup.LAST_INSERTED_TEXT_REGISTER
+  private const val nonCheckingRegisters =
+    RegisterGroup.CLIPBOARD_REGISTERS +
+      RegisterGroup.LAST_INSERTED_TEXT_REGISTER +
+      RegisterGroup.BLACK_HOLE_REGISTER +
+      RegisterGroup.LAST_SEARCH_REGISTER +
+      RegisterGroup.ALTERNATE_BUFFER_REGISTER +
+      RegisterGroup.EXPRESSION_BUFFER_REGISTER +
+      RegisterGroup.CURRENT_FILENAME_REGISTER
 
   private fun assertRegisters() {
     for (register in RegisterGroup.VALID_REGISTERS) {
       if (register in nonCheckingRegisters) continue
       if (register in VimTestCase.Checks.neoVim.ignoredRegisters) continue
       val neovimRegister = neovimApi.callFunction("getreg", listOf(register)).get().toString()
-      val ideavimRegister = VimPlugin.getRegister().getRegister(register)?.text ?: ""
+      val vimPluginRegister = VimPlugin.getRegister().getRegister(register)
+      val ideavimRegister = vimPluginRegister?.text ?: ""
       assertEquals("Register '$register'", neovimRegister, ideavimRegister)
+
+      if (neovimRegister.isNotEmpty()) {
+        val neovimRegisterType = neovimApi.callFunction("getregtype", listOf(register)).get().toString()
+        val expectedType = when (vimPluginRegister?.type) {
+          SelectionType.CHARACTER_WISE -> "v"
+          SelectionType.LINE_WISE -> "V"
+          SelectionType.BLOCK_WISE -> "\u0016"
+          else -> ""
+        }
+
+        // We take only the first char because neovim returns width for block selection
+        val neovimChar = neovimRegisterType.getOrNull(0)?.toString() ?: ""
+        assertEquals("Register '$register'", expectedType, neovimChar)
+      }
     }
   }
 }
