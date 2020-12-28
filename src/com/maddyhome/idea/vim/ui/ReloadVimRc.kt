@@ -115,8 +115,8 @@ class ReloadVimRc : DumbAwareAction() {
     e.presentation.text = if (sameDoc) MessageHelper.message("action.no.changes.text")
     else MessageHelper.message("action.reload.text")
 
-    val virtualFile = e.getData(PlatformDataKeys.VIRTUAL_FILE) ?: return
-    e.presentation.isEnabledAndVisible = virtualFile.path == VimRcFileState.filePath
+    val virtualFile = e.getData(PlatformDataKeys.VIRTUAL_FILE)
+    e.presentation.isEnabledAndVisible = virtualFile != null && virtualFile.path == VimRcFileState.filePath
   }
 
   override fun actionPerformed(e: AnActionEvent) {
