@@ -2,6 +2,7 @@
   <profile version="1.0">
     <description>Inspections profile for Qodana</description>
     <option name="myName" value="Qodana" />
+    <inspection_tool class="BooleanMethodIsAlwaysInverted" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="CanBeFinal" enabled="false" level="WARNING" enabled_by_default="false">
       <option name="REPORT_CLASSES" value="false" />
       <option name="REPORT_METHODS" value="false" />
