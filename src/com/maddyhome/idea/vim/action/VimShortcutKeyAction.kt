@@ -54,7 +54,7 @@ import javax.swing.KeyStroke
  *
  * These keys are not passed to [com.maddyhome.idea.vim.VimTypedActionHandler] and should be handled by actions.
  */
-class VimShortcutKeyAction : AnAction(), DumbAware {
+class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   override fun actionPerformed(e: AnActionEvent) {
     val editor = getEditor(e)
     val keyStroke = getKeyStroke(e)
@@ -189,16 +189,67 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
 
   companion object {
     @JvmField
-    val VIM_ONLY_EDITOR_KEYS: Set<KeyStroke> = ImmutableSet.builder<KeyStroke>().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0)).addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0))
-      .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0)).addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK))
-      .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0)).addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_DOWN_MASK))
-      .addAll(getKeyStrokes(KeyEvent.VK_UP, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK)).addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK))
-      .addAll(getKeyStrokes(KeyEvent.VK_LEFT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))
-      .addAll(getKeyStrokes(KeyEvent.VK_RIGHT, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))
-      .addAll(getKeyStrokes(KeyEvent.VK_HOME, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))
-      .addAll(getKeyStrokes(KeyEvent.VK_END, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))
-      .addAll(getKeyStrokes(KeyEvent.VK_PAGE_UP, 0, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK))
-      .addAll(getKeyStrokes(KeyEvent.VK_PAGE_DOWN, 0, InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK)).build()
+    val VIM_ONLY_EDITOR_KEYS: Set<KeyStroke> =
+      ImmutableSet.builder<KeyStroke>().addAll(getKeyStrokes(KeyEvent.VK_ENTER, 0))
+        .addAll(getKeyStrokes(KeyEvent.VK_ESCAPE, 0))
+        .addAll(getKeyStrokes(KeyEvent.VK_TAB, 0))
+        .addAll(getKeyStrokes(KeyEvent.VK_BACK_SPACE, 0, InputEvent.CTRL_DOWN_MASK))
+        .addAll(getKeyStrokes(KeyEvent.VK_INSERT, 0))
+        .addAll(getKeyStrokes(KeyEvent.VK_DELETE, 0, InputEvent.CTRL_DOWN_MASK))
+        .addAll(getKeyStrokes(KeyEvent.VK_UP, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK))
+        .addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0, InputEvent.CTRL_DOWN_MASK, InputEvent.SHIFT_DOWN_MASK))
+        .addAll(
+          getKeyStrokes(
+            KeyEvent.VK_LEFT,
+            0,
+            InputEvent.CTRL_DOWN_MASK,
+            InputEvent.SHIFT_DOWN_MASK,
+            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK
+          )
+        )
+        .addAll(
+          getKeyStrokes(
+            KeyEvent.VK_RIGHT,
+            0,
+            InputEvent.CTRL_DOWN_MASK,
+            InputEvent.SHIFT_DOWN_MASK,
+            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK
+          )
+        )
+        .addAll(
+          getKeyStrokes(
+            KeyEvent.VK_HOME,
+            0,
+            InputEvent.CTRL_DOWN_MASK,
+            InputEvent.SHIFT_DOWN_MASK,
+            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK
+          )
+        )
+        .addAll(
+          getKeyStrokes(
+            KeyEvent.VK_END,
+            0,
+            InputEvent.CTRL_DOWN_MASK,
+            InputEvent.SHIFT_DOWN_MASK,
+            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK
+          )
+        )
+        .addAll(
+          getKeyStrokes(
+            KeyEvent.VK_PAGE_UP,
+            0,
+            InputEvent.SHIFT_DOWN_MASK,
+            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK
+          )
+        )
+        .addAll(
+          getKeyStrokes(
+            KeyEvent.VK_PAGE_DOWN,
+            0,
+            InputEvent.SHIFT_DOWN_MASK,
+            InputEvent.CTRL_DOWN_MASK or InputEvent.SHIFT_DOWN_MASK
+          )
+        ).build()
 
     private const val ACTION_ID = "VimShortcutKeyAction"
 
@@ -217,6 +268,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware {
       EmptyAction.wrap(ActionManager.getInstance().getAction(ACTION_ID))
     }
 
-    private fun getKeyStrokes(keyCode: Int, vararg modifiers: Int) = modifiers.map { KeyStroke.getKeyStroke(keyCode, it) }
+    private fun getKeyStrokes(keyCode: Int, vararg modifiers: Int) =
+      modifiers.map { KeyStroke.getKeyStroke(keyCode, it) }
   }
 }

@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.listener.VimListenerManager
 /**
  * @author Alex Plate
  */
-class PluginStartup : StartupActivity.DumbAware {
+class PluginStartup : StartupActivity.DumbAware/*, LightEditCompatible*/ {
 
   private var firstInitializationOccurred = false
 

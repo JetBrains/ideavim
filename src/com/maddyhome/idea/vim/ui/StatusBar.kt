@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim.ui
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.DataManager
-import com.intellij.ide.lightEdit.LightEditCompatible
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
@@ -55,7 +54,7 @@ import javax.swing.SwingConstants
 const val STATUS_BAR_ICON_ID = "IdeaVim-Icon"
 const val STATUS_BAR_DISPLAY_NAME = "IdeaVim"
 
-class StatusBarIconFactory : StatusBarWidgetFactory, LightEditCompatible {
+class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
 
   override fun getId(): String = STATUS_BAR_ICON_ID
 
@@ -220,19 +219,19 @@ private class HelpLink(
   /*@ActionText*/ name: String,
                   val link: String,
                   icon: Icon?
-) : DumbAwareAction(name, null, icon) {
+) : DumbAwareAction(name, null, icon)/*, LightEditCompatible*/ {
   override fun actionPerformed(e: AnActionEvent) {
     BrowserUtil.browse(link)
   }
 }
 
-private object ShortcutConflictsSettings : DumbAwareAction(MessageHelper.message("action.settings.text")) {
+private object ShortcutConflictsSettings : DumbAwareAction(MessageHelper.message("action.settings.text"))/*, LightEditCompatible*/ {
   override fun actionPerformed(e: AnActionEvent) {
     ShowSettingsUtil.getInstance().editConfigurable(e.project, VimEmulationConfigurable())
   }
 }
 
-private object JoinEap : DumbAwareAction() {
+private object JoinEap : DumbAwareAction()/*, LightEditCompatible*/ {
   private const val EAP_LINK = "https://plugins.jetbrains.com/plugins/eap/ideavim"
 
   fun eapActive() = EAP_LINK in UpdateSettings.getInstance().storedPluginHosts

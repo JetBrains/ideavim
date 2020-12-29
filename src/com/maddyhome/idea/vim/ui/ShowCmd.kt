@@ -1,6 +1,5 @@
 package com.maddyhome.idea.vim.ui
 
-import com.intellij.ide.lightEdit.LightEditCompatible
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.project.Project
@@ -66,7 +65,7 @@ object ShowCmdOptionChangeListener : OptionChangeListener<Boolean> {
   }
 }
 
-class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory, LightEditCompatible {
+class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
   override fun getId() = ShowCmd.ID
 
   override fun getDisplayName(): String = ShowCmd.displayName
