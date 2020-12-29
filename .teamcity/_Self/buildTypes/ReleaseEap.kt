@@ -48,22 +48,6 @@ object ReleaseEap : BuildType({
     }
   }
 
-  triggers {
-    schedule {
-      enabled = false
-      schedulingPolicy = daily {
-        hour = 22
-      }
-      branchFilter = ""
-      triggerBuild = onWatchedBuildChange {
-        buildType = "IdeaVim_TestsForIntelliJBranch146"
-        watchedBuildRule = ScheduleTrigger.WatchedBuildRule.LAST_SUCCESSFUL
-        watchedBuildBranchFilter = "<default>"
-        promoteWatchedBuild = false
-      }
-    }
-  }
-
   features {
     vcsLabeling {
       vcsRootId = "${DslContext.settingsRoot.id}"

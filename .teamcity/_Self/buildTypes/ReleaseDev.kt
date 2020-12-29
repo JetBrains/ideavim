@@ -25,7 +25,7 @@ object ReleaseDev : BuildType({
     param("env.ORG_GRADLE_PROJECT_publishUsername", "Aleksei.Plate")
     param("env.ORG_GRADLE_PROJECT_version", "%build.number%")
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
-    param("env.ORG_GRADLE_PROJECT_publishChannels", "dev")
+    param("env.ORG_GRADLE_PROJECT_publishChannels", "Dev")
   }
 
   vcs {
@@ -40,6 +40,16 @@ object ReleaseDev : BuildType({
       buildFile = ""
       enableStacktrace = true
       param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
+    }
+  }
+
+  triggers {
+    schedule {
+      enabled = true
+      schedulingPolicy = daily {
+        hour = 22
+      }
+      branchFilter = ""
     }
   }
 })
