@@ -1,19 +1,19 @@
 package _Self.buildTypes
 
+import _Self.Constants.DEV
+import _Self.Constants.DEV_VERSION
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
-import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.vcsLabeling
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
-import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.ScheduleTrigger
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 
 object ReleaseDev : BuildType({
-  name = "Publish DEV Build"
-  description = "Build and publish DEV of IdeaVim plugin"
+  name = "Publish Dev Build"
+  description = "Build and publish Dev of IdeaVim plugin"
 
   artifactRules = "build/distributions/*"
-  buildNumberPattern = "0.65-DEV.%build.counter%"
+  buildNumberPattern = "$DEV_VERSION-dev.%build.counter%"
 
   params {
     param("env.ORG_GRADLE_PROJECT_ideaVersion", "2020.2")
@@ -25,7 +25,7 @@ object ReleaseDev : BuildType({
     param("env.ORG_GRADLE_PROJECT_publishUsername", "Aleksei.Plate")
     param("env.ORG_GRADLE_PROJECT_version", "%build.number%")
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
-    param("env.ORG_GRADLE_PROJECT_publishChannels", "Dev")
+    param("env.ORG_GRADLE_PROJECT_publishChannels", DEV)
   }
 
   vcs {
