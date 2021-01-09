@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.exitInsertMode
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 
@@ -33,7 +32,6 @@ class SelectEscapeAction : VimActionHandler.SingleExecution() {
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val blockMode = editor.inBlockSubMode
     editor.exitSelectMode(true)
-    editor.exitInsertMode(context);
     if (blockMode) editor.caretModel.removeSecondaryCarets()
     return true
   }
