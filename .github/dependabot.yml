@@ -1,0 +1,14 @@
+# https://help.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+  - package-ecosystem: "maven"
+    directory: "/.teamcity/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"

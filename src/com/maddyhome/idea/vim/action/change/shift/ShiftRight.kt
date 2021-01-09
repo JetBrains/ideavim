@@ -39,7 +39,14 @@ class ShiftRightLinesAction : ChangeEditorActionHandler.ForEachCaret() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
 
-  override fun execute(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     VimPlugin.getChange().indentLines(editor, caret, context, count, 1)
 
     return true
@@ -53,7 +60,14 @@ class ShiftRightMotionAction : ChangeEditorActionHandler.ForEachCaret(), Duplica
 
   override val duplicateWith: Char = '>'
 
-  override fun execute(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     argument ?: return false
 
     VimPlugin.getChange().indentMotion(editor, caret, context, count, rawCount, argument, 1)
@@ -66,7 +80,13 @@ class ShiftRightVisualAction : VisualOperatorActionHandler.ForEachCaret() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
-  override fun executeAction(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: VimSelection): Boolean {
+  override fun executeAction(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    range: VimSelection
+  ): Boolean {
     VimPlugin.getChange().indentRange(editor, caret, context, range.toVimTextRange(false), cmd.count, 1)
     return true
   }

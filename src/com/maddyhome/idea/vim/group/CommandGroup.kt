@@ -19,12 +19,14 @@
 package com.maddyhome.idea.vim.group
 
 import com.maddyhome.idea.vim.common.Alias
+import org.jetbrains.annotations.NonNls
 
 /**
  * @author Elliot Courant
  */
 class CommandGroup {
   companion object {
+    @NonNls
     val BLACKLISTED_ALIASES = arrayOf("X", "Next", "Print")
     private const val overridePrefix = "!"
   }
@@ -51,7 +53,7 @@ class CommandGroup {
     return name in this.aliases
   }
 
-  fun getAlias(name: String): Alias {
+  private fun getAlias(name: String): Alias {
     return this.aliases[name]!!
   }
 

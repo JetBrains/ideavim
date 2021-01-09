@@ -1,15 +1,21 @@
+import dev.feedforward.markdownto.DownParser
+
 buildscript {
   repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
   }
 
   dependencies {
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    classpath "com.github.AlexPl292:mark-down-to-slack:1.1.2"
   }
 }
 
 plugins {
-  id 'org.jetbrains.intellij' version '0.4.18'
+  id 'org.jetbrains.intellij' version '0.6.5'
+  id 'io.gitlab.arturbosch.detekt' version '1.15.0'
+  id "org.jetbrains.changelog" version "0.6.2"
 }
 
 apply plugin: 'java'
@@ -39,6 +45,8 @@ intellij {
   intellijRepo = "https://www.jetbrains.com/intellij-repository"
   plugins = ['java']
 
+  downloadRobotServerPlugin.version = "0.10.0"
+
   publishPlugin {
     channels publishChannels.split(',')
     username publishUsername
@@ -46,16 +54,32 @@ intellij {
   }
 }
 
+runIdeForUiTests {
+  systemProperty "robot-server.port", "8082"
+}
+
+runPluginVerifier {
+  ideVersions = ["IC-2020.2.3", "IC-2020.3"]
+  downloadDirectory = "${project.buildDir}/pluginVerifier/ides"
+  teamCityOutputFormat = true
+}
+
 repositories {
   mavenCentral()
+  jcenter()
+  maven { url = "https://jetbrains.bintray.com/intellij-third-party-dependencies" }
 }
 
 dependencies {
   compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-  compileOnly "org.jetbrains:annotations:19.0.0"
+  compileOnly "org.jetbrains:annotations:20.1.0"
 
   // https://mvnrepository.com/artifact/com.ensarsarajcic.neovim.java/neovim-api
-  compile group: 'com.ensarsarajcic.neovim.java', name: 'neovim-api', version: '0.1.16'
+  testImplementation("com.ensarsarajcic.neovim.java:neovim-api:0.2.0")
+  testImplementation 'com.ensarsarajcic.neovim.java:core-rpc:0.2.0'
+
+  testImplementation("com.intellij.remoterobot:remote-robot:0.10.0")
+  testImplementation("com.intellij.remoterobot:remote-fixtures:1.1.18")
 }
 
 compileKotlin {
@@ -69,20 +93,52 @@ compileTestKotlin {
   }
 }
 
-task testWithNeovim(type : Test) {
+detekt {
+  config = files("${rootProject.projectDir}/.detekt/config.yaml")
+  baseline = file("${rootProject.projectDir}/.detekt/baseline.xml")
+  input = files("src")
+
+  buildUponDefaultConfig = true
+
+  reports {
+    html.enabled = false
+    xml.enabled = false
+    txt.enabled = false
+  }
+}
+
+tasks.detekt.jvmTarget = javaVersion
+
+task testWithNeovim(type: Test) {
   group = "verification"
-  systemProperty "ideavim.neovim.test", 'true'
+  systemProperty "ideavim.nvim.test", 'true'
+}
+
+changelog {
+  groups = ["Features:", "Changes:", "Deprecations:", "Fixes:", "Merged PRs:"]
+  itemPrefix = "*"
+  path = "${project.projectDir}/CHANGES.md"
+  unreleasedTerm = "To Be Released"
+  headerParserRegex = /0\.\d{2}(.\d+)?/
+//  header = { "${project.version}" }
+//  version = "0.60"
+}
+
+task getUnreleasedChangelog() {
+  group = "changelog"
+  doLast {
+    def log = changelog.getUnreleased().toHTML()
+    println log
+  }
 }
 
 tasks.register("slackEapNotification") {
   doLast {
     if (!slackUrl) return
     def post = new URL(slackUrl).openConnection()
-    def changeLog = extractChangelog()
-    changeLog = changeLog.replace("* ", "• ") // Replace stars with bullets
-    changeLog = changeLog.replace("**", "*") // Enable bold text
-    changeLog = changeLog.replaceAll("\\[([^]]+)]\\(([^)]+)\\)", '<$2|$1>') // Enable links
-    def message ="""
+    def changeLog = changelog.getUnreleased().toText()
+    def slackDown = new DownParser(changeLog, true).toSlack().toString()
+    def message = """
       {
           "text": "New version of IdeaVim",
           "blocks": [
@@ -90,7 +146,7 @@ tasks.register("slackEapNotification") {
                     "type": "section",
                     "text": {
                       "type": "mrkdwn",
-                      "text": "IdeaVim EAP $version has been released\\n$changeLog"
+                      "text": "IdeaVim EAP $version has been released\\n$slackDown"
                     }
                   }
           ]
@@ -102,32 +158,8 @@ tasks.register("slackEapNotification") {
     post.getOutputStream().write(message.getBytes("UTF-8"))
     def postRC = post.getResponseCode()
     println(postRC)
-    if(postRC == 200) {
+    if (postRC == 200) {
       println(post.getInputStream().getText())
     }
   }
-}
-
-// Very primitive changelog extraction code
-def extractChangelog() {
-  def startLine = "_Available since $version EAP:_"
-  def endLine = "_To Be Released..._"
-  def startSaving = false
-  def res = new StringBuilder()
-  new File("./CHANGES.md").eachLine { line ->
-    if (startSaving) {
-      if (line == endLine) {
-        startSaving = false
-      }
-      else {
-        res.append(line).append('\n')
-      }
-    }
-    else {
-      if (line == startLine) {
-        startSaving = true
-      }
-    }
-  }
-  return res.toString()
 }

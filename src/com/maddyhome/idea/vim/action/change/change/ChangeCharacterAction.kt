@@ -35,12 +35,14 @@ class ChangeCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_ALLOW_DIGRAPH)
 
-  override fun execute(editor: Editor,
-                       caret: Caret,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     return argument != null && VimPlugin.getChange().changeCharacter(editor, caret, count, argument.character)
   }
 }

@@ -22,6 +22,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
 import org.apache.commons.codec.binary.Base64;
 import org.jdom.Element;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,6 +45,7 @@ public class StringHelper {
    * Fake key for <Plug> mappings
    */
   private static final int VK_PLUG = KeyEvent.CHAR_UNDEFINED - 1;
+  public static final int VK_ACTION = KeyEvent.CHAR_UNDEFINED - 2;
 
   private StringHelper() {}
 
@@ -58,7 +60,7 @@ public class StringHelper {
     return null;
   }
 
-  public static @NotNull List<KeyStroke> stringToKeys(@NotNull String s) {
+  public static @NotNull List<KeyStroke> stringToKeys(@NotNull @NonNls String s) {
     // The following if is a dirty hack to finally support `let mapleader = "\<space>"`
     if ("\\<SPACE>".equalsIgnoreCase(s)) return Collections.singletonList(getKeyStroke(' '));
     final List<KeyStroke> res = new ArrayList<>();
@@ -82,7 +84,7 @@ public class StringHelper {
    * @throws java.lang.IllegalArgumentException if the mapping doesn't make sense for Vim emulation
    * @see :help <>
    */
-  public static @NotNull List<KeyStroke> parseKeys(@NotNull String... strings) {
+  public static @NotNull List<KeyStroke> parseKeys(@NotNull @NonNls String... strings) {
     final List<KeyStroke> result = new ArrayList<>();
     for (String s : strings) {
       KeyParserState state = KeyParserState.INIT;
@@ -114,13 +116,10 @@ public class StringHelper {
             break;
           case ESCAPE:
             state = KeyParserState.INIT;
-            if (c == '\\' || c == '<') {
-              result.add(getKeyStroke(c));
-            }
-            else {
+            if (c != '\\' && c != '<') {
               result.add(getKeyStroke('\\'));
-              result.add(getKeyStroke(c));
             }
+            result.add(getKeyStroke(c));
             break;
           case SPECIAL:
             if (c == '>' || c == '»') {
@@ -167,7 +166,7 @@ public class StringHelper {
   }
 
   private static @Nullable List<KeyStroke> parseMapLeader(@NotNull String s) {
-    if ("leader".equals(s.toLowerCase())) {
+    if ("leader".equalsIgnoreCase(s)) {
       final Object mapLeader = VimScriptGlobalEnvironment.getInstance().getVariables().get("mapleader");
       if (mapLeader instanceof String) {
         return stringToKeys((String)mapLeader);
@@ -291,7 +290,7 @@ public class StringHelper {
     } else if (CharacterHelper.isInvisibleControlCharacter(c) || CharacterHelper.isZeroWidthCharacter(c)) {
       return String.format("<%04x>", (int) c);
     }
-    return "" + c;
+    return String.valueOf(c);
   }
 
   public static boolean containsUpperCase(@NotNull String text) {
@@ -406,7 +405,7 @@ public class StringHelper {
     }
   }
 
-  private static Integer getVimKeyName(String lower) {
+  private static Integer getVimKeyName(@NonNls String lower) {
     switch (lower) {
       case "cr":
       case "enter":
@@ -429,7 +428,6 @@ public class StringHelper {
       case "esc":
         return VK_ESCAPE;
       case "bs":
-        return VK_BACK_SPACE;
       case "backspace":
         return VK_BACK_SPACE;
       case "tab":
@@ -468,12 +466,14 @@ public class StringHelper {
         return VK_F12;
       case "plug":
         return VK_PLUG;
+      case "action":
+        return VK_ACTION;
       default:
         return null;
     }
   }
 
-  private static String getVimKeyValue(int c) {
+  private static @NonNls String getVimKeyValue(int c) {
     switch (c) {
       case VK_ENTER:
         return "cr";
@@ -529,6 +529,8 @@ public class StringHelper {
         return "f12";
       case VK_PLUG:
         return "plug";
+      case VK_ACTION:
+        return "action";
       default:
         return null;
     }

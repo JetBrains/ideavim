@@ -18,6 +18,8 @@
 
 package com.maddyhome.idea.vim.extension.highlightedyank
 
+import com.intellij.ide.ui.LafManager
+import com.intellij.ide.ui.LafManagerListener
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
@@ -33,19 +35,35 @@ import com.maddyhome.idea.vim.VimProjectService
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.listener.VimYankListener
 import com.maddyhome.idea.vim.option.StrictMode
+import org.jetbrains.annotations.NonNls
 import java.awt.Color
 import java.awt.Font
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 const val DEFAULT_HIGHLIGHT_DURATION: Long = 300
-private const val HIGHLIGHT_DURATION_VARIABLE_NAME = "g:highlightedyank_highlight_duration"
-private const val HIGHLIGHT_COLOR_VARIABLE_NAME = "g:highlightedyank_highlight_color"
-private val DEFAULT_HIGHLIGHT_TEXT_COLOR: Color = EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES.defaultAttributes.backgroundColor
 
+@NonNls
+private const val HIGHLIGHT_DURATION_VARIABLE_NAME = "g:highlightedyank_highlight_duration"
+@NonNls
+private const val HIGHLIGHT_COLOR_VARIABLE_NAME = "g:highlightedyank_highlight_color"
+private var defaultHighlightTextColor: Color? = null
+
+private fun getDefaultHighlightTextColor(): Color {
+  return defaultHighlightTextColor
+    ?: return EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES.defaultAttributes.backgroundColor
+      .also { defaultHighlightTextColor = it }
+}
+
+class HighlightColorResetter : LafManagerListener {
+  override fun lookAndFeelChanged(source: LafManager) {
+    defaultHighlightTextColor = null
+  }
+}
 
 /**
  * @author KostkaBrukowa (@kostkabrukowa)
@@ -164,7 +182,7 @@ class VimHighlightedYank: VimExtension, VimYankListener, VimInsertListener {
     }
 
     private fun extractUsersHighlightColor(): Color {
-      return extractVariable(HIGHLIGHT_COLOR_VARIABLE_NAME, DEFAULT_HIGHLIGHT_TEXT_COLOR) { value ->
+      return extractVariable(HIGHLIGHT_COLOR_VARIABLE_NAME, getDefaultHighlightTextColor()) { value ->
         val rgba = value
           .substring(4)
           .filter { it != '(' && it != ')' && !it.isWhitespace() }
@@ -184,7 +202,13 @@ class VimHighlightedYank: VimExtension, VimYankListener, VimInsertListener {
           extractFun(value)
         }
         catch (e: Exception){
-          VimPlugin.showMessage("highlightedyank: Invalid value of $variableName -- ${e.message}")
+          VimPlugin.showMessage(
+            MessageHelper.message(
+              "highlightedyank.invalid.value.of.0.1",
+              variableName,
+              e.message ?: ""
+            )
+          )
 
           default
         }

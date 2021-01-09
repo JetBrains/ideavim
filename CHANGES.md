@@ -22,25 +22,118 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-To Be Released
------------
+## 0.64, 2020-12-23
 
-**Fixes:**
+### Merged PRs:
+* [260](https://github.com/JetBrains/ideavim/pull/260) by [Matt Ellis](https://github.com/citizenmatt): Refactor SearchGroup
+
+### Fixes:
+* [VIM-2194](https://youtrack.jetbrains.com/issue/VIM-2194) Fix caret shape during editing a new file
+
+## 0.63, 2020-12-16
+
+### Changes:
+* Update the minimal required IJ version: 2020.2+
+
+### Fixes:
+* [CWM-927](https://youtrack.jetbrains.com/issue/CWM-927) Fix typing for CodeWithMe and IdeaVim
+
+### Merged PRs:
+* [259](https://github.com/JetBrains/ideavim/pull/259) by [Vladimir Petrenko](https://github.com/vladimir-petrenko): CWM-927 disable vim for client's hidden editor on host
+
+## 0.62, 2020-12-15
+
+### Features:
+* Support `unmap` and `mapclear` commands [VIM-1491](https://youtrack.jetbrains.com/issue/VIM-1491)
+* Support mappings in ex panel (`cmap`) [VIM-1227](https://youtrack.jetbrains.com/issue/VIM-1227)
+
+### Changes:
+* `octal` is now disabled by default for `nrformats`. [VIM-2181](https://youtrack.jetbrains.com/issue/VIM-2181)
+
+### Fixes:
+* [VIM-2113](https://youtrack.jetbrains.com/issue/VIM-2113) Fix `cit` for empty tags
+* [VIM-2114](https://youtrack.jetbrains.com/issue/VIM-2114) Unnamed register isn't changed after deleting empty tag
+* [VIM-1475](https://youtrack.jetbrains.com/issue/VIM-1475) Enable block caret to be used in insert mode.
+* [VIM-2170](https://youtrack.jetbrains.com/issue/VIM-2170) Fix an alternative range format for `s` command
+* [VIM-1913](https://youtrack.jetbrains.com/issue/VIM-1913)
+  [VIM-2154](https://youtrack.jetbrains.com/issue/VIM-2154) Several fixes for AppCode templates
+* [VIM-1756](https://youtrack.jetbrains.com/issue/VIM-1756) Fix startsel from insert mode
+
+### Merged PRs:
+* [249](https://github.com/JetBrains/ideavim/pull/249) by [Jan Palus](https://github.com/jpalus): VIM-2113 Increase tag range only in visual mode
+* [250](https://github.com/JetBrains/ideavim/pull/250) by [Jan Palus](https://github.com/jpalus): VIM-2114 Do not override registers when deleting empty range
+* [256](https://github.com/JetBrains/ideavim/pull/256) by [Brandon Conway](https://github.com/brandoncc): Fix typo
+* [254](https://github.com/JetBrains/ideavim/pull/254) by [Grzegorz Antoniak](https://github.com/antekone): VIM-1475: Add an option to use block caret in insert mode
+* [225](https://github.com/JetBrains/ideavim/pull/225) by [sumoooru2](https://github.com/sumoooru2): Implement cmap
+* [258](https://github.com/JetBrains/ideavim/pull/258) by [Matt Ellis](https://github.com/citizenmatt): Show the correct handler class in :map
+* [257](https://github.com/JetBrains/ideavim/pull/257) by [Matt Ellis](https://github.com/citizenmatt): Extract SearchHighlightsHelper from SearchGroup
+* [251](https://github.com/JetBrains/ideavim/pull/251) by [Shaun Patterson](https://github.com/shaunpatterson): VIM-1756: startSel works in insert mode
+
+## 0.61, 2020-11-12
+
+### Features:
+* Ability to map IDE actions via the `<Action>` keyword. E.g. `map <C-K> <Action>(CommentByLineComment)`.
+  Check out `README.md` for the details.
+* `IdeaVim: track action Ids` command to find action ids for the `:action` command.
+  Enable this option in "Search everywhere" (double shift).
+* Ability to enable extensions using `vim-plug` or `vundle` syntax.  
+  E.g. to enable commentary extension you can use one of the following commands:
+  ```vim
+  set commentary
+  Plug 'tpope/vim-commentary'
+  Plug 'https://github.com/tpope/vim-commentary'
+  Plugin 'tpope/vim-commentary'
+  ...
+  ```
+  This approach is especially handy if you have `.vimrc` with plugins registered via `vim-plug` or `vundle`.
+
+  
+### Changes:
+* Fix `<Esc>` for dialogs. Now `<Esc>` will exit insert / visual mode and close the dialog from normal mode.
+* Add option to disable IdeaVim in dialogs / single line editors. [VIM-765](https://youtrack.jetbrains.com/issue/VIM-765)  
+Use `set ideavimsupport=` to disable IdeaVim in dialog editors.  
+* Reposition cursor when `scrolloff` changes
+
+### Fixes:
+* [VIM-2150](https://youtrack.jetbrains.com/issue/VIM-2150) `Shift-D` should not delete an empty line
+* [VIM-2157](https://youtrack.jetbrains.com/issue/VIM-2157) Fix tab with an active template
+* [VIM-2156](https://youtrack.jetbrains.com/issue/VIM-2156) Correct up/down motions with inlays
+* [VIM-2144](https://youtrack.jetbrains.com/issue/VIM-2144) Correct text position after block insert with inlays
+* [VIM-2158](https://youtrack.jetbrains.com/issue/VIM-2158) Fix scrolling when `scrolloff` is over half screen height, but less than full height
+
+### Merged PRs:
+* [255](https://github.com/JetBrains/ideavim/pull/255) by [Matt Ellis](https://github.com/citizenmatt): Fix various scrolling issues
+
+## 0.60, 2020-10-09
+
+### Features:
+* Support of `virtualedit=onemore` ([VIM-844](https://youtrack.jetbrains.com/issue/VIM-844))
+
+### Fixes:
 * [VIM-2097](https://youtrack.jetbrains.com/issue/VIM-2097) Do not apply mappings for register selecting
 * [VIM-2080](https://youtrack.jetbrains.com/issue/VIM-2080) Fix S command with count
 * [VIM-2099](https://youtrack.jetbrains.com/issue/VIM-2099) Fix operations with backward inclusive motions
+* [VIM-2104](https://youtrack.jetbrains.com/issue/VIM-2104) Use `sidescrolloff` for horizontal offset
+* [VIM-1080](https://youtrack.jetbrains.com/issue/VIM-1080) Fix `zt` for virtual space enabled
+* [VIM-1556](https://youtrack.jetbrains.com/issue/VIM-1556) Fix horizontal scrolling
+* [VIM-1770](https://youtrack.jetbrains.com/issue/VIM-1770) Fix goto end with large inline hints
+* [VIM-2110](https://youtrack.jetbrains.com/issue/VIM-2110) Fix scrolling for non-monospaced fonts
 
-**Changes:**
-* `:w` works as `:wa` by default. This can be disabled with `ideawaonw` option.
+### Changes:
+* `:w` works as `:wa` by default. This can be disabled with `ideawrite` option.
  
     Now features like `Prettier on save` or `Run on save for files` would work with `:w` command as well.
   
     See [VIM-1968](https://youtrack.jetbrains.com/issue/VIM-1968).
+  
+### Merged PRs:
+* [248](https://github.com/JetBrains/ideavim/pull/248) by [Yaohui Wang](https://github.com/yaohui-wyh): Check if project is disposed when editorDeinit
+* [242](https://github.com/JetBrains/ideavim/pull/242) by [Iain Ballard](https://github.com/i-e-b): Partial implementation of virtualedit config
+* [252](https://github.com/JetBrains/ideavim/pull/252) by [Matt Ellis](https://github.com/citizenmatt): Fixes for scrolling
 
-0.59, 2020-08-25
-------------
+## 0.59, 2020-08-25
 
-**Features:**
+### Features:
 * `vim-highlightedyank` plugin emulation ([VIM-1970](https://youtrack.jetbrains.com/issue/VIM-1970) | [vim-highlightedyank](https://github.com/machakann/vim-highlightedyank)).
 
     * <details>
@@ -50,22 +143,21 @@ To Be Released
 
 * [VIM-2068](https://youtrack.jetbrains.com/issue/VIM-2068) `:tabclose` command
 
-**Fixes:**
+### Fixes:
 * [VIM-1421](https://youtrack.jetbrains.com/issue/VIM-1421) Escape key finishes `t` and `f` motions
 * [VIM-2075](https://youtrack.jetbrains.com/issue/VIM-2075) Fix zR command
 * [VIM-2059](https://youtrack.jetbrains.com/issue/VIM-2059) Fixed macro editing
 
-**Merged PRs:**
+### Merged PRs:
 * [237](https://github.com/JetBrains/ideavim/pull/237) by [Adrià Farrés](https://github.com/adriafarres): Reset operator-pending commands on escape
 * [241](https://github.com/JetBrains/ideavim/pull/241) by [Patrick Elmquist](https://github.com/patrick-elmquist): Properly reset when pressing Esc in the middle of command
 * [244](https://github.com/JetBrains/ideavim/pull/244) by [Rieon Ke](https://github.com/rieonke): Implement tabc[lose] ex command
 * [240](https://github.com/JetBrains/ideavim/pull/240) by [Rieon Ke](https://github.com/rieonke): add support for putting & editing macros
 * [245](https://github.com/JetBrains/ideavim/pull/245) by [KostkaBrukowa](https://github.com/KostkaBrukowa): VIM-1970 | Working solution of plugin vim-highlightedyank
 
-0.58, 2020-07-07
--------------
+## 0.58, 2020-07-07
 
-**Features:**
+### Features:
 * `exchange` plugin emulation ([VIM-921](https://youtrack.jetbrains.com/issue/VIM-921) | [vim-exchange](https://github.com/tommcdo/vim-exchange)).
 * `~/.ideavimrc` file can be reloaded using the new floating action.
 
@@ -76,10 +168,10 @@ To Be Released
 
 * Add `:buffer` command.
 
-**Changes:**
+### Changes:
 * Support IntelliJ's smooth scrolling. Use "Enable smooth scrolling" checkbox in _Preferences | Editor | General_ to disable.
 
-**Fixes:**
+### Fixes:
 * [VIM-1994](https://youtrack.jetbrains.com/issue/VIM-1994) Correct paste after `y}P` command.
 * [VIM-1924](https://youtrack.jetbrains.com/issue/VIM-1924) Select next occurrence doesn't become block selection.
 * [VIM-2038](https://youtrack.jetbrains.com/issue/VIM-2038) Last line is now accessible in normal mode
@@ -89,7 +181,7 @@ To Be Released
 * Fix mappings to `"\<SPACE>"` including `let mapleader="\<SPACE>"`
 
 
-**Merged PRs:**
+### Merged PRs:
 * [233](https://github.com/JetBrains/ideavim/pull/233) by [valis](https://github.com/valis): [VIM-1994] Correct paste after `y}P` command.
 * [224](https://github.com/JetBrains/ideavim/pull/224) by [pmnoxx](https://github.com/pmnoxx): Populate intelij navigation history together with ideavim jumplist.
 * [227](https://github.com/JetBrains/ideavim/pull/227) by [angelbot](https://github.com/angelbot): Add support for buffer command.
@@ -97,33 +189,31 @@ To Be Released
 * [231](https://github.com/JetBrains/ideavim/pull/231) by [citizenmatt](https://github.com/citizenmatt): Support smooth scrolling.
 * [239](https://github.com/JetBrains/ideavim/pull/239) by [citizenmatt](https://github.com/citizenmatt): Use new API for relative line numbers
 
-0.57, 2020-04-28
--------------
+## 0.57, 2020-04-28
 
-**Fixes:**
+### Fixes:
 * [VIM-1992](https://youtrack.jetbrains.com/issue/VIM-1992) Fix mappings to `<S-Letter>`
 * [VIM-1991](https://youtrack.jetbrains.com/issue/VIM-1991) Fix working with number registers
 
-**Merged PRs:**
+### Merged PRs:
 * [234](https://github.com/JetBrains/ideavim/pull/234) by [runforprogram](https://github.com/runforprogram): [VIM-1991] fix >0 number register not work
 
-0.56, 2020-04-09
---------------
+## 0.56, 2020-04-09
 
-**Features:**
+### Features:
 * `ReplaceWithRegister` plugin emulation ([ReplaceWithRegister](https://www.vim.org/scripts/script.php?script_id=2703)).
 * `argtextobj.vim` plugin emulation ([argtextobj.vim](https://vim.sourceforge.io/scripts/script.php?script_id=2699)).
 * `vim-textobj-entire` plugin emulation ([vim-textobj-entire](https://github.com/kana/vim-textobj-entire)).
 * [VIM-434](https://youtrack.jetbrains.com/issue/VIM-434) Add `'showcmd'` support, on by default.
 * Support `ls/buffers/files` commands.
 
-**Changes:**
+### Changes:
 * Replace `ideastatusbar` option with `ideastatusicon`. Now you can make the icon gray.
 
-**Deprecations:**
+### Deprecations:
 * `ideastatusbar` option is deprecated now. See `ideastatusicon`.
 
-**Fixes:**
+### Fixes:
 * [VIM-1284](https://youtrack.jetbrains.com/issue/VIM-1284) Fix mapping of digits.
 * Fix handling of counts on both operator and motion, e.g. `3d2w` deletes 6 words, instead of 32.
 * Allow mapping of `<C-K>` and `<C-V>`/`<C-Q>`.
@@ -136,15 +226,14 @@ To Be Released
 * [VIM-1911](https://youtrack.jetbrains.com/issue/VIM-1911) Lookup keys respect `IDE` handler.
 * [VIM-1008](https://youtrack.jetbrains.com/issue/VIM-1008) Correct `ci{` behavior.
 
-0.55, 2020-01-20
---------------
+## 0.55, 2020-01-20
 
-**Features:**
+### Features:
 * Surround and Commentary extensions support repeating with a dot command ([VIM-1118](https://youtrack.jetbrains.com/issue/VIM-1118))
 * Support XDG settings standard ([VIM-664](https://youtrack.jetbrains.com/issue/VIM-664))
 * Add option to remove the status bar icon ([VIM-1847](https://youtrack.jetbrains.com/issue/VIM-1847))
 
-**Fixes:**
+### Fixes:
 * [VIM-1823](https://youtrack.jetbrains.com/issue/VIM-1823) Fix multiple carets with ignorecase
 * [VIM-1053](https://youtrack.jetbrains.com/issue/VIM-1053)
   [VIM-1038](https://youtrack.jetbrains.com/issue/VIM-1038)
@@ -167,21 +256,20 @@ To Be Released
 * [VIM-1884](https://youtrack.jetbrains.com/issue/VIM-1884) Show quickDoc during popup with `CTRL-J`
 * [VIM-987](https://youtrack.jetbrains.com/issue/VIM-987) Fix arrow keys for the NEO keyboard
 
-0.54, 2019-11-20
---------------
+## 0.54, 2019-11-20
 
-**Features:**
+### Features:
 * EasyMotion plugin emulation ([VIM-820](https://youtrack.jetbrains.com/issue/VIM-820) | [Instructions](https://github.com/JetBrains/ideavim#emulated-vim-plugins))
 * Support surrounding with a function name ([link](https://github.com/tpope/vim-surround/blob/master/doc/surround.txt#L138))
 * Add `:delmarks` command ([VIM-1720](https://youtrack.jetbrains.com/issue/VIM-1720))
 * Add IdeaVim icon to the status bar ([VIM-943](https://youtrack.jetbrains.com/issue/VIM-943))
 
-**Changes:**
+### Changes:
 * Remove the default IdeaVim toggle shortcut (<kbd>CTRL</kbd><kbd>ALT</kbd><kbd>V</kbd>)
 * Rename `refactoring` value of `selectmode` option to `ideaselection`
 * Remove `template` value of `selectmode` option and replace it with `idearefactormode` option.
 
-**Fixes:**
+### Fixes:
 * [VIM-1766](https://youtrack.jetbrains.com/issue/VIM-1766) Fix disappearing caret in ex entry on Linux
 * [VIM-1032](https://youtrack.jetbrains.com/issue/VIM-1032) Annotations work well with relative line numbers enabled
 * [VIM-1762](https://youtrack.jetbrains.com/issue/VIM-1762) Relative line numbers respect line number theme
@@ -208,8 +296,7 @@ To Be Released
 * [VIM-1604](https://youtrack.jetbrains.com/issue/VIM-1604) Add IdeaVim logo
 
 
-0.53, 2019-08-07
---------------
+## 0.53, 2019-08-07
 * [VIM-1711](https://youtrack.jetbrains.com/issue/VIM-1711) Search is not triggered during surround action
 * [VIM-1712](https://youtrack.jetbrains.com/issue/VIM-1712) Fix `Y` command for visual mode
 * [VIM-1713](https://youtrack.jetbrains.com/issue/VIM-1713) Surround in visual mode put caret in correct position
@@ -220,8 +307,7 @@ To Be Released
 * [VIM-1736](https://youtrack.jetbrains.com/issue/VIM-1736) Fix `` for ex panel
 * [VIM-1739](https://youtrack.jetbrains.com/issue/VIM-1739) Fix full-width characters for ex pane
 
-0.52, 2019-07-23
---------------
+## 0.52, 2019-07-23
 
 * Introduce [Select Mode](https://github.com/JetBrains/ideavim/wiki/Select-mode).
 
@@ -314,8 +400,7 @@ To Be Released
 * [VIM-1698](https://youtrack.jetbrains.com/issue/VIM-1698) Paste doesn't clear clipboard
 * [VIM-1359](https://youtrack.jetbrains.com/issue/VIM-1359) Fix behavior of i_CTRL-W action
 
-0.51, 2019-02-12
-----------------
+## 0.51, 2019-02-12
 
 * [VIM-1558](https://youtrack.jetbrains.com/issue/VIM-1558) Fixed scrolling for code with block inlays in Rider 2018.3 
 * [VIM-1187](https://youtrack.jetbrains.com/issue/VIM-1187) Improved performance of `set relativelinenumber` on large files
@@ -323,8 +408,7 @@ To Be Released
 * [VIM-798](https://youtrack.jetbrains.com/issue/VIM-798) Allow arrow keys for window navigation commands
 
 
-0.50, 2018-10-18
-----------------
+## 0.50, 2018-10-18
 
 Moved "Vim Emulation" settings into "File | Settings | Vim Emulation". Support
 for vim-multiple-cursors commands `<A-n>`, `<A-x>`, `<A-p>`, `g<A-n>` (put `set
@@ -350,8 +434,7 @@ Vim commands for multiple cursors. Various bug fixes.
 * [VIM-1274](https://youtrack.jetbrains.com/issue/VIM-1274) Correctly process escaping when `smartcase` is on
 
 
-0.49, 2017-12-12
-----------------
+## 0.49, 2017-12-12
 
 Enabled zero-latency typing for Vim emulation. Added support for `iskeyword` option. Various bug fixes.
 
@@ -359,8 +442,7 @@ Enabled zero-latency typing for Vim emulation. Added support for `iskeyword` opt
 * [VIM-1367](https://youtrack.jetbrains.com/issue/VIM-1367) Support `iskeyword` option
 * [VIM-523](https://youtrack.jetbrains.com/issue/VIM-523) Fixed global mark remembering only the line number
 
-0.48, 2017-01-15
-----------------
+## 0.48, 2017-01-15
 
 A bugfix release.
 
@@ -374,8 +456,7 @@ Features:
 * Support for zero-latency rendering
 
 
-0.47, 2016-10-19
-----------------
+## 0.47, 2016-10-19
 
 A bugfix release.
 
@@ -385,8 +466,7 @@ Bug fixes:
 * VIM-1190 Fixed exception "Write access is allowed from write-safe contexts only"
 
 
-0.46, 2016-07-07
-----------------
+## 0.46, 2016-07-07
 
 Added `incsearch` option for incremental search. Added support for `it` and
 `at` tag block selection. Added `vim-surround` commands `ys`, `cs`, `ds`,
@@ -414,8 +494,7 @@ Bug fixes:
 * VIM-1126 Fixed warning about modifying shortcuts of global actions for 2016.2
 
 
-0.44, 2015-11-02
-----------------
+## 0.44, 2015-11-02
 
 A bugfix release.
 
@@ -424,16 +503,14 @@ A bugfix release.
   plugin disabled
 
 
-0.43, 2015-11-02
-----------------
+## 0.43, 2015-11-02
 
 A bugfix release.
 
 * VIM-1039 Fixed running the plugin with Java 6
 
 
-0.42, 2015-11-01
-----------------
+## 0.42, 2015-11-01
 
 This release is compatible with IntelliJ 15+ and other IDEs based on the
 IntelliJ platform branch 143+.
@@ -441,8 +518,7 @@ IntelliJ platform branch 143+.
 * VIM-970 Fixed move commands in read-only files
 
 
-0.41, 2015-06-10
-----------------
+## 0.41, 2015-06-10
 
 A bugfix release.
 
@@ -450,8 +526,7 @@ A bugfix release.
   IntelliJ
 
 
-0.40, 2015-06-09
-----------------
+## 0.40, 2015-06-09
 
 Added support for `mapleader`. Support comments in `%` brace matching. Various
 bug fixes.
@@ -478,8 +553,7 @@ Bug fixes:
 * VIM-930 Fixed editor focus issues after closing Ex entry box on Oracle Java 6
 
 
-0.39, 2014-12-03
-----------------
+## 0.39, 2014-12-03
 
 A bugfix release.
 
@@ -491,8 +565,7 @@ Bug fixes:
 * EA-63022 Don't update line numbers in the caret movement event listener
 
 
-0.38, 2014-12-01
-----------------
+## 0.38, 2014-12-01
 
 Added support for `number` and `relativenumber` options, `clipboard=unnamed`
 option. Added `:action` and `:actionlist` commands for executing arbitrary
@@ -524,8 +597,7 @@ Bug fixes:
 * VIM-723 Fix pasting to an empty line
 
 
-0.37, 2014-10-15
-----------------
+## 0.37, 2014-10-15
 
 A bugfix release.
 
@@ -536,8 +608,7 @@ Bug fixes:
 * VIM-407 Fixed `>>` to work if a line contains only one character
 
 
-0.36, 2014-10-14
-----------------
+## 0.36, 2014-10-14
 
 Added support for common window splitting and navigation commands. Various bug
 fixes.
@@ -556,8 +627,7 @@ Bug fixes:
 * VIM-569 Fixed `<C-W>` when the caret is at the end of a line
 
 
-0.35, 2014-05-15
-----------------
+## 0.35, 2014-05-15
 
 The `~/.vimrc` initialization file is no longer read by default, use
 `~/.ideavimrc` instead.
@@ -578,8 +648,7 @@ Bug fixes:
   selection
 
 
-0.34, 2014-04-29
-----------------
+## 0.34, 2014-04-29
 
 A bugfix release.
 
@@ -593,8 +662,7 @@ Bug fixes:
 * VIM-667 Ignore potentially nested lines of .vimrc based on leading whitespace
 
 
-0.33, 2014-04-28
-----------------
+## 0.33, 2014-04-28
 
 Added support for `:map` key mapping commands. New keyboard shortcuts handler
 that doesn't require a separate keymap for Vim emulation. Added support for
@@ -613,14 +681,12 @@ Bug fixes:
 * VIM-281 Don't disable global reformat code action for Vim emulation
 
 
-0.32, 2013-11-15
-----------------
+## 0.32, 2013-11-15
 
 Fixed API compatibility with IntelliJ platform builds 132.1052+.
 
 
-0.31, 2013-11-12
-----------------
+## 0.31, 2013-11-12
 
 A bugfix release.
 
@@ -629,8 +695,7 @@ Bug fixes:
 * VIM-582 Fixed line comment and reformat commands with no visual selection
 
 
-0.30, 2013-11-11
-----------------
+## 0.30, 2013-11-11
 
 Added support for a separate `.ideavimrc` config file. Fixed long-standing
 issues with merged undo/redo commands and `<Esc>` during code completion.
@@ -650,8 +715,7 @@ Bug fixes:
 * Fixed several reported exceptions
 
 
-0.29, 2013-05-15
-----------------
+## 0.29, 2013-05-15
 
 A bugfix release.
 
@@ -662,8 +726,7 @@ Bug fixes:
 * VIM-121 Don't move cursor while scrolling
 
 
-0.28, 2013-04-06
-----------------
+## 0.28, 2013-04-06
 
 A bugfix release.
 
@@ -673,8 +736,7 @@ Bug fixes:
 * VIM-479 Don't try to activate insert mode for diff view
 
 
-0.27, 2013-04-03
-----------------
+## 0.27, 2013-04-03
 
 New Vim keymap generator creates better keymaps, especially for Mac OS X.
 Restart after reconfiguring the keymap is no longer required.
@@ -695,8 +757,7 @@ Bug fixes:
 * Fixed command window font size to match editor font size
 
 
-0.26, 2012-12-26
-----------------
+## 0.26, 2012-12-26
 
 Added support for paste in the command mode: from a register using `<C-R>`,
 from the clipboard using `<S-Insert>` or `<M-V>`. Added support for the last
@@ -715,8 +776,7 @@ Bug fixes:
 * VIM-302 Fixed tab switching order for `gt` and `gT`
 
 
-0.25, 2012-12-19
-----------------
+## 0.25, 2012-12-19
 
 A bugfix release.
 
@@ -725,8 +785,7 @@ A bugfix release.
   character
 
 
-0.24, 2012-12-03
-----------------
+## 0.24, 2012-12-03
 
 Added Vim string object selection motions (see help topics `v_i"`, `v_a"`).
 Various bug fixes.
@@ -765,8 +824,7 @@ Bug fixes:
 * VIM-157 Fixed regression in moving the cursor after `~`
 
 
-0.23.115, 2012-11-14
---------------------
+## 0.23.115, 2012-11-14
 
 A bugfix release.
 
@@ -775,8 +833,7 @@ A bugfix release.
 * VIM-112 Delete a single previous word with <C-W> in insert mode, not all inserted words
 
 
-0.23.111, 2012-11-12
---------------------
+## 0.23.111, 2012-11-12
 
 A bugfix release.
 
@@ -795,8 +852,7 @@ A bugfix release.
   found
 
 
-0.23.93, 2012-03-21
--------------------
+## 0.23.93, 2012-03-21
 
 A bugfix release. Vim.xml was fixed to use Command+C, Command+V on Mac OS.
 Unfortunately you need to update Vim.xml manually this time.

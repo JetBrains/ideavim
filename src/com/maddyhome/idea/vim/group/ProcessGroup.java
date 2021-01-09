@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.helper.UiHelper;
-import com.maddyhome.idea.vim.ui.ExEntryPanel;
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,7 +52,7 @@ public class ProcessGroup {
     }
 
     String initText = "";
-    String label = "" + leader;
+    String label = String.valueOf(leader);
 
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, label, initText, count);

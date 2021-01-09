@@ -21,7 +21,7 @@ package org.jetbrains.plugins.ideavim.extension.replacewithregister
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -57,7 +57,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val text = ""
 
     configureByText(text)
-    VimPlugin.getRegister().storeTextInternal(myFixture.editor, TextRange(0, 0), "one", SelectionType.CHARACTER_WISE, '"', false)
+    VimPlugin.getRegister().storeTextSpecial(RegisterGroup.UNNAMED_REGISTER, "one")
     typeText(parseKeys("griw"))
     myFixture.checkResult("on${c}e")
   }
@@ -66,7 +66,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
     val text = "${c}one"
 
     configureByText(text)
-    VimPlugin.getRegister().storeText(myFixture.editor, "" rangeOf "", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeTextSpecial(RegisterGroup.UNNAMED_REGISTER, "")
     typeText(parseKeys("griw"))
     myFixture.checkResult(c)
   }

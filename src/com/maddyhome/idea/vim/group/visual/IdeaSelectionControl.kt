@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.popAllModes
@@ -49,10 +50,15 @@ object IdeaSelectionControl {
    *
    * See [VimVisualTimer] to more info.
    */
-  fun controlNonVimSelectionChange(editor: Editor, selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER) {
+  fun controlNonVimSelectionChange(
+    editor: Editor,
+    selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER
+  ) {
     VimVisualTimer.singleTask(editor.mode) { initialMode ->
 
-      logger.info("Adjust non-vim selection. Source: $selectionSource")
+      if (editor.isIdeaVimDisabledHere) return@singleTask
+
+      logger.debug("Adjust non-vim selection. Source: $selectionSource")
 
       // Perform logic in one of the next cases:
       //  - There was no selection and now it is
@@ -66,13 +72,13 @@ object IdeaSelectionControl {
           return@singleTask
         }
 
-        logger.info("Some carets have selection. State before adjustment: ${editor.commandState.toSimpleString()}")
+        logger.debug("Some carets have selection. State before adjustment: ${editor.commandState.toSimpleString()}")
 
         editor.popAllModes()
 
         activateMode(editor, chooseSelectionMode(editor, selectionSource, true))
       } else {
-        logger.info("None of carets have selection. State before adjustment: ${editor.commandState.toSimpleString()}")
+        logger.debug("None of carets have selection. State before adjustment: ${editor.commandState.toSimpleString()}")
         if (editor.inVisualMode) editor.exitVisualMode()
         if (editor.inSelectMode) editor.exitSelectMode(false)
 
@@ -83,7 +89,7 @@ object IdeaSelectionControl {
 
       KeyHandler.getInstance().reset(editor)
       updateCaretState(editor)
-      logger.info("${editor.mode} is enabled")
+      logger.debug("${editor.mode} is enabled")
     }
   }
 
@@ -108,15 +114,18 @@ object IdeaSelectionControl {
 
   private fun activateMode(editor: Editor, mode: CommandState.Mode) {
     when (mode) {
-      CommandState.Mode.VISUAL -> VimPlugin.getVisualMotion().enterVisualMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
-      CommandState.Mode.SELECT -> VimPlugin.getVisualMotion().enterSelectMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
+      CommandState.Mode.VISUAL -> VimPlugin.getVisualMotion()
+        .enterVisualMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
+      CommandState.Mode.SELECT -> VimPlugin.getVisualMotion()
+        .enterSelectMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
       CommandState.Mode.INSERT -> VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
       CommandState.Mode.COMMAND -> Unit
-      else -> throw RuntimeException("Unexpected mode: $mode")
+      else -> error("Unexpected mode: $mode")
     }
   }
 
-  private fun dontChangeMode(editor: Editor): Boolean = editor.isTemplateActive() && (IdeaRefactorMode.keepMode() || editor.mode.hasVisualSelection)
+  private fun dontChangeMode(editor: Editor): Boolean =
+    editor.isTemplateActive() && (IdeaRefactorMode.keepMode() || editor.mode.hasVisualSelection)
 
   private fun chooseNonSelectionMode(editor: Editor): CommandState.Mode {
     val templateActive = editor.isTemplateActive()
@@ -126,26 +135,30 @@ object IdeaSelectionControl {
     return CommandState.Mode.COMMAND
   }
 
-  private fun chooseSelectionMode(editor: Editor, selectionSource: VimListenerManager.SelectionSource, logReason: Boolean): CommandState.Mode {
+  private fun chooseSelectionMode(
+    editor: Editor,
+    selectionSource: VimListenerManager.SelectionSource,
+    logReason: Boolean
+  ): CommandState.Mode {
     return when {
       editor.isOneLineMode -> {
-        if (logReason) logger.info("Enter select mode. Reason: one line mode")
+        if (logReason) logger.debug("Enter select mode. Reason: one line mode")
         CommandState.Mode.SELECT
       }
       selectionSource == VimListenerManager.SelectionSource.MOUSE && SelectModeOptionData.mouse in OptionsManager.selectmode -> {
-        if (logReason) logger.info("Enter select mode. Selection source is mouse and selectMode option has mouse")
+        if (logReason) logger.debug("Enter select mode. Selection source is mouse and selectMode option has mouse")
         CommandState.Mode.SELECT
       }
       editor.isTemplateActive() && IdeaRefactorMode.selectMode() -> {
-        if (logReason) logger.info("Enter select mode. Template is active and selectMode has template")
+        if (logReason) logger.debug("Enter select mode. Template is active and selectMode has template")
         CommandState.Mode.SELECT
       }
       selectionSource == VimListenerManager.SelectionSource.OTHER && SelectModeOptionData.ideaselectionEnabled() -> {
-        if (logReason) logger.info("Enter select mode. Selection source is OTHER and selectMode has refactoring")
+        if (logReason) logger.debug("Enter select mode. Selection source is OTHER and selectMode has refactoring")
         CommandState.Mode.SELECT
       }
       else -> {
-        if (logReason) logger.info("Enter visual mode")
+        if (logReason) logger.debug("Enter visual mode")
         CommandState.Mode.VISUAL
       }
     }

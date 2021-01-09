@@ -25,7 +25,6 @@ import com.intellij.openapi.actionSystem.ShortcutSet;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.editor.actionSystem.TypedAction;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.event.*;
@@ -140,6 +139,6 @@ public class EventFacade {
   }
 
   private @NotNull TypedAction getTypedAction() {
-    return EditorActionManager.getInstance().getTypedAction();
+    return TypedAction.getInstance();
   }
 }

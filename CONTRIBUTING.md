@@ -26,7 +26,12 @@ OK, ready to do some coding?
 * Fork the repository and clone it to the local machine.
 * Open the project with IntelliJ IDEA.
 
-Yoo hoo! You’re all set to begin contributing. Here are some useful gradle commands:
+Yoo hoo! You’re all set to begin contributing.
+We've prepared some useful configurations for you:
+
+![Prepared configurations](resources/contributing/configurations.png)
+
+And here are useful gradle commands:
 
 * `./gradlew runIde` — start the dev version of IntelliJ IDEA with IdeaVim installed.
 * `./gradlew test` — run tests.
@@ -136,5 +141,5 @@ This is just terrible. [You know what to do](https://github.com/JetBrains/ideavi
 * [Changelog](CHANGES.md)
 * [Contributors listing](AUTHORS.md)
 
-[teamcity-build-status]: https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20201&guest=1
-[teamcity-build-status-svg]: https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20201)/statusIcon.svg?guest=1
+[teamcity-build-status]: https://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJEAP&guest=1
+[teamcity-build-status-svg]: https://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJEAP)/statusIcon.svg?guest=1

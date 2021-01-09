@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.helper.MessageHelper
 
 /**
  * @author Rieon Ke
@@ -36,8 +37,8 @@ class TabCloseHandler : CommandHandler.SingleExecution() {
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
 
-    val project = PlatformDataKeys.PROJECT.getData(context) ?: return false;
-    val fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
+    val project = PlatformDataKeys.PROJECT.getData(context) ?: return false
+    val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
     val currentWindow = fileEditorManager.currentWindow
     val tabbedPane = currentWindow.tabbedPane
 
@@ -51,7 +52,7 @@ class TabCloseHandler : CommandHandler.SingleExecution() {
       val select = if (index == current) index + 1 else current
       tabbedPane.removeTabAt(index, select)
     } else {
-      VimPlugin.showMessage("Error: invalid command argument")
+      VimPlugin.showMessage(MessageHelper.message("error.invalid.command.argument"))
     }
 
     return true

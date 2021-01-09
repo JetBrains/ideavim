@@ -442,6 +442,17 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("<a></a>");
   }
 
+  // VIM-2113
+  public void testReplaceEmptyTagContent() {
+    typeTextInFile(parseKeys("cit"),"<a><c><caret></c></a>");
+    myFixture.checkResult("<a><c></c></a>");
+  }
+
+  public void testDeleteToDigraph() {
+    typeTextInFile(parseKeys("d/<C-K>O:<CR>"),"ab<caret>cdÖef");
+    myFixture.checkResult("abÖef");
+  }
+
   // |[(|
   public void testUnmatchedOpenParenthesis() {
     typeTextInFile(parseKeys("[("),
@@ -556,6 +567,41 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("w"),
                    "ｳｳｳAAA");
     assertOffset(3);
+  }
+
+  // |w|
+  public void testCjkToPunctuation() {
+    typeTextInFile(parseKeys("w"),
+      "测试<caret>测试!!!");
+    assertOffset(4);
+  }
+
+  // |w|
+  public void testCjkToFullWidthPunctuation() {
+    typeTextInFile(parseKeys("w"),
+      "测试<caret>测试！！！");
+    assertOffset(4);
+  }
+
+  // |w|
+  public void testCjkToDigits() {
+    typeTextInFile(parseKeys("w"),
+      "测试<caret>测试123");
+    assertOffset(4);
+  }
+
+  // |w|
+  public void testCjkToFullWidthLatin() {
+    typeTextInFile(parseKeys("w"),
+      "测试<caret>测试ＡＡＡ");
+    assertOffset(4);
+  }
+
+  // |w|
+  public void testCjkToFullWidthDigits() {
+    typeTextInFile(parseKeys("w"),
+      "测试<caret>测试３３３");
+    assertOffset(4);
   }
 
   // |w|

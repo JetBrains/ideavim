@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.testFramework.PlatformTestUtil
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
@@ -30,6 +31,8 @@ import org.jetbrains.plugins.ideavim.NeovimTesting
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
+import kotlin.math.absoluteValue
+import kotlin.math.sign
 
 class IncrementDecrementTest : VimPropertyTest() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
@@ -48,6 +51,10 @@ class IncrementDecrementTest : VimPropertyTest() {
   }
 
   fun testPlayingWithNumbersGenerateNumber() {
+    setupChecks {
+      this.neoVim.ignoredRegisters = setOf(':')
+    }
+    OptionsManager.nrformats.append("octal")
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
         val number = env.generateValue(testNumberGenerator, "Generate %s number")
@@ -85,15 +92,10 @@ private class IncrementDecrementActions(private val editor: Editor, val test: Vi
 
 val differentFormNumberGenerator = Generator.from { env ->
   val form = env.generate(Generator.sampledFrom(/*2,*/ 8, 10, 16))
-  env.generate(Generator.integers().map {
-    val str = it.toString(form)
-    val prefix = when (form) {
-      2 -> "0b"
-      8 -> "0"
-      16 -> "0x"
-      else -> ""
-    }
-    if (str[0] == '-') "-$prefix${str.substring(1)}" else "$prefix$str"
+  env.generate(Generator.integers().suchThat { it != Int.MIN_VALUE }.map {
+    val sign = it.sign
+    val stringNumber = it.absoluteValue.toString(form)
+    if (sign < 0) "-$stringNumber" else stringNumber
   })
 }
 

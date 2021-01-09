@@ -65,6 +65,9 @@ class CommandParserTest : VimTestCase() {
   }
 
   fun `test execute in disabled state`() {
+    setupChecks {
+      caretShape = false
+    }
     val keys = commandToKeys(">>")
     val before = "I ${c}found it in a legendary land"
     val after = "I ${c}found it in a legendary land"

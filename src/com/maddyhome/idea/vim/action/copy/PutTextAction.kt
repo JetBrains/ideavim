@@ -36,7 +36,11 @@ sealed class PutTextBaseAction(
 
   override fun execute(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean {
     val lastRegister = VimPlugin.getRegister().lastRegister
-    val textData = if (lastRegister != null) TextData(lastRegister.text ?: StringHelper.toKeyNotation(lastRegister.keys), lastRegister.type, lastRegister.transferableData) else null
+    val textData = if (lastRegister != null) TextData(
+      lastRegister.text ?: StringHelper.toKeyNotation(lastRegister.keys),
+      lastRegister.type,
+      lastRegister.transferableData
+    ) else null
     val putData = PutData(textData, null, count, insertTextBeforeCaret, indent, caretAfterInsertedText, -1)
     return VimPlugin.getPut().putText(editor, context, putData)
   }

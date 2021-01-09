@@ -30,9 +30,8 @@ import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.OperatorFunction
-import com.maddyhome.idea.vim.ui.ExEntryPanel
 import com.maddyhome.idea.vim.ui.ModalEntry
-import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -44,22 +43,6 @@ import javax.swing.KeyStroke
  * @author vlan
  */
 object VimExtensionFacade {
-  /** The 'map' command for mapping keys to handlers defined in extensions. */
-  @JvmStatic
-  @ScheduledForRemoval(inVersion = "0.58")
-  @Deprecated("Only for EasyMotion support")
-  fun putExtensionHandlerMapping(modes: Set<MappingMode>, fromKeys: List<KeyStroke>, extensionHandler: VimExtensionHandler, recursive: Boolean) {
-    VimPlugin.getKey().putKeyMapping(modes, fromKeys, MappingOwner.Plugin.get("easymotion"), extensionHandler, recursive)
-  }
-
-  @ScheduledForRemoval(inVersion = "0.58")
-  @Deprecated("Only for EasyMotion support")
-  @JvmStatic
-  fun putKeyMapping(modes: Set<MappingMode>, fromKeys: List<KeyStroke>,
-                    toKeys: List<KeyStroke>, recursive: Boolean) {
-    VimPlugin.getKey().putKeyMapping(modes, fromKeys, MappingOwner.Plugin.get("easymotion"), toKeys, recursive)
-  }
-
   /** The 'map' command for mapping keys to handlers defined in extensions. */
   @JvmStatic
   fun putExtensionHandlerMapping(modes: Set<MappingMode>, fromKeys: List<KeyStroke>,
@@ -98,8 +81,7 @@ object VimExtensionFacade {
   fun inputKeyStroke(editor: Editor): KeyStroke {
     if (editor.commandState.isDotRepeatInProgress) {
       val input = VimRepeater.Extension.consumeKeystroke()
-      return input
-        ?: throw RuntimeException("Not enough keystrokes saved: ${VimRepeater.Extension.lastExtensionHandler}")
+      return input ?: error("Not enough keystrokes saved: ${VimRepeater.Extension.lastExtensionHandler}")
     }
 
     val key: KeyStroke? = if (ApplicationManager.getApplication().isUnitTestMode) {
@@ -122,7 +104,7 @@ object VimExtensionFacade {
   fun inputString(editor: Editor, prompt: String, finishOn: Char?): String {
     if (editor.commandState.isDotRepeatInProgress) {
       val input = VimRepeater.Extension.consumeString()
-      return input ?: throw RuntimeException("Not enough strings saved: ${VimRepeater.Extension.lastExtensionHandler}")
+      return input ?: error("Not enough strings saved: ${VimRepeater.Extension.lastExtensionHandler}")
     }
 
     if (ApplicationManager.getApplication().isUnitTestMode) {

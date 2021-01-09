@@ -1240,7 +1240,7 @@ public class MultipleCaretsTest extends VimTestCase {
                    "abcde\n" +
                    "a<caret>bcde\n" +
                    "abcde\n");
-    myFixture.checkResult("<caret>abcd<caret>e\n");
+    myFixture.checkResult("<caret>abcde\n<caret>");
   }
 
   // com.maddyhome.idea.vim.action.change.insert

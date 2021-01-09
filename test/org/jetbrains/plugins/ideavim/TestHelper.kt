@@ -93,3 +93,19 @@ fun assertHappened(timeInMillis: Int = 1000, precision: Int, condition: () -> Bo
 
   waitAndAssert(precision * 2) { condition() }
 }
+
+fun waitCondition(
+  durationMillis: Long,
+  interval: Long = 500,
+  condition: () -> Boolean
+): Boolean {
+  val endTime = System.currentTimeMillis() + durationMillis
+  while (System.currentTimeMillis() < endTime) {
+    if (condition())
+      return true
+    else {
+      Thread.sleep(interval)
+    }
+  }
+  return false
+}

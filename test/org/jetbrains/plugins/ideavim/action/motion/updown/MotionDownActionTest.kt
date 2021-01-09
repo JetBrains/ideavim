@@ -213,6 +213,23 @@ class MotionDownActionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  fun `test with inlays 8`() {
+    val keys = parseKeys("lj")
+    val before = """
+            I found it in a ${c}legendary land
+            all rocks and lavender and tufted grass,
+        """.trimIndent()
+    val after = """
+            I found it in a legendary land
+            all rocks and lav${c}ender and tufted grass,
+        """.trimIndent()
+    configureByText(before)
+    myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
+    myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+    typeText(keys)
+    myFixture.checkResult(after)
+  }
+
   fun `test motion to the last empty line`() {
     doTest("j",
       """

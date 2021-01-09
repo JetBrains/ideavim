@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.ex.vimscript
 import com.maddyhome.idea.vim.ex.CommandParser
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ui.VimRcFileState
+import org.jetbrains.annotations.NonNls
 import java.io.File
 import java.io.IOException
 import java.nio.file.Paths
@@ -30,8 +31,16 @@ import java.util.regex.Pattern
  * @author vlan
  */
 object VimScriptParser {
+  // [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
+  @NonNls
   private const val VIMRC_FILE_NAME = "ideavimrc"
+
+  // [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
+  @NonNls
   private val HOME_VIMRC_PATHS = arrayOf(".$VIMRC_FILE_NAME", "_$VIMRC_FILE_NAME")
+
+  // [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
+  @NonNls
   private val XDG_VIMRC_PATH = "ideavim" + File.separator + VIMRC_FILE_NAME
   private val DOUBLE_QUOTED_STRING = Pattern.compile("\"([^\"]*)\"")
   private val SINGLE_QUOTED_STRING = Pattern.compile("'([^']*)'")
@@ -93,6 +102,10 @@ object VimScriptParser {
     }
     executeText(data)
     return data
+  }
+
+  fun executeText(vararg text: String) {
+    executeText(listOf(*text))
   }
 
   fun executeText(text: List<String>) {

@@ -44,7 +44,9 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.EditorHelperRt;
+import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
+import com.maddyhome.idea.vim.option.IdeaWriteData;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,6 +71,8 @@ public class FileGroup {
       // Can't open a file unless it has a known file type. The next call will return the known type.
       // If unknown, IDEA will prompt the user to pick a type.
       FileType type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found, project);
+
+      //noinspection IfStatementWithIdenticalBranches
       if (type != null) {
         FileEditorManager fem = FileEditorManager.getInstance(project);
         fem.openFile(found, true);
@@ -82,7 +86,7 @@ public class FileGroup {
       }
     }
     else {
-      VimPlugin.showMessage("Unable to find " + filename);
+      VimPlugin.showMessage(MessageHelper.message("unable.to.find.0", filename));
 
       return false;
     }
@@ -162,7 +166,7 @@ public class FileGroup {
    */
   public void saveFile(DataContext context) {
     String action;
-    if (OptionsManager.INSTANCE.getIdeawaonw().isSet()) {
+    if (IdeaWriteData.all.equals(OptionsManager.INSTANCE.getIdeawrite().getValue())) {
       action = "SaveAll";
     }
     else {

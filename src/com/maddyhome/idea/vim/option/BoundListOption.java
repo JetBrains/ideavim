@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.option;
 
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ import java.util.List;
 
 
 public class BoundListOption extends ListOption {
-  BoundListOption(String name, String abbrev, String[] dflt, String[] values) {
+  BoundListOption(@NonNls String name, @NonNls String abbrev, @NonNls String[] dflt, @NonNls String[] values) {
     super(name, abbrev, dflt, null);
 
     this.values = new ArrayList<>(Arrays.asList(values));

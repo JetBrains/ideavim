@@ -21,14 +21,14 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.DigraphResult
 import com.maddyhome.idea.vim.helper.DigraphSequence
+import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.option.OptionsManager.showmode
-import org.jetbrains.annotations.ApiStatus
 import org.jetbrains.annotations.Contract
 import java.util.*
 import javax.swing.KeyStroke
@@ -61,12 +61,6 @@ class CommandState private constructor() {
   var executingCommand: Command? = null
     private set
 
-  // Keep the compatibility with the IdeaVim-EasyMotion plugin before the stable release
-  @get:Deprecated("")
-  @get:ApiStatus.ScheduledForRemoval(inVersion = "0.58")
-  val mappingMode: MappingMode
-    get() = mappingState.mappingMode
-
   val isOperatorPending: Boolean
     get() = mappingState.mappingMode == MappingMode.OP_PENDING && !commandBuilder.isEmpty
 
@@ -83,7 +77,7 @@ class CommandState private constructor() {
 
   fun pushModes(mode: Mode, submode: SubMode) {
     val newModeState = ModeState(mode, submode)
-    logger.info("Push new mode state: ${newModeState.toSimpleString()}")
+    logger.debug("Push new mode state: ${newModeState.toSimpleString()}")
     logger.debug { "Stack of mode states before push: ${toSimpleString()}" }
     modeStates.push(newModeState)
     setMappingMode()
@@ -94,7 +88,7 @@ class CommandState private constructor() {
     val popped = modeStates.pop()
     setMappingMode()
     updateStatus()
-    logger.info("Popped mode state: ${popped.toSimpleString()}")
+    logger.debug("Popped mode state: ${popped.toSimpleString()}")
     logger.debug { "Stack of mode states after pop: ${toSimpleString()}" }
   }
 
@@ -186,7 +180,7 @@ class CommandState private constructor() {
     executingCommand = null
     resetModes()
     commandBuilder.resetInProgressCommandPart(getKeyRootNode(mappingState.mappingMode))
-    startDigraphSequence()
+    digraphSequence.reset()
     updateStatus()
   }
 
@@ -199,11 +193,11 @@ class CommandState private constructor() {
    * :h mode()
    *
    * - mode([expr])          Return a string that indicates the current mode.
-   * 
+   *
    *   If [expr] is supplied and it evaluates to a non-zero Number or
    *   a non-empty String (|non-zero-arg|), then the full mode is
    *   returned, otherwise only the first letter is returned.
-   *  
+   *
    *   n          Normal
    *   no         Operator-pending
    *   nov        Operator-pending (forced characterwise |o_v|)
@@ -240,6 +234,7 @@ class CommandState private constructor() {
    *   be added. It's better not to compare the whole string but only
    *   the leading character(s).
    */
+  @VimNlsSafe
   fun toVimNotation(): String {
     return when (mode) {
       Mode.COMMAND -> "n"
@@ -274,7 +269,7 @@ class CommandState private constructor() {
       if (msg.isNotEmpty()) {
         msg.append(" - ")
       }
-      msg.append("recording")
+      msg.append(MessageHelper.message("show.mode.recording"))
     }
     VimPlugin.showMode(msg.toString())
   }

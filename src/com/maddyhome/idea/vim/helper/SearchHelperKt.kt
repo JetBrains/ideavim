@@ -18,14 +18,37 @@
 
 package com.maddyhome.idea.vim.helper
 
-import com.maddyhome.idea.vim.helper.SearchHelper.Direction
 import com.maddyhome.idea.vim.helper.SearchHelper.findPositionOfFirstCharacter
+import com.maddyhome.idea.vim.option.OptionsManager.ignorecase
+import com.maddyhome.idea.vim.option.OptionsManager.smartcase
+
+enum class Direction(private val value: Int) {
+  BACKWARDS(-1), FORWARDS(1);
+
+  fun toInt(): Int = value
+  fun reverse(): Direction = when (this) {
+    BACKWARDS -> FORWARDS
+    FORWARDS -> BACKWARDS
+  }
+
+  companion object {
+    fun fromInt(value: Int) = when (value) {
+      BACKWARDS.value -> BACKWARDS
+      FORWARDS.value -> FORWARDS
+      else -> FORWARDS
+    }
+  }
+}
+
+enum class SearchOptions {
+  BACKWARDS, WANT_ENDPOS, WRAP, SHOW_MESSAGES, WHOLE_FILE, IGNORE_SMARTCASE
+}
 
 private data class State(val position: Int, val trigger: Char, val inQuote: Boolean?, val lastOpenSingleQuotePos: Int)
 
 // bounds are considered inside corresponding quotes
 fun checkInString(chars: CharSequence, currentPos: Int, str: Boolean): Boolean {
-  val begin = findPositionOfFirstCharacter(chars, currentPos, setOf('\n'), false, Direction.BACK)?.second ?: 0
+  val begin = findPositionOfFirstCharacter(chars, currentPos, setOf('\n'), false, Direction.BACKWARDS)?.second ?: 0
   val changes = quoteChanges(chars, begin)
   // TODO: here we need to keep only the latest element in beforePos (if any) and
   //   don't need atAndAfterPos to be eagerly collected
@@ -105,7 +128,7 @@ private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
   //   in that situation it may be double quote inside single quotes, so we cannot threat it as double quote pair open/close
   var inQuote: Boolean? = false
   val charsToSearch = setOf('\'', '"', '\n')
-  var found = findPositionOfFirstCharacter(chars, begin, charsToSearch, false, Direction.FORWARD)
+  var found = findPositionOfFirstCharacter(chars, begin, charsToSearch, false, Direction.FORWARDS)
   while (found != null && found.first != '\n') {
     val i = found.second
 
@@ -158,6 +181,23 @@ private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
       }
     }
     yield(State(i, c, inQuote, lastOpenSingleQuotePos))
-    found = findPositionOfFirstCharacter(chars, i + Direction.FORWARD.toInt(), charsToSearch, false, Direction.FORWARD)
+    found = findPositionOfFirstCharacter(chars, i + Direction.FORWARDS.toInt(), charsToSearch, false, Direction.FORWARDS)
   }
+}
+
+/**
+ * Check ignorecase and smartcase options to see if a case insensitive search should be performed with the given pattern.
+ *
+ * When ignorecase is not set, this will always return false - perform a case sensitive search.
+ *
+ * Otherwise, check smartcase. When set, the search will be case insensitive if the pattern contains only lowercase
+ * characters, and case sensitive (returns false) if the pattern contains any lowercase characters.
+ *
+ * The smartcase option can be ignored, e.g. when searching for the whole word under the cursor. This always performs a
+ * case insensitive search, so `\<Work\>` will match `Work` and `work`. But when choosing the same pattern from search
+ * history, the smartcase option is applied, and `\<Work\>` will only match `Work`.
+ */
+fun shouldIgnoreCase(pattern: String, ignoreSmartCaseOption: Boolean): Boolean {
+  val sc = smartcase.isSet && !ignoreSmartCaseOption
+  return ignorecase.isSet && !(sc && StringHelper.containsUpperCase(pattern))
 }

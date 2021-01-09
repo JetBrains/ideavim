@@ -19,10 +19,14 @@ package com.maddyhome.idea.vim.action.motion.visual
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
+import com.maddyhome.idea.vim.helper.vimForEachCaret
 
 /**
  * @author vlan
@@ -32,6 +36,16 @@ class VisualExitModeAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     editor.getTopLevelEditor().exitVisualMode()
+
+    // Should it be in [exitVisualMode]?
+    editor.vimForEachCaret { caret ->
+      val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+      if (lineEnd == caret.offset) {
+        val position = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -1, false)
+        MotionGroup.moveCaret(editor, caret, position)
+      }
+    }
+
     return true
   }
 }

@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.key;
 
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -25,15 +26,25 @@ import org.jetbrains.annotations.NotNull;
  */
 public enum ShortcutOwner {
   UNDEFINED("undefined", "Undefined"),
-  IDE("ide", "IDE"),
-  VIM("vim", "Vim");
+  IDE(Constants.IDE_STRING, "IDE"),
+  VIM(Constants.VIM_STRING, "Vim");
 
-  private final @NotNull String name;
-  private final @NotNull String title;
+  private final @NotNull @NonNls String name;
+  private final @NotNull @NonNls String title;
 
-  ShortcutOwner(@NotNull String name, @NotNull String title) {
+  ShortcutOwner(@NotNull @NonNls String name, @NotNull @NonNls String title) {
     this.name = name;
     this.title = title;
+  }
+
+  public static @NotNull ShortcutOwner fromString(@NotNull String s) {
+    if (Constants.IDE_STRING.equals(s)) {
+      return IDE;
+    }
+    else if (Constants.VIM_STRING.equals(s)) {
+      return VIM;
+    }
+    return UNDEFINED;
   }
 
   @Override
@@ -45,13 +56,8 @@ public enum ShortcutOwner {
     return name;
   }
 
-  public static @NotNull ShortcutOwner fromString(@NotNull String s) {
-    if ("ide".equals(s)) {
-      return IDE;
-    }
-    else if ("vim".equals(s)) {
-      return VIM;
-    }
-    return UNDEFINED;
+  private static class Constants {
+    @NonNls private static final String IDE_STRING = "ide";
+    @NonNls private static final String VIM_STRING = "vim";
   }
 }

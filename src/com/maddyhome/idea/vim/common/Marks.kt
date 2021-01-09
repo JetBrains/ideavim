@@ -22,6 +22,7 @@ import com.intellij.ide.bookmarks.Bookmark
 import com.intellij.ide.bookmarks.BookmarkManager
 import com.intellij.openapi.project.Project
 import com.maddyhome.idea.vim.group.MarkGroup
+import org.jetbrains.annotations.NonNls
 import java.lang.ref.WeakReference
 
 interface Mark {
@@ -35,7 +36,7 @@ interface Mark {
   fun clear()
 
   object KeySorter : Comparator<Mark> {
-    private const val ORDER = "'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\"[]^.<>"
+    @NonNls private const val ORDER = "'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\"[]^.<>"
 
     override fun compare(o1: Mark, o2: Mark): Int {
       return ORDER.indexOf(o1.key) - ORDER.indexOf(o2.key)

@@ -28,12 +28,14 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 class DeleteCharacterLeftAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.DELETE
 
-  override fun execute(editor: Editor,
-                       caret: Caret,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     return VimPlugin.getChange().deleteCharacter(editor, caret, -count, false)
   }
 }

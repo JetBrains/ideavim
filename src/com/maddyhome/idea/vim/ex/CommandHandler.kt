@@ -52,14 +52,17 @@ sealed class CommandHandler {
      * Indicates that a range must be specified with this command
      */
     RANGE_REQUIRED,
+
     /**
      * Indicates that a range is optional for this command
      */
     RANGE_OPTIONAL,
+
     /**
      * Indicates that a range can't be specified for this command
      */
     RANGE_FORBIDDEN,
+
     /**
      * Indicates that the command takes a count, not a range - effects default
      * Works like RANGE_OPTIONAL
@@ -72,10 +75,12 @@ sealed class CommandHandler {
      * Indicates that an argument must be specified with this command
      */
     ARGUMENT_REQUIRED,
+
     /**
      * Indicates that an argument is optional for this command
      */
     ARGUMENT_OPTIONAL,
+
     /**
      * Indicates that an argument can't be specified for this command
      */
@@ -87,10 +92,12 @@ sealed class CommandHandler {
      * Indicates that this is a command that modifies the editor
      */
     WRITABLE,
+
     /**
      * Indicates that this command does not modify the editor
      */
     READ_ONLY,
+
     /**
      * Indicates that this command handles writability by itself
      */
@@ -121,31 +128,8 @@ sealed class CommandHandler {
   @Throws(ExException::class)
   fun process(editor: Editor, context: DataContext, cmd: ExCommand, count: Int): Boolean {
 
-    // No range allowed
-    if (RangeFlag.RANGE_FORBIDDEN == argFlags.rangeFlag && cmd.ranges.size() != 0) {
-      VimPlugin.showMessage(MessageHelper.message(Msg.e_norange))
-      throw NoRangeAllowedException()
-    }
+    checkArgs(cmd)
 
-    if (RangeFlag.RANGE_REQUIRED == argFlags.rangeFlag && cmd.ranges.size() == 0) {
-      VimPlugin.showMessage(MessageHelper.message(Msg.e_rangereq))
-      throw MissingRangeException()
-    }
-
-    if (RangeFlag.RANGE_IS_COUNT == argFlags.rangeFlag) {
-      cmd.ranges.setDefaultLine(1)
-    }
-
-    // Argument required
-    if (ArgumentFlag.ARGUMENT_REQUIRED == argFlags.argumentFlag && cmd.argument.isEmpty()) {
-      VimPlugin.showMessage(MessageHelper.message(Msg.e_argreq))
-      throw MissingArgumentException()
-    }
-
-    if (ArgumentFlag.ARGUMENT_FORBIDDEN == argFlags.argumentFlag && cmd.argument.isNotEmpty()) {
-      VimPlugin.showMessage(MessageHelper.message(Msg.e_argforb))
-      throw NoArgumentAllowedException()
-    }
     if (editor.inVisualMode && Flag.SAVE_VISUAL !in argFlags.flags) {
       editor.exitVisualMode()
     }
@@ -177,6 +161,34 @@ sealed class CommandHandler {
       VimPlugin.showMessage(e.message)
       VimPlugin.indicateError()
       return false
+    }
+  }
+
+  private fun checkArgs(cmd: ExCommand) {
+    // No range allowed
+    if (RangeFlag.RANGE_FORBIDDEN == argFlags.rangeFlag && cmd.ranges.size() != 0) {
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_norange))
+      throw NoRangeAllowedException()
+    }
+
+    if (RangeFlag.RANGE_REQUIRED == argFlags.rangeFlag && cmd.ranges.size() == 0) {
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_rangereq))
+      throw MissingRangeException()
+    }
+
+    if (RangeFlag.RANGE_IS_COUNT == argFlags.rangeFlag) {
+      cmd.ranges.setDefaultLine(1)
+    }
+
+    // Argument required
+    if (ArgumentFlag.ARGUMENT_REQUIRED == argFlags.argumentFlag && cmd.argument.isEmpty()) {
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_argreq))
+      throw MissingArgumentException()
+    }
+
+    if (ArgumentFlag.ARGUMENT_FORBIDDEN == argFlags.argumentFlag && cmd.argument.isNotEmpty()) {
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_argforb))
+      throw NoArgumentAllowedException()
     }
   }
 }

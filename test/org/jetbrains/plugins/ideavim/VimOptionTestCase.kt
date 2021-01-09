@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim
 
 import com.maddyhome.idea.vim.option.BoundStringOption
 import com.maddyhome.idea.vim.option.ListOption
+import com.maddyhome.idea.vim.option.NumberOption
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.ToggleOption
 
@@ -42,7 +43,8 @@ import com.maddyhome.idea.vim.option.ToggleOption
 abstract class VimOptionTestCase(option: String, vararg otherOptions: String) : VimTestCase() {
   private val options: Set<String> = setOf(option, *otherOptions)
 
-  override fun runTest() {
+  override fun setUp() {
+    super.setUp()
     val testMethod = this.javaClass.getMethod(this.name)
     if (!testMethod.isAnnotationPresent(VimOptionDefaultAll::class.java)) {
       if (!testMethod.isAnnotationPresent(VimOptionTestConfiguration::class.java)) kotlin.test.fail("You should add VimOptionTestConfiguration with options for this method")
@@ -80,10 +82,14 @@ abstract class VimOptionTestCase(option: String, vararg otherOptions: String) : 
 
             option.set(it.values.first())
           }
+          VimTestOptionType.NUMBER -> {
+            if (option !is NumberOption) kotlin.test.fail("${it.option} is not a number option. Change it for method `${testMethod.name}`")
+
+            option.set(it.values.first().toInt())
+          }
         }
       }
     }
-    super.runTest()
   }
 }
 
@@ -106,5 +112,6 @@ annotation class VimTestOption(
 enum class VimTestOptionType {
   LIST,
   TOGGLE,
-  VALUE
+  VALUE,
+  NUMBER
 }

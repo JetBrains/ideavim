@@ -25,6 +25,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 public class ReformatCodeTest extends VimTestCase {
 
   /*
+  [VERSION UPDATE] 203+
   public void testEmpty() {
     configureByJavaText("<caret>");
     typeText(parseKeys("gqq"));

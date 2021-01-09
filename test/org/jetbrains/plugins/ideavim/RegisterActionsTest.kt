@@ -37,6 +37,9 @@ class RegisterActionsTest : VimTestCase() {
   }
 
   fun `test action in disabled plugin`() {
+    setupChecks {
+      caretShape = false
+    }
     val keys = StringHelper.parseKeys("jklwB") // just random keys
     val before = "I ${c}found it in a legendary land"
     val after = "I ${c}found it in a legendary land"

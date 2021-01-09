@@ -38,10 +38,10 @@ class MotionShiftDownAction : ShiftedArrowKeyHandler() {
   override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
     editor.vimForEachCaret { caret ->
       val vertical = VimPlugin.getMotion().moveCaretVertical(editor, caret, cmd.count)
-      val col = EditorHelper.prepareLastColumn(editor, caret)
+      val col = EditorHelper.prepareLastColumn(caret)
       MotionGroup.moveCaret(editor, caret, vertical)
 
-      EditorHelper.updateLastColumn(editor, caret, col)
+      EditorHelper.updateLastColumn(caret, col)
     }
   }
 

@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.vimLastColumn
 
 /**
@@ -41,7 +42,7 @@ class SelectEnableCharacterModeAction : VimActionHandler.SingleExecution() {
       val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
       caret.run {
         vimSetSystemSelectionSilently(offset, (offset + 1).coerceAtMost(lineEnd))
-        moveToOffset((offset + 1).coerceAtMost(lineEnd))
+        moveToInlayAwareOffset((offset + 1).coerceAtMost(lineEnd))
         vimLastColumn = visualPosition.column
       }
     }

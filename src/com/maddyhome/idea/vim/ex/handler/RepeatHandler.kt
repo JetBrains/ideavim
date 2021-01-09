@@ -32,7 +32,8 @@ import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.MotionGroup
 
 class RepeatHandler : CommandHandler.ForEachCaret() {
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.SELF_SYNCHRONIZED, DONT_SAVE_LAST)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.SELF_SYNCHRONIZED, DONT_SAVE_LAST)
 
   private var lastArg = ':'
 
@@ -43,7 +44,11 @@ class RepeatHandler : CommandHandler.ForEachCaret() {
     lastArg = arg
 
     val line = cmd.getLine(editor, caret)
-    MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLine(editor, line, editor.caretModel.primaryCaret))
+    MotionGroup.moveCaret(
+      editor,
+      caret,
+      VimPlugin.getMotion().moveCaretToLine(editor, line, editor.caretModel.primaryCaret)
+    )
 
     if (arg == ':') {
       return CommandParser.getInstance().processLastCommand(editor, context, 1)

@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.helper;
 
+import com.google.common.collect.Lists;
 import com.intellij.lang.CodeDocumentationAwareCommenter;
 import com.intellij.lang.Commenter;
 import com.intellij.lang.Language;
@@ -29,9 +30,14 @@ import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import com.maddyhome.idea.vim.regexp.CharPointer;
+import com.maddyhome.idea.vim.regexp.RegExp;
 import kotlin.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -43,11 +49,357 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.checkInString;
+import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
 
 /**
  * Helper methods for searching text
  */
 public class SearchHelper {
+
+  /**
+   * Find text matching the given pattern.
+   *
+   * @param editor          The editor to search in
+   * @param pattern         The pattern to search for
+   * @param startOffset     The offset to start searching from
+   * @param count           Find the nth next occurrence of the pattern. Must be 1 or greater.
+   * @param searchOptions   A set of options, such as direction and wrap
+   * @return                A TextRange representing the result, or null
+   */
+  @Nullable
+  public static TextRange findPattern(@NotNull Editor editor,
+                                      @Nullable String pattern,
+                                      int startOffset,
+                                      int count,
+                                      EnumSet<SearchOptions> searchOptions) {
+    if (pattern == null || pattern.length() == 0) {
+      logger.warn("Pattern is null or empty. Cannot perform search");
+      return null;
+    }
+
+    Direction dir = searchOptions.contains(SearchOptions.BACKWARDS) ? Direction.BACKWARDS : Direction.FORWARDS;
+
+    //RE sp;
+    RegExp sp;
+    RegExp.regmmatch_T regmatch = new RegExp.regmmatch_T();
+    regmatch.rmm_ic = shouldIgnoreCase(pattern, searchOptions.contains(SearchOptions.IGNORE_SMARTCASE));
+    sp = new RegExp();
+    regmatch.regprog = sp.vim_regcomp(pattern, 1);
+    if (regmatch.regprog == null) {
+      if (logger.isDebugEnabled()) logger.debug("bad pattern: " + pattern);
+      return null;
+    }
+
+    /*
+    int extra_col = 1;
+    int startcol = -1;
+    boolean found = false;
+    boolean match_ok = true;
+    LogicalPosition pos = editor.offsetToLogicalPosition(startOffset);
+    LogicalPosition endpos = null;
+    //REMatch match = null;
+    */
+
+    CharacterPosition lpos = CharacterPosition.Companion.fromOffset(editor, startOffset);
+    RegExp.lpos_T pos = new RegExp.lpos_T();
+    pos.lnum = lpos.line;
+    pos.col = lpos.column;
+
+    int found;
+    int lnum;           /* no init to shut up Apollo cc */
+    //RegExp.regmmatch_T regmatch;
+    CharPointer ptr;
+    int matchcol;
+    RegExp.lpos_T matchpos;
+    RegExp.lpos_T endpos = new RegExp.lpos_T();
+    int loop;
+    RegExp.lpos_T start_pos;
+    boolean at_first_line;
+    int extra_col = dir == Direction.FORWARDS ? 1 : 0;
+    boolean match_ok;
+    long nmatched;
+    //int         submatch = 0;
+    boolean first_match = true;
+
+    int lineCount = EditorHelper.getLineCount(editor);
+    int startLine = 0;
+    int endLine = lineCount;
+
+    do  /* loop for count */ {
+      start_pos = new RegExp.lpos_T(pos);       /* remember start pos for detecting no match */
+      found = 0;              /* default: not found */
+      at_first_line = true;   /* default: start in first line */
+      if (pos.lnum == -1)     /* correct lnum for when starting in line 0 */ {
+        pos.lnum = 0;
+        pos.col = 0;
+        at_first_line = false;  /* not in first line now */
+      }
+
+      /*
+       * Start searching in current line, unless searching backwards and
+       * we're in column 0.
+       */
+      if (dir == Direction.BACKWARDS && start_pos.col == 0) {
+        lnum = pos.lnum - 1;
+        at_first_line = false;
+      }
+      else {
+        lnum = pos.lnum;
+      }
+
+      int lcount = EditorHelper.getLineCount(editor);
+      for (loop = 0; loop <= 1; ++loop)   /* loop twice if 'wrapscan' set */ {
+        if (!searchOptions.contains(SearchOptions.WHOLE_FILE)) {
+          startLine = lnum;
+          endLine = lnum + 1;
+        }
+        for (; lnum >= startLine && lnum < endLine; lnum += dir.toInt(), at_first_line = false) {
+          /*
+           * Look for a match somewhere in the line.
+           */
+          nmatched = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, 0);
+          if (nmatched > 0) {
+            /* match may actually be in another line when using \zs */
+            matchpos = new RegExp.lpos_T(regmatch.startpos[0]);
+            endpos = new RegExp.lpos_T(regmatch.endpos[0]);
+
+            ptr = new CharPointer(EditorHelper.getLineBuffer(editor, lnum + matchpos.lnum));
+
+            /*
+             * Forward search in the first line: match should be after
+             * the start position. If not, continue at the end of the
+             * match (this is vi compatible) or on the next char.
+             */
+            if (dir == Direction.FORWARDS && at_first_line) {
+              match_ok = true;
+              /*
+               * When match lands on a NUL the cursor will be put
+               * one back afterwards, compare with that position,
+               * otherwise "/$" will get stuck on end of line.
+               */
+              while (matchpos.lnum == 0
+                && (searchOptions.contains(SearchOptions.WANT_ENDPOS) && first_match
+                ? (nmatched == 1 && endpos.col - 1 < start_pos.col + extra_col)
+                : (matchpos.col - (ptr.charAt(matchpos.col) == '\u0000' ? 1 : 0) < start_pos.col + extra_col))) {
+                if (nmatched > 1) {
+                  /* end is in next line, thus no match in
+                   * this line */
+                  match_ok = false;
+                  break;
+                }
+                matchcol = endpos.col;
+                /* for empty match: advance one char */
+                if (matchcol == matchpos.col && ptr.charAt(matchcol) != '\u0000') {
+                  ++matchcol;
+                }
+                if (ptr.charAt(matchcol) == '\u0000' ||
+                  (nmatched = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, matchcol)) == 0) {
+                  match_ok = false;
+                  break;
+                }
+                matchpos = new RegExp.lpos_T(regmatch.startpos[0]);
+                endpos = new RegExp.lpos_T(regmatch.endpos[0]);
+
+                /* Need to get the line pointer again, a
+                 * multi-line search may have made it invalid. */
+                ptr = new CharPointer(EditorHelper.getLineBuffer(editor, lnum));
+              }
+              if (!match_ok) {
+                continue;
+              }
+            }
+            if (dir == Direction.BACKWARDS) {
+              /*
+               * Now, if there are multiple matches on this line,
+               * we have to get the last one. Or the last one before
+               * the cursor, if we're on that line.
+               * When putting the new cursor at the end, compare
+               * relative to the end of the match.
+               */
+              match_ok = false;
+              for (;;) {
+                if (loop != 0 ||
+                  (searchOptions.contains(SearchOptions.WANT_ENDPOS)
+                    ? (lnum + regmatch.endpos[0].lnum < start_pos.lnum || (lnum + regmatch.endpos[0].lnum == start_pos.lnum && regmatch.endpos[0].col - 1 < start_pos.col + extra_col))
+                    : (lnum + regmatch.startpos[0].lnum < start_pos.lnum || (lnum + regmatch.startpos[0].lnum == start_pos.lnum && regmatch.startpos[0].col < start_pos.col + extra_col)))) {
+                  /* Remember this position, we use it if it's
+                   * the last match in the line. */
+                  match_ok = true;
+                  matchpos = new RegExp.lpos_T(regmatch.startpos[0]);
+                  endpos = new RegExp.lpos_T(regmatch.endpos[0]);
+                }
+                else {
+                  break;
+                }
+
+                /*
+                 * We found a valid match, now check if there is
+                 * another one after it.
+                 * If vi-compatible searching, continue at the end
+                 * of the match, otherwise continue one position
+                 * forward.
+                 */
+                if (nmatched > 1) {
+                  break;
+                }
+                matchcol = endpos.col;
+                /* for empty match: advance one char */
+                if (matchcol == matchpos.col && ptr.charAt(matchcol) != '\u0000') {
+                  ++matchcol;
+                }
+                if (ptr.charAt(matchcol) == '\u0000' ||
+                  (nmatched = sp.vim_regexec_multi(regmatch, editor, lcount, lnum + matchpos.lnum, matchcol)) == 0) {
+                  break;
+                }
+
+                /* Need to get the line pointer again, a
+                 * multi-line search may have made it invalid. */
+                ptr = new CharPointer(EditorHelper.getLineBuffer(editor, lnum + matchpos.lnum));
+              }
+
+              /*
+               * If there is only a match after the cursor, skip
+               * this match.
+               */
+              if (!match_ok) {
+                continue;
+              }
+            }
+
+            pos.lnum = lnum + matchpos.lnum;
+            pos.col = matchpos.col;
+            endpos.lnum = lnum + endpos.lnum;
+            found = 1;
+            first_match = false;
+
+            /* Set variables used for 'incsearch' highlighting. */
+            //search_match_lines = endpos.lnum - (lnum - first_lnum);
+            //search_match_endcol = endpos.col;
+            break;
+          }
+          //line_breakcheck();      /* stop if ctrl-C typed */
+          //if (got_int)
+          //    break;
+
+          if (loop != 0 && lnum == start_pos.lnum) {
+            break;          /* if second loop, stop where started */
+          }
+        }
+        at_first_line = false;
+
+        /*
+         * stop the search if wrapscan isn't set, after an interrupt and
+         * after a match
+         */
+        if (!searchOptions.contains(SearchOptions.WRAP) || found != 0) {
+          break;
+        }
+
+        /*
+         * If 'wrapscan' is set we continue at the other end of the file.
+         * If 'shortmess' does not contain 's', we give a message.
+         * This message is also remembered in keep_msg for when the screen
+         * is redrawn. The keep_msg is cleared whenever another message is
+         * written.
+         */
+        if (dir == Direction.BACKWARDS)    /* start second loop at the other end */ {
+          lnum = lineCount - 1;
+          //if (!shortmess(SHM_SEARCH) && (options & SEARCH_MSG))
+          //    give_warning((char_u *)_(top_bot_msg), TRUE);
+        }
+        else {
+          lnum = 0;
+          //if (!shortmess(SHM_SEARCH) && (options & SEARCH_MSG))
+          //    give_warning((char_u *)_(bot_top_msg), TRUE);
+        }
+      }
+      //if (got_int || called_emsg || break_loop)
+      //    break;
+    }
+    while (--count > 0 && found != 0);   /* stop after count matches or no match */
+
+    if (found == 0)             /* did not find it */ {
+      //if ((options & SEARCH_MSG) == SEARCH_MSG)
+      if (searchOptions.contains(SearchOptions.SHOW_MESSAGES)) {
+        if (searchOptions.contains(SearchOptions.WRAP)) {
+          VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
+        }
+        else if (lnum <= 0) {
+          VimPlugin.showMessage(MessageHelper.message(Msg.E384, pattern));
+        }
+        else {
+          VimPlugin.showMessage(MessageHelper.message(Msg.E385, pattern));
+        }
+      }
+      return null;
+    }
+
+    //return new TextRange(editor.logicalPositionToOffset(new LogicalPosition(pos.lnum, pos.col)),
+    //    editor.logicalPositionToOffset(new LogicalPosition(endpos.lnum, endpos.col)));
+    //return new TextRange(editor.logicalPositionToOffset(new LogicalPosition(pos.lnum, 0)) + pos.col,
+    //    editor.logicalPositionToOffset(new LogicalPosition(endpos.lnum, 0)) + endpos.col);
+    return new TextRange(new CharacterPosition(pos.lnum, pos.col).toOffset(editor),
+      new CharacterPosition(endpos.lnum, endpos.col).toOffset(editor));
+  }
+
+  /**
+   * Find all occurrences of the pattern.
+   *
+   * @param editor      The editor to search in
+   * @param pattern     The pattern to search for
+   * @param startLine   The start line of the range to search for, or -1 for the whole document
+   * @param endLine     The end line of the range to search for, or -1 for the whole document
+   * @param ignoreCase  Case sensitive or insensitive searching
+   * @return            A list of TextRange objects representing the results
+   */
+  public static @NotNull List<TextRange> findAll(@NotNull Editor editor,
+                                                 @NotNull String pattern,
+                                                 int startLine,
+                                                 int endLine,
+                                                 boolean ignoreCase) {
+    final List<TextRange> results = Lists.newArrayList();
+    final int lineCount = EditorHelper.getLineCount(editor);
+    final int actualEndLine = endLine == -1 ? lineCount : endLine;
+
+    final RegExp.regmmatch_T regMatch = new RegExp.regmmatch_T();
+    final RegExp regExp = new RegExp();
+    regMatch.regprog = regExp.vim_regcomp(pattern, 1);
+    if (regMatch.regprog == null) {
+      return results;
+    }
+
+    regMatch.rmm_ic = ignoreCase;
+
+    int col = 0;
+    for (int line = startLine; line <= actualEndLine; ) {
+      int matchedLines = regExp.vim_regexec_multi(regMatch, editor, lineCount, line, col);
+      if (matchedLines > 0) {
+        final CharacterPosition startPos = new CharacterPosition(line + regMatch.startpos[0].lnum,
+          regMatch.startpos[0].col);
+        final CharacterPosition endPos = new CharacterPosition(line + regMatch.endpos[0].lnum,
+          regMatch.endpos[0].col);
+        int start = startPos.toOffset(editor);
+        int end = endPos.toOffset(editor);
+        results.add(new TextRange(start, end));
+
+        if (start != end) {
+          line += matchedLines - 1;
+          col = endPos.column;
+        }
+        else {
+          line += matchedLines;
+          col = 0;
+        }
+      }
+      else {
+        line++;
+        col = 0;
+      }
+    }
+
+    return results;
+  }
+
   public static boolean anyNonWhitespace(@NotNull Editor editor, int offset, int dir) {
     int start;
     int end;
@@ -102,7 +454,7 @@ public class SearchHelper {
     int pos = caret.getOffset();
     int loc = blockChars.indexOf(type);
     // What direction should we go now (-1 is backward, 1 is forward)
-    Direction dir = loc % 2 == 0 ? Direction.BACK : Direction.FORWARD;
+    Direction dir = loc % 2 == 0 ? Direction.BACKWARDS : Direction.FORWARDS;
     // Which character did we find and which should we now search for
     char match = blockChars.charAt(loc);
     char found = blockChars.charAt(loc - dir.toInt());
@@ -138,7 +490,7 @@ public class SearchHelper {
         type == chars.charAt(start - 1) &&
         end < chars.length() &&
         close == chars.charAt(end)) {
-      start = start - 1;
+      start -= 1;
       pos = start;
       rangeSelection = true;
     }
@@ -162,10 +514,10 @@ public class SearchHelper {
         int endOffset = quoteRange.getEndOffset();
         CharSequence subSequence = chars.subSequence(startOffset, endOffset);
         int inQuotePos = pos - startOffset;
-        int inQuoteStart = findBlockLocation(subSequence, close, type, Direction.BACK, inQuotePos, count, false);
+        int inQuoteStart = findBlockLocation(subSequence, close, type, Direction.BACKWARDS, inQuotePos, count, false);
         if (inQuoteStart != -1) {
           startPosInStringFound = true;
-          int inQuoteEnd = findBlockLocation(subSequence, type, close, Direction.FORWARD, inQuoteStart, 1, false);
+          int inQuoteEnd = findBlockLocation(subSequence, type, close, Direction.FORWARDS, inQuoteStart, 1, false);
           if (inQuoteEnd != -1) {
             bstart = inQuoteStart + startOffset;
             bend = inQuoteEnd + startOffset;
@@ -175,9 +527,9 @@ public class SearchHelper {
     }
 
     if (!startPosInStringFound) {
-      bstart = findBlockLocation(chars, close, type, Direction.BACK, pos, count, false);
+      bstart = findBlockLocation(chars, close, type, Direction.BACKWARDS, pos, count, false);
       if (bstart != -1) {
-        bend = findBlockLocation(chars, type, close, Direction.FORWARD, bstart, 1, false);
+        bend = findBlockLocation(chars, type, close, Direction.FORWARDS, bstart, 1, false);
       }
     }
 
@@ -293,7 +645,7 @@ public class SearchHelper {
     // If we found one ...
     if (loc >= 0) {
       // What direction should we go now (-1 is backward, 1 is forward)
-      Direction dir = loc % 2 == 0 ? Direction.FORWARD : Direction.BACK;
+      Direction dir = loc % 2 == 0 ? Direction.FORWARDS : Direction.BACKWARDS;
       // Which character did we find and which should we now search for
       char found = getPairChars().charAt(loc);
       char match = getPairChars().charAt(loc + dir.toInt());
@@ -326,7 +678,7 @@ public class SearchHelper {
                                        boolean allowInString) {
     int res = -1;
     int initialPos = pos;
-    Function<Integer, Integer> inCheckPosF = x -> dir == Direction.BACK && x > 0 ? x - 1 : x + 1;
+    Function<Integer, Integer> inCheckPosF = x -> dir == Direction.BACKWARDS && x > 0 ? x - 1 : x + 1;
     final int inCheckPos = inCheckPosF.apply(pos);
     boolean inString = checkInString(chars, inCheckPos, true);
     boolean initialInString = inString;
@@ -390,30 +742,16 @@ public class SearchHelper {
     return backslashCounter % 2 == 0;
   }
 
-  public enum Direction {
-    BACK(-1), FORWARD(1);
-
-    private final int value;
-
-    Direction(int i) {
-      value = i;
-    }
-
-    public int toInt() {
-      return value;
-    }
-  }
-
   public enum NumberType {
     BIN, OCT, DEC, HEX, ALPHA
   }
 
   private static int findNextQuoteInLine(@NotNull CharSequence chars, int pos, char quote) {
-    return findQuoteInLine(chars, pos, quote, Direction.FORWARD);
+    return findQuoteInLine(chars, pos, quote, Direction.FORWARDS);
   }
 
   private static int findPreviousQuoteInLine(@NotNull CharSequence chars, int pos, char quote) {
-    return findQuoteInLine(chars, pos, quote, Direction.BACK);
+    return findQuoteInLine(chars, pos, quote, Direction.BACKWARDS);
   }
 
   private static int findFirstQuoteInLine(@NotNull Editor editor, int pos, char quote) {
@@ -427,8 +765,8 @@ public class SearchHelper {
 
   private static int countCharactersInLine(@NotNull CharSequence chars, int pos, char c) {
     int cnt = 0;
-    while (pos > 0 && (chars.charAt(pos + Direction.BACK.toInt()) != '\n')) {
-      pos = findCharacterPosition(chars, pos + Direction.BACK.toInt(), c, false, true, Direction.BACK);
+    while (pos > 0 && (chars.charAt(pos + Direction.BACKWARDS.toInt()) != '\n')) {
+      pos = findCharacterPosition(chars, pos + Direction.BACKWARDS.toInt(), c, false, true, Direction.BACKWARDS);
       if (pos != -1) {
         cnt++;
       }
@@ -541,16 +879,19 @@ public class SearchHelper {
         selectionEndWithoutNewline++;
       }
 
-      if (closingTagTextRange.getStartOffset() == selectionEndWithoutNewline &&
+      final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
+      if (mode == CommandState.Mode.VISUAL) {
+        if (closingTagTextRange.getStartOffset() == selectionEndWithoutNewline &&
           openingTag.getEndOffset() == selectionStart) {
-        // Special case: if the inner tag is already selected we should like isOuter is active
-        // Note that we need to ignore newlines, because their selection is lost between multiple "it" invocations
-        isOuter = true;
-      }
-      else if (openingTag.getEndOffset() == closingTagTextRange.getStartOffset() &&
-               selectionStart == openingTag.getEndOffset()) {
-        // Special case: for an empty tag pair (e.g. <a></a>) the whole tag is selected if the caret is in the middle.
-        isOuter = true;
+          // Special case: if the inner tag is already selected we should like isOuter is active
+          // Note that we need to ignore newlines, because their selection is lost between multiple "it" invocations
+          isOuter = true;
+        }
+        else if (openingTag.getEndOffset() == closingTagTextRange.getStartOffset() &&
+          selectionStart == openingTag.getEndOffset()) {
+          // Special case: for an empty tag pair (e.g. <a></a>) the whole tag is selected if the caret is in the middle.
+          isOuter = true;
+        }
       }
 
       if (isOuter) {
@@ -608,7 +949,7 @@ public class SearchHelper {
     final Pattern tagPattern = Pattern.compile(String.format("(?:%s)|(?:%s)", openingTagPattern, closingTagPattern));
     final Matcher matcher = tagPattern.matcher(sequence.subSequence(position, sequence.length()));
 
-    final Stack<String> openTags = new Stack<>();
+    final Deque<String> openTags = new ArrayDeque<>();
 
     while (matcher.find()) {
       boolean isClosingTag = matcher.group(1) == null;
@@ -655,7 +996,7 @@ public class SearchHelper {
     final Pattern tagPattern =
       Pattern.compile(String.format(patternString, quotedTagName, quotedTagName), Pattern.CASE_INSENSITIVE);
     final Matcher matcher = tagPattern.matcher(sequence.subSequence(0, position + 1));
-    final Stack<TextRange> openTags = new Stack<>();
+    final Deque<TextRange> openTags = new ArrayDeque<>();
 
     while (matcher.find()) {
       final TextRange match = new TextRange(matcher.start(), matcher.end());
@@ -786,7 +1127,7 @@ public class SearchHelper {
         if (pos == size - 1 ||
             !Character.isLetter(chars.charAt(pos + 1)) ||
             (Character.isUpperCase(chars.charAt(pos + 1)) &&
-             pos <= size - 2 &&
+             pos < size - 2 &&
              Character.isLowerCase(chars.charAt(pos + 2)))) {
           res = pos;
           found++;
@@ -1375,7 +1716,7 @@ public class SearchHelper {
     }
 
     if (goForward && anyNonWhitespace(editor, end, 1)) {
-      while (end < max &&
+      while (end + 1 < max &&
              CharacterHelper.charType(chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
         end++;
       }

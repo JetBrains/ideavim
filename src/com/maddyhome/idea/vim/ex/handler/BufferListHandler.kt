@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.EditorHelper
+import org.jetbrains.annotations.NonNls
 import java.io.File
 
 /**
@@ -77,10 +78,13 @@ class BufferListHandler : CommandHandler.SingleExecution() {
 
       if (bufStatusMatchesFilter(filter, bufStatus)) {
         val lineNum = editor.caretModel.currentCaret.logicalPosition.line + 1
-        val lineNumPad = if (displayFileName.length < FILE_NAME_PAD) (FILE_NAME_PAD - displayFileName.length).toString() else ""
+        val lineNumPad =
+          if (displayFileName.length < FILE_NAME_PAD) (FILE_NAME_PAD - displayFileName.length).toString() else ""
 
-        bufferList.add(String.format(
-          "   %${bufNumPad}s %s %s%${lineNumPad}s line: %d", index, bufStatus, displayFileName, "", lineNum)
+        bufferList.add(
+          String.format(
+            "   %${bufNumPad}s %s %s%${lineNumPad}s line: %d", index, bufStatus, displayFileName, "", lineNum
+          )
         )
       }
       index++
@@ -114,10 +118,15 @@ class BufferListHandler : CommandHandler.SingleExecution() {
   private fun bufStatusMatchesFilter(filter: String, bufStatus: String) = filter.all { it in bufStatus }
 }
 
-private fun getBufferStatus(editor: Editor, file: VirtualFile, currentFile: VirtualFile, previousFile: VirtualFile?): String {
-  val bufStatus = StringBuilder()
+private fun getBufferStatus(
+  editor: Editor,
+  file: VirtualFile,
+  currentFile: VirtualFile,
+  previousFile: VirtualFile?
+): String {
+  @NonNls val bufStatus = StringBuilder()
 
-  when(file) {
+  when (file) {
     currentFile -> bufStatus.append("%a  ")
     previousFile -> bufStatus.append("#   ")
     else -> bufStatus.append("    ")

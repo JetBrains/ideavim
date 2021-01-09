@@ -315,6 +315,34 @@ Contributors:
   [![icon][github]](https://github.com/KostkaBrukowa)
   &nbsp;
   KostkaBrukowa
+* [![icon][mail]](mailto:wangyaohuicn@gmail.com)
+  [![icon][github]](https://github.com/yaohui-wyh)
+  &nbsp;
+  Yaohui Wang
+* [![icon][mail]](mailto:iain.ballard@bjss.com)
+  [![icon][github]](https://github.com/i-e-b)
+  &nbsp;
+  Iain Ballard
+* [![icon][mail]](mailto:brandoncc@gmail.com)
+  [![icon][github]](https://github.com/brandoncc)
+  &nbsp;
+  Brandon Conway
+* [![icon][mail]](mailto:ga@anadoxin.org)
+  [![icon][github]](https://github.com/antekone)
+  &nbsp;
+  Grzegorz Antoniak
+* [![icon][mail]](mailto:shaunpatterson@gmail.com)
+  [![icon][github]](https://github.com/shaunpatterson)
+  &nbsp;
+  Shaun Patterson
+* [![icon][mail]](mailto:vladimir.petrenko@jetbrains.com)
+  [![icon][github]](https://github.com/vladimir-petrenko)
+  &nbsp;
+  Vladimir Petrenko
+* [![icon][mail]](mailto:sergey.vorobyov@jetbrains.com)
+  [![icon][github]](https://github.com/DeveloperHacker)
+  &nbsp;
+  Sergei Vorobyov
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.

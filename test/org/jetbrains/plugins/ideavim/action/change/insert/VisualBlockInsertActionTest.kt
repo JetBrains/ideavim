@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
+import com.intellij.codeInsight.daemon.impl.HintRenderer
 import com.intellij.codeInsight.folding.CodeFoldingManager
 import com.intellij.codeInsight.folding.impl.FoldingUtil
 import com.maddyhome.idea.vim.command.CommandState
@@ -148,6 +149,37 @@ Xbar
                     """.trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
+    assertMode(CommandState.Mode.COMMAND)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
+  fun `test block mode with inlays`() {
+    val before = """
+                A Discovery
+
+                I found it in ${c}a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """
+    doTestWithoutNeovim(
+      parseKeys("<C-V>", "jjI", " Hello ", "<ESC>"),
+      before.trimIndent(),
+      """
+                A Discovery
+
+                I found it in  Hello a legendary land
+                all rocks and  Hello lavender and tufted grass,
+                where it was s Hello ettled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent(),
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    ) {
+      it.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
+      it.inlayModel.addInlineElement(before.indexOf("l rocks"), HintRenderer("Hello"))
+      it.inlayModel.addInlineElement(before.indexOf("ere it"), HintRenderer("Hello"))
+    }
     assertMode(CommandState.Mode.COMMAND)
   }
 }

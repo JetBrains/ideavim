@@ -50,6 +50,8 @@ object CharacterHelper {
       CharacterType.KATAKANA
     } else if (isHalfWidthKatakanaLetter(ch)) {
       CharacterType.HALF_WIDTH_KATAKANA
+    } else if (block == UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS) {
+      CharacterType.CJK_UNIFIED_IDEOGRAPHS
     } else if (punctuationAsLetters || iskeyword.isKeyword(ch)) {
       CharacterType.KEYWORD
     } else {
@@ -89,6 +91,6 @@ object CharacterHelper {
   }
 
   enum class CharacterType {
-    KEYWORD, HIRAGANA, KATAKANA, HALF_WIDTH_KATAKANA, PUNCTUATION, WHITESPACE
+    KEYWORD, HIRAGANA, KATAKANA, HALF_WIDTH_KATAKANA, CJK_UNIFIED_IDEOGRAPHS, PUNCTUATION, WHITESPACE
   }
 }

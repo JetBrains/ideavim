@@ -32,12 +32,14 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.actionSystem.ex.AnActionListener
+import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
 import com.intellij.openapi.project.DumbAwareToggleAction
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Key
 import com.intellij.util.PlatformUtils
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler
@@ -47,9 +49,12 @@ import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.commandState
+import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.option.IdeaRefactorMode
+import org.jetbrains.annotations.NonNls
+import org.jetbrains.annotations.NotNull
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 
@@ -66,6 +71,7 @@ object IdeaSpecifics {
   }
 
   class VimActionListener : AnActionListener {
+    @NonNls
     private val surrounderItems = listOf("if", "if / else", "for")
     private val surrounderAction = "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
     private var editor: Editor? = null
@@ -154,7 +160,8 @@ object IdeaSpecifics {
   //region Register shortcuts for lookup and perform partial reset
   private object LookupListener : PropertyChangeListener {
     override fun propertyChange(evt: PropertyChangeEvent?) {
-      if (evt != null && evt.propertyName == "activeLookup" && evt.oldValue == null && evt.newValue != null) {
+      if (evt == null) return
+      if (evt.propertyName == "activeLookup" && evt.oldValue == null && evt.newValue != null) {
         val lookup = evt.newValue
         if (lookup is LookupImpl) {
           VimPlugin.getKey().registerShortcutsForLookup(lookup)
@@ -188,8 +195,95 @@ object IdeaSpecifics {
       .javaClass.name.startsWith("org.acejump.")
   }
   //endregion
+
+  //region AppCode templates
+  /**
+   * A collection of hacks to improve the interaction with fancy AppCode templates
+   */
+  object AppCodeTemplates {
+    private val facedAppCodeTemplate = Key.create<IntRange>("FacedAppCodeTemplate")
+
+    private const val TEMPLATE_START = "<#T##"
+    private const val TEMPLATE_END = "#>"
+
+    @JvmStatic
+    fun onMovement(
+      editor: @NotNull Editor,
+      caret: @NotNull Caret,
+      toRight: Boolean
+    ) {
+      if (!PlatformUtils.isAppCode()) return
+
+      val offset = caret.offset
+      val offsetRightEnd = offset + TEMPLATE_START.length
+      val offsetLeftEnd = offset - 1
+      val templateRange = caret.getUserData(facedAppCodeTemplate)
+      if (templateRange == null) {
+        if (offsetRightEnd < editor.fileSize
+          && editor.document.charsSequence.subSequence(offset, offsetRightEnd).toString() == TEMPLATE_START) {
+          caret.shake()
+
+          val templateEnd = editor.findTemplateEnd(offset) ?: return
+
+          caret.putUserData(facedAppCodeTemplate, offset..templateEnd)
+        }
+        if (offsetLeftEnd >= 0
+          && editor.document.charsSequence.subSequence(offsetLeftEnd, offset + 1).toString() == TEMPLATE_END) {
+          caret.shake()
+
+          val templateStart = editor.findTemplateStart(offsetLeftEnd) ?: return
+
+          caret.putUserData(facedAppCodeTemplate, templateStart..offset)
+        }
+      } else {
+        if (offset in templateRange) {
+          if (toRight) {
+            caret.moveToOffset(templateRange.last + 1)
+          } else {
+            caret.moveToOffset(templateRange.first)
+          }
+        }
+        caret.putUserData(facedAppCodeTemplate, null)
+        caret.shake()
+      }
+    }
+
+    fun Editor.appCodeTemplateCaptured(): Boolean {
+      if (!PlatformUtils.isAppCode()) return false
+      return this.caretModel.allCarets.any { it.getUserData(facedAppCodeTemplate) != null }
+    }
+
+    private fun Caret.shake() {
+      moveCaretRelatively(1, 0, false, false)
+      moveCaretRelatively(-1, 0, false, false)
+    }
+
+    private fun Editor.findTemplateEnd(start: Int): Int? {
+      val charSequence = this.document.charsSequence
+      val length = charSequence.length
+      for (i in start until length - 1) {
+        if (charSequence[i] == TEMPLATE_END[0] && charSequence[i+1] == TEMPLATE_END[1]) {
+          return i + 1
+        }
+      }
+      return null
+    }
+
+    private fun Editor.findTemplateStart(start: Int): Int? {
+      val charSequence = this.document.charsSequence
+      val templateLastIndex = TEMPLATE_START.length
+      for (i in start downTo templateLastIndex) {
+        if (charSequence.subSequence(i - templateLastIndex, i + 1).toString() == TEMPLATE_START) {
+          return i - templateLastIndex
+        }
+      }
+      return null
+    }
+  }
+  //endregion
 }
 
+//region Find action ID
 class FindActionIdAction : DumbAwareToggleAction() {
   override fun isSelected(e: AnActionEvent): Boolean = FindActionId.enabled
 
@@ -201,3 +295,4 @@ class FindActionIdAction : DumbAwareToggleAction() {
 object FindActionId {
   var enabled = false
 }
+//endregion

@@ -24,13 +24,12 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
-import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.handler.GotoLineHandler;
 import com.maddyhome.idea.vim.ex.ranges.Range;
 import com.maddyhome.idea.vim.ex.ranges.Ranges;
 import com.maddyhome.idea.vim.group.HistoryGroup;
+import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import org.jetbrains.annotations.NotNull;
@@ -126,7 +125,6 @@ public class CommandParser {
   private void processCommand(@NotNull Editor editor, @NotNull DataContext context, @NotNull String cmd,
                              int count, int aliasCountdown) throws ExException {
     // Nothing entered
-    int result = 0;
     if (cmd.length() == 0) {
       logger.warn("CMD is empty");
       return;
@@ -151,7 +149,7 @@ public class CommandParser {
         }
         processCommand(editor, context, commandAlias, count, aliasCountdown - 1);
       } else {
-        VimPlugin.showMessage("Recursion detected, maximum alias depth reached.");
+        VimPlugin.showMessage(MessageHelper.message("recursion.detected.maximum.alias.depth.reached"));
         VimPlugin.indicateError();
         logger.warn("Recursion detected, maximum alias depth reached. ");
       }
@@ -178,8 +176,7 @@ public class CommandParser {
     ThrowableComputable<Object, ExException> runCommand = () -> {
       boolean ok = handler.process(editor, context, command, count);
       if (ok && !handler.getArgFlags().getFlags().contains(CommandHandler.Flag.DONT_SAVE_LAST)) {
-        VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
-                                                  SelectionType.CHARACTER_WISE, ':', false);
+        VimPlugin.getRegister().storeTextSpecial(RegisterGroup.LAST_COMMAND_REGISTER, cmd);
       }
       return null;
     };
@@ -211,7 +208,7 @@ public class CommandParser {
       }
     }
     final ExBeanClass handlerHolder = node.getCommandHandler();
-    return handlerHolder != null ? handlerHolder.getHandler() : null;
+    return handlerHolder != null ? handlerHolder.getInstance() : null;
   }
 
   /**
@@ -308,6 +305,10 @@ public class CommandParser {
               state = State.RANGE_SHORT_PATTERN;
               reprocess = false;
             }
+            else if (ch == ',') {
+              location.append('.');
+              state = State.RANGE_MAYBE_DONE;
+            }
             else if (ch == '/' || ch == '?') {
               location.append(ch);
               patternType = ch;
@@ -326,13 +327,12 @@ public class CommandParser {
             if (ch == '/' || ch == '?' || ch == '&') {
               location.append(ch);
               state = State.RANGE_PATTERN_MAYBE_DONE;
-              reprocess = false;
             }
             else {
               error = MessageHelper.message(Msg.e_backslash);
               state = State.ERROR;
-              reprocess = false;
             }
+            reprocess = false;
             break;
           case RANGE_PATTERN: // Reading a pattern range
             // No trailing / or ? required if there is no command so look for newline to tell us we are done
@@ -556,8 +556,8 @@ public class CommandParser {
     if (handlerHolder.getNames() != null) {
       names = CommandDefinitionKt.commands(handlerHolder.getNames().split(","));
     }
-    else if (handlerHolder.getHandler() instanceof ComplicatedNameExCommand) {
-      names = ((ComplicatedNameExCommand)handlerHolder.getHandler()).getNames();
+    else if (handlerHolder.getInstance() instanceof ComplicatedNameExCommand) {
+      names = ((ComplicatedNameExCommand)handlerHolder.getInstance()).getNames();
     }
     else {
       throw new RuntimeException("Cannot create an ex command: " + handlerHolder);

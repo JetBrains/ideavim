@@ -30,10 +30,10 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
-import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 
 /**
@@ -140,7 +140,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
           if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
             VimPlugin.getMark().saveJumpLocation(editor)
           }
-          if (!editor.mode.isEndAllowed) {
+          if (!editor.commandState.mode.isEndAllowed) {
             offset = EditorHelper.normalizeOffset(editor, offset, false)
           }
           preMove(editor, context, cmd)
@@ -179,7 +179,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
         VimPlugin.getMark().saveJumpLocation(editor)
       }
-      if (!editor.mode.isEndAllowed) {
+      if (!editor.commandState.mode.isEndAllowed) {
         offset = EditorHelper.normalizeOffset(editor, offset, false)
       }
       preMove(editor, caret, context, cmd)
@@ -195,10 +195,11 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       val caretToDelete = event.caret ?: return
       if (editor.inVisualMode) {
         for (caret in editor.caretModel.allCarets) {
-          if (caretToDelete.selectionStart < caret.selectionEnd &&
-            caretToDelete.selectionStart >= caret.selectionStart ||
-            caretToDelete.selectionEnd <= caret.selectionEnd &&
-            caretToDelete.selectionEnd > caret.selectionStart) {
+          val curCaretStart = caret.selectionStart
+          val curCaretEnd = caret.selectionEnd
+          val caretStartBetweenCur = caretToDelete.selectionStart in curCaretStart until curCaretEnd
+          val caretEndBetweenCur = caretToDelete.selectionEnd in curCaretStart + 1..curCaretEnd
+          if (caretStartBetweenCur || caretEndBetweenCur) {
             // Okay, caret is being removed because of merging
             val vimSelectionStart = caretToDelete.vimSelectionStart
             caret.vimSelectionStart = vimSelectionStart

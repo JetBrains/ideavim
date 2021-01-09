@@ -32,7 +32,7 @@ import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.helper.TestInputModel;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.option.ToggleOption;
-import com.maddyhome.idea.vim.ui.ExEntryPanel;
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -89,7 +89,7 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
   protected Editor typeText(@NotNull List<KeyStroke> keys) {
     final Editor editor = myFixture.getEditor();
     final KeyHandler keyHandler = KeyHandler.getInstance();
-    final EditorDataContext dataContext = new EditorDataContext(editor);
+    final EditorDataContext dataContext = new EditorDataContext(editor, null);
     final Project project = myFixture.getProject();
     TestInputModel.getInstance(editor).setKeyStrokes(keys);
     RunnableHelper.runWriteCommand(project, () -> {

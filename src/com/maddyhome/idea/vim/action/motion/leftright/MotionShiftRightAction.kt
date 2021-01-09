@@ -36,7 +36,7 @@ class MotionShiftRightAction : ShiftedArrowKeyHandler() {
 
   override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
     editor.vimForEachCaret { caret ->
-      val vertical = VimPlugin.getMotion().moveCaretHorizontal(editor, caret, cmd.count, true)
+      val vertical = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, cmd.count, true)
       MotionGroup.moveCaret(editor, caret, vertical)
     }
   }

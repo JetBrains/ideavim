@@ -2,17 +2,29 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-      <ul>
-        <li>vim-highlightedyank plugin emulation</li>
-        <li>:tabclose command</li>
-        <li>Fix zR command</li>
-        <li>Fix macro editing</li>
-      </ul>
-      <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
-    ]]></change-notes>
+    <h3>Merged PRs:</h3>
+    <ul>
+    <li>
+      <a href="https://github.com/JetBrains/ideavim/pull/260">260</a>
+      by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Refactor SearchGroup
+    </li>
+    </ul>
+
+    <h3>Fixes:</h3>
+    <ul>
+    <li>
+      <a href="https://youtrack.jetbrains.com/issue/VIM-2194">VIM-2194</a>
+      Fix caret shape during editing a new file
+    </li>
+    </ul>
+  ]]>
+  </change-notes>
   <description><![CDATA[
-      <p>Vim emulation plug-in for IDEs based on the IntelliJ platform.</p>
-      <p>IdeaVim supports many Vim features including normal/insert/visual modes, motion keys, deletion/changing, marks, registers, some Ex commands, Vim regexps, configuration via ~/.ideavimrc, macros, window commands, etc.</p>
+      <p>Vim emulation plugin for IntelliJ Platform-based IDEs.</p>
+      <br/>
+      <p>IdeaVim supports many Vim features including normal/insert/visual modes, motion keys, deletion/changing,
+      marks, registers, some Ex commands, Vim regexps, configuration via ~/.ideavimrc, macros, Vim plugins, etc.</p>
+      <br/>
       <p>See also:</p>
       <ul>
         <li><a href="https://github.com/JetBrains/ideavim">GitHub repository</a>: documentation and contributing</li>
@@ -24,11 +36,11 @@
 
   <!-- Please search for "[VERSION UPDATE]" in project in case you update the since-build version -->
   <!-- Check for [Version Update] tag in YouTrack as well -->
-  <idea-version since-build="201.5985.32"/>
+  <idea-version since-build="202.5103.13"/>
 
   <!-- Mark the plugin as compatible with RubyMine and other products based on the IntelliJ platform -->
   <depends>com.intellij.modules.lang</depends>
-  <resource-bundle xmlns="">messages</resource-bundle>
+  <resource-bundle>messages.IdeaVimBundle</resource-bundle>
 
   <application-components>
     <component>
@@ -37,7 +49,10 @@
   </application-components>
 
   <extensionPoints>
-    <extensionPoint name="vimExtension" interface="com.maddyhome.idea.vim.extension.VimExtension" dynamic="true"/>
+    <extensionPoint name="vimExtension" beanClass="com.maddyhome.idea.vim.extension.ExtensionBeanClass" dynamic="true">
+      <with attribute="implementation" implements="com.maddyhome.idea.vim.extension.VimExtension"/>
+
+    </extensionPoint>
 
     <!--    For internal use only -->
     <extensionPoint name="vimExCommand" beanClass="com.maddyhome.idea.vim.ex.ExBeanClass" dynamic="true">
@@ -55,7 +70,6 @@
     <statusBarWidgetFactory implementation="com.maddyhome.idea.vim.ui.StatusBarIconFactory"/>
     <statusBarWidgetFactory implementation="com.maddyhome.idea.vim.ui.ShowCmdStatusBarWidgetFactory" order="first"/>
 
-    <applicationService serviceImplementation="com.maddyhome.idea.vim.config.VimLocalConfig"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.VimPlugin"/>
 
     <!-- Initialise as early as possible so that we're ready to edit quickly. This is especially important for Rider,
@@ -72,13 +86,14 @@
   <xi:include href="/META-INF/includes/VimExtensions.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/includes/VimListeners.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
-  <actions>
+  <actions resource-bundle="messages.IdeaVimBundle">
     <action id="VimPluginToggle" class="com.maddyhome.idea.vim.action.VimPluginToggleAction">
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>
 
     <!-- Internal -->
-    <action id="VimInternalAddInlays" class="com.maddyhome.idea.vim.action.internal.AddInlaysAction" text="Add Test Inlays | IdeaVim Internal" internal="true"/>
+    <action id="VimInternalAddBlockInlays" class="com.maddyhome.idea.vim.action.internal.AddBlockInlaysAction" text="Add Test Block Inlays | IdeaVim Internal" internal="true"/>
+    <action id="VimInternalAddInlineInlays" class="com.maddyhome.idea.vim.action.internal.AddInlineInlaysAction" text="Add Test Inline Inlays | IdeaVim Internal" internal="true"/>
 
     <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction"/>
     <action id="VimActions" class="com.maddyhome.idea.vim.ui.VimActions"/>
@@ -97,8 +112,6 @@
       </action>
     </group>
 
-    <action id="VimFindActionIdAction"
-            class="com.maddyhome.idea.vim.listener.FindActionIdAction" text="Track Action Ids"
-            description="Starts tracking ids of executed actions"/>
+    <action id="VimFindActionIdAction" class="com.maddyhome.idea.vim.listener.FindActionIdAction"/>
   </actions>
 </idea-plugin>

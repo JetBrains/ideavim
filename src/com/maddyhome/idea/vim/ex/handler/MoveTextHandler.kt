@@ -36,7 +36,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.fileSize
-import java.util.*
 import kotlin.math.min
 
 class MoveTextHandler : CommandHandler.SingleExecution() {
@@ -74,7 +73,15 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
       val text = texts[i]
 
       val textData = PutData.TextData(text, SelectionType.LINE_WISE, emptyList())
-      val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, _indent = true, caretAfterInsertedText = false, putToLine = line)
+      val putData = PutData(
+        textData,
+        null,
+        1,
+        insertTextBeforeCaret = false,
+        rawIndent = true,
+        caretAfterInsertedText = false,
+        putToLine = line
+      )
       VimPlugin.getPut().putTextForCaret(editor, caret, context, putData)
     }
 
@@ -82,8 +89,10 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
   }
 
   @Throws
-  private fun normalizeLine(editor: Editor, caret: Caret, command: ExCommand,
-                            lineRange: LineRange): Int {
+  private fun normalizeLine(
+    editor: Editor, caret: Caret, command: ExCommand,
+    lineRange: LineRange
+  ): Int {
     var line = command.ranges.getFirstLine(editor, caret)
     val adj = lineRange.endLine - lineRange.startLine + 1
     if (line >= lineRange.endLine)

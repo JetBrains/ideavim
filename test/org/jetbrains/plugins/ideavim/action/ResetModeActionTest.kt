@@ -47,6 +47,22 @@ class ResetModeActionTest : VimTestCase() {
     TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
   }
 
+  fun `test reset from insert mode check position`() {
+    val keys = listOf("i", "<C-\\><C-N>")
+    val before = "A Disc${c}overy"
+    val after = "A Dis${c}covery"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
+  }
+
+  fun `test reset and execute command`() {
+    val keys = listOf("i", "<C-\\><C-N>", "3l")
+    val before = "${c}A Discovery"
+    val after = "A D${c}iscovery"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    TestCase.assertFalse(myFixture.editor.selectionModel.hasSelection())
+  }
+
   fun `test reset from visual mode`() {
     val keys = listOf("V", "<C-\\><C-N>")
     val before = "A Discovery"

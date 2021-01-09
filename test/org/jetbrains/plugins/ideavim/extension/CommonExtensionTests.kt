@@ -18,11 +18,15 @@
 
 package org.jetbrains.plugins.ideavim.extension
 
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
+import com.maddyhome.idea.vim.extension.Alias
+import com.maddyhome.idea.vim.extension.ExtensionBeanClass
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
@@ -38,48 +42,63 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class OpMappingTest : VimTestCase() {
   private var initialized = false
 
-  private val extension = TestExtension()
+  private lateinit var extension: ExtensionBeanClass
 
   override fun setUp() {
     super.setUp()
     if (!initialized) {
       initialized = true
-      @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
-      VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
+
+      extension = TestExtension.createBean()
+
+      VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
       enableExtensions("TestExtension")
     }
   }
 
+  override fun tearDown() {
+    @Suppress("DEPRECATION")
+    VimExtension.EP_NAME.point.unregisterExtension(extension)
+    super.tearDown()
+  }
+
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test simple delete`() {
-    doTest("dI",
+    doTest(
+      "dI",
       "${c}I found it in a legendary land",
       "${c}nd it in a legendary land",
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test simple delete backwards`() {
-    doTest("dP",
+    doTest(
+      "dP",
       "I found ${c}it in a legendary land",
       "I f${c}it in a legendary land",
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test delete emulate inclusive`() {
-    doTest("dU",
+    doTest(
+      "dU",
       "${c}I found it in a legendary land",
       "${c}d it in a legendary land",
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test linewise delete`() {
-    doTest("dO",
+    doTest(
+      "dO",
       """
                 A Discovery
 
@@ -95,7 +114,8 @@ class OpMappingTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   fun `test disable extension via set`() {
@@ -117,15 +137,14 @@ class OpMappingTest : VimTestCase() {
     typeText(parseKeys("Q"))
     myFixture.checkResult("I${c} found it in a legendary land")
 
-    @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
-    VimExtension.EP_NAME.getPoint(null).unregisterExtension(TestExtension::class.java)
-    assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.owner))
+    @Suppress("DEPRECATION")
+    VimExtension.EP_NAME.point.unregisterExtension(extension)
+    assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
     typeText(parseKeys("Q"))
     myFixture.checkResult("I${c} found it in a legendary land")
 
-    @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
-    VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
-    assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.owner))
+    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
+    assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
     enableExtensions("TestExtension")
     typeText(parseKeys("Q"))
     myFixture.checkResult("I ${c}found it in a legendary land")
@@ -137,25 +156,84 @@ class OpMappingTest : VimTestCase() {
     myFixture.checkResult("I${c} found it in a legendary land")
 
     enterCommand("set noTestExtension")
-    @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
-    VimExtension.EP_NAME.getPoint(null).unregisterExtension(TestExtension::class.java)
+    @Suppress("DEPRECATION")
+    VimExtension.EP_NAME.point.unregisterExtension(extension)
     typeText(parseKeys("Q"))
     myFixture.checkResult("I${c} found it in a legendary land")
 
-    @Suppress("DEPRECATION") // [VERSION UPDATE] 202+
-    VimExtension.EP_NAME.getPoint(null).registerExtension(extension)
+    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
     enableExtensions("TestExtension")
     typeText(parseKeys("Q"))
     myFixture.checkResult("I ${c}found it in a legendary land")
   }
 }
 
+class PlugExtensionsTest : VimTestCase() {
+
+  private lateinit var extension: ExtensionBeanClass
+
+  override fun setUp() {
+    super.setUp()
+
+    extension = TestExtension.createBean()
+    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
+  }
+
+  override fun tearDown() {
+    @Suppress("DEPRECATION")
+    VimExtension.EP_NAME.point.unregisterExtension(extension)
+    super.tearDown()
+  }
+
+  fun `test enable via plug`() {
+    VimScriptParser.executeText("Plug 'MyTest'")
+
+    assertTrue(extension.ext.initialized)
+  }
+
+  fun `test enable via plugin`() {
+    VimScriptParser.executeText("Plugin 'MyTest'")
+
+    assertTrue(extension.ext.initialized)
+  }
+
+  fun `test enable via plug and disable via set`() {
+    VimScriptParser.executeText(
+      "Plug 'MyTest'",
+      "set noTestExtension"
+    )
+
+    assertTrue(extension.ext.initialized)
+    assertTrue(extension.ext.disposed)
+  }
+}
+
+private val ExtensionBeanClass.ext: TestExtension
+  get() = this.instance as TestExtension
+
 private class TestExtension : VimExtension {
+
+  var initialized = false
+  var disposed = false
+
   override fun getName(): String = "TestExtension"
 
   override fun init() {
-    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionEmulateInclusive"), owner, MoveEmulateInclusive(), false)
-    putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionBackwardsCharacter"), owner, MoveBackwards(), false)
+    initialized = true
+    putExtensionHandlerMapping(
+      MappingMode.O,
+      parseKeys("<Plug>TestExtensionEmulateInclusive"),
+      owner,
+      MoveEmulateInclusive(),
+      false
+    )
+    putExtensionHandlerMapping(
+      MappingMode.O,
+      parseKeys("<Plug>TestExtensionBackwardsCharacter"),
+      owner,
+      MoveBackwards(),
+      false
+    )
     putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionCharacter"), owner, Move(), false)
     putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionLinewise"), owner, MoveLinewise(), false)
     putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>TestMotion"), owner, MoveLinewiseInNormal(), false)
@@ -167,11 +245,16 @@ private class TestExtension : VimExtension {
     putKeyMapping(MappingMode.N, parseKeys("Q"), owner, parseKeys("<Plug>TestMotion"), true)
   }
 
+  override fun dispose() {
+    disposed = true
+    super.dispose()
+  }
+
   private class MoveEmulateInclusive : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
       VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
       val caret = editor.caretModel.currentCaret
-      val newOffset = VimPlugin.getMotion().moveCaretHorizontal(editor, caret, 5, editor.mode.isEndAllowed)
+      val newOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, 5, editor.mode.isEndAllowed)
       MotionGroup.moveCaret(editor, caret, newOffset)
     }
   }
@@ -200,8 +283,18 @@ private class TestExtension : VimExtension {
   private class MoveLinewiseInNormal : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
       val caret = editor.caretModel.currentCaret
-      val newOffset = VimPlugin.getMotion().moveCaretHorizontal(editor, caret, 1, true)
+      val newOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, 1, true)
       MotionGroup.moveCaret(editor, caret, newOffset)
+    }
+  }
+
+  companion object {
+    fun createBean(): ExtensionBeanClass {
+      val beanClass = ExtensionBeanClass()
+      beanClass.implementation = TestExtension::class.java.canonicalName
+      beanClass.aliases = listOf(Alias().also { it.name = "MyTest" })
+      beanClass.pluginDescriptor = PluginManagerCore.getPlugin(VimPlugin.getPluginId())!!
+      return beanClass
     }
   }
 }

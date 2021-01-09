@@ -38,10 +38,12 @@ class YankVisualLinesAction : VisualOperatorActionHandler.SingleExecution() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_EXIT_VISUAL)
 
-  override fun executeForAllCarets(editor: Editor,
-                                   context: DataContext,
-                                   cmd: Command,
-                                   caretsAndSelections: Map<Caret, VimSelection>): Boolean {
+  override fun executeForAllCarets(
+    editor: Editor,
+    context: DataContext,
+    cmd: Command,
+    caretsAndSelections: Map<Caret, VimSelection>
+  ): Boolean {
     val selections = caretsAndSelections.values
     val starts: MutableList<Int> = ArrayList()
     val ends: MutableList<Int> = ArrayList()
@@ -54,7 +56,8 @@ class YankVisualLinesAction : VisualOperatorActionHandler.SingleExecution() {
     val startsArray = starts.toIntArray()
     val endsArray = ends.toIntArray()
 
-    val selection = if (vimSelection.type == SelectionType.BLOCK_WISE) SelectionType.BLOCK_WISE else SelectionType.LINE_WISE
+    val selection =
+      if (vimSelection.type == SelectionType.BLOCK_WISE) SelectionType.BLOCK_WISE else SelectionType.LINE_WISE
     return VimPlugin.getYank().yankRange(editor, TextRange(startsArray, endsArray), selection, true)
   }
 }

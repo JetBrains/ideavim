@@ -28,9 +28,11 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
+import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -102,6 +104,24 @@ public class ExOutputPanel extends JPanel {
     return panel;
   }
 
+  private static int countLines(@NotNull String text) {
+    if (text.length() == 0) {
+      return 0;
+    }
+
+    int count = 0;
+    int pos = -1;
+    while ((pos = text.indexOf('\n', pos + 1)) != -1) {
+      count++;
+    }
+
+    if (text.charAt(text.length() - 1) != '\n') {
+      count++;
+    }
+
+    return count;
+  }
+
   // Called automatically when the LAF is changed and the component is visible, and manually by the LAF listener handler
   @Override
   public void updateUI() {
@@ -119,7 +139,7 @@ public class ExOutputPanel extends JPanel {
     }
   }
 
-  public void setText(@NotNull String data) {
+  public void setText(@NotNull @Nls(capitalization = Nls.Capitalization.Sentence) String data) {
     if (data.length() > 0 && data.charAt(data.length() - 1) == '\n') {
       data = data.substring(0, data.length() - 1);
     }
@@ -194,24 +214,6 @@ public class ExOutputPanel extends JPanel {
     myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
   }
 
-  private static int countLines(@NotNull String text) {
-    if (text.length() == 0) {
-      return 0;
-    }
-
-    int count = 0;
-    int pos = -1;
-    while ((pos = text.indexOf('\n', pos + 1)) != -1) {
-      count++;
-    }
-
-    if (text.charAt(text.length() - 1) != '\n') {
-      count++;
-    }
-
-    return count;
-  }
-
   private void scrollLine() {
     scrollOffset(myLineHeight);
   }
@@ -236,7 +238,7 @@ public class ExOutputPanel extends JPanel {
   }
 
   private void badKey() {
-    myLabel.setText("-- MORE -- (RET: line, SPACE: page, d: half page, q: quit)");
+    myLabel.setText(MessageHelper.message("more.ret.line.space.page.d.half.page.q.quit"));
     myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
   }
 
@@ -248,11 +250,11 @@ public class ExOutputPanel extends JPanel {
     if (val + more >=
         myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount()) {
       myAtEnd = true;
-      myLabel.setText("Hit ENTER or type command to continue");
+      myLabel.setText(MessageHelper.message("hit.enter.or.type.command.to.continue"));
       myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
     }
     else {
-      myLabel.setText("-- MORE --");
+      myLabel.setText(MessageHelper.message("ex.output.panel.more"));
       myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
     }
   }
@@ -302,7 +304,7 @@ public class ExOutputPanel extends JPanel {
         final KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
         final List<KeyStroke> keys = new ArrayList<>(1);
         keys.add(key);
-        VimPlugin.getMacro().playbackKeys(myEditor, new EditorDataContext(myEditor), project, keys, 0, 0, 1);
+        VimPlugin.getMacro().playbackKeys(myEditor, new EditorDataContext(myEditor, null), project, keys, 0, 0, 1);
       }
     });
   }
@@ -331,13 +333,11 @@ public class ExOutputPanel extends JPanel {
             myExOutputPanel.scrollHalfPage();
             break;
           case 'q':
+          case '\u001b':
             myExOutputPanel.close();
             break;
           case '\n':
             myExOutputPanel.handleEnter();
-            break;
-          case '\u001b':
-            myExOutputPanel.close();
             break;
           case KeyEvent.CHAR_UNDEFINED: {
             switch (e.getKeyCode()) {

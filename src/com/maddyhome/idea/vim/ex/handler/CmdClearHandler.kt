@@ -22,12 +22,15 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandler.Access.READ_ONLY
+import com.maddyhome.idea.vim.ex.CommandHandler.ArgumentFlag.ARGUMENT_FORBIDDEN
+import com.maddyhome.idea.vim.ex.CommandHandler.RangeFlag.RANGE_FORBIDDEN
 import com.maddyhome.idea.vim.ex.CommandHandlerFlags
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
 
 class CmdClearHandler : CommandHandler.SingleExecution() {
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags = flags(RANGE_FORBIDDEN, ARGUMENT_FORBIDDEN, READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     VimPlugin.getCommand().resetAliases()

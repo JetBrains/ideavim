@@ -23,12 +23,16 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.CommandFlags.FLAG_EXIT_VISUAL
+import com.maddyhome.idea.vim.command.CommandFlags.FLAG_MOT_LINEWISE
+import com.maddyhome.idea.vim.command.CommandFlags.FLAG_MULTIKEY_UNDO
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.helper.fileSize
 import java.util.*
 
 /**
@@ -37,16 +41,22 @@ import java.util.*
 class ChangeVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_MULTIKEY_UNDO, CommandFlags.FLAG_EXIT_VISUAL)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_MOT_LINEWISE, FLAG_MULTIKEY_UNDO, FLAG_EXIT_VISUAL)
 
-  override fun executeAction(editor: Editor,
-                             caret: Caret,
-                             context: DataContext,
-                             cmd: Command,
-                             range: VimSelection): Boolean {
+  override fun executeAction(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    range: VimSelection
+  ): Boolean {
     val textRange = range.toVimTextRange(true)
-    val lineRange = TextRange(EditorHelper.getLineStartForOffset(editor, textRange.startOffset),
-      EditorHelper.getLineEndForOffset(editor, textRange.endOffset) + 1)
+    val lineEndForOffset = EditorHelper.getLineEndForOffset(editor, textRange.endOffset)
+    val endsWithNewLine = if (lineEndForOffset == editor.fileSize) 0 else 1
+    val lineRange = TextRange(
+      EditorHelper.getLineStartForOffset(editor, textRange.startOffset),
+      lineEndForOffset + endsWithNewLine
+    )
     return VimPlugin.getChange().changeRange(editor, caret, lineRange, SelectionType.LINE_WISE, context)
   }
 }

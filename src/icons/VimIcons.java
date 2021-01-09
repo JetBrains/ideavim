@@ -1,12 +1,13 @@
 package icons;
 
 import com.intellij.ui.IconManager;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
 public final class VimIcons {
-  private static @NotNull Icon load(@NotNull String path) {
+  private static @NotNull Icon load(@NotNull @NonNls String path) {
     return IconManager.getInstance().getIcon(path, VimIcons.class);
   }
 

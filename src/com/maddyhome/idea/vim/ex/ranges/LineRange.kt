@@ -21,6 +21,7 @@ class LineRange(startLine: Int, endLine: Int) {
 
   @JvmField
   val startLine: Int
+
   @JvmField
   val endLine: Int
 

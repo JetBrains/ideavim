@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.SelectionType.CHARACTER_WISE
 import com.maddyhome.idea.vim.command.SelectionType.LINE_WISE
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.EditorHelper
+import org.jetbrains.annotations.NonNls
 import kotlin.math.max
 import kotlin.math.min
 
@@ -68,6 +69,7 @@ sealed class VimSelection {
     }
   }
 
+  @NonNls
   override fun toString(): String {
     val startLogPosition = editor.offsetToLogicalPosition(vimStart)
     val endLogPosition = editor.offsetToLogicalPosition(vimEnd)
@@ -106,11 +108,18 @@ sealed class VimSimpleSelection : VimSelection() {
     /**
      * Create character- and linewise selection if native selection is already known. Doesn't work for block selection
      */
-    fun createWithNative(vimStart: Int, vimEnd: Int, nativeStart: Int, nativeEnd: Int, type: SelectionType, editor: Editor) =
+    fun createWithNative(
+      vimStart: Int,
+      vimEnd: Int,
+      nativeStart: Int,
+      nativeEnd: Int,
+      type: SelectionType,
+      editor: Editor
+    ) =
       when (type) {
         CHARACTER_WISE -> VimCharacterSelection(vimStart, vimEnd, nativeStart, nativeEnd, editor)
         LINE_WISE -> VimLineSelection(vimStart, vimEnd, nativeStart, nativeEnd, editor)
-        BLOCK_WISE -> throw RuntimeException("This method works only for line and character selection")
+        BLOCK_WISE -> error("This method works only for line and character selection")
       }
   }
 }
@@ -152,7 +161,7 @@ class VimBlockSelection(
   override val vimStart: Int,
   override val vimEnd: Int,
   override val editor: Editor,
-  val toLineEnd: Boolean
+  private val toLineEnd: Boolean
 ) : VimSelection() {
   override fun getNativeStartAndEnd() = blockToNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL).let {
     editor.logicalPositionToOffset(it.first) to editor.logicalPositionToOffset(it.second)
@@ -172,7 +181,8 @@ class VimBlockSelection(
 
   private fun forEachLine(action: (start: Int, end: Int) -> Unit) {
     val (logicalStart, logicalEnd) = blockToNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL)
-    val lineRange = if (logicalStart.line > logicalEnd.line) logicalEnd.line..logicalStart.line else logicalStart.line..logicalEnd.line
+    val lineRange =
+      if (logicalStart.line > logicalEnd.line) logicalEnd.line..logicalStart.line else logicalStart.line..logicalEnd.line
     lineRange.map { line ->
       val start = editor.logicalPositionToOffset(LogicalPosition(line, logicalStart.column))
       val end = if (toLineEnd) {

@@ -76,11 +76,12 @@ abstract class ShiftedArrowKeyHandler : VimActionHandler.SingleExecution() {
   final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val keymodelOption = OptionsManager.keymodel
     val startSel = KeyModelOptionData.startsel in keymodelOption
-    val continueselect = KeyModelOptionData.continueselect in keymodelOption
-    val continuevisual = KeyModelOptionData.continuevisual in keymodelOption
     val inVisualMode = editor.inVisualMode
     val inSelectMode = editor.inSelectMode
-    if (startSel || continueselect && inSelectMode || continuevisual && inVisualMode) {
+
+    val continueSelectSelection = KeyModelOptionData.continueselect in keymodelOption && inSelectMode
+    val continueVisualSelection = KeyModelOptionData.continuevisual in keymodelOption && inVisualMode
+    if (startSel || continueSelectSelection || continueVisualSelection) {
       if (!inVisualMode && !inSelectMode) {
         if (SelectModeOptionData.key in OptionsManager.selectmode) {
           VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)

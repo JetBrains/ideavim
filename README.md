@@ -11,7 +11,7 @@ IdeaVim
 [![Gitter][gitter-svg]][gitter]
 [![Twitter][twitter-svg]][twitter]
 
-IdeaVim is a Vim emulation plugin for IDEs based on the IntelliJ Platform.
+IdeaVim is a Vim emulation plugin for IntelliJ Platform-based IDEs.
 
 ##### Contact maintainers:
 * [Bug tracker](https://youtrack.jetbrains.com/issues/VIM)
@@ -144,28 +144,45 @@ set idearefactormode=keep
 map <leader>f <Plug>(easymotion-s)
 map <leader>e <Plug>(easymotion-f)
 
-map <leader>d :action Debug<CR>
-map <leader>r :action RenameElement<CR>
-map <leader>c :action Stop<CR>
-map <leader>z :action ToggleDistractionFreeMode<CR>
+map <leader>d <Action>(Debug)
+map <leader>r <Action>(RenameElement)
+map <leader>c <Action>(Stop)
+map <leader>z <Action>(ToggleDistractionFreeMode)
 
-map <leader>s :action SelectInProjectView<CR>
-map <leader>a :action Annotate<CR>
-map <leader>h :action Vcs.ShowTabbedFileHistory<CR>
-map <S-Space> :action GotoNextError<CR>
+map <leader>s <Action>(SelectInProjectView)
+map <leader>a <Action>(Annotate)
+map <leader>h <Action>(Vcs.ShowTabbedFileHistory)
+map <S-Space> <Action>(GotoNextError)
 
-map <leader>b :action ToggleLineBreakpoint<CR>
-map <leader>o :action FileStructurePopup<CR>
+map <leader>b <Action>(ToggleLineBreakpoint)
+map <leader>o <Action>(FileStructurePopup)
 ```
 </details>
 
+<details>
+<summary><strong>Suggested options</strong> (click to see)</summary>
+
+Here is also a list of the suggested options from [defaults.vim](https://github.com/vim/vim/blob/master/runtime/defaults.vim)
+
+```vim
+" Show a few lines of context around the cursor.  Note that this makes the
+" text scroll if you mouse-click near the start or end of the window.
+set scrolloff=5
+
+" Do incremental searching
+set incsearch
+
+" Don't use Ex mode, use Q for formatting.
+map Q gq
+```
+</details>
 
 
 You can read your `~/.vimrc` file from `~/.ideavimrc` with this command:
 
     source ~/.vimrc
 
-Please note that IdeaVim currently parses `~/.ideavimrc` & `~/.vimrc` files via simple pattern-matching.
+> :warning: Please note that IdeaVim currently parses `~/.ideavimrc` & `~/.vimrc` files via simple pattern-matching.
 See [VIM-669](https://youtrack.jetbrains.com/issue/VIM-669) for proper parsing
 of VimL files.
 
@@ -183,49 +200,42 @@ Emulated Vim Plugins
 
 See [doc/emulated-plugins.md](doc/emulated-plugins.md)
 
-Changes to the IDE
-------------------
+Executing IDE Actions
+---------------------
 
-### Executing IDE Actions
-
-IdeaVim adds two commands for listing and executing arbitrary IDE actions as
+IdeaVim adds various commands for listing and executing arbitrary IDE actions as
 Ex commands or via `:map` command mappings:
 
+**Executing actions:**
+* `:action {action_id}`
+    * Execute an action by id. Works from Ex command line.
+* `<Action>(*action_id*)`
+    * For the mappings you can use a special `<Action>` keyword. Don't forget the parentheses.
+
+**Finding actions:**
 * `:actionlist [pattern]`
-    * Find IDE actions by name or keymap pattern (E.g. `:actionlist extract`, `:actionlist <C-D`)
-* `:action {name}`
-    * Execute an action named `NAME`
+    * Find IDE actions by id or keymap pattern (E.g. `:actionlist extract`, `:actionlist <C-D`)
+    
+* In addition to `:actionlist` command, IdeaVim provides `IdeaVim: track action Ids` option to 
+extract the ids of executed command. This option can be found in "Search everywhere" (double `shift`).
+
+    <details>
+        <summary><strong>"Track action Ids" Details</strong> (click to see)</summary>
+        <img src="resources/readme/track_action_id.gif" alt="track action ids"/>
+    </details>
 
 Examples:
 
 ```vim
 " Map \r to the Reformat Code action
-:map \r :action ReformatCode<CR>
+:map \r <Action>(ReformatCode)
 
 " Map <leader>d to start debug
-:map <leader>d :action Debug<CR>
+:map <leader>d <Action>(Debug)
 
 " Map \b to toggle the breakpoint on the current line
-:map \b :action ToggleLineBreakpoint<CR>
+:map \b <Action>(ToggleLineBreakpoint)
 ```
-
-### Undo/Redo
-
-The IdeaVim plugin uses the undo/redo functionality of the IntelliJ Platform,
-so the behavior of the `u` and `<C-R>` commands may differ from the original
-Vim. Vim compatibility of undo/redo may be improved in future releases.
-
-See also [unresolved undo issues](https://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+u).
-
-### Escape
-
-Using `<Esc>` in dialog windows remains problematic. For most dialog windows,
-the Vim emulator is put into insert mode with `<Esc>` not working. You
-should use `<C-c>` or `<C-[>` instead. In some dialog windows, the normal mode is
-switched by default. The usage of the Vim emulator in dialog windows is an area for
-improvement.
-
-See also [unresolved escape issues](https://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+i_Esc).
 
 :gem: Contributing
 ------------

@@ -90,6 +90,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
   }
 
 /*
+[VERSION UPDATE] 203+
   fun `test on empty file`() {
     doTest("<C-V>", "", "",
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)

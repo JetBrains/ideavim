@@ -47,6 +47,7 @@ import com.maddyhome.idea.vim.key.*;
 import kotlin.Pair;
 import kotlin.text.StringsKt;
 import org.jdom.Element;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,9 +66,9 @@ import static java.util.stream.Collectors.toList;
  */
 @State(name = "VimKeySettings", storages = {@Storage(value = "$APP_CONFIG$/vim_settings.xml")})
 public class KeyGroup implements PersistentStateComponent<Element> {
-  public static final String SHORTCUT_CONFLICTS_ELEMENT = "shortcut-conflicts";
-  private static final String SHORTCUT_CONFLICT_ELEMENT = "shortcut-conflict";
-  private static final String OWNER_ATTRIBUTE = "owner";
+  public static final @NonNls String SHORTCUT_CONFLICTS_ELEMENT = "shortcut-conflicts";
+  private static final @NonNls String SHORTCUT_CONFLICT_ELEMENT = "shortcut-conflict";
+  private static final @NonNls String OWNER_ATTRIBUTE = "owner";
   private static final String TEXT_ELEMENT = "text";
 
   private static final Logger logger = Logger.getInstance(KeyGroup.class);
@@ -105,15 +106,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
       builder.append(" ");
       builder.append(mappingInfo.isRecursive() ? " " : "*");
       builder.append(" ");
-      if (mappingInfo instanceof ToKeysMappingInfo) {
-        List<KeyStroke> toKeys = ((ToKeysMappingInfo)mappingInfo).getToKeys();
-        builder.append(toKeyNotation(toKeys));
-      }
-      else if (mappingInfo instanceof ToHandlerMappingInfo) {
-        final VimExtensionHandler extensionHandler = ((ToHandlerMappingInfo)mappingInfo).getExtensionHandler();
-        builder.append("call ");
-        builder.append(extensionHandler.getClass().getCanonicalName());
-      }
+      builder.append(mappingInfo.getPresentableString());
       builder.append("\n");
     }
     ExOutputModel.getInstance(editor).output(builder.toString());
@@ -123,6 +116,14 @@ public class KeyGroup implements PersistentStateComponent<Element> {
   public void removeKeyMapping(@NotNull MappingOwner owner) {
     Arrays.stream(MappingMode.values()).map(this::getKeyMapping).forEach(o -> o.delete(owner));
     unregisterKeyMapping(owner);
+  }
+
+  public void removeKeyMapping(@NotNull Set<MappingMode> modes, @NotNull List<KeyStroke> keys) {
+    modes.stream().map(this::getKeyMapping).forEach(o -> o.delete(keys));
+  }
+
+  public void removeKeyMapping(@NotNull Set<MappingMode> modes) {
+    modes.stream().map(this::getKeyMapping).forEach(KeyMapping::delete);
   }
 
   public void putKeyMapping(@NotNull Set<MappingMode> modes,
@@ -306,17 +307,17 @@ public class KeyGroup implements PersistentStateComponent<Element> {
 
   public void registerCommandAction(@NotNull ActionBeanClass actionHolder) {
 
-    if (!VimPlugin.getPluginId().equals(actionHolder.getPluginId())) {
+    if (!VimPlugin.getPluginId().equals(actionHolder.getPluginDescriptor().getPluginId())) {
       logger.error("IdeaVim doesn't accept contributions to `vimActions` extension points. " +
                    "Please create a plugin using `VimExtension`. " +
                    "Plugin to blame: " +
-                   actionHolder.getPluginId());
+                   actionHolder.getPluginDescriptor().getPluginId());
       return;
     }
 
     Set<List<KeyStroke>> actionKeys = actionHolder.getParsedKeys();
     if (actionKeys == null) {
-      final EditorActionHandlerBase action = actionHolder.getAction();
+      final EditorActionHandlerBase action = actionHolder.getInstance();
       if (action instanceof ComplicatedKeysAction) {
         actionKeys = ((ComplicatedKeysAction)action).getKeyStrokesSet();
       }
@@ -336,7 +337,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
         prefixes = new HashMap<>();
       }
       for (List<KeyStroke> keys : actionKeys) {
-        checkCommand(actionModes, actionHolder.getAction(), keys);
+        checkCommand(actionModes, actionHolder.getInstance(), keys);
       }
     }
 
@@ -475,7 +476,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
     return rows;
   }
 
-  private static @NotNull String getModesStringCode(@NotNull Set<MappingMode> modes) {
+  private static @NotNull @NonNls String getModesStringCode(@NotNull Set<MappingMode> modes) {
     if (modes.equals(MappingMode.NVO)) {
       return "";
     }
@@ -506,8 +507,8 @@ public class KeyGroup implements PersistentStateComponent<Element> {
           if (action instanceof VimShortcutKeyAction) {
             continue;
           }
-          final com.intellij.openapi.actionSystem.Shortcut[] shortcuts = action.getShortcutSet().getShortcuts();
-          for (com.intellij.openapi.actionSystem.Shortcut shortcut : shortcuts) {
+          final Shortcut[] shortcuts = action.getShortcutSet().getShortcuts();
+          for (Shortcut shortcut : shortcuts) {
             if (shortcut.isKeyboard() && shortcut.startsWith(keyStrokeShortcut) && !results.contains(action)) {
               results.add(action);
             }
@@ -533,7 +534,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
   @Nullable
   @Override
   public Element getState() {
-    Element element = new Element("key");
+    @NonNls Element element = new Element("key");
     saveData(element);
     return element;
   }

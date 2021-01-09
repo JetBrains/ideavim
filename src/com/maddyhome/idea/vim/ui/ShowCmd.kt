@@ -1,6 +1,5 @@
 package com.maddyhome.idea.vim.ui
 
-import com.intellij.ide.lightEdit.LightEditCompatible
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.project.Project
@@ -13,16 +12,22 @@ import com.intellij.openapi.wm.impl.status.EditorBasedWidget
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.util.Consumer
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.option.OptionChangeListener
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.annotations.NonNls
 import java.awt.Component
 import java.awt.event.MouseEvent
 
 object ShowCmd {
   // https://github.com/vim/vim/blob/b376ace1aeaa7614debc725487d75c8f756dd773/src/vim.h#L1721
   private const val SHOWCMD_COLS = 10
+  @NonNls
   internal const val ID = "IdeaVim::ShowCmd"
+
+  // [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
+  @NonNls
   internal const val displayName = "IdeaVim showcmd"
 
   fun update() {
@@ -47,7 +52,7 @@ object ShowCmd {
   }
 }
 
-object ShowCmdOptionChangeListener: OptionChangeListener<Boolean> {
+object ShowCmdOptionChangeListener : OptionChangeListener<Boolean> {
   override fun valueChange(oldValue: Boolean?, newValue: Boolean?) {
     ShowCmd.update()
 
@@ -60,12 +65,14 @@ object ShowCmdOptionChangeListener: OptionChangeListener<Boolean> {
   }
 }
 
-class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory, LightEditCompatible {
+class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
   override fun getId() = ShowCmd.ID
 
   override fun getDisplayName(): String = ShowCmd.displayName
 
-  override fun disposeWidget(widget: StatusBarWidget) {}
+  override fun disposeWidget(widget: StatusBarWidget) {
+    // Nothing
+  }
 
   override fun isAvailable(project: Project): Boolean = OptionsManager.showcmd.isSet
 
@@ -88,17 +95,19 @@ class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory, LightEditCompatibl
 //
 // We only need to show partial commands, since the standard PositionPanel shows the other information already, with
 // the exception of "{lines}x{columns}" (it shows "x carets" instead)
-class Widget(project: Project) : EditorBasedWidget(project), StatusBarWidget.Multiframe, StatusBarWidget.TextPresentation {
+class Widget(project: Project) : EditorBasedWidget(project), StatusBarWidget.Multiframe,
+  StatusBarWidget.TextPresentation {
 
   override fun ID() = ShowCmd.ID
 
-  override fun getPresentation(): StatusBarWidget.WidgetPresentation? = this
+  override fun getPresentation(): StatusBarWidget.WidgetPresentation = this
 
   override fun getClickConsumer(): Consumer<MouseEvent>? = null
 
+  @VimNlsSafe
   override fun getTooltipText(): String {
     var count = ShowCmd.getFullText(this.editor)
-    if (!count.isBlank()) count = ": $count"
+    if (count.isNotBlank()) count = ": $count"
     return "${ShowCmd.displayName}$count"
   }
 

@@ -25,7 +25,9 @@
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.JoinLinesHandler" names="j[oin]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.JumpsHandler" names="ju[mps]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.LetHandler" names="let"/>
-    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.MapHandler"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.mapping.MapHandler"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.mapping.UnMapHandler"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.mapping.MapClearHandler"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.MarkHandler" names="ma[rk],k"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.MarksHandler" names="marks"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.MoveTextHandler" names="m[ove]"/>
@@ -64,5 +66,6 @@
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.TabCloseHandler" names="tabc[lose]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.BufferListHandler" names="buffers,ls,files"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.BufferHandler" names="b[uffer]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PlugHandler" names="Plug[in]"/>
   </extensions>
 </idea-plugin>

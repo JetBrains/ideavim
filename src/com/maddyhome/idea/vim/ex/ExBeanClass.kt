@@ -18,29 +18,23 @@
 
 package com.maddyhome.idea.vim.ex
 
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.extensions.AbstractExtensionPointBean
+import com.intellij.serviceContainer.BaseKeyedLazyInstance
 import com.intellij.util.xmlb.annotations.Attribute
 import com.maddyhome.idea.vim.VimPlugin
 
-// [Version Update] 202+
-@Suppress("DEPRECATION")
-class ExBeanClass : AbstractExtensionPointBean() {
+class ExBeanClass : BaseKeyedLazyInstance<CommandHandler>() {
   @Attribute("implementation")
   var implementation: String? = null
 
   @Attribute("names")
   var names: String? = null
 
-  val handler: CommandHandler by lazy {
-    this.instantiateClass<CommandHandler>(
-      implementation ?: "", ApplicationManager.getApplication().picoContainer)
-  }
+  override fun getImplementationClassName(): String? = implementation
 
   fun register() {
-    if (pluginId != VimPlugin.getPluginId()) {
-      logger<ExBeanClass>().error("IdeaVim doesn't accept contributions to `vimActions` extension points. Please create a plugin using `VimExtension`. Plugin to blame: $pluginId")
+    if (this.pluginDescriptor.pluginId != VimPlugin.getPluginId()) {
+      logger<ExBeanClass>().error("IdeaVim doesn't accept contributions to `vimActions` extension points. Please create a plugin using `VimExtension`. Plugin to blame: ${this.pluginDescriptor.pluginId}")
       return
     }
     CommandParser.getInstance().addHandler(this)

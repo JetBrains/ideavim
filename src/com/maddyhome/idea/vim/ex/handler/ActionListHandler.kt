@@ -23,17 +23,21 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandler.Access.READ_ONLY
+import com.maddyhome.idea.vim.ex.CommandHandler.ArgumentFlag.ARGUMENT_OPTIONAL
+import com.maddyhome.idea.vim.ex.CommandHandler.RangeFlag.RANGE_FORBIDDEN
 import com.maddyhome.idea.vim.ex.CommandHandlerFlags
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.StringHelper
 
 /**
  * @author smartbomb
  */
 class ActionListHandler : CommandHandler.SingleExecution() {
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags = flags(RANGE_FORBIDDEN, ARGUMENT_OPTIONAL, READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val lineSeparator = "\n"
@@ -52,7 +56,7 @@ class ActionListHandler : CommandHandler.SingleExecution() {
       .joinToString(lineSeparator)
 
 
-    ExOutputModel.getInstance(editor).output("--- Actions ---$lineSeparator$actions")
+    ExOutputModel.getInstance(editor).output(MessageHelper.message("ex.show.all.actions.0.1", lineSeparator, actions))
     return true
   }
 }

@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.ex.CommandParser
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
@@ -41,19 +42,27 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
     val application = ApplicationManager.getApplication()
     val res = Ref.create(false)
     when (reg) {
-        '@' -> {
-          application.runWriteAction { res.set(VimPlugin.getMacro().playbackLastRegister(editor, context, project, cmd.count)) }
+      '@' -> {
+        application.runWriteAction {
+          res.set(
+            VimPlugin.getMacro().playbackLastRegister(editor, context, project, cmd.count)
+          )
         }
-        ':' -> { // No write action
-          try {
-            res.set(CommandParser.getInstance().processLastCommand(editor, context, cmd.count))
-          } catch (e: ExException) {
-            res.set(false)
-          }
+      }
+      RegisterGroup.LAST_COMMAND_REGISTER -> { // No write action
+        try {
+          res.set(CommandParser.getInstance().processLastCommand(editor, context, cmd.count))
+        } catch (e: ExException) {
+          res.set(false)
         }
-        else -> {
-          application.runWriteAction { res.set(VimPlugin.getMacro().playbackRegister(editor, context, project, reg, cmd.count)) }
+      }
+      else -> {
+        application.runWriteAction {
+          res.set(
+            VimPlugin.getMacro().playbackRegister(editor, context, project, reg, cmd.count)
+          )
         }
+      }
     }
     return res.get()
   }

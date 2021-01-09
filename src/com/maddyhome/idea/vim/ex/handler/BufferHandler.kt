@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.MessageHelper
 
 /**
  * Handles buffer, buf, bu, b.
@@ -47,28 +48,27 @@ class BufferHandler : CommandHandler.SingleExecution() {
         val bufNum = buffer.toInt() - 1
 
         if (!VimPlugin.getFile().selectFile(bufNum, context)) {
-          VimPlugin.showMessage("Buffer $bufNum does not exist")
+          VimPlugin.showMessage(MessageHelper.message("buffer.0.does.not.exist", bufNum))
           result = false
         }
       } else {
         val editors = findPartialMatch(context, buffer)
 
-        when(editors.size) {
+        when (editors.size) {
           0 -> {
-            VimPlugin.showMessage("No matching buffer for $buffer")
+            VimPlugin.showMessage(MessageHelper.message("no.matching.buffer.for.0", buffer))
             result = false
           }
           1 -> {
             if (EditorHelper.hasUnsavedChanges(editor) && !overrideModified) {
-              VimPlugin.showMessage("No write since last change (add ! to override)")
+              VimPlugin.showMessage(MessageHelper.message("no.write.since.last.change.add.to.override"))
               result = false
-            }
-            else {
+            } else {
               VimPlugin.getFile().openFile(EditorHelper.getVirtualFile(editors[0])!!.name, context)
             }
           }
           else -> {
-            VimPlugin.showMessage("More than one match for $buffer")
+            VimPlugin.showMessage(MessageHelper.message("more.than.one.match.for.0", buffer))
             result = false
           }
         }

@@ -27,14 +27,17 @@ import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
+import com.intellij.openapi.editor.ex.EditorSettingsExternalizable;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,7 +47,7 @@ import org.jetbrains.annotations.Nullable;
 @State(name = "VimEditorSettings", storages = {@Storage(value = "$APP_CONFIG$/vim_settings.xml")})
 public class EditorGroup implements PersistentStateComponent<Element> {
   private static final boolean REFRAIN_FROM_SCROLLING_VIM_VALUE = true;
-  public static final String EDITOR_STORE_ELEMENT = "editor";
+  public static final @NonNls String EDITOR_STORE_ELEMENT = "editor";
 
   private boolean isBlockCursor = false;
   private boolean isRefrainFromScrolling = false;
@@ -73,7 +76,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
   }
 
   private void deinitLineNumbers(@NotNull Editor editor, boolean isReleasing) {
-    if (!supportsVimLineNumbers(editor) || !UserDataManager.getVimEditorGroup(editor)) {
+    if (isProjectDisposed(editor) || !supportsVimLineNumbers(editor) || !UserDataManager.getVimEditorGroup(editor)) {
       return;
     }
 
@@ -95,6 +98,10 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     // We only support line numbers in editors that are file based, and that aren't for diffs, which control their
     // own line numbers, often using EditorGutter#setLineNumberConverter
     return EditorHelper.isFileEditor(editor) && !EditorHelper.isDiffEditor(editor);
+  }
+
+  private static boolean isProjectDisposed(final @NotNull Editor editor) {
+    return editor.getProject() == null || editor.getProject().isDisposed();
   }
 
   private static void updateLineNumbers(final @NotNull Editor editor) {
@@ -199,6 +206,10 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     }
   }
 
+  public boolean isBarCursorSettings() {
+    return !EditorSettingsExternalizable.getInstance().isBlockCursor();
+  }
+
   public void editorCreated(@NotNull Editor editor) {
     isBlockCursor = editor.getSettings().isBlockCursor();
     isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
@@ -210,10 +221,10 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     if (!EditorHelper.isFileEditor(editor) &&
         editor.getDocument().isWritable() &&
         !CommandStateHelper.inInsertMode(editor)) {
-      VimPlugin.getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
+      VimPlugin.getChange().insertBeforeCursor(editor, new EditorDataContext(editor, null));
       KeyHandler.getInstance().reset(editor);
     }
-    editor.getSettings().setBlockCursor(!CommandStateHelper.inInsertMode(editor));
+    VisualGroupKt.resetShape(CommandStateHelper.getMode(editor), editor);
     editor.getSettings().setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
   }
 

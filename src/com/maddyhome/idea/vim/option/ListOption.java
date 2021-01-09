@@ -18,6 +18,9 @@
 
 package com.maddyhome.idea.vim.option;
 
+import com.intellij.util.ArrayUtil;
+import com.maddyhome.idea.vim.helper.VimNlsSafe;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +33,7 @@ import java.util.StringTokenizer;
  * This is an option that accepts an arbitrary list of values
  */
 public class ListOption extends TextOption {
-  public static final @NotNull ListOption empty = new ListOption("", "", new String[0], "");
+  public static final @NotNull ListOption empty = new ListOption("", "", ArrayUtil.EMPTY_STRING_ARRAY, "");
 
   /**
    * Gets the value of the option as a comma separated list of values
@@ -68,7 +71,7 @@ public class ListOption extends TextOption {
    * @param val A comma separated list of values to look for
    * @return True if all the supplied values are set in this option, false if not
    */
-  public boolean contains(String val) {
+  public boolean contains(@NonNls String val) {
     final List<String> vals = parseVals(val);
     return vals != null && value.containsAll(vals);
   }
@@ -177,7 +180,7 @@ public class ListOption extends TextOption {
    * @param dflt    The option's default values
    * @param pattern A regular expression that is used to validate new values. null if no check needed
    */
-  ListOption(String name, String abbrev, String[] dflt, String pattern) {
+  ListOption(@VimNlsSafe String name, @VimNlsSafe String abbrev, @VimNlsSafe String[] dflt, @VimNlsSafe String pattern) {
     super(name, abbrev);
 
     this.dflt = new ArrayList<>(Arrays.asList(dflt));

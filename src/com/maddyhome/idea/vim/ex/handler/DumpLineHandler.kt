@@ -39,7 +39,9 @@ class DumpLineHandler : CommandHandler.SingleExecution() {
       logger.debug("Line $l, start offset=$start, end offset=$end")
 
       for (i in start..end) {
-        logger.debug("Offset $i, char=${chars[i]}, lp=${editor.offsetToLogicalPosition(i)}, vp=${editor.offsetToVisualPosition(i)}")
+        logger.debug(
+          "Offset $i, char=${chars[i]}, lp=${editor.offsetToLogicalPosition(i)}, vp=${editor.offsetToVisualPosition(i)}"
+        )
       }
     }
 

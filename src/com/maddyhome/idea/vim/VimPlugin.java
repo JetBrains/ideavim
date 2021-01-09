@@ -18,7 +18,7 @@
 package com.maddyhome.idea.vim;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManager;
+import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationListener;
 import com.intellij.openapi.Disposable;
@@ -40,7 +40,6 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
-import com.maddyhome.idea.vim.config.VimLocalConfig;
 import com.maddyhome.idea.vim.config.VimState;
 import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator;
 import com.maddyhome.idea.vim.ex.CommandParser;
@@ -53,10 +52,10 @@ import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.option.OptionsManager;
-import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import com.maddyhome.idea.vim.ui.VimRcFileState;
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -105,11 +104,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   public void initialize() {
     LOG.debug("initComponent");
 
-    // Initialize a legacy local config.
-    if (previousStateVersion == 5) {
-      //noinspection deprecation
-      VimLocalConfig.Companion.initialize();
-    }
     if (enabled) {
       Application application = ApplicationManager.getApplication();
       if (application.isUnitTestMode()) {
@@ -168,7 +162,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @Nullable RegisterGroup getRegisterIfCreated() {
-    return ServiceManager.getServiceIfCreated(RegisterGroup.class);
+    return ApplicationManager.getApplication().getServiceIfCreated(RegisterGroup.class);
   }
 
   public static @NotNull FileGroup getFile() {
@@ -180,7 +174,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @Nullable SearchGroup getSearchIfCreated() {
-    return ServiceManager.getServiceIfCreated(SearchGroup.class);
+    return ApplicationManager.getApplication().getServiceIfCreated(SearchGroup.class);
   }
 
   public static @NotNull ProcessGroup getProcess() {
@@ -204,7 +198,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @Nullable KeyGroup getKeyIfCreated() {
-    return ServiceManager.getServiceIfCreated(KeyGroup.class);
+    return ApplicationManager.getApplication().getServiceIfCreated(KeyGroup.class);
   }
 
   public static @NotNull WindowGroup getWindow() {
@@ -216,7 +210,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @Nullable EditorGroup getEditorIfCreated() {
-    return ServiceManager.getServiceIfCreated(EditorGroup.class);
+    return ApplicationManager.getApplication().getServiceIfCreated(EditorGroup.class);
   }
 
   public static @NotNull VisualMotionGroup getVisualMotion() {
@@ -263,7 +257,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull String getVersion() {
-    final IdeaPluginDescriptor plugin = PluginManager.getPlugin(getPluginId());
+    final IdeaPluginDescriptor plugin = PluginManagerCore.getPlugin(getPluginId());
     if (!ApplicationManager.getApplication().isInternal()) {
       return plugin != null ? plugin.getVersion() : "SNAPSHOT";
     }
@@ -327,7 +321,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     showMessage(msg);
   }
 
-  public static void showMessage(@Nls @Nullable String msg) {
+  public static void showMessage(@Nls(capitalization = Nls.Capitalization.Sentence) @Nullable String msg) {
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       getInstance().message = msg;
     }

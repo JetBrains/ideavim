@@ -28,12 +28,19 @@ import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
-sealed class IncNumber(val inc: Int, val avalanche: Boolean) : VisualOperatorActionHandler.ForEachCaret() {
+sealed class IncNumber(val inc: Int, private val avalanche: Boolean) : VisualOperatorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
-  override fun executeAction(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: VimSelection): Boolean {
-    return VimPlugin.getChange().changeNumberVisualMode(editor, caret, range.toVimTextRange(false), inc * cmd.count, avalanche)
+  override fun executeAction(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    range: VimSelection
+  ): Boolean {
+    return VimPlugin.getChange()
+      .changeNumberVisualMode(editor, caret, range.toVimTextRange(false), inc * cmd.count, avalanche)
   }
 }
 

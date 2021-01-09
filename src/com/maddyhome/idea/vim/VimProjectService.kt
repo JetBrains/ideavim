@@ -25,7 +25,9 @@ import com.intellij.openapi.project.Project
 
 @Service
 class VimProjectService(val project: Project) : Disposable {
-  override fun dispose() {}
+  override fun dispose() {
+    // Nothing
+  }
 
   companion object {
     @JvmStatic

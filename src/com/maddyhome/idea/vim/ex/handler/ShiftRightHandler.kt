@@ -24,6 +24,9 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandler.Access.WRITABLE
+import com.maddyhome.idea.vim.ex.CommandHandler.ArgumentFlag.ARGUMENT_OPTIONAL
+import com.maddyhome.idea.vim.ex.CommandHandler.RangeFlag.RANGE_OPTIONAL
 import com.maddyhome.idea.vim.ex.CommandHandlerFlags
 import com.maddyhome.idea.vim.ex.CommandName
 import com.maddyhome.idea.vim.ex.ComplicatedNameExCommand
@@ -33,14 +36,16 @@ import com.maddyhome.idea.vim.ex.flags
 
 class ShiftRightHandler : CommandHandler.ForEachCaret(), ComplicatedNameExCommand {
   override val names: Array<CommandName> = commands(">[${">".repeat(31)}]")
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
+  override val argFlags: CommandHandlerFlags = flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, WRITABLE)
 
   override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
     val range = cmd.getTextRange(editor, caret, true)
     val endOffsets = range.endOffsets.map { it - 1 }.toIntArray()
-    VimPlugin.getChange().indentRange(editor, caret, context,
+    VimPlugin.getChange().indentRange(
+      editor, caret, context,
       TextRange(range.startOffsets, endOffsets),
-      cmd.command.length, 1)
+      cmd.command.length, 1
+    )
     return true
   }
 }

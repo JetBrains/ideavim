@@ -21,13 +21,14 @@ package com.maddyhome.idea.vim.action
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAwareToggleAction
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.ui.VimActions
 
 /**
  * This class is used to handle the Vim Plugin enabled/disabled toggle. This is most likely used as a menu option
  * but could also be used as a toolbar item.
  */
-class VimPluginToggleAction : DumbAwareToggleAction() {
+class VimPluginToggleAction : DumbAwareToggleAction()/*, LightEditCompatible*/ {
   override fun isSelected(event: AnActionEvent): Boolean = VimPlugin.isEnabled()
 
   override fun setSelected(event: AnActionEvent, b: Boolean) {
@@ -38,7 +39,7 @@ class VimPluginToggleAction : DumbAwareToggleAction() {
     super.update(e)
 
     e.presentation.text = if (VimActions.actionPlace == e.place) {
-      if (VimPlugin.isEnabled()) "Enabled" else "Enable"
-    } else "Vim Emulator"
+      if (VimPlugin.isEnabled()) MessageHelper.message("action.VimPluginToggle.enabled") else MessageHelper.message("action.VimPluginToggle.enable")
+    } else MessageHelper.message("action.VimPluginToggle.text")
   }
 }

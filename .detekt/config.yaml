@@ -1,0 +1,31 @@
+formatting:
+  Indentation:
+    indentSize: 2
+    continuationIndentSize: 8
+  ParameterListWrapping:
+    indentSize: 8
+complexity:
+  LongParameterList:
+    functionThreshold: 12
+  NestedBlockDepth:
+    threshold: 6
+  ComplexCondition:
+    threshold: 6
+  ComplexMethod:
+    threshold: 20
+exceptions:
+  TooGenericExceptionCaught:
+    active: false
+naming:
+  ClassNaming:
+    excludes: "**/ConfigurationMigrators.kt, **/VersionDetectors.kt"
+performance:
+  SpreadOperator:
+    active: false
+style:
+  ForbiddenComment:
+    active: false
+  MaxLineLength:
+    maxLineLength: 160
+  ReturnCount:
+    max: 5

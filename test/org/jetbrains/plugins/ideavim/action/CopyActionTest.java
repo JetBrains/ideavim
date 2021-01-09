@@ -218,4 +218,16 @@ public class CopyActionTest extends VimTestCase {
     typeTextInFile(parseKeys("\"ap"), "");
     myFixture.checkResult("test");
   }
+
+  public void testOverridingRegisterWithEmptyTag() {
+    configureByText("<root>\n" +
+                    "<a><caret>value</a>\n" +
+                    "<b></b>\n" +
+                    "</root>\n");
+    typeText(parseKeys("dit", "j", "cit", "<C-R>\""));
+    myFixture.checkResult("<root>\n" +
+                          "<a></a>\n" +
+                          "<b>value</b>\n" +
+                          "</root>\n");
+  }
 }

@@ -31,7 +31,8 @@ public class VimScriptGlobalEnvironment {
 
   private final Map<String, Object> myVariables = new HashMap<>();
 
-  private VimScriptGlobalEnvironment() {}
+  private VimScriptGlobalEnvironment() {
+  }
 
   public static @NotNull VimScriptGlobalEnvironment getInstance() {
     return ourInstance;

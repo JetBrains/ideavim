@@ -47,8 +47,11 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.fileSize
+import com.maddyhome.idea.vim.helper.moveToInlayAwareLogicalPosition
+import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.key.OperatorFunction
+import org.jetbrains.annotations.NonNls
 
 /**
  * This emulation misses:
@@ -61,7 +64,8 @@ import com.maddyhome.idea.vim.key.OperatorFunction
  *        It just won't work if the binding is defined after `set exchange`.
  */
 
-class VimExchangeExtension: VimExtension {
+class VimExchangeExtension : VimExtension {
+
   override fun getName() = "exchange"
 
   override fun init() {
@@ -77,8 +81,11 @@ class VimExchangeExtension: VimExtension {
   }
 
   companion object {
+    @NonNls
     const val EXCHANGE_CMD = "<Plug>(Exchange)"
+    @NonNls
     const val EXCHANGE_CLEAR_CMD = "<Plug>(ExchangeClear)"
+    @NonNls
     const val EXCHANGE_LINE_CMD = "<Plug>(ExchangeLine)"
 
     val EXCHANGE_KEY = Key<Exchange>("exchange")
@@ -107,17 +114,17 @@ class VimExchangeExtension: VimExtension {
 
     override fun execute(editor: Editor, context: DataContext) {
       setOperatorFunction(Operator(false))
-      executeNormalWithoutMapping(parseKeys(if(isLine) "g@_" else "g@"), editor)
+      executeNormalWithoutMapping(parseKeys(if (isLine) "g@_" else "g@"), editor)
     }
   }
 
-  private class ExchangeClearHandler: VimExtensionHandler {
+  private class ExchangeClearHandler : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
       clearExchange(editor)
     }
   }
 
-  private class VExchangeHandler: VimExtensionHandler {
+  private class VExchangeHandler : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
       runWriteAction {
         val subMode = editor.subMode
@@ -128,19 +135,19 @@ class VimExchangeExtension: VimExtension {
     }
   }
 
-  private class Operator(private val isVisual: Boolean): OperatorFunction {
+  private class Operator(private val isVisual: Boolean) : OperatorFunction {
     fun Editor.getMarkOffset(mark: Mark) = EditorHelper.getOffset(this, mark.logicalLine, mark.col)
-    fun CommandState.SubMode.getString() = when(this) {
+    fun CommandState.SubMode.getString() = when (this) {
       CommandState.SubMode.VISUAL_CHARACTER -> "v"
       CommandState.SubMode.VISUAL_LINE -> "V"
       CommandState.SubMode.VISUAL_BLOCK -> "\\<C-V>"
-      else -> throw Error("Invalid SubMode: $this")
+      else -> error("Invalid SubMode: $this")
     }
 
     override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
       fun highlightExchange(ex: Exchange): RangeHighlighter {
         val attributes = editor.colorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES)
-        val hlArea = when(ex.type) {
+        val hlArea = when (ex.type) {
           CommandState.SubMode.VISUAL_LINE -> HighlighterTargetArea.LINES_IN_RANGE
           // TODO: handle other modes
           else -> HighlighterTargetArea.EXACT_RANGE
@@ -153,6 +160,7 @@ class VimExchangeExtension: VimExtension {
           hlArea
         )
       }
+
       val currentExchange = getExchange(editor, isVisual, selectionType)
       val exchange1 = editor.getUserData(EXCHANGE_KEY)
       if (exchange1 == null) {
@@ -164,7 +172,7 @@ class VimExchangeExtension: VimExtension {
         val cmp = compareExchanges(exchange1, currentExchange)
         var reverse = false
         var expand = false
-        val (ex1, ex2) = when(cmp) {
+        val (ex1, ex2) = when (cmp) {
           ExchangeCompareResult.OVERLAP -> return false
           ExchangeCompareResult.OUTER -> {
             reverse = true
@@ -191,25 +199,27 @@ class VimExchangeExtension: VimExtension {
 
     private fun exchange(editor: Editor, ex1: Exchange, ex2: Exchange, reverse: Boolean, expand: Boolean) {
       fun pasteExchange(sourceExchange: Exchange, targetExchange: Exchange) {
-        VimPlugin.getMark().setChangeMarks(editor, TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end)+1))
+        VimPlugin.getMark().setChangeMarks(editor, TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end) + 1))
         // do this instead of direct text manipulation to set change marks
         setRegister('z', stringToKeys(sourceExchange.text), SelectionType.fromSubMode(sourceExchange.type))
         executeNormalWithoutMapping(stringToKeys("`[${targetExchange.type.getString()}`]\"zp"), editor)
       }
+
       fun fixCursor(ex1: Exchange, ex2: Exchange, reverse: Boolean) {
         val primaryCaret = editor.caretModel.primaryCaret
-        if(reverse) {
-          primaryCaret.moveToOffset(editor.getMarkOffset(ex1.start))
+        if (reverse) {
+          primaryCaret.moveToInlayAwareOffset(editor.getMarkOffset(ex1.start))
         } else {
           if (ex1.start.logicalLine == ex2.start.logicalLine) {
             val horizontalOffset = ex1.end.col - ex2.end.col
-            primaryCaret.moveToLogicalPosition(LogicalPosition(ex1.start.logicalLine, ex1.start.col - horizontalOffset))
-          } else if(ex1.end.logicalLine - ex1.start.logicalLine != ex2.end.logicalLine - ex2.start.logicalLine) {
+            primaryCaret.moveToInlayAwareLogicalPosition(LogicalPosition(ex1.start.logicalLine, ex1.start.col - horizontalOffset))
+          } else if (ex1.end.logicalLine - ex1.start.logicalLine != ex2.end.logicalLine - ex2.start.logicalLine) {
             val verticalOffset = ex1.end.logicalLine - ex2.end.logicalLine
-            primaryCaret.moveToLogicalPosition(LogicalPosition(ex1.start.logicalLine - verticalOffset, ex1.start.col))
+            primaryCaret.moveToInlayAwareLogicalPosition(LogicalPosition(ex1.start.logicalLine - verticalOffset, ex1.start.col))
           }
         }
       }
+
       val zRegText = getRegister('z')
       val unnRegText = getRegister('"')
       val startRegText = getRegister('*')
@@ -249,24 +259,24 @@ class VimExchangeExtension: VimExtension {
 
       return if (x.type == CommandState.SubMode.VISUAL_BLOCK && y.type == CommandState.SubMode.VISUAL_BLOCK) {
         when {
-            intersects(x, y) -> {
-              ExchangeCompareResult.OVERLAP
-            }
-            x.start.col <= y.start.col -> {
-              ExchangeCompareResult.LT
-            }
-            else -> {
-              ExchangeCompareResult.GT
-            }
+          intersects(x, y) -> {
+            ExchangeCompareResult.OVERLAP
+          }
+          x.start.col <= y.start.col -> {
+            ExchangeCompareResult.LT
+          }
+          else -> {
+            ExchangeCompareResult.GT
+          }
         }
-      } else if (comparePos(x.start, y.start) <=0 && comparePos(x.end, y.end) >=0) {
+      } else if (comparePos(x.start, y.start) <= 0 && comparePos(x.end, y.end) >= 0) {
         ExchangeCompareResult.OUTER
-      } else if (comparePos(y.start, x.start) <=0 && comparePos(y.end, x.end) >=0) {
+      } else if (comparePos(y.start, x.start) <= 0 && comparePos(y.end, x.end) >= 0) {
         ExchangeCompareResult.INNER
-      } else if (comparePos(x.start, y.end) <=0 && comparePos(y.start, x.end) <=0 ||
-          comparePos(y.start, x.end) <=0 && comparePos(x.start, y.end) <=0
-        ) {
-          ExchangeCompareResult.OVERLAP
+      } else if (comparePos(x.start, y.end) <= 0 && comparePos(y.start, x.end) <= 0 ||
+        comparePos(y.start, x.end) <= 0 && comparePos(x.start, y.end) <= 0
+      ) {
+        ExchangeCompareResult.OVERLAP
       } else {
         val cmp = comparePos(x.start, y.start)
         when {
@@ -293,6 +303,7 @@ class VimExchangeExtension: VimExtension {
           selectionEnd.col
         }
       }
+
       // TODO: improve KeyStroke list to sting conversion
       fun getRegisterText(reg: Char): String = getRegister(reg)?.map { it.keyChar }?.joinToString("") ?: ""
       fun getMarks(isVisual: Boolean): Pair<Mark, Mark> {

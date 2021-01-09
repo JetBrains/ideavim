@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.CommandFlags.FLAG_MULTIKEY_UNDO
+import com.maddyhome.idea.vim.command.CommandFlags.FLAG_NO_REPEAT_INSERT
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
@@ -31,14 +33,16 @@ import java.util.*
 class ChangeEndOfLineAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.CHANGE
 
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_NO_REPEAT_INSERT, CommandFlags.FLAG_MULTIKEY_UNDO)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_NO_REPEAT_INSERT, FLAG_MULTIKEY_UNDO)
 
-  override fun execute(editor: Editor,
-                       caret: Caret,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     return VimPlugin.getChange().changeEndOfLine(editor, caret, count)
   }
 }

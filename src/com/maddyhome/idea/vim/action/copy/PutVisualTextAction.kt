@@ -43,7 +43,12 @@ sealed class PutVisualTextBaseAction(
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
-  override fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean {
+  override fun executeForAllCarets(
+    editor: Editor,
+    context: DataContext,
+    cmd: Command,
+    caretsAndSelections: Map<Caret, VimSelection>
+  ): Boolean {
     if (caretsAndSelections.isEmpty()) return false
     val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type, it.transferableData) }
     VimPlugin.getRegister().resetRegister()

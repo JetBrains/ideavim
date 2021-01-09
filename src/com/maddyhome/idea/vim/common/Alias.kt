@@ -19,6 +19,8 @@
 package com.maddyhome.idea.vim.common
 
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.helper.MessageHelper
+import org.jetbrains.annotations.NonNls
 
 /**
  * @author Elliot Courant
@@ -39,10 +41,10 @@ class Alias(
     }
 
   private companion object {
-    const val LessThan = "<lt>"
-    const val Count = "<count>"
-    const val Arguments = "<args>"
-    const val QuotedArguments = "<q-args>"
+    @NonNls const val LessThan = "<lt>"
+    @NonNls const val Count = "<count>"
+    @NonNls const val Arguments = "<args>"
+    @NonNls const val QuotedArguments = "<q-args>"
   }
 
   fun getCommand(input: String, count: Int): String {
@@ -52,7 +54,7 @@ class Alias(
     var compiledCommand = this.command
     val cleanedInput = input.trim().removePrefix(name).trim()
     if (minimumNumberOfArguments > 0 && cleanedInput.isEmpty()) {
-      VimPlugin.showMessage("E471: Argument required")
+      VimPlugin.showMessage(MessageHelper.message("e471.argument.required"))
       VimPlugin.indicateError()
       return ""
     }

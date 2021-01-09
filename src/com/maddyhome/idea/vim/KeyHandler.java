@@ -26,7 +26,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
-import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
@@ -39,18 +38,15 @@ import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction;
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction;
 import com.maddyhome.idea.vim.action.macro.ToggleRecordingAction;
 import com.maddyhome.idea.vim.command.*;
-import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.group.RegisterGroup;
-import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.*;
-import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
-import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.ShowCmd;
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -58,13 +54,12 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.intellij.openapi.actionSystem.CommonDataKeys.*;
 import static com.intellij.openapi.actionSystem.PlatformDataKeys.PROJECT_FILE_DIRECTORY;
@@ -300,7 +295,7 @@ public class KeyHandler {
     return node;
   }
 
-  private static <T> boolean isPrefix(@NotNull List<T> list1, @NotNull List<T> list2) {
+  public static <T> boolean isPrefix(@NotNull List<T> list1, @NotNull List<T> list2) {
     if (list1.size() > list2.size()) {
       return false;
     }
@@ -392,7 +387,7 @@ public class KeyHandler {
         }
 
         for (KeyStroke keyStroke : unhandledKeys) {
-          handleKey(editor, keyStroke, new EditorDataContext(editor), false);
+          handleKey(editor, keyStroke, new EditorDataContext(editor, null), false);
         }
       }, ModalityState.stateForComponent(editor.getComponent())));
     }
@@ -435,80 +430,9 @@ public class KeyHandler {
 
     mappingState.resetMappingSequence();
 
-    final EditorDataContext currentContext = new EditorDataContext(editor);
+    final EditorDataContext currentContext = new EditorDataContext(editor, context);
 
-    if (mappingInfo instanceof ToKeysMappingInfo) {
-      final List<KeyStroke> toKeys = ((ToKeysMappingInfo)mappingInfo).getToKeys();
-      final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), toKeys);
-      boolean first = true;
-      for (KeyStroke keyStroke : toKeys) {
-        final boolean recursive = mappingInfo.isRecursive() && !(first && fromIsPrefix);
-        handleKey(editor, keyStroke, currentContext, recursive);
-        first = false;
-      }
-    }
-    else if (mappingInfo instanceof ToHandlerMappingInfo) {
-      final VimExtensionHandler extensionHandler = ((ToHandlerMappingInfo)mappingInfo).getExtensionHandler();
-      final CommandProcessor processor = CommandProcessor.getInstance();
-
-      // Cache isOperatorPending in case the extension changes the mode while moving the caret
-      // See CommonExtensionTest
-      // TODO: Is this legal? Should we assert in this case?
-      final boolean shouldCalculateOffsets = commandState.isOperatorPending();
-
-      Map<Caret, Integer> startOffsets =
-        editor.getCaretModel().getAllCarets().stream().collect(Collectors.toMap(Function.identity(), Caret::getOffset));
-
-      if (extensionHandler.isRepeatable()) {
-        VimRepeater.Extension.INSTANCE.clean();
-      }
-
-      processor.executeCommand(editor.getProject(), () -> extensionHandler.execute(editor, context),
-        "Vim " + extensionHandler.getClass().getSimpleName(), null);
-
-      if (extensionHandler.isRepeatable()) {
-        VimRepeater.Extension.INSTANCE.setLastExtensionHandler(extensionHandler);
-        VimRepeater.Extension.INSTANCE.setArgumentCaptured(null);
-        VimRepeater.INSTANCE.setRepeatHandler(true);
-      }
-
-      if (shouldCalculateOffsets && !commandState.getCommandBuilder().hasCurrentCommandPartArgument()) {
-        Map<Caret, VimSelection> offsets = new HashMap<>();
-
-        for (Caret caret : editor.getCaretModel().getAllCarets()) {
-          @Nullable Integer startOffset = startOffsets.get(caret);
-          if (caret.hasSelection()) {
-            final VimSelection vimSelection = VimSelection.Companion
-              .create(UserDataManager.getVimSelectionStart(caret), caret.getOffset(),
-                SelectionType.fromSubMode(CommandStateHelper.getSubMode(editor)), editor);
-            offsets.put(caret, vimSelection);
-            commandState.popModes();
-          }
-          else if (startOffset != null && startOffset != caret.getOffset()) {
-            // Command line motions are always characterwise exclusive
-            int endOffset = caret.getOffset();
-            if (startOffset < endOffset) {
-              endOffset -= 1;
-            } else {
-              startOffset -= 1;
-            }
-            final VimSelection vimSelection = VimSelection.Companion
-              .create(startOffset, endOffset, SelectionType.CHARACTER_WISE, editor);
-            offsets.put(caret, vimSelection);
-
-            try (VimListenerSuppressor.Locked ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
-              // Move caret to the initial offset for better undo action
-              //  This is not a necessary thing, but without it undo action look less convenient
-              editor.getCaretModel().moveToOffset(startOffset);
-            }
-          }
-        }
-
-        if (!offsets.isEmpty()) {
-          commandState.getCommandBuilder().completeCommandPart(new Argument(offsets));
-        }
-      }
-    }
+    mappingInfo.execute(editor, context);
 
     // If we've just evaluated the previous key sequence, make sure to also handle the current key
     if (mappingInfo != currentMappingInfo) {
@@ -669,6 +593,22 @@ public class KeyHandler {
     }
 
     DigraphResult res = editorState.processDigraphKey(key, editor);
+    if (ExEntryPanel.getInstance().isActive()) {
+      switch (res.getResult()) {
+        case DigraphResult.RES_HANDLED:
+          setPromptCharacterEx(commandBuilder.isPuttingLiteral() ? '^' : key.getKeyChar());
+          break;
+        case DigraphResult.RES_DONE:
+        case DigraphResult.RES_BAD:
+          if (key.getKeyCode() == KeyEvent.VK_C && (key.getModifiers() & InputEvent.CTRL_DOWN_MASK) != 0) {
+            return false;
+          } else {
+            ExEntryPanel.getInstance().getEntry().clearCurrentAction();
+          }
+          break;
+      }
+    }
+
     switch (res.getResult()) {
       case DigraphResult.RES_HANDLED:
         editorState.getCommandBuilder().addKey(key);
@@ -752,7 +692,7 @@ public class KeyHandler {
                                  @NotNull CommandNode node,
                                  CommandState editorState) {
     // The user entered a valid command. Create the command and add it to the stack.
-    final EditorActionHandlerBase action = node.getActionHolder().getAction();
+    final EditorActionHandlerBase action = node.getActionHolder().getInstance();
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
     final Argument.Type expectedArgumentType = commandBuilder.getExpectedArgumentType();
 
@@ -799,7 +739,7 @@ public class KeyHandler {
   }
 
   private boolean stopMacroRecord(CommandNode node, @NotNull CommandState editorState) {
-    return editorState.isRecording() && node.getActionHolder().getAction() instanceof ToggleRecordingAction;
+    return editorState.isRecording() && node.getActionHolder().getInstance() instanceof ToggleRecordingAction;
   }
 
   private void startWaitingForArgument(Editor editor,
@@ -823,8 +763,10 @@ public class KeyHandler {
         // the key handler when it's complete.
         if (action instanceof InsertCompletedDigraphAction) {
           editorState.startDigraphSequence();
+          setPromptCharacterEx('?');
         } else if (action instanceof InsertCompletedLiteralAction) {
           editorState.startLiteralSequence();
+          setPromptCharacterEx('^');
         }
         break;
       case EX_STRING:
@@ -847,7 +789,7 @@ public class KeyHandler {
    * @param name    The name of the action to execute
    * @param context The context to run it in
    */
-  public static boolean executeAction(@NotNull String name, @NotNull DataContext context) {
+  public static boolean executeAction(@NotNull @NonNls String name, @NotNull DataContext context) {
     ActionManager aMgr = ActionManager.getInstance();
     AnAction action = aMgr.getAction(name);
     return action != null && executeAction(action, context);
@@ -919,6 +861,13 @@ public class KeyHandler {
 
   }
 
+  private void setPromptCharacterEx(final char promptCharacter) {
+    final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
+    if (exEntryPanel.isActive()) {
+        exEntryPanel.getEntry().setCurrentActionPromptCharacter(promptCharacter);
+    }
+  }
+
   // This class is copied from com.intellij.openapi.editor.actionSystem.DialogAwareDataContext.DialogAwareDataContext
   private static final class DialogAwareDataContext implements DataContext {
     @SuppressWarnings("rawtypes")
@@ -985,9 +934,12 @@ public class KeyHandler {
       if (editorState.getSubMode() == CommandState.SubMode.SINGLE_COMMAND &&
           (!cmd.getFlags().contains(CommandFlags.FLAG_EXPECT_MORE))) {
         editorState.popModes();
+        VisualGroupKt.resetShape(CommandStateHelper.getMode(editor), editor);
       }
 
-      KeyHandler.getInstance().reset(editor);
+      if (editorState.getCommandBuilder().isDone()) {
+        KeyHandler.getInstance().reset(editor);
+      }
     }
 
     private final Editor editor;

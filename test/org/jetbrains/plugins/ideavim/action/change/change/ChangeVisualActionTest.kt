@@ -92,22 +92,10 @@ class ChangeVisualActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             ${c}
             
-            
         """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
-
-  @VimBehaviorDiffers(originalVimAfter = """
-            A Discovery
-
-            I found it in a legendary land
-            all rocks and lavender and tufted grass,
-           
-            ${c}
-            
-            
-  """)
   fun `test multiple line change till the end with two new lines`() {
     val keys = "Vjc"
     val before = """
@@ -127,8 +115,8 @@ class ChangeVisualActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
            
-           
             ${c}
+            
             
         """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
@@ -195,12 +183,18 @@ class ChangeVisualActionTest : VimTestCase() {
   @VimBehaviorDiffers(description = "Different caret position")
   fun `test change visual block with shorter line in the middle`() {
     doTest(listOf("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
-      "foo foo\n" +
-        "x\n" +
-        "bar bar\n",
-      ("fo_quux_foo\n" +
-        "x\n" +
-        "ba_quux_bar\n"),
+      """
+        foo foo
+        x
+        bar bar
+        
+        """.trimIndent(),
+      """
+        fo_quux_foo
+        x
+        ba_quux_bar
+        
+        """.trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }

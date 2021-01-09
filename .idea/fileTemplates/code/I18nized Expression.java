@@ -1,0 +1,1 @@
+com.maddyhome.idea.vim.helper.MessageHelper.message("${PROPERTY_KEY}")

@@ -34,7 +34,6 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.helper.EditorDataContext
@@ -43,9 +42,11 @@ import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.key.OperatorFunction
+import org.jetbrains.annotations.NonNls
 
 
 class ReplaceWithRegister : VimExtension {
+
   override fun getName(): String = "ReplaceWithRegister"
 
   override fun init() {
@@ -123,8 +124,11 @@ class ReplaceWithRegister : VimExtension {
   }
 
   companion object {
+    @NonNls
     private const val RWR_OPERATOR = "<Plug>ReplaceWithRegisterOperator"
+    @NonNls
     private const val RWR_LINE = "<Plug>ReplaceWithRegisterLine"
+    @NonNls
     private const val RWR_VISUAL = "<Plug>ReplaceWithRegisterVisual"
 
     private fun doReplace(editor: Editor, visualSelection: PutData.VisualSelection) {
@@ -140,11 +144,11 @@ class ReplaceWithRegister : VimExtension {
 
       val textData = PutData.TextData(usedText, usedType, savedRegister.transferableData)
 
-      val putData = PutData(textData, visualSelection, 1, insertTextBeforeCaret = true, _indent = true, caretAfterInsertedText = false, putToLine = -1)
+      val putData = PutData(textData, visualSelection, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = false, putToLine = -1)
       VimPlugin.getPut().putText(editor, EditorDataContext(editor), putData)
 
       VimPlugin.getRegister().saveRegister(savedRegister.name, savedRegister)
-      VimPlugin.getRegister().saveRegister(RegisterGroup.DEFAULT_REGISTER, savedRegister)
+      VimPlugin.getRegister().saveRegister(VimPlugin.getRegister().defaultRegister, savedRegister)
     }
   }
 }

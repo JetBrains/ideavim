@@ -356,6 +356,9 @@ quux
   }
 
   fun testDeleteCharVisualBlockOnEmptyLinesDoesntDeleteAnything() {
+    setupChecks {
+      this.neoVim.ignoredRegisters = setOf('1', '"')
+    }
     doTest(listOf("<C-V>", "j", "x"),
       "\n\n", "\n\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
@@ -378,6 +381,7 @@ quux
   }
 
   // VIM-781 |CTRL-V| |j|
+  @VimBehaviorDiffers(description = "Different registers content")
   fun testDeleteCharVisualBlockWithShorterLineInTheMiddle() {
     doTest(listOf("l", "<C-V>", "jj", "x"),
       """

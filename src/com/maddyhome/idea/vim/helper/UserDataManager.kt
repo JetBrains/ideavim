@@ -64,7 +64,8 @@ fun Caret.vimSelectionStartClear() {
 private var Caret._vimSelectionStart: Int? by userDataCaretToEditor()
 //endregion ----------------------------------------------------
 
-var Caret.vimLastColumn: Int by userDataCaretToEditorOr { (this as Caret).visualPosition.column }
+// Last column excluding inlays before the caret
+var Caret.vimLastColumn: Int by userDataCaretToEditorOr { (this as Caret).inlayAwareVisualColumn }
 var Caret.vimLastVisualOperatorRange: VisualChange? by userDataCaretToEditor()
 var Caret.vimInsertStart: RangeMarker by userDataOr { (this as Caret).editor.document.createRangeMarker(this.offset, this.offset) }
 
@@ -79,7 +80,7 @@ fun unInitializeEditor(editor: Editor) {
 }
 
 var Editor.vimLastSearch: String? by userData()
-var Editor.vimLastHighlighters: Collection<RangeHighlighter>? by userData()
+var Editor.vimLastHighlighters: MutableCollection<RangeHighlighter>? by userData()
 var Editor.vimIncsearchCurrentMatchOffset: Int? by userData()
 /***
  * @see :help visualmode()

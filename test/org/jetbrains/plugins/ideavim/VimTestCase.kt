@@ -25,9 +25,13 @@ import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.Inlay
 import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.colors.EditorColors
+import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
+import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.PlainTextFileType
 import com.intellij.openapi.project.Project
 import com.intellij.testFramework.EditorTestUtil
@@ -40,23 +44,29 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.CommandState.SubMode
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
 import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
-import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.helper.isBlockCaretShape
+import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.key.MappingOwner
+import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.OptionsManager.getOption
 import com.maddyhome.idea.vim.option.OptionsManager.ideastrictmode
 import com.maddyhome.idea.vim.option.OptionsManager.resetAllOptions
 import com.maddyhome.idea.vim.option.ToggleOption
-import com.maddyhome.idea.vim.ui.ExEntryPanel
-import junit.framework.Assert
-import java.util.*
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
+import org.junit.Assert
 import java.util.function.Consumer
 import javax.swing.KeyStroke
 
@@ -77,12 +87,14 @@ abstract class VimTestCase : UsefulTestCase() {
       LightTempDirTestFixtureImpl(true))
     myFixture.setUp()
     myFixture.testDataPath = testDataPath
+    // Note that myFixture.editor is usually null here. It's only set once configureByText has been called
     KeyHandler.getInstance().fullReset(myFixture.editor)
     resetAllOptions()
     VimPlugin.getKey().resetKeyMappings()
     VimPlugin.getSearch().resetState()
     if (!VimPlugin.isEnabled()) VimPlugin.setEnabled(true)
     ideastrictmode.set()
+    Checks.reset()
 
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
     ExEntryPanel.getInstance().entry.setBounds(0, 0, 100, 25)
@@ -90,7 +102,7 @@ abstract class VimTestCase : UsefulTestCase() {
     NeovimTesting.setUp(this)
   }
 
-  protected val testDataPath: String
+  private val testDataPath: String
     get() = PathManager.getHomePath() + "/community/plugins/ideavim/testData"
 
   @Throws(Exception::class)
@@ -123,24 +135,87 @@ abstract class VimTestCase : UsefulTestCase() {
     return typeText(keys)
   }
 
-  protected fun configureByText(content: String): Editor {
-    myFixture.configureByText(PlainTextFileType.INSTANCE, content)
+  protected val screenWidth: Int
+    get() = 80
+  protected val screenHeight: Int
+    get() = 35
+
+  protected fun setEditorVisibleSize(width: Int, height: Int) {
+    EditorTestUtil.setEditorVisibleSize(myFixture.editor, width, height)
+  }
+
+  protected fun configureByText(content: String) = configureByText(PlainTextFileType.INSTANCE, content)
+  protected fun configureByJavaText(content: String) = configureByText(JavaFileType.INSTANCE, content)
+  protected fun configureByXmlText(content: String) = configureByText(XmlFileType.INSTANCE, content)
+
+  private fun configureByText(fileType: FileType, content: String): Editor {
+    myFixture.configureByText(fileType, content)
+    setEditorVisibleSize(screenWidth, screenHeight)
     return myFixture.editor
   }
 
   protected fun configureByFileName(fileName: String): Editor {
     myFixture.configureByText(fileName, "\n")
+    setEditorVisibleSize(screenWidth, screenHeight)
     return myFixture.editor
   }
 
-  protected fun configureByJavaText(content: String): Editor {
-    myFixture.configureByText(JavaFileType.INSTANCE, content)
-    return myFixture.editor
+  @Suppress("SameParameterValue")
+  protected fun configureByPages(pageCount: Int) {
+    val stringBuilder = StringBuilder()
+    repeat(pageCount * screenHeight) {
+      stringBuilder.appendln("I found it in a legendary land")
+    }
+    configureByText(stringBuilder.toString())
   }
 
-  protected fun configureByXmlText(content: String): Editor {
-    myFixture.configureByText(XmlFileType.INSTANCE, content)
-    return myFixture.editor
+  protected fun configureByLines(lineCount: Int, line: String) {
+    val stringBuilder = StringBuilder()
+    repeat(lineCount) {
+      stringBuilder.appendln(line)
+    }
+    configureByText(stringBuilder.toString())
+  }
+
+  protected fun configureByColumns(columnCount: Int) {
+    val content = buildString {
+      repeat(columnCount) {
+        append('0' + (it % 10))
+      }
+    }
+    configureByText(content)
+  }
+
+  @JvmOverloads
+  protected fun setPositionAndScroll(scrollToLogicalLine: Int, caretLogicalLine: Int, caretLogicalColumn: Int = 0) {
+
+    // Note that it is possible to request a position which would be invalid under normal Vim!
+    // We disable scrolloff + scrolljump, position as requested, and reset. When resetting scrolloff, Vim will
+    // recalculate the correct offsets, and that could move the top and/or caret line
+    val scrolloff = OptionsManager.scrolloff.value()
+    val scrolljump = OptionsManager.scrolljump.value()
+    OptionsManager.scrolloff.set(0)
+    OptionsManager.scrolljump.set(1)
+
+    // Convert to visual lines to handle any collapsed folds
+    val scrollToVisualLine = EditorHelper.logicalLineToVisualLine(myFixture.editor, scrollToLogicalLine)
+    val bottomVisualLine = scrollToVisualLine + EditorHelper.getApproximateScreenHeight(myFixture.editor) - 1
+    val bottomLogicalLine = EditorHelper.visualLineToLogicalLine(myFixture.editor, bottomVisualLine)
+
+    // Make sure we're not trying to put caret in an invalid location
+    val boundsTop = EditorHelper.visualLineToLogicalLine(myFixture.editor, scrollToVisualLine)
+    val boundsBottom = EditorHelper.visualLineToLogicalLine(myFixture.editor, bottomVisualLine)
+    Assert.assertTrue("Caret line $caretLogicalLine not inside legal screen bounds (${boundsTop} - ${boundsBottom})",
+      caretLogicalLine in boundsTop..boundsBottom)
+
+    typeText(parseKeys("${scrollToLogicalLine+1}z<CR>", "${caretLogicalLine+1}G", "${caretLogicalColumn+1}|"))
+
+    OptionsManager.scrolljump.set(scrolljump)
+    OptionsManager.scrolloff.set(scrolloff)
+
+    // Make sure we're where we want to be
+    assertVisibleArea(scrollToLogicalLine, bottomLogicalLine)
+    assertPosition(caretLogicalLine, caretLogicalColumn)
   }
 
   protected fun typeText(keys: List<KeyStroke?>): Editor {
@@ -171,6 +246,13 @@ abstract class VimTestCase : UsefulTestCase() {
     Assert.assertEquals(LogicalPosition(line, column), actualPosition)
   }
 
+  fun assertVisualPosition(visualLine: Int, visualColumn: Int) {
+    val carets = myFixture.editor.caretModel.allCarets
+    Assert.assertEquals("Wrong amount of carets", 1, carets.size)
+    val actualPosition = carets[0].visualPosition
+    Assert.assertEquals(VisualPosition(visualLine, visualColumn), actualPosition)
+  }
+
   fun assertOffset(vararg expectedOffsets: Int) {
     val carets = myFixture.editor.caretModel.allCarets
     if (expectedOffsets.size == 2 && carets.size == 1) {
@@ -179,6 +261,71 @@ abstract class VimTestCase : UsefulTestCase() {
     Assert.assertEquals("Wrong amount of carets", expectedOffsets.size, carets.size)
     for (i in expectedOffsets.indices) {
       Assert.assertEquals(expectedOffsets[i], carets[i].offset)
+    }
+  }
+
+  fun assertOffsetAt(text: String) {
+    val indexOf = myFixture.editor.document.charsSequence.indexOf(text)
+    if (indexOf < 0) kotlin.test.fail()
+    assertOffset(indexOf)
+  }
+
+  // Use logical rather than visual lines, so we can correctly test handling of collapsed folds and soft wraps
+  fun assertVisibleArea(topLogicalLine: Int, bottomLogicalLine: Int) {
+    val actualVisualTop = EditorHelper.getVisualLineAtTopOfScreen(myFixture.editor)
+    val actualLogicalTop = EditorHelper.visualLineToLogicalLine(myFixture.editor, actualVisualTop)
+    val actualVisualBottom = EditorHelper.getVisualLineAtBottomOfScreen(myFixture.editor)
+    val actualLogicalBottom = EditorHelper.visualLineToLogicalLine(myFixture.editor, actualVisualBottom)
+
+    Assert.assertEquals("Top logical lines don't match", topLogicalLine, actualLogicalTop)
+    Assert.assertEquals("Bottom logical lines don't match", bottomLogicalLine, actualLogicalBottom)
+  }
+
+  fun assertVisibleLineBounds(logicalLine: Int, leftLogicalColumn: Int, rightLogicalColumn: Int) {
+    val visualLine = EditorHelper.logicalLineToVisualLine(myFixture.editor, logicalLine)
+    val actualLeftVisualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(myFixture.editor, visualLine)
+    val actualLeftLogicalColumn = myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualLeftVisualColumn)).column
+    val actualRightVisualColumn = EditorHelper.getVisualColumnAtRightOfScreen(myFixture.editor, visualLine)
+    val actualRightLogicalColumn =  myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualRightVisualColumn)).column
+
+    val expected = ScreenBounds(leftLogicalColumn, rightLogicalColumn)
+    val actual = ScreenBounds(actualLeftLogicalColumn, actualRightLogicalColumn)
+    Assert.assertEquals(expected, actual)
+  }
+
+  fun putMapping(modes: Set<MappingMode>, from: String, to: String, recursive: Boolean) {
+    VimPlugin.getKey().putKeyMapping(modes, parseKeys(from), MappingOwner.IdeaVim, parseKeys(to), recursive)
+  }
+
+  fun assertNoMapping(from: String) {
+    val keys = parseKeys(from)
+    for (mode in MappingMode.ALL) {
+      assertNull(VimPlugin.getKey().getKeyMapping(mode).get(keys))
+    }
+  }
+
+  fun assertNoMapping(from: String, modes: Set<MappingMode>) {
+    val keys = parseKeys(from)
+    for (mode in modes) {
+      assertNull(VimPlugin.getKey().getKeyMapping(mode).get(keys))
+    }
+  }
+
+  fun assertMappingExists(from: String, to: String, modes: Set<MappingMode>) {
+    val keys = parseKeys(from)
+    val toKeys = parseKeys(to)
+    for (mode in modes) {
+      val info = VimPlugin.getKey().getKeyMapping(mode).get(keys)
+      kotlin.test.assertNotNull(info)
+      if (info is ToKeysMappingInfo) {
+        assertEquals(toKeys, info.toKeys)
+      }
+    }
+  }
+
+  private data class ScreenBounds(val leftLogicalColumn: Int, val rightLogicalColumn: Int) {
+    override fun toString(): String {
+      return "[$leftLogicalColumn-$rightLogicalColumn]"
     }
   }
 
@@ -256,7 +403,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   private fun performTest(keys: String, after: String, modeAfter: CommandState.Mode, subModeAfter: SubMode) {
-    typeText(StringHelper.parseKeys(keys))
+    typeText(parseKeys(keys))
     myFixture.checkResult(after)
     assertState(modeAfter, subModeAfter)
   }
@@ -282,10 +429,24 @@ abstract class VimTestCase : UsefulTestCase() {
     assertCaretsColour()
     assertMode(modeAfter)
     assertSubMode(subModeAfter)
+    if (Checks.caretShape) assertEquals(myFixture.editor.mode.isBlockCaretShape, myFixture.editor.settings.isBlockCursor)
   }
 
   protected val fileManager: FileEditorManagerEx
     get() = FileEditorManagerEx.getInstanceEx(myFixture.project)
+
+  protected fun addInlay(offset: Int, relatesToPrecedingText: Boolean, widthInColumns: Int): Inlay<*> {
+    // Enforce deterministic tests for inlays. Default text char width is different per platform (e.g. Windows is 7 and
+    // Mac is 8) and using the same inlay width on all platforms can cause columns to be on or off screen unexpectedly.
+    // If inlay width is related to character width, we will scale correctly across different platforms
+    val columnWidth = EditorUtil.getPlainSpaceWidth(myFixture.editor)
+    return EditorTestUtil.addInlay(myFixture.editor, offset, relatesToPrecedingText, widthInColumns * columnWidth)!!
+  }
+
+  // Disable or enable checks for the particular test
+  protected inline fun setupChecks(setup: Checks.() -> Unit) {
+    Checks.setup()
+  }
 
   companion object {
     const val c = EditorTestUtil.CARET_TAG
@@ -300,12 +461,7 @@ abstract class VimTestCase : UsefulTestCase() {
         val inputModel = TestInputModel.getInstance(editor)
         var key = inputModel.nextKeyStroke()
         while (key != null) {
-          val exEntryPanel = ExEntryPanel.getInstance()
-          if (exEntryPanel.isActive) {
-            exEntryPanel.handleKey(key)
-          } else {
-            keyHandler.handleKey(editor, key, dataContext)
-          }
+          keyHandler.handleKey(editor, key, dataContext)
           key = inputModel.nextKeyStroke()
         }
       }, null, null)
@@ -314,9 +470,9 @@ abstract class VimTestCase : UsefulTestCase() {
     @JvmStatic
     fun commandToKeys(command: String): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
-      keys.addAll(StringHelper.parseKeys(":"))
+      keys.addAll(parseKeys(":"))
       keys.addAll(stringToKeys(command))
-      keys.addAll(StringHelper.parseKeys("<Enter>"))
+      keys.addAll(parseKeys("<Enter>"))
       return keys
     }
 
@@ -324,12 +480,32 @@ abstract class VimTestCase : UsefulTestCase() {
 
     fun searchToKeys(pattern: String, forwards: Boolean): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
-      keys.addAll(StringHelper.parseKeys(if (forwards) "/" else "?"))
+      keys.addAll(parseKeys(if (forwards) "/" else "?"))
       keys.addAll(stringToKeys(pattern))
-      keys.addAll(StringHelper.parseKeys("<Enter>"))
+      keys.addAll(parseKeys("<Enter>"))
       return keys
     }
 
     fun String.dotToTab(): String = replace('.', '\t')
+  }
+
+  object Checks {
+    var caretShape: Boolean = true
+
+    val neoVim = NeoVim()
+
+    fun reset() {
+      caretShape = true
+
+      neoVim.reset()
+    }
+
+    class NeoVim {
+      var ignoredRegisters: Set<Char> = setOf()
+
+      fun reset() {
+        ignoredRegisters = setOf()
+      }
+    }
   }
 }

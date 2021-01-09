@@ -1,0 +1,35 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="BooleanMethodIsAlwaysInverted" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="HardCodedStringLiteral" enabled="false" level="WARNING" enabled_by_default="false">
+      <scope name="Production" level="WARNING" enabled="false">
+        <option name="ignoreForAssertStatements" value="true" />
+        <option name="ignoreForExceptionConstructors" value="true" />
+        <option name="ignoreForSpecifiedExceptionConstructors" value="" />
+        <option name="ignoreForJUnitAsserts" value="true" />
+        <option name="ignoreForClassReferences" value="true" />
+        <option name="ignoreForPropertyKeyReferences" value="true" />
+        <option name="ignoreForNonAlpha" value="true" />
+        <option name="ignoreAssignedToConstants" value="false" />
+        <option name="ignoreToString" value="true" />
+        <option name="nonNlsCommentPattern" value="NON-NLS" />
+      </scope>
+      <option name="ignoreForAssertStatements" value="true" />
+      <option name="ignoreForExceptionConstructors" value="true" />
+      <option name="ignoreForSpecifiedExceptionConstructors" value="" />
+      <option name="ignoreForJUnitAsserts" value="true" />
+      <option name="ignoreForClassReferences" value="true" />
+      <option name="ignoreForPropertyKeyReferences" value="true" />
+      <option name="ignoreForNonAlpha" value="true" />
+      <option name="ignoreAssignedToConstants" value="false" />
+      <option name="ignoreToString" value="false" />
+      <option name="nonNlsCommentPattern" value="NON-NLS" />
+    </inspection_tool>
+    <inspection_tool class="MissortedModifiers" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="m_requireAnnotationsFirst" value="true" />
+    </inspection_tool>
+    <inspection_tool class="PluginXmlI18n" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="UnstableApiUsage" enabled="false" level="WARNING" enabled_by_default="false" />
+  </profile>
+</component>

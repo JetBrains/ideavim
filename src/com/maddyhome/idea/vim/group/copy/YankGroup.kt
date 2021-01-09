@@ -32,11 +32,10 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.listener.VimYankListener
 import org.jetbrains.annotations.Contract
-import java.util.*
 import kotlin.math.min
 
 class YankGroup {
-  private val yankListeners: MutableList<VimYankListener> = ContainerUtil.createLockFreeCopyOnWriteList();
+  private val yankListeners: MutableList<VimYankListener> = ContainerUtil.createLockFreeCopyOnWriteList()
 
   fun addListener(listener: VimYankListener) = yankListeners.add(listener)
 
@@ -65,7 +64,8 @@ class YankGroup {
     val ranges = ArrayList<Pair<Int, Int>>(caretModel.caretCount)
 
     // This logic is from original vim
-    val startOffsets = if (argument.motion.action is MotionDownLess1FirstNonSpaceAction) null else HashMap<Caret, Int>(caretModel.caretCount)
+    val startOffsets =
+      if (argument.motion.action is MotionDownLess1FirstNonSpaceAction) null else HashMap<Caret, Int>(caretModel.caretCount)
 
     for (caret in caretModel.allCarets) {
       val motionRange = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument)
@@ -127,7 +127,8 @@ class YankGroup {
           range.startOffsets[i] = EditorHelper.getLineStartForOffset(editor, range.startOffsets[i])
         }
         if (editor.offsetToLogicalPosition(range.endOffsets[i]).column != 0) {
-          range.endOffsets[i] = (EditorHelper.getLineEndForOffset(editor, range.endOffsets[i]) + 1).coerceAtMost(editor.fileSize)
+          range.endOffsets[i] =
+            (EditorHelper.getLineEndForOffset(editor, range.endOffsets[i]) + 1).coerceAtMost(editor.fileSize)
         }
       }
     }
@@ -180,9 +181,11 @@ class YankGroup {
     return TextRange(starts, ends)
   }
 
-  private fun yankRange(editor: Editor, range: TextRange, type: SelectionType,
-                        startOffsets: Map<Caret, Int>?): Boolean {
-    startOffsets?.forEach { caret, offset -> MotionGroup.moveCaret(editor, caret, offset) }
+  private fun yankRange(
+    editor: Editor, range: TextRange, type: SelectionType,
+    startOffsets: Map<Caret, Int>?
+  ): Boolean {
+    startOffsets?.forEach { (caret, offset) -> MotionGroup.moveCaret(editor, caret, offset) }
 
     notifyListeners(editor, range)
 

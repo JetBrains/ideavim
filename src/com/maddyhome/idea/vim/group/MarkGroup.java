@@ -48,6 +48,7 @@ import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -122,7 +123,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     else if (FILE_MARKS.indexOf(ch) >= 0) {
       final HashMap<Character, Mark> fmarks = getFileMarks(editor.getDocument());
       if (fmarks != null) {
-        mark = (Mark)fmarks.get(ch);
+        mark = fmarks.get(ch);
         if (mark != null && mark.isClear()) {
           fmarks.remove(ch);
           mark = null;
@@ -171,7 +172,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     if (fmarks == null) {
       return null;
     }
-    Mark mark = (Mark)fmarks.get(ch);
+    Mark mark = fmarks.get(ch);
     if (mark != null && mark.isClear()) {
       fmarks.remove(ch);
       mark = null;
@@ -752,7 +753,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
 
   public static class MarkListener implements BookmarksListener {
 
-    private WeakReference<Project> project;
+    private final WeakReference<Project> project;
     private Bookmark bookmarkTemplate = null;
 
     @Contract(pure = true)
@@ -811,7 +812,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
   private static final int SAVE_JUMP_COUNT = 100;
 
   public static final String WR_GLOBAL_MARKS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  public static final String WR_REGULAR_FILE_MARKS = "abcdefghijklmnopqrstuvwxyz";
+  public static final @NonNls String WR_REGULAR_FILE_MARKS = "abcdefghijklmnopqrstuvwxyz";
   /** Marks: abcdefghijklmnopqrstuvwxyz' */
   private static final String WR_FILE_MARKS = WR_REGULAR_FILE_MARKS + "'";
 

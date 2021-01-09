@@ -40,7 +40,7 @@ public class SpecialRegistersTest extends VimTestCase {
 
     final RegisterGroup registerGroup = VimPlugin.getRegister();
     registerGroup.setKeys('a', stringToKeys(DUMMY_TEXT));
-    registerGroup.setKeys('-', stringToKeys(DUMMY_TEXT));
+    registerGroup.setKeys(RegisterGroup.SMALL_DELETION_REGISTER, stringToKeys(DUMMY_TEXT));
     for (char c = '0'; c <= '9'; c++) {
       registerGroup.setKeys(c, stringToKeys(DUMMY_TEXT));
     }
@@ -50,7 +50,7 @@ public class SpecialRegistersTest extends VimTestCase {
   public void testSmallDelete() {
     typeTextInFile(parseKeys("de"), "one <caret>two three\n");
 
-    assertEquals("two", getRegisterText('-'));
+    assertEquals("two", getRegisterText(RegisterGroup.SMALL_DELETION_REGISTER));
     // Text smaller than line doesn't go to numbered registers (except special cases)
     assertRegisterNotChanged('1');
   }
@@ -60,7 +60,7 @@ public class SpecialRegistersTest extends VimTestCase {
     typeTextInFile(parseKeys("d%"), "(one<caret> two) three\n");
 
     assertRegisterChanged('1');
-    assertRegisterChanged('-');
+    assertRegisterChanged(RegisterGroup.SMALL_DELETION_REGISTER);
   }
 
   // |d| |(| Special case for small delete
@@ -68,7 +68,7 @@ public class SpecialRegistersTest extends VimTestCase {
     typeTextInFile(parseKeys("d("), "One. Two<caret>. Three.\n");
 
     assertRegisterChanged('1');
-    assertRegisterChanged('-');
+    assertRegisterChanged(RegisterGroup.SMALL_DELETION_REGISTER);
   }
 
   // |d| |)| Special case for small delete
@@ -76,7 +76,7 @@ public class SpecialRegistersTest extends VimTestCase {
     typeTextInFile(parseKeys("d)"), "One. <caret>Two. Three.\n");
 
     assertRegisterChanged('1');
-    assertRegisterChanged('-');
+    assertRegisterChanged(RegisterGroup.SMALL_DELETION_REGISTER);
   }
 
   // |d| |`| Special case for small delete
@@ -84,7 +84,7 @@ public class SpecialRegistersTest extends VimTestCase {
     typeTextInFile(parseKeys("ma", "b", "d`a"), "one two<caret> three\n");
 
     assertRegisterChanged('1');
-    assertRegisterChanged('-');
+    assertRegisterChanged(RegisterGroup.SMALL_DELETION_REGISTER);
   }
 
   // |d| |/| Special case for small delete
@@ -92,7 +92,7 @@ public class SpecialRegistersTest extends VimTestCase {
     typeTextInFile(parseKeys("d/", "o", "<Enter>"), "one <caret>two three\n");
 
     assertRegisterChanged('1');
-    assertRegisterChanged('-');
+    assertRegisterChanged(RegisterGroup.SMALL_DELETION_REGISTER);
   }
 
   // |d| |?| Special case for small delete
@@ -100,7 +100,7 @@ public class SpecialRegistersTest extends VimTestCase {
     typeTextInFile(parseKeys("d?", "t", "<Enter>"), "one two<caret> three\n");
 
     assertRegisterChanged('1');
-    assertRegisterChanged('-');
+    assertRegisterChanged(RegisterGroup.SMALL_DELETION_REGISTER);
   }
 
   // |d| |n| Special case for small delete
@@ -108,7 +108,7 @@ public class SpecialRegistersTest extends VimTestCase {
     typeTextInFile(parseKeys("/", "t", "<Enter>", "dn"), "<caret>one two three\n");
 
     assertRegisterChanged('1');
-    assertRegisterChanged('-');
+    assertRegisterChanged(RegisterGroup.SMALL_DELETION_REGISTER);
   }
 
   // |d| |N| Special case for small delete
@@ -116,7 +116,7 @@ public class SpecialRegistersTest extends VimTestCase {
     typeTextInFile(parseKeys("/", "t", "<Enter>", "dN"), "one tw<caret>o three\n");
 
     assertRegisterChanged('1');
-    assertRegisterChanged('-');
+    assertRegisterChanged(RegisterGroup.SMALL_DELETION_REGISTER);
   }
 
   // |d| |{| Special case for small delete
@@ -124,7 +124,7 @@ public class SpecialRegistersTest extends VimTestCase {
     typeTextInFile(parseKeys("d{"), "one<caret> two three");
 
     assertRegisterChanged('1');
-    assertRegisterChanged('-');
+    assertRegisterChanged(RegisterGroup.SMALL_DELETION_REGISTER);
   }
 
   // |d| |}| Special case for small delete
@@ -132,7 +132,7 @@ public class SpecialRegistersTest extends VimTestCase {
     typeTextInFile(parseKeys("d}"), "one<caret> two three");
 
     assertRegisterChanged('1');
-    assertRegisterChanged('-');
+    assertRegisterChanged(RegisterGroup.SMALL_DELETION_REGISTER);
   }
 
   public void testSmallDeleteInRegister() {
@@ -141,14 +141,14 @@ public class SpecialRegistersTest extends VimTestCase {
     // Small deletes (less than a line) with register specified go to that register and to numbered registers
     assertRegisterChanged('a');
     assertRegisterChanged('1');
-    assertRegisterNotChanged('-');
+    assertRegisterNotChanged(RegisterGroup.SMALL_DELETION_REGISTER);
   }
 
   public void testLineDelete() {
     typeTextInFile(parseKeys("dd"), "one <caret>two three\n");
 
     assertRegisterChanged('1');
-    assertRegisterNotChanged('-');
+    assertRegisterNotChanged(RegisterGroup.SMALL_DELETION_REGISTER);
   }
 
   public void testLineDeleteInRegister() {
@@ -190,5 +190,4 @@ public class SpecialRegistersTest extends VimTestCase {
 
     return register.getText();
   }
-
 }

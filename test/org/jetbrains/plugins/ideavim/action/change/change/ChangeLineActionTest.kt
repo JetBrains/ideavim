@@ -23,10 +23,16 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ChangeLineActionTest : VimTestCase() {
   fun `test on empty file`() {
+    setupChecks {
+      this.neoVim.ignoredRegisters = setOf('1', '"')
+    }
     doTest("cc", "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   fun `test on empty file with S`() {
+    setupChecks {
+      this.neoVim.ignoredRegisters = setOf('1', '"')
+    }
     doTest("S", "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 

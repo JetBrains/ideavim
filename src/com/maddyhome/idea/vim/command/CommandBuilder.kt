@@ -1,6 +1,9 @@
 package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.action.DuplicableOperatorAction
+import com.maddyhome.idea.vim.action.ResetModeAction
+import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction
+import com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.Node
@@ -24,6 +27,9 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
   var expectedArgumentType: Argument.Type? = null
     private set
 
+  var prevExpectedArgumentType: Argument.Type? = null
+    private set
+
   val isReady get() = commandState == CurrentCommandState.READY
   val isBad get() = commandState == CurrentCommandState.BAD_COMMAND
   val isEmpty get() = commandParts.isEmpty()
@@ -38,6 +44,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
 
   fun pushCommandPart(action: EditorActionHandlerBase) {
     commandParts.add(Command(count, action, action.type, action.flags))
+    prevExpectedArgumentType = expectedArgumentType
     expectedArgumentType = action.argumentType
     count = 0
   }
@@ -106,6 +113,14 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     return currentCommandPartNode !is RootNode
   }
 
+  fun isPuttingLiteral(): Boolean {
+    return !commandParts.isEmpty() && commandParts.last.action is InsertCompletedLiteralAction
+  }
+
+  fun isDone(): Boolean {
+    return commandParts.isEmpty()
+  }
+
   fun completeCommandPart(argument: Argument) {
     commandParts.peekLast().argument = argument
     commandState = CurrentCommandState.READY
@@ -121,6 +136,11 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
   }
 
   fun buildCommand(): Command {
+    if (commandParts.last.action is InsertCompletedDigraphAction || commandParts.last.action is ResetModeAction) {
+      expectedArgumentType = prevExpectedArgumentType
+      prevExpectedArgumentType = null
+      return commandParts.removeLast()
+    }
 
     var command: Command = commandParts.removeFirst()
     while (commandParts.size > 0) {
@@ -147,6 +167,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     commandParts.clear()
     keyList.clear()
     expectedArgumentType = null
+    prevExpectedArgumentType = null
   }
 
   fun resetInProgressCommandPart(commandPartNode: CommandPartNode) {
