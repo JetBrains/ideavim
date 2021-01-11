@@ -15,47 +15,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package org.jetbrains.plugins.ideavim.action
 
-package org.jetbrains.plugins.ideavim.action;
-
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.common.Register;
-import com.maddyhome.idea.vim.group.RegisterGroup;
-import com.maddyhome.idea.vim.helper.StringHelper;
-import org.jetbrains.plugins.ideavim.VimTestCase;
-
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.CommandState.Companion.getInstance
+import com.maddyhome.idea.vim.helper.StringHelper
+import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
  * @author vlan
  */
-public class MacroActionTest extends VimTestCase {
+class MacroActionTest : VimTestCase() {
   // |q|
-  public void testRecordMacro() {
-    final Editor editor = typeTextInFile(parseKeys("qa", "3l", "q"), "on<caret>e two three\n");
-    final CommandState commandState = CommandState.getInstance(editor);
-    assertFalse(commandState.isRecording());
-    final RegisterGroup registerGroup = VimPlugin.getRegister();
-    final Register register = registerGroup.getRegister('a');
-    assertNotNull(register);
-    assertEquals("3l", register.getText());
+  fun testRecordMacro() {
+    val editor = typeTextInFile(StringHelper.parseKeys("qa", "3l", "q"), "on<caret>e two three\n")
+    val commandState = getInstance(editor)
+    assertFalse(commandState.isRecording)
+    val registerGroup = VimPlugin.getRegister()
+    val register = registerGroup.getRegister('a')
+    assertNotNull(register)
+    assertEquals("3l", register!!.text)
   }
 
-  public void testRecordMacroDoesNotExpandMap() {
-    configureByText("");
-    enterCommand("imap pp hello");
-    typeText(parseKeys("qa", "i", "pp<Esc>", "q"));
-    final Register register = VimPlugin.getRegister().getRegister('a');
-    assertNotNull(register);
-    assertEquals("ipp<Esc>", StringHelper.toKeyNotation(register.getKeys()));
+  fun testRecordMacroDoesNotExpandMap() {
+    configureByText("")
+    enterCommand("imap pp hello")
+    typeText(StringHelper.parseKeys("qa", "i", "pp<Esc>", "q"))
+    val register = VimPlugin.getRegister().getRegister('a')
+    assertNotNull(register)
+    assertEquals("ipp<Esc>", StringHelper.toKeyNotation(register!!.keys))
   }
 
-  public void testRecordMacroWithDigraph() {
-    typeTextInFile(parseKeys("qa", "i", "<C-K>OK<Esc>", "q"), "");
-    final Register register = VimPlugin.getRegister().getRegister('a');
-    assertNotNull(register);
-    assertEquals("i<C-K>OK<Esc>", StringHelper.toKeyNotation(register.getKeys()));
+  fun testRecordMacroWithDigraph() {
+    typeTextInFile(StringHelper.parseKeys("qa", "i", "<C-K>OK<Esc>", "q"), "")
+    val register = VimPlugin.getRegister().getRegister('a')
+    assertNotNull(register)
+    assertEquals("i<C-K>OK<Esc>", StringHelper.toKeyNotation(register!!.keys))
   }
 }
