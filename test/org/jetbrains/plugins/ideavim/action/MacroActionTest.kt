@@ -20,7 +20,11 @@ package org.jetbrains.plugins.ideavim.action
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState.Companion.getInstance
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.rangeOf
+import org.jetbrains.plugins.ideavim.waitAndAssert
 
 /**
  * @author vlan
@@ -51,5 +55,41 @@ class MacroActionTest : VimTestCase() {
     val register = VimPlugin.getRegister().getRegister('a')
     assertNotNull(register)
     assertEquals("i<C-K>OK<Esc>", StringHelper.toKeyNotation(register!!.keys))
+  }
+
+  fun `test macro with search`() {
+    val content = """
+            A Discovery
+
+            ${c}I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    configureByText(content)
+    typeText(parseKeys("qa", "/rocks<CR>", "q", "gg", "@a"))
+
+    val startOffset = content.rangeOf("rocks").startOffset
+
+    waitAndAssert {
+      startOffset == myFixture.editor.caretModel.offset
+    }
+  }
+
+  fun `test macro with command`() {
+    val content = """
+            A Discovery
+
+            ${c}I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    configureByText(content)
+    typeText(parseKeys("qa", ":map x y<CR>", "q"))
+
+    val register = VimPlugin.getRegister().getRegister('a')
+    val registerSize = register!!.keys.size
+    TestCase.assertEquals(9, registerSize)
   }
 }
