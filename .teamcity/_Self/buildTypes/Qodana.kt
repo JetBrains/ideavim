@@ -3,6 +3,7 @@ package _Self.buildTypes
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.qodana
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object Qodana : BuildType({
@@ -19,8 +20,19 @@ object Qodana : BuildType({
     checkoutMode = CheckoutMode.ON_SERVER
   }
 
+  steps {
+    qodana {
+      name = "Qodana"
+      reportAsTestsEnable = ""
+      failBuildOnErrors = ""
+      codeInspectionXmlConfig = "Custom"
+      codeInspectionCustomXmlConfigPath = ".idea/inspectionProfiles/Qodana.xml"
+    }
+  }
+
   triggers {
     vcs {
+      enabled = false
       branchFilter = ""
     }
   }
