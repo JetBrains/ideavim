@@ -399,7 +399,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
    * @param count   Search for the nth occurrence of the current word
    * @param whole   Include word boundaries in the search pattern
    * @param dir     Which direction to search
-   * @return        The offset of the result, or -1 if no result is found
+   * @return        The offset of the result or the start of the word under the caret if not found. Returns -1 on error
    */
   public int searchWord(@NotNull Editor editor, @NotNull Caret caret, int count, boolean whole, Direction dir) {
     TextRange range = SearchHelper.findWordUnderCursor(editor, caret);
@@ -417,8 +417,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
       pattern.append("\\>");
     }
 
-    MotionGroup.moveCaret(editor, caret, range.getStartOffset());
-
     // Updates RE_LAST, ready for findItOffset
     // Direction is always saved
     // IgnoreSmartCase is always set to true
@@ -431,7 +429,8 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     resetShowSearchHighlight();
     forceUpdateSearchHighlights();
 
-    return findItOffset(editor, caret.getOffset(), count, lastDir);
+    final int offset = findItOffset(editor, range.getStartOffset(), count, lastDir);
+    return offset == -1 ? range.getStartOffset() : offset;
   }
 
   /**
