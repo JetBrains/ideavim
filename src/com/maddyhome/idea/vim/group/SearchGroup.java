@@ -1031,7 +1031,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
     final String pattern = getLastUsedPattern();
     if (pattern != null) {
-      final List<TextRange> results = findAll(editor, pattern, startLine, endLine,
+      final List<TextRange> results = SearchHelper.findAll(editor, pattern, startLine, endLine,
         shouldIgnoreCase(pattern, lastIgnoreSmartCase));
       SearchHighlightsHelper.highlightSearchResults(editor, pattern, results, -1);
     }
