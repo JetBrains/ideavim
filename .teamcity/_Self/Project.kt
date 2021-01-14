@@ -3,6 +3,7 @@ package _Self
 import _Self.buildTypes.GitHubPullRequests
 import _Self.buildTypes.Nvim
 import _Self.buildTypes.PluginVerifier
+import _Self.buildTypes.PropertyBased
 import _Self.buildTypes.Qodana
 import _Self.buildTypes.TestsForIntelliJ20202
 import _Self.buildTypes.TestsForIntelliJ20203
@@ -34,6 +35,8 @@ object Project : Project({
   buildType(TestsForIntelliJ20202)
   buildType(TestsForIntelliJ20203)
   buildType(TestsForIntelliJEAP)
+
+  buildType(PropertyBased)
 
   buildType(Nvim)
   buildType(PluginVerifier)
