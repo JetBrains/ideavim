@@ -34,6 +34,7 @@ changeProject(DslContext.projectId) {
         }
         feature1.apply {
             param("instance-type", "c5d.xlarge")
+            param("spot-instance-price", "0.12")
         }
         val feature2 = find<ProjectFeature> {
             feature {
