@@ -114,6 +114,15 @@ task testWithNeovim(type: Test) {
   systemProperty "ideavim.nvim.test", 'true'
 }
 
+test {
+  exclude '**/propertybased/**'
+}
+
+task testPropertyBased(type: Test) {
+  group = "verification"
+  include '**/propertybased/**'
+}
+
 changelog {
   groups = ["Features:", "Changes:", "Deprecations:", "Fixes:", "Merged PRs:"]
   itemPrefix = "*"
