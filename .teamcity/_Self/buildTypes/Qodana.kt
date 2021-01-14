@@ -32,7 +32,6 @@ object Qodana : BuildType({
 
   triggers {
     vcs {
-      enabled = false
       branchFilter = ""
     }
   }
