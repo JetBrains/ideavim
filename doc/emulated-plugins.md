@@ -22,6 +22,14 @@ Available extensions:
     * Install [IdeaVim-EasyMotion](https://plugins.jetbrains.com/plugin/13360-ideavim-easymotion/)
     and [AceJump](https://plugins.jetbrains.com/plugin/7086-acejump/) plugins.
     * `set easymotion`
+  * <details>
+    <summary>Alternative vim-plug / vundle syntax</summary>
+    <code>Plug 'https://github.com/easymotion/vim-easymotion'</code>
+    <br/>
+    <code>Plug 'easymotion/vim-easymotion'</code>
+    <br/>
+    <code>Plug 'vim-easymotion'</code>
+    </details>
 * Emulates [vim-easymotion](https://github.com/easymotion/vim-easymotion)
 * Commands: All commands with the mappings are supported. See the [full list of supported commands](https://github.com/AlexPl292/IdeaVim-EasyMotion#supported-commands).
 
