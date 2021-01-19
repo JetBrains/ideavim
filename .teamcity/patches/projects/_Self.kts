@@ -59,7 +59,10 @@ changeProject(DslContext.projectId) {
             }
         }
         feature2.apply {
+            param("user-script", "")
+            param("spot-fleet-config", "")
             param("terminate-after-build", "true")
+            param("name", "Cloud Agents - Single Build")
         }
     }
 }
