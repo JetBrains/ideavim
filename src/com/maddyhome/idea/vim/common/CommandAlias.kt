@@ -70,6 +70,19 @@ sealed class CommandAlias(
     override fun printValue(): String = command
   }
 
+  class Call(
+    minimumNumberOfArguments: Int,
+    maximumNumberOfArguments: Int,
+    name: String,
+    val handler: CommandAliasHandler
+  ) : CommandAlias(minimumNumberOfArguments, maximumNumberOfArguments, name) {
+    override fun getCommand(input: String, count: Int): GoalCommand {
+      return GoalCommand.Call(handler)
+    }
+
+    override fun printValue(): String = handler.javaClass.toString()
+  }
+
   val numberOfArguments =
     when {
       this.minimumNumberOfArguments == 0 && this.maximumNumberOfArguments == 0 -> "0" // No arguments
@@ -86,10 +99,13 @@ sealed class CommandAlias(
   private companion object {
     @NonNls
     const val LessThan = "<lt>"
+
     @NonNls
     const val Count = "<count>"
+
     @NonNls
     const val Arguments = "<args>"
+
     @NonNls
     const val QuotedArguments = "<q-args>"
   }
@@ -101,4 +117,10 @@ sealed class GoalCommand {
       val EMPTY = Ex("")
     }
   }
+
+  class Call(val handler: CommandAliasHandler) : GoalCommand()
+}
+
+interface CommandAliasHandler {
+  fun execute()
 }
