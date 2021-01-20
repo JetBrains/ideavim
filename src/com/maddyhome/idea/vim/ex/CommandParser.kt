@@ -26,6 +26,7 @@ import com.intellij.openapi.extensions.ExtensionPointChangeListener
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.util.ThrowableComputable
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.common.GoalCommand
 import com.maddyhome.idea.vim.ex.handler.GotoLineHandler
 import com.maddyhome.idea.vim.ex.ranges.Range.Companion.createRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
@@ -123,11 +124,15 @@ object CommandParser {
     if (VimPlugin.getCommand().isAlias(cmd)) {
       if (aliasCountdown > 0) {
         val commandAlias = VimPlugin.getCommand().getAliasCommand(cmd, count)
-        if (commandAlias.isEmpty()) {
-          logger.warn("Command alias is empty")
-          return
+        when (commandAlias) {
+          is GoalCommand.Ex -> {
+            if (commandAlias.command.isEmpty()) {
+              logger.warn("Command alias is empty")
+              return
+            }
+            processCommand(editor, context, commandAlias.command, count, aliasCountdown - 1)
+          }
         }
-        processCommand(editor, context, commandAlias, count, aliasCountdown - 1)
       } else {
         VimPlugin.showMessage(message("recursion.detected.maximum.alias.depth.reached"))
         VimPlugin.indicateError()
