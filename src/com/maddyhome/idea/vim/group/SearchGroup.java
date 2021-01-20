@@ -205,7 +205,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
    *
    * @param editor      The editor to search in
    * @param pattern     The pattern to search for
-   * @param startLine   The start line of the range to search for, or -1 for the whole document
+   * @param startLine   The start line of the range to search for
    * @param endLine     The end line of the range to search for, or -1 for the whole document
    * @param ignoreCase  Case sensitive or insensitive searching
    * @return            A list of TextRange objects representing the results
@@ -408,20 +408,13 @@ public class SearchGroup implements PersistentStateComponent<Element> {
       return -1;
     }
 
-    StringBuilder pattern = new StringBuilder();
-    if (whole) {
-      pattern.append("\\<");
-    }
-    pattern.append(EditorHelper.getText(editor, range.getStartOffset(), range.getEndOffset()));
-    if (whole) {
-      pattern.append("\\>");
-    }
+    final String pattern = SearchHelper.makeSearchPattern(EditorHelper.getText(editor, range.getStartOffset(), range.getEndOffset()), whole);
 
     // Updates RE_LAST, ready for findItOffset
     // Direction is always saved
     // IgnoreSmartCase is always set to true
     // There is no pattern offset available
-    setLastUsedPattern(pattern.toString(), RE_SEARCH, true);
+    setLastUsedPattern(pattern, RE_SEARCH, true);
     lastIgnoreSmartCase = true;
     lastPatternOffset = "";
     lastDir = dir;
@@ -476,24 +469,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
       offset = findItOffset(editor, startOffset, count + 1, dir);
     }
     return offset;
-  }
-
-  /**
-   * Find the next occurrence of the last used pattern, moving forwards
-   *
-   * <p>Searches for RE_LAST, complete with last used pattern offset. Search is always performed forwards. Wrap depends
-   * on options.</p>
-   *
-   * @param editor  The editor to search in
-   * @param offset  The offset to search from
-   * @param count   Find the nth occurrence
-   * @return        The offset of the next match, or -1 if not found
-   */
-  public int searchNextFromOffset(@NotNull Editor editor, int offset, int count) {
-    // TODO: Remove this. It is only used from multiple-cursors, and shouldn't be using or updating state
-    resetShowSearchHighlight();
-    updateSearchHighlights();
-    return findItOffset(editor, offset, count, Direction.FORWARDS);
   }
 
 
@@ -1196,6 +1171,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
       int line = editor.offsetToLogicalPosition(range.getStartOffset()).line;
       int newLine = EditorHelper.normalizeLine(editor, line + offset);
 
+      // TODO: Don't move the caret!
       res = VimPlugin.getMotion().moveCaretToLineStart(editor, newLine);
     }
     else if (hasEndOffset || offset != 0) {

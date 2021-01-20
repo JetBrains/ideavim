@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim.extension.multiplecursors
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.commandState
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -258,6 +259,12 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @VimBehaviorDiffers(shouldBeFixed = false,
+    description = "Vim does not have native support for multiple cursors, so vim-multiple-cursors fakes it and " +
+      "keeps a track of selections added as part of additional cursors. It will only remove selections from these " +
+      "additional cursors. IdeaVim has native support, so doesn't track if a selection is due to an additional cursor " +
+      "so IdeaVim will remove arbitrary selections, while vim-multiple-cursors do not."
+  )
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testRemoveSelectionVisualMode() {
     val before = """q${s}we
@@ -269,7 +276,13 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     editor.commandState.pushModes(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
 
     typeText(parseKeys("<A-p>"))
-    myFixture.checkResult(before)
+
+    val after = """qwe
+      |dsgkldfjs ldfl gkjsdsl kj
+      |dsfg dhjsdafkljgh
+      |dfkjsg
+    """.trimMargin()
+    myFixture.checkResult(after)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -298,6 +311,16 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |private int e = 4;
     """.trimMargin()
     configureByJavaText(before)
+
+    typeText(parseKeys("<A-n>", "<A-n>".repeat(3), "<A-p>"))
+
+    val after = """private ${s}int${se} a = 0;
+      |private ${s}int${se} b = 1;
+      |private ${s}int${se} c = 2;
+      |private int d = 3;
+      |private int e = 4;
+    """.trimMargin()
+    myFixture.checkResult(after)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -482,7 +505,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
-  fun testNextOccurrenceIgnorecase() {
+  fun testNextOccurrenceCaseSensitive() {
     val before = """@TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
 fun getCellType(${c}pos: VisualPosition): CellType {
     if (pos in snakeCells) {
@@ -500,11 +523,11 @@ fun getCellType(${c}pos: VisualPosition): CellType {
     typeText(commandToKeys("set ignorecase"))
     typeText(parseKeys("g<A-n><A-n><A-n>"))
     val after = """@TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
-fun getCellType(${s}pos$se: Visual${s}Pos${se}ition): CellType {
-    if (${s}pos$se in snakeCells) {
+fun getCellType(${s}pos${se}: VisualPosition): CellType {
+    if (${s}pos${se} in snakeCells) {
       return CellType.SNAKE
     }
-    val char = getCharAt(pos)
+    val char = getCharAt(${s}pos${se})
     return when {
       char.isWhitespace() || pos in eatenCells -> CellType.EMPTY
       char in ANTI_PYTHON_CHARS -> CellType.FOOD
@@ -533,24 +556,24 @@ fun getCellType(${s}pos$se: Visual${s}Pos${se}ition): CellType {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
-  fun `test multiple capitalized occurrences with ignorecase`() {
-    val before = """text ${c}Test text Test text Test text Test text"""
+  fun `test pattern is always case sensitive`() {
+    val before = """test ${c}Test tEst TeSt tEST Test test Test test"""
     configureByText(before)
 
     typeText(commandToKeys("set ignorecase"))
     typeText(parseKeys("<A-n><A-n><A-n><A-n>"))
-    val after = """text ${s}Test$se text ${s}Test$se text ${s}Test$se text ${s}Test$se text"""
+    val after = """test ${s}Test${se} tEst TeSt tEST ${s}Test${se} test ${s}Test${se} test"""
     myFixture.checkResult(after)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
-  fun `test multiple mixed case occurrences with ignorecase`() {
-    val before = """text ${c}Test text tesT text TEST text test text"""
-    configureByText(before)
+  fun `test ignores regex in search pattern`() {
+    val before = "test ${s}t.*st${c}${se} toast tallest t.*st"
+    val editor = configureByText(before)
+    editor.commandState.pushModes(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
 
-    typeText(commandToKeys("set ignorecase"))
-    typeText(parseKeys("<A-n><A-n><A-n><A-n>"))
-    val after = """text ${s}Test$se text ${s}tesT$se text ${s}TEST$se text ${s}test$se text"""
+    typeText(parseKeys("<A-n><A-n>"))
+    val after = "test ${s}t.*st${se} toast tallest ${s}t.*st${se}"
     myFixture.checkResult(after)
   }
 }

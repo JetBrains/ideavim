@@ -56,6 +56,10 @@ import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
  */
 public class SearchHelper {
 
+  public static String makeSearchPattern(String pattern, Boolean whole) {
+    return whole ? "\\<" + pattern + "\\>" : pattern;
+  }
+
   /**
    * Find text matching the given pattern.
    *
@@ -349,7 +353,7 @@ public class SearchHelper {
    *
    * @param editor      The editor to search in
    * @param pattern     The pattern to search for
-   * @param startLine   The start line of the range to search for, or -1 for the whole document
+   * @param startLine   The start line of the range to search for
    * @param endLine     The end line of the range to search for, or -1 for the whole document
    * @param ignoreCase  Case sensitive or insensitive searching
    * @return            A list of TextRange objects representing the results
