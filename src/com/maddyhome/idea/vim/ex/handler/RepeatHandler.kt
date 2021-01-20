@@ -51,13 +51,13 @@ class RepeatHandler : CommandHandler.ForEachCaret() {
     )
 
     if (arg == ':') {
-      return CommandParser.getInstance().processLastCommand(editor, context, 1)
+      return CommandParser.processLastCommand(editor, context, 1)
     }
 
     val reg = VimPlugin.getRegister().getPlaybackRegister(arg) ?: return false
     val text = reg.text ?: return false
 
-    CommandParser.getInstance().processCommand(editor, context, text, 1)
+    CommandParser.processCommand(editor, context, text, 1)
     return true
   }
 }

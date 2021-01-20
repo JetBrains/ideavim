@@ -15,76 +15,57 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.maddyhome.idea.vim.ex;
+package com.maddyhome.idea.vim.ex
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.extensions.ExtensionPointName;
-import com.intellij.openapi.util.ThrowableComputable;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.common.Register;
-import com.maddyhome.idea.vim.ex.handler.GotoLineHandler;
-import com.maddyhome.idea.vim.ex.ranges.Range;
-import com.maddyhome.idea.vim.ex.ranges.Ranges;
-import com.maddyhome.idea.vim.group.HistoryGroup;
-import com.maddyhome.idea.vim.group.RegisterGroup;
-import com.maddyhome.idea.vim.helper.MessageHelper;
-import com.maddyhome.idea.vim.helper.Msg;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.extensions.ExtensionPointChangeListener
+import com.intellij.openapi.extensions.ExtensionPointName
+import com.intellij.openapi.util.ThrowableComputable
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.ex.handler.GotoLineHandler
+import com.maddyhome.idea.vim.ex.ranges.Range.Companion.createRange
+import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.group.HistoryGroup
+import com.maddyhome.idea.vim.group.RegisterGroup
+import com.maddyhome.idea.vim.helper.MessageHelper.message
+import com.maddyhome.idea.vim.helper.Msg
+import java.util.regex.Pattern
 
 /**
  * Maintains a tree of Ex commands based on the required and optional parts of the command names. Parses and
  * executes Ex commands entered by the user.
  */
-public class CommandParser {
-  private static final int MAX_RECURSION = 100;
-  private static final Pattern TRIM_WHITESPACE = Pattern.compile("[ \\t]*(.*)[ \\t\\n\\r]+", Pattern.DOTALL);
-  public static final ExtensionPointName<ExBeanClass> EX_COMMAND_EP = ExtensionPointName.create("IdeaVIM.vimExCommand");
+object CommandParser {
+  private const val MAX_RECURSION = 100
+  private val TRIM_WHITESPACE = Pattern.compile("[ \\t]*(.*)[ \\t\\n\\r]+", Pattern.DOTALL)
+  val EX_COMMAND_EP = ExtensionPointName.create<ExBeanClass>("IdeaVIM.vimExCommand")
+  private val logger = logger<CommandParser>()
 
-  private static class CommandParserHolder {
-    static final CommandParser INSTANCE = new CommandParser();
-  }
+  private val root = CommandNode()
 
-  /**
-   * There is only one parser.
-   *
-   * @return The singleton instance
-   */
-  public static synchronized CommandParser getInstance() {
-    return CommandParserHolder.INSTANCE;
-  }
-
-  /**
-   * Don't let anyone create one of these.
-   */
-  private CommandParser() {
-  }
-
-  public void unregisterHandlers() {
-    root.clear();
+  fun unregisterHandlers() {
+    root.clear()
   }
 
   /**
    * Registers all the supported Ex commands
    */
-  public void registerHandlers() {
-    EX_COMMAND_EP.extensions().forEach(ExBeanClass::register);
-    registerEpListener();
+  fun registerHandlers() {
+    EX_COMMAND_EP.extensions().forEach(ExBeanClass::register)
+    registerEpListener()
   }
 
-  private void registerEpListener() {
+  private fun registerEpListener() {
     // IdeaVim doesn't support contribution to ex_command_ep extension point, so technically we can skip this update,
     //   but let's support dynamic plugins in a more classic way and reload handlers on every EP change.
-    EX_COMMAND_EP.getPoint(null).addExtensionPointListener(() -> {
-      unregisterHandlers();
-      registerHandlers();
-    }, false, VimPlugin.getInstance());
+    EX_COMMAND_EP.getPoint(null).addExtensionPointListener(ExtensionPointChangeListener {
+      unregisterHandlers()
+      registerHandlers()
+    }, false, VimPlugin.getInstance())
   }
 
   /**
@@ -96,16 +77,12 @@ public class CommandParser {
    * @return True if the command succeeded, false if it failed or there was no previous command
    * @throws ExException if any part of the command was invalid
    */
-  public boolean processLastCommand(@NotNull Editor editor, @NotNull DataContext context, int count) throws ExException {
-    final Register reg = VimPlugin.getRegister().getRegister(':');
-    if (reg != null) {
-      final String text = reg.getText();
-      if (text != null) {
-        processCommand(editor, context, text, count);
-        return true;
-      }
-    }
-    return false;
+  @kotlin.jvm.Throws(ExException::class)
+  fun processLastCommand(editor: Editor, context: DataContext, count: Int): Boolean {
+    val reg = VimPlugin.getRegister().getRegister(':') ?: return false
+    val text = reg.text ?: return false
+    processCommand(editor, context, text, count)
+    return true
   }
 
   /**
@@ -117,17 +94,20 @@ public class CommandParser {
    * @param count   The count entered before the colon
    * @throws ExException if any part of the command is invalid or unknown
    */
-  public void processCommand(@NotNull Editor editor, @NotNull DataContext context, @NotNull String cmd,
-                            int count) throws ExException {
-    processCommand(editor, context, cmd, count, MAX_RECURSION);
+  @kotlin.jvm.Throws(ExException::class)
+  fun processCommand(editor: Editor, context: DataContext, cmd: String, count: Int) {
+    processCommand(editor, context, cmd, count, MAX_RECURSION)
   }
 
-  private void processCommand(@NotNull Editor editor, @NotNull DataContext context, @NotNull String cmd,
-                             int count, int aliasCountdown) throws ExException {
+  @kotlin.jvm.Throws(ExException::class)
+  private fun processCommand(
+    editor: Editor, context: DataContext, cmd: String,
+    count: Int, aliasCountdown: Int
+  ) {
     // Nothing entered
-    if (cmd.length() == 0) {
-      logger.warn("CMD is empty");
-      return;
+    if (cmd.isEmpty()) {
+      logger.warn("CMD is empty")
+      return
     }
 
     // Only save the command to the history if it is at the top of the stack.
@@ -135,80 +115,68 @@ public class CommandParser {
     // user input.
     if (aliasCountdown == MAX_RECURSION) {
       // Save the command history
-      VimPlugin.getHistory().addEntry(HistoryGroup.COMMAND, cmd);
+      VimPlugin.getHistory().addEntry(HistoryGroup.COMMAND, cmd)
     }
 
     // If there is a command alias for the entered text, then process the alias and return that
     // instead of the original command.
     if (VimPlugin.getCommand().isAlias(cmd)) {
       if (aliasCountdown > 0) {
-        String commandAlias = VimPlugin.getCommand().getAliasCommand(cmd, count);
+        val commandAlias = VimPlugin.getCommand().getAliasCommand(cmd, count)
         if (commandAlias.isEmpty()) {
-          logger.warn("Command alias is empty");
-          return;
+          logger.warn("Command alias is empty")
+          return
         }
-        processCommand(editor, context, commandAlias, count, aliasCountdown - 1);
+        processCommand(editor, context, commandAlias, count, aliasCountdown - 1)
       } else {
-        VimPlugin.showMessage(MessageHelper.message("recursion.detected.maximum.alias.depth.reached"));
-        VimPlugin.indicateError();
-        logger.warn("Recursion detected, maximum alias depth reached. ");
+        VimPlugin.showMessage(message("recursion.detected.maximum.alias.depth.reached"))
+        VimPlugin.indicateError()
+        logger.warn("Recursion detected, maximum alias depth reached. ")
       }
-      return;
+      return
     }
 
     // Parse the command
-    final ExCommand command = parse(cmd);
-    final CommandHandler handler = getCommandHandler(command);
-
+    val command = parse(cmd)
+    val handler = getCommandHandler(command)
     if (handler == null) {
-      final String message = MessageHelper.message(Msg.NOT_EX_CMD, command.getCommand());
-      throw new InvalidCommandException(message, cmd);
+      val message = message(Msg.NOT_EX_CMD, command.command)
+      throw InvalidCommandException(message, cmd)
     }
-
-    if (handler.getArgFlags().getAccess() == CommandHandler.Access.WRITABLE && !editor.getDocument().isWritable()) {
-      VimPlugin.indicateError();
-      logger.info("Trying to modify readonly document");
-      return;
+    if (handler.argFlags.access === CommandHandler.Access.WRITABLE && !editor.document.isWritable) {
+      VimPlugin.indicateError()
+      logger.info("Trying to modify readonly document")
+      return
     }
 
     // Run the command
-
-    ThrowableComputable<Object, ExException> runCommand = () -> {
-      boolean ok = handler.process(editor, context, command, count);
-      if (ok && !handler.getArgFlags().getFlags().contains(CommandHandler.Flag.DONT_SAVE_LAST)) {
-        VimPlugin.getRegister().storeTextSpecial(RegisterGroup.LAST_COMMAND_REGISTER, cmd);
+    val runCommand = ThrowableComputable<Any?, ExException> {
+      val ok = handler.process(editor, context, command, count)
+      if (ok && !handler.argFlags.flags.contains(CommandHandler.Flag.DONT_SAVE_LAST)) {
+        VimPlugin.getRegister().storeTextSpecial(RegisterGroup.LAST_COMMAND_REGISTER, cmd)
       }
-      return null;
-    };
-
-    switch (handler.getArgFlags().getAccess()) {
-      case WRITABLE:
-        ApplicationManager.getApplication().runWriteAction(runCommand);
-        break;
-      case READ_ONLY:
-        ApplicationManager.getApplication().runReadAction(runCommand);
-        break;
-      case SELF_SYNCHRONIZED:
-        runCommand.compute();
+      null
+    }
+    when (handler.argFlags.access) {
+      CommandHandler.Access.WRITABLE -> ApplicationManager.getApplication().runWriteAction(runCommand)
+      CommandHandler.Access.READ_ONLY -> ApplicationManager.getApplication().runReadAction(runCommand)
+      CommandHandler.Access.SELF_SYNCHRONIZED -> runCommand.compute()
     }
   }
 
-  public @Nullable CommandHandler getCommandHandler(@NotNull ExCommand command) {
-    final String cmd = command.getCommand();
+  fun getCommandHandler(command: ExCommand): CommandHandler? {
+    val cmd = command.command
     // If there is no command, just a range, use the 'goto line' handler
-    if (cmd.length() == 0) {
-      return new GotoLineHandler();
+    if (cmd.isEmpty()) {
+      return GotoLineHandler()
     }
     // See if the user entered a supported command by checking each character entered
-    CommandNode node = root;
-    for (int i = 0; i < cmd.length(); i++) {
-      node = node.getChild(cmd.charAt(i));
-      if (node == null) {
-        return null;
-      }
+    var node: CommandNode = root
+    for (element in cmd) {
+      node = node.getChild(element) ?: return null
     }
-    final ExBeanClass handlerHolder = node.getCommandHandler();
-    return handlerHolder != null ? handlerHolder.getInstance() : null;
+    val handlerHolder = node.commandHandler
+    return handlerHolder?.instance
   }
 
   /**
@@ -218,414 +186,331 @@ public class CommandParser {
    * @return The parse result
    * @throws ExException if the text is syntactically incorrect
    */
-  public @NotNull ExCommand parse(@NotNull String cmd) throws ExException {
+  @kotlin.jvm.Throws(ExException::class)
+  fun parse(cmd: String): ExCommand {
     // This is a complicated state machine that should probably be rewritten
-    if (logger.isDebugEnabled()) {
-      logger.debug("processing `" + cmd + "'");
-    }
-    State state = State.START;
-    Ranges ranges = new Ranges(); // The list of ranges
-    StringBuilder command = new StringBuilder(); // The command
-    StringBuilder argument = new StringBuilder(); // The command's argument(s)
-    StringBuffer location = null; // The current range text
-    int offsetSign = 1; // Sign of current range offset
-    int offsetNumber = 0; // The value of the current range offset
-    int offsetTotal = 0; // The sum of all the current range offsets
-    boolean move = false; // , vs. ; separated ranges (true=; false=,)
-    char patternType = 0; // ? or /
-    int backCount = 0; // Number of backslashes in a row in a pattern
-    boolean inBrackets = false; // If inside [ ] range in a pattern
-    String error = "";
+    logger.debug { "processing `$cmd'" }
+
+    var state = State.START
+    val ranges = Ranges() // The list of ranges
+    val command = StringBuilder() // The command
+    val argument = StringBuilder() // The command's argument(s)
+    var location: StringBuffer? = null // The current range text
+    var offsetSign = 1 // Sign of current range offset
+    var offsetNumber = 0 // The value of the current range offset
+    var offsetTotal = 0 // The sum of all the current range offsets
+    var move = false // , vs. ; separated ranges (true=; false=,)
+    var patternType = 0.toChar() // ? or /
+    var backCount = 0 // Number of backslashes in a row in a pattern
+    var inBrackets = false // If inside [ ] range in a pattern
+    var error = ""
 
     // Loop through each character. Treat the end of the string as a newline character
-    for (int i = 0; i <= cmd.length(); i++) {
-      boolean reprocess = true; // Should the current character be reprocessed after a state change?
-      char ch = (i == cmd.length() ? '\n' : cmd.charAt(i));
-      while (reprocess) {
-        switch (state) {
-          case START: // Very start of the entered text
-            if (Character.isLetter(ch) || "~<>@=#*&!".indexOf(ch) >= 0) {
-              state = State.COMMAND;
-            }
-            else if (ch == ' ') {
-              state = State.START;
-              reprocess = false;
-            }
-            else {
-              state = State.RANGE;
-            }
-            break;
-          case COMMAND: // Reading the actual command name
-            // For commands that start with a non-letter, treat other non-letter characters as part of
+    for (i in 0..cmd.length) {
+      var reprocess = true // Should the current character be reprocessed after a state change?
+      val ch = if (i == cmd.length) '\n' else cmd[i]
+      loop@ while (reprocess) {
+        when (state) {
+          State.START -> if (Character.isLetter(ch) || "~<>@=#*&!".indexOf(ch) >= 0) {
+            state = State.COMMAND
+          } else if (ch == ' ') {
+            state = State.START
+            reprocess = false
+          } else {
+            state = State.RANGE
+          }
+          State.COMMAND ->             // For commands that start with a non-letter, treat other non-letter characters as part of
             // the argument except for !, <, or >
             if (Character.isLetter(ch) ||
-                (command.length() == 0 && "~<>@=#*&!".indexOf(ch) >= 0) ||
-                (command.length() > 0 && ch == command.charAt(command.length() - 1) &&
-                 "<>".indexOf(ch) >= 0)) {
-              command.append(ch);
-              reprocess = false;
+              command.isEmpty() && "~<>@=#*&!".indexOf(ch) >= 0 ||
+              command.isNotEmpty() && ch == command[command.length - 1] && "<>".indexOf(ch) >= 0
+            ) {
+              command.append(ch)
+              reprocess = false
               if (!Character.isLetter(ch) && "<>".indexOf(ch) < 0) {
-                state = State.CMD_ARG;
+                state = State.CMD_ARG
               }
+            } else {
+              state = State.CMD_ARG
             }
-            else {
-              state = State.CMD_ARG;
+          State.CMD_ARG -> {
+            argument.append(ch)
+            reprocess = false
+          }
+          State.RANGE -> {
+            location = StringBuffer()
+            offsetTotal = 0
+            offsetNumber = 0
+            move = false
+            if (ch in '0'..'9') {
+              state = State.RANGE_LINE
+            } else if (ch == '.') {
+              state = State.RANGE_CURRENT
+            } else if (ch == '$') {
+              state = State.RANGE_LAST
+            } else if (ch == '%') {
+              state = State.RANGE_ALL
+            } else if (ch == '\'') {
+              state = State.RANGE_MARK
+            } else if (ch == '+' || ch == '-') {
+              location.append('.')
+              state = State.RANGE_OFFSET
+            } else if (ch == '\\') {
+              location.append(ch)
+              state = State.RANGE_SHORT_PATTERN
+              reprocess = false
+            } else if (ch == ',') {
+              location.append('.')
+              state = State.RANGE_MAYBE_DONE
+            } else if (ch == '/' || ch == '?') {
+              location.append(ch)
+              patternType = ch
+              backCount = 0
+              inBrackets = false
+              state = State.RANGE_PATTERN
+              reprocess = false
+            } else {
+              error = message(Msg.e_badrange, Character.toString(ch))
+              state = State.ERROR
+              reprocess = false
             }
-            break;
-          case CMD_ARG: // Reading the command's argument
-            argument.append(ch);
-            reprocess = false;
-            break;
-          case RANGE: // Starting a new range
-            location = new StringBuffer();
-            offsetTotal = 0;
-            offsetNumber = 0;
-            move = false;
-            if (ch >= '0' && ch <= '9') {
-              state = State.RANGE_LINE;
-            }
-            else if (ch == '.') {
-              state = State.RANGE_CURRENT;
-            }
-            else if (ch == '$') {
-              state = State.RANGE_LAST;
-            }
-            else if (ch == '%') {
-              state = State.RANGE_ALL;
-            }
-            else if (ch == '\'') {
-              state = State.RANGE_MARK;
-            }
-            else if (ch == '+' || ch == '-') {
-              location.append('.');
-              state = State.RANGE_OFFSET;
-            }
-            else if (ch == '\\') {
-              location.append(ch);
-              state = State.RANGE_SHORT_PATTERN;
-              reprocess = false;
-            }
-            else if (ch == ',') {
-              location.append('.');
-              state = State.RANGE_MAYBE_DONE;
-            }
-            else if (ch == '/' || ch == '?') {
-              location.append(ch);
-              patternType = ch;
-              backCount = 0;
-              inBrackets = false;
-              state = State.RANGE_PATTERN;
-              reprocess = false;
-            }
-            else {
-              error = MessageHelper.message(Msg.e_badrange, Character.toString(ch));
-              state = State.ERROR;
-              reprocess = false;
-            }
-            break;
-          case RANGE_SHORT_PATTERN: // Handle \/, \?, and \& patterns
+          }
+          State.RANGE_SHORT_PATTERN -> {
             if (ch == '/' || ch == '?' || ch == '&') {
-              location.append(ch);
-              state = State.RANGE_PATTERN_MAYBE_DONE;
+              location!!.append(ch)
+              state = State.RANGE_PATTERN_MAYBE_DONE
+            } else {
+              error = message(Msg.e_backslash)
+              state = State.ERROR
             }
-            else {
-              error = MessageHelper.message(Msg.e_backslash);
-              state = State.ERROR;
-            }
-            reprocess = false;
-            break;
-          case RANGE_PATTERN: // Reading a pattern range
-            // No trailing / or ? required if there is no command so look for newline to tell us we are done
+            reprocess = false
+          }
+          State.RANGE_PATTERN ->             // No trailing / or ? required if there is no command so look for newline to tell us we are done
             if (ch == '\n') {
-              location.append(patternType);
-              state = State.RANGE_MAYBE_DONE;
-            }
-            else {
+              location!!.append(patternType)
+              state = State.RANGE_MAYBE_DONE
+            } else {
               // We need to skip over [ ] ranges. The ] is valid right after the [ or [^
-              location.append(ch);
+              location!!.append(ch)
               if (ch == '[' && !inBrackets) {
-                inBrackets = true;
-              }
-              else if (ch == ']' && inBrackets && !(location.charAt(location.length() - 2) == '[' ||
-                                                    (location.length() >= 3 && location.substring(location.length() - 3).equals("[^]")))) {
-                inBrackets = false;
-              }
-              // Keep count of the backslashes
-              else if (ch == '\\') {
-                backCount++;
-              }
-              // Does this mark the end of the current pattern? True if we found the matching / or ?
-              // and it is not preceded by an even number of backslashes
-              else if (ch == patternType && !inBrackets &&
-                       (location.charAt(location.length() - 2) != '\\' || backCount % 2 == 0)) {
-                state = State.RANGE_PATTERN_MAYBE_DONE;
+                inBrackets = true
+              } else if (ch == ']' && inBrackets && !(location[location.length - 2] == '[' ||
+                  location.length >= 3 && location.substring(location.length - 3) == "[^]")
+              ) {
+                inBrackets = false
+              } else if (ch == '\\') {
+                backCount++
+              } else if (ch == patternType && !inBrackets &&
+                (location[location.length - 2] != '\\' || backCount % 2 == 0)
+              ) {
+                state = State.RANGE_PATTERN_MAYBE_DONE
               }
 
               // No more backslashes
               if (ch != '\\') {
-                backCount = 0;
+                backCount = 0
               }
-
-              reprocess = false;
+              reprocess = false
             }
-            break;
-          case RANGE_PATTERN_MAYBE_DONE: // Check to see if there is another immediate pattern
-            if (ch == '/' || ch == '?') {
-              // Use a special character to separate pattern for later, easier, parsing
-              location.append('\u0000');
-              location.append(ch);
-              patternType = ch;
-              backCount = 0;
-              inBrackets = false;
-              state = State.RANGE_PATTERN;
-              reprocess = false;
-            }
-            else {
-              state = State.RANGE_MAYBE_DONE;
-            }
-            break;
-          case RANGE_LINE: // Explicit line number
-            if (ch >= '0' && ch <= '9') {
-              location.append(ch);
-              state = State.RANGE_MAYBE_DONE;
-              reprocess = false;
-            }
-            else {
-              state = State.RANGE_MAYBE_DONE;
-            }
-            break;
-          case RANGE_CURRENT: // Current line - .
-            location.append(ch);
-            state = State.RANGE_MAYBE_DONE;
-            reprocess = false;
-            break;
-          case RANGE_LAST: // Last line - $
-            location.append(ch);
-            state = State.RANGE_MAYBE_DONE;
-            reprocess = false;
-            break;
-          case RANGE_ALL: // All lines - %
-            location.append(ch);
-            state = State.RANGE_MAYBE_DONE;
-            reprocess = false;
-            break;
-          case RANGE_MARK: // Mark line - 'x
-            location.append(ch);
-            state = State.RANGE_MARK_CHAR;
-            reprocess = false;
-            break;
-          case RANGE_MARK_CHAR: // Actual mark
-            location.append(ch);
-            state = State.RANGE_MAYBE_DONE;
-            reprocess = false;
-            break;
-          case RANGE_DONE: // We have hit the end of a range - process it
-            Range[] range = Range.createRange(location.toString(), offsetTotal, move);
+          State.RANGE_PATTERN_MAYBE_DONE -> if (ch == '/' || ch == '?') {
+            // Use a special character to separate pattern for later, easier, parsing
+            location!!.append('\u0000')
+            location.append(ch)
+            patternType = ch
+            backCount = 0
+            inBrackets = false
+            state = State.RANGE_PATTERN
+            reprocess = false
+          } else {
+            state = State.RANGE_MAYBE_DONE
+          }
+          State.RANGE_LINE -> if (ch in '0'..'9') {
+            location!!.append(ch)
+            state = State.RANGE_MAYBE_DONE
+            reprocess = false
+          } else {
+            state = State.RANGE_MAYBE_DONE
+          }
+          State.RANGE_CURRENT -> {
+            location!!.append(ch)
+            state = State.RANGE_MAYBE_DONE
+            reprocess = false
+          }
+          State.RANGE_LAST -> {
+            location!!.append(ch)
+            state = State.RANGE_MAYBE_DONE
+            reprocess = false
+          }
+          State.RANGE_ALL -> {
+            location!!.append(ch)
+            state = State.RANGE_MAYBE_DONE
+            reprocess = false
+          }
+          State.RANGE_MARK -> {
+            location!!.append(ch)
+            state = State.RANGE_MARK_CHAR
+            reprocess = false
+          }
+          State.RANGE_MARK_CHAR -> {
+            location!!.append(ch)
+            state = State.RANGE_MAYBE_DONE
+            reprocess = false
+          }
+          State.RANGE_DONE -> {
+            val range = createRange(location.toString(), offsetTotal, move)
             if (range == null) {
-              error = MessageHelper.message(Msg.e_badrange, Character.toString(ch));
-              state = State.ERROR;
-              reprocess = false;
-              break;
+              error = message(Msg.e_badrange, Character.toString(ch))
+              state = State.ERROR
+              reprocess = false
+              break@loop
             }
-            ranges.addRange(range);
+            ranges.addRange(range)
             // Could there be more ranges - nope - at end, start command
             if (ch == ':' || ch == '\n') {
-              state = State.COMMAND;
-              reprocess = false;
+              state = State.COMMAND
+              reprocess = false
+            } else if (Character.isLetter(ch) || "~<>@=#*&!".indexOf(ch) >= 0 || ch == ' ') {
+              state = State.START
+            } else {
+              state = State.RANGE
             }
-            // Start of command
-            else if (Character.isLetter(ch) || "~<>@=#*&!".indexOf(ch) >= 0 || ch == ' ') {
-              state = State.START;
+          }
+          State.RANGE_MAYBE_DONE ->             // The range has an offset after it
+            state = if (ch == '+' || ch == '-') {
+              State.RANGE_OFFSET
+            } else if (ch == ',' || ch == ';') {
+              State.RANGE_SEPARATOR
+            } else if (ch in '0'..'9') {
+              State.RANGE_LINE
+            } else {
+              State.RANGE_DONE
             }
-            // We have another range
-            else {
-              state = State.RANGE;
-            }
-            break;
-          case RANGE_MAYBE_DONE: // Are we done with the current range?
-            // The range has an offset after it
-            if (ch == '+' || ch == '-') {
-              state = State.RANGE_OFFSET;
-            }
-            // End of the range - we found a separator
-            else if (ch == ',' || ch == ';') {
-              state = State.RANGE_SEPARATOR;
-            }
-            // Part of a line number
-            else if (ch >= '0' && ch <= '9') {
-              state = State.RANGE_LINE;
-            }
-            // No more range
-            else {
-              state = State.RANGE_DONE;
-            }
-            break;
-          case RANGE_OFFSET: // Offset after a range
+          State.RANGE_OFFSET -> {
             // Figure out the sign of the offset and reset the offset value
-            offsetNumber = 0;
+            offsetNumber = 0
             if (ch == '+') {
-              offsetSign = 1;
+              offsetSign = 1
+            } else if (ch == '-') {
+              offsetSign = -1
             }
-            else if (ch == '-') {
-              offsetSign = -1;
+            state = State.RANGE_OFFSET_MAYBE_DONE
+            reprocess = false
+          }
+          State.RANGE_OFFSET_MAYBE_DONE ->             // We found an offset value
+            state = if (ch in '0'..'9') {
+              State.RANGE_OFFSET_NUM
+            } else {
+              State.RANGE_OFFSET_DONE
             }
-            state = State.RANGE_OFFSET_MAYBE_DONE;
-            reprocess = false;
-            break;
-          case RANGE_OFFSET_MAYBE_DONE: // Are we done with the offset?
-            // We found an offset value
-            if (ch >= '0' && ch <= '9') {
-              state = State.RANGE_OFFSET_NUM;
-            }
-            // Yes, offset done
-            else {
-              state = State.RANGE_OFFSET_DONE;
-            }
-            break;
-          case RANGE_OFFSET_DONE: // At the end of a range offset
+          State.RANGE_OFFSET_DONE -> {
             // No number implies a one
             if (offsetNumber == 0) {
-              offsetNumber = 1;
+              offsetNumber = 1
             }
             // Update offset total for this range
-            offsetTotal += offsetNumber * offsetSign;
+            offsetTotal += offsetNumber * offsetSign
 
             // Another offset
-            if (ch == '+' || ch == '-') {
-              state = State.RANGE_OFFSET;
+            state = if (ch == '+' || ch == '-') {
+              State.RANGE_OFFSET
+            } else {
+              State.RANGE_MAYBE_DONE
             }
-            // No more offsets for this range
-            else {
-              state = State.RANGE_MAYBE_DONE;
+          }
+          State.RANGE_OFFSET_NUM ->             // Update the value of the current offset
+            if (ch in '0'..'9') {
+              offsetNumber = offsetNumber * 10 + (ch - '0')
+              state = State.RANGE_OFFSET_MAYBE_DONE
+              reprocess = false
+            } else if (ch == '+' || ch == '-') {
+              state = State.RANGE_OFFSET_DONE
+            } else {
+              state = State.RANGE_OFFSET_MAYBE_DONE
             }
-            break;
-          case RANGE_OFFSET_NUM: // An offset number
-            // Update the value of the current offset
-            if (ch >= '0' && ch <= '9') {
-              offsetNumber = offsetNumber * 10 + (ch - '0');
-              state = State.RANGE_OFFSET_MAYBE_DONE;
-              reprocess = false;
-            }
-            // Found the start of a new offset
-            else if (ch == '+' || ch == '-') {
-              state = State.RANGE_OFFSET_DONE;
-            }
-            else {
-              state = State.RANGE_OFFSET_MAYBE_DONE;
-            }
-            break;
-          case RANGE_SEPARATOR: // Found a range separator
+          State.RANGE_SEPARATOR -> {
             if (ch == ',') {
-              move = false;
+              move = false
+            } else if (ch == ';') {
+              move = true
             }
-            else if (ch == ';') {
-              move = true;
-            }
-            state = State.RANGE_DONE;
-            reprocess = false;
-            break;
-          case ERROR:
-            break;
+            state = State.RANGE_DONE
+            reprocess = false
+          }
+          State.ERROR -> {
+          }
         }
       }
 
       // Oops - bad command string
       if (state == State.ERROR) {
-        throw new InvalidCommandException(error, cmd);
+        throw InvalidCommandException(error, cmd)
       }
     }
-
-    if (logger.isDebugEnabled()) {
-      logger.debug("ranges = " + ranges);
-      logger.debug("command = " + command);
-      logger.debug("argument = " + argument);
+    if (logger.isDebugEnabled) {
+      logger.debug("ranges = $ranges")
+      logger.debug("command = $command")
+      logger.debug("argument = $argument")
     }
-
-    String argumentString = argument.toString();
-    final Matcher matcher = TRIM_WHITESPACE.matcher(argumentString);
+    var argumentString = argument.toString()
+    val matcher = TRIM_WHITESPACE.matcher(argumentString)
     if (matcher.matches()) {
-      argumentString = matcher.group(1);
+      argumentString = matcher.group(1)
     }
-    return new ExCommand(ranges, command.toString(), argumentString);
+    return ExCommand(ranges, command.toString(), argumentString)
   }
 
-  /** Adds a command handler to the parser */
-  public void addHandler(@NotNull ExBeanClass handlerHolder) {
+  /** Adds a command handler to the parser  */
+  fun addHandler(handlerHolder: ExBeanClass) {
     // Iterator through each command name alias
-    CommandName[] names;
-    if (handlerHolder.getNames() != null) {
-      names = CommandDefinitionKt.commands(handlerHolder.getNames().split(","));
-    }
-    else if (handlerHolder.getInstance() instanceof ComplicatedNameExCommand) {
-      names = ((ComplicatedNameExCommand)handlerHolder.getInstance()).getNames();
-    }
-    else {
-      throw new RuntimeException("Cannot create an ex command: " + handlerHolder);
-    }
-    for (CommandName name : names) {
-      CommandNode node = root;
-      String text = name.getRequired();
-      // Build a tree for each character in the required portion of the command name
-      for (int i = 0; i < text.length() - 1; i++) {
-        CommandNode cn = node.getChild(text.charAt(i));
-        if (cn == null) {
-          cn = node.addChild(text.charAt(i), null);
+    val names: Array<CommandName> = when {
+        handlerHolder.names != null -> {
+          commands(*handlerHolder.names!!.split(",").toTypedArray())
         }
-
-        node = cn;
+        handlerHolder.instance is ComplicatedNameExCommand -> {
+          (handlerHolder.instance as ComplicatedNameExCommand).names
+        }
+        else -> throw RuntimeException("Cannot create an ex command: $handlerHolder")
+    }
+    for (name in names) {
+      var node = root
+      var text = name.required
+      // Build a tree for each character in the required portion of the command name
+      for (i in 0 until text.length - 1) {
+        var cn = node.getChild(text[i])
+        if (cn == null) {
+          cn = node.addChild(text[i], null)
+        }
+        node = cn
       }
 
       // For the last character we need to add the actual handler
-      CommandNode cn = node.getChild(text.charAt(text.length() - 1));
+      var cn = node.getChild(text[text.length - 1])
       if (cn == null) {
-        cn = node.addChild(text.charAt(text.length() - 1), handlerHolder);
+        cn = node.addChild(text[text.length - 1], handlerHolder)
+      } else {
+        cn.commandHandler = handlerHolder
       }
-      else {
-        cn.setCommandHandler(handlerHolder);
-      }
-      node = cn;
+      node = cn
 
       // Now add the handler for each character in the optional portion of the command name
-      text = name.getOptional();
-      for (int i = 0; i < text.length(); i++) {
-        cn = node.getChild(text.charAt(i));
+      text = name.optional
+      for (i in text.indices) {
+        cn = node.getChild(text[i])
         if (cn == null) {
-          cn = node.addChild(text.charAt(i), handlerHolder);
+          cn = node.addChild(text[i], handlerHolder)
+        } else if (cn.commandHandler == null) {
+          cn.commandHandler = handlerHolder
         }
-        else if (cn.getCommandHandler() == null) {
-          cn.setCommandHandler(handlerHolder);
-        }
-
-        node = cn;
+        node = cn
       }
     }
   }
 
-  private final @NotNull CommandNode root = new CommandNode();
-
-  private enum State {
-    START,
-    COMMAND,
+  private enum class State {
+    START, COMMAND,
     CMD_ARG,
-    RANGE,
-    RANGE_LINE,
-    RANGE_CURRENT,
-    RANGE_LAST,
-    RANGE_MARK,
-    RANGE_MARK_CHAR,
-    RANGE_ALL,
-    RANGE_PATTERN,
-    RANGE_SHORT_PATTERN,
-    RANGE_PATTERN_MAYBE_DONE,
-    RANGE_OFFSET,
-    RANGE_OFFSET_NUM,
-    RANGE_OFFSET_DONE,
-    RANGE_OFFSET_MAYBE_DONE,
-    RANGE_SEPARATOR,
-    RANGE_MAYBE_DONE,
-    RANGE_DONE,
-    ERROR
+    RANGE, RANGE_LINE, RANGE_CURRENT, RANGE_LAST, RANGE_MARK, RANGE_MARK_CHAR, RANGE_ALL, RANGE_PATTERN,
+    RANGE_SHORT_PATTERN, RANGE_PATTERN_MAYBE_DONE, RANGE_OFFSET, RANGE_OFFSET_NUM, RANGE_OFFSET_DONE,
+    RANGE_OFFSET_MAYBE_DONE, RANGE_SEPARATOR, RANGE_MAYBE_DONE, RANGE_DONE, ERROR
   }
-
-  private static final Logger logger = Logger.getInstance(CommandParser.class.getName());
 }

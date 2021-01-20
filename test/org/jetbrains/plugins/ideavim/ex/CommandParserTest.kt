@@ -106,16 +106,16 @@ class CommandParserTest : VimTestCase() {
       extension = EX_COMMAND_EP.extensions().findFirst().get()
 
       // TODO: 08.02.2020 I'm sorry if your tests have been failed because of this code. Please update it properly
-      TestCase.assertNotNull(CommandParser.getInstance().getCommandHandler(ExCommand(Ranges(), "actionlist", "")))
+      TestCase.assertNotNull(CommandParser.getCommandHandler(ExCommand(Ranges(), "actionlist", "")))
 
       @Suppress("DEPRECATION")
       EX_COMMAND_EP.getPoint(null).unregisterExtension(extension!!)
 
-      TestCase.assertNull(CommandParser.getInstance().getCommandHandler(ExCommand(Ranges(), "actionlist", "")))
+      TestCase.assertNull(CommandParser.getCommandHandler(ExCommand(Ranges(), "actionlist", "")))
     }
     @Suppress("DEPRECATION")
     EX_COMMAND_EP.getPoint(null).registerExtension(extension!!)
 
-    TestCase.assertNotNull(CommandParser.getInstance().getCommandHandler(ExCommand(Ranges(), "actionlist", "")))
+    TestCase.assertNotNull(CommandParser.getCommandHandler(ExCommand(Ranges(), "actionlist", "")))
   }
 }

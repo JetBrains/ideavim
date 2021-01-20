@@ -114,10 +114,9 @@ object VimScriptParser {
       if (line.startsWith(" ") || line.startsWith("\t")) continue
 
       val lineToExecute = if (line.startsWith(":")) line.substring(1) else line
-      val commandParser = CommandParser.getInstance()
       try {
-        val command = commandParser.parse(lineToExecute)
-        val commandHandler = commandParser.getCommandHandler(command)
+        val command = CommandParser.parse(lineToExecute)
+        val commandHandler = CommandParser.getCommandHandler(command)
         if (commandHandler is VimScriptCommandHandler) {
           commandHandler.execute(command)
         }

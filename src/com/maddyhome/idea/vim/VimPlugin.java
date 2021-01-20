@@ -351,7 +351,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     RegisterActions.registerActions();
 
     // Register ex handlers
-    CommandParser.getInstance().registerHandlers();
+    CommandParser.INSTANCE.registerHandlers();
 
     // Register extensions
     VimExtensionRegistrar.registerExtensions();
@@ -378,7 +378,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     RegisterActions.unregisterActions();
 
     // Unregister ex handlers
-    CommandParser.getInstance().unregisterHandlers();
+    CommandParser.INSTANCE.unregisterHandlers();
   }
 
   private boolean stateUpdated = false;

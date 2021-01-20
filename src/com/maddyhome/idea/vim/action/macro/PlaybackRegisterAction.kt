@@ -51,7 +51,7 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
       }
       RegisterGroup.LAST_COMMAND_REGISTER -> { // No write action
         try {
-          res.set(CommandParser.getInstance().processLastCommand(editor, context, cmd.count))
+          res.set(CommandParser.processLastCommand(editor, context, cmd.count))
         } catch (e: ExException) {
           res.set(false)
         }

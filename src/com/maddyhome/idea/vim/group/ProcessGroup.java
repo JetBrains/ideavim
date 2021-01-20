@@ -107,7 +107,7 @@ public class ProcessGroup {
       final String text = panel.getText();
       if (logger.isDebugEnabled()) logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
       if (panel.getLabel().equals(":")) {
-        CommandParser.getInstance().processCommand(editor, context, text, 1);
+        CommandParser.INSTANCE.processCommand(editor, context, text, 1);
       }
       else {
         // FIXME looks like this branch gets never executed

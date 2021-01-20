@@ -50,7 +50,7 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
     val texts = ArrayList<String>(caretCount)
     val ranges = ArrayList<TextRange>(caretCount)
     var line = editor.fileSize
-    val command = CommandParser.getInstance().parse(cmd.argument)
+    val command = CommandParser.parse(cmd.argument)
 
     var lastRange: TextRange? = null
     for (caret in carets) {

@@ -312,7 +312,7 @@ public class ExEntryPanel extends JPanel {
     private @Nullable ExCommand getIncsearchCommand(@Nullable String commandText) {
       if (commandText == null) return null;
       try {
-        final ExCommand exCommand = CommandParser.getInstance().parse(commandText);
+        final ExCommand exCommand = CommandParser.INSTANCE.parse(commandText);
         final String command = exCommand.getCommand();
         // TODO: Add global, vglobal, smagic and snomagic here when the commands are supported
         if ("substitute".startsWith(command)) {
