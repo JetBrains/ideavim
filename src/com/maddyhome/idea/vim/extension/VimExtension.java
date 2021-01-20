@@ -31,12 +31,6 @@ import org.jetbrains.annotations.NotNull;
 public interface VimExtension {
   @NotNull ExtensionPointName<ExtensionBeanClass> EP_NAME = ExtensionPointName.create("IdeaVIM.vimExtension");
 
-  /**
-   * @deprecated This property is not used anymore, but we'll remove it much later to keep the compatibility of IdeaVim
-   *   extensions with previous versions of IdeaVim.
-   */
-  @Deprecated
-  @ApiStatus.ScheduledForRemoval(inVersion = "0.65")
   @VimNlsSafe
   @NotNull String getName();
 
