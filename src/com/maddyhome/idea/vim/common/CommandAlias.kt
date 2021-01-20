@@ -18,6 +18,8 @@
 
 package com.maddyhome.idea.vim.common
 
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.MessageHelper
 import org.jetbrains.annotations.NonNls
@@ -122,5 +124,5 @@ sealed class GoalCommand {
 }
 
 interface CommandAliasHandler {
-  fun execute()
+  fun execute(editor: Editor, context: DataContext)
 }

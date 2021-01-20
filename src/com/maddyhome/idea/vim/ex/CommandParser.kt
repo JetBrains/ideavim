@@ -132,7 +132,7 @@ object CommandParser {
             }
             processCommand(editor, context, commandAlias.command, count, aliasCountdown - 1)
           }
-          is GoalCommand.Call -> commandAlias.handler.execute()
+          is GoalCommand.Call -> commandAlias.handler.execute(editor, context)
         }.let { }
       } else {
         VimPlugin.showMessage(message("recursion.detected.maximum.alias.depth.reached"))

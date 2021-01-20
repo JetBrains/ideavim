@@ -80,5 +80,15 @@
         <alias name="vim-highlightedyank"/>
       </aliases>
     </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.nerdtree.NerdTree" name="NERDTree">
+      <aliases>
+        <alias name="https://github.com/preservim/nerdtree"/>
+        <alias name="preservim/nerdtree"/>
+        <alias name="https://github.com/scrooloose/nerdtree"/>
+        <alias name="scrooloose/nerdtree"/>
+        <alias name="nerdtree"/>
+      </aliases>
+    </vimExtension>
   </extensions>
 </idea-plugin>
