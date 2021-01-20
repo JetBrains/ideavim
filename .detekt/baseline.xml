@@ -5,6 +5,8 @@
     <ID>ComplexMethod:CommandState.kt$CommandState$ fun toVimNotation(): String</ID>
   </ManuallySuppressedIssues>
   <CurrentIssues>
+    <ID>ComplexCondition:CommandParser.kt$CommandParser$Character.isLetter(ch) || command.isEmpty() &amp;&amp; "~&lt;&gt;@=#*&amp;!".indexOf(ch) &gt;= 0 || command.isNotEmpty() &amp;&amp; ch == command[command.length - 1] &amp;&amp; "&lt;&gt;".indexOf(ch) &gt;= 0</ID>
+    <ID>ComplexMethod:CommandParser.kt$CommandParser$ @kotlin.jvm.Throws(ExException::class) fun parse(cmd: String): ExCommand</ID>
     <ID>ComplexMethod:HistoryHandler.kt$HistoryHandler$override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean</ID>
     <ID>ComplexMethod:OptionsManager.kt$OptionsManager$ fun parseOptionLine(editor: Editor?, args: String, failOnBad: Boolean): Boolean</ID>
     <ID>ComplexMethod:PutGroup.kt$PutGroup$private fun prepareDocumentAndGetStartOffsets( editor: Editor, caret: Caret, typeInRegister: SelectionType, data: PutData, additionalData: Map&lt;String, Any&gt; ): List&lt;Int&gt;</ID>
@@ -15,6 +17,7 @@
     <ID>ComplexMethod:VimMultipleCursorsExtension.kt$VimMultipleCursorsExtension.NextOccurrenceHandler$override fun executeInWriteAction(editor: Editor, context: DataContext)</ID>
     <ID>ComplexMethod:VimShortcutKeyAction.kt$VimShortcutKeyAction$private fun isEnabled(e: AnActionEvent): Boolean</ID>
     <ID>LongMethod:CmdHandler.kt$CmdHandler$private fun addAlias(cmd: ExCommand, editor: Editor?): Boolean</ID>
+    <ID>LongMethod:CommandParser.kt$CommandParser$ @kotlin.jvm.Throws(ExException::class) fun parse(cmd: String): ExCommand</ID>
     <ID>LongMethod:HistoryHandler.kt$HistoryHandler$override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean</ID>
     <ID>LongMethod:OptionsManager.kt$OptionsManager$ fun parseOptionLine(editor: Editor?, args: String, failOnBad: Boolean): Boolean</ID>
     <ID>LongMethod:PutGroup.kt$PutGroup$private fun prepareDocumentAndGetStartOffsets( editor: Editor, caret: Caret, typeInRegister: SelectionType, data: PutData, additionalData: Map&lt;String, Any&gt; ): List&lt;Int&gt;</ID>
@@ -37,6 +40,8 @@
     <ID>MagicNumber:CmdHandler.kt$CmdHandler$12</ID>
     <ID>MagicNumber:CommandBuilder.kt$CommandBuilder$10</ID>
     <ID>MagicNumber:CommandBuilder.kt$CommandBuilder$999999999</ID>
+    <ID>MagicNumber:CommandParser.kt$CommandParser$10</ID>
+    <ID>MagicNumber:CommandParser.kt$CommandParser$3</ID>
     <ID>MagicNumber:ConfigurationMigrators.kt$Version 6 to 7 config migration$6</ID>
     <ID>MagicNumber:ConfigurationMigrators.kt$Version 6 to 7 config migration$7</ID>
     <ID>MagicNumber:ExKeyBindings.kt$ExKeyBindings$0x05</ID>
@@ -72,8 +77,6 @@
     <ID>MaxLineLength:OptionsManager.kt$OptionsManager$val clipboard = addOption(ListOption(ClipboardOptionsData.name, ClipboardOptionsData.abbr, arrayOf(ClipboardOptionsData.ideaput, "autoselect,exclude:cons\\|linux"), null))</ID>
     <ID>MaxLineLength:ReplaceWithRegister.kt$ReplaceWithRegister.Operator$val visualSelection = PutData.VisualSelection(mapOf(editor.caretModel.primaryCaret to VimSelection.create(range.startOffset, range.endOffset - 1, selectionType, editor)), selectionType)</ID>
     <ID>MaxLineLength:StatisticReporter.kt$StatisticReporter$val url = "https://plugins.jetbrains.com/plugins/list?pluginId=${VimPlugin.getPluginId().idString}&amp;build=$buildNumber&amp;pluginVersion=$version&amp;os=$os&amp;uuid=$uid"</ID>
-    <ID>MaxLineLength:VimShortcutKeyAction.kt$VimShortcutKeyAction.Companion$.</ID>
-    <ID>MaxLineLength:VimShortcutKeyAction.kt$VimShortcutKeyAction.Companion$val</ID>
     <ID>MemberNameEqualsClassName:Ranges.kt$Ranges$private val ranges: MutableList&lt;Range&gt; = mutableListOf()</ID>
     <ID>NestedBlockDepth:OptionsManager.kt$OptionsManager$ fun parseOptionLine(editor: Editor?, args: String, failOnBad: Boolean): Boolean</ID>
     <ID>ReturnCount:CmdHandler.kt$CmdHandler$private fun addAlias(cmd: ExCommand, editor: Editor?): Boolean</ID>
@@ -83,6 +86,7 @@
     <ID>ReturnCount:VimShortcutKeyAction.kt$VimShortcutKeyAction$private fun isEnabled(e: AnActionEvent): Boolean</ID>
     <ID>ReturnCount:VisualMotionGroup.kt$VisualMotionGroup$private fun seemsLikeBlockMode(editor: Editor): Boolean</ID>
     <ID>ThrowsCount:CommandHandler.kt$CommandHandler$private fun checkArgs(cmd: ExCommand)</ID>
+    <ID>TooGenericExceptionThrown:CommandParser.kt$CommandParser$throw RuntimeException("Cannot create an ex command: $handlerHolder")</ID>
     <ID>TooManyFunctions:CommandBuilder.kt$CommandBuilder</ID>
     <ID>TooManyFunctions:CommandState.kt$CommandState</ID>
     <ID>TooManyFunctions:PutGroup.kt$PutGroup</ID>
