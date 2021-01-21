@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.key
 
-import com.maddyhome.idea.vim.handler.ActionBeanClass
 import javax.swing.KeyStroke
 
 /**
@@ -55,3 +54,24 @@ open class CommandPartNode<T> : Node<T>, HashMap<KeyStroke, Node<T>>()
 
 /** Represents a root node for the mode */
 class RootNode<T> : CommandPartNode<T>()
+
+fun <T> Node<T>.addLeafs(keyStrokes: List<KeyStroke>, actionHolder: T) {
+  var node: Node<T> = this
+  val len = keyStrokes.size
+  // Add a child for each keystroke in the shortcut for this action
+  for (i in 0 until len) {
+    if (node !is CommandPartNode<*>) {
+      error("Error in tree constructing")
+    }
+    node = addNode(node as CommandPartNode<T>, actionHolder, keyStrokes[i], i == len - 1)
+  }
+}
+
+private fun <T> addNode(base: CommandPartNode<T>, actionHolder: T, key: KeyStroke, isLastInSequence: Boolean): Node<T> {
+  val existing = base[key]
+  if (existing != null) return existing
+
+  val newNode: Node<T> = if (isLastInSequence) CommandNode(actionHolder) else CommandPartNode()
+  base[key] = newNode
+  return newNode
+}

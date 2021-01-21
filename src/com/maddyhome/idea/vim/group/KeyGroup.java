@@ -346,15 +346,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
 
       for (MappingMode mappingMode : actionModes) {
         Node<ActionBeanClass> node = getKeyRoot(mappingMode);
-        final int len = keyStrokes.size();
-        // Add a child for each keystroke in the shortcut for this action
-        for (int i = 0; i < len; i++) {
-          if (!(node instanceof CommandPartNode)) {
-            throw new Error("Error in tree constructing");
-          }
-
-          node = addMNode((CommandPartNode<ActionBeanClass>)node, actionHolder, keyStrokes.get(i), i == len - 1);
-        }
+        NodesKt.addLeafs(node, keyStrokes, actionHolder);
       }
     }
   }
@@ -414,24 +406,6 @@ public class KeyGroup implements PersistentStateComponent<Element> {
 
   private @Nullable Map<MappingMode, Set<List<KeyStroke>>> identityChecker;
   private @Nullable Map<List<KeyStroke>, String> prefixes;
-
-  private @NotNull Node<ActionBeanClass> addMNode(@NotNull CommandPartNode<ActionBeanClass> base,
-                                                  ActionBeanClass actionHolder,
-                                                  @NotNull KeyStroke key,
-                                                  boolean isLastInSequence) {
-    Node<ActionBeanClass> existing = base.get(key);
-    if (existing != null) return existing;
-
-    Node<ActionBeanClass> newNode;
-    if (isLastInSequence) {
-      newNode = new CommandNode<>(actionHolder);
-    }
-    else {
-      newNode = new CommandPartNode<>();
-    }
-    base.put(key, newNode);
-    return newNode;
-  }
 
   public static @NotNull ShortcutSet toShortcutSet(@NotNull Collection<RequiredShortcut> requiredShortcuts) {
     final List<Shortcut> shortcuts = new ArrayList<>();
