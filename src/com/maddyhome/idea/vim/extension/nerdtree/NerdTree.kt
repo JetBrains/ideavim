@@ -163,6 +163,7 @@ class NerdTree : VimExtension {
           ?.filter { it.canNavigateToSource() }
           ?.forEach { it.navigate(false) }
       })
+      addLeafs("s", NerdAction.ToIj("OpenInRightSplit"))
     }
 
     private var currentNode: CommandPartNode<NerdAction> = actionsRoot
