@@ -39,7 +39,12 @@ import com.maddyhome.idea.vim.group.KeyGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
+import com.maddyhome.idea.vim.key.CommandNode
+import com.maddyhome.idea.vim.key.CommandPartNode
+import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.RequiredShortcut
+import com.maddyhome.idea.vim.key.RootNode
+import com.maddyhome.idea.vim.key.addLeafs
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
@@ -60,7 +65,7 @@ class NerdTree : VimExtension {
 
   private fun installDispatcher(project: Project) {
     val action = NerdDispatcher.instance
-    val shortcuts = nerdActions.keys.map { RequiredShortcut(it, owner) }
+    val shortcuts = collectShortcuts(actionsRoot).map { RequiredShortcut(it, owner) }
     action.registerCustomShortcutSet(
       KeyGroup.toShortcutSet(shortcuts),
       (ProjectView.getInstance(project) as ProjectViewImpl).component
@@ -70,11 +75,22 @@ class NerdTree : VimExtension {
   class NerdDispatcher : DumbAwareAction() {
     override fun actionPerformed(e: AnActionEvent) {
       val keyStroke = getKeyStroke(e) ?: return
-      val action = nerdActions[keyStroke] ?: return
 
-      when (action) {
-        is NerdAction.ToIj -> callAction(action.name, e.dataContext)
-        is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext) }
+      val nextNode = currentNode[keyStroke]
+
+      if (nextNode == null) {
+        currentNode = actionsRoot
+        return
+      }
+
+      if (nextNode is CommandNode<NerdAction>) {
+        currentNode = actionsRoot
+
+        val action = nextNode.actionHolder
+        when (action) {
+          is NerdAction.ToIj -> callAction(action.name, e.dataContext)
+          is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext) }
+        }
       }
     }
 
@@ -125,10 +141,10 @@ class NerdTree : VimExtension {
       VimPlugin.getCommand().setAlias(alias, CommandAlias.Call(0, -1, alias, handler))
     }
 
-    private val nerdActions: Map<KeyStroke, NerdAction> = mapOf(
-      parseKeys("j")[0] to NerdAction.ToIj("Tree-selectNext"),
-      parseKeys("k")[0] to NerdAction.ToIj("Tree-selectPrevious"),
-      parseKeys("o")[0] to NerdAction.Code { project, dataContext ->
+    private val actionsRoot: RootNode<NerdAction> = RootNode<NerdAction>().apply {
+      addLeafs("j", NerdAction.ToIj("Tree-selectNext"))
+      addLeafs("k", NerdAction.ToIj("Tree-selectPrevious"))
+      addLeafs("o", NerdAction.Code { project, dataContext ->
         val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
 
         val array = CommonDataKeys.NAVIGATABLE_ARRAY.getData(dataContext)?.filter { it.canNavigateToSource() }
@@ -142,12 +158,17 @@ class NerdTree : VimExtension {
         } else {
           array.forEach { it.navigate(true) }
         }
-      }
-    )
-  }
-}
+      })
+    }
 
-private sealed class NerdAction {
-  class ToIj(val name: String) : NerdAction()
-  class Code(val action: (Project, DataContext) -> Unit) : NerdAction()
+    private var currentNode: CommandPartNode<NerdAction> = actionsRoot
+
+    private fun collectShortcuts(node: Node<NerdAction>): Set<KeyStroke> {
+      return if (node is CommandPartNode<NerdAction>) {
+        val res = node.keys.toMutableSet()
+        res += node.values.map { collectShortcuts(it) }.flatten()
+        res
+      } else emptySet()
+    }
+  }
 }

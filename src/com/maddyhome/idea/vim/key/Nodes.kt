@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.key
 
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import javax.swing.KeyStroke
 
 /**
@@ -54,6 +55,10 @@ open class CommandPartNode<T> : Node<T>, HashMap<KeyStroke, Node<T>>()
 
 /** Represents a root node for the mode */
 class RootNode<T> : CommandPartNode<T>()
+
+fun <T> Node<T>.addLeafs(keys: String, actionHolder: T) {
+  addLeafs(parseKeys(keys), actionHolder)
+}
 
 fun <T> Node<T>.addLeafs(keyStrokes: List<KeyStroke>, actionHolder: T) {
   var node: Node<T> = this
