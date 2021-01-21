@@ -73,6 +73,7 @@ class NerdTree : VimExtension {
 
       when (action) {
         is NerdAction.ToIj -> callAction(action.name, e.dataContext)
+        is NerdAction.Code -> e.project?.let { action.action(it) }
       }
     }
 
@@ -125,11 +126,21 @@ class NerdTree : VimExtension {
 
     private val nerdActions: Map<KeyStroke, NerdAction> = mapOf(
       parseKeys("j")[0] to NerdAction.ToIj("Tree-selectNext"),
-      parseKeys("k")[0] to NerdAction.ToIj("Tree-selectPrevious")
+      parseKeys("k")[0] to NerdAction.ToIj("Tree-selectPrevious"),
+      parseKeys("o")[0] to NerdAction.Code {
+        val tree = ProjectView.getInstance(it).currentProjectViewPane.tree
+        val row = tree.selectionRows?.getOrNull(0) ?: return@Code
+        if (tree.isExpanded(row)) {
+          tree.collapseRow(row)
+        } else {
+          tree.expandRow(row)
+        }
+      }
     )
   }
 }
 
 private sealed class NerdAction {
   class ToIj(val name: String) : NerdAction()
+  class Code(val action: (Project) -> Unit) : NerdAction()
 }
