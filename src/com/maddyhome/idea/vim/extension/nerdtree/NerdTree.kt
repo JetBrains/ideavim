@@ -37,7 +37,6 @@ import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.group.KeyGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
 import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
@@ -78,19 +77,18 @@ class NerdTree : VimExtension {
 
       val nextNode = currentNode[keyStroke]
 
-      if (nextNode == null) {
-        currentNode = actionsRoot
-        return
-      }
+      when (nextNode) {
+        null -> currentNode = actionsRoot
+        is CommandNode<NerdAction> -> {
+          currentNode = actionsRoot
 
-      if (nextNode is CommandNode<NerdAction>) {
-        currentNode = actionsRoot
-
-        val action = nextNode.actionHolder
-        when (action) {
-          is NerdAction.ToIj -> callAction(action.name, e.dataContext)
-          is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext) }
+          val action = nextNode.actionHolder
+          when (action) {
+            is NerdAction.ToIj -> callAction(action.name, e.dataContext)
+            is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext) }
+          }
         }
+        is CommandPartNode<NerdAction> -> currentNode = nextNode
       }
     }
 
@@ -158,6 +156,12 @@ class NerdTree : VimExtension {
         } else {
           array.forEach { it.navigate(true) }
         }
+      })
+      addLeafs("go", NerdAction.Code { project, dataContext ->
+        CommonDataKeys.NAVIGATABLE_ARRAY
+          .getData(dataContext)
+          ?.filter { it.canNavigateToSource() }
+          ?.forEach { it.navigate(false) }
       })
     }
 
