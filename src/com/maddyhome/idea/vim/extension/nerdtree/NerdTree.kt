@@ -18,28 +18,90 @@
 
 package com.maddyhome.idea.vim.extension.nerdtree
 
+import com.intellij.ide.projectView.ProjectView
+import com.intellij.ide.projectView.impl.ProjectViewImpl
 import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
+import com.intellij.ui.KeyStrokeAdapter
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
 import com.maddyhome.idea.vim.extension.VimExtension
+import com.maddyhome.idea.vim.group.KeyGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
+import com.maddyhome.idea.vim.key.RequiredShortcut
+import java.awt.event.KeyEvent
+import javax.swing.KeyStroke
 
 class NerdTree : VimExtension {
   override fun getName(): String = "NERDTree"
 
   override fun init() {
     addCommand("NERDTreeFocus", FocusHandler())
+
+    ProjectManager.getInstance().openProjects.forEach { project -> installDispatcher(project) }
   }
 
   class FocusHandler : CommandAliasHandler {
     override fun execute(editor: Editor, context: DataContext) {
       callAction("ActivateProjectToolWindow", context)
+    }
+  }
+
+  private fun installDispatcher(project: Project) {
+    val action = NerdDispatcher.instance
+    val shortcuts = nerdActions.keys.map { RequiredShortcut(it, owner) }
+    action.registerCustomShortcutSet(
+      KeyGroup.toShortcutSet(shortcuts),
+      (ProjectView.getInstance(project) as ProjectViewImpl).component
+    )
+  }
+
+  class NerdDispatcher : DumbAwareAction() {
+    override fun actionPerformed(e: AnActionEvent) {
+      val keyStroke = getKeyStroke(e) ?: return
+      val action = nerdActions[keyStroke] ?: return
+
+      when (action) {
+        is NerdAction.ToIj -> callAction(action.name, e.dataContext)
+      }
+    }
+
+    companion object {
+      val instance = NerdDispatcher()
+    }
+
+    /**
+     * getDefaultKeyStroke is needed for NEO layout keyboard VIM-987
+     * but we should cache the value because on the second call (isEnabled -> actionPerformed)
+     * the event is already consumed
+     */
+    private var keyStrokeCache: Pair<KeyEvent?, KeyStroke?> = null to null
+
+    private fun getKeyStroke(e: AnActionEvent): KeyStroke? {
+      val inputEvent = e.inputEvent
+      if (inputEvent is KeyEvent) {
+        val defaultKeyStroke = KeyStrokeAdapter.getDefaultKeyStroke(inputEvent)
+        val strokeCache = keyStrokeCache
+        if (defaultKeyStroke != null) {
+          keyStrokeCache = inputEvent to defaultKeyStroke
+          return defaultKeyStroke
+        } else if (strokeCache.first === inputEvent) {
+          keyStrokeCache = null to null
+          return strokeCache.second
+        }
+        return KeyStroke.getKeyStrokeForEvent(inputEvent)
+      }
+      return null
     }
   }
 
@@ -60,5 +122,14 @@ class NerdTree : VimExtension {
     private fun addCommand(alias: String, handler: CommandAliasHandler) {
       VimPlugin.getCommand().setAlias(alias, CommandAlias.Call(0, -1, alias, handler))
     }
+
+    private val nerdActions: Map<KeyStroke, NerdAction> = mapOf(
+      parseKeys("j")[0] to NerdAction.ToIj("Tree-selectNext"),
+      parseKeys("k")[0] to NerdAction.ToIj("Tree-selectPrevious")
+    )
   }
+}
+
+private sealed class NerdAction {
+  class ToIj(val name: String) : NerdAction()
 }

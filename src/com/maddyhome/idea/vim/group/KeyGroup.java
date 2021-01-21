@@ -433,7 +433,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
     return newNode;
   }
 
-  private static @NotNull ShortcutSet toShortcutSet(@NotNull Collection<RequiredShortcut> requiredShortcuts) {
+  public static @NotNull ShortcutSet toShortcutSet(@NotNull Collection<RequiredShortcut> requiredShortcuts) {
     final List<Shortcut> shortcuts = new ArrayList<>();
     for (RequiredShortcut key : requiredShortcuts) {
       shortcuts.add(new KeyboardShortcut(key.getKeyStroke(), null));
