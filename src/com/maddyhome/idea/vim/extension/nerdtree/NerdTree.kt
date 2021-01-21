@@ -22,6 +22,7 @@ import com.intellij.ide.projectView.ProjectView
 import com.intellij.ide.projectView.impl.ProjectViewImpl
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
@@ -73,7 +74,7 @@ class NerdTree : VimExtension {
 
       when (action) {
         is NerdAction.ToIj -> callAction(action.name, e.dataContext)
-        is NerdAction.Code -> e.project?.let { action.action(it) }
+        is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext) }
       }
     }
 
@@ -127,13 +128,19 @@ class NerdTree : VimExtension {
     private val nerdActions: Map<KeyStroke, NerdAction> = mapOf(
       parseKeys("j")[0] to NerdAction.ToIj("Tree-selectNext"),
       parseKeys("k")[0] to NerdAction.ToIj("Tree-selectPrevious"),
-      parseKeys("o")[0] to NerdAction.Code {
-        val tree = ProjectView.getInstance(it).currentProjectViewPane.tree
-        val row = tree.selectionRows?.getOrNull(0) ?: return@Code
-        if (tree.isExpanded(row)) {
-          tree.collapseRow(row)
+      parseKeys("o")[0] to NerdAction.Code { project, dataContext ->
+        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+
+        val array = CommonDataKeys.NAVIGATABLE_ARRAY.getData(dataContext)?.filter { it.canNavigateToSource() }
+        if (array.isNullOrEmpty()) {
+          val row = tree.selectionRows?.getOrNull(0) ?: return@Code
+          if (tree.isExpanded(row)) {
+            tree.collapseRow(row)
+          } else {
+            tree.expandRow(row)
+          }
         } else {
-          tree.expandRow(row)
+          array.forEach { it.navigate(true) }
         }
       }
     )
@@ -142,5 +149,5 @@ class NerdTree : VimExtension {
 
 private sealed class NerdAction {
   class ToIj(val name: String) : NerdAction()
-  class Code(val action: (Project) -> Unit) : NerdAction()
+  class Code(val action: (Project, DataContext) -> Unit) : NerdAction()
 }
