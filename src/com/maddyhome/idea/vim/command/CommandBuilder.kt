@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.action.ResetModeAction
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction
+import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.Node
@@ -30,7 +31,7 @@ import org.jetbrains.annotations.TestOnly
 import java.util.*
 import javax.swing.KeyStroke
 
-class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
+class CommandBuilder(private var currentCommandPartNode: CommandPartNode<ActionBeanClass>) {
   private val commandParts = ArrayDeque<Command>()
   private var keyList = mutableListOf<KeyStroke>()
 
@@ -108,11 +109,11 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     keyList.removeAt(keyList.size - 1)
   }
 
-  fun setCurrentCommandPartNode(newNode: CommandPartNode) {
+  fun setCurrentCommandPartNode(newNode: CommandPartNode<ActionBeanClass>) {
     currentCommandPartNode = newNode
   }
 
-  fun getChildNode(key: KeyStroke): Node? {
+  fun getChildNode(key: KeyStroke): Node<ActionBeanClass>? {
     return currentCommandPartNode[key]
   }
 
@@ -179,7 +180,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     return command
   }
 
-  fun resetAll(commandPartNode: CommandPartNode) {
+  fun resetAll(commandPartNode: CommandPartNode<ActionBeanClass>) {
     resetInProgressCommandPart(commandPartNode)
     commandState = CurrentCommandState.NEW_COMMAND
     commandParts.clear()
@@ -188,11 +189,11 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     prevExpectedArgumentType = null
   }
 
-  fun resetInProgressCommandPart(commandPartNode: CommandPartNode) {
+  fun resetInProgressCommandPart(commandPartNode: CommandPartNode<ActionBeanClass>) {
     count = 0
     setCurrentCommandPartNode(commandPartNode)
   }
 
   @TestOnly
-  fun getCurrentTrie(): CommandPartNode = currentCommandPartNode
+  fun getCurrentTrie(): CommandPartNode<ActionBeanClass> = currentCommandPartNode
 }

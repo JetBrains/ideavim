@@ -21,6 +21,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.helper.DigraphResult
 import com.maddyhome.idea.vim.helper.DigraphSequence
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -341,7 +342,7 @@ class CommandState private constructor() {
       return res
     }
 
-    private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode = VimPlugin.getKey().getKeyRoot(mappingMode)
+    private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode<ActionBeanClass> = VimPlugin.getKey().getKeyRoot(mappingMode)
   }
 
   init {

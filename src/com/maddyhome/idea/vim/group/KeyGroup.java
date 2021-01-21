@@ -75,7 +75,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
 
   private final @NotNull Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<>();
   private final @NotNull Set<RequiredShortcut> requiredShortcutKeys = new HashSet<>(300);
-  private final @NotNull Map<MappingMode, CommandPartNode> keyRoots = new EnumMap<>(MappingMode.class);
+  private final @NotNull Map<MappingMode, CommandPartNode<ActionBeanClass>> keyRoots = new EnumMap<>(MappingMode.class);
   private final @NotNull Map<MappingMode, KeyMapping> keyMappings = new EnumMap<>(MappingMode.class);
   private @Nullable OperatorFunction operatorFunction = null;
 
@@ -280,8 +280,8 @@ public class KeyGroup implements PersistentStateComponent<Element> {
    * @param mappingMode The mapping mode
    * @return The key mapping tree root
    */
-  public @NotNull CommandPartNode getKeyRoot(@NotNull MappingMode mappingMode) {
-    return keyRoots.computeIfAbsent(mappingMode, (key) -> new RootNode());
+  public @NotNull CommandPartNode<ActionBeanClass> getKeyRoot(@NotNull MappingMode mappingMode) {
+    return keyRoots.computeIfAbsent(mappingMode, (key) -> new RootNode<>());
   }
 
   /**
@@ -345,7 +345,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
       registerRequiredShortcut(keyStrokes, MappingOwner.IdeaVim.INSTANCE);
 
       for (MappingMode mappingMode : actionModes) {
-        Node node = getKeyRoot(mappingMode);
+        Node<ActionBeanClass> node = getKeyRoot(mappingMode);
         final int len = keyStrokes.size();
         // Add a child for each keystroke in the shortcut for this action
         for (int i = 0; i < len; i++) {
@@ -353,7 +353,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
             throw new Error("Error in tree constructing");
           }
 
-          node = addMNode((CommandPartNode)node, actionHolder, keyStrokes.get(i), i == len - 1);
+          node = addMNode((CommandPartNode<ActionBeanClass>)node, actionHolder, keyStrokes.get(i), i == len - 1);
         }
       }
     }
@@ -415,19 +415,19 @@ public class KeyGroup implements PersistentStateComponent<Element> {
   private @Nullable Map<MappingMode, Set<List<KeyStroke>>> identityChecker;
   private @Nullable Map<List<KeyStroke>, String> prefixes;
 
-  private @NotNull Node addMNode(@NotNull CommandPartNode base,
-                                 ActionBeanClass actionHolder,
-                                 @NotNull KeyStroke key,
-                                 boolean isLastInSequence) {
-    Node existing = base.get(key);
+  private @NotNull Node<ActionBeanClass> addMNode(@NotNull CommandPartNode<ActionBeanClass> base,
+                                                  ActionBeanClass actionHolder,
+                                                  @NotNull KeyStroke key,
+                                                  boolean isLastInSequence) {
+    Node<ActionBeanClass> existing = base.get(key);
     if (existing != null) return existing;
 
-    Node newNode;
+    Node<ActionBeanClass> newNode;
     if (isLastInSequence) {
-      newNode = new CommandNode(actionHolder);
+      newNode = new CommandNode<>(actionHolder);
     }
     else {
-      newNode = new CommandPartNode();
+      newNode = new CommandPartNode<>();
     }
     base.put(key, newNode);
     return newNode;

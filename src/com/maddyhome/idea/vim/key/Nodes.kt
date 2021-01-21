@@ -45,13 +45,13 @@ import javax.swing.KeyStroke
  *   and the user should complete the sequence, it's [CommandPartNode]
  */
 @Suppress("GrazieInspection")
-interface Node
+interface Node<T>
 
 /** Represents a complete command */
-class CommandNode(val actionHolder: ActionBeanClass) : Node
+class CommandNode<T>(val actionHolder: T) : Node<T>
 
 /** Represents a part of the command */
-open class CommandPartNode : Node, HashMap<KeyStroke, Node>()
+open class CommandPartNode<T> : Node<T>, HashMap<KeyStroke, Node<T>>()
 
 /** Represents a root node for the mode */
-class RootNode : CommandPartNode()
+class RootNode<T> : CommandPartNode<T>()

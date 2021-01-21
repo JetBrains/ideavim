@@ -88,9 +88,9 @@ class RegisterActionsTest : VimTestCase() {
     TestCase.assertNotNull(getCommandNode())
   }
 
-  private fun getCommandNode(): CommandNode? {
+  private fun getCommandNode(): CommandNode<ActionBeanClass>? {
     // TODO: 08.02.2020 Sorry if your tests will fail because of this test
     val node = VimPlugin.getKey().getKeyRoot(MappingMode.NORMAL)[KeyStroke.getKeyStroke('g')] as CommandPartNode
-    return node[KeyStroke.getKeyStroke('T')] as CommandNode?
+    return node[KeyStroke.getKeyStroke('T')] as CommandNode<ActionBeanClass>?
   }
 }

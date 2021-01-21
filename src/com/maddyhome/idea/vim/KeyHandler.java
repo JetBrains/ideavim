@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
+import com.maddyhome.idea.vim.handler.ActionBeanClass;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.*;
@@ -229,13 +230,13 @@ public class KeyHandler {
         else if (!handleDigraph(editor, key, context, editorState)) {
           // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
           // return the node matching this keystroke
-          final Node node = mapOpCommand(key, commandBuilder.getChildNode(key), editorState);
+          final Node<ActionBeanClass> node = mapOpCommand(key, commandBuilder.getChildNode(key), editorState);
 
           if (node instanceof CommandNode) {
-            handleCommandNode(editor, context, key, (CommandNode) node, editorState);
+            handleCommandNode(editor, context, key, (CommandNode<ActionBeanClass>) node, editorState);
             commandBuilder.addKey(key);
           } else if (node instanceof CommandPartNode) {
-            commandBuilder.setCurrentCommandPartNode((CommandPartNode) node);
+            commandBuilder.setCurrentCommandPartNode((CommandPartNode<ActionBeanClass>) node);
             commandBuilder.addKey(key);
           } else if (isSelectRegister(key, editorState)) {
             editorState.pushModes(CommandState.Mode.COMMAND, CommandState.SubMode.REGISTER_PENDING);
@@ -288,7 +289,7 @@ public class KeyHandler {
   /**
    * See the description for {@link com.maddyhome.idea.vim.action.DuplicableOperatorAction}
    */
-  private Node mapOpCommand(KeyStroke key, Node node, @NotNull CommandState editorState) {
+  private Node<ActionBeanClass> mapOpCommand(KeyStroke key, Node<ActionBeanClass> node, @NotNull CommandState editorState) {
     if (editorState.isDuplicateOperatorKeyStroke(key)) {
       return editorState.getCommandBuilder().getChildNode(KeyStroke.getKeyStroke('_'));
     }
@@ -689,7 +690,7 @@ public class KeyHandler {
   private void handleCommandNode(Editor editor,
                                  DataContext context,
                                  KeyStroke key,
-                                 @NotNull CommandNode node,
+                                 @NotNull CommandNode<ActionBeanClass> node,
                                  CommandState editorState) {
     // The user entered a valid command. Create the command and add it to the stack.
     final EditorActionHandlerBase action = node.getActionHolder().getInstance();
@@ -738,7 +739,7 @@ public class KeyHandler {
     }
   }
 
-  private boolean stopMacroRecord(CommandNode node, @NotNull CommandState editorState) {
+  private boolean stopMacroRecord(CommandNode<ActionBeanClass> node, @NotNull CommandState editorState) {
     return editorState.isRecording() && node.getActionHolder().getInstance() instanceof ToggleRecordingAction;
   }
 
@@ -818,7 +819,7 @@ public class KeyHandler {
     editorState.getCommandBuilder().resetAll(getKeyRoot(editorState.getMappingState().getMappingMode()));
   }
 
-  private @NotNull CommandPartNode getKeyRoot(MappingMode mappingMode) {
+  private @NotNull CommandPartNode<ActionBeanClass> getKeyRoot(MappingMode mappingMode) {
     return VimPlugin.getKey().getKeyRoot(mappingMode);
   }
 
