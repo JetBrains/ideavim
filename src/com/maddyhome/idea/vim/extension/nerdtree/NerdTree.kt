@@ -86,9 +86,9 @@ import javax.swing.SwingConstants
  * C........Change the tree root to the selected dir...................|NERDTree-C|
  * u........Move the tree root up one directory........................|NERDTree-u|
  * U........Same as 'u' except the old root node is left open..........|NERDTree-U|
- * r........Recursively refresh the current directory..................|NERDTree-r|
- * R........Recursively refresh the current root.......................|NERDTree-R|
- * m........Display the NERDTree menu..................................|NERDTree-m|
+ * + r........Recursively refresh the current directory..................|NERDTree-r|
+ * + R........Recursively refresh the current root.......................|NERDTree-R|
+ * + m........Display the NERDTree menu..................................|NERDTree-m|
  * cd.......Change the CWD to the dir of the selected node............|NERDTree-cd|
  * CD.......Change tree root to the CWD...............................|NERDTree-CD|
  *
@@ -302,6 +302,9 @@ class NerdTree : VimExtension {
     })
     registerCommand("g:NERDTreeMapJumpNextSibling", "<C-J>", NerdAction.ToIj("Tree-selectNextSibling"))
     registerCommand("g:NERDTreeMapJumpPrevSibling", "<C-K>", NerdAction.ToIj("Tree-selectPreviousSibling"))
+    registerCommand("g:NERDTreeMapRefresh", "r", NerdAction.ToIj("SynchronizeCurrentFile"))
+    registerCommand("g:NERDTreeMapRefreshRoot", "R", NerdAction.ToIj("Synchronize"))
+    registerCommand("g:NERDTreeMapMenu", "m", NerdAction.ToIj("ShowPopupMenu"))
   }
 
   companion object {
