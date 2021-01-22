@@ -79,8 +79,8 @@ import javax.swing.SwingConstants
  * + p........Jump to current nodes parent...............................|NERDTree-p|
  * + K........Jump up inside directories at the current tree depth.......|NERDTree-K|
  * + J........Jump down inside directories at the current tree depth.....|NERDTree-J|
- * <C-J>....Jump down to next sibling of the current directory.......|NERDTree-C-J|
- * <C-K>....Jump up to previous sibling of the current directory.....|NERDTree-C-K|
+ * + <C-J>....Jump down to next sibling of the current directory.......|NERDTree-C-J|
+ * + <C-K>....Jump up to previous sibling of the current directory.....|NERDTree-C-K|
  *
  * C........Change the tree root to the selected dir...................|NERDTree-C|
  * u........Move the tree root up one directory........................|NERDTree-u|
@@ -291,6 +291,8 @@ class NerdTree : VimExtension {
 
       tree.scrollRowToVisible(expectedRow)
     })
+    registerCommand("g:NERDTreeMapJumpNextSibling", "<C-J>", NerdAction.ToIj("Tree-selectNextSibling"))
+    registerCommand("g:NERDTreeMapJumpPrevSibling", "<C-K>", NerdAction.ToIj("Tree-selectPreviousSibling"))
   }
 
   companion object {
