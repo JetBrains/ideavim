@@ -66,8 +66,8 @@ import javax.swing.SwingConstants
  * + gs.......Same as s, but leave the cursor on the NERDTree...........|NERDTree-gs|
  * <CR>.....User-definable custom open action.......................|NERDTree-<CR>|
  * + O........Recursively open the selected directory....................|NERDTree-O|
- * x........Close the current nodes parent.............................|NERDTree-x|
- * X........Recursively close all children of the current node.........|NERDTree-X|
+ * + x........Close the current nodes parent.............................|NERDTree-x|
+ * + X........Recursively close all children of the current node.........|NERDTree-X|
  * e........Edit the current dir.......................................|NERDTree-e|
  *
  * double-click....same as |NERDTree-o|.
@@ -232,9 +232,26 @@ class NerdTree : VimExtension {
 
       callAction("ActivateProjectToolWindow", context)
     })
-    registerCommand("g:NERDTreeMapOpenRecursively", "O", NerdAction.Code { project, context, event ->
+    registerCommand("g:NERDTreeMapOpenRecursively", "O", NerdAction.Code { project, _, _ ->
       val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
       TreeExpandCollapse.expandAll(tree)
+    })
+    registerCommand("g:NERDTreeMapCloseChildren", "X", NerdAction.Code { project, _, _ ->
+      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+      TreeExpandCollapse.collapse(tree)
+    })
+    registerCommand("g:NERDTreeMapCloseDir", "x", NerdAction.Code { project, _, _ ->
+      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+      val currentPath = tree.selectionPath ?: return@Code
+      if (tree.isExpanded(currentPath)) {
+        tree.collapsePath(currentPath)
+      } else {
+        val parentPath = currentPath.parentPath ?: return@Code
+        if (parentPath.parentPath != null) {
+          // The real root of the project is not shown in the project view
+          tree.collapsePath(parentPath)
+        }
+      }
     })
   }
 
