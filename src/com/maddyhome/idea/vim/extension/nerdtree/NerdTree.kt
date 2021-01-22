@@ -62,8 +62,8 @@ import javax.swing.SwingConstants
  * + o........Open files, directories and bookmarks......................|NERDTree-o|
  * + go.......Open selected file, but leave cursor in the NERDTree......|NERDTree-go|
  *            Open selected bookmark dir in current NERDTree
- * t........Open selected node/bookmark in a new tab...................|NERDTree-t|
- * T........Same as 't' but keep the focus on the current tab..........|NERDTree-T|
+ * + t........Open selected node/bookmark in a new tab...................|NERDTree-t|
+ * + T........Same as 't' but keep the focus on the current tab..........|NERDTree-T|
  * + i........Open selected file in a split window.......................|NERDTree-i|
  * + gi.......Same as i, but leave the cursor on the NERDTree...........|NERDTree-gi|
  * + s........Open selected file in a new vsplit.........................|NERDTree-s|
@@ -235,6 +235,20 @@ class NerdTree : VimExtension {
         .getData(dataContext)
         ?.filter { it.canNavigateToSource() }
         ?.forEach { it.navigate(false) }
+    })
+    registerCommand("g:NERDTreeMapOpenInTab", "t", NerdAction.Code { _, dataContext, _ ->
+      // FIXME: 22.01.2021 Doesn't work correct
+      CommonDataKeys.NAVIGATABLE_ARRAY
+        .getData(dataContext)
+        ?.filter { it.canNavigateToSource() }
+        ?.forEach { it.navigate(true) }
+    })
+    registerCommand("g:NERDTreeMapOpenInTabSilent", "T", NerdAction.Code { _, dataContext, _ ->
+      // FIXME: 22.01.2021 Doesn't work correct
+      CommonDataKeys.NAVIGATABLE_ARRAY
+        .getData(dataContext)
+        ?.filter { it.canNavigateToSource() }
+        ?.forEach { it.navigate(true) }
     })
 
     // TODO: 21.01.2021 Should option in left split
