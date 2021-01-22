@@ -97,8 +97,8 @@ import javax.swing.SwingConstants
  * F........Toggle whether files are displayed.........................|NERDTree-F|
  * B........Toggle whether the bookmark table is displayed.............|NERDTree-B|
  *
- * q........Close the NERDTree window..................................|NERDTree-q|
- * A........Zoom (maximize/minimize) the NERDTree window...............|NERDTree-A|
+ * + q........Close the NERDTree window..................................|NERDTree-q|
+ * + A........Zoom (maximize/minimize) the NERDTree window...............|NERDTree-A|
  * ?........Toggle the display of the quick help.......................|NERDTree-?|
  */
 class NerdTree : VimExtension {
@@ -305,6 +305,8 @@ class NerdTree : VimExtension {
     registerCommand("g:NERDTreeMapRefresh", "r", NerdAction.ToIj("SynchronizeCurrentFile"))
     registerCommand("g:NERDTreeMapRefreshRoot", "R", NerdAction.ToIj("Synchronize"))
     registerCommand("g:NERDTreeMapMenu", "m", NerdAction.ToIj("ShowPopupMenu"))
+    registerCommand("g:NERDTreeMapQuit", "q", NerdAction.ToIj("HideActiveWindow"))
+    registerCommand("g:NERDTreeMapToggleZoom", "A", NerdAction.ToIj("MaximizeToolWindow"))
   }
 
   companion object {
