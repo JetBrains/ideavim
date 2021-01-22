@@ -21,6 +21,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.extensions.ExtensionPointListener
 import com.intellij.openapi.extensions.PluginDescriptor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.OptionsManager.addOption
@@ -33,6 +34,8 @@ object VimExtensionRegistrar {
   private val extensionAliases = HashMap<String, String>()
   private var extensionRegistered = false
   private val logger = logger<VimExtensionRegistrar>()
+
+  private val delayedExtensionEnabling = mutableListOf<ExtensionBeanClass>()
 
   @JvmStatic
   fun registerExtensions() {
@@ -62,13 +65,30 @@ object VimExtensionRegistrar {
     val option = ToggleOption(name, name, false)
     option.addOptionChangeListener { _, _ ->
       if (isSet(name)) {
-        extensionBean.instance.init()
-        logger.info("IdeaVim extension '$name' initialized")
+        initExtension(extensionBean, name)
       } else {
         extensionBean.instance.dispose()
       }
     }
     addOption(option)
+  }
+
+  private fun initExtension(extensionBean: ExtensionBeanClass, name: String) {
+    if (VimScriptParser.executingVimScript) {
+      delayedExtensionEnabling += extensionBean
+    } else {
+      extensionBean.instance.init()
+      logger.info("IdeaVim extension '$name' initialized")
+    }
+  }
+
+  @JvmStatic
+  fun enableDelayedExtensions() {
+    delayedExtensionEnabling.forEach {
+      it.instance.init()
+      logger.info("IdeaVim extension '${it.name}' initialized")
+    }
+    delayedExtensionEnabling.clear()
   }
 
   @Synchronized

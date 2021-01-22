@@ -236,7 +236,13 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     ideavimrcRegistered = true;
 
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      executeIdeaVimRc();
+      try {
+        VimScriptParser.INSTANCE.setExecutingVimScript(true);
+        executeIdeaVimRc();
+      }
+      finally {
+        VimScriptParser.INSTANCE.setExecutingVimScript(false);
+      }
     }
   }
 
@@ -358,6 +364,9 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
     // Execute ~/.ideavimrc
     registerIdeavimrc();
+
+    // Initialize extensions
+    VimExtensionRegistrar.enableDelayedExtensions();
 
     // Turing on should be performed after all commands registration
     getSearch().turnOn();
