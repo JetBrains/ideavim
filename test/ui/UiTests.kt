@@ -26,7 +26,6 @@ import com.intellij.remoterobot.utils.keyboard
 import com.intellij.remoterobot.utils.waitFor
 import org.assertj.swing.core.MouseButton
 import org.intellij.examples.simple.plugin.steps.JavaExampleSteps
-import org.junit.Ignore
 import org.junit.Test
 import ui.pages.Editor
 import ui.pages.actionMenu
@@ -54,7 +53,6 @@ class UiTests {
   }
 
   @Test
-  @Ignore("Please start it manually")
   fun ideaVimTest() = uiTest {
     val sharedSteps = JavaExampleSteps(this)
 

@@ -112,15 +112,22 @@ tasks.detekt.jvmTarget = javaVersion
 task testWithNeovim(type: Test) {
   group = "verification"
   systemProperty "ideavim.nvim.test", 'true'
+  exclude '/ui/**'
 }
 
 test {
   exclude '**/propertybased/**'
+  exclude '/ui/**'
 }
 
 task testPropertyBased(type: Test) {
   group = "verification"
   include '**/propertybased/**'
+}
+
+task testUi(type: Test) {
+  group = "verification"
+  include '/ui/**'
 }
 
 changelog {
