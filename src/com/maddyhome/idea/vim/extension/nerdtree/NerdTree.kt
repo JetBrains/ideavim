@@ -253,15 +253,7 @@ class NerdTree : VimExtension {
         }
       }
     })
-    registerCommand("g:NERDTreeMapJumpRoot", "P", NerdAction.Code { project, _, _ ->
-      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-      var currentPath = tree.selectionPath ?: return@Code
-      while (currentPath.parentPath != null && currentPath.parentPath.parentPath != null) {
-        // The real root of the project is not shown in the project view, so we check the grandparent of the node
-        currentPath = currentPath.parentPath
-      }
-      tree.selectionPath = currentPath
-    })
+    registerCommand("g:NERDTreeMapJumpRoot", "P", NerdAction.ToIj("Tree-selectFirst"))
     registerCommand("g:NERDTreeMapJumpParent", "p", NerdAction.Code { project, _, _ ->
       val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
       val currentPath = tree.selectionPath ?: return@Code
