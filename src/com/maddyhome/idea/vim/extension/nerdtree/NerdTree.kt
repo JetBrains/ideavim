@@ -26,6 +26,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
@@ -46,6 +47,7 @@ import com.maddyhome.idea.vim.key.RootNode
 import com.maddyhome.idea.vim.key.addLeafs
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
+import javax.swing.SwingConstants
 
 class NerdTree : VimExtension {
   override fun getName(): String = "NERDTree"
@@ -85,7 +87,7 @@ class NerdTree : VimExtension {
           val action = nextNode.actionHolder
           when (action) {
             is NerdAction.ToIj -> callAction(action.name, e.dataContext)
-            is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext) }
+            is NerdAction.Code -> e.project?.let { action.action(it, e.dataContext, e) }
           }
         }
         is CommandPartNode<NerdAction> -> currentNode = nextNode
@@ -140,9 +142,10 @@ class NerdTree : VimExtension {
     }
 
     private val actionsRoot: RootNode<NerdAction> = RootNode<NerdAction>().apply {
+      // TODO: 22.01.2021 Should not just to the last line after the first
       addLeafs("j", NerdAction.ToIj("Tree-selectNext"))
       addLeafs("k", NerdAction.ToIj("Tree-selectPrevious"))
-      addLeafs("o", NerdAction.Code { project, dataContext ->
+      addLeafs("o", NerdAction.Code { project, dataContext, _ ->
         val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
 
         val array = CommonDataKeys.NAVIGATABLE_ARRAY.getData(dataContext)?.filter { it.canNavigateToSource() }
@@ -157,13 +160,39 @@ class NerdTree : VimExtension {
           array.forEach { it.navigate(true) }
         }
       })
-      addLeafs("go", NerdAction.Code { project, dataContext ->
+      addLeafs("go", NerdAction.Code { _, dataContext, _ ->
         CommonDataKeys.NAVIGATABLE_ARRAY
           .getData(dataContext)
           ?.filter { it.canNavigateToSource() }
           ?.forEach { it.navigate(false) }
       })
+
+      // TODO: 21.01.2021 Should option in left split
       addLeafs("s", NerdAction.ToIj("OpenInRightSplit"))
+      // TODO: 21.01.2021 Should option in above split
+      addLeafs("i", NerdAction.Code { project, _, event ->
+        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
+        val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
+        val currentWindow = splitters.currentWindow
+        currentWindow.split(SwingConstants.HORIZONTAL, true, file, true)
+      })
+      addLeafs("gs", NerdAction.Code { project, context, event ->
+        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
+        val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
+        val currentWindow = splitters.currentWindow
+        currentWindow.split(SwingConstants.VERTICAL, true, file, true)
+
+        // FIXME: 22.01.2021 This solution bouncing a bit
+        callAction("ActivateProjectToolWindow", context)
+      })
+      addLeafs("gi", NerdAction.Code { project, context, event ->
+        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
+        val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
+        val currentWindow = splitters.currentWindow
+        currentWindow.split(SwingConstants.HORIZONTAL, true, file, true)
+
+        callAction("ActivateProjectToolWindow", context)
+      })
     }
 
     private var currentNode: CommandPartNode<NerdAction> = actionsRoot

@@ -18,10 +18,11 @@
 
 package com.maddyhome.idea.vim.extension.nerdtree
 
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.project.Project
 
 sealed class NerdAction {
   class ToIj(val name: String) : NerdAction()
-  class Code(val action: (Project, DataContext) -> Unit) : NerdAction()
+  class Code(val action: (Project, DataContext, AnActionEvent) -> Unit) : NerdAction()
 }
