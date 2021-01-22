@@ -75,8 +75,8 @@ import javax.swing.SwingConstants
  *
  * D........Delete the current bookmark ...............................|NERDTree-D|
  *
- * P........Jump to the root node......................................|NERDTree-P|
- * p........Jump to current nodes parent...............................|NERDTree-p|
+ * + P........Jump to the root node......................................|NERDTree-P|
+ * + p........Jump to current nodes parent...............................|NERDTree-p|
  * K........Jump up inside directories at the current tree depth.......|NERDTree-K|
  * J........Jump down inside directories at the current tree depth.....|NERDTree-J|
  * <C-J>....Jump down to next sibling of the current directory.......|NERDTree-C-J|
@@ -248,10 +248,56 @@ class NerdTree : VimExtension {
       } else {
         val parentPath = currentPath.parentPath ?: return@Code
         if (parentPath.parentPath != null) {
-          // The real root of the project is not shown in the project view
+          // The real root of the project is not shown in the project view, so we check the grandparent of the node
           tree.collapsePath(parentPath)
         }
       }
+    })
+    registerCommand("g:NERDTreeMapJumpRoot", "P", NerdAction.Code { project, _, _ ->
+      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+      var currentPath = tree.selectionPath ?: return@Code
+      while (currentPath.parentPath != null && currentPath.parentPath.parentPath != null) {
+        // The real root of the project is not shown in the project view, so we check the grandparent of the node
+        currentPath = currentPath.parentPath
+      }
+      tree.selectionPath = currentPath
+    })
+    registerCommand("g:NERDTreeMapJumpParent", "p", NerdAction.Code { project, _, _ ->
+      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+      val currentPath = tree.selectionPath ?: return@Code
+      val parentPath = currentPath.parentPath ?:return@Code
+      if (parentPath.parentPath != null) {
+        // The real root of the project is not shown in the project view, so we check the grandparent of the node
+        tree.selectionPath = parentPath
+      }
+    })
+    registerCommand("g:NERDTreeMapJumpFirstChild", "K", NerdAction.Code { project, _, _ ->
+      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+      val currentPath = tree.selectionPath ?: return@Code
+      val parent = currentPath.parentPath ?: return@Code
+      val row = tree.getRowForPath(parent)
+      tree.setSelectionRow(row + 1)
+
+      tree.scrollRowToVisible(row + 1)
+    })
+    registerCommand("g:NERDTreeMapJumpLastChild", "J", NerdAction.Code { project, _, _ ->
+      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+      val currentPath = tree.selectionPath ?: return@Code
+
+      val currentPathCount = currentPath.pathCount
+      var row = tree.getRowForPath(currentPath)
+
+      var expectedRow = row
+      while (true) {
+        row++
+        val nextPath = tree.getPathForRow(row) ?: break
+        val pathCount = nextPath.pathCount
+        if (pathCount == currentPathCount) expectedRow = row
+        if (pathCount < currentPathCount) break
+      }
+      tree.setSelectionRow(expectedRow)
+
+      tree.scrollRowToVisible(expectedRow)
     })
   }
 
