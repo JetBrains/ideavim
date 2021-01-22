@@ -77,8 +77,8 @@ import javax.swing.SwingConstants
  *
  * + P........Jump to the root node......................................|NERDTree-P|
  * + p........Jump to current nodes parent...............................|NERDTree-p|
- * K........Jump up inside directories at the current tree depth.......|NERDTree-K|
- * J........Jump down inside directories at the current tree depth.....|NERDTree-J|
+ * + K........Jump up inside directories at the current tree depth.......|NERDTree-K|
+ * + J........Jump down inside directories at the current tree depth.....|NERDTree-J|
  * <C-J>....Jump down to next sibling of the current directory.......|NERDTree-C-J|
  * <C-K>....Jump up to previous sibling of the current directory.....|NERDTree-C-K|
  *
