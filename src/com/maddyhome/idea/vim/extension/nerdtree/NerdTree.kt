@@ -30,6 +30,8 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
+import com.intellij.openapi.wm.ToolWindowId
+import com.intellij.openapi.wm.ex.ToolWindowManagerEx
 import com.intellij.ui.KeyStrokeAdapter
 import com.intellij.ui.TreeExpandCollapse
 import com.intellij.util.ui.tree.TreeUtil
@@ -108,14 +110,41 @@ class NerdTree : VimExtension {
   override fun init() {
     registerCommands()
 
-    addCommand("NERDTreeFocus", FocusHandler())
+    addCommand("NERDTreeFocus", IjCommandHandler("ActivateProjectToolWindow"))
+    addCommand("NERDTree", IjCommandHandler("ActivateProjectToolWindow"))
+    addCommand("NERDTreeToggle", ToggleHandler())
+    addCommand("NERDTreeClose", CloseHandler())
+    addCommand("NERDTreeFind", IjCommandHandler("SelectInProjectView"))
+    addCommand("NERDTreeRefreshRoot", IjCommandHandler("Synchronize"))
 
     ProjectManager.getInstance().openProjects.forEach { project -> installDispatcher(project) }
   }
 
-  class FocusHandler : CommandAliasHandler {
+  class IjCommandHandler(val actionId: String) : CommandAliasHandler {
     override fun execute(editor: Editor, context: DataContext) {
-      callAction("ActivateProjectToolWindow", context)
+      callAction(actionId, context)
+    }
+  }
+
+  class ToggleHandler : CommandAliasHandler {
+    override fun execute(editor: Editor, context: DataContext) {
+      val project = editor.project ?: return
+      val toolWindow = ToolWindowManagerEx.getInstanceEx(project).getToolWindow(ToolWindowId.PROJECT_VIEW) ?: return
+      if (toolWindow.isVisible) {
+        toolWindow.hide()
+      } else {
+        callAction("ActivateProjectToolWindow", context)
+      }
+    }
+  }
+
+  class CloseHandler : CommandAliasHandler {
+    override fun execute(editor: Editor, context: DataContext) {
+      val project = editor.project ?: return
+      val toolWindow = ToolWindowManagerEx.getInstanceEx(project).getToolWindow(ToolWindowId.PROJECT_VIEW) ?: return
+      if (toolWindow.isVisible) {
+          toolWindow.hide()
+      }
     }
   }
 
