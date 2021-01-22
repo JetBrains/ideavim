@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.group.KeyGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -105,6 +106,8 @@ class NerdTree : VimExtension {
     addCommand("NERDTreeFocus", FocusHandler())
 
     ProjectManager.getInstance().openProjects.forEach { project -> installDispatcher(project) }
+
+    registerCommands()
   }
 
   class FocusHandler : CommandAliasHandler {
@@ -172,6 +175,60 @@ class NerdTree : VimExtension {
     }
   }
 
+  private fun registerCommands() {
+    // TODO: 22.01.2021 Should not just to the last line after the first
+    registerCommand("j", NerdAction.ToIj("Tree-selectNext"))
+    registerCommand("k", NerdAction.ToIj("Tree-selectPrevious"))
+    registerCommand("g:NERDTreeMapActivateNode", "o", NerdAction.Code { project, dataContext, _ ->
+      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+
+      val array = CommonDataKeys.NAVIGATABLE_ARRAY.getData(dataContext)?.filter { it.canNavigateToSource() }
+      if (array.isNullOrEmpty()) {
+        val row = tree.selectionRows?.getOrNull(0) ?: return@Code
+        if (tree.isExpanded(row)) {
+          tree.collapseRow(row)
+        } else {
+          tree.expandRow(row)
+        }
+      } else {
+        array.forEach { it.navigate(true) }
+      }
+    })
+    registerCommand("g:NERDTreeMapPreview", "go", NerdAction.Code { _, dataContext, _ ->
+      CommonDataKeys.NAVIGATABLE_ARRAY
+        .getData(dataContext)
+        ?.filter { it.canNavigateToSource() }
+        ?.forEach { it.navigate(false) }
+    })
+
+    // TODO: 21.01.2021 Should option in left split
+    registerCommand("g:NERDTreeMapOpenVSplit", "s", NerdAction.ToIj("OpenInRightSplit"))
+    // TODO: 21.01.2021 Should option in above split
+    registerCommand("g:NERDTreeMapActivateNode", "i", NerdAction.Code { project, _, event ->
+      val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
+      val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
+      val currentWindow = splitters.currentWindow
+      currentWindow.split(SwingConstants.HORIZONTAL, true, file, true)
+    })
+    registerCommand("g:NERDTreeMapPreviewVSplit", "gs", NerdAction.Code { project, context, event ->
+      val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
+      val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
+      val currentWindow = splitters.currentWindow
+      currentWindow.split(SwingConstants.VERTICAL, true, file, true)
+
+      // FIXME: 22.01.2021 This solution bouncing a bit
+      callAction("ActivateProjectToolWindow", context)
+    })
+    registerCommand("g:NERDTreeMapPreviewSplit", "gi", NerdAction.Code { project, context, event ->
+      val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
+      val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
+      val currentWindow = splitters.currentWindow
+      currentWindow.split(SwingConstants.HORIZONTAL, true, file, true)
+
+      callAction("ActivateProjectToolWindow", context)
+    })
+  }
+
   companion object {
     fun callAction(name: String, context: DataContext) {
       val action = ActionManager.getInstance().getAction(name) ?: run {
@@ -190,60 +247,16 @@ class NerdTree : VimExtension {
       VimPlugin.getCommand().setAlias(alias, CommandAlias.Call(0, -1, alias, handler))
     }
 
-    private val actionsRoot: RootNode<NerdAction> = RootNode<NerdAction>().apply {
-      // TODO: 22.01.2021 Should not just to the last line after the first
-      addLeafs("j", NerdAction.ToIj("Tree-selectNext"))
-      addLeafs("k", NerdAction.ToIj("Tree-selectPrevious"))
-      addLeafs("o", NerdAction.Code { project, dataContext, _ ->
-        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-
-        val array = CommonDataKeys.NAVIGATABLE_ARRAY.getData(dataContext)?.filter { it.canNavigateToSource() }
-        if (array.isNullOrEmpty()) {
-          val row = tree.selectionRows?.getOrNull(0) ?: return@Code
-          if (tree.isExpanded(row)) {
-            tree.collapseRow(row)
-          } else {
-            tree.expandRow(row)
-          }
-        } else {
-          array.forEach { it.navigate(true) }
-        }
-      })
-      addLeafs("go", NerdAction.Code { _, dataContext, _ ->
-        CommonDataKeys.NAVIGATABLE_ARRAY
-          .getData(dataContext)
-          ?.filter { it.canNavigateToSource() }
-          ?.forEach { it.navigate(false) }
-      })
-
-      // TODO: 21.01.2021 Should option in left split
-      addLeafs("s", NerdAction.ToIj("OpenInRightSplit"))
-      // TODO: 21.01.2021 Should option in above split
-      addLeafs("i", NerdAction.Code { project, _, event ->
-        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
-        val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
-        val currentWindow = splitters.currentWindow
-        currentWindow.split(SwingConstants.HORIZONTAL, true, file, true)
-      })
-      addLeafs("gs", NerdAction.Code { project, context, event ->
-        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
-        val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
-        val currentWindow = splitters.currentWindow
-        currentWindow.split(SwingConstants.VERTICAL, true, file, true)
-
-        // FIXME: 22.01.2021 This solution bouncing a bit
-        callAction("ActivateProjectToolWindow", context)
-      })
-      addLeafs("gi", NerdAction.Code { project, context, event ->
-        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
-        val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
-        val currentWindow = splitters.currentWindow
-        currentWindow.split(SwingConstants.HORIZONTAL, true, file, true)
-
-        callAction("ActivateProjectToolWindow", context)
-      })
+    private fun registerCommand(variable: String, default: String, action: NerdAction) {
+      val mappings = VimScriptGlobalEnvironment.getInstance().variables.getOrDefault(variable, default).toString()
+      actionsRoot.addLeafs(mappings, action)
     }
 
+    private fun registerCommand(default: String, action: NerdAction) {
+      actionsRoot.addLeafs(default, action)
+    }
+
+    private val actionsRoot: RootNode<NerdAction> = RootNode()
     private var currentNode: CommandPartNode<NerdAction> = actionsRoot
 
     private fun collectShortcuts(node: Node<NerdAction>): Set<KeyStroke> {
