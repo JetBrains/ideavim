@@ -32,6 +32,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.ui.KeyStrokeAdapter
 import com.intellij.ui.TreeExpandCollapse
+import com.intellij.util.ui.tree.TreeUtil
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.CommandAlias
@@ -235,10 +236,16 @@ class NerdTree : VimExtension {
     registerCommand("g:NERDTreeMapOpenRecursively", "O", NerdAction.Code { project, _, _ ->
       val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
       TreeExpandCollapse.expandAll(tree)
+      tree.selectionPath?.let {
+        TreeUtil.scrollToVisible(tree, it, false)
+      }
     })
     registerCommand("g:NERDTreeMapCloseChildren", "X", NerdAction.Code { project, _, _ ->
       val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
       TreeExpandCollapse.collapse(tree)
+      tree.selectionPath?.let {
+        TreeUtil.scrollToVisible(tree, it, false)
+      }
     })
     registerCommand("g:NERDTreeMapCloseDir", "x", NerdAction.Code { project, _, _ ->
       val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
@@ -250,6 +257,7 @@ class NerdTree : VimExtension {
         if (parentPath.parentPath != null) {
           // The real root of the project is not shown in the project view, so we check the grandparent of the node
           tree.collapsePath(parentPath)
+          TreeUtil.scrollToVisible(tree, parentPath, false)
         }
       }
     })
@@ -261,6 +269,7 @@ class NerdTree : VimExtension {
       if (parentPath.parentPath != null) {
         // The real root of the project is not shown in the project view, so we check the grandparent of the node
         tree.selectionPath = parentPath
+        TreeUtil.scrollToVisible(tree, parentPath, false)
       }
     })
     registerCommand("g:NERDTreeMapJumpFirstChild", "K", NerdAction.Code { project, _, _ ->
