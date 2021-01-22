@@ -120,7 +120,7 @@ class NerdTree : VimExtension {
     ProjectManager.getInstance().openProjects.forEach { project -> installDispatcher(project) }
   }
 
-  class IjCommandHandler(val actionId: String) : CommandAliasHandler {
+  class IjCommandHandler(private val actionId: String) : CommandAliasHandler {
     override fun execute(editor: Editor, context: DataContext) {
       callAction(actionId, context)
     }
