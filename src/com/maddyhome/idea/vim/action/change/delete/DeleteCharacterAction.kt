@@ -25,7 +25,11 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-class DeleteCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
+class DeleteCharacterAction : DeleteCharacter({ 1 })
+class DeleteCharacterLeftAction : DeleteCharacter({ -it })
+class DeleteCharacterRightAction : DeleteCharacter({ it })
+
+abstract class DeleteCharacter(private val countModifier: (Int) -> Int) : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.DELETE
 
   override fun execute(
@@ -36,6 +40,6 @@ class DeleteCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
     rawCount: Int,
     argument: Argument?
   ): Boolean {
-    return VimPlugin.getChange().deleteCharacter(editor, caret, 1, false)
+    return VimPlugin.getChange().deleteCharacter(editor, caret, countModifier(count), false)
   }
 }
