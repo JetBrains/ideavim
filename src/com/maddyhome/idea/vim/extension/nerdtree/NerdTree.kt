@@ -55,10 +55,11 @@ import javax.swing.SwingConstants
 
 /**
  * Key      Description                                                  help-tag~
+ * '+' means supported
  *
  * + o........Open files, directories and bookmarks......................|NERDTree-o|
  * + go.......Open selected file, but leave cursor in the NERDTree......|NERDTree-go|
- * Open selected bookmark dir in current NERDTree
+ *            Open selected bookmark dir in current NERDTree
  * t........Open selected node/bookmark in a new tab...................|NERDTree-t|
  * T........Same as 't' but keep the focus on the current tab..........|NERDTree-T|
  * + i........Open selected file in a split window.......................|NERDTree-i|
