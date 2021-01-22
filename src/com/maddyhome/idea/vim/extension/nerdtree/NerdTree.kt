@@ -31,6 +31,7 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.ui.KeyStrokeAdapter
+import com.intellij.ui.TreeExpandCollapse
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.CommandAlias
@@ -54,17 +55,17 @@ import javax.swing.SwingConstants
 /**
  * Key      Description                                                  help-tag~
  *
- * o........Open files, directories and bookmarks......................|NERDTree-o|
- * go.......Open selected file, but leave cursor in the NERDTree......|NERDTree-go|
+ * + o........Open files, directories and bookmarks......................|NERDTree-o|
+ * + go.......Open selected file, but leave cursor in the NERDTree......|NERDTree-go|
  * Open selected bookmark dir in current NERDTree
  * t........Open selected node/bookmark in a new tab...................|NERDTree-t|
  * T........Same as 't' but keep the focus on the current tab..........|NERDTree-T|
- * i........Open selected file in a split window.......................|NERDTree-i|
- * gi.......Same as i, but leave the cursor on the NERDTree...........|NERDTree-gi|
- * s........Open selected file in a new vsplit.........................|NERDTree-s|
- * gs.......Same as s, but leave the cursor on the NERDTree...........|NERDTree-gs|
+ * + i........Open selected file in a split window.......................|NERDTree-i|
+ * + gi.......Same as i, but leave the cursor on the NERDTree...........|NERDTree-gi|
+ * + s........Open selected file in a new vsplit.........................|NERDTree-s|
+ * + gs.......Same as s, but leave the cursor on the NERDTree...........|NERDTree-gs|
  * <CR>.....User-definable custom open action.......................|NERDTree-<CR>|
- * O........Recursively open the selected directory....................|NERDTree-O|
+ * + O........Recursively open the selected directory....................|NERDTree-O|
  * x........Close the current nodes parent.............................|NERDTree-x|
  * X........Recursively close all children of the current node.........|NERDTree-X|
  * e........Edit the current dir.......................................|NERDTree-e|
@@ -103,11 +104,11 @@ class NerdTree : VimExtension {
   override fun getName(): String = "NERDTree"
 
   override fun init() {
+    registerCommands()
+
     addCommand("NERDTreeFocus", FocusHandler())
 
     ProjectManager.getInstance().openProjects.forEach { project -> installDispatcher(project) }
-
-    registerCommands()
   }
 
   class FocusHandler : CommandAliasHandler {
@@ -127,7 +128,11 @@ class NerdTree : VimExtension {
 
   class NerdDispatcher : DumbAwareAction() {
     override fun actionPerformed(e: AnActionEvent) {
-      val keyStroke = getKeyStroke(e) ?: return
+      var keyStroke = getKeyStroke(e) ?: return
+      val keyChar = keyStroke.keyChar
+      if (keyChar != KeyEvent.CHAR_UNDEFINED) {
+        keyStroke = KeyStroke.getKeyStroke(keyChar)
+      }
 
       val nextNode = currentNode[keyStroke]
 
@@ -226,6 +231,10 @@ class NerdTree : VimExtension {
       currentWindow.split(SwingConstants.HORIZONTAL, true, file, true)
 
       callAction("ActivateProjectToolWindow", context)
+    })
+    registerCommand("g:NERDTreeMapOpenRecursively", "O", NerdAction.Code { project, context, event ->
+      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+      TreeExpandCollapse.expandAll(tree)
     })
   }
 
