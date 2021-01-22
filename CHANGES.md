@@ -26,6 +26,9 @@ usual beta standards.
 
 ### Fixes:
 * [VIM-2202](https://youtrack.jetbrains.com/issue/VIM-2202) Fix macro recording for ex command and search
+* [VIM-1799](https://youtrack.jetbrains.com/issue/VIM-1799)
+  [VIM-1794](https://youtrack.jetbrains.com/issue/VIM-179a)
+  Special characters are not interpreted on yanking
 
 ## 0.64, 2020-12-23
 

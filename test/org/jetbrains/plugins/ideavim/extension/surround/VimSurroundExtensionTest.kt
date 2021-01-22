@@ -429,4 +429,15 @@ class VimSurroundExtensionTest : VimTestCase() {
     typeText(parseKeys("cs(]"))
     myFixture.checkResult(after)
   }
+
+  fun `test change new line`() {
+    val before = """
+      "\n"
+      """.trimIndent()
+    configureByText(before)
+
+    typeText(parseKeys("cs\"'"))
+    val after = """'\n'"""
+    myFixture.checkResult(after)
+  }
 }

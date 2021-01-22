@@ -90,6 +90,9 @@ object OptionsManager {
   val ideawrite = addOption(BoundStringOption("ideawrite", "ideawrite", IdeaWriteData.all, IdeaWriteData.allValues))
   val ideavimsupport = addOption(BoundListOption("ideavimsupport", "ideavimsupport", arrayOf("dialog"), arrayOf("dialog", "singleline", "dialoglegacy")))
 
+  // This should be removed in the next versions
+  val ideacopypreprocess = addOption(ToggleOption("ideacopypreprocess", "ideacopypreprocess", false))
+
   fun isSet(name: String): Boolean {
     val option = getOption(name)
     return option is ToggleOption && option.getValue()

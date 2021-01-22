@@ -36,6 +36,7 @@ class DeleteCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
     rawCount: Int,
     argument: Argument?
   ): Boolean {
+    "\n"
     return VimPlugin.getChange().deleteCharacter(editor, caret, 1, false)
   }
 }

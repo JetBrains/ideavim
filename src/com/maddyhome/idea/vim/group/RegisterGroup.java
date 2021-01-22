@@ -344,13 +344,19 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     final PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
     if (file == null) return text;
     String rawText = TextBlockTransferable.convertLineSeparators(text, "\n", transferableDatas);
-    String escapedText;
-    for (CopyPastePreProcessor processor : CopyPastePreProcessor.EP_NAME.getExtensionList()) {
-      escapedText = processor.preprocessOnCopy(file, textRange.getStartOffsets(), textRange.getEndOffsets(), rawText);
-      if (escapedText != null) {
-        return escapedText;
+
+
+    if (OptionsManager.INSTANCE.getIdeacopypreprocess().getValue()) {
+      String escapedText;
+      for (CopyPastePreProcessor processor : CopyPastePreProcessor.EP_NAME.getExtensionList()) {
+        escapedText = processor.preprocessOnCopy(file, textRange.getStartOffsets(), textRange.getEndOffsets(), rawText);
+        if (escapedText != null) {
+          return escapedText;
+        }
       }
     }
+
+
     return text;
   }
 
