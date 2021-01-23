@@ -381,9 +381,7 @@ public class KeyHandler {
 
         final List<KeyStroke> unhandledKeys = mappingState.detachKeys();
 
-        // TODO: I'm not sure why we abandon plugin commands here
-        // Would be useful to have a comment or a helpfully named helper method here
-        if (editor.isDisposed() || unhandledKeys.get(0).equals(StringHelper.PlugKeyStroke)) {
+        if (editor.isDisposed() || isPluginMapping(unhandledKeys)) {
           return;
         }
 
@@ -465,15 +463,8 @@ public class KeyHandler {
     // If user enters `dI`, the first `d` will be caught be this handler because it's a prefix for `ds` command.
     //  After the user enters `I`, the caught `d` should be processed without mapping, and the rest of keys
     //  should be processed with mappings (to make I work)
-    //
-    // Additionally, the <Plug>mappings are not executed if the fail to map to something.
-    //   E.g.
-    //   - map <Plug>iA someAction
-    //   - map I <Plug>i
-    //   For `IA` someAction should be executed.
-    //   But if the user types `Ib`, `<Plug>i` won't be executed again. Only `b` will be passed to keyHandler.
 
-    if (unhandledKeyStrokes.get(0).equals(StringHelper.PlugKeyStroke)) {
+    if (isPluginMapping(unhandledKeyStrokes)) {
       handleKey(editor, unhandledKeyStrokes.get(unhandledKeyStrokes.size() - 1), context, true);
     } else {
       handleKey(editor, unhandledKeyStrokes.get(0), context, false);
@@ -484,6 +475,16 @@ public class KeyHandler {
     }
 
     return true;
+  }
+
+  // The <Plug>mappings are not executed if they fail to map to something.
+  //   E.g.
+  //   - map <Plug>iA someAction
+  //   - map I <Plug>i
+  //   For `IA` someAction should be executed.
+  //   But if the user types `Ib`, `<Plug>i` won't be executed again. Only `b` will be passed to keyHandler.
+  private boolean isPluginMapping(List<KeyStroke> unhandledKeyStrokes) {
+    return unhandledKeyStrokes.get(0).equals(StringHelper.PlugKeyStroke);
   }
 
   @SuppressWarnings("RedundantIfStatement")
