@@ -26,7 +26,7 @@ import org.jetbrains.jetCheck.PropertyChecker
 // TODO: 25.01.2021 Add neovim test integration
 class MapPropertyTest : VimPropertyTest() {
   fun testRandomMappings() {
-    PropertyChecker.customized().rechecking("/PK5iwfNypu/D18KBQoAAQYCBQEGAwMEBgQDAgYBAAUGAQIGAwUFCAYFBQUFAgEDAwMEBgIHBgUAAwIAAggCAQQEBgMEBgIABgMEAwUFAw0IAQQAAgMBAwMHAwQCBAAAAgMDAgMFAQEFBgUFAQIAAQUCAQMCAgoIBQUDAwYEAQMDAAIAAAEEBQAEBAYCAwAEAQ==").checkScenarios {
+    PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
         val editor = configureByText(simpleText)
         try {
