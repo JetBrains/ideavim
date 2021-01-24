@@ -24,6 +24,9 @@ usual beta standards.
 
 ## To Be Released
 
+### Features:
+* Support `maxmapdepth` option to define the maximum depth of mappings
+
 ### Fixes:
 * [VIM-2202](https://youtrack.jetbrains.com/issue/VIM-2202) Fix macro recording for ex command and search
 * [VIM-1799](https://youtrack.jetbrains.com/issue/VIM-1799)

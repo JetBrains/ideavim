@@ -53,7 +53,7 @@ sealed class MappingInfo(val fromKeys: List<KeyStroke>, val isRecursive: Boolean
   @VimNlsSafe
   abstract fun getPresentableString(): String
 
-  abstract fun execute(editor: Editor, context: DataContext)
+  abstract fun execute(editor: Editor, context: DataContext, recursionCounter: Int)
 
   override fun compareTo(other: MappingInfo): Int {
     val size = fromKeys.size
@@ -89,14 +89,14 @@ class ToKeysMappingInfo(
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = toKeyNotation(toKeys)
 
-  override fun execute(editor: Editor, context: DataContext) {
+  override fun execute(editor: Editor, context: DataContext, recursionCounter: Int) {
     val editorDataContext = EditorDataContext.init(editor, context)
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     var first = true
     for (keyStroke in toKeys) {
       val recursive = isRecursive && !(first && fromIsPrefix)
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false)
+      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false, recursionCounter + 1)
       first = false
     }
   }
@@ -110,7 +110,7 @@ class ToHandlerMappingInfo(
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = "call ${extensionHandler.javaClass.canonicalName}"
 
-  override fun execute(editor: Editor, context: DataContext) {
+  override fun execute(editor: Editor, context: DataContext, recursionCounter: Int) {
     val processor = CommandProcessor.getInstance()
     val commandState = CommandState.getInstance(editor)
 
@@ -180,7 +180,7 @@ class ToActionMappingInfo(
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = "action $action"
 
-  override fun execute(editor: Editor, context: DataContext) {
+  override fun execute(editor: Editor, context: DataContext, recursionCounter: Int) {
     val editorDataContext = EditorDataContext.init(editor, context)
     val dataContext = CaretSpecificDataContext(editorDataContext, editor.caretModel.currentCaret)
     KeyHandler.executeAction(action, dataContext)

@@ -162,8 +162,8 @@ public class KeyHandler {
    * @param key     The keystroke typed by the user
    * @param context The data context
    */
-  public void handleKey(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context) {
-    handleKey(editor, key, context, true, false);
+  public void handleKey(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context, int recursionCounter) {
+    handleKey(editor, key, context, true, false, recursionCounter);
   }
 
   /**
@@ -193,12 +193,21 @@ public class KeyHandler {
    *
    * @param allowKeyMappings - If we allow key mappings or not
    * @param mappingCompleted - if true, we don't check if the mapping is incomplete
+   *
+   * TODO mappingCompleted and recursionCounter - we should find a more beautiful way to use them
    */
   public void handleKey(@NotNull Editor editor,
                         @NotNull KeyStroke key,
                         @NotNull DataContext context,
                         boolean allowKeyMappings,
-                        boolean mappingCompleted) {
+                        boolean mappingCompleted,
+                        int recursionCounter) {
+    if (recursionCounter >= OptionsManager.INSTANCE.getMaxmapdepth().value()) {
+      VimPlugin.showMessage(MessageHelper.message("E223"));
+      VimPlugin.indicateError();
+      return;
+    }
+
     VimPlugin.clearError();
     // All the editor actions should be performed with top level editor!!!
     // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
@@ -215,7 +224,7 @@ public class KeyHandler {
     handleKeyRecursionCount++;
 
     try {
-      if (!allowKeyMappings || !handleKeyMapping(editor, key, context, mappingCompleted)) {
+      if (!allowKeyMappings || !handleKeyMapping(editor, key, context, mappingCompleted, recursionCounter)) {
         if (isCommandCountKey(chKey, editorState)) {
           commandBuilder.addCountCharacter(key);
         } else if (isDeleteCommandCountKey(key, editorState)) {
@@ -234,7 +243,7 @@ public class KeyHandler {
         }
         // If we are this far, then the user must be entering a command or a non-single-character argument
         // to an entered command. Let's figure out which it is.
-        else if (!handleDigraph(editor, key, context, editorState)) {
+        else if (!handleDigraph(editor, key, context, editorState, recursionCounter)) {
           // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
           // return the node matching this keystroke
           final Node<ActionBeanClass> node = mapOpCommand(key, commandBuilder.getChildNode(key), editorState);
@@ -333,7 +342,8 @@ public class KeyHandler {
   private boolean handleKeyMapping(final @NotNull Editor editor,
                                    final @NotNull KeyStroke key,
                                    final @NotNull DataContext context,
-                                   boolean mappingCompleted) {
+                                   boolean mappingCompleted,
+                                   int recursionCounter) {
 
     final CommandState commandState = CommandState.getInstance(editor);
     final MappingState mappingState = commandState.getMappingState();
@@ -355,9 +365,9 @@ public class KeyHandler {
 
     // Returns true if any of these methods handle the key. False means that the key is unrelated to mapping and should
     // be processed as normal.
-    return (handleUnfinishedMappingSequence(editor, mappingState, mapping, mappingCompleted))
-      || handleCompleteMappingSequence(editor, context, mappingState, mapping, key)
-      || handleAbandonedMappingSequence(editor, mappingState, context);
+    return (handleUnfinishedMappingSequence(editor, mappingState, mapping, mappingCompleted, recursionCounter))
+      || handleCompleteMappingSequence(editor, context, mappingState, mapping, key, recursionCounter)
+      || handleAbandonedMappingSequence(editor, mappingState, context, recursionCounter);
   }
 
   private boolean isMappingDisabledForKey(@NotNull KeyStroke key, @NotNull CommandState commandState) {
@@ -370,7 +380,8 @@ public class KeyHandler {
   private boolean handleUnfinishedMappingSequence(@NotNull Editor editor,
                                                   @NotNull MappingState mappingState,
                                                   @NotNull KeyMapping mapping,
-                                                  boolean mappingCompleted) {
+                                                  boolean mappingCompleted,
+                                                  int recursionCounter) {
     if (mappingCompleted) return false;
 
     // Is there at least one mapping that starts with the current sequence? This does not include complete matches,
@@ -397,7 +408,7 @@ public class KeyHandler {
         }
 
         for (KeyStroke keyStroke : unhandledKeys) {
-          handleKey(editor, keyStroke, EditorDataContext.init(editor, null), true, true);
+          handleKey(editor, keyStroke, EditorDataContext.init(editor, null), true, true, recursionCounter + 1);
         }
       }, ModalityState.stateForComponent(editor.getComponent())));
     }
@@ -409,7 +420,7 @@ public class KeyHandler {
                                                 @NotNull DataContext context,
                                                 @NotNull MappingState mappingState,
                                                 @NotNull KeyMapping mapping,
-                                                KeyStroke key) {
+                                                KeyStroke key, int recursionCounter) {
 
     // The current sequence isn't a prefix, check to see if it's a completed sequence.
     final MappingInfo currentMappingInfo = mapping.get(mappingState.getKeys());
@@ -441,11 +452,11 @@ public class KeyHandler {
 
     final EditorDataContext currentContext = EditorDataContext.init(editor, context);
 
-    mappingInfo.execute(editor, context);
+    mappingInfo.execute(editor, context, recursionCounter);
 
     // If we've just evaluated the previous key sequence, make sure to also handle the current key
     if (mappingInfo != currentMappingInfo) {
-      handleKey(editor, key, currentContext, true, false);
+      handleKey(editor, key, currentContext, true, false, recursionCounter + 1);
     }
 
     return true;
@@ -453,7 +464,7 @@ public class KeyHandler {
 
   private boolean handleAbandonedMappingSequence(@NotNull Editor editor,
                                                  @NotNull MappingState mappingState,
-                                                 DataContext context) {
+                                                 DataContext context, int recursionCounter) {
 
     // The user has terminated a mapping sequence with an unexpected key
     // E.g. if there is a mapping for "hello" and user enters command "help" the processing of "h", "e" and "l" will be
@@ -475,12 +486,12 @@ public class KeyHandler {
     //  should be processed with mappings (to make I work)
 
     if (isPluginMapping(unhandledKeyStrokes)) {
-      handleKey(editor, unhandledKeyStrokes.get(unhandledKeyStrokes.size() - 1), context, true, false);
+      handleKey(editor, unhandledKeyStrokes.get(unhandledKeyStrokes.size() - 1), context, true, false, recursionCounter + 1);
     } else {
-      handleKey(editor, unhandledKeyStrokes.get(0), context, false, false);
+      handleKey(editor, unhandledKeyStrokes.get(0), context, false, false, recursionCounter + 1);
 
       for (KeyStroke keyStroke : unhandledKeyStrokes.subList(1, unhandledKeyStrokes.size())) {
-        handleKey(editor, keyStroke, context, true, false);
+        handleKey(editor, keyStroke, context, true, false, recursionCounter + 1);
       }
     }
 
@@ -584,7 +595,8 @@ public class KeyHandler {
   private boolean handleDigraph(@NotNull Editor editor,
                                 @NotNull KeyStroke key,
                                 @NotNull DataContext context,
-                                @NotNull CommandState editorState) {
+                                @NotNull CommandState editorState,
+                                int recursionCounter) {
 
     // Support starting a digraph/literal sequence if the operator accepts one as an argument, e.g. 'r' or 'f'.
     // Normally, we start the sequence (in Insert or CmdLine mode) through a VimAction that can be mapped. Our
@@ -635,7 +647,7 @@ public class KeyHandler {
           return false;
         }
         editorState.getCommandBuilder().addKey(key);
-        handleKey(editor, stroke, context);
+        handleKey(editor, stroke, context, recursionCounter + 1);
         return true;
 
       case DigraphResult.RES_BAD:
@@ -650,7 +662,7 @@ public class KeyHandler {
         // state. E.g. waiting for {char} <BS> {char}. Let the key handler have a go at it.
         if (commandBuilder.getExpectedArgumentType() == Argument.Type.DIGRAPH) {
           commandBuilder.fallbackToCharacterArgument();
-          handleKey(editor, key, context);
+          handleKey(editor, key, context, recursionCounter + 1);
           return true;
         }
         return false;

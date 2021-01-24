@@ -17,10 +17,12 @@
  */
 package org.jetbrains.plugins.ideavim.ex.handler.mapping
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.commandState
+import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitAndAssert
 
@@ -623,6 +625,22 @@ n  ,f            <Plug>Foo
               -----
               """.trimIndent()
     )
+  }
+
+  fun `test recursion`() {
+    val text = """
+          -----
+          1${c}2345
+          abcde
+          -----
+          """.trimIndent()
+    configureByJavaText(text)
+
+    typeText(commandToKeys("map x y"))
+    typeText(commandToKeys("map y x"))
+    typeText(StringHelper.parseKeys("x"))
+
+    TestCase.assertTrue(VimPlugin.isError())
   }
 
   private fun checkDelayedMapping(before: String, after: String) {

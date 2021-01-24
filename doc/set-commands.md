@@ -38,6 +38,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                                       acts like startsel is enabled
     
     'matchpairs'     'mps'   pairs of characters that "%" can match
+    'maxmapdepth'    'mmd'   Maximum depth of mappings
     'more'           'more'  When on, listings pause when the whole screen is filled.
     'nrformats'      'nf'    number formats recognized for CTRL-A command
     'number'         'nu'    print the line number in front of each line

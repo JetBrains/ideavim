@@ -95,7 +95,7 @@ object ExEditorKit : DefaultEditorKit() {
             if (target.useHandleKeyFromEx) {
               val entry = ExEntryPanel.getInstance().entry
               val editor = entry.editor
-              KeyHandler.getInstance().handleKey(editor, key, EditorDataContext.init(editor, entry.context))
+              KeyHandler.getInstance().handleKey(editor, key, EditorDataContext.init(editor, entry.context), 0)
             } else {
               val event = ActionEvent(e.source, e.id, c.toString(), e.getWhen(), e.modifiers)
               super.actionPerformed(event)

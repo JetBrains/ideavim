@@ -65,7 +65,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
       }
       // Should we use HelperKt.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
       try {
-        KeyHandler.getInstance().handleKey(editor, keyStroke, EditorDataContext.init(editor, e.dataContext))
+        KeyHandler.getInstance().handleKey(editor, keyStroke, EditorDataContext.init(editor, e.dataContext), 0)
       } catch (ignored: ProcessCanceledException) {
         // Control-flow exceptions (like ProcessCanceledException) should never be logged
         // See {@link com.intellij.openapi.diagnostic.Logger.checkException}
