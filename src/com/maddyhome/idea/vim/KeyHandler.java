@@ -376,7 +376,7 @@ public class KeyHandler {
     // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
     // delete a word)
     final Application application = ApplicationManager.getApplication();
-    if (!application.isUnitTestMode() && OptionsManager.INSTANCE.getTimeout().isSet()) {
+    if (OptionsManager.INSTANCE.getTimeout().isSet()) {
       mappingState.startMappingTimer(actionEvent -> application.invokeLater(() -> {
 
         final List<KeyStroke> unhandledKeys = mappingState.detachKeys();

@@ -20,7 +20,9 @@ package org.jetbrains.plugins.ideavim.ex.handler.mapping
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.commandState
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.waitAndAssert
 
 /**
  * @author vlan
@@ -525,5 +527,35 @@ n  ,f            <Plug>Foo
           abcde
           -----
           """.trimIndent())
+  }
+
+  fun `test execute mapping with a delay`() {
+    val text = """
+          -----
+          1${c}2345
+          abcde
+          -----
+          """.trimIndent()
+    configureByJavaText(text)
+
+    typeText(commandToKeys("map kk l"))
+    typeText(StringHelper.parseKeys("k"))
+
+    checkDelayedMapping(text,
+      """
+              -${c}----
+              12345
+              abcde
+              -----
+              """.trimIndent()
+    )
+  }
+
+  private fun checkDelayedMapping(before: String, after: String) {
+    myFixture.checkResult(before)
+
+    waitAndAssert { !myFixture.editor.commandState.mappingState.isTimerRunning() }
+
+    myFixture.checkResult(after)
   }
 }
