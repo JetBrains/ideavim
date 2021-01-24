@@ -574,10 +574,61 @@ n  ,f            <Plug>Foo
     )
   }
 
+  fun `test execute mapping with a delay and second mapping and another starting mappings`() {
+    // TODO: 24.01.2021  mapping time should be only 1000 sec
+    val text = """
+          -----
+          1${c}2345
+          abcde
+          -----
+          """.trimIndent()
+    configureByJavaText(text)
+
+    typeText(commandToKeys("map k j"))
+    typeText(commandToKeys("map kk l"))
+    typeText(commandToKeys("map j h"))
+    typeText(commandToKeys("map jz w"))
+    typeText(StringHelper.parseKeys("k"))
+
+    checkDelayedMapping(text,
+      """
+              -----
+              ${c}12345
+              abcde
+              -----
+              """.trimIndent()
+    )
+  }
+
+  fun `test execute mapping with a delay and second mapping and another starting mappings with another key`() {
+    val text = """
+          -----
+          1${c}2345
+          abcde
+          -----
+          """.trimIndent()
+    configureByJavaText(text)
+
+    typeText(commandToKeys("map k j"))
+    typeText(commandToKeys("map kk l"))
+    typeText(commandToKeys("map j h"))
+    typeText(commandToKeys("map jz w"))
+    typeText(StringHelper.parseKeys("kz"))
+
+    myFixture.checkResult(
+      """
+              -----
+              12345
+              ${c}abcde
+              -----
+              """.trimIndent()
+    )
+  }
+
   private fun checkDelayedMapping(before: String, after: String) {
     myFixture.checkResult(before)
 
-    waitAndAssert { !myFixture.editor.commandState.mappingState.isTimerRunning() }
+    waitAndAssert(5000) { !myFixture.editor.commandState.mappingState.isTimerRunning() }
 
     myFixture.checkResult(after)
   }
