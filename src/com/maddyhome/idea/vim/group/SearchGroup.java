@@ -835,7 +835,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     else {
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
       final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
-      exEntryPanel.activate(editor, new EditorDataContext(editor, null), MessageHelper.message("replace.with.0", match), "", 1);
+      exEntryPanel.activate(editor, EditorDataContext.init(editor, null), MessageHelper.message("replace.with.0", match), "", 1);
       MotionGroup.moveCaret(editor, caret, startoff);
       ModalEntry.INSTANCE.activate(keyStrokeProcessor);
       exEntryPanel.deactivate(true, false);

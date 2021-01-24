@@ -61,7 +61,7 @@ class VimTypedActionHandler(origHandler: TypedActionHandler?) : TypedActionHandl
     try {
       val modifiers = if (charTyped == ' ' && VimKeyListener.isSpaceShift) KeyEvent.SHIFT_DOWN_MASK else 0
       val keyStroke = KeyStroke.getKeyStroke(charTyped, modifiers)
-      handler.handleKey(editor, keyStroke, EditorDataContext(editor, context))
+      handler.handleKey(editor, keyStroke, EditorDataContext.init(editor, context))
     } catch (e: Throwable) {
       logger.error(e)
     }

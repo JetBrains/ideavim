@@ -89,7 +89,7 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
   protected Editor typeText(@NotNull List<KeyStroke> keys) {
     final Editor editor = myFixture.getEditor();
     final KeyHandler keyHandler = KeyHandler.getInstance();
-    final EditorDataContext dataContext = new EditorDataContext(editor, null);
+    final EditorDataContext dataContext = EditorDataContext.init(editor, null);
     final Project project = myFixture.getProject();
     TestInputModel.getInstance(editor).setKeyStrokes(keys);
     RunnableHelper.runWriteCommand(project, () -> {

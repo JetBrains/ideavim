@@ -148,7 +148,7 @@ object IdeaSpecifics {
           // Enable insert mode if there is no selection in template
           // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
           if (editor.inNormalMode) {
-            VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
+            VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext.init(editor))
             KeyHandler.getInstance().reset(editor)
           }
         }

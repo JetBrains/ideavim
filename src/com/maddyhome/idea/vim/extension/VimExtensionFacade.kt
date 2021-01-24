@@ -72,7 +72,7 @@ object VimExtensionFacade {
    */
   @JvmStatic
   fun executeNormalWithoutMapping(keys: List<KeyStroke>, editor: Editor) {
-    val context = EditorDataContext(editor)
+    val context = EditorDataContext.init(editor)
     keys.forEach { KeyHandler.getInstance().handleKey(editor, it, context, false, false) }
   }
 
@@ -129,7 +129,7 @@ object VimExtensionFacade {
       var text = ""
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for input()
       val exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts()
-      exEntryPanel.activate(editor, EditorDataContext(editor), prompt.ifEmpty { " " }, "", 1)
+      exEntryPanel.activate(editor, EditorDataContext.init(editor), prompt.ifEmpty { " " }, "", 1)
       ModalEntry.activate { key: KeyStroke ->
         return@activate when {
           StringHelper.isCloseKeyStroke(key) -> {
