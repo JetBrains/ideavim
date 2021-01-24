@@ -551,6 +551,29 @@ n  ,f            <Plug>Foo
     )
   }
 
+  fun `test execute mapping with a delay and second mapping`() {
+    val text = """
+          -----
+          1${c}2345
+          abcde
+          -----
+          """.trimIndent()
+    configureByJavaText(text)
+
+    typeText(commandToKeys("map k j"))
+    typeText(commandToKeys("map kk l"))
+    typeText(StringHelper.parseKeys("k"))
+
+    checkDelayedMapping(text,
+      """
+              -----
+              12345
+              a${c}bcde
+              -----
+              """.trimIndent()
+    )
+  }
+
   private fun checkDelayedMapping(before: String, after: String) {
     myFixture.checkResult(before)
 

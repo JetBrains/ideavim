@@ -73,7 +73,7 @@ object VimExtensionFacade {
   @JvmStatic
   fun executeNormalWithoutMapping(keys: List<KeyStroke>, editor: Editor) {
     val context = EditorDataContext(editor)
-    keys.forEach { KeyHandler.getInstance().handleKey(editor, it, context, false) }
+    keys.forEach { KeyHandler.getInstance().handleKey(editor, it, context, false, false) }
   }
 
   /** Returns a single key stroke from the user input similar to 'getchar()'. */

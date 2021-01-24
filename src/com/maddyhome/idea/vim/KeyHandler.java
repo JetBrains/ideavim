@@ -163,7 +163,7 @@ public class KeyHandler {
    * @param context The data context
    */
   public void handleKey(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context) {
-    handleKey(editor, key, context, true);
+    handleKey(editor, key, context, true, false);
   }
 
   /**
@@ -188,10 +188,17 @@ public class KeyHandler {
     }
   }
 
+  /**
+   * Handling input keys with additional parameters
+   *
+   * @param allowKeyMappings - If we allow key mappings or not
+   * @param mappingCompleted - if true, we don't check if the mapping is incomplete
+   */
   public void handleKey(@NotNull Editor editor,
                         @NotNull KeyStroke key,
                         @NotNull DataContext context,
-                        boolean allowKeyMappings) {
+                        boolean allowKeyMappings,
+                        boolean mappingCompleted) {
     VimPlugin.clearError();
     // All the editor actions should be performed with top level editor!!!
     // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
@@ -208,7 +215,7 @@ public class KeyHandler {
     handleKeyRecursionCount++;
 
     try {
-      if (!allowKeyMappings || !handleKeyMapping(editor, key, context)) {
+      if (!allowKeyMappings || !handleKeyMapping(editor, key, context, mappingCompleted)) {
         if (isCommandCountKey(chKey, editorState)) {
           commandBuilder.addCountCharacter(key);
         } else if (isDeleteCommandCountKey(key, editorState)) {
@@ -325,7 +332,8 @@ public class KeyHandler {
 
   private boolean handleKeyMapping(final @NotNull Editor editor,
                                    final @NotNull KeyStroke key,
-                                   final @NotNull DataContext context) {
+                                   final @NotNull DataContext context,
+                                   boolean mappingCompleted) {
 
     final CommandState commandState = CommandState.getInstance(editor);
     final MappingState mappingState = commandState.getMappingState();
@@ -347,7 +355,7 @@ public class KeyHandler {
 
     // Returns true if any of these methods handle the key. False means that the key is unrelated to mapping and should
     // be processed as normal.
-    return handleUnfinishedMappingSequence(editor, mappingState, mapping)
+    return (handleUnfinishedMappingSequence(editor, mappingState, mapping, mappingCompleted))
       || handleCompleteMappingSequence(editor, context, mappingState, mapping, key)
       || handleAbandonedMappingSequence(editor, mappingState, context);
   }
@@ -361,7 +369,10 @@ public class KeyHandler {
 
   private boolean handleUnfinishedMappingSequence(@NotNull Editor editor,
                                                   @NotNull MappingState mappingState,
-                                                  @NotNull KeyMapping mapping) {
+                                                  @NotNull KeyMapping mapping,
+                                                  boolean mappingCompleted) {
+    if (mappingCompleted) return false;
+
     // Is there at least one mapping that starts with the current sequence? This does not include complete matches,
     // unless a sequence is also a prefix for another mapping. We eagerly evaluate the shortest mapping, so even if a
     // mapping is a prefix, it will get evaluated when the next character is entered.
@@ -386,7 +397,7 @@ public class KeyHandler {
         }
 
         for (KeyStroke keyStroke : unhandledKeys) {
-          handleKey(editor, keyStroke, new EditorDataContext(editor, null), false);
+          handleKey(editor, keyStroke, new EditorDataContext(editor, null), true, true);
         }
       }, ModalityState.stateForComponent(editor.getComponent())));
     }
@@ -434,7 +445,7 @@ public class KeyHandler {
 
     // If we've just evaluated the previous key sequence, make sure to also handle the current key
     if (mappingInfo != currentMappingInfo) {
-      handleKey(editor, key, currentContext, true);
+      handleKey(editor, key, currentContext, true, false);
     }
 
     return true;
@@ -464,12 +475,12 @@ public class KeyHandler {
     //  should be processed with mappings (to make I work)
 
     if (isPluginMapping(unhandledKeyStrokes)) {
-      handleKey(editor, unhandledKeyStrokes.get(unhandledKeyStrokes.size() - 1), context, true);
+      handleKey(editor, unhandledKeyStrokes.get(unhandledKeyStrokes.size() - 1), context, true, false);
     } else {
-      handleKey(editor, unhandledKeyStrokes.get(0), context, false);
+      handleKey(editor, unhandledKeyStrokes.get(0), context, false, false);
 
       for (KeyStroke keyStroke : unhandledKeyStrokes.subList(1, unhandledKeyStrokes.size())) {
-        handleKey(editor, keyStroke, context, true);
+        handleKey(editor, keyStroke, context, true, false);
       }
     }
 

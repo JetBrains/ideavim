@@ -96,7 +96,7 @@ class ToKeysMappingInfo(
     for (keyStroke in toKeys) {
       val recursive = isRecursive && !(first && fromIsPrefix)
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive)
+      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false)
       first = false
     }
   }
