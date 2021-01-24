@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.helper.commandState
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -34,6 +35,9 @@ abstract class VimPropertyTest : VimTestCase() {
   }
 
   protected fun reset(editor: Editor) {
+    editor.commandState.mappingState.resetMappingSequence()
+    VimPlugin.getKey().resetKeyMappings()
+
     KeyHandler.getInstance().fullReset(editor)
     VimPlugin.getRegister().resetRegisters()
     editor.caretModel.runForEachCaret { it.moveToOffset(0) }
@@ -42,5 +46,4 @@ abstract class VimPropertyTest : VimTestCase() {
     VimPlugin.getSearch().resetState()
     VimPlugin.getChange().reset()
   }
-
 }
