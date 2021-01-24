@@ -348,7 +348,7 @@ public class KeyHandler {
     // Returns true if any of these methods handle the key. False means that the key is unrelated to mapping and should
     // be processed as normal.
     return handleUnfinishedMappingSequence(editor, mappingState, mapping)
-      || handleCompleteMappingSequence(editor, context, commandState, mappingState, mapping, key)
+      || handleCompleteMappingSequence(editor, context, mappingState, mapping, key)
       || handleAbandonedMappingSequence(editor, mappingState, context);
   }
 
@@ -396,7 +396,6 @@ public class KeyHandler {
 
   private boolean handleCompleteMappingSequence(@NotNull Editor editor,
                                                 @NotNull DataContext context,
-                                                @NotNull CommandState commandState,
                                                 @NotNull MappingState mappingState,
                                                 @NotNull KeyMapping mapping,
                                                 KeyStroke key) {
