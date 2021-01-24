@@ -643,6 +643,21 @@ n  ,f            <Plug>Foo
     TestCase.assertTrue(VimPlugin.isError())
   }
 
+  fun `test recursion 2`() {
+    val text = """
+          -----
+          1${c}2345
+          abcde
+          -----
+          """.trimIndent()
+    configureByJavaText(text)
+
+    typeText(commandToKeys("map b wbb"))
+    typeText(StringHelper.parseKeys("b"))
+
+    TestCase.assertTrue(VimPlugin.isError())
+  }
+
   private fun checkDelayedMapping(before: String, after: String) {
     myFixture.checkResult(before)
 

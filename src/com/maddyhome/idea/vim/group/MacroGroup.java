@@ -136,7 +136,7 @@ public class MacroGroup {
         logger.debug("processing key " + pos);
       }
       // Handle one keystroke then queue up the next key
-      KeyHandler.getInstance().handleKey(editor, keys.get(pos), context, 0);
+      KeyHandler.getInstance().handleKey(editor, keys.get(pos), context);
       if (pos < keys.size() - 1) {
         playbackKeys(editor, context, project, keys, pos + 1, cnt, total);
       }

@@ -44,7 +44,7 @@ class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : AnAction() {
     val keyStroke = getKeyStroke(e)
     if (keyStroke != null) {
       val editor = exEntryPanel.entry.editor
-      KeyHandler.getInstance().handleKey(editor, keyStroke, EditorDataContext.init(editor, e.dataContext), 0)
+      KeyHandler.getInstance().handleKey(editor, keyStroke, EditorDataContext.init(editor, e.dataContext))
     }
   }
 
