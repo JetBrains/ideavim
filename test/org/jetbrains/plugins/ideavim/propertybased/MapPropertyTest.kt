@@ -37,18 +37,18 @@ class MapPropertyTest : VimPropertyTest() {
 
             val fromKeys = generateSequence {
               env.generateValue(Generator.sampledFrom(keysPlaying), null)
-            }.take(env.generateValue(Generator.integers(0, 10), null)).joinToString(separator = "")
+            }.take(env.generateValue(Generator.integers(1, 10), null)).joinToString(separator = "")
 
             val toKeys = generateSequence {
               env.generateValue(Generator.sampledFrom(keysPlaying), null)
-            }.take(env.generateValue(Generator.integers(0, 10), null)).joinToString(separator = "")
+            }.take(env.generateValue(Generator.integers(1, 10), null)).joinToString(separator = "")
 
             "$mode $fromKeys $toKeys"
-          }.take(env.generateValue(Generator.integers(0, 10), null)).toList()
+          }.take(env.generateValue(Generator.integers(1, 10), null)).toList()
 
           val enteringKeys = generateSequence {
             env.generateValue(Generator.sampledFrom(keysPlaying), null)
-          }.take(env.generateValue(Generator.integers(0, 10), null)).joinToString(separator = "")
+          }.take(env.generateValue(Generator.integers(1, 10), null)).joinToString(separator = "")
 
           env.logMessage("Commands:\n${mappingCommands.joinToString("\n")}")
           mappingCommands.forEach { typeText(parseKeys(exCommand(it))) }
