@@ -643,7 +643,7 @@ n  ,f            <Plug>Foo
     TestCase.assertTrue(VimPlugin.isError())
   }
 
-  fun `test recursion 2`() {
+  fun `test double recursion`() {
     val text = """
           -----
           1${c}2345

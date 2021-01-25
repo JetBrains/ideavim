@@ -89,7 +89,9 @@ object OptionsManager {
   val ideastrictmode = addOption(ToggleOption("ideastrictmode", "ideastrictmode", false))
   val ideawrite = addOption(BoundStringOption("ideawrite", "ideawrite", IdeaWriteData.all, IdeaWriteData.allValues))
   val ideavimsupport = addOption(BoundListOption("ideavimsupport", "ideavimsupport", arrayOf("dialog"), arrayOf("dialog", "singleline", "dialoglegacy")))
-  val maxmapdepth = addOption(NumberOption("maxmapdepth", "mmd", 100))
+
+  // TODO The default value if 1000, but we can't increase it because of terrible performance of our mappings
+  val maxmapdepth = addOption(NumberOption("maxmapdepth", "mmd", 20))
 
   // This should be removed in the next versions
   val ideacopypreprocess = addOption(ToggleOption("ideacopypreprocess", "ideacopypreprocess", false))
