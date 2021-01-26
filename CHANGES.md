@@ -25,6 +25,7 @@ usual beta standards.
 ## To Be Released
 
 ### Features:
+* Support `NERDTree` extension [VIM-1042](https://youtrack.jetbrains.com/issue/VIM-1042) | [NERDTree](https://github.com/preservim/nerdtree)
 * Support `maxmapdepth` option to define the maximum depth of mappings
 
 ### Fixes:

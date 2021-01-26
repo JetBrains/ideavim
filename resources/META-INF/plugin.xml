@@ -2,22 +2,23 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-    <h3>Merged PRs:</h3>
+    <h3>Features:</h3>
     <ul>
-    <li>
-      <a href="https://github.com/JetBrains/ideavim/pull/260">260</a>
-      by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Refactor SearchGroup
-    </li>
+      <li>Support <code>NERDTree</code> extension <a href="https://youtrack.jetbrains.com/issue/VIM-1042">VIM-1042</a> | <a
+          href="https://github.com/preservim/nerdtree">NERDTree</a></li>
+      <li>Support <code>maxmapdepth</code> option to define the maximum depth of mappings</li>
     </ul>
 
     <h3>Fixes:</h3>
     <ul>
-    <li>
-      <a href="https://youtrack.jetbrains.com/issue/VIM-2194">VIM-2194</a>
-      Fix caret shape during editing a new file
-    </li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2202">VIM-2202</a> Fix macro recording for ex command and search
+      </li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1799">VIM-1799</a>
+        <a href="https://youtrack.jetbrains.com/issue/VIM-179a">VIM-1794</a>
+        Special characters are not interpreted on yanking
+      </li>
     </ul>
-  ]]>
+    ]]>
   </change-notes>
   <description><![CDATA[
       <p>Vim emulation plugin for IntelliJ Platform-based IDEs.</p>
