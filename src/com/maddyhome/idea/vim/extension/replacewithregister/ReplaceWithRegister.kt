@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.MotionGroup
@@ -54,9 +54,9 @@ class ReplaceWithRegister : VimExtension {
     VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, parseKeys(RWR_LINE), owner, RwrLine(), false)
     VimExtensionFacade.putExtensionHandlerMapping(MappingMode.X, parseKeys(RWR_VISUAL), owner, RwrVisual(), false)
 
-    putKeyMapping(MappingMode.N, parseKeys("gr"), owner, parseKeys(RWR_OPERATOR), true)
-    putKeyMapping(MappingMode.N, parseKeys("grr"), owner, parseKeys(RWR_LINE), true)
-    putKeyMapping(MappingMode.X, parseKeys("gr"), owner, parseKeys(RWR_VISUAL), true)
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("gr"), owner, parseKeys(RWR_OPERATOR), true)
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("grr"), owner, parseKeys(RWR_LINE), true)
+    putKeyMappingIfMissing(MappingMode.X, parseKeys("gr"), owner, parseKeys(RWR_VISUAL), true)
   }
 
   private class RwrVisual : VimExtensionHandler {

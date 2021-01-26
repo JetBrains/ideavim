@@ -38,7 +38,7 @@ import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegister
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
@@ -74,10 +74,10 @@ class VimExchangeExtension : VimExtension {
     putExtensionHandlerMapping(MappingMode.N, parseKeys(EXCHANGE_CLEAR_CMD), owner, ExchangeClearHandler(), false)
     putExtensionHandlerMapping(MappingMode.N, parseKeys(EXCHANGE_LINE_CMD), owner, ExchangeHandler(true), false)
 
-    putKeyMapping(MappingMode.N, parseKeys("cx"), owner, parseKeys(EXCHANGE_CMD), true)
-    putKeyMapping(MappingMode.X, parseKeys("X"), owner, parseKeys(EXCHANGE_CMD), true)
-    putKeyMapping(MappingMode.N, parseKeys("cxc"), owner, parseKeys(EXCHANGE_CLEAR_CMD), true)
-    putKeyMapping(MappingMode.N, parseKeys("cxx"), owner, parseKeys(EXCHANGE_LINE_CMD), true)
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("cx"), owner, parseKeys(EXCHANGE_CMD), true)
+    putKeyMappingIfMissing(MappingMode.X, parseKeys("X"), owner, parseKeys(EXCHANGE_CMD), true)
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("cxc"), owner, parseKeys(EXCHANGE_CLEAR_CMD), true)
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("cxx"), owner, parseKeys(EXCHANGE_LINE_CMD), true)
   }
 
   companion object {

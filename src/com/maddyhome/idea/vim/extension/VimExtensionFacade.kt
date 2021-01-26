@@ -57,6 +57,16 @@ object VimExtensionFacade {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, toKeys, recursive)
   }
 
+  /** The 'map' command for mapping keys to other keys if there is no other mapping to these keys */
+  @JvmStatic
+  fun putKeyMappingIfMissing(
+    modes: Set<MappingMode>, fromKeys: List<KeyStroke>,
+    pluginOwner: MappingOwner, toKeys: List<KeyStroke>, recursive: Boolean
+  ) {
+    val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().hasmapto(it, toKeys) }
+    VimPlugin.getKey().putKeyMapping(filteredModes, fromKeys, pluginOwner, toKeys, recursive)
+  }
+
   /** Sets the value of 'operatorfunc' to be used as the operator function in 'g@'. */
   @JvmStatic
   fun setOperatorFunction(function: OperatorFunction) {

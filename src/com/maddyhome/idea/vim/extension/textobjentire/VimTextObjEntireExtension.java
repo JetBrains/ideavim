@@ -34,8 +34,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
+import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
 import static com.maddyhome.idea.vim.group.visual.VisualGroupKt.vimSetSelection;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
@@ -76,8 +75,8 @@ public class VimTextObjEntireExtension implements VimExtension {
     putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>textobj-entire-i"), getOwner(),
       new VimTextObjEntireExtension.EntireHandler(true), false);
 
-    putKeyMapping(MappingMode.XO, parseKeys("ae"), getOwner(), parseKeys("<Plug>textobj-entire-a"), true);
-    putKeyMapping(MappingMode.XO, parseKeys("ie"), getOwner(), parseKeys("<Plug>textobj-entire-i"), true);
+    putKeyMappingIfMissing(MappingMode.XO, parseKeys("ae"), getOwner(), parseKeys("<Plug>textobj-entire-a"), true);
+    putKeyMappingIfMissing(MappingMode.XO, parseKeys("ie"), getOwner(), parseKeys("<Plug>textobj-entire-i"), true);
   }
 
   static class EntireHandler implements VimExtensionHandler {

@@ -151,4 +151,15 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
     char lastChar = keyList.get(keyList.size() - 1).getKeyChar();
     return firstChar == StringHelper.VK_ACTION && lastChar != ')';
   }
+
+  public boolean hasmapto(@NotNull List<KeyStroke> toKeys) {
+    return myKeys.values().stream()
+      .anyMatch(o -> o instanceof ToKeysMappingInfo && ((ToKeysMappingInfo)o).getToKeys().equals(toKeys));
+  }
+
+  public List<Pair<List<KeyStroke>, MappingInfo>> getMapTo(@NotNull List<KeyStroke> toKeys) {
+    return myKeys.entrySet().stream()
+      .filter(o -> o.getValue() instanceof ToKeysMappingInfo && ((ToKeysMappingInfo)o.getValue()).getToKeys().equals(toKeys))
+      .map(o -> new Pair<>(o.getKey(), o.getValue())).collect(Collectors.toList());
+  }
 }

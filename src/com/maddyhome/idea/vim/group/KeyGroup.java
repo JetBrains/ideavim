@@ -144,6 +144,14 @@ public class KeyGroup implements PersistentStateComponent<Element> {
     registerKeyMapping(fromKeys, owner);
   }
 
+  public boolean hasmapto(@NotNull MappingMode mode, @NotNull List<KeyStroke> toKeys) {
+    return this.getKeyMapping(mode).hasmapto(toKeys);
+  }
+
+  public List<Pair<List<KeyStroke>, MappingInfo>> getMapTo(@NotNull MappingMode mode, @NotNull List<KeyStroke> toKeys) {
+    return this.getKeyMapping(mode).getMapTo(toKeys);
+  }
+
   public List<Pair<List<KeyStroke>, MappingInfo>> getKeyMappingByOwner(@NotNull MappingOwner owner) {
     return Arrays.stream(MappingMode.values()).map(this::getKeyMapping).flatMap(o -> o.getByOwner(owner).stream())
       .collect(toList());

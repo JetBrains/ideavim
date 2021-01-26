@@ -25,16 +25,20 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser.executingVimScript
 import com.maddyhome.idea.vim.extension.Alias
 import com.maddyhome.idea.vim.extension.ExtensionBeanClass
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
+import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.mode
+import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -208,6 +212,61 @@ class PlugExtensionsTest : VimTestCase() {
   }
 }
 
+class PlugMissingKeys : VimTestCase() {
+
+  private lateinit var extension: ExtensionBeanClass
+
+  override fun setUp() {
+    super.setUp()
+
+    extension = TestExtension.createBean()
+    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
+  }
+
+  override fun tearDown() {
+    @Suppress("DEPRECATION")
+    VimExtension.EP_NAME.point.unregisterExtension(extension)
+    super.tearDown()
+  }
+
+  fun `test missing keys`() {
+    executeLikeVimrc(
+      "map myKey <Plug>TestMissing",
+      "Plug 'MyTest'"
+    )
+
+    val keyMappings = VimPlugin.getKey().getMapTo(MappingMode.NORMAL, parseKeys("<Plug>TestMissing"))
+    TestCase.assertEquals(1, keyMappings.size)
+    TestCase.assertEquals(parseKeys("myKey"), keyMappings.first().first)
+
+    val iKeyMappings = VimPlugin.getKey().getMapTo(MappingMode.INSERT, parseKeys("<Plug>TestMissing"))
+    TestCase.assertEquals(1, iKeyMappings.size)
+    TestCase.assertEquals(parseKeys("L"), iKeyMappings.first().first)
+  }
+
+  fun `test missing keys enable plugin first`() {
+    executeLikeVimrc(
+      "Plug 'MyTest'",
+      "map myKey <Plug>TestMissing"
+    )
+
+    val keyMappings = VimPlugin.getKey().getMapTo(MappingMode.NORMAL, parseKeys("<Plug>TestMissing"))
+    TestCase.assertEquals(1, keyMappings.size)
+    TestCase.assertEquals(parseKeys("myKey"), keyMappings.first().first)
+
+    val iKeyMappings = VimPlugin.getKey().getMapTo(MappingMode.INSERT, parseKeys("<Plug>TestMissing"))
+    TestCase.assertEquals(1, iKeyMappings.size)
+    TestCase.assertEquals(parseKeys("L"), iKeyMappings.first().first)
+  }
+
+  private fun executeLikeVimrc(vararg text: String) {
+    executingVimScript = true
+    VimScriptParser.executeText(*text)
+    executingVimScript = false
+    VimExtensionRegistrar.enableDelayedExtensions()
+  }
+}
+
 private val ExtensionBeanClass.ext: TestExtension
   get() = this.instance as TestExtension
 
@@ -237,12 +296,16 @@ private class TestExtension : VimExtension {
     putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionCharacter"), owner, Move(), false)
     putExtensionHandlerMapping(MappingMode.O, parseKeys("<Plug>TestExtensionLinewise"), owner, MoveLinewise(), false)
     putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>TestMotion"), owner, MoveLinewiseInNormal(), false)
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>TestMissing"), owner, MoveLinewiseInNormal(), false)
 
     putKeyMapping(MappingMode.O, parseKeys("U"), owner, parseKeys("<Plug>TestExtensionEmulateInclusive"), true)
     putKeyMapping(MappingMode.O, parseKeys("P"), owner, parseKeys("<Plug>TestExtensionBackwardsCharacter"), true)
     putKeyMapping(MappingMode.O, parseKeys("I"), owner, parseKeys("<Plug>TestExtensionCharacter"), true)
     putKeyMapping(MappingMode.O, parseKeys("O"), owner, parseKeys("<Plug>TestExtensionLinewise"), true)
     putKeyMapping(MappingMode.N, parseKeys("Q"), owner, parseKeys("<Plug>TestMotion"), true)
+
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("Z"), owner, parseKeys("<Plug>TestMissing"), true)
+    putKeyMappingIfMissing(MappingMode.I, parseKeys("L"), owner, parseKeys("<Plug>TestMissing"), true)
   }
 
   override fun dispose() {

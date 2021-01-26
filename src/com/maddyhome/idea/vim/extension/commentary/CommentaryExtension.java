@@ -58,9 +58,9 @@ public class CommentaryExtension implements VimExtension {
     putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentLine)"), getOwner(), new CommentLineHandler(), false);
     putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>(CommentMotionV)"), getOwner(), new CommentMotionVHandler(), false);
 
-    putKeyMapping(MappingMode.N, parseKeys("gc"), getOwner(), parseKeys("<Plug>(CommentMotion)"), true);
-    putKeyMapping(MappingMode.N, parseKeys("gcc"), getOwner(), parseKeys("<Plug>(CommentLine)"), true);
-    putKeyMapping(MappingMode.XO, parseKeys("gc"), getOwner(), parseKeys("<Plug>(CommentMotionV)"), true);
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("gc"), getOwner(), parseKeys("<Plug>(CommentMotion)"), true);
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("gcc"), getOwner(), parseKeys("<Plug>(CommentLine)"), true);
+    putKeyMappingIfMissing(MappingMode.XO, parseKeys("gc"), getOwner(), parseKeys("<Plug>(CommentMotionV)"), true);
   }
 
   private static class CommentMotionHandler implements VimExtensionHandler {
