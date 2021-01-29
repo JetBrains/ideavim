@@ -62,6 +62,10 @@ class MapPropertyTest : VimPropertyTest() {
       }
     }
   }
+
+  fun testEmpty() {
+    // Just an empty test
+  }
 }
 
 // I think, it would be enough to test normal mode only. Not sure if it's true
