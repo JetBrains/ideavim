@@ -113,6 +113,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
       if (keyStroke in VIM_ONLY_EDITOR_KEYS) return true
 
+
       val savedShortcutConflicts = VimPlugin.getKey().savedShortcutConflicts
       return when (savedShortcutConflicts[keyStroke]) {
         ShortcutOwner.VIM -> true
