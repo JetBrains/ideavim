@@ -54,6 +54,15 @@ import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 import javax.swing.SwingConstants
 
+/**
+ * Features and issues:
+ * - Multiple projects (reported as not working)
+ * - quicksearch
+ * - Files are opened with "open with a single click"
+ * - Enable mappings in project view for regilar commands "j", "k", etc.
+ * - Support more regular commands (gg, G, etc.)
+ * - Support ex commands in project view (https://youtrack.jetbrains.com/issue/VIM-1042#focus=Comments-27-4654338.0-0)
+ */
 
 /**
  * Key      Description                                                  help-tag~
