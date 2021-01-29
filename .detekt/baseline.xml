@@ -73,6 +73,7 @@
     <ID>MagicNumber:VimHighlightedYank.kt$VimHighlightedYank.HighlightHandler$3</ID>
     <ID>MagicNumber:VimHighlightedYank.kt$VimHighlightedYank.HighlightHandler$4</ID>
     <ID>MatchingDeclarationName:CommandDefinition.kt$CommandName</ID>
+    <ID>MaxLineLength:EditorDataContext.kt$EditorDataContext$class</ID>
     <ID>MaxLineLength:ExBeanClass.kt$ExBeanClass$logger&lt;ExBeanClass&gt;().error("IdeaVim doesn't accept contributions to `vimActions` extension points. Please create a plugin using `VimExtension`. Plugin to blame: ${this.pluginDescriptor.pluginId}")</ID>
     <ID>MaxLineLength:NotificationService.kt$NotificationService$notification.addAction(AppendToIdeaVimRcAction(notification, "set clipboard+=ideaput", "ideaput") { OptionsManager.clipboard.append(ClipboardOptionsData.ideaput) })</ID>
     <ID>MaxLineLength:NotificationService.kt$NotificationService.AppendToIdeaVimRcAction$private inner</ID>
