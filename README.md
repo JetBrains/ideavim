@@ -81,12 +81,12 @@ Here are some examples of supported vim features and commands:
 * Motion / deletion / change / window / etc. commands
 * Key mappings
 * Marks / Macros / Digraphs / Registers
-* Some [set commands](doc/set-commands.md)
+* Some [set commands](https://github.com/JetBrains/ideavim/wiki/%22set%22-commands)
 * Full Vim regexps for search and search/replace
 * Vim web help
 * `~/.ideavimrc` configuration file
 
-[Emulated Vim plugins](doc/emulated-plugins.md):
+[Emulated Vim plugins](https://github.com/JetBrains/ideavim/wiki/Emulated-plugins):
 
 * vim-easymotion
 * vim-surround
@@ -198,7 +198,7 @@ Put your settings to `$XDG_CONFIG_HOME/ideavim/ideavimrc` file.
 Emulated Vim Plugins
 --------------------
 
-See [doc/emulated-plugins.md](doc/emulated-plugins.md)
+See [doc/emulated-plugins.md](https://github.com/JetBrains/ideavim/wiki/Emulated-plugins)
 
 Executing IDE Actions
 ---------------------
@@ -257,15 +257,15 @@ IdeaVim tips and tricks
     - `set ideajoin` to enable join via the IDE. See the [examples](https://jb.gg/f9zji9).
     - Make sure `ideaput` is enabled for `clipboard` to enable native IJ insertion in Vim.
     - Sync IJ bookmarks and Vim marks: `set ideamarks`
-    - Check out more [ex commands](doc/set-commands.md).
+    - Check out more [ex commands](https://github.com/JetBrains/ideavim/wiki/%22set%22-commands).
 
 - Use your vim settings with IdeaVim. Put `source ~/.vimrc` in `~/.ideavimrc`.
     > :warning: Please note that IdeaVim currently parses `~/.ideavimrc` & `~/.vimrc` files via simple pattern-matching.
     See [VIM-669](https://youtrack.jetbrains.com/issue/VIM-669) for proper parsing
     of VimL files.
 
-- Control the status bar icon via the [`ideastatusicon` option](doc/set-commands.md).
-- Not familiar with the default behaviour during a refactoring? See the [`idearefactormode` option](doc/set-commands.md).
+- Control the status bar icon via the [`ideastatusicon` option](https://github.com/JetBrains/ideavim/wiki/%22set%22-commands).
+- Not familiar with the default behaviour during a refactoring? See the [`idearefactormode` option](https://github.com/JetBrains/ideavim/wiki/%22set%22-commands).
 
 Some facts about Vim
 -------
