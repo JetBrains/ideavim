@@ -79,6 +79,8 @@
     <postStartupActivity implementation="com.maddyhome.idea.vim.PluginStartup" order="first"/>
 
     <editorFloatingToolbarProvider implementation="com.maddyhome.idea.vim.ui.ReloadFloatingToolbar"/>
+
+    <actionPromoter implementation="com.maddyhome.idea.vim.key.VimActionsPromoter" order="last"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>

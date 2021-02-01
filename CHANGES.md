@@ -33,6 +33,7 @@ usual beta standards.
 * [VIM-1799](https://youtrack.jetbrains.com/issue/VIM-1799)
   [VIM-1794](https://youtrack.jetbrains.com/issue/VIM-179a)
   Special characters are not interpreted on yanking
+* [VIM-2218](https://youtrack.jetbrains.com/issue/VIM-2218) Fix some shortcuts for 2021.+
 
 ## 0.64, 2020-12-23
 
