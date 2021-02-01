@@ -228,6 +228,7 @@ object IdeaSpecifics {
           caret.putUserData(facedAppCodeTemplate, offset..templateEnd)
         }
         if (offsetLeftEnd >= 0
+          && offset + 1 <= editor.fileSize
           && editor.document.charsSequence.subSequence(offsetLeftEnd, offset + 1).toString() == TEMPLATE_END) {
           caret.shake()
 

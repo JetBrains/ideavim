@@ -34,6 +34,7 @@ usual beta standards.
   [VIM-1794](https://youtrack.jetbrains.com/issue/VIM-179a)
   Special characters are not interpreted on yanking
 * [VIM-2218](https://youtrack.jetbrains.com/issue/VIM-2218) Fix some shortcuts for 2021.+
+* [VIM-2217](https://youtrack.jetbrains.com/issue/VIM-2217) Fix adding new line at the end of the file for the AppCode
 
 ### Merged PRs:
 * [269](https://github.com/JetBrains/ideavim/pull/269) by [大牙(Henry Zhu)](https://github.com/daya0576): fix invalid link of submodule docs
