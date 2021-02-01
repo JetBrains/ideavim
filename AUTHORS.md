@@ -343,6 +343,10 @@ Contributors:
   [![icon][github]](https://github.com/DeveloperHacker)
   &nbsp;
   Sergei Vorobyov
+* [![icon][mail]](mailto:daya0576@users.noreply.github.com)
+  [![icon][github]](https://github.com/daya0576)
+  &nbsp;
+  大牙(Henry Zhu)
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.

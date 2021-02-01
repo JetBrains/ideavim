@@ -35,6 +35,9 @@ usual beta standards.
   Special characters are not interpreted on yanking
 * [VIM-2218](https://youtrack.jetbrains.com/issue/VIM-2218) Fix some shortcuts for 2021.+
 
+### Merged PRs:
+* [269](https://github.com/JetBrains/ideavim/pull/269) by [大牙(Henry Zhu)](https://github.com/daya0576): fix invalid link of submodule docs
+
 ## 0.64, 2020-12-23
 
 ### Merged PRs:
