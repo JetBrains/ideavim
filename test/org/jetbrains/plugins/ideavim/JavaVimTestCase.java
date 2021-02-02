@@ -49,9 +49,13 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
   protected void setUp() throws Exception {
     super.setUp();
 
-    KeyHandler.getInstance().fullReset(myFixture.getEditor());
+    Editor editor = myFixture.getEditor();
+    if (editor != null) {
+      KeyHandler.getInstance().fullReset(editor);
+    }
     OptionsManager.INSTANCE.resetAllOptions();
     VimPlugin.getKey().resetKeyMappings();
+    VimPlugin.clearError();
   }
 
   @Override

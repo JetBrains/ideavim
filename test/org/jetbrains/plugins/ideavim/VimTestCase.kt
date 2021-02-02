@@ -88,7 +88,10 @@ abstract class VimTestCase : UsefulTestCase() {
     myFixture.setUp()
     myFixture.testDataPath = testDataPath
     // Note that myFixture.editor is usually null here. It's only set once configureByText has been called
-    KeyHandler.getInstance().fullReset(myFixture.editor)
+    val editor = myFixture.editor
+    if (editor != null) {
+      KeyHandler.getInstance().fullReset(editor)
+    }
     resetAllOptions()
     VimPlugin.getKey().resetKeyMappings()
     VimPlugin.getSearch().resetState()
@@ -100,6 +103,8 @@ abstract class VimTestCase : UsefulTestCase() {
     ExEntryPanel.getInstance().entry.setBounds(0, 0, 100, 25)
 
     NeovimTesting.setUp(this)
+
+    VimPlugin.clearError()
   }
 
   private val testDataPath: String
