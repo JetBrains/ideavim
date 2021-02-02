@@ -330,10 +330,7 @@ class CommandState private constructor() {
     private val defaultModeState = ModeState(Mode.COMMAND, SubMode.NONE)
 
     @JvmStatic
-    @Contract("null -> new")
-    fun getInstance(editor: Editor?): CommandState {
-      if (editor == null) return CommandState()
-
+    fun getInstance(editor: Editor): CommandState {
       var res = editor.vimCommandState
       if (res == null) {
         res = CommandState()

@@ -374,8 +374,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   private void turnOffPlugin() {
-    KeyHandler.getInstance().fullReset(null);
-
     SearchGroup searchGroup = getSearchIfCreated();
     if (searchGroup != null) {
       searchGroup.turnOff();

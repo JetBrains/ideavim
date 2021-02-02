@@ -102,5 +102,5 @@ val Editor.inSingleCommandMode
   get() = this.subMode == CommandState.SubMode.SINGLE_COMMAND && this.inNormalMode
 
 @get:JvmName("commandState")
-val Editor?.commandState
+val Editor.commandState
   get() = CommandState.getInstance(this)

@@ -821,7 +821,7 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  public void partialReset(@Nullable Editor editor) {
+  public void partialReset(@NotNull Editor editor) {
     CommandState editorState = CommandState.getInstance(editor);
     editorState.getMappingState().resetMappingSequence();
     editorState.getCommandBuilder().resetInProgressCommandPart(getKeyRoot(editorState.getMappingState().getMappingMode()));
@@ -832,7 +832,7 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  public void reset(@Nullable Editor editor) {
+  public void reset(@NotNull Editor editor) {
     partialReset(editor);
     CommandState editorState = CommandState.getInstance(editor);
     editorState.getCommandBuilder().resetAll(getKeyRoot(editorState.getMappingState().getMappingMode()));
@@ -848,7 +848,7 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  public void fullReset(@Nullable Editor editor) {
+  public void fullReset(@NotNull Editor editor) {
     VimPlugin.clearError();
     CommandState.getInstance(editor).reset();
     reset(editor);
@@ -856,10 +856,8 @@ public class KeyHandler {
     if (registerGroup != null) {
       registerGroup.resetRegister();
     }
-    if (editor != null) {
-      VisualGroupKt.updateCaretState(editor);
-      editor.getSelectionModel().removeSelection();
-    }
+    VisualGroupKt.updateCaretState(editor);
+    editor.getSelectionModel().removeSelection();
   }
 
   // This method is copied from com.intellij.openapi.editor.actionSystem.EditorAction.getProjectAwareDataContext

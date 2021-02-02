@@ -113,7 +113,7 @@ object IdeaSpecifics {
       //region Enter insert mode after surround with if
       if (surrounderAction == action.javaClass.name && surrounderItems.any { action.templatePresentation.text.endsWith(it) }) {
         editor?.let {
-          val commandState = editor.commandState
+          val commandState = it.commandState
           while (commandState.mode != CommandState.Mode.COMMAND) {
             commandState.popModes()
           }
