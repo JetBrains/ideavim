@@ -25,6 +25,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAwareAction
@@ -122,6 +123,8 @@ class NerdTree : VimExtension {
   override fun getName(): String = pluginName
 
   override fun init() {
+    LOG.info("IdeaVim: Initializing NERDTree extension. Disable this extension if you observe a strange behaviour of the project tree. E.g. moving down on 'j'")
+
     registerCommands()
 
     addCommand("NERDTreeFocus", IjCommandHandler("ActivateProjectToolWindow"))
@@ -430,6 +433,8 @@ class NerdTree : VimExtension {
 
     internal val monitor = Any()
     internal var commandsRegistered = false
+
+    private val LOG = logger<NerdTree>()
 
     fun callAction(name: String, context: DataContext) {
       val action = ActionManager.getInstance().getAction(name) ?: run {
