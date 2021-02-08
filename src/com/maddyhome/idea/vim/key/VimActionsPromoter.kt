@@ -25,7 +25,7 @@ import com.intellij.openapi.actionSystem.EmptyAction
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction
 
 class VimActionsPromoter : ActionPromoter {
-  override fun promote(actions: MutableList<AnAction>, context: DataContext): List<AnAction> {
+  override fun promote(actions: MutableList<out AnAction>, context: DataContext): List<AnAction> {
     return actions.filter {
       it is EmptyAction.MyDelegatingAction && it.delegate is VimShortcutKeyAction
     }
