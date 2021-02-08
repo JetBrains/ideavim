@@ -227,7 +227,7 @@ class NerdTree : VimExtension {
       val project = e.project ?: return
 
       // Special processing of esc.
-      if ((e.inputEvent as? KeyEvent)?.keyCode == 27) {
+      if ((e.inputEvent as? KeyEvent)?.keyCode == ESCAPE_KEY_CODE) {
         e.presentation.isEnabled = waitForSearch
         return
       }
@@ -248,6 +248,8 @@ class NerdTree : VimExtension {
       fun getInstance(project: Project): NerdDispatcher {
         return project.getService(NerdDispatcher::class.java)
       }
+
+      private const val ESCAPE_KEY_CODE = 27
     }
 
     /**
