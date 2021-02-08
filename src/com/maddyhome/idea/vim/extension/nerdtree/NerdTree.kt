@@ -30,10 +30,13 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
+import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowId
 import com.intellij.openapi.wm.ex.ToolWindowManagerEx
+import com.intellij.openapi.wm.ex.ToolWindowManagerListener
 import com.intellij.ui.KeyStrokeAdapter
 import com.intellij.ui.TreeExpandCollapse
+import com.intellij.ui.speedSearch.SpeedSearchSupply
 import com.intellij.util.ui.tree.TreeUtil
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -57,11 +60,12 @@ import javax.swing.SwingConstants
 /**
  * Features and issues:
  * - Multiple projects (reported as not working)
- * - quicksearch
  * - Files are opened with "open with a single click"
  * - Enable mappings in project view for regilar commands "j", "k", etc.
  * - Support more regular commands (gg, G, etc.)
  * - Support ex commands in project view (https://youtrack.jetbrains.com/issue/VIM-1042#focus=Comments-27-4654338.0-0)
+ * - Add label after pressing `/`
+ * - Write UI tests
  */
 
 /**
@@ -158,15 +162,36 @@ class NerdTree : VimExtension {
   }
 
   private fun installDispatcher(project: Project) {
-    val action = NerdDispatcher.instance
+    val dispatcher = NerdDispatcher.getInstance(project)
     val shortcuts = collectShortcuts(actionsRoot).map { RequiredShortcut(it, owner) }
-    action.registerCustomShortcutSet(
+    dispatcher.registerCustomShortcutSet(
       KeyGroup.toShortcutSet(shortcuts),
       (ProjectView.getInstance(project) as ProjectViewImpl).component
     )
   }
 
+  class ProjectViewListener(private val project: Project) : ToolWindowManagerListener {
+    override fun toolWindowShown(toolWindow: ToolWindow) {
+      if (ToolWindowId.PROJECT_VIEW != toolWindow.id) return
+
+      val dispatcher = NerdDispatcher.getInstance(project)
+      if (dispatcher.speedSearchListenerInstalled) return
+
+      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree ?: return
+      val supply = SpeedSearchSupply.getSupply(tree, true) ?: return
+
+      // NB: Here might be some issues with concurrency, but it's not really bad, I think
+      dispatcher.speedSearchListenerInstalled = true
+      supply.addChangeListener {
+        dispatcher.waitForSearch = false
+      }
+    }
+  }
+
   class NerdDispatcher : DumbAwareAction() {
+    internal var waitForSearch = false
+    internal var speedSearchListenerInstalled = false
+
     override fun actionPerformed(e: AnActionEvent) {
       var keyStroke = getKeyStroke(e) ?: return
       val keyChar = keyStroke.keyChar
@@ -191,8 +216,31 @@ class NerdTree : VimExtension {
       }
     }
 
+    override fun update(e: AnActionEvent) {
+      val project = e.project ?: return
+
+      // Special processing of esc.
+      if ((e.inputEvent as? KeyEvent)?.keyCode == 27) {
+        e.presentation.isEnabled = waitForSearch
+        return
+      }
+
+      if (waitForSearch) {
+        e.presentation.isEnabled = false
+        return
+      }
+      e.presentation.isEnabled = !speedSearchIsHere(project)
+    }
+
+    private fun speedSearchIsHere(project: Project): Boolean {
+      val component = ProjectView.getInstance(project).currentProjectViewPane.tree ?: return false
+      return SpeedSearchSupply.getSupply(component) != null
+    }
+
     companion object {
-      val instance = NerdDispatcher()
+      fun getInstance(project: Project): NerdDispatcher {
+        return project.getService(NerdDispatcher::class.java)
+      }
     }
 
     /**
@@ -360,6 +408,17 @@ class NerdTree : VimExtension {
     registerCommand("g:NERDTreeMapMenu", "m", NerdAction.ToIj("ShowPopupMenu"))
     registerCommand("g:NERDTreeMapQuit", "q", NerdAction.ToIj("HideActiveWindow"))
     registerCommand("g:NERDTreeMapToggleZoom", "A", NerdAction.ToIj("MaximizeToolWindow"))
+
+    registerCommand("/", NerdAction.Code { project, _, _ ->
+      NerdDispatcher.getInstance(project).waitForSearch = true
+    })
+
+    registerCommand("<ESC>", NerdAction.Code { project, _, _ ->
+      val instance = NerdDispatcher.getInstance(project)
+      if (instance.waitForSearch) {
+        instance.waitForSearch = false
+      }
+    })
   }
 
   companion object {

@@ -91,4 +91,13 @@
       </aliases>
     </vimExtension>
   </extensions>
+
+  <!--  IdeaVim extensions-->
+  <extensions defaultExtensionNs="com.intellij">
+    <projectService serviceImplementation="com.maddyhome.idea.vim.extension.nerdtree.NerdTree$NerdDispatcher"/>
+  </extensions>
+  <projectListeners>
+    <listener class="com.maddyhome.idea.vim.extension.nerdtree.NerdTree$ProjectViewListener"
+              topic="com.intellij.openapi.wm.ex.ToolWindowManagerListener"/>
+  </projectListeners>
 </idea-plugin>
