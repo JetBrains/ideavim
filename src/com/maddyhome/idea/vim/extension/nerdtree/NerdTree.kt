@@ -30,6 +30,7 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
+import com.intellij.openapi.project.ProjectManagerListener
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowId
 import com.intellij.openapi.wm.ex.ToolWindowManagerEx
@@ -49,6 +50,7 @@ import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
 import com.maddyhome.idea.vim.key.CommandNode
 import com.maddyhome.idea.vim.key.CommandPartNode
+import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.RequiredShortcut
 import com.maddyhome.idea.vim.key.RootNode
@@ -59,7 +61,6 @@ import javax.swing.SwingConstants
 
 /**
  * Features and issues:
- * - Multiple projects (reported as not working)
  * - Files are opened with "open with a single click"
  * - Enable mappings in project view for regilar commands "j", "k", etc.
  * - Support more regular commands (gg, G, etc.)
@@ -118,7 +119,7 @@ import javax.swing.SwingConstants
  * ?........Toggle the display of the quick help.......................|NERDTree-?|
  */
 class NerdTree : VimExtension {
-  override fun getName(): String = "NERDTree"
+  override fun getName(): String = pluginName
 
   override fun init() {
     registerCommands()
@@ -130,7 +131,10 @@ class NerdTree : VimExtension {
     addCommand("NERDTreeFind", IjCommandHandler("SelectInProjectView"))
     addCommand("NERDTreeRefreshRoot", IjCommandHandler("Synchronize"))
 
-    ProjectManager.getInstance().openProjects.forEach { project -> installDispatcher(project) }
+    synchronized(monitor) {
+      commandsRegistered = true
+      ProjectManager.getInstance().openProjects.forEach { project -> installDispatcher(project) }
+    }
   }
 
   class IjCommandHandler(private val actionId: String) : CommandAliasHandler {
@@ -161,15 +165,6 @@ class NerdTree : VimExtension {
     }
   }
 
-  private fun installDispatcher(project: Project) {
-    val dispatcher = NerdDispatcher.getInstance(project)
-    val shortcuts = collectShortcuts(actionsRoot).map { RequiredShortcut(it, owner) }
-    dispatcher.registerCustomShortcutSet(
-      KeyGroup.toShortcutSet(shortcuts),
-      (ProjectView.getInstance(project) as ProjectViewImpl).component
-    )
-  }
-
   class ProjectViewListener(private val project: Project) : ToolWindowManagerListener {
     override fun toolWindowShown(toolWindow: ToolWindow) {
       if (ToolWindowId.PROJECT_VIEW != toolWindow.id) return
@@ -184,6 +179,15 @@ class NerdTree : VimExtension {
       dispatcher.speedSearchListenerInstalled = true
       supply.addChangeListener {
         dispatcher.waitForSearch = false
+      }
+    }
+  }
+
+  class NerdProjectListener : ProjectManagerListener {
+    override fun projectOpened(project: Project) {
+      synchronized(monitor) {
+        if (!commandsRegistered) return
+        installDispatcher(project)
       }
     }
   }
@@ -422,6 +426,11 @@ class NerdTree : VimExtension {
   }
 
   companion object {
+    const val pluginName = "NERDTree"
+
+    internal val monitor = Any()
+    internal var commandsRegistered = false
+
     fun callAction(name: String, context: DataContext) {
       val action = ActionManager.getInstance().getAction(name) ?: run {
         VimPlugin.showMessage(MessageHelper.message("action.not.found.0", name))
@@ -457,6 +466,15 @@ class NerdTree : VimExtension {
         res += node.values.map { collectShortcuts(it) }.flatten()
         res
       } else emptySet()
+    }
+
+    private fun installDispatcher(project: Project) {
+      val dispatcher = NerdDispatcher.getInstance(project)
+      val shortcuts = collectShortcuts(actionsRoot).map { RequiredShortcut(it, MappingOwner.Plugin.get(pluginName)) }
+      dispatcher.registerCustomShortcutSet(
+        KeyGroup.toShortcutSet(shortcuts),
+        (ProjectView.getInstance(project) as ProjectViewImpl).component
+      )
     }
   }
 }
