@@ -31,7 +31,7 @@ usual beta standards.
 ### Fixes:
 * [VIM-2202](https://youtrack.jetbrains.com/issue/VIM-2202) Fix macro recording for ex command and search
 * [VIM-1799](https://youtrack.jetbrains.com/issue/VIM-1799)
-  [VIM-1794](https://youtrack.jetbrains.com/issue/VIM-179a)
+  [VIM-1794](https://youtrack.jetbrains.com/issue/VIM-1794)
   Special characters are not interpreted on yanking
 * [VIM-2218](https://youtrack.jetbrains.com/issue/VIM-2218) Fix some shortcuts for 2021.+
 * [VIM-2217](https://youtrack.jetbrains.com/issue/VIM-2217) Fix adding new line at the end of the file for the AppCode
