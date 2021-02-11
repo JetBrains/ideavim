@@ -10,10 +10,6 @@ The original author:
 
 The current maintainers:
 
-* [![icon][mail]](mailto:andrey.vlasovskikh@gmail.com)
-  [![icon][github]](https://github.com/vlasovskikh)
-  &nbsp;
-  Andrey Vlasovskikh
 * [![icon][mail]](mailto:alexpl292@gmail.com)
   [![icon][github]](https://github.com/AlexPl292)
   &nbsp;
@@ -25,8 +21,13 @@ Previous maintainers:
   [![icon][github]](https://github.com/olegs)
   &nbsp;
   Oleg Shpynov
+* [![icon][mail]](mailto:andrey.vlasovskikh@gmail.com)
+  [![icon][github]](https://github.com/vlasovskikh)
+  &nbsp;
+  Andrey Vlasovskikh
 
 Contributors:
+
 * [![icon][mail]](mailto:yole@jetbrains.com)
   [![icon][github]](https://github.com/yole)
   &nbsp;
