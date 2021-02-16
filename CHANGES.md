@@ -36,6 +36,7 @@ usual beta standards.
 * [VIM-2218](https://youtrack.jetbrains.com/issue/VIM-2218) Fix some shortcuts for 2021.+
 * [VIM-2217](https://youtrack.jetbrains.com/issue/VIM-2217) Fix adding new line at the end of the file for the AppCode
 * [VIM-2220](https://youtrack.jetbrains.com/issue/VIM-2220) Do not try to get a commandState for null editor
+* [VIM-2153](https://youtrack.jetbrains.com/issue/VIM-2153) Fix storing special characters after IDE closing
 
 ### Merged PRs:
 * [269](https://github.com/JetBrains/ideavim/pull/269) by [大牙(Henry Zhu)](https://github.com/daya0576): fix invalid link of submodule docs
