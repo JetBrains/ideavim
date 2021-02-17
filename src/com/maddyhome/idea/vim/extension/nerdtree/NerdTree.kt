@@ -321,7 +321,7 @@ class NerdTree : VimExtension {
     // TODO: 21.01.2021 Should option in left split
     registerCommand("g:NERDTreeMapOpenVSplit", "s", NerdAction.ToIj("OpenInRightSplit"))
     // TODO: 21.01.2021 Should option in above split
-    registerCommand("g:NERDTreeMapActivateNode", "i", NerdAction.Code { project, _, event ->
+    registerCommand("g:NERDTreeMapOpenSplit", "i", NerdAction.Code { project, _, event ->
       val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
       val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
       val currentWindow = splitters.currentWindow
