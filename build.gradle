@@ -181,3 +181,8 @@ tasks.register("slackEapNotification") {
     }
   }
 }
+
+ktlint {
+  // I don't know how to disable it for java.utils.* only
+  disabledRules = ["no-wildcard-imports"]
+}
