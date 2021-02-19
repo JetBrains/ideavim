@@ -44,7 +44,9 @@ class ActionListHandler : CommandHandler.SingleExecution() {
     val searchPattern = cmd.argument.trim().toLowerCase().split("*")
     val actionManager = ActionManager.getInstance()
 
-    val actions = actionManager.getActionIdList("")
+    // [VERSION UPDATE] 203+
+    @Suppress("DEPRECATION")
+    val actions = actionManager.getActionIds("")
       .sortedWith(String.CASE_INSENSITIVE_ORDER)
       .map { actionName ->
         val shortcuts = actionManager.getAction(actionName).shortcutSet.shortcuts.joinToString(" ") {
