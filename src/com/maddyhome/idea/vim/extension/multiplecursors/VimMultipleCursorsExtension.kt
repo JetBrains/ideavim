@@ -263,6 +263,7 @@ class VimMultipleCursorsExtension : VimExtension {
   }
 
   private fun findNextOccurrence(editor: Editor, caret: Caret, range: TextRange, whole: Boolean): Int {
+    @Suppress("DEPRECATION")
     VimPlugin.getVisualMotion().setVisualMode(editor)
     val wordRange = VimPlugin.getMotion().getWordRange(editor, caret, 1, false, false)
     caret.vimSetSelection(wordRange.startOffset, wordRange.endOffsetInclusive, true)

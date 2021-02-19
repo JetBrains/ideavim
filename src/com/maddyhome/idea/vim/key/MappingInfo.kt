@@ -158,7 +158,7 @@ class ToHandlerMappingInfo(
           }
           val vimSelection = create(startOffset, endOffset, SelectionType.CHARACTER_WISE, editor)
           offsets[caret] = vimSelection
-          SelectionVimListenerSuppressor.lock().use { ignored ->
+          SelectionVimListenerSuppressor.lock().use { _ ->
             // Move caret to the initial offset for better undo action
             //  This is not a necessary thing, but without it undo action look less convenient
             editor.caretModel.moveToOffset(startOffset)

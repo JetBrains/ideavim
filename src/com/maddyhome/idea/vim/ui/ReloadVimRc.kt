@@ -133,10 +133,10 @@ class ReloadFloatingToolbar : AbstractFloatingToolbarProvider(ACTION_GROUP) {
 
   override val priority: Int = 0
 
-  override fun register(toolbar: FloatingToolbarComponent, parentDisposable: Disposable) {
-    super.register(toolbar, parentDisposable)
+  override fun register(component: FloatingToolbarComponent, parentDisposable: Disposable) {
+    super.register(component, parentDisposable)
     VimRcFileState.whenFileStateSaved {
-      toolbar.scheduleShow()
+      component.scheduleShow()
     }
   }
 }

@@ -22,7 +22,6 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.extensions.ExtensionPointChangeListener
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.util.ThrowableComputable
 import com.maddyhome.idea.vim.VimPlugin
@@ -63,12 +62,12 @@ object CommandParser {
   private fun registerEpListener() {
     // IdeaVim doesn't support contribution to ex_command_ep extension point, so technically we can skip this update,
     //   but let's support dynamic plugins in a more classic way and reload handlers on every EP change.
-    EX_COMMAND_EP.getPoint(null).addExtensionPointListener(
-      ExtensionPointChangeListener {
+    EX_COMMAND_EP.addChangeListener(
+      Runnable {
         unregisterHandlers()
         registerHandlers()
       },
-      false, VimPlugin.getInstance()
+      VimPlugin.getInstance()
     )
   }
 
@@ -373,8 +372,9 @@ object CommandParser {
           State.RANGE_DONE -> {
             val range = createRange(location.toString(), offsetTotal, move)
             if (range == null) {
-              error = message(Msg.e_badrange, Character.toString(ch))
+              error = message(Msg.e_badrange, ch.toString())
               state = State.ERROR
+              @Suppress("UNUSED_VALUE")
               reprocess = false
               break@loop
             }

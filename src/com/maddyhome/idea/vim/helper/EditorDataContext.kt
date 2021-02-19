@@ -40,6 +40,7 @@ class EditorDataContext @Deprecated("Please use `init` method") constructor(
   }
 
   companion object {
+    @Suppress("DEPRECATION")
     @JvmStatic
     fun init(editor: Editor, contextDelegate: DataContext? = null): EditorDataContext {
       return if (contextDelegate is EditorDataContext) {
