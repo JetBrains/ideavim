@@ -32,7 +32,7 @@ import org.jetbrains.plugins.ideavim.waitAndAssert
 class MacroActionTest : VimTestCase() {
   // |q|
   fun testRecordMacro() {
-    val editor = typeTextInFile(StringHelper.parseKeys("qa", "3l", "q"), "on<caret>e two three\n")
+    val editor = typeTextInFile(parseKeys("qa", "3l", "q"), "on<caret>e two three\n")
     val commandState = getInstance(editor)
     assertFalse(commandState.isRecording)
     val registerGroup = VimPlugin.getRegister()
@@ -44,14 +44,14 @@ class MacroActionTest : VimTestCase() {
   fun testRecordMacroDoesNotExpandMap() {
     configureByText("")
     enterCommand("imap pp hello")
-    typeText(StringHelper.parseKeys("qa", "i", "pp<Esc>", "q"))
+    typeText(parseKeys("qa", "i", "pp<Esc>", "q"))
     val register = VimPlugin.getRegister().getRegister('a')
     assertNotNull(register)
     assertEquals("ipp<Esc>", StringHelper.toKeyNotation(register!!.keys))
   }
 
   fun testRecordMacroWithDigraph() {
-    typeTextInFile(StringHelper.parseKeys("qa", "i", "<C-K>OK<Esc>", "q"), "")
+    typeTextInFile(parseKeys("qa", "i", "<C-K>OK<Esc>", "q"), "")
     val register = VimPlugin.getRegister().getRegister('a')
     assertNotNull(register)
     assertEquals("i<C-K>OK<Esc>", StringHelper.toKeyNotation(register!!.keys))

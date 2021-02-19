@@ -7,3 +7,5 @@ exclude:
     paths:
       - resources/icons/youtrack.svg
       - src/com/maddyhome/idea/vim/regexp/RegExp.java
+      - build.gradle
+      - src/com/maddyhome/idea/vim/helper/SearchHelper.java
