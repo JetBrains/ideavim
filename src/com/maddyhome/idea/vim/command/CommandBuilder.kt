@@ -46,7 +46,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<ActionB
   var expectedArgumentType: Argument.Type? = null
     private set
 
-  var prevExpectedArgumentType: Argument.Type? = null
+  private var prevExpectedArgumentType: Argument.Type? = null
     private set
 
   val isReady get() = commandState == CurrentCommandState.READY

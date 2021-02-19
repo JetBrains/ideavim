@@ -1,0 +1,9 @@
+version: 1.0
+profile:
+  name: Qodana
+exclude:
+  - name: PluginXmlValidity
+  - name: All
+    paths:
+      - resources/icons/youtrack.svg
+      - src/com/maddyhome/idea/vim/regexp/RegExp.java

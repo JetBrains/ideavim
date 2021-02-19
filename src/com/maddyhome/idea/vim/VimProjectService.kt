@@ -37,5 +37,6 @@ class VimProjectService(val project: Project) : Disposable {
   }
 }
 
+@Suppress("unused")
 val Project.vimDisposable
   get() = VimProjectService.getInstance(this)

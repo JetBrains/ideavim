@@ -281,7 +281,7 @@ object CommandParser {
               state = State.RANGE_PATTERN
               reprocess = false
             } else {
-              error = message(Msg.e_badrange, Character.toString(ch))
+              error = message(Msg.e_badrange, ch.toString())
               state = State.ERROR
               reprocess = false
             }
