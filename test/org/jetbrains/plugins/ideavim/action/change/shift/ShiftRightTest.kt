@@ -30,16 +30,18 @@ class ShiftRightTest : VimTestCase() {
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     typeTextInFile(StringHelper.parseKeys(">W"), file)
-    myFixture.checkResult("""
+    myFixture.checkResult(
+      """
             A Discovery
 
                   I found it in a legendary land
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   // VIM-407
@@ -124,15 +126,17 @@ class ShiftRightTest : VimTestCase() {
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     typeTextInFile(StringHelper.parseKeys("i<C-T>"), file)
-    myFixture.checkResult("""
+    myFixture.checkResult(
+      """
             A Discovery
 
                   I found it in a legendary land
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 }

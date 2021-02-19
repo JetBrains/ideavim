@@ -30,11 +30,13 @@ import java.util.*
 class VisualSelectNextSearch : MotionActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = noneOfEnum()
 
-  override fun getOffset(editor: Editor,
-                         context: DataContext,
-                         count: Int,
-                         rawCount: Int,
-                         argument: Argument?): Int {
+  override fun getOffset(
+    editor: Editor,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     return VimPlugin.getMotion().selectNextSearch(editor, count, true)
   }
 

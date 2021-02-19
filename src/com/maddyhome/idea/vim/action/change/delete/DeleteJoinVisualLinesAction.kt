@@ -38,23 +38,28 @@ class DeleteJoinVisualLinesAction : VisualOperatorActionHandler.SingleExecution(
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
-  override fun executeForAllCarets(editor: Editor,
-                                   context: DataContext,
-                                   cmd: Command,
-                                   caretsAndSelections: Map<Caret, VimSelection>): Boolean {
+  override fun executeForAllCarets(
+    editor: Editor,
+    context: DataContext,
+    cmd: Command,
+    caretsAndSelections: Map<Caret, VimSelection>
+  ): Boolean {
     if (editor.isOneLineMode) return false
     if (ideajoin.isSet) {
       VimPlugin.getChange().joinViaIdeaBySelections(editor, context, caretsAndSelections)
       return true
     }
     val res = Ref.create(true)
-    editor.caretModel.runForEachCaret({ caret: Caret ->
-      if (!caret.isValid) return@runForEachCaret
-      val range = caretsAndSelections[caret] ?: return@runForEachCaret
-      if (!VimPlugin.getChange().deleteJoinRange(editor, caret, range.toVimTextRange(true).normalize(), false)) {
-        res.set(false)
-      }
-    }, true)
+    editor.caretModel.runForEachCaret(
+      { caret: Caret ->
+        if (!caret.isValid) return@runForEachCaret
+        val range = caretsAndSelections[caret] ?: return@runForEachCaret
+        if (!VimPlugin.getChange().deleteJoinRange(editor, caret, range.toVimTextRange(true).normalize(), false)) {
+          res.set(false)
+        }
+      },
+      true
+    )
     return res.get()
   }
 }

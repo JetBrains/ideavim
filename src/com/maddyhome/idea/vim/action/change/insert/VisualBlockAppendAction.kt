@@ -37,10 +37,12 @@ class VisualBlockAppendAction : VisualOperatorActionHandler.SingleExecution() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO, CommandFlags.FLAG_EXIT_VISUAL)
 
-  override fun executeForAllCarets(editor: Editor,
-                                   context: DataContext,
-                                   cmd: Command,
-                                   caretsAndSelections: Map<Caret, VimSelection>): Boolean {
+  override fun executeForAllCarets(
+    editor: Editor,
+    context: DataContext,
+    cmd: Command,
+    caretsAndSelections: Map<Caret, VimSelection>
+  ): Boolean {
     if (editor.isOneLineMode) return false
     val range = caretsAndSelections.values.stream().findFirst().orElse(null) ?: return false
     return if (range.type == SelectionType.BLOCK_WISE) {

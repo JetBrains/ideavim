@@ -80,8 +80,13 @@ fun addSubstitutionConfirmationHighlight(editor: Editor, start: Int, end: Int): 
  * Refreshes current search highlights for all editors of currently active text editor/document
  */
 private fun updateSearchHighlights(
-  pattern: String?, shouldIgnoreSmartCase: Boolean, showHighlights: Boolean,
-  initialOffset: Int, searchRange: LineRange?, forwards: Boolean, forceUpdate: Boolean
+  pattern: String?,
+  shouldIgnoreSmartCase: Boolean,
+  showHighlights: Boolean,
+  initialOffset: Int,
+  searchRange: LineRange?,
+  forwards: Boolean,
+  forceUpdate: Boolean
 ): Int {
   var currentMatchOffset = -1
   val projectManager = ProjectManager.getInstanceIfCreated() ?: return currentMatchOffset

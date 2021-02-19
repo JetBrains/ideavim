@@ -52,7 +52,8 @@ sealed class CommandAlias(
       }
       for (symbol in arrayOf(Count, Arguments, QuotedArguments)) {
         compiledCommand = compiledCommand.replace(
-          symbol, when (symbol) {
+          symbol,
+          when (symbol) {
             Count -> arrayOf(count.toString())
             Arguments -> arrayOf(cleanedInput)
             QuotedArguments -> arrayOf("'$cleanedInput'")

@@ -25,13 +25,17 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class MotionParagraphPreviousActionTest : VimTestCase() {
   @VimBehaviorDiffers("")
   fun `test delete till start with empty line`() {
-    doTest("d{", """
+    doTest(
+      "d{",
+      """
       
       I found it in a legendary land
       all rocks and lavender and tufted grass,
       where it was settled on some sodden sand
-      hard by the torrent of a mountain pass${c}.
-    """.trimIndent(), ".",
-    CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+      hard by the torrent of a mountain pass$c.
+      """.trimIndent(),
+      ".",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 }

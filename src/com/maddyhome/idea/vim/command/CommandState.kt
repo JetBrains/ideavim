@@ -311,7 +311,7 @@ class CommandState private constructor() {
 
   enum class Mode {
     // Basic modes
-    COMMAND, VISUAL, SELECT, INSERT, CMD_LINE,  /*EX*/
+    COMMAND, VISUAL, SELECT, INSERT, CMD_LINE, /*EX*/
 
     // Additional modes
     OP_PENDING, REPLACE /*, VISUAL_REPLACE, INSERT_NORMAL, INSERT_VISUAL, INSERT_SELECT */

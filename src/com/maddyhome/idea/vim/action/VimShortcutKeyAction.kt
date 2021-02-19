@@ -129,9 +129,9 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   }
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
-    return editor.isPrimaryEditor()
-      || EditorHelper.isFileEditor(editor) && !editor.inNormalMode
-      || OptionsManager.ideavimsupport.contains("dialog") && !editor.inNormalMode
+    return editor.isPrimaryEditor() ||
+      EditorHelper.isFileEditor(editor) && !editor.inNormalMode ||
+      OptionsManager.ideavimsupport.contains("dialog") && !editor.inNormalMode
   }
 
   private fun isShortcutConflict(keyStroke: KeyStroke): Boolean {

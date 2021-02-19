@@ -32,7 +32,6 @@ import com.maddyhome.idea.vim.group.MarkGroup.WR_REGULAR_FILE_MARKS
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 
-
 private val VIML_COMMENT = Regex("(?<!\\\\)\".*")
 private val TRAILING_SPACES = Regex("\\s*$")
 private val ARGUMENT_DELETE_ALL_FILE_MARKS = Regex("^!$")

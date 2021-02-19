@@ -38,8 +38,10 @@ class MotionScrollLastScreenLinePageStartAction : VimActionHandler.SingleExecuti
     // Without [count]: Redraw with the line just above the window at the bottom of the window. Put the cursor in that
     // line, at the first non-blank in the line.
     if (cmd.rawCount == 0) {
-      val prevVisualLine = EditorHelper.normalizeVisualLine(editor,
-        EditorHelper.getVisualLineAtTopOfScreen(editor) - 1)
+      val prevVisualLine = EditorHelper.normalizeVisualLine(
+        editor,
+        EditorHelper.getVisualLineAtTopOfScreen(editor) - 1
+      )
       val logicalLine = EditorHelper.visualLineToLogicalLine(editor, prevVisualLine)
       return motion.scrollLineToLastScreenLine(editor, logicalLine + 1, true)
     }

@@ -36,62 +36,86 @@ class MotionOuterBlockParenActionTest : VimTestCase() {
   }
 
   fun `test multiline outside parentheses`() {
-    configureByText("""(outer
-                      |${c}(inner))""".trimMargin())
+    configureByText(
+      """(outer
+                      |$c(inner))""".trimMargin()
+    )
     typeText(parseKeys("va)"))
     assertSelection("(inner)")
   }
 
   fun `test multiline in parentheses`() {
-    configureByText("""(outer
-                      |(inner${c}))""".trimMargin())
+    configureByText(
+      """(outer
+                      |(inner$c))""".trimMargin()
+    )
     typeText(parseKeys("va)"))
     assertSelection("(inner)")
   }
 
   fun `test multiline inside of outer parentheses`() {
-    configureByText("""(outer
-                     |${c} (inner))""".trimMargin())
+    configureByText(
+      """(outer
+                     |$c (inner))""".trimMargin()
+    )
     typeText(parseKeys("va)"))
-    assertSelection("""(outer
-                        | (inner))""".trimMargin())
+    assertSelection(
+      """(outer
+                        | (inner))""".trimMargin()
+    )
   }
 
   fun `test double motion`() {
-    configureByText("""(outer
-                      |${c}(inner))""".trimMargin())
+    configureByText(
+      """(outer
+                      |$c(inner))""".trimMargin()
+    )
     typeText(parseKeys("va)a)"))
-    assertSelection("""(outer
-                      |(inner))""".trimMargin())
+    assertSelection(
+      """(outer
+                      |(inner))""".trimMargin()
+    )
   }
 
   fun `test motion with count`() {
-    configureByText("""(outer
-                      |${c}(inner))""".trimMargin())
+    configureByText(
+      """(outer
+                      |$c(inner))""".trimMargin()
+    )
     typeText(parseKeys("v2a)"))
-    assertSelection("""(outer
-                      |(inner))""".trimMargin())
+    assertSelection(
+      """(outer
+                      |(inner))""".trimMargin()
+    )
   }
 
   fun `test text object after motion`() {
-    configureByText("""(outer
-                      |${c}(inner))""".trimMargin())
+    configureByText(
+      """(outer
+                      |$c(inner))""".trimMargin()
+    )
     typeText(parseKeys("vlla)"))
-    assertSelection("""(outer
-                      |(inner))""".trimMargin())
+    assertSelection(
+      """(outer
+                      |(inner))""".trimMargin()
+    )
   }
 
   fun `test text object after motion outside parentheses`() {
-    configureByText("""(outer
-                      |(inner${c}))""".trimMargin())
+    configureByText(
+      """(outer
+                      |(inner$c))""".trimMargin()
+    )
     typeText(parseKeys("vlla)"))
     assertSelection("(inner)")
   }
 
   // |d| |v_ab|
   fun testDeleteOuterBlock() {
-    typeTextInFile(parseKeys("da)"),
-      "foo(b${c}ar, baz);\n")
+    typeTextInFile(
+      parseKeys("da)"),
+      "foo(b${c}ar, baz);\n"
+    )
     myFixture.checkResult("foo;\n")
   }
 }

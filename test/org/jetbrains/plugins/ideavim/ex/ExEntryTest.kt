@@ -517,7 +517,7 @@ class ExEntryTest : VimTestCase() {
 
     typeExInput(":set<Home><C-R>c")
     assertExText("hello worldset")
-    assertExOffset(11)  // Just before 'set'
+    assertExOffset(11) // Just before 'set'
 
     // TODO: Test caret feedback
     // Vim shows " after hitting <C-R>
@@ -579,8 +579,10 @@ class ExEntryTest : VimTestCase() {
   }
 
   private fun typeExInput(text: String) {
-    assertTrue("Ex command must start with ':', '/' or '?'",
-      text.startsWith(":") || text.startsWith('/') || text.startsWith('?'))
+    assertTrue(
+      "Ex command must start with ':', '/' or '?'",
+      text.startsWith(":") || text.startsWith('/') || text.startsWith('?')
+    )
 
     val keys = mutableListOf<KeyStroke>()
     StringHelper.parseKeys(text).forEach {

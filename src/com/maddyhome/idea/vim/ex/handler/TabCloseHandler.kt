@@ -88,7 +88,7 @@ class TabCloseHandler : CommandHandler.SingleExecution() {
         c == '$' && sb.isEmpty() && sign == Char.MIN_VALUE -> end = true
 
         c == ' ' -> {
-          //ignore
+          // ignore
         }
 
         else -> return null

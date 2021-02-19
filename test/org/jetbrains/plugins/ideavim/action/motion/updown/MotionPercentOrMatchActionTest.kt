@@ -27,50 +27,64 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 class MotionPercentOrMatchActionTest : VimTestCase() {
   fun `test percent match simple`() {
-    typeTextInFile(parseKeys("%"),
-      "foo(b${c}ar)\n")
+    typeTextInFile(
+      parseKeys("%"),
+      "foo(b${c}ar)\n"
+    )
     assertOffset(3)
   }
 
   fun `test percent match multi line`() {
-    typeTextInFile(parseKeys("%"),
+    typeTextInFile(
+      parseKeys("%"),
       """foo(bar,
                      |baz,
                      |${c}quux)
-               """.trimMargin())
+               """.trimMargin()
+    )
     assertOffset(3)
   }
 
   fun `test percent visual mode match multi line end of line`() {
-    typeTextInFile(parseKeys("v$%"),
+    typeTextInFile(
+      parseKeys("v$%"),
       """${c}foo(
-                  |bar)""".trimMargin())
+                  |bar)""".trimMargin()
+    )
     assertOffset(8)
   }
 
   fun `test percent visual mode match from start multi line end of line`() {
-    typeTextInFile(parseKeys("v$%"),
+    typeTextInFile(
+      parseKeys("v$%"),
       """$c(
-                  |bar)""".trimMargin())
+                  |bar)""".trimMargin()
+    )
     assertOffset(5)
   }
 
   fun `test percent visual mode find brackets on the end of line`() {
-    typeTextInFile(parseKeys("v$%"),
-      """foo(${c}bar)""")
+    typeTextInFile(
+      parseKeys("v$%"),
+      """foo(${c}bar)"""
+    )
     assertOffset(3)
   }
 
   fun `test percent twice visual mode find brackets on the end of line`() {
-    typeTextInFile(parseKeys("v$%%"),
-      """foo(${c}bar)""")
+    typeTextInFile(
+      parseKeys("v$%%"),
+      """foo(${c}bar)"""
+    )
     assertOffset(7)
   }
 
   fun `test percent match parens in string`() {
-    typeTextInFile(parseKeys("%"),
+    typeTextInFile(
+      parseKeys("%"),
       """foo(bar, "foo(bar", ${c}baz)
-               """)
+               """
+    )
     assertOffset(3)
   }
 
@@ -135,15 +149,17 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   fun `test motion with quote on the way`() {
-    doTest("%", """
-            for (; c!= cj;c = it.next()) ${c}{
+    doTest(
+      "%",
+      """
+            for (; c!= cj;c = it.next()) $c{
              if (dsa) {
                if (c == '\\') {
                  dsadsakkk
                }
              }
             }
-        """.trimIndent(),
+      """.trimIndent(),
       """
             for (; c!= cj;c = it.next()) {
              if (dsa) {
@@ -151,47 +167,61 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
                  dsadsakkk
                }
              }
-            ${c}}
-        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+            $c}
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 
   fun `test motion outside text`() {
-    doTest("%", """
+    doTest(
+      "%",
+      """
             (
             ""${'"'}
             ""${'"'} + ${c}title("Display")
             ""${'"'}
             ""${'"'}
             )
-        """.trimIndent(),
+      """.trimIndent(),
       """
             (
             ""${'"'}
-            ""${'"'} + title("Display"${c})
+            ""${'"'} + title("Display"$c)
             ""${'"'}
             ""${'"'}
             )
-        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 
   fun `test motion in text`() {
-    doTest("%", """ "I found ${c}it in a (legendary) land" """,
-      """ "I found it in a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(
+      "%", """ "I found ${c}it in a (legendary) land" """,
+      """ "I found it in a (legendary$c) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 
   fun `test motion in text with quotes`() {
-    doTest("%", """ "I found ${c}it in \"a (legendary) land" """,
-      """ "I found it in \"a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(
+      "%", """ "I found ${c}it in \"a (legendary) land" """,
+      """ "I found it in \"a (legendary$c) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 
   fun `test motion in text with quotes start before quote`() {
-    doTest("%", """ ${c} "I found it in \"a (legendary) land" """,
-      """  "I found it in \"a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(
+      "%", """ $c "I found it in \"a (legendary) land" """,
+      """  "I found it in \"a (legendary$c) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 
   fun `test motion in text with quotes and double escape`() {
-    doTest("%", """ "I found ${c}it in \\\"a (legendary) land" """,
-      """ "I found it in \\\"a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(
+      "%", """ "I found ${c}it in \\\"a (legendary) land" """,
+      """ "I found it in \\\"a (legendary$c) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 
   fun `test deleting with percent motion backward`() {

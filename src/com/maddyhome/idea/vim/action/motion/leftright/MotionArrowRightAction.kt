@@ -45,4 +45,3 @@ class MotionArrowRightAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAct
     return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, allowPastEnd)
   }
 }
-

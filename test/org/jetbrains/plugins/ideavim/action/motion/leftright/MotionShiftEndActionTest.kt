@@ -44,7 +44,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -52,7 +52,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -70,7 +70,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -78,10 +78,9 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
-
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
@@ -97,7 +96,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -105,7 +104,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
@@ -121,7 +120,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -129,7 +128,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(parseKeys("<S-End>"))
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
@@ -150,7 +149,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -158,7 +157,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(parseKeys("<S-End>"))
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)

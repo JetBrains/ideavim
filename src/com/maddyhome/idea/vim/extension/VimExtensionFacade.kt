@@ -45,23 +45,36 @@ import javax.swing.KeyStroke
 object VimExtensionFacade {
   /** The 'map' command for mapping keys to handlers defined in extensions. */
   @JvmStatic
-  fun putExtensionHandlerMapping(modes: Set<MappingMode>, fromKeys: List<KeyStroke>,
-                                 pluginOwner: MappingOwner, extensionHandler: VimExtensionHandler, recursive: Boolean) {
+  fun putExtensionHandlerMapping(
+    modes: Set<MappingMode>,
+    fromKeys: List<KeyStroke>,
+    pluginOwner: MappingOwner,
+    extensionHandler: VimExtensionHandler,
+    recursive: Boolean
+  ) {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)
   }
 
   /** The 'map' command for mapping keys to other keys. */
   @JvmStatic
-  fun putKeyMapping(modes: Set<MappingMode>, fromKeys: List<KeyStroke>,
-                    pluginOwner: MappingOwner, toKeys: List<KeyStroke>, recursive: Boolean) {
+  fun putKeyMapping(
+    modes: Set<MappingMode>,
+    fromKeys: List<KeyStroke>,
+    pluginOwner: MappingOwner,
+    toKeys: List<KeyStroke>,
+    recursive: Boolean
+  ) {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, toKeys, recursive)
   }
 
   /** The 'map' command for mapping keys to other keys if there is no other mapping to these keys */
   @JvmStatic
   fun putKeyMappingIfMissing(
-    modes: Set<MappingMode>, fromKeys: List<KeyStroke>,
-    pluginOwner: MappingOwner, toKeys: List<KeyStroke>, recursive: Boolean
+    modes: Set<MappingMode>,
+    fromKeys: List<KeyStroke>,
+    pluginOwner: MappingOwner,
+    toKeys: List<KeyStroke>,
+    recursive: Boolean
   ) {
     val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().hasmapto(it, toKeys) }
     VimPlugin.getKey().putKeyMapping(filteredModes, fromKeys, pluginOwner, toKeys, recursive)
@@ -121,9 +134,10 @@ object VimExtensionFacade {
       val builder = StringBuilder()
       val inputModel = TestInputModel.getInstance(editor)
       var key: KeyStroke? = inputModel.nextKeyStroke()
-      while (key != null
-        && !StringHelper.isCloseKeyStroke(key) && key.keyCode != KeyEvent.VK_ENTER
-        && (finishOn == null || key.keyChar != finishOn)) {
+      while (key != null &&
+        !StringHelper.isCloseKeyStroke(key) && key.keyCode != KeyEvent.VK_ENTER &&
+        (finishOn == null || key.keyChar != finishOn)
+      ) {
         val c = key.keyChar
         if (c != KeyEvent.CHAR_UNDEFINED) {
           builder.append(c)

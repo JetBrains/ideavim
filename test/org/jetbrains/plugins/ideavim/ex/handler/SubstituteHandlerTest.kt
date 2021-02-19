@@ -36,7 +36,8 @@ import javax.swing.KeyStroke
 class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, IgnoreCaseOptionsData.name) {
   @VimOptionDefaultAll
   fun `test one letter`() {
-    doTest("s/a/b/",
+    doTest(
+      "s/a/b/",
       """a${c}baba
                  |ab
                """.trimMargin(),
@@ -48,7 +49,8 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
 
   @VimOptionDefaultAll
   fun `test one letter multi per line`() {
-    doTest("s/a/b/g",
+    doTest(
+      "s/a/b/g",
       """a${c}baba
                  |ab
                """.trimMargin(),
@@ -60,7 +62,8 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
 
   @VimOptionDefaultAll
   fun `test one letter multi per line whole file`() {
-    doTest("%s/a/b/g",
+    doTest(
+      "%s/a/b/g",
       """a${c}baba
                  |ab
                """.trimMargin(),
@@ -73,7 +76,8 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
   // VIM-146
   @VimOptionDefaultAll
   fun `test eoLto quote`() {
-    doTest("s/$/'/g",
+    doTest(
+      "s/$/'/g",
       """${c}one
                   |two
                """.trimMargin(),
@@ -85,7 +89,8 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
 
   @VimOptionDefaultAll
   fun `test soLto quote`() {
-    doTest("s/^/'/g",
+    doTest(
+      "s/^/'/g",
       """${c}one
                   |two
                """.trimMargin(),
@@ -97,44 +102,53 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
 
   @VimOptionDefaultAll
   fun `test dot to nul`() {
-    doTest("s/\\./\\n/g",
+    doTest(
+      "s/\\./\\n/g",
       "${c}one.two.three\n",
-      "one\u0000two\u0000three\n")
+      "one\u0000two\u0000three\n"
+    )
   }
 
   // VIM-528
   @VimOptionDefaultAll
   fun `test groups`() {
-    doTest("s/\\(a\\|b\\)/z\\1/g",
+    doTest(
+      "s/\\(a\\|b\\)/z\\1/g",
       "${c}abcdefg",
-      "zazbcdefg")
+      "zazbcdefg"
+    )
   }
 
   @VimOptionDefaultAll
   fun `test to nl`() {
-    doTest("s/\\./\\r/g",
+    doTest(
+      "s/\\./\\r/g",
       "${c}one.two.three\n",
-      "one\ntwo\nthree\n")
+      "one\ntwo\nthree\n"
+    )
   }
 
   // VIM-289
   @VimOptionDefaultAll
   fun `test dot to nlDot`() {
-    doTest("s/\\./\\r\\./g",
+    doTest(
+      "s/\\./\\r\\./g",
       "${c}one.two.three\n",
-      "one\n.two\n.three\n")
+      "one\n.two\n.three\n"
+    )
   }
 
   // VIM-702
   @VimOptionDefaultAll
   fun `test end of line to nl`() {
-    doTest("%s/$/\\r/g",
+    doTest(
+      "%s/$/\\r/g",
       """
         ${c}one
         two
         three
         
-        """.trimIndent(),
+      """.trimIndent(),
       """
         one
         
@@ -144,19 +158,21 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
         
         
         
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   // VIM-702
   @VimOptionDefaultAll
   fun `test start of line to nl`() {
-    doTest("%s/^/\\r/g",
+    doTest(
+      "%s/^/\\r/g",
       """
         ${c}one
         two
         three
         
-        """.trimIndent(),
+      """.trimIndent(),
       """
         
         one
@@ -166,15 +182,18 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
         three
         
         
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @VimOptionTestConfiguration(VimTestOption(IgnoreCaseOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
   @VimOptionDefault(SmartCaseOptionsData.name)
   fun `test ignorecase option`() {
-    doTest("%s/foo/bar/g",
+    doTest(
+      "%s/foo/bar/g",
       "foo Foo foo\nFoo FOO foo",
-      "bar bar bar\nbar bar bar")
+      "bar bar bar\nbar bar bar"
+    )
   }
 
   @VimOptionDefaultAll
@@ -182,54 +201,74 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     OptionsManager.smartcase.set()
 
     // smartcase does nothing if ignorecase is not set
-    doTest("%s/foo/bar/g",
+    doTest(
+      "%s/foo/bar/g",
       "foo Foo foo\nFoo FOO foo",
-      "bar Foo bar\nFoo FOO bar")
-    doTest("%s/Foo/bar/g",
+      "bar Foo bar\nFoo FOO bar"
+    )
+    doTest(
+      "%s/Foo/bar/g",
       "foo Foo foo\nFoo FOO foo",
-      "foo bar foo\nbar FOO foo")
+      "foo bar foo\nbar FOO foo"
+    )
 
     OptionsManager.ignorecase.set()
-    doTest("%s/foo/bar/g",
+    doTest(
+      "%s/foo/bar/g",
       "foo Foo foo\nFoo FOO foo",
-      "bar bar bar\nbar bar bar")
-    doTest("%s/Foo/bar/g",
+      "bar bar bar\nbar bar bar"
+    )
+    doTest(
+      "%s/Foo/bar/g",
       "foo Foo foo\nFoo FOO foo",
-      "foo bar foo\nbar FOO foo")
+      "foo bar foo\nbar FOO foo"
+    )
   }
 
   @VimOptionDefaultAll
   fun `test force ignore case flag`() {
-    doTest("%s/foo/bar/gi",
+    doTest(
+      "%s/foo/bar/gi",
       "foo Foo foo\nFoo FOO foo",
-      "bar bar bar\nbar bar bar")
+      "bar bar bar\nbar bar bar"
+    )
 
     OptionsManager.ignorecase.set()
-    doTest("%s/foo/bar/gi",
+    doTest(
+      "%s/foo/bar/gi",
       "foo Foo foo\nFoo FOO foo",
-      "bar bar bar\nbar bar bar")
+      "bar bar bar\nbar bar bar"
+    )
 
     OptionsManager.smartcase.set()
-    doTest("%s/foo/bar/gi",
+    doTest(
+      "%s/foo/bar/gi",
       "foo Foo foo\nFoo FOO foo",
-      "bar bar bar\nbar bar bar")
+      "bar bar bar\nbar bar bar"
+    )
   }
 
   @VimOptionDefaultAll
   fun `test force match case flag`() {
-    doTest("%s/foo/bar/gI",
+    doTest(
+      "%s/foo/bar/gI",
       "foo Foo foo\nFoo FOO foo",
-      "bar Foo bar\nFoo FOO bar")
+      "bar Foo bar\nFoo FOO bar"
+    )
 
     OptionsManager.ignorecase.set()
-    doTest("%s/foo/bar/gI",
+    doTest(
+      "%s/foo/bar/gI",
       "foo Foo foo\nFoo FOO foo",
-      "bar Foo bar\nFoo FOO bar")
+      "bar Foo bar\nFoo FOO bar"
+    )
 
     OptionsManager.smartcase.set()
-    doTest("%s/Foo/bar/gI",
+    doTest(
+      "%s/Foo/bar/gI",
       "foo Foo foo\nFoo FOO foo",
-      "foo bar foo\nbar FOO foo")
+      "foo bar foo\nbar FOO foo"
+    )
   }
 
   // VIM-864
@@ -242,9 +281,11 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
 
   @VimOptionDefaultAll
   fun `test offset range`() {
-    doTest(".,+2s/a/b/g",
+    doTest(
+      ".,+2s/a/b/g",
       "aaa\naa${c}a\naaa\naaa\naaa\n",
-      "aaa\nbbb\nbbb\nbbb\naaa\n")
+      "aaa\nbbb\nbbb\nbbb\naaa\n"
+    )
   }
 
   @VimOptionDefaultAll
@@ -302,7 +343,8 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
   fun `test confirm all replaces all in range`() {
     // Make sure the "a" is added as part of the same parseKeys as the <Enter>, as it needs to be available while the
     // <Enter> is processed
-    doTest(parseKeys(":", ".,\$s/and/AND/gc", "<Enter>", "a"),
+    doTest(
+      parseKeys(":", ".,\$s/and/AND/gc", "<Enter>", "a"),
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
@@ -310,14 +352,16 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
       """I found it in a legendary land
         |all rocks AND lavender AND tufted grass,
         |${c}where it was settled on some sodden sAND
-        |hard by the torrent of a mountain pass.""".trimMargin())
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    )
   }
 
   @VimOptionDefaultAll
   fun `test confirm all replaces all in rest of range`() {
     // Make sure the "a" is added as part of the same parseKeys as the <Enter>, as it needs to be available while the
     // <Enter> is processed
-    doTest(parseKeys(":", "%s/and/AND/gc", "<Enter>", "n", "n", "a"),
+    doTest(
+      parseKeys(":", "%s/and/AND/gc", "<Enter>", "n", "n", "a"),
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
@@ -325,14 +369,16 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
       """I found it in a legendary land
         |all rocks and lavender AND tufted grass,
         |${c}where it was settled on some sodden sAND
-        |hard by the torrent of a mountain pass.""".trimMargin())
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    )
   }
 
   @VimOptionDefaultAll
   fun `test confirm options`() {
     // Make sure the "a" is added as part of the same parseKeys as the <Enter>, as it needs to be available while the
     // <Enter> is processed
-    doTest(parseKeys(":", "%s/and/AND/gc", "<Enter>", "y", "n", "l"),
+    doTest(
+      parseKeys(":", "%s/and/AND/gc", "<Enter>", "y", "n", "l"),
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
@@ -340,14 +386,16 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
       """I found it in a legendary lAND
         |${c}all rocks and lavender AND tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin())
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    )
   }
 
   @VimOptionDefaultAll
   fun `test confirm options with quit`() {
     // Make sure the "a" is added as part of the same parseKeys as the <Enter>, as it needs to be available while the
     // <Enter> is processed
-    doTest(parseKeys(":", "%s/and/AND/gc", "<Enter>", "y", "n", "q"),
+    doTest(
+      parseKeys(":", "%s/and/AND/gc", "<Enter>", "y", "n", "q"),
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
@@ -355,7 +403,8 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
       """I found it in a legendary lAND
         |all rocks and lavender ${c}and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin())
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    )
   }
 
   @VimOptionDefaultAll
@@ -364,7 +413,8 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin())
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    )
 
     typeText(parseKeys(":", "%s/and/or/gc", "<Enter>"))
     assertPosition(0, 27)
@@ -376,7 +426,8 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
       """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
-        |hard by the torrent of a mountain pass.""".trimMargin())
+        |hard by the torrent of a mountain pass.""".trimMargin()
+    )
 
     typeText(parseKeys(":", "%s/and/or/gc", "<Enter>", "n"))
     assertPosition(1, 10)
@@ -390,15 +441,18 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
         |One
         |One
         |One
-        |One""".trimMargin())
+        |One""".trimMargin()
+    )
 
     typeText(parseKeys(":", ",+3s/One/Two/g", "<Enter>"))
-    myFixture.checkResult(      """One
+    myFixture.checkResult(
+      """One
         |Two
         |Two
         |Two
         |${c}Two
-        |One""".trimMargin())
+        |One""".trimMargin()
+    )
   }
 
   @VimOptionDefaultAll
@@ -409,15 +463,18 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
         |One
         |One
         |One
-        |One""".trimMargin())
+        |One""".trimMargin()
+    )
 
     typeText(parseKeys(":", ",.+3s/One/Two/g", "<Enter>"))
-    myFixture.checkResult(      """One
+    myFixture.checkResult(
+      """One
         |Two
         |Two
         |Two
         |${c}Two
-        |One""".trimMargin())
+        |One""".trimMargin()
+    )
   }
 
   private fun doTest(command: String, before: String, after: String) {

@@ -134,11 +134,14 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         when {
           selections.keys.isEmpty() -> return false
           selections.keys.size == 1 -> res.set(executeAction(editor, selections.keys.first(), context, cmd, selections.values.first()))
-          else -> editor.caretModel.runForEachCaret({ currentCaret ->
-            val range = selections.getValue(currentCaret)
-            val loopRes = executeAction(editor, currentCaret, context, cmd, range)
-            res.set(loopRes and res.get())
-          }, true)
+          else -> editor.caretModel.runForEachCaret(
+            { currentCaret ->
+              val range = selections.getValue(currentCaret)
+              val loopRes = executeAction(editor, currentCaret, context, cmd, range)
+              res.set(loopRes and res.get())
+            },
+            true
+          )
         }
 
         logger.debug("Calling 'after execution'")
@@ -162,10 +165,13 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
           val primaryCaret = caretModel.primaryCaret
           val range = primaryCaret.vimLastVisualOperatorRange ?: return null
           val end = VisualOperation.calculateRange(this, range, 1, primaryCaret)
-          mapOf(primaryCaret to VimBlockSelection(
-            primaryCaret.offset,
-            end,
-            this, range.columns >= MotionGroup.LAST_COLUMN))
+          mapOf(
+            primaryCaret to VimBlockSelection(
+              primaryCaret.offset,
+              end,
+              this, range.columns >= MotionGroup.LAST_COLUMN
+            )
+          )
         } else {
           val carets = mutableMapOf<Caret, VimSelection>()
           this.caretModel.allCarets.forEach { caret ->
@@ -178,10 +184,13 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
       }
       this.inBlockSubMode -> {
         val primaryCaret = caretModel.primaryCaret
-        mapOf(primaryCaret to VimBlockSelection(
-          primaryCaret.vimSelectionStart,
-          primaryCaret.offset,
-          this, primaryCaret.vimLastColumn >= MotionGroup.LAST_COLUMN))
+        mapOf(
+          primaryCaret to VimBlockSelection(
+            primaryCaret.vimSelectionStart,
+            primaryCaret.offset,
+            this, primaryCaret.vimLastColumn >= MotionGroup.LAST_COLUMN
+          )
+        )
       }
       else -> this.caretModel.allCarets.associateWith { caret ->
 

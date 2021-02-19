@@ -22,7 +22,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.helper.EditorHelper.getLineStartOffset
 
-
 class CharacterPosition(line: Int, col: Int) : LogicalPosition(line, col) {
   fun toOffset(editor: Editor) = getLineStartOffset(editor, line) + column
 

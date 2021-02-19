@@ -373,9 +373,16 @@ class PutGroup {
   }
 
   private fun putTextInternal(
-    editor: Editor, caret: Caret, context: DataContext,
-    text: String, type: SelectionType, mode: CommandState.SubMode,
-    startOffset: Int, count: Int, indent: Boolean, cursorAfter: Boolean
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    text: String,
+    type: SelectionType,
+    mode: CommandState.SubMode,
+    startOffset: Int,
+    count: Int,
+    indent: Boolean,
+    cursorAfter: Boolean
   ): Int =
     when (type) {
       SelectionType.CHARACTER_WISE -> putTextCharacterwise(
@@ -406,9 +413,16 @@ class PutGroup {
     }
 
   private fun putTextLinewise(
-    editor: Editor, caret: Caret, context: DataContext,
-    text: String, type: SelectionType, mode: CommandState.SubMode,
-    startOffset: Int, count: Int, indent: Boolean, cursorAfter: Boolean
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    text: String,
+    type: SelectionType,
+    mode: CommandState.SubMode,
+    startOffset: Int,
+    count: Int,
+    indent: Boolean,
+    cursorAfter: Boolean
   ): Int {
     val caretModel = editor.caretModel
     val overlappedCarets = ArrayList<Caret>(caretModel.caretCount)
@@ -438,9 +452,16 @@ class PutGroup {
   }
 
   private fun putTextBlockwise(
-    editor: Editor, caret: Caret, context: DataContext,
-    text: String, type: SelectionType, mode: CommandState.SubMode,
-    startOffset: Int, count: Int, indent: Boolean, cursorAfter: Boolean
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    text: String,
+    type: SelectionType,
+    mode: CommandState.SubMode,
+    startOffset: Int,
+    count: Int,
+    indent: Boolean,
+    cursorAfter: Boolean
   ): Int {
     val startPosition = editor.offsetToLogicalPosition(startOffset)
     val currentColumn = if (mode == CommandState.SubMode.VISUAL_LINE) 0 else startPosition.column
@@ -500,9 +521,15 @@ class PutGroup {
   }
 
   private fun putTextCharacterwise(
-    editor: Editor, caret: Caret, context: DataContext,
-    text: String, type: SelectionType,
-    mode: CommandState.SubMode, startOffset: Int, count: Int, indent: Boolean,
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    text: String,
+    type: SelectionType,
+    mode: CommandState.SubMode,
+    startOffset: Int,
+    count: Int,
+    indent: Boolean,
     cursorAfter: Boolean
   ): Int {
     MotionGroup.moveCaret(editor, caret, startOffset)
@@ -575,9 +602,9 @@ class PutGroup {
   }
 
   private fun notifyAboutIdeaPut(project: Project?) {
-    if (VimPlugin.getVimState().isIdeaPutNotified
-      || ClipboardOptionsData.ideaput in OptionsManager.clipboard
-      || ClipboardOptionsData.ideaputDisabled
+    if (VimPlugin.getVimState().isIdeaPutNotified ||
+      ClipboardOptionsData.ideaput in OptionsManager.clipboard ||
+      ClipboardOptionsData.ideaputDisabled
     ) return
 
     VimPlugin.getVimState().isIdeaPutNotified = true

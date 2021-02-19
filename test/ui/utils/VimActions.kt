@@ -21,8 +21,6 @@ package ui.utils
 import com.intellij.remoterobot.fixtures.Fixture
 import com.intellij.remoterobot.utils.keyboard
 
-
-
 fun Fixture.insertMode() {
   type("i")
 }

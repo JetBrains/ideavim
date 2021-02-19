@@ -117,9 +117,9 @@ class ScrollColumnLeftActionTest : VimTestCase() {
     typeText(parseKeys("100|"))
     // Text at start of line is:            456:test7
     assertVisibleLineBounds(0, 64, 138)
-    typeText(parseKeys("2zl"))  // 6:test7
+    typeText(parseKeys("2zl")) // 6:test7
     assertVisibleLineBounds(0, 66, 140)
-    typeText(parseKeys("zl"))   // 7
+    typeText(parseKeys("zl")) // 7
     assertVisibleLineBounds(0, 67, 146)
   }
 
@@ -129,11 +129,11 @@ class ScrollColumnLeftActionTest : VimTestCase() {
     typeText(parseKeys("100|"))
     // Text at start of line is:            456test:78
     assertVisibleLineBounds(0, 64, 138)
-    typeText(parseKeys("2zl"))  // 6test:78
+    typeText(parseKeys("2zl")) // 6test:78
     assertVisibleLineBounds(0, 66, 140)
-    typeText(parseKeys("zl"))   // test:78
+    typeText(parseKeys("zl")) // test:78
     assertVisibleLineBounds(0, 67, 141)
-    typeText(parseKeys("zl"))   // 8
+    typeText(parseKeys("zl")) // 8
     assertVisibleLineBounds(0, 68, 147)
   }
 }

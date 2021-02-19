@@ -43,9 +43,12 @@ class DeleteJoinLinesAction : ChangeEditorActionHandler.SingleExecution() {
     }
     VimPlugin.getEditor().notifyIdeaJoin(editor.project)
     val res = Ref.create(true)
-    editor.caretModel.runForEachCaret({ caret: Caret ->
-      if (!VimPlugin.getChange().deleteJoinLines(editor, caret, count, false)) res.set(false)
-    }, true)
+    editor.caretModel.runForEachCaret(
+      { caret: Caret ->
+        if (!VimPlugin.getChange().deleteJoinLines(editor, caret, count, false)) res.set(false)
+      },
+      true
+    )
     return res.get()
   }
 }

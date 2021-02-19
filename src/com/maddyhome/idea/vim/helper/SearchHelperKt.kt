@@ -80,7 +80,7 @@ fun checkInString(chars: CharSequence, currentPos: Int, str: Boolean): Boolean {
 
   var inQuote: Boolean? = null
 
-  for((_, trigger, inQuoteAfter, lastOpenSingleQuotePosAfter) in afterPos) {
+  for ((_, trigger, inQuoteAfter, lastOpenSingleQuotePosAfter) in afterPos) {
     inQuote = inQuoteAfter
     if (posInQuote != null && posInChar != null) break
     if (posInQuote == null && inQuoteAfter != null) {

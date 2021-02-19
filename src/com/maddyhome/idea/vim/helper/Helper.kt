@@ -89,7 +89,6 @@ fun Editor.isTemplateActive(): Boolean {
   return TemplateManager.getInstance(project).getActiveTemplate(this) != null
 }
 
-
 /**
  * This annotations marks if annotated function required read or write lock
  */

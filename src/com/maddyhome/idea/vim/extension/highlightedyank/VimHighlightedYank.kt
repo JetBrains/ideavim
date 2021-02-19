@@ -83,7 +83,7 @@ class HighlightColorResetter : LafManagerListener {
  *
  * When a new text is yanked or user starts editing, the old highlighting would be deleted.
  */
-class VimHighlightedYank: VimExtension, VimYankListener, VimInsertListener {
+class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
   private val highlightHandler = HighlightHandler()
 
   override fun getName() = "highlightedyank"
@@ -111,16 +111,19 @@ class VimHighlightedYank: VimExtension, VimYankListener, VimInsertListener {
     private val yankHighlighters: MutableSet<RangeHighlighter> = mutableSetOf()
 
     fun highlightYankRange(editor: Editor, range: TextRange) {
-      //from vim-highlightedyank docs: When a new text is yanked or user starts editing, the old highlighting would be deleted
+      // from vim-highlightedyank docs: When a new text is yanked or user starts editing, the old highlighting would be deleted
       clearAllYankHighlighters()
 
       this.editor = editor
       val project = editor.project
       if (project != null) {
-        Disposer.register(VimProjectService.getInstance(project), Disposable {
-          this.editor = null
-          yankHighlighters.clear()
-        })
+        Disposer.register(
+          VimProjectService.getInstance(project),
+          Disposable {
+            this.editor = null
+            yankHighlighters.clear()
+          }
+        )
       }
 
       if (range.isMultiple) {
@@ -134,7 +137,7 @@ class VimHighlightedYank: VimExtension, VimYankListener, VimInsertListener {
 
     fun clearAllYankHighlighters() {
       yankHighlighters.forEach { highlighter ->
-          editor?.markupModel?.removeHighlighter(highlighter) ?: StrictMode.fail("Highlighters without an editor")
+        editor?.markupModel?.removeHighlighter(highlighter) ?: StrictMode.fail("Highlighters without an editor")
       }
 
       yankHighlighters.clear()
@@ -157,13 +160,16 @@ class VimHighlightedYank: VimExtension, VimYankListener, VimInsertListener {
     private fun setClearHighlightRangeTimer(highlighter: RangeHighlighter) {
       val timeout = extractUsersHighlightDuration()
 
-      //from vim-highlightedyank docs: A negative number makes the highlight persistent.
-      if(timeout >= 0) {
-        Executors.newSingleThreadScheduledExecutor().schedule({
-          ApplicationManager.getApplication().invokeLater {
-            editor?.markupModel?.removeHighlighter(highlighter) ?: StrictMode.fail("Highlighters without an editor")
-          }
-        }, timeout, TimeUnit.MILLISECONDS)
+      // from vim-highlightedyank docs: A negative number makes the highlight persistent.
+      if (timeout >= 0) {
+        Executors.newSingleThreadScheduledExecutor().schedule(
+          {
+            ApplicationManager.getApplication().invokeLater {
+              editor?.markupModel?.removeHighlighter(highlighter) ?: StrictMode.fail("Highlighters without an editor")
+            }
+          },
+          timeout, TimeUnit.MILLISECONDS
+        )
       }
     }
 
@@ -193,15 +199,14 @@ class VimHighlightedYank: VimExtension, VimYankListener, VimInsertListener {
       }
     }
 
-    private fun<T> extractVariable(variableName: String, default: T, extractFun: (value: String) -> T): T {
+    private fun <T> extractVariable(variableName: String, default: T, extractFun: (value: String) -> T): T {
       val env = VimScriptGlobalEnvironment.getInstance()
       val value = env.variables[variableName]
 
-      if(value is String) {
+      if (value is String) {
         return try {
           extractFun(value)
-        }
-        catch (e: Exception){
+        } catch (e: Exception) {
           VimPlugin.showMessage(
             MessageHelper.message(
               "highlightedyank.invalid.value.of.0.1",

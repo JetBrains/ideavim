@@ -33,15 +33,19 @@ class RepeatActionTest : VimTestCase() {
 
   @Test
   fun testRepeatChangeToCharInNextLine() {
-    configureByText("The first line.\n" +
-      "This is the second line.\n" +
-      "Third line here, with a comma.\n" +
-      "Last line.")
+    configureByText(
+      "The first line.\n" +
+        "This is the second line.\n" +
+        "Third line here, with a comma.\n" +
+        "Last line."
+    )
     typeText(parseKeys("j", "ct.", "Change the line to point", "<Esc>", "j0", "."))
-    myFixture.checkResult("The first line.\n" +
-      "Change the line to point.\n" +
-      "Change the line to point.\n" +
-      "Last line.")
+    myFixture.checkResult(
+      "The first line.\n" +
+        "Change the line to point.\n" +
+        "Change the line to point.\n" +
+        "Last line."
+    )
   }
 
   // VIM-1644
@@ -69,5 +73,4 @@ class RepeatActionTest : VimTestCase() {
         "Good."
     )
   }
-
 }

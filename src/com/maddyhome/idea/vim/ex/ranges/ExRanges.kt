@@ -145,7 +145,8 @@ class LineNumberRange : Range {
   }
 
   override fun getRangeLine(
-    editor: Editor, caret: Caret,
+    editor: Editor,
+    caret: Caret,
     lastZero: Boolean
   ): Int {
     line = if (line == LAST_LINE) EditorHelper.getLineCount(editor) - 1 else caret.logicalPosition.line
@@ -181,7 +182,6 @@ class MarkRange(private val mark: Char, offset: Int, move: Boolean) : Range(offs
   override fun getRangeLine(editor: Editor, caret: Caret, lastZero: Boolean): Int = getRangeLine(editor, lastZero)
 
   override fun toString(): String = "MarkRange[mark=$mark, ${super.toString()}]"
-
 }
 
 /**
@@ -260,7 +260,8 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
   }
 
   override fun getRangeLine(
-    editor: Editor, caret: Caret,
+    editor: Editor,
+    caret: Caret,
     lastZero: Boolean
   ): Int {
     var line = caret.logicalPosition.line

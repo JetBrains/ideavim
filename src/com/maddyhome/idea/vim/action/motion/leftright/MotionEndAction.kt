@@ -36,8 +36,14 @@ import com.maddyhome.idea.vim.option.OptionsManager
 class MotionEndAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
-                      rawCount: Int, argument: Argument?): Int {
+  override fun offset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     var allow = false
     if (editor.inInsertMode) {
       allow = true

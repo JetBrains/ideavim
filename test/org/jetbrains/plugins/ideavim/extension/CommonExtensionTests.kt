@@ -110,13 +110,13 @@ class OpMappingTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
                 ${c}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE
     )
@@ -125,11 +125,11 @@ class OpMappingTest : VimTestCase() {
   fun `test disable extension via set`() {
     configureByText("${c}I found it in a legendary land")
     typeText(parseKeys("Q"))
-    myFixture.checkResult("I${c} found it in a legendary land")
+    myFixture.checkResult("I$c found it in a legendary land")
 
     enterCommand("set noTestExtension")
     typeText(parseKeys("Q"))
-    myFixture.checkResult("I${c} found it in a legendary land")
+    myFixture.checkResult("I$c found it in a legendary land")
 
     enterCommand("set TestExtension")
     typeText(parseKeys("Q"))
@@ -139,13 +139,13 @@ class OpMappingTest : VimTestCase() {
   fun `test disable extension as extension point`() {
     configureByText("${c}I found it in a legendary land")
     typeText(parseKeys("Q"))
-    myFixture.checkResult("I${c} found it in a legendary land")
+    myFixture.checkResult("I$c found it in a legendary land")
 
     @Suppress("DEPRECATION")
     VimExtension.EP_NAME.point.unregisterExtension(extension)
     assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
     typeText(parseKeys("Q"))
-    myFixture.checkResult("I${c} found it in a legendary land")
+    myFixture.checkResult("I$c found it in a legendary land")
 
     VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
     assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
@@ -157,13 +157,13 @@ class OpMappingTest : VimTestCase() {
   fun `test disable disposed extension`() {
     configureByText("${c}I found it in a legendary land")
     typeText(parseKeys("Q"))
-    myFixture.checkResult("I${c} found it in a legendary land")
+    myFixture.checkResult("I$c found it in a legendary land")
 
     enterCommand("set noTestExtension")
     @Suppress("DEPRECATION")
     VimExtension.EP_NAME.point.unregisterExtension(extension)
     typeText(parseKeys("Q"))
-    myFixture.checkResult("I${c} found it in a legendary land")
+    myFixture.checkResult("I$c found it in a legendary land")
 
     VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
     enableExtensions("TestExtension")

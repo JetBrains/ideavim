@@ -28,11 +28,13 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
  * @author oleg
  */
 class MotionPreviousTabAction : MotionActionHandler.SingleExecution() {
-  override fun getOffset(editor: Editor,
-                         context: DataContext,
-                         count: Int,
-                         rawCount: Int,
-                         argument: Argument?): Int {
+  override fun getOffset(
+    editor: Editor,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     return VimPlugin.getMotion().moveCaretGotoPreviousTab(editor, context, rawCount)
   }
 

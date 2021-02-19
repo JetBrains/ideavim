@@ -26,19 +26,19 @@ import com.intellij.remoterobot.search.locators.byXpath
 import com.intellij.remoterobot.utils.waitFor
 
 fun RemoteRobot.actionMenu(text: String): ActionMenuFixture {
-    val xpath = byXpath("text '$text'", "//div[@class='ActionMenu' and @text='$text']")
-    waitFor {
-        findAll<ActionMenuFixture>(xpath).isNotEmpty()
-    }
-    return findAll<ActionMenuFixture>(xpath).first()
+  val xpath = byXpath("text '$text'", "//div[@class='ActionMenu' and @text='$text']")
+  waitFor {
+    findAll<ActionMenuFixture>(xpath).isNotEmpty()
+  }
+  return findAll<ActionMenuFixture>(xpath).first()
 }
 
 fun RemoteRobot.actionMenuItem(text: String): ActionMenuItemFixture {
-    val xpath = byXpath("text '$text'", "//div[@class='ActionMenuItem' and @text='$text']")
-    waitFor {
-        findAll<ActionMenuItemFixture>(xpath).isNotEmpty()
-    }
-    return findAll<ActionMenuItemFixture>(xpath).first()
+  val xpath = byXpath("text '$text'", "//div[@class='ActionMenuItem' and @text='$text']")
+  waitFor {
+    findAll<ActionMenuItemFixture>(xpath).isNotEmpty()
+  }
+  return findAll<ActionMenuItemFixture>(xpath).first()
 }
 
 @FixtureName("ActionMenu")

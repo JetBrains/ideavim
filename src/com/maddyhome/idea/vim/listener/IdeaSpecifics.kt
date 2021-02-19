@@ -219,17 +219,19 @@ object IdeaSpecifics {
       val offsetLeftEnd = offset - 1
       val templateRange = caret.getUserData(facedAppCodeTemplate)
       if (templateRange == null) {
-        if (offsetRightEnd < editor.fileSize
-          && editor.document.charsSequence.subSequence(offset, offsetRightEnd).toString() == TEMPLATE_START) {
+        if (offsetRightEnd < editor.fileSize &&
+          editor.document.charsSequence.subSequence(offset, offsetRightEnd).toString() == TEMPLATE_START
+        ) {
           caret.shake()
 
           val templateEnd = editor.findTemplateEnd(offset) ?: return
 
           caret.putUserData(facedAppCodeTemplate, offset..templateEnd)
         }
-        if (offsetLeftEnd >= 0
-          && offset + 1 <= editor.fileSize
-          && editor.document.charsSequence.subSequence(offsetLeftEnd, offset + 1).toString() == TEMPLATE_END) {
+        if (offsetLeftEnd >= 0 &&
+          offset + 1 <= editor.fileSize &&
+          editor.document.charsSequence.subSequence(offsetLeftEnd, offset + 1).toString() == TEMPLATE_END
+        ) {
           caret.shake()
 
           val templateStart = editor.findTemplateStart(offsetLeftEnd) ?: return
@@ -263,7 +265,7 @@ object IdeaSpecifics {
       val charSequence = this.document.charsSequence
       val length = charSequence.length
       for (i in start until length - 1) {
-        if (charSequence[i] == TEMPLATE_END[0] && charSequence[i+1] == TEMPLATE_END[1]) {
+        if (charSequence[i] == TEMPLATE_END[0] && charSequence[i + 1] == TEMPLATE_END[1]) {
           return i + 1
         }
       }

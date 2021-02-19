@@ -50,7 +50,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -58,7 +58,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(keys)
     myFixture.checkResult(after)

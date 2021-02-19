@@ -26,7 +26,8 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class InsertBeforeFirstNonBlankActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test insert multiple carets`() {
-    doTest("IHello<esc>",
+    doTest(
+      "IHello<esc>",
       """
                 ${c}A Discovery
 
@@ -34,7 +35,7 @@ class InsertBeforeFirstNonBlankActionTest : VimTestCase() {
                 all rocks and ${c}lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 Hell${c}oA Discovery
 
@@ -42,9 +43,10 @@ class InsertBeforeFirstNonBlankActionTest : VimTestCase() {
                 Hell${c}oall rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
     assertMode(CommandState.Mode.COMMAND)
   }
 }

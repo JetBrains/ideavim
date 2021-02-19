@@ -216,9 +216,10 @@ private object VimActionsPopup {
 
 private class HelpLink(
   // [VERSION UPDATE] 203+ uncomment
-  /*@ActionText*/ name: String,
-                  val link: String,
-                  icon: Icon?
+  /*@ActionText*/
+  name: String,
+  val link: String,
+  icon: Icon?
 ) : DumbAwareAction(name, null, icon)/*, LightEditCompatible*/ {
   override fun actionPerformed(e: AnActionEvent) {
     BrowserUtil.browse(link)

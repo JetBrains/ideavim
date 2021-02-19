@@ -83,8 +83,10 @@ abstract class VimTestCase : UsefulTestCase() {
     val projectDescriptor = LightProjectDescriptor.EMPTY_PROJECT_DESCRIPTOR
     val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor)
     val fixture = fixtureBuilder.fixture
-    myFixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(fixture,
-      LightTempDirTestFixtureImpl(true))
+    myFixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(
+      fixture,
+      LightTempDirTestFixtureImpl(true)
+    )
     myFixture.setUp()
     myFixture.testDataPath = testDataPath
     // Note that myFixture.editor is usually null here. It's only set once configureByText has been called
@@ -210,10 +212,12 @@ abstract class VimTestCase : UsefulTestCase() {
     // Make sure we're not trying to put caret in an invalid location
     val boundsTop = EditorHelper.visualLineToLogicalLine(myFixture.editor, scrollToVisualLine)
     val boundsBottom = EditorHelper.visualLineToLogicalLine(myFixture.editor, bottomVisualLine)
-    Assert.assertTrue("Caret line $caretLogicalLine not inside legal screen bounds (${boundsTop} - ${boundsBottom})",
-      caretLogicalLine in boundsTop..boundsBottom)
+    Assert.assertTrue(
+      "Caret line $caretLogicalLine not inside legal screen bounds ($boundsTop - $boundsBottom)",
+      caretLogicalLine in boundsTop..boundsBottom
+    )
 
-    typeText(parseKeys("${scrollToLogicalLine+1}z<CR>", "${caretLogicalLine+1}G", "${caretLogicalColumn+1}|"))
+    typeText(parseKeys("${scrollToLogicalLine + 1}z<CR>", "${caretLogicalLine + 1}G", "${caretLogicalColumn + 1}|"))
 
     OptionsManager.scrolljump.set(scrolljump)
     OptionsManager.scrolloff.set(scrolloff)
@@ -291,7 +295,7 @@ abstract class VimTestCase : UsefulTestCase() {
     val actualLeftVisualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(myFixture.editor, visualLine)
     val actualLeftLogicalColumn = myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualLeftVisualColumn)).column
     val actualRightVisualColumn = EditorHelper.getVisualColumnAtRightOfScreen(myFixture.editor, visualLine)
-    val actualRightLogicalColumn =  myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualRightVisualColumn)).column
+    val actualRightLogicalColumn = myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualRightVisualColumn)).column
 
     val expected = ScreenBounds(leftLogicalColumn, rightLogicalColumn)
     val actual = ScreenBounds(actualLeftLogicalColumn, actualRightLogicalColumn)
@@ -384,19 +388,23 @@ abstract class VimTestCase : UsefulTestCase() {
     }
   }
 
-  fun doTest(keys: List<String>,
-             before: String,
-             after: String,
-             modeAfter: CommandState.Mode,
-             subModeAfter: SubMode) {
+  fun doTest(
+    keys: List<String>,
+    before: String,
+    after: String,
+    modeAfter: CommandState.Mode,
+    subModeAfter: SubMode
+  ) {
     doTest(keys.joinToString(separator = ""), before, after, modeAfter, subModeAfter)
   }
 
-  fun doTest(keys: String,
-             before: String,
-             after: String,
-             modeAfter: CommandState.Mode,
-             subModeAfter: SubMode) {
+  fun doTest(
+    keys: String,
+    before: String,
+    after: String,
+    modeAfter: CommandState.Mode,
+    subModeAfter: SubMode
+  ) {
     configureByText(before)
 
     NeovimTesting.setupEditor(myFixture.editor, this)
@@ -413,11 +421,14 @@ abstract class VimTestCase : UsefulTestCase() {
     assertState(modeAfter, subModeAfter)
   }
 
-  fun doTestWithoutNeovim(keys: List<KeyStroke>,
-                          before: String,
-                          after: String?,
-                          modeAfter: CommandState.Mode, subModeAfter: SubMode,
-                          afterEditorInitialized: (Editor) -> Unit) {
+  fun doTestWithoutNeovim(
+    keys: List<KeyStroke>,
+    before: String,
+    after: String?,
+    modeAfter: CommandState.Mode,
+    subModeAfter: SubMode,
+    afterEditorInitialized: (Editor) -> Unit
+  ) {
     configureByText(before)
     afterEditorInitialized(myFixture.editor)
     typeText(keys)
@@ -462,14 +473,18 @@ abstract class VimTestCase : UsefulTestCase() {
       val keyHandler = KeyHandler.getInstance()
       val dataContext = EditorDataContext.init(editor)
       TestInputModel.getInstance(editor).setKeyStrokes(keys)
-      runWriteCommand(project, Runnable {
-        val inputModel = TestInputModel.getInstance(editor)
-        var key = inputModel.nextKeyStroke()
-        while (key != null) {
-          keyHandler.handleKey(editor, key, dataContext)
-          key = inputModel.nextKeyStroke()
-        }
-      }, null, null)
+      runWriteCommand(
+        project,
+        Runnable {
+          val inputModel = TestInputModel.getInstance(editor)
+          var key = inputModel.nextKeyStroke()
+          while (key != null) {
+            keyHandler.handleKey(editor, key, dataContext)
+            key = inputModel.nextKeyStroke()
+          }
+        },
+        null, null
+      )
     }
 
     @JvmStatic

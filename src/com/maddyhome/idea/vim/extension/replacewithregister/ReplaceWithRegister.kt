@@ -44,7 +44,6 @@ import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.key.OperatorFunction
 import org.jetbrains.annotations.NonNls
 
-
 class ReplaceWithRegister : VimExtension {
 
   override fun getName(): String = "ReplaceWithRegister"

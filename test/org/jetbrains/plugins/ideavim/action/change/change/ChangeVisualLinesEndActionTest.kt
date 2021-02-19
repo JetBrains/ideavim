@@ -34,7 +34,7 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             ${c}hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -42,7 +42,7 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             ${c}
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
@@ -56,7 +56,7 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             ${c}
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -65,18 +65,20 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             ${c}
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviorDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(
+    originalVimAfter = """
             A Discovery
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             ${c}
-  """)
+  """
+  )
   fun `test change last two lines`() {
     val keys = "vjC"
     val before = """
@@ -87,7 +89,7 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass${c}.
             
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -96,7 +98,7 @@ class ChangeVisualLinesEndActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${c}
             
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 }

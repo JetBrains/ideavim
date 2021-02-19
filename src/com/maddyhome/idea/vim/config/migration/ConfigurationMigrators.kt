@@ -66,4 +66,3 @@ object `Version 6 to 7 config migration` : ConfigMigrator {
     return localElement to sharedElement
   }
 }
-

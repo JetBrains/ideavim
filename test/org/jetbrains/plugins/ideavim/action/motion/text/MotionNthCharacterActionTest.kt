@@ -24,7 +24,8 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionNthCharacterActionTest : VimTestCase() {
   fun `test goto without count`() {
-    doTest("go",
+    doTest(
+      "go",
       """
             A Discovery
 
@@ -32,7 +33,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
             all rocks ${c}and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent(),
+      """.trimIndent(),
       """
             ${c}A Discovery
 
@@ -40,13 +41,14 @@ class MotionNthCharacterActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
 
   fun `test goto with 0`() {
-    doTest("0go",
+    doTest(
+      "0go",
       """
             A Discovery
 
@@ -54,7 +56,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
             all rocks ${c}and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent(),
+      """.trimIndent(),
       """
             ${c}A Discovery
 
@@ -62,13 +64,14 @@ class MotionNthCharacterActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
 
   fun `test goto with 1`() {
-    doTest("1go",
+    doTest(
+      "1go",
       """
             A Discovery
 
@@ -76,7 +79,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
             all rocks ${c}and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent(),
+      """.trimIndent(),
       """
             ${c}A Discovery
 
@@ -84,13 +87,14 @@ class MotionNthCharacterActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
 
   fun `test goto with 2`() {
-    doTest("2go",
+    doTest(
+      "2go",
       """
             A Discovery
 
@@ -98,21 +102,22 @@ class MotionNthCharacterActionTest : VimTestCase() {
             all rocks ${c}and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent(),
+      """.trimIndent(),
       """
-            A${c} Discovery
+            A$c Discovery
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
 
   fun `test goto with 10`() {
-    doTest("10go",
+    doTest(
+      "10go",
       """
             A Discovery
 
@@ -120,7 +125,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
             all rocks ${c}and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent(),
+      """.trimIndent(),
       """
             A Discove${c}ry
 
@@ -128,13 +133,14 @@ class MotionNthCharacterActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
 
   fun `test goto with 1000`() {
-    doTest("1000go",
+    doTest(
+      "1000go",
       """
             A Discovery
 
@@ -142,29 +148,32 @@ class MotionNthCharacterActionTest : VimTestCase() {
             all rocks ${c}and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent(),
+      """.trimIndent(),
       """
             A Discovery
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            hard by the torrent of a mountain pass${c}.
-        """.trimIndent(),
+            hard by the torrent of a mountain pass$c.
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
 
-  @VimBehaviorDiffers("""
+  @VimBehaviorDiffers(
+    """
             A Discovery
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.${c}
-  """)
+            hard by the torrent of a mountain pass.$c
+  """
+  )
   fun `test goto with 1000 in visual mode`() {
-    doTest("v1000go",
+    doTest(
+      "v1000go",
       """
             A Discovery
 
@@ -172,20 +181,21 @@ class MotionNthCharacterActionTest : VimTestCase() {
             all rocks ${c}and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent(),
+      """.trimIndent(),
       """
             A Discovery
 
             I found it in a legendary land
             all rocks ${s}and lavender and tufted grass,
             where it was settled on some sodden sand
-            hard by the torrent of a mountain pass${c}.${se}
-        """.trimIndent(),
+            hard by the torrent of a mountain pass$c.$se
+      """.trimIndent(),
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
     )
   }
 
-  @VimBehaviorDiffers("""
+  @VimBehaviorDiffers(
+    """
             A Discovery
 
             I found it in a legendary land
@@ -193,9 +203,11 @@ class MotionNthCharacterActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             $c
-  """)
+  """
+  )
   fun `test goto with 1000 and new line`() {
-    doTest("1000go",
+    doTest(
+      "1000go",
       """
             A Discovery
 
@@ -204,7 +216,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             
-        """.trimIndent(),
+      """.trimIndent(),
       """
             A Discovery
 
@@ -213,7 +225,7 @@ class MotionNthCharacterActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass$c.
             
-        """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }

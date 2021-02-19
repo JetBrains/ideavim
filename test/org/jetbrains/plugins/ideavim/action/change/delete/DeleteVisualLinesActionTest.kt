@@ -25,69 +25,79 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class DeleteVisualLinesActionTest : VimTestCase() {
   fun `test remove line in char visual mode`() {
-    doTest("vlllX",
+    doTest(
+      "vlllX",
       """
                 I found ${c}it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 ${c}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   fun `test remove line in char visual mode last line`() {
-    doTest("vlllX",
+    doTest(
+      "vlllX",
       """
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by ${c}the torrent of a mountain pass.""".trimIndent(),
+                hard by ${c}the torrent of a mountain pass.
+      """.trimIndent(),
       """
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 ${c}where it was settled on some sodden sand
-                """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   fun `test remove line in line visual mode`() {
-    doTest("VX",
+    doTest(
+      "VX",
       """
                 I found ${c}it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 ${c}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   fun `test remove line in line visual mode line end`() {
-    doTest("VX",
+    doTest(
+      "VX",
       """
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by ${c}the torrent of a mountain pass.""".trimIndent(),
+                hard by ${c}the torrent of a mountain pass.
+      """.trimIndent(),
       """
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 ${c}where it was settled on some sodden sand
-                """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   fun `test multiple line delete till the end`() {
@@ -100,14 +110,14 @@ class DeleteVisualLinesActionTest : VimTestCase() {
             
             ${c}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             ${c}
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -122,7 +132,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
             ${c}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -130,7 +140,7 @@ class DeleteVisualLinesActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             
             ${c}
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 }

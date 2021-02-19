@@ -26,7 +26,8 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test entering select mode`() {
-    doTest(listOf("g<C-H>"),
+    doTest(
+      listOf("g<C-H>"),
       """
                 A Discovery
 
@@ -34,7 +35,7 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -42,70 +43,83 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_BLOCK)
+      CommandState.SubMode.VISUAL_BLOCK
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test entering select mode at the end of file`() {
-    doTest("g<C-H>",
+    doTest(
+      "g<C-H>",
       """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass$c.""".trimIndent(),
+                hard by the torrent of a mountain pass$c.
+      """.trimIndent(),
       """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass$s.$c$se""".trimIndent(),
+                hard by the torrent of a mountain pass$s.$c$se
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_BLOCK)
+      CommandState.SubMode.VISUAL_BLOCK
+    )
   }
 
   fun `test entering select mode on empty line`() {
-    doTest("g<C-H>",
+    doTest(
+      "g<C-H>",
       """
                 A Discovery
                 $c
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
       """
                 A Discovery
                 $s$c$se
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_BLOCK)
+      CommandState.SubMode.VISUAL_BLOCK
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SELECT_MODE)
   fun `test entering select mode multicaret`() {
-    doTest(listOf("g<C-H>"),
+    doTest(
+      listOf("g<C-H>"),
       """
                 A Discovery
                 $c
                 ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was ${c}settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
       """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was ${s}s$c${se}ettled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_BLOCK)
+      CommandState.SubMode.VISUAL_BLOCK
+    )
   }
 }

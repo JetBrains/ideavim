@@ -30,7 +30,8 @@ class YankLinesHandlerTest : VimTestCase() {
                 ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                h""".trimIndent()
+                h
+      """.trimIndent()
     )
     typeText(commandToKeys("3,4y"))
     val yanked = VimPlugin.getRegister().lastRegister!!.text
@@ -38,7 +39,9 @@ class YankLinesHandlerTest : VimTestCase() {
       """|I found it in a legendary land
          |all rocks and lavender and tufted grass,
          |
-         """.trimMargin(), yanked)
+         """.trimMargin(),
+      yanked
+    )
   }
 
   fun `test copy with one char on the last line`() {
@@ -49,7 +52,8 @@ class YankLinesHandlerTest : VimTestCase() {
                 ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                h""".trimIndent()
+                h
+      """.trimIndent()
     )
     typeText(commandToKeys("%y"))
     val yanked = VimPlugin.getRegister().lastRegister!!.text
@@ -62,6 +66,8 @@ class YankLinesHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 h
                 
-                """.trimIndent(), yanked)
+      """.trimIndent(),
+      yanked
+    )
   }
 }

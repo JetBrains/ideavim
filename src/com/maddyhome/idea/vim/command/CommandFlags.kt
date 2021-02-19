@@ -65,7 +65,7 @@ enum class CommandFlags {
   FLAG_IGNORE_SCROLL_JUMP,
   FLAG_IGNORE_SIDE_SCROLL_JUMP,
 
-  //TODO REMOVE!
+  // TODO REMOVE!
   /**
    * Search Flags
    */

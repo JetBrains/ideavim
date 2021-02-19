@@ -37,7 +37,7 @@ data class Command(
   var flags: EnumSet<CommandFlags>
 ) {
 
-  constructor(rawCount: Int, register: Char): this(rawCount, NonExecutableActionHandler, Type.SELECT_REGISTER, EnumSet.of(CommandFlags.FLAG_EXPECT_MORE)) {
+  constructor(rawCount: Int, register: Char) : this(rawCount, NonExecutableActionHandler, Type.SELECT_REGISTER, EnumSet.of(CommandFlags.FLAG_EXPECT_MORE)) {
     this.register = register
   }
 

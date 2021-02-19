@@ -30,9 +30,11 @@ class PutHandlerTest : VimTestCase() {
     myFixture.configureByText("a.txt", "Test\n" + "Hello <caret>World!\n")
     typeText(parseKeys("\"ayw"))
     typeText(commandToKeys("put a"))
-    myFixture.checkResult("Test\n" +
-      "Hello World!\n" +
-      "<caret>World\n")
+    myFixture.checkResult(
+      "Test\n" +
+        "Hello World!\n" +
+        "<caret>World\n"
+    )
   }
 
   // VIM-551 |:put|

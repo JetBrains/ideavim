@@ -29,7 +29,7 @@ class AsciiHandlerTest : VimTestCase() {
   }
 
   fun `test show ascii for space`() {
-    configureByText("${c} ")
+    configureByText("$c ")
     enterCommand("ascii")
     assertEquals("< >  32,  Hex 20,  Oct 040, Digr SP", VimPlugin.getMessage())
   }

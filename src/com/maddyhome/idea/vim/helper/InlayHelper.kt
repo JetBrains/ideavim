@@ -89,4 +89,4 @@ fun Editor.amountOfInlaysBeforeVisualPosition(pos: VisualPosition): Int {
   return this.inlayModel.getInlineElementsInRange(lineStartNewOffset, newOffset).size
 }
 
-fun VisualPosition.toInlayAwareOffset(caret: Caret): Int =this.column - caret.amountOfInlaysBeforeCaret
+fun VisualPosition.toInlayAwareOffset(caret: Caret): Int = this.column - caret.amountOfInlaysBeforeCaret

@@ -33,12 +33,14 @@ class InsertDeleteInsertedTextAction : ChangeEditorActionHandler.ForEachCaret() 
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
 
-  override fun execute(editor: Editor,
-                       caret: Caret,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     return VimPlugin.getChange().insertDeleteInsertedText(editor, caret)
   }
 }

@@ -111,7 +111,8 @@ class MapHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler, Co
   }
 
   private class CommandArguments(
-    val specialArguments: Set<SpecialArgument>, val fromKeys: List<KeyStroke>,
+    val specialArguments: Set<SpecialArgument>,
+    val fromKeys: List<KeyStroke>,
     val toKeys: List<KeyStroke>
   )
 

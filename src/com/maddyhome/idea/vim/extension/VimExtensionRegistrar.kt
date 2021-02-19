@@ -44,15 +44,18 @@ object VimExtensionRegistrar {
 
     VimExtension.EP_NAME.extensions.forEach(this::registerExtension)
 
-    VimExtension.EP_NAME.point.addExtensionPointListener(object : ExtensionPointListener<ExtensionBeanClass> {
-      override fun extensionAdded(extension: ExtensionBeanClass, pluginDescriptor: PluginDescriptor) {
-        registerExtension(extension)
-      }
+    VimExtension.EP_NAME.point.addExtensionPointListener(
+      object : ExtensionPointListener<ExtensionBeanClass> {
+        override fun extensionAdded(extension: ExtensionBeanClass, pluginDescriptor: PluginDescriptor) {
+          registerExtension(extension)
+        }
 
-      override fun extensionRemoved(extension: ExtensionBeanClass, pluginDescriptor: PluginDescriptor) {
-        unregisterExtension(extension)
-      }
-    }, false, VimPlugin.getInstance())
+        override fun extensionRemoved(extension: ExtensionBeanClass, pluginDescriptor: PluginDescriptor) {
+          unregisterExtension(extension)
+        }
+      },
+      false, VimPlugin.getInstance()
+    )
   }
 
   @Synchronized

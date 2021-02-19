@@ -30,12 +30,14 @@ import java.awt.Point
 
 @JvmOverloads
 fun ContainerFixture.editor(title: String, function: Editor.() -> Unit = {}): Editor {
-    find<ComponentFixture>(
-            byXpath("//div[@class='EditorTabs']//div[@accessiblename='$title' and @class='SingleHeightLabel']")).click()
-    return find<Editor>(
-            byXpath("title '$title'", "//div[@accessiblename='Editor for $title' and @class='EditorComponentImpl']"))
-            .apply { runJs("robot.moveMouse(component);") }
-            .apply(function)
+  find<ComponentFixture>(
+    byXpath("//div[@class='EditorTabs']//div[@accessiblename='$title' and @class='SingleHeightLabel']")
+  ).click()
+  return find<Editor>(
+    byXpath("title '$title'", "//div[@accessiblename='Editor for $title' and @class='EditorComponentImpl']")
+  )
+    .apply { runJs("robot.moveMouse(component);") }
+    .apply(function)
 }
 
 @FixtureName("Editor")
@@ -54,15 +56,19 @@ class Editor(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) : Commo
   }
 
   fun findPointByOffset(offset: Int): Point {
-    return callJs("""
+    return callJs(
+      """
             const editor = component.getEditor()
             const visualPosition = editor.offsetToVisualPosition($offset)
             editor.visualPositionToXY(visualPosition) 
-        """, true)
+        """,
+      true
+    )
   }
 
   fun moveToLine(lineNumber: Int) {
-    val pointToClick = callJs<Point>("""
+    val pointToClick = callJs<Point>(
+      """
             importClass(com.intellij.openapi.editor.ScrollType)
             const editor = component.getEditor()
             const document = editor.getDocument()
@@ -70,7 +76,9 @@ class Editor(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) : Commo
             editor.getScrollingModel().scrollTo(editor.offsetToLogicalPosition(offset), ScrollType.CENTER)
             const visualPosition = editor.offsetToVisualPosition(offset)
             editor.visualPositionToXY(visualPosition)
-        """, runInEdt = true)
+        """,
+      runInEdt = true
+    )
     // wait a bit for scroll completed
     Thread.sleep(500)
 

@@ -45,11 +45,13 @@ class RegistersHandlerTest : VimTestCase() {
     }
 
     enterCommand("registers abc")
-    assertExOutput("""Type Name Content
+    assertExOutput(
+      """Type Name Content
       |  c  "a   Content for register a
       |  c  "b   Content for register b
       |  c  "c   Content for register c
-    """.trimMargin())
+    """.trimMargin()
+    )
   }
 
   fun `test argument allows spaces`() {
@@ -61,7 +63,8 @@ class RegistersHandlerTest : VimTestCase() {
     }
 
     enterCommand("registers hello world")
-    assertExOutput("""Type Name Content
+    assertExOutput(
+      """Type Name Content
       |  c  "d   Content for register d
       |  c  "e   Content for register e
       |  c  "h   Content for register h
@@ -69,7 +72,8 @@ class RegistersHandlerTest : VimTestCase() {
       |  c  "o   Content for register o
       |  c  "r   Content for register r
       |  c  "w   Content for register w
-    """.trimMargin())
+    """.trimMargin()
+    )
   }
 
   fun `test list nothing if no registers match`() {
@@ -94,9 +98,11 @@ class RegistersHandlerTest : VimTestCase() {
 
     // Does not trim whitespace
     enterCommand("registers a")
-    assertExOutput("""Type Name Content
+    assertExOutput(
+      """Type Name Content
                      |  c  "a   ${(indent + text).take(200)}
-      """.trimMargin())
+      """.trimMargin()
+    )
   }
 
   fun `test correctly encodes non printable characters`() {
@@ -105,9 +111,11 @@ class RegistersHandlerTest : VimTestCase() {
     VimPlugin.getRegister().setKeys('a', parseKeys("<Tab>Hello<Space>World<CR><Esc>"))
 
     enterCommand("registers")
-    assertExOutput("""Type Name Content
+    assertExOutput(
+      """Type Name Content
                      |  c  "a   ^IHello World^J^[
-      """.trimMargin())
+      """.trimMargin()
+    )
   }
 
   fun `test display synonym for registers command`() {
@@ -119,15 +127,18 @@ class RegistersHandlerTest : VimTestCase() {
     }
 
     enterCommand("display abc")
-    assertExOutput("""Type Name Content
+    assertExOutput(
+      """Type Name Content
       |  c  "a   Content for register a
       |  c  "b   Content for register b
       |  c  "c   Content for register c
-    """.trimMargin())
+    """.trimMargin()
+    )
   }
 
   fun `test list all registers in correct order`() {
-    configureByText(""""<caret>line 0
+    configureByText(
+      """"<caret>line 0
       |line 1
       |line 2
       |line 3
@@ -139,7 +150,8 @@ class RegistersHandlerTest : VimTestCase() {
       |line 9
       |last yank register
       |small delete register
-    """.trimMargin())
+    """.trimMargin()
+    )
 
     // Populate unnamed "" and numbered "1-9 registers - linewise
     for (i in 1..10) {
@@ -172,7 +184,8 @@ class RegistersHandlerTest : VimTestCase() {
     // "# alternate file name
     // "= expression register
     enterCommand("registers")
-    assertExOutput("""Type Name Content
+    assertExOutput(
+      """Type Name Content
       |  c  ""   s
       |  c  "0   last yank 
       |  l  "1   line 9^J
@@ -215,6 +228,7 @@ class RegistersHandlerTest : VimTestCase() {
       |  c  "+   clipboard content
       |  c  ":   ascii
       |  c  "/   search pattern
-    """.trimMargin())
+    """.trimMargin()
+    )
   }
 }

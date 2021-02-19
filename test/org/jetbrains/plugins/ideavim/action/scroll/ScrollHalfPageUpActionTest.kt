@@ -104,4 +104,3 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     assertVisibleArea(33, 67)
   }
 }
-

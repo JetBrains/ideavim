@@ -34,7 +34,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent()
+    """.trimIndent()
     val after = """
                 A Discovery
 
@@ -42,7 +42,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 ${c}XXXXXXXXXXand lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -55,7 +55,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent()
+    """.trimIndent()
     val after = """
                 A Discovery
 
@@ -63,7 +63,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -76,7 +76,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent()
+    """.trimIndent()
     val after = """
                 A Discovery
 
@@ -84,7 +84,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 all rocks and lavender and tufted ${c}XXXXXX
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -98,7 +98,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent()
+    """.trimIndent()
     val after = """
                 A Discovery
 
@@ -106,7 +106,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 XXXXrocks and lavender and tufted grass,
                 whe${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 XXXX by the torrent of a mountain pass.
-                    """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -119,7 +119,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent()
+    """.trimIndent()
     val after = """
                 A Discovery
 
@@ -127,7 +127,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 ${c}XXXXXXXXXXand lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -141,7 +141,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where ${c}it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent()
+    """.trimIndent()
     val after = """
                 A Discovery
 
@@ -149,7 +149,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 ${c}XXXXXXXXXXand lavender and tufted grass,
                 where XXXXXX settled on some sodden sand
                 ${c}XXXXXXy the torrent of a mountain pass.
-                    """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -162,7 +162,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent()
+    """.trimIndent()
     val after = """
                 A Discovery
 
@@ -170,7 +170,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -183,14 +183,16 @@ class RepeatChangeActionTest : VimTestCase() {
                 ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent()
+                hard by the torrent of a mountain pass.
+    """.trimIndent()
     val after = """
                 A Discovery
 
                 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 where it was settled on some sodden sand
-                ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX""".trimIndent()
+                ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -226,7 +228,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent()
+    """.trimIndent()
     val after = """
                 A Discovery
 
@@ -234,11 +236,12 @@ class RepeatChangeActionTest : VimTestCase() {
                 XXX ${c}XXXks and lavender and tufted grass,
                 wherXXXt was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviorDiffers("""
+  @VimBehaviorDiffers(
+    """
                 A Discovery
 
                 XXXXXnd it in a legendary land
@@ -246,7 +249,8 @@ class RepeatChangeActionTest : VimTestCase() {
                 XXXXX it was settled on some sodden sand
                 hard ${c}XXXXXe torrent of a mountain pass.
 
-    """)
+    """
+  )
   fun `test block motion to end`() {
     val keys = listOf("<C-V>jjerXjl", ".")
     val before = """
@@ -257,7 +261,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
 
-                """.trimIndent()
+    """.trimIndent()
     val after = """
                 A Discovery
 
@@ -266,7 +270,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 XXXXX it was settled on some sodden sand
                 XXXXX${c}Xy the torrent of a mountain pass.
 
-                """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -280,7 +284,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand[additional characters]
                 hard by the torrent of a mountain pass.
-                """.trimIndent()
+    """.trimIndent()
     val after = """
                 A Discovery
 
@@ -288,7 +292,7 @@ class RepeatChangeActionTest : VimTestCase() {
                 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 ${c}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-                """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 }

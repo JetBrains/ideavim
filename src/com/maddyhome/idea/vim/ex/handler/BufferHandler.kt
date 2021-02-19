@@ -92,4 +92,3 @@ class BufferHandler : CommandHandler.SingleExecution() {
     return matchedFiles
   }
 }
-

@@ -28,12 +28,14 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 class InsertCharacterAboveCursorAction : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.INSERT
 
-  override fun execute(editor: Editor,
-                       caret: Caret,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     return if (editor.isOneLineMode) {
       false
     } else VimPlugin.getChange().insertCharacterAroundCursor(editor, caret, -1)

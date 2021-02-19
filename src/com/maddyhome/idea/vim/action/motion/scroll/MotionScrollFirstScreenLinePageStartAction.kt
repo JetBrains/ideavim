@@ -35,8 +35,10 @@ class MotionScrollFirstScreenLinePageStartAction : VimActionHandler.SingleExecut
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     var rawCount = cmd.rawCount
     if (rawCount == 0) {
-      val nextVisualLine = EditorHelper.normalizeVisualLine(editor,
-        EditorHelper.getVisualLineAtBottomOfScreen(editor) + 1)
+      val nextVisualLine = EditorHelper.normalizeVisualLine(
+        editor,
+        EditorHelper.getVisualLineAtBottomOfScreen(editor) + 1
+      )
       rawCount = EditorHelper.visualLineToLogicalLine(editor, nextVisualLine) + 1 // rawCount is 1 based
     }
     return VimPlugin.getMotion().scrollLineToFirstScreenLine(editor, rawCount, true)

@@ -31,7 +31,8 @@ class DeleteJoinVisualLinesSpacesActionTest : VimOptionTestCase(IdeaJoinOptionsD
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(IdeaJoinOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
   fun `test join via idea`() {
-    doTest("VjJ",
+    doTest(
+      "VjJ",
       """
                 A Discovery
 
@@ -39,15 +40,16 @@ class DeleteJoinVisualLinesSpacesActionTest : VimOptionTestCase(IdeaJoinOptionsD
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
                 ${c}I found it in a legendary land all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 }

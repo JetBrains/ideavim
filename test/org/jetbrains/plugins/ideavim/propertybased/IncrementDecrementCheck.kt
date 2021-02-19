@@ -92,11 +92,13 @@ private class IncrementDecrementActions(private val editor: Editor, val test: Vi
 
 val differentFormNumberGenerator = Generator.from { env ->
   val form = env.generate(Generator.sampledFrom(/*2,*/ 8, 10, 16))
-  env.generate(Generator.integers().suchThat { it != Int.MIN_VALUE }.map {
-    val sign = it.sign
-    val stringNumber = it.absoluteValue.toString(form)
-    if (sign < 0) "-$stringNumber" else stringNumber
-  })
+  env.generate(
+    Generator.integers().suchThat { it != Int.MIN_VALUE }.map {
+      val sign = it.sign
+      val stringNumber = it.absoluteValue.toString(form)
+      if (sign < 0) "-$stringNumber" else stringNumber
+    }
+  )
 }
 
 val brokenNumberGenerator = Generator.from { env ->
@@ -109,9 +111,10 @@ val brokenNumberGenerator = Generator.from { env ->
 }
 
 val testNumberGenerator = Generator.from { env ->
-  env.generate(Generator.frequency(
-    10, differentFormNumberGenerator,
-    1, brokenNumberGenerator
-  ))
+  env.generate(
+    Generator.frequency(
+      10, differentFormNumberGenerator,
+      1, brokenNumberGenerator
+    )
+  )
 }
-

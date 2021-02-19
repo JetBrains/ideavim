@@ -29,44 +29,56 @@ import javax.swing.KeyStroke
 
 class GnNextTextObjectTest : VimTestCase() {
   fun `test delete word`() {
-    doTestWithSearch(parseKeys("dgn"), """
+    doTestWithSearch(
+      parseKeys("dgn"),
+      """
       Hello, ${c}this is a test here
-    """.trimIndent(),
+      """.trimIndent(),
       """
         Hello, this is a ${c} here
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   fun `test delete second word`() {
-    doTestWithSearch(parseKeys("2dgn"), """
+    doTestWithSearch(
+      parseKeys("2dgn"),
+      """
       Hello, ${c}this is a test here
       Hello, this is a test here
-    """.trimIndent(),
+      """.trimIndent(),
       """
         Hello, this is a test here
         Hello, this is a ${c} here
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   fun `test with repeat`() {
-    doTestWithSearch(parseKeys("cgnNewValue<ESC>..."), """
+    doTestWithSearch(
+      parseKeys("cgnNewValue<ESC>..."),
+      """
       Hello, ${c}this is a test here
       Hello, this is a test here
       Hello, this is a test here
       Hello, this is a test here
       Hello, this is a test here
-    """.trimIndent(),
+      """.trimIndent(),
       """
       Hello, this is a NewValue here
       Hello, this is a NewValue here
       Hello, this is a NewValue here
       Hello, this is a NewValu${c}e here
       Hello, this is a test here
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
-  private fun doTestWithSearch(keys: List<KeyStroke>, before: String,
-                               after: String) {
+  private fun doTestWithSearch(
+    keys: List<KeyStroke>,
+    before: String,
+    after: String
+  ) {
     configureByText(before)
     VimPlugin.getSearch().search(myFixture.editor, "test", 1, noneOfEnum(), false)
     typeText(keys)

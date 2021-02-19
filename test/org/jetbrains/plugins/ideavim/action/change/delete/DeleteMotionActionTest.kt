@@ -28,37 +28,46 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class DeleteMotionActionTest : VimTestCase() {
 
-  @VimBehaviorDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(
+    originalVimAfter = """
         def xxx():
           ${c}expression one
-  """)
+  """
+  )
   fun `test delete last line`() {
-    typeTextInFile(parseKeys("dd"),
+    typeTextInFile(
+      parseKeys("dd"),
       """
         def xxx():
           expression one
           expression${c} two
-          """.trimIndent())
-    myFixture.checkResult("""
+      """.trimIndent()
+    )
+    myFixture.checkResult(
+      """
         def xxx():
         ${c}  expression one
-          """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @VimBehaviorDiffers(originalVimAfter = "  expression two\n")
   fun `test delete last line stored with new line`() {
-    typeTextInFile(parseKeys("dd"),
+    typeTextInFile(
+      parseKeys("dd"),
       """
         def xxx():
           expression one
           expression${c} two
-          """.trimIndent())
+      """.trimIndent()
+    )
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: ""
     assertEquals("  expression two\n", savedText)
   }
 
   fun `test delete line action multicaret`() {
-    typeTextInFile(parseKeys("d3d"),
+    typeTextInFile(
+      parseKeys("d3d"),
       """
         abc${c}de
         abcde
@@ -68,12 +77,14 @@ class DeleteMotionActionTest : VimTestCase() {
         abcde
         abcde
         
-        """.trimIndent())
+      """.trimIndent()
+    )
     myFixture.checkResult("${c}abcde\n${c}")
   }
 
   fun `test delete motion action multicaret`() {
-    typeTextInFile(parseKeys("dt)"),
+    typeTextInFile(
+      parseKeys("dt)"),
       """|public class Foo {
          |  int foo(int a, int b) {
          |    boolean bar = (a < 0 && (b < 0 || a > 0)${c} || b != 0);
@@ -111,39 +122,41 @@ class DeleteMotionActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val newFile = """
             A Discovery
             ${c}I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     typeTextInFile(parseKeys("dd"), file)
     myFixture.checkResult(newFile)
   }
 
   fun `test delete on last line`() {
-    doTest("dd",
+    doTest(
+      "dd",
       """
             A Discovery
             
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             ${c}
-        """.trimIndent(),
+      """.trimIndent(),
       """
             A Discovery
             
             I found it in a legendary land
             ${c}all rocks and lavender and tufted grass,
-        """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
 
   fun `test empty line`() {
-    doTest("dd",
+    doTest(
+      "dd",
       """
             A Discovery
             
@@ -152,7 +165,7 @@ class DeleteMotionActionTest : VimTestCase() {
             
             I found it in a legendary land
             all rocks and lavender and tufted grass,
-        """.trimIndent(),
+      """.trimIndent(),
       """
             A Discovery
             
@@ -160,7 +173,7 @@ class DeleteMotionActionTest : VimTestCase() {
             
             I found it in a legendary land
             all rocks and lavender and tufted grass,
-        """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }

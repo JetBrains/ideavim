@@ -60,7 +60,8 @@ class CmdHandlerTest : VimTestCase() {
     typeText(commandToKeys("command"))
     assertPluginError(false)
     // The added alias should be listed
-    assertExOutput("""Name        Args       Definition
+    assertExOutput(
+      """Name        Args       Definition
             |Test1       *          echo
             |Test2       ?          echo
             |Test3       +          echo
@@ -68,15 +69,18 @@ class CmdHandlerTest : VimTestCase() {
             |Vs          0          vs
             |Wq          0          wq
             |WQ          0          wq
-        """.trimMargin())
+        """.trimMargin()
+    )
 
     typeText(commandToKeys("command W"))
     assertPluginError(false)
     // The filtered aliases should be listed
-    assertExOutput("""Name        Args       Definition
+    assertExOutput(
+      """Name        Args       Definition
             |Wq          0          wq
             |WQ          0          wq
-        """.trimMargin())
+        """.trimMargin()
+    )
   }
 
   fun `test bad alias`() {

@@ -45,4 +45,3 @@ object TestClipboardModel {
     override fun getTransferDataFlavors(): Array<DataFlavor> = emptyArray()
   }
 }
-

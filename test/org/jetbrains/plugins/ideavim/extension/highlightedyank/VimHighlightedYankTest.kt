@@ -29,7 +29,6 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.assertHappened
 
-
 class VimHighlightedYankTest : VimTestCase() {
   override fun setUp() {
     super.setUp()
@@ -153,7 +152,6 @@ fun sum(x: ${c}Int, y: ${c}Int, z: ${c}Int): Int {
   return x + y + z
 }
 """
-
 
   private fun assertHighlighterRange(start: Int, end: Int, highlighter: RangeHighlighter) {
     assertEquals(start, highlighter.startOffset)

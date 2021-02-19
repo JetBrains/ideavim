@@ -35,8 +35,14 @@ class MotionGotoMarkAction : MotionActionHandler.ForEachCaret() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_JUMP)
 
-  override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int,
-                         rawCount: Int, argument: Argument?): Int {
+  override fun getOffset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     if (argument == null) return -1
 
     val mark = argument.character
@@ -49,8 +55,14 @@ class MotionGotoMarkNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
-  override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int,
-                         rawCount: Int, argument: Argument?): Int {
+  override fun getOffset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     if (argument == null) return -1
 
     val mark = argument.character

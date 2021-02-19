@@ -100,7 +100,6 @@ class UiTests {
       testClickRightFromLineEnd(editor)
       testClickOnWord(editor)
       testGutterClick(editor)
-
     }
   }
 

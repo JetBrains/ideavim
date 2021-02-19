@@ -28,19 +28,23 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.vimLastColumn
 
 class MotionColumnAction : MotionActionHandler.ForEachCaret() {
-  override fun getOffset(editor: Editor,
-                         caret: Caret,
-                         context: DataContext,
-                         count: Int,
-                         rawCount: Int,
-                         argument: Argument?): Int {
+  override fun getOffset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     return VimPlugin.getMotion().moveCaretToColumn(editor, caret, count - 1, false)
   }
 
-  override fun postMove(editor: Editor,
-                        caret: Caret,
-                        context: DataContext,
-                        cmd: Command) {
+  override fun postMove(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command
+  ) {
     caret.vimLastColumn = cmd.count - 1
   }
 

@@ -99,8 +99,7 @@ object VimListenerManager {
       if (typedAction.rawHandler !is VimTypedActionHandler) {
         // Actually this if should always be true, but just as protection
         EventFacade.getInstance().setupTypedActionHandler(VimTypedActionHandler(typedAction.rawHandler))
-      }
-      else {
+      } else {
         StrictMode.fail("typeAction expected to be non-vim.")
       }
 
@@ -263,8 +262,9 @@ object VimListenerManager {
           cutOffFixed = true
           SelectionVimListenerSuppressor.lock().use {
             e.editor.caretModel.primaryCaret.let { caret ->
-              if (caret.selectionEnd == e.editor.document.getLineEndOffset(caret.logicalPosition.line) - 1
-                && caret.leadSelectionOffset == caret.selectionEnd) {
+              if (caret.selectionEnd == e.editor.document.getLineEndOffset(caret.logicalPosition.line) - 1 &&
+                caret.leadSelectionOffset == caret.selectionEnd
+              ) {
                 // A small but important customization. Because IdeaVim doesn't allow to put the caret on the line end,
                 //   the selection can omit the last character if the selection was started in the middle on the
                 //   last character in line and has a negative direction.
@@ -331,7 +331,8 @@ object VimListenerManager {
         caretModel.primaryCaret.vimLastColumn = caretModel.visualPosition.column
       } else if (event.area != EditorMouseEventArea.ANNOTATIONS_AREA &&
         event.area != EditorMouseEventArea.FOLDING_OUTLINE_AREA &&
-        event.mouseEvent.button != MouseEvent.BUTTON3) {
+        event.mouseEvent.button != MouseEvent.BUTTON3
+      ) {
         VimPlugin.getMotion()
         if (ExEntryPanel.getInstance().isActive) {
           VimPlugin.getProcess().cancelExEntry(event.editor, false)

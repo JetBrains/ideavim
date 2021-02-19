@@ -69,4 +69,3 @@ class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : AnAction() {
     registerCustomShortcutSet({ shortcuts }, exEntryPanel)
   }
 }
-

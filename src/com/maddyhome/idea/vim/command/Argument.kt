@@ -46,10 +46,14 @@ class Argument private constructor(
 
   companion object {
     @JvmField
-    val EMPTY_COMMAND = Command(0, object : MotionActionHandler.SingleExecution() {
-      override fun getOffset(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?) = 0
+    val EMPTY_COMMAND = Command(
+      0,
+      object : MotionActionHandler.SingleExecution() {
+        override fun getOffset(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?) = 0
 
-      override val motionType: MotionType = MotionType.EXCLUSIVE
-    }, Command.Type.MOTION, EnumSet.noneOf(CommandFlags::class.java))
+        override val motionType: MotionType = MotionType.EXCLUSIVE
+      },
+      Command.Type.MOTION, EnumSet.noneOf(CommandFlags::class.java)
+    )
   }
 }

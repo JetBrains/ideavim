@@ -414,7 +414,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
-
   fun testSkipSelectionSubstring() {
     val before = """qw${c}e
       |asdqweasd
@@ -500,14 +499,14 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
   ...${c}all rocks and lavender and tufted grass,
   ...all it was settled on some sodden sand
   ...all by the torrent of a mountain pass
-""".trimIndent().dotToTab()
+    """.trimIndent().dotToTab()
     val keys = listOf("vll", "<A-N>", "<A-N>")
     val after = """
   I found it in a legendary land
-  ...${s}al${c}l${se} rocks and lavender and tufted grass,
-  ...${s}al${c}l${se} it was settled on some sodden sand
-  ...${s}al${c}l${se} by the torrent of a mountain pass
-""".trimIndent().dotToTab()
+  ...${s}al${c}l$se rocks and lavender and tufted grass,
+  ...${s}al${c}l$se it was settled on some sodden sand
+  ...${s}al${c}l$se by the torrent of a mountain pass
+    """.trimIndent().dotToTab()
     doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
@@ -517,7 +516,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(commandToKeys("set ignorecase"))
     typeText(parseKeys("<A-n><A-n><A-n><A-n>"))
-    val after = """text ${s}Test${se} text ${s}Test${se} text ${s}Test${se} text ${s}Test${se} text"""
+    val after = """text ${s}Test$se text ${s}Test$se text ${s}Test$se text ${s}Test$se text"""
     myFixture.checkResult(after)
   }
 
@@ -527,7 +526,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(commandToKeys("set ignorecase"))
     typeText(parseKeys("<A-n><A-n><A-n><A-n>"))
-    val after = """text ${s}Test${se} text ${s}tesT${se} text ${s}TEST${se} text ${s}test${se} text"""
+    val after = """text ${s}Test$se text ${s}tesT$se text ${s}TEST$se text ${s}test$se text"""
     myFixture.checkResult(after)
   }
 }

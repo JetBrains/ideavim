@@ -36,7 +36,7 @@ class YankMotionActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     typeTextInFile(parseKeys("yW"), file)
     val text = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
 
@@ -51,7 +51,7 @@ class YankMotionActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(file)
 
     val initialOffset = myFixture.editor.caretModel.offset
@@ -105,7 +105,7 @@ class YankMotionActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     typeTextInFile(parseKeys("yk"), file)
 
     Assert.assertTrue(VimPlugin.isError())
@@ -120,7 +120,7 @@ class YankMotionActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             $c
-        """.trimIndent()
+    """.trimIndent()
     typeTextInFile(parseKeys("y$"), file)
     val text = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
 
@@ -135,7 +135,7 @@ class YankMotionActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     typeTextInFile(commandToKeys("map * *zz"), file)
     typeTextInFile(parseKeys("\"*yiw"), file)
     val text = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
@@ -151,7 +151,7 @@ class YankMotionActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     typeTextInFile(commandToKeys("map * *yiw"), file)
     typeTextInFile(parseKeys("\"*"), file)
     Assert.assertNull(VimPlugin.getRegister().lastRegister?.text)
@@ -164,8 +164,8 @@ class YankMotionActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            hard by the torrent${c} of a mountain pass.
-        """.trimIndent()
+            hard by the torrent$c of a mountain pass.
+    """.trimIndent()
 
     doTest("yy", file, file, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     val text = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()

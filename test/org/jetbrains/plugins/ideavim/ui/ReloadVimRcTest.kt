@@ -45,7 +45,7 @@ class ReloadVimRcTest : VimTestCase() {
   }
 
   fun `test equalTo with whitespaces`() {
-    val s = " "  // Just to see whitespaces in the following code
+    val s = " " // Just to see whitespaces in the following code
     val origFile = """
       map x y
       set myPlugin

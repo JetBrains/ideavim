@@ -25,28 +25,38 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class InsertDeleteInsertedTextActionTest : VimTestCase() {
   // VIM-1655
   fun `test deleted text is not yanked`() {
-    doTest(listOf("yiw", "ea", "Hello", "<C-U>", "<ESC>p"), """
+    doTest(
+      listOf("yiw", "ea", "Hello", "<C-U>", "<ESC>p"),
+      """
             A Discovery
 
             I found ${c}it in a legendary land
-        """.trimIndent(), """
+      """.trimIndent(),
+      """
             A Discovery
 
             I found iti${c}t in a legendary land
-        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 
   // VIM-1655
   @VimBehaviorDiffers(description = "Inserted text is not deleted after <C-U>")
   fun `test deleted text is not yanked after replace`() {
-    doTest(listOf("yiw", "eR", "Hello", "<C-U>", "<ESC>p"), """
+    doTest(
+      listOf("yiw", "eR", "Hello", "<C-U>", "<ESC>p"),
+      """
             A Discovery
 
             I found ${c}it in a legendary land
-        """.trimIndent(), """
+      """.trimIndent(),
+      """
             A Discovery
 
             I found ii${c}ta legendary land
-        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 }

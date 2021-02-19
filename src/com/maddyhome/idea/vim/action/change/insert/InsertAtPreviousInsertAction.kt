@@ -32,11 +32,13 @@ class InsertAtPreviousInsertAction : ChangeEditorActionHandler.SingleExecution()
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
 
-  override fun execute(editor: Editor,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     VimPlugin.getChange().insertAtPreviousInsert(editor, context)
     return true
   }

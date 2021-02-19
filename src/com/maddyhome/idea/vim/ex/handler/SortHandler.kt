@@ -89,7 +89,7 @@ class SortHandler : CommandHandler.SingleExecution() {
         LineRange(startLine, endLine)
       } else {
         LineRange(0, editor.document.lineCount - 1)
-      }// If we have a generic selection, i.e. "sort" entire document
+      } // If we have a generic selection, i.e. "sort" entire document
     }
 
     return normalizedRange

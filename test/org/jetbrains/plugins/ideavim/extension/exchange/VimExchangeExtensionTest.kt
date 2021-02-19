@@ -37,7 +37,8 @@ class VimExchangeExtensionTest : VimTestCase() {
   // |cx|
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words left to right`() {
-    doTest(listOf("cxe", "w", "cxe"),
+    doTest(
+      listOf("cxe", "w", "cxe"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -48,7 +49,8 @@ class VimExchangeExtensionTest : VimTestCase() {
   // |cx|
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words dot repeat`() {
-    doTest(listOf("cxiw", "w", "."),
+    doTest(
+      listOf("cxiw", "w", "."),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -59,7 +61,8 @@ class VimExchangeExtensionTest : VimTestCase() {
   // |cx|
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words right to left`() {
-    doTest(listOf("cxe", "b", "cxe"),
+    doTest(
+      listOf("cxe", "b", "cxe"),
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -70,7 +73,8 @@ class VimExchangeExtensionTest : VimTestCase() {
   // |cx|
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words right to left with dot`() {
-    doTest(listOf("cxe", "b", "."),
+    doTest(
+      listOf("cxe", "b", "."),
       "The quick brown ${c}fox catch over the lazy dog",
       "The quick ${c}fox brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -81,7 +85,8 @@ class VimExchangeExtensionTest : VimTestCase() {
   // |X|
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual exchange words left to right`() {
-    doTest(listOf("veX", "w", "veX"),
+    doTest(
+      listOf("veX", "w", "veX"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The quick fox ${c}brown catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -96,7 +101,8 @@ class VimExchangeExtensionTest : VimTestCase() {
   )
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual exchange words from inside`() {
-    doTest(listOf("veX", "b", "v3e", "X"),
+    doTest(
+      listOf("veX", "b", "v3e", "X"),
       "The quick ${c}brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -111,7 +117,8 @@ class VimExchangeExtensionTest : VimTestCase() {
   )
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual exchange words from outside`() {
-    doTest(listOf("v3e", "X", "w", "veX"),
+    doTest(
+      listOf("v3e", "X", "w", "veX"),
       "The ${c}quick brown fox catch over the lazy dog",
       "The brow${c}n catch over the lazy dog",
       CommandState.Mode.COMMAND,
@@ -131,15 +138,18 @@ class VimExchangeExtensionTest : VimTestCase() {
   )
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange lines top down`() {
-    doTest(listOf("cxx", "j", "cxx"),
+    doTest(
+      listOf("cxx", "j", "cxx"),
       """The quick
          brown ${c}fox
          catch over
-         the lazy dog""".trimIndent(),
+         the lazy dog
+      """.trimIndent(),
       """The quick
          ${c}catch over
          brown fox
-         the lazy dog""".trimIndent(),
+         the lazy dog
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE
     )
@@ -157,15 +167,18 @@ class VimExchangeExtensionTest : VimTestCase() {
   )
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange lines top down with dot`() {
-    doTest(listOf("cxx", "j", "."),
+    doTest(
+      listOf("cxx", "j", "."),
       """The quick
          brown ${c}fox
          catch over
-         the lazy dog""".trimIndent(),
+         the lazy dog
+      """.trimIndent(),
       """The quick
          ${c}catch over
          brown fox
-         the lazy dog""".trimIndent(),
+         the lazy dog
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE
     )
@@ -181,15 +194,18 @@ class VimExchangeExtensionTest : VimTestCase() {
   )
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange to the line end`() {
-    doTest(listOf("v$", "X", "jj^ve", "X"),
+    doTest(
+      listOf("v$", "X", "jj^ve", "X"),
       """The quick
          brown ${c}fox
          catch over
-         the lazy dog""".trimIndent(),
+         the lazy dog
+      """.trimIndent(),
       """The quick
          brown the
          catch over
-         fox lazy dog""".trimIndent(),
+         fox lazy dog
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE
     )
@@ -207,20 +223,21 @@ class VimExchangeExtensionTest : VimTestCase() {
   )
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange visual lines`() {
-    doTest(listOf("Vj", "X", "jj", "Vj", "X"),
+    doTest(
+      listOf("Vj", "X", "jj", "Vj", "X"),
       """
          The ${c}quick
          brown fox
          catch over
          the lazy dog
-         """.trimIndent(),
+      """.trimIndent(),
       """
          ${c}catch over
          the lazy dog
          The quick
          brown fox
          
-         """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE
     )
@@ -232,7 +249,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          brown fox
          catch over
          the lazy dog
-         """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(StringHelper.parseKeys("vlll", "X"))
 
@@ -248,7 +265,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          brown fox
          catch over
          the lazy dog
-         """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(StringHelper.parseKeys("Vj", "X"))
 
@@ -262,7 +279,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     val before = """
          The ${c}quick
          brown fox
-         """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(StringHelper.parseKeys("v$", "X"))
 
@@ -276,7 +293,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     val before = """
          The ${c}quick
          brown fox
-         """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(StringHelper.parseKeys("v\$h", "X"))
 
@@ -290,7 +307,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     val before = """
          The ${c}quick
          brown fox
-         """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(StringHelper.parseKeys("v\$hh", "X"))
 
@@ -304,7 +321,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     val before = """
          The quick
          brown ${c}fox
-         """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(StringHelper.parseKeys("v\$", "X"))
 
@@ -319,7 +336,7 @@ class VimExchangeExtensionTest : VimTestCase() {
          The quick
          brown ${c}fox
          
-         """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(StringHelper.parseKeys("v\$", "X"))
 

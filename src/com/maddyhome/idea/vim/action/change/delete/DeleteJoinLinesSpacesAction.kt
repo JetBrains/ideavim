@@ -30,11 +30,13 @@ import com.maddyhome.idea.vim.option.OptionsManager.ideajoin
 class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.DELETE
 
-  override fun execute(editor: Editor,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     if (editor.isOneLineMode) return false
     if (ideajoin.isSet) {
       return VimPlugin.getChange().joinViaIdeaByCount(editor, context, count)

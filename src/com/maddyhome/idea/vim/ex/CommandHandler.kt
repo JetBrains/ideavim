@@ -138,12 +138,15 @@ sealed class CommandHandler {
     try {
       when (this) {
         is ForEachCaret -> {
-          editor.caretModel.runForEachCaret({ caret ->
-            var i = 0
-            while (i++ < count && res.get()) {
-              res.set(execute(editor, caret, context, cmd))
-            }
-          }, true)
+          editor.caretModel.runForEachCaret(
+            { caret ->
+              var i = 0
+              while (i++ < count && res.get()) {
+                res.set(execute(editor, caret, context, cmd))
+              }
+            },
+            true
+          )
         }
         is SingleExecution -> {
           var i = 0

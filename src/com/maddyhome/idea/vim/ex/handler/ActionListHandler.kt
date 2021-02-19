@@ -55,7 +55,6 @@ class ActionListHandler : CommandHandler.SingleExecution() {
       .filter { line -> searchPattern.all { it in line.toLowerCase() } }
       .joinToString(lineSeparator)
 
-
     ExOutputModel.getInstance(editor).output(MessageHelper.message("ex.show.all.actions.0.1", lineSeparator, actions))
     return true
   }

@@ -37,11 +37,11 @@ class KeyGroupTest : VimTestCase() {
 
     keyGroup.putKeyMapping(MappingMode.N, keys, owner, parseKeys("h"), false)
     typeText(keys)
-    myFixture.checkResult("I${c} found it in a legendary land")
+    myFixture.checkResult("I$c found it in a legendary land")
 
     keyGroup.removeKeyMapping(owner)
     typeText(keys)
-    myFixture.checkResult("I${c} found it in a legendary land")
+    myFixture.checkResult("I$c found it in a legendary land")
   }
 
   fun `test remove and add key mapping`() {
@@ -54,7 +54,7 @@ class KeyGroupTest : VimTestCase() {
 
     keyGroup.putKeyMapping(MappingMode.N, keys, owner, parseKeys("h"), false)
     typeText(keys)
-    myFixture.checkResult("I${c} found it in a legendary land")
+    myFixture.checkResult("I$c found it in a legendary land")
 
     repeat(10) {
       keyGroup.removeKeyMapping(owner)

@@ -28,15 +28,18 @@ class JavaExampleSteps(private val remoteRobot: RemoteRobot) {
   private val keyboard: Keyboard
 
   fun closeTipOfTheDay() {
-    step("Close Tip of the Day if it appears", Runnable {
-      val idea: IdeaFrame = remoteRobot.find(IdeaFrame::class.java)
-      idea.dumbAware {
-        try {
-          idea.find(DialogFixture::class.java, byTitle("Tip of the Day")).button("Close").click()
-        } catch (ignore: Throwable) {
+    step(
+      "Close Tip of the Day if it appears",
+      Runnable {
+        val idea: IdeaFrame = remoteRobot.find(IdeaFrame::class.java)
+        idea.dumbAware {
+          try {
+            idea.find(DialogFixture::class.java, byTitle("Tip of the Day")).button("Close").click()
+          } catch (ignore: Throwable) {
+          }
         }
       }
-    })
+    )
   }
 
   init {

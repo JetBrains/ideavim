@@ -54,4 +54,3 @@ class PutTextBeforeCursorNoIndentAction : PutTextBaseAction(insertTextBeforeCare
 
 class PutTextBeforeCursorAction : PutTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = false)
 class PutTextBeforeCursorActionMoveCursor : PutTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = true)
-

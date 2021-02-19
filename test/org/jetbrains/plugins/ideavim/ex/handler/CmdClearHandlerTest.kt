@@ -41,11 +41,13 @@ class CmdClearHandlerTest : VimTestCase() {
     typeText(commandToKeys("command"))
     assertPluginError(false)
     // The added alias should be listed
-    assertExOutput("""Name        Args       Definition
+    assertExOutput(
+      """Name        Args       Definition
             |Vs          0          vs
             |Wq          0          wq
             |WQ          0          wq
-        """.trimMargin())
+        """.trimMargin()
+    )
 
     // Delete all of the aliases and then list aliases again.
     typeText(commandToKeys("comclear"))

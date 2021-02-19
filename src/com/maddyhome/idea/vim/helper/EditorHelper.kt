@@ -39,10 +39,10 @@ val Editor.fileSize: Int
  */
 val Editor.isIdeaVimDisabledHere: Boolean
   get() {
-    return disabledInDialog
-      || (!ClientId.isCurrentlyUnderLocalId)  // CWM-927
-      || (!OptionsManager.ideavimsupport.contains("singleline") && isDatabaseCell())
-      || (!OptionsManager.ideavimsupport.contains("singleline") && isOneLineMode)
+    return disabledInDialog ||
+      (!ClientId.isCurrentlyUnderLocalId) || // CWM-927
+      (!OptionsManager.ideavimsupport.contains("singleline") && isDatabaseCell()) ||
+      (!OptionsManager.ideavimsupport.contains("singleline") && isOneLineMode)
   }
 
 private fun Editor.isDatabaseCell(): Boolean {
@@ -50,8 +50,8 @@ private fun Editor.isDatabaseCell(): Boolean {
 }
 
 private val Editor.disabledInDialog: Boolean
-  get() = (!OptionsManager.ideavimsupport.contains("dialog") && !OptionsManager.ideavimsupport.contains("dialoglegacy"))
-    && (!this.isPrimaryEditor() && !EditorHelper.isFileEditor(this))
+  get() = (!OptionsManager.ideavimsupport.contains("dialog") && !OptionsManager.ideavimsupport.contains("dialoglegacy")) &&
+    (!this.isPrimaryEditor() && !EditorHelper.isFileEditor(this))
 
 /**
  * Checks if the editor is a primary editor in the main editing area.

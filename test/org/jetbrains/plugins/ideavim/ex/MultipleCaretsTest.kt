@@ -50,7 +50,7 @@ class MultipleCaretsTest : VimTestCase() {
       zxc
       v${c}bn
       
-      """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(commandToKeys("+2"))
     val after = """
@@ -61,7 +61,7 @@ class MultipleCaretsTest : VimTestCase() {
       zxc
       vbn
       $c
-      """.trimIndent()
+    """.trimIndent()
     myFixture.checkResult(after)
   }
 
@@ -109,7 +109,7 @@ class MultipleCaretsTest : VimTestCase() {
           zxc
           vbn
 
-          """.trimIndent()
+    """.trimIndent()
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(commandToKeys("pu"))
@@ -123,7 +123,7 @@ class MultipleCaretsTest : VimTestCase() {
           zxc
           vbn
 
-          """.trimIndent()
+    """.trimIndent()
     myFixture.checkResult(after)
   }
 
@@ -137,7 +137,7 @@ class MultipleCaretsTest : VimTestCase() {
           zxc
           vbn
 
-          """.trimIndent()
+    """.trimIndent()
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(commandToKeys("4pu"))
@@ -150,7 +150,7 @@ class MultipleCaretsTest : VimTestCase() {
           zxc
           vbn
 
-          """.trimIndent()
+    """.trimIndent()
     myFixture.checkResult(after)
   }
 
@@ -172,7 +172,6 @@ class MultipleCaretsTest : VimTestCase() {
     typeText(commandToKeys("m 1"))
     val after = "qwe\n" + "${c}asd\n" + "${c}zxc\n" + "rty\n" + "fgh\n" + "vbn\n"
     myFixture.checkResult(after)
-
   }
 
   fun testMoveTextAfterCarets() {

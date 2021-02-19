@@ -27,7 +27,7 @@ class YankLineActionTest : VimTestCase() {
     val before = """
             ${c}I found it in a legendary land
             all rocks and lavender and tufted grass,
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(parseKeys("\"4yy"))
     val register = VimPlugin.getRegister().getRegister('4')!!

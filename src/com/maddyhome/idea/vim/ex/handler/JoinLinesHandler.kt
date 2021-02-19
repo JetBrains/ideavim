@@ -39,10 +39,12 @@ class JoinLinesHandler : CommandHandler.ForEachCaret() {
     val textRange = cmd.getTextRange(editor, caret, true)
 
     return VimPlugin.getChange().deleteJoinRange(
-      editor, caret, TextRange(
+      editor, caret,
+      TextRange(
         textRange.startOffset,
         textRange.endOffset - 1
-      ), spaces
+      ),
+      spaces
     )
   }
 }

@@ -41,29 +41,35 @@ class DelCmdHandlerTest : VimTestCase() {
     typeText(commandToKeys("command"))
     assertPluginError(false)
     // The added alias should be listed
-    assertExOutput("""Name        Args       Definition
+    assertExOutput(
+      """Name        Args       Definition
             |Vs          0          vs
             |Wq          0          wq
             |WQ          0          wq
-        """.trimMargin())
+        """.trimMargin()
+    )
 
     typeText(commandToKeys("command W"))
     assertPluginError(false)
     // The filtered aliases should be listed
-    assertExOutput("""Name        Args       Definition
+    assertExOutput(
+      """Name        Args       Definition
             |Wq          0          wq
             |WQ          0          wq
-        """.trimMargin())
+        """.trimMargin()
+    )
 
     // Delete one of the aliases and then list all aliases again.
     typeText(commandToKeys("delcommand Wq"))
     assertPluginError(false)
     typeText(commandToKeys("command"))
     assertPluginError(false)
-    assertExOutput("""Name        Args       Definition
+    assertExOutput(
+      """Name        Args       Definition
             |Vs          0          vs
             |WQ          0          wq
-        """.trimMargin())
+        """.trimMargin()
+    )
   }
 
   fun `test remove non-existant alias`() {

@@ -32,11 +32,13 @@ class InsertBeforeFirstNonBlankAction : ChangeEditorActionHandler.SingleExecutio
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MULTIKEY_UNDO)
 
-  override fun execute(editor: Editor,
-                       context: DataContext,
-                       count: Int,
-                       rawCount: Int,
-                       argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Boolean {
     VimPlugin.getChange().insertBeforeFirstNonBlank(editor, context)
     return true
   }

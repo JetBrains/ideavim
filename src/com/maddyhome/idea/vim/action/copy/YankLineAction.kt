@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-
 class YankLineAction : VimActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.COPY

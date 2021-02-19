@@ -27,7 +27,8 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VisualToggleBlockModeActionTest : VimTestCase() {
   fun `test enter visual with count`() {
-    doTest("1<C-V>",
+    doTest(
+      "1<C-V>",
       """
                     A Discovery
 
@@ -35,7 +36,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -43,12 +44,14 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK
+    )
   }
 
   fun `test enter visual with five count`() {
-    doTest("5<C-V>",
+    doTest(
+      "5<C-V>",
       """
                     A Discovery
 
@@ -56,7 +59,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -64,12 +67,14 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK
+    )
   }
 
   fun `test enter visual with 100 count`() {
-    doTest("100<C-V>",
+    doTest(
+      "100<C-V>",
       """
                     A Discovery
 
@@ -77,7 +82,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -85,8 +90,9 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK
+    )
   }
 
 /*
@@ -98,14 +104,16 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
 */
 
   fun `test selectmode option`() {
-    configureByText("""
+    configureByText(
+      """
                     A Discovery
 
                     I${c} found it in a legendary land
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand[long line]
                     hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     OptionsManager.selectmode.set("cmd")
     typeText(parseKeys("<C-V>"))
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_BLOCK)

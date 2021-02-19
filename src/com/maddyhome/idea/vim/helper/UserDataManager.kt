@@ -69,8 +69,7 @@ var Caret.vimLastColumn: Int by userDataCaretToEditorOr { (this as Caret).inlayA
 var Caret.vimLastVisualOperatorRange: VisualChange? by userDataCaretToEditor()
 var Caret.vimInsertStart: RangeMarker by userDataOr { (this as Caret).editor.document.createRangeMarker(this.offset, this.offset) }
 
-
-//------------------ Editor
+// ------------------ Editor
 fun unInitializeEditor(editor: Editor) {
   editor.vimLastSelectionType = null
   editor.vimCommandState = null
@@ -98,7 +97,6 @@ var Editor.vimTestInputModel: TestInputModel? by userData()
  */
 var Editor.vimKeepingVisualOperatorAction: Boolean by userDataOr { false }
 var Editor.vimChangeActionSwitchMode: CommandState.Mode? by userData()
-
 
 /**
  * Function for delegated properties.

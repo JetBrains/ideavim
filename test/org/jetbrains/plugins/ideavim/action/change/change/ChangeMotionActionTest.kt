@@ -36,88 +36,112 @@ class ChangeMotionActionTest : VimTestCase() {
 
   // VIM-296 |cc|
   fun testChangeLineAtLastLine() {
-    doTest("cc",
+    doTest(
+      "cc",
       "foo\n" + "${c}bar\n",
-      "foo\n${c}" + "\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+      "foo\n${c}" + "\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
   }
 
   // VIM-536 |cc|
   fun testChangeLineAtSecondLastLine() {
-    doTest("ccbaz",
+    doTest(
+      "ccbaz",
       "${c}foo\n" + "bar\n",
-      "baz\n" + "bar\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+      "baz\n" + "bar\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
   }
 
   fun testChangeLineAtLastLineWithUnderscoreMotion() {
-    doTest("c_",
+    doTest(
+      "c_",
       """
         foo
         ${c}bar
         
-        """.trimIndent(),
+      """.trimIndent(),
       """
         foo
         ${c}
         
-        """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
   }
 
   fun testChangeLineAtSecondLastLineWithUnderscoreMotion() {
-    doTest("c_baz",
+    doTest(
+      "c_baz",
       "${c}foo\n" + "bar\n",
-      "baz\n" + "bar\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+      "baz\n" + "bar\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
   }
 
   // VIM-200 |c| |w|
   fun testChangeWordAtLastChar() {
-    doTest("cw", "on${c}e two three\n", "on${c} two three\n", CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE)
+    doTest(
+      "cw", "on${c}e two three\n", "on${c} two three\n", CommandState.Mode.INSERT,
+      CommandState.SubMode.NONE
+    )
   }
 
   // VIM-1380 |c| |w| |count|
   fun testChangeTwoWordsAtLastChar() {
-    doTest("c2w", "on${c}e two three\n", "on${c} three\n", CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE)
+    doTest(
+      "c2w", "on${c}e two three\n", "on${c} three\n", CommandState.Mode.INSERT,
+      CommandState.SubMode.NONE
+    )
   }
 
   // |c| |t|
   fun testChangeLinesTillForwards() {
-    doTest(listOf("ct(", "for "), """
+    doTest(
+      listOf("ct(", "for "),
+      """
    ${c}if (condition) {
    }
    
-   """.trimIndent(), """
+      """.trimIndent(),
+      """
    for (condition) {
    }
    
-   """.trimIndent(),
-      CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
   }
 
   // VIM-276 |c| |T|
   fun testChangeLinesTillBackwards() {
-    doTest("cT(", "if (condition) ${c}{\n" + "}\n", "if ({\n" + "}\n", CommandState.Mode.INSERT,
-      CommandState.SubMode.NONE)
+    doTest(
+      "cT(", "if (condition) ${c}{\n" + "}\n", "if ({\n" + "}\n", CommandState.Mode.INSERT,
+      CommandState.SubMode.NONE
+    )
   }
 
   // VIM-276 |c| |F|
   fun ignoreTestChangeLinesToBackwards() {
-    doTest("cFc",
+    doTest(
+      "cFc",
       "if (condition) {${c}\n" + "}\n",
-      "if (\n" + "}\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+      "if (\n" + "}\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
   }
-
 
   // VIM-421 |c| |w|
   fun testChangeLastWordInLine() {
-    doTest("cw",
-      "ab.${c}cd\n", "ab.${c}\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(
+      "cw",
+      "ab.${c}cd\n", "ab.${c}\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
   }
 
   // VIM-421 |c| |iw|
   fun testChangeLastInnerWordInLine() {
-    doTest(listOf("c", "iw", "baz"),
-      "foo bar bo${c}o\n", "foo bar baz\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest(
+      listOf("c", "iw", "baz"),
+      "foo bar bo${c}o\n", "foo bar baz\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
   }
 
   // VIM-421 |c| |w|

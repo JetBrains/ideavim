@@ -113,7 +113,9 @@ class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEditCompati
 //
 // We only need to show partial commands, since the standard PositionPanel shows the other information already, with
 // the exception of "{lines}x{columns}" (it shows "x carets" instead)
-class Widget(project: Project) : EditorBasedWidget(project), StatusBarWidget.Multiframe,
+class Widget(project: Project) :
+  EditorBasedWidget(project),
+  StatusBarWidget.Multiframe,
   StatusBarWidget.TextPresentation {
 
   override fun ID() = ShowCmd.ID

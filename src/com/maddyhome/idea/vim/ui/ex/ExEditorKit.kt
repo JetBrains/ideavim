@@ -110,7 +110,6 @@ object ExEditorKit : DefaultEditorKit() {
     }
   }
 
-
   fun convert(event: ActionEvent): KeyStroke? {
     val cmd = event.actionCommand
     val mods = event.modifiers

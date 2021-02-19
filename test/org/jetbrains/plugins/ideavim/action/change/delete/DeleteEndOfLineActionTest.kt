@@ -30,13 +30,13 @@ class DeleteEndOfLineActionTest : VimTestCase() {
                 $c
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
                 $c
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE
     )

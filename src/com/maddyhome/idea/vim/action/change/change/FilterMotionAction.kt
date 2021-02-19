@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
 
-
 class FilterMotionAction : VimActionHandler.SingleExecution(), DuplicableOperatorAction {
 
   override val type: Command.Type = Command.Type.CHANGE
@@ -60,4 +59,3 @@ class FilterMotionAction : VimActionHandler.SingleExecution(), DuplicableOperato
     return true
   }
 }
-

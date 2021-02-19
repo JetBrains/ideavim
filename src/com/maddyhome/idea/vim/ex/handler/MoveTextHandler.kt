@@ -90,7 +90,9 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
 
   @Throws
   private fun normalizeLine(
-    editor: Editor, caret: Caret, command: ExCommand,
+    editor: Editor,
+    caret: Caret,
+    command: ExCommand,
     lineRange: LineRange
   ): Int {
     var line = command.ranges.getFirstLine(editor, caret)

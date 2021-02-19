@@ -68,12 +68,15 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
     val worked = Ref.create(true)
     when (this) {
       is ForEachCaret -> {
-        editor.caretModel.runForEachCaret({ current ->
-          if (!current.isValid) return@runForEachCaret
-          if (!execute(editor, current, context, cmd.count, cmd.rawCount, cmd.argument)) {
-            worked.set(false)
-          }
-        }, true)
+        editor.caretModel.runForEachCaret(
+          { current ->
+            if (!current.isValid) return@runForEachCaret
+            if (!execute(editor, current, context, cmd.count, cmd.rawCount, cmd.argument)) {
+              worked.set(false)
+            }
+          },
+          true
+        )
       }
       is SingleExecution -> {
         worked.set(execute(editor, context, cmd.count, cmd.rawCount, cmd.argument))

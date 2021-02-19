@@ -163,7 +163,7 @@ class NerdTree : VimExtension {
       val project = editor.project ?: return
       val toolWindow = ToolWindowManagerEx.getInstanceEx(project).getToolWindow(ToolWindowId.PROJECT_VIEW) ?: return
       if (toolWindow.isVisible) {
-          toolWindow.hide()
+        toolWindow.hide()
       }
     }
   }
@@ -282,135 +282,174 @@ class NerdTree : VimExtension {
     // TODO: 22.01.2021 Should not just to the last line after the first
     registerCommand("j", NerdAction.ToIj("Tree-selectNext"))
     registerCommand("k", NerdAction.ToIj("Tree-selectPrevious"))
-    registerCommand("g:NERDTreeMapActivateNode", "o", NerdAction.Code { project, dataContext, _ ->
-      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+    registerCommand(
+      "g:NERDTreeMapActivateNode", "o",
+      NerdAction.Code { project, dataContext, _ ->
+        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
 
-      val array = CommonDataKeys.NAVIGATABLE_ARRAY.getData(dataContext)?.filter { it.canNavigateToSource() }
-      if (array.isNullOrEmpty()) {
-        val row = tree.selectionRows?.getOrNull(0) ?: return@Code
-        if (tree.isExpanded(row)) {
-          tree.collapseRow(row)
+        val array = CommonDataKeys.NAVIGATABLE_ARRAY.getData(dataContext)?.filter { it.canNavigateToSource() }
+        if (array.isNullOrEmpty()) {
+          val row = tree.selectionRows?.getOrNull(0) ?: return@Code
+          if (tree.isExpanded(row)) {
+            tree.collapseRow(row)
+          } else {
+            tree.expandRow(row)
+          }
         } else {
-          tree.expandRow(row)
+          array.forEach { it.navigate(true) }
         }
-      } else {
-        array.forEach { it.navigate(true) }
       }
-    })
-    registerCommand("g:NERDTreeMapPreview", "go", NerdAction.Code { _, dataContext, _ ->
-      CommonDataKeys.NAVIGATABLE_ARRAY
-        .getData(dataContext)
-        ?.filter { it.canNavigateToSource() }
-        ?.forEach { it.navigate(false) }
-    })
-    registerCommand("g:NERDTreeMapOpenInTab", "t", NerdAction.Code { _, dataContext, _ ->
-      // FIXME: 22.01.2021 Doesn't work correct
-      CommonDataKeys.NAVIGATABLE_ARRAY
-        .getData(dataContext)
-        ?.filter { it.canNavigateToSource() }
-        ?.forEach { it.navigate(true) }
-    })
-    registerCommand("g:NERDTreeMapOpenInTabSilent", "T", NerdAction.Code { _, dataContext, _ ->
-      // FIXME: 22.01.2021 Doesn't work correct
-      CommonDataKeys.NAVIGATABLE_ARRAY
-        .getData(dataContext)
-        ?.filter { it.canNavigateToSource() }
-        ?.forEach { it.navigate(true) }
-    })
+    )
+    registerCommand(
+      "g:NERDTreeMapPreview", "go",
+      NerdAction.Code { _, dataContext, _ ->
+        CommonDataKeys.NAVIGATABLE_ARRAY
+          .getData(dataContext)
+          ?.filter { it.canNavigateToSource() }
+          ?.forEach { it.navigate(false) }
+      }
+    )
+    registerCommand(
+      "g:NERDTreeMapOpenInTab", "t",
+      NerdAction.Code { _, dataContext, _ ->
+        // FIXME: 22.01.2021 Doesn't work correct
+        CommonDataKeys.NAVIGATABLE_ARRAY
+          .getData(dataContext)
+          ?.filter { it.canNavigateToSource() }
+          ?.forEach { it.navigate(true) }
+      }
+    )
+    registerCommand(
+      "g:NERDTreeMapOpenInTabSilent", "T",
+      NerdAction.Code { _, dataContext, _ ->
+        // FIXME: 22.01.2021 Doesn't work correct
+        CommonDataKeys.NAVIGATABLE_ARRAY
+          .getData(dataContext)
+          ?.filter { it.canNavigateToSource() }
+          ?.forEach { it.navigate(true) }
+      }
+    )
 
     // TODO: 21.01.2021 Should option in left split
     registerCommand("g:NERDTreeMapOpenVSplit", "s", NerdAction.ToIj("OpenInRightSplit"))
     // TODO: 21.01.2021 Should option in above split
-    registerCommand("g:NERDTreeMapOpenSplit", "i", NerdAction.Code { project, _, event ->
-      val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
-      val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
-      val currentWindow = splitters.currentWindow
-      currentWindow.split(SwingConstants.HORIZONTAL, true, file, true)
-    })
-    registerCommand("g:NERDTreeMapPreviewVSplit", "gs", NerdAction.Code { project, context, event ->
-      val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
-      val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
-      val currentWindow = splitters.currentWindow
-      currentWindow.split(SwingConstants.VERTICAL, true, file, true)
-
-      // FIXME: 22.01.2021 This solution bouncing a bit
-      callAction("ActivateProjectToolWindow", context)
-    })
-    registerCommand("g:NERDTreeMapPreviewSplit", "gi", NerdAction.Code { project, context, event ->
-      val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
-      val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
-      val currentWindow = splitters.currentWindow
-      currentWindow.split(SwingConstants.HORIZONTAL, true, file, true)
-
-      callAction("ActivateProjectToolWindow", context)
-    })
-    registerCommand("g:NERDTreeMapOpenRecursively", "O", NerdAction.Code { project, _, _ ->
-      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-      TreeExpandCollapse.expandAll(tree)
-      tree.selectionPath?.let {
-        TreeUtil.scrollToVisible(tree, it, false)
+    registerCommand(
+      "g:NERDTreeMapOpenSplit", "i",
+      NerdAction.Code { project, _, event ->
+        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
+        val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
+        val currentWindow = splitters.currentWindow
+        currentWindow.split(SwingConstants.HORIZONTAL, true, file, true)
       }
-    })
-    registerCommand("g:NERDTreeMapCloseChildren", "X", NerdAction.Code { project, _, _ ->
-      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-      TreeExpandCollapse.collapse(tree)
-      tree.selectionPath?.let {
-        TreeUtil.scrollToVisible(tree, it, false)
+    )
+    registerCommand(
+      "g:NERDTreeMapPreviewVSplit", "gs",
+      NerdAction.Code { project, context, event ->
+        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
+        val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
+        val currentWindow = splitters.currentWindow
+        currentWindow.split(SwingConstants.VERTICAL, true, file, true)
+
+        // FIXME: 22.01.2021 This solution bouncing a bit
+        callAction("ActivateProjectToolWindow", context)
       }
-    })
-    registerCommand("g:NERDTreeMapCloseDir", "x", NerdAction.Code { project, _, _ ->
-      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-      val currentPath = tree.selectionPath ?: return@Code
-      if (tree.isExpanded(currentPath)) {
-        tree.collapsePath(currentPath)
-      } else {
+    )
+    registerCommand(
+      "g:NERDTreeMapPreviewSplit", "gi",
+      NerdAction.Code { project, context, event ->
+        val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
+        val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
+        val currentWindow = splitters.currentWindow
+        currentWindow.split(SwingConstants.HORIZONTAL, true, file, true)
+
+        callAction("ActivateProjectToolWindow", context)
+      }
+    )
+    registerCommand(
+      "g:NERDTreeMapOpenRecursively", "O",
+      NerdAction.Code { project, _, _ ->
+        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+        TreeExpandCollapse.expandAll(tree)
+        tree.selectionPath?.let {
+          TreeUtil.scrollToVisible(tree, it, false)
+        }
+      }
+    )
+    registerCommand(
+      "g:NERDTreeMapCloseChildren", "X",
+      NerdAction.Code { project, _, _ ->
+        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+        TreeExpandCollapse.collapse(tree)
+        tree.selectionPath?.let {
+          TreeUtil.scrollToVisible(tree, it, false)
+        }
+      }
+    )
+    registerCommand(
+      "g:NERDTreeMapCloseDir", "x",
+      NerdAction.Code { project, _, _ ->
+        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+        val currentPath = tree.selectionPath ?: return@Code
+        if (tree.isExpanded(currentPath)) {
+          tree.collapsePath(currentPath)
+        } else {
+          val parentPath = currentPath.parentPath ?: return@Code
+          if (parentPath.parentPath != null) {
+            // The real root of the project is not shown in the project view, so we check the grandparent of the node
+            tree.collapsePath(parentPath)
+            TreeUtil.scrollToVisible(tree, parentPath, false)
+          }
+        }
+      }
+    )
+    registerCommand("g:NERDTreeMapJumpRoot", "P", NerdAction.ToIj("Tree-selectFirst"))
+    registerCommand(
+      "g:NERDTreeMapJumpParent", "p",
+      NerdAction.Code { project, _, _ ->
+        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+        val currentPath = tree.selectionPath ?: return@Code
         val parentPath = currentPath.parentPath ?: return@Code
         if (parentPath.parentPath != null) {
           // The real root of the project is not shown in the project view, so we check the grandparent of the node
-          tree.collapsePath(parentPath)
+          tree.selectionPath = parentPath
           TreeUtil.scrollToVisible(tree, parentPath, false)
         }
       }
-    })
-    registerCommand("g:NERDTreeMapJumpRoot", "P", NerdAction.ToIj("Tree-selectFirst"))
-    registerCommand("g:NERDTreeMapJumpParent", "p", NerdAction.Code { project, _, _ ->
-      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-      val currentPath = tree.selectionPath ?: return@Code
-      val parentPath = currentPath.parentPath ?:return@Code
-      if (parentPath.parentPath != null) {
-        // The real root of the project is not shown in the project view, so we check the grandparent of the node
-        tree.selectionPath = parentPath
-        TreeUtil.scrollToVisible(tree, parentPath, false)
+    )
+    registerCommand(
+      "g:NERDTreeMapJumpFirstChild", "K",
+      NerdAction.Code { project, _, _ ->
+        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+        val currentPath = tree.selectionPath ?: return@Code
+        val parent = currentPath.parentPath ?: return@Code
+        val row = tree.getRowForPath(parent)
+        tree.setSelectionRow(row + 1)
+
+        tree.scrollRowToVisible(row + 1)
       }
-    })
-    registerCommand("g:NERDTreeMapJumpFirstChild", "K", NerdAction.Code { project, _, _ ->
-      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-      val currentPath = tree.selectionPath ?: return@Code
-      val parent = currentPath.parentPath ?: return@Code
-      val row = tree.getRowForPath(parent)
-      tree.setSelectionRow(row + 1)
+    )
+    registerCommand(
+      "g:NERDTreeMapJumpLastChild", "J",
+      NerdAction.Code { project, _, _ ->
+        val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
+        val currentPath = tree.selectionPath ?: return@Code
 
-      tree.scrollRowToVisible(row + 1)
-    })
-    registerCommand("g:NERDTreeMapJumpLastChild", "J", NerdAction.Code { project, _, _ ->
-      val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
-      val currentPath = tree.selectionPath ?: return@Code
+        val currentPathCount = currentPath.pathCount
+        var row = tree.getRowForPath(currentPath)
 
-      val currentPathCount = currentPath.pathCount
-      var row = tree.getRowForPath(currentPath)
+        var expectedRow = row
+        while (true) {
+          row++
+          val nextPath = tree.getPathForRow(row) ?: break
+          val pathCount = nextPath.pathCount
+          if (pathCount == currentPathCount) expectedRow = row
+          if (pathCount < currentPathCount) break
+        }
+        tree.setSelectionRow(expectedRow)
 
-      var expectedRow = row
-      while (true) {
-        row++
-        val nextPath = tree.getPathForRow(row) ?: break
-        val pathCount = nextPath.pathCount
-        if (pathCount == currentPathCount) expectedRow = row
-        if (pathCount < currentPathCount) break
+        tree.scrollRowToVisible(expectedRow)
       }
-      tree.setSelectionRow(expectedRow)
-
-      tree.scrollRowToVisible(expectedRow)
-    })
+    )
     registerCommand("g:NERDTreeMapJumpNextSibling", "<C-J>", NerdAction.ToIj("Tree-selectNextSibling"))
     registerCommand("g:NERDTreeMapJumpPrevSibling", "<C-K>", NerdAction.ToIj("Tree-selectPreviousSibling"))
     registerCommand("g:NERDTreeMapRefresh", "r", NerdAction.ToIj("SynchronizeCurrentFile"))
@@ -419,16 +458,22 @@ class NerdTree : VimExtension {
     registerCommand("g:NERDTreeMapQuit", "q", NerdAction.ToIj("HideActiveWindow"))
     registerCommand("g:NERDTreeMapToggleZoom", "A", NerdAction.ToIj("MaximizeToolWindow"))
 
-    registerCommand("/", NerdAction.Code { project, _, _ ->
-      NerdDispatcher.getInstance(project).waitForSearch = true
-    })
-
-    registerCommand("<ESC>", NerdAction.Code { project, _, _ ->
-      val instance = NerdDispatcher.getInstance(project)
-      if (instance.waitForSearch) {
-        instance.waitForSearch = false
+    registerCommand(
+      "/",
+      NerdAction.Code { project, _, _ ->
+        NerdDispatcher.getInstance(project).waitForSearch = true
       }
-    })
+    )
+
+    registerCommand(
+      "<ESC>",
+      NerdAction.Code { project, _, _ ->
+        val instance = NerdDispatcher.getInstance(project)
+        if (instance.waitForSearch) {
+          instance.waitForSearch = false
+        }
+      }
+    )
   }
 
   companion object {

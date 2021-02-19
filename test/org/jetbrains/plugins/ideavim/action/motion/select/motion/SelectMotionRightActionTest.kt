@@ -33,7 +33,8 @@ class SelectMotionRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
   fun `test char select simple move`() {
-    doTest(listOf("viw", "<C-G>", "<Right>"),
+    doTest(
+      listOf("viw", "<C-G>", "<Right>"),
       """
                 A Discovery
 
@@ -41,7 +42,7 @@ class SelectMotionRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -49,37 +50,43 @@ class SelectMotionRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
   fun `test select multiple carets`() {
-    doTest(listOf("viw", "<C-G>", "<Right>"),
+    doTest(
+      listOf("viw", "<C-G>", "<Right>"),
       """
                 A Discovery
 
                 I ${c}found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden san${c}d
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
       """
                 A Discovery
 
                 I found${c} it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden san${c}d
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []))
   fun `test without stopsel`() {
-    doTest(listOf("viw", "<C-G>", "<Right>"),
+    doTest(
+      listOf("viw", "<C-G>", "<Right>"),
       """
                 A Discovery
 
@@ -87,7 +94,7 @@ class SelectMotionRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -95,8 +102,9 @@ class SelectMotionRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_CHARACTER)
+      CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 }

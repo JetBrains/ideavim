@@ -30,17 +30,19 @@ import org.junit.Test
 class PutTestAfterCursorActionTest : VimTestCase() {
   fun `test put from number register`() {
     setRegister('4', "XXX ")
-    doTest("\"4p", "This is my${c} text", "This is my XXX${c} text", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest("\"4p", "This is my$c text", "This is my XXX$c text", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviorDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(
+    originalVimAfter = """
             A Discovery
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             ${c}A Discovery
-    """)
+    """
+  )
   @Test
   fun `test put visual text line to last line`() {
     val before = """
@@ -50,7 +52,7 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the ${c}torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
     typeText(StringHelper.parseKeys("p"))
@@ -63,8 +65,7 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
             ${c}A Discovery
 
-            """.trimIndent()
+    """.trimIndent()
     myFixture.checkResult(after)
   }
-
 }

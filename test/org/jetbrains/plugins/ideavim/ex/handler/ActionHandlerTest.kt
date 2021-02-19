@@ -38,33 +38,41 @@ class ActionHandlerTest : VimTestCase() {
 
   // VIM-862 |:action| in visual character mode
   fun testExCommandInVisualCharacterMode() {
-    configureByJavaText("-----\n" +
-      "1<caret>2345\n" +
-      "abcde\n" +
-      "-----")
+    configureByJavaText(
+      "-----\n" +
+        "1<caret>2345\n" +
+        "abcde\n" +
+        "-----"
+    )
     typeText(parseKeys("vjl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    myFixture.checkResult("-----\n" +
-      "1/*2345\n" +
-      "abc*/de\n" +
-      "-----")
+    myFixture.checkResult(
+      "-----\n" +
+        "1/*2345\n" +
+        "abc*/de\n" +
+        "-----"
+    )
   }
 
   // https://github.com/JetBrains/ideavim/commit/fe714a90032d0cb5ef0a0e0d8783980b6f1c7d20#r35647600
   fun testExCommandInVisualCharacterModeWithIncSearch() {
     OptionsManager.incsearch.set()
-    configureByJavaText("-----\n" +
-      "1<caret>2345\n" +
-      "abcde\n" +
-      "-----")
+    configureByJavaText(
+      "-----\n" +
+        "1<caret>2345\n" +
+        "abcde\n" +
+        "-----"
+    )
     typeText(parseKeys("vjl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    myFixture.checkResult("-----\n" +
-      "1/*2345\n" +
-      "abc*/de\n" +
-      "-----")
+    myFixture.checkResult(
+      "-----\n" +
+        "1/*2345\n" +
+        "abc*/de\n" +
+        "-----"
+    )
     OptionsManager.incsearch.reset()
   }
 
@@ -89,67 +97,83 @@ class ActionHandlerTest : VimTestCase() {
 
   // VIM-862 |:action| in visual line mode
   fun testExCommandInVisualLineMode() {
-    configureByJavaText("-----\n" +
-      "1<caret>2345\n" +
-      "abcde\n" +
-      "-----")
+    configureByJavaText(
+      "-----\n" +
+        "1<caret>2345\n" +
+        "abcde\n" +
+        "-----"
+    )
     typeText(parseKeys("Vj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    myFixture.checkResult("-----\n" +
-      "/*\n" +
-      "12345\n" +
-      "abcde\n" +
-      "*/\n" +
-      "-----")
+    myFixture.checkResult(
+      "-----\n" +
+        "/*\n" +
+        "12345\n" +
+        "abcde\n" +
+        "*/\n" +
+        "-----"
+    )
   }
 
   fun testExCommandInVisualLineModeWithIncsearch() {
     OptionsManager.incsearch.set()
-    configureByJavaText("-----\n" +
-      "1<caret>2345\n" +
-      "abcde\n" +
-      "-----")
+    configureByJavaText(
+      "-----\n" +
+        "1<caret>2345\n" +
+        "abcde\n" +
+        "-----"
+    )
     typeText(parseKeys("Vj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    myFixture.checkResult("-----\n" +
-      "/*\n" +
-      "12345\n" +
-      "abcde\n" +
-      "*/\n" +
-      "-----")
+    myFixture.checkResult(
+      "-----\n" +
+        "/*\n" +
+        "12345\n" +
+        "abcde\n" +
+        "*/\n" +
+        "-----"
+    )
     OptionsManager.incsearch.reset()
   }
 
   // VIM-862 |:action| in visual block mode
   fun testExCommandInVisualBlockMode() {
-    configureByJavaText("-----\n" +
-      "1<caret>2345\n" +
-      "abcde\n" +
-      "-----")
+    configureByJavaText(
+      "-----\n" +
+        "1<caret>2345\n" +
+        "abcde\n" +
+        "-----"
+    )
     typeText(parseKeys("<C-V>lj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    myFixture.checkResult("-----\n" +
-      "1/*23*/45\n" +
-      "a/*bc*/de\n" +
-      "-----")
+    myFixture.checkResult(
+      "-----\n" +
+        "1/*23*/45\n" +
+        "a/*bc*/de\n" +
+        "-----"
+    )
   }
 
   fun testExCommandInVisualBlockModeWithIncsearch() {
     OptionsManager.incsearch.set()
-    configureByJavaText("-----\n" +
-      "1<caret>2345\n" +
-      "abcde\n" +
-      "-----")
+    configureByJavaText(
+      "-----\n" +
+        "1<caret>2345\n" +
+        "abcde\n" +
+        "-----"
+    )
     typeText(parseKeys("<C-V>lj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    myFixture.checkResult("-----\n" +
-      "1/*23*/45\n" +
-      "a/*bc*/de\n" +
-      "-----")
+    myFixture.checkResult(
+      "-----\n" +
+        "1/*23*/45\n" +
+        "a/*bc*/de\n" +
+        "-----"
+    )
     OptionsManager.incsearch.reset()
   }
 }

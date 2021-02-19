@@ -159,10 +159,11 @@ class VimMultipleCursorsExtension : VimExtension {
         val pattern = patterns.first()
         if (nextOffset == -1 || patternComparator.compare(
             EditorHelper.getText(
-              editor,
-              nextOffset,
-              nextOffset + pattern.length
-            ), pattern
+                editor,
+                nextOffset,
+                nextOffset + pattern.length
+              ),
+            pattern
           ) != 0
         ) {
           if (caretModel.caretCount > 1) return

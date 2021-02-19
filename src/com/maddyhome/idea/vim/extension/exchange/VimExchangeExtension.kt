@@ -97,7 +97,6 @@ class VimExchangeExtension : VimExtension {
       }
 
       fun getHighlighter(): RangeHighlighter? = myHighlighter
-
     }
 
     fun clearExchange(editor: Editor) {
@@ -227,7 +226,7 @@ class VimExchangeExtension : VimExtension {
       runWriteAction {
         // TODO handle:
         // 	" Compare using =~ because "'==' != 0" returns 0
-        //	let indent = s:get_setting('exchange_indent', 1) !~ 0 && a:x.type ==# 'V' && a:y.type ==# 'V'
+        // 	let indent = s:get_setting('exchange_indent', 1) !~ 0 && a:x.type ==# 'V' && a:y.type ==# 'V'
         pasteExchange(ex1, ex2)
         if (!expand) {
           pasteExchange(ex2, ex1)
@@ -325,8 +324,8 @@ class VimExchangeExtension : VimExtension {
       if (isVisual) {
         executeNormalWithoutMapping(parseKeys("gvy"), editor)
         // TODO: handle
-        //if &selection ==# 'exclusive' && start != end
-        //			let end.column -= len(matchstr(@@, '\_.$'))
+        // if &selection ==# 'exclusive' && start != end
+        // 			let end.column -= len(matchstr(@@, '\_.$'))
       } else {
         selectionEnd = selectionEnd.let {
           VimMark.create(

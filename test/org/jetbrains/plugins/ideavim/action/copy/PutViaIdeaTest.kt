@@ -91,7 +91,7 @@ class PutViaIdeaTest : VimTestCase() {
             I found it in a legendary land
             
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
 
     VimPlugin.getRegister().storeText(myFixture.editor, before rangeOf "\nI found it in a legendary land\n", SelectionType.CHARACTER_WISE, false)
@@ -105,7 +105,7 @@ class PutViaIdeaTest : VimTestCase() {
             I found it in a legendary land
             
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     myFixture.checkResult(after)
   }
 }

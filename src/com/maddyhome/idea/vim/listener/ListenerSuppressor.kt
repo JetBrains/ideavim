@@ -58,7 +58,7 @@ import java.io.Closeable
  * SelectionVimListenerSuppressor.lock().use { ... }
  * ```
  */
-sealed class VimListenerSuppressor{
+sealed class VimListenerSuppressor {
   private var caretListenerSuppressor = 0
 
   fun lock(): Locked {
@@ -71,7 +71,7 @@ sealed class VimListenerSuppressor{
       try {
         action()
       } finally {
-          caretListenerSuppressor--
+        caretListenerSuppressor--
       }
     } else {
       caretListenerSuppressor--

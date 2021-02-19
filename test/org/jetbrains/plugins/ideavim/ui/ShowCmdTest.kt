@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.ShowCmd
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class ShowCmdTest: VimTestCase() {
+class ShowCmdTest : VimTestCase() {
   override fun setUp() {
     super.setUp()
     val before = "${c}I found it in a legendary land"
@@ -76,7 +76,7 @@ class ShowCmdTest: VimTestCase() {
 
   // TODO: This test fails because IdeaVim's mapping handler doesn't correctly expand unhandled keys on timeout
 //  fun `test showcmd expands ambiguous mapped keys on timeout`() {
-    // `rrr` should timeout and replay `rr` which is mapped to `42`
+  // `rrr` should timeout and replay `rr` which is mapped to `42`
 //    enterCommand("nmap rr 42")
 //    enterCommand("nmap rrr 55")
 //    typeText(parseKeys("12rr"))
