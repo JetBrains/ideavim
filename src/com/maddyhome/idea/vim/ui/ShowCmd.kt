@@ -41,6 +41,7 @@ import java.awt.event.MouseEvent
 object ShowCmd {
   // https://github.com/vim/vim/blob/b376ace1aeaa7614debc725487d75c8f756dd773/src/vim.h#L1721
   private const val SHOWCMD_COLS = 10
+
   @NonNls
   internal const val ID = "IdeaVim::ShowCmd"
 

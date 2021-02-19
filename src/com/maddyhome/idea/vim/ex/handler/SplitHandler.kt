@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NonNls
 
 class SplitHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
   @NonNls
   private val visualSplitPrefix = "v"
 

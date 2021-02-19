@@ -17,6 +17,7 @@
  */
 
 package ui.pages;
+
 import com.intellij.remoterobot.RemoteRobot;
 import com.intellij.remoterobot.data.RemoteComponent;
 import com.intellij.remoterobot.fixtures.ComponentFixture;
@@ -31,15 +32,17 @@ import static com.intellij.remoterobot.search.locators.Locators.byXpath;
 @DefaultXpath(by = "FlatWelcomeFrame type", xpath = "//div[@class='FlatWelcomeFrame']")
 @FixtureName(name = "Welcome Frame")
 public class WelcomeFrameFixture extends ContainerFixture {
-    public WelcomeFrameFixture(@NotNull RemoteRobot remoteRobot, @NotNull RemoteComponent remoteComponent) {
-        super(remoteRobot, remoteComponent);
-    }
+  public WelcomeFrameFixture(@NotNull RemoteRobot remoteRobot, @NotNull RemoteComponent remoteComponent) {
+    super(remoteRobot, remoteComponent);
+  }
 
-    public ActionLinkFixture createNewProjectLink() {
-        return find(ActionLinkFixture.class, byXpath("//div[(@accessiblename='New Project' and @class='MainButton') or (@accessiblename='New Project' and @class='JButton')]"));
-    }
+  public ActionLinkFixture createNewProjectLink() {
+    return find(ActionLinkFixture.class, byXpath(
+      "//div[(@accessiblename='New Project' and @class='MainButton') or (@accessiblename='New Project' and @class='JButton')]"));
+  }
 
-    public ComponentFixture importProjectLink() {
-        return find(ComponentFixture.class, byXpath("//div[@accessiblename='Get from Version Control...' and @class='JButton']"));
-    }
+  public ComponentFixture importProjectLink() {
+    return find(ComponentFixture.class,
+                byXpath("//div[@accessiblename='Get from Version Control...' and @class='JButton']"));
+  }
 }

@@ -32,7 +32,8 @@ import java.util.List;
 public class TestInputModel {
   private final @NotNull List<KeyStroke> myKeyStrokes = Lists.newArrayList();
 
-  private TestInputModel() {}
+  private TestInputModel() {
+  }
 
   public static TestInputModel getInstance(@NotNull Editor editor) {
     TestInputModel model = UserDataManager.getVimTestInputModel(editor);

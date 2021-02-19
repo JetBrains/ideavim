@@ -174,7 +174,13 @@ class VimSurroundExtensionTest : VimTestCase() {
                   if "myFunction(condition)" { }
                     """
 
-    doTest(listOf("ysiwf", "myFunction<CR>", "j", "."), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(
+      listOf("ysiwf", "myFunction<CR>", "j", "."),
+      before,
+      after,
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)

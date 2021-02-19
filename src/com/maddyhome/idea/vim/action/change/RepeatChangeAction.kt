@@ -52,7 +52,12 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
     try {
       if (repeatHandler && lastHandler != null) {
         val processor = CommandProcessor.getInstance()
-        processor.executeCommand(editor.project, { lastHandler.execute(editor, context) }, "Vim " + lastHandler.javaClass.simpleName, null)
+        processor.executeCommand(
+          editor.project,
+          { lastHandler.execute(editor, context) },
+          "Vim " + lastHandler.javaClass.simpleName,
+          null
+        )
       } else if (!repeatHandler && lastCommand != null) {
         if (cmd.rawCount > 0) {
           lastCommand.count = cmd.count

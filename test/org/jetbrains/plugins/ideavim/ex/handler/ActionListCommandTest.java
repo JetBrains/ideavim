@@ -53,7 +53,8 @@ public class ActionListCommandTest extends VimTestCase {
       String line = displayedLines[i];
       if (i == 0) {
         assertEquals("--- Actions ---", line);
-      }else {
+      }
+      else {
         assertTrue(line.toLowerCase().contains("quickimpl"));
       }
     }
@@ -68,7 +69,8 @@ public class ActionListCommandTest extends VimTestCase {
       String line = displayedLines[i];
       if (i == 0) {
         assertEquals("--- Actions ---", line);
-      }else {
+      }
+      else {
         assertTrue(line.toLowerCase().contains("<m-s-"));
       }
     }

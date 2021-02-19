@@ -181,7 +181,8 @@ private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
       }
     }
     yield(State(i, c, inQuote, lastOpenSingleQuotePos))
-    found = findPositionOfFirstCharacter(chars, i + Direction.FORWARDS.toInt(), charsToSearch, false, Direction.FORWARDS)
+    found =
+      findPositionOfFirstCharacter(chars, i + Direction.FORWARDS.toInt(), charsToSearch, false, Direction.FORWARDS)
   }
 }
 

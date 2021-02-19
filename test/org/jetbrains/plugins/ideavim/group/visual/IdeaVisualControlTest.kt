@@ -701,7 +701,13 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     assertCaretsColour()
   }
 
-  @VimOptionTestConfiguration(VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.ideaselection]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      SelectModeOptionData.name,
+      VimTestOptionType.LIST,
+      [SelectModeOptionData.ideaselection]
+    )
+  )
   fun `test control selection`() {
     configureByText(
       """

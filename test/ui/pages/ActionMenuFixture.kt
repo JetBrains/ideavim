@@ -42,7 +42,13 @@ fun RemoteRobot.actionMenuItem(text: String): ActionMenuItemFixture {
 }
 
 @FixtureName("ActionMenu")
-class ActionMenuFixture(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) : ComponentFixture(remoteRobot, remoteComponent)
+class ActionMenuFixture(
+  remoteRobot: RemoteRobot,
+  remoteComponent: RemoteComponent
+) : ComponentFixture(remoteRobot, remoteComponent)
 
 @FixtureName("ActionMenuItem")
-class ActionMenuItemFixture(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) : ComponentFixture(remoteRobot, remoteComponent)
+class ActionMenuItemFixture(
+  remoteRobot: RemoteRobot,
+  remoteComponent: RemoteComponent
+) : ComponentFixture(remoteRobot, remoteComponent)

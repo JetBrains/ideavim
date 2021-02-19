@@ -110,7 +110,17 @@ class ReplaceWithRegister : VimExtension {
   private class Operator : OperatorFunction {
     override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
       val range = getRange(editor) ?: return false
-      val visualSelection = PutData.VisualSelection(mapOf(editor.caretModel.primaryCaret to VimSelection.create(range.startOffset, range.endOffset - 1, selectionType, editor)), selectionType)
+      val visualSelection = PutData.VisualSelection(
+        mapOf(
+          editor.caretModel.primaryCaret to VimSelection.create(
+            range.startOffset,
+            range.endOffset - 1,
+            selectionType,
+            editor
+          )
+        ),
+        selectionType
+      )
       doReplace(editor, visualSelection)
       return true
     }
@@ -125,8 +135,10 @@ class ReplaceWithRegister : VimExtension {
   companion object {
     @NonNls
     private const val RWR_OPERATOR = "<Plug>ReplaceWithRegisterOperator"
+
     @NonNls
     private const val RWR_LINE = "<Plug>ReplaceWithRegisterLine"
+
     @NonNls
     private const val RWR_VISUAL = "<Plug>ReplaceWithRegisterVisual"
 
@@ -143,7 +155,15 @@ class ReplaceWithRegister : VimExtension {
 
       val textData = PutData.TextData(usedText, usedType, savedRegister.transferableData)
 
-      val putData = PutData(textData, visualSelection, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = false, putToLine = -1)
+      val putData = PutData(
+        textData,
+        visualSelection,
+        1,
+        insertTextBeforeCaret = true,
+        rawIndent = true,
+        caretAfterInsertedText = false,
+        putToLine = -1
+      )
       VimPlugin.getPut().putText(editor, EditorDataContext.init(editor), putData)
 
       VimPlugin.getRegister().saveRegister(savedRegister.name, savedRegister)

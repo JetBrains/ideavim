@@ -112,7 +112,8 @@ class CommandState private constructor() {
 
   private fun setMappingMode() {
     val modeState = currentModeState()
-    mappingState.mappingMode = if (modeState.mode == Mode.OP_PENDING) MappingMode.OP_PENDING else modeToMappingMode(mode)
+    val newMappingMode = if (modeState.mode == Mode.OP_PENDING) MappingMode.OP_PENDING else modeToMappingMode(mode)
+    mappingState.mappingMode = newMappingMode
   }
 
   @Contract(pure = true)
@@ -339,7 +340,9 @@ class CommandState private constructor() {
       return res
     }
 
-    private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode<ActionBeanClass> = VimPlugin.getKey().getKeyRoot(mappingMode)
+    private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode<ActionBeanClass> {
+      return VimPlugin.getKey().getKeyRoot(mappingMode)
+    }
   }
 
   init {

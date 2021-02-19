@@ -27,6 +27,8 @@ import java.util.List;
 
 
 public class BoundListOption extends ListOption {
+  protected final @NotNull List<String> values;
+
   BoundListOption(@NonNls String name, @NonNls String abbrev, @NonNls String[] dflt, @NonNls String[] values) {
     super(name, abbrev, dflt, null);
 
@@ -72,6 +74,4 @@ public class BoundListOption extends ListOption {
 
     return true;
   }
-
-  protected final @NotNull List<String> values;
 }

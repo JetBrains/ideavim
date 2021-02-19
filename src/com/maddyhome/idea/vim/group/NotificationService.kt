@@ -70,7 +70,13 @@ class NotificationService(private val project: Project?) {
 
     notification.addAction(OpenIdeaVimRcAction(notification))
 
-    notification.addAction(AppendToIdeaVimRcAction(notification, "set clipboard+=ideaput", "ideaput") { OptionsManager.clipboard.append(ClipboardOptionsData.ideaput) })
+    notification.addAction(
+      AppendToIdeaVimRcAction(
+        notification,
+        "set clipboard+=ideaput",
+        "ideaput"
+      ) { OptionsManager.clipboard.append(ClipboardOptionsData.ideaput) }
+    )
 
     notification.notify(project)
   }
@@ -84,7 +90,13 @@ class NotificationService(private val project: Project?) {
 
     notification.addAction(OpenIdeaVimRcAction(notification))
 
-    notification.addAction(AppendToIdeaVimRcAction(notification, "set ideajoin", "ideajoin") { OptionsManager.ideajoin.set() })
+    notification.addAction(
+      AppendToIdeaVimRcAction(
+        notification,
+        "set ideajoin",
+        "ideajoin"
+      ) { OptionsManager.ideajoin.set() }
+    )
 
     notification.addAction(HelpLink(notification, ideajoinExamplesUrl))
     notification.notify(project)
@@ -214,7 +226,8 @@ class NotificationService(private val project: Project?) {
     }
   }
 
-  class OpenIdeaVimRcAction(private val notification: Notification?) : DumbAwareAction("Open ~/.ideavimrc")/*, LightEditCompatible*/ {
+  class OpenIdeaVimRcAction(private val notification: Notification?) :
+    DumbAwareAction("Open ~/.ideavimrc")/*, LightEditCompatible*/ {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project
       if (eventProject != null) {
@@ -226,11 +239,19 @@ class NotificationService(private val project: Project?) {
         }
       }
       notification?.expire()
-      createIdeaVimRcManually("Cannot create configuration file.<br/>Please create <code>~/.ideavimrc</code> manually", eventProject)
+      createIdeaVimRcManually(
+        "Cannot create configuration file.<br/>Please create <code>~/.ideavimrc</code> manually",
+        eventProject
+      )
     }
   }
 
-  private inner class AppendToIdeaVimRcAction(val notification: Notification, val appendableText: String, val optionName: String, val enableOption: () -> Unit) : AnAction("Append to ~/.ideavimrc") {
+  private inner class AppendToIdeaVimRcAction(
+    val notification: Notification,
+    val appendableText: String,
+    val optionName: String,
+    val enableOption: () -> Unit
+  ) : AnAction("Append to ~/.ideavimrc") {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project
       enableOption()
@@ -239,18 +260,27 @@ class NotificationService(private val project: Project?) {
         if (ideaVimRc != null && ideaVimRc.canWrite()) {
           ideaVimRc.appendText(appendableText)
           notification.expire()
-          val successNotification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, "<code>$optionName</code> is enabled", NotificationType.INFORMATION)
+          val successNotification = Notification(
+            IDEAVIM_NOTIFICATION_ID,
+            IDEAVIM_NOTIFICATION_TITLE,
+            "<code>$optionName</code> is enabled",
+            NotificationType.INFORMATION
+          )
           successNotification.addAction(OpenIdeaVimRcAction(successNotification))
           successNotification.notify(project)
           return
         }
       }
       notification.expire()
-      createIdeaVimRcManually("Option is enabled, but the file is not modified<br/>Please modify <code>~/.ideavimrc</code> manually", project)
+      createIdeaVimRcManually(
+        "Option is enabled, but the file is not modified<br/>Please modify <code>~/.ideavimrc</code> manually",
+        project
+      )
     }
   }
 
-  private inner class HelpLink(val notification: Notification, val link: String) : AnAction("", "", AllIcons.General.TodoQuestion) {
+  private inner class HelpLink(val notification: Notification, val link: String) :
+    AnAction("", "", AllIcons.General.TodoQuestion) {
     override fun actionPerformed(e: AnActionEvent) {
       BrowserLauncher.instance.open(link)
       notification.expire()
@@ -264,8 +294,10 @@ class NotificationService(private val project: Project?) {
     const val ideajoinExamplesUrl = "https://jb.gg/f9zji9"
 
     private fun createIdeaVimRcManually(message: String, project: Project?) {
-      val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, message, NotificationType.WARNING)
-      var actionName = if (SystemInfo.isMac) "Reveal Home in Finder" else "Show Home in " + RevealFileAction.getFileManagerName()
+      val notification =
+        Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, message, NotificationType.WARNING)
+      var actionName =
+        if (SystemInfo.isMac) "Reveal Home in Finder" else "Show Home in " + RevealFileAction.getFileManagerName()
       if (!File(System.getProperty("user.home")).exists()) {
         actionName = ""
       }

@@ -44,8 +44,8 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
   public void testDeleteAnArgument() {
     doTest(Lists.newArrayList("daa"), "function(int arg1,    char<caret>* arg2=\"a,b,c(d,e)\")",
            "function(int arg1<caret>)", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(Lists.newArrayList("daa"), "function(int arg1<caret>)", "function(<caret>)",
-           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(Lists.newArrayList("daa"), "function(int arg1<caret>)", "function(<caret>)", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -59,15 +59,13 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
     doTest(Lists.newArrayList("dia"), "function(1, (20<caret>*30)+40, somefunc2(3, 4))",
            "function(1, <caret>, somefunc2(3, 4))", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     doTest(Lists.newArrayList("daa"), "function(1, (20*30)+40, somefunc2(<caret>3, 4))",
-           "function(1, (20*30)+40, somefunc2(<caret>4))", CommandState.Mode.COMMAND,
-           CommandState.SubMode.NONE);
+           "function(1, (20*30)+40, somefunc2(<caret>4))", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testIgnoreQuotedArguments() {
     doTest(Lists.newArrayList("daa"), "function(int arg1,    char* arg2=a,b,c(<caret>arg,e))",
-           "function(int arg1,    char* arg2=a,b,c(<caret>e))", CommandState.Mode.COMMAND,
-           CommandState.SubMode.NONE);
+           "function(int arg1,    char* arg2=a,b,c(<caret>e))", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     doTest(Lists.newArrayList("daa"), "function(int arg1,    char* arg2=\"a,b,c(<caret>arg,e)\")",
            "function(int arg1<caret>)", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     doTest(Lists.newArrayList("daa"), "function(int arg1,    char* arg2=\"a,b,c(arg,e\"<caret>)",
@@ -78,10 +76,10 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testDeleteTwoArguments() {
-    doTest(Lists.newArrayList("d2aa"), "function(int <caret>arg1,    char* arg2=\"a,b,c(d,e)\")",
-           "function(<caret>)", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(Lists.newArrayList("d2ia"), "function(int <caret>arg1,    char* arg2=\"a,b,c(d,e)\")",
-           "function(<caret>)", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(Lists.newArrayList("d2aa"), "function(int <caret>arg1,    char* arg2=\"a,b,c(d,e)\")", "function(<caret>)",
+           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(Lists.newArrayList("d2ia"), "function(int <caret>arg1,    char* arg2=\"a,b,c(d,e)\")", "function(<caret>)",
+           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     doTest(Lists.newArrayList("d2aa"), "function(int <caret>arg1,    char* arg2=\"a,b,c(d,e)\", bool arg3)",
            "function(<caret>bool arg3)", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     doTest(Lists.newArrayList("d2ia"), "function(int <caret>arg1,    char* arg2=\"a,b,c(d,e)\", bool arg3)",
@@ -113,11 +111,9 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
   public void testWhenUnbalancedHigherPriorityPairIsUsed() {
     setArgTextObjPairsVariable("{:},(:)");
     doTest(Lists.newArrayList("dia"), "namespace foo { void foo(int arg1, bool arg2<caret> { body }\n}",
-           "namespace foo { void foo(int arg1, <caret>}", CommandState.Mode.COMMAND,
-           CommandState.SubMode.NONE);
+           "namespace foo { void foo(int arg1, <caret>}", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     doTest(Lists.newArrayList("dia"), "namespace foo { void foo(int <caret>arg1, bool arg2 { body }\n}",
-           "namespace foo { <caret>, bool arg2 { body }\n}", CommandState.Mode.COMMAND,
-           CommandState.SubMode.NONE);
+           "namespace foo { <caret>, bool arg2 { body }\n}", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -133,22 +129,18 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testEmptyFile() {
     assertPluginError(false);
-    doTest(Lists.newArrayList("daa"), "<caret>", "<caret>", CommandState.Mode.COMMAND,
-           CommandState.SubMode.NONE);
+    doTest(Lists.newArrayList("daa"), "<caret>", "<caret>", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     assertPluginError(true);
-    doTest(Lists.newArrayList("dia"), "<caret>", "<caret>", CommandState.Mode.COMMAND,
-           CommandState.SubMode.NONE);
+    doTest(Lists.newArrayList("dia"), "<caret>", "<caret>", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     assertPluginError(true);
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testEmptyLine() {
     assertPluginError(false);
-    doTest(Lists.newArrayList("daa"), "<caret>\n", "<caret>\n", CommandState.Mode.COMMAND,
-           CommandState.SubMode.NONE);
+    doTest(Lists.newArrayList("daa"), "<caret>\n", "<caret>\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     assertPluginError(true);
-    doTest(Lists.newArrayList("dia"), "<caret>\n", "<caret>\n", CommandState.Mode.COMMAND,
-           CommandState.SubMode.NONE);
+    doTest(Lists.newArrayList("dia"), "<caret>\n", "<caret>\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     assertPluginError(true);
   }
 
@@ -185,8 +177,8 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testHandleImbalancedPairs() {
-    doTest(Lists.newArrayList("dia"), "foo(arg1, ba<caret>r(not-an-arg{body",
-           "foo(arg1, ba<caret>r(not-an-arg{body", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(Lists.newArrayList("dia"), "foo(arg1, ba<caret>r(not-an-arg{body", "foo(arg1, ba<caret>r(not-an-arg{body",
+           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     assertPluginError(true);
     doTest(Lists.newArrayList("dia"), "foo(arg1, ba<caret>r ( x > 3 )", "foo(arg1, ba<caret>r ( x > 3 )",
            CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
@@ -194,8 +186,8 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
     doTest(Lists.newArrayList("dia"), "foo(arg1, ba<caret>r + x >", "foo(arg1, ba<caret>r + x >",
            CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     assertPluginError(true);
-    doTest(Lists.newArrayList("dia"), "<arg1, ba<caret>r + x)", "<arg1, ba<caret>r + x)",
-           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(Lists.newArrayList("dia"), "<arg1, ba<caret>r + x)", "<arg1, ba<caret>r + x)", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
     assertPluginError(true);
   }
 
@@ -209,17 +201,17 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testExtendVisualSelection() {
     doTest(Lists.newArrayList("vllia"), "function(int arg1,    ch<caret>ar* arg2=\"a,b,c(d,e)\")",
-           "function(int arg1,    <selection>char* arg2=\"a,b,c(d,e)\"</selection>)",
-           CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER);
+           "function(int arg1,    <selection>char* arg2=\"a,b,c(d,e)\"</selection>)", CommandState.Mode.VISUAL,
+           CommandState.SubMode.VISUAL_CHARACTER);
     doTest(Lists.newArrayList("vhhia"), "function(int arg1,    char<caret>* arg2=\"a,b,c(d,e)\")",
-           "function(int arg1,    <selection>char* arg2=\"a,b,c(d,e)\"</selection>)",
-           CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER);
+           "function(int arg1,    <selection>char* arg2=\"a,b,c(d,e)\"</selection>)", CommandState.Mode.VISUAL,
+           CommandState.SubMode.VISUAL_CHARACTER);
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testExtendVisualSelectionUsesCaretPos() {
-    doTest(Lists.newArrayList("vllia"), "fu<caret>n(arg)", "fun(<selection>arg</selection>)",
-           CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER);
+    doTest(Lists.newArrayList("vllia"), "fu<caret>n(arg)", "fun(<selection>arg</selection>)", CommandState.Mode.VISUAL,
+           CommandState.SubMode.VISUAL_CHARACTER);
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -243,31 +235,29 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testFunctionWithSpaceAfterName() {
-    doTest(Lists.newArrayList("dia"), "function (int <caret>a)", "function (int <caret>a)",
-           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(Lists.newArrayList("daa"), "function (int <caret>a)", "function (int <caret>a)",
-           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(Lists.newArrayList("dia"), "function (int <caret>a)", "function (int <caret>a)", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
+    doTest(Lists.newArrayList("daa"), "function (int <caret>a)", "function (int <caret>a)", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   @VimBehaviorDiffers(originalVimAfter = "function (int <caret>a, int b)", description = "Should work the same as testFunctionWithSpaceAfterName")
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testFunctionWithSpaceAfterNameWithTwoArgs() {
-    doTest(Lists.newArrayList("dia"), "function (int <caret>a, int b)", "function (, int b)",
-           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(Lists.newArrayList("daa"), "function (int <caret>a, int b)", "function (int b)",
-           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(Lists.newArrayList("dia"), "function (int <caret>a, int b)", "function (, int b)", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
+    doTest(Lists.newArrayList("daa"), "function (int <caret>a, int b)", "function (int b)", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   public void testDeleteInIf() {
-    doTest(Lists.newArrayList("dia"),
-           "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }",
-           "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }",
-           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(Lists.newArrayList("daa"),
-           "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }",
-           "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }",
-           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(Lists.newArrayList("dia"), "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }",
+           "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
+    doTest(Lists.newArrayList("daa"), "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }",
+           "class MyClass{ public int myFun() { if (tr<caret>ue) { somFunction(); } } }", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
@@ -324,8 +314,8 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
            CommandState.SubMode.NONE);
     doTest(Lists.newArrayList("daa"),
            "[capture1, c = capture2] { return Clazz<int,<caret> bool>{ctorParam1, ctorParam2}; }",
-           "[capture1, c = capture2] { return Clazz<int>{ctorParam1, ctorParam2}; }",
-           CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+           "[capture1, c = capture2] { return Clazz<int>{ctorParam1, ctorParam2}; }", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
     doTest(Lists.newArrayList("daa"),
            "[capture1, c = capture2] { return Clazz<int, bool>{ctorPar<caret>am1, ctorParam2}; }",
            "[capture1, c = capture2] { return Clazz<int, bool>{ctorParam2}; }", CommandState.Mode.COMMAND,

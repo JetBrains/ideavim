@@ -265,7 +265,11 @@ abstract class VimTestCase : UsefulTestCase() {
   fun assertOffset(vararg expectedOffsets: Int) {
     val carets = myFixture.editor.caretModel.allCarets
     if (expectedOffsets.size == 2 && carets.size == 1) {
-      Assert.assertEquals("Wrong amount of carets. Did you mean to use assertPosition?", expectedOffsets.size, carets.size)
+      Assert.assertEquals(
+        "Wrong amount of carets. Did you mean to use assertPosition?",
+        expectedOffsets.size,
+        carets.size
+      )
     }
     Assert.assertEquals("Wrong amount of carets", expectedOffsets.size, carets.size)
     for (i in expectedOffsets.indices) {
@@ -293,9 +297,11 @@ abstract class VimTestCase : UsefulTestCase() {
   fun assertVisibleLineBounds(logicalLine: Int, leftLogicalColumn: Int, rightLogicalColumn: Int) {
     val visualLine = EditorHelper.logicalLineToVisualLine(myFixture.editor, logicalLine)
     val actualLeftVisualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(myFixture.editor, visualLine)
-    val actualLeftLogicalColumn = myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualLeftVisualColumn)).column
+    val actualLeftLogicalColumn =
+      myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualLeftVisualColumn)).column
     val actualRightVisualColumn = EditorHelper.getVisualColumnAtRightOfScreen(myFixture.editor, visualLine)
-    val actualRightLogicalColumn = myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualRightVisualColumn)).column
+    val actualRightLogicalColumn =
+      myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualRightVisualColumn)).column
 
     val expected = ScreenBounds(leftLogicalColumn, rightLogicalColumn)
     val actual = ScreenBounds(actualLeftLogicalColumn, actualRightLogicalColumn)
@@ -445,7 +451,10 @@ abstract class VimTestCase : UsefulTestCase() {
     assertCaretsColour()
     assertMode(modeAfter)
     assertSubMode(subModeAfter)
-    if (Checks.caretShape) assertEquals(myFixture.editor.mode.isBlockCaretShape, myFixture.editor.settings.isBlockCursor)
+    if (Checks.caretShape) assertEquals(
+      myFixture.editor.mode.isBlockCaretShape,
+      myFixture.editor.settings.isBlockCursor
+    )
   }
 
   protected val fileManager: FileEditorManagerEx

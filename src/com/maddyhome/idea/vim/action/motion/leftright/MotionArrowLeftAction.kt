@@ -33,9 +33,17 @@ import javax.swing.KeyStroke
 class MotionArrowLeftAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Left>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0)))
+  override val keyStrokesSet: Set<List<KeyStroke>> =
+    setOf(parseKeys("<Left>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0)))
 
-  override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+  override fun offset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -count, false)
   }
 }

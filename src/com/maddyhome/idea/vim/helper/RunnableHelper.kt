@@ -32,12 +32,14 @@ object RunnableHelper {
   @JvmStatic
   fun runReadCommand(project: Project?, cmd: Runnable, name: String?, groupId: Any?) {
     logger.debug { "Run read command: $name" }
-    CommandProcessor.getInstance().executeCommand(project, { ApplicationManager.getApplication().runReadAction(cmd) }, name, groupId)
+    CommandProcessor.getInstance()
+      .executeCommand(project, { ApplicationManager.getApplication().runReadAction(cmd) }, name, groupId)
   }
 
   @JvmStatic
   fun runWriteCommand(project: Project?, cmd: Runnable, name: String?, groupId: Any?) {
     logger.debug { "Run write command: $name" }
-    CommandProcessor.getInstance().executeCommand(project, { ApplicationManager.getApplication().runWriteAction(cmd) }, name, groupId)
+    CommandProcessor.getInstance()
+      .executeCommand(project, { ApplicationManager.getApplication().runWriteAction(cmd) }, name, groupId)
   }
 }

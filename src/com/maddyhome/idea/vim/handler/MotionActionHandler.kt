@@ -58,7 +58,14 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
      *   called 5 times.
      * The method executes only once it there is block selection.
      */
-    abstract fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int
+    abstract fun getOffset(
+      editor: Editor,
+      caret: Caret,
+      context: DataContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?
+    ): Int
 
     /**
      * This method is called before [getOffset] once for each [caret].
@@ -120,7 +127,14 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
 
   final override val type: Command.Type = Command.Type.MOTION
 
-  fun getHandlerOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+  fun getHandlerOffset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     return when (this) {
       is SingleExecution -> getOffset(editor, context, count, rawCount, argument)
       is ForEachCaret -> getOffset(editor, caret, context, count, rawCount, argument)

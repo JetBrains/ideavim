@@ -130,7 +130,8 @@ object VimListenerManager {
 
     fun removeAll() {
       // Project listeners are self-disposable, so there is no need to unregister them on project close
-      ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }.forEach { IdeaSpecifics.removeIdeaSpecificsListeners(it) }
+      ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }
+        .forEach { IdeaSpecifics.removeIdeaSpecificsListeners(it) }
     }
 
     fun addAll() {

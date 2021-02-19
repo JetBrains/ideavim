@@ -45,7 +45,14 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
    * @see [ChangeEditorActionHandler.SingleExecution] for only one execution.
    */
   abstract class ForEachCaret : ChangeEditorActionHandler() {
-    abstract fun execute(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean
+    abstract fun execute(
+      editor: Editor,
+      caret: Caret,
+      context: DataContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?
+    ): Boolean
   }
 
   /**

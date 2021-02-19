@@ -41,7 +41,7 @@ public class KeywordOptionTest extends VimTestCase {
     OptionsManager.INSTANCE.parseOptionLine(myFixture.getEditor(), "iskeyword" + val, false);
   }
 
-  private void assertIsKeyword(char c){
+  private void assertIsKeyword(char c) {
     CharacterHelper.CharacterType charType = CharacterHelper.charType(c, false);
     assertSame(CharacterHelper.CharacterType.KEYWORD, charType);
   }
@@ -89,12 +89,16 @@ public class KeywordOptionTest extends VimTestCase {
 
   public void testRangeInWhichLeftValueIsHigherThanRightValueIsInvalid() {
     option.set("b-a");
-    assertDoesntContain(option.values(), new ArrayList<String>(){{add("b-a");}});
+    assertDoesntContain(option.values(), new ArrayList<String>() {{
+      add("b-a");
+    }});
   }
 
   public void testTwoAdjacentLettersAreInvalid() {
     option.set("ab");
-    assertDoesntContain(option.values(), new ArrayList<String>(){{add("ab");}});
+    assertDoesntContain(option.values(), new ArrayList<String>() {{
+      add("ab");
+    }});
   }
 
   public void testAddsACharByChar() throws ExException {

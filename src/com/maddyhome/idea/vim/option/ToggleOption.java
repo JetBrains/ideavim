@@ -28,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 public class ToggleOption extends Option<Boolean> {
 
   private static final @NonNls String NO_PREFIX = "no";
+  protected final boolean dflt;
+  protected boolean value;
 
   /**
    * Creates the option
@@ -122,7 +124,4 @@ public class ToggleOption extends Option<Boolean> {
   public void resetDefault() {
     value = dflt;
   }
-
-  protected final boolean dflt;
-  protected boolean value;
 }

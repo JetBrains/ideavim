@@ -35,7 +35,14 @@ class GnNextTextObject : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
-  override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
+  override fun getRange(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): TextRange? {
     if (caret != editor.caretModel.primaryCaret) return null
     val range = VimPlugin.getSearch().getNextSearchRange(editor, count, true)
     return range?.let { TextRange(it.startOffset, it.endOffset) }

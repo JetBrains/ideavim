@@ -59,7 +59,13 @@ class MotionArrowDownActionTest : VimOptionTestCase(KeyModelOptionData.name, Vir
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopsel]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopsel]
+    )
+  )
   @VimOptionDefault(VirtualEditData.name)
   fun `test visual stopsel`() {
     doTest(
@@ -85,7 +91,13 @@ class MotionArrowDownActionTest : VimOptionTestCase(KeyModelOptionData.name, Vir
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopselect]
+    )
+  )
   @VimOptionDefault(VirtualEditData.name)
   fun `test visual stopselect`() {
     doTest(
@@ -111,7 +123,13 @@ class MotionArrowDownActionTest : VimOptionTestCase(KeyModelOptionData.name, Vir
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopvisual]
+    )
+  )
   @VimOptionDefault(VirtualEditData.name)
   fun `test visual stopvisual`() {
     doTest(
@@ -137,7 +155,13 @@ class MotionArrowDownActionTest : VimOptionTestCase(KeyModelOptionData.name, Vir
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopvisual]
+    )
+  )
   @VimOptionDefault(VirtualEditData.name)
   fun `test visual stopvisual multicaret`() {
     doTest(
@@ -386,7 +410,13 @@ class MotionArrowDownActionTest : VimOptionTestCase(KeyModelOptionData.name, Vir
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopselect]
+    )
+  )
   @VimOptionDefault(VirtualEditData.name)
   fun `test char select simple move`() {
     doTest(
@@ -413,7 +443,13 @@ class MotionArrowDownActionTest : VimOptionTestCase(KeyModelOptionData.name, Vir
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopselect]
+    )
+  )
   @VimOptionDefault(VirtualEditData.name)
   fun `test select multiple carets`() {
     doTest(

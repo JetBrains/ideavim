@@ -57,7 +57,13 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopsel]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopsel]
+    )
+  )
   fun `test visual stopsel`() {
     doTest(
       listOf("v", "<Up>"),
@@ -82,7 +88,13 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopselect]
+    )
+  )
   fun `test visual stopselect`() {
     doTest(
       listOf("v", "<Up>"),
@@ -107,7 +119,13 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopvisual]
+    )
+  )
   fun `test visual stopvisual`() {
     doTest(
       listOf("v", "<Up>"),
@@ -132,7 +150,13 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopvisual]
+    )
+  )
   fun `test visual stopvisual multicaret`() {
     doTest(
       listOf("v", "<Up>"),
@@ -157,7 +181,13 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopselect]
+    )
+  )
   fun `test char select simple move`() {
     doTest(
       listOf("gH", "<Up>"),
@@ -209,7 +239,13 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopselect]
+    )
+  )
   fun `test select multiple carets`() {
     doTest(
       listOf("gH", "<Up>"),

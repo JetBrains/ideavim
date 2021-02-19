@@ -33,6 +33,10 @@ public class DigraphResult {
   static final DigraphResult UNHANDLED = new DigraphResult(RES_UNHANDLED);
   static final DigraphResult BAD = new DigraphResult(RES_BAD);
 
+  private final int result;
+  private final @Nullable KeyStroke stroke;
+  private char promptCharacter;
+
   private DigraphResult(int result) {
     this.result = result;
     stroke = null;
@@ -68,8 +72,4 @@ public class DigraphResult {
   public char getPromptCharacter() {
     return promptCharacter;
   }
-
-  private final int result;
-  private final @Nullable KeyStroke stroke;
-  private char promptCharacter;
 }

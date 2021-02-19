@@ -118,7 +118,14 @@ abstract class ShiftedArrowKeyHandler : VimActionHandler.SingleExecution() {
  * Handler is called for each caret
  */
 abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() {
-  final override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+  final override fun getOffset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     val keymodel = OptionsManager.keymodel
     if (editor.inSelectMode && (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel)) {
       editor.exitSelectMode(false)
@@ -133,5 +140,12 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
   /**
    * Calculate new offset for current [caret]
    */
-  abstract fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int
+  abstract fun offset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int
 }

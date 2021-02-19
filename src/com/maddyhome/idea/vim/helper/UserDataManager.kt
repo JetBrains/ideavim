@@ -67,7 +67,12 @@ private var Caret._vimSelectionStart: Int? by userDataCaretToEditor()
 // Last column excluding inlays before the caret
 var Caret.vimLastColumn: Int by userDataCaretToEditorOr { (this as Caret).inlayAwareVisualColumn }
 var Caret.vimLastVisualOperatorRange: VisualChange? by userDataCaretToEditor()
-var Caret.vimInsertStart: RangeMarker by userDataOr { (this as Caret).editor.document.createRangeMarker(this.offset, this.offset) }
+var Caret.vimInsertStart: RangeMarker by userDataOr {
+  (this as Caret).editor.document.createRangeMarker(
+    this.offset,
+    this.offset
+  )
+}
 
 // ------------------ Editor
 fun unInitializeEditor(editor: Editor) {
@@ -81,6 +86,7 @@ fun unInitializeEditor(editor: Editor) {
 var Editor.vimLastSearch: String? by userData()
 var Editor.vimLastHighlighters: MutableCollection<RangeHighlighter>? by userData()
 var Editor.vimIncsearchCurrentMatchOffset: Int? by userData()
+
 /***
  * @see :help visualmode()
  */
@@ -92,6 +98,7 @@ var Editor.vimHasRelativeLineNumbersInstalled: Boolean by userDataOr { false }
 var Editor.vimMorePanel: ExOutputPanel? by userData()
 var Editor.vimExOutput: ExOutputModel? by userData()
 var Editor.vimTestInputModel: TestInputModel? by userData()
+
 /**
  * Checks whether a keeping visual mode visual operator action is performed on editor.
  */
@@ -102,15 +109,16 @@ var Editor.vimChangeActionSwitchMode: CommandState.Mode? by userData()
  * Function for delegated properties.
  * The property will be delegated to UserData and has nullable type.
  */
-private fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> = object : UserDataReadWriteProperty<UserDataHolder, T?>() {
-  override fun getValue(thisRef: UserDataHolder, property: KProperty<*>): T? {
-    return thisRef.getUserData(getKey(property))
-  }
+private fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> =
+  object : UserDataReadWriteProperty<UserDataHolder, T?>() {
+    override fun getValue(thisRef: UserDataHolder, property: KProperty<*>): T? {
+      return thisRef.getUserData(getKey(property))
+    }
 
-  override fun setValue(thisRef: UserDataHolder, property: KProperty<*>, value: T?) {
-    thisRef.putUserData(getKey(property), value)
+    override fun setValue(thisRef: UserDataHolder, property: KProperty<*>, value: T?) {
+      thisRef.putUserData(getKey(property), value)
+    }
   }
-}
 
 /**
  * Function for delegated properties.
@@ -119,22 +127,23 @@ private fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> = object : Use
  * In case of primary caret getter uses value stored in caret. If it's null, then the value from editor
  * Has nullable type.
  */
-private fun <T> userDataCaretToEditor(): ReadWriteProperty<Caret, T?> = object : UserDataReadWriteProperty<Caret, T?>() {
-  override fun getValue(thisRef: Caret, property: KProperty<*>): T? {
-    return if (thisRef == thisRef.editor.caretModel.primaryCaret) {
-      thisRef.getUserData(getKey(property)) ?: thisRef.editor.getUserData(getKey(property))
-    } else {
-      thisRef.getUserData(getKey(property))
+private fun <T> userDataCaretToEditor(): ReadWriteProperty<Caret, T?> =
+  object : UserDataReadWriteProperty<Caret, T?>() {
+    override fun getValue(thisRef: Caret, property: KProperty<*>): T? {
+      return if (thisRef == thisRef.editor.caretModel.primaryCaret) {
+        thisRef.getUserData(getKey(property)) ?: thisRef.editor.getUserData(getKey(property))
+      } else {
+        thisRef.getUserData(getKey(property))
+      }
     }
-  }
 
-  override fun setValue(thisRef: Caret, property: KProperty<*>, value: T?) {
-    if (thisRef == thisRef.editor.caretModel.primaryCaret) {
-      thisRef.editor.putUserData(getKey(property), value)
+    override fun setValue(thisRef: Caret, property: KProperty<*>, value: T?) {
+      if (thisRef == thisRef.editor.caretModel.primaryCaret) {
+        thisRef.editor.putUserData(getKey(property), value)
+      }
+      thisRef.putUserData(getKey(property), value)
     }
-    thisRef.putUserData(getKey(property), value)
   }
-}
 
 /**
  * Function for delegated properties.
@@ -143,29 +152,30 @@ private fun <T> userDataCaretToEditor(): ReadWriteProperty<Caret, T?> = object :
  * In case of primary caret getter uses value stored in caret. If it's null, then the value from editor
  * Has not nullable type.
  */
-private fun <T> userDataCaretToEditorOr(default: UserDataHolder.() -> T): ReadWriteProperty<Caret, T> = object : UserDataReadWriteProperty<Caret, T>() {
-  override fun getValue(thisRef: Caret, property: KProperty<*>): T {
-    val res = if (thisRef == thisRef.editor.caretModel.primaryCaret) {
-      thisRef.getUserData(getKey(property)) ?: thisRef.editor.getUserData(getKey(property))
-    } else {
-      thisRef.getUserData(getKey(property))
+private fun <T> userDataCaretToEditorOr(default: UserDataHolder.() -> T): ReadWriteProperty<Caret, T> =
+  object : UserDataReadWriteProperty<Caret, T>() {
+    override fun getValue(thisRef: Caret, property: KProperty<*>): T {
+      val res = if (thisRef == thisRef.editor.caretModel.primaryCaret) {
+        thisRef.getUserData(getKey(property)) ?: thisRef.editor.getUserData(getKey(property))
+      } else {
+        thisRef.getUserData(getKey(property))
+      }
+
+      if (res == null) {
+        val defaultValue = thisRef.default()
+        setValue(thisRef, property, defaultValue)
+        return defaultValue
+      }
+      return res
     }
 
-    if (res == null) {
-      val defaultValue = thisRef.default()
-      setValue(thisRef, property, defaultValue)
-      return defaultValue
+    override fun setValue(thisRef: Caret, property: KProperty<*>, value: T) {
+      if (thisRef == thisRef.editor.caretModel.primaryCaret) {
+        thisRef.editor.putUserData(getKey(property), value)
+      }
+      thisRef.putUserData(getKey(property), value)
     }
-    return res
   }
-
-  override fun setValue(thisRef: Caret, property: KProperty<*>, value: T) {
-    if (thisRef == thisRef.editor.caretModel.primaryCaret) {
-      thisRef.editor.putUserData(getKey(property), value)
-    }
-    thisRef.putUserData(getKey(property), value)
-  }
-}
 
 /**
  * Function for delegated properties.
@@ -173,19 +183,20 @@ private fun <T> userDataCaretToEditorOr(default: UserDataHolder.() -> T): ReadWr
  * [default] action will be executed if UserData doesn't have this property now.
  *   The result of [default] will be put to user data and returned.
  */
-private fun <T> userDataOr(default: UserDataHolder.() -> T): ReadWriteProperty<UserDataHolder, T> = object : UserDataReadWriteProperty<UserDataHolder, T>() {
-  override fun getValue(thisRef: UserDataHolder, property: KProperty<*>): T {
-    return thisRef.getUserData(getKey(property)) ?: run<ReadWriteProperty<UserDataHolder, T>, T> {
-      val defaultValue = thisRef.default()
-      thisRef.putUserData(getKey(property), defaultValue)
-      defaultValue
+private fun <T> userDataOr(default: UserDataHolder.() -> T): ReadWriteProperty<UserDataHolder, T> =
+  object : UserDataReadWriteProperty<UserDataHolder, T>() {
+    override fun getValue(thisRef: UserDataHolder, property: KProperty<*>): T {
+      return thisRef.getUserData(getKey(property)) ?: run<ReadWriteProperty<UserDataHolder, T>, T> {
+        val defaultValue = thisRef.default()
+        thisRef.putUserData(getKey(property), defaultValue)
+        defaultValue
+      }
+    }
+
+    override fun setValue(thisRef: UserDataHolder, property: KProperty<*>, value: T) {
+      thisRef.putUserData(getKey(property), value)
     }
   }
-
-  override fun setValue(thisRef: UserDataHolder, property: KProperty<*>, value: T) {
-    thisRef.putUserData(getKey(property), value)
-  }
-}
 
 private abstract class UserDataReadWriteProperty<in R, T> : ReadWriteProperty<R, T> {
   private var key: Key<T>? = null

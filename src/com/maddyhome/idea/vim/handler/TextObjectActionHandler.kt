@@ -53,7 +53,14 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
    */
   abstract val visualType: TextObjectVisualType
 
-  abstract fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange?
+  abstract fun getRange(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): TextRange?
 
   /**
    * This code is called when user executes text object in visual mode. E.g. `va(a(a(`

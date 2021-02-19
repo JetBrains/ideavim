@@ -49,19 +49,34 @@ open class MotionDownAction : MotionDownBase() {
 
   override val motionType: MotionType = MotionType.LINE_WISE
 
-  override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+  override fun getOffset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)
   }
 }
 
 class MotionDownCtrlNAction : MotionDownAction() {
-  override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+  override fun getOffset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     val activeLookup = LookupManager.getActiveLookup(editor)
     return if (activeLookup != null) {
       val primaryCaret = editor.caretModel.primaryCaret
       if (caret == primaryCaret) {
         IdeEventQueue.getInstance().flushDelayedKeyEvents()
-        EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN).execute(editor, primaryCaret, context)
+        EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN)
+          .execute(editor, primaryCaret, context)
       }
       caret.offset
     } else {
@@ -74,7 +89,14 @@ class MotionDownNotLineWiseAction : MotionDownBase() {
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+  override fun getOffset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)
   }
 }

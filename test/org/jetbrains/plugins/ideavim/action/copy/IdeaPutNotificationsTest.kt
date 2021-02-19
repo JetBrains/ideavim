@@ -48,7 +48,13 @@ class IdeaPutNotificationsTest : VimOptionTestCase(ClipboardOptionsData.name) {
     assertEquals(2, notification.actions.size)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, [ClipboardOptionsData.ideaput]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      ClipboardOptionsData.name,
+      VimTestOptionType.LIST,
+      [ClipboardOptionsData.ideaput]
+    )
+  )
   fun `test no notification on ideaput`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)

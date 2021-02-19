@@ -35,11 +35,19 @@ import javax.swing.KeyStroke
 class MotionArrowUpAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAction {
   override val motionType: MotionType = MotionType.LINE_WISE
 
-  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Up>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0)))
+  override val keyStrokesSet: Set<List<KeyStroke>> =
+    setOf(parseKeys("<Up>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0)))
 
   private var col: Int = 0
 
-  override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+  override fun offset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     return VimPlugin.getMotion().moveCaretVertical(editor, caret, -count)
   }
 

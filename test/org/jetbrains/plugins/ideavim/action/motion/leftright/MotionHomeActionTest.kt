@@ -107,7 +107,13 @@ class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopvisual]
+    )
+  )
   fun `test exit visual`() {
     val keys = listOf("v", "<Home>")
     val before = """
@@ -130,7 +136,13 @@ class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopselect]
+    )
+  )
   fun `test exit select`() {
     val keys = listOf("gh", "<Home>")
     val before = """

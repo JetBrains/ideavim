@@ -54,9 +54,12 @@ public class CommentaryExtension implements VimExtension {
 
   @Override
   public void init() {
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentMotion)"), getOwner(), new CommentMotionHandler(), false);
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentLine)"), getOwner(), new CommentLineHandler(), false);
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>(CommentMotionV)"), getOwner(), new CommentMotionVHandler(), false);
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentMotion)"), getOwner(),
+                               new CommentMotionHandler(), false);
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentLine)"), getOwner(), new CommentLineHandler(),
+                               false);
+    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>(CommentMotionV)"), getOwner(),
+                               new CommentMotionVHandler(), false);
 
     putKeyMappingIfMissing(MappingMode.N, parseKeys("gc"), getOwner(), parseKeys("<Plug>(CommentMotion)"), true);
     putKeyMappingIfMissing(MappingMode.N, parseKeys("gcc"), getOwner(), parseKeys("<Plug>(CommentLine)"), true);
@@ -106,10 +109,9 @@ public class CommentaryExtension implements VimExtension {
         editor.getSelectionModel().setSelection(range.getStartOffset(), range.getEndOffset());
       }
 
-      final MultiCaretCodeInsightActionHandler handler =
-        selectionType == SelectionType.CHARACTER_WISE
-          ? new CommentByBlockCommentHandler()
-          : new CommentByLineCommentHandler();
+      final MultiCaretCodeInsightActionHandler handler = selectionType == SelectionType.CHARACTER_WISE
+                                                         ? new CommentByBlockCommentHandler()
+                                                         : new CommentByLineCommentHandler();
 
       return WriteAction.compute(() -> {
         try {
@@ -127,7 +129,8 @@ public class CommentaryExtension implements VimExtension {
             executeNormalWithoutMapping(parseKeys("`["), editor);
           }
           return true;
-        } finally {
+        }
+        finally {
           // remove the selection
           editor.getSelectionModel().removeSelection();
         }

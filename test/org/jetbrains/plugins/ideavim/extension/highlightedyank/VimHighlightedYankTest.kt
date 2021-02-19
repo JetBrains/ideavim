@@ -71,8 +71,12 @@ class VimHighlightedYankTest : VimTestCase() {
     typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_duration = \"500.15\"<CR>"))
     typeText(StringHelper.parseKeys("yy"))
 
-    Assert.assertEquals(VimPlugin.getMessage(), "highlightedyank: Invalid value of g:highlightedyank_highlight_duration -- For input string: \"500.15\"")
+    Assert.assertEquals(
+      VimPlugin.getMessage(),
+      "highlightedyank: Invalid value of g:highlightedyank_highlight_duration -- For input string: \"500.15\""
+    )
   }
+
   fun `test not indicating error when correct highlight duration was provided by user`() {
 
     configureByJavaText(code)
@@ -89,7 +93,10 @@ class VimHighlightedYankTest : VimTestCase() {
       typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_color = \"$color\"<CR>"))
       typeText(StringHelper.parseKeys("yy"))
 
-      Assert.assertTrue(color, VimPlugin.getMessage().contains("highlightedyank: Invalid value of g:highlightedyank_highlight_color"))
+      Assert.assertTrue(
+        color,
+        VimPlugin.getMessage().contains("highlightedyank: Invalid value of g:highlightedyank_highlight_color")
+      )
     }
   }
 

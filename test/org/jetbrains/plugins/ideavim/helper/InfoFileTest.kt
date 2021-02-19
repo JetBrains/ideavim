@@ -37,7 +37,10 @@ class InfoFileTest : VimTestCase() {
         notPresentedActions += actionName
       }
     }
-    assertTrue(notPresentedActions.joinToString(prefix = "Not presented actions in info file: \n", separator = "\n"), notPresentedActions.isEmpty())
+    assertTrue(
+      notPresentedActions.joinToString(prefix = "Not presented actions in info file: \n", separator = "\n"),
+      notPresentedActions.isEmpty()
+    )
   }
 
   private inline fun forEachAction(supply: (action: EditorActionHandlerBase) -> Unit) {

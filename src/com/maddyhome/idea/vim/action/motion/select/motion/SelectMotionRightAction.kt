@@ -39,7 +39,14 @@ class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+  override fun getOffset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     val keymodel = OptionsManager.keymodel
     if (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel) {
       logger.debug("Keymodel option has stopselect. Exiting select mode")

@@ -65,13 +65,16 @@ public class EventFacade {
     }
   }
 
-  public void registerCustomShortcutSet(@NotNull AnAction action, @NotNull ShortcutSet shortcutSet,
+  public void registerCustomShortcutSet(@NotNull AnAction action,
+                                        @NotNull ShortcutSet shortcutSet,
                                         @Nullable JComponent component) {
     action.registerCustomShortcutSet(shortcutSet, component);
   }
 
-  public void registerCustomShortcutSet(@NotNull AnAction action, @NotNull ShortcutSet shortcutSet,
-                                        @Nullable JComponent component, @NotNull Disposable disposable) {
+  public void registerCustomShortcutSet(@NotNull AnAction action,
+                                        @NotNull ShortcutSet shortcutSet,
+                                        @Nullable JComponent component,
+                                        @NotNull Disposable disposable) {
     action.registerCustomShortcutSet(shortcutSet, component, disposable);
   }
 

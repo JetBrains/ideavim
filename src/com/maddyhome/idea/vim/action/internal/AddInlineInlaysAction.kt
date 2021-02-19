@@ -50,7 +50,11 @@ class AddInlineInlaysAction : AnAction() {
 
       val offset = EditorHelper.visualPositionToOffset(editor, VisualPosition(currentVisualLine, i))
       // We don't need a custom renderer, just use the standard parameter hint renderer
-      inlayModel.addInlineElement(offset, relatesToPrecedingText, HintRenderer(if (relatesToPrecedingText) ":$text" else "$text:"))
+      inlayModel.addInlineElement(
+        offset,
+        relatesToPrecedingText,
+        HintRenderer(if (relatesToPrecedingText) ":$text" else "$text:")
+      )
       // Every 20 chars +/- 5 chars
       i += 20 + (random.nextInt(10) - 5)
     }

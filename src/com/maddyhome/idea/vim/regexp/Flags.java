@@ -19,6 +19,8 @@
 package com.maddyhome.idea.vim.regexp;
 
 public class Flags {
+  private int flags;
+
   public Flags() {
     flags = 0;
   }
@@ -56,6 +58,4 @@ public class Flags {
 
     return this.flags;
   }
-
-  private int flags;
 }

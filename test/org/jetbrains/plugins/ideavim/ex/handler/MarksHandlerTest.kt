@@ -203,7 +203,14 @@ class MarksHandlerTest : VimTestCase() {
     typeText(parseKeys("ma", "w", "mb", "2w", "j")) // a + b
     typeText(parseKeys("v2b", "<Esc>", "j")) // < and > - last visual selection marks
     typeText(parseKeys("2b", "mB", "j", "mA", "<CR><CR>w")) // A + B
-    typeText(parseKeys("i", "inserted text ", "<Esc>", "<CR><CR>")) // ^ - position of end of last insert. Also '.' for start of change
+    typeText(
+      parseKeys(
+        "i",
+        "inserted text ",
+        "<Esc>",
+        "<CR><CR>"
+      )
+    ) // ^ - position of end of last insert. Also '.' for start of change
     typeText(parseKeys("w", "c4w", "replaced content", "<Esc>")) // [ and ] - recently changed/yanked
     typeText(parseKeys("gg")) // ' - position before last jump
 

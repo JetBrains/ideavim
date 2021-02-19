@@ -39,7 +39,12 @@ class Register {
     this.rawText = text
   }
 
-  constructor(name: Char, type: SelectionType, text: String, transferableData: MutableList<out TextBlockTransferableData>) {
+  constructor(
+    name: Char,
+    type: SelectionType,
+    text: String,
+    transferableData: MutableList<out TextBlockTransferableData>
+  ) {
     this.name = name
     this.type = type
     this.keys = StringHelper.stringToKeys(text)
@@ -47,7 +52,13 @@ class Register {
     this.rawText = text
   }
 
-  constructor(name: Char, type: SelectionType, text: String, transferableData: MutableList<out TextBlockTransferableData>, rawText: String) {
+  constructor(
+    name: Char,
+    type: SelectionType,
+    text: String,
+    transferableData: MutableList<out TextBlockTransferableData>,
+    rawText: String
+  ) {
     this.name = name
     this.type = type
     this.keys = StringHelper.stringToKeys(text)
@@ -81,7 +92,8 @@ class Register {
   }
 
   object KeySorter : Comparator<Register> {
-    @NonNls private const val ORDER = "\"0123456789abcdefghijklmnopqrstuvwxyz-*+.:%#/="
+    @NonNls
+    private const val ORDER = "\"0123456789abcdefghijklmnopqrstuvwxyz-*+.:%#/="
 
     override fun compare(o1: Register, o2: Register): Int {
       return ORDER.indexOf(o1.name.toLowerCase()) - ORDER.indexOf(o2.name.toLowerCase())

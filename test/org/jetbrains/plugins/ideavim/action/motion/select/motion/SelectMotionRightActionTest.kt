@@ -31,7 +31,13 @@ import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class SelectMotionRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopselect]
+    )
+  )
   fun `test char select simple move`() {
     doTest(
       listOf("viw", "<C-G>", "<Right>"),
@@ -57,7 +63,13 @@ class SelectMotionRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopselect]
+    )
+  )
   fun `test select multiple carets`() {
     doTest(
       listOf("viw", "<C-G>", "<Right>"),

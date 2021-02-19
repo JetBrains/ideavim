@@ -28,8 +28,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
-* @author vlan
-*/
+ * @author vlan
+ */
 public class MacKeyRepeat {
   @VimNlsSafe public static final String FMT = "defaults %s -globalDomain ApplePressAndHoldEnabled";
   @NotNull private static final MacKeyRepeat INSTANCE = new MacKeyRepeat();
@@ -42,6 +42,10 @@ public class MacKeyRepeat {
     return INSTANCE;
   }
 
+  private static @NotNull String read(@NotNull InputStream stream) throws IOException {
+    return CharStreams.toString(new InputStreamReader(stream));
+  }
+
   public @Nullable Boolean isEnabled() {
     final String command = String.format(FMT, read);
     try {
@@ -49,7 +53,8 @@ public class MacKeyRepeat {
       final String data = read(process.getInputStream()).trim();
       try {
         return Integer.parseInt(data) == 0;
-      } catch (NumberFormatException e) {
+      }
+      catch (NumberFormatException e) {
         return null;
       }
     }
@@ -76,9 +81,5 @@ public class MacKeyRepeat {
     }
     catch (IOException | InterruptedException ignored) {
     }
-  }
-
-  private static @NotNull String read(@NotNull InputStream stream) throws IOException {
-    return CharStreams.toString(new InputStreamReader(stream));
   }
 }

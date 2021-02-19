@@ -29,7 +29,11 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 class VisualSelectPreviousAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean { // FIXME: 2019-03-05 Make it multicaret
+  override fun execute(
+    editor: Editor,
+    context: DataContext,
+    cmd: Command
+  ): Boolean { // FIXME: 2019-03-05 Make it multicaret
     return VimPlugin.getVisualMotion().selectPreviousVisualMode(editor)
   }
 }

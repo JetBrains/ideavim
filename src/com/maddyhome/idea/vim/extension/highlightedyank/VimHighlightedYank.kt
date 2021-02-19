@@ -49,6 +49,7 @@ const val DEFAULT_HIGHLIGHT_DURATION: Long = 300
 
 @NonNls
 private const val HIGHLIGHT_DURATION_VARIABLE_NAME = "g:highlightedyank_highlight_duration"
+
 @NonNls
 private const val HIGHLIGHT_COLOR_VARIABLE_NAME = "g:highlightedyank_highlight_color"
 private var defaultHighlightTextColor: Color? = null

@@ -27,6 +27,11 @@ import org.jetbrains.annotations.Nullable;
  * Represents an option with a numeric value
  */
 public class NumberOption extends TextOption {
+  private final int dflt;
+  private final int min;
+  private final int max;
+  private int value;
+
   /**
    * Creates a number option that must contain a zero or positive value
    *
@@ -237,9 +242,4 @@ public class NumberOption extends TextOption {
 
     return "  " + getName() + "=" + value;
   }
-
-  private final int dflt;
-  private int value;
-  private final int min;
-  private final int max;
 }

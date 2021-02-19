@@ -22,6 +22,8 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 public class BoundStringOption extends StringOption {
+  protected final String[] values;
+
   BoundStringOption(@NonNls String name, @NonNls String abbrev, @NonNls String dflt, String[] values) {
     super(name, abbrev, dflt);
 
@@ -73,6 +75,4 @@ public class BoundStringOption extends StringOption {
 
     return false;
   }
-
-  protected final String[] values;
 }

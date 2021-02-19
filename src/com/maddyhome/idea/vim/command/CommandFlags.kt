@@ -36,19 +36,23 @@ enum class CommandFlags {
    * TODO it should be only INCLUSIVE, EXCLUSIVE and LINEWISE motions. Should be moved to [MotionType]
    */
   FLAG_MOT_LINEWISE,
+
   /**
    * Indicates that the cursor position should be saved prior to this motion command
    */
   FLAG_SAVE_JUMP,
+
   /**
    * A special command flag indicating that the inserted text after this command will not be repeated.
    * Example: `2i123` will insert `123123`, but `2s123` will insert `123`
    */
   FLAG_NO_REPEAT_INSERT,
+
   /**
    * This insert command should clear all saved keystrokes from the current insert
    */
   FLAG_CLEAR_STROKES,
+
   /**
    * This keystroke should be saved as part of the current insert
    */
@@ -71,14 +75,17 @@ enum class CommandFlags {
    */
   FLAG_SEARCH_FWD,
   FLAG_SEARCH_REV,
+
   /**
    * Command exits the visual mode, so caret movement shouldn't update visual selection
    */
   FLAG_EXIT_VISUAL,
+
   /**
    * This command starts a multi-command undo transaction
    */
   FLAG_MULTIKEY_UNDO,
+
   /**
    * This command should be followed by another command
    */
@@ -90,6 +97,7 @@ enum class CommandFlags {
   FLAG_ALLOW_DIGRAPH,
   FLAG_COMPLETE_EX,
   FLAG_TEXT_BLOCK,
+
   /**
    * Some IDE actions do enable `typeahead` option for proper popups handling.
    *   There actions are GoToClass, GoToFile, SearchEverywhere and so on. With this options enabled if vim-action is

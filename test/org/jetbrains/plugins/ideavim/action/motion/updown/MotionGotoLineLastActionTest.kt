@@ -44,6 +44,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
+
   fun `test with last empty line`() {
     doTest(
       "G",

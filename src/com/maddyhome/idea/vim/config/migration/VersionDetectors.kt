@@ -29,7 +29,8 @@ interface VersionDetector {
 
 object `Detect versions 3, 4, 5, 6` : VersionDetector {
 
-  @NonNls val pattern = "state version=\"(.)\"".toRegex()
+  @NonNls
+  val pattern = "state version=\"(.)\"".toRegex()
 
   override fun extractVersion(): Int? {
     val configFile = PathManager.getOptionsFile("vim_settings")

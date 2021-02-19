@@ -24,6 +24,9 @@ import org.jetbrains.annotations.NotNull;
  * An option that has an arbitrary string value
  */
 public class StringOption extends TextOption {
+  protected final String dflt;
+  protected String value;
+
   /**
    * Creates the string option
    *
@@ -143,7 +146,4 @@ public class StringOption extends TextOption {
 
     return "  " + getName() + "=" + value;
   }
-
-  protected final String dflt;
-  protected String value;
 }

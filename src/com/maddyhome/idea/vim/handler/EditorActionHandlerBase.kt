@@ -108,7 +108,8 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
       StringHelper.parseKeys(keyStrings[it])
     }.toSet()
 
-    @NonNls private const val VimActionPrefix = "Vim"
+    @NonNls
+    private const val VimActionPrefix = "Vim"
 
     @NonNls
     fun getActionId(classFullName: String): String {

@@ -440,14 +440,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     hard by the torrent of a mountain pass.
       """.trimIndent(),
       // Correct vim behaviour:
-     /* """
-                    A Discovery
+      /* """
+                     A Discovery
 
-                    I
-                    all rocks and lavender and tufted grass,
-                    w${s}here it was settled on some sodden sand[long line]
-                    hard by the torrent of a mountain pass.${c}${se}
-                """.trimIndent(),*/
+                     I
+                     all rocks and lavender and tufted grass,
+                     w${s}here it was settled on some sodden sand[long line]
+                     hard by the torrent of a mountain pass.${c}${se}
+                 """.trimIndent(),*/
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
     )
   }

@@ -41,7 +41,10 @@ fun ContainerFixture.editor(title: String, function: Editor.() -> Unit = {}): Ed
 }
 
 @FixtureName("Editor")
-class Editor(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) : CommonContainerFixture(remoteRobot, remoteComponent) {
+class Editor(
+  remoteRobot: RemoteRobot,
+  remoteComponent: RemoteComponent
+) : CommonContainerFixture(remoteRobot, remoteComponent) {
   val text: String
     get() = callJs("component.getEditor().getDocument().getText()", true)
 

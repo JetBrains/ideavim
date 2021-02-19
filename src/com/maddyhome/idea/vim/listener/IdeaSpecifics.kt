@@ -73,7 +73,8 @@ object IdeaSpecifics {
   class VimActionListener : AnActionListener {
     @NonNls
     private val surrounderItems = listOf("if", "if / else", "for")
-    private val surrounderAction = "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
+    private val surrounderAction =
+      "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
     private var editor: Editor? = null
     override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
       if (!VimPlugin.isEnabled()) return
@@ -100,7 +101,8 @@ object IdeaSpecifics {
             editor?.caretModel?.addCaretListener(object : CaretListener {
               override fun caretPositionChanged(event: CaretEvent) {
                 val eventEditor = event.editor.getTopLevelEditor()
-                val predictedMode = IdeaSelectionControl.predictMode(eventEditor, VimListenerManager.SelectionSource.OTHER)
+                val predictedMode =
+                  IdeaSelectionControl.predictMode(eventEditor, VimListenerManager.SelectionSource.OTHER)
                 moveCaretOneCharLeftFromSelectionEnd(eventEditor, predictedMode)
                 eventEditor.caretModel.removeCaretListener(this)
               }
@@ -111,7 +113,12 @@ object IdeaSpecifics {
       //endregion
 
       //region Enter insert mode after surround with if
-      if (surrounderAction == action.javaClass.name && surrounderItems.any { action.templatePresentation.text.endsWith(it) }) {
+      if (surrounderAction == action.javaClass.name && surrounderItems.any {
+        action.templatePresentation.text.endsWith(
+            it
+          )
+      }
+      ) {
         editor?.let {
           val commandState = it.commandState
           while (commandState.mode != CommandState.Mode.COMMAND) {
@@ -134,7 +141,12 @@ object IdeaSpecifics {
       val editor = state.editor ?: return
 
       state.addTemplateStateListener(object : TemplateEditingAdapter() {
-        override fun currentVariableChanged(templateState: TemplateState, template: Template?, oldIndex: Int, newIndex: Int) {
+        override fun currentVariableChanged(
+          templateState: TemplateState,
+          template: Template?,
+          oldIndex: Int,
+          newIndex: Int
+        ) {
           if (IdeaRefactorMode.keepMode()) {
             IdeaRefactorMode.correctSelection(editor)
           }

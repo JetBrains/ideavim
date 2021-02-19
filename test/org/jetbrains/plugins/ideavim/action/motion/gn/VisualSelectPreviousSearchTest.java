@@ -32,8 +32,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 public class VisualSelectPreviousSearchTest extends VimTestCase {
   @TestFor(classes = {SearchWholeWordForwardAction.class})
   public void testSearch() {
-    typeTextInFile(parseKeys("*w","gN"),
-            "h<caret>ello world\nhello world hello world");
+    typeTextInFile(parseKeys("*w", "gN"), "h<caret>ello world\nhello world hello world");
 
     assertOffset(12);
     assertSelection("hello");
@@ -50,8 +49,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
   public void testSearchWhenOnMatch() {
-    typeTextInFile(parseKeys("*","gN"),
-                   "h<caret>ello world\nhello world hello world");
+    typeTextInFile(parseKeys("*", "gN"), "h<caret>ello world\nhello world hello world");
 
     assertOffset(12);
     assertSelection("hello");

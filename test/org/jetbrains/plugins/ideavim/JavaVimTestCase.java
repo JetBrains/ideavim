@@ -41,7 +41,8 @@ import java.util.List;
 
 /**
  * NB: We need to extend from JavaCodeInsightFixtureTestCase so we
- *  can create PsiFiles with proper Java Language type
+ * can create PsiFiles with proper Java Language type
+ *
  * @author dhleong
  */
 public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {

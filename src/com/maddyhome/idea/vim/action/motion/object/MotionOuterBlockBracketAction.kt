@@ -36,7 +36,14 @@ class MotionOuterBlockBracketAction : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
-  override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
+  override fun getRange(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): TextRange? {
     return VimPlugin.getMotion().getBlockRange(editor, caret, count, true, '[')
   }
 }

@@ -158,8 +158,8 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
   }
 
   public List<Pair<List<KeyStroke>, MappingInfo>> getMapTo(@NotNull List<KeyStroke> toKeys) {
-    return myKeys.entrySet().stream()
-      .filter(o -> o.getValue() instanceof ToKeysMappingInfo && ((ToKeysMappingInfo)o.getValue()).getToKeys().equals(toKeys))
+    return myKeys.entrySet().stream().filter(
+      o -> o.getValue() instanceof ToKeysMappingInfo && ((ToKeysMappingInfo)o.getValue()).getToKeys().equals(toKeys))
       .map(o -> new Pair<>(o.getKey(), o.getValue())).collect(Collectors.toList());
   }
 }

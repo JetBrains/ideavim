@@ -23,6 +23,7 @@ import com.intellij.remoterobot.stepsProcessing.StepWorker
 
 object StepsLogger {
   private var initializaed = false
+
   @JvmStatic
   fun init() = synchronized(initializaed) {
     if (initializaed.not()) {

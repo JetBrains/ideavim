@@ -30,9 +30,9 @@ import org.jetbrains.annotations.NotNull;
 public interface VimExtensionHandler {
   /**
    * Executes the action.
-   *
+   * <p>
    * The action is run on the EDT thread inside the {@link com.intellij.openapi.command.CommandProcessor}.
-   *
+   * <p>
    * It's run without any read or write actions of {@link com.intellij.openapi.application.Application}, so you have to
    * make sure your code is synchronized properly. A read action is not needed for the EDT in the IntelliJ platform. As
    * for a write action, you'll have to apply it by yourself if you're modifying IntelliJ's data structures like

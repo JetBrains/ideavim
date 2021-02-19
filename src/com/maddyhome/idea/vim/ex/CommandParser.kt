@@ -307,9 +307,9 @@ object CommandParser {
               if (ch == '[' && !inBrackets) {
                 inBrackets = true
               } else if (ch == ']' && inBrackets && !(
-                location[location.length - 2] == '[' ||
-                  location.length >= 3 && location.substring(location.length - 3) == "[^]"
-                )
+                  location[location.length - 2] == '[' ||
+                    location.length >= 3 && location.substring(location.length - 3) == "[^]"
+                  )
               ) {
                 inBrackets = false
               } else if (ch == '\\') {
