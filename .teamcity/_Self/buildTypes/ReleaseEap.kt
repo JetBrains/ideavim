@@ -7,8 +7,6 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.vcsLabeling
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
-import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.ScheduleTrigger
-import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 
 object ReleaseEap : BuildType({
   name = "Publish EAP Build"
