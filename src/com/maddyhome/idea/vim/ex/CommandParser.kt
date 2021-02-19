@@ -304,13 +304,13 @@ object CommandParser {
             } else {
               // We need to skip over [ ] ranges. The ] is valid right after the [ or [^
               location!!.append(ch)
+              val cBracketCond = !(
+                location[location.length - 2] == '[' ||
+                  location.length >= 3 && location.substring(location.length - 3) == "[^]"
+                )
               if (ch == '[' && !inBrackets) {
                 inBrackets = true
-              } else if (ch == ']' && inBrackets && !(
-                  location[location.length - 2] == '[' ||
-                    location.length >= 3 && location.substring(location.length - 3) == "[^]"
-                  )
-              ) {
+              } else if (ch == ']' && inBrackets && cBracketCond) {
                 inBrackets = false
               } else if (ch == '\\') {
                 backCount++

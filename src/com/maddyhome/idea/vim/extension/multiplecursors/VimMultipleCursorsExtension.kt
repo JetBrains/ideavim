@@ -157,15 +157,11 @@ class VimMultipleCursorsExtension : VimExtension {
         val primaryCaret = editor.caretModel.primaryCaret
         val nextOffset = VimPlugin.getSearch().searchNextFromOffset(editor, primaryCaret.offset + 1, 1)
         val pattern = patterns.first()
-        if (nextOffset == -1 || patternComparator.compare(
-            EditorHelper.getText(
-              editor,
-              nextOffset,
-              nextOffset + pattern.length
-            ),
-            pattern
-          ) != 0
-        ) {
+        val compareText = patternComparator.compare(
+          EditorHelper.getText(editor, nextOffset, nextOffset + pattern.length),
+          pattern
+        )
+        if (nextOffset == -1 || compareText != 0) {
           if (caretModel.caretCount > 1) return
 
           val newNextOffset =
