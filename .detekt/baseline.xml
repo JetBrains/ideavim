@@ -73,13 +73,8 @@
     <ID>MagicNumber:VimHighlightedYank.kt$VimHighlightedYank.HighlightHandler$3</ID>
     <ID>MagicNumber:VimHighlightedYank.kt$VimHighlightedYank.HighlightHandler$4</ID>
     <ID>MatchingDeclarationName:CommandDefinition.kt$CommandName</ID>
-    <ID>MaxLineLength:EditorDataContext.kt$EditorDataContext$class</ID>
     <ID>MaxLineLength:ExBeanClass.kt$ExBeanClass$logger&lt;ExBeanClass&gt;().error("IdeaVim doesn't accept contributions to `vimActions` extension points. Please create a plugin using `VimExtension`. Plugin to blame: ${this.pluginDescriptor.pluginId}")</ID>
-    <ID>MaxLineLength:NotificationService.kt$NotificationService$notification.addAction(AppendToIdeaVimRcAction(notification, "set clipboard+=ideaput", "ideaput") { OptionsManager.clipboard.append(ClipboardOptionsData.ideaput) })</ID>
-    <ID>MaxLineLength:NotificationService.kt$NotificationService.AppendToIdeaVimRcAction$private inner</ID>
-    <ID>MaxLineLength:NotificationService.kt$NotificationService.AppendToIdeaVimRcAction$val successNotification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, "&lt;code&gt;$optionName&lt;/code&gt; is enabled", NotificationType.INFORMATION)</ID>
     <ID>MaxLineLength:OptionsManager.kt$OptionsManager$val clipboard = addOption(ListOption(ClipboardOptionsData.name, ClipboardOptionsData.abbr, arrayOf(ClipboardOptionsData.ideaput, "autoselect,exclude:cons\\|linux"), null))</ID>
-    <ID>MaxLineLength:ReplaceWithRegister.kt$ReplaceWithRegister.Operator$val visualSelection = PutData.VisualSelection(mapOf(editor.caretModel.primaryCaret to VimSelection.create(range.startOffset, range.endOffset - 1, selectionType, editor)), selectionType)</ID>
     <ID>MaxLineLength:StatisticReporter.kt$StatisticReporter$val url = "https://plugins.jetbrains.com/plugins/list?pluginId=${VimPlugin.getPluginId().idString}&amp;build=$buildNumber&amp;pluginVersion=$version&amp;os=$os&amp;uuid=$uid"</ID>
     <ID>MemberNameEqualsClassName:Ranges.kt$Ranges$private val ranges: MutableList&lt;Range&gt; = mutableListOf()</ID>
     <ID>NestedBlockDepth:OptionsManager.kt$OptionsManager$ fun parseOptionLine(editor: Editor?, args: String, failOnBad: Boolean): Boolean</ID>
