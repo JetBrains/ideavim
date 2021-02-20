@@ -53,17 +53,17 @@ object Project : Project({
       param("ebs-optimized", "false")
       param("image-instances-limit", "")
       param("image-name-prefix", "BuildAgentsIdeaVim")
-      param("instance-type", "c5d.large")
+      param("instance-type", "c5d.xlarge")
       param("key-pair-name", "teamcity-prod-pub")
       param("profileId", "amazon-48")
       param("security-group-ids", "sg-eda08696,sg-7332cf0f,")
       param("source-id", "BuildAgentsIdeaVim")
-      param("spot-instance-price", "0.1")
+      param("spot-instance-price", "0.12")
       param("subnet-id", "subnet-58839511")
       param("use-spot-instances", "true")
       param("user-tags", "project=idea-vim")
-      param("instance-type", "c5d.xlarge")
-      param("spot-instance-price", "0.12")
+      param("key-pair-name", "")
+      param("spot-instance-price", "")
     }
     feature {
       type = "CloudProfile"
@@ -84,6 +84,10 @@ object Project : Project({
       param("system.cloud.profile_id", "amazon-48")
       param("terminate-idle-time", "15")
       param("total-work-time", "")
+      param("user-script", "")
+      param("spot-fleet-config", "")
+      param("terminate-after-build", "true")
+      param("name", "Cloud Agents - Single Build")
     }
   }
 })

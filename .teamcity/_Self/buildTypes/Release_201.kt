@@ -31,7 +31,7 @@ object Release_201 : BuildType({
   vcs {
     root(_Self.vcsRoots.Branch_201)
 
-    checkoutMode = CheckoutMode.ON_SERVER
+    checkoutMode = CheckoutMode.AUTO
   }
 
   steps {

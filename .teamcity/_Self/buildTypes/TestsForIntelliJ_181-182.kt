@@ -20,7 +20,7 @@ sealed class TestsForIntelliJ_181_branch(private val version: String) : BuildTyp
   vcs {
     root(_Self.vcsRoots.Branch_181)
 
-    checkoutMode = CheckoutMode.ON_SERVER
+    checkoutMode = CheckoutMode.AUTO
   }
 
   steps {

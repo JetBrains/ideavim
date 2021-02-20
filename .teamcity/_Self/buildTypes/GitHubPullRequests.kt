@@ -23,7 +23,7 @@ object GitHubPullRequests : BuildType({
   vcs {
     root(_Self.vcsRoots.GitHubPullRequest)
 
-    checkoutMode = CheckoutMode.ON_SERVER
+    checkoutMode = CheckoutMode.AUTO
     branchFilter = """
             +:*
             -:<default>

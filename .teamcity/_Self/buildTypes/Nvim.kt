@@ -21,7 +21,7 @@ object Nvim : BuildType({
   vcs {
     root(DslContext.settingsRoot)
 
-    checkoutMode = CheckoutMode.ON_SERVER
+    checkoutMode = CheckoutMode.AUTO
   }
 
   steps {
