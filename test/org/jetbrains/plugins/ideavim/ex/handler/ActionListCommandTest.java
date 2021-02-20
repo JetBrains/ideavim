@@ -40,6 +40,8 @@ public class ActionListCommandTest extends VimTestCase {
 
     // Action lines
     int displayedActionNum = displayedLines.length - 1;
+    // [VERSION UPDATE] 203+
+    //noinspection deprecation
     String[] actionIds = ActionManager.getInstance().getActionIds("");
     assertEquals(displayedActionNum, actionIds.length);
   }

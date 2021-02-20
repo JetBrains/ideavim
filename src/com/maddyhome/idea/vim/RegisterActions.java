@@ -45,6 +45,8 @@ public class RegisterActions {
   private static void registerEpListener() {
     // IdeaVim doesn't support contribution to VIM_ACTIONS_EP extension point, so technically we can skip this update,
     //   but let's support dynamic plugins in a more classic way and reload actions on every EP change.
+    // [VERSION UPDATE] 203+
+    //noinspection deprecation
     VIM_ACTIONS_EP.getPoint(null).addExtensionPointListener(() -> {
       unregisterActions();
       registerActions();

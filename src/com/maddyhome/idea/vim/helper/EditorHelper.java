@@ -775,7 +775,7 @@ public class EditorHelper {
     // a visual position). If it is an inlay and is related to preceding text, we want to display it, so use it as the
     // target column. If it's an inlay related to following text, we don't want to display it at the right of the
     // screen, show the previous column
-    Inlay inlay = editor.getInlayModel().getInlineElementAt(new VisualPosition(visualLine, visualColumn));
+    Inlay<?> inlay = editor.getInlayModel().getInlineElementAt(new VisualPosition(visualLine, visualColumn));
     if (inlay != null && !inlay.isRelatedToPrecedingText()) {
       targetVisualColumn = visualColumn - 1;
     }

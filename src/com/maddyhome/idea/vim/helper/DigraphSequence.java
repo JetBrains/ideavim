@@ -160,18 +160,16 @@ public class DigraphSequence {
             logger.debug("decimal");
             return DigraphResult.HANDLED_LITERAL;
           default:
-            switch (key.getKeyCode()) {
-              case KeyEvent.VK_TAB:
-                KeyStroke code = KeyStroke.getKeyStroke('\t');
-                digraphState = DIG_STATE_PENDING;
+            if (key.getKeyCode() == KeyEvent.VK_TAB) {
+              KeyStroke code = KeyStroke.getKeyStroke('\t');
+              digraphState = DIG_STATE_PENDING;
 
-                return DigraphResult.done(code);
-              default:
-                logger.debug("unknown");
-                digraphState = DIG_STATE_PENDING;
-
-                return DigraphResult.done(key);
+              return DigraphResult.done(code);
             }
+            logger.debug("unknown");
+            digraphState = DIG_STATE_PENDING;
+
+            return DigraphResult.done(key);
         }
 
       case DIG_STATE_CODE_CHAR:

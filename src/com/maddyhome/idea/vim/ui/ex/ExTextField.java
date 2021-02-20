@@ -233,6 +233,8 @@ public class ExTextField extends JTextField {
     return text == null ? "" : text;
   }
 
+  // I'm not sure how to deal with these dispose issues and deprecations
+  @SuppressWarnings("deprecation")
   void setEditor(@NotNull Editor editor, DataContext context) {
     this.editor = editor;
     this.context = context;
@@ -459,6 +461,7 @@ public class ExTextField extends JTextField {
 
     private void updateDamage() {
       try {
+        //noinspection deprecation need java 9+
         Rectangle r = getComponent().getUI().modelToView(getComponent(), getDot(), getDotBias());
         damage(r);
       }
@@ -497,6 +500,7 @@ public class ExTextField extends JTextField {
         g.setColor(component.getCaretColor());
 
         // We have to use the deprecated version because we still support 1.8
+        //noinspection deprecation
         final Rectangle r = component.getUI().modelToView(component, getDot(), getDotBias());
         FontMetrics fm = g.getFontMetrics();
         final int boundsHeight = fm.getHeight();
@@ -562,7 +566,7 @@ public class ExTextField extends JTextField {
 
   private Editor editor;
   private DataContext context;
-  private CommandLineCaret caret;
+  private final CommandLineCaret caret;
   private String lastEntry;
   private String actualText;
   private List<HistoryGroup.HistoryEntry> history;

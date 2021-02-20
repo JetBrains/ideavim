@@ -47,7 +47,6 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<ActionB
     private set
 
   private var prevExpectedArgumentType: Argument.Type? = null
-    private set
 
   val isReady get() = commandState == CurrentCommandState.READY
   val isBad get() = commandState == CurrentCommandState.BAD_COMMAND

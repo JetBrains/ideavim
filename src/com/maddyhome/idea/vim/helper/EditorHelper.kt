@@ -86,9 +86,3 @@ fun Editor.endsWithNewLine(): Boolean {
   if (textLength == 0) return false
   return this.document.charsSequence[textLength - 1] == '\n'
 }
-
-fun Editor.secondLastCharIsNewLine(): Boolean {
-  val textLength = this.document.textLength
-  if (textLength <= 1) return false
-  return this.document.charsSequence[textLength - 2] == '\n'
-}

@@ -417,6 +417,8 @@ public class FileGroup {
   /**
    * This method listens for editor tab changes so any insert/replace modes that need to be reset can be.
    */
+  // I don't understand how to deal with these issues
+  @SuppressWarnings("deprecation")
   public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
     // The user has changed the editor they are working with - exit insert/replace mode, and complete any
     // appropriate repeat

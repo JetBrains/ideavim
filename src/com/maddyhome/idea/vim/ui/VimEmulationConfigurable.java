@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.openapi.ui.StripeTable;
 import com.intellij.ui.IdeBorderFactory;
@@ -72,7 +71,7 @@ public class VimEmulationConfigurable implements Configurable {
   }
 
   @Override
-  public void apply() throws ConfigurationException {
+  public void apply() {
     myConflictsTableModel.apply();
   }
 

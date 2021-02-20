@@ -3,9 +3,15 @@ profile:
   name: Qodana
 exclude:
   - name: PluginXmlValidity
+  - name: SuperTearDownInFinally
+  - name: MoveVariableDeclarationIntoWhen
   - name: All
     paths:
       - resources/icons/youtrack.svg
       - src/com/maddyhome/idea/vim/regexp/RegExp.java
       - build.gradle
       - src/com/maddyhome/idea/vim/helper/SearchHelper.java
+      - gradle/wrapper/gradle-wrapper.properties
+      - test/org/jetbrains/plugins/ideavim/propertybased/samples/LoremText.kt
+      - test/org/jetbrains/plugins/ideavim/propertybased/samples/SimpleText.kt
+      - test/org/jetbrains/plugins/ideavim/propertybased/samples/JavaText.kt

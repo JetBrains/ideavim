@@ -89,7 +89,3 @@ fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
 fun Editor.exitInsertMode(context: DataContext) {
   VimPlugin.getChange().processEscape(this, context)
 }
-
-fun Editor.exitInsertModeHardReset() {
-  VimPlugin.getChange().processEscape(this, null)
-}

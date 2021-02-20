@@ -226,6 +226,7 @@ class NotificationService(private val project: Project?) {
     }
   }
 
+  @Suppress("DialogTitleCapitalization")
   class OpenIdeaVimRcAction(private val notification: Notification?) :
     DumbAwareAction("Open ~/.ideavimrc")/*, LightEditCompatible*/ {
     override fun actionPerformed(e: AnActionEvent) {
@@ -246,6 +247,7 @@ class NotificationService(private val project: Project?) {
     }
   }
 
+  @Suppress("DialogTitleCapitalization")
   private inner class AppendToIdeaVimRcAction(
     val notification: Notification,
     val appendableText: String,
@@ -288,6 +290,8 @@ class NotificationService(private val project: Project?) {
   }
 
   companion object {
+    // [VERSION UPDATE] 203+
+    @Suppress("DEPRECATION")
     val IDEAVIM_STICKY_GROUP = NotificationGroup("ideavim-sticky", NotificationDisplayType.STICKY_BALLOON, false)
     const val IDEAVIM_NOTIFICATION_ID = "ideavim"
     const val IDEAVIM_NOTIFICATION_TITLE = "IdeaVim"

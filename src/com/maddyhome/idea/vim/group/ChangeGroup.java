@@ -98,7 +98,7 @@ public class ChangeGroup {
 
   private @Nullable Command lastInsert;
 
-  private List<VimInsertListener> insertListeners = ContainerUtil.createLockFreeCopyOnWriteList();
+  private final List<VimInsertListener> insertListeners = ContainerUtil.createLockFreeCopyOnWriteList();
 
   private void setInsertRepeat(int lines, int column, boolean append) {
     repeatLines = lines;
@@ -634,15 +634,16 @@ public class ChangeGroup {
               insertText(editor, caret, offset, pad);
             }
           }
+          int updatedCount = started ? (i == 0 ? count : count + 1) : count;
           if (repeatColumn >= MotionGroup.LAST_COLUMN) {
             caret.moveToOffset(VimPlugin.getMotion().moveCaretToLineEnd(editor, logicalLine + i, true));
-            repeatInsertText(editor, context, started ? (i == 0 ? count : count + 1) : count);
+            repeatInsertText(editor, context, updatedCount);
           }
           else if (EditorHelper.getVisualLineLength(editor, visualLine + i) >= repeatColumn) {
             VisualPosition visualPosition = new VisualPosition(visualLine + i, repeatColumn);
             int inlaysCount = InlayHelperKt.amountOfInlaysBeforeVisualPosition(editor, visualPosition);
             caret.moveToVisualPosition(new VisualPosition(visualLine + i, repeatColumn + inlaysCount));
-            repeatInsertText(editor, context, started ? (i == 0 ? count : count + 1) : count);
+            repeatInsertText(editor, context, updatedCount);
           }
         }
 
@@ -1423,16 +1424,6 @@ public class ChangeGroup {
     replaceText(editor, start, end, sb.toString());
   }
 
-  public void autoIndentLines(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count) {
-    final int startLine = caret.getLogicalPosition().line;
-    final int endLine = startLine + count - 1;
-
-    if (endLine <= EditorHelper.getLineCount(editor)) {
-      final TextRange range = new TextRange(caret.getOffset(), editor.getDocument().getLineEndOffset(endLine));
-      autoIndentRange(editor, caret, context, range);
-    }
-  }
-
   /**
    * Deletes the range of text and enters insert mode
    *
@@ -1440,7 +1431,6 @@ public class ChangeGroup {
    * @param caret   The caret to be moved after range deletion
    * @param range   The range to change
    * @param type    The type of the range
-   * @param context
    * @return true if able to delete the range, false if not
    */
   public boolean changeRange(@NotNull Editor editor,

@@ -134,10 +134,14 @@ public class EventFacade {
 
   public void registerLookupListener(@NotNull Project project, @NotNull PropertyChangeListener propertyChangeListener) {
     VimProjectService parentDisposable = VimProjectService.getInstance(project);
+    // [VERSION UPDATE] 203+
+    //noinspection deprecation
     LookupManager.getInstance(project).addPropertyChangeListener(propertyChangeListener, parentDisposable);
   }
 
   public void removeLookupListener(@NotNull Project project, @NotNull PropertyChangeListener propertyChangeListener) {
+    // [VERSION UPDATE] 203+
+    //noinspection deprecation
     LookupManager.getInstance(project).removePropertyChangeListener(propertyChangeListener);
   }
 

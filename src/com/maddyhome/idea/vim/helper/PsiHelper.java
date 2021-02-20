@@ -90,7 +90,7 @@ public class PsiHelper {
                                             @NotNull TIntArrayList navigationOffsets,
                                             boolean start) {
     if (root instanceof PsiTreeElementBase) {
-      PsiElement element = ((PsiTreeElementBase)root).getValue();
+      PsiElement element = ((PsiTreeElementBase<?>)root).getValue();
       int offset;
       if (start) {
         offset = element.getTextRange().getStartOffset();
