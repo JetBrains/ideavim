@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.util.NlsSafe;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -32,6 +31,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.InlayHelperKt;
 import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.helper.VimNlsSafe;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import org.jetbrains.annotations.Nls;
@@ -206,7 +206,7 @@ public class VimArgTextObjExtension implements VimExtension {
           try {
             bracketPairs = BracketPairs.fromBracketPairList(bracketPairsVar);
           } catch (BracketPairs.ParseException parseException) {
-            @NlsSafe String message =
+            @VimNlsSafe String message =
               MessageHelper.message("argtextobj.invalid.value.of.g.argtextobj.pairs.0", parseException.getMessage());
             VimPlugin.showMessage(message);
             VimPlugin.indicateError();
