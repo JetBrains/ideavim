@@ -132,6 +132,10 @@ class ReloadVimRc : DumbAwareAction() {
 class ReloadFloatingToolbar : AbstractFloatingToolbarProvider(ACTION_GROUP) {
   override val autoHideable: Boolean = false
 
+  // [VERSION UPDATE] 212+
+  @Suppress("OverridingDeprecatedMember")
+  override val priority: Int = 0
+
   override fun register(component: FloatingToolbarComponent, parentDisposable: Disposable) {
     super.register(component, parentDisposable)
     VimRcFileState.whenFileStateSaved {
