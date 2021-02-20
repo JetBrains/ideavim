@@ -105,6 +105,7 @@ annotation class RWLockLabel {
    * [Writable] annotation means that annotated function should be called from write action
    * This annotation is only a marker and doesn't enable r/w lock automatically
    */
+  @Suppress("unused")
   @Target(AnnotationTarget.FUNCTION)
   annotation class Writable
 

@@ -1447,7 +1447,7 @@ public class ChangeGroup {
         col = MotionGroup.LAST_COLUMN;
       }
     }
-    boolean after = range.getEndOffset() >= EditorHelper.getFileSize(editor, true);
+    boolean after = range.getEndOffset() >= EditorHelperRt.getFileSize(editor);
 
     final LogicalPosition lp =
       editor.offsetToLogicalPosition(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret));

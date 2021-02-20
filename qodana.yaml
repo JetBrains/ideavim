@@ -16,3 +16,6 @@ exclude:
       - test/org/jetbrains/plugins/ideavim/propertybased/samples/LoremText.kt
       - test/org/jetbrains/plugins/ideavim/propertybased/samples/SimpleText.kt
       - test/org/jetbrains/plugins/ideavim/propertybased/samples/JavaText.kt
+  - name: RedundantThrows
+    paths:
+      - src/com/maddyhome/idea/vim/ex/vimscript/VimScriptCommandHandler.java

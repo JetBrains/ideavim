@@ -26,6 +26,7 @@ import org.jetbrains.jetCheck.PropertyChecker
 // TODO: 25.01.2021 Add neovim test integration
 class MapPropertyTest : VimPropertyTest() {
   // Disabled, it works too long
+  @Suppress("TestFunctionName", "unused")
   fun /*test*/RandomMappings() {
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->

@@ -30,6 +30,7 @@ import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.util.NlsSafe
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimProjectService
 import com.maddyhome.idea.vim.common.TextRange
@@ -208,13 +209,12 @@ class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
         return try {
           extractFun(value)
         } catch (e: Exception) {
-          VimPlugin.showMessage(
-            MessageHelper.message(
-              "highlightedyank.invalid.value.of.0.1",
-              variableName,
-              e.message ?: ""
-            )
+          @NlsSafe val message = MessageHelper.message(
+            "highlightedyank.invalid.value.of.0.1",
+            variableName,
+            e.message ?: ""
           )
+          VimPlugin.showMessage(message)
 
           default
         }
