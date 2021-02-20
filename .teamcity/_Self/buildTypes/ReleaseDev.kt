@@ -47,7 +47,7 @@ object ReleaseDev : BuildType({
     schedule {
       enabled = true
       schedulingPolicy = daily {
-        hour = 22
+        hour = 2
       }
       branchFilter = ""
     }
