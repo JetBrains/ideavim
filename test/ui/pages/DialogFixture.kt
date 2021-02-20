@@ -46,6 +46,7 @@ class DialogFixture(
     fun byTitle(title: String) = byXpath("title $title", "//div[@title='$title' and @class='MyDialog']")
   }
 
+  @Suppress("unused")
   val title: String
     get() = callJs("component.getTitle();")
 }

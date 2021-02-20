@@ -30,6 +30,8 @@ import javax.swing.text.BadLocationException
 import javax.swing.text.DefaultEditorKit
 import javax.swing.text.Document
 import javax.swing.text.TextAction
+import kotlin.math.abs
+import kotlin.math.min
 
 interface MultiStepAction : Action {
   fun reset()
@@ -145,7 +147,7 @@ abstract class DeleteCharAction internal constructor(name: String?) : TextAction
   @kotlin.jvm.Throws(BadLocationException::class)
   fun deleteSelection(doc: Document, dot: Int, mark: Int): Boolean {
     if (dot != mark) {
-      doc.remove(Math.min(dot, mark), Math.abs(dot - mark))
+      doc.remove(min(dot, mark), abs(dot - mark))
       return true
     }
     return false

@@ -98,6 +98,7 @@ fun assertHappened(timeInMillis: Int = 1000, precision: Int, condition: () -> Bo
   waitAndAssert(precision * 2) { condition() }
 }
 
+@Suppress("unused")
 fun waitCondition(
   durationMillis: Long,
   interval: Long = 500,

@@ -5,6 +5,7 @@ exclude:
   - name: PluginXmlValidity
   - name: SuperTearDownInFinally
   - name: MoveVariableDeclarationIntoWhen
+  - name: UnusedReturnValue
   - name: All
     paths:
       - resources/icons/youtrack.svg

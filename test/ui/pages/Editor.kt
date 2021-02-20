@@ -58,6 +58,7 @@ class Editor(
     runJs("component.getEditor().getDocument().setText('${text.escape()}')", runInEdt = true)
   }
 
+  @Suppress("unused")
   fun findPointByOffset(offset: Int): Point {
     return callJs(
       """
@@ -69,6 +70,7 @@ class Editor(
     )
   }
 
+  @Suppress("unused")
   fun moveToLine(lineNumber: Int) {
     val pointToClick = callJs<Point>(
       """

@@ -25,7 +25,8 @@ import ui.pages.DialogFixture.Companion.byTitle
 import ui.pages.IdeaFrame
 
 class JavaExampleSteps(private val remoteRobot: RemoteRobot) {
-  private val keyboard: Keyboard
+  @Suppress("unused")
+  private val keyboard: Keyboard = Keyboard(remoteRobot)
 
   fun closeTipOfTheDay() {
     step(
@@ -40,9 +41,5 @@ class JavaExampleSteps(private val remoteRobot: RemoteRobot) {
         }
       }
     )
-  }
-
-  init {
-    keyboard = Keyboard(remoteRobot)
   }
 }

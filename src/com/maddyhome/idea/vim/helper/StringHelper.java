@@ -82,7 +82,6 @@ public class StringHelper {
    * Parses Vim key notation strings.
    *
    * @throws java.lang.IllegalArgumentException if the mapping doesn't make sense for Vim emulation
-   * @see :help <>
    */
   public static @NotNull List<KeyStroke> parseKeys(@NotNull @NonNls String... strings) {
     final List<KeyStroke> result = new ArrayList<>();
@@ -242,7 +241,7 @@ public class StringHelper {
       }
     }
 
-    return name != null ? "<" + prefix + name + ">" : "<<" + key.toString() + ">>";
+    return name != null ? "<" + prefix + name + ">" : "<<" + key + ">>";
   }
 
   public static String toPrintableCharacters(@NotNull List<KeyStroke> keys) {
@@ -523,13 +522,5 @@ public class StringHelper {
     else {
       return getKeyStroke(Character.toUpperCase(c), modifiers);
     }
-  }
-
-  private static @Nullable Character lastCharacter(@NotNull String text) {
-    return text.length() > 0 ? text.charAt(text.length() - 1) : null;
-  }
-
-  private static @Nullable Character firstCharacter(@NotNull String text) {
-    return text.length() > 0 ? text.charAt(0) : null;
   }
 }

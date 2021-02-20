@@ -208,6 +208,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @Suppress("unused")
   @Ignore
   fun `ingoretest put visual block visual line mode`() {
     val before = """
@@ -257,6 +258,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @Suppress("unused")
   @Ignore
   fun `ignoretest put visual text multicaret`() {
     val before = "${c}qwe asd ${c}zxc rty ${c}fgh vbn"

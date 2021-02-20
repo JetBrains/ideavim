@@ -146,6 +146,7 @@ annotation class TestWithoutNeovim(val reason: SkipNeovimReason, val description
 enum class SkipNeovimReason {
   PLUGIN,
   MULTICARET,
+  @Suppress("unused")
   INLAYS,
   OPTION,
   UNCLEAR,

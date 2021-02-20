@@ -480,7 +480,6 @@ object IdeaRefactorMode {
 
   fun keepMode(): Boolean = OptionsManager.idearefactormode.value == keep
   fun selectMode(): Boolean = OptionsManager.idearefactormode.value == select
-  fun visualMode(): Boolean = OptionsManager.idearefactormode.value == visual
 
   fun correctSelection(editor: Editor) {
     val action: () -> Unit = {

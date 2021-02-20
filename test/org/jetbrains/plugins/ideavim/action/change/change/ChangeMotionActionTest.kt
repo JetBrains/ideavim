@@ -120,6 +120,7 @@ class ChangeMotionActionTest : VimTestCase() {
   }
 
   // VIM-276 |c| |F|
+  @Suppress("unused")
   fun ignoreTestChangeLinesToBackwards() {
     doTest(
       "cFc",

@@ -214,16 +214,6 @@ public class ExTextField extends JTextField {
     resetFont(string);
   }
 
-  /**
-   * @deprecated Use getActualText()
-   * Using this method can include prompt characters used when entering digraphs or register text
-   */
-  @Override
-  @Deprecated
-  public String getText() {
-    return super.getText();
-  }
-
   @NotNull
   String getActualText() {
     if (actualText != null) {

@@ -21,6 +21,7 @@ package ui.utils
 import com.intellij.remoterobot.fixtures.Fixture
 import com.intellij.remoterobot.utils.keyboard
 
+@Suppress("unused")
 fun Fixture.insertMode() {
   type("i")
 }
