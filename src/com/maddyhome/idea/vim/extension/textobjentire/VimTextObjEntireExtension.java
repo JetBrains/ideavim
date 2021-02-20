@@ -134,6 +134,7 @@ public class VimTextObjEntireExtension implements VimExtension {
       int count = Math.max(1, commandState.getCommandBuilder().getCount());
 
       final EntireTextObjectHandler textObjectHandler = new EntireTextObjectHandler(ignoreLeadingAndTrailing);
+      //noinspection DuplicatedCode
       if (!commandState.isOperatorPending()) {
         editor.getCaretModel().runForEachCaret((Caret caret) -> {
           final TextRange range = textObjectHandler.getRange(editor, caret, context, count, 0, null);
