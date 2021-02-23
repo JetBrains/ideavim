@@ -38,6 +38,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static java.lang.Integer.max;
+import static java.lang.Integer.min;
 
 /**
  * This is a set of helper methods for working with editors. All line and column values are zero based.
@@ -72,8 +73,12 @@ public class EditorHelper {
   }
 
   public static int getVisualLineAtMiddleOfScreen(final @NotNull Editor editor) {
+    // The editor will return line numbers of virtual space if the text doesn't reach the end of the visible area
+    // (either because it's too short, or it's been scrolled up)
+    final int lastLineBaseline = editor.logicalPositionToXY(new LogicalPosition(getLineCount(editor), 0)).y;
     final Rectangle visibleArea = getVisibleArea(editor);
-    return editor.yToVisualLine(visibleArea.y + (visibleArea.height / 2));
+    final int height = min(lastLineBaseline - visibleArea.y, visibleArea.height);
+    return editor.yToVisualLine(visibleArea.y + (height / 2));
   }
 
   public static int getVisualLineAtBottomOfScreen(final @NotNull Editor editor) {

@@ -29,6 +29,7 @@ import com.intellij.openapi.editor.Inlay
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.colors.EditorColors
+import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileTypes.FileType
@@ -149,6 +150,12 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected fun setEditorVisibleSize(width: Int, height: Int) {
     EditorTestUtil.setEditorVisibleSize(myFixture.editor, width, height)
+  }
+
+  protected fun setEditorVirtualSpace() {
+    // Enable virtual space at the bottom of the file and force a layout to pick up the changes
+    myFixture.editor.settings.isAdditionalPageAtBottom = true
+    (myFixture.editor as EditorEx).scrollPane.viewport.doLayout()
   }
 
   protected fun configureByText(content: String) = configureByText(PlainTextFileType.INSTANCE, content)
@@ -460,12 +467,23 @@ abstract class VimTestCase : UsefulTestCase() {
   protected val fileManager: FileEditorManagerEx
     get() = FileEditorManagerEx.getInstanceEx(myFixture.project)
 
+  // Specify width in columns, not pixels, just like we do for visible screen size. The default text char width differs
+  // per platform (e.g. Windows is 7, Mac is 8) so we can't guarantee correct positioning for tests if we use hard coded
+  // pixel widths
   protected fun addInlay(offset: Int, relatesToPrecedingText: Boolean, widthInColumns: Int): Inlay<*> {
-    // Enforce deterministic tests for inlays. Default text char width is different per platform (e.g. Windows is 7 and
-    // Mac is 8) and using the same inlay width on all platforms can cause columns to be on or off screen unexpectedly.
-    // If inlay width is related to character width, we will scale correctly across different platforms
-    val columnWidth = EditorUtil.getPlainSpaceWidth(myFixture.editor)
-    return EditorTestUtil.addInlay(myFixture.editor, offset, relatesToPrecedingText, widthInColumns * columnWidth)!!
+    val widthInPixels = EditorUtil.getPlainSpaceWidth(myFixture.editor) * widthInColumns
+    return EditorTestUtil.addInlay(myFixture.editor, offset, relatesToPrecedingText, widthInPixels)
+  }
+
+  // As for inline inlays, height is specified as a multiplier of line height, as we can't guarantee the same line
+  // height on all platforms, so can't guarantee correct positioning for tests if we use pixels. This currently limits
+  // us to integer multiples of line heights. I don't think this will cause any issues, but we can change this to a
+  // float if necessary. We'd still be working scaled to the line height, so fractional values should still work.
+  protected fun addBlockInlay(offset: Int, showAbove: Boolean, heightInRows: Int): Inlay<*> {
+    val widthInColumns = 10 // Arbitrary width. We don't care.
+    val widthInPixels = EditorUtil.getPlainSpaceWidth(myFixture.editor) * widthInColumns
+    val heightInPixels = myFixture.editor.lineHeight * heightInRows
+    return EditorTestUtil.addBlockInlay(myFixture.editor, offset, false, showAbove, widthInPixels, heightInPixels)
   }
 
   // Disable or enable checks for the particular test

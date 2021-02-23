@@ -28,6 +28,11 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
+/*
+                                                 *M*
+M                       To Middle line of window, on the first non-blank
+                        character |linewise|.  See also 'startofline' option.
+ */
 class MotionMiddleScreenLineAction : MotionActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_JUMP)
 
