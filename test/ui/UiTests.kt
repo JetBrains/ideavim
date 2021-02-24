@@ -25,7 +25,6 @@ import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.keyboard
 import com.intellij.remoterobot.utils.waitFor
 import org.assertj.swing.core.MouseButton
-import ui.utils.JavaExampleSteps
 import org.junit.Test
 import ui.pages.Editor
 import ui.pages.actionMenu
@@ -35,6 +34,7 @@ import ui.pages.editor
 import ui.pages.gutter
 import ui.pages.idea
 import ui.pages.welcomeFrame
+import ui.utils.JavaExampleSteps
 import ui.utils.StepsLogger
 import ui.utils.doubleClickOnRight
 import ui.utils.moveMouseForthAndBack
