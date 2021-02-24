@@ -78,14 +78,8 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
     }
   }
 
-  @NotNull
-  protected Editor configureByJavaText(@NotNull String content) {
-    myFixture.configureByText(JavaFileType.INSTANCE, content);
-    return myFixture.getEditor();
-  }
-
   public void doTest(final List<KeyStroke> keys, String before, String after) {
-    configureByJavaText(before);
+    myFixture.configureByText(JavaFileType.INSTANCE, before);
     typeText(keys);
     myFixture.checkResult(after);
   }
