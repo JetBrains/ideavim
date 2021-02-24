@@ -29,7 +29,7 @@ OK, ready to do some coding?
 Yoo hoo! You’re all set to begin contributing.
 We've prepared some useful configurations for you:
 
-![Prepared configurations](resources/contributing/configurations.png)
+![Prepared configurations](assets/contributing/configurations.png)
 
 And here are useful gradle commands:
 

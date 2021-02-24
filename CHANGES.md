@@ -29,7 +29,7 @@ usual beta standards.
   
     * <details>
             <summary><strong>Click to see details</strong></summary>
-            <img src="resources/changes/0.65/nerdtree.gif" alt="NERDTree example"/>
+            <img src="assets/changes/0.65/nerdtree.gif" alt="NERDTree example"/>
     </details>
 * Support `maxmapdepth` option to define the maximum depth of mappings
 
@@ -162,7 +162,7 @@ Use `set ideavimsupport=` to disable IdeaVim in dialog editors.
 
     * <details>
             <summary><strong>Click to see details</strong></summary>
-            <img src="resources/changes/0.59/highlight_yank.gif" alt="highlight yank"/>
+            <img src="assets/changes/0.59/highlight_yank.gif" alt="highlight yank"/>
       </details>
 
 * [VIM-2068](https://youtrack.jetbrains.com/issue/VIM-2068) `:tabclose` command
@@ -187,7 +187,7 @@ Use `set ideavimsupport=` to disable IdeaVim in dialog editors.
 
     * <details>
             <summary><strong>Click to see details</strong></summary>
-            <img src="resources/changes/0.58/reload_ideavimrc.png" alt="IdeaVimRc reload"/>
+            <img src="assets/changes/0.58/reload_ideavimrc.png" alt="IdeaVimRc reload"/>
       </details>
 
 * Add `:buffer` command.

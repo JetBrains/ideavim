@@ -221,7 +221,7 @@ extract the ids of executed command. This option can be found in "Search everywh
 
     <details>
         <summary><strong>"Track action Ids" Details</strong> (click to see)</summary>
-        <img src="resources/readme/track_action_id.gif" alt="track action ids"/>
+        <img src="assets/readme/track_action_id.gif" alt="track action ids"/>
     </details>
 
 Examples:
