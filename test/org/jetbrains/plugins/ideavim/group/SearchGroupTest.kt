@@ -1418,6 +1418,7 @@ class SearchGroupTest : VimTestCase() {
     assertEquals(0, myFixture.editor.markupModel.allHighlighters.size)
   }
 
+  @Suppress("DEPRECATION")
   private fun assertSearchHighlights(tooltip: String, expected: String) {
     val allHighlighters = myFixture.editor.markupModel.allHighlighters
 

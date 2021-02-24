@@ -25,7 +25,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 /**
  * @author Alex Plate
  */
-@Suppress("ClassName")
+@Suppress("ClassName", "DEPRECATION")
 class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
   fun `test enable character selection`() {
     configureByText(
