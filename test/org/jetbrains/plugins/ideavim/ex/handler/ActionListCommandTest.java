@@ -27,6 +27,8 @@ import org.jetbrains.plugins.ideavim.VimTestCase;
  * @author Naoto Ikeno
  */
 public class ActionListCommandTest extends VimTestCase {
+  // [VERSION UPDATE] 203+
+  @SuppressWarnings("deprecation")
   public void testListAllActions() {
     configureByText("\n");
     typeText(commandToKeys("actionlist"));
@@ -40,8 +42,6 @@ public class ActionListCommandTest extends VimTestCase {
 
     // Action lines
     int displayedActionNum = displayedLines.length - 1;
-    // [VERSION UPDATE] 203+
-    //noinspection deprecation
     String[] actionIds = ActionManager.getInstance().getActionIds("");
     assertEquals(displayedActionNum, actionIds.length);
   }
