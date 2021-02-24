@@ -46,6 +46,6 @@ class MotionMiddleScreenLineAction : MotionActionHandler.ForEachCaret() {
     rawCount: Int,
     argument: Argument?
   ): Int {
-    return VimPlugin.getMotion().moveCaretToMiddleScreenLine(editor)
+    return VimPlugin.getMotion().moveCaretToMiddleScreenLine(editor, caret)
   }
 }

@@ -22,7 +22,7 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.VirtualEditData
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -111,15 +111,6 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
     )
   }
 
-  @VimBehaviorDiffers(
-    originalVimAfter = """
-            A Discovery
-
-                ${c}all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-    """
-  )
   @VimOptionDefaultAll
   fun `test simple deletion with indent`() {
     val keys = listOf("v", "D")
@@ -134,7 +125,29 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
     val after = """
             A Discovery
 
-            ${c}    all rocks and lavender and tufted grass,
+                ${c}all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  @VimOptionDefaultAll
+  fun `test simple deletion with indent and nostartofline`() {
+    OptionsManager.startofline.reset()
+    val keys = listOf("v", "D")
+    val before = """
+            A Discovery
+
+            I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    val after = """
+            A Discovery
+
+              ${c}  all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
@@ -329,15 +342,6 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviorDiffers(
-    originalVimAfter = """
-            A Discovery
-
-                ${c}all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-    """
-  )
   @VimOptionDefaultAll
   fun `test line deletion with indent`() {
     val keys = listOf("V", "D")
@@ -352,7 +356,29 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
     val after = """
             A Discovery
 
-            ${c}    all rocks and lavender and tufted grass,
+                ${c}all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  @VimOptionDefaultAll
+  fun `test line deletion with indent and nostartofline`() {
+    OptionsManager.startofline.reset()
+    val keys = listOf("V", "D")
+    val before = """
+            A Discovery
+
+            I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    val after = """
+            A Discovery
+
+              ${c}  all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()

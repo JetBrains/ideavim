@@ -1140,6 +1140,9 @@ public class ChangeGroup {
                              @Nullable SelectionType type,
                              boolean isChange) {
 
+    // Update the last column before we delete, or we might be retrieving the data for a line that no longer exists
+    UserDataManager.setVimLastColumn(caret, InlayHelperKt.getInlayAwareVisualColumn(caret));
+
     boolean removeLastNewLine = removeLastNewLine(editor, range, type);
     final boolean res = deleteText(editor, range, type);
     if (removeLastNewLine) {
@@ -1150,7 +1153,7 @@ public class ChangeGroup {
     if (res) {
       int pos = EditorHelper.normalizeOffset(editor, range.getStartOffset(), isChange);
       if (type == SelectionType.LINE_WISE) {
-        pos = VimPlugin.getMotion().moveCaretToLineStart(editor, editor.offsetToLogicalPosition(pos).line);
+        pos = VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor, editor.offsetToLogicalPosition(pos).line, caret);
       }
       MotionGroup.moveCaret(editor, caret, pos);
     }

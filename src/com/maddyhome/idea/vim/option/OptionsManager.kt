@@ -75,6 +75,7 @@ object OptionsManager {
   val sidescroll = addOption(NumberOption("sidescroll", "ss", 0))
   val sidescrolloff = addOption(NumberOption("sidescrolloff", "siso", 0))
   val smartcase = addOption(ToggleOption(SmartCaseOptionsData.name, SmartCaseOptionsData.abbr, false))
+  val startofline = addOption(ToggleOption("startofline", "sol", true))
   val ideajoin = addOption(IdeaJoinOptionsData.option)
   val timeout = addOption(ToggleOption("timeout", "to", true))
   val timeoutlen = addOption(NumberOption("timeoutlen", "tm", 1000, -1, Int.MAX_VALUE))

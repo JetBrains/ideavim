@@ -126,8 +126,10 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.mark.MotionJumpNextAction" mappingModes="N" keys="«C-I»,«Tab»"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.mark.MotionJumpPreviousAction" mappingModes="N" keys="«C-O»,«C-T»"/>
     <!-- Screen -->
-    <vimAction implementation="com.maddyhome.idea.vim.action.motion.screen.MotionFirstScreenLineAction" mappingModes="NXO" keys="H"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.motion.screen.MotionLastScreenLineAction" mappingModes="NXO" keys="L"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.screen.MotionFirstScreenLineAction" mappingModes="NX" keys="H"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.screen.MotionOpPendingFirstScreenLineAction" mappingModes="O" keys="H"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.screen.MotionLastScreenLineAction" mappingModes="NX" keys="L"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.motion.screen.MotionOpPendingLastScreenLineAction" mappingModes="O" keys="L"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.screen.MotionMiddleScreenLineAction" mappingModes="NXO" keys="M"/>
     <!-- Scroll -->
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLinePageStartAction" mappingModes="NXO" keys="z+"/>

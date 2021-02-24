@@ -24,16 +24,11 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class DeleteMotionActionTest : VimTestCase() {
 
-  @VimBehaviorDiffers(
-    originalVimAfter = """
-        def xxx():
-          ${c}expression one
-  """
-  )
   fun `test delete last line`() {
     typeTextInFile(
       parseKeys("dd"),
@@ -46,8 +41,26 @@ class DeleteMotionActionTest : VimTestCase() {
     myFixture.checkResult(
       """
         def xxx():
-        ${c}  expression one
+          ${c}expression one
       """.trimIndent()
+    )
+  }
+
+  fun `test delete last line with nostartofline`() {
+    OptionsManager.startofline.reset()
+    typeTextInFile(
+      parseKeys("dd"),
+      """
+        |def xxx():
+        |  expression one
+        |  expression${c} two
+      """.trimMargin()
+    )
+    myFixture.checkResult(
+      """
+        |def xxx():
+        |  expression${c} one
+      """.trimMargin()
     )
   }
 
