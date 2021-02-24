@@ -893,8 +893,7 @@ public class KeyHandler {
     private final Map<String, Object> values = new HashMap<>();
 
     DialogAwareDataContext(DataContext context) {
-      //noinspection rawtypes
-      for (DataKey key : keys) {
+      for (DataKey<?> key : keys) {
         values.put(key.getName(), key.getData(context));
       }
     }

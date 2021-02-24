@@ -251,12 +251,11 @@ public class ExOutputPanel extends JPanel {
         myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount()) {
       myAtEnd = true;
       myLabel.setText(MessageHelper.message("hit.enter.or.type.command.to.continue"));
-      myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
     }
     else {
       myLabel.setText(MessageHelper.message("ex.output.panel.more"));
-      myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
     }
+    myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
   }
 
   private void positionPanel() {

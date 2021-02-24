@@ -94,9 +94,9 @@ public class EventFacade {
     EditorFactory.getInstance().addEditorFactoryListener(listener, parentDisposable);
   }
 
+  @SuppressWarnings("deprecation")
   public void removeEditorFactoryListener(@NotNull EditorFactoryListener listener) {
     // Listener is removed not only if application is disposed
-    //noinspection deprecation
     EditorFactory.getInstance().removeEditorFactoryListener(listener);
   }
 
@@ -132,16 +132,16 @@ public class EventFacade {
     editor.getSelectionModel().removeSelectionListener(listener);
   }
 
+  // [VERSION UPDATE] 203+
+  @SuppressWarnings("deprecation")
   public void registerLookupListener(@NotNull Project project, @NotNull PropertyChangeListener propertyChangeListener) {
     VimProjectService parentDisposable = VimProjectService.getInstance(project);
-    // [VERSION UPDATE] 203+
-    //noinspection deprecation
     LookupManager.getInstance(project).addPropertyChangeListener(propertyChangeListener, parentDisposable);
   }
 
+  // [VERSION UPDATE] 203+
+  @SuppressWarnings("deprecation")
   public void removeLookupListener(@NotNull Project project, @NotNull PropertyChangeListener propertyChangeListener) {
-    // [VERSION UPDATE] 203+
-    //noinspection deprecation
     LookupManager.getInstance(project).removePropertyChangeListener(propertyChangeListener);
   }
 

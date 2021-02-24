@@ -449,9 +449,10 @@ public class ExTextField extends JTextField {
       }
     }
 
+    // Java 9+
+    @SuppressWarnings("deprecation")
     private void updateDamage() {
       try {
-        //noinspection deprecation need java 9+
         Rectangle r = getComponent().getUI().modelToView(getComponent(), getDot(), getDotBias());
         damage(r);
       }
@@ -481,6 +482,8 @@ public class ExTextField extends JTextField {
       updateDamage();
     }
 
+    // Java 9+
+    @SuppressWarnings("deprecation")
     @Override
     public void paint(Graphics g) {
       if (!isVisible()) return;
@@ -489,8 +492,6 @@ public class ExTextField extends JTextField {
         final JTextComponent component = getComponent();
         g.setColor(component.getCaretColor());
 
-        // We have to use the deprecated version because we still support 1.8
-        //noinspection deprecation
         final Rectangle r = component.getUI().modelToView(component, getDot(), getDotBias());
         FontMetrics fm = g.getFontMetrics();
         final int boundsHeight = fm.getHeight();
