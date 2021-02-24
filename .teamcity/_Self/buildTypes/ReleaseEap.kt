@@ -7,6 +7,8 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.vcsLabeling
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
+import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 
 object ReleaseEap : BuildType({
   name = "Publish EAP Build"
@@ -54,6 +56,18 @@ object ReleaseEap : BuildType({
       labelingPattern = "%system.build.number%-EAP"
       successfulOnly = true
       branchFilter = ""
+    }
+  }
+
+  failureConditions {
+    failOnMetricChange {
+      metric = BuildFailureOnMetric.MetricType.ARTIFACT_SIZE
+      threshold = 5
+      units = BuildFailureOnMetric.MetricUnit.PERCENTS
+      comparison = BuildFailureOnMetric.MetricComparison.DIFF
+      compareTo = build {
+        buildRule = lastSuccessful()
+      }
     }
   }
 })

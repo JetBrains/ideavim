@@ -8,6 +8,8 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
+import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 
 object Release : BuildType({
   name = "Publish Release"
@@ -41,6 +43,18 @@ object Release : BuildType({
       buildFile = ""
       enableStacktrace = true
       param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
+    }
+  }
+
+  failureConditions {
+    failOnMetricChange {
+      metric = BuildFailureOnMetric.MetricType.ARTIFACT_SIZE
+      threshold = 5
+      units = BuildFailureOnMetric.MetricUnit.PERCENTS
+      comparison = BuildFailureOnMetric.MetricComparison.DIFF
+      compareTo = build {
+        buildRule = lastSuccessful()
+      }
     }
   }
 })
