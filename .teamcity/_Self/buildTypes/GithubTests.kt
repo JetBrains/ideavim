@@ -10,12 +10,12 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.VcsTrigger
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
-object GithubTests : Github("clean test")
-object GithubLint : Github("clean detekt ktlintCheck")
+object GithubTests : Github("clean test", "Tests")
+object GithubLint : Github("clean detekt ktlintCheck", "Lint")
 
-sealed class Github(command: String) : BuildType({
-  name = "GitHub Pull Requests"
-  description = "Test GitHub pull requests"
+sealed class Github(command: String, desc: String) : BuildType({
+  name = "GitHub Pull Requests $desc"
+  description = "Test GitHub pull requests $desc"
 
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
