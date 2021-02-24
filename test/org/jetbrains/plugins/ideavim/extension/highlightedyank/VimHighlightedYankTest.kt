@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.extension.highlightedyank.DEFAULT_HIGHLIGHT_DURATION
 import com.maddyhome.idea.vim.helper.StringHelper
-import junit.framework.Assert
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -71,7 +70,7 @@ class VimHighlightedYankTest : VimTestCase() {
     typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_duration = \"500.15\"<CR>"))
     typeText(StringHelper.parseKeys("yy"))
 
-    Assert.assertEquals(
+    assertEquals(
       VimPlugin.getMessage(),
       "highlightedyank: Invalid value of g:highlightedyank_highlight_duration -- For input string: \"500.15\""
     )
@@ -83,7 +82,7 @@ class VimHighlightedYankTest : VimTestCase() {
     typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_duration = \"-1\"<CR>"))
     typeText(StringHelper.parseKeys("yy"))
 
-    Assert.assertEquals(VimPlugin.getMessage(), "")
+    assertEquals(VimPlugin.getMessage(), "")
   }
 
   fun `test indicating error when incorrect highlight color was provided by user`() {
@@ -93,7 +92,7 @@ class VimHighlightedYankTest : VimTestCase() {
       typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_color = \"$color\"<CR>"))
       typeText(StringHelper.parseKeys("yy"))
 
-      Assert.assertTrue(
+      assertTrue(
         color,
         VimPlugin.getMessage().contains("highlightedyank: Invalid value of g:highlightedyank_highlight_color")
       )
@@ -107,7 +106,7 @@ class VimHighlightedYankTest : VimTestCase() {
       typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_color = \"$color\"<CR>"))
       typeText(StringHelper.parseKeys("yy"))
 
-      Assert.assertEquals("", VimPlugin.getMessage())
+      assertEquals("", VimPlugin.getMessage())
     }
   }
 
@@ -166,7 +165,7 @@ fun sum(x: ${c}Int, y: ${c}Int, z: ${c}Int): Int {
   }
 
   private fun assertAllHighlightersCount(count: Int) {
-    Assert.assertEquals(count, getAllHighlightersCount())
+    assertEquals(count, getAllHighlightersCount())
   }
 
   private fun getAllHighlightersCount() = myFixture.editor.markupModel.allHighlighters.size

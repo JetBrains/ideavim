@@ -21,7 +21,6 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
-import junit.framework.Assert
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /*
@@ -155,7 +154,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(0, 25)
     typeText(parseKeys("<C-B>"))
-    Assert.assertTrue(VimPlugin.isError())
+    assertTrue(VimPlugin.isError())
   }
 
   fun `test scroll page up on second page moves cursor to previous top`() {

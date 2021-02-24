@@ -22,7 +22,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
-import junit.framework.Assert
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /*
@@ -83,7 +82,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(100, 110)
     typeText(parseKeys("10<C-D>"))
-    Assert.assertEquals(OptionsManager.scroll.value(), 10)
+    assertEquals(OptionsManager.scroll.value(), 10)
   }
 
   fun `test scroll downwards uses scroll option`() {
