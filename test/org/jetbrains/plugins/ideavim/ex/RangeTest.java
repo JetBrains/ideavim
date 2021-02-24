@@ -66,6 +66,12 @@ public class RangeTest extends VimTestCase {
     myFixture.checkResult("1\n2\n3\n5\n");
   }
 
+  public void testOffsetWithZero() {
+    myFixture.configureByText("a.txt", "1\n2\n<caret>3\n4\n5\n");
+    typeText(commandToKeys(".+0d"));
+    myFixture.checkResult("1\n2\n4\n5\n");
+  }
+
   public void testTwoOffsetsWithSameSign() {
     myFixture.configureByText("a.txt", "1\n<caret>2\n3\n4\n5\n");
     typeText(commandToKeys(".+1+1d"));
@@ -76,6 +82,12 @@ public class RangeTest extends VimTestCase {
     myFixture.configureByText("a.txt", "1\n<caret>2\n3\n4\n5\n");
     typeText(commandToKeys(".+2-1d"));
     myFixture.checkResult("1\n2\n4\n5\n");
+  }
+
+  public void testMultipleZeroOffsets() {
+    myFixture.configureByText("a.txt", "1\n<caret>2\n3\n4\n5\n");
+    typeText(commandToKeys(".+0-0d"));
+    myFixture.checkResult("1\n3\n4\n5\n");
   }
 
   public void testSearchForward() {

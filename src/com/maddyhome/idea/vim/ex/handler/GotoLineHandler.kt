@@ -53,7 +53,8 @@ class GotoLineHandler : CommandHandler.ForEachCaret() {
     val line = min(cmd.getLine(editor, caret), EditorHelper.getLineCount(editor) - 1)
 
     if (line >= 0) {
-      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, line))
+      val offset = VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor, line, caret)
+      MotionGroup.moveCaret(editor, caret, offset)
       return true
     }
 
