@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim.action.motion.screen
 
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionMiddleScreenLineActionTest : VimTestCase() {
@@ -60,7 +61,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     configureByLines(21, "    I found it in a legendary land")
     setPositionAndScroll(0, 0)
     typeText(parseKeys("M"))
-    assertPosition(11, 4)
+    assertPosition(10, 4)
   }
 
   fun `test move caret to middle line when file is shorter than screen 3`() {
@@ -76,7 +77,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     setEditorVisibleSize(screenWidth, 34)
     setPositionAndScroll(0, 0)
     typeText(parseKeys("M"))
-    assertPosition(11, 4)
+    assertPosition(10, 4)
   }
 
   fun `test move caret to middle line of visible lines with virtual space enabled`() {
@@ -85,6 +86,40 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     setPositionAndScroll(20, 20)
     typeText(parseKeys("M"))
     assertPosition(25, 4)
+  }
+
+  fun `test move caret to same column with nostartofline`() {
+    OptionsManager.startofline.reset()
+    configureByLines(50, "    I found it in a legendary land")
+    setPositionAndScroll(0, 0, 10)
+    typeText(parseKeys("M"))
+    assertPosition(17, 10)
+  }
+
+  fun `test move caret to end of shorter line with nostartofline`() {
+    OptionsManager.startofline.reset()
+    configureByLines(70, "    I found it in a legendary land")
+    setPositionAndScroll(0, 0, 10)
+    typeText(parseKeys("A", " extra text", "<Esc>"))
+    typeText(parseKeys("M"))
+    assertPosition(17, 33)
+  }
+
+  fun `test operator pending acts to middle line`() {
+    configureByLines(20, "    I found it in a legendary land")
+    setPositionAndScroll(0, 4, 10)
+    typeText(parseKeys("dM"))
+    assertPosition(4, 4)
+    assertLineCount(13)
+  }
+
+  fun `test operator pending acts to middle line with nostartofline`() {
+    OptionsManager.startofline.reset()
+    configureByLines(20, "    I found it in a legendary land")
+    setPositionAndScroll(0, 4, 10)
+    typeText(parseKeys("dM"))
+    assertPosition(4, 10)
+    assertLineCount(13)
   }
 
   fun `test move caret to middle line of screen with block inlays above`() {

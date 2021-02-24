@@ -47,7 +47,7 @@ class RepeatHandler : CommandHandler.ForEachCaret() {
     MotionGroup.moveCaret(
       editor,
       caret,
-      VimPlugin.getMotion().moveCaretToLine(editor, line, editor.caretModel.primaryCaret)
+      VimPlugin.getMotion().moveCaretToLineWithSameColumn(editor, line, editor.caretModel.primaryCaret)
     )
 
     if (arg == ':') {

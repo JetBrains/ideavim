@@ -185,9 +185,10 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected fun configureByLines(lineCount: Int, line: String) {
     val stringBuilder = StringBuilder()
-    repeat(lineCount) {
+    repeat(lineCount - 1) {
       stringBuilder.appendln(line)
     }
+    stringBuilder.append(line)
     configureByText(stringBuilder.toString())
   }
 
@@ -211,27 +212,21 @@ abstract class VimTestCase : UsefulTestCase() {
     OptionsManager.scrolloff.set(0)
     OptionsManager.scrolljump.set(1)
 
-    // Convert to visual lines to handle any collapsed folds
-    val scrollToVisualLine = EditorHelper.logicalLineToVisualLine(myFixture.editor, scrollToLogicalLine)
-    val bottomVisualLine = scrollToVisualLine + EditorHelper.getApproximateScreenHeight(myFixture.editor) - 1
-    val bottomLogicalLine = EditorHelper.visualLineToLogicalLine(myFixture.editor, bottomVisualLine)
-
-    // Make sure we're not trying to put caret in an invalid location
-    val boundsTop = EditorHelper.visualLineToLogicalLine(myFixture.editor, scrollToVisualLine)
-    val boundsBottom = EditorHelper.visualLineToLogicalLine(myFixture.editor, bottomVisualLine)
-    Assert.assertTrue(
-      "Caret line $caretLogicalLine not inside legal screen bounds ($boundsTop - $boundsBottom)",
-      caretLogicalLine in boundsTop..boundsBottom
-    )
-
     typeText(parseKeys("${scrollToLogicalLine + 1}z<CR>", "${caretLogicalLine + 1}G", "${caretLogicalColumn + 1}|"))
 
     OptionsManager.scrolljump.set(scrolljump)
     OptionsManager.scrolloff.set(scrolloff)
 
-    // Make sure we're where we want to be
-    assertVisibleArea(scrollToLogicalLine, bottomLogicalLine)
+    // Make sure we're where we want to be. If there are block inlays, we can't easily assert the bottom line because
+    // we'd have to duplicate the scrolling logic here. Asserting top when we know height is good enough
+    assertTopLogicalLine(scrollToLogicalLine)
     assertPosition(caretLogicalLine, caretLogicalColumn)
+
+    // Belt and braces. Let's make sure that the caret is fully onscreen
+    val bottomLogicalLine = EditorHelper.visualLineToLogicalLine(myFixture.editor,
+      EditorHelper.getVisualLineAtBottomOfScreen(myFixture.editor))
+    assertTrue(bottomLogicalLine >= caretLogicalLine)
+    assertTrue(caretLogicalLine >= scrollToLogicalLine)
   }
 
   protected fun typeText(keys: List<KeyStroke?>): Editor {
@@ -292,12 +287,21 @@ abstract class VimTestCase : UsefulTestCase() {
 
   // Use logical rather than visual lines, so we can correctly test handling of collapsed folds and soft wraps
   fun assertVisibleArea(topLogicalLine: Int, bottomLogicalLine: Int) {
+    assertTopLogicalLine(topLogicalLine)
+    assertBottomLogicalLine(bottomLogicalLine)
+  }
+
+  fun assertTopLogicalLine(topLogicalLine: Int) {
     val actualVisualTop = EditorHelper.getVisualLineAtTopOfScreen(myFixture.editor)
     val actualLogicalTop = EditorHelper.visualLineToLogicalLine(myFixture.editor, actualVisualTop)
+
+    Assert.assertEquals("Top logical lines don't match", topLogicalLine, actualLogicalTop)
+  }
+
+  fun assertBottomLogicalLine(bottomLogicalLine: Int) {
     val actualVisualBottom = EditorHelper.getVisualLineAtBottomOfScreen(myFixture.editor)
     val actualLogicalBottom = EditorHelper.visualLineToLogicalLine(myFixture.editor, actualVisualBottom)
 
-    Assert.assertEquals("Top logical lines don't match", topLogicalLine, actualLogicalTop)
     Assert.assertEquals("Bottom logical lines don't match", bottomLogicalLine, actualLogicalBottom)
   }
 
@@ -313,6 +317,10 @@ abstract class VimTestCase : UsefulTestCase() {
     val expected = ScreenBounds(leftLogicalColumn, rightLogicalColumn)
     val actual = ScreenBounds(actualLeftLogicalColumn, actualRightLogicalColumn)
     Assert.assertEquals(expected, actual)
+  }
+
+  fun assertLineCount(expected: Int) {
+    assertEquals(expected, EditorHelper.getLineCount(myFixture.editor))
   }
 
   fun putMapping(modes: Set<MappingMode>, from: String, to: String, recursive: Boolean) {

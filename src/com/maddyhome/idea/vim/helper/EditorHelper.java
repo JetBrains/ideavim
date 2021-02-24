@@ -81,10 +81,16 @@ public class EditorHelper {
     return editor.yToVisualLine(visibleArea.y + (height / 2));
   }
 
-  public static int getVisualLineAtBottomOfScreen(final @NotNull Editor editor) {
+  public static int getNonNormalizedVisualLineAtBottomOfScreen(final @NotNull Editor editor) {
+    // The editor will return line numbers of virtual space if the text doesn't reach the end of the visible area
+    // (either because it's too short, or it's been scrolled up)
     final Rectangle visibleArea = getVisibleArea(editor);
     return getFullVisualLine(editor, visibleArea.y + visibleArea.height, visibleArea.y,
                              visibleArea.y + visibleArea.height);
+  }
+
+  public static int getVisualLineAtBottomOfScreen(final @NotNull Editor editor) {
+    return normalizeVisualLine(editor, getNonNormalizedVisualLineAtBottomOfScreen(editor));
   }
 
   /**

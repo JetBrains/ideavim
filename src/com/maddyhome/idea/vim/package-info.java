@@ -164,10 +164,12 @@
  * |F|                    {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLeftMatchCharAction}
  * |G|                    {@link com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastAction}
  * |H|                    {@link com.maddyhome.idea.vim.action.motion.screen.MotionFirstScreenLineAction}
+ * |H|                    {@link com.maddyhome.idea.vim.action.motion.screen.MotionOpPendingFirstScreenLineAction}
  * |I|                    {@link com.maddyhome.idea.vim.action.change.insert.InsertBeforeFirstNonBlankAction}
  * |J|                    {@link com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesSpacesAction}
  * |K|                    {@link com.maddyhome.idea.vim.action.editor.VimQuickJavaDoc}
  * |L|                    {@link com.maddyhome.idea.vim.action.motion.screen.MotionLastScreenLineAction}
+ * |L|                    {@link com.maddyhome.idea.vim.action.motion.screen.MotionOpPendingLastScreenLineAction}
  * |M|                    {@link com.maddyhome.idea.vim.action.motion.screen.MotionMiddleScreenLineAction}
  * |N|                    {@link com.maddyhome.idea.vim.action.motion.search.SearchAgainPreviousAction}
  * |O|                    {@link com.maddyhome.idea.vim.action.change.insert.InsertNewLineAboveAction}
