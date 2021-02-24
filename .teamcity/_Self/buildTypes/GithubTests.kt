@@ -10,7 +10,10 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.VcsTrigger
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
-object GitHubPullRequests : BuildType({
+object GithubTests : Github("clean test")
+object GithubLint : Github("clean detekt ktlintCheck")
+
+sealed class Github(command: String) : BuildType({
   name = "GitHub Pull Requests"
   description = "Test GitHub pull requests"
 
@@ -21,7 +24,7 @@ object GitHubPullRequests : BuildType({
   }
 
   vcs {
-    root(_Self.vcsRoots.GitHubPullRequest)
+    root(GitHubPullRequest)
 
     checkoutMode = CheckoutMode.AUTO
     branchFilter = """
@@ -32,7 +35,7 @@ object GitHubPullRequests : BuildType({
 
   steps {
     gradle {
-      tasks = "clean test"
+      tasks = command
       buildFile = ""
       enableStacktrace = true
       param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")

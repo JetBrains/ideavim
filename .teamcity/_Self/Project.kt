@@ -1,6 +1,7 @@
 package _Self
 
-import _Self.buildTypes.GitHubPullRequests
+import _Self.buildTypes.GithubLint
+import _Self.buildTypes.GithubTests
 import _Self.buildTypes.Nvim
 import _Self.buildTypes.PluginVerifier
 import _Self.buildTypes.PropertyBased
@@ -8,6 +9,7 @@ import _Self.buildTypes.Qodana
 import _Self.buildTypes.TestsForIntelliJ20202
 import _Self.buildTypes.TestsForIntelliJ20203
 import _Self.buildTypes.TestsForIntelliJEAP
+import _Self.subprojects.GitHub
 import _Self.subprojects.OldTests
 import _Self.subprojects.Releases
 import _Self.vcsRoots.Branch_181
@@ -20,7 +22,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 object Project : Project({
   description = "Vim emulation plugin for the IntelliJ platform products"
 
-  subProjects(Releases, OldTests)
+  subProjects(Releases, OldTests, GitHub)
 
   // VCS roots
   vcsRoot(Branch_183)
@@ -30,8 +32,6 @@ object Project : Project({
   vcsRoot(GitHubPullRequest)
 
   // Builds
-  buildType(GitHubPullRequests)
-
   buildType(TestsForIntelliJ20202)
   buildType(TestsForIntelliJ20203)
   buildType(TestsForIntelliJEAP)
