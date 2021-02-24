@@ -208,7 +208,7 @@ object CommandParser {
     val argument = StringBuilder() // The command's argument(s)
     var location: StringBuffer? = null // The current range text
     var offsetSign = 1 // Sign of current range offset
-    var offsetNumber = 0 // The value of the current range offset
+    var offsetNumber = -1 // The value of the current range offset
     var offsetTotal = 0 // The sum of all the current range offsets
     var move = false // , vs. ; separated ranges (true=; false=,)
     var patternType = 0.toChar() // ? or /
@@ -251,7 +251,7 @@ object CommandParser {
           State.RANGE -> {
             location = StringBuffer()
             offsetTotal = 0
-            offsetNumber = 0
+            offsetNumber = -1
             move = false
             if (ch in '0'..'9') {
               state = State.RANGE_LINE
@@ -401,7 +401,7 @@ object CommandParser {
             }
           State.RANGE_OFFSET -> {
             // Figure out the sign of the offset and reset the offset value
-            offsetNumber = 0
+            offsetNumber = -1
             if (ch == '+') {
               offsetSign = 1
             } else if (ch == '-') {
@@ -418,7 +418,7 @@ object CommandParser {
             }
           State.RANGE_OFFSET_DONE -> {
             // No number implies a one
-            if (offsetNumber == 0) {
+            if (offsetNumber == -1) {
               offsetNumber = 1
             }
             // Update offset total for this range
@@ -433,7 +433,7 @@ object CommandParser {
           }
           State.RANGE_OFFSET_NUM -> // Update the value of the current offset
             if (ch in '0'..'9') {
-              offsetNumber = offsetNumber * 10 + (ch - '0')
+              offsetNumber = (if (offsetNumber == -1) 0 else offsetNumber) * 10 + (ch - '0')
               state = State.RANGE_OFFSET_MAYBE_DONE
               reprocess = false
             } else if (ch == '+' || ch == '-') {
