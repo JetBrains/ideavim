@@ -100,7 +100,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     assertPosition(30, 4)
   }
 
-  fun `test operator pending acts to first screen line` () {
+  fun `test operator pending acts to first screen line`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
     typeText(parseKeys("dH"))
@@ -115,7 +115,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     assertPosition(24, 4)
   }
 
-  fun `test operator pending acts to first screen line with nostartofline` () {
+  fun `test operator pending acts to first screen line with nostartofline`() {
     OptionsManager.startofline.reset()
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
@@ -176,4 +176,3 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     assertPosition(24, 4)
   }
 }
-
