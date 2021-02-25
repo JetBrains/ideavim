@@ -20,7 +20,6 @@ package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -102,12 +101,20 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
     assertVisibleArea(135, 169)
   }
 
-  @VimBehaviorDiffers(description = "IdeaVim does not support the 'startofline' options")
   fun `test scroll downwards puts cursor on first non-blank column`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 25, 14)
     typeText(parseKeys("<C-D>"))
     assertPosition(42, 4)
+    assertVisibleArea(37, 71)
+  }
+
+  fun `test scroll downwards keeps same column with nostartofline`() {
+    OptionsManager.startofline.reset()
+    configureByLines(100, "    I found it in a legendary land")
+    setPositionAndScroll(20, 25, 14)
+    typeText(parseKeys("<C-D>"))
+    assertPosition(42, 14)
     assertVisibleArea(37, 71)
   }
 }

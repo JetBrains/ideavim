@@ -164,4 +164,21 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertPosition(11, 0)
     assertVisibleArea(0, 34)
   }
+
+  fun `test scroll page up puts cursor on first non-blank column`() {
+    configureByLines(100, "    I found it in a legendary land")
+    setPositionAndScroll(50, 60, 14)
+    typeText(parseKeys("<C-B>"))
+    assertPosition(51, 4)
+    assertVisibleArea(17, 51)
+  }
+
+  fun `test scroll page up keeps same column with nostartofline`() {
+    OptionsManager.startofline.reset()
+    configureByLines(100, "    I found it in a legendary land")
+    setPositionAndScroll(50, 60, 14)
+    typeText(parseKeys("<C-B>"))
+    assertPosition(51, 14)
+    assertVisibleArea(17, 51)
+  }
 }

@@ -1075,7 +1075,7 @@ public class MotionGroup {
     }
   }
 
-  public boolean scrollFullPage(@NotNull Editor editor, int pages) {
+  public boolean scrollFullPage(@NotNull Editor editor, @NotNull Caret caret, int pages) {
     int caretVisualLine = EditorHelper.scrollFullPage(editor, pages);
     if (caretVisualLine != -1) {
       final int scrollOffset = getNormalizedScrollOffset(editor);
@@ -1099,9 +1099,10 @@ public class MotionGroup {
         }
       }
 
-      int offset =
-        moveCaretToLineStartSkipLeading(editor, visualLineToLogicalLine(editor, caretVisualLine));
-      moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
+      int offset = moveCaretToLineWithStartOfLineOption(editor,
+                                                        visualLineToLogicalLine(editor, caretVisualLine),
+                                                        caret);
+      moveCaret(editor, caret, offset);
       return success;
     }
 
@@ -1134,7 +1135,7 @@ public class MotionGroup {
     }
   }
 
-  public boolean scrollScreen(final @NotNull Editor editor, int rawCount, boolean down) {
+  public boolean scrollScreen(final @NotNull Editor editor, final @NotNull Caret caret, int rawCount, boolean down) {
     final CaretModel caretModel = editor.getCaretModel();
     final int currentLogicalLine = caretModel.getLogicalPosition().line;
 
@@ -1178,8 +1179,8 @@ public class MotionGroup {
     }
 
     int logicalLine = visualLineToLogicalLine(editor, targetCaretVisualLine);
-    int caretOffset = moveCaretToLineStartSkipLeading(editor, logicalLine);
-    moveCaret(editor, caretModel.getPrimaryCaret(), caretOffset);
+    int caretOffset = moveCaretToLineWithStartOfLineOption(editor, logicalLine, caret);
+    moveCaret(editor, caret, caretOffset);
 
     return true;
   }

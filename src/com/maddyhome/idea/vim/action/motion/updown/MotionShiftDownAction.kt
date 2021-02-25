@@ -46,6 +46,6 @@ class MotionShiftDownAction : ShiftedArrowKeyHandler() {
   }
 
   override fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command) {
-    VimPlugin.getMotion().scrollFullPage(editor, cmd.count)
+    VimPlugin.getMotion().scrollFullPage(editor, editor.caretModel.primaryCaret, cmd.count)
   }
 }
