@@ -29,6 +29,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.VirtualFileSystem;
+import com.intellij.util.MathUtil;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.*;
@@ -1301,10 +1302,10 @@ public class MotionGroup {
     }
   }
 
-  public int moveCaretToLinePercent(@NotNull Editor editor, int count) {
-    if (count > 100) count = 100;
-
-    return moveCaretToLineStartSkipLeading(editor, normalizeLine(editor, (getLineCount(editor) * count + 99) / 100 - 1));
+  public int moveCaretToLinePercent(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    return moveCaretToLineWithStartOfLineOption(editor,
+      normalizeLine(editor, (getLineCount(editor) * MathUtil.clamp(count, 0, 100) + 99) /100 - 1),
+      caret);
   }
 
   public int moveCaretGotoLineLastEnd(@NotNull Editor editor, int rawCount, int line, boolean pastEnd) {
