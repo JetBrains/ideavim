@@ -1652,6 +1652,9 @@ public class ChangeGroup {
       logger.debug("count=" + count);
     }
 
+    // Update the last column before we indent, or we might be retrieving the data for a line that no longer exists
+    UserDataManager.setVimLastColumn(caret, InlayHelperKt.getInlayAwareVisualColumn(caret));
+
     IndentConfig indentConfig = IndentConfig.create(editor, context);
 
     final int sline = editor.offsetToLogicalPosition(range.getStartOffset()).line;
@@ -1713,7 +1716,7 @@ public class ChangeGroup {
 
     if (!CommandStateHelper.inInsertMode(editor)) {
       if (!range.isMultiple()) {
-        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, sline));
+        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor, sline, caret));
       }
       else {
         MotionGroup.moveCaret(editor, caret, range.getStartOffset());
