@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
@@ -42,7 +43,8 @@ class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
     rawCount: Int,
     argument: Argument?
   ): Int {
-    return VimPlugin.getMotion().moveCaretGotoLineFirst(editor, count - 1)
+    val line = EditorHelper.normalizeLine(editor, count - 1)
+    return VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor, line, caret)
   }
 }
 
@@ -59,6 +61,7 @@ class MotionGotoLineFirstInsertAction : MotionActionHandler.ForEachCaret() {
     rawCount: Int,
     argument: Argument?
   ): Int {
-    return VimPlugin.getMotion().moveCaretGotoLineFirst(editor, count - 1)
+    val line = EditorHelper.normalizeLine(editor, count - 1)
+    return VimPlugin.getMotion().moveCaretToLineStart(editor, line)
   }
 }
