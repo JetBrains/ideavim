@@ -19,6 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.change.shift
 
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ShiftRightTest : VimTestCase() {
@@ -36,7 +37,7 @@ class ShiftRightTest : VimTestCase() {
       """
             A Discovery
 
-                  I found it in a legendary land
+                  ${c}I found it in a legendary land
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
@@ -116,6 +117,47 @@ class ShiftRightTest : VimTestCase() {
     myFixture.configureByText("a.txt", "foo<caret>foo\nfoobar\nfoobaz\n")
     typeText(StringHelper.parseKeys("<C-V>jjl>"))
     myFixture.checkResult("foo    foo\nfoo    bar\nfoo    baz\n")
+  }
+
+  fun `test shift right positions caret at first non-blank char`() {
+    val file = """
+      |A Discovery
+      |
+      |       I found it in a legendary l${c}and
+      |       all rocks and lavender and tufted grass,
+      |       where it was settled on some sodden sand
+      |       hard by the torrent of a mountain pass.
+    """.trimMargin()
+    typeTextInFile(StringHelper.parseKeys(">>"), file)
+    myFixture.checkResult("""
+      |A Discovery
+
+      |           ${c}I found it in a legendary land
+      |       all rocks and lavender and tufted grass,
+      |       where it was settled on some sodden sand
+      |       hard by the torrent of a mountain pass.
+      """.trimMargin())
+  }
+
+  fun `test shift right does not move caret with nostartofline`() {
+    OptionsManager.startofline.reset()
+    val file = """
+      |A Discovery
+      |
+      |       I found it in a ${c}legendary land
+      |       all rocks and lavender and tufted grass,
+      |       where it was settled on some sodden sand
+      |       hard by the torrent of a mountain pass.
+    """.trimMargin()
+    typeTextInFile(StringHelper.parseKeys(">>"), file)
+    myFixture.checkResult("""
+      |A Discovery
+
+      |           I found it i${c}n a legendary land
+      |       all rocks and lavender and tufted grass,
+      |       where it was settled on some sodden sand
+      |       hard by the torrent of a mountain pass.
+      """.trimMargin())
   }
 
   fun `test shift ctrl-t`() {
