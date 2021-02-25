@@ -223,8 +223,10 @@ abstract class VimTestCase : UsefulTestCase() {
     assertPosition(caretLogicalLine, caretLogicalColumn)
 
     // Belt and braces. Let's make sure that the caret is fully onscreen
-    val bottomLogicalLine = EditorHelper.visualLineToLogicalLine(myFixture.editor,
-      EditorHelper.getVisualLineAtBottomOfScreen(myFixture.editor))
+    val bottomLogicalLine = EditorHelper.visualLineToLogicalLine(
+      myFixture.editor,
+      EditorHelper.getVisualLineAtBottomOfScreen(myFixture.editor)
+    )
     assertTrue(bottomLogicalLine >= caretLogicalLine)
     assertTrue(caretLogicalLine >= scrollToLogicalLine)
   }

@@ -129,14 +129,16 @@ class ShiftRightTest : VimTestCase() {
       |       hard by the torrent of a mountain pass.
     """.trimMargin()
     typeTextInFile(StringHelper.parseKeys(">>"), file)
-    myFixture.checkResult("""
+    myFixture.checkResult(
+      """
       |A Discovery
 
       |           ${c}I found it in a legendary land
       |       all rocks and lavender and tufted grass,
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
-      """.trimMargin())
+      """.trimMargin()
+    )
   }
 
   fun `test shift right does not move caret with nostartofline`() {
@@ -150,14 +152,16 @@ class ShiftRightTest : VimTestCase() {
       |       hard by the torrent of a mountain pass.
     """.trimMargin()
     typeTextInFile(StringHelper.parseKeys(">>"), file)
-    myFixture.checkResult("""
+    myFixture.checkResult(
+      """
       |A Discovery
 
       |           I found it i${c}n a legendary land
       |       all rocks and lavender and tufted grass,
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
-      """.trimMargin())
+      """.trimMargin()
+    )
   }
 
   fun `test shift ctrl-t`() {

@@ -35,7 +35,7 @@ class MotionGotoLineFirstInsertActionTest : VimTestCase() {
         |       hard by the torrent of a mountain pass.
       """.trimMargin(),
       """
-        |${c}       A Discovery
+        |$c       A Discovery
         |
         |       I found it in a legendary land
         |       all rocks and lavender and tufted grass,
@@ -59,7 +59,7 @@ class MotionGotoLineFirstInsertActionTest : VimTestCase() {
         |       hard by the torrent of a mountain pass.
       """.trimMargin(),
       """
-        |${c}       A Discovery
+        |$c       A Discovery
         |
         |       I found it in a legendary land
         |       all rocks and lavender and tufted grass,

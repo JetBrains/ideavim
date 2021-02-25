@@ -42,11 +42,14 @@ class MotionGotoLineLastAction : MotionActionHandler.ForEachCaret() {
     rawCount: Int,
     argument: Argument?
   ): Int {
-    val line = EditorHelper.normalizeLine(editor, if (rawCount == 0) {
-      EditorHelper.getLineCount(editor) - 1
-    } else {
-      rawCount - 1
-    })
+    val line = EditorHelper.normalizeLine(
+      editor,
+      if (rawCount == 0) {
+        EditorHelper.getLineCount(editor) - 1
+      } else {
+        rawCount - 1
+      }
+    )
     return VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor, line, caret)
   }
 }

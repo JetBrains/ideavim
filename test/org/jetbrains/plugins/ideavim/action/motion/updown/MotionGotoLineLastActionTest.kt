@@ -156,7 +156,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
         |       I found it in a legendary land
         |       all rocks and lavender and tufted grass,
         |       where it was settled on some sodden sand
-        |       hard${c} by the torrent of a mountain pass.
+        |       hard$c by the torrent of a mountain pass.
       """.trimMargin(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
