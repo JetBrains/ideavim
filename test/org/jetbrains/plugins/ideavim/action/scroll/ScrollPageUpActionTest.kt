@@ -21,7 +21,6 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
-import junit.framework.Assert
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /*
@@ -155,7 +154,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(0, 25)
     typeText(parseKeys("<C-B>"))
-    Assert.assertTrue(VimPlugin.isError())
+    assertTrue(VimPlugin.isError())
   }
 
   fun `test scroll page up on second page moves cursor to previous top`() {
@@ -164,5 +163,22 @@ class ScrollPageUpActionTest : VimTestCase() {
     typeText(parseKeys("<C-B>"))
     assertPosition(11, 0)
     assertVisibleArea(0, 34)
+  }
+
+  fun `test scroll page up puts cursor on first non-blank column`() {
+    configureByLines(100, "    I found it in a legendary land")
+    setPositionAndScroll(50, 60, 14)
+    typeText(parseKeys("<C-B>"))
+    assertPosition(51, 4)
+    assertVisibleArea(17, 51)
+  }
+
+  fun `test scroll page up keeps same column with nostartofline`() {
+    OptionsManager.startofline.reset()
+    configureByLines(100, "    I found it in a legendary land")
+    setPositionAndScroll(50, 60, 14)
+    typeText(parseKeys("<C-B>"))
+    assertPosition(51, 14)
+    assertVisibleArea(17, 51)
   }
 }

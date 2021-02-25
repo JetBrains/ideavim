@@ -32,6 +32,6 @@ class MotionScrollHalfPageDownAction : VimActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_IGNORE_SCROLL_JUMP)
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    return VimPlugin.getMotion().scrollScreen(editor, cmd.rawCount, true)
+    return VimPlugin.getMotion().scrollScreen(editor, editor.caretModel.primaryCaret, cmd.rawCount, true)
   }
 }

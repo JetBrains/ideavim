@@ -20,9 +20,7 @@ package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
-import junit.framework.Assert
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /*
@@ -75,7 +73,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(50, 53)
     typeText(parseKeys("10<C-U>"))
-    Assert.assertEquals(OptionsManager.scroll.value(), 10)
+    assertEquals(OptionsManager.scroll.value(), 10)
   }
 
   fun `test scroll upwards uses scroll option`() {
@@ -95,12 +93,20 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     assertVisibleArea(65, 99)
   }
 
-  @VimBehaviorDiffers(description = "IdeaVim does not support the 'startofline' options")
   fun `test scroll up puts cursor on first non-blank column`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(50, 60, 14)
     typeText(parseKeys("<C-U>"))
     assertPosition(43, 4)
+    assertVisibleArea(33, 67)
+  }
+
+  fun `test scroll upwards keeps same column with nostartofline`() {
+    OptionsManager.startofline.reset()
+    configureByLines(100, "    I found it in a legendary land")
+    setPositionAndScroll(50, 60, 14)
+    typeText(parseKeys("<C-U>"))
+    assertPosition(43, 14)
     assertVisibleArea(33, 67)
   }
 }
