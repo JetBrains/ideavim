@@ -43,7 +43,7 @@ class MotionPercentOrMatchAction : MotionActionHandler.ForEachCaret() {
     return if (rawCount == 0) {
       VimPlugin.getMotion().moveCaretToMatchingPair(editor, caret)
     } else {
-      VimPlugin.getMotion().moveCaretToLinePercent(editor, count)
+      VimPlugin.getMotion().moveCaretToLinePercent(editor, caret, count)
     }
   }
 
