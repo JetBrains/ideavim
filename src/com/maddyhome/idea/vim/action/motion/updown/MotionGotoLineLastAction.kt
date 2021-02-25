@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
@@ -41,6 +42,11 @@ class MotionGotoLineLastAction : MotionActionHandler.ForEachCaret() {
     rawCount: Int,
     argument: Argument?
   ): Int {
-    return VimPlugin.getMotion().moveCaretGotoLineLast(editor, rawCount)
+    val line = EditorHelper.normalizeLine(editor, if (rawCount == 0) {
+      EditorHelper.getLineCount(editor) - 1
+    } else {
+      rawCount - 1
+    })
+    return VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor, line, caret)
   }
 }

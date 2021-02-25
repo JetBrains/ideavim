@@ -22,10 +22,10 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class MotionGotoLineLastActionTest : VimTestCase() {
+class MotionGotoLineFirstActionTest : VimTestCase() {
   fun `test simple motion`() {
     doTest(
-      "G",
+      "gg",
       """
                 A Discovery
 
@@ -35,12 +35,12 @@ class MotionGotoLineLastActionTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
       """.trimIndent(),
       """
-                A Discovery
+                ${c}A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                ${c}hard by the torrent of a mountain pass.
+                hard by the torrent of a mountain pass.
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
@@ -48,7 +48,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
 
   fun `test motion with count`() {
     doTest(
-      "5G",
+      "5gg",
       """
                 A ${c}Discovery
 
@@ -71,7 +71,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
 
   fun `test motion with large count`() {
     doTest(
-      "100G",
+      "100gg",
       """
                 A ${c}Discovery
 
@@ -94,22 +94,22 @@ class MotionGotoLineLastActionTest : VimTestCase() {
 
   fun `test motion with zero count`() {
     doTest(
-      "0G",
+      "0gg",
       """
-                A ${c}Discovery
+                A Discovery
+
+                I found it in a legendary land
+                all ${c}rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      """
+                ${c}A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-      """.trimIndent(),
-      """
-                A Discovery
-
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                ${c}hard by the torrent of a mountain pass.
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
@@ -117,7 +117,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
 
   fun `test moves caret to first non-blank char`() {
     doTest(
-      "G",
+      "gg",
       """
         |       A Discovery
         |
@@ -127,12 +127,12 @@ class MotionGotoLineLastActionTest : VimTestCase() {
         |       hard by the torrent of a mountain pass.
       """.trimMargin(),
       """
-        |       A Discovery
+        |       ${c}A Discovery
         |
         |       I found it in a legendary land
         |       all rocks and lavender and tufted grass,
         |       where it was settled on some sodden sand
-        |       ${c}hard by the torrent of a mountain pass.
+        |       hard by the torrent of a mountain pass.
       """.trimMargin(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
@@ -141,7 +141,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   fun `test moves caret to same column with nostartofline`() {
     OptionsManager.startofline.reset()
     doTest(
-      "G",
+      "gg",
       """
         |       A Discovery
         |
@@ -151,38 +151,13 @@ class MotionGotoLineLastActionTest : VimTestCase() {
         |       hard by the torrent of a mountain pass.
       """.trimMargin(),
       """
-        |       A Discovery
+        |       A Di${c}scovery
         |
         |       I found it in a legendary land
         |       all rocks and lavender and tufted grass,
         |       where it was settled on some sodden sand
-        |       hard${c} by the torrent of a mountain pass.
+        |       hard by the torrent of a mountain pass.
       """.trimMargin(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
-    )
-  }
-
-  fun `test with last empty line`() {
-    doTest(
-      "G",
-      """
-                A Discovery
-
-                I found it in a legendary land
-                all ${c}rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                
-      """.trimIndent(),
-      """
-                A Discovery
-
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                $c
-      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }

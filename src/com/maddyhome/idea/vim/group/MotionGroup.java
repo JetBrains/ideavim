@@ -1208,10 +1208,6 @@ public class MotionGroup {
     return normalizeOffset(editor, line, getLineEndOffset(editor, line, allowPastEnd), allowPastEnd);
   }
 
-  public int moveCaretGotoLineFirst(@NotNull Editor editor, int line) {
-    return moveCaretToLineStartSkipLeading(editor, line);
-  }
-
   // Scrolls current or [count] line to given screen location
   // In Vim, [count] refers to a file line, so it's a one-based logical line
   private void scrollLineToScreenLocation(@NotNull Editor editor,
@@ -1308,13 +1304,6 @@ public class MotionGroup {
     if (count > 100) count = 100;
 
     return moveCaretToLineStartSkipLeading(editor, normalizeLine(editor, (getLineCount(editor) * count + 99) / 100 - 1));
-  }
-
-  public int moveCaretGotoLineLast(@NotNull Editor editor, int rawCount) {
-    final int line =
-      rawCount == 0 ? normalizeLine(editor, getLineCount(editor) - 1) : rawCount - 1;
-
-    return moveCaretToLineStartSkipLeading(editor, line);
   }
 
   public int moveCaretGotoLineLastEnd(@NotNull Editor editor, int rawCount, int line, boolean pastEnd) {

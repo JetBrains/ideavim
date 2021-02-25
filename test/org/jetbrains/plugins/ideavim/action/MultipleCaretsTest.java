@@ -1133,7 +1133,7 @@ public class MultipleCaretsTest extends VimTestCase {
                                                "dsfa<caret>dsf fg dsfg sd<caret>fjgkfdgl jsdf" +
                                                "nflgj sd\n dflgj dfdsfg\n dfsgj sdf<caret>klgj");
     myFixture
-      .checkResult("    <caret>sdf" + "dsfadsf fg dsfg sdfjgkfdgl jsdf" + "nflgj sd\n dflgj dfdsfg\n dfsgj sdfklgj");
+      .checkResult("<caret>    sdf" + "dsfadsf fg dsfg sdfjgkfdgl jsdf" + "nflgj sd\n dflgj dfdsfg\n dfsgj sdfklgj");
   }
 
   public void testMotionGotoLineLastEnd() {
