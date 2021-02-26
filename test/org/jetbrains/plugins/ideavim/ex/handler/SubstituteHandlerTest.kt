@@ -471,29 +471,20 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     )
   }
 
-//  val before = """
-//       I found it in a legendary land
-//       ${c}all rocks and lavender and tufted grass,
-//       where it was settled on some sodden sand
-//       hard by the torrent of a mountain pass.
-//
-//       The features it combines mark it as new
-//       to science: shape and shade -- the special tinge,
-//       akin to moonlight, tempering its blue,
-//       the dingy underside, the checquered fringe.""".trimIndent()
-
   @VimOptionDefaultAll
   fun `test substitute pattern becomes last used pattern for search next`() {
     val before = """
        I found it in a legendary land
        ${c}all rocks and lavender and tufted grass,
        where it was settled on some sodden sand
-       hard by the torrent of a mountain pass.""".trimIndent()
+       hard by the torrent of a mountain pass.
+    """.trimIndent()
     val after = """
        I found it in a legendary land
        all rocks or lavender ${c}and tufted grass,
        where it was settled on some sodden sand
-       hard by the torrent of a mountain pass.""".trimIndent()
+       hard by the torrent of a mountain pass.
+    """.trimIndent()
 
     doTest(listOf(exCommand("s/and/or"), "n"), before, after)
   }
@@ -504,12 +495,14 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
        ${c}I found it in a legendary land
        all rocks and lavender and tufted grass,
        where it was settled on some sodden sand
-       hard by the torrent of a mountain pass.""".trimIndent()
+       hard by the torrent of a mountain pass.
+    """.trimIndent()
     val after = """
        I found it in a legendary lor
        ${c}all rocks or lavender and tufted grass,
        where it was settled on some sodden sand
-       hard by the torrent of a mountain pass.""".trimIndent()
+       hard by the torrent of a mountain pass.
+    """.trimIndent()
 
     doTest(listOf(exCommand("s/and/or"), "j", exCommand("s")), before, after)
   }
@@ -520,12 +513,14 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
        I found it in a legendary land
        ${c}all rocks and lavender and tufted grass,
        where it was settled on some sodden sand
-       hard by the torrent of a mountain pass.""".trimIndent()
+       hard by the torrent of a mountain pass.
+    """.trimIndent()
     val after = """
        I founz it in a legendary land
        ${c}all rocks anz lavenzer and tufted grass,
        where it was settled on some sodden sand
-       hard by the torrent of a mountain pass.""".trimIndent()
+       hard by the torrent of a mountain pass.
+    """.trimIndent()
 
     // Convert the first occurrence of d to z in the first two lines. :s will repeat the substitution on the current line
     doTest(listOf(exCommand("1,2s/d/z"), exCommand("s")), before, after)
@@ -537,12 +532,14 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
        I found it in a legendary land
        ${c}all rocks and lavender and tufted grass,
        where it was settled on some sodden sand
-       hard by the torrent of a mountain pass.""".trimIndent()
+       hard by the torrent of a mountain pass.
+    """.trimIndent()
     val after = """
        I founz it in a legendary land
        ${c}all rocks anz lavenzer and tufted grass,
        where it was settled on some sodden sand
-       hard by the torrent of a mountain pass.""".trimIndent()
+       hard by the torrent of a mountain pass.
+    """.trimIndent()
 
     // Convert the first occurrence of d to z in the first two lines. :s will repeat the substitution on the current line
     doTest(listOf(exCommand("1,2s/d/z"), exCommand("&")), before, after)
@@ -554,12 +551,14 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
        I found it in a legendary land
        ${c}all rocks and lavender and tufted grass,
        where it was settled on some sodden sand
-       hard by the torrent of a mountain pass.""".trimIndent()
+       hard by the torrent of a mountain pass.
+    """.trimIndent()
     val after = """
        I founz it in a legenzary land
        all rocks anz lavenzer and tufted grass,
        where it was settlez on some sodden sand
-       ${c}harz by the torrent of a mountain pass.""".trimIndent()
+       ${c}harz by the torrent of a mountain pass.
+    """.trimIndent()
 
     // Convert the first occurrence of d to z in the first two lines. :1,4s will repeat the substitution for all lines
     doTest(listOf(exCommand("1,2s/d/z"), exCommand("1,4s")), before, after)
@@ -571,12 +570,14 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
        I found it in a legendary land
        ${c}all rocks and lavender and tufted grass,
        where it was settled on some sodden sand
-       hard by the torrent of a mountain pass.""".trimIndent()
+       hard by the torrent of a mountain pass.
+    """.trimIndent()
     val after = """
        I founz it in a legenzary land
        all rocks anz lavenzer and tufted grass,
        where it was settlez on some sodden sand
-       ${c}harz by the torrent of a mountain pass.""".trimIndent()
+       ${c}harz by the torrent of a mountain pass.
+    """.trimIndent()
 
     // Convert the first occurrence of d to z in the first two lines. :1,4s will repeat the substitution for all lines
     doTest(listOf(exCommand("1,2s/d/z"), exCommand("1,4&")), before, after)
@@ -661,12 +662,14 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
        ${c}I found it in a legendary land
        all rocks and lavender and tufted grass,
        where it was settled on some sodden sand
-       hard by the torrent of a mountain pass.""".trimIndent()
+       hard by the torrent of a mountain pass.
+    """.trimIndent()
     val after = """
        I fouzd it iz a legendary land
        all rocks azd lavender and tufted grass,
        ${c}where it was settled oz some sodden sand
-       hard by the torrent of a mountain pass.""".trimIndent()
+       hard by the torrent of a mountain pass.
+    """.trimIndent()
 
     // Change the first `n` to `z`. Then repeat 3 times - i.e. first occurrence on 3 lines
     doTest(listOf(exCommand("s/n/z"), exCommand("s 3")), before, after)

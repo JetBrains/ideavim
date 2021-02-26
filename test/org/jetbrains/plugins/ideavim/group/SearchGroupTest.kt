@@ -1407,7 +1407,7 @@ class SearchGroupTest : VimTestCase() {
       project,
       Runnable {
         // Does not move the caret!
-      val n = searchGroup.processSearchCommand(editor, pattern, myFixture.caretOffset, Direction.FORWARDS)
+        val n = searchGroup.processSearchCommand(editor, pattern, myFixture.caretOffset, Direction.FORWARDS)
       ref.set(n)},
       null, null
     )

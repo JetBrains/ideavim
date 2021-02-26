@@ -104,7 +104,8 @@ class SearchAgainPreviousActionTest : VimTestCase() {
       The features it combines mark it as new
       to science: shape and shade -- the special tinge,
       akin to moonlight, tempering its blue,
-      the dingy underside, the checquered fringe.""".trimIndent()
+      the dingy underside, the checquered fringe.
+    """.trimIndent()
     val after = """
       I found it in a legendary land
       all rocks and lavender and tufted grass,
@@ -114,7 +115,8 @@ class SearchAgainPreviousActionTest : VimTestCase() {
       The features it combines mark it as new
       to science: shape and shade -- the special tinge,
       ${c}akin to moonlight, tempering its blue,
-      the dingy underside, the checquered fringe.""".trimIndent()
+      the dingy underside, the checquered fringe.
+    """.trimIndent()
 
     // Should search again for the search pattern, and apply offset
     doTest(listOf(searchCommand("/and/1"), "G", "N"), before, after)
@@ -125,12 +127,14 @@ class SearchAgainPreviousActionTest : VimTestCase() {
       I found it in a legendary land
       all rocks and lavender and tufted grass,
       ${c}all it was settled on some sodden sand
-      all by the torrent of a mountain pass""".trimIndent()
+      all by the torrent of a mountain pass
+    """.trimIndent()
     val after = """
       I found it in a legendary land
       ${c}all rocks and lavender and tufted grass,
       with it was settled on some sodden sand
-      all by the torrent of a mountain pass""".trimIndent()
+      all by the torrent of a mountain pass
+    """.trimIndent()
 
     // Should search again for the substitution pattern
     doTest(listOf(exCommand("s/all/with"), "N"), before, after)
@@ -146,7 +150,8 @@ class SearchAgainPreviousActionTest : VimTestCase() {
       The features it combines mark it as new
       to science: shape and shade -- the special tinge,
       akin to moonlight, tempering its blue,
-      the dingy underside, the checquered fringe.""".trimIndent()
+      the dingy underside, the checquered fringe.
+    """.trimIndent()
     val after = """
       I found it in a legendary land
       all rocks or lavender and tufted grass,
@@ -156,7 +161,8 @@ class SearchAgainPreviousActionTest : VimTestCase() {
       The features it combines mark it as new
       to science: shape and shade -- the special tinge,
       ${c}akin to moonlight, tempering its blue,
-      the dingy underside, the checquered fringe.""".trimIndent()
+      the dingy underside, the checquered fringe.
+    """.trimIndent()
 
     // Should search again for the substitution pattern, but apply offset from search
     doTest(listOf(searchCommand("/land/1"), exCommand("s/and/or"), "G", "N"), before, after)

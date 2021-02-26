@@ -412,9 +412,11 @@ abstract class VimTestCase : UsefulTestCase() {
     }
   }
 
-  fun doTest(keys: List<String>,
-             before: String,
-             after: String) {
+  fun doTest(
+    keys: List<String>,
+    before: String,
+    after: String
+  ) {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 

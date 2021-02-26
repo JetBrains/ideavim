@@ -79,7 +79,8 @@ class GnNextTextObjectTest : VimTestCase() {
       listOf("/is<CR>", ":s/test/tester/<CR>", "0", "dgn"),
       "Hello, ${c}this is a test here",
       "Hello, this is a ${c}er here",
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 
   private fun doTestWithSearch(keys: List<KeyStroke>, before: String, after: String) {

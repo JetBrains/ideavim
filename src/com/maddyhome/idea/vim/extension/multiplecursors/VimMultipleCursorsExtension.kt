@@ -64,7 +64,6 @@ private const val ALL_WHOLE_OCCURRENCES = "<Plug>AllWholeOccurrences"
 @NonNls
 private const val ALL_OCCURRENCES = "<Plug>AllOccurrences"
 
-
 private var Editor.vimMultipleCursorsWholeWord: Boolean? by userData()
 private var Editor.vimMultipleCursorsLastSelection: TextRange? by userData()
 
@@ -184,11 +183,11 @@ class VimMultipleCursorsExtension : VimExtension {
         // changed, so we're adding a first cursor based on the current selection (set a new non-whole word flag)
         val currentSelection = TextRange(caretModel.primaryCaret.selectionStart, caretModel.primaryCaret.selectionEnd)
         var lastSelection = editor.vimMultipleCursorsLastSelection
-        val wholeWord = if (lastSelection != null && lastSelection.startOffset == currentSelection.startOffset
-          && lastSelection.endOffset == currentSelection.endOffset) {
+        val wholeWord = if (lastSelection != null && lastSelection.startOffset == currentSelection.startOffset &&
+          lastSelection.endOffset == currentSelection.endOffset
+        ) {
           editor.vimMultipleCursorsWholeWord ?: false
-        }
-        else {
+        } else {
           false
         }
         editor.vimMultipleCursorsWholeWord = wholeWord
@@ -210,8 +209,7 @@ class VimMultipleCursorsExtension : VimExtension {
 
           val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(nextOffset), true) ?: return
           editor.vimMultipleCursorsLastSelection = selectText(caret, pattern, nextOffset)
-        }
-        else {
+        } else {
           VimPlugin.showMessage(MessageHelper.message("message.no.more.matches"))
         }
       }
@@ -226,8 +224,7 @@ class VimMultipleCursorsExtension : VimExtension {
       val primaryCaret = caretModel.primaryCaret
       val text = if (editor.inVisualMode) {
         primaryCaret.selectedText ?: return
-      }
-      else {
+      } else {
         val range = SearchHelper.findWordUnderCursor(editor, primaryCaret) ?: return
         if (range.startOffset > primaryCaret.offset) return
         EditorHelper.getText(editor, range)
@@ -244,8 +241,7 @@ class VimMultipleCursorsExtension : VimExtension {
         if (match.contains(primaryCaret.offset)) {
           MotionGroup.moveCaret(editor, primaryCaret, match.startOffset)
           selectText(primaryCaret, text, match.startOffset)
-        }
-        else {
+        } else {
           val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(match.startOffset), true) ?: return
           selectText(caret, text, match.startOffset)
         }
