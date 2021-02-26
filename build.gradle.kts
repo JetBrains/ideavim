@@ -18,7 +18,7 @@ buildscript {
 
 plugins {
     java
-    kotlin("jvm") version "1.4.30"
+    kotlin("jvm") version "1.3.71"
 
     id("org.jetbrains.intellij") version "0.7.2"
     id("io.gitlab.arturbosch.detekt") version "1.15.0"
