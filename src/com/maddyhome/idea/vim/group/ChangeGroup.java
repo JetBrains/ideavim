@@ -308,14 +308,11 @@ public class ChangeGroup {
   public boolean insertRegister(@NotNull Editor editor, @NotNull DataContext context, char key) {
     final Register register = VimPlugin.getRegister().getRegister(key);
     if (register != null) {
-      final String text = register.getText();
-      if (text != null) {
-        final int length = text.length();
-        for (int i = 0; i < length; i++) {
-          processKey(editor, context, KeyStroke.getKeyStroke(text.charAt(i)));
-        }
-        return true;
+      final List<KeyStroke> keys = register.getKeys();
+      for (KeyStroke k:keys) {
+        processKey(editor, context, k);
       }
+      return true;
     }
 
     return false;
