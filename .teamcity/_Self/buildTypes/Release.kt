@@ -7,6 +7,7 @@ import _Self.Constants.VERSION
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.vcsLabeling
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
@@ -43,6 +44,15 @@ object Release : BuildType({
       buildFile = ""
       enableStacktrace = true
       param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
+    }
+  }
+
+  features {
+    vcsLabeling {
+      vcsRootId = "${DslContext.settingsRoot.id}"
+      labelingPattern = "%system.build.number%"
+      successfulOnly = true
+      branchFilter = ""
     }
   }
 
