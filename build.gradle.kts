@@ -206,13 +206,13 @@ tasks.register("getUnreleasedChangelog") {
 
 // --- Slack notification
 
-tasks.register("slackEapNotification") {
+tasks.register("slackNotification") {
     doLast {
         if (slackUrl.isBlank()) {
             println("Slack Url is not defined")
             return@doLast
         }
-        val changeLog = changelog.getUnreleased().toText()
+        val changeLog = changelog.getLatest().toText()
         val slackDown = DownParser(changeLog, true).toSlack().toString()
 
         //language=JSON
@@ -224,7 +224,7 @@ tasks.register("slackEapNotification") {
                         "type": "selection",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "IdeaVim EAP $version has been released\\n$slackDown"
+                            "text": "IdeaVim $version has been released\\n$slackDown"
                         }
                     }
                 ]
