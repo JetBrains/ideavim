@@ -43,7 +43,7 @@ object ReleaseEap : BuildType({
 
   steps {
     gradle {
-      tasks = "clean publishPlugin slackEapNotification"
+      tasks = "clean publishPlugin"
       buildFile = ""
       enableStacktrace = true
       param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")

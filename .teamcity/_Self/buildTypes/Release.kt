@@ -39,7 +39,7 @@ object Release : BuildType({
 
   steps {
     gradle {
-      tasks = "clean publishPlugin"
+      tasks = "clean publishPlugin slackNotification"
       buildFile = ""
       enableStacktrace = true
       param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
