@@ -3,6 +3,8 @@ package patches.buildTypes
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.Qodana
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.qodana
+import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
+import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.ui.*
 
 /*
@@ -27,6 +29,21 @@ changeBuildType(RelativeId("Qodana")) {
             reportAsTestMode = "each-problem-is-test"
             param("report-version", "")
             param("yaml-configuration", "")
+        }
+    }
+
+    failureConditions {
+        val feature1 = find<BuildFailureOnMetric> {
+            failOnMetricChange {
+                threshold = 0
+                units = BuildFailureOnMetric.MetricUnit.DEFAULT_UNIT
+                comparison = BuildFailureOnMetric.MetricComparison.MORE
+                compareTo = value()
+                param("metricKey", "QodanaProblemsTotal")
+            }
+        }
+        feature1.apply {
+            metric = BuildFailureOnMetric.MetricType.TEST_FAILED_COUNT
         }
     }
 }
