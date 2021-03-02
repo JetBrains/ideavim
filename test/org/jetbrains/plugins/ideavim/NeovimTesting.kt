@@ -38,6 +38,9 @@ internal object NeovimTesting {
 
   private var neovimTestsCounter = 0
 
+  private var currentTestName = ""
+  private val untested = mutableListOf<String>()
+
   fun setUp(test: VimTestCase) {
     if (!neovimEnabled(test)) return
     val nvimPath = System.getenv("ideavim.nvim.path") ?: "nvim"
@@ -45,12 +48,18 @@ internal object NeovimTesting {
     neovim = pb.start()
     val neovimConnection = ProcessRpcConnection(neovim, true)
     neovimApi = NeovimApis.getApiForConnection(neovimConnection)
+    currentTestName = test.name
   }
 
   fun tearDown(test: VimTestCase) {
     if (!neovimEnabled(test)) return
     println("Tested with neovim: $neovimTestsCounter")
     neovim.destroy()
+    if (currentTestName.isNotBlank()) {
+      untested.add(currentTestName)
+      println("----")
+      println(untested)
+    }
   }
 
   private fun neovimEnabled(test: VimTestCase): Boolean {
@@ -74,6 +83,7 @@ internal object NeovimTesting {
 
   fun assertState(editor: Editor, test: VimTestCase) {
     if (!neovimEnabled(test)) return
+    currentTestName = ""
     neovimTestsCounter++
     assertText(editor)
     assertCaret(editor)
@@ -155,6 +165,11 @@ enum class SkipNeovimReason {
   SELECT_MODE,
   VISUAL_BLOCK_MODE,
   DIFFERENT,
+
+  // This test doesn't check vim behaviour
+  NOT_VIM_TESTING,
+
+  SHOW_CMD,
 }
 
 fun LogicalPosition.toVimCoords(): VimCoords {

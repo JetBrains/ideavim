@@ -32,6 +32,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     enableExtensions("multiple-cursors")
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testNextOccurrence() {
     val before = """public class ChangeLineAction extends EditorAction {
   public ChangeLineAction() {
@@ -71,6 +72,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testAllOccurrencesIterative() {
     val before = """public class ChangeLineAction extends EditorAction {
   public ChangeLineAction() {
@@ -110,6 +112,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testNotWholeOccurrence() {
     val before = """Int
       |Integer
@@ -134,6 +137,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSelectSubstring() {
     val before = """q${c}we
       |asdqweasd
@@ -152,6 +156,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSelectSingleOccurrence() {
     val before = """q${c}we
       |asd
@@ -174,6 +179,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSelectionWithMultipleCarets() {
     val before = """qwe
       |sdfgdfs${c}fdasfg
@@ -187,6 +193,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(before)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSelectAll() {
     val before = """qwe
       |asd
@@ -207,6 +214,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSelectAllNotWhole() {
     val before = """Int
       |Integer
@@ -230,6 +238,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSelectAllSingleOccurrence() {
     val before = """qwe
       |asd
@@ -249,6 +258,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testRemoveSelectionVisualMode() {
     val before = """q${s}we
       |dsgkldfjs ldfl gkjsdsl kj
@@ -262,6 +272,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(before)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testRemoveSubSelection() {
     val before = """Int
       |kekInteger
@@ -278,6 +289,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testRemoveOccurrence() {
     val before = """private i${c}nt a = 0;
       |private int b = 1;
@@ -288,6 +300,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     configureByJavaText(before)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSkipOccurrence() {
     val before = """pr${c}ivate int a = 0;
       |private int b = 1;
@@ -305,6 +318,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSkipAndThenSelectAllOccurrences() {
     val before = """pr${c}ivate int a = 0;
       |private int b = 1;
@@ -322,6 +336,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSeveralActions() {
     val before = """public class Main {
       |  public static void main(String[] args) {
@@ -390,6 +405,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(afterInsert)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSelectTwice() {
     val before = """qwe
       |asd
@@ -414,6 +430,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSkipSelectionSubstring() {
     val before = """qw${c}e
       |asdqweasd
@@ -434,6 +451,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testSkipSelectionVisualMode() {
     val before = """q${s}we
       |dsgkldfjs ldfl gkjsdsl kj
@@ -448,6 +466,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(before)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testAddSelectionVisualMode() {
     val before = """jdfsg sdf${c}dfkgjhfkgkldfjsg
       |dfkjghdfsgs
@@ -462,8 +481,10 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun testNextOccurrenceIgnorecase() {
-    val before = """fun getCellType(${c}pos: VisualPosition): CellType {
+    val before = """@TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
+fun getCellType(${c}pos: VisualPosition): CellType {
     if (pos in snakeCells) {
       return CellType.SNAKE
     }
@@ -478,7 +499,8 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     typeText(commandToKeys("set ignorecase"))
     typeText(parseKeys("g<A-n><A-n><A-n>"))
-    val after = """fun getCellType(${s}pos$se: Visual${s}Pos${se}ition): CellType {
+    val after = """@TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
+fun getCellType(${s}pos$se: Visual${s}Pos${se}ition): CellType {
     if (${s}pos$se in snakeCells) {
       return CellType.SNAKE
     }
@@ -492,7 +514,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
-  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test with tabs`() {
     val before = """
   I found it in a legendary land
@@ -510,6 +532,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test multiple capitalized occurrences with ignorecase`() {
     val before = """text ${c}Test text Test text Test text Test text"""
     configureByText(before)
@@ -520,6 +543,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test multiple mixed case occurrences with ignorecase`() {
     val before = """text ${c}Test text tesT text TEST text test text"""
     configureByText(before)

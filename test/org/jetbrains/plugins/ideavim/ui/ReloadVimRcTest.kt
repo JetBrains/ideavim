@@ -21,6 +21,8 @@ package org.jetbrains.plugins.ideavim.ui
 import com.intellij.mock.MockEditorFactory
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.ui.VimRcFileState
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ReloadVimRcTest : VimTestCase() {
@@ -31,6 +33,7 @@ class ReloadVimRcTest : VimTestCase() {
     VimRcFileState.clear()
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test equalTo`() {
     val file = """
       map x y
@@ -44,6 +47,7 @@ class ReloadVimRcTest : VimTestCase() {
     assertTrue(VimRcFileState.equalTo(document))
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test equalTo with whitespaces`() {
     val s = " " // Just to see whitespaces in the following code
     val origFile = """
@@ -67,6 +71,7 @@ class ReloadVimRcTest : VimTestCase() {
     assertTrue(VimRcFileState.equalTo(document))
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test equalTo add line`() {
     val origFile = """
       map x y
@@ -86,6 +91,7 @@ class ReloadVimRcTest : VimTestCase() {
     assertFalse(VimRcFileState.equalTo(document))
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test equalTo remove line`() {
     val origFile = """
       map x y
