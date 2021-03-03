@@ -22,6 +22,17 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Features:
+* Support `startofline` option
+
+### Fixes:
+* [VIM-2238](https://youtrack.jetbrains.com/issue/VIM-2238) Fix `M` command for small files
+
+### Merged PRs:
+* [275](https://github.com/JetBrains/ideavim/pull/275) by [Matt Ellis](https://github.com/citizenmatt): Fix edge cases for H, L and M and introduce 'startofline' option
+
 ## 0.65, 2021-02-17
 
 ### Features:
