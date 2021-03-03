@@ -122,6 +122,7 @@ class OpMappingTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test disable extension via set`() {
     configureByText("${c}I found it in a legendary land")
     typeText(parseKeys("Q"))
@@ -136,6 +137,7 @@ class OpMappingTest : VimTestCase() {
     myFixture.checkResult("I ${c}found it in a legendary land")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test disable extension as extension point`() {
     configureByText("${c}I found it in a legendary land")
     typeText(parseKeys("Q"))
@@ -154,6 +156,7 @@ class OpMappingTest : VimTestCase() {
     myFixture.checkResult("I ${c}found it in a legendary land")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test disable disposed extension`() {
     configureByText("${c}I found it in a legendary land")
     typeText(parseKeys("Q"))
@@ -189,18 +192,21 @@ class PlugExtensionsTest : VimTestCase() {
     super.tearDown()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test enable via plug`() {
     VimScriptParser.executeText("Plug 'MyTest'")
 
     assertTrue(extension.ext.initialized)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test enable via plugin`() {
     VimScriptParser.executeText("Plugin 'MyTest'")
 
     assertTrue(extension.ext.initialized)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test enable via plug and disable via set`() {
     VimScriptParser.executeText(
       "Plug 'MyTest'",
@@ -229,6 +235,7 @@ class PlugMissingKeys : VimTestCase() {
     super.tearDown()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test missing keys`() {
     executeLikeVimrc(
       "map myKey <Plug>TestMissing",
@@ -244,6 +251,7 @@ class PlugMissingKeys : VimTestCase() {
     TestCase.assertEquals(parseKeys("L"), iKeyMappings.first().first)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test missing keys enable plugin first`() {
     executeLikeVimrc(
       "Plug 'MyTest'",

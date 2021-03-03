@@ -20,6 +20,8 @@ package org.jetbrains.plugins.ideavim.group.motion
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -27,6 +29,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 @Suppress("ClassName", "DEPRECATION")
 class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable character selection`() {
     configureByText(
       """
@@ -44,6 +47,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable character selection multicaret`() {
     configureByText(
       """
@@ -61,6 +65,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable line selection`() {
     configureByText(
       """
@@ -78,6 +83,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable line selection multicaret`() {
     configureByText(
       """
@@ -95,6 +101,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable line selection till next line`() {
     configureByText(
       """
@@ -112,6 +119,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable line selection till next line multicaret`() {
     configureByText(
       """
@@ -129,6 +137,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable block selection`() {
     configureByText(
       """
@@ -146,6 +155,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable block selection with different line size`() {
     configureByText(
       """
@@ -163,6 +173,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable block selection with long line`() {
     configureByText(
       """

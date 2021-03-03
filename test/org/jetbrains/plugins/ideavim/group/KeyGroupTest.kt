@@ -22,11 +22,14 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.MappingOwner
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class KeyGroupTest : VimTestCase() {
   private val owner = MappingOwner.Plugin.get("KeyGroupTest")
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test remove key mapping`() {
     val keyGroup = VimPlugin.getKey()
     val keys = parseKeys("<C-S-B>")
@@ -44,6 +47,7 @@ class KeyGroupTest : VimTestCase() {
     myFixture.checkResult("I$c found it in a legendary land")
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test remove and add key mapping`() {
     val keyGroup = VimPlugin.getKey()
     val keys = parseKeys("<C-S-B>")

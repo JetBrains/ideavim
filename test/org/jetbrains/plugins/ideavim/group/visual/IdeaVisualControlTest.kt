@@ -30,6 +30,8 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.SelectModeOptionData
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
@@ -43,6 +45,7 @@ import org.jetbrains.plugins.ideavim.waitAndAssertMode
  */
 class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection no selection`() {
     configureByText(
       """
@@ -62,6 +65,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection cursor in the middle`() {
     configureByText(
       """
@@ -107,6 +111,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     """
   )
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection cursor on end`() {
     configureByText(
       """
@@ -142,6 +147,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection cursor on start`() {
     configureByText(
       """
@@ -177,6 +183,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection lineend`() {
     configureByText(
       """
@@ -212,6 +219,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection next line`() {
     configureByText(
       """
@@ -247,6 +255,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection start on line start`() {
     configureByText(
       """
@@ -282,6 +291,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection start on line end`() {
     configureByText(
       """
@@ -317,6 +327,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection multicaret`() {
     configureByText(
       """
@@ -352,6 +363,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection`() {
     configureByText(
       """
@@ -402,6 +414,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection next line`() {
     configureByText(
       """
@@ -437,6 +450,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection cursor on last line`() {
     configureByText(
       """
@@ -472,6 +486,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection cursor on first line`() {
     configureByText(
       """
@@ -507,6 +522,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection multicaret`() {
     configureByText(
       """
@@ -542,6 +558,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection motion up`() {
     configureByText(
       """
@@ -577,6 +594,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection looks like block`() {
     configureByText(
       """
@@ -597,6 +615,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection`() {
     configureByText(
       """
@@ -632,6 +651,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection with longer line`() {
     configureByText(
       """
@@ -667,6 +687,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection caret to the left`() {
     configureByText(
       """
@@ -708,6 +729,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
       [SelectModeOptionData.ideaselection]
     )
   )
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test control selection`() {
     configureByText(
       """
@@ -726,6 +748,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [""]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test control selection to visual mode`() {
     configureByText(
       """
@@ -744,6 +767,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [""]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test control selection from line to char visual modes`() {
     configureByText(
       """
@@ -767,6 +791,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [""]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test control selection from line to char visual modes in keep mode`() {
     configureByText(
       """

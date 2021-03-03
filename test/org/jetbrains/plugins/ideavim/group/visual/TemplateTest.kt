@@ -38,6 +38,8 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
@@ -56,6 +58,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     TemplateManagerImpl.setTemplateTesting(myFixture.testRootDisposable)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   @VimOptionDefaultAll
   fun `test simple rename`() {
     configureByJavaText(
@@ -80,6 +83,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test type rename`() {
     configureByJavaText(
       """
@@ -109,6 +113,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test selectmode without template`() {
     OptionsManager.idearefactormode.set(IdeaRefactorMode.visual)
     configureByJavaText(
@@ -128,6 +133,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test prepend`() {
     configureByJavaText(
       """
@@ -159,6 +165,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test motion right`() {
     configureByJavaText(
       """
@@ -187,6 +194,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test motion left on age`() {
     configureByJavaText(
       """
@@ -215,6 +223,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test motion right on age`() {
     configureByJavaText(
       """
@@ -243,6 +252,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test escape`() {
     configureByJavaText(
       """
@@ -272,6 +282,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test escape after typing`() {
     configureByJavaText(
       """
@@ -301,6 +312,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.keep]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template in normal mode`() {
     configureByJavaText(
       """
@@ -316,6 +328,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.keep]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test save mode for insert mode`() {
     configureByJavaText(
       """
@@ -332,6 +345,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.keep]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test save mode for visual mode`() {
     configureByJavaText(
       """
@@ -348,6 +362,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.select]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to select in normal mode`() {
     configureByJavaText(
       """
@@ -363,6 +378,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.select]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to select in insert mode`() {
     configureByJavaText(
       """
@@ -379,6 +395,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.select]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to select in visual mode`() {
     configureByJavaText(
       """
@@ -395,6 +412,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.select]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to select in select mode`() {
     configureByJavaText(
       """
@@ -411,6 +429,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.visual]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to visual in normal mode`() {
     configureByJavaText(
       """
@@ -426,6 +445,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.visual]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to visual in insert mode`() {
     configureByJavaText(
       """
@@ -442,6 +462,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.visual]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to visual in visual mode`() {
     configureByJavaText(
       """
@@ -458,6 +479,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.visual]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to visual in select mode`() {
     configureByJavaText(
       """
@@ -474,6 +496,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.keep]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template with multiple times`() {
     configureByJavaText(c)
     val manager = TemplateManager.getInstance(myFixture.project)
@@ -494,6 +517,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.keep]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template with lookup`() {
     configureByJavaText(
       """

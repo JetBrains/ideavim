@@ -137,6 +137,7 @@ class VimHighlightedYankTest : VimTestCase() {
     }
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test highlighting for a correct user provided amount of time`() {
     configureByJavaText(code)
     typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_duration = \"1000\"<CR>"))

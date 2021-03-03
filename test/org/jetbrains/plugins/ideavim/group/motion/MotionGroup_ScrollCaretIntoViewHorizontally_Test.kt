@@ -21,10 +21,13 @@ package org.jetbrains.plugins.ideavim.group.motion
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 @Suppress("ClassName")
 class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving right scrolls half screen to right by default`() {
     configureByColumns(200)
     typeText(parseKeys("80|", "l")) // 1 based
@@ -32,6 +35,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     assertVisibleLineBounds(0, 40, 119) // 0 based
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving right scrolls half screen to right by default 2`() {
     configureByColumns(200)
     setEditorVisibleSize(100, screenHeight)
@@ -39,18 +43,21 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     assertVisibleLineBounds(0, 50, 149)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving right scrolls half screen if moving too far 1`() {
     configureByColumns(400)
     typeText(parseKeys("70|", "41l")) // Move more than half screen width, but scroll less
     assertVisibleLineBounds(0, 70, 149)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving right scrolls half screen if moving too far 2`() {
     configureByColumns(400)
     typeText(parseKeys("50|", "200l")) // Move and scroll more than half screen width
     assertVisibleLineBounds(0, 209, 288)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving right with sidescroll 1`() {
     OptionsManager.sidescroll.set(1)
     configureByColumns(200)
@@ -58,6 +65,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     assertVisibleLineBounds(0, 1, 80)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving right with sidescroll 2`() {
     OptionsManager.sidescroll.set(2)
     configureByColumns(200)
@@ -65,6 +73,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     assertVisibleLineBounds(0, 2, 81)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving right with sidescrolloff`() {
     OptionsManager.sidescrolloff.set(10)
     configureByColumns(200)
@@ -72,6 +81,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     assertVisibleLineBounds(0, 30, 109)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving right with sidescroll and sidescrolloff`() {
     OptionsManager.sidescroll.set(1)
     OptionsManager.sidescrolloff.set(10)
@@ -80,6 +90,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     assertVisibleLineBounds(0, 1, 80)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving right with large sidescrolloff keeps cursor centred`() {
     OptionsManager.sidescrolloff.set(999)
     configureByColumns(200)
@@ -87,6 +98,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     assertVisibleLineBounds(0, 10, 89)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving right with inline inlay`() {
     OptionsManager.sidescroll.set(1)
     configureByColumns(200)
@@ -99,6 +111,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     assertVisibleLineBounds(0, 119 - availableColumns + 1, 119)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving left scrolls half screen to left by default`() {
     configureByColumns(200)
     typeText(parseKeys("80|zs", "h"))
@@ -106,6 +119,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     assertVisibleLineBounds(0, 38, 117)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving left scrolls half screen to left by default 2`() {
     configureByColumns(200)
     setEditorVisibleSize(100, screenHeight)
@@ -113,18 +127,21 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     assertVisibleLineBounds(0, 48, 147)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving left scrolls half screen if moving too far 1`() {
     configureByColumns(400)
     typeText(parseKeys("170|zs", "41h")) // Move more than half screen width, but scroll less
     assertVisibleLineBounds(0, 88, 167)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving left scrolls half screen if moving too far 2`() {
     configureByColumns(400)
     typeText(parseKeys("290|zs", "200h")) // Move more than half screen width, but scroll less
     assertVisibleLineBounds(0, 49, 128)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving left with sidescroll 1`() {
     OptionsManager.sidescroll.set(1)
     configureByColumns(200)
@@ -132,6 +149,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     assertVisibleLineBounds(0, 98, 177)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving left with sidescroll 2`() {
     OptionsManager.sidescroll.set(2)
     configureByColumns(200)
@@ -139,6 +157,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     assertVisibleLineBounds(0, 97, 176)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving left with sidescrolloff`() {
     OptionsManager.sidescrolloff.set(10)
     configureByColumns(200)
@@ -146,6 +165,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     assertVisibleLineBounds(0, 78, 157)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving left with sidescroll and sidescrolloff`() {
     OptionsManager.sidescroll.set(1)
     OptionsManager.sidescrolloff.set(10)
@@ -154,6 +174,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     assertVisibleLineBounds(0, 108, 187)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving left with inline inlay`() {
     OptionsManager.sidescroll.set(1)
     configureByColumns(200)
@@ -165,6 +186,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
     assertVisibleLineBounds(0, 99, 99 + availableColumns - 1)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving left with large sidescrolloff keeps cursor centred`() {
     OptionsManager.sidescrolloff.set(999)
     configureByColumns(200)

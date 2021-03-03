@@ -27,6 +27,8 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.assertDoesntChange
 import org.jetbrains.plugins.ideavim.rangeOf
@@ -37,6 +39,7 @@ import org.jetbrains.plugins.ideavim.waitAndAssertMode
  * @author Alex Plate
  */
 class NonVimVisualChangeTest : VimTestCase() {
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test save mode after removing text`() {
     // PyCharm uses BackspaceHandler.deleteToTargetPosition to remove indent
     // See https://github.com/JetBrains/ideavim/pull/186#issuecomment-486656093
@@ -71,6 +74,7 @@ class NonVimVisualChangeTest : VimTestCase() {
     assertMode(CommandState.Mode.INSERT)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable and disable selection`() {
     configureByText(
       """
@@ -93,6 +97,7 @@ class NonVimVisualChangeTest : VimTestCase() {
     assertDoesntChange { myFixture.editor.mode == CommandState.Mode.INSERT }
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable, disable, and enable selection again`() {
     configureByText(
       """
@@ -116,6 +121,7 @@ class NonVimVisualChangeTest : VimTestCase() {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test switch from char to line visual mode`() {
     val text = """
             A Discovery

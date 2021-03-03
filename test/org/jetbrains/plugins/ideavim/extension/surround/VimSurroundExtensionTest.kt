@@ -87,6 +87,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     doTest("ys4w\"", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundTag() {
     configureByText("Hello ${c}World!\n")
     typeText(parseKeys("ysiw\\<em>"))
@@ -94,6 +95,7 @@ class VimSurroundExtensionTest : VimTestCase() {
   }
 
   // VIM-1569
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundTagWithAttributes() {
     configureByText("Hello ${c}World!")
     typeText(parseKeys("ysiw\\<span class=\"important\" data-foo=\"bar\">"))
@@ -101,18 +103,21 @@ class VimSurroundExtensionTest : VimTestCase() {
   }
 
   // VIM-1569
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurraungTagAsInIssue() {
     configureByText("<p>${c}Hello</p>")
     typeText(parseKeys("VS<div class = \"container\">"))
     myFixture.checkResult("<div class = \"container\"><p>Hello</p></div>")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundFunctionName() {
     configureByText("foo = b${c}ar")
     typeText(parseKeys("ysiwfbaz"))
     myFixture.checkResult("foo = ${c}baz(bar)")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundFunctionNameDoesNothingIfInputIsEmpty() {
     // The cursor does not move. This is different from Vim
     // where the cursor moves to the beginning of the text object.
@@ -121,12 +126,14 @@ class VimSurroundExtensionTest : VimTestCase() {
     myFixture.checkResult("foo = b${c}ar")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundFunctionNameWithInnerSpacing() {
     configureByText("foo = b${c}ar")
     typeText(parseKeys("ysiwFbaz"))
     myFixture.checkResult("foo = ${c}baz( bar )")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundSpace() {
     configureByText("foo(b${c}ar)")
     typeText(parseKeys("csbs"))
@@ -457,6 +464,7 @@ class VimSurroundExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test change new line`() {
     val before = """
       "\n"
