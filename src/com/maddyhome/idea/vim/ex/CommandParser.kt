@@ -152,7 +152,7 @@ object CommandParser {
     val handler = getCommandHandler(command)
     if (handler == null) {
       val message = message(Msg.NOT_EX_CMD, command.command)
-      throw InvalidCommandException(message, cmd)
+      throw InvalidCommandException(message, null)
     }
     if (handler.argFlags.access === CommandHandler.Access.WRITABLE && !editor.document.isWritable) {
       VimPlugin.indicateError()
@@ -392,10 +392,13 @@ object CommandParser {
           State.RANGE_MAYBE_DONE -> // The range has an offset after it
             state = if (ch == '+' || ch == '-') {
               State.RANGE_OFFSET
+            } else if (ch in '0'..'9') {
+              // Start of an offset, without the leading '+'
+              offsetNumber = 0
+              offsetSign = 1
+              State.RANGE_OFFSET_MAYBE_DONE
             } else if (ch == ',' || ch == ';') {
               State.RANGE_SEPARATOR
-            } else if (ch in '0'..'9') {
-              State.RANGE_LINE
             } else {
               State.RANGE_DONE
             }
