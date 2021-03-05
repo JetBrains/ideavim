@@ -23,6 +23,7 @@ plugins {
     id("org.jetbrains.intellij") version "0.7.2"
     id("io.gitlab.arturbosch.detekt") version "1.15.0"
     id("org.jetbrains.changelog") version "1.1.2"
+
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
 }
