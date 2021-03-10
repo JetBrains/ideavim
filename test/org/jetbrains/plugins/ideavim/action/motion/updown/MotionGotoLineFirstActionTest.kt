@@ -20,6 +20,8 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionGotoLineFirstActionTest : VimTestCase() {
@@ -138,6 +140,7 @@ class MotionGotoLineFirstActionTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test moves caret to same column with nostartofline`() {
     OptionsManager.startofline.reset()
     doTest(

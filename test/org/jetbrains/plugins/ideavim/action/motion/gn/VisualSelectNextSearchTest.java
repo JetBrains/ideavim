@@ -23,6 +23,8 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.CommandState;
+import org.jetbrains.plugins.ideavim.SkipNeovimReason;
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import java.util.EnumSet;
@@ -56,6 +58,7 @@ public class VisualSelectNextSearchTest extends VimTestCase {
     assertMode(CommandState.Mode.VISUAL);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testWithoutSpaces() {
     configureByText("test<caret>test");
     VimPlugin.getSearch().search(myFixture.getEditor(), "test", 1, EnumSet.noneOf(CommandFlags.class), false);

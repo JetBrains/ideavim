@@ -23,6 +23,8 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.VisualPosition;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
+import org.jetbrains.plugins.ideavim.SkipNeovimReason;
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.command.CommandState.Mode.COMMAND;
@@ -71,6 +73,7 @@ public class MotionActionTest extends VimTestCase {
     assertEquals(new VisualPosition(2, 2), position);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testDeleteDigitsInCount() {
     typeTextInFile(parseKeys("42<Delete>l"), "on<caret>e two three four five six seven\n");
     assertOffset(6);
@@ -83,6 +86,7 @@ public class MotionActionTest extends VimTestCase {
     assertMode(COMMAND);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testIllegalCharArgument() {
     typeTextInFile(parseKeys("f<Insert>"), "on<caret>e two three four five six seven\n");
     assertOffset(2);
@@ -157,6 +161,7 @@ public class MotionActionTest extends VimTestCase {
   }
 
   // VIM-261 |c| |v_iB|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testChangeInnerCurlyBraceBlockMultiLine() {
     typeTextInFile(parseKeys("ci{"), "foo {\n" + "    <caret>bar\n" + "}\n");
     myFixture.checkResult("foo {\n" + "\n" + "}\n");
@@ -411,96 +416,112 @@ public class MotionActionTest extends VimTestCase {
   }
 
   // VIM-331 |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testNonAsciiLettersInWord() {
     typeTextInFile(parseKeys("w"), "Če<caret>ská republika");
     assertOffset(6);
   }
 
   // VIM-58 |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testHiraganaToPunctuation() {
     typeTextInFile(parseKeys("w"), "は<caret>はは!!!");
     assertOffset(3);
   }
 
   // VIM-58 |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testHiraganaToFullWidthPunctuation() {
     typeTextInFile(parseKeys("w"), "は<caret>はは！！！");
     assertOffset(3);
   }
 
   // VIM-58 |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testKatakanaToHiragana() {
     typeTextInFile(parseKeys("w"), "チ<caret>チチははは");
     assertOffset(3);
   }
 
   // VIM-58 |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testKatakanaToHalfWidthKana() {
     typeTextInFile(parseKeys("w"), "チ<caret>チチｳｳｳ");
     assertOffset(3);
   }
 
   // VIM-58 |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testKatakanaToDigits() {
     typeTextInFile(parseKeys("w"), "チ<caret>チチ123");
     assertOffset(3);
   }
 
   // VIM-58 |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testKatakanaToLetters() {
     typeTextInFile(parseKeys("w"), "チ<caret>チチ123");
     assertOffset(3);
   }
 
   // VIM-58 |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testKatakanaToFullWidthLatin() {
     typeTextInFile(parseKeys("w"), "チ<caret>チチＡＡＡ");
     assertOffset(3);
   }
 
   // VIM-58 |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testKatakanaToFullWidthDigits() {
     typeTextInFile(parseKeys("w"), "チ<caret>チチ３３３");
     assertOffset(3);
   }
 
   // VIM-58 |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testHiraganaToKatakana() {
     typeTextInFile(parseKeys("w"), "は<caret>ははチチチ");
     assertOffset(3);
   }
 
   // VIM-58 |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testHalftWidthKanaToLetters() {
     typeTextInFile(parseKeys("w"), "ｳｳｳAAA");
     assertOffset(3);
   }
 
   // |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testCjkToPunctuation() {
     typeTextInFile(parseKeys("w"), "测试<caret>测试!!!");
     assertOffset(4);
   }
 
   // |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testCjkToFullWidthPunctuation() {
     typeTextInFile(parseKeys("w"), "测试<caret>测试！！！");
     assertOffset(4);
   }
 
   // |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testCjkToDigits() {
     typeTextInFile(parseKeys("w"), "测试<caret>测试123");
     assertOffset(4);
   }
 
   // |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testCjkToFullWidthLatin() {
     typeTextInFile(parseKeys("w"), "测试<caret>测试ＡＡＡ");
     assertOffset(4);
   }
 
   // |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testCjkToFullWidthDigits() {
     typeTextInFile(parseKeys("w"), "测试<caret>测试３３３");
     assertOffset(4);
@@ -519,6 +540,7 @@ public class MotionActionTest extends VimTestCase {
   }
 
   // VIM-312 |w|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testLastWord() {
     typeTextInFile(parseKeys("w"), "<caret>one\n");
     assertOffset(2);
@@ -530,6 +552,7 @@ public class MotionActionTest extends VimTestCase {
     assertOffset(0);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testRightToLastChar() {
     typeTextInFile(parseKeys("i<Right>"), "on<caret>e\n");
     assertOffset(3);
@@ -541,6 +564,7 @@ public class MotionActionTest extends VimTestCase {
   }
 
   // VIM-262 |c_CTRL-R|
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   public void testSearchFromRegister() {
     VimPlugin.getRegister().setKeys('a', stringToKeys("two"));
     typeTextInFile(parseKeys("/", "<C-R>a", "<Enter>"), "<caret>one\n" + "two\n" + "three\n");

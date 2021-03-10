@@ -30,6 +30,8 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import java.util.*
 
@@ -141,15 +143,16 @@ class SearchGroupTest : VimTestCase() {
   }
 
   // VIM-856
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   fun `test negative lookbehind regression`() {
     val pos = search(
       "a\\@<!b",
-      "${c}ab\n",
-      0
+      "${c}ab\n"
     )
     assertEquals(-1, pos)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   fun `test smart case search case insensitive`() {
     setIgnoreCaseAndSmartCase()
     val pos = search(
@@ -392,6 +395,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   fun `test search word honours ignorecase`() {
     setIgnoreCase()
     typeTextInFile(
@@ -402,6 +406,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   fun `test search next word honours ignorecase`() {
     setIgnoreCase()
     typeTextInFile(
@@ -411,6 +416,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(14)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @TestFor(classes = [SearchWholeWordForwardAction::class])
   fun `test search word overrides smartcase`() {
     setIgnoreCaseAndSmartCase()
@@ -422,6 +428,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   fun `test search next word overrides smartcase`() {
     setIgnoreCaseAndSmartCase()
     typeTextInFile(
