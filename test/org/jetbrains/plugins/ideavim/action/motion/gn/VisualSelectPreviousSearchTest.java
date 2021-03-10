@@ -23,6 +23,8 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.Direction;
+import org.jetbrains.plugins.ideavim.SkipNeovimReason;
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -54,6 +56,7 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
     assertMode(CommandState.Mode.VISUAL);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   public void testWithoutSpaces() {
     configureByText("tes<caret>ttest");
     VimPlugin.getSearch().setLastSearchState(myFixture.getEditor(), "test", "", Direction.FORWARDS);

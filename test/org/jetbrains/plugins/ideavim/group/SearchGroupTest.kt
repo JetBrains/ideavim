@@ -25,10 +25,13 @@ import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -40,7 +43,8 @@ class SearchGroupTest : VimTestCase() {
       "w",
       """${c}one
                   |two
-               """.trimMargin()
+               """.trimMargin(),
+      5
     )
     assertEquals(5, pos)
   }
@@ -50,7 +54,8 @@ class SearchGroupTest : VimTestCase() {
       "$",
       """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
-               """.trimMargin()
+               """.trimMargin(),
+      29
     )
     assertEquals(30, pos)
   }
@@ -62,29 +67,32 @@ class SearchGroupTest : VimTestCase() {
       "$",
       """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
-               """.trimMargin()
+               """.trimMargin(),
+      29
     )
     assertEquals(30, pos)
   }
 
-  fun `test "and" without branches`() {
+  fun `test 'and' without branches`() {
     val pos = search(
       "\\&",
       """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
-               """.trimMargin()
+               """.trimMargin(),
+      1
     )
     assertEquals(1, pos)
   }
 
   // VIM-226
-  fun `test "and" without branches with highlighting`() {
+  fun `test 'and' without branches with highlighting`() {
     setHighlightSearch()
     val pos = search(
       "\\&",
       """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
-               """.trimMargin()
+               """.trimMargin(),
+      1
     )
     assertEquals(1, pos)
   }
@@ -95,7 +103,8 @@ class SearchGroupTest : VimTestCase() {
       "(found)",
       """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
-               """.trimMargin()
+               """.trimMargin(),
+      0
     )
     assertEquals(-1, pos)
     assertPluginErrorMessageContains("Pattern not found: (found)")
@@ -107,7 +116,8 @@ class SearchGroupTest : VimTestCase() {
       "\\(found\\)",
       """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
-               """.trimMargin()
+               """.trimMargin(),
+      2
     )
     assertEquals(2, pos)
   }
@@ -116,7 +126,8 @@ class SearchGroupTest : VimTestCase() {
   fun `test character class regression`() {
     val pos = search(
       "[^c]b",
-      "${c}bb\n"
+      "${c}bb\n",
+      0
     )
     assertEquals(0, pos)
   }
@@ -125,12 +136,14 @@ class SearchGroupTest : VimTestCase() {
   fun `test character class regression case insensitive`() {
     val pos = search(
       "\\c[ABC]b",
-      "${c}dd\n"
+      "${c}dd\n",
+      0
     )
     assertEquals(-1, pos)
   }
 
   // VIM-856
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   fun `test negative lookbehind regression`() {
     val pos = search(
       "a\\@<!b",
@@ -139,11 +152,13 @@ class SearchGroupTest : VimTestCase() {
     assertEquals(-1, pos)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   fun `test smart case search case insensitive`() {
     setIgnoreCaseAndSmartCase()
     val pos = search(
       "tostring",
-      "obj.toString();\n"
+      "obj.toString();\n",
+      4
     )
     assertEquals(4, pos)
   }
@@ -153,7 +168,8 @@ class SearchGroupTest : VimTestCase() {
     val pos = search(
       "toString",
       """obj.tostring();
-                 |obj.toString();""".trimMargin()
+                 |obj.toString();""".trimMargin(),
+      20
     )
     assertEquals(20, pos)
   }
@@ -379,6 +395,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   fun `test search word honours ignorecase`() {
     setIgnoreCase()
     typeTextInFile(
@@ -389,6 +406,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   fun `test search next word honours ignorecase`() {
     setIgnoreCase()
     typeTextInFile(
@@ -398,6 +416,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(14)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   @TestFor(classes = [SearchWholeWordForwardAction::class])
   fun `test search word overrides smartcase`() {
     setIgnoreCaseAndSmartCase()
@@ -409,6 +428,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   @TestFor(classes = [SearchWholeWordForwardAction::class])
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   fun `test search next word overrides smartcase`() {
     setIgnoreCaseAndSmartCase()
     typeTextInFile(
@@ -1397,6 +1417,31 @@ class SearchGroupTest : VimTestCase() {
   private fun clearHighlightSearch() = OptionsManager.hlsearch.reset()
   private fun setIncrementalSearch() = OptionsManager.incsearch.set()
 
+  // TODO: Remove these search methods and test by invoking VIM commands rather than calling APIs
+  private fun search(pattern: String, input: String, expectedLocation: Int): Int {
+    myFixture.configureByText("a.java", input)
+    val editor = myFixture.editor
+    val project = myFixture.project
+    val searchGroup = VimPlugin.getSearch()
+    val ref = Ref.create(-1)
+    RunnableHelper.runReadCommand(
+      project,
+      Runnable {
+        // Does not move the caret!
+        val n = searchGroup.processSearchCommand(editor, pattern, myFixture.caretOffset, Direction.FORWARDS)
+        ref.set(n)
+      },
+      null, null
+    )
+
+    // Tests with neovim
+    val keys = "/$pattern<CR>"
+    doTest(keys, input, input.replace(c, ""), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    assertEquals(expectedLocation, myFixture.editor.caretModel.offset)
+
+    return ref.get()
+  }
+
   private fun search(pattern: String, input: String): Int {
     myFixture.configureByText("a.java", input)
     val editor = myFixture.editor
@@ -1408,7 +1453,8 @@ class SearchGroupTest : VimTestCase() {
       Runnable {
         // Does not move the caret!
         val n = searchGroup.processSearchCommand(editor, pattern, myFixture.caretOffset, Direction.FORWARDS)
-      ref.set(n)},
+        ref.set(n)
+      },
       null, null
     )
     return ref.get()

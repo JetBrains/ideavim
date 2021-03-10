@@ -22,6 +22,8 @@ import com.google.common.collect.Lists;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Mark;
+import org.jetbrains.plugins.ideavim.SkipNeovimReason;
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -130,6 +132,7 @@ public class MarkTest extends VimTestCase {
   }
 
   // VIM-43 |i| |`.|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   public void testGotoLastChangePosition() {
     typeTextInFile(parseKeys("i", "hello ", "<Esc>", "gg", "`."),
                    "one two\n" + "<caret>hello world\n" + "three four\n");

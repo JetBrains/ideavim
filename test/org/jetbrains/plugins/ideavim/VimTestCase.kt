@@ -54,6 +54,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
+import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.isBlockCaretShape
@@ -69,6 +70,7 @@ import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.assertj.core.api.Assertions
 import org.junit.Assert
+import java.util.*
 import java.util.function.Consumer
 import javax.swing.KeyStroke
 
@@ -141,6 +143,10 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected fun typeTextInFile(keys: List<KeyStroke?>, fileContents: String): Editor {
     configureByText(fileContents)
+
+    NeovimTesting.setupEditor(myFixture.editor, this)
+    NeovimTesting.typeCommand(toKeyNotation(keys), this)
+
     return typeText(keys)
   }
 
@@ -280,6 +286,8 @@ abstract class VimTestCase : UsefulTestCase() {
     for (i in expectedOffsets.indices) {
       Assert.assertEquals(expectedOffsets[i], carets[i].offset)
     }
+
+    NeovimTesting.assertState(myFixture.editor, this)
   }
 
   fun assertOffsetAt(text: String) {
