@@ -172,6 +172,7 @@ enum class SkipNeovimReason {
   SHOW_CMD,
   SCROLL,
   TEMPLATES,
+  EDITOR_MODIFICATION,
 }
 
 fun LogicalPosition.toVimCoords(): VimCoords {

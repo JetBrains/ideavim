@@ -155,6 +155,7 @@ class SearchGroupTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   fun `test smart case search case insensitive`() {
     setIgnoreCaseAndSmartCase()
+
     val pos = search(
       "tostring",
       "obj.toString();\n",

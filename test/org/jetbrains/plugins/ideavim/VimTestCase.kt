@@ -461,7 +461,7 @@ abstract class VimTestCase : UsefulTestCase() {
     assertState(modeAfter, subModeAfter)
   }
 
-  fun doTestWithoutNeovim(
+  fun doTest(
     keys: List<KeyStroke>,
     before: String,
     after: String?,

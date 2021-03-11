@@ -408,12 +408,12 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
       """.trimIndent(),
       // Correct vim behaviour:
       /*"""
-                    A Discovery
+                  A Discovery
 
-                    Iall rocks and lavender and tufted grass,
-                    w${s}here it was settled on some sodden sand${c}${se}
-                    hard by the torrent of a mountain pass.
-                """.trimIndent(),*/
+                  Iall rocks and lavender and tufted grass,
+                  w${s}here it was settled on some sodden sand${c}${se}
+                  hard by the torrent of a mountain pass.
+              """.trimIndent(),*/
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
     )
   }
@@ -441,13 +441,13 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
       """.trimIndent(),
       // Correct vim behaviour:
       /* """
-                     A Discovery
+                   A Discovery
 
-                     I
-                     all rocks and lavender and tufted grass,
-                     w${s}here it was settled on some sodden sand[long line]
-                     hard by the torrent of a mountain pass.${c}${se}
-                 """.trimIndent(),*/
+                   I
+                   all rocks and lavender and tufted grass,
+                   w${s}here it was settled on some sodden sand[long line]
+                   hard by the torrent of a mountain pass.${c}${se}
+               """.trimIndent(),*/
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
     )
   }
@@ -705,13 +705,13 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
       """.trimIndent(),
       // correct vim behaviour
       /*"""
-                    A Discovery
+                  A Discovery
 
-                    I
-                    a
-                    w${s}here it was settled on some sodden sand[long line${c}]${se}
-                    h${s}ard by the torrent of a mountain pass.${c}${se}
-                """.trimIndent(),*/
+                  I
+                  a
+                  w${s}here it was settled on some sodden sand[long line${c}]${se}
+                  h${s}ard by the torrent of a mountain pass.${c}${se}
+              """.trimIndent(),*/
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK
     )
   }

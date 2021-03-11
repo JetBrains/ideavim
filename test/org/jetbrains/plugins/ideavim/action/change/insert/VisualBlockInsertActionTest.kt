@@ -177,7 +177,7 @@ Xbar
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """
-    doTestWithoutNeovim(
+    doTest(
       parseKeys("<C-V>", "jjI", " Hello ", "<ESC>"),
       before.trimIndent(),
       """

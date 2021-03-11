@@ -22,10 +22,13 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import javax.swing.KeyStroke
 
 class SearchAgainPreviousActionTest : VimTestCase() {
+  @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test search with tabs`() {
     val before = """
   I found it in a legendary land
@@ -43,6 +46,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
     doTestWithSearch(keys, before, after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test search with tabs 2`() {
     val before = """
   I found it in a legendary land
@@ -60,6 +64,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
     doTestWithSearch(keys, before, after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test search with tabs 3`() {
     val before = """
   I found it in a legendary land
@@ -77,6 +82,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
     doTestWithSearch(keys, before, after)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test search with tabs with wrap`() {
     val before = """
   I found it in a legendary land
@@ -169,7 +175,7 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   }
 
   private fun doTestWithSearch(keys: List<KeyStroke>, before: String, after: String) {
-    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch().setLastSearchState(it, "all", "", Direction.FORWARDS)
     }
   }
