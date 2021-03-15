@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.handler.IdeActionHandler
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.awt.event.KeyEvent
@@ -63,22 +64,13 @@ class VimEditorDelete : VimActionHandler.SingleExecution(), ComplicatedKeysActio
   }
 }
 
-class VimEditorDown : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
-  private val actionName: String = "EditorDown"
-
+class VimEditorDown : IdeActionHandler("EditorDown"), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)),
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0))
   )
-
-  override val type: Command.Type = Command.Type.INSERT
-
+  override val type: Command.Type = Command.Type.MOTION
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
-
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    KeyHandler.executeAction(actionName, context)
-    return true
-  }
 }
 
 class VimEditorTab : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
@@ -99,22 +91,13 @@ class VimEditorTab : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
   }
 }
 
-class VimEditorUp : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
-  private val actionName: String = "EditorUp"
-
+class VimEditorUp : IdeActionHandler("EditorUp"), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)),
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0))
   )
-
-  override val type: Command.Type = Command.Type.INSERT
-
+  override val type: Command.Type = Command.Type.MOTION
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
-
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    KeyHandler.executeAction(actionName, context)
-    return true
-  }
 }
 
 class VimQuickJavaDoc : VimActionHandler.SingleExecution() {
