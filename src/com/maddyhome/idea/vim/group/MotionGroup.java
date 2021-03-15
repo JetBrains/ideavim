@@ -305,15 +305,18 @@ public class MotionGroup {
       return;
     }
 
-    // Always move the caret. It will be smart enough to not do anything if the offsets are the same, but it will also
-    // ensure that it's in the correct location relative to any inline inlays
+    // Make sure to always reposition the caret, even if the offset hasn't changed. We might need to reposition due to
+    // changes in surrounding text, especially with inline inlays.
     final int oldOffset = caret.getOffset();
     InlayHelperKt.moveToInlayAwareOffset(caret, offset);
     if (oldOffset != offset) {
       UserDataManager.setVimLastColumn(caret, InlayHelperKt.getInlayAwareVisualColumn(caret));
-      if (caret == editor.getCaretModel().getPrimaryCaret()) {
-        scrollCaretIntoView(editor);
-      }
+    }
+
+    // Similarly, always make sure the caret is positioned within the view. Adding or removing text could move the caret
+    // position relative to the view, without changing offset.
+    if (caret == editor.getCaretModel().getPrimaryCaret()) {
+      scrollCaretIntoView(editor);
     }
 
     if (CommandStateHelper.inVisualMode(editor) || CommandStateHelper.inSelectMode(editor)) {

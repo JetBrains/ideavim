@@ -715,11 +715,17 @@ public class ChangeGroup {
     final int endOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, true);
     if (endOffset != -1) {
       final boolean res = deleteText(editor, new TextRange(caret.getOffset(), endOffset), SelectionType.CHARACTER_WISE);
+
       final int pos = caret.getOffset();
       final int norm = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, pos, isChange);
       if (norm != pos || editor.offsetToVisualPosition(norm) != EditorUtil.inlayAwareOffsetToVisualPosition(editor, norm)) {
         MotionGroup.moveCaret(editor, caret, norm);
       }
+      // Always move the caret. Our position might or might not have changed, but an inlay might have been moved to our
+      // location, or deleting the character(s) might have caused us to scroll sideways in long files. Moving the caret
+      // will make sure it's in the right place, and visible
+      final int offset = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, caret.getOffset(), isChange);
+      MotionGroup.moveCaret(editor, caret, offset);
 
       return res;
     }
@@ -840,7 +846,7 @@ public class ChangeGroup {
       CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> ApplicationManager.getApplication()
                                                       .runWriteAction(() -> KeyHandler.getInstance().getOriginalHandler().execute(editor, key.getKeyChar(), context)),
                                                     "", doc, UndoConfirmationPolicy.DEFAULT, doc);
-
+      MotionGroup.scrollCaretIntoView(editor);
       return true;
     }
 
