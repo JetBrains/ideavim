@@ -236,6 +236,8 @@ public class ChangeGroup {
 
     initInsert(editor, context, CommandState.Mode.INSERT);
     runEnterAction(editor, context);
+
+    MotionGroup.scrollCaretIntoView(editor);
   }
 
   /**
