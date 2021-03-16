@@ -258,7 +258,7 @@ public class ChangeGroup {
     if (!state.isDotRepeatInProgress()) {
       // While repeating the enter action has been already executed because `initInsert` repeats the input
       final ActionManager actionManager = ActionManager.getInstance();
-      final AnAction action = actionManager.getAction("EditorEnter");
+      final AnAction action = actionManager.getAction(IdeActions.ACTION_EDITOR_ENTER);
       if (action != null) {
         strokes.add(action);
         KeyHandler.executeAction(action, context);

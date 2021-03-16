@@ -329,7 +329,7 @@ public class KeyHandler {
       if (register.getCurrentRegister() == register.getDefaultRegister()) {
         if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
           CommandProcessor.getInstance()
-            .executeCommand(editor.getProject(), () -> KeyHandler.executeAction("EditorEscape", context), "", null);
+            .executeCommand(editor.getProject(), () -> KeyHandler.executeAction(IdeActions.ACTION_EDITOR_ESCAPE, context), "", null);
         }
         VimPlugin.indicateError();
       }

@@ -29,10 +29,8 @@ import com.maddyhome.idea.vim.group.MotionGroup
  */
 abstract class IdeActionHandler(private val actionName: String) : VimActionHandler.SingleExecution() {
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-      KeyHandler.executeAction(actionName, context)
-    if (type == Command.Type.MOTION) {
-        MotionGroup.scrollCaretIntoView(editor)
-    }
+    KeyHandler.executeAction(actionName, context)
+    MotionGroup.scrollCaretIntoView(editor)
     return true
   }
 }
