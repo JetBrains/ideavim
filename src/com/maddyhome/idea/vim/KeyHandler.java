@@ -33,6 +33,7 @@ import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
+import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.action.change.VimRepeater;
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction;
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction;
@@ -327,11 +328,20 @@ public class KeyHandler {
     if (editorState.getCommandBuilder().isAtDefaultState()) {
       RegisterGroup register = VimPlugin.getRegister();
       if (register.getCurrentRegister() == register.getDefaultRegister()) {
+        boolean indicateError = true;
+
         if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
+          Ref<Boolean> executed = Ref.create();
           CommandProcessor.getInstance()
-            .executeCommand(editor.getProject(), () -> KeyHandler.executeAction(IdeActions.ACTION_EDITOR_ESCAPE, context), "", null);
+            .executeCommand(editor.getProject(),
+                            () -> executed.set(KeyHandler.executeAction(IdeActions.ACTION_EDITOR_ESCAPE, context)),
+                            "", null);
+          indicateError = !executed.get();
         }
-        VimPlugin.indicateError();
+
+        if (indicateError) {
+          VimPlugin.indicateError();
+        }
       }
     }
     reset(editor);
