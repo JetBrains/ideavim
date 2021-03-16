@@ -19,57 +19,70 @@
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class InsertNewLineBelowActionTest : VimTestCase() {
-  fun `test insert new line below`() {
+class InsertNewLineAboveActionTest : VimTestCase() {
+  fun `test insert new line above`() {
     val before = """I found it in a legendary land
         |${c}all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
     val after = """I found it in a legendary land
-        |all rocks and lavender and tufted grass,
         |$c
+        |all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("o", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("O", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
-  fun `test insert new line below with caret in middle of line`() {
+  fun `test insert new line above with caret in middle of line`() {
     val before = """I found it in a legendary land
         |all rocks and ${c}lavender and tufted grass,
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
     val after = """I found it in a legendary land
-        |all rocks and lavender and tufted grass,
         |$c
+        |all rocks and lavender and tufted grass,
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("o", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("O", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
-  fun `test insert new line below matches indent for plain text`() {
+  fun `test insert new line above matches indent for plain text`() {
     val before = """    I found it in a legendary land
-        |    ${c}all rocks and lavender and tufted grass,
-        |    where it was settled on some sodden sand
+        |    all rocks and lavender and tufted grass,
+        |    ${c}where it was settled on some sodden sand
         |    hard by the torrent of a mountain pass.""".trimMargin()
     val after = """    I found it in a legendary land
         |    all rocks and lavender and tufted grass,
         |    $c
         |    where it was settled on some sodden sand
         |    hard by the torrent of a mountain pass.""".trimMargin()
-    doTest("o", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    doTest("O", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  fun `test insert new line above matches indent for first line of plain text`() {
+    val before = """    ${c}I found it in a legendary land
+        |    all rocks and lavender and tufted grass,
+        |    where it was settled on some sodden sand
+        |    hard by the torrent of a mountain pass.""".trimMargin()
+    val after = """    $c
+        |    I found it in a legendary land
+        |    all rocks and lavender and tufted grass,
+        |    where it was settled on some sodden sand
+        |    hard by the torrent of a mountain pass.""".trimMargin()
+    doTest("O", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN) // Java support would be a neovim plugin
-  fun `test insert new line below matches indent for java`() {
+  fun `test insert new line above matches indent for java`() {
     val before = """public class C {
-      |  ${c}Integer a;
-      |  Integer b;
+      |  Integer a;
+      |  ${c}Integer b;
       |}
     """.trimMargin()
     val after = """public class C {
@@ -79,34 +92,34 @@ class InsertNewLineBelowActionTest : VimTestCase() {
       |}
     """.trimMargin()
     configureByJavaText(before)
-    typeText(parseKeys("o"))
+    typeText(StringHelper.parseKeys("O"))
     myFixture.checkResult(after)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
-  fun `test insert new line below with multiple carets`() {
+  fun `test insert new line above with multiple carets`() {
     val before = """    I fou${c}nd it in a legendary land
         |    all rocks and laven${c}der and tufted grass,
         |    where it was sett${c}led on some sodden sand
         |    hard by the tor${c}rent of a mountain pass.""".trimMargin()
-    val after = """    I found it in a legendary land
+    val after = """    $c
+        |    I found it in a legendary land
         |    $c
         |    all rocks and lavender and tufted grass,
         |    $c
         |    where it was settled on some sodden sand
         |    $c
-        |    hard by the torrent of a mountain pass.
-        |    $c""".trimMargin()
-    doTest("o", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+        |    hard by the torrent of a mountain pass.""".trimMargin()
+    doTest("O", before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  fun `test insert new line below at bottom of screen does not scroll bottom of screen`() {
+  fun `test insert new line above at top of screen does not scroll top of screen`() {
     OptionsManager.scrolloff.set(10)
     configureByLines(50, "I found it in a legendary land")
-    setPositionAndScroll(5, 29)
-    typeText(parseKeys("o"))
-    assertPosition(30, 0)
-    assertVisibleArea(6, 40)
+    setPositionAndScroll(5, 15)
+    typeText(StringHelper.parseKeys("O"))
+    assertPosition(15, 0)
+    assertVisibleArea(5, 39)
   }
 }

@@ -170,16 +170,24 @@ public class ChangeGroup {
   public void insertNewLineAbove(final @NotNull Editor editor, @NotNull DataContext context) {
     if (editor.isOneLineMode()) return;
 
+    // See also EditorStartNewLineBefore. That will move the caret to line start, call EditorEnter to create a new line,
+    // and then move up and call EditorLineEnd. We get better indent positioning by going to the line end of the
+    // previous line and hitting enter, especially with plain text files.
+
+    // Note that we're deliberately bypassing MotionGroup.moveCaret to avoid side effects, most notably unncessary
+    // scrolling
     Set<Caret> firstLiners = new HashSet<>();
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
+      final int offset;
       if (caret.getVisualPosition().line == 0) {
-        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStart(editor, caret));
+        // Fake indenting for the first line. Works well for plain text to match the existing indent
+        offset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret);
         firstLiners.add(caret);
       }
       else {
-        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretVertical(editor, caret, -1));
-        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
+        offset = VimPlugin.getMotion().moveCaretToLineEnd(editor, caret.getLogicalPosition().line - 1, true);
       }
+      caret.moveToOffset(offset);
     }
 
     initInsert(editor, context, CommandState.Mode.INSERT);
@@ -187,9 +195,12 @@ public class ChangeGroup {
 
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
       if (firstLiners.contains(caret)) {
-        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretVertical(editor, caret, -1));
+        final int offset = VimPlugin.getMotion().moveCaretToLineEnd(editor, 0,true);
+        MotionGroup.moveCaret(editor, caret, offset);
       }
     }
+
+    MotionGroup.scrollCaretIntoView(editor);
   }
 
   /**
