@@ -32,37 +32,20 @@ import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-class VimEditorBackSpace : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
-  private val actionName: String = IdeActions.ACTION_EDITOR_BACKSPACE
-
+class VimEditorBackSpace : IdeActionHandler(IdeActions.ACTION_EDITOR_BACKSPACE), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_DOWN_MASK)),
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0))
   )
-
-  override val type: Command.Type = Command.Type.INSERT
-
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    KeyHandler.executeAction(actionName, context)
-    return true
-  }
+  override val type: Command.Type = Command.Type.DELETE
 }
 
-class VimEditorDelete : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
-  private val actionName: String = IdeActions.ACTION_EDITOR_DELETE
-
+class VimEditorDelete : IdeActionHandler(IdeActions.ACTION_EDITOR_DELETE), ComplicatedKeysAction {
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0))
   )
-
-  override val type: Command.Type = Command.Type.INSERT
-
+  override val type: Command.Type = Command.Type.DELETE
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
-
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    KeyHandler.executeAction(actionName, context)
-    return true
-  }
 }
 
 class VimEditorDown : IdeActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN), ComplicatedKeysAction {
@@ -93,12 +76,10 @@ class VimEditorUp : IdeActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_UP), Co
 }
 
 class VimQuickJavaDoc : VimActionHandler.SingleExecution() {
-  private val actionName: String = "QuickJavaDoc"
-
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    KeyHandler.executeAction(actionName, context)
+    KeyHandler.executeAction(IdeActions.ACTION_QUICK_JAVADOC, context)
     return true
   }
 }
