@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
-import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -30,7 +30,7 @@ class InsertBackspaceActionTest : VimTestCase() {
     val after = "I f${c}und it in a legendary land"
     configureByText(before)
 
-    typeText(StringHelper.parseKeys("i", "<BS>"))
+    typeText(parseKeys("i", "<BS>"))
 
     myFixture.checkResult(after)
   }
@@ -40,7 +40,7 @@ class InsertBackspaceActionTest : VimTestCase() {
     OptionsManager.sidescrolloff.set(10)
     configureByColumns(200)
 
-    typeText(StringHelper.parseKeys("70zl", "i", "<BS>"))
+    typeText(parseKeys("70zl", "i", "<BS>"))
     assertVisibleLineBounds(0, 39, 118)
   }
 }

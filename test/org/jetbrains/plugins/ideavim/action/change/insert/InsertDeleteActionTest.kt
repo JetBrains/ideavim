@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
-import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertDeleteActionTest : VimTestCase() {
@@ -27,7 +27,7 @@ class InsertDeleteActionTest : VimTestCase() {
     val after = "I fo${c}nd it in a legendary land"
     configureByText(before)
 
-    typeText(StringHelper.parseKeys("i", "<Del>"))
+    typeText(parseKeys("i", "<Del>"))
 
     myFixture.checkResult(after)
   }

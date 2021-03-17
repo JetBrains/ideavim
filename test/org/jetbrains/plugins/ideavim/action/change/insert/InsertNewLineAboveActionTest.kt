@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -92,7 +92,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
       |}
     """.trimMargin()
     configureByJavaText(before)
-    typeText(StringHelper.parseKeys("O"))
+    typeText(parseKeys("O"))
     myFixture.checkResult(after)
   }
 
@@ -118,7 +118,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
     OptionsManager.scrolloff.set(10)
     configureByLines(50, "I found it in a legendary land")
     setPositionAndScroll(5, 15)
-    typeText(StringHelper.parseKeys("O"))
+    typeText(parseKeys("O"))
     assertPosition(15, 0)
     assertVisibleArea(5, 39)
   }
