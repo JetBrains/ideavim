@@ -211,7 +211,7 @@ public class MotionGroup {
     int newColumn = caretColumn;
 
     // TODO: Visual column arithmetic will be inaccurate as it include columns for inlays and folds
-    if (caretColumn < leftVisualColumn + sideScrollOffset) {
+    if (leftVisualColumn > 0 && caretColumn < leftVisualColumn + sideScrollOffset) {
       newColumn = leftVisualColumn + sideScrollOffset;
     }
     else if (caretColumn > rightVisualColumn - sideScrollOffset) {

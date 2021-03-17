@@ -46,6 +46,15 @@ class ScrollLineUpActionTest : VimTestCase() {
     assertVisibleArea(28, 62)
   }
 
+  fun `test scroll line up will maintain current column at start of line with sidescrolloff`() {
+    OptionsManager.sidescrolloff.set(10)
+    configureByPages(5)
+    setPositionAndScroll(29, 63, 5)
+    typeText(parseKeys("<C-Y>"))
+    assertPosition(62, 5)
+    assertVisibleArea(28, 62)
+  }
+
   fun `test scroll count lines up`() {
     configureByPages(5)
     setPositionAndScroll(29, 29)

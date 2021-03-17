@@ -46,6 +46,15 @@ class ScrollLineDownActionTest : VimTestCase() {
     assertVisibleArea(1, 35)
   }
 
+  fun `test scroll line down will maintain current column at start of line with sidescrolloff`() {
+    OptionsManager.sidescrolloff.set(10)
+    configureByPages(5)
+    setPositionAndScroll(30, 50, 5)
+    typeText(parseKeys("<C-E>"))
+    assertPosition(50, 5)
+    assertTopLogicalLine(31)
+  }
+
   fun `test scroll count lines down`() {
     configureByPages(5)
     setPositionAndScroll(0, 34)
