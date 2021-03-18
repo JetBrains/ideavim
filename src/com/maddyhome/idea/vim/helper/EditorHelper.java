@@ -708,11 +708,25 @@ public class EditorHelper {
    * @param editor     The editor to scroll
    * @param visualLine The visual line to place in the middle of the current window
    */
-  public static void scrollVisualLineToMiddleOfScreen(@NotNull Editor editor, int visualLine) {
+  public static void scrollVisualLineToMiddleOfScreen(@NotNull Editor editor, int visualLine, boolean allowVirtualSpace) {
     final int y = editor.visualLineToY(normalizeVisualLine(editor, visualLine));
-    final int screenHeight = getVisibleArea(editor).height;
+    final Rectangle visibleArea = getVisibleArea(editor);
+    final int screenHeight = visibleArea.height;
     final int lineHeight = editor.getLineHeight();
-    scrollVertically(editor, y - ((screenHeight - lineHeight) / lineHeight / 2 * lineHeight));
+
+    final int offset = y - ((screenHeight - lineHeight) / lineHeight / 2 * lineHeight);
+    final int lastVisualLine = EditorHelper.getVisualLineCount(editor) - 1;
+    final int offsetForLastLineAtBottom = getOffsetToScrollVisualLineToBottomOfScreen(editor, lastVisualLine);
+
+    // For `zz`, we want to use virtual space and move any line, including the last one, to the middle of the screen.
+    // For `G` or `zb`, do not allow virtual space, so only scroll far enough to keep the last line at the bottom of the
+    // screen
+    if (!allowVirtualSpace && offset > offsetForLastLineAtBottom) {
+      scrollVertically(editor, offsetForLastLineAtBottom);
+    }
+    else {
+      scrollVertically(editor, offset);
+    }
   }
 
   /**
@@ -727,6 +741,11 @@ public class EditorHelper {
    * @return True if the editor was scrolled
    */
   public static boolean scrollVisualLineToBottomOfScreen(@NotNull Editor editor, int visualLine) {
+    final int offset = getOffsetToScrollVisualLineToBottomOfScreen(editor, visualLine);
+    return scrollVertically(editor, offset);
+  }
+
+  private static int getOffsetToScrollVisualLineToBottomOfScreen(@NotNull Editor editor, int visualLine) {
     int exPanelHeight = 0;
     if (ExEntryPanel.getInstance().isActive()) {
       exPanelHeight = ExEntryPanel.getInstance().getHeight();
@@ -737,12 +756,11 @@ public class EditorHelper {
 
     final int normalizedVisualLine = normalizeVisualLine(editor, visualLine);
     final int lineHeight = editor.getLineHeight();
-    final int inlayHeight = EditorUtil.getInlaysHeight(editor, normalizedVisualLine, false);
+    final int screenHeight = getVisibleArea(editor).height - exPanelHeight;
+    final int inlayHeight = EditorUtil.getInlaysHeight(editor, visualLine, false);
     final int maxInlayHeight = BLOCK_INLAY_MAX_LINE_HEIGHT * lineHeight;
-    final int y =
-      editor.visualLineToY(normalizedVisualLine) + lineHeight + Math.min(inlayHeight, maxInlayHeight) + exPanelHeight;
-    final Rectangle visibleArea = getVisibleArea(editor);
-    return scrollVertically(editor, max(0, y - visibleArea.height));
+    final int y = editor.visualLineToY(normalizedVisualLine) + lineHeight + min(inlayHeight, maxInlayHeight);
+    return max(0, y - screenHeight);
   }
 
   public static void scrollColumnToLeftOfScreen(@NotNull Editor editor, int visualLine, int visualColumn) {

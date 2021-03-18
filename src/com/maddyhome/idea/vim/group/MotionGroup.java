@@ -705,12 +705,12 @@ public class MotionGroup {
     // optionally checks and moves the top line, then optionally checks the bottom line. This gives us the same results
     // via the tests.
     if (height > inlayAwareMinHeightFudge && scrollOffset > height / 2) {
-      scrollVisualLineToMiddleOfScreen(editor, caretLine);
+      scrollVisualLineToMiddleOfScreen(editor, caretLine, false);
     } else if (caretLine < topBound) {
       // Scrolling up, put the cursor at the top of the window (minus scrolloff)
       // Initial approximation in move.c:update_topline (including same calculation for halfHeight)
       if (topLine + scrollOffset - caretLine >= max(2, (height / 2) - 1)) {
-        scrollVisualLineToMiddleOfScreen(editor, caretLine);
+        scrollVisualLineToMiddleOfScreen(editor, caretLine, false);
       }
       else {
         // New top line must be at least scrolloff above caretLine. If this is above current top line, we must scroll
@@ -727,7 +727,7 @@ public class MotionGroup {
         final int usedBelow = min(scrollOffset, getVisualLineCount(editor) - caretLine);
         final int used = 1 + usedAbove + usedBelow;
         if (used > height) {
-          scrollVisualLineToMiddleOfScreen(editor, caretLine);
+          scrollVisualLineToMiddleOfScreen(editor, caretLine, false);
         }
         else {
           scrollVisualLineToTopOfScreen(editor, newTopLine);
@@ -740,7 +740,7 @@ public class MotionGroup {
       // line in the window (bottomLine + 1). See move.c:update_topline
       int lineCount = caretLine - (bottomLine + 1) + 1 + scrollOffset;
       if (lineCount > height) {
-        scrollVisualLineToMiddleOfScreen(editor, caretLine);
+        scrollVisualLineToMiddleOfScreen(editor, caretLine, false);
       } else {
         // Vim expands out from caretLine at least scrolljump lines. It stops expanding above when it hits the
         // current bottom line, or (because it's expanding above and below) when it's scrolled scrolljump/2. It expands
@@ -763,7 +763,7 @@ public class MotionGroup {
         // scroll more than a screen full or more than scrolloff, redraw with the cursor in the middle of the screen.
         lineCount = used > height ? used : scrolled;
         if (lineCount >= height && lineCount > scrollOffset) {
-          scrollVisualLineToMiddleOfScreen(editor, caretLine);
+          scrollVisualLineToMiddleOfScreen(editor, caretLine, false);
         }
         else {
           scrollVisualLineToBottomOfScreen(editor, caretLine + extra);
@@ -1232,7 +1232,7 @@ public class MotionGroup {
         scrollVisualLineToTopOfScreen(editor, visualLine - scrollOffset);
         break;
       case MIDDLE:
-        scrollVisualLineToMiddleOfScreen(editor, visualLine);
+        scrollVisualLineToMiddleOfScreen(editor, visualLine, true);
         break;
       case BOTTOM:
         scrollVisualLineToBottomOfScreen(editor, visualLine + scrollOffset);
