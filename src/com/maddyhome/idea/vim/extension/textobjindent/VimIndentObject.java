@@ -108,6 +108,113 @@ public class VimIndentObject implements VimExtension {
       public @Nullable
       TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                          int count, int rawCount, @Nullable Argument argument) {
+        final CharSequence charSequence = editor.getDocument().getCharsSequence();
+        final int caretOffset = caret.getOffset();
+
+        // Part 1: Find the start of the caret line.
+        int caretLineIndentSize = 0;
+        int caretLineStartOffset = caretOffset;
+        int accumulatedWhitespace = 0;
+        while (--caretLineStartOffset >= 0) {
+          final char ch = charSequence.charAt(caretLineStartOffset);
+          if (ch == ' ' || ch == '\t') {
+            ++accumulatedWhitespace;
+          } else if (ch == '\n') {
+            caretLineIndentSize = accumulatedWhitespace;
+            ++caretLineStartOffset;
+            break;
+          } else {
+            accumulatedWhitespace = 0;
+          }
+        }
+
+        // `caretLineStartOffset` points to the first character in the line where the caret is located.
+
+        // Part 2: Compute the indentation level of the caret line.
+        // This is done as a separate step so that it works even when the caret is inside the indentation.
+        int offset = caretLineStartOffset;
+        int indentSize = 0;
+        while (++offset < charSequence.length()) {
+          final char ch = charSequence.charAt(offset);
+          if (ch == ' ' || ch == '\t') {
+            ++indentSize;
+          } else {
+            break;
+          }
+        }
+
+        // `indentSize` contains the amount of indent to be used for the text object range to be returned.
+
+        Integer upperBoundaryOffset = null;
+        // Part 3: Find a line above the caret line, that has an indentation lower than `indentSize`.
+        int pos1 = caretLineStartOffset - 1;
+        while (upperBoundaryOffset == null) {
+          // 3.1: Going backwards from `caretLineStartOffset`, find the first non-whitespace character.
+          while (--pos1 >= 0) {
+            final char ch = charSequence.charAt(pos1);
+            if (ch != ' ' && ch != '\t' && ch != '\n') {
+              break;
+            }
+          }
+          // 3.2: Find the indent size of the line with this non-whitespace character and check against `indentSize`.
+          accumulatedWhitespace = 0;
+          while (--pos1 >= 0) {
+            final char ch = charSequence.charAt(pos1);
+            if (ch == ' ' || ch == '\t') {
+              ++accumulatedWhitespace;
+            } else if (ch == '\n') {
+              if (accumulatedWhitespace < indentSize) {
+                upperBoundaryOffset = pos1 + 1;
+              }
+              break;
+            } else {
+              accumulatedWhitespace = 0;
+            }
+          }
+        }
+
+        // Part 4: Find the start of the caret line.
+        int caretLineEndOffset = caretOffset;
+        while (++caretLineEndOffset < charSequence.length()) {
+          final char ch = charSequence.charAt(caretLineEndOffset);
+          if (ch == '\n') {
+            ++caretLineEndOffset;
+            break;
+          }
+        }
+
+        Integer lowerBoundaryOffset = null;
+        // Part 5: Find a line below the caret line, that has an indentation lower than `indentSize`.
+        int pos2 = caretLineEndOffset;
+        while (lowerBoundaryOffset == null) {
+          int accumulatedWhitespace2 = 0;
+          int lastNewlinePos = 0;
+          boolean isInIndent = true;
+          while (++pos2 < charSequence.length()) {
+            final char ch = charSequence.charAt(pos2);
+            if (ch == ' ' || ch == '\t' && isInIndent) {
+              ++accumulatedWhitespace2;
+            } else if (ch == '\n') {
+              accumulatedWhitespace2 = 0;
+              lastNewlinePos = pos2;
+              isInIndent = true;
+            } else {
+              if (isInIndent && accumulatedWhitespace2 < indentSize) {
+                lowerBoundaryOffset = lastNewlinePos;
+                break;
+              }
+              isInIndent = false;
+            }
+          }
+        }
+
+        return new TextRange(upperBoundaryOffset, caretLineEndOffset);
+        // return getRange2(editor, caret, context, count, rawCount, argument);
+      }
+
+      public @Nullable
+      TextRange getRange2(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                          int count, int rawCount, @Nullable Argument argument) {
         final int caretLineNum = caret.getCaretModel().getVisualPosition().getLine();
         String content = editor.getDocument().getText();
         String[] lines = content.split("\n");
