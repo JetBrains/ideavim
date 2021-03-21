@@ -112,7 +112,6 @@ public class VimIndentObject implements VimExtension {
         final int caretOffset = caret.getOffset();
 
         // Part 1: Find the start of the caret line.
-        int caretLineIndentSize = 0;
         int caretLineStartOffset = caretOffset;
         int accumulatedWhitespace = 0;
         while (--caretLineStartOffset >= 0) {
@@ -120,7 +119,6 @@ public class VimIndentObject implements VimExtension {
           if (ch == ' ' || ch == '\t') {
             ++accumulatedWhitespace;
           } else if (ch == '\n') {
-            caretLineIndentSize = accumulatedWhitespace;
             ++caretLineStartOffset;
             break;
           } else {
@@ -223,6 +221,14 @@ public class VimIndentObject implements VimExtension {
         }
 
         // Now `lowerBoundaryOffset` marks the end of an `ii` text object.
+        if (includeBelow) {
+          while (++lowerBoundaryOffset < charSequence.length()) {
+            final char ch = charSequence.charAt(lowerBoundaryOffset);
+            if (ch == '\n') {
+              break;
+            }
+          }
+        }
 
         return new TextRange(upperBoundaryOffset, lowerBoundaryOffset);
         // return getRange2(editor, caret, context, count, rawCount, argument);
