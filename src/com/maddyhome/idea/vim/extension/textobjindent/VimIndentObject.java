@@ -173,6 +173,20 @@ public class VimIndentObject implements VimExtension {
           }
         }
 
+        // Now `upperBoundaryOffset` marks the beginning of an `ai` text object.
+        if (!includeAbove) {
+          while (++upperBoundaryOffset < charSequence.length()) {
+            final char ch = charSequence.charAt(upperBoundaryOffset);
+            if (ch == '\n') {
+              ++upperBoundaryOffset;
+              break;
+            }
+          }
+          while (charSequence.charAt(upperBoundaryOffset) == '\n') {
+            ++upperBoundaryOffset;
+          }
+        }
+
         // Part 4: Find the start of the caret line.
         int caretLineEndOffset = caretOffset;
         while (++caretLineEndOffset < charSequence.length()) {
@@ -208,7 +222,9 @@ public class VimIndentObject implements VimExtension {
           }
         }
 
-        return new TextRange(upperBoundaryOffset, caretLineEndOffset);
+        // Now `lowerBoundaryOffset` marks the end of an `ii` text object.
+
+        return new TextRange(upperBoundaryOffset, lowerBoundaryOffset);
         // return getRange2(editor, caret, context, count, rawCount, argument);
       }
 
