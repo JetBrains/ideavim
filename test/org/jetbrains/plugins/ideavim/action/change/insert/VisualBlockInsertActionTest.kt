@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,12 +31,14 @@ class VisualBlockInsertActionTest : VimTestCase() {
 
   // VIM-1110 |CTRL-V| |v_b_i| |zc|
   fun `test block insert after folds`() {
-    configureByJavaText("""$c/**
+    configureByJavaText(
+      """$c/**
  * Something to fold.
  */
 foo
 bar
-""")
+"""
+    )
 
     myFixture.editor.foldingModel.runBatchFoldingOperation {
       CodeFoldingManager.getInstance(myFixture.project).updateFoldRegions(myFixture.editor)
@@ -44,52 +46,60 @@ bar
     }
 
     typeText(parseKeys("j", "<C-V>", "j", "I", "X", "<Esc>"))
-    myFixture.checkResult("""/**
+    myFixture.checkResult(
+      """/**
  * Something to fold.
  */
 ${c}Xfoo
 Xbar
-""")
+"""
+    )
   }
 
   // VIM-1379 |CTRL-V| |j| |v_b_I|
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test insert visual block with empty line in the middle`() {
-    doTest(listOf("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
+    doTest(
+      listOf("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
       """
                     foo
 
                     bar
 
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                     fo_quux_o
 
                     ba_quux_r
 
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   // VIM-632 |CTRL-V| |v_b_I|
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test change visual block`() {
-    doTest(listOf("<C-V>", "j", "I", "quux ", "<Esc>"),
+    doTest(
+      listOf("<C-V>", "j", "I", "quux ", "<Esc>"),
       """
                     foo bar
                     ${c}baz quux
                     spam eggs
 
-                    """.trimIndent(),
-      ("""
+      """.trimIndent(),
+      (
+        """
                     foo bar
                     ${c}quux baz quux
                     quux spam eggs
 
-                    """.trimIndent()),
+        """.trimIndent()
+        ),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   fun `test visual block insert`() {
@@ -97,40 +107,44 @@ Xbar
             ${c}int a;
             int b;
             int c;
-            """.trimIndent()
+    """.trimIndent()
     typeTextInFile(parseKeys("<C-V>", "2j", "I", "const ", "<Esc>"), before)
     val after = """
             ${c}const int a;
             const int b;
             const int c;
-            """.trimIndent()
+    """.trimIndent()
     myFixture.checkResult(after)
   }
-
 
   // VIM-1379 |CTRL-V| |j| |v_b_I|
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test insert visual block with shorter line in the middle`() {
-    doTest(listOf("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
+    doTest(
+      listOf("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
       """
                     foo
                     x
                     bar
 
-                    """.trimIndent(),
-      ("""
+      """.trimIndent(),
+      (
+        """
                     fo_quux_o
                     x
                     ba_quux_r
 
-                    """.trimIndent()),
+        """.trimIndent()
+        ),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
   fun `test insert in non block mode`() {
-    doTest(listOf("vwIHello<esc>"),
+    doTest(
+      listOf("vwIHello<esc>"),
       """
                 ${c}A Discovery
 
@@ -138,7 +152,7 @@ Xbar
                 all rocks and ${c}lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 Hell${c}oA Discovery
 
@@ -146,9 +160,10 @@ Xbar
                 Hell${c}oall rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
     assertMode(CommandState.Mode.COMMAND)
   }
 
@@ -172,7 +187,7 @@ Xbar
                 all rocks and  Hello lavender and tufted grass,
                 where it was s Hello ettled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE
     ) {

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,11 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
-import org.jetbrains.plugins.ideavim.*
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
+import org.jetbrains.plugins.ideavim.rangeOf
 
 /**
  * @author Alex Plate
@@ -44,7 +48,13 @@ class IdeaPutNotificationsTest : VimOptionTestCase(ClipboardOptionsData.name) {
     assertEquals(2, notification.actions.size)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, [ClipboardOptionsData.ideaput]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      ClipboardOptionsData.name,
+      VimTestOptionType.LIST,
+      [ClipboardOptionsData.ideaput]
+    )
+  )
   fun `test no notification on ideaput`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)

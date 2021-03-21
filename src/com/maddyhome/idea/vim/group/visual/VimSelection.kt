@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -108,7 +108,14 @@ sealed class VimSimpleSelection : VimSelection() {
     /**
      * Create character- and linewise selection if native selection is already known. Doesn't work for block selection
      */
-    fun createWithNative(vimStart: Int, vimEnd: Int, nativeStart: Int, nativeEnd: Int, type: SelectionType, editor: Editor) =
+    fun createWithNative(
+      vimStart: Int,
+      vimEnd: Int,
+      nativeStart: Int,
+      nativeEnd: Int,
+      type: SelectionType,
+      editor: Editor
+    ) =
       when (type) {
         CHARACTER_WISE -> VimCharacterSelection(vimStart, vimEnd, nativeStart, nativeEnd, editor)
         LINE_WISE -> VimLineSelection(vimStart, vimEnd, nativeStart, nativeEnd, editor)
@@ -174,7 +181,8 @@ class VimBlockSelection(
 
   private fun forEachLine(action: (start: Int, end: Int) -> Unit) {
     val (logicalStart, logicalEnd) = blockToNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL)
-    val lineRange = if (logicalStart.line > logicalEnd.line) logicalEnd.line..logicalStart.line else logicalStart.line..logicalEnd.line
+    val lineRange =
+      if (logicalStart.line > logicalEnd.line) logicalEnd.line..logicalStart.line else logicalStart.line..logicalEnd.line
     lineRange.map { line ->
       val start = editor.logicalPositionToOffset(LogicalPosition(line, logicalStart.column))
       val end = if (toLineEnd) {

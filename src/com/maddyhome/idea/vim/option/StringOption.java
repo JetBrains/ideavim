@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,9 @@ import org.jetbrains.annotations.NotNull;
  * An option that has an arbitrary string value
  */
 public class StringOption extends TextOption {
+  protected final String dflt;
+  protected String value;
+
   /**
    * Creates the string option
    *
@@ -143,7 +146,4 @@ public class StringOption extends TextOption {
 
     return "  " + getName() + "=" + value;
   }
-
-  protected final String dflt;
-  protected String value;
 }

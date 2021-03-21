@@ -81,6 +81,16 @@
       </aliases>
     </vimExtension>
 
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.nerdtree.NerdTree" name="NERDTree">
+      <aliases>
+        <alias name="https://github.com/preservim/nerdtree"/>
+        <alias name="preservim/nerdtree"/>
+        <alias name="https://github.com/scrooloose/nerdtree"/>
+        <alias name="scrooloose/nerdtree"/>
+        <alias name="nerdtree"/>
+      </aliases>
+    </vimExtension>
+
     <vimExtension implementation="com.maddyhome.idea.vim.extension.textobjindent.VimIndentObject" name="textobjindent">
       <aliases>
         <alias name="https://github.com/michaeljsmith/vim-indent-object"/>
@@ -89,4 +99,17 @@
       </aliases>
     </vimExtension>
   </extensions>
+
+  <!--  IdeaVim extensions-->
+  <extensions defaultExtensionNs="com.intellij">
+    <projectService serviceImplementation="com.maddyhome.idea.vim.extension.nerdtree.NerdTree$NerdDispatcher"/>
+  </extensions>
+  <projectListeners>
+    <listener class="com.maddyhome.idea.vim.extension.nerdtree.NerdTree$ProjectViewListener"
+              topic="com.intellij.openapi.wm.ex.ToolWindowManagerListener"/>
+  </projectListeners>
+  <applicationListeners>
+    <listener class="com.maddyhome.idea.vim.extension.nerdtree.NerdTree$NerdProjectListener"
+              topic="com.intellij.openapi.project.ProjectManagerListener"/>
+  </applicationListeners>
 </idea-plugin>

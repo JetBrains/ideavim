@@ -1,15 +1,21 @@
 package _Self.buildTypes
 
+import _Self.Constants.DEFAULT
+import _Self.Constants.DEV
+import _Self.Constants.EAP
+import _Self.Constants.VERSION
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
+import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 
 object Release_201 : BuildType({
   name = "Publish Release 2020.1"
   description = "Build and publish IdeaVim plugin"
 
   artifactRules = "build/distributions/*"
-  buildNumberPattern = "0.64-2020.1"
+  buildNumberPattern = "$VERSION-2020.1"
 
   params {
     param("env.ORG_GRADLE_PROJECT_ideaVersion", "2020.1")
@@ -21,13 +27,13 @@ object Release_201 : BuildType({
     param("env.ORG_GRADLE_PROJECT_publishUsername", "Aleksei.Plate")
     param("env.ORG_GRADLE_PROJECT_version", "%build.number%")
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
-    param("env.ORG_GRADLE_PROJECT_publishChannels", "default,eap")
+    param("env.ORG_GRADLE_PROJECT_publishChannels", "$DEFAULT,$EAP,$DEV")
   }
 
   vcs {
     root(_Self.vcsRoots.Branch_201)
 
-    checkoutMode = CheckoutMode.ON_SERVER
+    checkoutMode = CheckoutMode.AUTO
   }
 
   steps {
@@ -36,6 +42,18 @@ object Release_201 : BuildType({
       buildFile = ""
       enableStacktrace = true
       param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
+    }
+  }
+
+  failureConditions {
+    failOnMetricChange {
+      metric = BuildFailureOnMetric.MetricType.ARTIFACT_SIZE
+      threshold = 5
+      units = BuildFailureOnMetric.MetricUnit.PERCENTS
+      comparison = BuildFailureOnMetric.MetricComparison.DIFF
+      compareTo = build {
+        buildRule = lastSuccessful()
+      }
     }
   }
 })

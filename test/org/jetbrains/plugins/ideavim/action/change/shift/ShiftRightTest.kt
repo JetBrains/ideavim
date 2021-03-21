@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.change.shift
 
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ShiftRightTest : VimTestCase() {
@@ -30,16 +31,18 @@ class ShiftRightTest : VimTestCase() {
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     typeTextInFile(StringHelper.parseKeys(">W"), file)
-    myFixture.checkResult("""
+    myFixture.checkResult(
+      """
             A Discovery
 
-                  I found it in a legendary land
+                  ${c}I found it in a legendary land
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   // VIM-407
@@ -116,6 +119,51 @@ class ShiftRightTest : VimTestCase() {
     myFixture.checkResult("foo    foo\nfoo    bar\nfoo    baz\n")
   }
 
+  fun `test shift right positions caret at first non-blank char`() {
+    val file = """
+      |A Discovery
+      |
+      |       I found it in a legendary l${c}and
+      |       all rocks and lavender and tufted grass,
+      |       where it was settled on some sodden sand
+      |       hard by the torrent of a mountain pass.
+    """.trimMargin()
+    typeTextInFile(StringHelper.parseKeys(">>"), file)
+    myFixture.checkResult(
+      """
+      |A Discovery
+
+      |           ${c}I found it in a legendary land
+      |       all rocks and lavender and tufted grass,
+      |       where it was settled on some sodden sand
+      |       hard by the torrent of a mountain pass.
+      """.trimMargin()
+    )
+  }
+
+  fun `test shift right does not move caret with nostartofline`() {
+    OptionsManager.startofline.reset()
+    val file = """
+      |A Discovery
+      |
+      |       I found it in a ${c}legendary land
+      |       all rocks and lavender and tufted grass,
+      |       where it was settled on some sodden sand
+      |       hard by the torrent of a mountain pass.
+    """.trimMargin()
+    typeTextInFile(StringHelper.parseKeys(">>"), file)
+    myFixture.checkResult(
+      """
+      |A Discovery
+
+      |           I found it i${c}n a legendary land
+      |       all rocks and lavender and tufted grass,
+      |       where it was settled on some sodden sand
+      |       hard by the torrent of a mountain pass.
+      """.trimMargin()
+    )
+  }
+
   fun `test shift ctrl-t`() {
     val file = """
             A Discovery
@@ -124,15 +172,17 @@ class ShiftRightTest : VimTestCase() {
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     typeTextInFile(StringHelper.parseKeys("i<C-T>"), file)
-    myFixture.checkResult("""
+    myFixture.checkResult(
+      """
             A Discovery
 
                   I found it in a legendary land
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 }

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,9 +41,11 @@ class ShiftRightHandler : CommandHandler.ForEachCaret(), ComplicatedNameExComman
   override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
     val range = cmd.getTextRange(editor, caret, true)
     val endOffsets = range.endOffsets.map { it - 1 }.toIntArray()
-    VimPlugin.getChange().indentRange(editor, caret, context,
+    VimPlugin.getChange().indentRange(
+      editor, caret, context,
       TextRange(range.startOffsets, endOffsets),
-      cmd.command.length, 1)
+      cmd.command.length, 1
+    )
     return true
   }
 }

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,8 @@
 
 package com.maddyhome.idea.vim.group
 
-import com.maddyhome.idea.vim.common.Alias
+import com.maddyhome.idea.vim.common.CommandAlias
+import com.maddyhome.idea.vim.common.GoalCommand
 import org.jetbrains.annotations.NonNls
 
 /**
@@ -26,11 +27,12 @@ import org.jetbrains.annotations.NonNls
  */
 class CommandGroup {
   companion object {
-    @NonNls val BLACKLISTED_ALIASES = arrayOf("X", "Next", "Print")
+    @NonNls
+    val BLACKLISTED_ALIASES = arrayOf("X", "Next", "Print")
     private const val overridePrefix = "!"
   }
 
-  private var aliases = HashMap<String, Alias>()
+  private var aliases = HashMap<String, CommandAlias>()
 
   fun isAlias(command: String): Boolean {
     val name = this.getAliasName(command)
@@ -52,23 +54,23 @@ class CommandGroup {
     return name in this.aliases
   }
 
-  private fun getAlias(name: String): Alias {
+  private fun getAlias(name: String): CommandAlias {
     return this.aliases[name]!!
   }
 
-  fun getAliasCommand(command: String, count: Int): String {
+  fun getAliasCommand(command: String, count: Int): GoalCommand {
     return this.getAlias(this.getAliasName(command)).getCommand(command, count)
   }
 
-  fun setAlias(name: String, alias: Alias) {
-    this.aliases[name] = alias
+  fun setAlias(name: String, commandAlias: CommandAlias) {
+    this.aliases[name] = commandAlias
   }
 
   fun removeAlias(name: String) {
     this.aliases.remove(name)
   }
 
-  fun listAliases(): Set<Map.Entry<String, Alias>> {
+  fun listAliases(): Set<Map.Entry<String, CommandAlias>> {
     return this.aliases.entries
   }
 

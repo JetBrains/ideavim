@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,11 @@ sealed class PutTextBaseAction(
 
   override fun execute(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean {
     val lastRegister = VimPlugin.getRegister().lastRegister
-    val textData = if (lastRegister != null) TextData(lastRegister.text ?: StringHelper.toKeyNotation(lastRegister.keys), lastRegister.type, lastRegister.transferableData) else null
+    val textData = if (lastRegister != null) TextData(
+      lastRegister.text ?: StringHelper.toKeyNotation(lastRegister.keys),
+      lastRegister.type,
+      lastRegister.transferableData
+    ) else null
     val putData = PutData(textData, null, count, insertTextBeforeCaret, indent, caretAfterInsertedText, -1)
     return VimPlugin.getPut().putText(editor, context, putData)
   }
@@ -50,4 +54,3 @@ class PutTextBeforeCursorNoIndentAction : PutTextBaseAction(insertTextBeforeCare
 
 class PutTextBeforeCursorAction : PutTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = false)
 class PutTextBeforeCursorActionMoveCursor : PutTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = true)
-

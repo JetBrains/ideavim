@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,13 +30,13 @@ class VisualBlockAppendActionTest : VimTestCase() {
             ${c}int a;
             int b;
             int c;
-            """.trimIndent()
+    """.trimIndent()
     typeTextInFile(parseKeys("<C-V>", "2j", "e", "A", " const", "<Esc>"), before)
     val after = """
             int const a;
             int const b;
             int const c;
-            """.trimIndent()
+    """.trimIndent()
     myFixture.checkResult(after)
   }
 
@@ -45,19 +45,20 @@ class VisualBlockAppendActionTest : VimTestCase() {
             ${c}int a;
             private String b;
             int c;
-            """.trimIndent()
+    """.trimIndent()
     typeTextInFile(parseKeys("<C-V>", "2j", "$", "A", " // My variables", "<Esc>"), before)
     val after = """
             int a; // My variables
             private String b; // My variables
             int c; // My variables
-            """.trimIndent()
+    """.trimIndent()
     myFixture.checkResult(after)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test append in non block mode`() {
-    doTest("vwAHello<esc>",
+    doTest(
+      "vwAHello<esc>",
       """
                 ${c}A Discovery
 
@@ -65,7 +66,7 @@ class VisualBlockAppendActionTest : VimTestCase() {
                 all rocks and ${c}lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A DiscoveryHell${c}o
 
@@ -73,9 +74,10 @@ class VisualBlockAppendActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,Hell${c}o
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
     assertMode(CommandState.Mode.COMMAND)
   }
 }

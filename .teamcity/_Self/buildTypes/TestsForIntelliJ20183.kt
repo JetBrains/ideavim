@@ -3,6 +3,8 @@ package _Self.buildTypes
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
+import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
+import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object TestsForIntelliJ20183 : BuildType({
@@ -20,7 +22,7 @@ object TestsForIntelliJ20183 : BuildType({
   vcs {
     root(_Self.vcsRoots.Branch_183)
 
-    checkoutMode = CheckoutMode.ON_SERVER
+    checkoutMode = CheckoutMode.AUTO
   }
 
   steps {
@@ -40,5 +42,17 @@ object TestsForIntelliJ20183 : BuildType({
 
   requirements {
     noLessThanVer("teamcity.agent.jvm.version", "1.8")
+  }
+
+  failureConditions {
+    failOnMetricChange {
+      metric = BuildFailureOnMetric.MetricType.TEST_COUNT
+      threshold = 20
+      units = BuildFailureOnMetric.MetricUnit.PERCENTS
+      comparison = BuildFailureOnMetric.MetricComparison.LESS
+      compareTo = build {
+        buildRule = lastSuccessful()
+      }
+    }
   }
 })

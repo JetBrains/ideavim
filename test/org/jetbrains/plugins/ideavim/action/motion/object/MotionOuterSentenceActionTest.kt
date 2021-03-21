@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,42 +23,51 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionOuterSentenceActionTest : VimTestCase() {
-  @VimBehaviorDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(
+    originalVimAfter = """
         I found it in a legendary land
         all rocks and lavender and tufted grass,
         where it was settled on some sodden sand
         $c
-    """)
+    """
+  )
   fun `test on empty last line`() {
-    doTest("=as", """
+    doTest(
+      "=as",
+      """
         I found it in a legendary land
         all rocks and lavender and tufted grass,
         where it was settled on some sodden sand
         $c
-    """.trimIndent(),
+      """.trimIndent(),
       """
         ${c}I found it in a legendary land
         all rocks and lavender and tufted grass,
         where it was settled on some sodden sand
         
-    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
 
-  @VimBehaviorDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(
+    originalVimAfter = """
         I found it in a legendary land
         all rocks and lavender and tufted grass,
         where it was settled on some sodden sand
         $c
-    """)
+    """
+  )
   fun `test delete on empty last line`() {
-    doTest("das", """
+    doTest(
+      "das",
+      """
         I found it in a legendary land
         all rocks and lavender and tufted grass,
         where it was settled on some sodden sand
         $c
-    """.trimIndent(), "\n",
+      """.trimIndent(),
+      "\n",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }

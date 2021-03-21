@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,75 +36,102 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
   }
 
   fun `test multiline outside parentheses`() {
-    configureByText("""(outer
-                        |${c}(inner))""".trimMargin())
+    configureByText(
+      """(outer
+                        |$c(inner))""".trimMargin()
+    )
     typeText(parseKeys("vi)"))
     assertSelection("inner")
   }
 
   fun `test multiline in parentheses`() {
-    configureByText("""(outer
-                        |(inner${c}))""".trimMargin())
+    configureByText(
+      """(outer
+                        |(inner$c))""".trimMargin()
+    )
     typeText(parseKeys("vi)"))
     assertSelection("inner")
   }
 
   fun `test multiline inside of outer parentheses`() {
-    configureByText("""(outer
-                         |${c} (inner))""".trimMargin())
+    configureByText(
+      """(outer
+                         |$c (inner))""".trimMargin()
+    )
     typeText(parseKeys("vi)"))
-    assertSelection("""outer
-                        | (inner)""".trimMargin())
+    assertSelection(
+      """outer
+                        | (inner)""".trimMargin()
+    )
   }
 
   fun `test double motion`() {
-    configureByText("""(outer
-                      |${c}(inner))""".trimMargin())
+    configureByText(
+      """(outer
+                      |$c(inner))""".trimMargin()
+    )
     typeText(parseKeys("vi)i)"))
-    assertSelection("""outer
-                          |(inner)""".trimMargin())
+    assertSelection(
+      """outer
+                          |(inner)""".trimMargin()
+    )
   }
 
   fun `test motion with count`() {
-    configureByText("""(outer
-                          |${c}(inner))""".trimMargin())
+    configureByText(
+      """(outer
+                          |$c(inner))""".trimMargin()
+    )
     typeText(parseKeys("v2i)"))
-    assertSelection("""outer
-                      |(inner)""".trimMargin())
+    assertSelection(
+      """outer
+                      |(inner)""".trimMargin()
+    )
   }
 
   fun `test text object after motion`() {
-    configureByText("""(outer
-                      |${c}(inner))""".trimMargin())
+    configureByText(
+      """(outer
+                      |$c(inner))""".trimMargin()
+    )
     typeText(parseKeys("vlli)"))
-    assertSelection("""outer
-                      |(inner)""".trimMargin())
+    assertSelection(
+      """outer
+                      |(inner)""".trimMargin()
+    )
   }
 
   fun `test text object after motion outside parentheses`() {
-    configureByText("""(outer
-                      |(inner${c}))""".trimMargin())
+    configureByText(
+      """(outer
+                      |(inner$c))""".trimMargin()
+    )
     typeText(parseKeys("vlli)"))
     assertSelection("inner")
   }
 
   fun `test text object after motion inside parentheses`() {
-    configureByText("""(outer
-                      |(${c}inner))""".trimMargin())
+    configureByText(
+      """(outer
+                      |(${c}inner))""".trimMargin()
+    )
     typeText(parseKeys("vllli)"))
     assertSelection("inner")
   }
 
   // VIM-326 |d| |v_ib|
   fun testDeleteInnerBlock() {
-    typeTextInFile(parseKeys("di)"),
-      "foo(\"b${c}ar\")\n")
+    typeTextInFile(
+      parseKeys("di)"),
+      "foo(\"b${c}ar\")\n"
+    )
     myFixture.checkResult("foo()\n")
   }
 
   // VIM-1008 |d| |v_ib|
   fun testDeleteInnerBlockWithQuote() {
-    typeTextInFile(parseKeys("di)"),
+    typeTextInFile(
+      parseKeys("di)"),
       "(abc${c}def'ghi)"
     )
     myFixture.checkResult("()")
@@ -112,7 +139,8 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
 
   // VIM-1008 |d| |v_ib|
   fun testDeleteInnerBlockWithDoubleQuote() {
-    typeTextInFile(parseKeys("di)"),
+    typeTextInFile(
+      parseKeys("di)"),
       """(abc${c}def"ghi)"""
     )
     myFixture.checkResult("()")
@@ -120,22 +148,28 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
 
   // VIM-326 |d| |v_ib|
   fun testDeleteInnerBlockCaretBeforeString() {
-    typeTextInFile(parseKeys("di)"),
-      "foo(${c}\"bar\")\n")
+    typeTextInFile(
+      parseKeys("di)"),
+      "foo(${c}\"bar\")\n"
+    )
     myFixture.checkResult("foo()\n")
   }
 
   // VIM-326 |c| |v_ib|
   fun testChangeInnerBlockCaretBeforeString() {
-    typeTextInFile(parseKeys("ci)"),
-      "foo(${c}\"bar\")\n")
+    typeTextInFile(
+      parseKeys("ci)"),
+      "foo(${c}\"bar\")\n"
+    )
     myFixture.checkResult("foo()\n")
   }
 
   // VIM-392 |c| |v_ib|
   fun testChangeInnerBlockCaretBeforeBlock() {
-    typeTextInFile(parseKeys("ci)"),
-      "foo${c}(bar)\n")
+    typeTextInFile(
+      parseKeys("ci)"),
+      "foo$c(bar)\n"
+    )
     myFixture.checkResult("foo()\n")
     assertOffset(4)
   }
@@ -148,16 +182,20 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
 
   // VIM-275 |d| |v_ib|
   fun testDeleteInnerParensBlockBeforeOpen() {
-    typeTextInFile(parseKeys("di)"),
-      "foo${c}(bar)\n")
+    typeTextInFile(
+      parseKeys("di)"),
+      "foo$c(bar)\n"
+    )
     myFixture.checkResult("foo()\n")
     assertOffset(4)
   }
 
   // |d| |v_ib|
   fun testDeleteInnerParensBlockBeforeClose() {
-    typeTextInFile(parseKeys("di)"),
-      "foo(bar${c})\n")
+    typeTextInFile(
+      parseKeys("di)"),
+      "foo(bar$c)\n"
+    )
     myFixture.checkResult("foo()\n")
   }
 }

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.helper.fileSize
 import java.util.*
 
 /**
@@ -42,14 +43,20 @@ class ChangeVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(FLAG_MOT_LINEWISE, FLAG_MULTIKEY_UNDO, FLAG_EXIT_VISUAL)
 
-  override fun executeAction(editor: Editor,
-                             caret: Caret,
-                             context: DataContext,
-                             cmd: Command,
-                             range: VimSelection): Boolean {
+  override fun executeAction(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    range: VimSelection
+  ): Boolean {
     val textRange = range.toVimTextRange(true)
-    val lineRange = TextRange(EditorHelper.getLineStartForOffset(editor, textRange.startOffset),
-      EditorHelper.getLineEndForOffset(editor, textRange.endOffset) + 1)
+    val lineEndForOffset = EditorHelper.getLineEndForOffset(editor, textRange.endOffset)
+    val endsWithNewLine = if (lineEndForOffset == editor.fileSize) 0 else 1
+    val lineRange = TextRange(
+      EditorHelper.getLineStartForOffset(editor, textRange.startOffset),
+      lineEndForOffset + endsWithNewLine
+    )
     return VimPlugin.getChange().changeRange(editor, caret, lineRange, SelectionType.LINE_WISE, context)
   }
 }

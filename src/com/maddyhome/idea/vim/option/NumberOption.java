@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,11 @@ import org.jetbrains.annotations.Nullable;
  * Represents an option with a numeric value
  */
 public class NumberOption extends TextOption {
+  private final int dflt;
+  private final int min;
+  private final int max;
+  private int value;
+
   /**
    * Creates a number option that must contain a zero or positive value
    *
@@ -52,7 +57,7 @@ public class NumberOption extends TextOption {
     this.dflt = dflt;
     this.value = dflt;
     this.min = min;
-    this.max = Integer.MAX_VALUE;
+    this.max = max;
   }
 
   /**
@@ -237,9 +242,4 @@ public class NumberOption extends TextOption {
 
     return "  " + getName() + "=" + value;
   }
-
-  private final int dflt;
-  private int value;
-  private final int min;
-  private final int max;
 }

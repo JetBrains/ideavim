@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.ex.handler
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.common.Alias
+import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandler.Access.READ_ONLY
 import com.maddyhome.idea.vim.ex.CommandHandler.ArgumentFlag.ARGUMENT_OPTIONAL
@@ -46,7 +46,8 @@ class CmdHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
     const val overridePrefix = "!"
 
     // [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
-    @NonNls const val argsPrefix = "-nargs"
+    @NonNls
+    const val argsPrefix = "-nargs"
 
     const val anyNumberOfArguments = "*"
     const val zeroOrOneArguments = "?"
@@ -70,7 +71,7 @@ class CmdHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
     val aliases = allAliases.filter {
       (filter.isEmpty() || it.key.startsWith(filter))
     }.map {
-      "${it.key.padEnd(12)}${it.value.numberOfArguments.padEnd(11)}${it.value.command}"
+      "${it.key.padEnd(12)}${it.value.numberOfArguments.padEnd(11)}${it.value.printValue()}"
     }.sortedWith(String.CASE_INSENSITIVE_ORDER).joinToString(lineSeparator)
     ExOutputModel.getInstance(editor).output("Name        Args       Definition$lineSeparator$aliases")
     return true
@@ -175,7 +176,7 @@ class CmdHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
     // Store the alias and the command. We don't need to parse the argument
     // at this time, if the syntax is wrong an error will be returned when
     // the alias is executed.
-    VimPlugin.getCommand().setAlias(alias, Alias(minNumberOfArgs, maxNumberOfArgs, alias, argument))
+    VimPlugin.getCommand().setAlias(alias, CommandAlias.Ex(minNumberOfArgs, maxNumberOfArgs, alias, argument))
 
     return true
   }

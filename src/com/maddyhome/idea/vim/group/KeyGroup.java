@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
 
   private final @NotNull Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<>();
   private final @NotNull Set<RequiredShortcut> requiredShortcutKeys = new HashSet<>(300);
-  private final @NotNull Map<MappingMode, CommandPartNode> keyRoots = new EnumMap<>(MappingMode.class);
+  private final @NotNull Map<MappingMode, CommandPartNode<ActionBeanClass>> keyRoots = new EnumMap<>(MappingMode.class);
   private final @NotNull Map<MappingMode, KeyMapping> keyMappings = new EnumMap<>(MappingMode.class);
   private @Nullable OperatorFunction operatorFunction = null;
 
@@ -142,6 +142,14 @@ public class KeyGroup implements PersistentStateComponent<Element> {
                             boolean recursive) {
     modes.stream().map(this::getKeyMapping).forEach(o -> o.put(fromKeys, toKeys, owner, recursive));
     registerKeyMapping(fromKeys, owner);
+  }
+
+  public boolean hasmapto(@NotNull MappingMode mode, @NotNull List<KeyStroke> toKeys) {
+    return this.getKeyMapping(mode).hasmapto(toKeys);
+  }
+
+  public List<Pair<List<KeyStroke>, MappingInfo>> getMapTo(@NotNull MappingMode mode, @NotNull List<KeyStroke> toKeys) {
+    return this.getKeyMapping(mode).getMapTo(toKeys);
   }
 
   public List<Pair<List<KeyStroke>, MappingInfo>> getKeyMappingByOwner(@NotNull MappingOwner owner) {
@@ -280,8 +288,8 @@ public class KeyGroup implements PersistentStateComponent<Element> {
    * @param mappingMode The mapping mode
    * @return The key mapping tree root
    */
-  public @NotNull CommandPartNode getKeyRoot(@NotNull MappingMode mappingMode) {
-    return keyRoots.computeIfAbsent(mappingMode, (key) -> new RootNode());
+  public @NotNull CommandPartNode<ActionBeanClass> getKeyRoot(@NotNull MappingMode mappingMode) {
+    return keyRoots.computeIfAbsent(mappingMode, (key) -> new RootNode<>());
   }
 
   /**
@@ -345,16 +353,8 @@ public class KeyGroup implements PersistentStateComponent<Element> {
       registerRequiredShortcut(keyStrokes, MappingOwner.IdeaVim.INSTANCE);
 
       for (MappingMode mappingMode : actionModes) {
-        Node node = getKeyRoot(mappingMode);
-        final int len = keyStrokes.size();
-        // Add a child for each keystroke in the shortcut for this action
-        for (int i = 0; i < len; i++) {
-          if (!(node instanceof CommandPartNode)) {
-            throw new Error("Error in tree constructing");
-          }
-
-          node = addMNode((CommandPartNode)node, actionHolder, keyStrokes.get(i), i == len - 1);
-        }
+        Node<ActionBeanClass> node = getKeyRoot(mappingMode);
+        NodesKt.addLeafs(node, keyStrokes, actionHolder);
       }
     }
   }
@@ -415,25 +415,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
   private @Nullable Map<MappingMode, Set<List<KeyStroke>>> identityChecker;
   private @Nullable Map<List<KeyStroke>, String> prefixes;
 
-  private @NotNull Node addMNode(@NotNull CommandPartNode base,
-                                 ActionBeanClass actionHolder,
-                                 @NotNull KeyStroke key,
-                                 boolean isLastInSequence) {
-    Node existing = base.get(key);
-    if (existing != null) return existing;
-
-    Node newNode;
-    if (isLastInSequence) {
-      newNode = new CommandNode(actionHolder);
-    }
-    else {
-      newNode = new CommandPartNode();
-    }
-    base.put(key, newNode);
-    return newNode;
-  }
-
-  private static @NotNull ShortcutSet toShortcutSet(@NotNull Collection<RequiredShortcut> requiredShortcuts) {
+  public static @NotNull ShortcutSet toShortcutSet(@NotNull Collection<RequiredShortcut> requiredShortcuts) {
     final List<Shortcut> shortcuts = new ArrayList<>();
     for (RequiredShortcut key : requiredShortcuts) {
       shortcuts.add(new KeyboardShortcut(key.getKeyStroke(), null));

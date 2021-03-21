@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ fun checkInString(chars: CharSequence, currentPos: Int, str: Boolean): Boolean {
 
   var inQuote: Boolean? = null
 
-  for((_, trigger, inQuoteAfter, lastOpenSingleQuotePosAfter) in afterPos) {
+  for ((_, trigger, inQuoteAfter, lastOpenSingleQuotePosAfter) in afterPos) {
     inQuote = inQuoteAfter
     if (posInQuote != null && posInChar != null) break
     if (posInQuote == null && inQuoteAfter != null) {
@@ -181,7 +181,8 @@ private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
       }
     }
     yield(State(i, c, inQuote, lastOpenSingleQuotePos))
-    found = findPositionOfFirstCharacter(chars, i + Direction.FORWARDS.toInt(), charsToSearch, false, Direction.FORWARDS)
+    found =
+      findPositionOfFirstCharacter(chars, i + Direction.FORWARDS.toInt(), charsToSearch, false, Direction.FORWARDS)
   }
 }
 

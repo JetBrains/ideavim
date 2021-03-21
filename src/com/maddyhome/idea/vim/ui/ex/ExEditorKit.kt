@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -95,7 +95,7 @@ object ExEditorKit : DefaultEditorKit() {
             if (target.useHandleKeyFromEx) {
               val entry = ExEntryPanel.getInstance().entry
               val editor = entry.editor
-              KeyHandler.getInstance().handleKey(editor, key, EditorDataContext(editor, entry.context))
+              KeyHandler.getInstance().handleKey(editor, key, EditorDataContext.init(editor, entry.context))
             } else {
               val event = ActionEvent(e.source, e.id, c.toString(), e.getWhen(), e.modifiers)
               super.actionPerformed(event)
@@ -109,7 +109,6 @@ object ExEditorKit : DefaultEditorKit() {
       }
     }
   }
-
 
   fun convert(event: ActionEvent): KeyStroke? {
     val cmd = event.actionCommand

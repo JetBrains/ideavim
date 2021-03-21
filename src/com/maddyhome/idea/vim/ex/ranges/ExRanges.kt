@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -144,8 +144,11 @@ class LineNumberRange : Range {
     return line
   }
 
-  override fun getRangeLine(editor: Editor, caret: Caret,
-                            lastZero: Boolean): Int {
+  override fun getRangeLine(
+    editor: Editor,
+    caret: Caret,
+    lastZero: Boolean
+  ): Int {
     line = if (line == LAST_LINE) EditorHelper.getLineCount(editor) - 1 else caret.logicalPosition.line
     return line
   }
@@ -179,7 +182,6 @@ class MarkRange(private val mark: Char, offset: Int, move: Boolean) : Range(offs
   override fun getRangeLine(editor: Editor, caret: Caret, lastZero: Boolean): Int = getRangeLine(editor, lastZero)
 
   override fun toString(): String = "MarkRange[mark=$mark, ${super.toString()}]"
-
 }
 
 /**
@@ -233,7 +235,10 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
    * @param lastZero True if last line was set to start of file
    * @return The zero based line number, -1 if the text was not found
    */
-  override fun getRangeLine(editor: Editor, lastZero: Boolean): Int { // Each subsequent pattern is searched for starting in the line after the previous search match
+  override fun getRangeLine(
+    editor: Editor,
+    lastZero: Boolean
+  ): Int { // Each subsequent pattern is searched for starting in the line after the previous search match
     var line = editor.caretModel.logicalPosition.line
     var pos = -1
     for (i in patterns.indices) {
@@ -254,8 +259,11 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
     return if (pos != -1) line else -1
   }
 
-  override fun getRangeLine(editor: Editor, caret: Caret,
-                            lastZero: Boolean): Int {
+  override fun getRangeLine(
+    editor: Editor,
+    caret: Caret,
+    lastZero: Boolean
+  ): Int {
     var line = caret.logicalPosition.line
     var offset = -1
     for (i in patterns.indices) {

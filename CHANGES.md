@@ -22,6 +22,41 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Features:
+* Support `startofline` option
+
+### Fixes:
+* [VIM-2238](https://youtrack.jetbrains.com/issue/VIM-2238) Fix `M` command for small files
+
+### Merged PRs:
+* [275](https://github.com/JetBrains/ideavim/pull/275) by [Matt Ellis](https://github.com/citizenmatt): Fix edge cases for H, L and M and introduce 'startofline' option
+
+## 0.65, 2021-02-17
+
+### Features:
+* Support `NERDTree` extension [VIM-1042](https://youtrack.jetbrains.com/issue/VIM-1042) | [NERDTree](https://github.com/preservim/nerdtree)
+  
+    * <details>
+            <summary><strong>Click to see details</strong></summary>
+            <img src="assets/changes/0.65/nerdtree.gif" alt="NERDTree example"/>
+    </details>
+* Support `maxmapdepth` option to define the maximum depth of mappings
+
+### Fixes:
+* [VIM-2202](https://youtrack.jetbrains.com/issue/VIM-2202) Fix macro recording for ex command and search
+* [VIM-1799](https://youtrack.jetbrains.com/issue/VIM-1799)
+  [VIM-1794](https://youtrack.jetbrains.com/issue/VIM-1794)
+  Special characters are not interpreted on yanking
+* [VIM-2218](https://youtrack.jetbrains.com/issue/VIM-2218) Fix some shortcuts for 2021.+
+* [VIM-2217](https://youtrack.jetbrains.com/issue/VIM-2217) Fix adding new line at the end of the file for the AppCode
+* [VIM-2220](https://youtrack.jetbrains.com/issue/VIM-2220) Do not try to get a commandState for null editor
+* [VIM-2153](https://youtrack.jetbrains.com/issue/VIM-2153) Fix storing special characters after IDE closing
+
+### Merged PRs:
+* [269](https://github.com/JetBrains/ideavim/pull/269) by [大牙(Henry Zhu)](https://github.com/daya0576): fix invalid link of submodule docs
+
 ## 0.64, 2020-12-23
 
 ### Merged PRs:
@@ -138,7 +173,7 @@ Use `set ideavimsupport=` to disable IdeaVim in dialog editors.
 
     * <details>
             <summary><strong>Click to see details</strong></summary>
-            <img src="resources/changes/0.59/highlight_yank.gif" alt="highlight yank"/>
+            <img src="assets/changes/0.59/highlight_yank.gif" alt="highlight yank"/>
       </details>
 
 * [VIM-2068](https://youtrack.jetbrains.com/issue/VIM-2068) `:tabclose` command
@@ -163,7 +198,7 @@ Use `set ideavimsupport=` to disable IdeaVim in dialog editors.
 
     * <details>
             <summary><strong>Click to see details</strong></summary>
-            <img src="resources/changes/0.58/reload_ideavimrc.png" alt="IdeaVimRc reload"/>
+            <img src="assets/changes/0.58/reload_ideavimrc.png" alt="IdeaVimRc reload"/>
       </details>
 
 * Add `:buffer` command.

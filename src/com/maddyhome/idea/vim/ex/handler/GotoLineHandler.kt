@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ import kotlin.math.min
  * range.
  */
 class GotoLineHandler : CommandHandler.ForEachCaret() {
-    override val argFlags: CommandHandlerFlags = flags(RANGE_REQUIRED, ARGUMENT_OPTIONAL, READ_ONLY)
+  override val argFlags: CommandHandlerFlags = flags(RANGE_REQUIRED, ARGUMENT_OPTIONAL, READ_ONLY)
 
   /**
    * Moves the cursor to the line entered by the user
@@ -53,7 +53,8 @@ class GotoLineHandler : CommandHandler.ForEachCaret() {
     val line = min(cmd.getLine(editor, caret), EditorHelper.getLineCount(editor) - 1)
 
     if (line >= 0) {
-      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, line))
+      val offset = VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor, line, caret)
+      MotionGroup.moveCaret(editor, caret, offset)
       return true
     }
 

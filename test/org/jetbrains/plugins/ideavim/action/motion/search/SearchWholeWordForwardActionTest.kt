@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,13 +28,13 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
   .he${c}llo 1
   .hello 2
   .hello 3
-""".trimIndent().dotToTab()
+    """.trimIndent().dotToTab()
     val keys = "**"
     val after = """
   .hello 1
   .hello 2
   .${c}hello 3
-""".trimIndent().dotToTab()
+    """.trimIndent().dotToTab()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -43,43 +43,50 @@ class SearchWholeWordForwardActionTest : VimTestCase() {
     assertPluginError(false)
   }
 
-  @VimBehaviorDiffers(originalVimAfter =
-        """
+  @VimBehaviorDiffers(
+    originalVimAfter =
+    """
           I found it in a legendary land
           all rocks and lavender and tufted grass,
           where it was settled on some sodden sand
-          hard by the torrent of a mountain pass${c}.
+          hard by the torrent of a mountain pass$c.
         """
   )
   fun `test last dot`() {
-    doTest("*",
+    doTest(
+      "*",
       """
           I found it in a legendary land
           all rocks and lavender and tufted grass,
           where it was settled on some sodden sand
-          hard by the torrent of a mountain pass${c}.
-        """.trimIndent(),
+          hard by the torrent of a mountain pass$c.
+      """.trimIndent(),
       """
           ${c}I found it in a legendary land
           all rocks and lavender and tufted grass,
           where it was settled on some sodden sand
           hard by the torrent of a mountain pass.
-        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 
   fun `test last word`() {
-    doTest("*",
+    doTest(
+      "*",
       """
           I found it in a legendary land
           all |pass| rocks and lavender and tufted grass,
           where it was settled on some sodden sand
           hard by the torrent of a mountain pas${c}s
-        """.trimIndent(),
+      """.trimIndent(),
       """
           I found it in a legendary land
           all |${c}pass| rocks and lavender and tufted grass,
           where it was settled on some sodden sand
           hard by the torrent of a mountain pass
-        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 }

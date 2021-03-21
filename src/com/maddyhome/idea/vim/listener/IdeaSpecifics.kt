@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -73,7 +73,8 @@ object IdeaSpecifics {
   class VimActionListener : AnActionListener {
     @NonNls
     private val surrounderItems = listOf("if", "if / else", "for")
-    private val surrounderAction = "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
+    private val surrounderAction =
+      "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
     private var editor: Editor? = null
     override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
       if (!VimPlugin.isEnabled()) return
@@ -100,7 +101,8 @@ object IdeaSpecifics {
             editor?.caretModel?.addCaretListener(object : CaretListener {
               override fun caretPositionChanged(event: CaretEvent) {
                 val eventEditor = event.editor.getTopLevelEditor()
-                val predictedMode = IdeaSelectionControl.predictMode(eventEditor, VimListenerManager.SelectionSource.OTHER)
+                val predictedMode =
+                  IdeaSelectionControl.predictMode(eventEditor, VimListenerManager.SelectionSource.OTHER)
                 moveCaretOneCharLeftFromSelectionEnd(eventEditor, predictedMode)
                 eventEditor.caretModel.removeCaretListener(this)
               }
@@ -111,9 +113,14 @@ object IdeaSpecifics {
       //endregion
 
       //region Enter insert mode after surround with if
-      if (surrounderAction == action.javaClass.name && surrounderItems.any { action.templatePresentation.text.endsWith(it) }) {
+      if (surrounderAction == action.javaClass.name && surrounderItems.any {
+        action.templatePresentation.text.endsWith(
+            it
+          )
+      }
+      ) {
         editor?.let {
-          val commandState = editor.commandState
+          val commandState = it.commandState
           while (commandState.mode != CommandState.Mode.COMMAND) {
             commandState.popModes()
           }
@@ -134,7 +141,12 @@ object IdeaSpecifics {
       val editor = state.editor ?: return
 
       state.addTemplateStateListener(object : TemplateEditingAdapter() {
-        override fun currentVariableChanged(templateState: TemplateState, template: Template?, oldIndex: Int, newIndex: Int) {
+        override fun currentVariableChanged(
+          templateState: TemplateState,
+          template: Template?,
+          oldIndex: Int,
+          newIndex: Int
+        ) {
           if (IdeaRefactorMode.keepMode()) {
             IdeaRefactorMode.correctSelection(editor)
           }
@@ -148,7 +160,7 @@ object IdeaSpecifics {
           // Enable insert mode if there is no selection in template
           // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
           if (editor.inNormalMode) {
-            VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
+            VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext.init(editor))
             KeyHandler.getInstance().reset(editor)
           }
         }
@@ -219,16 +231,19 @@ object IdeaSpecifics {
       val offsetLeftEnd = offset - 1
       val templateRange = caret.getUserData(facedAppCodeTemplate)
       if (templateRange == null) {
-        if (offsetRightEnd < editor.fileSize
-          && editor.document.charsSequence.subSequence(offset, offsetRightEnd).toString() == TEMPLATE_START) {
+        if (offsetRightEnd < editor.fileSize &&
+          editor.document.charsSequence.subSequence(offset, offsetRightEnd).toString() == TEMPLATE_START
+        ) {
           caret.shake()
 
           val templateEnd = editor.findTemplateEnd(offset) ?: return
 
           caret.putUserData(facedAppCodeTemplate, offset..templateEnd)
         }
-        if (offsetLeftEnd >= 0
-          && editor.document.charsSequence.subSequence(offsetLeftEnd, offset + 1).toString() == TEMPLATE_END) {
+        if (offsetLeftEnd >= 0 &&
+          offset + 1 <= editor.fileSize &&
+          editor.document.charsSequence.subSequence(offsetLeftEnd, offset + 1).toString() == TEMPLATE_END
+        ) {
           caret.shake()
 
           val templateStart = editor.findTemplateStart(offsetLeftEnd) ?: return
@@ -262,7 +277,7 @@ object IdeaSpecifics {
       val charSequence = this.document.charsSequence
       val length = charSequence.length
       for (i in start until length - 1) {
-        if (charSequence[i] == TEMPLATE_END[0] && charSequence[i+1] == TEMPLATE_END[1]) {
+        if (charSequence[i] == TEMPLATE_END[0] && charSequence[i + 1] == TEMPLATE_END[1]) {
           return i + 1
         }
       }

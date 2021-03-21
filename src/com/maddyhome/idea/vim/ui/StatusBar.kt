@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim.ui
 
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.DataManager
-import com.intellij.ide.lightEdit.LightEditCompatible
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
@@ -51,10 +50,11 @@ import java.awt.event.MouseEvent
 import javax.swing.Icon
 import javax.swing.SwingConstants
 
-@NonNls const val STATUS_BAR_ICON_ID = "IdeaVim-Icon"
+@NonNls
+const val STATUS_BAR_ICON_ID = "IdeaVim-Icon"
 const val STATUS_BAR_DISPLAY_NAME = "IdeaVim"
 
-class StatusBarIconFactory : StatusBarWidgetFactory, LightEditCompatible {
+class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
 
   override fun getId(): String = STATUS_BAR_ICON_ID
 
@@ -152,9 +152,11 @@ private object VimActionsPopup {
   fun getPopup(dataContext: DataContext): ListPopup {
     val actions = getActions()
     val popup = JBPopupFactory.getInstance()
-      .createActionGroupPopup(STATUS_BAR_DISPLAY_NAME, actions,
+      .createActionGroupPopup(
+        STATUS_BAR_DISPLAY_NAME, actions,
         dataContext, JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, false,
-        VimActions.actionPlace)
+        VimActions.actionPlace
+      )
     popup.setAdText(MessageHelper.message("popup.advertisement.version", VimPlugin.getVersion()), SwingConstants.CENTER)
 
     return popup
@@ -170,15 +172,42 @@ private object VimActionsPopup {
     actionGroup.add(ShortcutConflictsSettings)
     actionGroup.addSeparator()
 
-    val eapGroup = DefaultActionGroup(MessageHelper.message("action.eap.choice.active.text", if (JoinEap.eapActive()) 0 else 1), true)
+    val eapGroup = DefaultActionGroup(
+      MessageHelper.message("action.eap.choice.active.text", if (JoinEap.eapActive()) 0 else 1),
+      true
+    )
     eapGroup.add(JoinEap)
-    eapGroup.add(HelpLink(MessageHelper.message("action.about.eap.text"), "https://github.com/JetBrains/ideavim#get-early-access", null))
+    eapGroup.add(
+      HelpLink(
+        MessageHelper.message("action.about.eap.text"),
+        "https://github.com/JetBrains/ideavim#get-early-access",
+        null
+      )
+    )
     actionGroup.add(eapGroup)
 
     val helpGroup = DefaultActionGroup(MessageHelper.message("action.contacts.help.text"), true)
-    helpGroup.add(HelpLink(MessageHelper.message("action.contact.on.twitter.text"), "https://twitter.com/ideavim", VimIcons.TWITTER))
-    helpGroup.add(HelpLink(MessageHelper.message("action.create.issue.text"), "https://youtrack.jetbrains.com/issues/VIM", VimIcons.YOUTRACK))
-    helpGroup.add(HelpLink(MessageHelper.message("action.contribute.on.github.text"), "https://github.com/JetBrains/ideavim", VimIcons.GITHUB))
+    helpGroup.add(
+      HelpLink(
+        MessageHelper.message("action.contact.on.twitter.text"),
+        "https://twitter.com/ideavim",
+        VimIcons.TWITTER
+      )
+    )
+    helpGroup.add(
+      HelpLink(
+        MessageHelper.message("action.create.issue.text"),
+        "https://youtrack.jetbrains.com/issues/VIM",
+        VimIcons.YOUTRACK
+      )
+    )
+    helpGroup.add(
+      HelpLink(
+        MessageHelper.message("action.contribute.on.github.text"),
+        "https://github.com/JetBrains/ideavim",
+        VimIcons.GITHUB
+      )
+    )
     actionGroup.add(helpGroup)
 
     return actionGroup
@@ -187,22 +216,23 @@ private object VimActionsPopup {
 
 private class HelpLink(
   // [VERSION UPDATE] 203+ uncomment
-  /*@ActionText*/ name: String,
+  /*@ActionText*/
+  name: String,
   val link: String,
   icon: Icon?
-) : DumbAwareAction(name, null, icon) {
+) : DumbAwareAction(name, null, icon)/*, LightEditCompatible*/ {
   override fun actionPerformed(e: AnActionEvent) {
     BrowserUtil.browse(link)
   }
 }
 
-private object ShortcutConflictsSettings : DumbAwareAction(MessageHelper.message("action.settings.text")) {
+private object ShortcutConflictsSettings : DumbAwareAction(MessageHelper.message("action.settings.text"))/*, LightEditCompatible*/ {
   override fun actionPerformed(e: AnActionEvent) {
     ShowSettingsUtil.getInstance().editConfigurable(e.project, VimEmulationConfigurable())
   }
 }
 
-private object JoinEap : DumbAwareAction() {
+private object JoinEap : DumbAwareAction()/*, LightEditCompatible*/ {
   private const val EAP_LINK = "https://plugins.jetbrains.com/plugins/eap/ideavim"
 
   fun eapActive() = EAP_LINK in UpdateSettings.getInstance().storedPluginHosts

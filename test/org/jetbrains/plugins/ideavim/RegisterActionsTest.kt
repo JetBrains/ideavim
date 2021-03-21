@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -88,9 +88,9 @@ class RegisterActionsTest : VimTestCase() {
     TestCase.assertNotNull(getCommandNode())
   }
 
-  private fun getCommandNode(): CommandNode? {
+  private fun getCommandNode(): CommandNode<ActionBeanClass>? {
     // TODO: 08.02.2020 Sorry if your tests will fail because of this test
     val node = VimPlugin.getKey().getKeyRoot(MappingMode.NORMAL)[KeyStroke.getKeyStroke('g')] as CommandPartNode
-    return node[KeyStroke.getKeyStroke('T')] as CommandNode?
+    return node[KeyStroke.getKeyStroke('T')] as CommandNode<ActionBeanClass>?
   }
 }

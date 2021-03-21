@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,8 @@ class YankLinesHandlerTest : VimTestCase() {
                 ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                h""".trimIndent()
+                h
+      """.trimIndent()
     )
     typeText(commandToKeys("3,4y"))
     val yanked = VimPlugin.getRegister().lastRegister!!.text
@@ -38,7 +39,9 @@ class YankLinesHandlerTest : VimTestCase() {
       """|I found it in a legendary land
          |all rocks and lavender and tufted grass,
          |
-         """.trimMargin(), yanked)
+         """.trimMargin(),
+      yanked
+    )
   }
 
   fun `test copy with one char on the last line`() {
@@ -49,7 +52,8 @@ class YankLinesHandlerTest : VimTestCase() {
                 ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                h""".trimIndent()
+                h
+      """.trimIndent()
     )
     typeText(commandToKeys("%y"))
     val yanked = VimPlugin.getRegister().lastRegister!!.text
@@ -60,6 +64,10 @@ class YankLinesHandlerTest : VimTestCase() {
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                h""".trimIndent(), yanked)
+                h
+                
+      """.trimIndent(),
+      yanked
+    )
   }
 }

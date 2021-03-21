@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,12 +38,20 @@ class CopyTextHandler : CommandHandler.SingleExecution() {
       val range = cmd.getTextRange(editor, caret, false)
       val text = EditorHelper.getText(editor, range.startOffset, range.endOffset)
 
-      val arg = CommandParser.getInstance().parse(cmd.argument)
+      val arg = CommandParser.parse(cmd.argument)
       val line = arg.ranges.getFirstLine(editor, caret)
 
       val transferableData = VimPlugin.getRegister().getTransferableData(editor, range, text)
       val textData = PutData.TextData(text, SelectionType.LINE_WISE, transferableData)
-      val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, rawIndent = true, caretAfterInsertedText = false, putToLine = line)
+      val putData = PutData(
+        textData,
+        null,
+        1,
+        insertTextBeforeCaret = false,
+        rawIndent = true,
+        caretAfterInsertedText = false,
+        putToLine = line
+      )
       VimPlugin.getPut().putTextForCaret(editor, caret, context, putData)
     }
     return true

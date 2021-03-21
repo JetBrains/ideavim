@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.CommandState;
+import org.jetbrains.plugins.ideavim.SkipNeovimReason;
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import java.util.EnumSet;
@@ -32,8 +34,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 public class VisualSelectPreviousSearchTest extends VimTestCase {
   @TestFor(classes = {SearchWholeWordForwardAction.class})
   public void testSearch() {
-    typeTextInFile(parseKeys("*w","gN"),
-            "h<caret>ello world\nhello world hello world");
+    typeTextInFile(parseKeys("*w", "gN"), "h<caret>ello world\nhello world hello world");
 
     assertOffset(12);
     assertSelection("hello");
@@ -50,14 +51,14 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
 
   @TestFor(classes = {SearchWholeWordForwardAction.class})
   public void testSearchWhenOnMatch() {
-    typeTextInFile(parseKeys("*","gN"),
-                   "h<caret>ello world\nhello world hello world");
+    typeTextInFile(parseKeys("*", "gN"), "h<caret>ello world\nhello world hello world");
 
     assertOffset(12);
     assertSelection("hello");
     assertMode(CommandState.Mode.VISUAL);
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   public void testWithoutSpaces() {
     configureByText("tes<caret>ttest");
     VimPlugin.getSearch().search(myFixture.getEditor(), "test", 1, EnumSet.noneOf(CommandFlags.class), false);

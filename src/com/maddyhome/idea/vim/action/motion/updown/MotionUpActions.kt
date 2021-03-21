@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,19 +48,34 @@ sealed class MotionUpBase : MotionActionHandler.ForEachCaret() {
 open class MotionUpAction : MotionUpBase() {
   override val motionType: MotionType = MotionType.LINE_WISE
 
-  override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+  override fun getOffset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     return VimPlugin.getMotion().moveCaretVertical(editor, caret, -count)
   }
 }
 
 class MotionUpCtrlPAction : MotionUpAction() {
-  override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+  override fun getOffset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     val activeLookup = LookupManager.getActiveLookup(editor)
     return if (activeLookup != null) {
       val primaryCaret = editor.caretModel.primaryCaret
       if (caret == primaryCaret) {
         IdeEventQueue.getInstance().flushDelayedKeyEvents()
-        EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_UP).execute(editor, primaryCaret, context)
+        EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_UP)
+          .execute(editor, primaryCaret, context)
       }
       caret.offset
     } else {
@@ -72,7 +87,14 @@ class MotionUpCtrlPAction : MotionUpAction() {
 class MotionUpNotLineWiseAction : MotionUpBase() {
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+  override fun getOffset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     return VimPlugin.getMotion().moveCaretVertical(editor, caret, -count)
   }
 }

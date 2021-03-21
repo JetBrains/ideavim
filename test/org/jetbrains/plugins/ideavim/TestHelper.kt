@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.option.OptionsManager
-import java.time.Duration
 import kotlin.test.fail
 
 /**
@@ -73,7 +72,11 @@ inline fun waitAndAssert(timeInMillis: Int = 1000, condition: () -> Boolean) {
   fail()
 }
 
-fun waitAndAssertMode(fixture: CodeInsightTestFixture, mode: CommandState.Mode, timeInMillis: Int = OptionsManager.visualEnterDelay.value() + 1000) {
+fun waitAndAssertMode(
+  fixture: CodeInsightTestFixture,
+  mode: CommandState.Mode,
+  timeInMillis: Int = OptionsManager.visualEnterDelay.value() + 1000
+) {
   waitAndAssert(timeInMillis) { fixture.editor.mode == mode }
 }
 
@@ -95,6 +98,7 @@ fun assertHappened(timeInMillis: Int = 1000, precision: Int, condition: () -> Bo
   waitAndAssert(precision * 2) { condition() }
 }
 
+@Suppress("unused")
 fun waitCondition(
   durationMillis: Long,
   interval: Long = 500,

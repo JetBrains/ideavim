@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,10 @@ import java.util.List;
  * when the value of the option changes.
  */
 public abstract class Option<T> {
+  protected final String name;
+  protected final String abbrev;
+  private final @NotNull List<OptionChangeListener<T>> listeners = ContainerUtil.createLockFreeCopyOnWriteList();
+
   /**
    * Create the option
    *
@@ -110,8 +114,4 @@ public abstract class Option<T> {
   }
 
   public abstract T getValue();
-
-  protected final String name;
-  protected final String abbrev;
-  private final @NotNull List<OptionChangeListener<T>> listeners = ContainerUtil.createLockFreeCopyOnWriteList();
 }

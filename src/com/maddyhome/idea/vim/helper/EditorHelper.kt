@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,10 +39,10 @@ val Editor.fileSize: Int
  */
 val Editor.isIdeaVimDisabledHere: Boolean
   get() {
-    return disabledInDialog
-      || (!ClientId.isCurrentlyUnderLocalId)  // CWM-927
-      || (!OptionsManager.ideavimsupport.contains("singleline") && isDatabaseCell())
-      || (!OptionsManager.ideavimsupport.contains("singleline") && isOneLineMode)
+    return disabledInDialog ||
+      (!ClientId.isCurrentlyUnderLocalId) || // CWM-927
+      (!OptionsManager.ideavimsupport.contains("singleline") && isDatabaseCell()) ||
+      (!OptionsManager.ideavimsupport.contains("singleline") && isOneLineMode)
   }
 
 private fun Editor.isDatabaseCell(): Boolean {
@@ -50,8 +50,8 @@ private fun Editor.isDatabaseCell(): Boolean {
 }
 
 private val Editor.disabledInDialog: Boolean
-  get() = (!OptionsManager.ideavimsupport.contains("dialog") && !OptionsManager.ideavimsupport.contains("dialoglegacy"))
-    && (!this.isPrimaryEditor() && !EditorHelper.isFileEditor(this))
+  get() = (!OptionsManager.ideavimsupport.contains("dialog") && !OptionsManager.ideavimsupport.contains("dialoglegacy")) &&
+    (!this.isPrimaryEditor() && !EditorHelper.isFileEditor(this))
 
 /**
  * Checks if the editor is a primary editor in the main editing area.
@@ -79,4 +79,10 @@ private inline fun findParentByCondition(c: Component?, condition: (Component?) 
     eachParent = eachParent.parent
   }
   return null
+}
+
+fun Editor.endsWithNewLine(): Boolean {
+  val textLength = this.document.textLength
+  if (textLength == 0) return false
+  return this.document.charsSequence[textLength - 1] == '\n'
 }

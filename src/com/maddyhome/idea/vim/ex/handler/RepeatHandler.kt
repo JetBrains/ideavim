@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,8 @@ import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.MotionGroup
 
 class RepeatHandler : CommandHandler.ForEachCaret() {
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.SELF_SYNCHRONIZED, DONT_SAVE_LAST)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.SELF_SYNCHRONIZED, DONT_SAVE_LAST)
 
   private var lastArg = ':'
 
@@ -43,16 +44,20 @@ class RepeatHandler : CommandHandler.ForEachCaret() {
     lastArg = arg
 
     val line = cmd.getLine(editor, caret)
-    MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLine(editor, line, editor.caretModel.primaryCaret))
+    MotionGroup.moveCaret(
+      editor,
+      caret,
+      VimPlugin.getMotion().moveCaretToLineWithSameColumn(editor, line, editor.caretModel.primaryCaret)
+    )
 
     if (arg == ':') {
-      return CommandParser.getInstance().processLastCommand(editor, context, 1)
+      return CommandParser.processLastCommand(editor, context, 1)
     }
 
     val reg = VimPlugin.getRegister().getPlaybackRegister(arg) ?: return false
     val text = reg.text ?: return false
 
-    CommandParser.getInstance().processCommand(editor, context, text, 1)
+    CommandParser.processCommand(editor, context, text, 1)
     return true
   }
 }

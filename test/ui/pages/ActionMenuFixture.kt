@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,23 +26,29 @@ import com.intellij.remoterobot.search.locators.byXpath
 import com.intellij.remoterobot.utils.waitFor
 
 fun RemoteRobot.actionMenu(text: String): ActionMenuFixture {
-    val xpath = byXpath("text '$text'", "//div[@class='ActionMenu' and @text='$text']")
-    waitFor {
-        findAll<ActionMenuFixture>(xpath).isNotEmpty()
-    }
-    return findAll<ActionMenuFixture>(xpath).first()
+  val xpath = byXpath("text '$text'", "//div[@class='ActionMenu' and @text='$text']")
+  waitFor {
+    findAll<ActionMenuFixture>(xpath).isNotEmpty()
+  }
+  return findAll<ActionMenuFixture>(xpath).first()
 }
 
 fun RemoteRobot.actionMenuItem(text: String): ActionMenuItemFixture {
-    val xpath = byXpath("text '$text'", "//div[@class='ActionMenuItem' and @text='$text']")
-    waitFor {
-        findAll<ActionMenuItemFixture>(xpath).isNotEmpty()
-    }
-    return findAll<ActionMenuItemFixture>(xpath).first()
+  val xpath = byXpath("text '$text'", "//div[@class='ActionMenuItem' and @text='$text']")
+  waitFor {
+    findAll<ActionMenuItemFixture>(xpath).isNotEmpty()
+  }
+  return findAll<ActionMenuItemFixture>(xpath).first()
 }
 
 @FixtureName("ActionMenu")
-class ActionMenuFixture(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) : ComponentFixture(remoteRobot, remoteComponent)
+class ActionMenuFixture(
+  remoteRobot: RemoteRobot,
+  remoteComponent: RemoteComponent
+) : ComponentFixture(remoteRobot, remoteComponent)
 
 @FixtureName("ActionMenuItem")
-class ActionMenuItemFixture(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) : ComponentFixture(remoteRobot, remoteComponent)
+class ActionMenuItemFixture(
+  remoteRobot: RemoteRobot,
+  remoteComponent: RemoteComponent
+) : ComponentFixture(remoteRobot, remoteComponent)

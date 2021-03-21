@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
 
-
 class FilterMotionAction : VimActionHandler.SingleExecution(), DuplicableOperatorAction {
 
   override val type: Command.Type = Command.Type.CHANGE
@@ -40,8 +39,10 @@ class FilterMotionAction : VimActionHandler.SingleExecution(), DuplicableOperato
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val argument = cmd.argument ?: return false
     val range = MotionGroup
-      .getMotionRange(editor, editor.caretModel.primaryCaret, context, cmd.count, cmd.rawCount,
-        argument)
+      .getMotionRange(
+        editor, editor.caretModel.primaryCaret, context, cmd.count, cmd.rawCount,
+        argument
+      )
       ?: return false
 
     val current = editor.caretModel.logicalPosition
@@ -58,4 +59,3 @@ class FilterMotionAction : VimActionHandler.SingleExecution(), DuplicableOperato
     return true
   }
 }
-

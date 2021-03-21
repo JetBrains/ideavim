@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,6 +51,9 @@ class IncrementDecrementTest : VimPropertyTest() {
   }
 
   fun testPlayingWithNumbersGenerateNumber() {
+    setupChecks {
+      this.neoVim.ignoredRegisters = setOf(':')
+    }
     OptionsManager.nrformats.append("octal")
     PropertyChecker.checkScenarios {
       ImperativeCommand { env ->
@@ -89,11 +92,13 @@ private class IncrementDecrementActions(private val editor: Editor, val test: Vi
 
 val differentFormNumberGenerator = Generator.from { env ->
   val form = env.generate(Generator.sampledFrom(/*2,*/ 8, 10, 16))
-  env.generate(Generator.integers().suchThat { it != Int.MIN_VALUE }.map {
-    val sign = it.sign
-    val stringNumber = it.absoluteValue.toString(form)
-    if (sign < 0) "-$stringNumber" else stringNumber
-  })
+  env.generate(
+    Generator.integers().suchThat { it != Int.MIN_VALUE }.map {
+      val sign = it.sign
+      val stringNumber = it.absoluteValue.toString(form)
+      if (sign < 0) "-$stringNumber" else stringNumber
+    }
+  )
 }
 
 val brokenNumberGenerator = Generator.from { env ->
@@ -106,9 +111,10 @@ val brokenNumberGenerator = Generator.from { env ->
 }
 
 val testNumberGenerator = Generator.from { env ->
-  env.generate(Generator.frequency(
-    10, differentFormNumberGenerator,
-    1, brokenNumberGenerator
-  ))
+  env.generate(
+    Generator.frequency(
+      10, differentFormNumberGenerator,
+      1, brokenNumberGenerator
+    )
+  )
 }
-

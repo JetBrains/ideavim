@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,6 @@ import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.keyboard
 import com.intellij.remoterobot.utils.waitFor
 import org.assertj.swing.core.MouseButton
-import org.intellij.examples.simple.plugin.steps.JavaExampleSteps
-import org.junit.Ignore
 import org.junit.Test
 import ui.pages.Editor
 import ui.pages.actionMenu
@@ -36,6 +34,7 @@ import ui.pages.editor
 import ui.pages.gutter
 import ui.pages.idea
 import ui.pages.welcomeFrame
+import ui.utils.JavaExampleSteps
 import ui.utils.StepsLogger
 import ui.utils.doubleClickOnRight
 import ui.utils.moveMouseForthAndBack
@@ -54,7 +53,6 @@ class UiTests {
   }
 
   @Test
-  @Ignore("Please start it manually")
   fun ideaVimTest() = uiTest {
     val sharedSteps = JavaExampleSteps(this)
 
@@ -102,7 +100,6 @@ class UiTests {
       testClickRightFromLineEnd(editor)
       testClickOnWord(editor)
       testGutterClick(editor)
-
     }
   }
 

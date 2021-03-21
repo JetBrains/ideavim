@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,7 +89,6 @@ fun Editor.isTemplateActive(): Boolean {
   return TemplateManager.getInstance(project).getActiveTemplate(this) != null
 }
 
-
 /**
  * This annotations marks if annotated function required read or write lock
  */
@@ -106,6 +105,7 @@ annotation class RWLockLabel {
    * [Writable] annotation means that annotated function should be called from write action
    * This annotation is only a marker and doesn't enable r/w lock automatically
    */
+  @Suppress("unused")
   @Target(AnnotationTarget.FUNCTION)
   annotation class Writable
 

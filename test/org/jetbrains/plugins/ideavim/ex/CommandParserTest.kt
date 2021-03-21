@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -106,16 +106,16 @@ class CommandParserTest : VimTestCase() {
       extension = EX_COMMAND_EP.extensions().findFirst().get()
 
       // TODO: 08.02.2020 I'm sorry if your tests have been failed because of this code. Please update it properly
-      TestCase.assertNotNull(CommandParser.getInstance().getCommandHandler(ExCommand(Ranges(), "actionlist", "")))
+      TestCase.assertNotNull(CommandParser.getCommandHandler(ExCommand(Ranges(), "actionlist", "")))
 
       @Suppress("DEPRECATION")
       EX_COMMAND_EP.getPoint(null).unregisterExtension(extension!!)
 
-      TestCase.assertNull(CommandParser.getInstance().getCommandHandler(ExCommand(Ranges(), "actionlist", "")))
+      TestCase.assertNull(CommandParser.getCommandHandler(ExCommand(Ranges(), "actionlist", "")))
     }
     @Suppress("DEPRECATION")
     EX_COMMAND_EP.getPoint(null).registerExtension(extension!!)
 
-    TestCase.assertNotNull(CommandParser.getInstance().getCommandHandler(ExCommand(Ranges(), "actionlist", "")))
+    TestCase.assertNotNull(CommandParser.getCommandHandler(ExCommand(Ranges(), "actionlist", "")))
   }
 }

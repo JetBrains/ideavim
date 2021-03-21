@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,10 @@ class InfoFileTest : VimTestCase() {
         notPresentedActions += actionName
       }
     }
-    assertTrue(notPresentedActions.joinToString(prefix = "Not presented actions in info file: \n", separator = "\n"), notPresentedActions.isEmpty())
+    assertTrue(
+      notPresentedActions.joinToString(prefix = "Not presented actions in info file: \n", separator = "\n"),
+      notPresentedActions.isEmpty()
+    )
   }
 
   private inline fun forEachAction(supply: (action: EditorActionHandlerBase) -> Unit) {

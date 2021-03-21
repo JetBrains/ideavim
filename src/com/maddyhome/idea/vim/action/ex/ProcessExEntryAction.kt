@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,8 @@ import javax.swing.KeyStroke
  * The mapping for this action means that the ex command is executed as a write action
  */
 class ProcessExEntryAction : VimActionHandler.SingleExecution(), ComplicatedKeysAction {
-  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<CR>", "<C-M>", 0x0a.toChar().toString(), 0x0d.toChar().toString())
+  override val keyStrokesSet: Set<List<KeyStroke>> =
+    parseKeysSet("<CR>", "<C-M>", 0x0a.toChar().toString(), 0x0d.toChar().toString())
 
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

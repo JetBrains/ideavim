@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.helper.DigraphResult
 import com.maddyhome.idea.vim.helper.DigraphSequence
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -111,7 +112,8 @@ class CommandState private constructor() {
 
   private fun setMappingMode() {
     val modeState = currentModeState()
-    mappingState.mappingMode = if (modeState.mode == Mode.OP_PENDING) MappingMode.OP_PENDING else modeToMappingMode(mode)
+    val newMappingMode = if (modeState.mode == Mode.OP_PENDING) MappingMode.OP_PENDING else modeToMappingMode(mode)
+    mappingState.mappingMode = newMappingMode
   }
 
   @Contract(pure = true)
@@ -192,9 +194,9 @@ class CommandState private constructor() {
    *  Neovim
    * :h mode()
    *
-   * - mode([expr])          Return a string that indicates the current mode.
+   * - mode(expr)          Return a string that indicates the current mode.
    *
-   *   If [expr] is supplied and it evaluates to a non-zero Number or
+   *   If "expr" is supplied and it evaluates to a non-zero Number or
    *   a non-empty String (|non-zero-arg|), then the full mode is
    *   returned, otherwise only the first letter is returned.
    *
@@ -310,7 +312,7 @@ class CommandState private constructor() {
 
   enum class Mode {
     // Basic modes
-    COMMAND, VISUAL, SELECT, INSERT, CMD_LINE,  /*EX*/
+    COMMAND, VISUAL, SELECT, INSERT, CMD_LINE, /*EX*/
 
     // Additional modes
     OP_PENDING, REPLACE /*, VISUAL_REPLACE, INSERT_NORMAL, INSERT_VISUAL, INSERT_SELECT */
@@ -329,10 +331,7 @@ class CommandState private constructor() {
     private val defaultModeState = ModeState(Mode.COMMAND, SubMode.NONE)
 
     @JvmStatic
-    @Contract("null -> new")
-    fun getInstance(editor: Editor?): CommandState {
-      if (editor == null) return CommandState()
-
+    fun getInstance(editor: Editor): CommandState {
       var res = editor.vimCommandState
       if (res == null) {
         res = CommandState()
@@ -341,7 +340,9 @@ class CommandState private constructor() {
       return res
     }
 
-    private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode = VimPlugin.getKey().getKeyRoot(mappingMode)
+    private fun getKeyRootNode(mappingMode: MappingMode): CommandPartNode<ActionBeanClass> {
+      return VimPlugin.getKey().getKeyRoot(mappingMode)
+    }
   }
 
   init {

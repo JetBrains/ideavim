@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,11 +59,13 @@ class ScrollColumnRightActionTest : VimTestCase() {
 
   @VimBehaviorDiffers(description = "Vim has virtual space at the end of line. IdeaVim will scroll up to length of longest line")
   fun `test scroll last column to right moves cursor 2`() {
-    configureByText(buildString {
-      repeat(300) { append("0") }
-      appendln()
-      repeat(200) { append("0") }
-    })
+    configureByText(
+      buildString {
+        repeat(300) { append("0") }
+        appendln()
+        repeat(200) { append("0") }
+      }
+    )
     typeText(parseKeys("j$"))
     // Assert we got initial scroll correct
     // Note, this matches Vim - we've scrolled to centre (but only because the line above allows us to scroll without
@@ -124,11 +126,11 @@ class ScrollColumnRightActionTest : VimTestCase() {
     typeText(parseKeys("100|"))
     // Text at end of line is:              89:inlay0123
     assertVisibleLineBounds(0, 59, 133) // 75 characters wide
-    typeText(parseKeys("3zh"))  //    89:inlay0
+    typeText(parseKeys("3zh")) //    89:inlay0
     assertVisibleLineBounds(0, 56, 130) // 75 characters
-    typeText(parseKeys("zh"))   //     89:inlay
+    typeText(parseKeys("zh")) //     89:inlay
     assertVisibleLineBounds(0, 55, 129) // 75 characters
-    typeText(parseKeys("zh"))   //            8
+    typeText(parseKeys("zh")) //            8
     assertVisibleLineBounds(0, 49, 128) // 80 characters
   }
 
@@ -138,11 +140,11 @@ class ScrollColumnRightActionTest : VimTestCase() {
     typeText(parseKeys("100|"))
     // Text at end of line is:              89inlay:0123
     assertVisibleLineBounds(0, 59, 133) // 75 characters wide
-    typeText(parseKeys("3zh"))  //    89inlay:0
+    typeText(parseKeys("3zh")) //    89inlay:0
     assertVisibleLineBounds(0, 56, 130) // 75 characters
-    typeText(parseKeys("zh"))   //           89
+    typeText(parseKeys("zh")) //           89
     assertVisibleLineBounds(0, 50, 129) // 80 characters
-    typeText(parseKeys("zh"))   //            9
+    typeText(parseKeys("zh")) //            9
     assertVisibleLineBounds(0, 49, 128) // 80 characters
   }
 

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@ interface VersionDetector {
 
 object `Detect versions 3, 4, 5, 6` : VersionDetector {
 
-  @NonNls val pattern = "state version=\"(.)\"".toRegex()
+  @NonNls
+  val pattern = "state version=\"(.)\"".toRegex()
 
   override fun extractVersion(): Int? {
     val configFile = PathManager.getOptionsFile("vim_settings")

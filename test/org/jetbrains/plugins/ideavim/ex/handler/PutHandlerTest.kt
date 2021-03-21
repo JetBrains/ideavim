@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,9 +30,11 @@ class PutHandlerTest : VimTestCase() {
     myFixture.configureByText("a.txt", "Test\n" + "Hello <caret>World!\n")
     typeText(parseKeys("\"ayw"))
     typeText(commandToKeys("put a"))
-    myFixture.checkResult("Test\n" +
-      "Hello World!\n" +
-      "<caret>World\n")
+    myFixture.checkResult(
+      "Test\n" +
+        "Hello World!\n" +
+        "<caret>World\n"
+    )
   }
 
   // VIM-551 |:put|

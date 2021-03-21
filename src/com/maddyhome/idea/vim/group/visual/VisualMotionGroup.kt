@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ class VisualMotionGroup {
     editor.commandState.pushModes(CommandState.Mode.VISUAL, lastSelectionType.toSubMode())
 
     val primaryCaret = editor.caretModel.primaryCaret
-    primaryCaret.vimSetSelection(visualMarks.startOffset, visualMarks.endOffset-1, true)
+    primaryCaret.vimSetSelection(visualMarks.startOffset, visualMarks.endOffset - 1, true)
 
     editor.scrollingModel.scrollToCaret(ScrollType.CENTER)
 
@@ -105,7 +105,7 @@ class VisualMotionGroup {
     return true
   }
 
-  //=============================== ENTER VISUAL and SELECT MODE ==============================================
+  // =============================== ENTER VISUAL and SELECT MODE ==============================================
 
   /**
    * This function toggles visual mode.
@@ -125,7 +125,10 @@ class VisualMotionGroup {
         editor.vimForEachCaret {
           val range = it.vimLastVisualOperatorRange ?: VisualChange.default(subMode)
           val end = VisualOperation.calculateRange(editor, range, count, it)
-          val lastColumn = if (range.columns == MotionGroup.LAST_COLUMN) MotionGroup.LAST_COLUMN else editor.offsetToLogicalPosition(end).column
+          val lastColumn =
+            if (range.columns == MotionGroup.LAST_COLUMN) MotionGroup.LAST_COLUMN else editor.offsetToLogicalPosition(
+              end
+            ).column
           it.vimLastColumn = lastColumn
           it.vimSetSelection(it.offset, end, true)
         }
@@ -219,22 +222,25 @@ class VisualMotionGroup {
   fun autodetectVisualSubmode(editor: Editor): CommandState.SubMode {
     // IJ specific. See https://youtrack.jetbrains.com/issue/VIM-1924.
     val project = editor.project
-    if (project != null && FindManager.getInstance(project).selectNextOccurrenceWasPerformed()) return CommandState.SubMode.VISUAL_CHARACTER
+    if (project != null && FindManager.getInstance(project).selectNextOccurrenceWasPerformed()) {
+      return CommandState.SubMode.VISUAL_CHARACTER
+    }
 
     if (editor.caretModel.caretCount > 1 && seemsLikeBlockMode(editor)) {
       return CommandState.SubMode.VISUAL_BLOCK
     }
-    if (editor.caretModel.allCarets.all { caret ->
-        // Detect if visual mode is character wise or line wise
-        val selectionStart = caret.selectionStart
-        val selectionEnd = caret.selectionEnd
-        val logicalStartLine = editor.offsetToLogicalPosition(selectionStart).line
-        val logicalEnd = editor.offsetToLogicalPosition(selectionEnd)
-        val logicalEndLine = if (logicalEnd.column == 0) (logicalEnd.line - 1).coerceAtLeast(0) else logicalEnd.line
-        val lineStartOfSelectionStart = EditorHelper.getLineStartOffset(editor, logicalStartLine)
-        val lineEndOfSelectionEnd = EditorHelper.getLineEndOffset(editor, logicalEndLine, true)
-        lineStartOfSelectionStart == selectionStart && (lineEndOfSelectionEnd + 1 == selectionEnd || lineEndOfSelectionEnd == selectionEnd)
-      }) return CommandState.SubMode.VISUAL_LINE
+    val all = editor.caretModel.allCarets.all { caret ->
+      // Detect if visual mode is character wise or line wise
+      val selectionStart = caret.selectionStart
+      val selectionEnd = caret.selectionEnd
+      val logicalStartLine = editor.offsetToLogicalPosition(selectionStart).line
+      val logicalEnd = editor.offsetToLogicalPosition(selectionEnd)
+      val logicalEndLine = if (logicalEnd.column == 0) (logicalEnd.line - 1).coerceAtLeast(0) else logicalEnd.line
+      val lineStartOfSelectionStart = EditorHelper.getLineStartOffset(editor, logicalStartLine)
+      val lineEndOfSelectionEnd = EditorHelper.getLineEndOffset(editor, logicalEndLine, true)
+      lineStartOfSelectionStart == selectionStart && (lineEndOfSelectionEnd + 1 == selectionEnd || lineEndOfSelectionEnd == selectionEnd)
+    }
+    if (all) return CommandState.SubMode.VISUAL_LINE
     return CommandState.SubMode.VISUAL_CHARACTER
   }
 

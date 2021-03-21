@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,37 +62,57 @@ class NotificationService(private val project: Project?) {
   constructor() : this(null)
 
   fun notifyAboutIdeaPut() {
-    val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+    val notification = Notification(
+      IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
       """Add <code>ideaput</code> to <code>clipboard</code> option to perform a put via the IDE<br/><b><code>set clipboard+=ideaput</code></b>""",
-      NotificationType.INFORMATION)
+      NotificationType.INFORMATION
+    )
 
     notification.addAction(OpenIdeaVimRcAction(notification))
 
-    notification.addAction(AppendToIdeaVimRcAction(notification, "set clipboard+=ideaput", "ideaput") { OptionsManager.clipboard.append(ClipboardOptionsData.ideaput) })
+    notification.addAction(
+      AppendToIdeaVimRcAction(
+        notification,
+        "set clipboard+=ideaput",
+        "ideaput"
+      ) { OptionsManager.clipboard.append(ClipboardOptionsData.ideaput) }
+    )
 
     notification.notify(project)
   }
 
   fun notifyAboutIdeaJoin() {
-    val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+    val notification = Notification(
+      IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
       """Put <b><code>set ideajoin</code></b> into your <code>~/.ideavimrc</code> to perform a join via the IDE""",
-      NotificationType.INFORMATION)
+      NotificationType.INFORMATION
+    )
 
     notification.addAction(OpenIdeaVimRcAction(notification))
 
-    notification.addAction(AppendToIdeaVimRcAction(notification, "set ideajoin", "ideajoin") { OptionsManager.ideajoin.set() })
+    notification.addAction(
+      AppendToIdeaVimRcAction(
+        notification,
+        "set ideajoin",
+        "ideajoin"
+      ) { OptionsManager.ideajoin.set() }
+    )
 
     notification.addAction(HelpLink(notification, ideajoinExamplesUrl))
     notification.notify(project)
   }
 
-  fun enableRepeatingMode() = Messages.showYesNoDialog("Do you want to enable repeating keys in Mac OS X on press and hold?\n\n" +
-    "(You can do it manually by running 'defaults write -g " +
-    "ApplePressAndHoldEnabled 0' in the console).", IDEAVIM_NOTIFICATION_TITLE,
-    Messages.getQuestionIcon())
+  fun enableRepeatingMode() = Messages.showYesNoDialog(
+    "Do you want to enable repeating keys in Mac OS X on press and hold?\n\n" +
+      "(You can do it manually by running 'defaults write -g " +
+      "ApplePressAndHoldEnabled 0' in the console).",
+    IDEAVIM_NOTIFICATION_TITLE,
+    Messages.getQuestionIcon()
+  )
 
   fun specialKeymap(keymap: Keymap, listener: NotificationListener.Adapter) {
-    IDEAVIM_STICKY_GROUP.createNotification(IDEAVIM_NOTIFICATION_TITLE,
+    IDEAVIM_STICKY_GROUP.createNotification(
+      IDEAVIM_NOTIFICATION_TITLE,
       "IdeaVim plugin doesn't use the special \"Vim\" keymap any longer. " +
         "Switching to \"${keymap.presentableName}\" keymap.<br/><br/>" +
         "Now it is possible to set up:<br/>" +
@@ -100,13 +120,18 @@ class NotificationService(private val project: Project?) {
         "<li>Vim keys in your ~/.ideavimrc file using key mapping commands</li>" +
         "<li>IDE action shortcuts in \"File | Settings | Keymap\"</li>" +
         "<li>Vim or IDE handlers for conflicting shortcuts in <a href='#settings'>Vim Emulation</a> settings</li>" +
-        "</ul>", NotificationType.INFORMATION, listener).notify(project)
+        "</ul>",
+      NotificationType.INFORMATION, listener
+    ).notify(project)
   }
 
-  fun noVimrcAsDefault() = IDEAVIM_STICKY_GROUP.createNotification(IDEAVIM_NOTIFICATION_TITLE, "",
+  fun noVimrcAsDefault() = IDEAVIM_STICKY_GROUP.createNotification(
+    IDEAVIM_NOTIFICATION_TITLE, "",
     "The ~/.vimrc file is no longer read by default, use ~/.ideavimrc instead. You can read it from your " +
       "~/.ideavimrc using this command:<br/><br/>" +
-      "<code>source ~/.vimrc</code>", NotificationType.INFORMATION).notify(project)
+      "<code>source ~/.vimrc</code>",
+    NotificationType.INFORMATION
+  ).notify(project)
 
   fun notifyAboutShortcutConflict(keyStroke: KeyStroke) {
     VimPlugin.getKey().savedShortcutConflicts[keyStroke] = ShortcutOwner.VIM
@@ -125,23 +150,29 @@ class NotificationService(private val project: Project?) {
         }
       }
     }
-    Notification(IDEAVIM_NOTIFICATION_ID,
+    Notification(
+      IDEAVIM_NOTIFICATION_ID,
       IDEAVIM_NOTIFICATION_TITLE,
       message,
       NotificationType.INFORMATION,
-      listener).notify(project)
+      listener
+    ).notify(project)
   }
 
   fun notifySubscribedToEap() {
-    Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+    Notification(
+      IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
       """You are successfully subscribed to IdeaVim EAP releases.""",
-      NotificationType.INFORMATION).notify(project)
+      NotificationType.INFORMATION
+    ).notify(project)
   }
 
   fun notifyEapFinished() {
-    Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+    Notification(
+      IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
       """You have finished the Early Access Program. Please reinstall IdeaVim to get the stable version.""",
-      NotificationType.INFORMATION).notify(project)
+      NotificationType.INFORMATION
+    ).notify(project)
   }
 
   fun notifyActionId(id: String?) {
@@ -195,7 +226,9 @@ class NotificationService(private val project: Project?) {
     }
   }
 
-  class OpenIdeaVimRcAction(private val notification: Notification?) : DumbAwareAction("Open ~/.ideavimrc") {
+  @Suppress("DialogTitleCapitalization")
+  class OpenIdeaVimRcAction(private val notification: Notification?) :
+    DumbAwareAction("Open ~/.ideavimrc")/*, LightEditCompatible*/ {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project
       if (eventProject != null) {
@@ -207,11 +240,20 @@ class NotificationService(private val project: Project?) {
         }
       }
       notification?.expire()
-      createIdeaVimRcManually("Cannot create configuration file.<br/>Please create <code>~/.ideavimrc</code> manually", eventProject)
+      createIdeaVimRcManually(
+        "Cannot create configuration file.<br/>Please create <code>~/.ideavimrc</code> manually",
+        eventProject
+      )
     }
   }
 
-  private inner class AppendToIdeaVimRcAction(val notification: Notification, val appendableText: String, val optionName: String, val enableOption: () -> Unit) : AnAction("Append to ~/.ideavimrc") {
+  @Suppress("DialogTitleCapitalization")
+  private inner class AppendToIdeaVimRcAction(
+    val notification: Notification,
+    val appendableText: String,
+    val optionName: String,
+    val enableOption: () -> Unit
+  ) : AnAction("Append to ~/.ideavimrc") {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project
       enableOption()
@@ -220,18 +262,27 @@ class NotificationService(private val project: Project?) {
         if (ideaVimRc != null && ideaVimRc.canWrite()) {
           ideaVimRc.appendText(appendableText)
           notification.expire()
-          val successNotification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, "<code>$optionName</code> is enabled", NotificationType.INFORMATION)
+          val successNotification = Notification(
+            IDEAVIM_NOTIFICATION_ID,
+            IDEAVIM_NOTIFICATION_TITLE,
+            "<code>$optionName</code> is enabled",
+            NotificationType.INFORMATION
+          )
           successNotification.addAction(OpenIdeaVimRcAction(successNotification))
           successNotification.notify(project)
           return
         }
       }
       notification.expire()
-      createIdeaVimRcManually("Option is enabled, but the file is not modified<br/>Please modify <code>~/.ideavimrc</code> manually", project)
+      createIdeaVimRcManually(
+        "Option is enabled, but the file is not modified<br/>Please modify <code>~/.ideavimrc</code> manually",
+        project
+      )
     }
   }
 
-  private inner class HelpLink(val notification: Notification, val link: String) : AnAction("", "", AllIcons.General.TodoQuestion) {
+  private inner class HelpLink(val notification: Notification, val link: String) :
+    AnAction("", "", AllIcons.General.TodoQuestion) {
     override fun actionPerformed(e: AnActionEvent) {
       BrowserLauncher.instance.open(link)
       notification.expire()
@@ -239,14 +290,18 @@ class NotificationService(private val project: Project?) {
   }
 
   companion object {
+    // [VERSION UPDATE] 203+
+    @Suppress("DEPRECATION")
     val IDEAVIM_STICKY_GROUP = NotificationGroup("ideavim-sticky", NotificationDisplayType.STICKY_BALLOON, false)
     const val IDEAVIM_NOTIFICATION_ID = "ideavim"
     const val IDEAVIM_NOTIFICATION_TITLE = "IdeaVim"
-    const val ideajoinExamplesUrl = "https://github.com/JetBrains/ideavim/wiki/%60ideajoin%60-examples"
+    const val ideajoinExamplesUrl = "https://jb.gg/f9zji9"
 
     private fun createIdeaVimRcManually(message: String, project: Project?) {
-      val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, message, NotificationType.WARNING)
-      var actionName = if (SystemInfo.isMac) "Reveal Home in Finder" else "Show Home in " + RevealFileAction.getFileManagerName()
+      val notification =
+        Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, message, NotificationType.WARNING)
+      var actionName =
+        if (SystemInfo.isMac) "Reveal Home in Finder" else "Show Home in " + RevealFileAction.getFileManagerName()
       if (!File(System.getProperty("user.home")).exists()) {
         actionName = ""
       }

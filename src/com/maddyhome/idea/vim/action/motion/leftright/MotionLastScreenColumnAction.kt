@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,12 +32,14 @@ import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.option.OptionsManager.selection
 
 class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
-  override fun getOffset(editor: Editor,
-                         caret: Caret,
-                         context: DataContext,
-                         count: Int,
-                         rawCount: Int,
-                         argument: Argument?): Int {
+  override fun getOffset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): Int {
     var allow = false
     if (editor.inInsertMode) {
       allow = true
@@ -50,10 +52,12 @@ class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
     return VimPlugin.getMotion().moveCaretToLineScreenEnd(editor, caret, allow)
   }
 
-  override fun postMove(editor: Editor,
-                        caret: Caret,
-                        context: DataContext,
-                        cmd: Command) {
+  override fun postMove(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command
+  ) {
     caret.vimLastColumn = MotionGroup.LAST_COLUMN
   }
 

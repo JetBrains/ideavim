@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,7 +82,6 @@ public class StringHelper {
    * Parses Vim key notation strings.
    *
    * @throws java.lang.IllegalArgumentException if the mapping doesn't make sense for Vim emulation
-   * @see :help <>
    */
   public static @NotNull List<KeyStroke> parseKeys(@NotNull @NonNls String... strings) {
     final List<KeyStroke> result = new ArrayList<>();
@@ -242,7 +241,7 @@ public class StringHelper {
       }
     }
 
-    return name != null ? "<" + prefix + name + ">" : "<<" + key.toString() + ">>";
+    return name != null ? "<" + prefix + name + ">" : "<<" + key + ">>";
   }
 
   public static String toPrintableCharacters(@NotNull List<KeyStroke> keys) {
@@ -314,18 +313,9 @@ public class StringHelper {
    * Set the text of an XML element, safely encode it if needed.
    */
   public static @NotNull Element setSafeXmlText(@NotNull Element element, @NotNull String text) {
-    final Character first = firstCharacter(text);
-    final Character last = lastCharacter(text);
-    if (!StringHelper.isXmlCharacterData(text) ||
-        first != null && Character.isWhitespace(first) ||
-        last != null && Character.isWhitespace(last)) {
-      element.setAttribute("encoding", "base64");
-      final String encoded = new String(Base64.encodeBase64(text.getBytes()));
-      element.setText(encoded);
-    }
-    else {
-      element.setText(text);
-    }
+    element.setAttribute("encoding", "base64");
+    final String encoded = new String(Base64.encodeBase64(text.getBytes()));
+    element.setText(encoded);
     return element;
   }
 
@@ -342,20 +332,6 @@ public class StringHelper {
       return new String(Base64.decodeBase64(text.getBytes()));
     }
     return null;
-  }
-
-  /**
-   * Check if the text matches the CharData production from the XML grammar.
-   *
-   * This check is more restricted than CharData as it completely forbids '>'.
-   */
-  public static boolean isXmlCharacterData(@NotNull String text) {
-    for (char c : text.toCharArray()) {
-      if (!isXmlChar(c) || c == '<' || c == '>' || c == '&') {
-        return false;
-      }
-    }
-    return true;
   }
 
   private static @Nullable KeyStroke parseSpecialKey(@NotNull String s, int modifiers) {
@@ -546,22 +522,5 @@ public class StringHelper {
     else {
       return getKeyStroke(Character.toUpperCase(c), modifiers);
     }
-  }
-
-  private static @Nullable Character lastCharacter(@NotNull String text) {
-    return text.length() > 0 ? text.charAt(text.length() - 1) : null;
-  }
-
-  private static @Nullable Character firstCharacter(@NotNull String text) {
-    return text.length() > 0 ? text.charAt(0) : null;
-  }
-
-  /**
-   * Check if a char matches the Char production from the XML grammar.
-   *
-   * Characters beyond the Basic Multilingual Plane are not supported.
-   */
-  private static boolean isXmlChar(char c) {
-    return '\u0001' <= c && c <= '\uD7FF' || '\uE000' <= c && c <= '\uFFFD';
   }
 }

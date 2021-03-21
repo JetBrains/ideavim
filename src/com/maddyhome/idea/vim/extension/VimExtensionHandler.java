@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,9 +30,9 @@ import org.jetbrains.annotations.NotNull;
 public interface VimExtensionHandler {
   /**
    * Executes the action.
-   *
+   * <p>
    * The action is run on the EDT thread inside the {@link com.intellij.openapi.command.CommandProcessor}.
-   *
+   * <p>
    * It's run without any read or write actions of {@link com.intellij.openapi.application.Application}, so you have to
    * make sure your code is synchronized properly. A read action is not needed for the EDT in the IntelliJ platform. As
    * for a write action, you'll have to apply it by yourself if you're modifying IntelliJ's data structures like

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,20 @@ import javax.swing.*;
 import java.awt.event.KeyEvent;
 
 public class DigraphSequence {
+  private static final int DIG_STATE_PENDING = 1;
+  private static final int DIG_STATE_DIG_ONE = 2;
+  private static final int DIG_STATE_DIG_TWO = 3;
+  private static final int DIG_STATE_CODE_START = 10;
+  private static final int DIG_STATE_CODE_CHAR = 11;
+  private static final int DIG_STATE_BACK_SPACE = 20;
+  private static final Logger logger = Logger.getInstance(DigraphSequence.class.getName());
+  private int digraphState = DIG_STATE_PENDING;
+  private char digraphChar;
+  private char[] codeChars;
+  private int codeCnt;
+  private int codeType;
+  private int codeMax;
+
   public DigraphSequence() {
   }
 
@@ -37,7 +51,8 @@ public class DigraphSequence {
   }
 
   public static boolean isLiteralStart(@NotNull KeyStroke key) {
-    return (key.getKeyCode() == KeyEvent.VK_V || key.getKeyCode() == KeyEvent.VK_Q) && (key.getModifiers() & KeyEvent.CTRL_DOWN_MASK) != 0;
+    return (key.getKeyCode() == KeyEvent.VK_V || key.getKeyCode() == KeyEvent.VK_Q) &&
+           (key.getModifiers() & KeyEvent.CTRL_DOWN_MASK) != 0;
   }
 
   public DigraphResult startDigraphSequence() {
@@ -62,7 +77,8 @@ public class DigraphSequence {
         logger.debug("DIG_STATE_PENDING");
         if (key.getKeyCode() == KeyEvent.VK_BACK_SPACE && OptionsManager.INSTANCE.getDigraph().isSet()) {
           digraphState = DIG_STATE_BACK_SPACE;
-        } else if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
+        }
+        else if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
           digraphChar = key.getKeyChar();
         }
         return DigraphResult.UNHANDLED;
@@ -144,18 +160,16 @@ public class DigraphSequence {
             logger.debug("decimal");
             return DigraphResult.HANDLED_LITERAL;
           default:
-            switch (key.getKeyCode()) {
-              case KeyEvent.VK_TAB:
-                KeyStroke code = KeyStroke.getKeyStroke('\t');
-                digraphState = DIG_STATE_PENDING;
+            if (key.getKeyCode() == KeyEvent.VK_TAB) {
+              KeyStroke code = KeyStroke.getKeyStroke('\t');
+              digraphState = DIG_STATE_PENDING;
 
-                return DigraphResult.done(code);
-              default:
-                logger.debug("unknown");
-                digraphState = DIG_STATE_PENDING;
-
-                return DigraphResult.done(key);
+              return DigraphResult.done(code);
             }
+            logger.debug("unknown");
+            digraphState = DIG_STATE_PENDING;
+
+            return DigraphResult.done(key);
         }
 
       case DIG_STATE_CODE_CHAR:
@@ -221,20 +235,4 @@ public class DigraphSequence {
     digraphState = DIG_STATE_PENDING;
     codeChars = new char[8];
   }
-
-  private int digraphState = DIG_STATE_PENDING;
-  private char digraphChar;
-  private char[] codeChars;
-  private int codeCnt;
-  private int codeType;
-  private int codeMax;
-
-  private static final int DIG_STATE_PENDING = 1;
-  private static final int DIG_STATE_DIG_ONE = 2;
-  private static final int DIG_STATE_DIG_TWO = 3;
-  private static final int DIG_STATE_CODE_START = 10;
-  private static final int DIG_STATE_CODE_CHAR = 11;
-  private static final int DIG_STATE_BACK_SPACE = 20;
-
-  private static final Logger logger = Logger.getInstance(DigraphSequence.class.getName());
 }

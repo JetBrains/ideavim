@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -221,7 +221,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     if (!EditorHelper.isFileEditor(editor) &&
         editor.getDocument().isWritable() &&
         !CommandStateHelper.inInsertMode(editor)) {
-      VimPlugin.getChange().insertBeforeCursor(editor, new EditorDataContext(editor, null));
+      VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext.init(editor, null));
       KeyHandler.getInstance().reset(editor);
     }
     VisualGroupKt.resetShape(CommandStateHelper.getMode(editor), editor);

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -104,6 +104,24 @@ public class ExOutputPanel extends JPanel {
     return panel;
   }
 
+  private static int countLines(@NotNull String text) {
+    if (text.length() == 0) {
+      return 0;
+    }
+
+    int count = 0;
+    int pos = -1;
+    while ((pos = text.indexOf('\n', pos + 1)) != -1) {
+      count++;
+    }
+
+    if (text.charAt(text.length() - 1) != '\n') {
+      count++;
+    }
+
+    return count;
+  }
+
   // Called automatically when the LAF is changed and the component is visible, and manually by the LAF listener handler
   @Override
   public void updateUI() {
@@ -196,24 +214,6 @@ public class ExOutputPanel extends JPanel {
     myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
   }
 
-  private static int countLines(@NotNull String text) {
-    if (text.length() == 0) {
-      return 0;
-    }
-
-    int count = 0;
-    int pos = -1;
-    while ((pos = text.indexOf('\n', pos + 1)) != -1) {
-      count++;
-    }
-
-    if (text.charAt(text.length() - 1) != '\n') {
-      count++;
-    }
-
-    return count;
-  }
-
   private void scrollLine() {
     scrollOffset(myLineHeight);
   }
@@ -251,12 +251,11 @@ public class ExOutputPanel extends JPanel {
         myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount()) {
       myAtEnd = true;
       myLabel.setText(MessageHelper.message("hit.enter.or.type.command.to.continue"));
-      myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
     }
     else {
       myLabel.setText(MessageHelper.message("ex.output.panel.more"));
-      myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
     }
+    myLabel.setFont(UiHelper.selectFont(myLabel.getText()));
   }
 
   private void positionPanel() {
@@ -304,7 +303,7 @@ public class ExOutputPanel extends JPanel {
         final KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
         final List<KeyStroke> keys = new ArrayList<>(1);
         keys.add(key);
-        VimPlugin.getMacro().playbackKeys(myEditor, new EditorDataContext(myEditor, null), project, keys, 0, 0, 1);
+        VimPlugin.getMacro().playbackKeys(myEditor, EditorDataContext.init(myEditor, null), project, keys, 0, 0, 1);
       }
     });
   }

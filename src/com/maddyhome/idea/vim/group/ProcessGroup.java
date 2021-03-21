@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,9 +66,7 @@ public class ProcessGroup {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true);
 
-    String text = panel.getText();
-    record(editor, text);
-    return text;
+    return panel.getText();
   }
 
   public void startExCommand(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
@@ -107,10 +105,9 @@ public class ProcessGroup {
       CommandState.getInstance(editor).popModes();
       logger.debug("processing command");
       final String text = panel.getText();
-      record(editor, text);
       if (logger.isDebugEnabled()) logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
       if (panel.getLabel().equals(":")) {
-        CommandParser.getInstance().processCommand(editor, context, text, 1);
+        CommandParser.INSTANCE.processCommand(editor, context, text, 1);
       }
       else {
         // FIXME looks like this branch gets never executed
@@ -147,12 +144,6 @@ public class ProcessGroup {
     KeyHandler.getInstance().reset(editor);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true, resetCaret);
-  }
-
-  private void record(Editor editor, @NotNull String text) {
-    if (CommandState.getInstance(editor).isRecording()) {
-      VimPlugin.getRegister().recordText(text);
-    }
   }
 
   public void startFilterCommand(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {

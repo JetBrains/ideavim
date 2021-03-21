@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import com.intellij.openapi.extensions.ExtensionPointName;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
 import com.maddyhome.idea.vim.key.MappingOwner;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -31,12 +30,6 @@ import org.jetbrains.annotations.NotNull;
 public interface VimExtension {
   @NotNull ExtensionPointName<ExtensionBeanClass> EP_NAME = ExtensionPointName.create("IdeaVIM.vimExtension");
 
-  /**
-   * @deprecated This property is not used anymore, but we'll remove it much later to keep the compatibility of IdeaVim
-   *   extensions with previous versions of IdeaVim.
-   */
-  @Deprecated
-  @ApiStatus.ScheduledForRemoval(inVersion = "0.65")
   @VimNlsSafe
   @NotNull String getName();
 

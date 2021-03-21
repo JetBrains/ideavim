@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -417,6 +417,8 @@ public class FileGroup {
   /**
    * This method listens for editor tab changes so any insert/replace modes that need to be reset can be.
    */
+  // I don't understand how to deal with these issues
+  @SuppressWarnings("deprecation")
   public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
     // The user has changed the editor they are working with - exit insert/replace mode, and complete any
     // appropriate repeat

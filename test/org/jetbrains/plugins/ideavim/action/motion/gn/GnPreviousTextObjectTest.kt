@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,27 +29,36 @@ import javax.swing.KeyStroke
 
 class GnPreviousTextObjectTest : VimTestCase() {
   fun `test delete word`() {
-    doTestWithSearch(parseKeys("dgN"), """
+    doTestWithSearch(
+      parseKeys("dgN"),
+      """
       Hello, ${c}this is a test here
-    """.trimIndent(),
+      """.trimIndent(),
       """
         Hello, this is a ${c} here
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   fun `test delete second word`() {
-    doTestWithSearch(parseKeys("2dgN"), """
+    doTestWithSearch(
+      parseKeys("2dgN"),
+      """
       Hello, this is a test here
       Hello, this is a test ${c}here
-    """.trimIndent(),
+      """.trimIndent(),
       """
         Hello, this is a ${c} here
         Hello, this is a test here
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
-  private fun doTestWithSearch(keys: List<KeyStroke>, before: String,
-                               after: String) {
+  private fun doTestWithSearch(
+    keys: List<KeyStroke>,
+    before: String,
+    after: String
+  ) {
     configureByText(before)
     VimPlugin.getSearch().search(myFixture.editor, "test", 1, noneOfEnum(), false)
     typeText(keys)

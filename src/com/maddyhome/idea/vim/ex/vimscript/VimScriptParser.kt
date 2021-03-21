@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,9 +34,11 @@ object VimScriptParser {
   // [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
   @NonNls
   private const val VIMRC_FILE_NAME = "ideavimrc"
+
   // [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
   @NonNls
   private val HOME_VIMRC_PATHS = arrayOf(".$VIMRC_FILE_NAME", "_$VIMRC_FILE_NAME")
+
   // [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
   @NonNls
   private val XDG_VIMRC_PATH = "ideavim" + File.separator + VIMRC_FILE_NAME
@@ -47,6 +49,8 @@ object VimScriptParser {
 
   // This is a pattern used in ideavimrc parsing for a long time. It removes all trailing/leading spaced and blank lines
   private val EOL_SPLIT_PATTERN = Pattern.compile(" *(\r\n|\n)+ *")
+
+  var executingVimScript = false
 
   @JvmStatic
   fun findIdeaVimRc(): File? {
@@ -112,10 +116,9 @@ object VimScriptParser {
       if (line.startsWith(" ") || line.startsWith("\t")) continue
 
       val lineToExecute = if (line.startsWith(":")) line.substring(1) else line
-      val commandParser = CommandParser.getInstance()
       try {
-        val command = commandParser.parse(lineToExecute)
-        val commandHandler = commandParser.getCommandHandler(command)
+        val command = CommandParser.parse(lineToExecute)
+        val commandHandler = CommandParser.getCommandHandler(command)
         if (commandHandler is VimScriptCommandHandler) {
           commandHandler.execute(command)
         }

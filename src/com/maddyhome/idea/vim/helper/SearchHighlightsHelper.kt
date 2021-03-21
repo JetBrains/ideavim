@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,8 +80,13 @@ fun addSubstitutionConfirmationHighlight(editor: Editor, start: Int, end: Int): 
  * Refreshes current search highlights for all editors of currently active text editor/document
  */
 private fun updateSearchHighlights(
-  pattern: String?, shouldIgnoreSmartCase: Boolean, showHighlights: Boolean,
-  initialOffset: Int, searchRange: LineRange?, forwards: Boolean, forceUpdate: Boolean
+  pattern: String?,
+  shouldIgnoreSmartCase: Boolean,
+  showHighlights: Boolean,
+  initialOffset: Int,
+  searchRange: LineRange?,
+  forwards: Boolean,
+  forceUpdate: Boolean
 ): Int {
   var currentMatchOffset = -1
   val projectManager = ProjectManager.getInstanceIfCreated() ?: return currentMatchOffset

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,22 +26,27 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertAfterLineEndActionTest : VimTestCase() {
   fun `test insert after line end action`() {
-    typeTextInFile(parseKeys("A", " four", "<ESC>"),
+    typeTextInFile(
+      parseKeys("A", " four", "<ESC>"),
       """
                     one two ${c}three
                     sev${c}en si${c}x five
 
-                    """.trimIndent())
-    myFixture.checkResult("""
+      """.trimIndent()
+    )
+    myFixture.checkResult(
+      """
     one two three fou${c}r
     seven six five fou${c}r
 
-    """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test multiple carets`() {
-    doTest("AHello<esc>",
+    doTest(
+      "AHello<esc>",
       """
                 ${c}A Discovery
 
@@ -49,7 +54,7 @@ class InsertAfterLineEndActionTest : VimTestCase() {
                 all rocks and ${c}lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A DiscoveryHell${c}o
 
@@ -57,9 +62,10 @@ class InsertAfterLineEndActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,Hell${c}o
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
     assertMode(CommandState.Mode.COMMAND)
   }
 }

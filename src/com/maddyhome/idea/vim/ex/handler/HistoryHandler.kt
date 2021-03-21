@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,7 +63,8 @@ class HistoryHandler : CommandHandler.SingleExecution() {
         !"search".startsWith(key) &&
         !"expr".startsWith(key) &&
         !"input".startsWith(key) &&
-        !"all".startsWith(key)) {
+        !"all".startsWith(key)
+      ) {
         // Invalid command
         logger.debug { "invalid command $key" }
         return false

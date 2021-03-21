@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,8 @@ import javax.swing.KeyStroke
  */
 class MapHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler, ComplicatedNameExCommand {
   override val names: Array<CommandName> = COMMAND_NAMES
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
@@ -109,8 +110,11 @@ class MapHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler, Co
     }
   }
 
-  private class CommandArguments(val specialArguments: Set<SpecialArgument>, val fromKeys: List<KeyStroke>,
-                                 val toKeys: List<KeyStroke>)
+  private class CommandArguments(
+    val specialArguments: Set<SpecialArgument>,
+    val fromKeys: List<KeyStroke>,
+    val toKeys: List<KeyStroke>
+  )
 
   companion object {
     private const val CTRL_V = '\u0016'

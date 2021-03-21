@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,8 +68,8 @@ import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.remove
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.StrictMode
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 
@@ -99,8 +99,7 @@ object VimListenerManager {
       if (typedAction.rawHandler !is VimTypedActionHandler) {
         // Actually this if should always be true, but just as protection
         EventFacade.getInstance().setupTypedActionHandler(VimTypedActionHandler(typedAction.rawHandler))
-      }
-      else {
+      } else {
         StrictMode.fail("typeAction expected to be non-vim.")
       }
 
@@ -131,7 +130,8 @@ object VimListenerManager {
 
     fun removeAll() {
       // Project listeners are self-disposable, so there is no need to unregister them on project close
-      ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }.forEach { IdeaSpecifics.removeIdeaSpecificsListeners(it) }
+      ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }
+        .forEach { IdeaSpecifics.removeIdeaSpecificsListeners(it) }
     }
 
     fun addAll() {
@@ -263,8 +263,9 @@ object VimListenerManager {
           cutOffFixed = true
           SelectionVimListenerSuppressor.lock().use {
             e.editor.caretModel.primaryCaret.let { caret ->
-              if (caret.selectionEnd == e.editor.document.getLineEndOffset(caret.logicalPosition.line) - 1
-                && caret.leadSelectionOffset == caret.selectionEnd) {
+              if (caret.selectionEnd == e.editor.document.getLineEndOffset(caret.logicalPosition.line) - 1 &&
+                caret.leadSelectionOffset == caret.selectionEnd
+              ) {
                 // A small but important customization. Because IdeaVim doesn't allow to put the caret on the line end,
                 //   the selection can omit the last character if the selection was started in the middle on the
                 //   last character in line and has a negative direction.
@@ -331,7 +332,8 @@ object VimListenerManager {
         caretModel.primaryCaret.vimLastColumn = caretModel.visualPosition.column
       } else if (event.area != EditorMouseEventArea.ANNOTATIONS_AREA &&
         event.area != EditorMouseEventArea.FOLDING_OUTLINE_AREA &&
-        event.mouseEvent.button != MouseEvent.BUTTON3) {
+        event.mouseEvent.button != MouseEvent.BUTTON3
+      ) {
         VimPlugin.getMotion()
         if (ExEntryPanel.getInstance().isActive) {
           VimPlugin.getProcess().cancelExEntry(event.editor, false)

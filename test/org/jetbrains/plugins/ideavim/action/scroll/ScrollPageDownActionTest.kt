@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -165,5 +165,22 @@ class ScrollPageDownActionTest : VimTestCase() {
     setPositionAndScroll(146, 175)
     typeText(parseKeys("<C-F>"))
     assertTrue(VimPlugin.isError())
+  }
+
+  fun `test scroll page down puts cursor on first non-blank column`() {
+    configureByLines(100, "    I found it in a legendary land")
+    setPositionAndScroll(20, 25, 14)
+    typeText(parseKeys("<C-F>"))
+    assertPosition(53, 4)
+    assertVisibleArea(53, 87)
+  }
+
+  fun `test scroll page down keeps same column with nostartofline`() {
+    OptionsManager.startofline.reset()
+    configureByLines(100, "    I found it in a legendary land")
+    setPositionAndScroll(20, 25, 14)
+    typeText(parseKeys("<C-F>"))
+    assertPosition(53, 14)
+    assertVisibleArea(53, 87)
   }
 }

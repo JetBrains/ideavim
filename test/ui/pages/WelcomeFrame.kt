@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,18 +27,26 @@ import com.intellij.remoterobot.fixtures.FixtureName
 import com.intellij.remoterobot.search.locators.byXpath
 import java.time.Duration
 
-fun RemoteRobot.welcomeFrame(function: WelcomeFrame.()-> Unit) {
-    find(WelcomeFrame::class.java, Duration.ofSeconds(10)).apply(function)
+fun RemoteRobot.welcomeFrame(function: WelcomeFrame.() -> Unit) {
+  find(WelcomeFrame::class.java, Duration.ofSeconds(10)).apply(function)
 }
 
 @FixtureName("Welcome Frame")
 @DefaultXpath("type", "//div[@class='FlatWelcomeFrame']")
-class WelcomeFrame(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) : CommonContainerFixture(remoteRobot, remoteComponent) {
-    val createNewProjectLink
-        get() = actionLink(byXpath("New Project","//div[(@class='MainButton' and @text='New Project') or (@accessiblename='New Project' and @class='JButton')]"))
-    val moreActions
-        get() = button(byXpath("More Action", "//div[@accessiblename='More Actions' and @class='ActionButton']"))
+class WelcomeFrame(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) :
+  CommonContainerFixture(remoteRobot, remoteComponent) {
+  val createNewProjectLink
+    get() = actionLink(
+      byXpath(
+        "New Project",
+        "//div[(@class='MainButton' and @text='New Project') or (@accessiblename='New Project' and @class='JButton')]"
+      )
+    )
+  @Suppress("unused")
+  val moreActions
+    get() = button(byXpath("More Action", "//div[@accessiblename='More Actions' and @class='ActionButton']"))
 
-    val heavyWeightPopup
-        get() = remoteRobot.find(ComponentFixture::class.java, byXpath("//div[@class='HeavyWeightWindow']"))
+  @Suppress("unused")
+  val heavyWeightPopup
+    get() = remoteRobot.find(ComponentFixture::class.java, byXpath("//div[@class='HeavyWeightWindow']"))
 }

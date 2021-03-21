@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 
 package org.jetbrains.plugins.ideavim.option;
 
-import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
 import com.maddyhome.idea.vim.option.KeywordOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -41,7 +40,7 @@ public class KeywordOptionTest extends VimTestCase {
     OptionsManager.INSTANCE.parseOptionLine(myFixture.getEditor(), "iskeyword" + val, false);
   }
 
-  private void assertIsKeyword(char c){
+  private void assertIsKeyword(char c) {
     CharacterHelper.CharacterType charType = CharacterHelper.charType(c, false);
     assertSame(CharacterHelper.CharacterType.KEYWORD, charType);
   }
@@ -51,87 +50,91 @@ public class KeywordOptionTest extends VimTestCase {
     assertSame(CharacterHelper.CharacterType.PUNCTUATION, charType);
   }
 
-  public void testSingleCommaIsAValue() throws ExException {
+  public void testSingleCommaIsAValue() {
     option.set(",");
     assertEquals(",", option.values().get(0));
   }
 
-  public void testSingleCommaIsAValueAsAppend() throws ExException {
+  public void testSingleCommaIsAValueAsAppend() {
     option.append(",");
     assertTrue(option.values().contains(","));
   }
 
-  public void testSingleNegatedCommaIsAValue() throws ExException {
+  public void testSingleNegatedCommaIsAValue() {
     option.set("^,");
     assertEquals("^,", option.values().get(0));
   }
 
-  public void testCommaInARangeIsAValue() throws ExException {
+  public void testCommaInARangeIsAValue() {
     option.set("+-,");
     assertEquals("+-,", option.values().get(0));
   }
 
-  public void testSecondCommaIsASeparator() throws ExException {
+  public void testSecondCommaIsASeparator() {
     option.set(",,a");
     assertEquals(",", option.values().get(0));
     assertEquals("a", option.values().get(1));
   }
 
-  public void testSingleHyphenIsAValue() throws ExException {
+  public void testSingleHyphenIsAValue() {
     option.set("-");
     assertEquals("-", option.values().get(0));
   }
 
-  public void testHyphenBetweenCharNumsIsARange() throws ExException {
+  public void testHyphenBetweenCharNumsIsARange() {
     option.set("a-b");
     assertEquals("a-b", option.values().get(0));
   }
 
   public void testRangeInWhichLeftValueIsHigherThanRightValueIsInvalid() {
     option.set("b-a");
-    assertDoesntContain(option.values(), new ArrayList<String>(){{add("b-a");}});
+    assertDoesntContain(option.values(), new ArrayList<String>() {{
+      add("b-a");
+    }});
   }
 
   public void testTwoAdjacentLettersAreInvalid() {
     option.set("ab");
-    assertDoesntContain(option.values(), new ArrayList<String>(){{add("ab");}});
+    assertDoesntContain(option.values(), new ArrayList<String>() {{
+      add("ab");
+    }});
   }
 
-  public void testAddsACharByChar() throws ExException {
+  public void testAddsACharByChar() {
     setKeyword("=-");
     assertIsKeyword('-');
   }
 
-  public void testAddsACharByUnicodeCodePoint() throws ExException {
+  public void testAddsACharByUnicodeCodePoint() {
     setKeyword("=" + (int)'-');
     assertIsKeyword('-');
   }
 
-  public void testAddsARange() throws ExException {
+  public void testAddsARange() {
     setKeyword("=a-c");
     assertIsKeyword('a');
     assertIsKeyword('b');
     assertIsKeyword('c');
   }
 
-  public void testAtSignRepresentsAllLetters() throws ExException {
+  public void testAtSignRepresentsAllLetters() {
     setKeyword("=@");
     assertIsKeyword('A');
     assertIsKeyword('Ā');
   }
 
-  public void testRangeOfAtSignToAtSignRepresentsAtSign() throws ExException {
+  public void testRangeOfAtSignToAtSignRepresentsAtSign() {
     setKeyword("=@-@");
     assertIsKeyword('@');
   }
 
-  public void testCaretRemovesAChar() throws ExException {
+  public void testCaretRemovesAChar() {
     setKeyword("=a");
     setKeyword("+=^a");
     assertIsNotKeyword('a');
   }
 
-  public void testCaretRemovesARange() throws ExException {
+  public void testCaretRemovesARange() {
     setKeyword("=a-c");
     setKeyword("+=^b-c,d");
     assertIsKeyword('a');
@@ -139,12 +142,12 @@ public class KeywordOptionTest extends VimTestCase {
     assertIsNotKeyword('c');
   }
 
-  public void testCaretAloneRepresentsACaret() throws ExException {
+  public void testCaretAloneRepresentsACaret() {
     setKeyword("=^");
     assertIsKeyword('^');
   }
 
-  public void testMultibyteCharactersAreKeywords() throws ExException {
+  public void testMultibyteCharactersAreKeywords() {
     assertIsKeyword('Ź');
   }
 

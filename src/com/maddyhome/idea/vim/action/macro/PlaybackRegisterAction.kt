@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,19 +42,27 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
     val application = ApplicationManager.getApplication()
     val res = Ref.create(false)
     when (reg) {
-        '@' -> {
-          application.runWriteAction { res.set(VimPlugin.getMacro().playbackLastRegister(editor, context, project, cmd.count)) }
+      '@' -> {
+        application.runWriteAction {
+          res.set(
+            VimPlugin.getMacro().playbackLastRegister(editor, context, project, cmd.count)
+          )
         }
-        RegisterGroup.LAST_COMMAND_REGISTER -> { // No write action
-          try {
-            res.set(CommandParser.getInstance().processLastCommand(editor, context, cmd.count))
-          } catch (e: ExException) {
-            res.set(false)
-          }
+      }
+      RegisterGroup.LAST_COMMAND_REGISTER -> { // No write action
+        try {
+          res.set(CommandParser.processLastCommand(editor, context, cmd.count))
+        } catch (e: ExException) {
+          res.set(false)
         }
-        else -> {
-          application.runWriteAction { res.set(VimPlugin.getMacro().playbackRegister(editor, context, project, reg, cmd.count)) }
+      }
+      else -> {
+        application.runWriteAction {
+          res.set(
+            VimPlugin.getMacro().playbackRegister(editor, context, project, reg, cmd.count)
+          )
         }
+      }
     }
     return res.get()
   }

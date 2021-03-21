@@ -1,6 +1,23 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2021 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.maddyhome.idea.vim.ui
 
-import com.intellij.ide.lightEdit.LightEditCompatible
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.project.Project
@@ -24,9 +41,13 @@ import java.awt.event.MouseEvent
 object ShowCmd {
   // https://github.com/vim/vim/blob/b376ace1aeaa7614debc725487d75c8f756dd773/src/vim.h#L1721
   private const val SHOWCMD_COLS = 10
-  @NonNls internal const val ID = "IdeaVim::ShowCmd"
+
+  @NonNls
+  internal const val ID = "IdeaVim::ShowCmd"
+
   // [VERSION UPDATE] 203+ Annotation should be replaced with @NlsSafe
-  @NonNls internal const val displayName = "IdeaVim showcmd"
+  @NonNls
+  internal const val displayName = "IdeaVim showcmd"
 
   fun update() {
     val windowManager = WindowManager.getInstance()
@@ -50,7 +71,7 @@ object ShowCmd {
   }
 }
 
-object ShowCmdOptionChangeListener: OptionChangeListener<Boolean> {
+object ShowCmdOptionChangeListener : OptionChangeListener<Boolean> {
   override fun valueChange(oldValue: Boolean?, newValue: Boolean?) {
     ShowCmd.update()
 
@@ -63,7 +84,7 @@ object ShowCmdOptionChangeListener: OptionChangeListener<Boolean> {
   }
 }
 
-class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory, LightEditCompatible {
+class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
   override fun getId() = ShowCmd.ID
 
   override fun getDisplayName(): String = ShowCmd.displayName
@@ -93,7 +114,10 @@ class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory, LightEditCompatibl
 //
 // We only need to show partial commands, since the standard PositionPanel shows the other information already, with
 // the exception of "{lines}x{columns}" (it shows "x carets" instead)
-class Widget(project: Project) : EditorBasedWidget(project), StatusBarWidget.Multiframe, StatusBarWidget.TextPresentation {
+class Widget(project: Project) :
+  EditorBasedWidget(project),
+  StatusBarWidget.Multiframe,
+  StatusBarWidget.TextPresentation {
 
   override fun ID() = ShowCmd.ID
 

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 public class ToggleOption extends Option<Boolean> {
 
   private static final @NonNls String NO_PREFIX = "no";
+  protected final boolean dflt;
+  protected boolean value;
 
   /**
    * Creates the option
@@ -122,7 +124,4 @@ public class ToggleOption extends Option<Boolean> {
   public void resetDefault() {
     value = dflt;
   }
-
-  protected final boolean dflt;
-  protected boolean value;
 }

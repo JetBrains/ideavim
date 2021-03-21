@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,14 +32,14 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...all rocks and lavender and tufted grass,
   ...${c}all it was settled on some sodden sand
   ...all by the torrent of a mountain pass
-""".trimIndent().dotToTab()
+    """.trimIndent().dotToTab()
     val keys = parseKeys("N")
     val after = """
   I found it in a legendary land
   ...${c}all rocks and lavender and tufted grass,
   ...all it was settled on some sodden sand
   ...all by the torrent of a mountain pass
-""".trimIndent().dotToTab()
+    """.trimIndent().dotToTab()
     doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch()
         .search(it, it.caretModel.primaryCaret, "all", 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
@@ -52,14 +52,14 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...all rocks and lavender and tufted grass,
   ...all it was .${c}all settled on some sodden sand
   ...all by the torrent of a mountain pass
-""".trimIndent().dotToTab()
+    """.trimIndent().dotToTab()
     val keys = parseKeys("N")
     val after = """
   I found it in a legendary land
   ...all rocks and lavender and tufted grass,
   ...${c}all it was .all settled on some sodden sand
   ...all by the torrent of a mountain pass
-""".trimIndent().dotToTab()
+    """.trimIndent().dotToTab()
     doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch()
         .search(it, it.caretModel.primaryCaret, "all", 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
@@ -72,14 +72,14 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...all rocks and lavender and tufted grass,
   ...all it was .all.${c}all settled on some sodden sand
   ...all by the torrent of a mountain pass
-""".trimIndent().dotToTab()
+    """.trimIndent().dotToTab()
     val keys = parseKeys("N")
     val after = """
   I found it in a legendary land
   ...all rocks and lavender and tufted grass,
   ...all it was .${c}all.all settled on some sodden sand
   ...all by the torrent of a mountain pass
-""".trimIndent().dotToTab()
+    """.trimIndent().dotToTab()
     doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch()
         .search(it, it.caretModel.primaryCaret, "all", 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
@@ -92,14 +92,14 @@ class SearchAgainPreviousActionTest : VimTestCase() {
   ...${c}all rocks and lavender and tufted grass,
   ...all it was settled on some sodden sand
   ...all by the torrent of a mountain pass
-""".trimIndent().dotToTab()
+    """.trimIndent().dotToTab()
     val keys = parseKeys("N")
     val after = """
   I found it in a legendary land
   ...all rocks and lavender and tufted grass,
   ...all it was settled on some sodden sand
   ...${c}all by the torrent of a mountain pass
-""".trimIndent().dotToTab()
+    """.trimIndent().dotToTab()
     doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.getSearch()
         .search(it, it.caretModel.primaryCaret, "all", 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)

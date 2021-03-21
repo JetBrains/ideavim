@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -91,9 +91,10 @@ object VisualOperation {
     val endLine = (sp.line + linesDiff).coerceAtMost(editor.document.lineCount - 1)
 
     return when (type) {
-      SelectionType.LINE_WISE -> VimPlugin.getMotion().moveCaretToLine(editor, endLine, caret)
+      SelectionType.LINE_WISE -> VimPlugin.getMotion().moveCaretToLineWithSameColumn(editor, endLine, caret)
       SelectionType.CHARACTER_WISE -> when {
-        lines > 1 -> VimPlugin.getMotion().moveCaretToLineStart(editor, endLine) + min(EditorHelper.getLineLength(editor, endLine), chars)
+        lines > 1 -> VimPlugin.getMotion()
+          .moveCaretToLineStart(editor, endLine) + min(EditorHelper.getLineLength(editor, endLine), chars)
         else -> EditorHelper.normalizeOffset(editor, sp.line, caret.offset + chars - 1, true)
       }
       SelectionType.BLOCK_WISE -> {

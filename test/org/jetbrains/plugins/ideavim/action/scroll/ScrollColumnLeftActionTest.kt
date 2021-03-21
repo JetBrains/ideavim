@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -117,9 +117,9 @@ class ScrollColumnLeftActionTest : VimTestCase() {
     typeText(parseKeys("100|"))
     // Text at start of line is:            456:test7
     assertVisibleLineBounds(0, 64, 138)
-    typeText(parseKeys("2zl"))  // 6:test7
+    typeText(parseKeys("2zl")) // 6:test7
     assertVisibleLineBounds(0, 66, 140)
-    typeText(parseKeys("zl"))   // 7
+    typeText(parseKeys("zl")) // 7
     assertVisibleLineBounds(0, 67, 146)
   }
 
@@ -129,11 +129,11 @@ class ScrollColumnLeftActionTest : VimTestCase() {
     typeText(parseKeys("100|"))
     // Text at start of line is:            456test:78
     assertVisibleLineBounds(0, 64, 138)
-    typeText(parseKeys("2zl"))  // 6test:78
+    typeText(parseKeys("2zl")) // 6test:78
     assertVisibleLineBounds(0, 66, 140)
-    typeText(parseKeys("zl"))   // test:78
+    typeText(parseKeys("zl")) // test:78
     assertVisibleLineBounds(0, 67, 141)
-    typeText(parseKeys("zl"))   // 8
+    typeText(parseKeys("zl")) // 8
     assertVisibleLineBounds(0, 68, 147)
   }
 }

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
     val texts = ArrayList<String>(caretCount)
     val ranges = ArrayList<TextRange>(caretCount)
     var line = editor.fileSize
-    val command = CommandParser.getInstance().parse(cmd.argument)
+    val command = CommandParser.parse(cmd.argument)
 
     var lastRange: TextRange? = null
     for (caret in carets) {
@@ -73,7 +73,15 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
       val text = texts[i]
 
       val textData = PutData.TextData(text, SelectionType.LINE_WISE, emptyList())
-      val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, rawIndent = true, caretAfterInsertedText = false, putToLine = line)
+      val putData = PutData(
+        textData,
+        null,
+        1,
+        insertTextBeforeCaret = false,
+        rawIndent = true,
+        caretAfterInsertedText = false,
+        putToLine = line
+      )
       VimPlugin.getPut().putTextForCaret(editor, caret, context, putData)
     }
 
@@ -81,8 +89,12 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
   }
 
   @Throws
-  private fun normalizeLine(editor: Editor, caret: Caret, command: ExCommand,
-                            lineRange: LineRange): Int {
+  private fun normalizeLine(
+    editor: Editor,
+    caret: Caret,
+    command: ExCommand,
+    lineRange: LineRange
+  ): Int {
     var line = command.ranges.getFirstLine(editor, caret)
     val adj = lineRange.endLine - lineRange.startLine + 1
     if (line >= lineRange.endLine)

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,8 +32,15 @@ sealed class IncNumber(val inc: Int, private val avalanche: Boolean) : VisualOpe
   override val type: Command.Type = Command.Type.CHANGE
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
-  override fun executeAction(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: VimSelection): Boolean {
-    return VimPlugin.getChange().changeNumberVisualMode(editor, caret, range.toVimTextRange(false), inc * cmd.count, avalanche)
+  override fun executeAction(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    range: VimSelection
+  ): Boolean {
+    return VimPlugin.getChange()
+      .changeNumberVisualMode(editor, caret, range.toVimTextRange(false), inc * cmd.count, avalanche)
   }
 }
 

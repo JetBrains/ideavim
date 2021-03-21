@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,8 +37,8 @@ class TabCloseHandler : CommandHandler.SingleExecution() {
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
 
-    val project = PlatformDataKeys.PROJECT.getData(context) ?: return false;
-    val fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
+    val project = PlatformDataKeys.PROJECT.getData(context) ?: return false
+    val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
     val currentWindow = fileEditorManager.currentWindow
     val tabbedPane = currentWindow.tabbedPane
 
@@ -88,7 +88,7 @@ class TabCloseHandler : CommandHandler.SingleExecution() {
         c == '$' && sb.isEmpty() && sign == Char.MIN_VALUE -> end = true
 
         c == ' ' -> {
-          //ignore
+          // ignore
         }
 
         else -> return null

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,8 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class JoinLinesHandlerTest : VimTestCase() {
   @VimBehaviorDiffers(description = "Different caret position")
   fun `test simple join`() {
-    doTest(exCommand("j"),
+    doTest(
+      exCommand("j"),
       """
                 A Discovery
 
@@ -34,21 +35,23 @@ class JoinLinesHandlerTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
                 I found it in a legendary land$c all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
   fun `test simple join full command`() {
-    doTest(exCommand("join"),
+    doTest(
+      exCommand("join"),
       """
                 A Discovery
 
@@ -56,21 +59,23 @@ class JoinLinesHandlerTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
                 I found it in a legendary land$c all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
   fun `test join with range`() {
-    doTest(exCommand("4,6j"),
+    doTest(
+      exCommand("4,6j"),
       """
                 A Discovery
 
@@ -78,33 +83,38 @@ class JoinLinesHandlerTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass, where it was settled on some sodden sand$c hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   fun `test join multicaret`() {
-    configureByText("""
+    configureByText(
+      """
                 A Discovery
 
                 ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("Vjj"))
     typeText(commandToKeys("join"))
-    myFixture.checkResult("""
+    myFixture.checkResult(
+      """
                 A Discovery
 
                 I found it in a legendary land all rocks and lavender and tufted grass,$c where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+      """.trimIndent()
+    )
   }
 }

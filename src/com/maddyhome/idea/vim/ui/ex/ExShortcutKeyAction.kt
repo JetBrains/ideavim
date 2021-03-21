@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : AnAction() {
     val keyStroke = getKeyStroke(e)
     if (keyStroke != null) {
       val editor = exEntryPanel.entry.editor
-      KeyHandler.getInstance().handleKey(editor, keyStroke, EditorDataContext(editor, e.dataContext))
+      KeyHandler.getInstance().handleKey(editor, keyStroke, EditorDataContext.init(editor, e.dataContext))
     }
   }
 
@@ -69,4 +69,3 @@ class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : AnAction() {
     registerCustomShortcutSet({ shortcuts }, exEntryPanel)
   }
 }
-

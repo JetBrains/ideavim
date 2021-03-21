@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@ package com.maddyhome.idea.vim.ui.ex
 import com.intellij.openapi.diagnostic.logger
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.helper.DigraphResult
-import com.maddyhome.idea.vim.helper.DigraphSequence
 import com.maddyhome.idea.vim.helper.SearchHelper
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
@@ -32,6 +30,8 @@ import javax.swing.text.BadLocationException
 import javax.swing.text.DefaultEditorKit
 import javax.swing.text.Document
 import javax.swing.text.TextAction
+import kotlin.math.abs
+import kotlin.math.min
 
 interface MultiStepAction : Action {
   fun reset()
@@ -147,7 +147,7 @@ abstract class DeleteCharAction internal constructor(name: String?) : TextAction
   @kotlin.jvm.Throws(BadLocationException::class)
   fun deleteSelection(doc: Document, dot: Int, mark: Int): Boolean {
     if (dot != mark) {
-      doc.remove(Math.min(dot, mark), Math.abs(dot - mark))
+      doc.remove(min(dot, mark), abs(dot - mark))
       return true
     }
     return false

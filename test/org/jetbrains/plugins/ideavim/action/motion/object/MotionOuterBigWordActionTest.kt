@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,29 +27,35 @@ class MotionOuterBigWordActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, description = "Wrong caret position, but in real neovim works fine")
   fun `test on last dot`() {
     doTest(
-      "<aW", """
+      "<aW",
+      """
       I found it in a legendary land
       all rocks and lavender and tufted grass,
       where it was settled on some sodden sand
-      hard by the torrent of a mountain pass${c}.
-    """.trimIndent(), """
+      hard by the torrent of a mountain pass$c.
+      """.trimIndent(),
+      """
       I found it in a legendary land
       all rocks and lavender and tufted grass,
       where it was settled on some sodden sand
       ${c}hard by the torrent of a mountain pass.
-    """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
 
   fun `test past end in visual`() {
     doTest(
-      "v\$aW", """
+      "v\$aW",
+      """
       I found it in a ${c}legendary land
       }
-    """.trimIndent(), """
+      """.trimIndent(),
+      """
       I found it in a ${s}legendary land
-      ${c}}${se}
-    """.trimIndent(), CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+      $c}$se
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
     )
   }
 }

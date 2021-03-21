@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ class BufferHandler : CommandHandler.SingleExecution() {
       } else {
         val editors = findPartialMatch(context, buffer)
 
-        when(editors.size) {
+        when (editors.size) {
           0 -> {
             VimPlugin.showMessage(MessageHelper.message("no.matching.buffer.for.0", buffer))
             result = false
@@ -63,8 +63,7 @@ class BufferHandler : CommandHandler.SingleExecution() {
             if (EditorHelper.hasUnsavedChanges(editor) && !overrideModified) {
               VimPlugin.showMessage(MessageHelper.message("no.write.since.last.change.add.to.override"))
               result = false
-            }
-            else {
+            } else {
               VimPlugin.getFile().openFile(EditorHelper.getVirtualFile(editors[0])!!.name, context)
             }
           }
@@ -93,4 +92,3 @@ class BufferHandler : CommandHandler.SingleExecution() {
     return matchedFiles
   }
 }
-

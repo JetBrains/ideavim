@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,11 @@ class AddInlineInlaysAction : AnAction() {
 
       val offset = EditorHelper.visualPositionToOffset(editor, VisualPosition(currentVisualLine, i))
       // We don't need a custom renderer, just use the standard parameter hint renderer
-      inlayModel.addInlineElement(offset, relatesToPrecedingText, HintRenderer(if (relatesToPrecedingText) ":$text" else "$text:"))
+      inlayModel.addInlineElement(
+        offset,
+        relatesToPrecedingText,
+        HintRenderer(if (relatesToPrecedingText) ":$text" else "$text:")
+      )
       // Every 20 chars +/- 5 chars
       i += 20 + (random.nextInt(10) - 5)
     }

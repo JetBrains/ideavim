@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarkskOptionsData.name) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(text)
     typeText(keys)
     checkMarks('A' to 2)
@@ -55,7 +55,7 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarkskOptionsData.name) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(text)
     typeText(keys)
     checkMarks('A' to 2, 'B' to 3, 'C' to 4)
@@ -71,7 +71,7 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarkskOptionsData.name) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(text)
     typeText(keys)
     checkMarks('A' to 2, 'B' to 2, 'C' to 2)
@@ -87,7 +87,7 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarkskOptionsData.name) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(text)
     typeText(keys)
     checkMarks('A' to 4)
@@ -102,7 +102,7 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarkskOptionsData.name) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(text)
     val bookmarkManager = BookmarkManager.getInstance(myFixture.project)
     bookmarkManager.addEditorBookmark(myFixture.editor, 2)
@@ -122,7 +122,7 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarkskOptionsData.name) {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(text)
     var bookmarkManager = BookmarkManager.getInstance(myFixture.project)
     bookmarkManager.addEditorBookmark(myFixture.editor, 2)

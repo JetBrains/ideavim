@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,14 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
    * @see [ChangeEditorActionHandler.SingleExecution] for only one execution.
    */
   abstract class ForEachCaret : ChangeEditorActionHandler() {
-    abstract fun execute(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean
+    abstract fun execute(
+      editor: Editor,
+      caret: Caret,
+      context: DataContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?
+    ): Boolean
   }
 
   /**
@@ -68,12 +75,15 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
     val worked = Ref.create(true)
     when (this) {
       is ForEachCaret -> {
-        editor.caretModel.runForEachCaret({ current ->
-          if (!current.isValid) return@runForEachCaret
-          if (!execute(editor, current, context, cmd.count, cmd.rawCount, cmd.argument)) {
-            worked.set(false)
-          }
-        }, true)
+        editor.caretModel.runForEachCaret(
+          { current ->
+            if (!current.isValid) return@runForEachCaret
+            if (!execute(editor, current, context, cmd.count, cmd.rawCount, cmd.argument)) {
+              worked.set(false)
+            }
+          },
+          true
+        )
       }
       is SingleExecution -> {
         worked.set(execute(editor, context, cmd.count, cmd.rawCount, cmd.argument))

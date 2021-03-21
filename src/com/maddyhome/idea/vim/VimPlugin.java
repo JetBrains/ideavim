@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 package com.maddyhome.idea.vim;
 
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManager;
 import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationListener;
@@ -53,10 +52,10 @@ import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.option.OptionsManager;
-import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import com.maddyhome.idea.vim.ui.VimRcFileState;
+import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -237,7 +236,13 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     ideavimrcRegistered = true;
 
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      executeIdeaVimRc();
+      try {
+        VimScriptParser.INSTANCE.setExecutingVimScript(true);
+        executeIdeaVimRc();
+      }
+      finally {
+        VimScriptParser.INSTANCE.setExecutingVimScript(false);
+      }
     }
   }
 
@@ -352,7 +357,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     RegisterActions.registerActions();
 
     // Register ex handlers
-    CommandParser.getInstance().registerHandlers();
+    CommandParser.INSTANCE.registerHandlers();
 
     // Register extensions
     VimExtensionRegistrar.registerExtensions();
@@ -360,14 +365,15 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     // Execute ~/.ideavimrc
     registerIdeavimrc();
 
+    // Initialize extensions
+    VimExtensionRegistrar.enableDelayedExtensions();
+
     // Turing on should be performed after all commands registration
     getSearch().turnOn();
     VimListenerManager.INSTANCE.turnOn();
   }
 
   private void turnOffPlugin() {
-    KeyHandler.getInstance().fullReset(null);
-
     SearchGroup searchGroup = getSearchIfCreated();
     if (searchGroup != null) {
       searchGroup.turnOff();
@@ -379,7 +385,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     RegisterActions.unregisterActions();
 
     // Unregister ex handlers
-    CommandParser.getInstance().unregisterHandlers();
+    CommandParser.INSTANCE.unregisterHandlers();
   }
 
   private boolean stateUpdated = false;

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,5 @@ package ui.utils
 import com.intellij.remoterobot.RemoteRobot
 
 fun uiTest(url: String = "http://127.0.0.1:8082", test: RemoteRobot.() -> Unit) {
-    RemoteRobot(url).apply(test)
+  RemoteRobot(url).apply(test)
 }
-

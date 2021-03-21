@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,12 +36,14 @@ class MotionInnerBlockDoubleQuoteAction : TextObjectActionHandler() {
 
   override val visualType: TextObjectVisualType = TextObjectVisualType.CHARACTER_WISE
 
-  override fun getRange(editor: Editor,
-                        caret: Caret,
-                        context: DataContext,
-                        count: Int,
-                        rawCount: Int,
-                        argument: Argument?): TextRange? {
+  override fun getRange(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?
+  ): TextRange? {
     return VimPlugin.getMotion().getBlockQuoteRange(editor, caret, '"', false)
   }
 }
