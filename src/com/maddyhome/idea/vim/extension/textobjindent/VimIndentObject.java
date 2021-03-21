@@ -231,80 +231,6 @@ public class VimIndentObject implements VimExtension {
         }
 
         return new TextRange(upperBoundaryOffset, lowerBoundaryOffset);
-        // return getRange2(editor, caret, context, count, rawCount, argument);
-      }
-
-      public @Nullable
-      TextRange getRange2(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                          int count, int rawCount, @Nullable Argument argument) {
-        final int caretLineNum = caret.getCaretModel().getVisualPosition().getLine();
-        String content = editor.getDocument().getText();
-        String[] lines = content.split("\n");
-        String caretLine = lines[caretLineNum];
-
-        Pattern indentPattern = Pattern.compile("^\\s+");
-        Matcher matcher = indentPattern.matcher(caretLine);
-        if (!matcher.find()) {
-          return new TextRange(
-            editor.getDocument().getLineStartOffset(caretLineNum),
-            editor.getDocument().getLineEndOffset(caretLineNum)
-          );
-        }
-
-        int indentSize = matcher.end();
-        int startLineNum = caretLineNum;
-        int endLineNum = caretLineNum;
-
-        if (indentSize > 0) {
-          while (--startLineNum >= 0) {
-            final String line = lines[startLineNum];
-            if (isWhiteSpace(line)) {
-              continue;
-            }
-            Matcher matcher1 = indentPattern.matcher(line);
-            if (!matcher1.find()) {
-              break;
-            }
-            int indentSize1 = matcher1.end();
-            if (indentSize1 < indentSize) {
-              break;
-            }
-          }
-
-          while (++endLineNum < lines.length) {
-            final String line = lines[endLineNum];
-            if (isWhiteSpace(line)) {
-              continue;
-            }
-            Matcher matcher1 = indentPattern.matcher(line);
-            if (!matcher1.find()) {
-              break;
-            }
-            int indentSize1 = matcher1.end();
-            if (indentSize1 < indentSize) {
-              break;
-            }
-          }
-        }
-
-        if (!includeAbove) {
-          ++startLineNum;
-          while (startLineNum < caretLineNum && isWhiteSpace(lines[startLineNum])) {
-            ++startLineNum;
-          }
-        }
-
-        if (!includeBelow) {
-          --endLineNum;
-          while (endLineNum < caretLineNum && isWhiteSpace(lines[endLineNum])) {
-            --endLineNum;
-          }
-        }
-
-        return new TextRange(
-          editor.getDocument().getLineStartOffset(startLineNum),
-          editor.getDocument().getLineEndOffset(endLineNum)
-        );
       }
 
       @NotNull
@@ -313,9 +239,6 @@ public class VimIndentObject implements VimExtension {
         return TextObjectVisualType.LINE_WISE;
       }
 
-      private boolean isWhiteSpace(String text) {
-        return text.matches("^\\s*$");
-      }
     }
 
     @Override
