@@ -649,10 +649,9 @@ public class MotionGroup {
     // Ironically, after figuring out how Vim's algorithm works (although not *why*) and reimplementing, it looks likely
     // that this needs to be replaced as a more or less dumb line for line rewrite.
 
-    // This algorithm is based on screen height, so get the non-normalised line number at the bottom of the screen, even
-    // if the text ends sooner
     final int topLine = getVisualLineAtTopOfScreen(editor);
-    final int bottomLine = getNonNormalizedVisualLineAtBottomOfScreen(editor);
+    final int bottomLine = getVisualLineAtBottomOfScreen(editor);
+    final int lastLine = EditorHelper.getLineCount(editor) - 1;
 
     // We need the non-normalised value here, so we can handle cases such as so=999 to keep the current line centred
     final int scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();
@@ -664,11 +663,11 @@ public class MotionGroup {
     // 100. It also handles so=999 keeping the current line centred.
     // Note that block inlays means that the pixel height we are scrolling can be larger than half the screen, even if
     // the number of lines is less. I'm not sure what impact this has.
-    final int height = bottomLine - topLine + 1;
+    final int height = getNonNormalizedVisualLineAtBottomOfScreen(editor) - topLine + 1;
 
     // Scrolljump isn't handled as you might expect. It is the minimal number of lines to scroll, but that doesn't mean
     // newLine = caretLine +/- MAX(sj, so)
-    //
+    // <editor-fold desc="// Details">
     // When scrolling up (`k` - scrolling window up in the buffer; more lines are visible at the top of the window), Vim
     // will start at the new cursor line and repeatedly advance lines above and below. The new top line must be at least
     // scrolloff above caretLine. If this takes the new top line above the current top line, we must scroll at least
@@ -690,6 +689,7 @@ public class MotionGroup {
     // On top of that, if the scroll distance is "too large", the new cursor line is positioned in the centre of the
     // screen. What "too large" means depends on scroll direction. There is an initial approximate check before working
     // out correct scroll locations
+    // </editor-fold>
     final int scrollJump = getScrollJump(editor, height);
 
     // Unavoidable fudge value. Multiline rendered doc comments can mean we have very few actual lines, and scrolling
@@ -736,8 +736,9 @@ public class MotionGroup {
         }
       }
     }
-    else if (caretLine > bottomBound) {
+    else if (caretLine > bottomBound && bottomLine < lastLine) {
       // Scrolling down, put the cursor at the bottom of the window (minus scrolloff)
+      // Do nothing if the bottom of the file is already above the bottom of the screen
       // Vim does a quick approximation before going through the full algorithm. It checks the line below the bottom
       // line in the window (bottomLine + 1). See move.c:update_topline
       int lineCount = caretLine - (bottomLine + 1) + 1 + scrollOffset;
@@ -847,7 +848,7 @@ public class MotionGroup {
       scrollVisualLineToTopOfScreen(editor, visualLine + lines);
     }
     else {
-      final int visualLine = getVisualLineAtBottomOfScreen(editor);
+      final int visualLine = getNonNormalizedVisualLineAtBottomOfScreen(editor);
       scrollVisualLineToBottomOfScreen(editor, visualLine + lines);
     }
 
@@ -1237,7 +1238,8 @@ public class MotionGroup {
         scrollVisualLineToMiddleOfScreen(editor, visualLine, true);
         break;
       case BOTTOM:
-        scrollVisualLineToBottomOfScreen(editor, visualLine + scrollOffset);
+        // Make sure we scroll to an actual line, not virtual space
+        scrollVisualLineToBottomOfScreen(editor, normalizeVisualLine(editor, visualLine + scrollOffset));
         break;
     }
 

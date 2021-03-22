@@ -223,8 +223,8 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   fun `test go to line in last half screen of file puts last line at bottom of screen ignoring scrolloff`() {
     OptionsManager.scrolloff.set(10)
     configureByLines(100, "    I found it in a legendary land")
-    typeText(parseKeys("90G"))
-    assertPosition(89, 4)
+    typeText(parseKeys("95G"))
+    assertPosition(94, 4)
     assertVisibleArea(65, 99)
   }
 
@@ -244,5 +244,15 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     typeText(parseKeys("G"))
     assertPosition(99, 4)
     assertVisibleArea(85, 99)
+  }
+
+  fun `test go to line does not scroll when last line is less than scrolloff above bottom of file`() {
+    OptionsManager.scrolloff.set(10)
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    setPositionAndScroll(67, 97)
+    typeText(parseKeys("G"))
+    assertPosition(99, 4)
+    assertVisibleArea(67, 99)
   }
 }

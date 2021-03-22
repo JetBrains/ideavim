@@ -736,16 +736,17 @@ public class EditorHelper {
    * place a line at the bottom of the screen. Due to block inlays, we can't do this by specifying a top line to scroll
    * to.</p>
    *
-   * @param editor     The editor to scroll
-   * @param visualLine The visual line to place at the bottom of the current window
+   * @param editor                  The editor to scroll
+   * @param nonNormalisedVisualLine The non-normalised visual line to place at the bottom of the current window. Might
+   *                                be greater than visual line count to scroll to virtual space at the end of the file
    * @return True if the editor was scrolled
    */
-  public static boolean scrollVisualLineToBottomOfScreen(@NotNull Editor editor, int visualLine) {
-    final int offset = getOffsetToScrollVisualLineToBottomOfScreen(editor, visualLine);
+  public static boolean scrollVisualLineToBottomOfScreen(@NotNull Editor editor, int nonNormalisedVisualLine) {
+    final int offset = getOffsetToScrollVisualLineToBottomOfScreen(editor, nonNormalisedVisualLine);
     return scrollVertically(editor, offset);
   }
 
-  private static int getOffsetToScrollVisualLineToBottomOfScreen(@NotNull Editor editor, int visualLine) {
+  private static int getOffsetToScrollVisualLineToBottomOfScreen(@NotNull Editor editor, int nonNormalisedVisualLine) {
     int exPanelHeight = 0;
     if (ExEntryPanel.getInstance().isActive()) {
       exPanelHeight = ExEntryPanel.getInstance().getHeight();
@@ -754,12 +755,13 @@ public class EditorHelper {
       exPanelHeight += ExEntryPanel.getInstanceWithoutShortcuts().getHeight();
     }
 
-    final int normalizedVisualLine = normalizeVisualLine(editor, visualLine);
+    // Note that we explicitly do not normalise the visual line, as we might be trying to scroll a virtual line, at the
+    // end of the file
     final int lineHeight = editor.getLineHeight();
     final int screenHeight = getVisibleArea(editor).height - exPanelHeight;
-    final int inlayHeight = EditorUtil.getInlaysHeight(editor, visualLine, false);
+    final int inlayHeight = EditorUtil.getInlaysHeight(editor, nonNormalisedVisualLine, false);
     final int maxInlayHeight = BLOCK_INLAY_MAX_LINE_HEIGHT * lineHeight;
-    final int y = editor.visualLineToY(normalizedVisualLine) + lineHeight + min(inlayHeight, maxInlayHeight);
+    final int y = editor.visualLineToY(nonNormalisedVisualLine) + lineHeight + min(inlayHeight, maxInlayHeight);
     return max(0, y - screenHeight);
   }
 
@@ -882,9 +884,9 @@ public class EditorHelper {
 
   private static int scrollFullPageDown(final @NotNull Editor editor, int pages) {
     final Rectangle visibleArea = getVisibleArea(editor);
-    final int lineCount = getVisualLineCount(editor);
+    final int lastVisualLine = getVisualLineCount(editor) - 1;
 
-    if (editor.getCaretModel().getVisualPosition().line == lineCount - 1) return -1;
+    if (editor.getCaretModel().getVisualPosition().line == lastVisualLine) return -1;
 
     int y = visibleArea.y + visibleArea.height;
     int topBound = visibleArea.y;
@@ -894,10 +896,10 @@ public class EditorHelper {
 
     for (int i = 0; i < pages; i++) {
       line = getFullVisualLine(editor, y, topBound, bottomBound);
-      if (line >= lineCount - 1) {
+      if (line >= lastVisualLine) {
         // If we're on the last page, end nicely on the last line, otherwise return the overrun so we can "beep"
         if (i == pages - 1) {
-          caretLine = lineCount - 1;
+          caretLine = lastVisualLine;
         }
         else {
           caretLine = line;

@@ -111,4 +111,34 @@ class ScrollLineUpActionTest : VimTestCase() {
     typeText(parseKeys("Vjjjj", "<C-Y>"))
     assertVisibleArea(28, 62)
   }
+
+  fun `test scroll line up with virtual space`() {
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    setPositionAndScroll(85, 90, 4)
+    typeText(parseKeys("<C-Y>"))
+    assertVisibleArea(84, 99)
+  }
+
+  fun `test scroll line up with virtual space and scrolloff`() {
+    OptionsManager.scrolloff.set(10)
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    // Last line is scrolloff from top. <C-Y> should just move last line down
+    setPositionAndScroll(89, 99, 4)
+    typeText(parseKeys("<C-Y>"))
+    assertVisibleArea(88, 99)
+    assertVisualPosition(99, 4)
+  }
+
+  // This actually works, but the set up puts us in the wrong position
+  fun `test scroll line up on last line with scrolloff`() {
+    OptionsManager.scrolloff.set(10)
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    setPositionAndScroll(65, 99, 4)
+    typeText(parseKeys("<C-Y>"))
+    assertVisibleArea(64, 98)
+    assertVisualPosition(88, 4) // Moves caret up by scrolloff
+  }
 }
