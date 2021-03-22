@@ -108,4 +108,23 @@ class ScrollLineDownActionTest : VimTestCase() {
     typeText(parseKeys("Vjjjj", "<C-E>"))
     assertVisibleArea(21, 55)
   }
+
+  fun `test scroll last line down at end of file with virtual space`() {
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    setPositionAndScroll(75, 99, 4)
+    typeText(parseKeys("<C-E>"))
+    assertPosition(99, 4)
+    assertVisibleArea(76, 99)
+  }
+
+  fun `test scroll line down at end of file with virtual space and scrolloff`() {
+    OptionsManager.scrolloff.set(10)
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    setPositionAndScroll(75, 95, 4)
+    typeText(parseKeys("<C-E>"))
+    assertPosition(95, 4)
+    assertVisibleArea(76, 99)
+  }
 }

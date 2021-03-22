@@ -186,11 +186,13 @@ public class MotionGroup {
     final int topVisualLine = getVisualLineAtTopOfScreen(editor);
     final int bottomVisualLine = getVisualLineAtBottomOfScreen(editor);
     final int caretVisualLine = editor.getCaretModel().getVisualPosition().line;
+    final int lastVisualLine = EditorHelper.getVisualLineCount(editor) - 1;
+
     final int newVisualLine;
     if (caretVisualLine < topVisualLine + scrollOffset) {
       newVisualLine = normalizeVisualLine(editor, topVisualLine + scrollOffset);
     }
-    else if (caretVisualLine > bottomVisualLine - scrollOffset) {
+    else if (bottomVisualLine < lastVisualLine && caretVisualLine > bottomVisualLine - scrollOffset) {
       newVisualLine = normalizeVisualLine(editor, bottomVisualLine - scrollOffset);
     }
     else {
