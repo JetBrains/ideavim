@@ -1083,37 +1083,50 @@ public class MotionGroup {
   }
 
   public boolean scrollFullPage(@NotNull Editor editor, @NotNull Caret caret, int pages) {
-    int caretVisualLine = EditorHelper.scrollFullPage(editor, pages);
-    if (caretVisualLine != -1) {
-      final int scrollOffset = getNormalizedScrollOffset(editor);
-      boolean success = true;
+    assert pages != 0;
+    return pages > 0 ? scrollFullPageDown(editor, caret, pages) : scrollFullPageUp(editor, caret, Math.abs(pages));
+  }
 
-      if (pages > 0) {
-        // If the caret is ending up passed the end of the file, we need to beep
-        if (caretVisualLine > getVisualLineCount(editor) - 1) {
-          success = false;
-        }
+  private boolean scrollFullPageDown(@NotNull Editor editor, @NotNull Caret caret, int pages) {
+    final Pair<Boolean, Integer> result = EditorHelper.scrollFullPageDown(editor, pages);
 
-        int topVisualLine = getVisualLineAtTopOfScreen(editor);
-        if (caretVisualLine < topVisualLine + scrollOffset) {
-          caretVisualLine = normalizeVisualLine(editor, caretVisualLine + scrollOffset);
-        }
-      }
-      else if (pages < 0) {
-        int bottomVisualLine = getVisualLineAtBottomOfScreen(editor);
-        if (caretVisualLine > bottomVisualLine - scrollOffset) {
-          caretVisualLine = normalizeVisualLine(editor, caretVisualLine - scrollOffset);
-        }
-      }
+    final int scrollOffset = getNormalizedScrollOffset(editor);
+    final int topVisualLine = getVisualLineAtTopOfScreen(editor);
+    int caretVisualLine = result.getSecond();
+    if (caretVisualLine < topVisualLine + scrollOffset) {
+      caretVisualLine = normalizeVisualLine(editor, caretVisualLine + scrollOffset);
+    }
 
-      int offset = moveCaretToLineWithStartOfLineOption(editor,
-                                                        visualLineToLogicalLine(editor, caretVisualLine),
-                                                        caret);
+    if (caretVisualLine != caret.getVisualPosition().line) {
+      final int offset = moveCaretToLineWithStartOfLineOption(editor, visualLineToLogicalLine(editor, caretVisualLine), caret);
       moveCaret(editor, caret, offset);
-      return success;
+      return result.getFirst();
     }
 
     return false;
+  }
+
+  private boolean scrollFullPageUp(@NotNull Editor editor, @NotNull Caret caret, int pages) {
+    final Pair<Boolean, Integer> result = EditorHelper.scrollFullPageUp(editor, pages);
+
+    final int scrollOffset = getNormalizedScrollOffset(editor);
+    final int bottomVisualLine = getVisualLineAtBottomOfScreen(editor);
+    int caretVisualLine = result.getSecond();
+    if (caretVisualLine > bottomVisualLine - scrollOffset) {
+      caretVisualLine = normalizeVisualLine(editor, caretVisualLine - scrollOffset);
+    }
+
+    if (caretVisualLine != caret.getVisualPosition().line && caretVisualLine != -1) {
+      final int offset = moveCaretToLineWithStartOfLineOption(editor, visualLineToLogicalLine(editor, caretVisualLine), caret);
+      moveCaret(editor, caret, offset);
+      return result.getFirst();
+    }
+
+    // We normally error if we didn't move the caret, but we have a special case for a page showing only the last two
+    // lines of the file and virtual space. Vim normally scrolls window height minus two, but when the caret is on last
+    // line minus one, this becomes window height minus one, meaning the top line of the current page becomes the bottom
+    // line of the new page, and the caret doesn't move. Make sure we don't beep in this scenario.
+    return caretVisualLine == EditorHelper.getVisualLineCount(editor) - 2;
   }
 
   public int moveCaretToLineWithSameColumn(@NotNull Editor editor, int logicalLine, @NotNull Caret caret) {

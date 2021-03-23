@@ -28,6 +28,7 @@ import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
+import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -825,23 +826,6 @@ public class EditorHelper {
     scrollHorizontally(editor, targetColumnRightX - screenWidth);
   }
 
-  /**
-   * Scrolls the screen up or down one or more pages.
-   *
-   * @param editor The editor to scroll
-   * @param pages  The number of pages to scroll. Positive is scroll down (lines move up). Negative is scroll up.
-   * @return The visual line to place the caret on. -1 if the page wasn't scrolled at all.
-   */
-  public static int scrollFullPage(final @NotNull Editor editor, int pages) {
-    if (pages > 0) {
-      return scrollFullPageDown(editor, pages);
-    }
-    else if (pages < 0) {
-      return scrollFullPageUp(editor, pages);
-    }
-    return -1;  // visual lines are 1-based
-  }
-
   public static int lastColumnForLine(final @NotNull Editor editor, int line, boolean allowEnd) {
     return editor.offsetToVisualPosition(EditorHelper.getLineEndOffset(editor, line, allowEnd)).column;
   }
@@ -882,75 +866,99 @@ public class EditorHelper {
     UserDataManager.setVimLastColumn(caret, prevLastColumn);
   }
 
-  private static int scrollFullPageDown(final @NotNull Editor editor, int pages) {
+  /**
+   * Scroll page down, moving text up.
+   *
+   * @param editor  The editor to scroll
+   * @param pages   How many pages to scroll
+   * @return A pair consisting of a flag to show if scrolling was completed, and a visual line to position the cart on
+   */
+  public static Pair<Boolean, Integer> scrollFullPageDown(final @NotNull Editor editor, int pages) {
     final Rectangle visibleArea = getVisibleArea(editor);
     final int lastVisualLine = getVisualLineCount(editor) - 1;
-
-    if (editor.getCaretModel().getVisualPosition().line == lastVisualLine) return -1;
 
     int y = visibleArea.y + visibleArea.height;
     int topBound = visibleArea.y;
     int bottomBound = visibleArea.y + visibleArea.height;
-    int line = 0;
-    int caretLine = -1;
+    int targetTopVisualLine = 0;
+    int caretVisualLine = -1;
+    boolean completed = true;
 
     for (int i = 0; i < pages; i++) {
-      line = getFullVisualLine(editor, y, topBound, bottomBound);
-      if (line >= lastVisualLine) {
-        // If we're on the last page, end nicely on the last line, otherwise return the overrun so we can "beep"
+      targetTopVisualLine = getFullVisualLine(editor, y, topBound, bottomBound);
+      if (targetTopVisualLine >= lastVisualLine) {
+        // If we're on the last page, end nicely on the last line, otherwise move the caret to the last line of the file
         if (i == pages - 1) {
-          caretLine = lastVisualLine;
+          caretVisualLine = lastVisualLine;
         }
         else {
-          caretLine = line;
+          caretVisualLine = getVisualLineCount(editor) - 1;
+          completed = false;
         }
+        targetTopVisualLine = lastVisualLine;
         break;
       }
 
       // The help page for 'scrolling' states that a page is the number of lines in the window minus two. Scrolling a
-      // page adds this page length to the current line. Or in other words, scrolling down a page puts the last but one
-      // line at the top of the next page.
+      // page adds this page length to the current targetTopVisualLine. Or in other words, scrolling down a page puts
+      // the last but one targetTopVisualLine at the top of the next page.
       // E.g. a window showing lines 1-35 has a page size of 33, and scrolling down a page shows 34 as the top line
-      line--;
+      targetTopVisualLine--;
 
-      y = editor.visualLineToY(line);
+      y = editor.visualLineToY(targetTopVisualLine);
       topBound = y;
       bottomBound = y + visibleArea.height;
       y = bottomBound;
-      caretLine = line;
+      caretVisualLine = targetTopVisualLine;
     }
 
-    scrollVisualLineToTopOfScreen(editor, line);
-    return caretLine;
+    scrollVisualLineToTopOfScreen(editor, targetTopVisualLine);
+    return new Pair<>(completed, caretVisualLine);
   }
 
-  private static int scrollFullPageUp(final @NotNull Editor editor, int pages) {
+  /**
+   * Scroll page up, moving text down.
+   *
+   * @param editor  The editor to scroll
+   * @param pages   How many pages to scroll
+   * @return A pair consisting of a flag to show if scrolling was completed, and a visual line to position the cart on
+   */
+  public static Pair<Boolean, Integer> scrollFullPageUp(final @NotNull Editor editor, int pages) {
     final Rectangle visibleArea = getVisibleArea(editor);
     final int lineHeight = editor.getLineHeight();
+    final int lastVisualLine = getVisualLineCount(editor) - 1;
 
     int y = visibleArea.y;
     int topBound = visibleArea.y;
     int bottomBound = visibleArea.y + visibleArea.height;
-    int line = 0;
-    int caretLine = -1;
+    int targetBottomVisualLine = 0;
+    int caretVisualLine = -1;
+    boolean completed = true;
 
-    // We know pages is negative
-    for (int i = pages; i < 0; i++) {
-      // E.g. a window showing 73-107 has page size 33. Scrolling up puts 74 at the bottom of the screen
-      line = getFullVisualLine(editor, y, topBound, bottomBound) + 1;
-      if (line == 1) {
+    for (int i = 0; i < pages; i++) {
+      // Scrolling up puts the current top line plus one at the bottom of the screen
+      targetBottomVisualLine = getFullVisualLine(editor, y, topBound, bottomBound) + 1;
+      if (targetBottomVisualLine == 1) {
+        completed = i == pages - 1;
         break;
       }
+      else if (targetBottomVisualLine == lastVisualLine) {
+        // Vim normally scrolls up window height minus two. When there are only one or two lines in the screen, due to
+        // end of file and virtual space, it scrolls window height minus one, or just plain windows height. IntelliJ
+        // doesn't allow us only one line when virtual space is enabled, so we only need to handle the two line case.
+        // Subtract the +1 we added above.
+        targetBottomVisualLine--;
+      }
 
-      y = editor.visualLineToY(line);
+      y = editor.visualLineToY(targetBottomVisualLine);
       bottomBound = y + lineHeight;
       topBound = bottomBound - visibleArea.height;
       y = topBound;
-      caretLine = line;
+      caretVisualLine = targetBottomVisualLine;
     }
 
-    scrollVisualLineToBottomOfScreen(editor, line);
-    return caretLine;
+    scrollVisualLineToBottomOfScreen(editor, targetBottomVisualLine);
+    return new Pair<>(completed, caretVisualLine);
   }
 
   private static int getFullVisualLine(final @NotNull Editor editor, int y, int topBound, int bottomBound) {
