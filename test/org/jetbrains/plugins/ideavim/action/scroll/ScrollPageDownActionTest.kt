@@ -18,7 +18,6 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager

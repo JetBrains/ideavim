@@ -18,9 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -182,7 +180,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     typeText(parseKeys("20<C-B>"))
     // Essentially, move top line up a multiple of (window height minus 2) +1. Not sure where the +1 comes from, but it
     // matches Vim behaviour
-    assertPosition(18, 0)  // Hard to explain, but matches Vim
+    assertPosition(18, 0) // Hard to explain, but matches Vim
     assertVisibleArea(0, 34)
     assertPluginError(true)
   }
@@ -193,7 +191,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     typeText(parseKeys("20<C-B>"))
     // Essentially, move top line up a multiple of (window height minus 2) +1. Not sure where the +1 comes from, but it
     // matches Vim behaviour
-    assertPosition(34, 0)  // Hard to explain, but matches Vim
+    assertPosition(34, 0) // Hard to explain, but matches Vim
     assertVisibleArea(0, 34)
     assertPluginError(true)
   }
