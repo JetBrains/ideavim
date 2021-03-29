@@ -108,7 +108,19 @@ object VimRcFileState {
 
 class ReloadVimRc : DumbAwareAction() {
   override fun update(e: AnActionEvent) {
-    val editor = e.getData(PlatformDataKeys.EDITOR) ?: return
+    val editor = e.getData(PlatformDataKeys.EDITOR) ?: run {
+      e.presentation.isEnabledAndVisible = false
+      return
+    }
+    val virtualFile = e.getData(PlatformDataKeys.VIRTUAL_FILE) ?: run {
+      e.presentation.isEnabledAndVisible = false
+      return
+    }
+
+    if (virtualFile.path != VimRcFileState.filePath) {
+      e.presentation.isEnabledAndVisible = false
+      return
+    }
 
     // XXX: Actually, it worth to add e.presentation.description, but it doesn't work because of some reason
     val sameDoc = VimRcFileState.equalTo(editor.document)
@@ -116,8 +128,7 @@ class ReloadVimRc : DumbAwareAction() {
     e.presentation.text = if (sameDoc) MessageHelper.message("action.no.changes.text")
     else MessageHelper.message("action.reload.text")
 
-    val virtualFile = e.getData(PlatformDataKeys.VIRTUAL_FILE)
-    e.presentation.isEnabledAndVisible = virtualFile != null && virtualFile.path == VimRcFileState.filePath
+    e.presentation.isEnabledAndVisible = true
   }
 
   override fun actionPerformed(e: AnActionEvent) {
