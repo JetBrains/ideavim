@@ -34,8 +34,16 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissin
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
-import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.SearchHelper
+import com.maddyhome.idea.vim.helper.SearchOptions
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.endOffsetInclusive
+import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.userData
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.annotations.NonNls
 import java.lang.Integer.min
@@ -254,7 +262,8 @@ class VimMultipleCursorsExtension : VimExtension {
       val primaryCaret = editor.caretModel.primaryCaret
       val selectedText = primaryCaret.selectedText ?: return
 
-      val nextOffset = findNextOccurrence(editor, primaryCaret.offset, selectedText, editor.vimMultipleCursorsWholeWord ?: false)
+      val nextOffset =
+        findNextOccurrence(editor, primaryCaret.offset, selectedText, editor.vimMultipleCursorsWholeWord ?: false)
       if (nextOffset != -1) {
         editor.caretModel.allCarets.forEach {
           if (it.selectionStart == nextOffset) {
