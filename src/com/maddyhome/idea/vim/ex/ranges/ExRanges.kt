@@ -244,8 +244,11 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
     return getRangeLine(editor, editor.caretModel.currentCaret, lastZero)
   }
 
-  override fun getRangeLine(editor: Editor,
-    caret: Caret, lastZero: Boolean): Int {
+  override fun getRangeLine(
+    editor: Editor,
+    caret: Caret,
+    lastZero: Boolean
+  ): Int {
     var line = caret.logicalPosition.line
     var searchOffset = -1
     for (i in patterns.indices) {
