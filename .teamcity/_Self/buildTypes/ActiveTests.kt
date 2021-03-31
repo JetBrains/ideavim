@@ -24,7 +24,7 @@ sealed class ActiveTests(buildName: String, ijVersion: String) : BuildType({
 
   steps {
     gradle {
-      tasks = "clean check"
+      tasks = "clean check -x detekt ktlintCheck"
       buildFile = ""
       enableStacktrace = true
       param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
