@@ -22,8 +22,8 @@ package org.jetbrains.plugins.ideavim.action.motion.gn
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.noneOfEnum
 import org.jetbrains.plugins.ideavim.VimTestCase
 import javax.swing.KeyStroke
 
@@ -54,13 +54,18 @@ class GnPreviousTextObjectTest : VimTestCase() {
     )
   }
 
-  private fun doTestWithSearch(
-    keys: List<KeyStroke>,
-    before: String,
-    after: String
-  ) {
+  fun `test gn uses last used pattern not just search pattern`() {
+    doTest(
+      listOf("/is<CR>", ":s/test/tester/<CR>", "$", "dgN"),
+      "Hello, ${c}this is a test here",
+      "Hello, this is a ${c}er here",
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
+  }
+
+  private fun doTestWithSearch(keys: List<KeyStroke>, before: String, after: String) {
     configureByText(before)
-    VimPlugin.getSearch().search(myFixture.editor, "test", 1, noneOfEnum(), false)
+    VimPlugin.getSearch().setLastSearchState(myFixture.editor, "test", "", Direction.FORWARDS)
     typeText(keys)
     myFixture.checkResult(after)
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)

@@ -25,15 +25,14 @@ import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
-import java.util.*
 
 /**
  * @author Alex Plate
@@ -108,6 +107,7 @@ class SearchGroupTest : VimTestCase() {
       0
     )
     assertEquals(-1, pos)
+    assertPluginErrorMessageContains("Pattern not found: (found)")
   }
 
   // VIM-528
@@ -1417,6 +1417,7 @@ class SearchGroupTest : VimTestCase() {
   private fun clearHighlightSearch() = OptionsManager.hlsearch.reset()
   private fun setIncrementalSearch() = OptionsManager.incsearch.set()
 
+  // TODO: Remove these search methods and test by invoking VIM commands rather than calling APIs
   private fun search(pattern: String, input: String, expectedLocation: Int): Int {
     myFixture.configureByText("a.java", input)
     val editor = myFixture.editor
@@ -1426,7 +1427,8 @@ class SearchGroupTest : VimTestCase() {
     RunnableHelper.runReadCommand(
       project,
       Runnable {
-        val n = searchGroup.search(editor, pattern, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
+        // Does not move the caret!
+        val n = searchGroup.processSearchCommand(editor, pattern, myFixture.caretOffset, Direction.FORWARDS)
         ref.set(n)
       },
       null, null
@@ -1449,7 +1451,8 @@ class SearchGroupTest : VimTestCase() {
     RunnableHelper.runReadCommand(
       project,
       Runnable {
-        val n = searchGroup.search(editor, pattern, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
+        // Does not move the caret!
+        val n = searchGroup.processSearchCommand(editor, pattern, myFixture.caretOffset, Direction.FORWARDS)
         ref.set(n)
       },
       null, null

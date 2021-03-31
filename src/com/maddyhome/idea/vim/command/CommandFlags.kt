@@ -69,13 +69,6 @@ enum class CommandFlags {
   FLAG_IGNORE_SCROLL_JUMP,
   FLAG_IGNORE_SIDE_SCROLL_JUMP,
 
-  // TODO REMOVE!
-  /**
-   * Search Flags
-   */
-  FLAG_SEARCH_FWD,
-  FLAG_SEARCH_REV,
-
   /**
    * Command exits the visual mode, so caret movement shouldn't update visual selection
    */
@@ -95,7 +88,16 @@ enum class CommandFlags {
    * Indicate that the character argument may come from a digraph
    */
   FLAG_ALLOW_DIGRAPH,
+
+  /**
+   * Indicates that a command handles completing ex input.
+   *
+   * When performing a search, the search action command requires an EX_STRING as input. This is completed by a command
+   * that has FLAG_COMPLETE_EX. That command isn't called and the ex string becomes an argument for the previous command
+   * that started the EX_STRING.
+   */
   FLAG_COMPLETE_EX,
+
   FLAG_TEXT_BLOCK,
 
   /**

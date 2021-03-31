@@ -38,6 +38,6 @@ class ChangeLastGlobalSearchReplaceAction : ChangeEditorActionHandler.SingleExec
   ): Boolean {
     val range = LineRange(0, EditorHelper.getLineCount(editor) - 1)
     return VimPlugin.getSearch()
-      .searchAndReplace(editor, editor.caretModel.primaryCaret, range, "s", "//~/&")
+      .processSubstituteCommand(editor, editor.caretModel.primaryCaret, range, "s", "//~/&")
   }
 }
