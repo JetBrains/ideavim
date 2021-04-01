@@ -1250,7 +1250,12 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     }
 
     Element dir = search.getChild("last-dir");
-    lastDir = Direction.Companion.fromInt(Integer.parseInt(dir.getText()));
+    try {
+      lastDir = Direction.Companion.fromInt(Integer.parseInt(dir.getText()));
+    }
+    catch (NumberFormatException e) {
+      lastDir = Direction.FORWARDS;
+    }
 
     Element show = search.getChild("show-last");
     final ListOption vimInfo = OptionsManager.INSTANCE.getViminfo();
