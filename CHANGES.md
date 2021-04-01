@@ -24,6 +24,8 @@ usual beta standards.
 
 ## To Be Released
 
+Not a lot of changes for this release. Focused on internal improvements.
+
 ### Features:
 * Support `startofline` option
 
