@@ -32,6 +32,7 @@ usual beta standards.
 
 ### Merged PRs:
 * [275](https://github.com/JetBrains/ideavim/pull/275) by [Matt Ellis](https://github.com/citizenmatt): Fix edge cases for H, L and M and introduce 'startofline' option
+* [276](https://github.com/JetBrains/ideavim/pull/276) by [Matt Ellis](https://github.com/citizenmatt): More refactoring of SearchGroup
 
 ## 0.65, 2021-02-17
 
