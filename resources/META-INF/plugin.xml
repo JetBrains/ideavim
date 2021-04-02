@@ -21,11 +21,11 @@
      <ul>
      <li>
        <a href="https://github.com/JetBrains/ideavim/pull/275">275</a>
-       by <a href="https://github.com/citizenmatt">大牙(Matt Ellis)</a>: Fix edge cases for H, L and M and introduce 'startofline' option
+       by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Fix edge cases for H, L and M and introduce 'startofline' option
      </li>
      <li>
        <a href="https://github.com/JetBrains/ideavim/pull/276">276</a>
-       by <a href="https://github.com/citizenmatt">大牙(Matt Ellis)</a>: More refactoring of SearchGroup
+       by <a href="https://github.com/citizenmatt">Matt Ellis</a>: More refactoring of SearchGroup
      </li>
      </ul>
     ]]>
