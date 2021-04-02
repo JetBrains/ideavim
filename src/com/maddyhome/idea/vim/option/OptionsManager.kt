@@ -97,6 +97,8 @@ object OptionsManager {
   // This should be removed in the next versions
   val ideacopypreprocess = addOption(ToggleOption("ideacopypreprocess", "ideacopypreprocess", false))
 
+  val ideatracetime = addOption(ToggleOption("ideatracetime", "ideatracetime", false))
+
   fun isSet(name: String): Boolean {
     val option = getOption(name)
     return option is ToggleOption && option.getValue()

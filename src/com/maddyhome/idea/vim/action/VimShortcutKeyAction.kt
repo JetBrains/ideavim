@@ -55,6 +55,8 @@ import javax.swing.KeyStroke
  * These keys are not passed to [com.maddyhome.idea.vim.VimTypedActionHandler] and should be handled by actions.
  */
 class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
+  private val traceTime = OptionsManager.ideatracetime.isSet
+
   override fun actionPerformed(e: AnActionEvent) {
     val editor = getEditor(e)
     val keyStroke = getKeyStroke(e)
@@ -65,7 +67,12 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
       }
       // Should we use HelperKt.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
       try {
+        val start = if (traceTime) System.currentTimeMillis() else null
         KeyHandler.getInstance().handleKey(editor, keyStroke, EditorDataContext.init(editor, e.dataContext))
+        if (start != null) {
+          val duration = System.currentTimeMillis() - start
+          ourLogger.info("VimShortcut update '$keyStroke': $duration ms")
+        }
       } catch (ignored: ProcessCanceledException) {
         // Control-flow exceptions (like ProcessCanceledException) should never be logged
         // See {@link com.intellij.openapi.diagnostic.Logger.checkException}
@@ -76,7 +83,13 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   }
 
   override fun update(e: AnActionEvent) {
+    val start = if (traceTime) System.currentTimeMillis() else null
     e.presentation.isEnabled = isEnabled(e)
+    if (start != null) {
+      val keyStroke = getKeyStroke(e)
+      val duration = System.currentTimeMillis() - start
+      ourLogger.info("VimShortcut update '$keyStroke': $duration ms")
+    }
   }
 
   private fun isEnabled(e: AnActionEvent): Boolean {
