@@ -89,6 +89,7 @@ Here are some examples of supported vim features and commands:
 [Emulated Vim plugins](https://github.com/JetBrains/ideavim/wiki/Emulated-plugins):
 
 * vim-easymotion
+* NERDTree
 * vim-surround
 * vim-multiple-cursors
 * vim-commentary
