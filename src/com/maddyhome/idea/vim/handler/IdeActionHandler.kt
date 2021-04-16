@@ -15,26 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.maddyhome.idea.vim.action.change.insert
+
+package com.maddyhome.idea.vim.handler
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.helper.getTopLevelEditor
-import java.util.*
 
-class InsertEnterAction : VimActionHandler.SingleExecution() {
-  override val type: Command.Type = Command.Type.INSERT
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
-
+/**
+ * Base class for Vim commands handled by existing IDE actions.
+ */
+abstract class IdeActionHandler(private val actionName: String) : VimActionHandler.SingleExecution() {
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    VimPlugin.getChange().processEnter(editor.getTopLevelEditor(), context)
+    KeyHandler.executeAction(actionName, context)
     MotionGroup.scrollCaretIntoView(editor)
     return true
   }

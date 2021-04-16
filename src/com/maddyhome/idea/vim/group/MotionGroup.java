@@ -186,11 +186,13 @@ public class MotionGroup {
     final int topVisualLine = getVisualLineAtTopOfScreen(editor);
     final int bottomVisualLine = getVisualLineAtBottomOfScreen(editor);
     final int caretVisualLine = editor.getCaretModel().getVisualPosition().line;
+    final int lastVisualLine = EditorHelper.getVisualLineCount(editor) - 1;
+
     final int newVisualLine;
     if (caretVisualLine < topVisualLine + scrollOffset) {
       newVisualLine = normalizeVisualLine(editor, topVisualLine + scrollOffset);
     }
-    else if (caretVisualLine > bottomVisualLine - scrollOffset) {
+    else if (bottomVisualLine < lastVisualLine && caretVisualLine > bottomVisualLine - scrollOffset) {
       newVisualLine = normalizeVisualLine(editor, bottomVisualLine - scrollOffset);
     }
     else {
@@ -211,7 +213,7 @@ public class MotionGroup {
     int newColumn = caretColumn;
 
     // TODO: Visual column arithmetic will be inaccurate as it include columns for inlays and folds
-    if (caretColumn < leftVisualColumn + sideScrollOffset) {
+    if (leftVisualColumn > 0 && caretColumn < leftVisualColumn + sideScrollOffset) {
       newColumn = leftVisualColumn + sideScrollOffset;
     }
     else if (caretColumn > rightVisualColumn - sideScrollOffset) {
@@ -305,15 +307,18 @@ public class MotionGroup {
       return;
     }
 
-    // Always move the caret. It will be smart enough to not do anything if the offsets are the same, but it will also
-    // ensure that it's in the correct location relative to any inline inlays
+    // Make sure to always reposition the caret, even if the offset hasn't changed. We might need to reposition due to
+    // changes in surrounding text, especially with inline inlays.
     final int oldOffset = caret.getOffset();
     InlayHelperKt.moveToInlayAwareOffset(caret, offset);
     if (oldOffset != offset) {
       UserDataManager.setVimLastColumn(caret, InlayHelperKt.getInlayAwareVisualColumn(caret));
-      if (caret == editor.getCaretModel().getPrimaryCaret()) {
-        scrollCaretIntoView(editor);
-      }
+    }
+
+    // Similarly, always make sure the caret is positioned within the view. Adding or removing text could move the caret
+    // position relative to the view, without changing offset.
+    if (caret == editor.getCaretModel().getPrimaryCaret()) {
+      scrollCaretIntoView(editor);
     }
 
     if (CommandStateHelper.inVisualMode(editor) || CommandStateHelper.inSelectMode(editor)) {
@@ -644,10 +649,9 @@ public class MotionGroup {
     // Ironically, after figuring out how Vim's algorithm works (although not *why*) and reimplementing, it looks likely
     // that this needs to be replaced as a more or less dumb line for line rewrite.
 
-    // This algorithm is based on screen height, so get the non-normalised line number at the bottom of the screen, even
-    // if the text ends sooner
     final int topLine = getVisualLineAtTopOfScreen(editor);
-    final int bottomLine = getNonNormalizedVisualLineAtBottomOfScreen(editor);
+    final int bottomLine = getVisualLineAtBottomOfScreen(editor);
+    final int lastLine = EditorHelper.getLineCount(editor) - 1;
 
     // We need the non-normalised value here, so we can handle cases such as so=999 to keep the current line centred
     final int scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();
@@ -659,11 +663,11 @@ public class MotionGroup {
     // 100. It also handles so=999 keeping the current line centred.
     // Note that block inlays means that the pixel height we are scrolling can be larger than half the screen, even if
     // the number of lines is less. I'm not sure what impact this has.
-    final int height = bottomLine - topLine + 1;
+    final int height = getNonNormalizedVisualLineAtBottomOfScreen(editor) - topLine + 1;
 
     // Scrolljump isn't handled as you might expect. It is the minimal number of lines to scroll, but that doesn't mean
     // newLine = caretLine +/- MAX(sj, so)
-    //
+    // <editor-fold desc="// Details">
     // When scrolling up (`k` - scrolling window up in the buffer; more lines are visible at the top of the window), Vim
     // will start at the new cursor line and repeatedly advance lines above and below. The new top line must be at least
     // scrolloff above caretLine. If this takes the new top line above the current top line, we must scroll at least
@@ -685,6 +689,7 @@ public class MotionGroup {
     // On top of that, if the scroll distance is "too large", the new cursor line is positioned in the centre of the
     // screen. What "too large" means depends on scroll direction. There is an initial approximate check before working
     // out correct scroll locations
+    // </editor-fold>
     final int scrollJump = getScrollJump(editor, height);
 
     // Unavoidable fudge value. Multiline rendered doc comments can mean we have very few actual lines, and scrolling
@@ -702,12 +707,12 @@ public class MotionGroup {
     // optionally checks and moves the top line, then optionally checks the bottom line. This gives us the same results
     // via the tests.
     if (height > inlayAwareMinHeightFudge && scrollOffset > height / 2) {
-      scrollVisualLineToMiddleOfScreen(editor, caretLine);
+      scrollVisualLineToMiddleOfScreen(editor, caretLine, false);
     } else if (caretLine < topBound) {
       // Scrolling up, put the cursor at the top of the window (minus scrolloff)
       // Initial approximation in move.c:update_topline (including same calculation for halfHeight)
       if (topLine + scrollOffset - caretLine >= max(2, (height / 2) - 1)) {
-        scrollVisualLineToMiddleOfScreen(editor, caretLine);
+        scrollVisualLineToMiddleOfScreen(editor, caretLine, false);
       }
       else {
         // New top line must be at least scrolloff above caretLine. If this is above current top line, we must scroll
@@ -724,20 +729,21 @@ public class MotionGroup {
         final int usedBelow = min(scrollOffset, getVisualLineCount(editor) - caretLine);
         final int used = 1 + usedAbove + usedBelow;
         if (used > height) {
-          scrollVisualLineToMiddleOfScreen(editor, caretLine);
+          scrollVisualLineToMiddleOfScreen(editor, caretLine, false);
         }
         else {
           scrollVisualLineToTopOfScreen(editor, newTopLine);
         }
       }
     }
-    else if (caretLine > bottomBound) {
+    else if (caretLine > bottomBound && bottomLine < lastLine) {
       // Scrolling down, put the cursor at the bottom of the window (minus scrolloff)
+      // Do nothing if the bottom of the file is already above the bottom of the screen
       // Vim does a quick approximation before going through the full algorithm. It checks the line below the bottom
       // line in the window (bottomLine + 1). See move.c:update_topline
       int lineCount = caretLine - (bottomLine + 1) + 1 + scrollOffset;
       if (lineCount > height) {
-        scrollVisualLineToMiddleOfScreen(editor, caretLine);
+        scrollVisualLineToMiddleOfScreen(editor, caretLine, false);
       } else {
         // Vim expands out from caretLine at least scrolljump lines. It stops expanding above when it hits the
         // current bottom line, or (because it's expanding above and below) when it's scrolled scrolljump/2. It expands
@@ -760,7 +766,7 @@ public class MotionGroup {
         // scroll more than a screen full or more than scrolloff, redraw with the cursor in the middle of the screen.
         lineCount = used > height ? used : scrolled;
         if (lineCount >= height && lineCount > scrollOffset) {
-          scrollVisualLineToMiddleOfScreen(editor, caretLine);
+          scrollVisualLineToMiddleOfScreen(editor, caretLine, false);
         }
         else {
           scrollVisualLineToBottomOfScreen(editor, caretLine + extra);
@@ -842,7 +848,7 @@ public class MotionGroup {
       scrollVisualLineToTopOfScreen(editor, visualLine + lines);
     }
     else {
-      final int visualLine = getVisualLineAtBottomOfScreen(editor);
+      final int visualLine = getNonNormalizedVisualLineAtBottomOfScreen(editor);
       scrollVisualLineToBottomOfScreen(editor, visualLine + lines);
     }
 
@@ -1077,37 +1083,50 @@ public class MotionGroup {
   }
 
   public boolean scrollFullPage(@NotNull Editor editor, @NotNull Caret caret, int pages) {
-    int caretVisualLine = EditorHelper.scrollFullPage(editor, pages);
-    if (caretVisualLine != -1) {
-      final int scrollOffset = getNormalizedScrollOffset(editor);
-      boolean success = true;
+    assert pages != 0;
+    return pages > 0 ? scrollFullPageDown(editor, caret, pages) : scrollFullPageUp(editor, caret, Math.abs(pages));
+  }
 
-      if (pages > 0) {
-        // If the caret is ending up passed the end of the file, we need to beep
-        if (caretVisualLine > getVisualLineCount(editor) - 1) {
-          success = false;
-        }
+  private boolean scrollFullPageDown(@NotNull Editor editor, @NotNull Caret caret, int pages) {
+    final Pair<Boolean, Integer> result = EditorHelper.scrollFullPageDown(editor, pages);
 
-        int topVisualLine = getVisualLineAtTopOfScreen(editor);
-        if (caretVisualLine < topVisualLine + scrollOffset) {
-          caretVisualLine = normalizeVisualLine(editor, caretVisualLine + scrollOffset);
-        }
-      }
-      else if (pages < 0) {
-        int bottomVisualLine = getVisualLineAtBottomOfScreen(editor);
-        if (caretVisualLine > bottomVisualLine - scrollOffset) {
-          caretVisualLine = normalizeVisualLine(editor, caretVisualLine - scrollOffset);
-        }
-      }
+    final int scrollOffset = getNormalizedScrollOffset(editor);
+    final int topVisualLine = getVisualLineAtTopOfScreen(editor);
+    int caretVisualLine = result.getSecond();
+    if (caretVisualLine < topVisualLine + scrollOffset) {
+      caretVisualLine = normalizeVisualLine(editor, caretVisualLine + scrollOffset);
+    }
 
-      int offset = moveCaretToLineWithStartOfLineOption(editor,
-                                                        visualLineToLogicalLine(editor, caretVisualLine),
-                                                        caret);
+    if (caretVisualLine != caret.getVisualPosition().line) {
+      final int offset = moveCaretToLineWithStartOfLineOption(editor, visualLineToLogicalLine(editor, caretVisualLine), caret);
       moveCaret(editor, caret, offset);
-      return success;
+      return result.getFirst();
     }
 
     return false;
+  }
+
+  private boolean scrollFullPageUp(@NotNull Editor editor, @NotNull Caret caret, int pages) {
+    final Pair<Boolean, Integer> result = EditorHelper.scrollFullPageUp(editor, pages);
+
+    final int scrollOffset = getNormalizedScrollOffset(editor);
+    final int bottomVisualLine = getVisualLineAtBottomOfScreen(editor);
+    int caretVisualLine = result.getSecond();
+    if (caretVisualLine > bottomVisualLine - scrollOffset) {
+      caretVisualLine = normalizeVisualLine(editor, caretVisualLine - scrollOffset);
+    }
+
+    if (caretVisualLine != caret.getVisualPosition().line && caretVisualLine != -1) {
+      final int offset = moveCaretToLineWithStartOfLineOption(editor, visualLineToLogicalLine(editor, caretVisualLine), caret);
+      moveCaret(editor, caret, offset);
+      return result.getFirst();
+    }
+
+    // We normally error if we didn't move the caret, but we have a special case for a page showing only the last two
+    // lines of the file and virtual space. Vim normally scrolls window height minus two, but when the caret is on last
+    // line minus one, this becomes window height minus one, meaning the top line of the current page becomes the bottom
+    // line of the new page, and the caret doesn't move. Make sure we don't beep in this scenario.
+    return caretVisualLine == EditorHelper.getVisualLineCount(editor) - 2;
   }
 
   public int moveCaretToLineWithSameColumn(@NotNull Editor editor, int logicalLine, @NotNull Caret caret) {
@@ -1229,10 +1248,11 @@ public class MotionGroup {
         scrollVisualLineToTopOfScreen(editor, visualLine - scrollOffset);
         break;
       case MIDDLE:
-        scrollVisualLineToMiddleOfScreen(editor, visualLine);
+        scrollVisualLineToMiddleOfScreen(editor, visualLine, true);
         break;
       case BOTTOM:
-        scrollVisualLineToBottomOfScreen(editor, visualLine + scrollOffset);
+        // Make sure we scroll to an actual line, not virtual space
+        scrollVisualLineToBottomOfScreen(editor, normalizeVisualLine(editor, visualLine + scrollOffset));
         break;
     }
 

@@ -19,6 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 // |X|
@@ -102,7 +103,7 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     // Hitting 'X' on the character before the inlay should place the cursor after the inlay
     // Before: "I fo«test:»|u|nd it in a legendary land."
     // After: "I f«test:»|u|nd it in a legendary land."
-    addInlay(4, true, 5)
+    addInlay(4, false, 5)
 
     typeText(keys)
     myFixture.checkResult(after)
@@ -112,5 +113,22 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     // 'X' moves the cursor one column to the left (along with the text), which puts it at offset 4. But offset 4 can
     // now mean visual column 3 or 4 - the inlay or the text. Make sure the cursor is positioned on the text.
     assertVisualPosition(0, 4)
+  }
+
+  fun `test deleting characters scrolls caret into view`() {
+    OptionsManager.sidescrolloff.set(5)
+    configureByText("Hello world".repeat(200))
+
+    // Scroll 70 characters to the left. First character on line should now be 71. sidescrolloff puts us at 76
+    typeText(parseKeys("70zl"))
+    assertVisualPosition(0, 75)
+    assertVisibleLineBounds(0, 70, 149)
+
+    typeText(parseKeys("20X"))
+
+    // Deleting 20 characters to the left would move us 20 characters to the left, which will force a scroll.
+    // sidescroll=0 scrolls half a page
+    assertVisualPosition(0, 55)
+    assertVisibleLineBounds(0, 15, 94)
   }
 }
