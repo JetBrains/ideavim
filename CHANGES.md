@@ -22,6 +22,15 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Fixes:
+* [VIM-2230](https://youtrack.jetbrains.com/issue/VIM-2230) Tweak caret position with inline rename options inlay
+* [VIM-2177](https://youtrack.jetbrains.com/issue/VIM-2177) Fix scrolling issues near bottom of file
+
+### Merged PRs:
+* [280](https://github.com/JetBrains/ideavim/pull/280) by [Matt Ellis](https://github.com/citizenmatt): Caret position and view scrolling fixes
+
 ## 0.66, 2021-04-09
 
 Not a lot of changes for this release. Focused on internal improvements.
