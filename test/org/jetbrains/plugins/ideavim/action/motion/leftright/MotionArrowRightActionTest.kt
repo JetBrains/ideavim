@@ -35,6 +35,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
 
   // Kotlin type hints should be an obvious example of an inlay related to preceding text, but they are actually
   // related to following (KTIJ-3768). The inline rename options inlay is a better example
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
   @VimOptionDefaultAll
   fun `test with inlay related to preceding text and block caret`() {
     val before = "I f${c}ound it in a legendary land"
@@ -58,6 +59,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     assertVisualPosition(0, 5)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
   @VimOptionDefaultAll
   fun `test with inlay related to preceding text and block caret 2`() {
     val before = "I fo${c}und it in a legendary land"
@@ -79,6 +81,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     assertVisualPosition(0, 6)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
   @VimOptionDefaultAll
   fun `test with inlay related to preceding text and bar caret`() {
     val before = "I f${c}ound it in a legendary land"
@@ -106,6 +109,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     assertVisualPosition(0, 3)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
   @VimOptionDefaultAll
   fun `test with inlay related to preceding text and bar caret 2`() {
     val before = "I fo${c}und it in a legendary land"
@@ -133,6 +137,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   // Kotlin parameter hints are a good example of inlays related to following text
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
   @VimOptionDefaultAll
   fun `test with inlay related to following text and block caret`() {
     val before = "I f${c}ound it in a legendary land"
@@ -155,6 +160,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     assertVisualPosition(0, 5)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
   @VimOptionDefaultAll
   fun `test with inlay related to following text and bar caret`() {
     val before = "I f${c}ound it in a legendary land"
