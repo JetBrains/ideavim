@@ -27,9 +27,11 @@ usual beta standards.
 ### Fixes:
 * [VIM-2230](https://youtrack.jetbrains.com/issue/VIM-2230) Tweak caret position with inline rename options inlay
 * [VIM-2177](https://youtrack.jetbrains.com/issue/VIM-2177) Fix scrolling issues near bottom of file
+* [VIM-2276](https://youtrack.jetbrains.com/issue/VIM-2276) `:ls` returns correct path for files on Microsoft Windows.
 
 ### Merged PRs:
 * [280](https://github.com/JetBrains/ideavim/pull/280) by [Matt Ellis](https://github.com/citizenmatt): Caret position and view scrolling fixes
+* [289](https://github.com/JetBrains/ideavim/pull/289) by [MichalPlacek](https://github.com/MichalPlacek): VIM-2276 ls returns "absolute path" for files on Microsoft Windows.
 
 ## 0.66, 2021-04-09
 
