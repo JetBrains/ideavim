@@ -24,7 +24,9 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotionOrNoMotion
 import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
@@ -39,8 +41,8 @@ class SearchWholeWordForwardAction : MotionActionHandler.ForEachCaret() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
-    return VimPlugin.getSearch().searchWord(editor, caret, count, true, Direction.FORWARDS)
+  ): Motion {
+    return VimPlugin.getSearch().searchWord(editor, caret, count, true, Direction.FORWARDS).toMotionOrNoMotion()
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

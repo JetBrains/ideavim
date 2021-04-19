@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 
@@ -44,7 +45,9 @@ class MotionShiftRightAction : ShiftedArrowKeyHandler() {
   override fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command) {
     editor.vimForEachCaret { caret ->
       val newOffset = VimPlugin.getMotion().findOffsetOfNextWord(editor, caret.offset, cmd.count, false)
-      MotionGroup.moveCaret(editor, caret, newOffset)
+      if (newOffset is Motion.AbsoluteOffset) {
+        MotionGroup.moveCaret(editor, caret, newOffset.offset)
+      }
     }
   }
 }

@@ -25,7 +25,9 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
@@ -39,8 +41,8 @@ class MotionFirstColumnAction : MotionActionHandler.ForEachCaret() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
-    return VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
+  ): Motion {
+    return VimPlugin.getMotion().moveCaretToLineStart(editor, caret).toMotion()
   }
 }
 
@@ -56,7 +58,7 @@ class MotionFirstColumnInsertModeAction : MotionActionHandler.ForEachCaret() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
-    return VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
+  ): Motion {
+    return VimPlugin.getMotion().moveCaretToLineStart(editor, caret).toMotion()
   }
 }

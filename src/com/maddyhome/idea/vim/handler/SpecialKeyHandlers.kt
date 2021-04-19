@@ -125,7 +125,7 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
+  ): Motion {
     val keymodel = OptionsManager.keymodel
     if (editor.inSelectMode && (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel)) {
       editor.exitSelectMode(false)
@@ -134,7 +134,7 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
       editor.exitVisualMode()
     }
 
-    return offset(editor, caret, context, count, rawCount, argument)
+    return offset(editor, caret, context, count, rawCount, argument).toMotionOrError()
   }
 
   /**

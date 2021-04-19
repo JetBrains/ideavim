@@ -59,6 +59,7 @@ import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.Motion;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimInsertListener;
@@ -378,7 +379,13 @@ public class ChangeGroup {
         deleteTo = pointer + 1;
       }
       else {
-        deleteTo = VimPlugin.getMotion().findOffsetOfNextWord(editor, pointer + 1, -1, false);
+        Motion motion = VimPlugin.getMotion().findOffsetOfNextWord(editor, pointer + 1, -1, false);
+        if (motion instanceof Motion.AbsoluteOffset) {
+          deleteTo = ((Motion.AbsoluteOffset)motion).getOffset();
+        }
+        else {
+          return false;
+        }
       }
     }
     if (deleteTo < 0) {

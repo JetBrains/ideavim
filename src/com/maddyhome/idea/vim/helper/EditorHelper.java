@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.awt.*;
 import java.nio.CharBuffer;
@@ -304,7 +305,7 @@ public class EditorHelper {
    * @param line   The logical line to get the start offset for.
    * @return 0 if line is &lt 0, file size of line is bigger than file, else the start offset for the line
    */
-  public static int getLineStartOffset(final @NotNull Editor editor, final int line) {
+  public static @Range(from = 0, to = Integer.MAX_VALUE) int getLineStartOffset(final @NotNull Editor editor, final int line) {
     if (line < 0) {
       return 0;
     }
@@ -440,7 +441,7 @@ public class EditorHelper {
     return getLeadingCharacterOffset(editor, line, 0);
   }
 
-  public static int getLeadingCharacterOffset(final @NotNull Editor editor, final int line, final int col) {
+  public static @Range(from = 0, to = Integer.MAX_VALUE) int getLeadingCharacterOffset(final @NotNull Editor editor, final int line, final int col) {
     int start = getLineStartOffset(editor, line) + col;
     int end = getLineEndOffset(editor, line, true);
     CharSequence chars = editor.getDocument().getCharsSequence();

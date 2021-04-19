@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
@@ -38,8 +39,9 @@ class MotionMethodNextEndAction : MotionActionHandler.ForEachCaret() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
-    return VimPlugin.getMotion().moveCaretToMethodEnd(editor, caret, count)
+  ): Motion {
+    val moveCaretToMethodEnd = VimPlugin.getMotion().moveCaretToMethodEnd(editor, caret, count)
+    return if (moveCaretToMethodEnd < 0) Motion.Error else Motion.AbsoluteOffset(moveCaretToMethodEnd)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

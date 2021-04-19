@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.awt.event.KeyEvent
@@ -43,7 +44,7 @@ class MotionWordRightAction : MotionActionHandler.ForEachCaret() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
+  ): Motion {
     return VimPlugin.getMotion().findOffsetOfNextWord(editor, caret.offset, count, false)
   }
 }
@@ -65,7 +66,7 @@ class MotionWordRightInsertAction : MotionActionHandler.ForEachCaret(), Complica
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
+  ): Motion {
     return VimPlugin.getMotion().findOffsetOfNextWord(editor, caret.offset, count, false)
   }
 }
