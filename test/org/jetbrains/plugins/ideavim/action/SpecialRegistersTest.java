@@ -176,25 +176,36 @@ public class SpecialRegistersTest extends VimTestCase {
   public void testSearchRegisterAfterSearch() {
     configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n");
     enterSearch("three", true);
-    assertEquals("three",getRegisterText(RegisterGroup.LAST_SEARCH_REGISTER));
+    assertEquals("three", getRegisterText(RegisterGroup.LAST_SEARCH_REGISTER));
   }
 
   public void testSearchRegisterAfterSubstitute() {
     configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n");
     enterCommand("%s/three/3/g");
-    assertEquals("three",getRegisterText(RegisterGroup.LAST_SEARCH_REGISTER));
+    assertEquals("three", getRegisterText(RegisterGroup.LAST_SEARCH_REGISTER));
   }
 
   public void testSearchRegisterAfterSearchRange() {
     configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n");
     enterCommand("/three/d");
-    assertEquals("three",getRegisterText(RegisterGroup.LAST_SEARCH_REGISTER));
+    assertEquals("three", getRegisterText(RegisterGroup.LAST_SEARCH_REGISTER));
   }
 
   public void testSearchRegisterAfterMultipleSearchRanges() {
     configureByText("<caret>one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n");
     enterCommand("/one/;/three/d");
-    assertEquals("three",getRegisterText(RegisterGroup.LAST_SEARCH_REGISTER));
+    assertEquals("three", getRegisterText(RegisterGroup.LAST_SEARCH_REGISTER));
+  }
+
+  public void testLastInsertedTextRegister() {
+    configureByText("<caret>");
+
+    typeText(parseKeys("i", "abc", "<Esc>"));
+
+    assertEquals("abc", getRegisterText('.'));
+
+    assertRegisterChanged(RegisterGroup.LAST_INSERTED_TEXT_REGISTER);
+
   }
 
   private void assertRegisterChanged(char registerName) {
@@ -214,4 +225,5 @@ public class SpecialRegistersTest extends VimTestCase {
 
     return register.getText();
   }
+
 }

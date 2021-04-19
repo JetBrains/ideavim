@@ -196,7 +196,7 @@ public class ChangeGroup {
 
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
       if (firstLiners.contains(caret)) {
-        final int offset = VimPlugin.getMotion().moveCaretToLineEnd(editor, 0,true);
+        final int offset = VimPlugin.getMotion().moveCaretToLineEnd(editor, 0, true);
         MotionGroup.moveCaret(editor, caret, offset);
       }
     }
@@ -323,7 +323,7 @@ public class ChangeGroup {
     final Register register = VimPlugin.getRegister().getRegister(key);
     if (register != null) {
       final List<KeyStroke> keys = register.getKeys();
-      for (KeyStroke k:keys) {
+      for (KeyStroke k : keys) {
         processKey(editor, context, k);
       }
       return true;
@@ -540,6 +540,10 @@ public class ChangeGroup {
       repeatInsert(editor, context, cnt == 0 ? 0 : cnt - 1, true);
     }
 
+    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.INSERT) {
+      updateLastInsertedTextRegister();
+    }
+
     // The change pos '.' mark is the offset AFTER processing escape, and after switching to overtype
     offset = editor.getCaretModel().getPrimaryCaret().getOffset();
     markGroup.setMark(editor, MarkGroup.MARK_CHANGE_POS, offset);
@@ -738,13 +742,15 @@ public class ChangeGroup {
 
       final int pos = caret.getOffset();
       final int norm = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, pos, isChange);
-      if (norm != pos || editor.offsetToVisualPosition(norm) != EditorUtil.inlayAwareOffsetToVisualPosition(editor, norm)) {
+      if (norm != pos ||
+          editor.offsetToVisualPosition(norm) != EditorUtil.inlayAwareOffsetToVisualPosition(editor, norm)) {
         MotionGroup.moveCaret(editor, caret, norm);
       }
       // Always move the caret. Our position might or might not have changed, but an inlay might have been moved to our
       // location, or deleting the character(s) might have caused us to scroll sideways in long files. Moving the caret
       // will make sure it's in the right place, and visible
-      final int offset = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, caret.getOffset(), isChange);
+      final int offset =
+        EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, caret.getOffset(), isChange);
       MotionGroup.moveCaret(editor, caret, offset);
 
       return res;
@@ -989,7 +995,8 @@ public class ChangeGroup {
       deleteText(editor, new TextRange(caret.getOffset(), offset), null);
       if (spaces && !hasTrailingWhitespace) {
         insertText(editor, caret, " ");
-        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -1, true));
+        MotionGroup
+          .moveCaret(editor, caret, VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -1, true));
       }
     }
 
@@ -1176,7 +1183,8 @@ public class ChangeGroup {
     if (res) {
       int pos = EditorHelper.normalizeOffset(editor, range.getStartOffset(), isChange);
       if (type == SelectionType.LINE_WISE) {
-        pos = VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor, editor.offsetToLogicalPosition(pos).line, caret);
+        pos = VimPlugin.getMotion()
+          .moveCaretToLineWithStartOfLineOption(editor, editor.offsetToLogicalPosition(pos).line, caret);
       }
       MotionGroup.moveCaret(editor, caret, pos);
     }
@@ -1186,7 +1194,7 @@ public class ChangeGroup {
   private boolean removeLastNewLine(@NotNull Editor editor, @NotNull TextRange range, @Nullable SelectionType type) {
     int endOffset = range.getEndOffset();
     int fileSize = EditorHelperRt.getFileSize(editor);
-    if (endOffset > fileSize){
+    if (endOffset > fileSize) {
       StrictMode.INSTANCE.fail("Incorrect offset. File size: " + fileSize + ", offset: " + endOffset);
       endOffset = fileSize;
     }
@@ -1453,10 +1461,10 @@ public class ChangeGroup {
   /**
    * Deletes the range of text and enters insert mode
    *
-   * @param editor  The editor to change
-   * @param caret   The caret to be moved after range deletion
-   * @param range   The range to change
-   * @param type    The type of the range
+   * @param editor The editor to change
+   * @param caret  The caret to be moved after range deletion
+   * @param range  The range to change
+   * @param type   The type of the range
    * @return true if able to delete the range, false if not
    */
   public boolean changeRange(@NotNull Editor editor,
@@ -1632,7 +1640,10 @@ public class ChangeGroup {
     insertText(editor, caret, caret.getOffset(), str);
   }
 
-  public void insertText(@NotNull Editor editor, @NotNull Caret caret, @NotNull LogicalPosition start, @NotNull String str) {
+  public void insertText(@NotNull Editor editor,
+                         @NotNull Caret caret,
+                         @NotNull LogicalPosition start,
+                         @NotNull String str) {
     insertText(editor, caret, editor.logicalPositionToOffset(start), str);
   }
 
@@ -1739,7 +1750,8 @@ public class ChangeGroup {
 
     if (!CommandStateHelper.inInsertMode(editor)) {
       if (!range.isMultiple()) {
-        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor, sline, caret));
+        MotionGroup
+          .moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor, sline, caret));
       }
       else {
         MotionGroup.moveCaret(editor, caret, range.getStartOffset());
@@ -1874,8 +1886,8 @@ public class ChangeGroup {
     boolean hex = nf.contains("hex");
     boolean octal = nf.contains("octal");
 
-    @NotNull List<Pair<TextRange, SearchHelper.NumberType>>
-      numberRanges = SearchHelper.findNumbersInRange(editor, selectedRange, alpha, hex, octal);
+    @NotNull List<Pair<TextRange, SearchHelper.NumberType>> numberRanges =
+      SearchHelper.findNumbersInRange(editor, selectedRange, alpha, hex, octal);
 
     List<String> newNumbers = new ArrayList<>();
     for (int i = 0; i < numberRanges.size(); i++) {
@@ -1889,7 +1901,8 @@ public class ChangeGroup {
       // Replace text bottom up. In other direction ranges will be desynchronized after inc numbers like 99
       Pair<TextRange, SearchHelper.NumberType> rangeToReplace = numberRanges.get(i);
       String newNumber = newNumbers.get(i);
-      replaceText(editor, rangeToReplace.getFirst().getStartOffset(), rangeToReplace.getFirst().getEndOffset(), newNumber);
+      replaceText(editor, rangeToReplace.getFirst().getStartOffset(), rangeToReplace.getFirst().getEndOffset(),
+                  newNumber);
     }
 
     InlayHelperKt.moveToInlayAwareOffset(caret, selectedRange.getStartOffset());
@@ -1915,7 +1928,8 @@ public class ChangeGroup {
     final boolean hex = nf.contains("hex");
     final boolean octal = nf.contains("octal");
 
-    @Nullable Pair<TextRange, SearchHelper.NumberType> range = SearchHelper.findNumberUnderCursor(editor, caret, alpha, hex, octal);
+    @Nullable Pair<TextRange, SearchHelper.NumberType> range =
+      SearchHelper.findNumberUnderCursor(editor, caret, alpha, hex, octal);
     if (range == null) {
       logger.debug("no number on line");
       return false;
@@ -1965,7 +1979,9 @@ public class ChangeGroup {
 
     char ch = text.charAt(0);
     if (hex && SearchHelper.NumberType.HEX.equals(numberType)) {
-      if (!text.toLowerCase().startsWith(HEX_START)) throw new RuntimeException("Hex number should start with 0x: " + text);
+      if (!text.toLowerCase().startsWith(HEX_START)) {
+        throw new RuntimeException("Hex number should start with 0x: " + text);
+      }
       for (int i = text.length() - 1; i >= 2; i--) {
         int index = "abcdefABCDEF".indexOf(text.charAt(i));
         if (index >= 0) {
@@ -2044,6 +2060,19 @@ public class ChangeGroup {
 
   private void notifyListeners(Editor editor) {
     insertListeners.forEach(listener -> listener.insertModeStarted(editor));
+  }
+
+  private void updateLastInsertedTextRegister() {
+    StringBuilder textToPutRegister = new StringBuilder();
+    if (lastStrokes != null) {
+      for (Object lastStroke : lastStrokes) {
+        if (lastStroke instanceof char[]) {
+          final char[] chars = (char[])lastStroke;
+          textToPutRegister.append(new String(chars));
+        }
+      }
+    }
+    VimPlugin.getRegister().storeTextSpecial(RegisterGroup.LAST_INSERTED_TEXT_REGISTER, textToPutRegister.toString());
   }
 
   private int oldOffset = -1;
