@@ -23,7 +23,9 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotion
 
 class MotionDownLess1FirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
@@ -35,7 +37,7 @@ class MotionDownLess1FirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
-    return VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, count - 1)
+  ): Motion {
+    return VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, count - 1).toMotion()
   }
 }

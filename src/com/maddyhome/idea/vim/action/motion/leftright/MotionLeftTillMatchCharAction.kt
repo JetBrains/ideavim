@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
@@ -41,14 +42,13 @@ class MotionLeftTillMatchCharAction : MotionActionHandler.ForEachCaret() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
+  ): Motion {
     if (argument == null) {
-      VimPlugin.indicateError()
-      return caret.offset
+      return Motion.Error
     }
     val res = VimPlugin.getMotion().moveCaretToBeforeNextCharacterOnLine(editor, caret, -count, argument.character)
     VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_T, argument.character)
-    return res
+    return if (res < 0) Motion.Error else Motion.AbsoluteOffset(res)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

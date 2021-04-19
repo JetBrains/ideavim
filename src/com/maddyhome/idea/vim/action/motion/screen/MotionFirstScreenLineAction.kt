@@ -25,7 +25,9 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
@@ -51,12 +53,12 @@ abstract class MotionFirstScreenLineActionBase(private val operatorPending: Bool
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
+  ): Motion {
 
     // Only apply scrolloff for NX motions. For op pending, use the actual first line and apply scrolloff after.
     // E.g. yH will yank from first visible line to current line, but it also moves the caret to the first visible line.
     // This is inside scrolloff, so Vim scrolls
-    return VimPlugin.getMotion().moveCaretToFirstScreenLine(editor, caret, count, !operatorPending)
+    return VimPlugin.getMotion().moveCaretToFirstScreenLine(editor, caret, count, !operatorPending).toMotion()
   }
 
   override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {

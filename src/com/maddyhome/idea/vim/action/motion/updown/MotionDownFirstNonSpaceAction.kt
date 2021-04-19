@@ -27,7 +27,9 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotion
 
 class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.LINE_WISE
@@ -39,8 +41,8 @@ class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
-    return VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, count)
+  ): Motion {
+    return VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, count).toMotion()
   }
 }
 
@@ -54,13 +56,13 @@ class EnterNormalAction : MotionActionHandler.ForEachCaret() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
+  ): Motion {
     val templateState = TemplateManagerImpl.getTemplateState(editor)
     return if (templateState != null) {
       KeyHandler.executeAction(IdeActions.ACTION_EDITOR_NEXT_TEMPLATE_VARIABLE, context)
-      -1
+      Motion.NoMotion
     } else {
-      VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, count)
+      VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, count).toMotion()
     }
   }
 }

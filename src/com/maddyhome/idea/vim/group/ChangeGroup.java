@@ -59,6 +59,7 @@ import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.Motion;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimInsertListener;
@@ -170,16 +171,24 @@ public class ChangeGroup {
   public void insertNewLineAbove(final @NotNull Editor editor, @NotNull DataContext context) {
     if (editor.isOneLineMode()) return;
 
+    // See also EditorStartNewLineBefore. That will move the caret to line start, call EditorEnter to create a new line,
+    // and then move up and call EditorLineEnd. We get better indent positioning by going to the line end of the
+    // previous line and hitting enter, especially with plain text files.
+
+    // Note that we're deliberately bypassing MotionGroup.moveCaret to avoid side effects, most notably unncessary
+    // scrolling
     Set<Caret> firstLiners = new HashSet<>();
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
+      final int offset;
       if (caret.getVisualPosition().line == 0) {
-        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStart(editor, caret));
+        // Fake indenting for the first line. Works well for plain text to match the existing indent
+        offset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret);
         firstLiners.add(caret);
       }
       else {
-        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretVertical(editor, caret, -1));
-        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
+        offset = VimPlugin.getMotion().moveCaretToLineEnd(editor, caret.getLogicalPosition().line - 1, true);
       }
+      caret.moveToOffset(offset);
     }
 
     initInsert(editor, context, CommandState.Mode.INSERT);
@@ -187,9 +196,12 @@ public class ChangeGroup {
 
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
       if (firstLiners.contains(caret)) {
-        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretVertical(editor, caret, -1));
+        final int offset = VimPlugin.getMotion().moveCaretToLineEnd(editor, 0,true);
+        MotionGroup.moveCaret(editor, caret, offset);
       }
     }
+
+    MotionGroup.scrollCaretIntoView(editor);
   }
 
   /**
@@ -236,6 +248,8 @@ public class ChangeGroup {
 
     initInsert(editor, context, CommandState.Mode.INSERT);
     runEnterAction(editor, context);
+
+    MotionGroup.scrollCaretIntoView(editor);
   }
 
   /**
@@ -258,7 +272,7 @@ public class ChangeGroup {
     if (!state.isDotRepeatInProgress()) {
       // While repeating the enter action has been already executed because `initInsert` repeats the input
       final ActionManager actionManager = ActionManager.getInstance();
-      final AnAction action = actionManager.getAction("EditorEnter");
+      final AnAction action = actionManager.getAction(IdeActions.ACTION_EDITOR_ENTER);
       if (action != null) {
         strokes.add(action);
         KeyHandler.executeAction(action, context);
@@ -308,14 +322,11 @@ public class ChangeGroup {
   public boolean insertRegister(@NotNull Editor editor, @NotNull DataContext context, char key) {
     final Register register = VimPlugin.getRegister().getRegister(key);
     if (register != null) {
-      final String text = register.getText();
-      if (text != null) {
-        final int length = text.length();
-        for (int i = 0; i < length; i++) {
-          processKey(editor, context, KeyStroke.getKeyStroke(text.charAt(i)));
-        }
-        return true;
+      final List<KeyStroke> keys = register.getKeys();
+      for (KeyStroke k:keys) {
+        processKey(editor, context, k);
       }
+      return true;
     }
 
     return false;
@@ -368,7 +379,13 @@ public class ChangeGroup {
         deleteTo = pointer + 1;
       }
       else {
-        deleteTo = VimPlugin.getMotion().findOffsetOfNextWord(editor, pointer + 1, -1, false);
+        Motion motion = VimPlugin.getMotion().findOffsetOfNextWord(editor, pointer + 1, -1, false);
+        if (motion instanceof Motion.AbsoluteOffset) {
+          deleteTo = ((Motion.AbsoluteOffset)motion).getOffset();
+        }
+        else {
+          return false;
+        }
       }
     }
     if (deleteTo < 0) {
@@ -718,11 +735,17 @@ public class ChangeGroup {
     final int endOffset = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, true);
     if (endOffset != -1) {
       final boolean res = deleteText(editor, new TextRange(caret.getOffset(), endOffset), SelectionType.CHARACTER_WISE);
+
       final int pos = caret.getOffset();
       final int norm = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, pos, isChange);
       if (norm != pos || editor.offsetToVisualPosition(norm) != EditorUtil.inlayAwareOffsetToVisualPosition(editor, norm)) {
         MotionGroup.moveCaret(editor, caret, norm);
       }
+      // Always move the caret. Our position might or might not have changed, but an inlay might have been moved to our
+      // location, or deleting the character(s) might have caused us to scroll sideways in long files. Moving the caret
+      // will make sure it's in the right place, and visible
+      final int offset = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, caret.getOffset(), isChange);
+      MotionGroup.moveCaret(editor, caret, offset);
 
       return res;
     }
@@ -843,7 +866,7 @@ public class ChangeGroup {
       CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> ApplicationManager.getApplication()
                                                       .runWriteAction(() -> KeyHandler.getInstance().getOriginalHandler().execute(editor, key.getKeyChar(), context)),
                                                     "", doc, UndoConfirmationPolicy.DEFAULT, doc);
-
+      MotionGroup.scrollCaretIntoView(editor);
       return true;
     }
 

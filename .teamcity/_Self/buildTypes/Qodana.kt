@@ -29,6 +29,8 @@ object Qodana : BuildType({
       failBuildOnErrors = ""
       codeInspectionXmlConfig = "Custom"
       codeInspectionCustomXmlConfigPath = ".idea/inspectionProfiles/Qodana.xml"
+      namesAndTags = "custom"
+      param("namesAndTagsCustom", "jetbrains/qodana:latest")
     }
   }
 

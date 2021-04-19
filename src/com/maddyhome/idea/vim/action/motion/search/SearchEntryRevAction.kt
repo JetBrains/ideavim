@@ -24,7 +24,9 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
@@ -41,10 +43,10 @@ class SearchEntryRevAction : MotionActionHandler.ForEachCaret() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
-    if (argument == null) return -1
+  ): Motion {
+    if (argument == null) return Motion.Error
     return VimPlugin.getSearch()
-      .processSearchCommand(editor, argument.string, caret.offset, Direction.BACKWARDS)
+      .processSearchCommand(editor, argument.string, caret.offset, Direction.BACKWARDS).toMotionOrError()
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

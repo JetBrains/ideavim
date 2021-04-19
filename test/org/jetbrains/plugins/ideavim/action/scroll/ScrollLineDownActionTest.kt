@@ -46,6 +46,15 @@ class ScrollLineDownActionTest : VimTestCase() {
     assertVisibleArea(1, 35)
   }
 
+  fun `test scroll line down will maintain current column at start of line with sidescrolloff`() {
+    OptionsManager.sidescrolloff.set(10)
+    configureByPages(5)
+    setPositionAndScroll(30, 50, 5)
+    typeText(parseKeys("<C-E>"))
+    assertPosition(50, 5)
+    assertTopLogicalLine(31)
+  }
+
   fun `test scroll count lines down`() {
     configureByPages(5)
     setPositionAndScroll(0, 34)
@@ -98,5 +107,24 @@ class ScrollLineDownActionTest : VimTestCase() {
     setPositionAndScroll(20, 30)
     typeText(parseKeys("Vjjjj", "<C-E>"))
     assertVisibleArea(21, 55)
+  }
+
+  fun `test scroll last line down at end of file with virtual space`() {
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    setPositionAndScroll(75, 99, 4)
+    typeText(parseKeys("<C-E>"))
+    assertPosition(99, 4)
+    assertVisibleArea(76, 99)
+  }
+
+  fun `test scroll line down at end of file with virtual space and scrolloff`() {
+    OptionsManager.scrolloff.set(10)
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    setPositionAndScroll(75, 95, 4)
+    typeText(parseKeys("<C-E>"))
+    assertPosition(95, 4)
+    assertVisibleArea(76, 99)
   }
 }

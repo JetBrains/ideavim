@@ -27,7 +27,9 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inVisualMode
@@ -45,7 +47,7 @@ class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
+  ): Motion {
     var allow = false
     if (editor.inInsertMode) {
       allow = true
@@ -56,7 +58,7 @@ class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
       }
     }
 
-    return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow)
+    return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow).toMotion()
   }
 
   override fun postMove(
@@ -90,7 +92,7 @@ class MotionLastColumnInsertAction : MotionActionHandler.ForEachCaret() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
+  ): Motion {
     var allow = false
     if (editor.inInsertMode) {
       allow = true
@@ -101,7 +103,7 @@ class MotionLastColumnInsertAction : MotionActionHandler.ForEachCaret() {
       }
     }
 
-    return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow)
+    return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow).toMotion()
   }
 
   override fun postMove(

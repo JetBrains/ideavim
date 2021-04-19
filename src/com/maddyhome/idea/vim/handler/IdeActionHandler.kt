@@ -15,29 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package com.maddyhome.idea.vim.action.motion.mark
+
+package com.maddyhome.idea.vim.handler
 
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.MotionType
-import com.maddyhome.idea.vim.handler.Motion
-import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.handler.toMotionOrError
+import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.group.MotionGroup
 
-class MotionJumpPreviousAction : MotionActionHandler.ForEachCaret() {
-  override fun getOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?
-  ): Motion {
-    return VimPlugin.getMotion().moveCaretToJump(editor, -count).toMotionOrError()
+/**
+ * Base class for Vim commands handled by existing IDE actions.
+ */
+abstract class IdeActionHandler(private val actionName: String) : VimActionHandler.SingleExecution() {
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    KeyHandler.executeAction(actionName, context)
+    MotionGroup.scrollCaretIntoView(editor)
+    return true
   }
-
-  override val motionType: MotionType = MotionType.EXCLUSIVE
 }

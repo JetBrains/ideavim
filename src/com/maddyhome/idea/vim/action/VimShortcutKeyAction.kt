@@ -115,8 +115,20 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
       if ((keyCode == KeyEvent.VK_TAB || keyCode == KeyEvent.VK_ENTER) && editor.appCodeTemplateCaptured()) return false
 
-      if (editor.inInsertMode) { // XXX: <Tab> won't be recorded in macros
+      if (editor.inInsertMode) {
         if (keyCode == KeyEvent.VK_TAB) {
+          // TODO: This stops VimEditorTab seeing <Tab> in insert mode and correctly scrolling the view
+          // There are multiple actions registered for VK_TAB. The important items, in order, are this, the Live
+          // Templates action and TabAction. Returning false in insert mode means that the Live Template action gets to
+          // execute, and this allows Emmet to work (VIM-674). But it also means that the VimEditorTab handle is never
+          // called, so we can't scroll the caret into view correctly.
+          // If we do return true, VimEditorTab handles the Vim side of things and then invokes
+          // IdeActions.ACTION_EDITOR_TAB, which inserts the tab. It also bypasses the Live Template action, and Emmet
+          // no longer works.
+          // This flag is used when recording text entry/keystrokes for repeated insertion. Because we return false and
+          // don't execute the VimEditorTab handler, we don't record tab as an action. Instead, we see an incoming text
+          // change of multiple whitespace characters, which is normally ignored because it's auto-indent content from
+          // hitting <Enter>. When this flag is set, we record the whitespace as the output of the <Tab>
           VimPlugin.getChange().tabAction = true
           return false
         }

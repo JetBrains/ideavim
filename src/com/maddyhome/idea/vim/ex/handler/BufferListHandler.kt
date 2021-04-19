@@ -32,7 +32,6 @@ import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.EditorHelper
 import org.jetbrains.annotations.NonNls
-import java.io.File
 
 /**
  * Handles buffers, files, ls command. Supports +, =, a, %, # filters.
@@ -95,7 +94,7 @@ class BufferListHandler : CommandHandler.SingleExecution() {
 
   private fun buildVirtualFileDisplayMap(project: Project): Map<VirtualFile, String> {
     val openFiles = FileEditorManager.getInstance(project).openFiles
-    val basePath = if (project.basePath != null) project.basePath + File.separator else ""
+    val basePath = if (project.basePath != null) project.basePath + "/" else ""
     val filePaths = mutableMapOf<VirtualFile, String>()
 
     for (file in openFiles) {

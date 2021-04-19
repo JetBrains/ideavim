@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 
 class MotionLeftWrapAction : MotionActionHandler.ForEachCaret() {
@@ -33,8 +34,9 @@ class MotionLeftWrapAction : MotionActionHandler.ForEachCaret() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
-    return VimPlugin.getMotion().moveCaretHorizontalWrap(editor, caret, -count)
+  ): Motion {
+    val moveCaretHorizontalWrap = VimPlugin.getMotion().moveCaretHorizontalWrap(editor, caret, -count)
+    return if (moveCaretHorizontalWrap < 0) Motion.Error else Motion.AbsoluteOffset(moveCaretHorizontalWrap)
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
