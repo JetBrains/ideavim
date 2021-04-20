@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.IdeEventQueue;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -148,7 +149,14 @@ public class KeyHandler {
       //   because rider use async update method. See VIM-1819.
       action.beforeActionPerformedUpdate(event);
       if (event.getPresentation().isEnabled()) {
+        // Executing listeners for action. I can't be sure that this code is absolutely correct,
+        //   action execution process in IJ seems to be more complicated.
+        ActionManagerEx actionManager = ActionManagerEx.getInstanceEx();
+        actionManager.fireBeforeActionPerformed(action, event.getDataContext(), event);
+
         action.actionPerformed(event);
+
+        actionManager.fireAfterActionPerformed(action, event.getDataContext(), event);
         return true;
       }
     }
