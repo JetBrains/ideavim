@@ -91,15 +91,15 @@ fun Editor.getTopLevelEditor() = if (this is EditorWindow) this.delegate else th
  * Return list of editors for local host (for code with me plugin)
  */
 fun localEditors(): List<Editor> {
-  return EditorFactory.getInstance().allEditors.filter { it.editorClientId.let { it == null || it == ClientId.currentOrNull } }
+  return EditorFactory.getInstance().allEditors.filter { editor -> editor.editorClientId.let { it == null || it == ClientId.currentOrNull } }
 }
 
 fun localEditors(doc: Document): List<Editor> {
-  return EditorFactory.getInstance().getEditors(doc).filter { it.editorClientId.let { it == null || it == ClientId.currentOrNull } }
+  return EditorFactory.getInstance().getEditors(doc).filter { editor -> editor.editorClientId.let { it == null || it == ClientId.currentOrNull } }
 }
 
 fun localEditors(doc: Document, project: Project): List<Editor> {
-  return EditorFactory.getInstance().getEditors(doc, project).filter { it.editorClientId.let { it == null || it == ClientId.currentOrNull } }
+  return EditorFactory.getInstance().getEditors(doc, project).filter { editor -> editor.editorClientId.let { it == null || it == ClientId.currentOrNull } }
 }
 
 val Editor.editorClientId: ClientId?

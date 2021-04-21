@@ -70,7 +70,6 @@ import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import org.assertj.core.api.Assertions
 import org.junit.Assert
-import java.util.*
 import java.util.function.Consumer
 import javax.swing.KeyStroke
 
@@ -425,7 +424,7 @@ abstract class VimTestCase : UsefulTestCase() {
     before: String,
     after: String
   ) {
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(keys, before, after, CommandState.Mode.COMMAND, SubMode.NONE)
   }
 
   fun doTest(

@@ -55,6 +55,7 @@ public class SearchHelperTest extends VimTestCase {
     String text = "first second";
     int previousWordPosition = SearchHelper.findNextWord(text, text.indexOf("second"), text.length(), -1, true, false);
 
+    //noinspection ConstantConditions
     assertEquals(previousWordPosition, text.indexOf("first"));
   }
 
@@ -63,6 +64,7 @@ public class SearchHelperTest extends VimTestCase {
     String text = "first second third";
     int previousWordPosition = SearchHelper.findNextWord(text, text.indexOf("third"), text.length(), -2, true, false);
 
+    //noinspection ConstantConditions
     assertEquals(previousWordPosition, text.indexOf("first"));
   }
 
@@ -71,6 +73,7 @@ public class SearchHelperTest extends VimTestCase {
     String text = "first second";
     int previousWordPosition = SearchHelper.findNextWord(text, text.indexOf("second"), text.length(), -3, true, false);
 
+    //noinspection ConstantConditions
     assertEquals(previousWordPosition, text.indexOf("first"));
   }
 

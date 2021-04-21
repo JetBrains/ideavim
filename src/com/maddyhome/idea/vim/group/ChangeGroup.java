@@ -802,6 +802,7 @@ public class ChangeGroup {
     int startOffset = initialOffset;
     if (offset == initialOffset && offset != lineStart) startOffset--; // handle delete from virtual space
 
+    //noinspection ConstantConditions
     if (offset != -1) {
       final TextRange rangeToDelete = new TextRange(startOffset, offset);
       editor.getCaretModel().getAllCarets().stream().filter(c -> c != caret && rangeToDelete.contains(c.getOffset()))
