@@ -266,7 +266,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
 
     @Override
     public void valueChange(Boolean oldValue, Boolean newValue) {
-      for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
+      for (Editor editor : HelperKt.localEditors()) {
         if (UserDataManager.getVimEditorGroup(editor) && supportsVimLineNumbers(editor)) {
           updateLineNumbers(editor);
         }

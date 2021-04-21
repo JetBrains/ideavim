@@ -56,6 +56,7 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.maddyhome.idea.vim.helper.HelperKt.localEditors;
 import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
 
 @State(name = "VimSearchSettings", storages = {
@@ -1035,7 +1036,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
       for (Project project : ProjectManager.getInstance().getOpenProjects()) {
         final Document document = event.getDocument();
 
-        for (Editor editor : EditorFactory.getInstance().getEditors(document, project)) {
+        for (Editor editor : localEditors(document, project)) {
           Collection<RangeHighlighter> hls = UserDataManager.getVimLastHighlighters(editor);
           if (hls == null) {
             continue;

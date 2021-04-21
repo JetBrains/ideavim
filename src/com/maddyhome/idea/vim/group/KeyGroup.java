@@ -42,6 +42,7 @@ import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.handler.ActionBeanClass;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.*;
 import kotlin.Pair;
@@ -161,7 +162,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
     final int oldSize = requiredShortcutKeys.size();
     requiredShortcutKeys.removeIf(requiredShortcut -> requiredShortcut.getOwner().equals(owner));
     if (requiredShortcutKeys.size() != oldSize) {
-      for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
+      for (Editor editor : HelperKt.localEditors()) {
         unregisterShortcutKeys(editor);
         registerRequiredShortcutKeys(editor);
       }
@@ -176,7 +177,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
       }
     }
     if (requiredShortcutKeys.size() != oldSize) {
-      for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
+      for (Editor editor : HelperKt.localEditors()) {
         unregisterShortcutKeys(editor);
         registerRequiredShortcutKeys(editor);
       }

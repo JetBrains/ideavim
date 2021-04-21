@@ -482,9 +482,9 @@ public class EditorHelper {
     if (doc == null) {
       return null;
     }
-    final Editor[] editors = EditorFactory.getInstance().getEditors(doc);
-    if (editors.length > 0) {
-      return editors[0];
+    final List<Editor> editors = HelperKt.localEditors(doc);
+    if (editors.size() > 0) {
+      return editors.get(0);
     }
 
     return null;

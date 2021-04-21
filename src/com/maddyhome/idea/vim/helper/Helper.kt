@@ -19,10 +19,15 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.codeInsight.template.TemplateManager
+import com.intellij.codeWithMe.ClientId
 import com.intellij.injected.editor.EditorWindow
 import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.common.TextRange
 import java.util.*
 
@@ -81,6 +86,31 @@ inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
 }
 
 fun Editor.getTopLevelEditor() = if (this is EditorWindow) this.delegate else this
+
+/**
+ * Return list of editors for local host (for code with me plugin)
+ */
+fun localEditors(): List<Editor> {
+  return EditorFactory.getInstance().allEditors.filter { it.editorClientId.let { it == null || it == ClientId.currentOrNull } }
+}
+
+fun localEditors(doc: Document): List<Editor> {
+  return EditorFactory.getInstance().getEditors(doc).filter { it.editorClientId.let { it == null || it == ClientId.currentOrNull } }
+}
+
+fun localEditors(doc: Document, project: Project): List<Editor> {
+  return EditorFactory.getInstance().getEditors(doc, project).filter { it.editorClientId.let { it == null || it == ClientId.currentOrNull } }
+}
+
+val Editor.editorClientId: ClientId?
+  get() {
+    if (editorClientKey == null) {
+      editorClientKey = Key.findKeyByName("editorClientIdby userData()") ?: return null
+    }
+    return editorClientKey?.let { this.getUserData(it) as? ClientId }
+  }
+
+private var editorClientKey: Key<*>? = null
 
 @Suppress("IncorrectParentDisposable")
 fun Editor.isTemplateActive(): Boolean {

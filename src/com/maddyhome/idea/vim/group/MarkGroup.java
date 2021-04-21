@@ -44,6 +44,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.*;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jdom.Element;
@@ -740,10 +741,10 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     }
 
     private @Nullable Editor getAnEditor(@NotNull Document doc) {
-      Editor[] editors = EditorFactory.getInstance().getEditors(doc);
+      List<Editor> editors = HelperKt.localEditors(doc);
 
-      if (editors.length > 0) {
-        return editors[0];
+      if (editors.size() > 0) {
+        return editors.get(0);
       }
       else {
         return null;

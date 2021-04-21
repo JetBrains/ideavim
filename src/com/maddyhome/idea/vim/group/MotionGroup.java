@@ -1444,7 +1444,7 @@ public class MotionGroup {
 
     @Override
     public void valueChange(String oldValue, String newValue) {
-      for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
+      for (Editor editor : HelperKt.localEditors()) {
         if (UserDataManager.getVimEditorGroup(editor)) {
           MotionGroup.scrollCaretIntoView(editor);
         }

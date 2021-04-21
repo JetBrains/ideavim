@@ -21,7 +21,6 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsScheme
 import com.intellij.openapi.editor.markup.EffectType
@@ -93,7 +92,7 @@ private fun updateSearchHighlights(
   for (project in projectManager.openProjects) {
     val current = FileEditorManager.getInstance(project).selectedTextEditor ?: continue
     // [VERSION UPDATE] 202+ Use editors
-    val editors = EditorFactory.getInstance().getEditors(current.document, project) ?: continue
+    val editors = localEditors(current.document, project) ?: continue
     for (editor in editors) {
       // Try to keep existing highlights if possible. Update if hlsearch has changed or if the pattern has changed.
       // Force update for the situations where the text is the same, but the ignore case values have changed.
