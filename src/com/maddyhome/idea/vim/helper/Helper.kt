@@ -105,6 +105,7 @@ fun localEditors(doc: Document, project: Project): List<Editor> {
 val Editor.editorClientId: ClientId?
   get() {
     if (editorClientKey == null) {
+      @Suppress("DEPRECATION")
       editorClientKey = Key.findKeyByName("editorClientIdby userData()") ?: return null
     }
     return editorClientKey?.let { this.getUserData(it) as? ClientId }
