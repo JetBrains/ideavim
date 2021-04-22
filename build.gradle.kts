@@ -44,7 +44,7 @@ val slackUrl: String by project
 repositories {
     mavenCentral()
     jcenter()
-    maven { url = uri("https://jetbrains.bintray.com/intellij-third-party-dependencies") }
+    maven { url = uri("https://cache-redirector.jetbrains.com/intellij-dependencies") }
 }
 
 dependencies {
