@@ -23,7 +23,7 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class ParagraphMotionTest : VimTestCase(){
+class ParagraphMotionTest : VimTestCase() {
 
   override fun setUp() {
     super.setUp()
@@ -39,7 +39,7 @@ class ParagraphMotionTest : VimTestCase(){
         |hard by the torrent of a mountain pass.""".trimMargin()
     val after = """I found it in a legendary land
         |all rocks and lavender and tufted grass,
-        |${c}
+        |$c
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
     doTest("}", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
@@ -54,7 +54,7 @@ class ParagraphMotionTest : VimTestCase(){
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
     val after = """I found it in a legendary land
         |all rocks and lavender and tufted grass,
-        |${c}....
+        |$c....
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
     doTest("}", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
@@ -69,7 +69,7 @@ class ParagraphMotionTest : VimTestCase(){
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
     val after = """I found it in a legendary land
         |${s}all rocks and lavender and tufted grass,
-        |${c}.${se}...
+        |$c.$se...
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
     doTest("v}", before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
@@ -83,7 +83,7 @@ class ParagraphMotionTest : VimTestCase(){
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
     val after = """I found it in a legendary land
-        |${c}
+        |$c
         |....
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
@@ -99,7 +99,7 @@ class ParagraphMotionTest : VimTestCase(){
         |hard by the torrent of a mountain pass.""".trimMargin()
     val after = """I found it in a legendary land
         |all rocks and lavender and tufted grass,
-        |${c}
+        |$c
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin()
     doTest("{", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
@@ -114,7 +114,7 @@ class ParagraphMotionTest : VimTestCase(){
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
     val after = """I found it in a legendary land
         |all rocks and lavender and tufted grass,
-        |${c}....
+        |$c....
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
     doTest("{", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
@@ -129,7 +129,7 @@ class ParagraphMotionTest : VimTestCase(){
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
     val after = """I found it in a legendary land
         |all rocks and lavender and tufted grass,
-        |${s}${c}....
+        |${s}$c....
         |w${se}here it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
     doTest("v{", before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
@@ -144,7 +144,7 @@ class ParagraphMotionTest : VimTestCase(){
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
     val after = """I found it in a legendary land
         |all rocks and lavender and tufted grass,
-        |${c}
+        |$c
         |where it was settled on some sodden sand
         |hard by the torrent of a mountain pass.""".trimMargin().dotToSpace()
     doTest("d{", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)

@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.SearchHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 
-class ParagraphMotion  : VimExtension {
+class ParagraphMotion : VimExtension {
   override fun getName(): String = "vim-paragraph-motion"
 
   override fun init() {
