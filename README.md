@@ -207,13 +207,13 @@ Executing IDE Actions
 IdeaVim adds various commands for listing and executing arbitrary IDE actions as
 Ex commands or via `:map` command mappings:
 
-**Executing actions:**
+### Executing actions:
 * `:action {action_id}`
     * Execute an action by id. Works from Ex command line.
 * `<Action>(*action_id*)`
     * For the mappings you can use a special `<Action>` keyword. Don't forget the parentheses.
 
-**Finding actions:**
+### Finding actions:
 * `:actionlist [pattern]`
     * Find IDE actions by id or keymap pattern (E.g. `:actionlist extract`, `:actionlist <C-D`)
     
@@ -225,7 +225,7 @@ extract the ids of executed command. This option can be found in "Search everywh
         <img src="assets/readme/track_action_id.gif" alt="track action ids"/>
     </details>
 
-Examples:
+##### Examples:
 
 ```vim
 " Map \r to the Reformat Code action
@@ -236,6 +236,14 @@ Examples:
 
 " Map \b to toggle the breakpoint on the current line
 :map \b <Action>(ToggleLineBreakpoint)
+```
+
+##### Some popular actions:
+
+```
+QuickJavaDoc - Quick Documentation (not only for java, all languages)
+ShowErrorDescription - Show description of the error under the caret (cursor hovering)
+QuickImplementations - Quick Definition
 ```
 
 :gem: Contributing
