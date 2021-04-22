@@ -90,6 +90,17 @@
         <alias name="nerdtree"/>
       </aliases>
     </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.paragraphmotion.ParagraphMotion" name="vim-paragraph-motion">
+      <aliases>
+        <alias name="https://github.com/dbakker/vim-paragraph-motion"/>
+        <alias name="dbakker/vim-paragraph-motion"/>
+        <alias name="vim-paragraph-motion"/>
+        <alias name="https://github.com/vim-scripts/Improved-paragraph-motion"/>
+        <alias name="vim-scripts/Improved-paragraph-motion"/>
+        <alias name="Improved-paragraph-motion"/>
+      </aliases>
+    </vimExtension>
   </extensions>
 
   <!--  IdeaVim extensions-->

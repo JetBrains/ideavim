@@ -562,6 +562,8 @@ abstract class VimTestCase : UsefulTestCase() {
     fun searchCommand(pattern: String) = "$pattern<CR>"
 
     fun String.dotToTab(): String = replace('.', '\t')
+
+    fun String.dotToSpace(): String = replace('.', ' ')
   }
 
   object Checks {

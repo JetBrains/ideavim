@@ -24,6 +24,9 @@ usual beta standards.
 
 ## To Be Released
 
+### Features:
+* Support `vim-paragraph-motion` extension [VIM-2290](https://youtrack.jetbrains.com/issue/VIM-2290) | [vim-paragraph-motion](https://github.com/dbakker/vim-paragraph-motion) 
+
 ### Fixes:
 * [VIM-2230](https://youtrack.jetbrains.com/issue/VIM-2230) Tweak caret position with inline rename options inlay
 * [VIM-2177](https://youtrack.jetbrains.com/issue/VIM-2177) Fix scrolling issues near bottom of file
