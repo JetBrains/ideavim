@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.key.ShortcutOwner
+import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.IdeaSpecifics.AppCodeTemplates.appCodeTemplateCaptured
 import com.maddyhome.idea.vim.listener.IdeaSpecifics.aceJumpActive
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -62,7 +63,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     val keyStroke = getKeyStroke(e)
     if (editor != null && keyStroke != null) {
       val owner = VimPlugin.getKey().savedShortcutConflicts[keyStroke]
-      if (owner == ShortcutOwner.UNDEFINED) {
+      if (owner?.normal == ShortcutOwner.UNDEFINED) {
         VimPlugin.getNotifications(editor.project).notifyAboutShortcutConflict(keyStroke)
       }
       // Should we use HelperKt.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
@@ -139,12 +140,12 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
       if (keyStroke in VIM_ONLY_EDITOR_KEYS) return true
 
       val savedShortcutConflicts = VimPlugin.getKey().savedShortcutConflicts
-      return when (savedShortcutConflicts[keyStroke]) {
+      return when (savedShortcutConflicts[keyStroke]?.normal) {
         ShortcutOwner.VIM -> true
         ShortcutOwner.IDE -> !isShortcutConflict(keyStroke)
         else -> {
           if (isShortcutConflict(keyStroke)) {
-            savedShortcutConflicts[keyStroke] = ShortcutOwner.UNDEFINED
+            savedShortcutConflicts[keyStroke] = ShortcutOwnerInfo.allUndefined
           }
           true
         }

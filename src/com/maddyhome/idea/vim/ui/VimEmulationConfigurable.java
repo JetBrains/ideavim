@@ -31,6 +31,7 @@ import com.intellij.util.ui.UIUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
+import com.maddyhome.idea.vim.key.ShortcutOwnerInfo;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -190,9 +191,9 @@ public class VimEmulationConfigurable implements Configurable {
     private static final class Row implements Comparable<Row> {
       private final @NotNull KeyStroke myKeyStroke;
       private final @NotNull AnAction myAction;
-      private @NotNull ShortcutOwner myOwner;
+      private @NotNull ShortcutOwnerInfo myOwner;
 
-      private Row(@NotNull KeyStroke keyStroke, @NotNull AnAction action, @NotNull ShortcutOwner owner) {
+      private Row(@NotNull KeyStroke keyStroke, @NotNull AnAction action, @NotNull ShortcutOwnerInfo owner) {
         myKeyStroke = keyStroke;
         myAction = action;
         myOwner = owner;
@@ -206,7 +207,7 @@ public class VimEmulationConfigurable implements Configurable {
         return myAction;
       }
 
-      public @NotNull ShortcutOwner getOwner() {
+      public @NotNull ShortcutOwnerInfo getOwner() {
         return myOwner;
       }
 
@@ -217,7 +218,7 @@ public class VimEmulationConfigurable implements Configurable {
         return keyCodeDiff != 0 ? keyCodeDiff : myKeyStroke.getModifiers() - otherKeyStroke.getModifiers();
       }
 
-      public void setOwner(@NotNull ShortcutOwner owner) {
+      public void setOwner(@NotNull ShortcutOwnerInfo owner) {
         myOwner = owner;
       }
     }
@@ -250,7 +251,7 @@ public class VimEmulationConfigurable implements Configurable {
             case IDE_ACTION:
               return row.getAction().getTemplatePresentation().getText();
             case OWNER:
-              return row.getOwner();
+              return row.getOwner().getNormal();
           }
         }
         return null;
@@ -261,7 +262,7 @@ public class VimEmulationConfigurable implements Configurable {
         final Column column = Column.fromIndex(columnIndex);
         if (column != null && rowIndex >= 0 && rowIndex < myRows.size() && object instanceof ShortcutOwner) {
           final Row row = myRows.get(rowIndex);
-          row.setOwner((ShortcutOwner)object);
+          row.setOwner(ShortcutOwnerInfo.allOf((ShortcutOwner)object));
         }
       }
 
@@ -286,7 +287,7 @@ public class VimEmulationConfigurable implements Configurable {
 
       public void reset() {
         myRows.clear();
-        for (Map.Entry<KeyStroke, ShortcutOwner> entry : VimPlugin.getKey().getShortcutConflicts().entrySet()) {
+        for (Map.Entry<KeyStroke, ShortcutOwnerInfo> entry : VimPlugin.getKey().getShortcutConflicts().entrySet()) {
           final KeyStroke keyStroke = entry.getKey();
           final List<AnAction> actions = VimPlugin.getKey().getKeymapConflicts(keyStroke);
           if (!actions.isEmpty()) {
@@ -296,8 +297,8 @@ public class VimEmulationConfigurable implements Configurable {
         Collections.sort(myRows);
       }
 
-      private @NotNull Map<KeyStroke, ShortcutOwner> getCurrentData() {
-        final Map<KeyStroke, ShortcutOwner> result = new HashMap<>();
+      private @NotNull Map<KeyStroke, ShortcutOwnerInfo> getCurrentData() {
+        final Map<KeyStroke, ShortcutOwnerInfo> result = new HashMap<>();
         for (Row row : myRows) {
           result.put(row.getKeyStroke(), row.getOwner());
         }

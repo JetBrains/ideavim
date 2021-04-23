@@ -22,6 +22,26 @@ import org.jetbrains.annotations.NonNls
 /**
  * @author vlan
  */
+
+data class ShortcutOwnerInfo(
+  val normal: ShortcutOwner,
+  val insert: ShortcutOwner,
+  val visual: ShortcutOwner,
+  val select: ShortcutOwner
+) {
+  companion object {
+    @JvmStatic
+    fun allOf(owner: ShortcutOwner): ShortcutOwnerInfo {
+      return ShortcutOwnerInfo(owner, owner, owner, owner)
+    }
+
+    @JvmField
+    val allUndefined = allOf(ShortcutOwner.UNDEFINED)
+    val allVim = allOf(ShortcutOwner.VIM)
+    val allIde = allOf(ShortcutOwner.IDE)
+  }
+}
+
 enum class ShortcutOwner(val ownerName: @NonNls String, private val title: @NonNls String) {
   UNDEFINED("undefined", "Undefined"),
   IDE(Constants.IDE_STRING, "IDE"),
@@ -37,9 +57,9 @@ enum class ShortcutOwner(val ownerName: @NonNls String, private val title: @NonN
   companion object {
     @JvmStatic
     fun fromString(s: String): ShortcutOwner = when (s) {
-        Constants.IDE_STRING -> IDE
-        Constants.VIM_STRING -> VIM
-        else -> UNDEFINED
+      Constants.IDE_STRING -> IDE
+      Constants.VIM_STRING -> VIM
+      else -> UNDEFINED
     }
   }
 }

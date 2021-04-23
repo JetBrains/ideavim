@@ -40,7 +40,7 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
-import com.maddyhome.idea.vim.key.ShortcutOwner
+import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.FindActionId
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -134,7 +134,7 @@ class NotificationService(private val project: Project?) {
   ).notify(project)
 
   fun notifyAboutShortcutConflict(keyStroke: KeyStroke) {
-    VimPlugin.getKey().savedShortcutConflicts[keyStroke] = ShortcutOwner.VIM
+    VimPlugin.getKey().savedShortcutConflicts[keyStroke] = ShortcutOwnerInfo.allVim
     val shortcutText = KeymapUtil.getShortcutText(KeyboardShortcut(keyStroke, null))
     val message = "Using the <b>$shortcutText</b> shortcut for Vim emulation.<br/>" +
       "You can redefine it as an <a href='#ide'>IDE shortcut</a> or " +
@@ -143,7 +143,7 @@ class NotificationService(private val project: Project?) {
       override fun hyperlinkActivated(notification: Notification, e: HyperlinkEvent) {
         when (e.description) {
           "#ide" -> {
-            VimPlugin.getKey().savedShortcutConflicts[keyStroke] = ShortcutOwner.IDE
+            VimPlugin.getKey().savedShortcutConflicts[keyStroke] = ShortcutOwnerInfo.allIde
             notification.expire()
           }
           "#settings" -> ShowSettingsUtil.getInstance().editConfigurable(project, VimEmulationConfigurable())
