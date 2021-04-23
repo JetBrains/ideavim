@@ -29,7 +29,6 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
@@ -198,7 +197,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
       final ShortcutOwner owner = entry.getValue();
       if (owner != ShortcutOwner.UNDEFINED) {
         final Element conflictElement = new Element(SHORTCUT_CONFLICT_ELEMENT);
-        conflictElement.setAttribute(OWNER_ATTRIBUTE, owner.getName());
+        conflictElement.setAttribute(OWNER_ATTRIBUTE, owner.getOwnerName());
         final Element textElement = new Element(TEXT_ELEMENT);
         StringHelper.setSafeXmlText(textElement, entry.getKey().toString());
         conflictElement.addContent(textElement);

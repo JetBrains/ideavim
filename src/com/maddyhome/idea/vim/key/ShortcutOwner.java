@@ -29,11 +29,11 @@ public enum ShortcutOwner {
   IDE(Constants.IDE_STRING, "IDE"),
   VIM(Constants.VIM_STRING, "Vim");
 
-  private final @NotNull @NonNls String name;
+  private final @NotNull @NonNls String ownerName;
   private final @NotNull @NonNls String title;
 
-  ShortcutOwner(@NotNull @NonNls String name, @NotNull @NonNls String title) {
-    this.name = name;
+  ShortcutOwner(@NotNull @NonNls String ownerName, @NotNull @NonNls String title) {
+    this.ownerName = ownerName;
     this.title = title;
   }
 
@@ -52,8 +52,8 @@ public enum ShortcutOwner {
     return title;
   }
 
-  public @NotNull String getName() {
-    return name;
+  public @NotNull String getOwnerName() {
+    return ownerName;
   }
 
   private static class Constants {
