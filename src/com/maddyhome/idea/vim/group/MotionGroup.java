@@ -656,7 +656,7 @@ public class MotionGroup {
 
     final int topLine = getVisualLineAtTopOfScreen(editor);
     final int bottomLine = getVisualLineAtBottomOfScreen(editor);
-    final int lastLine = EditorHelper.getLineCount(editor) - 1;
+    final int lastLine = EditorHelper.getVisualLineCount(editor) - 1;
 
     // We need the non-normalised value here, so we can handle cases such as so=999 to keep the current line centred
     final int scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();

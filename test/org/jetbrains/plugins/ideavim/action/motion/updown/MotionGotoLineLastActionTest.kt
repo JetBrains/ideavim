@@ -255,4 +255,15 @@ class MotionGotoLineLastActionTest : VimTestCase() {
     assertPosition(99, 4)
     assertVisibleArea(67, 99)
   }
+
+  fun `test go to line does not scroll when last line is less than scrolloff above bottom of file with folds`() {
+    OptionsManager.scrolloff.set(10)
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    typeText(parseKeys("20G", "V10j", ":'<,'>action CollapseSelection<CR>", "V"))
+    setPositionAndScroll(67, 97)
+    typeText(parseKeys("G"))
+    assertPosition(99, 4)
+    assertVisibleArea(67, 99)
+  }
 }
