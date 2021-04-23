@@ -15,49 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+package com.maddyhome.idea.vim.key
 
-package com.maddyhome.idea.vim.key;
-
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.NonNls
 
 /**
  * @author vlan
  */
-public enum ShortcutOwner {
+enum class ShortcutOwner(val ownerName: @NonNls String, private val title: @NonNls String) {
   UNDEFINED("undefined", "Undefined"),
   IDE(Constants.IDE_STRING, "IDE"),
   VIM(Constants.VIM_STRING, "Vim");
 
-  private final @NotNull @NonNls String ownerName;
-  private final @NotNull @NonNls String title;
+  override fun toString(): String = title
 
-  ShortcutOwner(@NotNull @NonNls String ownerName, @NotNull @NonNls String title) {
-    this.ownerName = ownerName;
-    this.title = title;
+  private object Constants {
+    const val IDE_STRING: @NonNls String = "ide"
+    const val VIM_STRING: @NonNls String = "vim"
   }
 
-  public static @NotNull ShortcutOwner fromString(@NotNull String s) {
-    if (Constants.IDE_STRING.equals(s)) {
-      return IDE;
+  companion object {
+    @JvmStatic
+    fun fromString(s: String): ShortcutOwner = when (s) {
+        Constants.IDE_STRING -> IDE
+        Constants.VIM_STRING -> VIM
+        else -> UNDEFINED
     }
-    else if (Constants.VIM_STRING.equals(s)) {
-      return VIM;
-    }
-    return UNDEFINED;
-  }
-
-  @Override
-  public @NotNull String toString() {
-    return title;
-  }
-
-  public @NotNull String getOwnerName() {
-    return ownerName;
-  }
-
-  private static class Constants {
-    @NonNls private static final String IDE_STRING = "ide";
-    @NonNls private static final String VIM_STRING = "vim";
   }
 }
