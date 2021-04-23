@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.ui
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.DataManager
 import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -133,10 +134,6 @@ class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
 
 class VimActions : DumbAwareAction() {
 
-  companion object {
-    const val actionPlace = "VimActionsPopup"
-  }
-
   override fun actionPerformed(e: AnActionEvent) {
     val project = e.project ?: return
     VimActionsPopup.getPopup(e.dataContext).showCenteredInCurrentWindow(project)
@@ -155,7 +152,7 @@ private object VimActionsPopup {
       .createActionGroupPopup(
         STATUS_BAR_DISPLAY_NAME, actions,
         dataContext, JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, false,
-        VimActions.actionPlace
+        ActionPlaces.POPUP
       )
     popup.setAdText(MessageHelper.message("popup.advertisement.version", VimPlugin.getVersion()), SwingConstants.CENTER)
 
