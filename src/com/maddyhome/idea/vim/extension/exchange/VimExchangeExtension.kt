@@ -92,6 +92,7 @@ class VimExchangeExtension : VimExtension {
 
     val EXCHANGE_KEY = Key<Exchange>("exchange")
 
+    // End mark has always greater of eq offset than start mark
     class Exchange(val type: CommandState.SubMode, val start: Mark, val end: Mark, val text: String) {
       private var myHighlighter: RangeHighlighter? = null
       fun setHighlighter(highlighter: RangeHighlighter) {
@@ -364,12 +365,12 @@ class VimExchangeExtension : VimExtension {
       setRegister('*', starRegText)
       setRegister('+', plusRegText)
 
-      return Exchange(
-        selectionType.toSubMode(),
-        selectionStart,
-        selectionEnd,
-        text
-      )
+      return if (selectionStart.offset(editor) <= selectionEnd.offset(editor)) {
+        Exchange(selectionType.toSubMode(), selectionStart, selectionEnd, text)
+      }
+      else {
+        Exchange(selectionType.toSubMode(), selectionEnd, selectionStart, text)
+      }
     }
   }
 }

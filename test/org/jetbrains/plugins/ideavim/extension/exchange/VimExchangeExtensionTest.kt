@@ -353,6 +353,55 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun `test back selection`() {
+    val before = """
+         The quick
+         brown ${c}fox
+         
+    """.trimIndent()
+    configureByText(before)
+    typeText(StringHelper.parseKeys("vb", "X"))
+
+    assertHighlighter(10, 17, HighlighterTargetArea.EXACT_RANGE)
+
+    // Exit vim-exchange
+    exitExchange()
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun `test back selection exchange 1`() {
+    doTest(
+      listOf("vb", "X", "bevb", "X"),
+      "The quick brow${c}n fox catch over the lazy dog",
+      "The ${c}brown quick fox catch over the lazy dog",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun `test back selection exchange 2`() {
+    doTest(
+      listOf("vb", "X", "wve", "X"),
+      "The quick brow${c}n fox catch over the lazy dog",
+      "The quick fox ${c}brown catch over the lazy dog",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun `test back selection exchange 3`() {
+    doTest(
+      listOf("ve", "X", "wevb", "X"),
+      "The quick ${c}brown fox catch over the lazy dog",
+      "The quick fox ${c}brown catch over the lazy dog",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    )
+  }
+
   private fun exitExchange() {
     typeText(StringHelper.parseKeys("cxc"))
   }
