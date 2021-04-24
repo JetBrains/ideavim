@@ -48,7 +48,6 @@ import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import java.awt.datatransfer.StringSelection
 import java.io.File
 import javax.swing.KeyStroke
-import javax.swing.event.HyperlinkEvent
 
 /**
  * @author Alex Plate
@@ -136,27 +135,25 @@ class NotificationService(private val project: Project?) {
   fun notifyAboutShortcutConflict(keyStroke: KeyStroke) {
     VimPlugin.getKey().savedShortcutConflicts[keyStroke] = ShortcutOwnerInfo.allVim
     val shortcutText = KeymapUtil.getShortcutText(KeyboardShortcut(keyStroke, null))
-    val message = "Using the <b>$shortcutText</b> shortcut for Vim emulation.<br/>" +
-      "You can redefine it as an <a href='#ide'>IDE shortcut</a> or " +
-      "configure its handler in <a href='#settings'>Vim Emulation</a> settings."
-    val listener = object : NotificationListener.Adapter() {
-      override fun hyperlinkActivated(notification: Notification, e: HyperlinkEvent) {
-        when (e.description) {
-          "#ide" -> {
-            VimPlugin.getKey().savedShortcutConflicts[keyStroke] = ShortcutOwnerInfo.allIde
-            notification.expire()
-          }
-          "#settings" -> ShowSettingsUtil.getInstance().showSettingsDialog(project, VimEmulationConfigurable::class.java)
-        }
-      }
-    }
-    Notification(
+    val message = "Using the <b>$shortcutText</b> as Vim shortcut"
+    val notification = Notification(
       IDEAVIM_NOTIFICATION_ID,
       IDEAVIM_NOTIFICATION_TITLE,
       message,
-      NotificationType.INFORMATION,
-      listener
-    ).notify(project)
+      NotificationType.INFORMATION
+    )
+    notification.addAction(object : DumbAwareAction("Use as IDE Shortcut") {
+      override fun actionPerformed(e: AnActionEvent) {
+        VimPlugin.getKey().savedShortcutConflicts[keyStroke] = ShortcutOwnerInfo.allIde
+        notification.expire()
+      }
+    })
+    notification.addAction(object : DumbAwareAction("Configure…") {
+      override fun actionPerformed(e: AnActionEvent) {
+        ShowSettingsUtil.getInstance().showSettingsDialog(project, VimEmulationConfigurable::class.java)
+      }
+    })
+    notification.notify(project)
   }
 
   fun notifySubscribedToEap() {
