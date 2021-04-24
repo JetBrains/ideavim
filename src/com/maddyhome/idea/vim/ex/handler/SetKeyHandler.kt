@@ -31,22 +31,65 @@ import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 
 class SetKeyHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+  override val argFlags: CommandHandlerFlags =
+    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-    execute(cmd)
-    return true
+    return doCommand(cmd)
   }
 
   override fun execute(cmd: ExCommand) {
+    doCommand(cmd)
+  }
+
+  private fun doCommand(cmd: ExCommand): Boolean {
+    if (cmd.argument.isBlank()) return false
+
     val args = cmd.argument.split(" ")
-    val key = parseKeys(args[0]).single()
-    val owner = ShortcutOwner.fromString(args[2])
-    val existingInfo: ShortcutOwnerInfo = VimPlugin.getKey().savedShortcutConflicts[key]!!
-    val newInfo = when (args[1]) {
-      "i" -> existingInfo.toPerMode().copy(insert = owner)
-      else -> error("")
+    if (args.isEmpty()) return false
+
+    val key = try {
+      parseKeys(args[0]).first()
+    } catch (e: IllegalArgumentException) {
+      null
     }
-    VimPlugin.getKey().savedShortcutConflicts[key] = newInfo
+
+    val owner = ShortcutOwnerInfo.allPerModeVim
+
+    val resultingOwner = args.drop(1).fold(owner) { currentOwner: ShortcutOwnerInfo.PerMode?, newData ->
+      updateOwner(currentOwner, newData)
+    } ?: return false
+
+    if (key != null) {
+      VimPlugin.getKey().savedShortcutConflicts[key] = resultingOwner
+    } else {
+      val conflicts = VimPlugin.getKey().savedShortcutConflicts
+      conflicts.keys.forEach { conflictKey ->
+        conflicts[conflictKey] = resultingOwner
+      }
+    }
+    return true
+  }
+
+  private fun updateOwner(owner: ShortcutOwnerInfo.PerMode?, newData: String): ShortcutOwnerInfo.PerMode? {
+    if (owner == null) return null
+    val split = newData.split(":", limit = 2)
+    if (split.size != 2) return null
+
+    val left = split[0]
+    val right = ShortcutOwner.fromStringOrVim(split[1])
+
+    var currentOwner: ShortcutOwnerInfo.PerMode = owner
+    val modeSplit = left.split("-")
+    modeSplit.forEach {
+      currentOwner = when (it) {
+        "n" -> currentOwner.copy(normal = right)
+        "i" -> currentOwner.copy(insert = right)
+        "v" -> currentOwner.copy(visual = right, select = right)
+        "x" -> currentOwner.copy(visual = right)
+        else -> return null
+      }
+    }
+    return currentOwner
   }
 }

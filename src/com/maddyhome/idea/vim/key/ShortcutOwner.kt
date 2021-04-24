@@ -59,6 +59,8 @@ sealed class ShortcutOwnerInfo {
     val allUndefined = AllModes(ShortcutOwner.UNDEFINED)
     val allVim = AllModes(ShortcutOwner.VIM)
     val allIde = AllModes(ShortcutOwner.IDE)
+
+    val allPerModeVim = PerMode(ShortcutOwner.VIM, ShortcutOwner.VIM, ShortcutOwner.VIM, ShortcutOwner.VIM)
   }
 }
 
@@ -81,5 +83,7 @@ enum class ShortcutOwner(val ownerName: @NonNls String, private val title: @NonN
       Constants.VIM_STRING -> VIM
       else -> UNDEFINED
     }
+
+    fun fromStringOrVim(s: String): ShortcutOwner = if (Constants.IDE_STRING.equals(s, ignoreCase = true)) IDE else VIM
   }
 }
