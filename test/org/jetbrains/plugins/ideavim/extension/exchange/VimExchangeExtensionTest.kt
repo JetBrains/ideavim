@@ -243,6 +243,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual char highlighter`() {
     val before = """
          The ${c}quick
@@ -259,6 +260,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual line highdhitligthhter`() {
     val before = """
          The ${c}quick
@@ -275,6 +277,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test till the line end highlighter`() {
     val before = """
          The ${c}quick
@@ -289,6 +292,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test pre line end highlighter`() {
     val before = """
          The ${c}quick
@@ -303,6 +307,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test pre pre line end highlighter`() {
     val before = """
          The ${c}quick
@@ -317,6 +322,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test to file end highlighter`() {
     val before = """
          The quick
@@ -331,6 +337,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test to file end with new line highlighter`() {
     val before = """
          The quick
