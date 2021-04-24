@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.isTemplateActive
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.IdeaSpecifics.AppCodeTemplates.appCodeTemplateCaptured
@@ -139,8 +140,9 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
       if (keyStroke in VIM_ONLY_EDITOR_KEYS) return true
 
+      val mode = editor.mode
       val savedShortcutConflicts = VimPlugin.getKey().savedShortcutConflicts
-      return when (savedShortcutConflicts[keyStroke]?.normal) {
+      return when (savedShortcutConflicts[keyStroke]?.forMode(mode)) {
         ShortcutOwner.VIM -> true
         ShortcutOwner.IDE -> !isShortcutConflict(keyStroke)
         else -> {

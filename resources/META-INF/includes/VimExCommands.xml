@@ -46,6 +46,7 @@
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SelectFirstFileHandler" names="fir[st],rew[ind]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SelectLastFileHandler" names="la[st]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SetHandler" names="se[t]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SetKeyHandler" names="setkeydev"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.ShiftLeftHandler"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.ShiftRightHandler"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SourceHandler" names="so[urce]"/>

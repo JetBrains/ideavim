@@ -17,6 +17,7 @@
  */
 package com.maddyhome.idea.vim.key
 
+import com.maddyhome.idea.vim.command.CommandState
 import org.jetbrains.annotations.NonNls
 
 /**
@@ -29,6 +30,19 @@ data class ShortcutOwnerInfo(
   val visual: ShortcutOwner,
   val select: ShortcutOwner
 ) {
+
+  fun forMode(mode: CommandState.Mode): ShortcutOwner {
+    return when (mode) {
+      CommandState.Mode.COMMAND -> this.normal
+      CommandState.Mode.VISUAL -> this.visual
+      CommandState.Mode.SELECT -> this.visual
+      CommandState.Mode.INSERT -> this.insert
+      CommandState.Mode.CMD_LINE -> this.normal
+      CommandState.Mode.OP_PENDING -> this.normal
+      CommandState.Mode.REPLACE -> this.insert
+    }
+  }
+
   companion object {
     @JvmStatic
     fun allOf(owner: ShortcutOwner): ShortcutOwnerInfo {
