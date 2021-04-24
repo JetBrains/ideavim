@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 
-class SetKeyHandler  : CommandHandler.SingleExecution(), VimScriptCommandHandler {
+class SetKeyHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
   override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
@@ -44,7 +44,7 @@ class SetKeyHandler  : CommandHandler.SingleExecution(), VimScriptCommandHandler
     val owner = ShortcutOwner.fromString(args[2])
     val existingInfo: ShortcutOwnerInfo = VimPlugin.getKey().savedShortcutConflicts[key]!!
     val newInfo = when (args[1]) {
-      "i" -> existingInfo.copy(insert = owner)
+      "i" -> existingInfo.toPerMode().copy(insert = owner)
       else -> error("")
     }
     VimPlugin.getKey().savedShortcutConflicts[key] = newInfo

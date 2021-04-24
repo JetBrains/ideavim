@@ -251,7 +251,12 @@ public class VimEmulationConfigurable implements Configurable {
             case IDE_ACTION:
               return row.getAction().getTemplatePresentation().getText();
             case OWNER:
-              return row.getOwner().getNormal();
+              ShortcutOwnerInfo owner = row.getOwner();
+              if (owner instanceof ShortcutOwnerInfo.AllModes) {
+                return ((ShortcutOwnerInfo.AllModes)owner).getOwner();
+              } else if (owner instanceof ShortcutOwnerInfo.PerMode) {
+                return ((ShortcutOwnerInfo.PerMode)owner).getNormal();
+              }
           }
         }
         return null;
@@ -262,7 +267,7 @@ public class VimEmulationConfigurable implements Configurable {
         final Column column = Column.fromIndex(columnIndex);
         if (column != null && rowIndex >= 0 && rowIndex < myRows.size() && object instanceof ShortcutOwner) {
           final Row row = myRows.get(rowIndex);
-          row.setOwner(ShortcutOwnerInfo.allOf((ShortcutOwner)object));
+          row.setOwner(new ShortcutOwnerInfo.AllModes((ShortcutOwner)object));
         }
       }
 

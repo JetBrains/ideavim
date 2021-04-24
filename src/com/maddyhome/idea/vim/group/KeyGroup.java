@@ -194,7 +194,17 @@ public class KeyGroup implements PersistentStateComponent<Element> {
   public void saveData(@NotNull Element element) {
     final Element conflictsElement = new Element(SHORTCUT_CONFLICTS_ELEMENT);
     for (Map.Entry<KeyStroke, ShortcutOwnerInfo> entry : shortcutConflicts.entrySet()) {
-      final ShortcutOwner owner = entry.getValue().getNormal();
+      final ShortcutOwner owner;
+      ShortcutOwnerInfo value = entry.getValue();
+      if (value instanceof ShortcutOwnerInfo.AllModes) {
+        owner = ((ShortcutOwnerInfo.AllModes)value).getOwner();
+      }
+      else if (value instanceof ShortcutOwnerInfo.PerMode) {
+        owner = ((ShortcutOwnerInfo.PerMode)value).getNormal();
+      }
+      else {
+        throw new RuntimeException();
+      }
       if (owner != ShortcutOwner.UNDEFINED) {
         final Element conflictElement = new Element(SHORTCUT_CONFLICT_ELEMENT);
         conflictElement.setAttribute(OWNER_ATTRIBUTE, owner.getOwnerName());
@@ -225,7 +235,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
           if (text != null) {
             final KeyStroke keyStroke = KeyStroke.getKeyStroke(text);
             if (keyStroke != null) {
-              shortcutConflicts.put(keyStroke, ShortcutOwnerInfo.allOf(owner));
+              shortcutConflicts.put(keyStroke, new ShortcutOwnerInfo.AllModes(owner));
             }
           }
         }

@@ -367,8 +367,7 @@ class VimExchangeExtension : VimExtension {
 
       return if (selectionStart.offset(editor) <= selectionEnd.offset(editor)) {
         Exchange(selectionType.toSubMode(), selectionStart, selectionEnd, text)
-      }
-      else {
+      } else {
         Exchange(selectionType.toSubMode(), selectionEnd, selectionStart, text)
       }
     }

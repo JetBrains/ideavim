@@ -17,42 +17,48 @@
  */
 package com.maddyhome.idea.vim.key
 
+import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.mode
 import org.jetbrains.annotations.NonNls
 
-/**
- * @author vlan
- */
+sealed class ShortcutOwnerInfo {
+  data class AllModes(val owner: ShortcutOwner) : ShortcutOwnerInfo()
 
-data class ShortcutOwnerInfo(
-  val normal: ShortcutOwner,
-  val insert: ShortcutOwner,
-  val visual: ShortcutOwner,
-  val select: ShortcutOwner
-) {
+  data class PerMode(
+    val normal: ShortcutOwner,
+    val insert: ShortcutOwner,
+    val visual: ShortcutOwner,
+    val select: ShortcutOwner
+  ) : ShortcutOwnerInfo()
 
-  fun forMode(mode: CommandState.Mode): ShortcutOwner {
-    return when (mode) {
-      CommandState.Mode.COMMAND -> this.normal
-      CommandState.Mode.VISUAL -> this.visual
-      CommandState.Mode.SELECT -> this.visual
-      CommandState.Mode.INSERT -> this.insert
-      CommandState.Mode.CMD_LINE -> this.normal
-      CommandState.Mode.OP_PENDING -> this.normal
-      CommandState.Mode.REPLACE -> this.insert
+  fun forEditor(editor: Editor): ShortcutOwner {
+    return when (this) {
+      is AllModes -> this.owner
+      is PerMode -> when (editor.mode) {
+        CommandState.Mode.COMMAND -> this.normal
+        CommandState.Mode.VISUAL -> this.visual
+        CommandState.Mode.SELECT -> this.visual
+        CommandState.Mode.INSERT -> this.insert
+        CommandState.Mode.CMD_LINE -> this.normal
+        CommandState.Mode.OP_PENDING -> this.normal
+        CommandState.Mode.REPLACE -> this.insert
+      }
+    }
+  }
+
+  fun toPerMode(): PerMode {
+    return when (this) {
+      is PerMode -> this
+      is AllModes -> PerMode(owner, owner, owner, owner)
     }
   }
 
   companion object {
-    @JvmStatic
-    fun allOf(owner: ShortcutOwner): ShortcutOwnerInfo {
-      return ShortcutOwnerInfo(owner, owner, owner, owner)
-    }
-
     @JvmField
-    val allUndefined = allOf(ShortcutOwner.UNDEFINED)
-    val allVim = allOf(ShortcutOwner.VIM)
-    val allIde = allOf(ShortcutOwner.IDE)
+    val allUndefined = AllModes(ShortcutOwner.UNDEFINED)
+    val allVim = AllModes(ShortcutOwner.VIM)
+    val allIde = AllModes(ShortcutOwner.IDE)
   }
 }
 
