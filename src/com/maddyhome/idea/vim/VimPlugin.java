@@ -421,7 +421,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
         VimPlugin.getNotifications().specialKeymap(keymap, new NotificationListener.Adapter() {
           @Override
           protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
-            ShowSettingsUtil.getInstance().editConfigurable((Project)null, new VimEmulationConfigurable());
+            ShowSettingsUtil.getInstance().showSettingsDialog(null, VimEmulationConfigurable.class);
           }
         });
         manager.setActiveKeymap(keymap);

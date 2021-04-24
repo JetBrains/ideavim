@@ -146,7 +146,7 @@ class NotificationService(private val project: Project?) {
             VimPlugin.getKey().savedShortcutConflicts[keyStroke] = ShortcutOwnerInfo.allIde
             notification.expire()
           }
-          "#settings" -> ShowSettingsUtil.getInstance().editConfigurable(project, VimEmulationConfigurable())
+          "#settings" -> ShowSettingsUtil.getInstance().showSettingsDialog(project, VimEmulationConfigurable::class.java)
         }
       }
     }

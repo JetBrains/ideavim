@@ -225,7 +225,7 @@ private class HelpLink(
 
 private object ShortcutConflictsSettings : DumbAwareAction(MessageHelper.message("action.settings.text"))/*, LightEditCompatible*/ {
   override fun actionPerformed(e: AnActionEvent) {
-    ShowSettingsUtil.getInstance().editConfigurable(e.project, VimEmulationConfigurable())
+    ShowSettingsUtil.getInstance().showSettingsDialog(e.project, VimEmulationConfigurable::class.java)
   }
 }
 
