@@ -39,6 +39,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.List;
@@ -110,6 +111,15 @@ public class VimEmulationConfigurable implements Configurable {
       ownerColumn.setPreferredWidth(150);
       ownerColumn.setCellRenderer(renderer);
       ownerColumn.setCellEditor(renderer);
+    }
+
+    @Override
+    public TableCellRenderer getCellRenderer(int row, int column) {
+      if (column != Column.OWNER.getIndex()) return super.getCellRenderer(row, column);
+      Model model = (Model)getModel();
+      ShortcutOwnerInfo owner = model.myRows.get(row).getOwner();
+      if (owner instanceof ShortcutOwnerInfo.PerMode) return super.getCellRenderer(row, Column.KEYSTROKE.getIndex());
+      return super.getCellRenderer(row, column);
     }
 
     @Override
@@ -273,6 +283,7 @@ public class VimEmulationConfigurable implements Configurable {
 
       @Override
       public boolean isCellEditable(int rowIndex, int columnIndex) {
+        if (myRows.get(rowIndex).myOwner instanceof ShortcutOwnerInfo.PerMode) return false;
         return Column.fromIndex(columnIndex) == Column.OWNER;
       }
 
