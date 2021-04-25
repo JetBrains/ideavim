@@ -40,6 +40,7 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
+import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.FindActionId
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
@@ -133,9 +134,17 @@ class NotificationService(private val project: Project?) {
   ).notify(project)
 
   fun notifyAboutShortcutConflict(keyStroke: KeyStroke) {
-    VimPlugin.getKey().savedShortcutConflicts[keyStroke] = ShortcutOwnerInfo.allVim
+    val conflicts = VimPlugin.getKey().savedShortcutConflicts
+    val allValuesAreUndefined =
+      conflicts.values.all { it is ShortcutOwnerInfo.PerMode || (it is ShortcutOwnerInfo.AllModes && it.owner == ShortcutOwner.UNDEFINED) }
     val shortcutText = KeymapUtil.getShortcutText(KeyboardShortcut(keyStroke, null))
-    val message = "Using the <b>$shortcutText</b> as Vim shortcut"
+    val message = if (allValuesAreUndefined) {
+      "<b>$shortcutText</b> is defined as a shortcut for both Vim and IntelliJ IDEA. It is now used by Vim, but you can change this."
+    } else {
+      "<b>$shortcutText</b> is used as a Vim command"
+    }
+
+    conflicts[keyStroke] = ShortcutOwnerInfo.allVim
     val notification = Notification(
       IDEAVIM_NOTIFICATION_ID,
       IDEAVIM_NOTIFICATION_TITLE,
@@ -144,7 +153,7 @@ class NotificationService(private val project: Project?) {
     )
     notification.addAction(object : DumbAwareAction("Use as IDE Shortcut") {
       override fun actionPerformed(e: AnActionEvent) {
-        VimPlugin.getKey().savedShortcutConflicts[keyStroke] = ShortcutOwnerInfo.allIde
+        conflicts[keyStroke] = ShortcutOwnerInfo.allIde
         notification.expire()
       }
     })
