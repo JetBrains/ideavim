@@ -224,8 +224,7 @@ class NotificationService(private val project: Project?) {
   }
 
   @Suppress("DialogTitleCapitalization")
-  class OpenIdeaVimRcAction(private val notification: Notification?) :
-    DumbAwareAction("Open ~/.ideavimrc")/*, LightEditCompatible*/ {
+  class OpenIdeaVimRcAction(private val notification: Notification?) : DumbAwareAction()/*, LightEditCompatible*/ {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project
       if (eventProject != null) {
@@ -241,6 +240,12 @@ class NotificationService(private val project: Project?) {
         "Cannot create configuration file.<br/>Please create <code>~/.ideavimrc</code> manually",
         eventProject
       )
+    }
+
+    override fun update(e: AnActionEvent) {
+      super.update(e)
+      val actionText = if (VimScriptParser.findIdeaVimRc() != null) "Open ~/.ideavimrc" else "Create ~/.ideavimrc"
+      e.presentation.text = actionText
     }
   }
 
