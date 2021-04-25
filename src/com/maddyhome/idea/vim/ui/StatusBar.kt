@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.ui
 
+import com.intellij.icons.AllIcons
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.DataManager
 import com.intellij.openapi.actionSystem.ActionManager
@@ -169,10 +170,10 @@ private object VimActionsPopup {
     actionGroup.add(ShortcutConflictsSettings)
     actionGroup.addSeparator()
 
-    val eapGroup = DefaultActionGroup(
-      MessageHelper.message("action.eap.choice.active.text", if (JoinEap.eapActive()) 0 else 1),
-      true
-    )
+    val eapGroup = DefaultActionGroup(MessageHelper.message("action.eap.choice.active.text"), true)
+    if (JoinEap.eapActive()) {
+      eapGroup.templatePresentation.icon = AllIcons.Debugger.Db_muted_breakpoint
+    }
     eapGroup.add(JoinEap)
     eapGroup.add(
       HelpLink(
@@ -202,7 +203,7 @@ private object VimActionsPopup {
       HelpLink(
         MessageHelper.message("action.contribute.on.github.text"),
         "https://github.com/JetBrains/ideavim",
-        VimIcons.GITHUB
+        AllIcons.Vcs.Vendors.Github
       )
     )
     actionGroup.add(helpGroup)
