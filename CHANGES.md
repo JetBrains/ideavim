@@ -14,7 +14,7 @@ Get an Early Access
 -------------------
 
 Would you like to try new features and fixes? Join the Early Access Program and
-receive EAP builds as updates! Use the `EAP` option in the status bar or
+receive EAP builds as updates! Use the `Early Access Program` option in the status bar or
 add this URL to "Settings | Plugins | Manage Plugin Repositories":
 `https://plugins.jetbrains.com/plugins/eap/ideavim`
 
