@@ -40,6 +40,7 @@ import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.Consumer
+import com.intellij.util.ui.LafIconLookup
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -172,7 +173,7 @@ private object VimActionsPopup {
 
     val eapGroup = DefaultActionGroup(MessageHelper.message("action.eap.choice.active.text"), true)
     if (JoinEap.eapActive()) {
-      eapGroup.templatePresentation.icon = AllIcons.Debugger.Db_muted_breakpoint
+      eapGroup.templatePresentation.icon = LafIconLookup.getIcon("checkmark")
     }
     eapGroup.add(JoinEap)
     eapGroup.add(
