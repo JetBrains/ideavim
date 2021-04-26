@@ -159,6 +159,7 @@ class NotificationService(private val project: Project?) {
     })
     notification.addAction(object : DumbAwareAction("Configure…") {
       override fun actionPerformed(e: AnActionEvent) {
+        notification.expire()
         ShowSettingsUtil.getInstance().showSettingsDialog(project, VimEmulationConfigurable::class.java)
       }
     })
