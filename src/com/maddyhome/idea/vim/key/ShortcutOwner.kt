@@ -17,6 +17,7 @@
  */
 package com.maddyhome.idea.vim.key
 
+import com.google.common.collect.HashMultimap
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.mode
@@ -30,7 +31,40 @@ sealed class ShortcutOwnerInfo {
     val insert: ShortcutOwner,
     val visual: ShortcutOwner,
     val select: ShortcutOwner
-  ) : ShortcutOwnerInfo()
+  ) : ShortcutOwnerInfo() {
+    fun toNotation(): String {
+      val owners = HashMultimap.create<ShortcutOwner, String>()
+      owners.put(normal, "n")
+      owners.put(insert, "i")
+      owners.put(visual, "x")
+      owners.put(select, "s")
+
+      if ("x" in owners[ShortcutOwner.VIM] && "s" in owners[ShortcutOwner.VIM]) {
+        owners.remove(ShortcutOwner.VIM, "x")
+        owners.remove(ShortcutOwner.VIM, "s")
+        owners.put(ShortcutOwner.VIM, "v")
+      }
+
+      if ("x" in owners[ShortcutOwner.IDE] && "s" in owners[ShortcutOwner.IDE]) {
+        owners.remove(ShortcutOwner.IDE, "x")
+        owners.remove(ShortcutOwner.IDE, "s")
+        owners.put(ShortcutOwner.IDE, "v")
+      }
+
+      if (owners[ShortcutOwner.IDE].isEmpty()) {
+        owners.removeAll(ShortcutOwner.VIM)
+        owners.put(ShortcutOwner.VIM, "a")
+      }
+
+      if (owners[ShortcutOwner.VIM].isEmpty()) {
+        owners.removeAll(ShortcutOwner.IDE)
+        owners.put(ShortcutOwner.IDE, "a")
+      }
+
+      return owners[ShortcutOwner.IDE].joinToString(separator = "-") + ":" + ShortcutOwner.IDE.ownerName + " " +
+        owners[ShortcutOwner.VIM].joinToString(separator = "-") + ":" + ShortcutOwner.VIM.ownerName
+    }
+  }
 
   fun forEditor(editor: Editor): ShortcutOwner {
     return when (this) {

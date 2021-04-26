@@ -39,6 +39,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
@@ -102,15 +103,16 @@ public class VimEmulationConfigurable implements Configurable {
   }
 
   private static final class VimShortcutConflictsTable extends StripeTable {
+    final ComboBoxTableRenderer<ShortcutOwner> renderer = new ShortcutOwnerRenderer();
+
     public VimShortcutConflictsTable(@NotNull Model model) {
       super(model);
       getTableColumn(Column.KEYSTROKE).setPreferredWidth(100);
       getTableColumn(Column.IDE_ACTION).setPreferredWidth(400);
       final TableColumn ownerColumn = getTableColumn(Column.OWNER);
-      final ComboBoxTableRenderer<ShortcutOwner> renderer = new ShortcutOwnerRenderer();
       ownerColumn.setPreferredWidth(150);
-      ownerColumn.setCellRenderer(renderer);
-      ownerColumn.setCellEditor(renderer);
+      //ownerColumn.setCellRenderer(renderer);
+      //ownerColumn.setCellEditor(renderer);
     }
 
     @Override
@@ -118,8 +120,17 @@ public class VimEmulationConfigurable implements Configurable {
       if (column != Column.OWNER.getIndex()) return super.getCellRenderer(row, column);
       Model model = (Model)getModel();
       ShortcutOwnerInfo owner = model.myRows.get(row).getOwner();
-      if (owner instanceof ShortcutOwnerInfo.PerMode) return super.getCellRenderer(row, Column.KEYSTROKE.getIndex());
-      return super.getCellRenderer(row, column);
+      if (owner instanceof ShortcutOwnerInfo.PerMode) return super.getCellRenderer(row, column);
+      return renderer;
+    }
+
+    @Override
+    public TableCellEditor getCellEditor(int row, int column) {
+      if (column != Column.OWNER.getIndex()) return super.getCellEditor(row, column);
+      Model model = (Model)getModel();
+      ShortcutOwnerInfo owner = model.myRows.get(row).getOwner();
+      if (owner instanceof ShortcutOwnerInfo.PerMode) return super.getCellEditor(row, column);
+      return renderer;
     }
 
     @Override
@@ -265,7 +276,7 @@ public class VimEmulationConfigurable implements Configurable {
               if (owner instanceof ShortcutOwnerInfo.AllModes) {
                 return ((ShortcutOwnerInfo.AllModes)owner).getOwner();
               } else if (owner instanceof ShortcutOwnerInfo.PerMode) {
-                return ((ShortcutOwnerInfo.PerMode)owner).getNormal();
+                return ((ShortcutOwnerInfo.PerMode)owner).toNotation();
               }
           }
         }
