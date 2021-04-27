@@ -26,7 +26,10 @@ import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.openapi.ui.StripeTable;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.components.JBTextArea;
+import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.ui.UIUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.MessageHelper;
@@ -99,6 +102,17 @@ public class VimEmulationConfigurable implements Configurable {
       conflictsPanel.setBorder(IdeBorderFactory.createTitledBorder(title, false));
       conflictsPanel.add(scrollPane);
       add(conflictsPanel, BorderLayout.CENTER);
+      addHelpLine(model);
+    }
+
+    public void addHelpLine(VimShortcutConflictsTable.Model model) {
+      VimShortcutConflictsTable.Row firstPerMode = ContainerUtil.find(model.myRows, row -> {
+        ShortcutOwnerInfo owner = row.getOwner();
+        return owner instanceof ShortcutOwnerInfo.PerMode;
+      });
+      JBLabel helpLine = new JBLabel();
+      helpLine.setText(MessageHelper.message("configurable.noneditablehandler.helper.text"));
+      add(helpLine, BorderLayout.SOUTH);
     }
   }
 
@@ -111,8 +125,6 @@ public class VimEmulationConfigurable implements Configurable {
       getTableColumn(Column.IDE_ACTION).setPreferredWidth(400);
       final TableColumn ownerColumn = getTableColumn(Column.OWNER);
       ownerColumn.setPreferredWidth(150);
-      //ownerColumn.setCellRenderer(renderer);
-      //ownerColumn.setCellEditor(renderer);
     }
 
     @Override
