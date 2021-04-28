@@ -68,6 +68,7 @@
     <ID>MagicNumber:SelectionType.kt$SelectionType.BLOCK_WISE$3</ID>
     <ID>MagicNumber:ShiftLeftHandler.kt$ShiftLeftHandler$31</ID>
     <ID>MagicNumber:ShiftRightHandler.kt$ShiftRightHandler$31</ID>
+    <ID>MagicNumber:ShortcutOwner.kt$ShortcutOwnerInfo.PerMode$1000</ID>
     <ID>MagicNumber:VimHighlightedYank.kt$VimHighlightedYank.HighlightHandler$3</ID>
     <ID>MagicNumber:VimHighlightedYank.kt$VimHighlightedYank.HighlightHandler$4</ID>
     <ID>MatchingDeclarationName:CommandDefinition.kt$CommandName</ID>
