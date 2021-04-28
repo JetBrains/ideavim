@@ -28,7 +28,6 @@ import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.components.JBTextArea;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.ui.UIUtil;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -106,12 +105,19 @@ public class VimEmulationConfigurable implements Configurable {
     }
 
     public void addHelpLine(VimShortcutConflictsTable.Model model) {
-      VimShortcutConflictsTable.Row firstPerMode = ContainerUtil.find(model.myRows, row -> {
+      @Nullable VimShortcutConflictsTable.Row firstPerMode = ContainerUtil.find(model.myRows, row -> {
         ShortcutOwnerInfo owner = row.getOwner();
         return owner instanceof ShortcutOwnerInfo.PerMode;
       });
       JBLabel helpLine = new JBLabel();
-      helpLine.setText(MessageHelper.message("configurable.noneditablehandler.helper.text"));
+      if (firstPerMode == null) {
+        helpLine.setText(MessageHelper.message("configurable.noneditablehandler.helper.text"));
+      }
+      else {
+        helpLine.setText(MessageHelper.message("configurable.noneditablehandler.helper.text.with.example",
+                         ((ShortcutOwnerInfo.PerMode)firstPerMode.myOwner).toNotation(),
+                         KeymapUtil.getShortcutText(new KeyboardShortcut(firstPerMode.getKeyStroke(), null))));
+      }
       add(helpLine, BorderLayout.SOUTH);
     }
   }
