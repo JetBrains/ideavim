@@ -61,8 +61,16 @@ sealed class ShortcutOwnerInfo {
         owners.put(ShortcutOwner.IDE, "a")
       }
 
-      return owners[ShortcutOwner.IDE].joinToString(separator = "-") + ":" + ShortcutOwner.IDE.ownerName + " " +
-        owners[ShortcutOwner.VIM].joinToString(separator = "-") + ":" + ShortcutOwner.VIM.ownerName
+      return owners[ShortcutOwner.IDE]
+        .sortedBy { wights[it] ?: 1000 }
+        .joinToString(separator = "-") +
+
+        ":" + ShortcutOwner.IDE.ownerName + " " +
+
+        owners[ShortcutOwner.VIM]
+          .sortedBy { wights[it] ?: 1000 }
+          .joinToString(separator = "-") +
+        ":" + ShortcutOwner.VIM.ownerName
     }
   }
 
@@ -95,6 +103,15 @@ sealed class ShortcutOwnerInfo {
     val allIde = AllModes(ShortcutOwner.IDE)
 
     val allPerModeVim = PerMode(ShortcutOwner.VIM, ShortcutOwner.VIM, ShortcutOwner.VIM, ShortcutOwner.VIM)
+
+    private val wights = mapOf(
+      "a" to 0,
+      "n" to 1,
+      "i" to 2,
+      "x" to 3,
+      "s" to 4,
+      "v" to 5
+    )
   }
 }
 
