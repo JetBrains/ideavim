@@ -18,20 +18,24 @@
 
 package com.maddyhome.idea.vim.ui;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.openapi.ui.StripeTable;
+import com.intellij.ui.DumbAwareActionButton;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.ui.UIUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo;
 import org.jetbrains.annotations.Nls;
@@ -94,7 +98,11 @@ public class VimEmulationConfigurable implements Configurable {
     public VimSettingsPanel(@NotNull VimShortcutConflictsTable.Model model) {
       VimShortcutConflictsTable shortcutConflictsTable = new VimShortcutConflictsTable(model);
       setLayout(new BorderLayout());
-      final JScrollPane scrollPane = new JBScrollPane(shortcutConflictsTable);
+
+      ToolbarDecorator decorator = ToolbarDecorator.createDecorator(shortcutConflictsTable);
+      decorator.addExtraAction(new CopyForRcAction(model));
+
+      final JPanel scrollPane = decorator.createPanel();
       scrollPane.setBorder(new LineBorder(JBColor.border()));
       final JPanel conflictsPanel = new JPanel(new BorderLayout());
       final String title = MessageHelper.message("border.title.shortcut.conflicts.for.active.keymap");
@@ -349,6 +357,40 @@ public class VimEmulationConfigurable implements Configurable {
         }
         return result;
       }
+
+      public @NotNull List<Row> getRows() {
+        return myRows;
+      }
+    }
+  }
+
+  private static class CopyForRcAction extends DumbAwareActionButton {
+    private final VimShortcutConflictsTable.Model myModel;
+
+    public CopyForRcAction(VimShortcutConflictsTable.@NotNull Model model) {
+      super("Copy for .ideavimrc", "Copy config for .ideavimrc", AllIcons.Actions.Copy);
+      myModel = model;
+    }
+
+    @Override
+    public void actionPerformed(@NotNull AnActionEvent e) {
+      StringBuilder stringBuilder = new StringBuilder();
+      for (VimShortcutConflictsTable.Row row : myModel.getRows()) {
+        ShortcutOwnerInfo ownerInfo = row.getOwner();
+        if (!(ownerInfo instanceof ShortcutOwnerInfo.AllModes)) continue;
+        ShortcutOwner owner = ((ShortcutOwnerInfo.AllModes)ownerInfo).getOwner();
+        if (owner == ShortcutOwner.UNDEFINED) continue;
+
+        stringBuilder.append("setkeydev ");
+        stringBuilder.append(StringHelper.toKeyNotation(row.getKeyStroke()));
+        stringBuilder.append(" ");
+        stringBuilder.append("a:");
+        stringBuilder.append(owner.getOwnerName());
+        stringBuilder.append("\n");
+      }
+
+      String data = stringBuilder.toString();
+      ClipboardHandler.setClipboardText(data, Collections.emptyList(), data);
     }
   }
 }
