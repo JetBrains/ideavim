@@ -877,6 +877,17 @@ public class ChangeGroup {
       return true;
     }
 
+    // Shift-space
+    if (key.getKeyCode() == 32 && ((key.getModifiers() & KeyEvent.SHIFT_DOWN_MASK) != 0)) {
+      final Document doc = editor.getDocument();
+      CommandProcessor.getInstance().executeCommand(editor.getProject(), () -> ApplicationManager.getApplication()
+                                                      .runWriteAction(() -> KeyHandler.getInstance().getOriginalHandler().execute(editor, ' ', context)),
+                                                    "", doc, UndoConfirmationPolicy.DEFAULT, doc);
+      MotionGroup.scrollCaretIntoView(editor);
+      return true;
+    }
+
+
     return false;
   }
 
