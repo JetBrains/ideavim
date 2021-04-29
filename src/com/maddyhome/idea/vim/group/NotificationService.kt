@@ -19,9 +19,9 @@
 package com.maddyhome.idea.vim.group
 
 import com.intellij.icons.AllIcons
+import com.intellij.ide.BrowserUtil
 import com.intellij.ide.actions.OpenFileAction
 import com.intellij.ide.actions.RevealFileAction
-import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationDisplayType
 import com.intellij.notification.NotificationGroup
@@ -98,7 +98,7 @@ class NotificationService(private val project: Project?) {
       ) { OptionsManager.ideajoin.set() }
     )
 
-    notification.addAction(HelpLink(notification, ideajoinExamplesUrl))
+    notification.addAction(HelpLink(ideajoinExamplesUrl))
     notification.notify(project)
   }
 
@@ -234,7 +234,9 @@ class NotificationService(private val project: Project?) {
   }
 
   @Suppress("DialogTitleCapitalization")
-  class OpenIdeaVimRcAction(private val notification: Notification?) : DumbAwareAction()/*, LightEditCompatible*/ {
+  class OpenIdeaVimRcAction(private val notification: Notification?) : DumbAwareAction(
+    if (VimScriptParser.findIdeaVimRc() != null) "Open ~/.ideavimrc" else "Create ~/.ideavimrc"
+  )/*, LightEditCompatible*/ {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project
       if (eventProject != null) {
@@ -293,11 +295,9 @@ class NotificationService(private val project: Project?) {
     }
   }
 
-  private inner class HelpLink(val notification: Notification, val link: String) :
-    AnAction("", "", AllIcons.General.TodoQuestion) {
+  private inner class HelpLink(val link: String) : AnAction("", "", AllIcons.Actions.Help) {
     override fun actionPerformed(e: AnActionEvent) {
-      BrowserLauncher.instance.open(link)
-      notification.expire()
+      BrowserUtil.browse(link)
     }
   }
 
