@@ -126,6 +126,7 @@ public class VimEmulationConfigurable implements Configurable {
                          ((ShortcutOwnerInfo.PerMode)firstPerMode.myOwner).toNotation(),
                          KeymapUtil.getShortcutText(new KeyboardShortcut(firstPerMode.getKeyStroke(), null))));
       }
+      helpLine.setForeground(UIUtil.getInactiveTextColor());
       add(helpLine, BorderLayout.SOUTH);
     }
   }
