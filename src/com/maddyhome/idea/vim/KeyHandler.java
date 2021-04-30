@@ -28,6 +28,7 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorModificationUtil;
 import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
@@ -698,9 +699,14 @@ public class KeyHandler {
 
     Project project = editor.getProject();
     final Command.Type type = command.getType();
-    if (type.isWrite() && !editor.getDocument().isWritable()) {
-      VimPlugin.indicateError();
-      reset(editor);
+    if (type.isWrite()) {
+      boolean modificationAllowed = EditorModificationUtil.checkModificationAllowed(editor);
+      boolean writeRequested = EditorModificationUtil.requestWriting(editor);
+      if (!modificationAllowed || !writeRequested) {
+        VimPlugin.indicateError();
+        reset(editor);
+        return;
+      }
     }
 
     if (!command.getFlags().contains(CommandFlags.FLAG_TYPEAHEAD_SELF_MANAGE)) {
