@@ -26,10 +26,7 @@ import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.openapi.ui.StripeTable;
-import com.intellij.ui.DumbAwareActionButton;
-import com.intellij.ui.IdeBorderFactory;
-import com.intellij.ui.JBColor;
-import com.intellij.ui.ToolbarDecorator;
+import com.intellij.ui.*;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.ui.UIUtil;
@@ -117,17 +114,21 @@ public class VimEmulationConfigurable implements Configurable {
         ShortcutOwnerInfo owner = row.getOwner();
         return owner instanceof ShortcutOwnerInfo.PerMode;
       });
-      JBLabel helpLine = new JBLabel();
       if (firstPerMode == null) {
-        helpLine.setText(MessageHelper.message("configurable.noneditablehandler.helper.text"));
+        HyperlinkLabel label = new HyperlinkLabel();
+        label.setTextWithHyperlink(MessageHelper.message("configurable.keyhandler.link"));
+        label.setHyperlinkTarget("https://jb.gg/abva4t");
+        label.setForeground(UIUtil.getInactiveTextColor());
+        add(label, BorderLayout.SOUTH);
       }
       else {
+        JBLabel helpLine = new JBLabel();
         helpLine.setText(MessageHelper.message("configurable.noneditablehandler.helper.text.with.example",
                          ((ShortcutOwnerInfo.PerMode)firstPerMode.myOwner).toNotation(),
                          KeymapUtil.getShortcutText(new KeyboardShortcut(firstPerMode.getKeyStroke(), null))));
+        helpLine.setForeground(UIUtil.getInactiveTextColor());
+        add(helpLine, BorderLayout.SOUTH);
       }
-      helpLine.setForeground(UIUtil.getInactiveTextColor());
-      add(helpLine, BorderLayout.SOUTH);
     }
   }
 
