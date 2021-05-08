@@ -169,6 +169,10 @@ public class VimIndentObject implements VimExtension {
               accumulatedWhitespace = 0;
             }
           }
+          if (pos1 == -1) {
+            // Reached first line in the buffer.
+            upperBoundaryOffset = 0;
+          }
         }
 
         // Now `upperBoundaryOffset` marks the beginning of an `ai` text object.
@@ -217,6 +221,10 @@ public class VimIndentObject implements VimExtension {
               }
               isInIndent = false;
             }
+          }
+          if (pos2 == charSequence.length()) {
+            // Reached end of the buffer.
+            lowerBoundaryOffset = lastNewlinePos;
           }
         }
 

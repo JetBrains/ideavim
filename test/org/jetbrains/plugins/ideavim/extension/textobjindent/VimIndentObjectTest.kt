@@ -33,29 +33,21 @@ class VimIndentObjectTest : JavaVimTestCase() {
 
   // |d| |ii|
   fun testUpperCaseInsideIndent() {
-    doTest(StringHelper.parseKeys("4Gdii"), pythonCode,"""
-      import os
-      
-      def yell():
-      
-      
-      if __name__ == "__main__":
-          yell()
-    """.trimIndent())
+    doTest(
+      StringHelper.parseKeys("2Gdii"),
+      """
+        one
+          two
+          three
+        four
+      """.trimIndent(),
+      """
+        one
+        four
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
-
-  private val pythonCode: String = """
-    import os
-    
-    def yell():
-        print("hello")
-        print(os.environ)
-    
-    
-    if __name__ == "__main__":
-        yell()
-  """.trimIndent()
 
 }
