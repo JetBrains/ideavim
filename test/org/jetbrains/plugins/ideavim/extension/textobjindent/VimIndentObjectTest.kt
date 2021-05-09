@@ -31,6 +31,18 @@ class VimIndentObjectTest : JavaVimTestCase() {
     enableExtensions("textobj-indent")
   }
 
+  fun testSingleLine() {
+    doTest(
+      StringHelper.parseKeys("dii"),
+      """
+        one
+      """.trimIndent(),
+      ""
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    assertSelection(null)
+  }
+
   fun testDeleteFlatIndent() {
     doTest(
       StringHelper.parseKeys("dii"),
@@ -179,6 +191,24 @@ class VimIndentObjectTest : JavaVimTestCase() {
     assertSelection(null)
   }
 
+  fun testNested1a() {
+    doTest(
+      StringHelper.parseKeys("3Gdai"),
+      """
+        one
+          two
+            three
+        four
+      """.trimIndent(),
+      """
+        one
+        four
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    assertSelection(null)
+  }
+
   fun testNested2() {
     doTest(
       StringHelper.parseKeys("3Gdii"),
@@ -192,6 +222,48 @@ class VimIndentObjectTest : JavaVimTestCase() {
         one
           two
         four
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    assertSelection(null)
+  }
+
+  fun testNested3() {
+    doTest(
+      StringHelper.parseKeys("3Gdii"),
+      """
+        one
+          two
+            three
+        four
+        five
+      """.trimIndent(),
+      """
+        one
+          two
+        four
+        five
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    assertSelection(null)
+  }
+
+  fun testNested4() {
+    doTest(
+      StringHelper.parseKeys("3Gdii"),
+      """
+        one
+          two
+            three
+        four
+
+      """.trimIndent(),
+      """
+        one
+          two
+        four
+
       """.trimIndent()
     )
     assertMode(CommandState.Mode.COMMAND)
