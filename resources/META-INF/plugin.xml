@@ -4,47 +4,44 @@
   <change-notes><![CDATA[
      <h3>Features:</h3>
      <ul>
-     <li>Support <code>NERDTree</code> extension <a href="https://youtrack.jetbrains.com/issue/VIM-1042">VIM-1042</a> |
-       <a href="https://github.com/preservim/nerdtree">NERDTree</a>
-     </li>
-     <li>Support <code>maxmapdepth</code> option to define the maximum depth of mappings
+     <li>Support <code>vim-paragraph-motion</code> extension <a href="https://youtrack.jetbrains.com/issue/VIM-2290">VIM-2290</a> |
+       <a href="https://github.com/dbakker/vim-paragraph-motion">vim-paragraph-motion</a>
      </li>
      </ul>
 
      <h3>Fixes:</h3>
      <ul>
      <li>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-2202">VIM-2202</a>
-       Fix macro recording for ex command and search
+       <a href="https://youtrack.jetbrains.com/issue/VIM-2230">VIM-2230</a>
+       Tweak caret position with inline rename options inlay
      </li>
      <li>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-1799">VIM-1799</a>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-1794">VIM-1794</a>
-       Special characters are not interpreted on yanking
+       <a href="https://youtrack.jetbrains.com/issue/VIM-2177">VIM-2177</a>
+       Fix scrolling issues near bottom of file
      </li>
      <li>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-2218">VIM-2218</a>
-       Fix some shortcuts for 2021.+
+       <a href="https://youtrack.jetbrains.com/issue/VIM-2276">VIM-2276</a>
+       <code>:ls</code> returns correct path for files on Microsoft Windows.
      </li>
      <li>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-2217">VIM-2217</a>
-       Fix adding new line at the end of the file for the AppCode
+       <a href="https://youtrack.jetbrains.com/issue/VIM-1953">VIM-1953</a>
+       Execute live testing for <code>:w</code> command
      </li>
      <li>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-2220">VIM-2220</a>
-       Do not try to get a commandState for null editor
-     </li>
-     <li>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-2153">VIM-2153</a>
-       Fix storing special characters after IDE closing
+       <a href="https://youtrack.jetbrains.com/issue/VIM-2289">VIM-2289</a>
+       Fix <code><End></code> command behaviour
      </li>
      </ul>
 
      <h3>Merged PRs:</h3>
      <ul>
      <li>
-       <a href="https://github.com/JetBrains/ideavim/pull/269">269</a>
-       by <a href="https://github.com/daya0576">大牙(Henry Zhu)</a>: fix invalid link of submodule docs
+       <a href="https://github.com/JetBrains/ideavim/pull/280">280</a>
+       by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Caret position and view scrolling fixes
+     </li>
+     <li>
+       <a href="https://github.com/JetBrains/ideavim/pull/289">289</a>
+       by <a href="https://github.com/MichalPlacek">MichalPlacek</a>: VIM-2276 ls returns "absolute path" for files on Microsoft Windows.
      </li>
      </ul>
     ]]>
@@ -110,6 +107,8 @@
     <editorFloatingToolbarProvider implementation="com.maddyhome.idea.vim.ui.ReloadFloatingToolbar"/>
 
     <actionPromoter implementation="com.maddyhome.idea.vim.key.VimActionsPromoter" order="last"/>
+
+    <spellchecker.bundledDictionaryProvider implementation="com.maddyhome.idea.vim.VimBundledDictionaryProvider"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>

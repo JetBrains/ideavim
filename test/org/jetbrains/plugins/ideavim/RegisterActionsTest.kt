@@ -36,6 +36,7 @@ class RegisterActionsTest : VimTestCase() {
     doTest("l", before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test action in disabled plugin`() {
     setupChecks {
       caretShape = false
@@ -43,45 +44,48 @@ class RegisterActionsTest : VimTestCase() {
     val keys = StringHelper.parseKeys("jklwB") // just random keys
     val before = "I ${c}found it in a legendary land"
     val after = "I ${c}found it in a legendary land"
-    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.setEnabled(false)
     }
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test turn plugin off and on`() {
     val keys = StringHelper.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
-    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.setEnabled(false)
       VimPlugin.setEnabled(true)
     }
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test enable twice`() {
     val keys = StringHelper.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
-    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       VimPlugin.setEnabled(false)
       VimPlugin.setEnabled(true)
       VimPlugin.setEnabled(true)
     }
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
   fun `test unregister extension`() {
     val keys = StringHelper.parseKeys("l")
     val before = "I ${c}found it in a legendary land"
     val after = "I f${c}ound it in a legendary land"
     var motionRightAction: ActionBeanClass? = null
-    doTestWithoutNeovim(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
       motionRightAction = VIM_ACTIONS_EP.extensions().findAny().get()
 
-      TestCase.assertNotNull(getCommandNode())
+      assertNotNull(getCommandNode())
 
       @Suppress("DEPRECATION")
       VIM_ACTIONS_EP.getPoint(null).unregisterExtension(motionRightAction!!)
-      TestCase.assertNull(getCommandNode())
+      assertNull(getCommandNode())
     }
     @Suppress("DEPRECATION")
     VIM_ACTIONS_EP.getPoint(null).registerExtension(motionRightAction!!)

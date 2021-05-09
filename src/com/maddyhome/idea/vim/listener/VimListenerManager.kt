@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.listener
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.actionSystem.TypedAction
 import com.intellij.openapi.editor.event.EditorFactoryEvent
 import com.intellij.openapi.editor.event.EditorFactoryListener
@@ -61,6 +60,7 @@ import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
+import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -141,13 +141,13 @@ object VimListenerManager {
 
   object EditorListeners {
     fun addAll() {
-      EditorFactory.getInstance().allEditors.forEach { editor ->
+      localEditors().forEach { editor ->
         this.add(editor)
       }
     }
 
     fun removeAll() {
-      EditorFactory.getInstance().allEditors.forEach { editor ->
+      localEditors().forEach { editor ->
         this.remove(editor, false)
       }
     }
@@ -226,10 +226,9 @@ object VimListenerManager {
       try {
         // Synchronize selections between editors
         val newRange = selectionEvent.newRange
-        for (e in EditorFactory.getInstance().getEditors(document)) {
+        for (e in localEditors(document)) {
           if (e != editor) {
-            e.selectionModel
-              .vimSetSystemSelectionSilently(newRange.startOffset, newRange.endOffset)
+            e.selectionModel.vimSetSystemSelectionSilently(newRange.startOffset, newRange.endOffset)
           }
         }
       } finally {

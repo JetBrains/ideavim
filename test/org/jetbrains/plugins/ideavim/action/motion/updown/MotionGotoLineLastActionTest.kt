@@ -19,6 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -188,5 +189,81 @@ class MotionGotoLineLastActionTest : VimTestCase() {
       """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
+  }
+
+  fun `test scrolling positions target line in middle of screen`() {
+    configureByLines(100, "    I found it in a legendary land")
+    typeText(parseKeys("70G"))
+    assertPosition(69, 4)
+    assertVisibleArea(52, 86)
+  }
+
+  fun `test go to last line of file puts target line at bottom of screen`() {
+    configureByLines(100, "    I found it in a legendary land")
+    typeText(parseKeys("G"))
+    assertPosition(99, 4)
+    assertVisibleArea(65, 99)
+  }
+
+  fun `test go to last line of file puts target line at bottom of screen with virtual space enabled`() {
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    typeText(parseKeys("G"))
+    assertPosition(99, 4)
+    assertVisibleArea(65, 99)
+  }
+
+  fun `test go to line in last half screen of file puts last line at bottom of screen`() {
+    configureByLines(100, "    I found it in a legendary land")
+    typeText(parseKeys("90G"))
+    assertPosition(89, 4)
+    assertVisibleArea(65, 99)
+  }
+
+  fun `test go to line in last half screen of file puts last line at bottom of screen ignoring scrolloff`() {
+    OptionsManager.scrolloff.set(10)
+    configureByLines(100, "    I found it in a legendary land")
+    typeText(parseKeys("95G"))
+    assertPosition(94, 4)
+    assertVisibleArea(65, 99)
+  }
+
+  fun `test go to line does not scroll when default virtual space already at bottom of file`() {
+    // Editor has 5 lines of virtual space by default
+    configureByLines(100, "    I found it in a legendary land")
+    setPositionAndScroll(69, 85)
+    typeText(parseKeys("G"))
+    assertPosition(99, 4)
+    assertVisibleArea(69, 99)
+  }
+
+  fun `test go to line does not scroll when full virtual space already at bottom of file`() {
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    setPositionAndScroll(85, 85)
+    typeText(parseKeys("G"))
+    assertPosition(99, 4)
+    assertVisibleArea(85, 99)
+  }
+
+  fun `test go to line does not scroll when last line is less than scrolloff above bottom of file`() {
+    OptionsManager.scrolloff.set(10)
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    setPositionAndScroll(67, 97)
+    typeText(parseKeys("G"))
+    assertPosition(99, 4)
+    assertVisibleArea(67, 99)
+  }
+
+  fun `test go to line does not scroll when last line is less than scrolloff above bottom of file with folds`() {
+    OptionsManager.scrolloff.set(10)
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    typeText(parseKeys("20G", "V10j", ":'<,'>action CollapseSelection<CR>", "V"))
+    setPositionAndScroll(67, 97)
+    typeText(parseKeys("G"))
+    assertPosition(99, 4)
+    assertVisibleArea(67, 99)
   }
 }

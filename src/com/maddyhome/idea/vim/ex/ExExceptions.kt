@@ -19,7 +19,7 @@ package com.maddyhome.idea.vim.ex
 
 open class ExException(s: String? = null) : Exception(s)
 
-class InvalidCommandException(message: String, cmd: String?) : ExException("$message | $cmd")
+class InvalidCommandException(message: String, cmd: String?) : ExException(message + if (cmd != null) " | $cmd" else "")
 
 class InvalidRangeException(s: String) : ExException(s)
 

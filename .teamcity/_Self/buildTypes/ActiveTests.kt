@@ -24,7 +24,7 @@ sealed class ActiveTests(buildName: String, ijVersion: String) : BuildType({
 
   steps {
     gradle {
-      tasks = "clean check"
+      tasks = "clean check -x detekt ktlintCheck"
       buildFile = ""
       enableStacktrace = true
       param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")
@@ -55,5 +55,6 @@ sealed class ActiveTests(buildName: String, ijVersion: String) : BuildType({
 })
 
 object TestsForIntelliJEAP : ActiveTests("Tests for IntelliJ Latest EAP", "LATEST-EAP-SNAPSHOT")
+object TestsForIntelliJ20211 : ActiveTests("Tests for IntelliJ 2021.1", "2021.1")
 object TestsForIntelliJ20203 : ActiveTests("Tests for IntelliJ 2020.3", "2020.3")
 object TestsForIntelliJ20202 : ActiveTests("Tests for IntelliJ 2020.2", "2020.2")

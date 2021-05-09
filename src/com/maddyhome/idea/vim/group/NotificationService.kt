@@ -19,9 +19,9 @@
 package com.maddyhome.idea.vim.group
 
 import com.intellij.icons.AllIcons
+import com.intellij.ide.BrowserUtil
 import com.intellij.ide.actions.OpenFileAction
 import com.intellij.ide.actions.RevealFileAction
-import com.intellij.ide.browsers.BrowserLauncher
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationDisplayType
 import com.intellij.notification.NotificationGroup
@@ -41,6 +41,7 @@ import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.key.ShortcutOwner
+import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.FindActionId
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -48,7 +49,6 @@ import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import java.awt.datatransfer.StringSelection
 import java.io.File
 import javax.swing.KeyStroke
-import javax.swing.event.HyperlinkEvent
 
 /**
  * @author Alex Plate
@@ -98,7 +98,7 @@ class NotificationService(private val project: Project?) {
       ) { OptionsManager.ideajoin.set() }
     )
 
-    notification.addAction(HelpLink(notification, ideajoinExamplesUrl))
+    notification.addAction(HelpLink(ideajoinExamplesUrl))
     notification.notify(project)
   }
 
@@ -134,29 +134,36 @@ class NotificationService(private val project: Project?) {
   ).notify(project)
 
   fun notifyAboutShortcutConflict(keyStroke: KeyStroke) {
-    VimPlugin.getKey().savedShortcutConflicts[keyStroke] = ShortcutOwner.VIM
+    val conflicts = VimPlugin.getKey().savedShortcutConflicts
+    val allValuesAreUndefined =
+      conflicts.values.all { it is ShortcutOwnerInfo.PerMode || (it is ShortcutOwnerInfo.AllModes && it.owner == ShortcutOwner.UNDEFINED) }
     val shortcutText = KeymapUtil.getShortcutText(KeyboardShortcut(keyStroke, null))
-    val message = "Using the <b>$shortcutText</b> shortcut for Vim emulation.<br/>" +
-      "You can redefine it as an <a href='#ide'>IDE shortcut</a> or " +
-      "configure its handler in <a href='#settings'>Vim Emulation</a> settings."
-    val listener = object : NotificationListener.Adapter() {
-      override fun hyperlinkActivated(notification: Notification, e: HyperlinkEvent) {
-        when (e.description) {
-          "#ide" -> {
-            VimPlugin.getKey().savedShortcutConflicts[keyStroke] = ShortcutOwner.IDE
-            notification.expire()
-          }
-          "#settings" -> ShowSettingsUtil.getInstance().editConfigurable(project, VimEmulationConfigurable())
-        }
-      }
+    val message = if (allValuesAreUndefined) {
+      "<b>$shortcutText</b> is defined as a shortcut for both Vim and IntelliJ IDEA. It is now used by Vim, but you can change this."
+    } else {
+      "<b>$shortcutText</b> is used as a Vim command"
     }
-    Notification(
+
+    conflicts[keyStroke] = ShortcutOwnerInfo.allVim
+    val notification = Notification(
       IDEAVIM_NOTIFICATION_ID,
       IDEAVIM_NOTIFICATION_TITLE,
       message,
-      NotificationType.INFORMATION,
-      listener
-    ).notify(project)
+      NotificationType.INFORMATION
+    )
+    notification.addAction(object : DumbAwareAction("Use as IDE Shortcut") {
+      override fun actionPerformed(e: AnActionEvent) {
+        conflicts[keyStroke] = ShortcutOwnerInfo.allIde
+        notification.expire()
+      }
+    })
+    notification.addAction(object : DumbAwareAction("Configure…") {
+      override fun actionPerformed(e: AnActionEvent) {
+        notification.expire()
+        ShowSettingsUtil.getInstance().showSettingsDialog(project, VimEmulationConfigurable::class.java)
+      }
+    })
+    notification.notify(project)
   }
 
   fun notifySubscribedToEap() {
@@ -227,8 +234,9 @@ class NotificationService(private val project: Project?) {
   }
 
   @Suppress("DialogTitleCapitalization")
-  class OpenIdeaVimRcAction(private val notification: Notification?) :
-    DumbAwareAction("Open ~/.ideavimrc")/*, LightEditCompatible*/ {
+  class OpenIdeaVimRcAction(private val notification: Notification?) : DumbAwareAction(
+    if (VimScriptParser.findIdeaVimRc() != null) "Open ~/.ideavimrc" else "Create ~/.ideavimrc"
+  )/*, LightEditCompatible*/ {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project
       if (eventProject != null) {
@@ -244,6 +252,12 @@ class NotificationService(private val project: Project?) {
         "Cannot create configuration file.<br/>Please create <code>~/.ideavimrc</code> manually",
         eventProject
       )
+    }
+
+    override fun update(e: AnActionEvent) {
+      super.update(e)
+      val actionText = if (VimScriptParser.findIdeaVimRc() != null) "Open ~/.ideavimrc" else "Create ~/.ideavimrc"
+      e.presentation.text = actionText
     }
   }
 
@@ -281,11 +295,9 @@ class NotificationService(private val project: Project?) {
     }
   }
 
-  private inner class HelpLink(val notification: Notification, val link: String) :
-    AnAction("", "", AllIcons.General.TodoQuestion) {
+  private inner class HelpLink(val link: String) : AnAction("", "", AllIcons.Actions.Help) {
     override fun actionPerformed(e: AnActionEvent) {
-      BrowserLauncher.instance.open(link)
-      notification.expire()
+      BrowserUtil.browse(link)
     }
   }
 

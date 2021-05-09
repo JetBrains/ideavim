@@ -21,7 +21,9 @@
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
@@ -268,5 +270,19 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE
     )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionDefaultAll
+  fun `test arrow up in insert mode scrolls caret at scrolloff`() {
+    OptionsManager.scrolljump.set(10)
+    OptionsManager.scrolloff.set(5)
+    configureByPages(5)
+    setPositionAndScroll(19, 24)
+
+    typeText(parseKeys("i", "<Up>"))
+
+    assertPosition(23, 0)
+    assertVisibleArea(9, 43)
   }
 }

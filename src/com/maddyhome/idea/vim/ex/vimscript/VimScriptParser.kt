@@ -75,6 +75,37 @@ object VimScriptParser {
     return if (xdgConfig != null && xdgConfig.exists()) xdgConfig else null
   }
 
+  private val newIdeaVimRcTemplate = """
+    "" Source your .vimrc
+    "source ~/.vimrc
+    
+    "" -- Suggested options --
+    " Show a few lines of context around the cursor. Note that this makes the
+    " text scroll if you mouse-click near the start or end of the window.
+    set scrolloff=5
+
+    " Do incremental searching.
+    set incsearch
+
+    " Don't use Ex mode, use Q for formatting.
+    map Q gq
+    
+    
+    "" -- Map IDE actions to IdeaVim -- https://jb.gg/abva4t
+    "" Map \r to the Reformat Code action
+    "map \r <Action>(ReformatCode)
+
+    "" Map <leader>d to start debug
+    "map <leader>d <Action>(Debug)
+
+    "" Map \b to toggle the breakpoint on the current line
+    "map \b <Action>(ToggleLineBreakpoint)
+    
+    
+    " Find more examples here: https://jb.gg/share-ideavimrc
+    
+  """.trimIndent()
+
   fun findOrCreateIdeaVimRc(): File? {
     val found = findIdeaVimRc()
     if (found != null) return found
@@ -85,6 +116,7 @@ object VimScriptParser {
         try {
           val file = File(homeDirName, fileName)
           file.createNewFile()
+          file.writeText(newIdeaVimRcTemplate)
           VimRcFileState.filePath = file.absolutePath
           return file
         } catch (ignored: IOException) {

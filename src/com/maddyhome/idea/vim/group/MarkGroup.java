@@ -28,7 +28,6 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
@@ -44,6 +43,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.*;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jdom.Element;
@@ -501,13 +501,12 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     Element marksElem = element.getChild("globalmarks");
     if (marksElem != null && !OptionsManager.INSTANCE.getIdeamarks().isSet()) {
       List<Element> markList = marksElem.getChildren("mark");
-      for (Object aMarkList : markList) {
-        Element markElem = (Element)aMarkList;
-        Mark mark = VimMark.create(markElem.getAttributeValue("key").charAt(0),
-                                   Integer.parseInt(markElem.getAttributeValue("line")),
-                                   Integer.parseInt(markElem.getAttributeValue("column")),
-                                   markElem.getAttributeValue("filename"),
-                                   markElem.getAttributeValue("protocol"));
+      for (Element aMarkList : markList) {
+        Mark mark = VimMark.create(aMarkList.getAttributeValue("key").charAt(0),
+                                   Integer.parseInt(aMarkList.getAttributeValue("line")),
+                                   Integer.parseInt(aMarkList.getAttributeValue("column")),
+                                   aMarkList.getAttributeValue("filename"),
+                                   aMarkList.getAttributeValue("protocol"));
 
         if (mark != null) {
           globalMarks.put(mark.getKey(), mark);
@@ -524,26 +523,24 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     Element fileMarksElem = element.getChild("filemarks");
     if (fileMarksElem != null) {
       List<Element> fileList = fileMarksElem.getChildren("file");
-      for (Object aFileList : fileList) {
-        Element fileElem = (Element)aFileList;
-        String filename = fileElem.getAttributeValue("name");
+      for (Element aFileList : fileList) {
+        String filename = aFileList.getAttributeValue("name");
         Date timestamp = new Date();
         try {
-          long date = Long.parseLong(fileElem.getAttributeValue("timestamp"));
+          long date = Long.parseLong(aFileList.getAttributeValue("timestamp"));
           timestamp.setTime(date);
         }
         catch (NumberFormatException e) {
           // ignore
         }
         FileMarks<Character, Mark> fmarks = getFileMarks(filename);
-        List<Element> markList = fileElem.getChildren("mark");
-        for (Object aMarkList : markList) {
-          Element markElem = (Element)aMarkList;
-          Mark mark = VimMark.create(markElem.getAttributeValue("key").charAt(0),
-                                     Integer.parseInt(markElem.getAttributeValue("line")),
-                                     Integer.parseInt(markElem.getAttributeValue("column")),
+        List<Element> markList = aFileList.getChildren("mark");
+        for (Element aMarkList : markList) {
+          Mark mark = VimMark.create(aMarkList.getAttributeValue("key").charAt(0),
+                                     Integer.parseInt(aMarkList.getAttributeValue("line")),
+                                     Integer.parseInt(aMarkList.getAttributeValue("column")),
                                      filename,
-                                     markElem.getAttributeValue("protocol"));
+                                     aMarkList.getAttributeValue("protocol"));
 
           if (mark != null) fmarks.put(mark.getKey(), mark);
         }
@@ -559,11 +556,10 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     Element jumpsElem = element.getChild("jumps");
     if (jumpsElem != null) {
       List<Element> jumpList = jumpsElem.getChildren("jump");
-      for (Object aJumpList : jumpList) {
-        Element jumpElem = (Element)aJumpList;
-        Jump jump = new Jump(Integer.parseInt(jumpElem.getAttributeValue("line")),
-                             Integer.parseInt(jumpElem.getAttributeValue("column")),
-                             jumpElem.getAttributeValue("filename"));
+      for (Element aJumpList : jumpList) {
+        Jump jump = new Jump(Integer.parseInt(aJumpList.getAttributeValue("line")),
+                             Integer.parseInt(aJumpList.getAttributeValue("column")),
+                             aJumpList.getAttributeValue("filename"));
 
         jumps.add(jump);
       }
@@ -740,10 +736,10 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     }
 
     private @Nullable Editor getAnEditor(@NotNull Document doc) {
-      Editor[] editors = EditorFactory.getInstance().getEditors(doc);
+      List<Editor> editors = HelperKt.localEditors(doc);
 
-      if (editors.length > 0) {
-        return editors[0];
+      if (editors.size() > 0) {
+        return editors.get(0);
       }
       else {
         return null;

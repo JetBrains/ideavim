@@ -29,7 +29,10 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotion
+import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.EditorHelper
 
 sealed class MotionDownBase : MotionActionHandler.ForEachCaret() {
@@ -56,8 +59,8 @@ open class MotionDownAction : MotionDownBase() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
-    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)
+  ): Motion {
+    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count).toMotionOrError()
   }
 }
 
@@ -69,7 +72,7 @@ class MotionDownCtrlNAction : MotionDownAction() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
+  ): Motion {
     val activeLookup = LookupManager.getActiveLookup(editor)
     return if (activeLookup != null) {
       val primaryCaret = editor.caretModel.primaryCaret
@@ -78,7 +81,7 @@ class MotionDownCtrlNAction : MotionDownAction() {
         EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_DOWN)
           .execute(editor, primaryCaret, context)
       }
-      caret.offset
+      caret.offset.toMotion()
     } else {
       super.getOffset(editor, caret, context, count, rawCount, argument)
     }
@@ -96,7 +99,7 @@ class MotionDownNotLineWiseAction : MotionDownBase() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
-    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)
+  ): Motion {
+    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count).toMotionOrError()
   }
 }

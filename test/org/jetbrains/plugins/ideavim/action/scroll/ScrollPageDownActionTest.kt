@@ -18,7 +18,6 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -152,6 +151,16 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(146, 175)
   }
 
+  @VimBehaviorDiffers(description = "IntelliJ keeps 2 lines at the top of a file even with virtual space")
+  fun `test scroll page down on last page with virtual space`() {
+    configureByPages(5)
+    setEditorVirtualSpace()
+    setPositionAndScroll(145, 150)
+    typeText(parseKeys("<C-F>"))
+    assertPosition(175, 0)
+    assertVisibleArea(174, 175)
+  }
+
   fun `test scroll page down on penultimate page`() {
     configureByPages(5)
     setPositionAndScroll(110, 130)
@@ -160,11 +169,57 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(143, 175)
   }
 
-  fun `test scroll page down on last line causes beep`() {
+  fun `test scroll page down on last line scrolls up by default virtual space`() {
     configureByPages(5)
     setPositionAndScroll(146, 175)
     typeText(parseKeys("<C-F>"))
-    assertTrue(VimPlugin.isError())
+    assertPosition(175, 0)
+    // 146+35 = 181 -> 6 lines of virtual space
+    assertVisibleArea(146, 175)
+  }
+
+  @VimBehaviorDiffers(description = "IntelliJ keeps 2 lines at the top of a file even with virtual space")
+  fun `test scroll page down on last line scrolls up by virtual space`() {
+    configureByPages(5)
+    setEditorVirtualSpace()
+    setPositionAndScroll(146, 175)
+    typeText(parseKeys("<C-F>"))
+    assertPosition(175, 0)
+    assertVisibleArea(174, 175)
+  }
+
+  @VimBehaviorDiffers(description = "IntelliJ keeps 2 lines at the top of a file even with virtual space")
+  fun `test scroll page down on fully scrolled last line does not move`() {
+    configureByPages(5)
+    setEditorVirtualSpace()
+    // This would be 175 in Vim
+    setPositionAndScroll(174, 175)
+    typeText(parseKeys("<C-F>"))
+    assertPosition(175, 0)
+    assertVisibleArea(174, 175)
+  }
+
+  fun `test scroll page down on last line causes beep with default lines of virtual space`() {
+    configureByPages(5)
+    // 146 is 5 lines of virtual space
+    setPositionAndScroll(146, 175)
+    typeText(parseKeys("<C-F>"))
+    assertPluginError(true)
+  }
+
+  fun `test scroll page down on last line causes beep with virtual space`() {
+    configureByPages(5)
+    setEditorVirtualSpace()
+    setPositionAndScroll(174, 175)
+    typeText(parseKeys("<C-F>"))
+    assertPluginError(true)
+  }
+
+  fun `test scroll page down too far causes error bell`() {
+    configureByPages(5)
+    setPositionAndScroll(146, 175)
+    typeText(parseKeys("10<C-F>"))
+    assertPluginError(true)
   }
 
   fun `test scroll page down puts cursor on first non-blank column`() {

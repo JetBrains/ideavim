@@ -32,50 +32,207 @@ import org.jetbrains.plugins.ideavim.VimTestOption
 import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
+
+  // Kotlin type hints should be an obvious example of an inlay related to preceding text, but they are actually
+  // related to following (KTIJ-3768). The inline rename options inlay is a better example
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
   @VimOptionDefaultAll
-  fun `test with inlay related to preceding text`() {
-    val keys = parseKeys("h")
+  fun `test with inlay related to preceding text and block caret`() {
     val before = "I fou${c}nd it in a legendary land"
     val after = "I fo${c}und it in a legendary land"
     configureByText(before)
+    assertOffset(5)
 
-    // The inlay is inserted at offset 4 (0 based) - the 'u' in "found". It occupies visual column 4, and is associated
-    // with the text in visual column 5 ('u' - because the inlay pushes it one visual column to the right).
-    // Kotlin parameter hints are a real world example of inlays related to following text.
-    // Hitting 'l' on the character before the inlay should place the cursor after the inlay
-    // Before: "I f|o|«test:»und it in a legendary land."
-    // After: "I f«test:»|u|nd it in a legendary land."
+    // Inlay shares offset 4 with the 'u' in "found", inserts a new visual column 4 and is related to the text at
+    // offset 3/visual column 3.
+    // Moving <Left> from offset 5 (visual column 6) to offset 4 should position the caret between the inlay and its
+    // related text, at visual column 4, but then the block caret would paint over the inlay, which looks wrong.
+    // Position at visual column 5 instead.
+    // Before: "I fo«:test»u|n|d it in a legendary land"
+    // After:  "I fo«:test»|u|nd it in a legendary land"
     addInlay(4, true, 5)
 
-    typeText(keys)
+    typeText(parseKeys("<Left>"))
     myFixture.checkResult(after)
 
-    // The cursor starts at offset 5 and moves to offset 4. Offset 4 contains both the inlay and the next character, at
-    // visual positions 4 and 5 respectively. We always want the cursor to move to the next character, not the inlay.
+    assertOffset(4)
     assertVisualPosition(0, 5)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
   @VimOptionDefaultAll
-  fun `test with inlay related to following text`() {
-    val keys = parseKeys("h")
+  fun `test with inlay related to preceding text and block caret 2`() {
+    val before = "I fo${c}und it in a legendary land"
+    val after = "I f${c}ound it in a legendary land"
+    configureByText(before)
+    assertOffset(4)
+
+    // Inlay shares offset 4 with the 'u' in "found", inserts a new visual column 4 and is related to the text at
+    // offset 3/visual column 3.
+    // Moving <Left> from offset 4 (visual column 5 for text) will move to offset 3, which is also visual column 3.
+    // Before: "I fo«:test»|u|nd it in a legendary land."
+    // After: "I f|o|«:test»und it in a legendary land."
+    addInlay(4, true, 5)
+
+    typeText(parseKeys("<Left>"))
+    myFixture.checkResult(after)
+
+    assertOffset(3)
+    assertVisualPosition(0, 3)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @VimOptionDefaultAll
+  fun `test with inlay related to preceding text and bar caret`() {
     val before = "I fou${c}nd it in a legendary land"
     val after = "I fo${c}und it in a legendary land"
     configureByText(before)
+    assertOffset(5)
 
-    // The inlay is inserted at offset 4 (0 based) - the 'u' in "found". It occupies visual column 4, and is associated
-    // with the text in visual column 5 ('u' - because the inlay pushes it one visual column to the right).
-    // Kotlin parameter hints are a real world example of inlays related to following text.
-    // Hitting 'l' on the character before the inlay should place the cursor after the inlay
-    // Before: "I f|o|«test:»und it in a legendary land."
+    // Inlay shares offset 4 with the 'u' in "found", inserts a new visual column 4 and is related to the text at
+    // offset 3/visual column 3.
+    // Moving <Left> from offset 5 (visual column 6) to offset 4 should position the caret between the inlay and the
+    // related text at visual column 4, which is the inlay. This is appropriate for the bar caret, which renders
+    // "in between columns".
+    // Before: "I fo«:test»u|nd it in a legendary land"
+    // After:  "I fo|«:test»und it in a legendary land"
+    addInlay(4, true, 5)
+
+    typeText(parseKeys("i", "<Left>"))
+    myFixture.checkResult(after)
+
+    assertOffset(4)
+    assertVisualPosition(0, 4)
+
+    typeText(parseKeys("<Esc>"))
+    assertOffset(3)
+    assertVisualPosition(0, 3)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @VimOptionDefaultAll
+  fun `test with inlay related to preceding text and bar caret 2`() {
+    val before = "I fo${c}und it in a legendary land"
+    val after = "I f${c}ound it in a legendary land"
+    configureByText(before)
+    assertOffset(4)
+
+    // Inlay shares offset 4 with the 'u' in "found", inserts a new visual column 4 and is related to the text at
+    // offset 3/visual column 3.
+    // Moving <Left> from offset 4 (visual column 5 for text) will move to offset 3, which is also visual column 3.
+    // Before: "I fo«:test»|und it in a legendary land." (Actually, the caret will be "fo|«:test»und")
+    // After: "I f|o«:test»und it in a legendary land."
+    addInlay(4, true, 5)
+
+    typeText(parseKeys("i", "<Left>"))
+    myFixture.checkResult(after)
+
+    assertOffset(3)
+    assertVisualPosition(0, 3)
+
+    typeText(parseKeys("<Esc>"))
+    assertOffset(2)
+    assertVisualPosition(0, 2)
+  }
+
+  // Kotlin parameter hints are a good example of inlays related to following text
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @VimOptionDefaultAll
+  fun `test with inlay related to following text with block caret`() {
+    val before = "I fou${c}nd it in a legendary land"
+    val after = "I fo${c}und it in a legendary land"
+    configureByText(before)
+    assertOffset(5)
+
+    // Inlay shares offset 4 with the 'u' in "found", inserts a new visual column 4 and is related to the text at
+    // offset 4/visual column 5.
+    // Inlay shares offset 4 with the 'u' in "found" and inserts a new visual column 4.
+    // Moving <Left> from offset 5 (visual column 6) to offset 4 should position the caret between the inlay and its
+    // related text, at visual column 5, which is fine for the block caret.
+    // Before: "I fo«test:»u|n|d it in a legendary land."
     // After: "I fo«test:»|u|nd it in a legendary land."
     addInlay(4, false, 5)
 
-    typeText(keys)
+    typeText(parseKeys("<Left>"))
     myFixture.checkResult(after)
 
-    // The cursor starts at offset 5 and moves to offset 4. Offset 4 contains both the inlay and the next character, at
-    // visual positions 4 and 5 respectively. We always want the cursor to move to the next character, not the inlay.
+    assertOffset(4)
     assertVisualPosition(0, 5)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @VimOptionDefaultAll
+  fun `test with inlay related to following text with block caret 2`() {
+    val before = "I fo${c}und it in a legendary land"
+    val after = "I f${c}ound it in a legendary land"
+    configureByText(before)
+    assertOffset(4)
+
+    // Inlay shares offset 4 with the 'u' in "found", inserts a new visual column 4 and is related to the text at
+    // offset 4/visual column 5.
+    // Moving <Left> from offset 4 (visual column 5 for text) will move to offset 3, which is also visual column 3.
+    // Before: "I fo«test:»|u|nd it in a legendary land."
+    // After: "I f|o|«test:»und it in a legendary land."
+    addInlay(4, false, 5)
+
+    typeText(parseKeys("<Left>"))
+    myFixture.checkResult(after)
+
+    assertOffset(3)
+    assertVisualPosition(0, 3)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @VimOptionDefaultAll
+  fun `test with inlay related to following text with bar caret`() {
+    val before = "I fou${c}nd it in a legendary land"
+    val after = "I fo${c}und it in a legendary land"
+    configureByText(before)
+    assertOffset(5)
+
+    // Inlay shares offset 4 with the 'u' in "found", inserts a new visual column 4 and is related to the text at
+    // offset 4/visual column 5.
+    // Moving <Left> from offset 5 (visual column 6) to offset 4 should position the caret between the inlay and its
+    // related text, at visual column 5, which is fine for the bar caret.
+    // Before: "I fo«test:»u|nd it in a legendary land."
+    // After: "I fo«test:»|und it in a legendary land."
+    addInlay(4, false, 5)
+
+    typeText(parseKeys("i", "<Left>"))
+    myFixture.checkResult(after)
+
+    assertOffset(4)
+    assertVisualPosition(0, 5)
+
+    typeText(parseKeys("<Esc>"))
+    assertOffset(3)
+    assertVisualPosition(0, 3)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.INLAYS)
+  @VimOptionDefaultAll
+  fun `test with inlay related to following text with bar caret 2`() {
+    val before = "I fo${c}und it in a legendary land"
+    val after = "I f${c}ound it in a legendary land"
+    configureByText(before)
+    assertOffset(4)
+
+    // Inlay shares offset 4 with the 'u' in "found", inserts a new visual column 4 and is related to the text at
+    // offset 4/visual column 5.
+    // Moving <Left> from offset 4 (visual column 5 for text) will move to offset 3, which is also visual column 3.
+    // Before: "I fo«test:»|und it in a legendary land."
+    // After: "I f|o«test:»und it in a legendary land."
+    addInlay(4, false, 5)
+
+    typeText(parseKeys("i", "<Left>"))
+    myFixture.checkResult(after)
+
+    assertOffset(3)
+    assertVisualPosition(0, 3)
+
+    typeText(parseKeys("<Esc>"))
+    assertOffset(2)
+    assertVisualPosition(0, 2)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)

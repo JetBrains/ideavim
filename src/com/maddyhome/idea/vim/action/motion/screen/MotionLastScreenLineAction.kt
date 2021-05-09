@@ -25,7 +25,9 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
@@ -51,8 +53,8 @@ abstract class MotionLastScreenLineActionBase(private val operatorPending: Boole
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
-    return VimPlugin.getMotion().moveCaretToLastScreenLine(editor, caret, count, !operatorPending)
+  ): Motion {
+    return VimPlugin.getMotion().moveCaretToLastScreenLine(editor, caret, count, !operatorPending).toMotion()
   }
 
   override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {

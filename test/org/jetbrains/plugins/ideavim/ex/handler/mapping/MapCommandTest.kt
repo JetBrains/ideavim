@@ -449,6 +449,13 @@ n  ,f            <Plug>Foo
     myFixture.checkResult("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
+  fun testShiftSpaceAndWorkInInsertMode() {
+    configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+    typeText(commandToKeys("nmap <S-Space> w"))
+    typeText(StringHelper.parseKeys("i<S-Space>"))
+    myFixture.checkResult("A quick  ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+  }
+
   fun testShiftLetter() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap <S-D> w"))

@@ -29,7 +29,6 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
@@ -42,6 +41,7 @@ import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.handler.ActionBeanClass;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.*;
 import kotlin.Pair;
@@ -73,7 +73,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
 
   private static final Logger logger = Logger.getInstance(KeyGroup.class);
 
-  private final @NotNull Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<>();
+  private final @NotNull Map<KeyStroke, ShortcutOwnerInfo> shortcutConflicts = new LinkedHashMap<>();
   private final @NotNull Set<RequiredShortcut> requiredShortcutKeys = new HashSet<>(300);
   private final @NotNull Map<MappingMode, CommandPartNode<ActionBeanClass>> keyRoots = new EnumMap<>(MappingMode.class);
   private final @NotNull Map<MappingMode, KeyMapping> keyMappings = new EnumMap<>(MappingMode.class);
@@ -161,7 +161,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
     final int oldSize = requiredShortcutKeys.size();
     requiredShortcutKeys.removeIf(requiredShortcut -> requiredShortcut.getOwner().equals(owner));
     if (requiredShortcutKeys.size() != oldSize) {
-      for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
+      for (Editor editor : HelperKt.localEditors()) {
         unregisterShortcutKeys(editor);
         registerRequiredShortcutKeys(editor);
       }
@@ -176,7 +176,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
       }
     }
     if (requiredShortcutKeys.size() != oldSize) {
-      for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
+      for (Editor editor : HelperKt.localEditors()) {
         unregisterShortcutKeys(editor);
         registerRequiredShortcutKeys(editor);
       }
@@ -193,11 +193,21 @@ public class KeyGroup implements PersistentStateComponent<Element> {
 
   public void saveData(@NotNull Element element) {
     final Element conflictsElement = new Element(SHORTCUT_CONFLICTS_ELEMENT);
-    for (Map.Entry<KeyStroke, ShortcutOwner> entry : shortcutConflicts.entrySet()) {
-      final ShortcutOwner owner = entry.getValue();
+    for (Map.Entry<KeyStroke, ShortcutOwnerInfo> entry : shortcutConflicts.entrySet()) {
+      final ShortcutOwner owner;
+      ShortcutOwnerInfo value = entry.getValue();
+      if (value instanceof ShortcutOwnerInfo.AllModes) {
+        owner = ((ShortcutOwnerInfo.AllModes)value).getOwner();
+      }
+      else if (value instanceof ShortcutOwnerInfo.PerMode) {
+        owner = ((ShortcutOwnerInfo.PerMode)value).getNormal();
+      }
+      else {
+        throw new RuntimeException();
+      }
       if (owner != ShortcutOwner.UNDEFINED) {
         final Element conflictElement = new Element(SHORTCUT_CONFLICT_ELEMENT);
-        conflictElement.setAttribute(OWNER_ATTRIBUTE, owner.getName());
+        conflictElement.setAttribute(OWNER_ATTRIBUTE, owner.getOwnerName());
         final Element textElement = new Element(TEXT_ELEMENT);
         StringHelper.setSafeXmlText(textElement, entry.getKey().toString());
         conflictElement.addContent(textElement);
@@ -225,7 +235,7 @@ public class KeyGroup implements PersistentStateComponent<Element> {
           if (text != null) {
             final KeyStroke keyStroke = KeyStroke.getKeyStroke(text);
             if (keyStroke != null) {
-              shortcutConflicts.put(keyStroke, owner);
+              shortcutConflicts.put(keyStroke, new ShortcutOwnerInfo.AllModes(owner));
             }
           }
         }
@@ -248,24 +258,24 @@ public class KeyGroup implements PersistentStateComponent<Element> {
     return actions;
   }
 
-  public @NotNull Map<KeyStroke, ShortcutOwner> getShortcutConflicts() {
+  public @NotNull Map<KeyStroke, ShortcutOwnerInfo> getShortcutConflicts() {
     final Set<RequiredShortcut> requiredShortcutKeys = this.requiredShortcutKeys;
-    final Map<KeyStroke, ShortcutOwner> savedConflicts = getSavedShortcutConflicts();
-    final Map<KeyStroke, ShortcutOwner> results = new HashMap<>();
+    final Map<KeyStroke, ShortcutOwnerInfo> savedConflicts = getSavedShortcutConflicts();
+    final Map<KeyStroke, ShortcutOwnerInfo> results = new HashMap<>();
     for (RequiredShortcut requiredShortcut : requiredShortcutKeys) {
       KeyStroke keyStroke = requiredShortcut.getKeyStroke();
       if (!VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
         final List<AnAction> conflicts = getKeymapConflicts(keyStroke);
         if (!conflicts.isEmpty()) {
-          final ShortcutOwner owner = savedConflicts.get(keyStroke);
-          results.put(keyStroke, owner != null ? owner : ShortcutOwner.UNDEFINED);
+          final ShortcutOwnerInfo owner = savedConflicts.get(keyStroke);
+          results.put(keyStroke, owner != null ? owner : ShortcutOwnerInfo.allUndefined);
         }
       }
     }
     return results;
   }
 
-  public @NotNull Map<KeyStroke, ShortcutOwner> getSavedShortcutConflicts() {
+  public @NotNull Map<KeyStroke, ShortcutOwnerInfo> getSavedShortcutConflicts() {
     return shortcutConflicts;
   }
 

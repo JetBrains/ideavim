@@ -68,8 +68,8 @@ import com.maddyhome.idea.vim.option.OptionsManager.ideastrictmode
 import com.maddyhome.idea.vim.option.OptionsManager.resetAllOptions
 import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
+import org.assertj.core.api.Assertions
 import org.junit.Assert
-import java.util.*
 import java.util.function.Consumer
 import javax.swing.KeyStroke
 
@@ -395,7 +395,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   fun assertPluginErrorMessageContains(message: String) {
-    Assert.assertTrue(VimPlugin.getMessage().contains(message))
+    Assertions.assertThat(VimPlugin.getMessage()).contains(message)
   }
 
   protected fun assertCaretsColour() {
@@ -417,6 +417,14 @@ abstract class VimTestCase : UsefulTestCase() {
         if (color != null) Assert.assertEquals(caretColour, color)
       }
     }
+  }
+
+  fun doTest(
+    keys: List<String>,
+    before: String,
+    after: String
+  ) {
+    doTest(keys, before, after, CommandState.Mode.COMMAND, SubMode.NONE)
   }
 
   fun doTest(
@@ -452,7 +460,7 @@ abstract class VimTestCase : UsefulTestCase() {
     assertState(modeAfter, subModeAfter)
   }
 
-  fun doTestWithoutNeovim(
+  fun doTest(
     keys: List<KeyStroke>,
     before: String,
     after: String?,
@@ -541,17 +549,21 @@ abstract class VimTestCase : UsefulTestCase() {
       return keys
     }
 
-    fun exCommand(command: String) = ":$command<Enter>"
+    fun exCommand(command: String) = ":$command<CR>"
 
     fun searchToKeys(pattern: String, forwards: Boolean): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
       keys.addAll(parseKeys(if (forwards) "/" else "?"))
       keys.addAll(stringToKeys(pattern))
-      keys.addAll(parseKeys("<Enter>"))
+      keys.addAll(parseKeys("<CR>"))
       return keys
     }
 
+    fun searchCommand(pattern: String) = "$pattern<CR>"
+
     fun String.dotToTab(): String = replace('.', '\t')
+
+    fun String.dotToSpace(): String = replace('.', ' ')
   }
 
   object Checks {

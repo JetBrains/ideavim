@@ -24,7 +24,9 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
@@ -38,8 +40,8 @@ class MotionSectionForwardStartAction : MotionActionHandler.ForEachCaret() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
-    return VimPlugin.getMotion().moveCaretToSection(editor, caret, '{', 1, count)
+  ): Motion {
+    return VimPlugin.getMotion().moveCaretToSection(editor, caret, '{', 1, count).toMotionOrError()
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

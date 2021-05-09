@@ -88,14 +88,14 @@ public class KeywordOptionTest extends VimTestCase {
 
   public void testRangeInWhichLeftValueIsHigherThanRightValueIsInvalid() {
     option.set("b-a");
-    assertDoesntContain(option.values(), new ArrayList<String>() {{
+    assertDoesntContain(option.values(), new ArrayList<>() {{
       add("b-a");
     }});
   }
 
   public void testTwoAdjacentLettersAreInvalid() {
     option.set("ab");
-    assertDoesntContain(option.values(), new ArrayList<String>() {{
+    assertDoesntContain(option.values(), new ArrayList<>() {{
       add("ab");
     }});
   }

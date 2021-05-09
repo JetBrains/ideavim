@@ -18,19 +18,23 @@
 
 package com.maddyhome.idea.vim.ui;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.openapi.ui.StripeTable;
-import com.intellij.ui.IdeBorderFactory;
-import com.intellij.ui.JBColor;
-import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.*;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.ui.UIUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
+import com.maddyhome.idea.vim.key.ShortcutOwnerInfo;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,6 +42,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.List;
@@ -89,26 +95,70 @@ public class VimEmulationConfigurable implements Configurable {
     public VimSettingsPanel(@NotNull VimShortcutConflictsTable.Model model) {
       VimShortcutConflictsTable shortcutConflictsTable = new VimShortcutConflictsTable(model);
       setLayout(new BorderLayout());
-      final JScrollPane scrollPane = new JBScrollPane(shortcutConflictsTable);
+
+      ToolbarDecorator decorator = ToolbarDecorator.createDecorator(shortcutConflictsTable);
+      decorator.addExtraAction(new CopyForRcAction(model));
+
+      final JPanel scrollPane = decorator.createPanel();
       scrollPane.setBorder(new LineBorder(JBColor.border()));
       final JPanel conflictsPanel = new JPanel(new BorderLayout());
       final String title = MessageHelper.message("border.title.shortcut.conflicts.for.active.keymap");
       conflictsPanel.setBorder(IdeBorderFactory.createTitledBorder(title, false));
       conflictsPanel.add(scrollPane);
       add(conflictsPanel, BorderLayout.CENTER);
+      addHelpLine(model);
+    }
+
+    public void addHelpLine(VimShortcutConflictsTable.Model model) {
+      @Nullable VimShortcutConflictsTable.Row firstPerMode = ContainerUtil.find(model.myRows, row -> {
+        ShortcutOwnerInfo owner = row.getOwner();
+        return owner instanceof ShortcutOwnerInfo.PerMode;
+      });
+      if (firstPerMode == null) {
+        HyperlinkLabel label = new HyperlinkLabel();
+        label.setTextWithHyperlink(MessageHelper.message("configurable.keyhandler.link"));
+        label.setHyperlinkTarget("https://jb.gg/abva4t");
+        label.setForeground(UIUtil.getInactiveTextColor());
+        add(label, BorderLayout.SOUTH);
+      }
+      else {
+        JBLabel helpLine = new JBLabel();
+        helpLine.setText(MessageHelper.message("configurable.noneditablehandler.helper.text.with.example",
+                         ((ShortcutOwnerInfo.PerMode)firstPerMode.myOwner).toNotation(),
+                         KeymapUtil.getShortcutText(new KeyboardShortcut(firstPerMode.getKeyStroke(), null))));
+        helpLine.setForeground(UIUtil.getInactiveTextColor());
+        add(helpLine, BorderLayout.SOUTH);
+      }
     }
   }
 
   private static final class VimShortcutConflictsTable extends StripeTable {
+    final ComboBoxTableRenderer<ShortcutOwner> renderer = new ShortcutOwnerRenderer();
+
     public VimShortcutConflictsTable(@NotNull Model model) {
       super(model);
       getTableColumn(Column.KEYSTROKE).setPreferredWidth(100);
       getTableColumn(Column.IDE_ACTION).setPreferredWidth(400);
       final TableColumn ownerColumn = getTableColumn(Column.OWNER);
-      final ComboBoxTableRenderer<ShortcutOwner> renderer = new ShortcutOwnerRenderer();
       ownerColumn.setPreferredWidth(150);
-      ownerColumn.setCellRenderer(renderer);
-      ownerColumn.setCellEditor(renderer);
+    }
+
+    @Override
+    public TableCellRenderer getCellRenderer(int row, int column) {
+      if (column != Column.OWNER.getIndex()) return super.getCellRenderer(row, column);
+      Model model = (Model)getModel();
+      ShortcutOwnerInfo owner = model.myRows.get(row).getOwner();
+      if (owner instanceof ShortcutOwnerInfo.PerMode) return super.getCellRenderer(row, column);
+      return renderer;
+    }
+
+    @Override
+    public TableCellEditor getCellEditor(int row, int column) {
+      if (column != Column.OWNER.getIndex()) return super.getCellEditor(row, column);
+      Model model = (Model)getModel();
+      ShortcutOwnerInfo owner = model.myRows.get(row).getOwner();
+      if (owner instanceof ShortcutOwnerInfo.PerMode) return super.getCellEditor(row, column);
+      return renderer;
     }
 
     @Override
@@ -190,9 +240,9 @@ public class VimEmulationConfigurable implements Configurable {
     private static final class Row implements Comparable<Row> {
       private final @NotNull KeyStroke myKeyStroke;
       private final @NotNull AnAction myAction;
-      private @NotNull ShortcutOwner myOwner;
+      private @NotNull ShortcutOwnerInfo myOwner;
 
-      private Row(@NotNull KeyStroke keyStroke, @NotNull AnAction action, @NotNull ShortcutOwner owner) {
+      private Row(@NotNull KeyStroke keyStroke, @NotNull AnAction action, @NotNull ShortcutOwnerInfo owner) {
         myKeyStroke = keyStroke;
         myAction = action;
         myOwner = owner;
@@ -206,7 +256,7 @@ public class VimEmulationConfigurable implements Configurable {
         return myAction;
       }
 
-      public @NotNull ShortcutOwner getOwner() {
+      public @NotNull ShortcutOwnerInfo getOwner() {
         return myOwner;
       }
 
@@ -217,7 +267,7 @@ public class VimEmulationConfigurable implements Configurable {
         return keyCodeDiff != 0 ? keyCodeDiff : myKeyStroke.getModifiers() - otherKeyStroke.getModifiers();
       }
 
-      public void setOwner(@NotNull ShortcutOwner owner) {
+      public void setOwner(@NotNull ShortcutOwnerInfo owner) {
         myOwner = owner;
       }
     }
@@ -250,7 +300,12 @@ public class VimEmulationConfigurable implements Configurable {
             case IDE_ACTION:
               return row.getAction().getTemplatePresentation().getText();
             case OWNER:
-              return row.getOwner();
+              ShortcutOwnerInfo owner = row.getOwner();
+              if (owner instanceof ShortcutOwnerInfo.AllModes) {
+                return ((ShortcutOwnerInfo.AllModes)owner).getOwner();
+              } else if (owner instanceof ShortcutOwnerInfo.PerMode) {
+                return ((ShortcutOwnerInfo.PerMode)owner).toNotation();
+              }
           }
         }
         return null;
@@ -261,12 +316,13 @@ public class VimEmulationConfigurable implements Configurable {
         final Column column = Column.fromIndex(columnIndex);
         if (column != null && rowIndex >= 0 && rowIndex < myRows.size() && object instanceof ShortcutOwner) {
           final Row row = myRows.get(rowIndex);
-          row.setOwner((ShortcutOwner)object);
+          row.setOwner(new ShortcutOwnerInfo.AllModes((ShortcutOwner)object));
         }
       }
 
       @Override
       public boolean isCellEditable(int rowIndex, int columnIndex) {
+        if (myRows.get(rowIndex).myOwner instanceof ShortcutOwnerInfo.PerMode) return false;
         return Column.fromIndex(columnIndex) == Column.OWNER;
       }
 
@@ -286,7 +342,7 @@ public class VimEmulationConfigurable implements Configurable {
 
       public void reset() {
         myRows.clear();
-        for (Map.Entry<KeyStroke, ShortcutOwner> entry : VimPlugin.getKey().getShortcutConflicts().entrySet()) {
+        for (Map.Entry<KeyStroke, ShortcutOwnerInfo> entry : VimPlugin.getKey().getShortcutConflicts().entrySet()) {
           final KeyStroke keyStroke = entry.getKey();
           final List<AnAction> actions = VimPlugin.getKey().getKeymapConflicts(keyStroke);
           if (!actions.isEmpty()) {
@@ -296,13 +352,47 @@ public class VimEmulationConfigurable implements Configurable {
         Collections.sort(myRows);
       }
 
-      private @NotNull Map<KeyStroke, ShortcutOwner> getCurrentData() {
-        final Map<KeyStroke, ShortcutOwner> result = new HashMap<>();
+      private @NotNull Map<KeyStroke, ShortcutOwnerInfo> getCurrentData() {
+        final Map<KeyStroke, ShortcutOwnerInfo> result = new HashMap<>();
         for (Row row : myRows) {
           result.put(row.getKeyStroke(), row.getOwner());
         }
         return result;
       }
+
+      public @NotNull List<Row> getRows() {
+        return myRows;
+      }
+    }
+  }
+
+  private static class CopyForRcAction extends DumbAwareActionButton {
+    private final VimShortcutConflictsTable.Model myModel;
+
+    public CopyForRcAction(VimShortcutConflictsTable.@NotNull Model model) {
+      super("Copy for .ideavimrc", "Copy config for .ideavimrc", AllIcons.Actions.Copy);
+      myModel = model;
+    }
+
+    @Override
+    public void actionPerformed(@NotNull AnActionEvent e) {
+      StringBuilder stringBuilder = new StringBuilder();
+      for (VimShortcutConflictsTable.Row row : myModel.getRows()) {
+        ShortcutOwnerInfo ownerInfo = row.getOwner();
+        if (!(ownerInfo instanceof ShortcutOwnerInfo.AllModes)) continue;
+        ShortcutOwner owner = ((ShortcutOwnerInfo.AllModes)ownerInfo).getOwner();
+        if (owner == ShortcutOwner.UNDEFINED) continue;
+
+        stringBuilder.append("setkeydev ");
+        stringBuilder.append(StringHelper.toKeyNotation(row.getKeyStroke()));
+        stringBuilder.append(" ");
+        stringBuilder.append("a:");
+        stringBuilder.append(owner.getOwnerName());
+        stringBuilder.append("\n");
+      }
+
+      String data = stringBuilder.toString();
+      ClipboardHandler.setClipboardText(data, Collections.emptyList(), data);
     }
   }
 }

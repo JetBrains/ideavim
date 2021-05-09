@@ -79,4 +79,13 @@ class ScrollMiddleScreenLineActionTest : VimTestCase() {
     assertPosition(174, 0)
     assertVisibleArea(146, 175)
   }
+
+  fun `test scrolls last line of file correctly with full virtual space`() {
+    configureByPages(5)
+    setEditorVirtualSpace()
+    setPositionAndScroll(0, 0)
+    typeText(parseKeys("175zz"))
+    assertPosition(174, 0)
+    assertVisibleArea(157, 175)
+  }
 }

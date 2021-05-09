@@ -152,7 +152,7 @@ object CommandParser {
     val handler = getCommandHandler(command)
     if (handler == null) {
       val message = message(Msg.NOT_EX_CMD, command.command)
-      throw InvalidCommandException(message, cmd)
+      throw InvalidCommandException(message, null)
     }
     if (handler.argFlags.access === CommandHandler.Access.WRITABLE && !editor.document.isWritable) {
       VimPlugin.indicateError()
@@ -339,11 +339,17 @@ object CommandParser {
           }
           State.RANGE_LINE -> if (ch in '0'..'9') {
             location!!.append(ch)
-            state = State.RANGE_MAYBE_DONE
+            state = State.RANGE_LINE_MAYBE_DONE
             reprocess = false
           } else {
             state = State.RANGE_MAYBE_DONE
           }
+          State.RANGE_LINE_MAYBE_DONE ->
+            state = if (ch in '0'..'9') {
+              State.RANGE_LINE
+            } else {
+              State.RANGE_MAYBE_DONE
+            }
           State.RANGE_CURRENT -> {
             location!!.append(ch)
             state = State.RANGE_MAYBE_DONE
@@ -389,26 +395,26 @@ object CommandParser {
               state = State.RANGE
             }
           }
-          State.RANGE_MAYBE_DONE -> // The range has an offset after it
-            state = if (ch == '+' || ch == '-') {
+          State.RANGE_MAYBE_DONE ->
+            state = if (ch == '+' || ch == '-' || ch in '0'..'9') {
+              // The range has an offset after it
               State.RANGE_OFFSET
             } else if (ch == ',' || ch == ';') {
               State.RANGE_SEPARATOR
-            } else if (ch in '0'..'9') {
-              State.RANGE_LINE
             } else {
               State.RANGE_DONE
             }
           State.RANGE_OFFSET -> {
             // Figure out the sign of the offset and reset the offset value
             offsetNumber = -1
+            offsetSign = 1
             if (ch == '+') {
-              offsetSign = 1
+              reprocess = false
             } else if (ch == '-') {
               offsetSign = -1
+              reprocess = false
             }
             state = State.RANGE_OFFSET_MAYBE_DONE
-            reprocess = false
           }
           State.RANGE_OFFSET_MAYBE_DONE -> // We found an offset value
             state = if (ch in '0'..'9') {
@@ -525,6 +531,6 @@ object CommandParser {
     CMD_ARG,
     RANGE, RANGE_LINE, RANGE_CURRENT, RANGE_LAST, RANGE_MARK, RANGE_MARK_CHAR, RANGE_ALL, RANGE_PATTERN,
     RANGE_SHORT_PATTERN, RANGE_PATTERN_MAYBE_DONE, RANGE_OFFSET, RANGE_OFFSET_NUM, RANGE_OFFSET_DONE,
-    RANGE_OFFSET_MAYBE_DONE, RANGE_SEPARATOR, RANGE_MAYBE_DONE, RANGE_DONE, ERROR
+    RANGE_LINE_MAYBE_DONE, RANGE_OFFSET_MAYBE_DONE, RANGE_SEPARATOR, RANGE_MAYBE_DONE, RANGE_DONE, ERROR
   }
 }

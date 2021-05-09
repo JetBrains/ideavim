@@ -25,11 +25,11 @@ import com.intellij.util.text.CharSequenceReader;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.ex.InvalidCommandException;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +37,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.io.*;
-import java.util.EnumSet;
 
 
 public class ProcessGroup {
@@ -56,10 +55,6 @@ public class ProcessGroup {
 
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, label, initText, count);
-  }
-
-  public boolean isForwardSearch() {
-    return ExEntryPanel.getInstance().getLabel().equals("/");
   }
 
   public @NotNull String endSearchCommand(final @NotNull Editor editor) {
@@ -103,27 +98,21 @@ public class ProcessGroup {
     boolean res = true;
     try {
       CommandState.getInstance(editor).popModes();
+
       logger.debug("processing command");
+
       final String text = panel.getText();
+
+      if (!panel.getLabel().equals(":")) {
+        // Search is handled via Argument.Type.EX_STRING. Although ProcessExEntryAction is registered as the handler for
+        // <CR> in both command and search modes, it's only invoked for command mode (see KeyHandler.handleCommandNode).
+        // We should never be invoked for anything other than an actual ex command.
+        throw new InvalidCommandException("Expected ':' command. Got '" + panel.getLabel() + "'", text);
+      }
+
       if (logger.isDebugEnabled()) logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
-      if (panel.getLabel().equals(":")) {
-        CommandParser.INSTANCE.processCommand(editor, context, text, 1);
-      }
-      else {
-        // FIXME looks like this branch gets never executed
-        // Search is handled through SearchEntry(Fwd|Rev)Action waiting for an argument type of EX_STRING. Once ex entry
-        // is complete, ProcessExEntryAction should be invoked which would invoke this method. However, keyHandler
-        // massages the Command stack, ignores ProcessExEntryAction, passes the ex content as a string argument to
-        // the previous SearchEntry(Fwd|Rev)Action and invokes it. This works better because the argument text is saved
-        // for repeats, and any leading operators are also executed (e.g. "d/foo")
-        int pos = VimPlugin.getSearch().search(editor, text, panel.getCount(),
-                                                                 panel.getLabel().equals("/")
-                                                                 ? EnumSet.of(CommandFlags.FLAG_SEARCH_FWD)
-                                                                 : EnumSet.of(CommandFlags.FLAG_SEARCH_REV), true);
-        if (pos == -1) {
-          res = false;
-        }
-      }
+
+      CommandParser.INSTANCE.processCommand(editor, context, text, 1);
     }
     catch (ExException e) {
       VimPlugin.showMessage(e.getMessage());

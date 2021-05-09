@@ -243,6 +243,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual char highlighter`() {
     val before = """
          The ${c}quick
@@ -259,6 +260,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual line highdhitligthhter`() {
     val before = """
          The ${c}quick
@@ -275,6 +277,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test till the line end highlighter`() {
     val before = """
          The ${c}quick
@@ -289,6 +292,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test pre line end highlighter`() {
     val before = """
          The ${c}quick
@@ -303,6 +307,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test pre pre line end highlighter`() {
     val before = """
          The ${c}quick
@@ -317,6 +322,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test to file end highlighter`() {
     val before = """
          The quick
@@ -331,6 +337,7 @@ class VimExchangeExtensionTest : VimTestCase() {
     exitExchange()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test to file end with new line highlighter`() {
     val before = """
          The quick
@@ -344,6 +351,55 @@ class VimExchangeExtensionTest : VimTestCase() {
 
     // Exit vim-exchange
     exitExchange()
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun `test back selection`() {
+    val before = """
+         The quick
+         brown ${c}fox
+         
+    """.trimIndent()
+    configureByText(before)
+    typeText(StringHelper.parseKeys("vb", "X"))
+
+    assertHighlighter(10, 17, HighlighterTargetArea.EXACT_RANGE)
+
+    // Exit vim-exchange
+    exitExchange()
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun `test back selection exchange 1`() {
+    doTest(
+      listOf("vb", "X", "bevb", "X"),
+      "The quick brow${c}n fox catch over the lazy dog",
+      "The ${c}brown quick fox catch over the lazy dog",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun `test back selection exchange 2`() {
+    doTest(
+      listOf("vb", "X", "wve", "X"),
+      "The quick brow${c}n fox catch over the lazy dog",
+      "The quick fox ${c}brown catch over the lazy dog",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun `test back selection exchange 3`() {
+    doTest(
+      listOf("ve", "X", "wevb", "X"),
+      "The quick ${c}brown fox catch over the lazy dog",
+      "The quick fox ${c}brown catch over the lazy dog",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    )
   }
 
   private fun exitExchange() {

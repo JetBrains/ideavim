@@ -109,7 +109,7 @@ var Editor.vimChangeActionSwitchMode: CommandState.Mode? by userData()
  * Function for delegated properties.
  * The property will be delegated to UserData and has nullable type.
  */
-private fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> =
+fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> =
   object : UserDataReadWriteProperty<UserDataHolder, T?>() {
     override fun getValue(thisRef: UserDataHolder, property: KProperty<*>): T? {
       return thisRef.getUserData(getKey(property))

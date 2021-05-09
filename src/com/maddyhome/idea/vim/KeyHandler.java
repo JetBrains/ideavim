@@ -21,18 +21,21 @@ package com.maddyhome.idea.vim;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.IdeEventQueue;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorModificationUtil;
 import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
+import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.action.change.VimRepeater;
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction;
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction;
@@ -147,7 +150,14 @@ public class KeyHandler {
       //   because rider use async update method. See VIM-1819.
       action.beforeActionPerformedUpdate(event);
       if (event.getPresentation().isEnabled()) {
+        // Executing listeners for action. I can't be sure that this code is absolutely correct,
+        //   action execution process in IJ seems to be more complicated.
+        ActionManagerEx actionManager = ActionManagerEx.getInstanceEx();
+        actionManager.fireBeforeActionPerformed(action, event.getDataContext(), event);
+
         action.actionPerformed(event);
+
+        actionManager.fireAfterActionPerformed(action, event.getDataContext(), event);
         return true;
       }
     }
@@ -327,11 +337,20 @@ public class KeyHandler {
     if (editorState.getCommandBuilder().isAtDefaultState()) {
       RegisterGroup register = VimPlugin.getRegister();
       if (register.getCurrentRegister() == register.getDefaultRegister()) {
+        boolean indicateError = true;
+
         if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
+          Ref<Boolean> executed = Ref.create();
           CommandProcessor.getInstance()
-            .executeCommand(editor.getProject(), () -> KeyHandler.executeAction("EditorEscape", context), "", null);
+            .executeCommand(editor.getProject(),
+                            () -> executed.set(KeyHandler.executeAction(IdeActions.ACTION_EDITOR_ESCAPE, context)),
+                            "", null);
+          indicateError = !executed.get();
         }
-        VimPlugin.indicateError();
+
+        if (indicateError) {
+          VimPlugin.indicateError();
+        }
       }
     }
     reset(editor);
@@ -680,9 +699,14 @@ public class KeyHandler {
 
     Project project = editor.getProject();
     final Command.Type type = command.getType();
-    if (type.isWrite() && !editor.getDocument().isWritable()) {
-      VimPlugin.indicateError();
-      reset(editor);
+    if (type.isWrite()) {
+      boolean modificationAllowed = EditorModificationUtil.checkModificationAllowed(editor);
+      boolean writeRequested = EditorModificationUtil.requestWriting(editor);
+      if (!modificationAllowed || !writeRequested) {
+        VimPlugin.indicateError();
+        reset(editor);
+        return;
+      }
     }
 
     if (!command.getFlags().contains(CommandFlags.FLAG_TYPEAHEAD_SELF_MANAGE)) {

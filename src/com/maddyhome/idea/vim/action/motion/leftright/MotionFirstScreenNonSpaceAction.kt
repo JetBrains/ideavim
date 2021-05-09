@@ -23,7 +23,9 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotion
 
 class MotionFirstScreenNonSpaceAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
@@ -33,8 +35,8 @@ class MotionFirstScreenNonSpaceAction : MotionActionHandler.ForEachCaret() {
     count: Int,
     rawCount: Int,
     argument: Argument?
-  ): Int {
-    return VimPlugin.getMotion().moveCaretToLineScreenStartSkipLeading(editor, caret)
+  ): Motion {
+    return VimPlugin.getMotion().moveCaretToLineScreenStartSkipLeading(editor, caret).toMotion()
   }
 
   override val motionType: MotionType = MotionType.EXCLUSIVE

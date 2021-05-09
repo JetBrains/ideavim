@@ -38,7 +38,7 @@ class ChangeLastSearchReplaceAction : ChangeEditorActionHandler.SingleExecution(
     var result = true
     for (caret in editor.caretModel.allCarets) {
       val line = caret.logicalPosition.line
-      if (!VimPlugin.getSearch().searchAndReplace(editor, caret, LineRange(line, line), "s", "//~/")) {
+      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, LineRange(line, line), "s", "//~/")) {
         result = false
       }
     }
