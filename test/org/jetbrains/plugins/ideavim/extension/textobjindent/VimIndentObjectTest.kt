@@ -31,8 +31,37 @@ class VimIndentObjectTest : JavaVimTestCase() {
     enableExtensions("textobj-indent")
   }
 
-  // |d| |ii|
-  fun testUpperCaseInsideIndent() {
+  fun testDeleteFlatIndent() {
+    doTest(
+      StringHelper.parseKeys("dii"),
+      """
+        one
+        two
+        three
+        four
+      """.trimIndent(),
+      ""
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    assertSelection(null)
+  }
+
+  fun testDeleteOuterFlatIndent() {
+    doTest(
+      StringHelper.parseKeys("dai"),
+      """
+        one
+        two
+        three
+        four
+      """.trimIndent(),
+      ""
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    assertSelection(null)
+  }
+
+  fun testDeleteInnerIndent() {
     doTest(
       StringHelper.parseKeys("2Gdii"),
       """
@@ -43,6 +72,125 @@ class VimIndentObjectTest : JavaVimTestCase() {
       """.trimIndent(),
       """
         one
+        four
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    assertSelection(null)
+  }
+
+  fun testDeleteOuterIndent() {
+    doTest(
+      StringHelper.parseKeys("2Gdai"),
+      """
+        one
+          two
+          three
+        four
+      """.trimIndent(),
+      """
+        four
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    assertSelection(null)
+  }
+
+  fun testDeleteFarOuterIndent() {
+    doTest(
+      StringHelper.parseKeys("2GdaI"),
+      """
+        one
+          two
+          three
+        four
+      """.trimIndent(),
+      ""
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    assertSelection(null)
+  }
+
+  fun testDeleteInnerIndentWithLinesAbove() {
+    doTest(
+      StringHelper.parseKeys("5Gdii"),
+      """
+        all
+        negatives
+        go hear
+        one
+          two
+          three
+        four
+      """.trimIndent(),
+      """
+        all
+        negatives
+        go hear
+        one
+        four
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    assertSelection(null)
+  }
+
+  fun testDeleteInnerIndentWithBlankLinesAbove() {
+    doTest(
+      StringHelper.parseKeys("6Gdii"),
+      """
+        all
+        negatives
+        go hear
+
+        one
+          two
+          three
+        four
+      """.trimIndent(),
+      """
+        all
+        negatives
+        go hear
+
+        one
+        four
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    assertSelection(null)
+  }
+
+  fun testNested1() {
+    doTest(
+      StringHelper.parseKeys("2Gdii"),
+      """
+        one
+          two
+            three
+        four
+      """.trimIndent(),
+      """
+        one
+        four
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    assertSelection(null)
+  }
+
+  fun testNested2() {
+    doTest(
+      StringHelper.parseKeys("3Gdii"),
+      """
+        one
+          two
+            three
+        four
+      """.trimIndent(),
+      """
+        one
+          two
         four
       """.trimIndent()
     )

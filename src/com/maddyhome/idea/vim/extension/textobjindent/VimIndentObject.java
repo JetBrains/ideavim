@@ -38,8 +38,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
@@ -125,6 +123,9 @@ public class VimIndentObject implements VimExtension {
             accumulatedWhitespace = 0;
           }
         }
+        if (caretLineStartOffset < 0) {
+          caretLineStartOffset = 0;
+        }
 
         // `caretLineStartOffset` points to the first character in the line where the caret is located.
 
@@ -146,6 +147,7 @@ public class VimIndentObject implements VimExtension {
         Integer upperBoundaryOffset = null;
         // Part 3: Find a line above the caret line, that has an indentation lower than `indentSize`.
         int pos1 = caretLineStartOffset - 1;
+        boolean isBoundaryFound = false;
         while (upperBoundaryOffset == null) {
           // 3.1: Going backwards from `caretLineStartOffset`, find the first non-whitespace character.
           while (--pos1 >= 0) {
@@ -163,20 +165,22 @@ public class VimIndentObject implements VimExtension {
             } else if (ch == '\n') {
               if (accumulatedWhitespace < indentSize) {
                 upperBoundaryOffset = pos1 + 1;
+                isBoundaryFound = true;
               }
               break;
             } else {
               accumulatedWhitespace = 0;
             }
           }
-          if (pos1 == -1) {
-            // Reached first line in the buffer.
+          if (pos1 < 0) {
+            // Reached start of the buffer.
             upperBoundaryOffset = 0;
+            isBoundaryFound = accumulatedWhitespace < indentSize;
           }
         }
 
         // Now `upperBoundaryOffset` marks the beginning of an `ai` text object.
-        if (!includeAbove) {
+        if (isBoundaryFound && !includeAbove) {
           while (++upperBoundaryOffset < charSequence.length()) {
             final char ch = charSequence.charAt(upperBoundaryOffset);
             if (ch == '\n') {
@@ -199,13 +203,15 @@ public class VimIndentObject implements VimExtension {
           }
         }
 
+        // `caretLineEndOffset` points to the first charater in the line below caret line.
+
         Integer lowerBoundaryOffset = null;
         // Part 5: Find a line below the caret line, that has an indentation lower than `indentSize`.
         int pos2 = caretLineEndOffset;
         while (lowerBoundaryOffset == null) {
           int accumulatedWhitespace2 = 0;
-          int lastNewlinePos = 0;
-          boolean isInIndent = true;
+          int lastNewlinePos = caretLineEndOffset - 1;
+          boolean isInIndent = isIndentChar(charSequence.charAt(pos2));
           while (++pos2 < charSequence.length()) {
             final char ch = charSequence.charAt(pos2);
             if (ch == ' ' || ch == '\t' && isInIndent) {
@@ -222,14 +228,14 @@ public class VimIndentObject implements VimExtension {
               isInIndent = false;
             }
           }
-          if (pos2 == charSequence.length()) {
+          if (pos2 >= charSequence.length()) {
             // Reached end of the buffer.
             lowerBoundaryOffset = lastNewlinePos;
           }
         }
 
         // Now `lowerBoundaryOffset` marks the end of an `ii` text object.
-        if (includeBelow) {
+        if (lowerBoundaryOffset < charSequence.length() && includeBelow) {
           while (++lowerBoundaryOffset < charSequence.length()) {
             final char ch = charSequence.charAt(lowerBoundaryOffset);
             if (ch == '\n') {
@@ -245,6 +251,10 @@ public class VimIndentObject implements VimExtension {
       @Override
       public TextObjectVisualType getVisualType() {
         return TextObjectVisualType.LINE_WISE;
+      }
+
+      private boolean isIndentChar(char ch) {
+        return ch == ' ' || ch == '\t';
       }
 
     }
