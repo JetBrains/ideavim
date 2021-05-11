@@ -48,6 +48,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
@@ -82,11 +83,6 @@ object IdeaSpecifics {
       val hostEditor = dataContext.getData(CommonDataKeys.HOST_EDITOR)
       if (hostEditor != null) {
         editor = hostEditor
-      }
-
-      if (FindActionId.enabled) {
-        val id: String? = ActionManager.getInstance().getId(action)
-        VimPlugin.getNotifications(dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
       }
     }
 
@@ -126,6 +122,16 @@ object IdeaSpecifics {
           }
           VimPlugin.getChange().insertBeforeCursor(it, dataContext)
           KeyHandler.getInstance().reset(it)
+        }
+      }
+      //endregion
+
+      //region Track action id
+      if (FindActionId.enabled) {
+        val copyActionText = MessageHelper.message("action.copy.action.id.text")
+        if (copyActionText != action.templateText) {
+          val id: String? = ActionManager.getInstance().getId(action)
+          VimPlugin.getNotifications(dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
         }
       }
       //endregion
