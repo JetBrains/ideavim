@@ -4,6 +4,9 @@
   <change-notes><![CDATA[
      <h3>Features:</h3>
      <ul>
+     <li>Support <code>sethandler</code> command to configure shortcuts conflicts via <code>~/.ideavimrc</code> file.
+       See <a href="https://jb.gg/vim-sethandler">docs</a>.
+     </li>
      <li>Support <code>vim-paragraph-motion</code> extension <a href="https://youtrack.jetbrains.com/issue/VIM-2290">VIM-2290</a> |
        <a href="https://github.com/dbakker/vim-paragraph-motion">vim-paragraph-motion</a>
      </li>
@@ -31,6 +34,26 @@
        <a href="https://youtrack.jetbrains.com/issue/VIM-2289">VIM-2289</a>
        Fix <code><End></code> command behaviour
      </li>
+     <li>
+       <a href="https://youtrack.jetbrains.com/issue/VIM-1476">VIM-1476</a>
+       Last inserted text is stored in <code>.</code> register
+     </li>
+     <li>
+       <a href="https://youtrack.jetbrains.com/issue/VIM-2295">VIM-2295</a>
+       Fix <code><S-Space></code> in insert mode with an existing mapping
+     </li>
+     <li>
+       <a href="https://youtrack.jetbrains.com/issue/VIM-1401">VIM-1401</a>
+       IdeaVim triggers readonly handler
+     </li>
+     <li>
+       <a href="https://youtrack.jetbrains.com/issue/VIM-1856">VIM-1856</a>
+       Support defining shortcuts in .ideavimrc
+     </li>
+     <li>
+       <a href="https://youtrack.jetbrains.com/issue/VIM-1523">VIM-1523</a>
+       Allow different shortcut handlers in different modes
+     </li>
      </ul>
 
      <h3>Merged PRs:</h3>
@@ -42,6 +65,10 @@
      <li>
        <a href="https://github.com/JetBrains/ideavim/pull/289">289</a>
        by <a href="https://github.com/MichalPlacek">MichalPlacek</a>: VIM-2276 ls returns "absolute path" for files on Microsoft Windows.
+     </li>
+     <li>
+       <a href="https://github.com/JetBrains/ideavim/pull/295">295</a>
+       by <a href="https://github.com/MichalPlacek">MichalPlacek</a>: VIM-1476
      </li>
      </ul>
     ]]>

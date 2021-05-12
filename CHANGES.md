@@ -36,7 +36,7 @@ usual beta standards.
 * [VIM-2284](https://youtrack.jetbrains.com/issue/VIM-2284) Values are not duplicated in set command
 * [VIM-2289](https://youtrack.jetbrains.com/issue/VIM-2289) Fix `<End>` command behaviour
 * [VIM-1476](https://youtrack.jetbrains.com/issue/VIM-1476) Last inserted text is stored in `.` register
-* [VIM-2295](https://youtrack.jetbrains.com/issue/VIM-2295) Fix `<S-Space>` in insert mode with an existing mappign
+* [VIM-2295](https://youtrack.jetbrains.com/issue/VIM-2295) Fix `<S-Space>` in insert mode with an existing mapping
 * [VIM-1401](https://youtrack.jetbrains.com/issue/VIM-1401) IdeaVim triggers readonly handler
 * [VIM-1856](https://youtrack.jetbrains.com/issue/VIM-1856) Support defining shortcuts in .ideavimrc
 * [VIM-1523](https://youtrack.jetbrains.com/issue/VIM-1523) Allow different shortcut handlers in different modes
