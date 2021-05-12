@@ -135,6 +135,14 @@ enum class ShortcutOwner(val ownerName: @NonNls String, private val title: @NonN
       else -> UNDEFINED
     }
 
-    fun fromStringOrVim(s: String): ShortcutOwner = if (Constants.IDE_STRING.equals(s, ignoreCase = true)) IDE else VIM
+    fun fromStringOrNull(s: String): ShortcutOwner? {
+      return if (Constants.IDE_STRING.equals(s, ignoreCase = true)) {
+        IDE
+      } else if (Constants.VIM_STRING.equals(s, ignoreCase = true)) {
+        VIM
+      } else {
+        null
+      }
+    }
   }
 }

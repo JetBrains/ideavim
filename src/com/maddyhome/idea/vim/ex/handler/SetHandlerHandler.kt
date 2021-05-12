@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandlerFlags
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
@@ -30,9 +29,8 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 
-class SetKeyHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
-  override val argFlags: CommandHandlerFlags =
-    flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+class SetHandlerHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     return doCommand(cmd)
@@ -77,7 +75,7 @@ class SetKeyHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler 
     if (split.size != 2) return null
 
     val left = split[0]
-    val right = ShortcutOwner.fromStringOrVim(split[1])
+    val right = ShortcutOwner.fromStringOrNull(split[1]) ?: return null
 
     var currentOwner: ShortcutOwnerInfo.PerMode = owner
     val modeSplit = left.split("-")
