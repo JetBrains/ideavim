@@ -370,7 +370,7 @@ public class VimEmulationConfigurable implements Configurable {
     private final VimShortcutConflictsTable.Model myModel;
 
     public CopyForRcAction(VimShortcutConflictsTable.@NotNull Model model) {
-      super("Copy for .ideavimrc", "Copy config for .ideavimrc", AllIcons.Actions.Copy);
+      super("Copy Config for .ideavimrc", "Copy config for .ideavimrc in sethandler format", AllIcons.Actions.Copy);
       myModel = model;
     }
 
