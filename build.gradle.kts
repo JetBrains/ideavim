@@ -20,7 +20,7 @@ plugins {
     java
     kotlin("jvm") version "1.3.71"
 
-    id("org.jetbrains.intellij") version "0.7.3"
+    id("org.jetbrains.intellij") version "1.0-SNAPSHOT"
     id("io.gitlab.arturbosch.detekt") version "1.15.0"
     id("org.jetbrains.changelog") version "1.1.2"
 
@@ -103,24 +103,24 @@ sourceSets {
 // --- Intellij plugin
 
 intellij {
-    version = ideaVersion
-    pluginName = "IdeaVim"
-    updateSinceUntilBuild = false
-    downloadSources = downloadIdeaSources.toBoolean()
-    instrumentCode = instrumentPluginCode.toBoolean()
-    intellijRepo = "https://www.jetbrains.com/intellij-repository"
-    setPlugins("java")
+    version.set(ideaVersion)
+    pluginName.set("IdeaVim")
+    updateSinceUntilBuild.set(false)
+    downloadSources.set(downloadIdeaSources.toBoolean())
+    instrumentCode.set(instrumentPluginCode.toBoolean())
+    intellijRepository.set("https://www.jetbrains.com/intellij-repository")
+    plugins.set(listOf("java"))
 }
 
 tasks {
     downloadRobotServerPlugin {
-        version = "0.10.0"
+        version.set("0.10.0")
     }
 
     publishPlugin {
-        channels(publishChannels.split(","))
-        username(publishUsername)
-        token(publishToken)
+        channels.set(publishChannels.split(","))
+        host.set(publishUsername)
+        token.set(publishToken)
     }
 
     runIdeForUiTests {
@@ -128,9 +128,9 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions(listOf("IC-2020.2.3", "IC-2020.3.2"))
-        downloadDirectory("${project.buildDir}/pluginVerifier/ides")
-        teamCityOutputFormat = true
+        ideVersions.set(listOf("IC-2020.2.3", "IC-2020.3.2"))
+        downloadDir.set("${project.buildDir}/pluginVerifier/ides")
+        teamCityOutputFormat.set(true)
     }
 }
 
