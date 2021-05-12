@@ -117,7 +117,7 @@ public class VimEmulationConfigurable implements Configurable {
       if (firstPerMode == null) {
         HyperlinkLabel label = new HyperlinkLabel();
         label.setHtmlText(MessageHelper.message("configurable.keyhandler.link"));
-        label.setHyperlinkTarget("https://jb.gg/abva4t");
+        label.setHyperlinkTarget("https://jb.gg/vim-sethandler");
         label.setForeground(UIUtil.getInactiveTextColor());
         add(label, BorderLayout.SOUTH);
       }
@@ -383,7 +383,7 @@ public class VimEmulationConfigurable implements Configurable {
         ShortcutOwner owner = ((ShortcutOwnerInfo.AllModes)ownerInfo).getOwner();
         if (owner == ShortcutOwner.UNDEFINED) continue;
 
-        stringBuilder.append("setkeydev ");
+        stringBuilder.append("sethandler ");
         stringBuilder.append(StringHelper.toKeyNotation(row.getKeyStroke()));
         stringBuilder.append(" ");
         stringBuilder.append("a:");
