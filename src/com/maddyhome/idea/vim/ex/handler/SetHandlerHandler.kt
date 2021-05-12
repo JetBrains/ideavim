@@ -47,23 +47,23 @@ class SetHandlerHandler : CommandHandler.SingleExecution(), VimScriptCommandHand
     if (args.isEmpty()) return false
 
     val key = try {
-      parseKeys(args[0]).first()
+      val shortcut = args[0]
+      if (shortcut.startsWith('<')) parseKeys(shortcut).first() else null
     } catch (e: IllegalArgumentException) {
       null
     }
 
     val owner = ShortcutOwnerInfo.allPerModeVim
-
-    val resultingOwner = args.drop(1).fold(owner) { currentOwner: ShortcutOwnerInfo.PerMode?, newData ->
+    val skipShortcut = if (key == null) 0 else 1
+    val resultingOwner = args.drop(skipShortcut).fold(owner) { currentOwner: ShortcutOwnerInfo.PerMode?, newData ->
       updateOwner(currentOwner, newData)
     } ?: return false
 
     if (key != null) {
       VimPlugin.getKey().savedShortcutConflicts[key] = resultingOwner
     } else {
-      val conflicts = VimPlugin.getKey().savedShortcutConflicts
-      conflicts.keys.forEach { conflictKey ->
-        conflicts[conflictKey] = resultingOwner
+      VimPlugin.getKey().shortcutConflicts.keys.forEach { conflictKey ->
+        VimPlugin.getKey().savedShortcutConflicts[conflictKey] = resultingOwner
       }
     }
     return true
