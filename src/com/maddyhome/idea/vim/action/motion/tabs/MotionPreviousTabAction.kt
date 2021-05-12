@@ -20,25 +20,14 @@ package com.maddyhome.idea.vim.action.motion.tabs
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.MotionType
-import com.maddyhome.idea.vim.handler.Motion
-import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.handler.toMotionOrError
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.handler.VimActionHandler
 
-/**
- * @author oleg
- */
-class MotionPreviousTabAction : MotionActionHandler.SingleExecution() {
-  override fun getOffset(
-    editor: Editor,
-    context: DataContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?
-  ): Motion {
-    return VimPlugin.getMotion().moveCaretGotoPreviousTab(editor, context, rawCount).toMotionOrError()
+class MotionPreviousTabAction : VimActionHandler.SingleExecution() {
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    VimPlugin.getMotion().moveCaretGotoPreviousTab(editor, context, cmd.rawCount)
+    return true
   }
 
-  override val motionType: MotionType = MotionType.INCLUSIVE
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 }
