@@ -116,7 +116,7 @@ public class VimEmulationConfigurable implements Configurable {
       });
       if (firstPerMode == null) {
         HyperlinkLabel label = new HyperlinkLabel();
-        label.setTextWithHyperlink(MessageHelper.message("configurable.keyhandler.link"));
+        label.setHtmlText(MessageHelper.message("configurable.keyhandler.link"));
         label.setHyperlinkTarget("https://jb.gg/abva4t");
         label.setForeground(UIUtil.getInactiveTextColor());
         add(label, BorderLayout.SOUTH);
