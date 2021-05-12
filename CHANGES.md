@@ -25,6 +25,7 @@ usual beta standards.
 ## To Be Released
 
 ### Features:
+* Support `sethandler` command to configure shortcuts conflicts via `~/.ideavimrc` file. See [docs](https://jb.gg/vim-sethandler).
 * Support `vim-paragraph-motion` extension [VIM-2290](https://youtrack.jetbrains.com/issue/VIM-2290) | [vim-paragraph-motion](https://github.com/dbakker/vim-paragraph-motion) 
 
 ### Fixes:
@@ -37,6 +38,8 @@ usual beta standards.
 * [VIM-1476](https://youtrack.jetbrains.com/issue/VIM-1476) Last inserted text is stored in `.` register
 * [VIM-2295](https://youtrack.jetbrains.com/issue/VIM-2295) Fix `<S-Space>` in insert mode with an existing mappign
 * [VIM-1401](https://youtrack.jetbrains.com/issue/VIM-1401) IdeaVim triggers readonly handler
+* [VIM-1856](https://youtrack.jetbrains.com/issue/VIM-1856) Support defining shortcuts in .ideavimrc
+* [VIM-1523](https://youtrack.jetbrains.com/issue/VIM-1523) Allow different shortcut handlers in different modes
 
 ### Merged PRs:
 * [280](https://github.com/JetBrains/ideavim/pull/280) by [Matt Ellis](https://github.com/citizenmatt): Caret position and view scrolling fixes
