@@ -33,7 +33,7 @@ class MotionLastMatchCharAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     val repeatLastMatchChar = VimPlugin.getMotion().repeatLastMatchChar(editor, caret, count)
     return if (repeatLastMatchChar < 0) Motion.Error else Motion.AbsoluteOffset(repeatLastMatchChar)

@@ -44,7 +44,7 @@ fun updateSearchHighlights(
   pattern: String?,
   shouldIgnoreSmartCase: Boolean,
   showHighlights: Boolean,
-  forceUpdate: Boolean
+  forceUpdate: Boolean,
 ) {
   updateSearchHighlights(pattern, shouldIgnoreSmartCase, showHighlights, -1, null, true, forceUpdate)
 }
@@ -54,7 +54,7 @@ fun updateIncsearchHighlights(
   pattern: String,
   forwards: Boolean,
   caretOffset: Int,
-  searchRange: LineRange?
+  searchRange: LineRange?,
 ): Int {
   val searchStartOffset =
     if (searchRange != null) EditorHelper.getLineStartOffset(editor, searchRange.startLine) else caretOffset
@@ -85,7 +85,7 @@ private fun updateSearchHighlights(
   initialOffset: Int,
   searchRange: LineRange?,
   forwards: Boolean,
-  forceUpdate: Boolean
+  forceUpdate: Boolean,
 ): Int {
   var currentMatchOffset = -1
   val projectManager = ProjectManager.getInstanceIfCreated() ?: return currentMatchOffset

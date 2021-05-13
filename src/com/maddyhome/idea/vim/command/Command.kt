@@ -34,7 +34,7 @@ data class Command(
   var rawCount: Int,
   var action: EditorActionHandlerBase,
   val type: Type,
-  var flags: EnumSet<CommandFlags>
+  var flags: EnumSet<CommandFlags>,
 ) {
 
   constructor(rawCount: Int, register: Char) : this(

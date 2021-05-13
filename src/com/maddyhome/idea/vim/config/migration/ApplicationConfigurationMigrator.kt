@@ -37,7 +37,7 @@ private val productionMigrationComponents = MigrationComponents(
 class MigrationComponents(
   val migrators: Set<ConfigMigrator>,
   val versionDetectors: List<VersionDetector>,
-  val currentVersion: Int
+  val currentVersion: Int,
 ) {
   val groupedMigrators: Map<Int, ConfigMigrator> = registerMigrators(migrators)
 

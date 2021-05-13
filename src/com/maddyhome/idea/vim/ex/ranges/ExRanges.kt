@@ -32,7 +32,7 @@ import java.util.*
 sealed class Range(
   // Line offset
   protected val offset: Int,
-  val isMove: Boolean
+  val isMove: Boolean,
 ) {
   /**
    * Gets the line number (0 based) specificied by this range. Includes the offset.
@@ -146,7 +146,7 @@ class LineNumberRange : Range {
   override fun getRangeLine(
     editor: Editor,
     caret: Caret,
-    lastZero: Boolean
+    lastZero: Boolean,
   ): Int {
     line = if (line == LAST_LINE) EditorHelper.getLineCount(editor) - 1 else caret.logicalPosition.line
     return line
@@ -239,7 +239,7 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
    */
   override fun getRangeLine(
     editor: Editor,
-    lastZero: Boolean
+    lastZero: Boolean,
   ): Int { // Each subsequent pattern is searched for starting in the line after the previous search match
     return getRangeLine(editor, editor.caretModel.currentCaret, lastZero)
   }
@@ -247,7 +247,7 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
   override fun getRangeLine(
     editor: Editor,
     caret: Caret,
-    lastZero: Boolean
+    lastZero: Boolean,
   ): Int {
     var line = caret.logicalPosition.line
     var searchOffset = -1

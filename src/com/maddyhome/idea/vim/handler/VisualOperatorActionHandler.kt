@@ -79,7 +79,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
       caret: Caret,
       context: DataContext,
       cmd: Command,
-      range: VimSelection
+      range: VimSelection,
     ): Boolean
 
     /**
@@ -91,7 +91,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
       editor: Editor,
       context: DataContext,
       cmd: Command,
-      caretsAndSelections: Map<Caret, VimSelection>
+      caretsAndSelections: Map<Caret, VimSelection>,
     ) = true
 
     /**
@@ -119,7 +119,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
       editor: Editor,
       context: DataContext,
       cmd: Command,
-      caretsAndSelections: Map<Caret, VimSelection>
+      caretsAndSelections: Map<Caret, VimSelection>,
     ): Boolean
   }
 

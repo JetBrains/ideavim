@@ -34,7 +34,7 @@ class MotionLastNonSpaceAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretToLineEndSkipLeadingOffset(editor, caret, count - 1).toMotion()
   }

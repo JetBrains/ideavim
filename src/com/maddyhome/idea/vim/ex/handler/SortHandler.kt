@@ -98,7 +98,7 @@ class SortHandler : CommandHandler.SingleExecution() {
   private class LineComparator(
     private val myIgnoreCase: Boolean,
     private val myNumber: Boolean,
-    private val myReverse: Boolean
+    private val myReverse: Boolean,
   ) : Comparator<String> {
 
     override fun compare(o1: String, o2: String): Int {

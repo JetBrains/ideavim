@@ -185,7 +185,7 @@ class YankGroup {
     editor: Editor,
     range: TextRange,
     type: SelectionType,
-    startOffsets: Map<Caret, Int>?
+    startOffsets: Map<Caret, Int>?,
   ): Boolean {
     startOffsets?.forEach { (caret, offset) -> MotionGroup.moveCaret(editor, caret, offset) }
 

@@ -65,7 +65,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       context: DataContext,
       count: Int,
       rawCount: Int,
-      argument: Argument?
+      argument: Argument?,
     ): Motion
 
     /**
@@ -134,7 +134,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return when (this) {
       is SingleExecution -> getOffset(editor, context, count, rawCount, argument)

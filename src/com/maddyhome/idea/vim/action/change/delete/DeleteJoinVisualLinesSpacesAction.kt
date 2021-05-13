@@ -42,7 +42,7 @@ class DeleteJoinVisualLinesSpacesAction : VisualOperatorActionHandler.SingleExec
     editor: Editor,
     context: DataContext,
     cmd: Command,
-    caretsAndSelections: Map<Caret, VimSelection>
+    caretsAndSelections: Map<Caret, VimSelection>,
   ): Boolean {
     if (editor.isOneLineMode) return false
     if (ideajoin.isSet) {

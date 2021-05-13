@@ -39,7 +39,7 @@ class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     var allow = false
     if (editor.inInsertMode) {
@@ -57,7 +57,7 @@ class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    cmd: Command
+    cmd: Command,
   ) {
     caret.vimLastColumn = MotionGroup.LAST_COLUMN
   }

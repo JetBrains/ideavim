@@ -85,7 +85,7 @@ class ToKeysMappingInfo(
   val toKeys: List<KeyStroke>,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
-  owner: MappingOwner
+  owner: MappingOwner,
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = toKeyNotation(toKeys)
 
@@ -106,7 +106,7 @@ class ToHandlerMappingInfo(
   private val extensionHandler: VimExtensionHandler,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
-  owner: MappingOwner
+  owner: MappingOwner,
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = "call ${extensionHandler.javaClass.canonicalName}"
 
@@ -176,7 +176,7 @@ class ToActionMappingInfo(
   val action: String,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
-  owner: MappingOwner
+  owner: MappingOwner,
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = "action $action"
 

@@ -43,7 +43,7 @@ class Register {
     name: Char,
     type: SelectionType,
     text: String,
-    transferableData: MutableList<out TextBlockTransferableData>
+    transferableData: MutableList<out TextBlockTransferableData>,
   ) {
     this.name = name
     this.type = type
@@ -57,7 +57,7 @@ class Register {
     type: SelectionType,
     text: String,
     transferableData: MutableList<out TextBlockTransferableData>,
-    rawText: String
+    rawText: String,
   ) {
     this.name = name
     this.type = type

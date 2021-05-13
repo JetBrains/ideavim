@@ -108,7 +108,7 @@ object CommandParser {
     context: DataContext,
     cmd: String,
     count: Int,
-    aliasCountdown: Int
+    aliasCountdown: Int,
   ) {
     // Nothing entered
     if (cmd.isEmpty()) {

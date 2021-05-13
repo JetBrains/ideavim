@@ -37,5 +37,5 @@ fun ContainerFixture.gutter(function: Gutter.() -> Unit = {}): ContainerFixture 
 @FixtureName("Gutter")
 class Gutter(
   remoteRobot: RemoteRobot,
-  remoteComponent: RemoteComponent
+  remoteComponent: RemoteComponent,
 ) : CommonContainerFixture(remoteRobot, remoteComponent)

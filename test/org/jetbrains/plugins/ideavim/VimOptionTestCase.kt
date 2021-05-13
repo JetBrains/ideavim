@@ -106,7 +106,7 @@ annotation class VimOptionTestConfiguration(vararg val value: VimTestOption)
 annotation class VimTestOption(
   val option: String,
   val type: VimTestOptionType,
-  val values: Array<String>
+  val values: Array<String>,
 )
 
 enum class VimTestOptionType {

@@ -30,7 +30,7 @@ sealed class ShortcutOwnerInfo {
     val normal: ShortcutOwner,
     val insert: ShortcutOwner,
     val visual: ShortcutOwner,
-    val select: ShortcutOwner
+    val select: ShortcutOwner,
   ) : ShortcutOwnerInfo() {
     fun toNotation(): String {
       val owners = HashMultimap.create<ShortcutOwner, String>()

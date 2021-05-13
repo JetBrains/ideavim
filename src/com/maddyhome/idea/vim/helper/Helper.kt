@@ -65,7 +65,7 @@ import java.util.*
 annotation class VimBehaviorDiffers(
   val originalVimAfter: String = "",
   val description: String = "",
-  val shouldBeFixed: Boolean = true
+  val shouldBeFixed: Boolean = true,
 )
 
 fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
@@ -95,11 +95,13 @@ fun localEditors(): List<Editor> {
 }
 
 fun localEditors(doc: Document): List<Editor> {
-  return EditorFactory.getInstance().getEditors(doc).filter { editor -> editor.editorClientId.let { it == null || it == ClientId.currentOrNull } }
+  return EditorFactory.getInstance().getEditors(doc)
+    .filter { editor -> editor.editorClientId.let { it == null || it == ClientId.currentOrNull } }
 }
 
 fun localEditors(doc: Document, project: Project): List<Editor> {
-  return EditorFactory.getInstance().getEditors(doc, project).filter { editor -> editor.editorClientId.let { it == null || it == ClientId.currentOrNull } }
+  return EditorFactory.getInstance().getEditors(doc, project)
+    .filter { editor -> editor.editorClientId.let { it == null || it == ClientId.currentOrNull } }
 }
 
 val Editor.editorClientId: ClientId?

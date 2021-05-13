@@ -35,7 +35,7 @@ class MotionPreviousTabAction : MotionActionHandler.SingleExecution() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretGotoPreviousTab(editor, context, rawCount).toMotionOrError()
   }

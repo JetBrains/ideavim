@@ -43,7 +43,7 @@ class ChangeCaseLowerVisualAction : VisualOperatorActionHandler.ForEachCaret() {
     caret: Caret,
     context: DataContext,
     cmd: Command,
-    range: VimSelection
+    range: VimSelection,
   ): Boolean {
     val topLevelEditor = editor.getTopLevelEditor()
     return VimPlugin.getChange()

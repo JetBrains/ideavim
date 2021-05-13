@@ -42,7 +42,7 @@ class ChangeLineAction : ChangeEditorActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     // `S` command is a synonym of `cc`
     val motion = MotionDownLess1FirstNonSpaceAction()

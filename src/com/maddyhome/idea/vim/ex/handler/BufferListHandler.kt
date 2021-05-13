@@ -121,7 +121,7 @@ private fun getBufferStatus(
   editor: Editor,
   file: VirtualFile,
   currentFile: VirtualFile,
-  previousFile: VirtualFile?
+  previousFile: VirtualFile?,
 ): String {
   @NonNls val bufStatus = StringBuilder()
 

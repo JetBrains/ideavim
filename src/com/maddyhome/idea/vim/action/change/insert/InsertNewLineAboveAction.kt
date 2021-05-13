@@ -37,7 +37,7 @@ class InsertNewLineAboveAction : ChangeEditorActionHandler.SingleExecution() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     if (editor.isOneLineMode) return false
     VimPlugin.getChange().insertNewLineAbove(editor, context)

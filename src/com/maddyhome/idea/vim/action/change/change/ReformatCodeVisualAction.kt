@@ -41,7 +41,7 @@ class ReformatCodeVisualAction : VisualOperatorActionHandler.ForEachCaret() {
     caret: Caret,
     context: DataContext,
     cmd: Command,
-    range: VimSelection
+    range: VimSelection,
   ): Boolean {
     VimPlugin.getChange().reformatCodeSelection(editor, caret, range)
     return true

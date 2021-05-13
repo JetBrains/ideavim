@@ -34,7 +34,7 @@ class MotionCamelEndRightAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretToNextCamelEnd(editor, caret, count).toMotionOrError()
   }

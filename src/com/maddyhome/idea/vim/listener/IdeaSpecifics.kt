@@ -110,10 +110,10 @@ object IdeaSpecifics {
 
       //region Enter insert mode after surround with if
       if (surrounderAction == action.javaClass.name && surrounderItems.any {
-        action.templatePresentation.text.endsWith(
+          action.templatePresentation.text.endsWith(
             it
           )
-      }
+        }
       ) {
         editor?.let {
           val commandState = it.commandState
@@ -151,7 +151,7 @@ object IdeaSpecifics {
           templateState: TemplateState,
           template: Template?,
           oldIndex: Int,
-          newIndex: Int
+          newIndex: Int,
         ) {
           if (IdeaRefactorMode.keepMode()) {
             IdeaRefactorMode.correctSelection(editor)
@@ -228,7 +228,7 @@ object IdeaSpecifics {
     fun onMovement(
       editor: @NotNull Editor,
       caret: @NotNull Caret,
-      toRight: Boolean
+      toRight: Boolean,
     ) {
       if (!PlatformUtils.isAppCode()) return
 

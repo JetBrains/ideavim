@@ -48,7 +48,7 @@ class ChangeVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
     caret: Caret,
     context: DataContext,
     cmd: Command,
-    range: VimSelection
+    range: VimSelection,
   ): Boolean {
     val vimTextRange = range.toVimTextRange(true)
     return if (range.type == SelectionType.BLOCK_WISE && vimTextRange.isMultiple) {

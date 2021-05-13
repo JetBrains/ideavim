@@ -37,7 +37,7 @@ class InsertAfterLineEndAction : ChangeEditorActionHandler.SingleExecution() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     VimPlugin.getChange().insertAfterLineEnd(editor, context)
     return true

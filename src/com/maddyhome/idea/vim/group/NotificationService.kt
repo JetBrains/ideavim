@@ -269,7 +269,7 @@ class NotificationService(private val project: Project?) {
     val notification: Notification,
     val appendableText: String,
     val optionName: String,
-    val enableOption: () -> Unit
+    val enableOption: () -> Unit,
   ) : AnAction("Append to ~/.ideavimrc") {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project

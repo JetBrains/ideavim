@@ -40,7 +40,7 @@ class MotionFirstColumnAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretToLineStart(editor, caret).toMotion()
   }
@@ -57,7 +57,7 @@ class MotionFirstColumnInsertModeAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretToLineStart(editor, caret).toMotion()
   }

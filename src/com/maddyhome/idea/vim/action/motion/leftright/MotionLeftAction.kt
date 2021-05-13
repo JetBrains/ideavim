@@ -39,7 +39,7 @@ class MotionLeftAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     val offsetOfHorizontalMotion = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -count, false)
     return if (offsetOfHorizontalMotion < 0) Motion.Error else Motion.AbsoluteOffset(offsetOfHorizontalMotion)
@@ -60,7 +60,7 @@ class MotionLeftInsertModeAction : MotionActionHandler.ForEachCaret(), Complicat
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     val offsetOfHorizontalMotion = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -count, false)
     return if (offsetOfHorizontalMotion < 0) Motion.Error else Motion.AbsoluteOffset(offsetOfHorizontalMotion)

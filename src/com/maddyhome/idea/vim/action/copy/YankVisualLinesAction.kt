@@ -42,7 +42,7 @@ class YankVisualLinesAction : VisualOperatorActionHandler.SingleExecution() {
     editor: Editor,
     context: DataContext,
     cmd: Command,
-    caretsAndSelections: Map<Caret, VimSelection>
+    caretsAndSelections: Map<Caret, VimSelection>,
   ): Boolean {
     val selections = caretsAndSelections.values
     val starts: MutableList<Int> = ArrayList()

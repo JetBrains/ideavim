@@ -39,7 +39,7 @@ class ChangeMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableO
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     return argument != null && VimPlugin.getChange().changeMotion(editor, caret, context, count, rawCount, argument)
   }

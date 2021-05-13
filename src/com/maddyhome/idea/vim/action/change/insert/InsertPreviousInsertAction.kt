@@ -32,7 +32,7 @@ class InsertPreviousInsertAction : ChangeEditorActionHandler.SingleExecution() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     VimPlugin.getChange().insertPreviousInsert(editor, context, false)
     return true

@@ -41,7 +41,7 @@ class VisualBlockAppendAction : VisualOperatorActionHandler.SingleExecution() {
     editor: Editor,
     context: DataContext,
     cmd: Command,
-    caretsAndSelections: Map<Caret, VimSelection>
+    caretsAndSelections: Map<Caret, VimSelection>,
   ): Boolean {
     if (editor.isOneLineMode) return false
     val range = caretsAndSelections.values.stream().findFirst().orElse(null) ?: return false

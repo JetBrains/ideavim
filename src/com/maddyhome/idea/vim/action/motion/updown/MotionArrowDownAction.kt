@@ -46,7 +46,7 @@ class MotionArrowDownAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysActi
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Int {
     return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)
   }

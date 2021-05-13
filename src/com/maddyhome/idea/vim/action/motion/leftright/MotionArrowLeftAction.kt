@@ -42,7 +42,7 @@ class MotionArrowLeftAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysActi
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Int {
     return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -count, false)
   }

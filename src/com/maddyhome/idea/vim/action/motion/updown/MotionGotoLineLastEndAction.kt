@@ -45,7 +45,7 @@ class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     var allow = false
     if (editor.inInsertMode) {
@@ -72,7 +72,7 @@ class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     var allow = false
     if (editor.inInsertMode) {

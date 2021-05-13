@@ -44,7 +44,7 @@ class ChangeVisualCharacterAction : VisualOperatorActionHandler.ForEachCaret() {
     caret: Caret,
     context: DataContext,
     cmd: Command,
-    range: VimSelection
+    range: VimSelection,
   ): Boolean {
     val argument = cmd.argument
     return argument != null &&

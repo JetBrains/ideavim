@@ -93,7 +93,7 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
     editor: Editor,
     caret: Caret,
     command: ExCommand,
-    lineRange: LineRange
+    lineRange: LineRange,
   ): Int {
     var line = command.ranges.getFirstLine(editor, caret)
     val adj = lineRange.endLine - lineRange.startLine + 1

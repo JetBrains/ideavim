@@ -46,7 +46,7 @@ class MotionArrowRightAction : NonShiftedSpecialKeyHandler(), ComplicatedKeysAct
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Int {
     val allowPastEnd = editor.commandState.mode.isEndAllowed
     return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, allowPastEnd)

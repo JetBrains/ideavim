@@ -41,7 +41,7 @@ class ChangeCharactersAction : ChangeEditorActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     return VimPlugin.getChange().changeCharacters(editor, caret, count)
   }

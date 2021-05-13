@@ -45,7 +45,7 @@ class DeleteVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
     caret: Caret,
     context: DataContext,
     cmd: Command,
-    range: VimSelection
+    range: VimSelection,
   ): Boolean {
     val textRange = range.toVimTextRange(false)
     val (usedCaret, usedRange, usedType) = when (range.type) {

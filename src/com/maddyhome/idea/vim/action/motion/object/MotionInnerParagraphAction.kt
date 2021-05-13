@@ -42,7 +42,7 @@ class MotionInnerParagraphAction : TextObjectActionHandler() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): TextRange? {
     return VimPlugin.getMotion().getParagraphRange(editor, caret, count, false)
   }

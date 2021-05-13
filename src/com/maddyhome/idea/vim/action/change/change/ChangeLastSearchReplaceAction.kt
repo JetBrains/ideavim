@@ -33,7 +33,7 @@ class ChangeLastSearchReplaceAction : ChangeEditorActionHandler.SingleExecution(
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     var result = true
     for (caret in editor.caretModel.allCarets) {

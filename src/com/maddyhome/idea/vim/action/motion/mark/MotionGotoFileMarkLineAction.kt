@@ -43,7 +43,7 @@ class MotionGotoFileMarkLineAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     if (argument == null) return Motion.Error
 
@@ -63,7 +63,7 @@ class MotionGotoFileMarkLineNoSaveJumpAction : MotionActionHandler.ForEachCaret(
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     if (argument == null) return Motion.Error
 

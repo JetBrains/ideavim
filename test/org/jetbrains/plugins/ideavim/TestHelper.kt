@@ -75,7 +75,7 @@ inline fun waitAndAssert(timeInMillis: Int = 1000, condition: () -> Boolean) {
 fun waitAndAssertMode(
   fixture: CodeInsightTestFixture,
   mode: CommandState.Mode,
-  timeInMillis: Int = OptionsManager.visualEnterDelay.value() + 1000
+  timeInMillis: Int = OptionsManager.visualEnterDelay.value() + 1000,
 ) {
   waitAndAssert(timeInMillis) { fixture.editor.mode == mode }
 }
@@ -102,7 +102,7 @@ fun assertHappened(timeInMillis: Int = 1000, precision: Int, condition: () -> Bo
 fun waitCondition(
   durationMillis: Long,
   interval: Long = 500,
-  condition: () -> Boolean
+  condition: () -> Boolean,
 ): Boolean {
   val endTime = System.currentTimeMillis() + durationMillis
   while (System.currentTimeMillis() < endTime) {

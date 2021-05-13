@@ -37,7 +37,7 @@ class VisualSelectNextSearch : MotionActionHandler.SingleExecution() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().selectNextSearch(editor, count, true).toMotionOrError()
   }

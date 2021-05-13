@@ -41,7 +41,7 @@ class AutoIndentLinesVisualAction : VisualOperatorActionHandler.ForEachCaret() {
     caret: Caret,
     context: DataContext,
     cmd: Command,
-    range: VimSelection
+    range: VimSelection,
   ): Boolean {
     VimPlugin.getChange().autoIndentRange(editor, caret, context, range.toVimTextRange(true))
     return true

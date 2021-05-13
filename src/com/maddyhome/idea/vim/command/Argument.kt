@@ -34,7 +34,7 @@ class Argument private constructor(
   val motion: Command = EMPTY_COMMAND,
   val offsets: Map<Caret, VimSelection> = emptyMap(),
   val string: String = "",
-  val type: Type
+  val type: Type,
 ) {
   constructor(motionArg: Command) : this(motion = motionArg, type = Type.MOTION)
   constructor(charArg: Char) : this(character = charArg, type = Type.CHARACTER)
@@ -50,7 +50,8 @@ class Argument private constructor(
     val EMPTY_COMMAND = Command(
       0,
       object : MotionActionHandler.SingleExecution() {
-        override fun getOffset(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?) = Motion.NoMotion
+        override fun getOffset(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?) =
+          Motion.NoMotion
 
         override val motionType: MotionType = MotionType.EXCLUSIVE
       },

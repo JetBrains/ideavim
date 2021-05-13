@@ -218,7 +218,7 @@ private class HelpLink(
   /*@ActionText*/
   name: String,
   val link: String,
-  icon: Icon?
+  icon: Icon?,
 ) : DumbAwareAction(name, null, icon)/*, LightEditCompatible*/ {
   override fun actionPerformed(e: AnActionEvent) {
     BrowserUtil.browse(link)
