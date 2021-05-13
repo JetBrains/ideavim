@@ -36,7 +36,6 @@ val downloadIdeaSources: String by project
 val instrumentPluginCode: String by project
 
 val publishChannels: String by project
-val publishUsername: String by project
 val publishToken: String by project
 
 val slackUrl: String by project
@@ -119,7 +118,6 @@ tasks {
 
     publishPlugin {
         channels.set(publishChannels.split(","))
-        host.set(publishUsername)
         token.set(publishToken)
     }
 
