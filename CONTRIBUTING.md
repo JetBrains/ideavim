@@ -1,6 +1,6 @@
 [![TeamCity Build][teamcity-build-status-svg]][teamcity-build-status]
 
-IdeaVim is an open source project created by 60+ contributors. Would you like to make it even better? That’s wonderful!
+IdeaVim is an open source project created by 80+ contributors. Would you like to make it even better? That’s wonderful!
 
 This page is created to help you start contributing. And who knows, maybe in a few days this project will be brighter than ever!
 
