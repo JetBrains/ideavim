@@ -209,12 +209,12 @@ public class KeyGroup implements PersistentStateComponent<Element> {
         owner = ((ShortcutOwnerInfo.AllModes)value).getOwner();
       }
       else if (value instanceof ShortcutOwnerInfo.PerMode) {
-        owner = ((ShortcutOwnerInfo.PerMode)value).getNormal();
+        owner = null;
       }
       else {
         throw new RuntimeException();
       }
-      if (owner != ShortcutOwner.UNDEFINED) {
+      if (owner != null && owner != ShortcutOwner.UNDEFINED) {
         final Element conflictElement = new Element(SHORTCUT_CONFLICT_ELEMENT);
         conflictElement.setAttribute(OWNER_ATTRIBUTE, owner.getOwnerName());
         final Element textElement = new Element(TEXT_ELEMENT);
