@@ -52,6 +52,7 @@ public class NumberOption extends TextOption {
    * @param min    The option's minimum value
    * @param max    The option's maximum value
    */
+  @SuppressWarnings("SameParameterValue")
   NumberOption(@VimNlsSafe String name, @VimNlsSafe String abbrev, int dflt, int min, int max) {
     super(name, abbrev);
     this.dflt = dflt;

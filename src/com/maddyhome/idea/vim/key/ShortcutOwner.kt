@@ -89,13 +89,6 @@ sealed class ShortcutOwnerInfo {
     }
   }
 
-  fun toPerMode(): PerMode {
-    return when (this) {
-      is PerMode -> this
-      is AllModes -> PerMode(owner, owner, owner, owner)
-    }
-  }
-
   companion object {
     @JvmField
     val allUndefined = AllModes(ShortcutOwner.UNDEFINED)
@@ -136,12 +129,10 @@ enum class ShortcutOwner(val ownerName: @NonNls String, private val title: @NonN
     }
 
     fun fromStringOrNull(s: String): ShortcutOwner? {
-      return if (Constants.IDE_STRING.equals(s, ignoreCase = true)) {
-        IDE
-      } else if (Constants.VIM_STRING.equals(s, ignoreCase = true)) {
-        VIM
-      } else {
-        null
+      return when {
+          Constants.IDE_STRING.equals(s, ignoreCase = true) -> IDE
+          Constants.VIM_STRING.equals(s, ignoreCase = true) -> VIM
+          else -> null
       }
     }
   }
