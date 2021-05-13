@@ -11,14 +11,14 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.71")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.0")
         classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
     }
 }
 
 plugins {
     java
-    kotlin("jvm") version "1.3.71"
+    kotlin("jvm") version "1.5.0"
 
     id("org.jetbrains.intellij") version "1.0-SNAPSHOT"
     id("io.gitlab.arturbosch.detekt") version "1.15.0"
@@ -71,12 +71,14 @@ tasks {
     compileKotlin {
         kotlinOptions {
             jvmTarget = javaVersion
+            apiVersion = "1.3"
 //            allWarningsAsErrors = true
         }
     }
     compileTestKotlin {
         kotlinOptions {
             jvmTarget = javaVersion
+            apiVersion = "1.3"
 //            allWarningsAsErrors = true
         }
     }
