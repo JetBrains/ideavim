@@ -110,10 +110,10 @@ object IdeaSpecifics {
 
       //region Enter insert mode after surround with if
       if (surrounderAction == action.javaClass.name && surrounderItems.any {
-          action.templatePresentation.text.endsWith(
+        action.templatePresentation.text.endsWith(
             it
           )
-        }
+      }
       ) {
         editor?.let {
           val commandState = it.commandState
