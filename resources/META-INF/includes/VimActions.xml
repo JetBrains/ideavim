@@ -294,8 +294,8 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowDownAction" mappingModes="N" keys="«C-W»j,«C-W»«C-J»,«C-W»«Down»"/>
 
     <!-- Tabs -->
-    <vimAction implementation="com.maddyhome.idea.vim.action.window.tabs.MotionNextTabAction" mappingModes="NXO" keys="gt"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.window.tabs.MotionPreviousTabAction" mappingModes="NXO" keys="gT"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.tabs.NextTabAction" mappingModes="NXO" keys="gt"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.tabs.PreviousTabAction" mappingModes="NXO" keys="gT"/>
 
     <!-- Search -->
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction" mappingModes="NXO" keys="/"/>

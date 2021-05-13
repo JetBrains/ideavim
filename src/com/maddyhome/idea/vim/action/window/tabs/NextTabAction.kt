@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
-class MotionNextTabAction : VimActionHandler.SingleExecution() {
+class NextTabAction : VimActionHandler.SingleExecution() {
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     VimPlugin.getMotion().moveCaretGotoNextTab(editor, context, cmd.rawCount)
     return true

@@ -410,7 +410,7 @@
  * |gP|                   {@link com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorActionMoveCursor}
  * |gQ|                   TO BE IMPLEMENTED
  * |gR|                   TO BE IMPLEMENTED
- * |gT|                   {@link com.maddyhome.idea.vim.action.window.tabs.MotionPreviousTabAction}
+ * |gT|                   {@link com.maddyhome.idea.vim.action.window.tabs.PreviousTabAction}
  * |gU|                   {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperMotionAction}
  * |gV|                   TO BE IMPLEMENTED
  * |g]|                   TO BE IMPLEMENTED
@@ -434,7 +434,7 @@
  * |gq|                   {@link com.maddyhome.idea.vim.action.change.change.ReformatCodeMotionAction}
  * |gr|                   TO BE IMPLEMENTED
  * |gs|                   TO BE IMPLEMENTED
- * |gt|                   {@link com.maddyhome.idea.vim.action.window.tabs.MotionNextTabAction}
+ * |gt|                   {@link com.maddyhome.idea.vim.action.window.tabs.NextTabAction}
  * |gu|                   {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerMotionAction}
  * |gv|                   {@link com.maddyhome.idea.vim.action.motion.visual.VisualSelectPreviousAction}
  * |gw|                   TO BE IMPLEMENTED
