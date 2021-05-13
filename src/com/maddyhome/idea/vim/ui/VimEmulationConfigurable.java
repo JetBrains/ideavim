@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.ui;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionToolbarPosition;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
@@ -97,6 +98,7 @@ public class VimEmulationConfigurable implements Configurable {
       setLayout(new BorderLayout());
 
       ToolbarDecorator decorator = ToolbarDecorator.createDecorator(shortcutConflictsTable);
+      decorator.setToolbarPosition(ActionToolbarPosition.RIGHT);
       decorator.addExtraAction(new CopyForRcAction(model));
 
       final JPanel scrollPane = decorator.createPanel();
