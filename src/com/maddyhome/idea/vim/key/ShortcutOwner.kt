@@ -130,9 +130,9 @@ enum class ShortcutOwner(val ownerName: @NonNls String, private val title: @NonN
 
     fun fromStringOrNull(s: String): ShortcutOwner? {
       return when {
-          Constants.IDE_STRING.equals(s, ignoreCase = true) -> IDE
-          Constants.VIM_STRING.equals(s, ignoreCase = true) -> VIM
-          else -> null
+        Constants.IDE_STRING.equals(s, ignoreCase = true) -> IDE
+        Constants.VIM_STRING.equals(s, ignoreCase = true) -> VIM
+        else -> null
       }
     }
   }
