@@ -26,7 +26,6 @@ object Release : BuildType({
       "credentialsJSON:61a36031-4da1-4226-a876-b8148bf32bde",
       label = "Password"
     )
-    param("env.ORG_GRADLE_PROJECT_publishUsername", "Aleksei.Plate")
     param("env.ORG_GRADLE_PROJECT_version", "%build.number%")
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
     param("env.ORG_GRADLE_PROJECT_publishChannels", "$DEFAULT,$EAP,$DEV")
