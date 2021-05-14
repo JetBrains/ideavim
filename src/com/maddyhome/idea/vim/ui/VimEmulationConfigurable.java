@@ -379,6 +379,14 @@ public class VimEmulationConfigurable implements Configurable {
     }
 
     @Override
+    public void updateButton(@NotNull AnActionEvent e) {
+      boolean enabled = myModel.getRows().stream().anyMatch(it -> it.getOwner() instanceof ShortcutOwnerInfo.AllModes &&
+                                                                  ((ShortcutOwnerInfo.AllModes)it.getOwner()).getOwner() !=
+                                                                  ShortcutOwner.UNDEFINED);
+      e.getPresentation().setEnabled(enabled);
+    }
+
+    @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
       StringBuilder stringBuilder = new StringBuilder();
       for (VimShortcutConflictsTable.Row row : myModel.getRows()) {
