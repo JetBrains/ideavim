@@ -16,13 +16,4 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-pluginManagement {
-  repositories {
-    maven {
-      url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
-    gradlePluginPortal()
-  }
-}
-
 rootProject.name = 'IdeaVIM'
