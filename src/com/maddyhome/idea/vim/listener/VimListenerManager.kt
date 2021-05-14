@@ -53,7 +53,7 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.StatisticReporter
+import com.maddyhome.idea.vim.helper.UpdatesChecker
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inSelectMode
@@ -193,7 +193,7 @@ object VimListenerManager {
   private object VimEditorFactoryListener : EditorFactoryListener {
     override fun editorCreated(event: EditorFactoryEvent) {
       add(event.editor)
-      StatisticReporter.report()
+      UpdatesChecker.check()
     }
 
     override fun editorReleased(event: EditorFactoryEvent) {

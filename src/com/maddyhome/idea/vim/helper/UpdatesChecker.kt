@@ -33,18 +33,19 @@ import java.io.IOException
 import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
 
-object StatisticReporter {
+object UpdatesChecker {
 
-  private val logger = logger<StatisticReporter>()
+  private val logger = logger<UpdatesChecker>()
   private const val IDEAVIM_STATISTICS_TIMESTAMP_KEY = "ideavim.statistics.timestamp"
   private val DAY_IN_MILLIS = TimeUnit.DAYS.toMillis(1)
 
   /**
-   * Reports statistics about installed IdeaVim and enabled Vim emulation.
+   * Check if we have plugin updates for IdeaVim.
    *
+   * Also this code is necessary for JetStat, so do not remove this check.
    * See https://github.com/go-lang-plugin-org/go-lang-idea-plugin/commit/5182ab4a1d01ad37f6786268a2fe5e908575a217
    */
-  fun report() {
+  fun check() {
     val lastUpdate = PropertiesComponent.getInstance().getLong(IDEAVIM_STATISTICS_TIMESTAMP_KEY, 0)
     val outOfDate = lastUpdate == 0L || System.currentTimeMillis() - lastUpdate > DAY_IN_MILLIS
 
@@ -61,7 +62,7 @@ object StatisticReporter {
         PropertiesComponent.getInstance().setValue(IDEAVIM_STATISTICS_TIMESTAMP_KEY, System.currentTimeMillis().toString())
 
         HttpRequests.request(url).connect { request: HttpRequests.Request ->
-          logger.info("Sending statistics: $url")
+          logger.info("Check IdeaVim updates: $url")
           try {
             JDOMUtil.load(request.inputStream)
           } catch (e: JDOMException) {
