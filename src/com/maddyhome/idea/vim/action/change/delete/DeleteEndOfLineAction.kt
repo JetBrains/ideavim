@@ -34,7 +34,7 @@ class DeleteEndOfLineAction : ChangeEditorActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     return VimPlugin.getChange().deleteEndOfLine(editor, caret, count)
   }

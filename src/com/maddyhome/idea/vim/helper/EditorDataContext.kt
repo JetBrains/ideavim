@@ -23,7 +23,7 @@ import com.intellij.openapi.editor.Editor
 
 class EditorDataContext @Deprecated("Please use `init` method") constructor(
   private val editor: Editor,
-  private val contextDelegate: DataContext? = null
+  private val contextDelegate: DataContext? = null,
 ) : DataContext {
   /**
    * Returns the object corresponding to the specified data identifier. Some of the supported data identifiers are

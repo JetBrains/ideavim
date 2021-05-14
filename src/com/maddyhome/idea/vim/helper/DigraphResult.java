@@ -42,7 +42,7 @@ public class DigraphResult {
     stroke = null;
   }
 
-  private DigraphResult(int result, char promptCharacter) {
+  private DigraphResult(@SuppressWarnings("SameParameterValue") int result, char promptCharacter) {
     this.result = result;
     this.promptCharacter = promptCharacter;
     stroke = null;

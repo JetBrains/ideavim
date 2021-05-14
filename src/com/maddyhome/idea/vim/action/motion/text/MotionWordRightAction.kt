@@ -43,7 +43,7 @@ class MotionWordRightAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().findOffsetOfNextWord(editor, caret.offset, count, false)
   }
@@ -65,7 +65,7 @@ class MotionWordRightInsertAction : MotionActionHandler.ForEachCaret(), Complica
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().findOffsetOfNextWord(editor, caret.offset, count, false)
   }

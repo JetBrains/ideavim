@@ -38,7 +38,7 @@ class MotionMethodNextStartAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     val moveCaretToMethodStart = VimPlugin.getMotion().moveCaretToMethodStart(editor, caret, count)
     return if (moveCaretToMethodStart < 0) Motion.Error else Motion.AbsoluteOffset(moveCaretToMethodStart)

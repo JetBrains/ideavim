@@ -42,7 +42,7 @@ class MotionInnerSentenceAction : TextObjectActionHandler() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): TextRange {
     return VimPlugin.getMotion().getSentenceRange(editor, caret, count, false)
   }

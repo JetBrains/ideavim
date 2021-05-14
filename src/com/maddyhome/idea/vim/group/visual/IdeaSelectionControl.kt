@@ -52,7 +52,7 @@ object IdeaSelectionControl {
    */
   fun controlNonVimSelectionChange(
     editor: Editor,
-    selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER
+    selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER,
   ) {
     VimVisualTimer.singleTask(editor.mode) { initialMode ->
 
@@ -138,7 +138,7 @@ object IdeaSelectionControl {
   private fun chooseSelectionMode(
     editor: Editor,
     selectionSource: VimListenerManager.SelectionSource,
-    logReason: Boolean
+    logReason: Boolean,
   ): CommandState.Mode {
     return when {
       editor.isOneLineMode -> {

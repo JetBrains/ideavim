@@ -50,7 +50,7 @@ object VimExtensionFacade {
     fromKeys: List<KeyStroke>,
     pluginOwner: MappingOwner,
     extensionHandler: VimExtensionHandler,
-    recursive: Boolean
+    recursive: Boolean,
   ) {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)
   }
@@ -62,7 +62,7 @@ object VimExtensionFacade {
     fromKeys: List<KeyStroke>,
     pluginOwner: MappingOwner,
     toKeys: List<KeyStroke>,
-    recursive: Boolean
+    recursive: Boolean,
   ) {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, toKeys, recursive)
   }
@@ -74,7 +74,7 @@ object VimExtensionFacade {
     fromKeys: List<KeyStroke>,
     pluginOwner: MappingOwner,
     toKeys: List<KeyStroke>,
-    recursive: Boolean
+    recursive: Boolean,
   ) {
     val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().hasmapto(it, toKeys) }
     VimPlugin.getKey().putKeyMapping(filteredModes, fromKeys, pluginOwner, toKeys, recursive)

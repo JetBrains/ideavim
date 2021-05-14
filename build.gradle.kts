@@ -11,14 +11,14 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.71")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.0")
         classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
     }
 }
 
 plugins {
     java
-    kotlin("jvm") version "1.3.71"
+    kotlin("jvm") version "1.5.0"
 
     id("org.jetbrains.intellij") version "0.7.3"
     id("io.gitlab.arturbosch.detekt") version "1.15.0"
@@ -36,7 +36,6 @@ val downloadIdeaSources: String by project
 val instrumentPluginCode: String by project
 
 val publishChannels: String by project
-val publishUsername: String by project
 val publishToken: String by project
 
 val slackUrl: String by project
@@ -55,7 +54,7 @@ dependencies {
     testImplementation("com.ensarsarajcic.neovim.java:neovim-api:0.2.3")
     testImplementation("com.ensarsarajcic.neovim.java:core-rpc:0.2.3")
 
-    testImplementation("com.intellij.remoterobot:remote-robot:0.10.3")
+    testImplementation("com.intellij.remoterobot:remote-robot:0.11.2")
     testImplementation("com.intellij.remoterobot:remote-fixtures:1.1.18")
 }
 
@@ -72,12 +71,14 @@ tasks {
     compileKotlin {
         kotlinOptions {
             jvmTarget = javaVersion
+            apiVersion = "1.3"
 //            allWarningsAsErrors = true
         }
     }
     compileTestKotlin {
         kotlinOptions {
             jvmTarget = javaVersion
+            apiVersion = "1.3"
 //            allWarningsAsErrors = true
         }
     }
@@ -119,7 +120,6 @@ tasks {
 
     publishPlugin {
         channels(publishChannels.split(","))
-        username(publishUsername)
         token(publishToken)
     }
 

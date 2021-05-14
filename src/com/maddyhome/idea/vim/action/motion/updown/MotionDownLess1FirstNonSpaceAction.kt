@@ -36,7 +36,7 @@ class MotionDownLess1FirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, count - 1).toMotion()
   }

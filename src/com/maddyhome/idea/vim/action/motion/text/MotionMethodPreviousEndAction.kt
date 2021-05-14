@@ -39,7 +39,7 @@ class MotionMethodPreviousEndAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretToMethodEnd(editor, caret, -count).toMotionOrError()
   }

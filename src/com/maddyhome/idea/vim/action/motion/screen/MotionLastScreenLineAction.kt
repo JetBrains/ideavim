@@ -52,7 +52,7 @@ abstract class MotionLastScreenLineActionBase(private val operatorPending: Boole
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretToLastScreenLine(editor, caret, count, !operatorPending).toMotion()
   }

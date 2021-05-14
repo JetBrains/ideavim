@@ -39,7 +39,7 @@ class MotionSectionForwardStartAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretToSection(editor, caret, '{', 1, count).toMotionOrError()
   }

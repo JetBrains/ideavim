@@ -37,7 +37,7 @@ class MotionOuterBigWordAction : TextObjectActionHandler() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): TextRange {
     return VimPlugin.getMotion().getWordRange(editor, caret, count, true, true)
   }

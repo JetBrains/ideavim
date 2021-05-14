@@ -42,7 +42,7 @@ class MotionOuterBlockParenAction : TextObjectActionHandler() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): TextRange? {
     return VimPlugin.getMotion().getBlockRange(editor, caret, count, true, '(')
   }

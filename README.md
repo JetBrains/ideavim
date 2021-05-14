@@ -41,8 +41,8 @@ See the [detailed instructions](https://www.jetbrains.com/help/idea/managing-plu
 - Use the `~/.ideavimrc` file as an analog of `~/.vimrc` ([learn more](#Files)). The XDG standard is supported, as well.
 
 - Shortcut conflicts can be resolved by using:
-     - On Linux & Windows: `File | Settings | Editor | Vim Emulation` & `File | Settings | Keymap`,
-     - On macOS: `Preferences | Editor | Vim Emulation` & `Preferences | Keymap`,
+     - On Linux & Windows: `File | Settings | Editor | Vim` & `File | Settings | Keymap`,
+     - On macOS: `Preferences | Editor | Vim` & `Preferences | Keymap`,
      - Regular Vim mappings in the  `~/.ideavimrc` file.
 
 Get Early Access

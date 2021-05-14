@@ -40,7 +40,7 @@ class MotionDownFirstNonSpaceAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, count).toMotion()
   }
@@ -55,7 +55,7 @@ class EnterNormalAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     val templateState = TemplateManagerImpl.getTemplateState(editor)
     return if (templateState != null) {

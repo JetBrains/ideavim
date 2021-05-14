@@ -31,6 +31,45 @@ import javax.swing.text.Document
 import javax.swing.text.TextAction
 
 object ExEditorKit : DefaultEditorKit() {
+
+  @NonNls
+  val CancelEntry: String = "cancel-entry"
+
+  @NonNls
+  val CompleteEntry: String = "complete-entry"
+
+  @NonNls
+  val EscapeChar: String = "escape"
+
+  @NonNls
+  val DeleteToCursor: String = "delete-to-cursor"
+
+  @NonNls
+  val ToggleInsertReplace: String = "toggle-insert"
+
+  @NonNls
+  val InsertRegister: String = "insert-register"
+
+  @NonNls
+  val HistoryUp: String = "history-up"
+
+  @NonNls
+  val HistoryDown: String = "history-down"
+
+  @NonNls
+  val HistoryUpFilter: String = "history-up-filter"
+
+  @NonNls
+  val HistoryDownFilter: String = "history-down-filter"
+
+  @NonNls
+  val StartDigraph: String = "start-digraph"
+
+  @NonNls
+  val StartLiteral: String = "start-literal"
+
+  private val logger = logger<ExEditorKit>()
+
   /**
    * Gets the MIME type of the data that this
    * kit represents support for.
@@ -125,42 +164,4 @@ object ExEditorKit : DefaultEditorKit() {
     }
     return null
   }
-
-  @NonNls
-  val CancelEntry: String = "cancel-entry"
-
-  @NonNls
-  val CompleteEntry: String = "complete-entry"
-
-  @NonNls
-  val EscapeChar: String = "escape"
-
-  @NonNls
-  val DeleteToCursor: String = "delete-to-cursor"
-
-  @NonNls
-  val ToggleInsertReplace: String = "toggle-insert"
-
-  @NonNls
-  val InsertRegister: String = "insert-register"
-
-  @NonNls
-  val HistoryUp: String = "history-up"
-
-  @NonNls
-  val HistoryDown: String = "history-down"
-
-  @NonNls
-  val HistoryUpFilter: String = "history-up-filter"
-
-  @NonNls
-  val HistoryDownFilter: String = "history-down-filter"
-
-  @NonNls
-  val StartDigraph: String = "start-digraph"
-
-  @NonNls
-  val StartLiteral: String = "start-literal"
-
-  private val logger = logger<ExEditorKit>()
 }

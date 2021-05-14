@@ -37,7 +37,7 @@ sealed class IncNumber(val inc: Int, private val avalanche: Boolean) : VisualOpe
     caret: Caret,
     context: DataContext,
     cmd: Command,
-    range: VimSelection
+    range: VimSelection,
   ): Boolean {
     return VimPlugin.getChange()
       .changeNumberVisualMode(editor, caret, range.toVimTextRange(false), inc * cmd.count, avalanche)

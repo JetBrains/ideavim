@@ -199,7 +199,7 @@ fun blockToNativeSelection(
   editor: Editor,
   start: Int,
   end: Int,
-  mode: CommandState.Mode
+  mode: CommandState.Mode,
 ): Pair<LogicalPosition, LogicalPosition> {
   var blockStart = editor.offsetToLogicalPosition(start)
   var blockEnd = editor.offsetToLogicalPosition(end)

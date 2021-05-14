@@ -34,7 +34,7 @@ class ChangeCaseToggleCharacterAction : ChangeEditorActionHandler.ForEachCaret()
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     return VimPlugin.getChange().changeCaseToggleCharacter(editor, caret, count)
   }

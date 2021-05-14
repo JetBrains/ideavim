@@ -37,7 +37,7 @@ class InsertBeforeFirstNonBlankAction : ChangeEditorActionHandler.SingleExecutio
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     VimPlugin.getChange().insertBeforeFirstNonBlank(editor, context)
     return true

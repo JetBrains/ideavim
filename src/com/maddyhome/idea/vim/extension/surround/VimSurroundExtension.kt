@@ -132,7 +132,10 @@ class VimSurroundExtension : VimExtension {
         IdeaputDisabler().use { executeNormalWithoutMapping(StringHelper.parseKeys("\"" + REGISTER + sequence), editor) }
       }
 
-      private fun pasteSurround(innerValue: List<KeyStroke?>, editor: Editor) { // This logic is direct from vim-surround
+      private fun pasteSurround(
+        innerValue: List<KeyStroke?>,
+        editor: Editor,
+      ) { // This logic is direct from vim-surround
         val offset = editor.caretModel.offset
         val lineEndOffset = EditorHelper.getLineEndForOffset(editor, offset)
         val motionEndMark = VimPlugin.getMark().getMark(editor, ']')
@@ -230,7 +233,7 @@ class VimSurroundExtension : VimExtension {
 
     private fun inputFunctionName(
       editor: Editor,
-      withInternalSpaces: Boolean
+      withInternalSpaces: Boolean,
     ): Pair<String, String>? {
       val functionNameInput = inputString(editor, "function: ", null)
       if (functionNameInput.isEmpty()) return null

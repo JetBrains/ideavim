@@ -37,7 +37,7 @@ class MotionInnerWordAction : TextObjectActionHandler() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): TextRange {
     return VimPlugin.getMotion().getWordRange(editor, caret, count, false, false)
   }

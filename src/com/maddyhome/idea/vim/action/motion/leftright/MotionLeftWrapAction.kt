@@ -33,7 +33,7 @@ class MotionLeftWrapAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     val moveCaretHorizontalWrap = VimPlugin.getMotion().moveCaretHorizontalWrap(editor, caret, -count)
     return if (moveCaretHorizontalWrap < 0) Motion.Error else Motion.AbsoluteOffset(moveCaretHorizontalWrap)

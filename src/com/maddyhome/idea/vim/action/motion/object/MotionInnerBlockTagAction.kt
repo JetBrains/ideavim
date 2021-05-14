@@ -42,7 +42,7 @@ class MotionInnerBlockTagAction : TextObjectActionHandler() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): TextRange? {
     return VimPlugin.getMotion().getBlockTagRange(editor, caret, count, false)
   }

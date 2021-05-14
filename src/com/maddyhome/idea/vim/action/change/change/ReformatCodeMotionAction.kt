@@ -39,7 +39,7 @@ class ReformatCodeMotionAction : ChangeEditorActionHandler.ForEachCaret(), Dupli
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     return argument != null &&
       VimPlugin.getChange().reformatCodeMotion(editor, caret, context, count, rawCount, argument)

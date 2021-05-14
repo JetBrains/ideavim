@@ -57,7 +57,7 @@ open class MotionUpAction : MotionUpBase() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretVertical(editor, caret, -count).toMotionOrError()
   }
@@ -70,7 +70,7 @@ class MotionUpCtrlPAction : MotionUpAction() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     val activeLookup = LookupManager.getActiveLookup(editor)
     return if (activeLookup != null) {
@@ -96,7 +96,7 @@ class MotionUpNotLineWiseAction : MotionUpBase() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretVertical(editor, caret, -count).toMotionOrError()
   }

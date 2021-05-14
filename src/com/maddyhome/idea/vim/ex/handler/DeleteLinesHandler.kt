@@ -36,7 +36,7 @@ class DeleteLinesHandler : CommandHandler.ForEachCaret() {
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    cmd: ExCommand
+    cmd: ExCommand,
   ): Boolean {
     val argument = cmd.argument
     val register = if (argument.isNotEmpty() && !argument[0].isDigit()) {

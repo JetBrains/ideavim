@@ -32,7 +32,7 @@ class VisualSelectPreviousAction : VimActionHandler.SingleExecution() {
   override fun execute(
     editor: Editor,
     context: DataContext,
-    cmd: Command
+    cmd: Command,
   ): Boolean { // FIXME: 2019-03-05 Make it multicaret
     return VimPlugin.getVisualMotion().selectPreviousVisualMode(editor)
   }

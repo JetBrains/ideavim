@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.ui;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionToolbarPosition;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
@@ -26,10 +27,8 @@ import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.openapi.ui.StripeTable;
-import com.intellij.ui.DumbAwareActionButton;
-import com.intellij.ui.IdeBorderFactory;
-import com.intellij.ui.JBColor;
-import com.intellij.ui.ToolbarDecorator;
+import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.ui.*;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.ui.UIUtil;
@@ -100,7 +99,9 @@ public class VimEmulationConfigurable implements Configurable {
       setLayout(new BorderLayout());
 
       ToolbarDecorator decorator = ToolbarDecorator.createDecorator(shortcutConflictsTable);
+      decorator.setToolbarPosition(ActionToolbarPosition.RIGHT);
       decorator.addExtraAction(new CopyForRcAction(model));
+      decorator.addExtraAction(new ResetHandlersAction(model, shortcutConflictsTable));
 
       final JPanel scrollPane = decorator.createPanel();
       scrollPane.setBorder(new LineBorder(JBColor.border()));
@@ -117,17 +118,21 @@ public class VimEmulationConfigurable implements Configurable {
         ShortcutOwnerInfo owner = row.getOwner();
         return owner instanceof ShortcutOwnerInfo.PerMode;
       });
-      JBLabel helpLine = new JBLabel();
       if (firstPerMode == null) {
-        helpLine.setText(MessageHelper.message("configurable.noneditablehandler.helper.text"));
+        HyperlinkLabel label = new HyperlinkLabel();
+        label.setHtmlText(MessageHelper.message("configurable.keyhandler.link"));
+        label.setHyperlinkTarget("https://jb.gg/vim-sethandler");
+        label.setForeground(UIUtil.getInactiveTextColor());
+        add(label, BorderLayout.SOUTH);
       }
       else {
+        JBLabel helpLine = new JBLabel();
         helpLine.setText(MessageHelper.message("configurable.noneditablehandler.helper.text.with.example",
                          ((ShortcutOwnerInfo.PerMode)firstPerMode.myOwner).toNotation(),
                          KeymapUtil.getShortcutText(new KeyboardShortcut(firstPerMode.getKeyStroke(), null))));
+        helpLine.setForeground(UIUtil.getInactiveTextColor());
+        add(helpLine, BorderLayout.SOUTH);
       }
-      helpLine.setForeground(UIUtil.getInactiveTextColor());
-      add(helpLine, BorderLayout.SOUTH);
     }
   }
 
@@ -369,8 +374,16 @@ public class VimEmulationConfigurable implements Configurable {
     private final VimShortcutConflictsTable.Model myModel;
 
     public CopyForRcAction(VimShortcutConflictsTable.@NotNull Model model) {
-      super("Copy for .ideavimrc", "Copy config for .ideavimrc", AllIcons.Actions.Copy);
+      super("Copy Config for .ideavimrc", "Copy config for .ideavimrc in sethandler format", AllIcons.Actions.Copy);
       myModel = model;
+    }
+
+    @Override
+    public void updateButton(@NotNull AnActionEvent e) {
+      boolean enabled = myModel.getRows().stream().anyMatch(it -> it.getOwner() instanceof ShortcutOwnerInfo.AllModes &&
+                                                                  ((ShortcutOwnerInfo.AllModes)it.getOwner()).getOwner() !=
+                                                                  ShortcutOwner.UNDEFINED);
+      e.getPresentation().setEnabled(enabled);
     }
 
     @Override
@@ -382,7 +395,7 @@ public class VimEmulationConfigurable implements Configurable {
         ShortcutOwner owner = ((ShortcutOwnerInfo.AllModes)ownerInfo).getOwner();
         if (owner == ShortcutOwner.UNDEFINED) continue;
 
-        stringBuilder.append("setkeydev ");
+        stringBuilder.append("sethandler ");
         stringBuilder.append(StringHelper.toKeyNotation(row.getKeyStroke()));
         stringBuilder.append(" ");
         stringBuilder.append("a:");
@@ -392,6 +405,43 @@ public class VimEmulationConfigurable implements Configurable {
 
       String data = stringBuilder.toString();
       ClipboardHandler.setClipboardText(data, Collections.emptyList(), data);
+    }
+  }
+
+  public static class ResetHandlersAction extends DumbAwareActionButton {
+
+    private final VimShortcutConflictsTable.Model myModel;
+    private final VimShortcutConflictsTable myTable;
+
+    public ResetHandlersAction(VimShortcutConflictsTable.@NotNull Model model, VimShortcutConflictsTable table) {
+      super("Reset Handlers", "Reset handlers", AllIcons.General.Reset);
+      myModel = model;
+      myTable = table;
+    }
+
+    @Override
+    public void updateButton(@NotNull AnActionEvent e) {
+      boolean enabled = myModel.getRows().stream().anyMatch(it -> it.getOwner() instanceof ShortcutOwnerInfo.AllModes &&
+                                                                  ((ShortcutOwnerInfo.AllModes)it.getOwner()).getOwner() !=
+                                                                  ShortcutOwner.UNDEFINED);
+      e.getPresentation().setEnabled(enabled);
+    }
+
+    @Override
+    public void actionPerformed(@NotNull AnActionEvent e) {
+      TableUtil.stopEditing(myTable);
+      for (VimShortcutConflictsTable.Row row : myModel.getRows()) {
+        ShortcutOwnerInfo owner = row.getOwner();
+        if (owner instanceof ShortcutOwnerInfo.AllModes) {
+          if (((ShortcutOwnerInfo.AllModes)owner).getOwner() != ShortcutOwner.UNDEFINED) {
+            row.setOwner(ShortcutOwnerInfo.allUndefined);
+          }
+        }
+      }
+
+      IdeFocusManager.getGlobalInstance()
+        .doWhenFocusSettlesDown(() -> IdeFocusManager.getGlobalInstance().requestFocus(myTable, true));
+      TableUtil.updateScroller(myTable);
     }
   }
 }

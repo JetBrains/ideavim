@@ -40,6 +40,7 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.FindActionId
@@ -208,13 +209,15 @@ class NotificationService(private val project: Project?) {
       }
     }
 
-    class CopyActionId(val id: String?, val project: Project?) : DumbAwareAction("Copy Action Id") {
+    class CopyActionId(val id: String?, val project: Project?) : DumbAwareAction(MessageHelper.message("action.copy.action.id.text")) {
       override fun actionPerformed(e: AnActionEvent) {
         CopyPasteManager.getInstance().setContents(StringSelection(id ?: ""))
         notification?.expire()
 
         val content = if (id == null) "No action id" else "Action id copied: $id"
         Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, content, NotificationType.INFORMATION).let {
+          notification = it
+          it.whenExpired { notification = null }
           it.addAction(StopTracking())
           it.notify(project)
         }
@@ -266,7 +269,7 @@ class NotificationService(private val project: Project?) {
     val notification: Notification,
     val appendableText: String,
     val optionName: String,
-    val enableOption: () -> Unit
+    val enableOption: () -> Unit,
   ) : AnAction("Append to ~/.ideavimrc") {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project

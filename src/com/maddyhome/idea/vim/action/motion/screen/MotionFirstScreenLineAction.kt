@@ -52,7 +52,7 @@ abstract class MotionFirstScreenLineActionBase(private val operatorPending: Bool
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
 
     // Only apply scrolloff for NX motions. For op pending, use the actual first line and apply scrolloff after.

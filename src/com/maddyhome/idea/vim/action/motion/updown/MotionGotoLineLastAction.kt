@@ -42,7 +42,7 @@ class MotionGotoLineLastAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     val line = EditorHelper.normalizeLine(
       editor,

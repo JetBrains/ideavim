@@ -39,7 +39,7 @@ class MotionNthCharacterAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretToNthCharacter(editor, count - 1).toMotion()
   }

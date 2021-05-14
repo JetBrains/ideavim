@@ -42,7 +42,7 @@ class ChangeCaseUpperVisualAction : VisualOperatorActionHandler.ForEachCaret() {
     caret: Caret,
     context: DataContext,
     cmd: Command,
-    range: VimSelection
+    range: VimSelection,
   ): Boolean {
     return VimPlugin.getChange()
       .changeCaseRange(editor, caret, range.toVimTextRange(false), CharacterHelper.CASE_UPPER)

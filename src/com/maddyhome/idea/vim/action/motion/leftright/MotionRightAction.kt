@@ -40,7 +40,7 @@ class MotionRightAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, true).toMotionOrError()
   }
@@ -60,7 +60,7 @@ class MotionRightInsertAction : MotionActionHandler.ForEachCaret(), ComplicatedK
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, count, true).toMotionOrError()
   }

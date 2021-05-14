@@ -30,5 +30,5 @@ fun flags(
   rangeFlag: CommandHandler.RangeFlag,
   argumentFlag: CommandHandler.ArgumentFlag,
   access: CommandHandler.Access,
-  vararg flags: CommandHandler.Flag
+  vararg flags: CommandHandler.Flag,
 ) = CommandHandlerFlags(rangeFlag, argumentFlag, access, flags.toSet())

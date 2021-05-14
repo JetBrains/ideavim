@@ -48,7 +48,7 @@ class ChangeVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
     caret: Caret,
     context: DataContext,
     cmd: Command,
-    range: VimSelection
+    range: VimSelection,
   ): Boolean {
     val textRange = range.toVimTextRange(true)
     val lineEndForOffset = EditorHelper.getLineEndForOffset(editor, textRange.endOffset)

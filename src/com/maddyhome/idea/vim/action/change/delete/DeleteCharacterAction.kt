@@ -38,7 +38,7 @@ abstract class DeleteCharacter(private val countModifier: (Int) -> Int) : Change
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     return VimPlugin.getChange().deleteCharacter(editor, caret, countModifier(count), false)
   }

@@ -34,7 +34,7 @@ sealed class IncAction(val inc: Int) : ChangeEditorActionHandler.ForEachCaret() 
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     return VimPlugin.getChange().changeNumber(editor, caret, inc * count)
   }

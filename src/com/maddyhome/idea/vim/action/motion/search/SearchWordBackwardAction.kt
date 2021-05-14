@@ -40,7 +40,7 @@ class SearchWordBackwardAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getSearch().searchWord(editor, caret, count, false, Direction.BACKWARDS).toMotionOrError()
   }

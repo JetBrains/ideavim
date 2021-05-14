@@ -37,7 +37,7 @@ fun RemoteRobot.idea(function: IdeaFrame.() -> Unit) {
 @DefaultXpath("IdeFrameImpl type", "//div[@class='IdeFrameImpl']")
 class IdeaFrame(
   remoteRobot: RemoteRobot,
-  remoteComponent: RemoteComponent
+  remoteComponent: RemoteComponent,
 ) : CommonContainerFixture(remoteRobot, remoteComponent) {
 
   val projectViewTree

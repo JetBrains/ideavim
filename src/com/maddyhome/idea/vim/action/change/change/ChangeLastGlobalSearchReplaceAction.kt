@@ -34,7 +34,7 @@ class ChangeLastGlobalSearchReplaceAction : ChangeEditorActionHandler.SingleExec
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     val range = LineRange(0, EditorHelper.getLineCount(editor) - 1)
     return VimPlugin.getSearch()

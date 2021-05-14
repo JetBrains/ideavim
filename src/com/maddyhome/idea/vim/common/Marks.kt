@@ -54,7 +54,7 @@ data class VimMark(
   override var logicalLine: Int,
   override val col: Int,
   override val filename: String,
-  override val protocol: String
+  override val protocol: String,
 ) : Mark {
 
   private var cleared = false

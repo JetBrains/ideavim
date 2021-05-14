@@ -35,7 +35,7 @@ class MotionColumnAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretToColumn(editor, caret, count - 1, false)
   }
@@ -44,7 +44,7 @@ class MotionColumnAction : MotionActionHandler.ForEachCaret() {
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    cmd: Command
+    cmd: Command,
   ) {
     caret.vimLastColumn = cmd.count - 1
   }

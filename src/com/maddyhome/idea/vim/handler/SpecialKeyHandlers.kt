@@ -124,7 +124,7 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     val keymodel = OptionsManager.keymodel
     if (editor.inSelectMode && (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel)) {
@@ -146,6 +146,6 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Int
 }

@@ -48,7 +48,7 @@ class SelectMotionRightAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     val keymodel = OptionsManager.keymodel
     if (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel) {

@@ -53,7 +53,7 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
       context: DataContext,
       count: Int,
       rawCount: Int,
-      argument: Argument?
+      argument: Argument?,
     ): Boolean
   }
 

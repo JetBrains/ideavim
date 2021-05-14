@@ -35,7 +35,7 @@ class DeleteJoinLinesAction : ChangeEditorActionHandler.SingleExecution() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     if (editor.isOneLineMode) return false
     if (ideajoin.isSet) {

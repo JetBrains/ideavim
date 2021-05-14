@@ -39,7 +39,7 @@ class InsertBeforeCursorAction : ChangeEditorActionHandler.SingleExecution() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     VimPlugin.getChange().insertBeforeCursor(editor, context)
     return true

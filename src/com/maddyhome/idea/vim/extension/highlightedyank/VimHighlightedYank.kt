@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim.extension.highlightedyank
 
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
@@ -120,12 +119,11 @@ class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
       val project = editor.project
       if (project != null) {
         Disposer.register(
-          VimProjectService.getInstance(project),
-          Disposable {
-            this.editor = null
-            yankHighlighters.clear()
-          }
-        )
+          VimProjectService.getInstance(project)
+        ) {
+          this.editor = null
+          yankHighlighters.clear()
+        }
       }
 
       if (range.isMultiple) {

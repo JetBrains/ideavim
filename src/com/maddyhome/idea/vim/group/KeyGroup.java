@@ -73,7 +73,8 @@ public class KeyGroup implements PersistentStateComponent<Element> {
 
   private static final Logger logger = Logger.getInstance(KeyGroup.class);
 
-  private final @NotNull Map<KeyStroke, ShortcutOwnerInfo> shortcutConflicts = new LinkedHashMap<>();
+  // It should be ShortcutOwnerInfo, but we use Object to keep the compatibility with easymotion
+  private final @NotNull Map<KeyStroke, Object> shortcutConflicts = new LinkedHashMap<>();
   private final @NotNull Set<RequiredShortcut> requiredShortcutKeys = new HashSet<>(300);
   private final @NotNull Map<MappingMode, CommandPartNode<ActionBeanClass>> keyRoots = new EnumMap<>(MappingMode.class);
   private final @NotNull Map<MappingMode, KeyMapping> keyMappings = new EnumMap<>(MappingMode.class);
@@ -193,19 +194,27 @@ public class KeyGroup implements PersistentStateComponent<Element> {
 
   public void saveData(@NotNull Element element) {
     final Element conflictsElement = new Element(SHORTCUT_CONFLICTS_ELEMENT);
-    for (Map.Entry<KeyStroke, ShortcutOwnerInfo> entry : shortcutConflicts.entrySet()) {
+    for (Map.Entry<KeyStroke, Object> entry : shortcutConflicts.entrySet()) {
       final ShortcutOwner owner;
-      ShortcutOwnerInfo value = entry.getValue();
+      Object myValue = entry.getValue();
+      ShortcutOwnerInfo value;
+      if (myValue instanceof ShortcutOwnerInfo) {
+        value = (ShortcutOwnerInfo)myValue;
+      } else if (myValue instanceof ShortcutOwner) {
+        value = new ShortcutOwnerInfo.AllModes((ShortcutOwner)myValue);
+      } else {
+        value = new ShortcutOwnerInfo.AllModes(ShortcutOwner.VIM);
+      }
       if (value instanceof ShortcutOwnerInfo.AllModes) {
         owner = ((ShortcutOwnerInfo.AllModes)value).getOwner();
       }
       else if (value instanceof ShortcutOwnerInfo.PerMode) {
-        owner = ((ShortcutOwnerInfo.PerMode)value).getNormal();
+        owner = null;
       }
       else {
         throw new RuntimeException();
       }
-      if (owner != ShortcutOwner.UNDEFINED) {
+      if (owner != null && owner != ShortcutOwner.UNDEFINED) {
         final Element conflictElement = new Element(SHORTCUT_CONFLICT_ELEMENT);
         conflictElement.setAttribute(OWNER_ATTRIBUTE, owner.getOwnerName());
         final Element textElement = new Element(TEXT_ELEMENT);
@@ -260,22 +269,37 @@ public class KeyGroup implements PersistentStateComponent<Element> {
 
   public @NotNull Map<KeyStroke, ShortcutOwnerInfo> getShortcutConflicts() {
     final Set<RequiredShortcut> requiredShortcutKeys = this.requiredShortcutKeys;
-    final Map<KeyStroke, ShortcutOwnerInfo> savedConflicts = getSavedShortcutConflicts();
+    final Map<KeyStroke, Object> savedConflicts = getSavedShortcutConflicts();
     final Map<KeyStroke, ShortcutOwnerInfo> results = new HashMap<>();
     for (RequiredShortcut requiredShortcut : requiredShortcutKeys) {
       KeyStroke keyStroke = requiredShortcut.getKeyStroke();
       if (!VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
         final List<AnAction> conflicts = getKeymapConflicts(keyStroke);
         if (!conflicts.isEmpty()) {
-          final ShortcutOwnerInfo owner = savedConflicts.get(keyStroke);
-          results.put(keyStroke, owner != null ? owner : ShortcutOwnerInfo.allUndefined);
+          final Object owner = savedConflicts.get(keyStroke);
+          ShortcutOwnerInfo result;
+          if (owner != null) {
+            if (owner instanceof ShortcutOwnerInfo) {
+              result = (ShortcutOwnerInfo)owner;
+            }
+            else if (owner instanceof ShortcutOwner) {
+              result = new ShortcutOwnerInfo.AllModes((ShortcutOwner)owner);
+            }
+            else {
+              result = ShortcutOwnerInfo.allUndefined;
+            }
+          }
+          else {
+            result = ShortcutOwnerInfo.allUndefined;
+          }
+          results.put(keyStroke, result);
         }
       }
     }
     return results;
   }
 
-  public @NotNull Map<KeyStroke, ShortcutOwnerInfo> getSavedShortcutConflicts() {
+  public @NotNull Map<KeyStroke, Object> getSavedShortcutConflicts() {
     return shortcutConflicts;
   }
 

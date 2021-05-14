@@ -63,7 +63,7 @@ object CommandParser {
     // IdeaVim doesn't support contribution to ex_command_ep extension point, so technically we can skip this update,
     //   but let's support dynamic plugins in a more classic way and reload handlers on every EP change.
     EX_COMMAND_EP.addChangeListener(
-      Runnable {
+      {
         unregisterHandlers()
         registerHandlers()
       },
@@ -108,7 +108,7 @@ object CommandParser {
     context: DataContext,
     cmd: String,
     count: Int,
-    aliasCountdown: Int
+    aliasCountdown: Int,
   ) {
     // Nothing entered
     if (cmd.isEmpty()) {

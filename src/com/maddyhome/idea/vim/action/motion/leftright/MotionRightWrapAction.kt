@@ -34,7 +34,7 @@ class MotionRightWrapAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretHorizontalWrap(editor, caret, count).toMotionOrError()
   }

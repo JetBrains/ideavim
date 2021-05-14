@@ -41,7 +41,7 @@ class DeleteVisualAction : VisualOperatorActionHandler.ForEachCaret() {
     caret: Caret,
     context: DataContext,
     cmd: Command,
-    range: VimSelection
+    range: VimSelection,
   ): Boolean {
     val selectionType = range.type
     return VimPlugin.getChange().deleteRange(editor, caret, range.toVimTextRange(false), selectionType, false)

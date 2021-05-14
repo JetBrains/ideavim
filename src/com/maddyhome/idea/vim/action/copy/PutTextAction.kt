@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.helper.StringHelper
 sealed class PutTextBaseAction(
   private val insertTextBeforeCaret: Boolean,
   private val indent: Boolean,
-  private val caretAfterInsertedText: Boolean
+  private val caretAfterInsertedText: Boolean,
 ) : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 

@@ -422,7 +422,7 @@ abstract class VimTestCase : UsefulTestCase() {
   fun doTest(
     keys: List<String>,
     before: String,
-    after: String
+    after: String,
   ) {
     doTest(keys, before, after, CommandState.Mode.COMMAND, SubMode.NONE)
   }
@@ -432,7 +432,7 @@ abstract class VimTestCase : UsefulTestCase() {
     before: String,
     after: String,
     modeAfter: CommandState.Mode,
-    subModeAfter: SubMode
+    subModeAfter: SubMode,
   ) {
     doTest(keys.joinToString(separator = ""), before, after, modeAfter, subModeAfter)
   }
@@ -442,7 +442,7 @@ abstract class VimTestCase : UsefulTestCase() {
     before: String,
     after: String,
     modeAfter: CommandState.Mode,
-    subModeAfter: SubMode
+    subModeAfter: SubMode,
   ) {
     configureByText(before)
 
@@ -466,7 +466,7 @@ abstract class VimTestCase : UsefulTestCase() {
     after: String?,
     modeAfter: CommandState.Mode,
     subModeAfter: SubMode,
-    afterEditorInitialized: (Editor) -> Unit
+    afterEditorInitialized: (Editor) -> Unit,
   ) {
     configureByText(before)
     afterEditorInitialized(myFixture.editor)

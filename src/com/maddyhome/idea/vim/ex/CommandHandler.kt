@@ -200,5 +200,5 @@ data class CommandHandlerFlags(
   val rangeFlag: CommandHandler.RangeFlag,
   val argumentFlag: CommandHandler.ArgumentFlag,
   val access: CommandHandler.Access,
-  val flags: Set<CommandHandler.Flag>
+  val flags: Set<CommandHandler.Flag>,
 )

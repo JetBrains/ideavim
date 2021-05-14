@@ -41,7 +41,7 @@ class MotionPercentOrMatchAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return if (rawCount == 0) {
       VimPlugin.getMotion().moveCaretToMatchingPair(editor, caret).toMotionOrError()

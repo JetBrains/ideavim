@@ -42,7 +42,7 @@ class AutoIndentMotionAction : ChangeEditorActionHandler.ForEachCaret(), Duplica
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     if (argument == null) {
       return false

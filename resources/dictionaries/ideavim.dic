@@ -1,4 +1,5 @@
 ideavim
+ideavimrc
 
 
 gdefault
@@ -37,6 +38,8 @@ ideavimsupport
 maxmapdepth
 ideacopypreprocess
 ideatracetime
+
+sethandler
 
 
 easymotion

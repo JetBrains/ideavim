@@ -39,7 +39,7 @@ class MotionSentencePreviousStartAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretToNextSentenceStart(editor, caret, -count).toMotionOrError()
   }

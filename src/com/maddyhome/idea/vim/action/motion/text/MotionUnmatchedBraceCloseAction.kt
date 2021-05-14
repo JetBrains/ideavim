@@ -39,7 +39,7 @@ class MotionUnmatchedBraceCloseAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     return VimPlugin.getMotion().moveCaretToUnmatchedBlock(editor, caret, count, '}').toMotionOrError()
   }

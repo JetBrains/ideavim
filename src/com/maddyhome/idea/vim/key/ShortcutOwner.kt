@@ -30,7 +30,7 @@ sealed class ShortcutOwnerInfo {
     val normal: ShortcutOwner,
     val insert: ShortcutOwner,
     val visual: ShortcutOwner,
-    val select: ShortcutOwner
+    val select: ShortcutOwner,
   ) : ShortcutOwnerInfo() {
     fun toNotation(): String {
       val owners = HashMultimap.create<ShortcutOwner, String>()
@@ -89,13 +89,6 @@ sealed class ShortcutOwnerInfo {
     }
   }
 
-  fun toPerMode(): PerMode {
-    return when (this) {
-      is PerMode -> this
-      is AllModes -> PerMode(owner, owner, owner, owner)
-    }
-  }
-
   companion object {
     @JvmField
     val allUndefined = AllModes(ShortcutOwner.UNDEFINED)
@@ -135,6 +128,12 @@ enum class ShortcutOwner(val ownerName: @NonNls String, private val title: @NonN
       else -> UNDEFINED
     }
 
-    fun fromStringOrVim(s: String): ShortcutOwner = if (Constants.IDE_STRING.equals(s, ignoreCase = true)) IDE else VIM
+    fun fromStringOrNull(s: String): ShortcutOwner? {
+      return when {
+        Constants.IDE_STRING.equals(s, ignoreCase = true) -> IDE
+        Constants.VIM_STRING.equals(s, ignoreCase = true) -> VIM
+        else -> null
+      }
+    }
   }
 }

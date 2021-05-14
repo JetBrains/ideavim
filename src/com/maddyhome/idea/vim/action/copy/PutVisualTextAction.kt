@@ -36,7 +36,7 @@ import java.util.*
 sealed class PutVisualTextBaseAction(
   private val insertTextBeforeCaret: Boolean,
   private val indent: Boolean,
-  private val caretAfterInsertedText: Boolean
+  private val caretAfterInsertedText: Boolean,
 ) : VisualOperatorActionHandler.SingleExecution() {
 
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
@@ -47,7 +47,7 @@ sealed class PutVisualTextBaseAction(
     editor: Editor,
     context: DataContext,
     cmd: Command,
-    caretsAndSelections: Map<Caret, VimSelection>
+    caretsAndSelections: Map<Caret, VimSelection>,
   ): Boolean {
     if (caretsAndSelections.isEmpty()) return false
     val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type, it.transferableData) }

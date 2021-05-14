@@ -43,7 +43,7 @@ class MotionGotoLineFirstAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     val line = EditorHelper.normalizeLine(editor, count - 1)
     return VimPlugin.getMotion().moveCaretToLineWithStartOfLineOption(editor, line, caret).toMotion()
@@ -61,7 +61,7 @@ class MotionGotoLineFirstInsertAction : MotionActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Motion {
     val line = EditorHelper.normalizeLine(editor, count - 1)
     return VimPlugin.getMotion().moveCaretToLineStart(editor, line).toMotion()

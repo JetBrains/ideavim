@@ -39,7 +39,7 @@ class DeleteMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableO
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     if (argument == null) return false
     val (first, second) = VimPlugin.getChange()

@@ -44,7 +44,7 @@ class ShiftLeftLinesAction : ChangeEditorActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     VimPlugin.getChange().indentLines(editor, caret, context, count, -1)
 
@@ -65,7 +65,7 @@ class ShiftLeftMotionAction : ChangeEditorActionHandler.ForEachCaret(), Duplicab
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     argument ?: return false
 
@@ -84,7 +84,7 @@ class ShiftLeftVisualAction : VisualOperatorActionHandler.ForEachCaret() {
     caret: Caret,
     context: DataContext,
     cmd: Command,
-    range: VimSelection
+    range: VimSelection,
   ): Boolean {
     VimPlugin.getChange().indentRange(editor, caret, context, range.toVimTextRange(false), cmd.count, -1)
     return true

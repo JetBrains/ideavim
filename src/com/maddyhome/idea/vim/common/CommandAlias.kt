@@ -30,14 +30,14 @@ import org.jetbrains.annotations.NonNls
 sealed class CommandAlias(
   protected val minimumNumberOfArguments: Int,
   protected val maximumNumberOfArguments: Int,
-  val name: String
+  val name: String,
 ) {
 
   class Ex(
     minimumNumberOfArguments: Int,
     maximumNumberOfArguments: Int,
     name: String,
-    val command: String
+    val command: String,
   ) : CommandAlias(minimumNumberOfArguments, maximumNumberOfArguments, name) {
     override fun getCommand(input: String, count: Int): GoalCommand {
       if (this.maximumNumberOfArguments == 0 && this.maximumNumberOfArguments == 0) {
@@ -77,7 +77,7 @@ sealed class CommandAlias(
     minimumNumberOfArguments: Int,
     maximumNumberOfArguments: Int,
     name: String,
-    val handler: CommandAliasHandler
+    val handler: CommandAliasHandler,
   ) : CommandAlias(minimumNumberOfArguments, maximumNumberOfArguments, name) {
     override fun getCommand(input: String, count: Int): GoalCommand {
       return GoalCommand.Call(handler)
