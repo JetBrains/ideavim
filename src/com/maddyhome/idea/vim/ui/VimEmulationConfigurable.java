@@ -27,6 +27,7 @@ import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.openapi.ui.StripeTable;
+import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.containers.ContainerUtil;
@@ -100,6 +101,7 @@ public class VimEmulationConfigurable implements Configurable {
       ToolbarDecorator decorator = ToolbarDecorator.createDecorator(shortcutConflictsTable);
       decorator.setToolbarPosition(ActionToolbarPosition.RIGHT);
       decorator.addExtraAction(new CopyForRcAction(model));
+      decorator.addExtraAction(new ResetHandlersAction(model, shortcutConflictsTable));
 
       final JPanel scrollPane = decorator.createPanel();
       scrollPane.setBorder(new LineBorder(JBColor.border()));
@@ -395,6 +397,43 @@ public class VimEmulationConfigurable implements Configurable {
 
       String data = stringBuilder.toString();
       ClipboardHandler.setClipboardText(data, Collections.emptyList(), data);
+    }
+  }
+
+  public static class ResetHandlersAction extends DumbAwareActionButton {
+
+    private final VimShortcutConflictsTable.Model myModel;
+    private final VimShortcutConflictsTable myTable;
+
+    public ResetHandlersAction(VimShortcutConflictsTable.@NotNull Model model, VimShortcutConflictsTable table) {
+      super("Reset Handlers", "Reset handlers", AllIcons.General.Reset);
+      myModel = model;
+      myTable = table;
+    }
+
+    @Override
+    public void updateButton(@NotNull AnActionEvent e) {
+      boolean enabled = myModel.getRows().stream().anyMatch(it -> it.getOwner() instanceof ShortcutOwnerInfo.AllModes &&
+                                                                  ((ShortcutOwnerInfo.AllModes)it.getOwner()).getOwner() !=
+                                                                  ShortcutOwner.UNDEFINED);
+      e.getPresentation().setEnabled(enabled);
+    }
+
+    @Override
+    public void actionPerformed(@NotNull AnActionEvent e) {
+      TableUtil.stopEditing(myTable);
+      for (VimShortcutConflictsTable.Row row : myModel.getRows()) {
+        ShortcutOwnerInfo owner = row.getOwner();
+        if (owner instanceof ShortcutOwnerInfo.AllModes) {
+          if (((ShortcutOwnerInfo.AllModes)owner).getOwner() != ShortcutOwner.UNDEFINED) {
+            row.setOwner(ShortcutOwnerInfo.allUndefined);
+          }
+        }
+      }
+
+      IdeFocusManager.getGlobalInstance()
+        .doWhenFocusSettlesDown(() -> IdeFocusManager.getGlobalInstance().requestFocus(myTable, true));
+      TableUtil.updateScroller(myTable);
     }
   }
 }
