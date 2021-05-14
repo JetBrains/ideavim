@@ -53,7 +53,7 @@ class ActionHandler : CommandHandler.SingleExecution() {
     if (application.isUnitTestMode) {
       executeAction(action, context)
     } else {
-      runAfterGotFocus(Runnable { executeAction(action, context) })
+      runAfterGotFocus { executeAction(action, context) }
     }
     return true
   }

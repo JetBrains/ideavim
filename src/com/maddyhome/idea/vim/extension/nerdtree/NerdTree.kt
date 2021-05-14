@@ -493,7 +493,7 @@ class NerdTree : VimExtension {
       if (application.isUnitTestMode) {
         KeyHandler.executeAction(action, context)
       } else {
-        runAfterGotFocus(Runnable { KeyHandler.executeAction(action, context) })
+        runAfterGotFocus { KeyHandler.executeAction(action, context) }
       }
     }
 
