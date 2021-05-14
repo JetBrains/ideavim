@@ -27,6 +27,7 @@ usual beta standards.
 ### Features:
 * Support `sethandler` command to configure shortcuts conflicts via `~/.ideavimrc` file. See [docs](https://jb.gg/vim-sethandler).
 * Support `vim-paragraph-motion` extension [VIM-2290](https://youtrack.jetbrains.com/issue/VIM-2290) | [vim-paragraph-motion](https://github.com/dbakker/vim-paragraph-motion) 
+* Add "Reset Handlers" button for "Conflicting Shortcuts" setting table
 
 ### Changes:
 * Rename "Vim Emulation" in settings to "Vim"
