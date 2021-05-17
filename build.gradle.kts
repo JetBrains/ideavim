@@ -14,7 +14,7 @@ buildscript {
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.0")
         classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
-        classpath("com.github.AlexPl292:authors-update:0.0.7")
+        classpath("com.github.AlexPl292:authors-update:0.0.8")
     }
 }
 
