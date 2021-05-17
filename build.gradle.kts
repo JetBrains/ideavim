@@ -1,4 +1,3 @@
-
 import dev.feedforward.authorsupdate.UpdateAuthors
 import dev.feedforward.markdownto.DownParser
 import io.gitlab.arturbosch.detekt.Detekt
@@ -15,7 +14,7 @@ buildscript {
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.0")
         classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
-        classpath("com.github.AlexPl292:authors-update:0.0.6")
+        classpath("com.github.AlexPl292:authors-update:0.0.7")
     }
 }
 
@@ -258,6 +257,10 @@ tasks.register("slackNotification") {
 
 tasks.register("updateAuthors") {
     doLast {
-        UpdateAuthors().update(".", updateAuthorsToken)
+        val uncheckedEmails = setOf(
+            "aleksei.plate@jetbrains.com",
+            "aleksei.plate@teamcity"
+        )
+        UpdateAuthors().update(".", updateAuthorsToken, uncheckedEmails)
     }
 }
