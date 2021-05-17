@@ -270,10 +270,12 @@ tasks.register("updateAuthors") {
 class UpdateAuthors {
     fun update(uncheckedEmails: Set<String>) {
         println("Start update authors")
+        println(File("").absolutePath)
         val repository = org.eclipse.jgit.lib.RepositoryBuilder().setGitDir(File("./.git")).build()
         val git = org.eclipse.jgit.api.Git(repository)
         val emails = git.log().call().take(20).mapTo(HashSet()) { it.authorIdent.emailAddress }
 
+        println("Emails: $emails")
         val gitHub = org.kohsuke.github.GitHub.connect()
         val searchUsers = gitHub.searchUsers()
         val users = mutableListOf<Author>()
