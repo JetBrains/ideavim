@@ -263,6 +263,11 @@ tasks.register("updateAuthors") {
             "aleksei.plate@TeamCity",
             "alex.plate@192.168.0.109"
         )
-        UpdateAuthors().update(".", updateAuthorsToken, uncheckedEmails)
+        val token = if (updateAuthorsToken.isEmpty()) {
+            System.getenv("UPDATE_AUTHORS")
+        } else {
+            updateAuthorsToken
+        }
+        UpdateAuthors().update(".", token, uncheckedEmails)
     }
 }
