@@ -58,8 +58,14 @@ object UpdatesChecker {
         val os = URLEncoder.encode("${SystemInfo.OS_NAME} ${SystemInfo.OS_VERSION}", CharsetToolkit.UTF8)
         val uid = PermanentInstallationID.get()
 
-        val url = "https://plugins.jetbrains.com/plugins/list?pluginId=${VimPlugin.getPluginId().idString}&build=$buildNumber&pluginVersion=$version&os=$os&uuid=$uid"
-        PropertiesComponent.getInstance().setValue(IDEAVIM_STATISTICS_TIMESTAMP_KEY, System.currentTimeMillis().toString())
+        val url = "https://plugins.jetbrains.com/plugins/list?" +
+          "pluginId=${VimPlugin.getPluginId().idString}" +
+          "&build=$buildNumber" +
+          "&pluginVersion=$version" +
+          "&os=$os" +
+          "&uuid=$uid"
+        PropertiesComponent.getInstance()
+          .setValue(IDEAVIM_STATISTICS_TIMESTAMP_KEY, System.currentTimeMillis().toString())
 
         HttpRequests.request(url).connect { request: HttpRequests.Request ->
           logger.info("Check IdeaVim updates: $url")
