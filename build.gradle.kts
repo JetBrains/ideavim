@@ -1,3 +1,5 @@
+
+import dev.feedforward.authorsupdate.UpdateAuthors
 import dev.feedforward.markdownto.DownParser
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.detekt
@@ -13,6 +15,7 @@ buildscript {
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.0")
         classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
+        classpath("com.github.AlexPl292:authors-update:0.0.5")
     }
 }
 
@@ -39,6 +42,8 @@ val publishChannels: String by project
 val publishToken: String by project
 
 val slackUrl: String by project
+
+val updateAuthorsToken: String by project
 
 repositories {
     mavenCentral()
@@ -246,5 +251,13 @@ tasks.register("slackNotification") {
                 println(inputStream.bufferedReader().use { it.readText() })
             }
         }
+    }
+}
+
+// --- Update authors
+
+tasks.register("updateAuthors") {
+    doLast {
+        UpdateAuthors().update(".", updateAuthorsToken)
     }
 }
