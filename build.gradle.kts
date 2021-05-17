@@ -44,8 +44,6 @@ val publishToken: String by project
 
 val slackUrl: String by project
 
-val updateAuthorsToken: String by project
-
 repositories {
     mavenCentral()
     jcenter()
@@ -271,6 +269,7 @@ tasks.register("updateAuthors") {
 
 class UpdateAuthors {
     fun update(uncheckedEmails: Set<String>) {
+        println("Start update authors")
         val repository = org.eclipse.jgit.lib.RepositoryBuilder().setGitDir(File("./.git")).build()
         val git = org.eclipse.jgit.api.Git(repository)
         val emails = git.log().call().take(20).mapTo(HashSet()) { it.authorIdent.emailAddress }
