@@ -260,6 +260,7 @@ tasks.register("updateAuthors") {
         val uncheckedEmails = setOf(
             "aleksei.plate@jetbrains.com",
             "aleksei.plate@teamcity",
+            "aleksei.plate@TeamCity",
             "alex.plate@192.168.0.109"
         )
         UpdateAuthors().update(".", updateAuthorsToken, uncheckedEmails)
