@@ -1,7 +1,7 @@
-import dev.feedforward.authorsupdate.UpdateAuthors
 import dev.feedforward.markdownto.DownParser
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.detekt
+import org.intellij.markdown.ast.getTextInNode
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -14,7 +14,9 @@ buildscript {
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.0")
         classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
-        classpath("com.github.AlexPl292:authors-update:0.0.9")
+        classpath("org.eclipse.jgit:org.eclipse.jgit:5.11.1.202105131744-r")
+        classpath("org.kohsuke:github-api:1.128")
+        classpath("org.jetbrains:markdown:0.1.45")
     }
 }
 
@@ -263,11 +265,69 @@ tasks.register("updateAuthors") {
             "aleksei.plate@TeamCity",
             "alex.plate@192.168.0.109"
         )
-        val token = if (updateAuthorsToken.isEmpty()) {
-            System.getenv("UPDATE_AUTHORS")
-        } else {
-            updateAuthorsToken
-        }
-        UpdateAuthors().update(".", token, uncheckedEmails)
+        UpdateAuthors().update(uncheckedEmails)
     }
 }
+
+class UpdateAuthors {
+    fun update(uncheckedEmails: Set<String>) {
+        val repository = org.eclipse.jgit.lib.RepositoryBuilder().setGitDir(File("./.git")).build()
+        val git = org.eclipse.jgit.api.Git(repository)
+        val emails = git.log().call().take(20).mapTo(HashSet()) { it.authorIdent.emailAddress }
+
+        val gitHub = org.kohsuke.github.GitHub.connect()
+        val searchUsers = gitHub.searchUsers()
+        val users = mutableListOf<Author>()
+        for (email in emails) {
+            if (email in uncheckedEmails) continue
+            val githubUsers = searchUsers.q(email).list().toList()
+            if (githubUsers.isEmpty()) error("Cannot find user $email")
+            val user = githubUsers.single()
+            val htmlUrl = user.htmlUrl.toString()
+            val name = user.name
+            users.add(Author(name, htmlUrl, email))
+        }
+
+        val authorsFile = File("./AUTHORS.md")
+        val authors = authorsFile.readText()
+        val parser =
+            org.intellij.markdown.parser.MarkdownParser(org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor())
+        val tree = parser.buildMarkdownTreeFromString(authors)
+
+        val contributorsSection = tree.children[24]
+        val existingEmails = mutableSetOf<String>()
+        for (child in contributorsSection.children) {
+            if (child.children.size > 1) {
+                existingEmails.add(
+                    child.children[1].children[0].children[2].children[2].getTextInNode(authors).toString()
+                )
+            }
+        }
+
+        val newAuthors = users.filterNot { it.mail in existingEmails }
+        if (newAuthors.isEmpty()) return
+
+        val insertionString = newAuthors.toMdString()
+        val resultingString = StringBuffer(authors).insert(contributorsSection.endOffset, insertionString).toString()
+
+        authorsFile.writeText(resultingString)
+    }
+}
+
+fun List<Author>.toMdString(): String {
+    return this.joinToString() {
+        """
+          |
+          |* [![icon][mail]](mailto:${it.mail})
+          |  [![icon][github]](${it.url})
+          |  &nbsp;
+          |  ${it.name}
+        """.trimMargin()
+    }
+}
+
+data class Author(
+    val name: String,
+    val url: String,
+    val mail: String
+)
