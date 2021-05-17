@@ -270,8 +270,8 @@ tasks.register("updateAuthors") {
 class UpdateAuthors {
     fun update(uncheckedEmails: Set<String>) {
         println("Start update authors")
-        println(File("").absolutePath)
-        val repository = org.eclipse.jgit.lib.RepositoryBuilder().setGitDir(File("./.git")).build()
+        println(projectDir)
+        val repository = org.eclipse.jgit.lib.RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
         val git = org.eclipse.jgit.api.Git(repository)
         val emails = git.log().call().take(20).mapTo(HashSet()) { it.authorIdent.emailAddress }
 
@@ -289,7 +289,7 @@ class UpdateAuthors {
             users.add(Author(name, htmlUrl, email))
         }
 
-        val authorsFile = File("./AUTHORS.md")
+        val authorsFile = File("$projectDir/AUTHORS.md")
         val authors = authorsFile.readText()
         val parser =
             org.intellij.markdown.parser.MarkdownParser(org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor())
