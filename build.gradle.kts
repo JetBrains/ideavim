@@ -14,7 +14,7 @@ buildscript {
         classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
         classpath("org.eclipse.jgit:org.eclipse.jgit:5.11.1.202105131744-r")
         classpath("org.kohsuke:github-api:1.128")
-        classpath("org.jetbrains:markdown:0.1.45")
+        classpath("org.jetbrains:markdown:0.2.3")
     }
 }
 
