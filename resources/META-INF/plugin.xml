@@ -10,6 +10,14 @@
      <li>Support <code>vim-paragraph-motion</code> extension <a href="https://youtrack.jetbrains.com/issue/VIM-2290">VIM-2290</a> |
        <a href="https://github.com/dbakker/vim-paragraph-motion">vim-paragraph-motion</a>
      </li>
+     <li>Add "Reset Handlers" button for "Conflicting Shortcuts" setting table
+     </li>
+     </ul>
+
+     <h3>Changes:</h3>
+     <ul>
+     <li>Rename "Vim Emulation" in settings to "Vim"
+     </li>
      </ul>
 
      <h3>Fixes:</h3>

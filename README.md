@@ -98,7 +98,7 @@ Here are some examples of supported vim features and commands:
 * ReplaceWithRegister
 * vim-exchange
 * vim-highlightedyank
-* vim-paragraph-motion [To Be Released]
+* vim-paragraph-motion
 
 See also:
 
