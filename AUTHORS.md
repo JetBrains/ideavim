@@ -348,6 +348,10 @@ Contributors:
   [![icon][github]](https://github.com/MichalPlacek)
   &nbsp;
   MichalPlacek
+* [![icon][mail]](mailto:alexpl292@gmail.com)
+  [![icon][github]](https://github.com/AlexPl292)
+  &nbsp;
+  Alex Pláte
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
