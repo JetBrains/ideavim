@@ -280,6 +280,7 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
     val users = mutableListOf<Author>()
     for (email in emails) {
         if (email in uncheckedEmails) continue
+        if (email in "dependabot[bot]@users.noreply.github.com") continue
         val githubUsers = searchUsers.q(email).list().toList()
         if (githubUsers.isEmpty()) error("Cannot find user $email")
         val user = githubUsers.single()
