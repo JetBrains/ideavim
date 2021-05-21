@@ -244,6 +244,18 @@ tasks.register("updateAuthors") {
     }
 }
 
+val prId: String by project
+
+tasks.register("updateMergedPr") {
+    doLast {
+        if (project.hasProperty("prId")) {
+            updateMergedPr(prId.toInt())
+        } else {
+            error("Cannot get prId")
+        }
+    }
+}
+
 fun updateAuthors(uncheckedEmails: Set<String>) {
     println("Start update authors")
     println(projectDir)
@@ -307,3 +319,75 @@ fun List<Author>.toMdString(): String {
 }
 
 data class Author(val name: String, val url: String, val mail: String)
+
+fun updateMergedPr(number: Int ) {
+    val gitHub = org.kohsuke.github.GitHub.connect()
+    val repository = gitHub.getRepository("JetBrains/ideavim")
+    val pullRequest = repository.getPullRequest(number)
+
+    val authorsFile = File("$projectDir/CHANGES.md")
+    val authors = authorsFile.readText()
+    val parser =
+        org.intellij.markdown.parser.MarkdownParser(org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor())
+    val tree = parser.buildMarkdownTreeFromString(authors)
+
+    var idx = -1
+    for (index in tree.children.indices) {
+        if (tree.children[index].getTextInNode(authors).startsWith("## ")) {
+            idx = index
+            break
+        }
+    }
+
+    val authorsBuilder = StringBuilder(authors)
+    val hasToBeReleased = tree.children[idx].getTextInNode(authors).contains("To Be Released")
+    val insertOffset = if (hasToBeReleased) {
+        var mrgIdx = -1
+        for (index in (idx + 1) until tree.children.lastIndex) {
+            val textInNode = tree.children[index].getTextInNode(authors)
+            val foundIndex = textInNode.startsWith("### Merged PRs:")
+            if (foundIndex) {
+                var filledPr = index + 2
+                while (tree.children[filledPr].getTextInNode(authors).startsWith("*")) {
+                    filledPr++
+                }
+                mrgIdx = tree.children[filledPr].startOffset + 1
+                break
+            } else {
+                val nextSection = textInNode.startsWith("## ")
+                if (nextSection) {
+                    val section = """
+                        ### Merged PRs:
+                        
+                        
+                    """.trimIndent()
+                    authorsBuilder.insert(tree.children[index].startOffset, section)
+                    mrgIdx = tree.children[index].startOffset + (section.length - 1)
+                    break
+                }
+            }
+        }
+        mrgIdx
+    } else {
+        val section = """
+            ## To Be Released
+            
+            ### Merged PRs:
+            
+            
+        """.trimIndent()
+        authorsBuilder.insert(tree.children[idx].startOffset, section)
+        tree.children[idx].startOffset + (section.length - 1)
+    }
+
+    if (insertOffset < 50) error("Incorrect offset: $insertOffset")
+
+    val prNumber = pullRequest.number
+    val userName = pullRequest.user.name
+    val login = pullRequest.user.login
+    val title = pullRequest.title
+    val section = "* [$prNumber](https://github.com/JetBrains/ideavim/pull/$prNumber) by [$userName](https://github.com/$login): $title\n"
+    authorsBuilder.insert(insertOffset, section)
+
+    authorsFile.writeText(authorsBuilder.toString())
+}
