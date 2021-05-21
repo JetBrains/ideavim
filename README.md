@@ -59,7 +59,9 @@ Or subscribe to EAP updates manually:
 
 1. Open `Settings | Plugins`
 2. Click the gear icon :gear:, select `Manage Plugin Repositories`, and add the following url:
- `https://plugins.jetbrains.com/plugins/eap/ideavim`
+```
+https://plugins.jetbrains.com/plugins/eap/ideavim
+```
 
 See [the changelog](CHANGES.md) for the list of unreleased features.
 
