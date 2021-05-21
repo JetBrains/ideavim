@@ -25,12 +25,13 @@ jobs:
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
       - name: Update authors
+        id: update_authors
         run: ./gradlew updateAuthors
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Update contributors list
+          commit_message: Add ${{ steps.update_authors.outputs.authors }} to contributors list
           commit_user_name: Alex Plate
           commit_user_email: aleksei.plate@jetbrains.com
           commit_author: Alex Plate <aleksei.plate@jetbrains.com>

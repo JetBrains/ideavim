@@ -285,6 +285,9 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
     val newAuthors = users.filterNot { it.mail in existingEmails }
     if (newAuthors.isEmpty()) return
 
+    val authorNames = newAuthors.joinToString(", ") { it.name }
+    println("::set-output name=authors::$authorNames")
+
     val insertionString = newAuthors.toMdString()
     val resultingString = StringBuffer(authors).insert(contributorsSection.endOffset, insertionString).toString()
 
