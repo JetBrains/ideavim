@@ -176,10 +176,6 @@ Contributors:
   [![icon][github]](https://github.com/johnlinp)
   &nbsp;
   John Lin
-* [![icon][mail]](mailto:alexpl292@gmail.com)
-  [![icon][github]](https://github.com/AlexPl292)
-  &nbsp;
-  Alex Plate
 * [![icon][mail]](mailto:m.t.ellis@gmail.com)
   [![icon][github]](https://github.com/citizenmatt)
   &nbsp;
