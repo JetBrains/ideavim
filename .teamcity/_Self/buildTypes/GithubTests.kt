@@ -11,7 +11,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.VcsTrigger
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object GithubTests : Github("clean test", "Tests")
-object GithubLint : Github("clean detekt ktlintCheck", "Lint")
+object GithubLint : Github("clean ktlintCheck", "Lint")
 
 sealed class Github(command: String, desc: String) : BuildType({
   name = "GitHub Pull Requests $desc"

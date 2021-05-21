@@ -22,7 +22,7 @@ object LintingFormatting : BuildType({
 
   steps {
     gradle {
-      tasks = "clean detekt ktlintCheck"
+      tasks = "clean ktlintCheck"
       buildFile = ""
       enableStacktrace = true
       param("org.jfrog.artifactory.selectedDeployableServer.defaultModuleVersionConfiguration", "GLOBAL")

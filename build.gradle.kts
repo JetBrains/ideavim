@@ -1,6 +1,4 @@
 import dev.feedforward.markdownto.DownParser
-import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.detekt
 import org.intellij.markdown.ast.getTextInNode
 import java.net.HttpURLConnection
 import java.net.URL
@@ -25,7 +23,6 @@ plugins {
     kotlin("jvm") version "1.5.0"
 
     id("org.jetbrains.intellij") version "0.7.3"
-    id("io.gitlab.arturbosch.detekt") version "1.17.0"
     id("org.jetbrains.changelog") version "1.1.2"
 
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
@@ -139,26 +136,6 @@ tasks {
 }
 
 // --- Linting
-
-detekt {
-    config = files("${rootProject.projectDir}/.detekt/config.yaml")
-    baseline = file("${rootProject.projectDir}/.detekt/baseline.xml")
-    input = files("src")
-
-    buildUponDefaultConfig = true
-
-    reports {
-        html.enabled = false
-        xml.enabled = false
-        txt.enabled = false
-    }
-}
-
-tasks {
-    withType<Detekt> {
-        this.jvmTarget = javaVersion
-    }
-}
 
 ktlint {
     disabledRules.add("no-wildcard-imports")
