@@ -32,6 +32,7 @@ jobs:
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
+          branch: master
           commit_message: Update changelog  after merging PR
           commit_user_name: Alex Plate
           commit_user_email: aleksei.plate@jetbrains.com
