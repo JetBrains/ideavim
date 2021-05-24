@@ -352,6 +352,10 @@ Contributors:
   [![icon][github]](https://github.com/MichalPlacek)
   &nbsp;
   MichalPlacek
+* [![icon][mail]](mailto:shrikantsharat.k@gmail.com)
+  [![icon][github]](https://github.com/sharat87)
+  &nbsp;
+  Shrikant Sharat Kandula
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
