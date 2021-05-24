@@ -22,6 +22,14 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Features:
+* Support `vim-indent-object` extension [VIM-1151](https://youtrack.jetbrains.com/issue/VIM-1151) | [vim-indent-object](https://github.com/michaeljsmith/vim-indent-object)
+
+### Merged PRs:
+* [261](https://github.com/JetBrains/ideavim/pull/261) by [Shrikant Sharat Kandula](https://github.com/sharat87): New extension: Indentation based text objects
+
 ## 0.67, 2021-05-20
 
 ### Features:
