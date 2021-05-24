@@ -1,8 +1,6 @@
 <idea-plugin>
   <extensions defaultExtensionNs="IdeaVIM">
     <!-- Motions -->
-    <vimAction implementation="com.maddyhome.idea.vim.action.motion.tabs.MotionPreviousTabAction" mappingModes="NXO" keys="gT"/>
-    <vimAction implementation="com.maddyhome.idea.vim.action.motion.tabs.MotionNextTabAction" mappingModes="NXO" keys="gt"/>
     <!-- Left/Right -->
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionColumnAction" mappingModes="NXO" keys="|"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnAction" mappingModes="NXO" keys="0"/>
@@ -294,6 +292,10 @@
     <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowRightAction" mappingModes="N" keys="«C-W»l,«C-W»«C-L»,«C-W»«Right»"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowUpAction" mappingModes="N" keys="«C-W»k,«C-W»«C-K»,«C-W»«Up»"/>
     <vimAction implementation="com.maddyhome.idea.vim.action.window.WindowDownAction" mappingModes="N" keys="«C-W»j,«C-W»«C-J»,«C-W»«Down»"/>
+
+    <!-- Tabs -->
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.tabs.NextTabAction" mappingModes="NXO" keys="gt"/>
+    <vimAction implementation="com.maddyhome.idea.vim.action.window.tabs.PreviousTabAction" mappingModes="NXO" keys="gT"/>
 
     <!-- Search -->
     <vimAction implementation="com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction" mappingModes="NXO" keys="/"/>
