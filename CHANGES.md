@@ -27,8 +27,12 @@ usual beta standards.
 ### Features:
 * Support `vim-indent-object` extension [VIM-1151](https://youtrack.jetbrains.com/issue/VIM-1151) | [vim-indent-object](https://github.com/michaeljsmith/vim-indent-object)
 
+### Fixes:
+* [VIM-2308](https://youtrack.jetbrains.com/issue/VIM-2308) Go to next tab doesn't move scrolling
+
 ### Merged PRs:
 * [261](https://github.com/JetBrains/ideavim/pull/261) by [Shrikant Sharat Kandula](https://github.com/sharat87): New extension: Indentation based text objects
+* [308](https://github.com/JetBrains/ideavim/pull/308) by [Matt Ellis](https://github.com/citizenmatt): Fix unnecessary caret movement when switching tabs
 
 ## 0.67, 2021-05-20
 
