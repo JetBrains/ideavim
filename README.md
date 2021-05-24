@@ -101,6 +101,7 @@ Here are some examples of supported vim features and commands:
 * vim-exchange
 * vim-highlightedyank
 * vim-paragraph-motion
+* vim-indent-object [To Be Released]
 
 See also:
 
