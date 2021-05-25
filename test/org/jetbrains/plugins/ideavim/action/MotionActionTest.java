@@ -37,19 +37,21 @@ import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
  */
 public class MotionActionTest extends VimTestCase {
   public void testDoubleToggleVisual() {
-    typeTextInFile(parseKeys("vv"), "one tw<caret>o\n");
-    assertMode(COMMAND);
+    String contents = "one tw<caret>o\n";
+    doTest("vv", contents, contents, COMMAND, CommandState.SubMode.NONE);
   }
 
   // VIM-198 |v_iw|
   public void testVisualMotionInnerWordNewLineAtEOF() {
-    typeTextInFile(parseKeys("viw"), "one tw<caret>o\n");
-    assertSelection("two");
+    String fileContents = "one tw<caret>o\n";
+    doTest("viw", fileContents, "one <selection>two</selection>\n", VISUAL, CommandState.SubMode.VISUAL_CHARACTER);
   }
 
   // |v_iW|
   public void testVisualMotionInnerBigWord() {
-    typeTextInFile(parseKeys("viW"), "one tw<caret>o.three four\n");
+    String fileContents = "one tw<caret>o.three four\n";
+    String fileContentsAfter = "one <selection>two.thre<caret>e</selection> four\n";
+    doTest("viW", fileContents, fileContentsAfter, VISUAL, CommandState.SubMode.VISUAL_CHARACTER);
     assertSelection("two.three");
   }
 
