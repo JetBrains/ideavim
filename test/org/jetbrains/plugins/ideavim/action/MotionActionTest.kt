@@ -18,10 +18,10 @@
 package org.jetbrains.plugins.ideavim.action
 
 import com.intellij.json.JsonFileType
-import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -54,126 +54,154 @@ class MotionActionTest : VimTestCase() {
   }
 
   fun testEscapeInCommand() {
-    typeTextInFile(StringHelper.parseKeys("f", "<Esc>", "<Esc>"), """
+    val content = """
      on${c}e two
      three
      
-     """.trimIndent())
+     """.trimIndent()
+    doTest(listOf("f", "<Esc>", "<Esc>"), content, content, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     assertPluginError(true)
     assertOffset(2)
-    assertMode(CommandState.Mode.COMMAND)
   }
 
   // |h| |l|
   fun testLeftRightMove() {
-    typeTextInFile(StringHelper.parseKeys("14l", "2h"), "on${c}e two three four five six seven\n")
-    assertOffset(14)
+    val before = "on${c}e two three four five six seven\n"
+    val after = "one two three ${c}four five six seven\n"
+    doTest(listOf("14l", "2h"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |j| |k|
   fun testUpDownMove() {
-    val editor = typeTextInFile(StringHelper.parseKeys("2j", "k"), """
+    val before = """
      one
      tw${c}o
      three
      four
      
-     """.trimIndent())
-    val position = editor.caretModel.visualPosition
-    assertEquals(VisualPosition(2, 2), position)
+     """.trimIndent()
+    val after = """
+     one
+     two
+     th${c}ree
+     four
+     
+     """.trimIndent()
+    doTest(listOf("2j", "k"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testDeleteDigitsInCount() {
-    typeTextInFile(StringHelper.parseKeys("42<Delete>l"), "on${c}e two three four five six seven\n")
+    typeTextInFile(parseKeys("42<Delete>l"), "on${c}e two three four five six seven\n")
     assertOffset(6)
   }
 
   // |f|
   fun testForwardToTab() {
-    typeTextInFile(StringHelper.parseKeys("f<Tab>"), "on${c}e two\tthree\nfour\n")
-    assertOffset(7)
-    assertMode(CommandState.Mode.COMMAND)
+    val before = "on${c}e two\tthree\nfour\n"
+    val after = "one two${c}\tthree\nfour\n"
+    doTest(listOf("f<Tab>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testIllegalCharArgument() {
-    typeTextInFile(StringHelper.parseKeys("f<Insert>"), "on${c}e two three four five six seven\n")
+    typeTextInFile(parseKeys("f<Insert>"), "on${c}e two three four five six seven\n")
     assertOffset(2)
     assertMode(CommandState.Mode.COMMAND)
   }
 
   // |F| |i_CTRL-K|
   fun testBackToDigraph() {
-    typeTextInFile(StringHelper.parseKeys("F<C-K>O:"), "Hallo, Öster${c}reich!\n")
-    myFixture.checkResult("Hallo, ${c}Österreich!\n")
-    assertMode(CommandState.Mode.COMMAND)
+    val before = "Hallo, Öster${c}reich!\n"
+    val after = "Hallo, ${c}Österreich!\n"
+    val keys = listOf("F<C-K>O:")
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-771 |t| |;|
   fun testTillCharRight() {
-    typeTextInFile(StringHelper.parseKeys("t:;"), "${c} 1:a 2:b 3:c \n")
-    myFixture.checkResult(" 1:a ${c}2:b 3:c \n")
+    val keys = listOf("t:;")
+    val before = "${c} 1:a 2:b 3:c \n"
+    val after = " 1:a ${c}2:b 3:c \n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-771 |t| |;|
   fun testTillCharRightRepeated() {
-    typeTextInFile(StringHelper.parseKeys("t:;"), "${c} 1:a 2:b 3:c \n")
-    myFixture.checkResult(" 1:a ${c}2:b 3:c \n")
+    val keys = listOf("t:;")
+    val before = "${c} 1:a 2:b 3:c \n"
+    val after = " 1:a ${c}2:b 3:c \n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-771 |t| |;|
   fun testTillCharRightRepeatedWithCount2() {
-    typeTextInFile(StringHelper.parseKeys("t:2;"), "${c} 1:a 2:b 3:c \n")
-    myFixture.checkResult(" 1:a ${c}2:b 3:c \n")
+    val keys = listOf("t:2;")
+    val before = "${c} 1:a 2:b 3:c \n"
+    val after = " 1:a ${c}2:b 3:c \n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-771 |t| |;|
   fun testTillCharRightRepeatedWithCountHigherThan2() {
-    typeTextInFile(StringHelper.parseKeys("t:3;"), "${c} 1:a 2:b 3:c \n")
-    myFixture.checkResult(" 1:a 2:b ${c}3:c \n")
+    val keys = listOf("t:3;")
+    val before = "${c} 1:a 2:b 3:c \n"
+    val after = " 1:a 2:b ${c}3:c \n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-771 |t| |,|
   fun testTillCharRightReverseRepeated() {
-    typeTextInFile(StringHelper.parseKeys("t:,,"), " 1:a 2:b${c} 3:c \n")
-    myFixture.checkResult(" 1:${c}a 2:b 3:c \n")
+    val keys = listOf("t:,,")
+    val before = " 1:a 2:b${c} 3:c \n"
+    val after = " 1:${c}a 2:b 3:c \n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-771 |t| |,|
   fun testTillCharRightReverseRepeatedWithCount2() {
-    typeTextInFile(StringHelper.parseKeys("t:,2,"), " 1:a 2:b${c} 3:c \n")
-    myFixture.checkResult(" 1:${c}a 2:b 3:c \n")
+    val keys = listOf("t:,2,")
+    val before = " 1:a 2:b${c} 3:c \n"
+    val after = " 1:${c}a 2:b 3:c \n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-771 |t| |,|
   fun testTillCharRightReverseRepeatedWithCountHigherThan3() {
-    typeTextInFile(StringHelper.parseKeys("t:,3,"), " 0:_ 1:a 2:b${c} 3:c \n")
-    myFixture.checkResult(" 0:${c}_ 1:a 2:b 3:c \n")
+    val keys = listOf("t:,3,")
+    val before = " 0:_ 1:a 2:b${c} 3:c \n"
+    val after = " 0:${c}_ 1:a 2:b 3:c \n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-314 |d| |v_iB|
   fun testDeleteInnerCurlyBraceBlock() {
-    typeTextInFile(StringHelper.parseKeys("di{"), "{foo, b${c}ar, baz}\n")
-    myFixture.checkResult("{}\n")
+    val keys = listOf("di{")
+    val before = "{foo, b${c}ar, baz}\n"
+    val after = "{}\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-314 |d| |v_iB|
   fun testDeleteInnerCurlyBraceBlockCaretBeforeString() {
-    typeTextInFile(StringHelper.parseKeys("di{"), "{foo, ${c}\"bar\", baz}\n")
-    myFixture.checkResult("{}\n")
+    val keys = listOf("di{")
+    val before = "{foo, ${c}\"bar\", baz}\n"
+    val after = "{}\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_aB|
   fun testDeleteOuterCurlyBraceBlock() {
-    typeTextInFile(StringHelper.parseKeys("da{"), "x = {foo, b${c}ar, baz};\n")
-    myFixture.checkResult("x = ;\n")
+    val keys = listOf("da{")
+    val before = "x = {foo, b${c}ar, baz};\n"
+    val after = "x = ;\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-261 |c| |v_iB|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testChangeInnerCurlyBraceBlockMultiLine() {
-    typeTextInFile(StringHelper.parseKeys("ci{"), """foo {
+    typeTextInFile(parseKeys("ci{"), """foo {
     ${c}bar
 }
 """)
@@ -188,31 +216,39 @@ class MotionActionTest : VimTestCase() {
 
   // |d| |v_aw|
   fun testDeleteOuterWord() {
-    typeTextInFile(StringHelper.parseKeys("daw"), "one t${c}wo three\n")
-    myFixture.checkResult("one three\n")
+    val keys = listOf("daw")
+    val before = "one t${c}wo three\n"
+    val after = "one three\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_aW|
   fun testDeleteOuterBigWord() {
-    typeTextInFile(StringHelper.parseKeys("daW"), "one \"t${c}wo\" three\n")
-    myFixture.checkResult("one three\n")
+    val keys = listOf("daW")
+    val before = "one \"t${c}wo\" three\n"
+    val after = "one three\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_is|
   fun testDeleteInnerSentence() {
-    typeTextInFile(StringHelper.parseKeys("dis"), "Hello World! How a${c}re you? Bye.\n")
-    myFixture.checkResult("Hello World!  Bye.\n")
+    val keys = listOf("dis")
+    val before = "Hello World! How a${c}re you? Bye.\n"
+    val after = "Hello World!  Bye.\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_as|
   fun testDeleteOuterSentence() {
-    typeTextInFile(StringHelper.parseKeys("das"), "Hello World! How a${c}re you? Bye.\n")
-    myFixture.checkResult("Hello World! Bye.\n")
+    val keys = listOf("das")
+    val before = "Hello World! How a${c}re you? Bye.\n"
+    val after = "Hello World! Bye.\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |v_as|
   fun testSentenceMotionPastStartOfFile() {
-    typeTextInFile(StringHelper.parseKeys("8("), """
+    typeTextInFile(parseKeys("8("), """
      
      P${c}.
      
@@ -221,7 +257,7 @@ class MotionActionTest : VimTestCase() {
 
   // |d| |v_ip|
   fun testDeleteInnerParagraph() {
-    typeTextInFile(StringHelper.parseKeys("dip"), """
+    typeTextInFile(parseKeys("dip"), """
      Hello World!
      
      How a${c}re you?
@@ -241,7 +277,7 @@ class MotionActionTest : VimTestCase() {
 
   // |d| |v_ap|
   fun testDeleteOuterParagraph() {
-    typeTextInFile(StringHelper.parseKeys("dap"), """
+    typeTextInFile(parseKeys("dap"), """
      Hello World!
      
      How a${c}re you?
@@ -260,7 +296,7 @@ class MotionActionTest : VimTestCase() {
 
   // |d| |v_a]|
   fun testDeleteOuterBracketBlock() {
-    typeTextInFile(StringHelper.parseKeys("da]"), """foo = [
+    typeTextInFile(parseKeys("da]"), """foo = [
     one,
     t${c}wo,
     three
@@ -271,117 +307,146 @@ class MotionActionTest : VimTestCase() {
 
   // |d| |v_i]|
   fun testDeleteInnerBracketBlock() {
-    typeTextInFile(StringHelper.parseKeys("di]"), "foo = [one, t${c}wo];\n")
-    myFixture.checkResult("foo = [];\n")
+    val keys = listOf("di]")
+    val before = "foo = [one, t${c}wo];\n"
+    val after = "foo = [];\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-1287 |d| |v_i(|
   fun testSelectInsideForStringLiteral() {
-    typeTextInFile(StringHelper.parseKeys("di("), "(text \"with quotes(and ${c}braces)\")")
-    myFixture.checkResult("(text \"with quotes()\")")
+    val keys = listOf("di(")
+    val before = "(text \"with quotes(and ${c}braces)\")"
+    val after = "(text \"with quotes()\")"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-1287 |d| |v_i{|
   fun testBadlyNestedBlockInsideString() {
     configureByText("{\"{foo, ${c}bar\", baz}}")
-    typeText(StringHelper.parseKeys("di{"))
+    typeText(parseKeys("di{"))
     myFixture.checkResult("{\"{foo, ${c}bar\", baz}}")
   }
 
   // VIM-1287 |d| |v_i{|
   fun testDeleteInsideBadlyNestedBlock() {
     configureByText("a{\"{foo}, ${c}bar\", baz}b}")
-    typeText(StringHelper.parseKeys("di{"))
+    typeText(parseKeys("di{"))
     myFixture.checkResult("a{${c}}b}")
   }
 
   // VIM-1008 |c| |v_i{|
   fun testDeleteInsideDoubleQuotesSurroundedBlockWithSingleQuote() {
     configureByText("\"{do${c}esn't work}\"")
-    typeText(StringHelper.parseKeys("ci{"))
+    typeText(parseKeys("ci{"))
     myFixture.checkResult("\"{${c}}\"")
   }
 
   // VIM-1008 |c| |v_i{|
   fun testDeleteInsideSingleQuotesSurroundedBlock() {
     configureByText("'{does n${c}ot work}'")
-    typeText(StringHelper.parseKeys("ci{"))
+    typeText(parseKeys("ci{"))
     myFixture.checkResult("'{${c}}'")
   }
 
   // VIM-1008 |c| |v_i{|
   fun testDeleteInsideDoublySurroundedBlock() {
     configureByText("<p class=\"{{ \$ctrl.so${c}meClassName }}\"></p>")
-    typeText(StringHelper.parseKeys("ci{"))
+    typeText(parseKeys("ci{"))
     myFixture.checkResult("<p class=\"{{${c}}}\"></p>")
   }
 
   // |d| |v_i>|
   fun testDeleteInnerAngleBracketBlock() {
-    typeTextInFile(StringHelper.parseKeys("di>"), "Foo<Foo, B${c}ar> bar\n")
-    myFixture.checkResult("Foo<> bar\n")
+    val keys = listOf("di>")
+    val before = "Foo<Foo, B${c}ar> bar\n"
+    val after = "Foo<> bar\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_a>|
   fun testDeleteOuterAngleBracketBlock() {
-    typeTextInFile(StringHelper.parseKeys("da>"), "Foo<Foo, B${c}ar> bar\n")
-    myFixture.checkResult("Foo bar\n")
+    val keys = listOf("da>")
+    val before = "Foo<Foo, B${c}ar> bar\n"
+    val after = "Foo bar\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_i"|
   fun testDeleteInnerDoubleQuoteString() {
-    typeTextInFile(StringHelper.parseKeys("di\""), "foo = \"bar b${c}az\";\n")
-    myFixture.checkResult("foo = \"\";\n")
+    val keys = listOf("di\"")
+    val before = "foo = \"bar b${c}az\";\n"
+    val after = "foo = \"\";\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_a"|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testDeleteOuterDoubleQuoteString() {
-    typeTextInFile(StringHelper.parseKeys("da\""), "foo = \"bar b${c}az\";\n")
-    myFixture.checkResult("foo = ;\n")
+    val keys = listOf("da\"")
+    val before = "foo = \"bar b${c}az\";\n"
+    val after = "foo = ;\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_i"|
   fun testDeleteDoubleQuotedStringStart() {
-    typeTextInFile(StringHelper.parseKeys("di\""), "foo = [\"one\", ${c}\"two\", \"three\"];\n")
-    myFixture.checkResult("foo = [\"one\", \"\", \"three\"];\n")
+    val keys = listOf("di\"")
+    val before = "foo = [\"one\", ${c}\"two\", \"three\"];\n"
+    val after = "foo = [\"one\", \"\", \"three\"];\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_i"|
   fun testDeleteDoubleQuotedStringEnd() {
-    typeTextInFile(StringHelper.parseKeys("di\""), "foo = [\"one\", \"two${c}\", \"three\"];\n")
-    myFixture.checkResult("foo = [\"one\", \"\", \"three\"];\n")
+    val keys = listOf("di\"")
+    val before = "foo = [\"one\", \"two${c}\", \"three\"];\n"
+    val after = "foo = [\"one\", \"\", \"three\"];\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_i"|
   fun testDeleteDoubleQuotedStringWithEscapes() {
-    typeTextInFile(StringHelper.parseKeys("di\""), "foo = \"fo\\\"o b${c}ar\";\n")
-    myFixture.checkResult("foo = \"\";\n")
+    val keys = listOf("di\"")
+    val before = "foo = \"fo\\\"o b${c}ar\";\n"
+    val after = "foo = \"\";\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_i"|
   fun testDeleteDoubleQuotedStringBefore() {
-    typeTextInFile(StringHelper.parseKeys("di\""), "f${c}oo = [\"one\", \"two\", \"three\"];\n")
-    myFixture.checkResult("foo = [\"\", \"two\", \"three\"];\n")
+    val keys = listOf("di\"")
+    val before = "f${c}oo = [\"one\", \"two\", \"three\"];\n"
+    val after = "foo = [\"\", \"two\", \"three\"];\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testDeleteDoubleQuotedStringOddNumberOfQuotes() {
-    typeTextInFile(StringHelper.parseKeys("di\""), "abc\"def${c}\"gh\"i")
-    myFixture.checkResult("abc\"\"gh\"i")
+    val keys = listOf("di\"")
+    val before = "abc\"def${c}\"gh\"i"
+    val after = "abc\"\"gh\"i"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testDeleteDoubleQuotedStringBetweenEvenNumberOfQuotes() {
-    typeTextInFile(StringHelper.parseKeys("di\""), "abc\"def\"g${c}h\"ijk\"l")
-    myFixture.checkResult("abc\"def\"\"ijk\"l")
+    val keys = listOf("di\"")
+    val before = "abc\"def\"g${c}h\"ijk\"l"
+    val after = "abc\"def\"\"ijk\"l"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testDeleteDoubleQuotedStringOddNumberOfQuotesOnLast() {
-    typeTextInFile(StringHelper.parseKeys("di\""), "abcdef\"gh\"ij${c}\"kl")
-    myFixture.checkResult("abcdef\"gh\"ij\"kl")
+    val keys = listOf("di\"")
+    val before = "abcdef\"gh\"ij${c}\"kl"
+    val after = "abcdef\"gh\"ij\"kl"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testDeleteDoubleQuotedStringEvenNumberOfQuotesOnLast() {
-    typeTextInFile(StringHelper.parseKeys("di\""), "abc\"def\"gh\"ij${c}\"kl")
-    myFixture.checkResult("abc\"def\"gh\"\"kl")
+    val keys = listOf("di\"")
+    val before = "abc\"def\"gh\"ij${c}\"kl"
+    val after = "abc\"def\"gh\"\"kl"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-132 |v_i"|
@@ -392,54 +457,72 @@ class MotionActionTest : VimTestCase() {
 
   // |c| |v_i"|
   fun testChangeEmptyQuotedString() {
-    typeTextInFile(StringHelper.parseKeys("ci\""), "foo = \"${c}\";\n")
-    myFixture.checkResult("foo = \"\";\n")
+    val keys = listOf("ci\"")
+    val before = "foo = \"${c}\";\n"
+    val after = "foo = \"\";\n"
+    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_i'|
   fun testDeleteInnerSingleQuoteString() {
-    typeTextInFile(StringHelper.parseKeys("di'"), "foo = 'bar b${c}az';\n")
-    myFixture.checkResult("foo = '';\n")
+    val keys = listOf("di'")
+    val before = "foo = 'bar b${c}az';\n"
+    val after = "foo = '';\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_i`|
   fun testDeleteInnerBackQuoteString() {
-    typeTextInFile(StringHelper.parseKeys("di`"), "foo = `bar b${c}az`;\n")
-    myFixture.checkResult("foo = ``;\n")
+    val keys = listOf("di`")
+    val before = "foo = `bar b${c}az`;\n"
+    val after = "foo = ``;\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_a'|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testDeleteOuterSingleQuoteString() {
-    typeTextInFile(StringHelper.parseKeys("da'"), "foo = 'bar b${c}az';\n")
-    myFixture.checkResult("foo = ;\n")
+    val keys = listOf("da'")
+    val before = "foo = 'bar b${c}az';\n"
+    val after = "foo = ;\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-132 |d| |v_a`|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testDeleteOuterBackQuoteString() {
-    typeTextInFile(StringHelper.parseKeys("da`"), "foo = `bar b${c}az`;\n")
-    myFixture.checkResult("foo = ;\n")
+    val keys = listOf("da`")
+    val before = "foo = `bar b${c}az`;\n"
+    val after = "foo = ;\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-1427
   fun testDeleteOuterTagWithCount() {
-    typeTextInFile(StringHelper.parseKeys("d2at"), "<a><b><c>${c}</c></b></a>")
-    myFixture.checkResult("<a></a>")
+    val keys = listOf("d2at")
+    val before = "<a><b><c>${c}</c></b></a>"
+    val after = "<a></a>"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-2113
   fun testReplaceEmptyTagContent() {
-    typeTextInFile(StringHelper.parseKeys("cit"), "<a><c>${c}</c></a>")
-    myFixture.checkResult("<a><c></c></a>")
+    val keys = listOf("cit")
+    val before = "<a><c>${c}</c></a>"
+    val after = "<a><c></c></a>"
+    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   fun testDeleteToDigraph() {
-    typeTextInFile(StringHelper.parseKeys("d/<C-K>O:<CR>"), "ab${c}cdÖef")
-    myFixture.checkResult("abÖef")
+    val keys = listOf("d/<C-K>O:<CR>")
+    val before = "ab${c}cdÖef"
+    val after = "abÖef"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |[(|
   fun testUnmatchedOpenParenthesis() {
-    typeTextInFile(StringHelper.parseKeys("[("), """
+    typeTextInFile(parseKeys("[("), """
      foo(bar, foo(bar, ${c}baz
      bar(foo)
      
@@ -449,7 +532,7 @@ class MotionActionTest : VimTestCase() {
 
   // |[{|
   fun testUnmatchedOpenBracketMultiLine() {
-    typeTextInFile(StringHelper.parseKeys("[{"), """foo {
+    typeTextInFile(parseKeys("[{"), """foo {
     bar,
     b${c}az
 """)
@@ -458,7 +541,7 @@ class MotionActionTest : VimTestCase() {
 
   // |])|
   fun testUnmatchedCloseParenthesisMultiLine() {
-    typeTextInFile(StringHelper.parseKeys("])"), """foo(bar, ${c}baz,
+    typeTextInFile(parseKeys("])"), """foo(bar, ${c}baz,
    quux)
 """)
     assertOffset(21)
@@ -473,125 +556,125 @@ class MotionActionTest : VimTestCase() {
   // VIM-965 |[m|
   fun testMethodMovingInNonJavaFile() {
     myFixture.configureByText(JsonFileType.INSTANCE, "{\"foo\": \"${c}bar\"}\n")
-    typeText(StringHelper.parseKeys("[m"))
+    typeText(parseKeys("[m"))
     myFixture.checkResult("{\"foo\": \"${c}bar\"}\n")
   }
 
   // VIM-331 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testNonAsciiLettersInWord() {
-    typeTextInFile(StringHelper.parseKeys("w"), "Če${c}ská republika")
+    typeTextInFile(parseKeys("w"), "Če${c}ská republika")
     assertOffset(6)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testHiraganaToPunctuation() {
-    typeTextInFile(StringHelper.parseKeys("w"), "は${c}はは!!!")
+    typeTextInFile(parseKeys("w"), "は${c}はは!!!")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testHiraganaToFullWidthPunctuation() {
-    typeTextInFile(StringHelper.parseKeys("w"), "は${c}はは！！！")
+    typeTextInFile(parseKeys("w"), "は${c}はは！！！")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testKatakanaToHiragana() {
-    typeTextInFile(StringHelper.parseKeys("w"), "チ${c}チチははは")
+    typeTextInFile(parseKeys("w"), "チ${c}チチははは")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testKatakanaToHalfWidthKana() {
-    typeTextInFile(StringHelper.parseKeys("w"), "チ${c}チチｳｳｳ")
+    typeTextInFile(parseKeys("w"), "チ${c}チチｳｳｳ")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testKatakanaToDigits() {
-    typeTextInFile(StringHelper.parseKeys("w"), "チ${c}チチ123")
+    typeTextInFile(parseKeys("w"), "チ${c}チチ123")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testKatakanaToLetters() {
-    typeTextInFile(StringHelper.parseKeys("w"), "チ${c}チチ123")
+    typeTextInFile(parseKeys("w"), "チ${c}チチ123")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testKatakanaToFullWidthLatin() {
-    typeTextInFile(StringHelper.parseKeys("w"), "チ${c}チチＡＡＡ")
+    typeTextInFile(parseKeys("w"), "チ${c}チチＡＡＡ")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testKatakanaToFullWidthDigits() {
-    typeTextInFile(StringHelper.parseKeys("w"), "チ${c}チチ３３３")
+    typeTextInFile(parseKeys("w"), "チ${c}チチ３３３")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testHiraganaToKatakana() {
-    typeTextInFile(StringHelper.parseKeys("w"), "は${c}ははチチチ")
+    typeTextInFile(parseKeys("w"), "は${c}ははチチチ")
     assertOffset(3)
   }
 
   // VIM-58 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testHalftWidthKanaToLetters() {
-    typeTextInFile(StringHelper.parseKeys("w"), "ｳｳｳAAA")
+    typeTextInFile(parseKeys("w"), "ｳｳｳAAA")
     assertOffset(3)
   }
 
   // |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testCjkToPunctuation() {
-    typeTextInFile(StringHelper.parseKeys("w"), "测试${c}测试!!!")
+    typeTextInFile(parseKeys("w"), "测试${c}测试!!!")
     assertOffset(4)
   }
 
   // |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testCjkToFullWidthPunctuation() {
-    typeTextInFile(StringHelper.parseKeys("w"), "测试${c}测试！！！")
+    typeTextInFile(parseKeys("w"), "测试${c}测试！！！")
     assertOffset(4)
   }
 
   // |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testCjkToDigits() {
-    typeTextInFile(StringHelper.parseKeys("w"), "测试${c}测试123")
+    typeTextInFile(parseKeys("w"), "测试${c}测试123")
     assertOffset(4)
   }
 
   // |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testCjkToFullWidthLatin() {
-    typeTextInFile(StringHelper.parseKeys("w"), "测试${c}测试ＡＡＡ")
+    typeTextInFile(parseKeys("w"), "测试${c}测试ＡＡＡ")
     assertOffset(4)
   }
 
   // |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testCjkToFullWidthDigits() {
-    typeTextInFile(StringHelper.parseKeys("w"), "测试${c}测试３３３")
+    typeTextInFile(parseKeys("w"), "测试${c}测试３３３")
     assertOffset(4)
   }
 
   // |w|
   fun testEmptyLineIsWord() {
-    typeTextInFile(StringHelper.parseKeys("w"), """
+    typeTextInFile(parseKeys("w"), """
      ${c}one
      
      two
@@ -602,7 +685,7 @@ class MotionActionTest : VimTestCase() {
 
   // |w|
   fun testNotEmptyLineIsNotWord() {
-    typeTextInFile(StringHelper.parseKeys("w"), """${c}one
+    typeTextInFile(parseKeys("w"), """${c}one
  
 two
 """)
@@ -612,24 +695,24 @@ two
   // VIM-312 |w|
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testLastWord() {
-    typeTextInFile(StringHelper.parseKeys("w"), "${c}one\n")
+    typeTextInFile(parseKeys("w"), "${c}one\n")
     assertOffset(2)
   }
 
   // |b|
   fun testWordBackwardsAtFirstLineWithWhitespaceInFront() {
-    typeTextInFile(StringHelper.parseKeys("b"), "    ${c}x\n")
+    typeTextInFile(parseKeys("b"), "    ${c}x\n")
     assertOffset(0)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testRightToLastChar() {
-    typeTextInFile(StringHelper.parseKeys("i<Right>"), "on${c}e\n")
+    typeTextInFile(parseKeys("i<Right>"), "on${c}e\n")
     assertOffset(3)
   }
 
   fun testDownToLastEmptyLine() {
-    typeTextInFile(StringHelper.parseKeys("j"), """
+    typeTextInFile(parseKeys("j"), """
      ${c}one
      
      
@@ -641,7 +724,7 @@ two
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   fun testSearchFromRegister() {
     VimPlugin.getRegister().setKeys('a', StringHelper.stringToKeys("two"))
-    typeTextInFile(StringHelper.parseKeys("/", "<C-R>a", "<Enter>"), """
+    typeTextInFile(parseKeys("/", "<C-R>a", "<Enter>"), """
      ${c}one
      two
      three
@@ -652,13 +735,15 @@ two
 
   // |v_gv|
   fun testSwapVisualSelections() {
-    typeTextInFile(StringHelper.parseKeys("viw", "<Esc>", "0", "viw", "gv", "d"), "foo ${c}bar\n")
-    myFixture.checkResult("foo \n")
+    val keys = listOf("viw", "<Esc>", "0", "viw", "gv", "d")
+    val before = "foo ${c}bar\n"
+    val after = "foo \n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |CTRL-V|
   fun testVisualBlockSelectionsDisplayedCorrectlyMovingRight() {
-    typeTextInFile(StringHelper.parseKeys("<C-V>jl"), """
+    typeTextInFile(parseKeys("<C-V>jl"), """
      ${c}foo
      bar
      
@@ -672,7 +757,7 @@ two
 
   // |CTRL-V|
   fun testVisualBlockSelectionsDisplayedCorrectlyMovingLeft() {
-    typeTextInFile(StringHelper.parseKeys("<C-V>jh"), """
+    typeTextInFile(parseKeys("<C-V>jh"), """
      fo${c}o
      bar
      
@@ -686,7 +771,7 @@ two
 
   // |CTRL-V|
   fun testVisualBlockSelectionsDisplayedCorrectlyInDollarMode() {
-    typeTextInFile(StringHelper.parseKeys("<C-V>jj$"), """
+    typeTextInFile(parseKeys("<C-V>jj$"), """
      a${c}b
      abc
      ab
@@ -703,7 +788,7 @@ two
 
   // |v_o|
   fun testSwapVisualSelectionEnds() {
-    typeTextInFile(StringHelper.parseKeys("v", "l", "o", "l", "d"), "${c}foo\n")
+    typeTextInFile(parseKeys("v", "l", "o", "l", "d"), "${c}foo\n")
     myFixture.checkResult("fo\n")
   }
 
@@ -747,7 +832,7 @@ two
 
   // VIM-646 |gv|
   fun testRestoreMultiLineSelectionAfterYank() {
-    typeTextInFile(StringHelper.parseKeys("V", "j", "y", "G", "p", "gv", "d"), """
+    typeTextInFile(parseKeys("V", "j", "y", "G", "p", "gv", "d"), """
      ${c}foo
      bar
      baz
@@ -763,7 +848,7 @@ two
 
   // |v_>| |gv|
   fun testRestoreMultiLineSelectionAfterIndent() {
-    typeTextInFile(StringHelper.parseKeys("V", "2j"), """
+    typeTextInFile(parseKeys("V", "2j"), """
      ${c}foo
      bar
      baz
@@ -775,24 +860,24 @@ two
     baz
     
     """.trimIndent())
-    typeText(StringHelper.parseKeys(">"))
+    typeText(parseKeys(">"))
     assertMode(CommandState.Mode.COMMAND)
     myFixture.checkResult("""    foo
     bar
     baz
 """)
-    typeText(StringHelper.parseKeys("gv"))
+    typeText(parseKeys("gv"))
     assertSelection("""    foo
     bar
     baz
 """)
-    typeText(StringHelper.parseKeys(">"))
+    typeText(parseKeys(">"))
     assertMode(CommandState.Mode.COMMAND)
     myFixture.checkResult("""        foo
         bar
         baz
 """)
-    typeText(StringHelper.parseKeys("gv"))
+    typeText(parseKeys("gv"))
     assertSelection("""        foo
         bar
         baz
@@ -806,13 +891,13 @@ two
     bar
     
     """.trimIndent())
-    typeText(StringHelper.parseKeys("vl", "<Esc>", "gv"))
+    typeText(parseKeys("vl", "<Esc>", "gv"))
     assertMode(CommandState.Mode.VISUAL)
     assertSelection("fo")
   }
 
   fun testVisualLineSelectDown() {
-    typeTextInFile(StringHelper.parseKeys("Vj"), """
+    typeTextInFile(parseKeys("Vj"), """
      foo
      ${c}bar
      baz
@@ -830,7 +915,7 @@ two
 
   // VIM-784
   fun testVisualLineSelectUp() {
-    typeTextInFile(StringHelper.parseKeys("Vk"), """
+    typeTextInFile(parseKeys("Vk"), """
      foo
      bar
      ${c}baz
