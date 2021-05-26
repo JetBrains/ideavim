@@ -26,7 +26,13 @@ changeBuildType(RelativeId("Qodana")) {
         update<Qodana>(0) {
             clearConditions()
             reportAsTestsEnable = "true"
-            reportAsTestMode = "each-problem-is-test"
+            param("clonefinder-languages", "Java")
+            param("clonefinder-languages-container", "Java Kotlin")
+            param("namesAndTagsCustom", "repo.labs.intellij.net/static-analyser/qodana")
+            param("clonefinder-queried-project", "src")
+            param("clonefinder-enable", "true")
+            param("clonefinder-reference-projects", "src")
+            param("clonefinder-mode", "")
             param("report-version", "")
             param("yaml-configuration", "")
         }
