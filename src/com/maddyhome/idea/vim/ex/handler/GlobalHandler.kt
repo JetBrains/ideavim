@@ -19,7 +19,6 @@
 package com.maddyhome.idea.vim.ex.handler
 
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.maddyhome.idea.vim.VimPlugin
@@ -31,6 +30,7 @@ import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.group.HistoryGroup
 import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.MessageHelper.message
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.shouldIgnoreCase
@@ -43,11 +43,11 @@ class GlobalHandler : CommandHandler.SingleExecution() {
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     var result = true
-    for (caret in editor.caretModel.allCarets) {
-      val lineRange = cmd.getLineRange(editor, caret)
-      if (!processGlobalCommand(editor, context, caret, lineRange, cmd.command, cmd.argument)) {
-        result = false
-      }
+    editor.caretModel.removeSecondaryCarets()
+    val caret = editor.caretModel.currentCaret
+    val lineRange = cmd.getLineRange(editor, caret)
+    if (!processGlobalCommand(editor, context, lineRange, cmd.command, cmd.argument)) {
+      result = false
     }
     return result
   }
@@ -55,22 +55,26 @@ class GlobalHandler : CommandHandler.SingleExecution() {
   private fun processGlobalCommand(
     editor: Editor,
     context: DataContext,
-    caret: Caret,
     range: LineRange,
     excmd: String,
-    exarg: String,
+    _exarg: String,
   ): Boolean {
     // TODO: 25.05.2021 Nesting command
-    // TODO: 25.05.2021 ":global!" is like ":vglobal"
 
-
-    // TODO: 25.05.2021 Multiple types
-    val type = 'g'
+    var exarg = _exarg
+    val type = if (exarg.startsWith("!")) {
+      exarg = exarg.drop(1)
+      GlobalType.V
+    } else if (excmd.startsWith("g")) {
+      GlobalType.G
+    } else if (excmd.startsWith("v")) {
+      GlobalType.V
+    } else error("Unexpected command: $excmd")
 
     var cmd = CharPointer(StringBuffer(exarg))
 
-    var pat: CharPointer
-    var delimiter: Char
+    val pat: CharPointer
+    val delimiter: Char
     var which_pat = RE_LAST
 
     /*
@@ -78,18 +82,17 @@ class GlobalHandler : CommandHandler.SingleExecution() {
      * "\/" and "\?": use previous search pattern.
      *   "\&": use previous substitute pattern.
      */
-    // TODO: 25.05.2021 Process empty expression
-    if (cmd.charAt() == '\\') {
+    if (exarg.isEmpty()) {
+      VimPlugin.showMessage(message("E148"))
+      VimPlugin.indicateError()
+      return false
+    } else if (cmd.charAt() == '\\') {
       cmd.inc()
       if ("/?&".indexOf(cmd.charAt()) == -1) {
         VimPlugin.showMessage(message(Msg.e_backslash))
         return false
       }
-      if (cmd.charAt() == '&') {
-        which_pat = RE_SUBST /* use last '/' pattern */
-      } else {
-        which_pat = RE_SEARCH /* use last '/' pattern */
-      }
+      which_pat = if (cmd.charAt() == '&') RE_SUBST else RE_SEARCH
       cmd.inc()
       pat = CharPointer("") /* empty search pattern */
     } else {
@@ -107,7 +110,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     // it to true when searching for a word with `*`, `#`, `g*`, etc.
     var isNewPattern = true
     var pattern: String? = ""
-    if (pat == null || pat.isNul) {
+    if (pat.isNul) {
       isNewPattern = false
       if (which_pat == RE_LAST) {
         which_pat = lastPatternIdx
@@ -135,20 +138,15 @@ class GlobalHandler : CommandHandler.SingleExecution() {
 
     // Set RE_SUBST and RE_LAST, but only for explicitly typed patterns. Reused patterns are not saved/updated
 
-    // Set RE_SUBST and RE_LAST, but only for explicitly typed patterns. Reused patterns are not saved/updated
     setLastUsedPattern(pattern, RE_SUBST, isNewPattern)
-
-    // Always reset after checking, only set for nv_ident
 
     // Always reset after checking, only set for nv_ident
     lastIgnoreSmartCase = false
     // Substitute does NOT reset last direction or pattern offset!
 
-    // Substitute does NOT reset last direction or pattern offset!
-    val sp: RegExp
     val regmatch = regmmatch_T()
     regmatch.rmm_ic = shouldIgnoreCase(pattern, false)
-    sp = RegExp()
+    val sp = RegExp()
     regmatch.regprog = sp.vim_regcomp(pattern, 1)
     if (regmatch.regprog == null) {
       if (do_error) {
@@ -183,7 +181,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
 
       // a match on this line?
       match = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol)
-      if ((type == 'g' && match > 0) || (type == 'v' && match <= 0)) {
+      if ((type == GlobalType.G && match > 0) || (type == GlobalType.V && match <= 0)) {
         // TODO: 25.05.2021 Use another way to mark things?
         marks += editor.markupModel.addLineHighlighter(null, lnum, 0)
         ndone += 1;
@@ -192,13 +190,12 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     }
 
     // pass 2: execute the command for each line that has been marked
-    if (gotInt) {
+    /*if (gotInt) {
       // TODO: 25.05.2021
     }
-    else if (ndone == 0) {
+    else */if (ndone == 0) {
       // TODO: 25.05.2021
-    }
-    else {
+    } else {
       globalExe(editor, context, marks, cmd.toString())
     }
     // TODO: 25.05.2021 More staff
@@ -209,12 +206,22 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     for (mark in marks) {
       val startOffset = mark.startOffset
       globalExecuteOne(editor, context, startOffset, cmd)
+      // TODO: 26.05.2021 break check
     }
+
+    // TODO: 26.05.2021 Add other staff
   }
 
-  private fun globalExecuteOne(editor: Editor, context: DataContext, lineStartOffset: Int, cmd: String) {
+  private fun globalExecuteOne(editor: Editor, context: DataContext, lineStartOffset: Int, cmd: String?) {
+    // TODO: 26.05.2021 Move to line start offset
+    // TODO: 26.05.2021 What about folds?
     editor.caretModel.moveToOffset(lineStartOffset)
-    CommandParser.processCommand(editor, context, cmd, 1)
+    if (cmd == null || cmd.isEmpty() || (cmd.length == 1 && cmd[0] == '\n')) {
+      CommandParser.processCommand(editor, context, "p", 1)
+    } else {
+      CommandParser.processCommand(editor, context, cmd, 1)
+    }
+    // TODO: 26.05.2021 Do not add the command to the history
   }
 
   /**
@@ -251,6 +258,11 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     // This will remove an existing entry and add it back to the end, and is expected to do so even if the string value
     // is the same
     VimPlugin.getHistory().addEntry(HistoryGroup.SEARCH, pattern)
+  }
+
+  private enum class GlobalType {
+    G,
+    V,
   }
 
   companion object {

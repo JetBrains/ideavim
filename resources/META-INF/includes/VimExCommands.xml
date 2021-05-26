@@ -53,6 +53,7 @@
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SourceHandler" names="so[urce]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SortHandler" names="sor[t]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SplitHandler" names="vs[plit],sp[lit]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.GlobalHandler" names="v[global]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.SubstituteHandler" names="s[ubstitute],&amp;,~"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.UndoHandler" names="u[ndo]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.WriteAllHandler" names="wa[ll]"/>
