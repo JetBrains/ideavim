@@ -60,6 +60,15 @@ class GlobalHandler : CommandHandler.SingleExecution() {
   ): Boolean {
     // TODO: 25.05.2021 Nesting command
 
+    // When nesting the command works on one line.  This allows for
+    // ":g/found/v/notfound/command".
+    if (globalBusy && (range.startLine != 0 || range.endLine != editor.document.lineCount)) {
+      // TODO: 26.05.2021 This is weird
+      VimPlugin.showMessage(message("E147"))
+      VimPlugin.indicateError()
+      return false
+    }
+
     var exarg = _exarg
     val type = if (exarg.startsWith("!")) {
       exarg = exarg.drop(1)
@@ -157,56 +166,68 @@ class GlobalHandler : CommandHandler.SingleExecution() {
 
     // TODO: 25.05.2021 global busy
 
-    // pass 1: set marks for each (not) matching line
-    val line1 = range.startLine
-    val line2 = range.endLine
     var match: Int
-    //region search_regcomp implementation
-    // We don't need to worry about lastIgnoreSmartCase, it's always false. Vim resets after checking, and it only sets
-    // it to true when searching for a word with `*`, `#`, `g*`, etc.
+    val lcount = EditorHelper.getLineCount(editor)
+    val searchcol = 0
+    if (globalBusy) {
+      val offset = editor.caretModel.currentCaret.offset
+      val lineStartOffset = editor.document.getLineStartOffset(editor.document.getLineNumber(offset))
+      match = sp.vim_regexec_multi(regmatch, editor, lcount, lineStartOffset, searchcol)
+      if ((type == GlobalType.G && match > 0) || (type == GlobalType.V && match <= 0)) {
+        globalExecuteOne(editor, context, lineStartOffset, cmd.toString())
+      }
+    } else {
+      // pass 1: set marks for each (not) matching line
+      val line1 = range.startLine
+      val line2 = range.endLine
+      //region search_regcomp implementation
+      // We don't need to worry about lastIgnoreSmartCase, it's always false. Vim resets after checking, and it only sets
+      // it to true when searching for a word with `*`, `#`, `g*`, etc.
 
     if (line1 < 0 || line2 < 0) {
       return false
     }
 
-    val lcount = EditorHelper.getLineCount(editor)
-    val searchcol = 0
-    var ndone = 0
-    val marks = mutableListOf<RangeHighlighter>()
-    for (lnum in line1..line2) {
-      // TODO: 25.05.2021 recheck gotInt
-//      if (!gotInt) break
+      var ndone = 0
+      val marks = mutableListOf<RangeHighlighter>()
+      for (lnum in line1..line2) {
+        // TODO: 25.05.2021 recheck gotInt
+  //      if (!gotInt) break
 
-      // a match on this line?
-      match = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol)
-      if ((type == GlobalType.G && match > 0) || (type == GlobalType.V && match <= 0)) {
-        // TODO: 25.05.2021 Use another way to mark things?
-        marks += editor.markupModel.addLineHighlighter(null, lnum, 0)
-        ndone += 1
+        // a match on this line?
+        match = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol)
+        if ((type == GlobalType.G && match > 0) || (type == GlobalType.V && match <= 0)) {
+          // TODO: 25.05.2021 Use another way to mark things?
+          marks += editor.markupModel.addLineHighlighter(null, lnum, 0)
+          ndone += 1
+        }
+        // TODO: 25.05.2021 Check break
       }
-      // TODO: 25.05.2021 Check break
-    }
 
-    // pass 2: execute the command for each line that has been marked
-    /*if (gotInt) {
-      // TODO: 25.05.2021
-    }
-    else */if (ndone == 0) {
-      // TODO: 25.05.2021
-    } else {
-      globalExe(editor, context, marks, cmd.toString())
+      // pass 2: execute the command for each line that has been marked
+      /*if (gotInt) {
+          // TODO: 25.05.2021
+        }
+        else */if (ndone == 0) {
+          // TODO: 25.05.2021
+        } else {
+          globalExe(editor, context, marks, cmd.toString())
+        }
     }
     // TODO: 25.05.2021 More staff
     return true
   }
 
   private fun globalExe(editor: Editor, context: DataContext, marks: List<RangeHighlighter>, cmd: String) {
+    globalBusy = true
     for (mark in marks) {
+      if (!globalBusy) break
       val startOffset = mark.startOffset
       globalExecuteOne(editor, context, startOffset, cmd)
       // TODO: 26.05.2021 break check
     }
 
+    globalBusy = false
     // TODO: 26.05.2021 Add other staff
   }
 
@@ -264,6 +285,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
   }
 
   companion object {
+    private var globalBusy = false
     var gotInt: Boolean = false
     private var lastPatternIdx = 0 // Which pattern was used last? RE_SEARCH or RE_SUBST?
     private var lastSearch: String? = null // Pattern used for last search command (`/`)
