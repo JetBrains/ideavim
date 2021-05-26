@@ -254,22 +254,27 @@ class MotionActionTest : VimTestCase() {
   }
 
   // |v_as|
+  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
   fun testSentenceMotionPastStartOfFile() {
-    typeTextInFile(
-      parseKeys("8("),
-      """
+    val keys = listOf("8(")
+
+    val before = """
      
      P$c.
      
       """.trimIndent()
-    )
+    val after = """
+     
+     P$c.
+     
+      """.trimIndent()
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_ip|
   fun testDeleteInnerParagraph() {
-    typeTextInFile(
-      parseKeys("dip"),
-      """
+    val keys = listOf("dip")
+    val before = """
      Hello World!
      
      How a${c}re you?
@@ -278,23 +283,20 @@ class MotionActionTest : VimTestCase() {
      Bye.
      
       """.trimIndent()
-    )
-    myFixture.checkResult(
-      """
+    val after = """
     Hello World!
     
     
     Bye.
     
       """.trimIndent()
-    )
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_ap|
   fun testDeleteOuterParagraph() {
-    typeTextInFile(
-      parseKeys("dap"),
-      """
+    val keys = listOf("dap")
+    val before = """
      Hello World!
      
      How a${c}re you?
@@ -303,29 +305,26 @@ class MotionActionTest : VimTestCase() {
      Bye.
      
       """.trimIndent()
-    )
-    myFixture.checkResult(
-      """
+    val after = """
     Hello World!
     
     Bye.
     
       """.trimIndent()
-    )
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_a]|
   fun testDeleteOuterBracketBlock() {
-    typeTextInFile(
-      parseKeys("da]"),
-      """foo = [
+    val keys = listOf("da]")
+    val before = """foo = [
     one,
     t${c}wo,
     three
 ];
 """
-    )
-    myFixture.checkResult("foo = ;\n")
+    val after = "foo = ;\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_i]|
@@ -346,37 +345,42 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-1287 |d| |v_i{|
   fun testBadlyNestedBlockInsideString() {
-    configureByText("{\"{foo, ${c}bar\", baz}}")
-    typeText(parseKeys("di{"))
-    myFixture.checkResult("{\"{foo, ${c}bar\", baz}}")
+    val before = "{\"{foo, ${c}bar\", baz}}"
+    val keys = listOf("di{")
+    val after = "{\"{foo, ${c}bar\", baz}}"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-1287 |d| |v_i{|
   fun testDeleteInsideBadlyNestedBlock() {
-    configureByText("a{\"{foo}, ${c}bar\", baz}b}")
-    typeText(parseKeys("di{"))
-    myFixture.checkResult("a{$c}b}")
+    val before = "a{\"{foo}, ${c}bar\", baz}b}"
+    val keys = listOf("di{")
+    val after = "a{$c}b}"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-1008 |c| |v_i{|
   fun testDeleteInsideDoubleQuotesSurroundedBlockWithSingleQuote() {
-    configureByText("\"{do${c}esn't work}\"")
-    typeText(parseKeys("ci{"))
-    myFixture.checkResult("\"{$c}\"")
+    val before = "\"{do${c}esn't work}\""
+    val keys = listOf("ci{")
+    val after = "\"{$c}\""
+    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   // VIM-1008 |c| |v_i{|
   fun testDeleteInsideSingleQuotesSurroundedBlock() {
-    configureByText("'{does n${c}ot work}'")
-    typeText(parseKeys("ci{"))
-    myFixture.checkResult("'{$c}'")
+    val keys = listOf("ci{")
+    val before = "'{does n${c}ot work}'"
+    val after = "'{$c}'"
+    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   // VIM-1008 |c| |v_i{|
   fun testDeleteInsideDoublySurroundedBlock() {
-    configureByText("<p class=\"{{ \$ctrl.so${c}meClassName }}\"></p>")
-    typeText(parseKeys("ci{"))
-    myFixture.checkResult("<p class=\"{{$c}}\"></p>")
+    val before = "<p class=\"{{ \$ctrl.so${c}meClassName }}\"></p>"
+    val keys = listOf("ci{")
+    val after = "<p class=\"{{$c}}\"></p>"
+    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   // |d| |v_i>|
@@ -474,8 +478,10 @@ class MotionActionTest : VimTestCase() {
 
   // VIM-132 |v_i"|
   fun testInnerDoubleQuotedStringSelection() {
-    typeTextInFile(StringHelper.parseKeys("vi\""), "foo = [\"o${c}ne\", \"two\"];\n")
-    assertSelection("one")
+    val keys = listOf("vi\"")
+    val before = "foo = [\"o${c}ne\", \"two\"];\n"
+    val after = "foo = [\"${s}on${c}e${se}\", \"two\"];\n"
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
   // |c| |v_i"|
@@ -586,6 +592,7 @@ class MotionActionTest : VimTestCase() {
   }
 
   // VIM-965 |[m|
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, "File type specific")
   fun testMethodMovingInNonJavaFile() {
     myFixture.configureByText(JsonFileType.INSTANCE, "{\"foo\": \"${c}bar\"}\n")
     typeText(parseKeys("[m"))
@@ -787,68 +794,60 @@ two
 
   // |CTRL-V|
   fun testVisualBlockSelectionsDisplayedCorrectlyMovingRight() {
-    typeTextInFile(
-      parseKeys("<C-V>jl"),
-      """
+    val keys = listOf("<C-V>jl")
+    val before = """
      ${c}foo
      bar
      
       """.trimIndent()
-    )
-    myFixture.checkResult(
-      """
+    val after = """
     ${s}fo${se}o
     ${s}ba${se}r
     
       """.trimIndent()
-    )
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 
   // |CTRL-V|
   fun testVisualBlockSelectionsDisplayedCorrectlyMovingLeft() {
-    typeTextInFile(
-      parseKeys("<C-V>jh"),
-      """
+    val keys = listOf("<C-V>jh")
+    val before = """
      fo${c}o
      bar
      
       """.trimIndent()
-    )
-    myFixture.checkResult(
-      """
+    val after = """
     f${s}oo$se
     b${s}ar$se
     
       """.trimIndent()
-    )
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 
   // |CTRL-V|
   fun testVisualBlockSelectionsDisplayedCorrectlyInDollarMode() {
-    typeTextInFile(
-      parseKeys("<C-V>jj$"),
-      """
+    val keys = listOf("<C-V>jj$")
+    val before = """
      a${c}b
      abc
      ab
      
       """.trimIndent()
-    )
-    myFixture
-      .checkResult(
-        """
+    val after = """
     a${s}b$se
     a${s}bc$se
     a${s}b$se
     
         """.trimIndent()
-      )
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 
   // |v_o|
   fun testSwapVisualSelectionEnds() {
-    typeTextInFile(parseKeys("v", "l", "o", "l", "d"), "${c}foo\n")
-    myFixture.checkResult("fo\n")
+    val keys = listOf("v", "l", "o", "l", "d")
+    val before = "${c}foo\n"
+    val after = "fo\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-564 |g_|
@@ -898,27 +897,26 @@ two
   }
 
   // VIM-646 |gv|
+  @TestWithoutNeovim(SkipNeovimReason.UNCLEAR)
   fun testRestoreMultiLineSelectionAfterYank() {
-    typeTextInFile(
-      parseKeys("V", "j", "y", "G", "p", "gv", "d"),
-      """
+    val keys = listOf("V", "j", "y", "G", "p", "gv", "d")
+    val before = """
      ${c}foo
      bar
      baz
      
       """.trimIndent()
-    )
-    myFixture.checkResult(
-      """
+    val after = """
     baz
     foo
     bar
     
       """.trimIndent()
-    )
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |v_>| |gv|
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Complicated")
   fun testRestoreMultiLineSelectionAfterIndent() {
     typeTextInFile(
       parseKeys("V", "2j"),
@@ -971,16 +969,18 @@ two
 
   // VIM-862 |gv|
   fun testRestoreSelectionRange() {
-    configureByText(
-      """
+    val keys = listOf("vl", "<Esc>", "gv")
+    val before = """
     ${c}foo
     bar
     
       """.trimIndent()
-    )
-    typeText(parseKeys("vl", "<Esc>", "gv"))
-    assertMode(CommandState.Mode.VISUAL)
-    assertSelection("fo")
+    val after = """
+    ${s}f${c}o${se}o
+    bar
+    
+      """.trimIndent()
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
   fun testVisualLineSelectDown() {
