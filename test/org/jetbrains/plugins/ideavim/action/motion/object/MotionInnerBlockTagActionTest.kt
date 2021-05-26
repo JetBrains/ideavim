@@ -18,276 +18,361 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.`object`
 
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionInnerBlockTagActionTest : VimTestCase() {
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockCaretInHtml() {
-    typeTextInFile(
-      parseKeys("dit"),
-      "<template ${c}name=\"hello\">\n" +
-        "  <button>Click Me</button>\n" +
-        "  <p>You've pressed the button {{counter}} times.</p>\n" +
-        "</template>\n"
-    )
-    myFixture.checkResult("<template name=\"hello\"></template>\n")
+    val keys = listOf("dit")
+    val before = "<template ${c}name=\"hello\">\n" +
+      "  <button>Click Me</button>\n" +
+      "  <p>You've pressed the button {{counter}} times.</p>\n" +
+      "</template>\n"
+
+    val after = "<template name=\"hello\"></template>\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockCaretInHtmlUnclosedTag() {
-    typeTextInFile(
-      parseKeys("dit"),
-      "<template ${c}name=\"hello\">\n" +
-        "  <button>Click Me</button>\n" +
-        "  <br>\n" +
-        "  <p>You've pressed the button {{counter}} times.</p>\n" +
-        "</template>\n"
-    )
-    myFixture.checkResult("<template name=\"hello\"></template>\n")
+    val keys = listOf("dit")
+    val before = "<template ${c}name=\"hello\">\n" +
+      "  <button>Click Me</button>\n" +
+      "  <br>\n" +
+      "  <p>You've pressed the button {{counter}} times.</p>\n" +
+      "</template>\n"
+
+    val after = "<template name=\"hello\"></template>\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun testDeleteInnerTagBlockCaretEdgeTag() {
-    typeTextInFile(
-      parseKeys("dit"),
-      "<template name=\"hello\"$c>\n" +
-        "  <button>Click Me</button>\n" +
-        "  <br>\n" +
-        "  <p>You've pressed the button {{counter}} times.</p>\n" +
-        "</template>\n"
-    )
-    myFixture.checkResult("<template name=\"hello\"></template>\n")
+    val keys = listOf("dit")
+    val before = "<template name=\"hello\"$c>\n" +
+      "  <button>Click Me</button>\n" +
+      "  <br>\n" +
+      "  <p>You've pressed the button {{counter}} times.</p>\n" +
+      "</template>\n"
+
+    val after = "<template name=\"hello\"></template>\n"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockBefore() {
-    typeTextInFile(parseKeys("dit"), "abc${c}de<tag>fg</tag>hi")
-    myFixture.checkResult("abcde<tag>fg</tag>hi")
+    val keys = listOf("dit")
+    val before = "abc${c}de<tag>fg</tag>hi"
+    val after = "abcde<tag>fg</tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockInOpen() {
-    typeTextInFile(parseKeys("dit"), "abcde<ta${c}g>fg</tag>hi")
-    myFixture.checkResult("abcde<tag></tag>hi")
+    val keys = listOf("dit")
+    val before = "abcde<ta${c}g>fg</tag>hi"
+    val after = "abcde<tag></tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockInOpenEndOfLine() {
-    typeTextInFile(parseKeys("dit"), "abcde<ta${c}g>fg</tag>")
-    myFixture.checkResult("abcde<tag></tag>")
+    val keys = listOf("dit")
+    val before = "abcde<ta${c}g>fg</tag>"
+    val after = "abcde<tag></tag>"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockInOpenStartOfLine() {
-    typeTextInFile(parseKeys("dit"), "<ta${c}g>fg</tag>hi")
-    myFixture.checkResult("<tag></tag>hi")
+    val keys = listOf("dit")
+    val before = "<ta${c}g>fg</tag>hi"
+    val after = "<tag></tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockInOpenWithArgs() {
-    typeTextInFile(parseKeys("dit"), "abcde<ta${c}g name = \"name\">fg</tag>hi")
-    myFixture.checkResult("abcde<tag name = \"name\"></tag>hi")
+    val keys = listOf("dit")
+    val before = "abcde<ta${c}g name = \"name\">fg</tag>hi"
+    val after = "abcde<tag name = \"name\"></tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockBetween() {
-    typeTextInFile(parseKeys("dit"), "abcde<tag>f${c}g</tag>hi")
-    myFixture.checkResult("abcde<tag></tag>hi")
+    val keys = listOf("dit")
+    val before = "abcde<tag>f${c}g</tag>hi"
+    val after = "abcde<tag></tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun testDeleteInnerTagBlockBetweenTagWithRegex() {
-    typeTextInFile(parseKeys("dit"), "abcde<[abc]*>af${c}gbc</[abc]*>hi")
-    myFixture.checkResult("abcde<[abc]*></[abc]*>hi")
+    val keys = listOf("dit")
+    val before = "abcde<[abc]*>af${c}gbc</[abc]*>hi"
+    val after = "abcde<[abc]*></[abc]*>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockBetweenCamelCase() {
-    typeTextInFile(parseKeys("dit"), "abcde<tAg>f${c}g</tag>hi")
-    myFixture.checkResult("abcde<tAg></tag>hi")
+    val keys = listOf("dit")
+    val before = "abcde<tAg>f${c}g</tag>hi"
+    val after = "abcde<tAg></tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockBetweenCaps() {
-    typeTextInFile(parseKeys("dit"), "abcde<tag>f${c}g</TAG>hi")
-    myFixture.checkResult("abcde<tag></TAG>hi")
+    val keys = listOf("dit")
+    val before = "abcde<tag>f${c}g</TAG>hi"
+    val after = "abcde<tag></TAG>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockBetweenWithSpaceBeforeTag() {
-    typeTextInFile(parseKeys("dit"), "abcde< tag>f${c}g</ tag>hi")
-    myFixture.checkResult("abcde< tag>fg</ tag>hi")
+    val keys = listOf("dit")
+    val before = "abcde< tag>f${c}g</ tag>hi"
+    val after = "abcde< tag>fg</ tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockBetweenWithSpaceAfterTag() {
-    typeTextInFile(parseKeys("dit"), "abcde<tag >f${c}g</tag>hi")
-    myFixture.checkResult("abcde<tag ></tag>hi")
+    val keys = listOf("dit")
+    val before = "abcde<tag >f${c}g</tag>hi"
+    val after = "abcde<tag ></tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockBetweenWithArgs() {
-    typeTextInFile(parseKeys("dit"), "abcde<tag name = \"name\">f${c}g</tag>hi")
-    myFixture.checkResult("abcde<tag name = \"name\"></tag>hi")
+    val keys = listOf("dit")
+    val before = "abcde<tag name = \"name\">f${c}g</tag>hi"
+    val after = "abcde<tag name = \"name\"></tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockInClose() {
-    typeTextInFile(parseKeys("dit"), "abcde<tag>fg</ta${c}g>hi")
-    myFixture.checkResult("abcde<tag></tag>hi")
+    val keys = listOf("dit")
+    val before = "abcde<tag>fg</ta${c}g>hi"
+    val after = "abcde<tag></tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockAfter() {
-    typeTextInFile(parseKeys("dit"), "abcde<tag>fg</tag>h${c}i")
-    myFixture.checkResult("abcde<tag>fg</tag>hi")
+    val keys = listOf("dit")
+    val before = "abcde<tag>fg</tag>h${c}i"
+    val after = "abcde<tag>fg</tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockInAlone() {
-    typeTextInFile(parseKeys("dit"), "abcde<ta${c}g>fghi")
-    myFixture.checkResult("abcde<tag>fghi")
+    val keys = listOf("dit")
+    val before = "abcde<ta${c}g>fghi"
+    val after = "abcde<tag>fghi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockWithoutTags() {
-    typeTextInFile(parseKeys("dit"), "abc${c}de")
-    myFixture.checkResult("abcde")
+    val keys = listOf("dit")
+    val before = "abc${c}de"
+    val after = "abcde"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockBeforeWithoutOpenTag() {
-    typeTextInFile(parseKeys("dit"), "abc${c}defg</tag>hi")
-    myFixture.checkResult("abcdefg</tag>hi")
+    val keys = listOf("dit")
+    val before = "abc${c}defg</tag>hi"
+    val after = "abcdefg</tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockInCloseWithoutOpenTag() {
-    typeTextInFile(parseKeys("dit"), "abcdefg</ta${c}g>hi")
-    myFixture.checkResult("abcdefg</tag>hi")
+    val keys = listOf("dit")
+    val before = "abcdefg</ta${c}g>hi"
+    val after = "abcdefg</tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockAfterWithoutOpenTag() {
-    typeTextInFile(parseKeys("dit"), "abcdefg</tag>h${c}i")
-    myFixture.checkResult("abcdefg</tag>hi")
+    val keys = listOf("dit")
+    val before = "abcdefg</tag>h${c}i"
+    val after = "abcdefg</tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockBeforeWithoutCloseTag() {
-    typeTextInFile(parseKeys("dit"), "abc${c}defg<tag>hi")
-    myFixture.checkResult("abcdefg<tag>hi")
+    val keys = listOf("dit")
+    val before = "abc${c}defg<tag>hi"
+    val after = "abcdefg<tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockInOpenWithoutCloseTag() {
-    typeTextInFile(parseKeys("dit"), "abcdefg<ta${c}g>hi")
-    myFixture.checkResult("abcdefg<tag>hi")
+    val keys = listOf("dit")
+    val before = "abcdefg<ta${c}g>hi"
+    val after = "abcdefg<tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockAfterWithoutCloseTag() {
-    typeTextInFile(parseKeys("dit"), "abcdefg<tag>h${c}i")
-    myFixture.checkResult("abcdefg<tag>hi")
+    val keys = listOf("dit")
+    val before = "abcdefg<tag>h${c}i"
+    val after = "abcdefg<tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockBeforeWrongOrder() {
-    typeTextInFile(parseKeys("dit"), "abc${c}de</tag>fg<tag>hi")
-    myFixture.checkResult("abcde</tag>fg<tag>hi")
+    val keys = listOf("dit")
+    val before = "abc${c}de</tag>fg<tag>hi"
+    val after = "abcde</tag>fg<tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockInOpenWrongOrder() {
-    typeTextInFile(parseKeys("dit"), "abcde</ta${c}g>fg<tag>hi")
-    myFixture.checkResult("abcde</tag>fg<tag>hi")
+    val keys = listOf("dit")
+    val before = "abcde</ta${c}g>fg<tag>hi"
+    val after = "abcde</tag>fg<tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockBetweenWrongOrder() {
-    typeTextInFile(parseKeys("dit"), "abcde</tag>f${c}g<tag>hi")
-    myFixture.checkResult("abcde</tag>fg<tag>hi")
+    val keys = listOf("dit")
+    val before = "abcde</tag>f${c}g<tag>hi"
+    val after = "abcde</tag>fg<tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockInCloseWrongOrder() {
-    typeTextInFile(parseKeys("dit"), "abcde</tag>fg<ta${c}g>hi")
-    myFixture.checkResult("abcde</tag>fg<tag>hi")
+    val keys = listOf("dit")
+    val before = "abcde</tag>fg<ta${c}g>hi"
+    val after = "abcde</tag>fg<tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun testDeleteInnerTagBlockTwoTagsWrongOrder() {
-    typeTextInFile(parseKeys("dit"), "<foo><html>t${c}ext</foo></html>")
-    myFixture.checkResult("<foo></foo></html>")
+    val keys = listOf("dit")
+    val before = "<foo><html>t${c}ext</foo></html>"
+    val after = "<foo></foo></html>"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun testDeleteInnerTagBlockTwoTagsWrongOrderInClosingTag() {
-    typeTextInFile(parseKeys("dit"), "<foo><html>text</foo></htm${c}l>")
-    myFixture.checkResult("<foo><html></html>")
+    val keys = listOf("dit")
+    val before = "<foo><html>text</foo></htm${c}l>"
+    val after = "<foo><html></html>"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockAfterWrongOrder() {
-    typeTextInFile(parseKeys("dit"), "abcde</tag>fg<tag>h${c}i")
-    myFixture.checkResult("abcde</tag>fg<tag>hi")
+    val keys = listOf("dit")
+    val before = "abcde</tag>fg<tag>h${c}i"
+    val after = "abcde</tag>fg<tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockBracketInside() {
-    typeTextInFile(parseKeys("dit"), "abcde<tag>f$c<>g</tag>hi")
-    myFixture.checkResult("abcde<tag></tag>hi")
+    val keys = listOf("dit")
+    val before = "abcde<tag>f$c<>g</tag>hi"
+    val after = "abcde<tag></tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagBlockBracketInsideString() {
-    typeTextInFile(parseKeys("dit"), "abcde<tag>f${c}\"<>\"g</tag>hi")
-    myFixture.checkResult("abcde<tag></tag>hi")
+    val keys = listOf("dit")
+    val before = "abcde<tag>f${c}\"<>\"g</tag>hi"
+    val after = "abcde<tag></tag>hi"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagIsCaseInsensitive() {
-    typeTextInFile(parseKeys("dit"), "<a> <as${c}df> </A>")
-    myFixture.checkResult("<a></A>")
+    val keys = listOf("dit")
+    val before = "<a> <as${c}df> </A>"
+    val after = "<a></A>"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagSlashesInAttribute() {
-    typeTextInFile(parseKeys("dit"), "<a href=\"https://isitchristmas.com\" class=\"button\">Bing ${c}Bing bing</a>")
-    myFixture.checkResult("<a href=\"https://isitchristmas.com\" class=\"button\"></a>")
+    val keys = listOf("dit")
+    val before = "<a href=\"https://isitchristmas.com\" class=\"button\">Bing ${c}Bing bing</a>"
+    val after = "<a href=\"https://isitchristmas.com\" class=\"button\"></a>"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-1090 |d| |v_it|
   // Adapted from vim source file "test_textobjects.vim"
   fun testDeleteInnerTagDuplicateTags() {
-    typeTextInFile(parseKeys("dit"), "<b>as${c}d<i>as<b />df</i>asdf</b>")
-    myFixture.checkResult("<b></b>")
+    val keys = listOf("dit")
+    val before = "<b>as${c}d<i>as<b />df</i>asdf</b>"
+    val after = "<b></b>"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // |v_it|
   fun testFileStartsWithSlash() {
-    configureByText(
-      "/*hello\n" +
-        "${c}foo\n" +
-        "bar>baz\n"
-    )
-    typeText(parseKeys("vit"))
+    val before = """
+      /*hello
+      ${c}foo
+      bar>baz
+      
+      """.trimIndent()
+    val after = """
+      /*hello
+      ${s}${c}f${se}oo
+      bar>baz
+      
+      """.trimIndent()
+    val keys = listOf("vit")
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
     assertPluginError(true)
   }
 
   // |v_it|
   fun testSelectInnerTagEmptyTag() {
-    configureByText("<a>$c</a>")
-    typeText(parseKeys("vit"))
-    assertSelection("<a></a>")
+    val before = "<a>$c</a>"
+    val after = "${s}<a></a$c>${se}"
+    configureByText(before)
+    val keys = listOf("vit")
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
   fun `test single character`() {
     // The whole tag block is also selected if there is only a single character inside
-    configureByText("<a>${c}a</a>")
-    typeText(parseKeys("vit"))
-    assertSelection("<a>a</a>")
+    val before = "<a>${c}a</a>"
+    val after = "${s}<a>a</a${c}>${se}"
+    val keys = listOf("vit")
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
   fun `test single character inside tag`() {
