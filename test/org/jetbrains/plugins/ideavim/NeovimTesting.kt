@@ -58,7 +58,7 @@ internal object NeovimTesting {
     if (currentTestName.isNotBlank()) {
       untested.add(currentTestName)
       println("----")
-      println(untested)
+      println("$untested : ${untested.size}")
     }
   }
 
