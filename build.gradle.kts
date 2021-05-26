@@ -320,7 +320,7 @@ fun List<Author>.toMdString(): String {
 
 data class Author(val name: String, val url: String, val mail: String)
 
-fun updateMergedPr(number: Int ) {
+fun updateMergedPr(number: Int) {
     val gitHub = org.kohsuke.github.GitHub.connect()
     val repository = gitHub.getRepository("JetBrains/ideavim")
     val pullRequest = repository.getPullRequest(number)

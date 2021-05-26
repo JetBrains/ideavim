@@ -30,7 +30,6 @@ import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.group.HistoryGroup
 import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.MessageHelper.message
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.shouldIgnoreCase
@@ -96,7 +95,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
       cmd.inc()
       pat = CharPointer("") /* empty search pattern */
     } else {
-      delimiter = cmd.charAt()  /* get the delimiter */
+      delimiter = cmd.charAt() /* get the delimiter */
       cmd.inc() // // TODO: 25.05.2021 Here should be if
       pat = cmd.ref(0) /* remember start of pattern */
       cmd = RegExp.skip_regexp(cmd, delimiter, true)
@@ -166,7 +165,6 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     // We don't need to worry about lastIgnoreSmartCase, it's always false. Vim resets after checking, and it only sets
     // it to true when searching for a word with `*`, `#`, `g*`, etc.
 
-
     if (line1 < 0 || line2 < 0) {
       return false
     }
@@ -184,7 +182,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
       if ((type == GlobalType.G && match > 0) || (type == GlobalType.V && match <= 0)) {
         // TODO: 25.05.2021 Use another way to mark things?
         marks += editor.markupModel.addLineHighlighter(null, lnum, 0)
-        ndone += 1;
+        ndone += 1
       }
       // TODO: 25.05.2021 Check break
     }
@@ -272,7 +270,6 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     private var lastSubstitute: String? = null // Pattern used for last substitute command (`:s`)
     private var lastIgnoreSmartCase = false
     private const val do_error = true /* if false, ignore errors */
-
 
     // Matching the values defined in Vim. Do not change these values, they are used as indexes
     private const val RE_SEARCH = 0 // Save/use search pattern

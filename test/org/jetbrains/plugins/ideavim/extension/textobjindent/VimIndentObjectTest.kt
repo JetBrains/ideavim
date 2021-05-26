@@ -269,5 +269,4 @@ class VimIndentObjectTest : JavaVimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
-
 }

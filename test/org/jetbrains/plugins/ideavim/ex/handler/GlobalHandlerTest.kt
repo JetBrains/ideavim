@@ -33,7 +33,6 @@ class GlobalHandlerTest : VimTestCase() {
     )
   }
 
-
   private fun doTest(command: String, before: String, after: String) {
     doTest(listOf(exCommand(command)), before, after)
   }
