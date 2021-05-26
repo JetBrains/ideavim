@@ -22,9 +22,9 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.markup.RangeHighlighter
-import com.intellij.testFramework.tearDownProjectAndApp
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandParser
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.ex.ranges.LineRange
@@ -45,7 +45,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     var result = true
     for (caret in editor.caretModel.allCarets) {
       val lineRange = cmd.getLineRange(editor, caret)
-      if (!processGlobalCommand(editor, caret, lineRange, cmd.command, cmd.argument)) {
+      if (!processGlobalCommand(editor, context, caret, lineRange, cmd.command, cmd.argument)) {
         result = false
       }
     }
@@ -54,6 +54,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
 
   private fun processGlobalCommand(
     editor: Editor,
+    context: DataContext,
     caret: Caret,
     range: LineRange,
     excmd: String,
@@ -178,7 +179,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     val marks = mutableListOf<RangeHighlighter>()
     for (lnum in line1..line2) {
       // TODO: 25.05.2021 recheck gotInt
-      if (!gotInt) break
+//      if (!gotInt) break
 
       // a match on this line?
       match = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol)
@@ -198,14 +199,22 @@ class GlobalHandler : CommandHandler.SingleExecution() {
       // TODO: 25.05.2021
     }
     else {
-      globalExe(marks)
+      globalExe(editor, context, marks, cmd.toString())
     }
     // TODO: 25.05.2021 More staff
     return true
   }
 
-  private fun globalExe(marks: List<RangeHighlighter>) {
-    TODO("Not yet implemented")
+  private fun globalExe(editor: Editor, context: DataContext, marks: List<RangeHighlighter>, cmd: String) {
+    for (mark in marks) {
+      val startOffset = mark.startOffset
+      globalExecuteOne(editor, context, startOffset, cmd)
+    }
+  }
+
+  private fun globalExecuteOne(editor: Editor, context: DataContext, lineStartOffset: Int, cmd: String) {
+    editor.caretModel.moveToOffset(lineStartOffset)
+    CommandParser.processCommand(editor, context, cmd, 1)
   }
 
   /**

@@ -20,6 +20,7 @@
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.FindFileHandler" names="fin[d]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.FindSymbolHandler" names="sym[bol]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.GotoCharacterHandler" names="go[to]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.GlobalHandler" names="g[lobal]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.HelpHandler" names="h[elp]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.HistoryHandler" names="his[tory]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.JoinLinesHandler" names="j[oin]"/>
