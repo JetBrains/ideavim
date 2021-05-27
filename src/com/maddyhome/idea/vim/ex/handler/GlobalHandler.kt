@@ -119,7 +119,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
 
     val (first, second) = VimPlugin.getSearch().search_regcomp(pat, whichPat, RE_BOTH)
     if (!first) {
-      // TODO: 27.05.2021 Show error
+      VimPlugin.showMessage(message(Msg.e_invcmd));
       return false
     }
     val regmatch = second.getFirst()

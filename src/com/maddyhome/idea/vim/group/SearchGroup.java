@@ -666,7 +666,12 @@ public class SearchGroup implements PersistentStateComponent<Element> {
 
     Pair<Boolean, Trinity<RegExp.regmmatch_T, String, RegExp>> booleanregmmatch_tPair = search_regcomp(pat, which_pat,
                                                                                                        RE_SUBST);
-    if (!booleanregmmatch_tPair.getFirst()) return false;
+    if (!booleanregmmatch_tPair.getFirst()) {
+      if (do_error) {
+        VimPlugin.showMessage(MessageHelper.message(Msg.e_invcmd));
+      }
+      return false;
+    }
     RegExp.regmmatch_T regmatch = booleanregmmatch_tPair.getSecond().getFirst();
     String pattern = booleanregmmatch_tPair.getSecond().getSecond();
     RegExp sp = booleanregmmatch_tPair.getSecond().getThird();
@@ -860,9 +865,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     sp = new RegExp();
     regmatch.regprog = sp.vim_regcomp(pattern, 1);
     if (regmatch.regprog == null) {
-      if (do_error) {
-        VimPlugin.showMessage(MessageHelper.message(Msg.e_invcmd));
-      }
       return new Pair<>(false, null);
     }
     return new Pair<>(true, new Trinity<>(regmatch, pattern, sp));
