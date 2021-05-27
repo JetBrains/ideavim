@@ -669,6 +669,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     if (!booleanregmmatch_tPair.getFirst()) {
       if (do_error) {
         VimPlugin.showMessage(MessageHelper.message(Msg.e_invcmd));
+        VimPlugin.indicateError();
       }
       return false;
     }

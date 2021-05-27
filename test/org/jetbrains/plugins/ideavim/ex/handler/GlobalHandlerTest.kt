@@ -128,6 +128,33 @@ class GlobalHandlerTest : VimTestCase() {
     )
   }
 
+  fun `test g only`() {
+    doTest(
+      "g",
+      initialText,
+      initialText,
+    )
+    assertPluginError(true)
+  }
+
+  fun `test g with one separator`() {
+    doTest(
+      "g/",
+      initialText,
+      initialText,
+    )
+    assertPluginError(true)
+  }
+
+  fun `test g with one separator and pattern`() {
+    // TODO: 27.05.2021 Implement and check :p command
+    doTest(
+      "g/found",
+      initialText,
+      initialText,
+    )
+    assertPluginError(true)
+  }
 
   private fun doTest(command: String, before: String, after: String) {
     doTest(listOf(exCommand(command)), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)

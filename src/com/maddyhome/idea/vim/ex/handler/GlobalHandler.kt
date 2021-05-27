@@ -109,7 +109,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
       pat = CharPointer("") /* empty search pattern */
     } else {
       delimiter = cmd.charAt() /* get the delimiter */
-      cmd.inc() // // TODO: 25.05.2021 Here should be if
+      cmd.inc()
       pat = cmd.ref(0) /* remember start of pattern */
       cmd = RegExp.skip_regexp(cmd, delimiter, true)
       if (cmd.charAt() == delimiter) { /* end delimiter found */
@@ -120,6 +120,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     val (first, second) = VimPlugin.getSearch().search_regcomp(pat, whichPat, RE_BOTH)
     if (!first) {
       VimPlugin.showMessage(message(Msg.e_invcmd));
+      VimPlugin.indicateError()
       return false
     }
     val regmatch = second.getFirst()
