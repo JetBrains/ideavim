@@ -346,13 +346,13 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
       ${c}foo
       bar>baz
       
-      """.trimIndent()
+    """.trimIndent()
     val after = """
       /*hello
       ${s}${c}f${se}oo
       bar>baz
       
-      """.trimIndent()
+    """.trimIndent()
     val keys = listOf("vit")
     doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
     assertPluginError(true)
@@ -361,7 +361,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   // |v_it|
   fun testSelectInnerTagEmptyTag() {
     val before = "<a>$c</a>"
-    val after = "${s}<a></a$c>${se}"
+    val after = "$s<a></a$c>$se"
     configureByText(before)
     val keys = listOf("vit")
     doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
@@ -370,7 +370,7 @@ class MotionInnerBlockTagActionTest : VimTestCase() {
   fun `test single character`() {
     // The whole tag block is also selected if there is only a single character inside
     val before = "<a>${c}a</a>"
-    val after = "${s}<a>a</a${c}>${se}"
+    val after = "$s<a>a</a$c>$se"
     val keys = listOf("vit")
     doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }

@@ -117,7 +117,7 @@ class GlobalHandlerTest : VimTestCase() {
                   all rocks and lavender and tufted grass,
                   where it was settled on some sodden sand
                   hard by the torrent of a mountain pass. 
-            """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
     
@@ -168,6 +168,6 @@ class GlobalHandlerTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass. 
-          """.trimIndent()
+    """.trimIndent()
   }
 }

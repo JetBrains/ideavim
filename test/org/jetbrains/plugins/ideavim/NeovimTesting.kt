@@ -52,9 +52,9 @@ internal object NeovimTesting {
     neovim = pb.start()
     val neovimConnection = ProcessRpcConnection(neovim, true)
     neovimApi = NeovimApis.getApiForConnection(neovimConnection)
-    exitCommand =  neovimApi.replaceTermcodes("<esc><esc>:qa!", true, false, true).get()
-    escapeCommand =  neovimApi.replaceTermcodes("<esc>", true, false, true).get()
-    ctrlcCommand =  neovimApi.replaceTermcodes("<C-C>", true, false, true).get()
+    exitCommand = neovimApi.replaceTermcodes("<esc><esc>:qa!", true, false, true).get()
+    escapeCommand = neovimApi.replaceTermcodes("<esc>", true, false, true).get()
+    ctrlcCommand = neovimApi.replaceTermcodes("<C-C>", true, false, true).get()
     currentTestName = test.name
   }
 

@@ -262,12 +262,12 @@ class MotionActionTest : VimTestCase() {
      
      P$c.
      
-      """.trimIndent()
+    """.trimIndent()
     val after = """
      
      P$c.
      
-      """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -282,14 +282,14 @@ class MotionActionTest : VimTestCase() {
      
      Bye.
      
-      """.trimIndent()
+    """.trimIndent()
     val after = """
     Hello World!
     
     
     Bye.
     
-      """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -304,13 +304,13 @@ class MotionActionTest : VimTestCase() {
      
      Bye.
      
-      """.trimIndent()
+    """.trimIndent()
     val after = """
     Hello World!
     
     Bye.
     
-      """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -799,12 +799,12 @@ two
      ${c}foo
      bar
      
-      """.trimIndent()
+    """.trimIndent()
     val after = """
     ${s}fo${se}o
     ${s}ba${se}r
     
-      """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 
@@ -815,12 +815,12 @@ two
      fo${c}o
      bar
      
-      """.trimIndent()
+    """.trimIndent()
     val after = """
     f${s}oo$se
     b${s}ar$se
     
-      """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 
@@ -832,13 +832,13 @@ two
      abc
      ab
      
-      """.trimIndent()
+    """.trimIndent()
     val after = """
     a${s}b$se
     a${s}bc$se
     a${s}b$se
     
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 
@@ -905,13 +905,13 @@ two
      bar
      baz
      
-      """.trimIndent()
+    """.trimIndent()
     val after = """
     baz
     foo
     bar
     
-      """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -974,12 +974,12 @@ two
     ${c}foo
     bar
     
-      """.trimIndent()
+    """.trimIndent()
     val after = """
     ${s}f${c}o${se}o
     bar
     
-      """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 

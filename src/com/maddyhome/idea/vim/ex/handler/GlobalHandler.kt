@@ -119,13 +119,12 @@ class GlobalHandler : CommandHandler.SingleExecution() {
 
     val (first, second) = VimPlugin.getSearch().search_regcomp(pat, whichPat, RE_BOTH)
     if (!first) {
-      VimPlugin.showMessage(message(Msg.e_invcmd));
+      VimPlugin.showMessage(message(Msg.e_invcmd))
       VimPlugin.indicateError()
       return false
     }
     val regmatch = second.getFirst()
     val sp = second.getThird()
-
 
     var match: Int
     val lcount = EditorHelper.getLineCount(editor)
