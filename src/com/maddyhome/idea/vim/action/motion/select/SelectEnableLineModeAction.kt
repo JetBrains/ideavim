@@ -36,6 +36,7 @@ class SelectEnableLineModeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    @Suppress("ideavimRunForEachCaret")
     editor.caretModel.runForEachCaret { caret ->
       val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
       val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
