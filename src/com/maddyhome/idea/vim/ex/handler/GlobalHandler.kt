@@ -58,8 +58,6 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     excmd: String,
     _exarg: String,
   ): Boolean {
-    // TODO: 25.05.2021 Nesting command
-
     // When nesting the command works on one line.  This allows for
     // ":g/found/v/notfound/command".
     if (globalBusy && (range.startLine != 0 || range.endLine != editor.document.lineCount)) {
@@ -164,8 +162,6 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     }
     //endregion
 
-    // TODO: 25.05.2021 global busy
-
     var match: Int
     val lcount = EditorHelper.getLineCount(editor)
     val searchcol = 0
@@ -208,11 +204,16 @@ class GlobalHandler : CommandHandler.SingleExecution() {
       /*if (gotInt) {
           // TODO: 25.05.2021
         }
-        else */if (ndone == 0) {
-          // TODO: 25.05.2021
+        else */
+      if (ndone == 0) {
+        if (type == GlobalType.V) {
+          VimPlugin.showMessage(message("global.command.not.found.v", pat.toString()))
         } else {
-          globalExe(editor, context, marks, cmd.toString())
+          VimPlugin.showMessage(message("global.command.not.found.g", pat.toString()))
         }
+      } else {
+        globalExe(editor, context, marks, cmd.toString())
+      }
     }
     // TODO: 25.05.2021 More staff
     return true
