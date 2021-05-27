@@ -159,6 +159,7 @@ class MotionEndActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test delete to the end`() {
     val keys = listOf("d", "<End>")
     val before = """

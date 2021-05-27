@@ -19,6 +19,8 @@
 package org.jetbrains.plugins.ideavim.ex.handler
 
 import com.maddyhome.idea.vim.command.CommandState
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class GlobalHandlerTest : VimTestCase() {
@@ -128,6 +130,7 @@ class GlobalHandlerTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test g only`() {
     doTest(
       "g",
@@ -137,6 +140,7 @@ class GlobalHandlerTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test g with one separator`() {
     doTest(
       "g/",
@@ -146,6 +150,7 @@ class GlobalHandlerTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test g with one separator and pattern`() {
     // TODO: 27.05.2021 Implement and check :p command
     doTest(

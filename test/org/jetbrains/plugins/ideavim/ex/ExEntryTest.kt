@@ -480,6 +480,7 @@ class ExEntryTest : VimTestCase() {
     assertExOffset(1)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test prompt while inserting literal character`() {
     typeExInput(":<C-V>")
     assertExText("^")

@@ -142,10 +142,6 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected fun typeTextInFile(keys: List<KeyStroke?>, fileContents: String): Editor {
     configureByText(fileContents)
-
-    NeovimTesting.setupEditor(myFixture.editor, this)
-    NeovimTesting.typeCommand(toKeyNotation(keys), this)
-
     return typeText(keys)
   }
 

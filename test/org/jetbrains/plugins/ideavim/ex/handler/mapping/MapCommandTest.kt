@@ -634,6 +634,7 @@ n  ,f            <Plug>Foo
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test execute mapping with a delay and second mapping and another starting mappings`() {
     // TODO: 24.01.2021  mapping time should be only 1000 sec
     val text = """
