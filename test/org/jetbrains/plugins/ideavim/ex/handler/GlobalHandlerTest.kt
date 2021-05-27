@@ -18,22 +18,129 @@
 
 package org.jetbrains.plugins.ideavim.ex.handler
 
+import com.maddyhome.idea.vim.command.CommandState
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class GlobalHandlerTest : VimTestCase() {
-  fun `x test one letter`() {
+  fun `test default range`() {
     doTest(
-      "gl!/ab/d",
-      """a${c}baba
-                 |ab
-               """.trimMargin(),
-      """bbaba
-                 |ab
-               """.trimMargin()
+      "g/found/d",
+      initialText,
+      """
+            A Discovery
+
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass. 
+      """.trimIndent(),
     )
   }
 
+  fun `test default range first line`() {
+    doTest(
+      "g/Discovery/d",
+      initialText,
+      """
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass. 
+      """.trimIndent(),
+    )
+  }
+
+  fun `test default range last line`() {
+    doTest(
+      "g/torrent/d",
+      initialText,
+      """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+      """.trimIndent(),
+    )
+  }
+
+  fun `test two lines`() {
+    doTest(
+      "g/it/d",
+      initialText,
+      """
+            A Discovery
+
+            all rocks and lavender and tufted grass,
+            hard by the torrent of a mountain pass. 
+      """.trimIndent(),
+    )
+  }
+
+  fun `test two lines force`() {
+    doTest(
+      "g!/it/d",
+      initialText,
+      """
+            I found it in a legendary land
+            where it was settled on some sodden sand
+      """.trimIndent(),
+    )
+  }
+
+  fun `test vglobal`() {
+    doTest(
+      "v/it/d",
+      initialText,
+      """
+            I found it in a legendary land
+            where it was settled on some sodden sand
+      """.trimIndent(),
+    )
+  }
+
+  fun `test current line`() {
+    doTest(
+      ".g/found/d",
+      initialText,
+      initialText,
+    )
+  }
+
+  fun `test current line right place`() {
+    doTest(
+      ".g/found/d",
+      """
+                  A Discovery
+      
+                  I found it in ${c}a legendary land
+                  all rocks and lavender and tufted grass,
+                  where it was settled on some sodden sand
+                  hard by the torrent of a mountain pass. 
+            """.trimIndent(),
+      """
+                A Discovery
+    
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass. 
+      """.trimIndent(),
+    )
+  }
+
+
   private fun doTest(command: String, before: String, after: String) {
-    doTest(listOf(exCommand(command)), before, after)
+    doTest(listOf(exCommand(command)), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  companion object {
+    private val initialText = """
+                A Discovery
+    
+                I found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass. 
+          """.trimIndent()
   }
 }

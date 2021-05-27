@@ -44,7 +44,13 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     var result = true
     editor.caretModel.removeSecondaryCarets()
     val caret = editor.caretModel.currentCaret
-    val lineRange = cmd.getLineRange(editor, caret)
+
+    // For :g command the default range is %
+    val lineRange: LineRange = if (cmd.ranges.size() == 0) {
+      LineRange(0, editor.document.lineCount - 1)
+    } else  {
+      cmd.getLineRange(editor, caret)
+    }
     if (!processGlobalCommand(editor, context, lineRange, cmd.command, cmd.argument)) {
       result = false
     }
