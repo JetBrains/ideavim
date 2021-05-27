@@ -183,15 +183,20 @@ class GlobalHandler : CommandHandler.SingleExecution() {
 
   private fun globalExe(editor: Editor, context: DataContext, marks: List<RangeHighlighter>, cmd: String) {
     globalBusy = true
-    for (mark in marks) {
-      if (gotInt) break
+    try {
+      for (mark in marks) {
+        if (gotInt) break
       if (!globalBusy) break
-      val startOffset = mark.startOffset
-      globalExecuteOne(editor, context, startOffset, cmd)
-      // TODO: 26.05.2021 break check
+        val startOffset = mark.startOffset
+        globalExecuteOne(editor, context, startOffset, cmd)
+        // TODO: 26.05.2021 break check
+      }
+    } catch (e: Exception) {
+      // TODO: 27.05.2021 Process this exception
+      throw e
+    } finally {
+      globalBusy = false
     }
-
-    globalBusy = false
     // TODO: 26.05.2021 Add other staff
   }
 
