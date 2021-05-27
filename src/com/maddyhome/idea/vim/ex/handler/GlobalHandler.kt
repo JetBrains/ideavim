@@ -48,7 +48,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     // For :g command the default range is %
     val lineRange: LineRange = if (cmd.ranges.size() == 0) {
       LineRange(0, editor.document.lineCount - 1)
-    } else  {
+    } else {
       cmd.getLineRange(editor, caret)
     }
     if (!processGlobalCommand(editor, context, lineRange, cmd.command, cmd.argument)) {
@@ -145,15 +145,14 @@ class GlobalHandler : CommandHandler.SingleExecution() {
       // We don't need to worry about lastIgnoreSmartCase, it's always false. Vim resets after checking, and it only sets
       // it to true when searching for a word with `*`, `#`, `g*`, etc.
 
-    if (line1 < 0 || line2 < 0) {
-      return false
-    }
+      if (line1 < 0 || line2 < 0) {
+        return false
+      }
 
       var ndone = 0
       val marks = mutableListOf<RangeHighlighter>()
       for (lnum in line1..line2) {
-        // TODO: 25.05.2021 recheck gotInt
-  //      if (!gotInt) break
+        if (gotInt) break
 
         // a match on this line?
         match = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol)
@@ -166,11 +165,9 @@ class GlobalHandler : CommandHandler.SingleExecution() {
       }
 
       // pass 2: execute the command for each line that has been marked
-      /*if (gotInt) {
-          // TODO: 25.05.2021
-        }
-        else */
-      if (ndone == 0) {
+      if (gotInt) {
+        VimPlugin.showMessage(message("e_interr"))
+      } else if (ndone == 0) {
         if (type == GlobalType.V) {
           VimPlugin.showMessage(message("global.command.not.found.v", pat.toString()))
         } else {
@@ -187,6 +184,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
   private fun globalExe(editor: Editor, context: DataContext, marks: List<RangeHighlighter>, cmd: String) {
     globalBusy = true
     for (mark in marks) {
+      if (gotInt) break
       if (!globalBusy) break
       val startOffset = mark.startOffset
       globalExecuteOne(editor, context, startOffset, cmd)
@@ -216,6 +214,8 @@ class GlobalHandler : CommandHandler.SingleExecution() {
 
   companion object {
     private var globalBusy = false
+
+    // Interruped. Not used at the moment
     var gotInt: Boolean = false
   }
 }
