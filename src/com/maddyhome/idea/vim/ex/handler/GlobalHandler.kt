@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.ex.handler
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.markup.RangeHighlighter
+import com.intellij.openapi.editor.RangeMarker
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandParser
@@ -150,15 +150,15 @@ class GlobalHandler : CommandHandler.SingleExecution() {
       }
 
       var ndone = 0
-      val marks = mutableListOf<RangeHighlighter>()
+      val marks = mutableListOf<RangeMarker>()
       for (lnum in line1..line2) {
         if (gotInt) break
 
         // a match on this line?
         match = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol)
         if ((type == GlobalType.G && match > 0) || (type == GlobalType.V && match <= 0)) {
-          // TODO: 25.05.2021 Use another way to mark things?
-          marks += editor.markupModel.addLineHighlighter(null, lnum, 0)
+          val lineStartOffset = editor.document.getLineStartOffset(lnum)
+          marks += editor.document.createRangeMarker(lineStartOffset, lineStartOffset)
           ndone += 1
         }
         // TODO: 25.05.2021 Check break
@@ -181,13 +181,14 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     return true
   }
 
-  private fun globalExe(editor: Editor, context: DataContext, marks: List<RangeHighlighter>, cmd: String) {
+  private fun globalExe(editor: Editor, context: DataContext, marks: List<RangeMarker>, cmd: String) {
     globalBusy = true
     try {
       for (mark in marks) {
         if (gotInt) break
-      if (!globalBusy) break
+        if (!globalBusy) break
         val startOffset = mark.startOffset
+        mark.dispose()
         globalExecuteOne(editor, context, startOffset, cmd)
         // TODO: 26.05.2021 break check
       }
