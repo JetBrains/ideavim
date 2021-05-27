@@ -31,6 +31,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
+import com.intellij.openapi.util.Trinity;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -44,6 +45,7 @@ import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ModalEntry;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
+import kotlin.Pair;
 import kotlin.jvm.functions.Function1;
 import org.jdom.Element;
 import org.jetbrains.annotations.*;
@@ -157,7 +159,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
    */
   private void setLastUsedPattern(@NotNull String pattern, int which_pat, boolean isNewPattern) {
     // Only update the last pattern with a new input pattern. Do not update if we're reusing the last pattern
-    // TODO: RE_BOTH isn't used in IdeaVim yet. Should be used for the global command
     if ((which_pat == RE_SEARCH || which_pat == RE_BOTH) && isNewPattern) {
       lastSearch = pattern;
       lastPatternIdx = RE_SEARCH;
@@ -663,57 +664,12 @@ public class SearchGroup implements PersistentStateComponent<Element> {
       return false;
     }
 
-    //region search_regcomp implementation
-    // We don't need to worry about lastIgnoreSmartCase, it's always false. Vim resets after checking, and it only sets
-    // it to true when searching for a word with `*`, `#`, `g*`, etc.
-    boolean isNewPattern = true;
-    String pattern = "";
-    if (pat == null || pat.isNul()) {
-      isNewPattern = false;
-      if (which_pat == RE_LAST) {
-        which_pat = lastPatternIdx;
-      }
-      String errorMessage = null;
-      switch (which_pat) {
-        case RE_SEARCH:
-          pattern = lastSearch;
-          errorMessage = MessageHelper.message("e_nopresub");
-          break;
-        case RE_SUBST:
-          pattern = lastSubstitute;
-          errorMessage = MessageHelper.message("e_noprevre");
-          break;
-      }
-
-      // Pattern was never defined
-      if (pattern == null) {
-        VimPlugin.showMessage(errorMessage);
-        return false;
-      }
-    }
-    else {
-      pattern = pat.toString();
-    }
-
-    // Set RE_SUBST and RE_LAST, but only for explicitly typed patterns. Reused patterns are not saved/updated
-    setLastUsedPattern(pattern, RE_SUBST, isNewPattern);
-
-    // Always reset after checking, only set for nv_ident
-    lastIgnoreSmartCase = false;
-    // Substitute does NOT reset last direction or pattern offset!
-
-    RegExp sp;
-    RegExp.regmmatch_T regmatch = new RegExp.regmmatch_T();
-    regmatch.rmm_ic = shouldIgnoreCase(pattern, false);
-    sp = new RegExp();
-    regmatch.regprog = sp.vim_regcomp(pattern, 1);
-    if (regmatch.regprog == null) {
-      if (do_error) {
-        VimPlugin.showMessage(MessageHelper.message(Msg.e_invcmd));
-      }
-      return false;
-    }
-    //endregion
+    Pair<Boolean, Trinity<RegExp.regmmatch_T, String, RegExp>> booleanregmmatch_tPair = search_regcomp(pat, which_pat,
+                                                                                                       RE_SUBST);
+    if (!booleanregmmatch_tPair.getFirst()) return false;
+    RegExp.regmmatch_T regmatch = booleanregmmatch_tPair.getSecond().getFirst();
+    String pattern = booleanregmmatch_tPair.getSecond().getSecond();
+    RegExp sp = booleanregmmatch_tPair.getSecond().getThird();
 
     /* the 'i' or 'I' flag overrules 'ignorecase' and 'smartcase' */
     if (do_ic == 'i') {
@@ -855,6 +811,61 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     // TODO: Support reporting number of changes (:help 'report')
 
     return true;
+  }
+
+  public Pair<Boolean, Trinity<RegExp.regmmatch_T, String, RegExp>> search_regcomp(CharPointer pat,
+                                                                                   int which_pat,
+                                                                                   int patSave) {
+    // We don't need to worry about lastIgnoreSmartCase, it's always false. Vim resets after checking, and it only sets
+    // it to true when searching for a word with `*`, `#`, `g*`, etc.
+    boolean isNewPattern = true;
+    String pattern = "";
+    if (pat == null || pat.isNul()) {
+      isNewPattern = false;
+      if (which_pat == RE_LAST) {
+        which_pat = lastPatternIdx;
+      }
+      String errorMessage = null;
+      switch (which_pat) {
+        case RE_SEARCH:
+          pattern = lastSearch;
+          errorMessage = MessageHelper.message("e_nopresub");
+          break;
+        case RE_SUBST:
+          pattern = lastSubstitute;
+          errorMessage = MessageHelper.message("e_noprevre");
+          break;
+      }
+
+      // Pattern was never defined
+      if (pattern == null) {
+        VimPlugin.showMessage(errorMessage);
+        return new Pair<>(false, null);
+      }
+    }
+    else {
+      pattern = pat.toString();
+    }
+
+    // Set RE_SUBST and RE_LAST, but only for explicitly typed patterns. Reused patterns are not saved/updated
+    setLastUsedPattern(pattern, patSave, isNewPattern);
+
+    // Always reset after checking, only set for nv_ident
+    lastIgnoreSmartCase = false;
+    // Substitute does NOT reset last direction or pattern offset!
+
+    RegExp sp;
+    RegExp.regmmatch_T regmatch = new RegExp.regmmatch_T();
+    regmatch.rmm_ic = shouldIgnoreCase(pattern, false);
+    sp = new RegExp();
+    regmatch.regprog = sp.vim_regcomp(pattern, 1);
+    if (regmatch.regprog == null) {
+      if (do_error) {
+        VimPlugin.showMessage(MessageHelper.message(Msg.e_invcmd));
+      }
+      return new Pair<>(false, null);
+    }
+    return new Pair<>(true, new Trinity<>(regmatch, pattern, sp));
   }
 
   private static @NotNull ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match, @NotNull Caret caret, int startoff) {
@@ -1328,10 +1339,10 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   private char do_ic = 0; /* ignore case flag */
 
   // Matching the values defined in Vim. Do not change these values, they are used as indexes
-  private static final int RE_SEARCH = 0; // Save/use search pattern
-  private static final int RE_SUBST = 1;  // Save/use substitute pattern
-  private static final int RE_BOTH = 2;   // Save to both patterns
-  private static final int RE_LAST = 2;   // Use last used pattern if "pat" is NULL
+  public static final int RE_SEARCH = 0; // Save/use search pattern
+  public static final int RE_SUBST = 1;  // Save/use substitute pattern
+  public static final int RE_BOTH = 2;   // Save to both patterns
+  public static final int RE_LAST = 2;   // Use last used pattern if "pat" is NULL
 
   private static final Logger logger = Logger.getInstance(SearchGroup.class.getName());
 }

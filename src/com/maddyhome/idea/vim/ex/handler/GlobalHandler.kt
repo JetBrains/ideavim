@@ -27,15 +27,15 @@ import com.maddyhome.idea.vim.ex.CommandParser
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.group.HistoryGroup
-import com.maddyhome.idea.vim.group.RegisterGroup
+import com.maddyhome.idea.vim.group.SearchGroup.RE_BOTH
+import com.maddyhome.idea.vim.group.SearchGroup.RE_LAST
+import com.maddyhome.idea.vim.group.SearchGroup.RE_SEARCH
+import com.maddyhome.idea.vim.group.SearchGroup.RE_SUBST
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper.message
 import com.maddyhome.idea.vim.helper.Msg
-import com.maddyhome.idea.vim.helper.shouldIgnoreCase
 import com.maddyhome.idea.vim.regexp.CharPointer
 import com.maddyhome.idea.vim.regexp.RegExp
-import com.maddyhome.idea.vim.regexp.RegExp.regmmatch_T
 
 class GlobalHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
@@ -81,7 +81,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
 
     val pat: CharPointer
     val delimiter: Char
-    var which_pat = RE_LAST
+    var whichPat = RE_LAST
 
     /*
      * undocumented vi feature:
@@ -98,7 +98,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
         VimPlugin.showMessage(message(Msg.e_backslash))
         return false
       }
-      which_pat = if (cmd.charAt() == '&') RE_SUBST else RE_SEARCH
+      whichPat = if (cmd.charAt() == '&') RE_SUBST else RE_SEARCH
       cmd.inc()
       pat = CharPointer("") /* empty search pattern */
     } else {
@@ -111,56 +111,14 @@ class GlobalHandler : CommandHandler.SingleExecution() {
       }
     }
 
-    //region search_regcomp implementation
-    // We don't need to worry about lastIgnoreSmartCase, it's always false. Vim resets after checking, and it only sets
-    // it to true when searching for a word with `*`, `#`, `g*`, etc.
-    var isNewPattern = true
-    var pattern: String? = ""
-    if (pat.isNul) {
-      isNewPattern = false
-      if (which_pat == RE_LAST) {
-        which_pat = lastPatternIdx
-      }
-      var errorMessage: String? = null
-      when (which_pat) {
-        RE_SEARCH -> {
-          pattern = lastSearch
-          errorMessage = message("e_nopresub")
-        }
-        RE_SUBST -> {
-          pattern = lastSubstitute
-          errorMessage = message("e_noprevre")
-        }
-      }
-
-      // Pattern was never defined
-      if (pattern == null) {
-        VimPlugin.showMessage(errorMessage)
-        return false
-      }
-    } else {
-      pattern = pat.toString()
-    }
-
-    // Set RE_SUBST and RE_LAST, but only for explicitly typed patterns. Reused patterns are not saved/updated
-
-    setLastUsedPattern(pattern, RE_SUBST, isNewPattern)
-
-    // Always reset after checking, only set for nv_ident
-    lastIgnoreSmartCase = false
-    // Substitute does NOT reset last direction or pattern offset!
-
-    val regmatch = regmmatch_T()
-    regmatch.rmm_ic = shouldIgnoreCase(pattern, false)
-    val sp = RegExp()
-    regmatch.regprog = sp.vim_regcomp(pattern, 1)
-    if (regmatch.regprog == null) {
-      if (do_error) {
-        VimPlugin.showMessage(message(Msg.e_invcmd))
-      }
+    val (first, second) = VimPlugin.getSearch().search_regcomp(pat, whichPat, RE_BOTH)
+    if (!first) {
+      // TODO: 27.05.2021 Show error
       return false
     }
-    //endregion
+    val regmatch = second.getFirst()
+    val sp = second.getThird()
+
 
     var match: Int
     val lcount = EditorHelper.getLineCount(editor)
@@ -244,42 +202,6 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     // TODO: 26.05.2021 Do not add the command to the history
   }
 
-  /**
-   * Set the last used pattern
-   *
-   *
-   * Only updates the last used flag if the pattern is new. This prevents incorrectly setting the last used pattern
-   * when search or substitute doesn't explicitly set the pattern but uses the last saved value. It also ensures the
-   * last used pattern is updated when a new pattern with the same value is used.
-   *
-   *
-   * Also saves the text to the search register and history.
-   *
-   * @param pattern       The pattern to remember
-   * @param which_pat     Which pattern to save - RE_SEARCH, RE_SUBST or RE_BOTH
-   * @param isNewPattern  Flag to indicate if the pattern is new, or comes from a last used pattern. True means to
-   * update the last used pattern index
-   */
-  private fun setLastUsedPattern(pattern: String, which_pat: Int, isNewPattern: Boolean) {
-    // Only update the last pattern with a new input pattern. Do not update if we're reusing the last pattern
-    // TODO: RE_BOTH isn't used in IdeaVim yet. Should be used for the global command
-    if ((which_pat == RE_SEARCH || which_pat == RE_BOTH) && isNewPattern) {
-      lastSearch = pattern
-      lastPatternIdx = RE_SEARCH
-    }
-    if ((which_pat == RE_SUBST || which_pat == RE_BOTH) && isNewPattern) {
-      lastSubstitute = pattern
-      lastPatternIdx = RE_SUBST
-    }
-
-    // Vim never actually sets this register, but looks it up on request
-    VimPlugin.getRegister().storeTextSpecial(RegisterGroup.LAST_SEARCH_REGISTER, pattern)
-
-    // This will remove an existing entry and add it back to the end, and is expected to do so even if the string value
-    // is the same
-    VimPlugin.getHistory().addEntry(HistoryGroup.SEARCH, pattern)
-  }
-
   private enum class GlobalType {
     G,
     V,
@@ -288,16 +210,5 @@ class GlobalHandler : CommandHandler.SingleExecution() {
   companion object {
     private var globalBusy = false
     var gotInt: Boolean = false
-    private var lastPatternIdx = 0 // Which pattern was used last? RE_SEARCH or RE_SUBST?
-    private var lastSearch: String? = null // Pattern used for last search command (`/`)
-    private var lastSubstitute: String? = null // Pattern used for last substitute command (`:s`)
-    private var lastIgnoreSmartCase = false
-    private const val do_error = true /* if false, ignore errors */
-
-    // Matching the values defined in Vim. Do not change these values, they are used as indexes
-    private const val RE_SEARCH = 0 // Save/use search pattern
-    private const val RE_SUBST = 1 // Save/use substitute pattern
-    private const val RE_BOTH = 2 // Save to both patterns
-    private const val RE_LAST = 2 // Use last used pattern if "pat" is NULL
   }
 }
