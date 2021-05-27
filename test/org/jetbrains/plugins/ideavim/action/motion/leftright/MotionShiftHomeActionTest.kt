@@ -118,6 +118,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(KeyModelOptionData.name, Sel
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test continue visual`() {
     val before = """
             A Discovery
@@ -147,6 +148,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(KeyModelOptionData.name, Sel
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test continue select`() {
     val before = """
             A Discovery

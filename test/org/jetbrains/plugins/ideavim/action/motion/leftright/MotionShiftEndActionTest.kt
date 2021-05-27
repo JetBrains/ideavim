@@ -112,6 +112,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test continue visual`() {
     val before = """
             A Discovery
@@ -141,6 +142,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
     VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []),
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test continue select`() {
     val before = """
             A Discovery

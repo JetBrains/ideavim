@@ -41,19 +41,29 @@ internal object NeovimTesting {
   private var currentTestName = ""
   private val untested = mutableListOf<String>()
 
+  private lateinit var exitCommand: String
+  private lateinit var escapeCommand: String
+  private lateinit var ctrlcCommand: String
+
   fun setUp(test: VimTestCase) {
     if (!neovimEnabled(test)) return
     val nvimPath = System.getenv("ideavim.nvim.path") ?: "nvim"
-    val pb = ProcessBuilder(nvimPath, "-u", "NONE", "--embed", "--headless", "--clean")
+    val pb = ProcessBuilder(nvimPath, "-u", "NONE", "--embed", "--headless", "--clean", "--cmd", "set noswapfile")
     neovim = pb.start()
     val neovimConnection = ProcessRpcConnection(neovim, true)
     neovimApi = NeovimApis.getApiForConnection(neovimConnection)
+    exitCommand =  neovimApi.replaceTermcodes("<esc><esc>:qa!", true, false, true).get()
+    escapeCommand =  neovimApi.replaceTermcodes("<esc>", true, false, true).get()
+    ctrlcCommand =  neovimApi.replaceTermcodes("<C-C>", true, false, true).get()
     currentTestName = test.name
   }
 
   fun tearDown(test: VimTestCase) {
     if (!neovimEnabled(test)) return
     println("Tested with neovim: $neovimTestsCounter")
+    if (VimTestCase.Checks.neoVim.exitOnTearDown) {
+      neovimApi.input(exitCommand).get()
+    }
     neovim.destroy()
     if (currentTestName.isNotBlank()) {
       untested.add(currentTestName)
@@ -78,7 +88,13 @@ internal object NeovimTesting {
 
   fun typeCommand(keys: String, test: VimTestCase) {
     if (!neovimEnabled(test)) return
-    neovimApi.input(neovimApi.replaceTermcodes(keys, true, false, true).get()).get()
+    if (keys.equals("<esc>", ignoreCase = true)) {
+      neovimApi.input(escapeCommand).get()
+    } else if (keys.equals("<C-C>", ignoreCase = true)) {
+      neovimApi.input(ctrlcCommand).get()
+    } else {
+      neovimApi.input(neovimApi.replaceTermcodes(keys, true, false, true).get()).get()
+    }
   }
 
   fun assertState(editor: Editor, test: VimTestCase) {
@@ -174,6 +190,8 @@ enum class SkipNeovimReason {
   SCROLL,
   TEMPLATES,
   EDITOR_MODIFICATION,
+
+  CMD,
 }
 
 fun LogicalPosition.toVimCoords(): VimCoords {

@@ -170,6 +170,7 @@ abstract class VimTestCase : UsefulTestCase() {
 
   private fun configureByText(fileType: FileType, content: String): Editor {
     myFixture.configureByText(fileType, content)
+    NeovimTesting.setupEditor(myFixture.editor, this)
     setEditorVisibleSize(screenWidth, screenHeight)
     return myFixture.editor
   }
@@ -238,6 +239,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   protected fun typeText(keys: List<KeyStroke?>): Editor {
+    NeovimTesting.typeCommand(keys.filterNotNull().joinToString(separator = "") { toKeyNotation(it) }, this)
     val editor = myFixture.editor
     val project = myFixture.project
     typeText(keys, editor, project)
@@ -388,6 +390,7 @@ abstract class VimTestCase : UsefulTestCase() {
     val actual = getInstance(myFixture.editor).text
     Assert.assertNotNull("No Ex output", actual)
     Assert.assertEquals(expected, actual)
+    NeovimTesting.typeCommand("<esc>", this)
   }
 
   fun assertPluginError(isError: Boolean) {
@@ -445,9 +448,6 @@ abstract class VimTestCase : UsefulTestCase() {
     subModeAfter: SubMode,
   ) {
     configureByText(before)
-
-    NeovimTesting.setupEditor(myFixture.editor, this)
-    NeovimTesting.typeCommand(keys, this)
 
     performTest(keys, after, modeAfter, subModeAfter)
 
@@ -579,9 +579,11 @@ abstract class VimTestCase : UsefulTestCase() {
 
     class NeoVim {
       var ignoredRegisters: Set<Char> = setOf()
+      var exitOnTearDown = true
 
       fun reset() {
         ignoredRegisters = setOf()
+        exitOnTearDown = true
       }
     }
   }

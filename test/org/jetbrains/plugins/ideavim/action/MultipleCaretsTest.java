@@ -27,6 +27,8 @@ import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.plugins.ideavim.SkipNeovimReason;
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -204,6 +206,7 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("a,<selection>bcd</selection>,e f,<selection>ghi</selection>,j");
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "replace with termcodes problem")
   public void testMotionInnerBlockAngleAction() {
     typeTextInFile(parseKeys("v", "2i<"), "<asdf<asdf<a<caret>sdf>a<caret>sdf>asdf> <asdf<as<caret>df>asdf>");
     myFixture.checkResult("<<selection>asdf<asdf<asdf>asdf>asdf</selection>> <<selection>asdf<asdf>asdf</selection>>");
@@ -272,6 +275,7 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult(" <selection>abcde</selection>.abcde.<selection>abcde  abcde</selection>.abcde");
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "replace with termcodes problem")
   public void testMotionOuterBlockAngleAction() {
     typeTextInFile(parseKeys("v", "2a<"), "<asdf<asdf<a<caret>sdf>a<caret>sdf>asdf> <asdf<a<caret>sdf>asdf>");
     myFixture.checkResult("<selection><asdf<asdf<asdf>asdf>asdf></selection> <selection><asdf<asdf>asdf></selection>");
@@ -1089,6 +1093,7 @@ public class MultipleCaretsTest extends VimTestCase {
 
   // com.maddyhome.idea.vim.action.change.shift
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "replace with termcodes problem")
   public void testShiftLeftLinesAction() {
     typeTextInFile(parseKeys("2<<"),
                    "        <caret>abcde\n" + "        abcde\n" + "    abcde\n" + "    <caret>abcde\n" + "    abcde\n");

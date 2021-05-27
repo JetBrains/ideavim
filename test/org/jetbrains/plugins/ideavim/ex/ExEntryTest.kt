@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.ex.ExDocument
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -234,6 +236,7 @@ class ExEntryTest : VimTestCase() {
     assertExText("set digraph")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.CMD)
   fun `test matching command history`() {
     typeExInput(":set digraph<CR>")
     typeExInput(":digraph<CR>")
@@ -488,13 +491,19 @@ class ExEntryTest : VimTestCase() {
     assertExText("^")
     assertExOffset(0)
 
+    deactivateExEntry()
+
     typeText("1")
     assertExText("^")
     assertExOffset(0)
 
+    deactivateExEntry()
+
     typeText("2")
     assertExText("^")
     assertExOffset(0)
+
+    deactivateExEntry()
 
     typeText("3")
     assertExText("S")
