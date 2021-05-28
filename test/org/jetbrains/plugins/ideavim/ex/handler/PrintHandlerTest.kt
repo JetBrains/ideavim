@@ -42,12 +42,14 @@ class PrintHandlerTest : VimTestCase() {
   fun `test with count`() {
     configureByText(initialText)
     typeText(commandToKeys("p 3"))
-    assertExOutput("""
+    assertExOutput(
+      """
                 A Discovery
     
                 I found it in a legendary land
                 
-    """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   companion object {
