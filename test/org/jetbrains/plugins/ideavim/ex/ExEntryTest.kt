@@ -492,19 +492,13 @@ class ExEntryTest : VimTestCase() {
     assertExText("^")
     assertExOffset(0)
 
-    deactivateExEntry()
-
     typeText("1")
     assertExText("^")
     assertExOffset(0)
 
-    deactivateExEntry()
-
     typeText("2")
     assertExText("^")
     assertExOffset(0)
-
-    deactivateExEntry()
 
     typeText("3")
     assertExText("S")
