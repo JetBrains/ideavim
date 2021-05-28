@@ -26,6 +26,7 @@ usual beta standards.
 
 ### Features:
 * Support `vim-indent-object` extension [VIM-1151](https://youtrack.jetbrains.com/issue/VIM-1151) | [vim-indent-object](https://github.com/michaeljsmith/vim-indent-object)
+* Support `:print` command
 
 ### Fixes:
 * [VIM-2308](https://youtrack.jetbrains.com/issue/VIM-2308) Go to next tab doesn't move scrolling

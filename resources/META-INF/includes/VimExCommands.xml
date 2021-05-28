@@ -37,6 +37,7 @@
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.OnlyHandler" names="on[ly]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PreviousFileHandler" names="N[ext],prev[ious]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PromptFindHandler" names="pro[mptfind]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PrintHandler" names="p[rint],P[rint]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PromptReplaceHandler" names="promptr[epl]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PutLinesHandler" names="pu[t]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.QuitHandler" names="q[uit],clo[se],hid[e]"/>
