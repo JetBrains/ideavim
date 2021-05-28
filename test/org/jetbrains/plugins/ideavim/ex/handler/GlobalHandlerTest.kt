@@ -152,13 +152,22 @@ class GlobalHandlerTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test g with one separator and pattern`() {
-    // TODO: 27.05.2021 Implement and check :p command
     doTest(
       "g/found",
       initialText,
       initialText,
     )
-    assertPluginError(true)
+    assertExOutput("I found it in a legendary land\n")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  fun `test g with one separator and pattern and separator`() {
+    doTest(
+      "g/found",
+      initialText,
+      initialText,
+    )
+    assertExOutput("I found it in a legendary land\n")
   }
 
   private fun doTest(command: String, before: String, after: String) {
