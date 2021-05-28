@@ -220,7 +220,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
   companion object {
     private var globalBusy = false
 
-    // Interruped. Not used at the moment
+    // Interrupted. Not used at the moment
     var gotInt: Boolean = false
   }
 }
