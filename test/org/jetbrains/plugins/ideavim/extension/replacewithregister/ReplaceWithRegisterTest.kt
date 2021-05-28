@@ -38,215 +38,205 @@ class ReplaceWithRegisterTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace with empty register`() {
-    val text = "one ${c}two three"
-    VimPlugin.getRegister().resetRegisters()
+      val text = "one ${c}two three"
+      VimPlugin.getRegister().resetRegisters()
 
-    configureByText(text)
-    typeText(parseKeys("griw"))
-    myFixture.checkResult(text)
+      configureByText(text)
+      typeText(parseKeys("griw"))
+      assertState(text)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test simple replace`() {
-    val text = "one ${c}two three"
+      val text = "one ${c}two three"
 
-    configureByText(text)
-    VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("griw"))
-    myFixture.checkResult("one on${c}e three")
-    assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
+      configureByText(text)
+      VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+      typeText(parseKeys("griw"))
+      assertState("one on${c}e three")
+      assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test empty text`() {
-    val text = ""
+      val text = ""
 
-    configureByText(text)
-    VimPlugin.getRegister().storeTextSpecial(RegisterGroup.UNNAMED_REGISTER, "one")
-    typeText(parseKeys("griw"))
-    myFixture.checkResult("on${c}e")
+      configureByText(text)
+      VimPlugin.getRegister().storeTextSpecial(RegisterGroup.UNNAMED_REGISTER, "one")
+      typeText(parseKeys("griw"))
+      assertState("on${c}e")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace with empty text`() {
-    val text = "${c}one"
+      val text = "${c}one"
 
-    configureByText(text)
-    VimPlugin.getRegister().storeTextSpecial(RegisterGroup.UNNAMED_REGISTER, "")
-    typeText(parseKeys("griw"))
-    myFixture.checkResult(c)
+      configureByText(text)
+      VimPlugin.getRegister().storeTextSpecial(RegisterGroup.UNNAMED_REGISTER, "")
+      typeText(parseKeys("griw"))
+      assertState(c)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace use different register`() {
-    val text = "one ${c}two three four"
+      val text = "one ${c}two three four"
 
-    configureByText(text)
-    typeText(parseKeys("\"ayiw", "w", "\"agriw"))
-    myFixture.checkResult("one two tw${c}o four")
-    assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
-    typeText(parseKeys("w", "griw"))
-    myFixture.checkResult("one two two tw${c}o")
-    assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
+      configureByText(text)
+      typeText(parseKeys("\"ayiw", "w", "\"agriw"))
+      assertState("one two tw${c}o four")
+      assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
+      typeText(parseKeys("w", "griw"))
+      assertState("one two two tw${c}o")
+      assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace use clipboard register`() {
-    val text = "one ${c}two three four"
+      val text = "one ${c}two three four"
 
-    configureByText(text)
-    typeText(parseKeys("\"+yiw", "w", "\"+griw", "w", "\"+griw"))
-    myFixture.checkResult("one two two tw${c}o")
-    assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
+      configureByText(text)
+      typeText(parseKeys("\"+yiw", "w", "\"+griw", "w", "\"+griw"))
+      assertState("one two two tw${c}o")
+      assertEquals("two", VimPlugin.getRegister().lastRegister?.text)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace use wrong register`() {
-    val text = "one ${c}two three"
+      val text = "one ${c}two three"
 
-    configureByText(text)
-    typeText(parseKeys("\"ayiw", "\"bgriw"))
-    myFixture.checkResult(text)
+      configureByText(text)
+      typeText(parseKeys("\"ayiw", "\"bgriw"))
+      assertState(text)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace with line`() {
-    val text = """
+      val text = """
             |I fou${c}nd it in a legendary land|
             all rocks and lavender and tufted grass,
     """.trimIndent()
 
-    configureByText(text)
-    typeText(parseKeys("yy", "j", "griw"))
-    myFixture.checkResult(
-      """
+      configureByText(text)
+      typeText(parseKeys("yy", "j", "griw"))
+      assertState("""
             |I found it in a legendary land|
             all |I found it in a legendary land$c| and lavender and tufted grass,
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace with line with clipboard register`() {
-    val text = """
+      val text = """
             |I fou${c}nd it in a legendary land|
             all rocks and lavender and tufted grass,
     """.trimIndent()
 
-    configureByText(text)
-    typeText(parseKeys("\"+yy", "j", "\"+griw"))
-    myFixture.checkResult(
-      """
+      configureByText(text)
+      typeText(parseKeys("\"+yy", "j", "\"+griw"))
+      assertState("""
             |I found it in a legendary land|
             all |I found it in a legendary land$c| and lavender and tufted grass,
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace block selection`() {
-    val text = """
+      val text = """
             ${c}one two three
             one two three
             one two three
             one two three
     """.trimIndent()
 
-    configureByText(text)
-    typeText(parseKeys("<C-v>jjlly", "gg^w", "griw"))
-    myFixture.checkResult(
-      """
+      configureByText(text)
+      typeText(parseKeys("<C-v>jjlly", "gg^w", "griw"))
+      assertState("""
             one ${c}one three
             one onetwo three
             one onetwo three
             one two three
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace with number`() {
-    val text = "one ${c}two three four"
+      val text = "one ${c}two three four"
 
-    configureByText(text)
-    VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("3griw"))
-    myFixture.checkResult("one on${c}e four")
-    assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
+      configureByText(text)
+      VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+      typeText(parseKeys("3griw"))
+      assertState("one on${c}e four")
+      assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
   @VimBehaviorDiffers("one on${c}e on${c}e four")
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test replace with multiple carets`() {
-    val text = "one ${c}two ${c}three four"
+      val text = "one ${c}two ${c}three four"
 
-    configureByText(text)
-    VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("griw"))
-    myFixture.checkResult("one two one four")
-    assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
+      configureByText(text)
+      VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+      typeText(parseKeys("griw"))
+      assertState("one two one four")
+      assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test dot repeat`() {
-    val text = "one ${c}two three four"
+      val text = "one ${c}two three four"
 
-    configureByText(text)
-    VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("griw", "w", "."))
-    myFixture.checkResult("one one on${c}e four")
-    assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
+      configureByText(text)
+      VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "one", SelectionType.CHARACTER_WISE, false)
+      typeText(parseKeys("griw", "w", "."))
+      assertState("one one on${c}e four")
+      assertEquals("one", VimPlugin.getRegister().lastRegister?.text)
   }
 
   // --------------------------------------- grr --------------------------
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test line replace`() {
-    val text = """
+      val text = """
             I found it in ${c}a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
 
-    configureByText(text)
-    VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("grr"))
-    myFixture.checkResult(
-      """
+      configureByText(text)
+      VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+      typeText(parseKeys("grr"))
+      assertState("""
             ${c}legendary
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
-    )
-    assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
+      """.trimIndent())
+      assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test line replace with line`() {
-    val text = """
+      val text = """
             I found it in ${c}a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
 
-    configureByText(text)
-    typeText(parseKeys("yyj", "grr"))
-    myFixture.checkResult(
-      """
+      configureByText(text)
+      typeText(parseKeys("yyj", "grr"))
+      assertState("""
             I found it in a legendary land
             ${c}I found it in a legendary land
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test line replace with line empty line`() {
-    val text = """
+      val text = """
             I found it in ${c}a legendary land
             
             all rocks and lavender and tufted grass,
@@ -254,33 +244,30 @@ class ReplaceWithRegisterTest : VimTestCase() {
             hard by the torrent of a mountain pass.
     """.trimIndent()
 
-    configureByText(text)
-    typeText(parseKeys("yyj", "grr"))
-    myFixture.checkResult(
-      """
+      configureByText(text)
+      typeText(parseKeys("yyj", "grr"))
+      assertState("""
             I found it in a legendary land
             ${c}I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   @VimBehaviorDiffers(description = "Where is the new line comes from?...")
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test line replace with block`() {
-    val text = """
+      val text = """
             ${c}one two three
             one two three
             one two three
             one two three
     """.trimIndent()
 
-    configureByText(text)
-    typeText(parseKeys("<C-V>lljjyj", "grr"))
-    myFixture.checkResult(
-      """
+      configureByText(text)
+      typeText(parseKeys("<C-V>lljjyj", "grr"))
+      assertState("""
             one two three
             ${c}one
             one
@@ -288,8 +275,7 @@ class ReplaceWithRegisterTest : VimTestCase() {
             one two three
             one two three
             
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   @VimBehaviorDiffers(
@@ -301,44 +287,40 @@ class ReplaceWithRegisterTest : VimTestCase() {
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test line with number`() {
-    val text = """
+      val text = """
             I found it in ${c}a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
 
-    configureByText(text)
-    typeText(parseKeys("yyj", "2grr"))
-    myFixture.checkResult(
-      """
+      configureByText(text)
+      typeText(parseKeys("yyj", "2grr"))
+      assertState("""
             I found it in a legendary land
             ${c}I found it in a legendary land
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test line dot repeat`() {
-    val text = """
+      val text = """
             I found it in ${c}a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
 
-    configureByText(text)
-    typeText(parseKeys("yyj", "grr", "j", "."))
-    myFixture.checkResult(
-      """
+      configureByText(text)
+      typeText(parseKeys("yyj", "grr", "j", "."))
+      assertState("""
             I found it in a legendary land
             I found it in a legendary land
             ${c}I found it in a legendary land
             hard by the torrent of a mountain pass.
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   @VimBehaviorDiffers(
@@ -351,17 +333,16 @@ class ReplaceWithRegisterTest : VimTestCase() {
   )
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test line multicaret`() {
-    val text = """
+      val text = """
             I found it in ${c}a legendary land
             all rocks and lavender and tufted grass,
             where it was s${c}ettled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
 
-    configureByText(text)
-    typeText(parseKeys("yyj", "grr"))
-    myFixture.checkResult(
-      """
+      configureByText(text)
+      typeText(parseKeys("yyj", "grr"))
+      assertState("""
             I found it in a legendary land
             I found it in a legendary land
             where it was settled on some sodden sand
@@ -369,123 +350,112 @@ class ReplaceWithRegisterTest : VimTestCase() {
             I found it in a legendary land
             where it was settled on some sodden sand
 
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   // ------------------------------------- gr + visual ----------------------
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test visual replace`() {
-    val text = """
+      val text = """
             I ${c}found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
 
-    configureByText(text)
-    VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("viw", "gr"))
-    myFixture.checkResult(
-      """
+      configureByText(text)
+      VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+      typeText(parseKeys("viw", "gr"))
+      assertState("""
             I legendar${c}y it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
-    )
-    assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
-    assertMode(CommandState.Mode.COMMAND)
+      """.trimIndent())
+      assertEquals("legendary", VimPlugin.getRegister().lastRegister?.text)
+      assertMode(CommandState.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test visual replace with line`() {
-    val text = """
+      val text = """
             |I fo${c}und it in a legendary land|
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
 
-    configureByText(text)
-    typeText(parseKeys("yyj", "viw", "gr"))
-    myFixture.checkResult(
-      """
+      configureByText(text)
+      typeText(parseKeys("yyj", "viw", "gr"))
+      assertState("""
             |I found it in a legendary land|
             all |I found it in a legendary land$c| and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
-    )
-    assertMode(CommandState.Mode.COMMAND)
+      """.trimIndent())
+      assertMode(CommandState.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test visual replace with two lines`() {
-    val text = """
+      val text = """
             |I found it in ${c}a legendary land|
             |all rocks and lavender and tufted grass,|
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
 
-    configureByText(text)
-    typeText(parseKeys("Vjyjj3w", "viw", "gr"))
-    myFixture.checkResult(
-      """
+      configureByText(text)
+      typeText(parseKeys("Vjyjj3w", "viw", "gr"))
+      assertState("""
             |I found it in a legendary land|
             |all rocks and lavender and tufted grass,|
             where it was |I found it in a legendary land|
             |all rocks and lavender and tufted grass,$c| on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
-    )
-    assertMode(CommandState.Mode.COMMAND)
+      """.trimIndent())
+      assertMode(CommandState.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test visual line replace`() {
-    val text = """
+      val text = """
             I fo${c}und it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
 
-    configureByText(text)
-    VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
-    typeText(parseKeys("V", "gr"))
-    myFixture.checkResult(
-      """
+      configureByText(text)
+      VimPlugin.getRegister().storeText(myFixture.editor, text rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+      typeText(parseKeys("V", "gr"))
+      assertState("""
             ${c}legendary
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
-    )
-    assertMode(CommandState.Mode.COMMAND)
+      """.trimIndent())
+      assertMode(CommandState.Mode.COMMAND)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test visual line replace with line`() {
-    val text = """
+      val text = """
             I fo${c}und it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
 
-    configureByText(text)
-    typeText(parseKeys("yyj", "V", "gr"))
-    myFixture.checkResult(
-      """
+      configureByText(text)
+      typeText(parseKeys("yyj", "V", "gr"))
+      assertState("""
             I found it in a legendary land
             ${c}I found it in a legendary land
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
-    )
-    assertMode(CommandState.Mode.COMMAND)
+      """.trimIndent())
+      assertMode(CommandState.Mode.COMMAND)
   }
 }

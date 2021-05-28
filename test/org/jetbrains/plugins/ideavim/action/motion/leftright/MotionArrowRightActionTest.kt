@@ -53,7 +53,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     addInlay(4, true, 5)
 
     typeText(parseKeys("<Right>"))
-    myFixture.checkResult(after)
+    assertState(after)
 
     assertOffset(4)
     assertVisualPosition(0, 5)
@@ -75,7 +75,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     addInlay(4, true, 5)
 
     typeText(parseKeys("<Right>"))
-    myFixture.checkResult(after)
+    assertState(after)
 
     assertOffset(5)
     assertVisualPosition(0, 6)
@@ -99,7 +99,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     addInlay(4, true, 5)
 
     typeText(parseKeys("i", "<Right>"))
-    myFixture.checkResult(after)
+    assertState(after)
 
     assertOffset(4)
     assertVisualPosition(0, 4)
@@ -126,7 +126,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     addInlay(4, true, 5)
 
     typeText(parseKeys("i", "<Right>"))
-    myFixture.checkResult(after)
+    assertState(after)
 
     assertOffset(5)
     assertVisualPosition(0, 6)
@@ -154,7 +154,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     addInlay(4, false, 5)
 
     typeText(parseKeys("<Right>"))
-    myFixture.checkResult(after)
+    assertState(after)
 
     assertOffset(4)
     assertVisualPosition(0, 5)
@@ -177,7 +177,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     addInlay(4, false, 5)
 
     typeText(parseKeys("i", "<Right>"))
-    myFixture.checkResult(after)
+    assertState(after)
 
     assertOffset(4)
     assertVisualPosition(0, 5)

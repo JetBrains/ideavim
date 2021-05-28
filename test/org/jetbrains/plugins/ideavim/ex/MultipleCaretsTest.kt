@@ -30,7 +30,7 @@ class MultipleCaretsTest : VimTestCase() {
     configureByText(before)
     typeText(commandToKeys("go 5"))
     val after = "qwe ${c}rty asd\n fgh zxc vbn"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun testGotoLine() {
@@ -38,7 +38,7 @@ class MultipleCaretsTest : VimTestCase() {
     configureByText(before)
     typeText(commandToKeys("2"))
     val after = "qwe\n" + "${c}rty\n" + "asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun testGotoLineInc() {
@@ -62,7 +62,7 @@ class MultipleCaretsTest : VimTestCase() {
       vbn
       $c
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun testJoinLines() {
@@ -70,7 +70,7 @@ class MultipleCaretsTest : VimTestCase() {
     configureByText(before)
     typeText(commandToKeys("j"))
     val after = "qwe\nrty$c asd\nfgh$c zxc\nvbn\n"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
 //  fun testJoinVisualLines() {
@@ -87,7 +87,7 @@ class MultipleCaretsTest : VimTestCase() {
     configureByText(before)
     typeText(commandToKeys("co 2"))
     val after = "qwe\n" + "rty\n" + "${c}asd\n" + "${c}fgh\n" + "asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
 //  fun testCopyVisualText() {
@@ -124,7 +124,7 @@ class MultipleCaretsTest : VimTestCase() {
           vbn
 
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun testPutTextCertainLine() {
@@ -151,7 +151,7 @@ class MultipleCaretsTest : VimTestCase() {
           vbn
 
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
 //  fun testPutVisualLines() {
@@ -171,7 +171,7 @@ class MultipleCaretsTest : VimTestCase() {
     configureByText(before)
     typeText(commandToKeys("m 1"))
     val after = "qwe\n" + "${c}asd\n" + "${c}zxc\n" + "rty\n" + "fgh\n" + "vbn\n"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun testMoveTextAfterCarets() {
@@ -179,7 +179,7 @@ class MultipleCaretsTest : VimTestCase() {
     configureByText(before)
     typeText(commandToKeys("m 4"))
     val after = "rty\n" + "fgh\n" + "zxc\n" + "${c}qwe\n" + "${c}asd\n" + "vbn\n"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun testMoveTextBetweenCarets() {
@@ -187,7 +187,7 @@ class MultipleCaretsTest : VimTestCase() {
     configureByText(before)
     typeText(commandToKeys("m 2"))
     val after = "rty\n" + "${c}qwe\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun testYankLines() {
@@ -218,7 +218,7 @@ class MultipleCaretsTest : VimTestCase() {
       |zxc
       |vbn
     """.trimMargin()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun testDeleteLines() {
@@ -243,7 +243,7 @@ class MultipleCaretsTest : VimTestCase() {
       |${c}zxc
       |vbn
     """.trimMargin()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun testSortRangeWholeFile() {
@@ -259,7 +259,7 @@ class MultipleCaretsTest : VimTestCase() {
     typeText(commandToKeys("sor"))
 
     val after = c + before.replace(c, "").split('\n').sorted().joinToString(separator = "\n")
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun testSortRange() {
@@ -281,7 +281,7 @@ class MultipleCaretsTest : VimTestCase() {
       |fgh
       |vbn
     """.trimMargin()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun testSortRangeReverse() {
@@ -302,7 +302,7 @@ class MultipleCaretsTest : VimTestCase() {
         .split('\n')
         .sortedWith(reverseOrder())
         .joinToString(separator = "\n")
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun testSortRangeIgnoreCase() {
@@ -324,6 +324,6 @@ class MultipleCaretsTest : VimTestCase() {
       |fgh
       |vbn
     """.trimMargin()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 }

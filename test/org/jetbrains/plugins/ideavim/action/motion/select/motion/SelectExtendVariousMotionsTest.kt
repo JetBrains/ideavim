@@ -32,7 +32,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class SelectExtendVariousMotionsTest : VimTestCase() {
 
   fun `test with tabs`() {
-    val code = """
+      val code = """
         class Scratch {
         .public static void main(String[] args) {
         ..try {
@@ -46,12 +46,11 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
         ${c}}
     """.trimIndent().dotToTab()
 
-    myFixture.configureByText(PlainTextFileType.INSTANCE, code)
+      myFixture.configureByText(PlainTextFileType.INSTANCE, code)
 
-    typeText(parseKeys("g<C-H>", "<S-UP>".repeat(2), "<S-Right>".repeat(2)))
+      typeText(parseKeys("g<C-H>", "<S-UP>".repeat(2), "<S-Right>".repeat(2)))
 
-    myFixture.checkResult(
-      """
+      assertState("""
         class Scratch {
         .public static void main(String[] args) {
         ..try {
@@ -63,13 +62,11 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
         ${s}fu${c}${se}nc myFunc() {
         ${s}${c}${se}.return anything
         ${s}}${c}${se}
-      """.trimIndent().dotToTab()
-    )
+      """.trimIndent().dotToTab())
 
-    typeText(parseKeys("<S-UP>".repeat(7), "<S-Right>".repeat(3)))
+      typeText(parseKeys("<S-UP>".repeat(7), "<S-Right>".repeat(3)))
 
-    myFixture.checkResult(
-      """
+      assertState("""
         class Scratch {
         ${s}.pu${c}${se}blic static void main(String[] args) {
         ${s}.${c}${se}.try {
@@ -81,13 +78,11 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
         ${s}func m${c}${se}yFunc() {
         ${s}.re${c}${se}turn anything
         ${s}}${c}${se}
-      """.trimIndent().dotToTab()
-    )
+      """.trimIndent().dotToTab())
 
-    typeText(parseKeys("<S-Right>".repeat(2)))
+      typeText(parseKeys("<S-Right>".repeat(2)))
 
-    myFixture.checkResult(
-      """
+      assertState("""
         class Scratch {
         ${s}.publ${c}${se}ic static void main(String[] args) {
         ${s}..${c}${se}try {
@@ -99,7 +94,6 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
         ${s}func myF${c}${se}unc() {
         ${s}.retu${c}${se}rn anything
         ${s}}${c}${se}
-      """.trimIndent().dotToTab()
-    )
+      """.trimIndent().dotToTab())
   }
 }

@@ -256,6 +256,12 @@ abstract class VimTestCase : UsefulTestCase() {
     }
   }
 
+  fun assertState(textAfter: String) {
+    @Suppress("IdeaVimAssertState")
+    myFixture.checkResult(textAfter)
+    NeovimTesting.assertState(myFixture.editor, this)
+  }
+
   fun assertPosition(line: Int, column: Int) {
     val carets = myFixture.editor.caretModel.allCarets
     Assert.assertEquals("Wrong amount of carets", 1, carets.size)
@@ -452,6 +458,7 @@ abstract class VimTestCase : UsefulTestCase() {
 
   private fun performTest(keys: String, after: String, modeAfter: CommandState.Mode, subModeAfter: SubMode) {
     typeText(parseKeys(keys))
+    @Suppress("IdeaVimAssertState")
     myFixture.checkResult(after)
     assertState(modeAfter, subModeAfter)
   }
@@ -467,6 +474,7 @@ abstract class VimTestCase : UsefulTestCase() {
     configureByText(before)
     afterEditorInitialized(myFixture.editor)
     typeText(keys)
+    @Suppress("IdeaVimAssertState")
     myFixture.checkResult(after!!)
     assertState(modeAfter, subModeAfter)
   }

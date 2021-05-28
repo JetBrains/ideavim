@@ -25,26 +25,26 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 // |X|
 class DeleteCharacterLeftActionTest : VimTestCase() {
   fun `test delete single character`() {
-    val keys = parseKeys("X")
-    val before = "I f${c}ound it in a legendary land"
-    val after = "I ${c}ound it in a legendary land"
-    configureByText(before)
-    typeText(keys)
-    myFixture.checkResult(after)
+      val keys = parseKeys("X")
+      val before = "I f${c}ound it in a legendary land"
+      val after = "I ${c}ound it in a legendary land"
+      configureByText(before)
+      typeText(keys)
+      assertState(after)
   }
 
   fun `test delete multiple characters`() {
-    val keys = parseKeys("5X")
-    val before = "I found$c it in a legendary land"
-    val after = "I $c it in a legendary land"
-    configureByText(before)
-    typeText(keys)
-    myFixture.checkResult(after)
+      val keys = parseKeys("5X")
+      val before = "I found$c it in a legendary land"
+      val after = "I $c it in a legendary land"
+      configureByText(before)
+      typeText(keys)
+      assertState(after)
   }
 
   fun `test deletes min of count and start of line`() {
-    val keys = parseKeys("25X")
-    val before = """
+      val keys = parseKeys("25X")
+      val before = """
             A Discovery
 
             I found$c it in a legendary land
@@ -52,7 +52,7 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    val after = """
+      val after = """
             A Discovery
 
             $c it in a legendary land
@@ -60,59 +60,59 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    configureByText(before)
-    typeText(keys)
-    myFixture.checkResult(after)
+      configureByText(before)
+      typeText(keys)
+      assertState(after)
   }
 
   fun `test delete with inlay relating to preceding text`() {
-    val keys = parseKeys("X")
-    val before = "I fo${c}und it in a legendary land"
-    val after = "I f${c}und it in a legendary land"
-    configureByText(before)
+      val keys = parseKeys("X")
+      val before = "I fo${c}und it in a legendary land"
+      val after = "I f${c}und it in a legendary land"
+      configureByText(before)
 
-    // The inlay is inserted at offset 4 (0 based) - the 'u' in "found". It occupies visual column 4, and is associated
-    // with the text in visual column 3 ('o'). The 'u' is moved to the right one visual column, and now lives at offset
-    // 4, visual column 5.
-    // Kotlin type annotations are a real world example of inlays related to preceding text.
-    // Hitting 'X' on the character before the inlay should place the cursor after the inlay
-    // Before: "I fo«:test»|u|nd it in a legendary land."
-    // After: "I f«:test»|u|nd it in a legendary land."
-    addInlay(4, true, 5)
+      // The inlay is inserted at offset 4 (0 based) - the 'u' in "found". It occupies visual column 4, and is associated
+      // with the text in visual column 3 ('o'). The 'u' is moved to the right one visual column, and now lives at offset
+      // 4, visual column 5.
+      // Kotlin type annotations are a real world example of inlays related to preceding text.
+      // Hitting 'X' on the character before the inlay should place the cursor after the inlay
+      // Before: "I fo«:test»|u|nd it in a legendary land."
+      // After: "I f«:test»|u|nd it in a legendary land."
+      addInlay(4, true, 5)
 
-    typeText(keys)
-    myFixture.checkResult(after)
+      typeText(keys)
+      assertState(after)
 
-    // It doesn't matter if the inlay is related to preceding or following text. Deleting visual column 3 moves the
-    // inlay one visual column to the left, from column 4 to 3. The cursor starts at offset 4, pushed to 5 by the inlay.
-    // 'X' moves the cursor one column to the left (along with the text), which puts it at offset 4. But offset 4 can
-    // now mean visual column 3 or 4 - the inlay or the text. Make sure the cursor is positioned on the text.
-    assertVisualPosition(0, 4)
+      // It doesn't matter if the inlay is related to preceding or following text. Deleting visual column 3 moves the
+      // inlay one visual column to the left, from column 4 to 3. The cursor starts at offset 4, pushed to 5 by the inlay.
+      // 'X' moves the cursor one column to the left (along with the text), which puts it at offset 4. But offset 4 can
+      // now mean visual column 3 or 4 - the inlay or the text. Make sure the cursor is positioned on the text.
+      assertVisualPosition(0, 4)
   }
 
   fun `test delete with inlay relating to following text`() {
-    // This should have the same behaviour as related to preceding text
-    val keys = parseKeys("X")
-    val before = "I fo${c}und it in a legendary land"
-    val after = "I f${c}und it in a legendary land"
-    configureByText(before)
+      // This should have the same behaviour as related to preceding text
+      val keys = parseKeys("X")
+      val before = "I fo${c}und it in a legendary land"
+      val after = "I f${c}und it in a legendary land"
+      configureByText(before)
 
-    // The inlay is inserted at offset 4 (0 based) - the 'u' in "found". It occupies visual column 4, and is associated
-    // with the text in visual column 5 ('u' - because the inlay pushes it one visual column to the right).
-    // Kotlin parameter hints are a real world example of inlays related to following text.
-    // Hitting 'X' on the character before the inlay should place the cursor after the inlay
-    // Before: "I fo«test:»|u|nd it in a legendary land."
-    // After: "I f«test:»|u|nd it in a legendary land."
-    addInlay(4, false, 5)
+      // The inlay is inserted at offset 4 (0 based) - the 'u' in "found". It occupies visual column 4, and is associated
+      // with the text in visual column 5 ('u' - because the inlay pushes it one visual column to the right).
+      // Kotlin parameter hints are a real world example of inlays related to following text.
+      // Hitting 'X' on the character before the inlay should place the cursor after the inlay
+      // Before: "I fo«test:»|u|nd it in a legendary land."
+      // After: "I f«test:»|u|nd it in a legendary land."
+      addInlay(4, false, 5)
 
-    typeText(keys)
-    myFixture.checkResult(after)
+      typeText(keys)
+      assertState(after)
 
-    // It doesn't matter if the inlay is related to preceding or following text. Deleting visual column 3 moves the
-    // inlay one visual column to the left, from column 4 to 3. The cursor starts at offset 4, pushed to 5 by the inlay.
-    // 'X' moves the cursor one column to the left (along with the text), which puts it at offset 4. But offset 4 can
-    // now mean visual column 3 or 4 - the inlay or the text. Make sure the cursor is positioned on the text.
-    assertVisualPosition(0, 4)
+      // It doesn't matter if the inlay is related to preceding or following text. Deleting visual column 3 moves the
+      // inlay one visual column to the left, from column 4 to 3. The cursor starts at offset 4, pushed to 5 by the inlay.
+      // 'X' moves the cursor one column to the left (along with the text), which puts it at offset 4. But offset 4 can
+      // now mean visual column 3 or 4 - the inlay or the text. Make sure the cursor is positioned on the text.
+      assertVisualPosition(0, 4)
   }
 
   fun `test deleting characters scrolls caret into view`() {

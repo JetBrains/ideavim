@@ -41,10 +41,10 @@ import org.jetbrains.plugins.ideavim.waitAndAssertMode
 class NonVimVisualChangeTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test save mode after removing text`() {
-    // PyCharm uses BackspaceHandler.deleteToTargetPosition to remove indent
-    // See https://github.com/JetBrains/ideavim/pull/186#issuecomment-486656093
-    configureByText(
-      """
+      // PyCharm uses BackspaceHandler.deleteToTargetPosition to remove indent
+      // See https://github.com/JetBrains/ideavim/pull/186#issuecomment-486656093
+      configureByText(
+          """
             A Discovery
 
             I ${c}found it in a legendary land
@@ -52,26 +52,24 @@ class NonVimVisualChangeTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent()
-    )
-    VimListenerManager.EditorListeners.add(myFixture.editor)
-    typeText(parseKeys("i"))
-    assertMode(CommandState.Mode.INSERT)
-    ApplicationManager.getApplication().runWriteAction {
-      CommandProcessor.getInstance().runUndoTransparentAction {
-        BackspaceHandler.deleteToTargetPosition(myFixture.editor, LogicalPosition(2, 0))
+      )
+      VimListenerManager.EditorListeners.add(myFixture.editor)
+      typeText(parseKeys("i"))
+      assertMode(CommandState.Mode.INSERT)
+      ApplicationManager.getApplication().runWriteAction {
+          CommandProcessor.getInstance().runUndoTransparentAction {
+              BackspaceHandler.deleteToTargetPosition(myFixture.editor, LogicalPosition(2, 0))
+          }
       }
-    }
-    myFixture.checkResult(
-      """
+      assertState("""
             A Discovery
 
             found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent()
-    )
-    assertMode(CommandState.Mode.INSERT)
+      """.trimIndent())
+      assertMode(CommandState.Mode.INSERT)
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)

@@ -140,7 +140,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(KeyModelOptionData.name, Sel
     typeText(parseKeys("<S-Home>"))
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     typeText(parseKeys("\$v", "<S-Home>"))
-    myFixture.checkResult(after)
+    assertState(after)
     assertState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
@@ -170,7 +170,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(KeyModelOptionData.name, Sel
     typeText(parseKeys("<S-Home>"))
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     typeText(parseKeys("\$gh", "<S-Home>"))
-    myFixture.checkResult(after)
+    assertState(after)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
   }
 }

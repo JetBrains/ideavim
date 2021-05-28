@@ -134,7 +134,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
     typeText(parseKeys("<S-End>"))
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     typeText(parseKeys("0v", "<S-End>"))
-    myFixture.checkResult(after)
+    assertState(after)
     assertState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
@@ -164,7 +164,7 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
     typeText(parseKeys("<S-End>"))
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     typeText(parseKeys("0gh", "<S-End>"))
-    myFixture.checkResult(after)
+    assertState(after)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
   }
 }

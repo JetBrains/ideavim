@@ -293,7 +293,7 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
   fun `test visual substitute doesnt change visual marks`() {
     myFixture.configureByText("a.java", "foo\nbar\nbaz\n")
     typeText(parseKeys("V", "j", ":'<,'>s/foo/fuu/<Enter>", "gv", "~"))
-    myFixture.checkResult("FUU\nBAR\nbaz\n")
+    assertState("FUU\nBAR\nbaz\n")
   }
 
   @VimOptionDefaultAll
@@ -327,7 +327,7 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
       |  String d;
       |}
     """.trimMargin()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @VimOptionDefaultAll
@@ -351,7 +351,7 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
       |  String d;
       |}
     """.trimMargin()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @VimOptionDefaultAll
@@ -473,14 +473,12 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     )
 
     enterCommand(",+3s/One/Two/g")
-    myFixture.checkResult(
-      """One
+    assertState("""One
         |Two
         |Two
         |Two
         |${c}Two
-        |One""".trimMargin()
-    )
+        |One""".trimMargin())
   }
 
   @VimOptionDefaultAll
@@ -496,14 +494,12 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     )
 
     enterCommand(",.+3s/One/Two/g")
-    myFixture.checkResult(
-      """One
+    assertState("""One
         |Two
         |Two
         |Two
         |${c}Two
-        |One""".trimMargin()
-    )
+        |One""".trimMargin())
   }
 
   @VimOptionDefaultAll

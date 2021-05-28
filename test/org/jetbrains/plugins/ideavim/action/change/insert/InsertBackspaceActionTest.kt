@@ -26,13 +26,13 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertBackspaceActionTest : VimTestCase() {
   fun `test insert backspace`() {
-    val before = "I fo${c}und it in a legendary land"
-    val after = "I f${c}und it in a legendary land"
-    configureByText(before)
+      val before = "I fo${c}und it in a legendary land"
+      val after = "I f${c}und it in a legendary land"
+      configureByText(before)
 
-    typeText(parseKeys("i", "<BS>"))
+      typeText(parseKeys("i", "<BS>"))
 
-    myFixture.checkResult(after)
+      assertState(after)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)

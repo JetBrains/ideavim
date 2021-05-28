@@ -39,7 +39,7 @@ class ShiftLeftHandlerTest : VimTestCase() {
                       |        where it was settled on some sodden sand
                       |        hard by the torrent of a mountain pass.
                        """.trimMargin()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test double left shift`() {
@@ -57,7 +57,7 @@ class ShiftLeftHandlerTest : VimTestCase() {
                       |        where it was settled on some sodden sand
                       |        hard by the torrent of a mountain pass.
                        """.trimMargin()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test left shift no space`() {
@@ -75,7 +75,7 @@ class ShiftLeftHandlerTest : VimTestCase() {
                       |where it was settled on some sodden sand
                       |hard by the torrent of a mountain pass.
                        """.trimMargin()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test range left shift`() {
@@ -93,7 +93,7 @@ class ShiftLeftHandlerTest : VimTestCase() {
                       |    ${c}where it was settled on some sodden sand
                       |    hard by the torrent of a mountain pass.
                        """.trimMargin()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test multiple carets`() {
@@ -111,6 +111,6 @@ class ShiftLeftHandlerTest : VimTestCase() {
                       |${c}where it was settled on some sodden sand
                       |${c}hard by the torrent of a mountain pass.
                        """.trimMargin()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 }

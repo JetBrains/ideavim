@@ -25,134 +25,134 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockBefore() {
-    typeTextInFile(parseKeys("dat"), "abc${c}de<tag>fg</tag>hi")
-    myFixture.checkResult("abcde<tag>fg</tag>hi")
+      typeTextInFile(parseKeys("dat"), "abc${c}de<tag>fg</tag>hi")
+      assertState("abcde<tag>fg</tag>hi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockInOpen() {
-    typeTextInFile(parseKeys("dat"), "abcde<ta${c}g>fg</tag>hi")
-    myFixture.checkResult("abcdehi")
+      typeTextInFile(parseKeys("dat"), "abcde<ta${c}g>fg</tag>hi")
+      assertState("abcdehi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockInOpenWithArgs() {
-    typeTextInFile(parseKeys("dat"), "abcde<ta${c}g name = \"name\">fg</tag>hi")
-    myFixture.checkResult("abcdehi")
+      typeTextInFile(parseKeys("dat"), "abcde<ta${c}g name = \"name\">fg</tag>hi")
+      assertState("abcdehi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockBetween() {
-    typeTextInFile(parseKeys("dat"), "abcde<tag>f${c}g</tag>hi")
-    myFixture.checkResult("abcdehi")
+      typeTextInFile(parseKeys("dat"), "abcde<tag>f${c}g</tag>hi")
+      assertState("abcdehi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockBetweenWithArgs() {
-    typeTextInFile(parseKeys("dat"), "abcde<tag name = \"name\">f${c}g</tag>hi")
-    myFixture.checkResult("abcdehi")
+      typeTextInFile(parseKeys("dat"), "abcde<tag name = \"name\">f${c}g</tag>hi")
+      assertState("abcdehi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockInClose() {
-    typeTextInFile(parseKeys("dat"), "abcde<tag>fg</ta${c}g>hi")
-    myFixture.checkResult("abcdehi")
+      typeTextInFile(parseKeys("dat"), "abcde<tag>fg</ta${c}g>hi")
+      assertState("abcdehi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockAfter() {
-    typeTextInFile(parseKeys("dat"), "abcde<tag>fg</tag>h${c}i")
-    myFixture.checkResult("abcde<tag>fg</tag>hi")
+      typeTextInFile(parseKeys("dat"), "abcde<tag>fg</tag>h${c}i")
+      assertState("abcde<tag>fg</tag>hi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockInAlone() {
-    typeTextInFile(parseKeys("dat"), "abcde<ta${c}g>fghi")
-    myFixture.checkResult("abcde<tag>fghi")
+      typeTextInFile(parseKeys("dat"), "abcde<ta${c}g>fghi")
+      assertState("abcde<tag>fghi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockWithoutTags() {
-    typeTextInFile(parseKeys("dat"), "abc${c}de")
-    myFixture.checkResult("abcde")
+      typeTextInFile(parseKeys("dat"), "abc${c}de")
+      assertState("abcde")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockBeforeWithoutOpenTag() {
-    typeTextInFile(parseKeys("dat"), "abc${c}defg</tag>hi")
-    myFixture.checkResult("abcdefg</tag>hi")
+      typeTextInFile(parseKeys("dat"), "abc${c}defg</tag>hi")
+      assertState("abcdefg</tag>hi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockInCloseWithoutOpenTag() {
-    typeTextInFile(parseKeys("dat"), "abcdefg</ta${c}g>hi")
-    myFixture.checkResult("abcdefg</tag>hi")
+      typeTextInFile(parseKeys("dat"), "abcdefg</ta${c}g>hi")
+      assertState("abcdefg</tag>hi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockAfterWithoutOpenTag() {
-    typeTextInFile(parseKeys("dat"), "abcdefg</tag>h${c}i")
-    myFixture.checkResult("abcdefg</tag>hi")
+      typeTextInFile(parseKeys("dat"), "abcdefg</tag>h${c}i")
+      assertState("abcdefg</tag>hi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockBeforeWithoutCloseTag() {
-    typeTextInFile(parseKeys("dat"), "abc${c}defg<tag>hi")
-    myFixture.checkResult("abcdefg<tag>hi")
+      typeTextInFile(parseKeys("dat"), "abc${c}defg<tag>hi")
+      assertState("abcdefg<tag>hi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockInOpenWithoutCloseTag() {
-    typeTextInFile(parseKeys("dat"), "abcdefg<ta${c}g>hi")
-    myFixture.checkResult("abcdefg<tag>hi")
+      typeTextInFile(parseKeys("dat"), "abcdefg<ta${c}g>hi")
+      assertState("abcdefg<tag>hi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockAfterWithoutCloseTag() {
-    typeTextInFile(parseKeys("dat"), "abcdefg<tag>h${c}i")
-    myFixture.checkResult("abcdefg<tag>hi")
+      typeTextInFile(parseKeys("dat"), "abcdefg<tag>h${c}i")
+      assertState("abcdefg<tag>hi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockBeforeWrongOrder() {
-    typeTextInFile(parseKeys("dat"), "abc${c}de</tag>fg<tag>hi")
-    myFixture.checkResult("abcde</tag>fg<tag>hi")
+      typeTextInFile(parseKeys("dat"), "abc${c}de</tag>fg<tag>hi")
+      assertState("abcde</tag>fg<tag>hi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockInOpenWrongOrder() {
-    typeTextInFile(parseKeys("dat"), "abcde</ta${c}g>fg<tag>hi")
-    myFixture.checkResult("abcde</tag>fg<tag>hi")
+      typeTextInFile(parseKeys("dat"), "abcde</ta${c}g>fg<tag>hi")
+      assertState("abcde</tag>fg<tag>hi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockBetweenWrongOrder() {
-    typeTextInFile(parseKeys("dat"), "abcde</tag>f${c}g<tag>hi")
-    myFixture.checkResult("abcde</tag>fg<tag>hi")
+      typeTextInFile(parseKeys("dat"), "abcde</tag>f${c}g<tag>hi")
+      assertState("abcde</tag>fg<tag>hi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockInCloseWrongOrder() {
-    typeTextInFile(parseKeys("dat"), "abcde</tag>fg<ta${c}g>hi")
-    myFixture.checkResult("abcde</tag>fg<tag>hi")
+      typeTextInFile(parseKeys("dat"), "abcde</tag>fg<ta${c}g>hi")
+      assertState("abcde</tag>fg<tag>hi")
   }
 
   // |d| |v_at|
   fun testDeleteOuterTagBlockAfterWrongOrder() {
-    typeTextInFile(parseKeys("dat"), "abcde</tag>fg<tag>h${c}i")
-    myFixture.checkResult("abcde</tag>fg<tag>hi")
+      typeTextInFile(parseKeys("dat"), "abcde</tag>fg<tag>h${c}i")
+      assertState("abcde</tag>fg<tag>hi")
   }
 
   // |d| |v_it|
   fun testDeleteInnerTagAngleBrackets() {
-    typeTextInFile(parseKeys("dit"), "<div ${c}hello=\"d > hsj < akl\"></div>")
-    myFixture.checkResult("<div hello=\"d ></div>")
+      typeTextInFile(parseKeys("dit"), "<div ${c}hello=\"d > hsj < akl\"></div>")
+      assertState("<div hello=\"d ></div>")
   }
 
   // VIM-1090 |d| |v_at|
   fun testDeleteOuterTagDuplicateTags() {
-    typeTextInFile(parseKeys("dat"), "<a><a></a></a$c>")
-    myFixture.checkResult("")
+      typeTextInFile(parseKeys("dat"), "<a><a></a></a$c>")
+      assertState("")
   }
 
   // |v_it| |v_at|

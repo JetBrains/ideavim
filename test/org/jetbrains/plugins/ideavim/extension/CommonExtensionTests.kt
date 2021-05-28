@@ -124,54 +124,54 @@ class OpMappingTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test disable extension via set`() {
-    configureByText("${c}I found it in a legendary land")
-    typeText(parseKeys("Q"))
-    myFixture.checkResult("I$c found it in a legendary land")
+      configureByText("${c}I found it in a legendary land")
+      typeText(parseKeys("Q"))
+      assertState("I$c found it in a legendary land")
 
-    enterCommand("set noTestExtension")
-    typeText(parseKeys("Q"))
-    myFixture.checkResult("I$c found it in a legendary land")
+      enterCommand("set noTestExtension")
+      typeText(parseKeys("Q"))
+      assertState("I$c found it in a legendary land")
 
-    enterCommand("set TestExtension")
-    typeText(parseKeys("Q"))
-    myFixture.checkResult("I ${c}found it in a legendary land")
+      enterCommand("set TestExtension")
+      typeText(parseKeys("Q"))
+      assertState("I ${c}found it in a legendary land")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test disable extension as extension point`() {
-    configureByText("${c}I found it in a legendary land")
-    typeText(parseKeys("Q"))
-    myFixture.checkResult("I$c found it in a legendary land")
+      configureByText("${c}I found it in a legendary land")
+      typeText(parseKeys("Q"))
+      assertState("I$c found it in a legendary land")
 
-    @Suppress("DEPRECATION")
-    VimExtension.EP_NAME.point.unregisterExtension(extension)
-    assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
-    typeText(parseKeys("Q"))
-    myFixture.checkResult("I$c found it in a legendary land")
+      @Suppress("DEPRECATION")
+      VimExtension.EP_NAME.point.unregisterExtension(extension)
+      assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
+      typeText(parseKeys("Q"))
+      assertState("I$c found it in a legendary land")
 
-    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
-    assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
-    enableExtensions("TestExtension")
-    typeText(parseKeys("Q"))
-    myFixture.checkResult("I ${c}found it in a legendary land")
+      VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
+      assertEmpty(VimPlugin.getKey().getKeyMappingByOwner(extension.instance.owner))
+      enableExtensions("TestExtension")
+      typeText(parseKeys("Q"))
+      assertState("I ${c}found it in a legendary land")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test disable disposed extension`() {
-    configureByText("${c}I found it in a legendary land")
-    typeText(parseKeys("Q"))
-    myFixture.checkResult("I$c found it in a legendary land")
+      configureByText("${c}I found it in a legendary land")
+      typeText(parseKeys("Q"))
+      assertState("I$c found it in a legendary land")
 
-    enterCommand("set noTestExtension")
-    @Suppress("DEPRECATION")
-    VimExtension.EP_NAME.point.unregisterExtension(extension)
-    typeText(parseKeys("Q"))
-    myFixture.checkResult("I$c found it in a legendary land")
+      enterCommand("set noTestExtension")
+      @Suppress("DEPRECATION")
+      VimExtension.EP_NAME.point.unregisterExtension(extension)
+      typeText(parseKeys("Q"))
+      assertState("I$c found it in a legendary land")
 
-    VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
-    enableExtensions("TestExtension")
-    typeText(parseKeys("Q"))
-    myFixture.checkResult("I ${c}found it in a legendary land")
+      VimExtension.EP_NAME.point.registerExtension(extension, VimPlugin.getInstance())
+      enableExtensions("TestExtension")
+      typeText(parseKeys("Q"))
+      assertState("I ${c}found it in a legendary land")
   }
 }
 

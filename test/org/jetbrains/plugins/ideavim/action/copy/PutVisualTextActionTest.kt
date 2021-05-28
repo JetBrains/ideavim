@@ -61,7 +61,7 @@ class PutVisualTextActionTest : VimTestCase() {
     val after = """
             ${c}all rocks and lavender and tufted grass,
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -70,7 +70,7 @@ class PutVisualTextActionTest : VimTestCase() {
     configureByText(before)
     typeText(parseKeys("ve", "p"))
     val after = "$c it in a legendary land"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -80,7 +80,7 @@ class PutVisualTextActionTest : VimTestCase() {
     VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("ve", "p"))
     val after = "legendar${c}y it in a legendary land"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -90,7 +90,7 @@ class PutVisualTextActionTest : VimTestCase() {
     VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("v2e", "2p"))
     val after = "legendarylegendar${c}y in a legendary land"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -100,7 +100,7 @@ class PutVisualTextActionTest : VimTestCase() {
     VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("v$", "2p"))
     val after = "legendarylegendar${c}y"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -110,7 +110,7 @@ class PutVisualTextActionTest : VimTestCase() {
     VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("ve", "p"))
     val after = "legendar${c}y legendar${c}y in a legendar${c}y land"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -120,7 +120,7 @@ class PutVisualTextActionTest : VimTestCase() {
     VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("vb", "p"))
     val after = "I legendar${c}y it in a legendary land"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   // ----- Case 2: Copied | Linewise | --- pasted | Characterwise | ---| small p |--------------------
@@ -148,7 +148,7 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -174,7 +174,7 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -200,7 +200,7 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
              by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -226,7 +226,7 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
 
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -256,7 +256,7 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
              by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -284,7 +284,7 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
              of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -314,7 +314,7 @@ class PutVisualTextActionTest : VimTestCase() {
             A Discovery
              of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   // ----- Case 3: Copied | Blockwise | --- pasted | Characterwise | ---| small p |--------------------
@@ -350,7 +350,7 @@ class PutVisualTextActionTest : VimTestCase() {
             akin|ere i| to moonlight, tempering its blue,
             the dingy underside, the checquered fringe.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -386,7 +386,7 @@ class PutVisualTextActionTest : VimTestCase() {
                       |l roc|
                       |ere i|
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -422,7 +422,7 @@ class PutVisualTextActionTest : VimTestCase() {
                       |l roc||l roc|
                       |ere i||ere i|
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -458,7 +458,7 @@ class PutVisualTextActionTest : VimTestCase() {
                       |l roc|
                       |ere i|
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   // ----- Case 4: Copied | Characterwise | --- pasted | Linewise | ---| small p |--------------------
@@ -484,7 +484,7 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -509,7 +509,7 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @VimBehaviorDiffers(
@@ -544,7 +544,7 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}Discovery
 
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @VimBehaviorDiffers(
@@ -579,7 +579,7 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}Discovery
 
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @VimBehaviorDiffers(
@@ -614,7 +614,7 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}Discovery
 
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   // ----- Case 5: Copied | Linewise | --- pasted | Linewise | ---| small p |--------------------
@@ -640,7 +640,7 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -665,7 +665,7 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @VimBehaviorDiffers(
@@ -700,7 +700,7 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
 
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @VimBehaviorDiffers(
@@ -735,7 +735,7 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
 
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @VimBehaviorDiffers(
@@ -770,7 +770,7 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
 
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   // ----- Case 6: Copied | Blockwise | --- pasted | Linewise | ---| small p |--------------------
@@ -808,7 +808,7 @@ class PutVisualTextActionTest : VimTestCase() {
             akin to moonlight, tempering its blue,
             the dingy underside, the checquered fringe.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @VimBehaviorDiffers(
@@ -864,7 +864,7 @@ class PutVisualTextActionTest : VimTestCase() {
 
 
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @VimBehaviorDiffers(
@@ -923,7 +923,7 @@ class PutVisualTextActionTest : VimTestCase() {
 
 
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @VimBehaviorDiffers(
@@ -983,7 +983,7 @@ class PutVisualTextActionTest : VimTestCase() {
 
 
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   // ----- Case 7: Copied | Characterwise | --- pasted | Blockwise | ---| small p |--------------------
@@ -1000,7 +1000,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I  it in a legendary land
             alks and lavender and tufted grass,
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -1024,7 +1024,7 @@ class PutVisualTextActionTest : VimTestCase() {
             whDiscoveryt was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -1048,7 +1048,7 @@ class PutVisualTextActionTest : VimTestCase() {
             whDiscoveryt was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -1072,7 +1072,7 @@ class PutVisualTextActionTest : VimTestCase() {
             whDiscoveryDiscoveryt was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -1096,7 +1096,7 @@ class PutVisualTextActionTest : VimTestCase() {
             whDiscovery
             haDiscovery
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   // ----- Case 8: Copied | Linewise | --- pasted | Blockwise | ---| small p |--------------------
@@ -1135,7 +1135,7 @@ class PutVisualTextActionTest : VimTestCase() {
 
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -1160,7 +1160,7 @@ class PutVisualTextActionTest : VimTestCase() {
             wht was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @VimBehaviorDiffers(
@@ -1199,7 +1199,7 @@ class PutVisualTextActionTest : VimTestCase() {
 
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @VimBehaviorDiffers(
@@ -1236,7 +1236,7 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}A Discovery
 
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @VimBehaviorDiffers(
@@ -1273,7 +1273,7 @@ class PutVisualTextActionTest : VimTestCase() {
 
             hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   // ----- Case 9: Copied | Blockwise | --- pasted | Blockwise | ---| small p |--------------------
@@ -1309,7 +1309,7 @@ class PutVisualTextActionTest : VimTestCase() {
             akin|ere i|light, tempering its blue,
             the dingy underside, the checquered fringe.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -1343,7 +1343,7 @@ class PutVisualTextActionTest : VimTestCase() {
             akin|ere i|light, tempering its blue,
             the derside, the checquered fringe.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -1377,7 +1377,7 @@ class PutVisualTextActionTest : VimTestCase() {
             akin|ere i| to moonlight, tempering its blue,
             the dingy underside, the checquered fringe.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -1412,7 +1412,7 @@ class PutVisualTextActionTest : VimTestCase() {
             the ding|l roc|de, the checquered fringe.
                     |ere i|
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   @Test
@@ -1446,6 +1446,6 @@ class PutVisualTextActionTest : VimTestCase() {
             akin|ere i|
             the dingy underside, the checquered fringe.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 }

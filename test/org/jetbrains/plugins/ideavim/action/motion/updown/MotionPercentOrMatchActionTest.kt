@@ -90,63 +90,63 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
   }
 
   fun `test percent match xml comment start`() {
-    configureByXmlText("$c<!-- foo -->")
-    typeText(parseKeys("%"))
-    myFixture.checkResult("<!-- foo --$c>")
+      configureByXmlText("$c<!-- foo -->")
+      typeText(parseKeys("%"))
+      assertState("<!-- foo --$c>")
   }
 
   fun `test percent doesnt match partial xml comment`() {
-    configureByXmlText("<!$c-- ")
-    typeText(parseKeys("%"))
-    myFixture.checkResult("<!$c-- ")
+      configureByXmlText("<!$c-- ")
+      typeText(parseKeys("%"))
+      assertState("<!$c-- ")
   }
 
   fun `test percent match xml comment end`() {
-    configureByXmlText("<!-- foo --$c>")
-    typeText(parseKeys("%"))
-    myFixture.checkResult("$c<!-- foo -->")
+      configureByXmlText("<!-- foo --$c>")
+      typeText(parseKeys("%"))
+      assertState("$c<!-- foo -->")
   }
 
   fun `test percent match java comment start`() {
-    configureByJavaText("/$c* foo */")
-    typeText(parseKeys("%"))
-    myFixture.checkResult("/* foo *$c/")
+      configureByJavaText("/$c* foo */")
+      typeText(parseKeys("%"))
+      assertState("/* foo *$c/")
   }
 
   fun `test percent doesnt match partial java comment`() {
-    configureByJavaText("$c/* ")
-    typeText(parseKeys("%"))
-    myFixture.checkResult("$c/* ")
+      configureByJavaText("$c/* ")
+      typeText(parseKeys("%"))
+      assertState("$c/* ")
   }
 
   fun `test percent match java comment end`() {
-    configureByJavaText("/* foo $c*/")
-    typeText(parseKeys("%"))
-    myFixture.checkResult("$c/* foo */")
+      configureByJavaText("/* foo $c*/")
+      typeText(parseKeys("%"))
+      assertState("$c/* foo */")
   }
 
   fun `test percent match java doc comment start`() {
-    configureByJavaText("/*$c* foo */")
-    typeText(parseKeys("%"))
-    myFixture.checkResult("/** foo *$c/")
+      configureByJavaText("/*$c* foo */")
+      typeText(parseKeys("%"))
+      assertState("/** foo *$c/")
   }
 
   fun `test percent match java doc comment end`() {
-    configureByJavaText("/** foo *$c/")
-    typeText(parseKeys("%"))
-    myFixture.checkResult("$c/** foo */")
+      configureByJavaText("/** foo *$c/")
+      typeText(parseKeys("%"))
+      assertState("$c/** foo */")
   }
 
   fun `test percent doesnt match after comment start`() {
-    configureByJavaText("/*$c foo */")
-    typeText(parseKeys("%"))
-    myFixture.checkResult("/*$c foo */")
+      configureByJavaText("/*$c foo */")
+      typeText(parseKeys("%"))
+      assertState("/*$c foo */")
   }
 
   fun `test percent doesnt match before comment end`() {
-    configureByJavaText("/* foo $c */")
-    typeText(parseKeys("%"))
-    myFixture.checkResult("/* foo $c */")
+      configureByJavaText("/* foo $c */")
+      typeText(parseKeys("%"))
+      assertState("/* foo $c */")
   }
 
   fun `test motion with quote on the way`() {

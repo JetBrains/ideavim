@@ -29,6 +29,6 @@ class InsertDeleteActionTest : VimTestCase() {
 
     typeText(parseKeys("i", "<Del>"))
 
-    myFixture.checkResult(after)
+    assertState(after)
   }
 }

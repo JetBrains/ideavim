@@ -24,7 +24,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ShiftLeftTest : VimTestCase() {
   fun `test shift till new line`() {
-    val file = """
+      val file = """
             A Discovery
 
               I found it in a legendary l${c}and
@@ -32,21 +32,19 @@ class ShiftLeftTest : VimTestCase() {
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
     """.trimIndent()
-    typeTextInFile(StringHelper.parseKeys("<W"), file)
-    myFixture.checkResult(
-      """
+      typeTextInFile(StringHelper.parseKeys("<W"), file)
+      assertState("""
             A Discovery
 
             ${c}I found it in a legendary land
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   fun `test shift left positions caret at first non-blank char`() {
-    val file = """
+      val file = """
       |A Discovery
       |
       |       I found it in a legendary l${c}and
@@ -54,22 +52,20 @@ class ShiftLeftTest : VimTestCase() {
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
     """.trimMargin()
-    typeTextInFile(StringHelper.parseKeys("<<"), file)
-    myFixture.checkResult(
-      """
+      typeTextInFile(StringHelper.parseKeys("<<"), file)
+      assertState("""
       |A Discovery
 
       |   ${c}I found it in a legendary land
       |       all rocks and lavender and tufted grass,
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
-      """.trimMargin()
-    )
+      """.trimMargin())
   }
 
   fun `test shift left does not move caret with nostartofline`() {
-    OptionsManager.startofline.reset()
-    val file = """
+      OptionsManager.startofline.reset()
+      val file = """
       |A Discovery
       |
       |       I found it in a ${c}legendary land
@@ -77,22 +73,20 @@ class ShiftLeftTest : VimTestCase() {
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
     """.trimMargin()
-    typeTextInFile(StringHelper.parseKeys("<<"), file)
-    myFixture.checkResult(
-      """
+      typeTextInFile(StringHelper.parseKeys("<<"), file)
+      assertState("""
       |A Discovery
 
       |   I found it in a lege${c}ndary land
       |       all rocks and lavender and tufted grass,
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
-      """.trimMargin()
-    )
+      """.trimMargin())
   }
 
   fun `test shift left positions caret at end of line with nostartofline`() {
-    OptionsManager.startofline.reset()
-    val file = """
+      OptionsManager.startofline.reset()
+      val file = """
       |A Discovery
       |
       |       I found it in a legendary la${c}nd
@@ -100,21 +94,19 @@ class ShiftLeftTest : VimTestCase() {
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
     """.trimMargin()
-    typeTextInFile(StringHelper.parseKeys("<<"), file)
-    myFixture.checkResult(
-      """
+      typeTextInFile(StringHelper.parseKeys("<<"), file)
+      assertState("""
       |A Discovery
 
       |   I found it in a legendary lan${c}d
       |       all rocks and lavender and tufted grass,
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
-      """.trimMargin()
-    )
+      """.trimMargin())
   }
 
   fun `test shift ctrl-D`() {
-    val file = """
+      val file = """
             A Discovery
 
               I found it in a legendary l${c}and
@@ -122,16 +114,14 @@ class ShiftLeftTest : VimTestCase() {
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
     """.trimIndent()
-    typeTextInFile(StringHelper.parseKeys("i<C-D>"), file)
-    myFixture.checkResult(
-      """
+      typeTextInFile(StringHelper.parseKeys("i<C-D>"), file)
+      assertState("""
             A Discovery
 
             I found it in a legendary land
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 }

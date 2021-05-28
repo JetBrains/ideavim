@@ -210,14 +210,12 @@ class MotionActionTest : VimTestCase() {
 }
 """
     )
-    myFixture.checkResult(
-      """
+    assertState("""
     foo {
     
     }
     
-      """.trimIndent()
-    )
+      """.trimIndent())
     assertOffset(6)
   }
 
@@ -596,7 +594,7 @@ class MotionActionTest : VimTestCase() {
   fun testMethodMovingInNonJavaFile() {
     myFixture.configureByText(JsonFileType.INSTANCE, "{\"foo\": \"${c}bar\"}\n")
     typeText(parseKeys("[m"))
-    myFixture.checkResult("{\"foo\": \"${c}bar\"}\n")
+    assertState("{\"foo\": \"${c}bar\"}\n")
   }
 
   // VIM-331 |w|
@@ -937,12 +935,10 @@ two
     )
     typeText(parseKeys(">"))
     assertMode(CommandState.Mode.COMMAND)
-    myFixture.checkResult(
-      """    foo
+    assertState("""    foo
     bar
     baz
-"""
-    )
+""")
     typeText(parseKeys("gv"))
     assertSelection(
       """    foo
@@ -952,12 +948,10 @@ two
     )
     typeText(parseKeys(">"))
     assertMode(CommandState.Mode.COMMAND)
-    myFixture.checkResult(
-      """        foo
+    assertState("""        foo
         bar
         baz
-"""
-    )
+""")
     typeText(parseKeys("gv"))
     assertSelection(
       """        foo

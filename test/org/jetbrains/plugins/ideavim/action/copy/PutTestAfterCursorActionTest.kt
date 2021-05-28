@@ -45,7 +45,7 @@ class PutTestAfterCursorActionTest : VimTestCase() {
   )
   @Test
   fun `test put visual text line to last line`() {
-    val before = """
+      val before = """
             A Discovery
 
             I found it in a legendary land
@@ -53,10 +53,10 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the ${c}torrent of a mountain pass.
     """.trimIndent()
-    val editor = configureByText(before)
-    VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
-    typeText(StringHelper.parseKeys("p"))
-    val after = """
+      val editor = configureByText(before)
+      VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+      typeText(StringHelper.parseKeys("p"))
+      val after = """
             A Discovery
 
             I found it in a legendary land
@@ -66,6 +66,6 @@ class PutTestAfterCursorActionTest : VimTestCase() {
             ${c}A Discovery
 
     """.trimIndent()
-    myFixture.checkResult(after)
+      assertState(after)
   }
 }

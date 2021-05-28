@@ -505,13 +505,11 @@ quux
       """.trimIndent()
     )
     typeText(StringHelper.parseKeys("<C-V>", "j", "x"))
-    myFixture.checkResult(
-      """
+    assertState("""
   oo
   ar
   
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   // |r|
@@ -664,13 +662,11 @@ foobaz
       """.trimIndent()
     )
     typeText(StringHelper.parseKeys("o", "foo(\"<Right>, \"<Right><Right>;", "<Esc>", "."))
-    myFixture.checkResult(
-      """class C {
+    assertState("""class C {
     foo("", "");
     foo("", "");
 }
-"""
-    )
+""")
   }
 
   // VIM-511 |.|
@@ -683,13 +679,11 @@ foobaz
       """.trimIndent()
     )
     typeText(StringHelper.parseKeys("o", "C(", "<BS>", "(int i) {}", "<Esc>", "."))
-    myFixture.checkResult(
-      """class C {
+    assertState("""class C {
     C(int i) {}
     C(int i) {}
 }
-"""
-    )
+""")
   }
 
   // VIM-613 |.|
@@ -703,14 +697,12 @@ foobaz
       """.trimIndent()
     )
     typeText(StringHelper.parseKeys("d$", "j", "."))
-    myFixture.checkResult(
-      """
+    assertState("""
   
   
   - 3
   
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   // VIM-511 |.|
@@ -723,8 +715,7 @@ foobaz
       """.trimIndent()
     )
     typeText(StringHelper.parseKeys("o", "C(", "<BS>", "(int i) {", "<Enter>", "i = 3;", "<Esc>", "<Down>", "."))
-    myFixture.checkResult(
-      """class C {
+    assertState("""class C {
     C(int i) {
         i = 3;
     }
@@ -732,8 +723,7 @@ foobaz
         i = 3;
     }
 }
-"""
-    )
+""")
   }
 
   // VIM-1067 |.|
@@ -748,14 +738,12 @@ foobaz
       """.trimIndent()
     )
     typeText(StringHelper.parseKeys("A", "<BS>", "<Esc>", "j", "."))
-    myFixture.checkResult(
-      """
+    assertState("""
   - 
   - 
   - 3
   
-      """.trimIndent()
-    )
+      """.trimIndent())
 
     // Case 2
     configureByText(
@@ -767,14 +755,12 @@ foobaz
       """.trimIndent()
     )
     typeText(StringHelper.parseKeys("A", "4", "<BS>", "<Esc>", "j", "."))
-    myFixture.checkResult(
-      """
+    assertState("""
   - 1
   - 2
   - 3
   
-      """.trimIndent()
-    )
+      """.trimIndent())
 
     // Case 3
     configureByText(
@@ -786,14 +772,12 @@ foobaz
       """.trimIndent()
     )
     typeText(StringHelper.parseKeys("A", "<BS>", "4", "<Esc>", "j", "."))
-    myFixture.checkResult(
-      """
+    assertState("""
   - 4
   - 4
   - 3
   
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   // VIM-287 |zc| |O|
@@ -807,15 +791,13 @@ foobaz
 and some text after"""
     )
     typeText(StringHelper.parseKeys("zc", "G", "O"))
-    myFixture.checkResult(
-      """/**
+    assertState("""/**
  * I should be fold
  * a little more text
  * and final fold
  */
 $c
-and some text after"""
-    )
+and some text after""")
   }
 
   // VIM-287 |zc| |o|
@@ -837,8 +819,7 @@ and some text after"""
     }
 
     typeText(StringHelper.parseKeys("o"))
-    myFixture.checkResult(
-      """
+    assertState("""
             /**
              * I should be fold
              * a little more text
@@ -846,8 +827,7 @@ and some text after"""
              */
             $c
             and some text after
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   fun testRepeatChangeWordDoesNotBreakNextRepeatFind() {
@@ -862,7 +842,7 @@ and some text after"""
     typeText(StringHelper.parseKeys("R"))
     assertMode(CommandState.Mode.REPLACE)
     typeText(StringHelper.parseKeys("FOO", "<Esc>", "l", "2."))
-    myFixture.checkResult("FOOFOOFO${c}O spam\n")
+    assertState("FOOFOOFO${c}O spam\n")
     assertMode(CommandState.Mode.COMMAND)
   }
 

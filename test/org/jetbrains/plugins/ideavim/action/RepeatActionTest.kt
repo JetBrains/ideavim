@@ -28,7 +28,7 @@ class RepeatActionTest : VimTestCase() {
   fun testSimpleRepeatLastCommand() {
     configureByText("foo foo")
     typeText(parseKeys("cw", "bar", "<Esc>", "w", "."))
-    myFixture.checkResult("bar bar")
+    assertState("bar bar")
   }
 
   @Test
@@ -40,12 +40,10 @@ class RepeatActionTest : VimTestCase() {
         "Last line."
     )
     typeText(parseKeys("j", "ct.", "Change the line to point", "<Esc>", "j0", "."))
-    myFixture.checkResult(
-      "The first line.\n" +
-        "Change the line to point.\n" +
-        "Change the line to point.\n" +
-        "Last line."
-    )
+    assertState("The first line.\n" +
+      "Change the line to point.\n" +
+      "Change the line to point.\n" +
+      "Last line.")
   }
 
   // VIM-1644
@@ -53,7 +51,7 @@ class RepeatActionTest : VimTestCase() {
   fun testRepeatChangeInVisualMode() {
     configureByText("foobar foobar")
     typeText(parseKeys("<C-V>llc", "fu", "<Esc>", "w", "."))
-    myFixture.checkResult("fubar fubar")
+    assertState("fubar fubar")
   }
 
   // VIM-1644
@@ -66,11 +64,9 @@ class RepeatActionTest : VimTestCase() {
         "Good."
     )
     typeText(parseKeys("www", "<C-V>ec", "blue", "<Esc>", "j0w.", "j0ww."))
-    myFixture.checkResult(
-      "There is a blue house.\n" +
-        "Another blue house there.\n" +
-        "They have blue windows.\n" +
-        "Good."
-    )
+    assertState("There is a blue house.\n" +
+      "Another blue house there.\n" +
+      "They have blue windows.\n" +
+      "Good.")
   }
 }

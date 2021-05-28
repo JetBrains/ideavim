@@ -108,13 +108,11 @@ class JoinLinesHandlerTest : VimTestCase() {
     )
     typeText(parseKeys("Vjj"))
     typeText(commandToKeys("join"))
-    myFixture.checkResult(
-      """
+    assertState("""
                 A Discovery
 
                 I found it in a legendary land all rocks and lavender and tufted grass,$c where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 }

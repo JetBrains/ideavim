@@ -41,7 +41,7 @@ class GotoLineHandlerTest : VimTestCase() {
       where it was settled on some sodden sand
       hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test goto positive relative line`() {
@@ -63,7 +63,7 @@ class GotoLineHandlerTest : VimTestCase() {
       ${c}where it was settled on some sodden sand
       hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test goto negative relative line`() {
@@ -85,7 +85,7 @@ class GotoLineHandlerTest : VimTestCase() {
       where it was settled on some sodden sand
       hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test goto line moves to first non-blank char`() {
@@ -107,7 +107,7 @@ class GotoLineHandlerTest : VimTestCase() {
       where it was settled on some sodden sand
       hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test goto zero relative line moves to first non-blank char on current line`() {
@@ -129,7 +129,7 @@ class GotoLineHandlerTest : VimTestCase() {
       where it was settled on some sodden sand
       hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test goto line moves to same column with nostartofline option`() {
@@ -152,7 +152,7 @@ class GotoLineHandlerTest : VimTestCase() {
       where it was settled on some sodden sand
       hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test goto zero relative line with nostartofline option does not move caret`() {
@@ -175,7 +175,7 @@ class GotoLineHandlerTest : VimTestCase() {
       where it was settled on some sodden sand
       hard by the torrent of a mountain pass.
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test goto line with scrolloff`() {

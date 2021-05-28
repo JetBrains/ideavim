@@ -54,7 +54,7 @@ class MapCommandTest : VimTestCase() {
     typeText(commandToKeys("imap jk <Esc>"))
     assertPluginError(false)
     typeText(StringHelper.parseKeys("i", "Hello, ", "jk"))
-    myFixture.checkResult("Hello, World!\n")
+    assertState("Hello, World!\n")
     assertMode(CommandState.Mode.COMMAND)
     assertOffset(6)
   }
@@ -64,7 +64,7 @@ class MapCommandTest : VimTestCase() {
     typeText(commandToKeys("imap \\\\,\\<,\\n foo"))
     assertPluginError(false)
     typeText(StringHelper.stringToKeys("i\\,<,\\n"))
-    myFixture.checkResult("foo\n")
+    assertState("foo\n")
   }
 
   fun testBackslashAtEnd() {
@@ -72,21 +72,21 @@ class MapCommandTest : VimTestCase() {
     typeText(commandToKeys("imap foo\\ bar"))
     assertPluginError(false)
     typeText(StringHelper.stringToKeys("ifoo\\"))
-    myFixture.checkResult("bar\n")
+    assertState("bar\n")
   }
 
   fun testUnfinishedSpecialKey() {
     configureByText("\n")
     typeText(commandToKeys("imap <Esc foo"))
     typeText(StringHelper.stringToKeys("i<Esc"))
-    myFixture.checkResult("foo\n")
+    assertState("foo\n")
   }
 
   fun testUnknownSpecialKey() {
     configureByText("\n")
     typeText(commandToKeys("imap <foo> bar"))
     typeText(StringHelper.stringToKeys("i<foo>"))
-    myFixture.checkResult("bar\n")
+    assertState("bar\n")
   }
 
   fun testMapTable() {
@@ -121,7 +121,7 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("imap bar baz"))
     typeText(commandToKeys("imap baz quux"))
     typeText(StringHelper.parseKeys("i", "foo"))
-    myFixture.checkResult("quux\n")
+    assertState("quux\n")
   }
 
   fun testNonRecursiveMapping() {
@@ -130,7 +130,7 @@ n  ,f            <Plug>Foo
     assertPluginError(false)
     typeText(commandToKeys("inoremap b a"))
     typeText(StringHelper.parseKeys("i", "ab"))
-    myFixture.checkResult("ba\n")
+    assertState("ba\n")
   }
 
   fun testNonRecursiveMapTable() {
@@ -160,13 +160,11 @@ n  ,f            <Plug>Foo
     assertPluginError(false)
     typeText(StringHelper.parseKeys("l", "<Right>"))
     assertPluginError(false)
-    myFixture.checkResult(
-      """
+    assertState("""
   foo
   bar
   
-      """.trimIndent()
-    )
+      """.trimIndent())
     assertOffset(1)
     typeText(commandToKeys("nmap"))
     assertExOutput("n  <Right>     * <Nop>\n")
@@ -199,9 +197,9 @@ n  ,f            <Plug>Foo
     configureByText("foo\n")
     typeText(commandToKeys("nmap <space> dw"))
     typeText(StringHelper.parseKeys(" "))
-    myFixture.checkResult("\n")
+    assertState("\n")
     typeText(StringHelper.parseKeys("i", " ", "<Esc>"))
-    myFixture.checkResult(" \n")
+    assertState(" \n")
   }
 
   // VIM-661 |:noremap| |r|
@@ -209,7 +207,7 @@ n  ,f            <Plug>Foo
     configureByText("${c}foo\n")
     typeText(commandToKeys("noremap A Z"))
     typeText(StringHelper.parseKeys("rA"))
-    myFixture.checkResult("Aoo\n")
+    assertState("Aoo\n")
   }
 
   // VIM-661 |:omap| |d| |t|
@@ -217,7 +215,7 @@ n  ,f            <Plug>Foo
     configureByText("${c}foo, bar\n")
     typeText(commandToKeys("omap , ?"))
     typeText(StringHelper.parseKeys("dt,"))
-    myFixture.checkResult(", bar\n")
+    assertState(", bar\n")
   }
 
   // VIM-666 |:imap|
@@ -225,7 +223,7 @@ n  ,f            <Plug>Foo
     configureByText("${c}foo\n")
     typeText(commandToKeys("imap a b |c \" Something else"))
     typeText(StringHelper.parseKeys("ia"))
-    myFixture.checkResult("b foo\n")
+    assertState("b foo\n")
   }
 
   // VIM-666 |:imap|
@@ -233,7 +231,7 @@ n  ,f            <Plug>Foo
     configureByText("${c}foo\n")
     typeText(commandToKeys("imap a b \\| c"))
     typeText(StringHelper.parseKeys("ia"))
-    myFixture.checkResult("b | cfoo\n")
+    assertState("b | cfoo\n")
   }
 
   // VIM-666 |:imap|
@@ -241,7 +239,7 @@ n  ,f            <Plug>Foo
     configureByText("${c}foo\n")
     typeText(commandToKeys("imap a b \\| c    |"))
     typeText(StringHelper.parseKeys("ia"))
-    myFixture.checkResult("b | c    foo\n")
+    assertState("b | c    foo\n")
   }
 
   // VIM-670 |:map|
@@ -249,7 +247,7 @@ n  ,f            <Plug>Foo
     configureByText("\n")
     typeText(commandToKeys("map ab abcd"))
     typeText(StringHelper.parseKeys("ab"))
-    myFixture.checkResult("bcd\n")
+    assertState("bcd\n")
   }
 
   // VIM-676 |:map|
@@ -257,7 +255,7 @@ n  ,f            <Plug>Foo
     configureByText("\n")
     VimScriptParser.executeText(VimScriptParser.readText("inoremap # X\u0008#\n"))
     typeText(StringHelper.parseKeys("i", "#", "<Esc>"))
-    myFixture.checkResult("#\n")
+    assertState("#\n")
     assertMode(CommandState.Mode.COMMAND)
     typeText(commandToKeys("imap"))
     assertExOutput("i  #           * X<C-H>#\n")
@@ -274,18 +272,16 @@ n  ,f            <Plug>Foo
     )
     VimScriptParser.executeText(VimScriptParser.readText("map \u0018i dd\n"))
     typeText(StringHelper.parseKeys("i", "#", "<Esc>"))
-    myFixture.checkResult(
-      """
+    assertState("""
   #foo
   bar
   
-      """.trimIndent()
-    )
+      """.trimIndent())
     assertMode(CommandState.Mode.COMMAND)
     typeText(commandToKeys("map"))
     assertExOutput("   <C-X>i        dd\n")
     typeText(StringHelper.parseKeys("<C-X>i"))
-    myFixture.checkResult("bar\n")
+    assertState("bar\n")
   }
 
   // VIM-679 |:map|
@@ -293,7 +289,7 @@ n  ,f            <Plug>Foo
     configureByText("${c}foo\n")
     VimScriptParser.executeText(listOf("imap a b \u0016|\u0016| c |\n"))
     typeText(StringHelper.parseKeys("ia"))
-    myFixture.checkResult("b || c foo\n")
+    assertState("b || c foo\n")
   }
 
   // VIM-679 |:map|
@@ -301,7 +297,7 @@ n  ,f            <Plug>Foo
     configureByText("${c}foo\n")
     VimScriptParser.executeText(listOf("map A :%s/foo/bar/g\r\u000C\n"))
     typeText(StringHelper.parseKeys("A"))
-    myFixture.checkResult("bar\n")
+    assertState("bar\n")
   }
 
   // VIM-700 |:map|
@@ -309,7 +305,7 @@ n  ,f            <Plug>Foo
     configureByText("x${c}yz\n")
     VimScriptParser.executeText(listOf("map 0 ~"))
     typeText(StringHelper.parseKeys("0"))
-    myFixture.checkResult("xYz\n")
+    assertState("xYz\n")
   }
 
   // VIM-700 |:map|
@@ -317,7 +313,7 @@ n  ,f            <Plug>Foo
     configureByText("a${c}bcdefghijklmnop\n")
     VimScriptParser.executeText(listOf("map 0 ^"))
     typeText(StringHelper.parseKeys("10~"))
-    myFixture.checkResult("aBCDEFGHIJKlmnop\n")
+    assertState("aBCDEFGHIJKlmnop\n")
   }
 
   // VIM-700 |:map|
@@ -325,7 +321,7 @@ n  ,f            <Plug>Foo
     configureByText("a${c}bcdefghijklmnop\n")
     VimScriptParser.executeText(listOf("map <Del> ~"))
     typeText(StringHelper.parseKeys("10<Del>"))
-    myFixture.checkResult("aBCDEFGHIJKlmnop\n")
+    assertState("aBCDEFGHIJKlmnop\n")
   }
 
   // VIM-650 |mapleader|
@@ -334,7 +330,7 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("let mapleader = \",\""))
     typeText(commandToKeys("nmap <Leader>z izzz<Esc>"))
     typeText(StringHelper.parseKeys(",z"))
-    myFixture.checkResult("zzz\n")
+    assertState("zzz\n")
   }
 
   // VIM-650 |mapleader|
@@ -343,7 +339,7 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("let mapleader = \"\\<SPACE>\""))
     typeText(commandToKeys("nmap <Leader>z izzz<Esc>"))
     typeText(StringHelper.parseKeys(" z"))
-    myFixture.checkResult("zzz\n")
+    assertState("zzz\n")
   }
 
   // VIM-650 |mapleader|
@@ -352,7 +348,7 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("let mapleader = \" \""))
     typeText(commandToKeys("nmap <Leader>z izzz<Esc>"))
     typeText(StringHelper.parseKeys(" z"))
-    myFixture.checkResult("zzz\n")
+    assertState("zzz\n")
   }
 
   fun testAmbiguousMapping() {
@@ -360,11 +356,11 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("nmap ,f iHello<Esc>"))
     typeText(commandToKeys("nmap ,fc iBye<Esc>"))
     typeText(StringHelper.parseKeys(",fdh"))
-    myFixture.checkResult("Helo\n")
+    assertState("Helo\n")
     typeText(StringHelper.parseKeys("diw"))
-    myFixture.checkResult("\n")
+    assertState("\n")
     typeText(StringHelper.parseKeys(",fch"))
-    myFixture.checkResult("Bye\n")
+    assertState("Bye\n")
   }
 
   fun testLongAmbiguousMapping() {
@@ -372,11 +368,11 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("nmap ,foo iHello<Esc>"))
     typeText(commandToKeys("nmap ,fooc iBye<Esc>"))
     typeText(StringHelper.parseKeys(",foodh"))
-    myFixture.checkResult("Helo\n")
+    assertState("Helo\n")
     typeText(StringHelper.parseKeys("diw"))
-    myFixture.checkResult("\n")
+    assertState("\n")
     typeText(StringHelper.parseKeys(",fooch"))
-    myFixture.checkResult("Bye\n")
+    assertState("Bye\n")
   }
 
   fun testPlugMapping() {
@@ -384,7 +380,7 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("nmap ,f <Plug>Foo"))
     typeText(commandToKeys("nmap <Plug>Foo iHello<Esc>"))
     typeText(StringHelper.parseKeys(",fa!<Esc>"))
-    myFixture.checkResult("Hello!\n")
+    assertState("Hello!\n")
   }
 
   fun testIntersectingCommands() {
@@ -392,7 +388,7 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("map ds h"))
     typeText(commandToKeys("map I 3l"))
     typeText(StringHelper.parseKeys("dI"))
-    myFixture.checkResult("123${c}7890")
+    assertState("123${c}7890")
   }
 
   fun testIncompleteMapping() {
@@ -400,14 +396,14 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("map <Plug>(Hi)l lll"))
     typeText(commandToKeys("map I <Plug>(Hi)"))
     typeText(StringHelper.parseKeys("Ih"))
-    myFixture.checkResult("12${c}34567890")
+    assertState("12${c}34567890")
   }
 
   fun testIntersectingCommands2() {
     configureByText("123${c}4567890")
     typeText(commandToKeys("map as x"))
     typeText(StringHelper.parseKeys("gas"))
-    myFixture.checkResult("123${c}567890")
+    assertState("123${c}567890")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
@@ -446,38 +442,38 @@ n  ,f            <Plug>Foo
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap <S-Space> w"))
     typeText(StringHelper.parseKeys("<S-Space>"))
-    myFixture.checkResult("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+    assertState("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
   fun testShiftSpaceAndWorkInInsertMode() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap <S-Space> w"))
     typeText(StringHelper.parseKeys("i<S-Space>"))
-    myFixture.checkResult("A quick  ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+    assertState("A quick  ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
   fun testShiftLetter() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap <S-D> w"))
     typeText(StringHelper.parseKeys("<S-D>"))
-    myFixture.checkResult("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+    assertState("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
   fun testUppercaseLetter() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap D w"))
     typeText(StringHelper.parseKeys("D"))
-    myFixture.checkResult("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+    assertState("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
   fun `test shift letter doesn't break insert mode`() {
     configureByText("A quick ${c}brown fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
     typeText(commandToKeys("nmap <S-D> w"))
     typeText(StringHelper.parseKeys("<S-D>"))
-    myFixture.checkResult("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+    assertState("A quick brown ${c}fox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
 
     typeText(StringHelper.parseKeys("iD<Esc>"))
-    myFixture.checkResult("A quick brown ${c}Dfox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
+    assertState("A quick brown ${c}Dfox jumps over the lazy dog. A quick brown fox jumps over the lazy dog")
   }
 
   fun `test comment line with action`() {
@@ -491,14 +487,12 @@ n  ,f            <Plug>Foo
     )
     typeText(commandToKeys("map k <Action>(CommentByLineComment)"))
     typeText(StringHelper.parseKeys("k"))
-    myFixture.checkResult(
-      """
+    assertState("""
         -----
         //12345
         abcde
         -----
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   fun `test execute two actions with two mappings`() {
@@ -512,14 +506,12 @@ n  ,f            <Plug>Foo
     )
     typeText(commandToKeys("map k <Action>(CommentByLineComment)"))
     typeText(StringHelper.parseKeys("kk"))
-    myFixture.checkResult(
-      """
+    assertState("""
           -----
           //12345
           //abcde
           -----
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   fun `test execute two actions with single mappings`() {
@@ -533,14 +525,12 @@ n  ,f            <Plug>Foo
     )
     typeText(commandToKeys("map k <Action>(CommentByLineComment)<Action>(CommentByLineComment)"))
     typeText(StringHelper.parseKeys("k"))
-    myFixture.checkResult(
-      """
+    assertState("""
           -----
           //12345
           //abcde
           -----
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   fun `test execute three actions with single mappings`() {
@@ -554,14 +544,12 @@ n  ,f            <Plug>Foo
     )
     typeText(commandToKeys("map k <Action>(CommentByLineComment)<Action>(CommentByLineComment)<Action>(CommentByLineComment)"))
     typeText(StringHelper.parseKeys("k"))
-    myFixture.checkResult(
-      """
+    assertState("""
           -----
           //12345
           //abcde
           //-----
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   fun `test execute action from insert mode`() {
@@ -575,14 +563,12 @@ n  ,f            <Plug>Foo
     )
     typeText(commandToKeys("imap k <Action>(CommentByLineComment)"))
     typeText(StringHelper.parseKeys("ik"))
-    myFixture.checkResult(
-      """
+    assertState("""
           -----
           //12345
           abcde
           -----
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
@@ -677,14 +663,12 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("map jz w"))
     typeText(StringHelper.parseKeys("kz"))
 
-    myFixture.checkResult(
-      """
+    assertState("""
               -----
               12345
               ${c}abcde
               -----
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   fun `test recursion`() {
@@ -719,10 +703,10 @@ n  ,f            <Plug>Foo
   }
 
   private fun checkDelayedMapping(before: String, after: String) {
-    myFixture.checkResult(before)
+    assertState(before)
 
     waitAndAssert(5000) { !myFixture.editor.commandState.mappingState.isTimerRunning() }
 
-    myFixture.checkResult(after)
+    assertState(after)
   }
 }

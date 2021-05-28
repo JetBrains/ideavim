@@ -26,33 +26,33 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VisualBlockAppendActionTest : VimTestCase() {
   fun `test visual block append`() {
-    val before = """
+      val before = """
             ${c}int a;
             int b;
             int c;
     """.trimIndent()
-    typeTextInFile(parseKeys("<C-V>", "2j", "e", "A", " const", "<Esc>"), before)
-    val after = """
+      typeTextInFile(parseKeys("<C-V>", "2j", "e", "A", " const", "<Esc>"), before)
+      val after = """
             int const a;
             int const b;
             int const c;
     """.trimIndent()
-    myFixture.checkResult(after)
+      assertState(after)
   }
 
   fun `test visual block append with dollar motion`() {
-    val before = """
+      val before = """
             ${c}int a;
             private String b;
             int c;
     """.trimIndent()
-    typeTextInFile(parseKeys("<C-V>", "2j", "$", "A", " // My variables", "<Esc>"), before)
-    val after = """
+      typeTextInFile(parseKeys("<C-V>", "2j", "$", "A", " // My variables", "<Esc>"), before)
+      val after = """
             int a; // My variables
             private String b; // My variables
             int c; // My variables
     """.trimIndent()
-    myFixture.checkResult(after)
+      assertState(after)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)

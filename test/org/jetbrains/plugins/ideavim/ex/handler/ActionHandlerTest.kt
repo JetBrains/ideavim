@@ -33,7 +33,7 @@ class ActionHandlerTest : VimTestCase() {
     configureByText("<caret>foo\n" + "bar\n")
     typeText(commandToKeys("action EditorRight"))
     assertMode(CommandState.Mode.COMMAND)
-    myFixture.checkResult("f<caret>oo\n" + "bar\n")
+    assertState("f<caret>oo\n" + "bar\n")
   }
 
   // VIM-862 |:action| in visual character mode
@@ -47,12 +47,10 @@ class ActionHandlerTest : VimTestCase() {
     typeText(parseKeys("vjl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    myFixture.checkResult(
-      "-----\n" +
-        "1/*2345\n" +
-        "abc*/de\n" +
-        "-----"
-    )
+    assertState("-----\n" +
+      "1/*2345\n" +
+      "abc*/de\n" +
+      "-----")
   }
 
   // https://github.com/JetBrains/ideavim/commit/fe714a90032d0cb5ef0a0e0d8783980b6f1c7d20#r35647600
@@ -67,12 +65,10 @@ class ActionHandlerTest : VimTestCase() {
     typeText(parseKeys("vjl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    myFixture.checkResult(
-      "-----\n" +
-        "1/*2345\n" +
-        "abc*/de\n" +
-        "-----"
-    )
+    assertState("-----\n" +
+      "1/*2345\n" +
+      "abc*/de\n" +
+      "-----")
     OptionsManager.incsearch.reset()
   }
 
@@ -82,7 +78,7 @@ class ActionHandlerTest : VimTestCase() {
     typeText(parseKeys("vl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    myFixture.checkResult("1/*23*/45\n" + "abcde\n")
+    assertState("1/*23*/45\n" + "abcde\n")
   }
 
   fun testExCommandInVisualCharacterModeSameLineWithIncsearch() {
@@ -91,7 +87,7 @@ class ActionHandlerTest : VimTestCase() {
     typeText(parseKeys("vl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    myFixture.checkResult("1/*23*/45\n" + "abcde\n")
+    assertState("1/*23*/45\n" + "abcde\n")
     OptionsManager.incsearch.reset()
   }
 
@@ -106,14 +102,12 @@ class ActionHandlerTest : VimTestCase() {
     typeText(parseKeys("Vj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    myFixture.checkResult(
-      "-----\n" +
-        "/*\n" +
-        "12345\n" +
-        "abcde\n" +
-        "*/\n" +
-        "-----"
-    )
+    assertState("-----\n" +
+      "/*\n" +
+      "12345\n" +
+      "abcde\n" +
+      "*/\n" +
+      "-----")
   }
 
   fun testExCommandInVisualLineModeWithIncsearch() {
@@ -127,14 +121,12 @@ class ActionHandlerTest : VimTestCase() {
     typeText(parseKeys("Vj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    myFixture.checkResult(
-      "-----\n" +
-        "/*\n" +
-        "12345\n" +
-        "abcde\n" +
-        "*/\n" +
-        "-----"
-    )
+    assertState("-----\n" +
+      "/*\n" +
+      "12345\n" +
+      "abcde\n" +
+      "*/\n" +
+      "-----")
     OptionsManager.incsearch.reset()
   }
 
@@ -149,12 +141,10 @@ class ActionHandlerTest : VimTestCase() {
     typeText(parseKeys("<C-V>lj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    myFixture.checkResult(
-      "-----\n" +
-        "1/*23*/45\n" +
-        "a/*bc*/de\n" +
-        "-----"
-    )
+    assertState("-----\n" +
+      "1/*23*/45\n" +
+      "a/*bc*/de\n" +
+      "-----")
   }
 
   fun testExCommandInVisualBlockModeWithIncsearch() {
@@ -168,12 +158,10 @@ class ActionHandlerTest : VimTestCase() {
     typeText(parseKeys("<C-V>lj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    myFixture.checkResult(
-      "-----\n" +
-        "1/*23*/45\n" +
-        "a/*bc*/de\n" +
-        "-----"
-    )
+    assertState("-----\n" +
+      "1/*23*/45\n" +
+      "a/*bc*/de\n" +
+      "-----")
     OptionsManager.incsearch.reset()
   }
 }

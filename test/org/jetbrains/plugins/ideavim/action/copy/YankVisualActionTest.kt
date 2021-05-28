@@ -115,7 +115,7 @@ class YankVisualActionTest : VimTestCase() {
       gh
       zxcvbn
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test yank line`() {
@@ -209,7 +209,7 @@ class YankVisualActionTest : VimTestCase() {
             vbn
             
     """.trimIndent()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test block yank`() {

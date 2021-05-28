@@ -31,40 +31,40 @@ class KeyGroupTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test remove key mapping`() {
-    val keyGroup = VimPlugin.getKey()
-    val keys = parseKeys("<C-S-B>")
+      val keyGroup = VimPlugin.getKey()
+      val keys = parseKeys("<C-S-B>")
 
-    configureByText("I ${c}found it in a legendary land")
-    typeText(keys)
-    myFixture.checkResult("I ${c}found it in a legendary land")
+      configureByText("I ${c}found it in a legendary land")
+      typeText(keys)
+      assertState("I ${c}found it in a legendary land")
 
-    keyGroup.putKeyMapping(MappingMode.N, keys, owner, parseKeys("h"), false)
-    typeText(keys)
-    myFixture.checkResult("I$c found it in a legendary land")
+      keyGroup.putKeyMapping(MappingMode.N, keys, owner, parseKeys("h"), false)
+      typeText(keys)
+      assertState("I$c found it in a legendary land")
 
-    keyGroup.removeKeyMapping(owner)
-    typeText(keys)
-    myFixture.checkResult("I$c found it in a legendary land")
+      keyGroup.removeKeyMapping(owner)
+      typeText(keys)
+      assertState("I$c found it in a legendary land")
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test remove and add key mapping`() {
-    val keyGroup = VimPlugin.getKey()
-    val keys = parseKeys("<C-S-B>")
+      val keyGroup = VimPlugin.getKey()
+      val keys = parseKeys("<C-S-B>")
 
-    configureByText("I ${c}found it in a legendary land")
-    typeText(keys)
-    myFixture.checkResult("I ${c}found it in a legendary land")
+      configureByText("I ${c}found it in a legendary land")
+      typeText(keys)
+      assertState("I ${c}found it in a legendary land")
 
-    keyGroup.putKeyMapping(MappingMode.N, keys, owner, parseKeys("h"), false)
-    typeText(keys)
-    myFixture.checkResult("I$c found it in a legendary land")
-
-    repeat(10) {
-      keyGroup.removeKeyMapping(owner)
       keyGroup.putKeyMapping(MappingMode.N, keys, owner, parseKeys("h"), false)
-    }
-    typeText(keys)
-    myFixture.checkResult("${c}I found it in a legendary land")
+      typeText(keys)
+      assertState("I$c found it in a legendary land")
+
+      repeat(10) {
+          keyGroup.removeKeyMapping(owner)
+          keyGroup.putKeyMapping(MappingMode.N, keys, owner, parseKeys("h"), false)
+      }
+      typeText(keys)
+      assertState("${c}I found it in a legendary land")
   }
 }

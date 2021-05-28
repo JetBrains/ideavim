@@ -53,7 +53,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     addInlay(4, true, 5)
 
     typeText(parseKeys("<Left>"))
-    myFixture.checkResult(after)
+    assertState(after)
 
     assertOffset(4)
     assertVisualPosition(0, 5)
@@ -75,7 +75,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     addInlay(4, true, 5)
 
     typeText(parseKeys("<Left>"))
-    myFixture.checkResult(after)
+    assertState(after)
 
     assertOffset(3)
     assertVisualPosition(0, 3)
@@ -99,7 +99,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     addInlay(4, true, 5)
 
     typeText(parseKeys("i", "<Left>"))
-    myFixture.checkResult(after)
+    assertState(after)
 
     assertOffset(4)
     assertVisualPosition(0, 4)
@@ -125,7 +125,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     addInlay(4, true, 5)
 
     typeText(parseKeys("i", "<Left>"))
-    myFixture.checkResult(after)
+    assertState(after)
 
     assertOffset(3)
     assertVisualPosition(0, 3)
@@ -154,7 +154,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     addInlay(4, false, 5)
 
     typeText(parseKeys("<Left>"))
-    myFixture.checkResult(after)
+    assertState(after)
 
     assertOffset(4)
     assertVisualPosition(0, 5)
@@ -176,7 +176,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     addInlay(4, false, 5)
 
     typeText(parseKeys("<Left>"))
-    myFixture.checkResult(after)
+    assertState(after)
 
     assertOffset(3)
     assertVisualPosition(0, 3)
@@ -199,7 +199,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     addInlay(4, false, 5)
 
     typeText(parseKeys("i", "<Left>"))
-    myFixture.checkResult(after)
+    assertState(after)
 
     assertOffset(4)
     assertVisualPosition(0, 5)
@@ -225,7 +225,7 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     addInlay(4, false, 5)
 
     typeText(parseKeys("i", "<Left>"))
-    myFixture.checkResult(after)
+    assertState(after)
 
     assertOffset(3)
     assertVisualPosition(0, 3)

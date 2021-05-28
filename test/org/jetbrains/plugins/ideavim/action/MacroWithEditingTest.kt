@@ -28,7 +28,7 @@ class MacroWithEditingTest : VimTestCase() {
     typeTextInFile(parseKeys("qa", "iHello<Esc>", "q"), "")
     setText("")
     typeText(parseKeys("\"ap"))
-    myFixture.checkResult("iHello<Esc>")
+    assertState("iHello<Esc>")
   }
 
   fun `test copy and perform macro`() {

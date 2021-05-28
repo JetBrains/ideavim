@@ -167,56 +167,46 @@ class VisualSwapEndsBlockActionTest : VimTestCase() {
   }
 
   fun testVisualSwapEndsBlockActionInBlockMode() {
-    typeTextInFile(
-      parseKeys("<C-V>", "2l", "j", "O"),
-      """
+      typeTextInFile(
+          parseKeys("<C-V>", "2l", "j", "O"),
+          """
                     a${c}abcc
                     ddeff
                     
       """.trimIndent()
-    )
-    myFixture.checkResult(
-      """
+      )
+      assertState("""
     a${s}${c}abc${se}c
     d${s}${c}def${se}f
     
-      """.trimIndent()
-    )
+      """.trimIndent())
   }
 
   fun testVisualBlockMovementAfterSwapEndsBlockAction() {
-    typeTextInFile(
-      parseKeys("<C-V>", "2l", "j", "O", "k", "h", "j"),
-      """
+      typeTextInFile(
+          parseKeys("<C-V>", "2l", "j", "O", "k", "h", "j"),
+          """
                     aabcc
                     d${c}deff
                     gghii
                     jjkll
 
       """.trimIndent()
-    )
-    myFixture.checkResult(
-      (
-        """
+      )
+      assertState("""
     aabcc
     ${s}${c}ddef${se}f
     ${s}${c}gghi${se}i
     jjkll
 
-        """.trimIndent()
-        )
-    )
-    typeText(parseKeys("j"))
-    myFixture.checkResult(
-      (
-        """
+        """.trimIndent())
+      typeText(parseKeys("j"))
+      assertState("""
     aabcc
     ${s}${c}ddef${se}f
     ${s}${c}gghi${se}i
     ${s}${c}jjkl${se}l
 
-        """.trimIndent()
-        )
-    )
+        """.trimIndent())
   }
 }

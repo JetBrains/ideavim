@@ -31,29 +31,27 @@ class VisualBlockInsertActionTest : VimTestCase() {
 
   // VIM-1110 |CTRL-V| |v_b_i| |zc|
   fun `test block insert after folds`() {
-    configureByJavaText(
-      """$c/**
+      configureByJavaText(
+          """$c/**
  * Something to fold.
  */
 foo
 bar
 """
-    )
+      )
 
-    myFixture.editor.foldingModel.runBatchFoldingOperation {
-      CodeFoldingManager.getInstance(myFixture.project).updateFoldRegions(myFixture.editor)
-      FoldingUtil.findFoldRegionStartingAtLine(myFixture.editor, 0)!!.isExpanded = false
-    }
+      myFixture.editor.foldingModel.runBatchFoldingOperation {
+          CodeFoldingManager.getInstance(myFixture.project).updateFoldRegions(myFixture.editor)
+          FoldingUtil.findFoldRegionStartingAtLine(myFixture.editor, 0)!!.isExpanded = false
+      }
 
-    typeText(parseKeys("j", "<C-V>", "j", "I", "X", "<Esc>"))
-    myFixture.checkResult(
-      """/**
+      typeText(parseKeys("j", "<C-V>", "j", "I", "X", "<Esc>"))
+      assertState("""/**
  * Something to fold.
  */
 ${c}Xfoo
 Xbar
-"""
-    )
+""")
   }
 
   // VIM-1379 |CTRL-V| |j| |v_b_I|
@@ -103,18 +101,18 @@ Xbar
   }
 
   fun `test visual block insert`() {
-    val before = """
+      val before = """
             ${c}int a;
             int b;
             int c;
     """.trimIndent()
-    typeTextInFile(parseKeys("<C-V>", "2j", "I", "const ", "<Esc>"), before)
-    val after = """
+      typeTextInFile(parseKeys("<C-V>", "2j", "I", "const ", "<Esc>"), before)
+      val after = """
             ${c}const int a;
             const int b;
             const int c;
     """.trimIndent()
-    myFixture.checkResult(after)
+      assertState(after)
   }
 
   // VIM-1379 |CTRL-V| |j| |v_b_I|
