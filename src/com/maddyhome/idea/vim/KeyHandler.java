@@ -124,6 +124,7 @@ public class KeyHandler {
    * @param action  The action to execute
    * @param context The context to run it in
    */
+  @SuppressWarnings("deprecation")
   public static boolean executeAction(@NotNull AnAction action, @NotNull DataContext context) {
     final AnActionEvent event =
       new AnActionEvent(null, context, ActionPlaces.ACTION_SEARCH, action.getTemplatePresentation(),
@@ -153,10 +154,12 @@ public class KeyHandler {
         // Executing listeners for action. I can't be sure that this code is absolutely correct,
         //   action execution process in IJ seems to be more complicated.
         ActionManagerEx actionManager = ActionManagerEx.getInstanceEx();
+        // [VERSION UPDATE] 212+
         actionManager.fireBeforeActionPerformed(action, event.getDataContext(), event);
 
         action.actionPerformed(event);
 
+        // [VERSION UPDATE] 212+
         actionManager.fireAfterActionPerformed(action, event.getDataContext(), event);
         return true;
       }

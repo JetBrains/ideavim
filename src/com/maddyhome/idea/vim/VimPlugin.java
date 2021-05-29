@@ -77,6 +77,8 @@ import static com.maddyhome.idea.vim.group.KeyGroup.SHORTCUT_CONFLICTS_ELEMENT;
  * This is an application level plugin meaning that all open projects will share a common instance of the plugin.
  * Registers and marks are shared across open projects so you can copy and paste between files of different projects.
  */
+@SuppressWarnings("deprecation")
+// [VERSION UPDATE] 212+ getService
 @State(name = "VimSettings", storages = {@Storage("$APP_CONFIG$/vim_settings.xml")})
 public class VimPlugin implements PersistentStateComponent<Element>, Disposable {
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
