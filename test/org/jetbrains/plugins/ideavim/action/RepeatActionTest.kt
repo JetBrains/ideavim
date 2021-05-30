@@ -42,10 +42,12 @@ class RepeatActionTest : VimTestCase() {
         "Last line."
     )
     typeText(parseKeys("j", "ct.", "Change the line to point", "<Esc>", "j0", "."))
-    assertState("The first line.\n" +
-      "Change the line to point.\n" +
-      "Change the line to point.\n" +
-      "Last line.")
+    assertState(
+      "The first line.\n" +
+        "Change the line to point.\n" +
+        "Change the line to point.\n" +
+        "Last line."
+    )
   }
 
   // VIM-1644
@@ -68,9 +70,11 @@ class RepeatActionTest : VimTestCase() {
         "Good."
     )
     typeText(parseKeys("www", "<C-V>ec", "blue", "<Esc>", "j0w.", "j0ww."))
-    assertState("There is a blue house.\n" +
-      "Another blue house there.\n" +
-      "They have blue windows.\n" +
-      "Good.")
+    assertState(
+      "There is a blue house.\n" +
+        "Another blue house there.\n" +
+        "They have blue windows.\n" +
+        "Good."
+    )
   }
 }

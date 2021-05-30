@@ -157,12 +157,12 @@ class ChangeVisualActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test change visual action`() {
-      typeTextInFile(
-          parseKeys("v2lc", "aaa", "<ESC>"),
-          "abcd${c}ffffff${c}abcde${c}aaaa\n"
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      assertState("abcdaa${c}afffaa${c}adeaa${c}aa\n")
+    typeTextInFile(
+      parseKeys("v2lc", "aaa", "<ESC>"),
+      "abcd${c}ffffff${c}abcde${c}aaaa\n"
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    assertState("abcdaa${c}afffaa${c}adeaa${c}aa\n")
   }
 
   // VIM-1379 |CTRL-V| |j| |v_b_c|

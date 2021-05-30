@@ -116,22 +116,24 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test change number dec visual action`() {
-      typeTextInFile(
-          parseKeys("Vj<C-X>"),
-          """
+    typeTextInFile(
+      parseKeys("Vj<C-X>"),
+      """
                     ${c}1
                     2
                     3
                     ${c}4
                     5
       """.trimIndent()
-      )
-      assertState("""
+    )
+    assertState(
+      """
                 ${c}0
                 1
                 3
                 ${c}3
                 4
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 }

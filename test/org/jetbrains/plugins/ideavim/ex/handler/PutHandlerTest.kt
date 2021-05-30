@@ -30,9 +30,11 @@ class PutHandlerTest : VimTestCase() {
     configureByText("Test\n" + "Hello <caret>World!\n")
     typeText(parseKeys("\"ayw"))
     typeText(commandToKeys("put a"))
-    assertState("Test\n" +
-      "Hello World!\n" +
-      "<caret>World\n")
+    assertState(
+      "Test\n" +
+        "Hello World!\n" +
+        "<caret>World\n"
+    )
   }
 
   // VIM-551 |:put|

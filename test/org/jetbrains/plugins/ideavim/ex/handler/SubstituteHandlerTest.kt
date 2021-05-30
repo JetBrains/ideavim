@@ -473,12 +473,14 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     )
 
     enterCommand(",+3s/One/Two/g")
-    assertState("""One
+    assertState(
+      """One
         |Two
         |Two
         |Two
         |${c}Two
-        |One""".trimMargin())
+        |One""".trimMargin()
+    )
   }
 
   @VimOptionDefaultAll
@@ -494,12 +496,14 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     )
 
     enterCommand(",.+3s/One/Two/g")
-    assertState("""One
+    assertState(
+      """One
         |Two
         |Two
         |Two
         |${c}Two
-        |One""".trimMargin())
+        |One""".trimMargin()
+    )
   }
 
   @VimOptionDefaultAll

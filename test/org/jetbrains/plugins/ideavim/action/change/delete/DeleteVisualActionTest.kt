@@ -116,10 +116,10 @@ class DeleteVisualActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test delete after extend selection`() {
-      // This test emulates deletion after structural selection
-      // In short, when caret is not on the selection end
-      configureByText(
-          """
+    // This test emulates deletion after structural selection
+    // In short, when caret is not on the selection end
+    configureByText(
+      """
             A Discovery
 
             ${s}I found it in a legendary land
@@ -127,16 +127,18 @@ class DeleteVisualActionTest : VimTestCase() {
             where it was settled on some sodden sand
             ${se}hard by the torrent of a mountain pass.
       """.trimIndent()
-      )
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      typeText(parseKeys("d"))
-      assertState("""
+    )
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    typeText(parseKeys("d"))
+    assertState(
+      """
             A Discovery
 
             hard by the torrent of a mountain pass.
-      """.trimIndent())
-      assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+      """.trimIndent()
+    )
+    assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test delete with dollar motion`() {

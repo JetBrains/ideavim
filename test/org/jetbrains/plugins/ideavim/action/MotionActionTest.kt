@@ -209,12 +209,14 @@ class MotionActionTest : VimTestCase() {
 }
 """
     )
-    assertState("""
+    assertState(
+      """
     foo {
     
     }
     
-      """.trimIndent())
+      """.trimIndent()
+    )
     assertOffset(6)
   }
 
@@ -934,10 +936,12 @@ two
     )
     typeText(parseKeys(">"))
     assertMode(CommandState.Mode.COMMAND)
-    assertState("""    foo
+    assertState(
+      """    foo
     bar
     baz
-""")
+"""
+    )
     typeText(parseKeys("gv"))
     assertSelection(
       """    foo
@@ -947,10 +951,12 @@ two
     )
     typeText(parseKeys(">"))
     assertMode(CommandState.Mode.COMMAND)
-    assertState("""        foo
+    assertState(
+      """        foo
         bar
         baz
-""")
+"""
+    )
     typeText(parseKeys("gv"))
     assertSelection(
       """        foo

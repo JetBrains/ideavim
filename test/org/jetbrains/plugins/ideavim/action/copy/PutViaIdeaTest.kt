@@ -51,28 +51,28 @@ class PutViaIdeaTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test simple insert via idea`() {
-      val before = "${c}I found it in a legendary land"
-      configureByText(before)
+    val before = "${c}I found it in a legendary land"
+    configureByText(before)
 
-      VimPlugin.getRegister()
-          .storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister()
+      .storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
 
-      typeText(StringHelper.parseKeys("ve", "p"))
-      val after = "legendar${c}y it in a legendary land"
-      assertState(after)
+    typeText(StringHelper.parseKeys("ve", "p"))
+    val after = "legendar${c}y it in a legendary land"
+    assertState(after)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test insert several times`() {
-      val before = "${c}I found it in a legendary land"
-      configureByText(before)
+    val before = "${c}I found it in a legendary land"
+    configureByText(before)
 
-      VimPlugin.getRegister()
-          .storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister()
+      .storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
 
-      typeText(StringHelper.parseKeys("ppp"))
-      val after = "Ilegendarylegendarylegendar${c}y found it in a legendary land"
-      assertState(after)
+    typeText(StringHelper.parseKeys("ppp"))
+    val after = "Ilegendarylegendarylegendar${c}y found it in a legendary land"
+    assertState(after)
   }
 
   fun `test insert doesn't clear existing elements`() {
@@ -93,24 +93,24 @@ class PutViaIdeaTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test insert block with newline`() {
-      val before = """
+    val before = """
             A Discovery
             $c
             I found it in a legendary land
             
             hard by the torrent of a mountain pass.
     """.trimIndent()
-      configureByText(before)
+    configureByText(before)
 
-      VimPlugin.getRegister().storeText(
-          myFixture.editor,
-          before rangeOf "\nI found it in a legendary land\n",
-          SelectionType.CHARACTER_WISE,
-          false
-      )
+    VimPlugin.getRegister().storeText(
+      myFixture.editor,
+      before rangeOf "\nI found it in a legendary land\n",
+      SelectionType.CHARACTER_WISE,
+      false
+    )
 
-      typeText(StringHelper.parseKeys("p"))
-      val after = """
+    typeText(StringHelper.parseKeys("p"))
+    val after = """
             A Discovery
             
             I found it in a legendary land
@@ -119,6 +119,6 @@ class PutViaIdeaTest : VimTestCase() {
             
             hard by the torrent of a mountain pass.
     """.trimIndent()
-      assertState(after)
+    assertState(after)
   }
 }

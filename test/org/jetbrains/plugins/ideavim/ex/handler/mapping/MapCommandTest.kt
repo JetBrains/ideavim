@@ -163,11 +163,13 @@ n  ,f            <Plug>Foo
     assertPluginError(false)
     typeText(StringHelper.parseKeys("l", "<Right>"))
     assertPluginError(false)
-    assertState("""
+    assertState(
+      """
   foo
   bar
   
-      """.trimIndent())
+      """.trimIndent()
+    )
     assertOffset(1)
     typeText(commandToKeys("nmap"))
     assertExOutput("n  <Right>     * <Nop>\n")
@@ -278,11 +280,13 @@ n  ,f            <Plug>Foo
     )
     VimScriptParser.executeText(VimScriptParser.readText("map \u0018i dd\n"))
     typeText(StringHelper.parseKeys("i", "#", "<Esc>"))
-    assertState("""
+    assertState(
+      """
   #foo
   bar
   
-      """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.COMMAND)
     typeText(commandToKeys("map"))
     assertExOutput("   <C-X>i        dd\n")
@@ -508,12 +512,14 @@ n  ,f            <Plug>Foo
     )
     typeText(commandToKeys("map k <Action>(CommentByLineComment)"))
     typeText(StringHelper.parseKeys("k"))
-    assertState("""
+    assertState(
+      """
         -----
         //12345
         abcde
         -----
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -528,12 +534,14 @@ n  ,f            <Plug>Foo
     )
     typeText(commandToKeys("map k <Action>(CommentByLineComment)"))
     typeText(StringHelper.parseKeys("kk"))
-    assertState("""
+    assertState(
+      """
           -----
           //12345
           //abcde
           -----
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -548,12 +556,14 @@ n  ,f            <Plug>Foo
     )
     typeText(commandToKeys("map k <Action>(CommentByLineComment)<Action>(CommentByLineComment)"))
     typeText(StringHelper.parseKeys("k"))
-    assertState("""
+    assertState(
+      """
           -----
           //12345
           //abcde
           -----
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -568,12 +578,14 @@ n  ,f            <Plug>Foo
     )
     typeText(commandToKeys("map k <Action>(CommentByLineComment)<Action>(CommentByLineComment)<Action>(CommentByLineComment)"))
     typeText(StringHelper.parseKeys("k"))
-    assertState("""
+    assertState(
+      """
           -----
           //12345
           //abcde
           //-----
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -588,12 +600,14 @@ n  ,f            <Plug>Foo
     )
     typeText(commandToKeys("imap k <Action>(CommentByLineComment)"))
     typeText(StringHelper.parseKeys("ik"))
-    assertState("""
+    assertState(
+      """
           -----
           //12345
           abcde
           -----
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
@@ -688,12 +702,14 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("map jz w"))
     typeText(StringHelper.parseKeys("kz"))
 
-    assertState("""
+    assertState(
+      """
               -----
               12345
               ${c}abcde
               -----
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   fun `test recursion`() {

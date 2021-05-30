@@ -32,35 +32,39 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class DeleteMotionActionTest : VimTestCase() {
 
   fun `test delete last line`() {
-      typeTextInFile(
-          parseKeys("dd"),
-          """
+    typeTextInFile(
+      parseKeys("dd"),
+      """
         def xxx():
           expression one
           expression${c} two
       """.trimIndent()
-      )
-      assertState("""
+    )
+    assertState(
+      """
         def xxx():
           ${c}expression one
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test delete last line with nostartofline`() {
-      OptionsManager.startofline.reset()
-      typeTextInFile(
-          parseKeys("dd"),
-          """
+    OptionsManager.startofline.reset()
+    typeTextInFile(
+      parseKeys("dd"),
+      """
         |def xxx():
         |  expression one
         |  expression${c} two
       """.trimMargin()
-      )
-      assertState("""
+    )
+    assertState(
+      """
         |def xxx():
         |  expression${c} one
-      """.trimMargin())
+      """.trimMargin()
+    )
   }
 
   @VimBehaviorDiffers(originalVimAfter = "  expression two\n")
@@ -79,9 +83,9 @@ class DeleteMotionActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test delete line action multicaret`() {
-      typeTextInFile(
-          parseKeys("d3d"),
-          """
+    typeTextInFile(
+      parseKeys("d3d"),
+      """
         abc${c}de
         abcde
         abcde
@@ -91,15 +95,15 @@ class DeleteMotionActionTest : VimTestCase() {
         abcde
         
       """.trimIndent()
-      )
-      assertState("${c}abcde\n${c}")
+    )
+    assertState("${c}abcde\n${c}")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test delete motion action multicaret`() {
-      typeTextInFile(
-          parseKeys("dt)"),
-          """|public class Foo {
+    typeTextInFile(
+      parseKeys("dt)"),
+      """|public class Foo {
          |  int foo(int a, int b) {
          |    boolean bar = (a < 0 && (b < 0 || a > 0)${c} || b != 0);
          |    if (bar${c} || b != 0) {
@@ -111,8 +115,9 @@ class DeleteMotionActionTest : VimTestCase() {
          |  }
          |}
         """.trimMargin()
-      )
-      assertState("""|public class Foo {
+    )
+    assertState(
+      """|public class Foo {
          |  int foo(int a, int b) {
          |    boolean bar = (a < 0 && (b < 0 || a > 0)${c});
          |    if (bar${c}) {
@@ -123,11 +128,12 @@ class DeleteMotionActionTest : VimTestCase() {
          |    }
          |  }
          |}
-         """.trimMargin())
+         """.trimMargin()
+    )
   }
 
   fun `test delete empty line`() {
-      val file = """
+    val file = """
             A Discovery
             ${c}
             I found it in a legendary land
@@ -135,15 +141,15 @@ class DeleteMotionActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-      val newFile = """
+    val newFile = """
             A Discovery
             ${c}I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
     """.trimIndent()
-      typeTextInFile(parseKeys("dd"), file)
-      assertState(newFile)
+    typeTextInFile(parseKeys("dd"), file)
+    assertState(newFile)
   }
 
   fun `test delete on last line`() {

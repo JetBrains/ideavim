@@ -139,19 +139,19 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
 
   // VIM-112 |i| |i_CTRL-W|
   fun `test insert delete previous word`() {
-      typeTextInFile(
-          parseKeys("i", "one two three", "<C-W>"),
-          "hello\n" + "<caret>\n"
-      )
-      assertState("hello\n" + "one two \n")
+    typeTextInFile(
+      parseKeys("i", "one two three", "<C-W>"),
+      "hello\n" + "<caret>\n"
+    )
+    assertState("hello\n" + "one two \n")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test insert delete previous word action`() {
-      typeTextInFile(
-          parseKeys("i", "<C-W>", "<ESC>"),
-          "one tw<caret>o three<caret> four   <caret>\n"
-      )
-      assertState("one<caret> o<caret> <caret> \n")
+    typeTextInFile(
+      parseKeys("i", "<C-W>", "<ESC>"),
+      "one tw<caret>o three<caret> four   <caret>\n"
+    )
+    assertState("one<caret> o<caret> <caret> \n")
   }
 }

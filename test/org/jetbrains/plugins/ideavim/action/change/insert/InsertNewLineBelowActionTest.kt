@@ -67,20 +67,20 @@ class InsertNewLineBelowActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN) // Java support would be a neovim plugin
   fun `test insert new line below matches indent for java`() {
-      val before = """public class C {
+    val before = """public class C {
       |  ${c}Integer a;
       |  Integer b;
       |}
     """.trimMargin()
-      val after = """public class C {
+    val after = """public class C {
       |  Integer a;
       |  $c
       |  Integer b;
       |}
     """.trimMargin()
-      configureByJavaText(before)
-      typeText(parseKeys("o"))
-      assertState(after)
+    configureByJavaText(before)
+    typeText(parseKeys("o"))
+    assertState(after)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)

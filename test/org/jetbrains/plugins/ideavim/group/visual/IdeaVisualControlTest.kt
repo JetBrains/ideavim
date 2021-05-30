@@ -67,8 +67,8 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection cursor in the middle`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
 
             I ${s}found$c it$se in a legendary land
@@ -76,26 +76,28 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
 
-      typeText(parseKeys("l"))
-      assertState("""
+    typeText(parseKeys("l"))
+    assertState(
+      """
             A Discovery
 
             I ${s}found ${c}i${se}t in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
   }
 
   @VimBehaviorDiffers(
@@ -111,8 +113,8 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection cursor on end`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
 
             I ${s}found it$c$se in a legendary land
@@ -120,33 +122,35 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
 
-      typeText(parseKeys("l"))
-      assertState("""
+    typeText(parseKeys("l"))
+    assertState(
+      """
             A Discovery
 
             I ${s}found it ${c}i${se}n a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection cursor on start`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
 
             I $s${c}found it$se in a legendary land
@@ -154,33 +158,35 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
 
-      typeText(parseKeys("l"))
-      assertState("""
+    typeText(parseKeys("l"))
+    assertState(
+      """
             A Discovery
 
             I f${s}${c}ound it$se in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection lineend`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
 
             I ${s}found ${c}it in a legendary land$se
@@ -188,33 +194,35 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
 
-      typeText(parseKeys("l"))
-      assertState("""
+    typeText(parseKeys("l"))
+    assertState(
+      """
             A Discovery
 
             I ${s}found i${c}t${se} in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection next line`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
 
             I ${s}found ${c}it in a legendary land
@@ -222,33 +230,35 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
 
-      typeText(parseKeys("l"))
-      assertState("""
+    typeText(parseKeys("l"))
+    assertState(
+      """
             A Discovery
 
             I ${s}found i${c}t${se} in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection start on line start`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
 
             ${s}I found ${c}it ${se}in a legendary land
@@ -256,33 +266,35 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
 
-      typeText(parseKeys("l"))
-      assertState("""
+    typeText(parseKeys("l"))
+    assertState(
+      """
             A Discovery
 
             ${s}I found i${c}t${se} in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection start on line end`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
             $s
             I found ${c}it ${se}in a legendary land
@@ -290,33 +302,35 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
 
-      typeText(parseKeys("l"))
-      assertState("""
+    typeText(parseKeys("l"))
+    assertState(
+      """
             A Discovery
             $s
             I found i${c}t${se} in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection multicaret`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
             $s
             I found ${c}it ${se}in a legendary land
@@ -324,33 +338,35 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             where it was $s${c}settled$se on some sodden sand
             hard by the torrent of a mountain ${s}pass.$c$se
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
 
-      typeText(parseKeys("l"))
-      assertState("""
+    typeText(parseKeys("l"))
+    assertState(
+      """
             A Discovery
             $s
             I found i${c}t${se} in a legendary land
             all rocks ${s}a${c}n${se}d lavender and tufted grass,
             where it was s$s${c}ettled$se on some sodden sand
             hard by the torrent of a mountain ${s}pass.$c$se
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+    assertCaretsColour()
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
 
             ${s}I found ${c}it in a legendary land$se
@@ -358,46 +374,50 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_LINE)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertCaretsColour()
 
-      typeText(parseKeys("l"))
-      assertState("""
+    typeText(parseKeys("l"))
+    assertState(
+      """
             A Discovery
 
             ${s}I found i${c}t in a legendary land
             ${se}all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_LINE)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertCaretsColour()
 
-      typeText(parseKeys("j"))
-      assertState("""
+    typeText(parseKeys("j"))
+    assertState(
+      """
             A Discovery
 
             ${s}I found it in a legendary land
             all rocks$c and lavender and tufted grass,
             ${se}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_LINE)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertCaretsColour()
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection next line`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
 
             ${s}I found ${c}it in a legendary land
@@ -405,33 +425,35 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_LINE)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertCaretsColour()
 
-      typeText(parseKeys("j"))
-      assertState("""
+    typeText(parseKeys("j"))
+    assertState(
+      """
             A Discovery
 
             ${s}I found it in a legendary land
             all rock${c}s and lavender and tufted grass,
             ${se}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_LINE)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertCaretsColour()
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection cursor on last line`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
 
             ${s}I found it in a legendary land
@@ -439,33 +461,35 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             where it was settled ${c}on some sodden sand$se
             hard by the torrent of a mountain pass.
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_LINE)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertCaretsColour()
 
-      typeText(parseKeys("j"))
-      assertState("""
+    typeText(parseKeys("j"))
+    assertState(
+      """
             A Discovery
 
             ${s}I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent o${c}f a mountain pass.$se
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_LINE)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertCaretsColour()
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection cursor on first line`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
 
             ${s}I found it in a ${c}legendary land
@@ -473,33 +497,35 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             where it was settled on some sodden sand$se
             hard by the torrent of a mountain pass.
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_LINE)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertCaretsColour()
 
-      typeText(parseKeys("j"))
-      assertState("""
+    typeText(parseKeys("j"))
+    assertState(
+      """
             A Discovery
 
             I found it in a legendary land
             ${s}all rocks and la${c}vender and tufted grass,
             where it was settled on some sodden sand
             ${se}hard by the torrent of a mountain pass.
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_LINE)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertCaretsColour()
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection multicaret`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
 
             ${s}I found it in a ${c}legendary land$se
@@ -507,33 +533,35 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             ${s}where it was settled ${c}on some sodden sand
             hard by the torrent of a mountain pass.$se
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_LINE)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertCaretsColour()
 
-      typeText(parseKeys("j"))
-      assertState("""
+    typeText(parseKeys("j"))
+    assertState(
+      """
             A Discovery
 
             ${s}I found it in a legendary land
             all rocks and la${c}vender and tufted grass,
             ${se}where it was settled on some sodden sand
             ${s}hard by the torrent o${c}f a mountain pass.$se
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_LINE)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertCaretsColour()
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable line selection motion up`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
 
             I found it in a legendary land
@@ -541,26 +569,28 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_LINE)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertCaretsColour()
 
-      typeText(parseKeys("k"))
-      assertState("""
+    typeText(parseKeys("k"))
+    assertState(
+      """
             A Discovery
 
             ${s}I found it in a legenda${c}ry land
             all rocks and lavender and tufted grass,
             ${se}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_LINE)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+    assertCaretsColour()
   }
 
   @VimOptionDefaultAll
@@ -587,8 +617,8 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
 
             I ${s}found$c$se it in a legendary land
@@ -596,33 +626,35 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             wh${s}ere i$c${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+    assertCaretsColour()
 
-      typeText(parseKeys("l"))
-      assertState("""
+    typeText(parseKeys("l"))
+    assertState(
+      """
             A Discovery
 
             I ${s}found ${c}i${se}t in a legendary land
             al${s}l rock${c}s${se} and lavender and tufted grass,
             wh${s}ere it${c} ${se}was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+    assertCaretsColour()
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection with longer line`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
 
             I ${s}found it in a legendary land$c$se
@@ -630,33 +662,35 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             wh${s}ere it was settled on some sodden sand$c$se
             hard by the torrent of a mountain pass.
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+    assertCaretsColour()
 
-      typeText(parseKeys("j"))
-      assertState("""
+    typeText(parseKeys("j"))
+    assertState(
+      """
             A Discovery
 
             I ${s}found it in a legendary lan${c}d$se
             al${s}l rocks and lavender and tufted gras${c}s${se},
             wh${s}ere it was settled on some sodden sa${c}n${se}d
             ha${s}rd by the torrent of a mountain pass.${c}$se
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+    assertCaretsColour()
   }
 
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable character selection caret to the left`() {
-      configureByText(
-          """
+    configureByText(
+      """
             A Discovery
 
             I $s${c}found$se it in a legendary land
@@ -664,26 +698,28 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
             wh$s${c}ere i${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
       """.trimIndent()
-      )
-      assertMode(CommandState.Mode.COMMAND)
-      IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
-      waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-      assertCaretsColour()
+    )
+    assertMode(CommandState.Mode.COMMAND)
+    IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+    assertCaretsColour()
 
-      typeText(parseKeys("l"))
-      assertState("""
+    typeText(parseKeys("l"))
+    assertState(
+      """
             A Discovery
 
             I f$s${c}ound$se it in a legendary land
             all$s$c roc${se}ks and lavender and tufted grass,
             whe$s${c}re i${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
-      """.trimIndent())
-      assertMode(CommandState.Mode.VISUAL)
-      assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-      assertCaretsColour()
+      """.trimIndent()
+    )
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+    assertCaretsColour()
   }
 
   @VimOptionTestConfiguration(

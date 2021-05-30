@@ -116,23 +116,25 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test change number inc visual multiple cursor`() {
-      typeTextInFile(
-          parseKeys("Vj<C-A>"),
-          """
+    typeTextInFile(
+      parseKeys("Vj<C-A>"),
+      """
                     ${c}1
                     2
                     3
                     ${c}4
                     5
       """.trimIndent()
-      )
-      assertState("""
+    )
+    assertState(
+      """
                     ${c}2
                     3
                     3
                     ${c}5
                     6
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   fun `test two numbers on the same line`() {

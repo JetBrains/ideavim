@@ -121,81 +121,81 @@ class MotionInnerBlockParenActionTest : VimTestCase() {
 
   // VIM-326 |d| |v_ib|
   fun testDeleteInnerBlock() {
-      typeTextInFile(
-          parseKeys("di)"),
-          "foo(\"b${c}ar\")\n"
-      )
-      assertState("foo()\n")
+    typeTextInFile(
+      parseKeys("di)"),
+      "foo(\"b${c}ar\")\n"
+    )
+    assertState("foo()\n")
   }
 
   // VIM-1008 |d| |v_ib|
   fun testDeleteInnerBlockWithQuote() {
-      typeTextInFile(
-          parseKeys("di)"),
-          "(abc${c}def'ghi)"
-      )
-      assertState("()")
+    typeTextInFile(
+      parseKeys("di)"),
+      "(abc${c}def'ghi)"
+    )
+    assertState("()")
   }
 
   // VIM-1008 |d| |v_ib|
   fun testDeleteInnerBlockWithDoubleQuote() {
-      typeTextInFile(
-          parseKeys("di)"),
-          """(abc${c}def"ghi)"""
-      )
-      assertState("()")
+    typeTextInFile(
+      parseKeys("di)"),
+      """(abc${c}def"ghi)"""
+    )
+    assertState("()")
   }
 
   // VIM-326 |d| |v_ib|
   fun testDeleteInnerBlockCaretBeforeString() {
-      typeTextInFile(
-          parseKeys("di)"),
-          "foo(${c}\"bar\")\n"
-      )
-      assertState("foo()\n")
+    typeTextInFile(
+      parseKeys("di)"),
+      "foo(${c}\"bar\")\n"
+    )
+    assertState("foo()\n")
   }
 
   // VIM-326 |c| |v_ib|
   fun testChangeInnerBlockCaretBeforeString() {
-      typeTextInFile(
-          parseKeys("ci)"),
-          "foo(${c}\"bar\")\n"
-      )
-      assertState("foo()\n")
+    typeTextInFile(
+      parseKeys("ci)"),
+      "foo(${c}\"bar\")\n"
+    )
+    assertState("foo()\n")
   }
 
   // VIM-392 |c| |v_ib|
   fun testChangeInnerBlockCaretBeforeBlock() {
-      typeTextInFile(
-          parseKeys("ci)"),
-          "foo$c(bar)\n"
-      )
-      assertState("foo()\n")
-      assertOffset(4)
+    typeTextInFile(
+      parseKeys("ci)"),
+      "foo$c(bar)\n"
+    )
+    assertState("foo()\n")
+    assertOffset(4)
   }
 
   // |v_ib|
   fun testInnerBlockCrashWhenNoDelimiterFound() {
-      typeTextInFile(parseKeys("di)"), "(x\n")
-      assertState("(x\n")
+    typeTextInFile(parseKeys("di)"), "(x\n")
+    assertState("(x\n")
   }
 
   // VIM-275 |d| |v_ib|
   fun testDeleteInnerParensBlockBeforeOpen() {
-      typeTextInFile(
-          parseKeys("di)"),
-          "foo$c(bar)\n"
-      )
-      assertState("foo()\n")
-      assertOffset(4)
+    typeTextInFile(
+      parseKeys("di)"),
+      "foo$c(bar)\n"
+    )
+    assertState("foo()\n")
+    assertOffset(4)
   }
 
   // |d| |v_ib|
   fun testDeleteInnerParensBlockBeforeClose() {
-      typeTextInFile(
-          parseKeys("di)"),
-          "foo(bar$c)\n"
-      )
-      assertState("foo()\n")
+    typeTextInFile(
+      parseKeys("di)"),
+      "foo(bar$c)\n"
+    )
+    assertState("foo()\n")
   }
 }

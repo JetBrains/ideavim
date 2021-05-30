@@ -27,13 +27,13 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class InsertTabActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test insert tab`() {
-      val before = "I fo${c}und it in a legendary land"
-      val after = "I fo    ${c}und it in a legendary land"
-      configureByText(before)
+    val before = "I fo${c}und it in a legendary land"
+    val after = "I fo    ${c}und it in a legendary land"
+    configureByText(before)
 
-      typeText(parseKeys("i", "<Tab>"))
+    typeText(parseKeys("i", "<Tab>"))
 
-      assertState(after)
+    assertState(after)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)

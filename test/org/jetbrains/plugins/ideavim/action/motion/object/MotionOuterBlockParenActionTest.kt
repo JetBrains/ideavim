@@ -112,10 +112,10 @@ class MotionOuterBlockParenActionTest : VimTestCase() {
 
   // |d| |v_ab|
   fun testDeleteOuterBlock() {
-      typeTextInFile(
-          parseKeys("da)"),
-          "foo(b${c}ar, baz);\n"
-      )
-      assertState("foo;\n")
+    typeTextInFile(
+      parseKeys("da)"),
+      "foo(b${c}ar, baz);\n"
+    )
+    assertState("foo;\n")
   }
 }

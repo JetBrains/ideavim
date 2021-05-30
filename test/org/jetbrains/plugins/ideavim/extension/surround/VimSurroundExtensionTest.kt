@@ -89,55 +89,55 @@ class VimSurroundExtensionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundTag() {
-      configureByText("Hello ${c}World!\n")
-      typeText(parseKeys("ysiw\\<em>"))
-      assertState("Hello <em>World</em>!\n")
+    configureByText("Hello ${c}World!\n")
+    typeText(parseKeys("ysiw\\<em>"))
+    assertState("Hello <em>World</em>!\n")
   }
 
   // VIM-1569
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundTagWithAttributes() {
-      configureByText("Hello ${c}World!")
-      typeText(parseKeys("ysiw\\<span class=\"important\" data-foo=\"bar\">"))
-      assertState("Hello <span class=\"important\" data-foo=\"bar\">World</span>!")
+    configureByText("Hello ${c}World!")
+    typeText(parseKeys("ysiw\\<span class=\"important\" data-foo=\"bar\">"))
+    assertState("Hello <span class=\"important\" data-foo=\"bar\">World</span>!")
   }
 
   // VIM-1569
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurraungTagAsInIssue() {
-      configureByText("<p>${c}Hello</p>")
-      typeText(parseKeys("VS<div class = \"container\">"))
-      assertState("<div class = \"container\"><p>Hello</p></div>")
+    configureByText("<p>${c}Hello</p>")
+    typeText(parseKeys("VS<div class = \"container\">"))
+    assertState("<div class = \"container\"><p>Hello</p></div>")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundFunctionName() {
-      configureByText("foo = b${c}ar")
-      typeText(parseKeys("ysiwfbaz"))
-      assertState("foo = ${c}baz(bar)")
+    configureByText("foo = b${c}ar")
+    typeText(parseKeys("ysiwfbaz"))
+    assertState("foo = ${c}baz(bar)")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundFunctionNameDoesNothingIfInputIsEmpty() {
-      // The cursor does not move. This is different from Vim
-      // where the cursor moves to the beginning of the text object.
-      configureByText("foo = b${c}ar")
-      typeText(parseKeys("ysiwf"))
-      assertState("foo = b${c}ar")
+    // The cursor does not move. This is different from Vim
+    // where the cursor moves to the beginning of the text object.
+    configureByText("foo = b${c}ar")
+    typeText(parseKeys("ysiwf"))
+    assertState("foo = b${c}ar")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundFunctionNameWithInnerSpacing() {
-      configureByText("foo = b${c}ar")
-      typeText(parseKeys("ysiwFbaz"))
-      assertState("foo = ${c}baz( bar )")
+    configureByText("foo = b${c}ar")
+    typeText(parseKeys("ysiwFbaz"))
+    assertState("foo = ${c}baz( bar )")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testSurroundSpace() {
-      configureByText("foo(b${c}ar)")
-      typeText(parseKeys("csbs"))
-      assertState("foo${c} bar")
+    configureByText("foo(b${c}ar)")
+    typeText(parseKeys("csbs"))
+    assertState("foo${c} bar")
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
@@ -454,25 +454,25 @@ class VimSurroundExtensionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun testWithAnExistingMapping() {
-      val before = "(foo)"
-      val after = "[foo]"
+    val before = "(foo)"
+    val after = "[foo]"
 
-      configureByText(before)
+    configureByText(before)
 
-      typeText(commandToKeys("noremap d <C-d>"))
-      typeText(parseKeys("cs(]"))
-      assertState(after)
+    typeText(commandToKeys("noremap d <C-d>"))
+    typeText(parseKeys("cs(]"))
+    assertState(after)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test change new line`() {
-      val before = """
+    val before = """
       "\n"
     """.trimIndent()
-      configureByText(before)
+    configureByText(before)
 
-      typeText(parseKeys("cs\"'"))
-      val after = """'\n'"""
-      assertState(after)
+    typeText(parseKeys("cs\"'"))
+    val after = """'\n'"""
+    assertState(after)
   }
 }

@@ -36,14 +36,16 @@ class ShiftRightTest : VimTestCase() {
               hard by the torrent of a mountain pass.
     """.trimIndent()
     typeTextInFile(StringHelper.parseKeys(">W"), file)
-    assertState("""
+    assertState(
+      """
             A Discovery
 
                   ${c}I found it in a legendary land
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   // VIM-407
@@ -142,14 +144,16 @@ class ShiftRightTest : VimTestCase() {
       |       hard by the torrent of a mountain pass.
     """.trimMargin()
     typeTextInFile(StringHelper.parseKeys(">>"), file)
-    assertState("""
+    assertState(
+      """
       |A Discovery
 
       |           ${c}I found it in a legendary land
       |       all rocks and lavender and tufted grass,
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
-      """.trimMargin())
+      """.trimMargin()
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
@@ -164,14 +168,16 @@ class ShiftRightTest : VimTestCase() {
       |       hard by the torrent of a mountain pass.
     """.trimMargin()
     typeTextInFile(StringHelper.parseKeys(">>"), file)
-    assertState("""
+    assertState(
+      """
       |A Discovery
 
       |           I found it i${c}n a legendary land
       |       all rocks and lavender and tufted grass,
       |       where it was settled on some sodden sand
       |       hard by the torrent of a mountain pass.
-      """.trimMargin())
+      """.trimMargin()
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
@@ -185,13 +191,15 @@ class ShiftRightTest : VimTestCase() {
               hard by the torrent of a mountain pass.
     """.trimIndent()
     typeTextInFile(StringHelper.parseKeys("i<C-T>"), file)
-    assertState("""
+    assertState(
+      """
             A Discovery
 
                   I found it in a legendary land
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 }

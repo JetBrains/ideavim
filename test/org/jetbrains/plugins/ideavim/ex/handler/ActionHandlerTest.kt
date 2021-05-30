@@ -51,10 +51,12 @@ class ActionHandlerTest : VimTestCase() {
     typeText(parseKeys("vjl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    assertState("-----\n" +
-      "1/*2345\n" +
-      "abc*/de\n" +
-      "-----")
+    assertState(
+      "-----\n" +
+        "1/*2345\n" +
+        "abc*/de\n" +
+        "-----"
+    )
   }
 
   // https://github.com/JetBrains/ideavim/commit/fe714a90032d0cb5ef0a0e0d8783980b6f1c7d20#r35647600
@@ -70,10 +72,12 @@ class ActionHandlerTest : VimTestCase() {
     typeText(parseKeys("vjl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    assertState("-----\n" +
-      "1/*2345\n" +
-      "abc*/de\n" +
-      "-----")
+    assertState(
+      "-----\n" +
+        "1/*2345\n" +
+        "abc*/de\n" +
+        "-----"
+    )
     OptionsManager.incsearch.reset()
   }
 
@@ -110,12 +114,14 @@ class ActionHandlerTest : VimTestCase() {
     typeText(parseKeys("Vj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    assertState("-----\n" +
-      "/*\n" +
-      "12345\n" +
-      "abcde\n" +
-      "*/\n" +
-      "-----")
+    assertState(
+      "-----\n" +
+        "/*\n" +
+        "12345\n" +
+        "abcde\n" +
+        "*/\n" +
+        "-----"
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -130,12 +136,14 @@ class ActionHandlerTest : VimTestCase() {
     typeText(parseKeys("Vj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    assertState("-----\n" +
-      "/*\n" +
-      "12345\n" +
-      "abcde\n" +
-      "*/\n" +
-      "-----")
+    assertState(
+      "-----\n" +
+        "/*\n" +
+        "12345\n" +
+        "abcde\n" +
+        "*/\n" +
+        "-----"
+    )
     OptionsManager.incsearch.reset()
   }
 
@@ -151,10 +159,12 @@ class ActionHandlerTest : VimTestCase() {
     typeText(parseKeys("<C-V>lj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    assertState("-----\n" +
-      "1/*23*/45\n" +
-      "a/*bc*/de\n" +
-      "-----")
+    assertState(
+      "-----\n" +
+        "1/*23*/45\n" +
+        "a/*bc*/de\n" +
+        "-----"
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
@@ -169,10 +179,12 @@ class ActionHandlerTest : VimTestCase() {
     typeText(parseKeys("<C-V>lj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
-    assertState("-----\n" +
-      "1/*23*/45\n" +
-      "a/*bc*/de\n" +
-      "-----")
+    assertState(
+      "-----\n" +
+        "1/*23*/45\n" +
+        "a/*bc*/de\n" +
+        "-----"
+    )
     OptionsManager.incsearch.reset()
   }
 }

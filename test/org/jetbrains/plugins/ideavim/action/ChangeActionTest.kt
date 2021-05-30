@@ -505,11 +505,13 @@ quux
       """.trimIndent()
     )
     typeText(StringHelper.parseKeys("<C-V>", "j", "x"))
-    assertState("""
+    assertState(
+      """
   oo
   ar
   
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   // |r|
@@ -663,11 +665,13 @@ foobaz
       """.trimIndent()
     )
     typeText(StringHelper.parseKeys("o", "foo(\"<Right>, \"<Right><Right>;", "<Esc>", "."))
-    assertState("""class C {
+    assertState(
+      """class C {
     foo("", "");
     foo("", "");
 }
-""")
+"""
+    )
   }
 
   // VIM-511 |.|
@@ -681,11 +685,13 @@ foobaz
       """.trimIndent()
     )
     typeText(StringHelper.parseKeys("o", "C(", "<BS>", "(int i) {}", "<Esc>", "."))
-    assertState("""class C {
+    assertState(
+      """class C {
     C(int i) {}
     C(int i) {}
 }
-""")
+"""
+    )
   }
 
   // VIM-613 |.|
@@ -699,12 +705,14 @@ foobaz
       """.trimIndent()
     )
     typeText(StringHelper.parseKeys("d$", "j", "."))
-    assertState("""
+    assertState(
+      """
   
   
   - 3
   
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   // VIM-511 |.|
@@ -718,7 +726,8 @@ foobaz
       """.trimIndent()
     )
     typeText(StringHelper.parseKeys("o", "C(", "<BS>", "(int i) {", "<Enter>", "i = 3;", "<Esc>", "<Down>", "."))
-    assertState("""class C {
+    assertState(
+      """class C {
     C(int i) {
         i = 3;
     }
@@ -726,7 +735,8 @@ foobaz
         i = 3;
     }
 }
-""")
+"""
+    )
   }
 
   // VIM-1067 |.|
@@ -742,12 +752,14 @@ foobaz
       """.trimIndent()
     )
     typeText(StringHelper.parseKeys("A", "<BS>", "<Esc>", "j", "."))
-    assertState("""
+    assertState(
+      """
   - 
   - 
   - 3
   
-      """.trimIndent())
+      """.trimIndent()
+    )
 
     // Case 2
     configureByText(
@@ -759,12 +771,14 @@ foobaz
       """.trimIndent()
     )
     typeText(StringHelper.parseKeys("A", "4", "<BS>", "<Esc>", "j", "."))
-    assertState("""
+    assertState(
+      """
   - 1
   - 2
   - 3
   
-      """.trimIndent())
+      """.trimIndent()
+    )
 
     // Case 3
     configureByText(
@@ -776,12 +790,14 @@ foobaz
       """.trimIndent()
     )
     typeText(StringHelper.parseKeys("A", "<BS>", "4", "<Esc>", "j", "."))
-    assertState("""
+    assertState(
+      """
   - 4
   - 4
   - 3
   
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   // VIM-287 |zc| |O|
@@ -795,13 +811,15 @@ foobaz
 and some text after"""
     )
     typeText(StringHelper.parseKeys("zc", "G", "O"))
-    assertState("""/**
+    assertState(
+      """/**
  * I should be fold
  * a little more text
  * and final fold
  */
 $c
-and some text after""")
+and some text after"""
+    )
   }
 
   // VIM-287 |zc| |o|
@@ -824,7 +842,8 @@ and some text after""")
     }
 
     typeText(StringHelper.parseKeys("o"))
-    assertState("""
+    assertState(
+      """
             /**
              * I should be fold
              * a little more text
@@ -832,7 +851,8 @@ and some text after""")
              */
             $c
             and some text after
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   fun testRepeatChangeWordDoesNotBreakNextRepeatFind() {

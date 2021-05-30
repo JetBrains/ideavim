@@ -27,19 +27,21 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class InsertAfterLineEndActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test insert after line end action`() {
-      typeTextInFile(
-          parseKeys("A", " four", "<ESC>"),
-          """
+    typeTextInFile(
+      parseKeys("A", " four", "<ESC>"),
+      """
                     one two ${c}three
                     sev${c}en si${c}x five
 
       """.trimIndent()
-      )
-      assertState("""
+    )
+    assertState(
+      """
     one two three fou${c}r
     seven six five fou${c}r
 
-      """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)

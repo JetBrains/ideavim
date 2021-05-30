@@ -307,9 +307,9 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test delete visual lines end action`() {
-      typeTextInFile(
-          parseKeys("v", "2j", "D"),
-          """
+    typeTextInFile(
+      parseKeys("v", "2j", "D"),
+      """
                     a${c}bcde
                     abcde
                     abcde
@@ -319,8 +319,8 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
                     abcde
 
       """.trimIndent()
-      )
-      assertState("${c}abcde\n${c}")
+    )
+    assertState("${c}abcde\n${c}")
   }
 
   @VimOptionDefaultAll
@@ -496,9 +496,9 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test line delete visual lines end action`() {
-      typeTextInFile(
-          parseKeys("V", "2j", "D"),
-          """
+    typeTextInFile(
+      parseKeys("V", "2j", "D"),
+      """
                     a${c}bcde
                     abcde
                     abcde
@@ -508,8 +508,8 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
                     abcde
 
       """.trimIndent()
-      )
-      assertState("${c}abcde\n${c}")
+    )
+    assertState("${c}abcde\n${c}")
   }
 
   @VimOptionDefaultAll
@@ -648,9 +648,9 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
 
   @VimOptionDefaultAll
   fun `test delete visual block line end action`() {
-      typeTextInFile(
-          parseKeys("<C-V>", "2j", "2l", "D"),
-          """
+    typeTextInFile(
+      parseKeys("<C-V>", "2j", "2l", "D"),
+      """
                     abcde
                     a${c}bcde
                     abcde
@@ -658,14 +658,16 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
                     abcde
 
       """.trimIndent()
-      )
-      assertState("""
+    )
+    assertState(
+      """
     abcde
     ${c}a
     a
     a
     abcde
 
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 }
