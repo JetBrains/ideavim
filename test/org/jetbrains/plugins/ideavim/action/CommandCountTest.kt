@@ -19,6 +19,8 @@
 package org.jetbrains.plugins.ideavim.action
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class CommandCountTest : VimTestCase() {
@@ -53,6 +55,7 @@ class CommandCountTest : VimTestCase() {
     assertState("567890")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun `test multiple select register counts`() {
     configureByText("${c}12345678901234567890123456789012345678901234567890")
     typeText(parseKeys("2\"a2\"b2\"b2d2l")) // Delete 32 characters

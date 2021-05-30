@@ -25,6 +25,8 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 import java.util.*
@@ -47,6 +49,7 @@ class PutViaIdeaTest : VimTestCase() {
     super.tearDown()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test simple insert via idea`() {
       val before = "${c}I found it in a legendary land"
       configureByText(before)
@@ -59,6 +62,7 @@ class PutViaIdeaTest : VimTestCase() {
       assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test insert several times`() {
       val before = "${c}I found it in a legendary land"
       configureByText(before)
@@ -87,6 +91,7 @@ class PutViaIdeaTest : VimTestCase() {
     assertEquals(sizeBefore, CopyPasteManager.getInstance().allContents.size)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test insert block with newline`() {
       val before = """
             A Discovery

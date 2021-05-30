@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.Test
@@ -51,6 +53,7 @@ class PutVisualTextActionTest : VimTestCase() {
   // ----- Case 1: Copied | Characterwise | --- pasted | Characterwise | ---| small p |--------------------
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual line without copy`() {
     val before = """
             ${c}I found it in a legendary land
@@ -65,6 +68,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text without copy`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
@@ -74,6 +78,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
@@ -84,6 +89,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text twice`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
@@ -94,6 +100,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text full line`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
@@ -104,6 +111,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text multicaret`() {
     val before = "${c}I found ${c}it in a ${c}legendary land"
     val editor = configureByText(before)
@@ -114,6 +122,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text another direction`() {
     val before = "I foun${c}d it in a legendary land"
     val editor = configureByText(before)
@@ -126,6 +135,7 @@ class PutVisualTextActionTest : VimTestCase() {
   // ----- Case 2: Copied | Linewise | --- pasted | Characterwise | ---| small p |--------------------
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text linewise`() {
     val before = """
             A Discovery
@@ -152,6 +162,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text linewise in middle`() {
     val before = """
             A Discovery
@@ -178,6 +189,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text linewise last line`() {
     val before = """
             A Discovery
@@ -204,6 +216,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text linewise last line full line`() {
     val before = """
             A Discovery
@@ -230,6 +243,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text linewise multicaret`() {
     val before = """
             A Discovery
@@ -260,6 +274,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text linewise multicaret on same line`() {
     val before = """
             A Discovery
@@ -288,6 +303,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text linewise multicaret on same line twice`() {
     val before = """
             A Discovery
@@ -320,6 +336,7 @@ class PutVisualTextActionTest : VimTestCase() {
   // ----- Case 3: Copied | Blockwise | --- pasted | Characterwise | ---| small p |--------------------
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text blockwise`() {
     val before = """
             A Discovery
@@ -354,6 +371,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text blockwise on last line`() {
     val before = """
             A Discovery
@@ -390,6 +408,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text blockwise on last line twice`() {
     val before = """
             A Discovery
@@ -426,6 +445,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text blockwise multicaret`() {
     val before = """
             A Discovery
@@ -464,6 +484,7 @@ class PutVisualTextActionTest : VimTestCase() {
   // ----- Case 4: Copied | Characterwise | --- pasted | Linewise | ---| small p |--------------------
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text character to line`() {
     val before = """
             A Discovery
@@ -488,6 +509,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text character to line twice`() {
     val before = """
             A Discovery
@@ -523,6 +545,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """
   )
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text character to last line`() {
     val before = """
             A Discovery
@@ -558,6 +581,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """
   )
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text character to line multicaret`() {
     val before = """
             A Discovery
@@ -593,6 +617,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """
   )
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text character to line multicaret on same line`() {
     val before = """
             A Discovery
@@ -620,6 +645,7 @@ class PutVisualTextActionTest : VimTestCase() {
   // ----- Case 5: Copied | Linewise | --- pasted | Linewise | ---| small p |--------------------
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text line to line`() {
     val before = """
             A Discovery
@@ -644,6 +670,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text line to line twice`() {
     val before = """
             A Discovery
@@ -679,6 +706,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """
   )
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text line to last line`() {
     val before = """
             A Discovery
@@ -714,6 +742,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """
   )
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text line to line multicaret`() {
     val before = """
             A Discovery
@@ -749,6 +778,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """
   )
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text line to line multicaret on same line`() {
     val before = """
             A Discovery
@@ -776,6 +806,7 @@ class PutVisualTextActionTest : VimTestCase() {
   // ----- Case 6: Copied | Blockwise | --- pasted | Linewise | ---| small p |--------------------
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text blockwise to line`() {
     val before = """
             A Discovery
@@ -829,6 +860,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """
   )
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text blockwise on last line to line`() {
     val before = """
             A Discovery
@@ -888,6 +920,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """
   )
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text blockwise on last line twice to line`() {
     val before = """
             A Discovery
@@ -946,6 +979,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """
   )
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text blockwise multicaret to line`() {
     val before = """
             A Discovery
@@ -989,6 +1023,7 @@ class PutVisualTextActionTest : VimTestCase() {
   // ----- Case 7: Copied | Characterwise | --- pasted | Blockwise | ---| small p |--------------------
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual block without copy`() {
     val before = """
             I $c|found| it in a legendary land
@@ -1004,6 +1039,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text character to block`() {
     val before = """
             A Discovery
@@ -1028,6 +1064,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text character to block motion up`() {
     val before = """
             A Discovery
@@ -1052,6 +1089,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text character to block twice`() {
     val before = """
             A Discovery
@@ -1076,6 +1114,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text character to block with dollar motion`() {
     val before = """
             A Discovery
@@ -1113,6 +1152,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """
   )
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text line to block`() {
     val before = """
             A Discovery
@@ -1139,6 +1179,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text line to block before caret`() {
     val before = """
             A Discovery
@@ -1176,6 +1217,7 @@ class PutVisualTextActionTest : VimTestCase() {
             """
   )
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text line to block twice`() {
     val before = """
             A Discovery
@@ -1214,6 +1256,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """
   )
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text line to block till end`() {
     val before = """
             A Discovery
@@ -1251,6 +1294,7 @@ class PutVisualTextActionTest : VimTestCase() {
     """
   )
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text line to block with dollar motion`() {
     val before = """
             A Discovery
@@ -1279,6 +1323,7 @@ class PutVisualTextActionTest : VimTestCase() {
   // ----- Case 9: Copied | Blockwise | --- pasted | Blockwise | ---| small p |--------------------
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text blockwise to block`() {
     val before = """
             A Discovery
@@ -1313,6 +1358,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text blockwise to longer block`() {
     val before = """
             A Discovery
@@ -1347,6 +1393,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text blockwise to shorter block`() {
     val before = """
             A Discovery
@@ -1381,6 +1428,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text blockwise to shorter block on line end`() {
     val before = """
             A Discovery
@@ -1416,6 +1464,7 @@ class PutVisualTextActionTest : VimTestCase() {
   }
 
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text blockwise to block with dollar motion`() {
     val before = """
             A Discovery

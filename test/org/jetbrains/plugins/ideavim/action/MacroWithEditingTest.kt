@@ -20,10 +20,13 @@ package org.jetbrains.plugins.ideavim.action
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitAndAssert
 
 class MacroWithEditingTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test print macro`() {
     typeTextInFile(parseKeys("qa", "iHello<Esc>", "q"), "")
     setText("")

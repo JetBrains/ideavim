@@ -21,6 +21,8 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -89,6 +91,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     assertOffset(3)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test percent match xml comment start`() {
       configureByXmlText("$c<!-- foo -->")
       typeText(parseKeys("%"))
@@ -101,6 +104,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
       assertState("<!$c-- ")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test percent match xml comment end`() {
       configureByXmlText("<!-- foo --$c>")
       typeText(parseKeys("%"))
@@ -125,6 +129,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
       assertState("$c/* foo */")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test percent match java doc comment start`() {
       configureByJavaText("/*$c* foo */")
       typeText(parseKeys("%"))

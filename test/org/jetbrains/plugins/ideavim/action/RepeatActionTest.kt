@@ -19,6 +19,8 @@
 package org.jetbrains.plugins.ideavim.action
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.Test
 
@@ -48,6 +50,7 @@ class RepeatActionTest : VimTestCase() {
 
   // VIM-1644
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun testRepeatChangeInVisualMode() {
     configureByText("foobar foobar")
     typeText(parseKeys("<C-V>llc", "fu", "<Esc>", "w", "."))
@@ -56,6 +59,7 @@ class RepeatActionTest : VimTestCase() {
 
   // VIM-1644
   @Test
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun testRepeatChangeInVisualModeMultiline() {
     configureByText(
       "There is a red house.\n" +

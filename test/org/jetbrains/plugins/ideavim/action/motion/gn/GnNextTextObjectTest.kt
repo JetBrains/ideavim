@@ -24,10 +24,13 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import javax.swing.KeyStroke
 
 class GnNextTextObjectTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test delete word`() {
     doTestWithSearch(
       parseKeys("dgn"),
@@ -40,6 +43,7 @@ class GnNextTextObjectTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test delete second word`() {
     doTestWithSearch(
       parseKeys("2dgn"),
@@ -54,6 +58,7 @@ class GnNextTextObjectTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test with repeat`() {
     doTestWithSearch(
       parseKeys("cgnNewValue<ESC>..."),

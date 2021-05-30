@@ -21,6 +21,8 @@
 package org.jetbrains.plugins.ideavim.action.motion.select.motion
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -30,6 +32,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 class SelectExtendVariousMotionsTest : VimTestCase() {
 
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun `test with tabs`() {
     val code = """
         class Scratch {

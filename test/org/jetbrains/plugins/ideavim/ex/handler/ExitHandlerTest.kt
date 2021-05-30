@@ -29,6 +29,7 @@ class ExitHandlerTest : VimTestCase() {
     setupChecks {
       neoVim.exitOnTearDown = false
     }
+    @Suppress("IdeaVimAssertState")
     val psiFile = myFixture.configureByText("A_Discovery", "I found it in a legendary land")
     fileManager.openFile(psiFile.virtualFile, false)
     TestCase.assertNotNull(fileManager.currentFile)
@@ -41,6 +42,7 @@ class ExitHandlerTest : VimTestCase() {
     setupChecks {
       neoVim.exitOnTearDown = false
     }
+    @Suppress("IdeaVimAssertState")
     val psiFile = myFixture.configureByText("A_Discovery", "I found it in a legendary land")
     fileManager.openFile(psiFile.virtualFile, false)
     TestCase.assertNotNull(fileManager.currentFile)
@@ -49,6 +51,7 @@ class ExitHandlerTest : VimTestCase() {
     TestCase.assertNull(fileManager.currentFile)
   }
 
+  @Suppress("IdeaVimAssertState")
   fun `test multiple files`() {
     setupChecks {
       neoVim.exitOnTearDown = false

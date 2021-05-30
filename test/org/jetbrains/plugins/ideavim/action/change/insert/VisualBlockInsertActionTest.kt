@@ -30,6 +30,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class VisualBlockInsertActionTest : VimTestCase() {
 
   // VIM-1110 |CTRL-V| |v_b_i| |zc|
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   fun `test block insert after folds`() {
       configureByJavaText(
           """$c/**

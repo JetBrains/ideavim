@@ -19,9 +19,12 @@
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertDeleteActionTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test insert delete`() {
     val before = "I fo${c}und it in a legendary land"
     val after = "I fo${c}nd it in a legendary land"

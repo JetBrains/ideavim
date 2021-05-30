@@ -20,9 +20,12 @@ package org.jetbrains.plugins.ideavim.action.change.shift
 
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ShiftLeftTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test shift till new line`() {
       val file = """
             A Discovery
@@ -43,6 +46,7 @@ class ShiftLeftTest : VimTestCase() {
       """.trimIndent())
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test shift left positions caret at first non-blank char`() {
       val file = """
       |A Discovery
@@ -63,6 +67,7 @@ class ShiftLeftTest : VimTestCase() {
       """.trimMargin())
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test shift left does not move caret with nostartofline`() {
       OptionsManager.startofline.reset()
       val file = """
@@ -84,6 +89,7 @@ class ShiftLeftTest : VimTestCase() {
       """.trimMargin())
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test shift left positions caret at end of line with nostartofline`() {
       OptionsManager.startofline.reset()
       val file = """

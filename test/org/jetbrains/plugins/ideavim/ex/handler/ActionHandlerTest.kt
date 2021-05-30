@@ -21,6 +21,8 @@ package org.jetbrains.plugins.ideavim.ex.handler
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -29,6 +31,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ActionHandlerTest : VimTestCase() {
   // VIM-652 |:action|
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   fun testEditorRightAction() {
     configureByText("<caret>foo\n" + "bar\n")
     typeText(commandToKeys("action EditorRight"))
@@ -37,6 +40,7 @@ class ActionHandlerTest : VimTestCase() {
   }
 
   // VIM-862 |:action| in visual character mode
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   fun testExCommandInVisualCharacterMode() {
     configureByJavaText(
       "-----\n" +
@@ -54,6 +58,7 @@ class ActionHandlerTest : VimTestCase() {
   }
 
   // https://github.com/JetBrains/ideavim/commit/fe714a90032d0cb5ef0a0e0d8783980b6f1c7d20#r35647600
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   fun testExCommandInVisualCharacterModeWithIncSearch() {
     OptionsManager.incsearch.set()
     configureByJavaText(
@@ -73,6 +78,7 @@ class ActionHandlerTest : VimTestCase() {
   }
 
   // VIM-862 |:action|
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   fun testExCommandInVisualCharacterModeSameLine() {
     configureByJavaText("1<caret>2345\n" + "abcde\n")
     typeText(parseKeys("vl"))
@@ -81,6 +87,7 @@ class ActionHandlerTest : VimTestCase() {
     assertState("1/*23*/45\n" + "abcde\n")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   fun testExCommandInVisualCharacterModeSameLineWithIncsearch() {
     OptionsManager.incsearch.set()
     configureByJavaText("1<caret>2345\n" + "abcde\n")
@@ -92,6 +99,7 @@ class ActionHandlerTest : VimTestCase() {
   }
 
   // VIM-862 |:action| in visual line mode
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   fun testExCommandInVisualLineMode() {
     configureByJavaText(
       "-----\n" +
@@ -110,6 +118,7 @@ class ActionHandlerTest : VimTestCase() {
       "-----")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   fun testExCommandInVisualLineModeWithIncsearch() {
     OptionsManager.incsearch.set()
     configureByJavaText(
@@ -131,6 +140,7 @@ class ActionHandlerTest : VimTestCase() {
   }
 
   // VIM-862 |:action| in visual block mode
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   fun testExCommandInVisualBlockMode() {
     configureByJavaText(
       "-----\n" +
@@ -147,6 +157,7 @@ class ActionHandlerTest : VimTestCase() {
       "-----")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   fun testExCommandInVisualBlockModeWithIncsearch() {
     OptionsManager.incsearch.set()
     configureByJavaText(

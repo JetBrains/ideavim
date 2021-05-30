@@ -305,6 +305,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test delete visual lines end action`() {
       typeTextInFile(
           parseKeys("v", "2j", "D"),
@@ -493,6 +494,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test line delete visual lines end action`() {
       typeTextInFile(
           parseKeys("V", "2j", "D"),

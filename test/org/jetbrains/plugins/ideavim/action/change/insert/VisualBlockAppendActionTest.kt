@@ -25,6 +25,7 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VisualBlockAppendActionTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test visual block append`() {
       val before = """
             ${c}int a;
@@ -40,6 +41,7 @@ class VisualBlockAppendActionTest : VimTestCase() {
       assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test visual block append with dollar motion`() {
       val before = """
             ${c}int a;

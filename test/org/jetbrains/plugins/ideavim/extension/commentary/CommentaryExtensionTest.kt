@@ -22,6 +22,7 @@ import com.intellij.ide.highlighter.HtmlFileType
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
 import org.jetbrains.plugins.ideavim.JavaVimTestCase
+import org.jetbrains.plugins.ideavim.VimTestCase.Companion.c
 
 /**
  * @author dhleong
@@ -100,7 +101,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   fun testLineCommentSingleLineInnerParagraph() {
     doTest(
       StringHelper.parseKeys("gcip"),
-      "<caret>if (condition) {}",
+      "${c}if (condition) {}",
       "//if (condition) {}"
     )
   }
@@ -121,7 +122,7 @@ class CommentaryExtensionTest : JavaVimTestCase() {
   fun testLineUncommentSingleLineInnerParagraph() {
     doTest(
       StringHelper.parseKeys("gcip"),
-      "<caret>//if (condition) {}",
+      "$c//if (condition) {}",
       "if (condition) {}"
     )
   }

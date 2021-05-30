@@ -18,12 +18,15 @@
 
 package org.jetbrains.plugins.ideavim.ex.handler
 
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
  * @author Alex Plate
  */
 class ShiftLeftHandlerTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad replce term codes")
   fun `test simple left shift`() {
     val before = """        I found it in a legendary land
                       |        ${c}all rocks and lavender and tufted grass,
@@ -42,6 +45,7 @@ class ShiftLeftHandlerTest : VimTestCase() {
     assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad replce term codes")
   fun `test double left shift`() {
     val before = """        I found it in a legendary land
                       |        ${c}all rocks and lavender and tufted grass,
@@ -60,6 +64,7 @@ class ShiftLeftHandlerTest : VimTestCase() {
     assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad replce term codes")
   fun `test left shift no space`() {
     val before = """I found it in a legendary land
                       |${c}all rocks and lavender and tufted grass,
@@ -78,6 +83,7 @@ class ShiftLeftHandlerTest : VimTestCase() {
     assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad replce term codes")
   fun `test range left shift`() {
     val before = """        I found it in a legendary land
                       |        ${c}all rocks and lavender and tufted grass,
@@ -96,6 +102,7 @@ class ShiftLeftHandlerTest : VimTestCase() {
     assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test multiple carets`() {
     val before = """    I found it in a legendary land
                       |${c}all rocks and lavender and tufted grass,

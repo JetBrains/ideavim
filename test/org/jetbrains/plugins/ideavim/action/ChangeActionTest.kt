@@ -653,6 +653,7 @@ foobaz
   }
 
   // VIM-511 |.|
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun testRepeatWithParensAndQuotesAutoInsertion() {
     configureByJavaText(
       """
@@ -670,6 +671,7 @@ foobaz
   }
 
   // VIM-511 |.|
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun testDeleteBothParensAndStartAgain() {
     configureByJavaText(
       """
@@ -706,6 +708,7 @@ foobaz
   }
 
   // VIM-511 |.|
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun testAutoCompleteCurlyBraceWithEnterWithinFunctionBody() {
     configureByJavaText(
       """
@@ -727,6 +730,7 @@ foobaz
   }
 
   // VIM-1067 |.|
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun testRepeatWithInsertAfterLineEnd() {
     // Case 1
     configureByText(
@@ -801,6 +805,7 @@ and some text after""")
   }
 
   // VIM-287 |zc| |o|
+  @TestWithoutNeovim(SkipNeovimReason.FOLDING)
   fun testInsertBeforeFold() {
     configureByJavaText(
       """

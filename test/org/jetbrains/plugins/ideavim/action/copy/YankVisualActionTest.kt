@@ -25,6 +25,8 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import junit.framework.TestCase
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import javax.swing.KeyStroke
 
@@ -91,6 +93,7 @@ class YankVisualActionTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun testYankVisualRange() {
     val before = """
             q${c}werty
@@ -163,6 +166,7 @@ class YankVisualActionTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun testYankVisualLines() {
     val before = """
             q${c}we

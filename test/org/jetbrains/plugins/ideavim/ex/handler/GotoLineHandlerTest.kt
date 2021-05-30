@@ -19,6 +19,8 @@
 package org.jetbrains.plugins.ideavim.ex.handler
 
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class GotoLineHandlerTest : VimTestCase() {
@@ -132,6 +134,7 @@ class GotoLineHandlerTest : VimTestCase() {
     assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test goto line moves to same column with nostartofline option`() {
     OptionsManager.startofline.reset()
     val before = """
@@ -155,6 +158,7 @@ class GotoLineHandlerTest : VimTestCase() {
     assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test goto zero relative line with nostartofline option does not move caret`() {
     OptionsManager.startofline.reset()
     val before = """

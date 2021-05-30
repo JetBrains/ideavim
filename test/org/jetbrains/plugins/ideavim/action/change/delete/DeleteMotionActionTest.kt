@@ -25,6 +25,8 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class DeleteMotionActionTest : VimTestCase() {
@@ -44,6 +46,7 @@ class DeleteMotionActionTest : VimTestCase() {
       """.trimIndent())
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test delete last line with nostartofline`() {
       OptionsManager.startofline.reset()
       typeTextInFile(
@@ -74,6 +77,7 @@ class DeleteMotionActionTest : VimTestCase() {
     assertEquals("  expression two\n", savedText)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test delete line action multicaret`() {
       typeTextInFile(
           parseKeys("d3d"),
@@ -91,6 +95,7 @@ class DeleteMotionActionTest : VimTestCase() {
       assertState("${c}abcde\n${c}")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test delete motion action multicaret`() {
       typeTextInFile(
           parseKeys("dt)"),

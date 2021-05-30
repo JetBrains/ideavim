@@ -25,6 +25,7 @@ import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertBackspaceActionTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test insert backspace`() {
       val before = "I fo${c}und it in a legendary land"
       val after = "I f${c}und it in a legendary land"
