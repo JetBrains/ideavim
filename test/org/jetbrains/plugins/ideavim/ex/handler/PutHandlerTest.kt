@@ -27,7 +27,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class PutHandlerTest : VimTestCase() {
   // VIM-550 |:put|
   fun `test put creates new line`() {
-    myFixture.configureByText("a.txt", "Test\n" + "Hello <caret>World!\n")
+    configureByText("Test\n" + "Hello <caret>World!\n")
     typeText(parseKeys("\"ayw"))
     typeText(commandToKeys("put a"))
     assertState("Test\n" +
@@ -37,7 +37,7 @@ class PutHandlerTest : VimTestCase() {
 
   // VIM-551 |:put|
   fun `test put default`() {
-    myFixture.configureByText("a.txt", "<caret>Hello World!\n")
+    configureByText("<caret>Hello World!\n")
     typeText(parseKeys("yw"))
     typeText(commandToKeys("put"))
     assertState("Hello World!\n" + "<caret>Hello \n")

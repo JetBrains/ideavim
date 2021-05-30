@@ -1420,7 +1420,7 @@ class SearchGroupTest : VimTestCase() {
 
   // TODO: Remove these search methods and test by invoking VIM commands rather than calling APIs
   private fun search(pattern: String, input: String, expectedLocation: Int): Int {
-    myFixture.configureByText("a.java", input)
+    configureByText(input)
     val editor = myFixture.editor
     val project = myFixture.project
     val searchGroup = VimPlugin.getSearch()
@@ -1444,7 +1444,7 @@ class SearchGroupTest : VimTestCase() {
   }
 
   private fun search(pattern: String, input: String): Int {
-    myFixture.configureByText("a.java", input)
+    configureByText(input)
     val editor = myFixture.editor
     val project = myFixture.project
     val searchGroup = VimPlugin.getSearch()

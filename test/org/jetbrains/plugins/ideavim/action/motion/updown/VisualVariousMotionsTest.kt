@@ -20,7 +20,6 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
-import com.intellij.openapi.fileTypes.PlainTextFileType
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -31,7 +30,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class VisualVariousMotionsTest : VimTestCase() {
 
   fun `test with tabs`() {
-      val code = """
+    val code = """
         class Scratch {
         .public static void main(String[] args) {
         ..try {
@@ -45,11 +44,11 @@ class VisualVariousMotionsTest : VimTestCase() {
         ${c}}
     """.trimIndent().dotToTab()
 
-      myFixture.configureByText(PlainTextFileType.INSTANCE, code)
+    configureByText(code)
 
-      typeText(parseKeys("<C-V>", "k".repeat(2), "l".repeat(2)))
+    typeText(parseKeys("<C-V>", "k".repeat(2), "l".repeat(2)))
 
-      assertState("""
+    assertState("""
         class Scratch {
         .public static void main(String[] args) {
         ..try {
@@ -63,10 +62,10 @@ class VisualVariousMotionsTest : VimTestCase() {
         ${s}${c}}${se}
       """.trimIndent().dotToTab())
 
-      typeText(parseKeys("k".repeat(7), "l".repeat(3)))
+    typeText(parseKeys("k".repeat(7), "l".repeat(3)))
 
-      // Carets 2-4 have 0 column as logical position, but ${se} - 1 column as visual position
-      assertState("""
+    // Carets 2-4 have 0 column as logical position, but ${se} - 1 column as visual position
+    assertState("""
         class Scratch {
         ${s}.pu${c}b${se}lic static void main(String[] args) {
         ${s}${c}.${se}.try {
@@ -80,13 +79,13 @@ class VisualVariousMotionsTest : VimTestCase() {
         ${s}${c}}${se}
       """.trimIndent().dotToTab())
 
-      TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[1].visualPosition.column)
-      TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[2].visualPosition.column)
-      TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[3].visualPosition.column)
+    TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[1].visualPosition.column)
+    TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[2].visualPosition.column)
+    TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[3].visualPosition.column)
 
-      typeText(parseKeys("l".repeat(2)))
+    typeText(parseKeys("l".repeat(2)))
 
-      assertState("""
+    assertState("""
         class Scratch {
         ${s}.publ${c}i${se}c static void main(String[] args) {
         ${s}..${c}t${se}ry {
@@ -99,6 +98,6 @@ class VisualVariousMotionsTest : VimTestCase() {
         ${s}.retu${c}r${se}n anything
         ${s}${c}}${se}
       """.trimIndent().dotToTab())
-      TestCase.assertEquals(7, myFixture.editor.caretModel.allCarets[2].visualPosition.column)
+    TestCase.assertEquals(7, myFixture.editor.caretModel.allCarets[2].visualPosition.column)
   }
 }

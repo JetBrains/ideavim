@@ -303,7 +303,7 @@ n  ,f            <Plug>Foo
   // VIM-700 |:map|
   fun testRemappingZero() {
     configureByText("x${c}yz\n")
-    VimScriptParser.executeText(listOf("map 0 ~"))
+    typeText(commandToKeys("map 0 ~"))
     typeText(StringHelper.parseKeys("0"))
     assertState("xYz\n")
   }
@@ -319,7 +319,7 @@ n  ,f            <Plug>Foo
   // VIM-700 |:map|
   fun testRemappingDeleteOverridesRemovingLastDigitFromCount() {
     configureByText("a${c}bcdefghijklmnop\n")
-    VimScriptParser.executeText(listOf("map <Del> ~"))
+    typeText(commandToKeys("map <Del> ~"))
     typeText(StringHelper.parseKeys("10<Del>"))
     assertState("aBCDEFGHIJKlmnop\n")
   }

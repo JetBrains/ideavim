@@ -17,7 +17,6 @@
  */
 package org.jetbrains.plugins.ideavim.action
 
-import com.intellij.json.JsonFileType
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
@@ -592,7 +591,7 @@ class MotionActionTest : VimTestCase() {
   // VIM-965 |[m|
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, "File type specific")
   fun testMethodMovingInNonJavaFile() {
-    myFixture.configureByText(JsonFileType.INSTANCE, "{\"foo\": \"${c}bar\"}\n")
+    configureByJsonText("{\"foo\": \"${c}bar\"}\n")
     typeText(parseKeys("[m"))
     assertState("{\"foo\": \"${c}bar\"}\n")
   }

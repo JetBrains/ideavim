@@ -291,7 +291,7 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test visual substitute doesnt change visual marks`() {
-    myFixture.configureByText("a.java", "foo\nbar\nbaz\n")
+    configureByText("foo\nbar\nbaz\n")
     typeText(parseKeys("V", "j", ":'<,'>s/foo/fuu/<Enter>", "gv", "~"))
     assertState("FUU\nBAR\nbaz\n")
   }

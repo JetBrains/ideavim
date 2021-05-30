@@ -9,7 +9,6 @@
     <JavaCodeStyleSettings>
       <option name="FIELD_NAME_PREFIX" value="my" />
       <option name="STATIC_FIELD_NAME_PREFIX" value="our" />
-      <option name="USE_EXTERNAL_ANNOTATIONS" value="true" />
     </JavaCodeStyleSettings>
     <JetCodeStyleSettings>
       <option name="NAME_COUNT_TO_USE_STAR_IMPORT" value="2147483647" />
