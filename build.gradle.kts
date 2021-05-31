@@ -325,6 +325,7 @@ fun updateMergedPr(number: Int) {
     val gitHub = org.kohsuke.github.GitHub.connect()
     val repository = gitHub.getRepository("JetBrains/ideavim")
     val pullRequest = repository.getPullRequest(number)
+    if ("dependabot" == pullRequest.user.name) return
 
     val authorsFile = File("$projectDir/CHANGES.md")
     val authors = authorsFile.readText()
