@@ -176,7 +176,6 @@ class GlobalHandler : CommandHandler.SingleExecution() {
         globalExe(editor, context, marks, cmd.toString())
       }
     }
-    // TODO: 25.05.2021 More staff
     return true
   }
 
