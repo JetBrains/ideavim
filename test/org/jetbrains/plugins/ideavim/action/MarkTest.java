@@ -122,13 +122,13 @@ public class MarkTest extends VimTestCase {
   // |m| |`|
   public void testDeleteBacktickMotionIsCharacterWise() {
     typeTextInFile(parseKeys("mk", "kh", "d`k"), "    abcd\n" + "    efgh\n" + "    ij<caret>kl\n" + "    mnop\n");
-    myFixture.checkResult("    abcd\n" + "    ekl\n" + "    mnop\n");
+    assertState("    abcd\n" + "    ekl\n" + "    mnop\n");
   }
 
   // |m| |`|
   public void testDeleteSingleQuoteMotionIsLineWise() {
     typeTextInFile(parseKeys("mk", "kh", "d'k"), "    abcd\n" + "    efgh\n" + "    ij<caret>kl\n" + "    mnop\n");
-    myFixture.checkResult("    abcd\n" + "    mnop\n");
+    assertState("    abcd\n" + "    mnop\n");
   }
 
   // VIM-43 |i| |`.|

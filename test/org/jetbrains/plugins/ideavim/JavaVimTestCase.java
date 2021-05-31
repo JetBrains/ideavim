@@ -79,8 +79,10 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
   }
 
   public void doTest(final List<KeyStroke> keys, String before, String after) {
+    //noinspection IdeaVimAssertState
     myFixture.configureByText(JavaFileType.INSTANCE, before);
     typeText(keys);
+    //noinspection IdeaVimAssertState
     myFixture.checkResult(after);
   }
 

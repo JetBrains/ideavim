@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import org.jetbrains.plugins.ideavim.SkipNeovimReason;
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -35,42 +37,44 @@ public class CopyActionTest extends VimTestCase {
   // |y| |p| |count|
   public void testYankPutCharacters() {
     typeTextInFile(parseKeys("y2h", "p"), "one two<caret> three\n");
-    myFixture.checkResult("one twwoo three\n");
+    assertState("one twwoo three\n");
   }
 
   // |yy|
   public void testYankLine() {
     typeTextInFile(parseKeys("yy", "p"), "one\n" + "tw<caret>o\n" + "three\n");
-    myFixture.checkResult("one\n" + "two\n" + "two\n" + "three\n");
+    assertState("one\n" + "two\n" + "two\n" + "three\n");
   }
 
   // VIM-723 |p|
   public void testYankPasteToEmptyLine() {
     typeTextInFile(parseKeys("yiw", "j", "p"), "foo\n" + "\n" + "bar\n");
-    myFixture.checkResult("foo\n" + "foo\n" + "bar\n");
+    assertState("foo\n" + "foo\n" + "bar\n");
   }
 
   // VIM-390 |yy| |p|
   public void testYankLinePasteAtLastLine() {
     typeTextInFile(parseKeys("yy", "p"), "one two\n" + "<caret>three four\n");
-    myFixture.checkResult("one two\n" + "three four\n" + "three four\n");
+    assertState("one two\n" + "three four\n" + "three four\n");
   }
 
   // |register| |y|
   public void testYankRegister() {
     typeTextInFile(parseKeys("\"ayl", "l", "\"byl", "\"ap", "\"bp"), "hel<caret>lo world\n");
-    myFixture.checkResult("hellolo world\n");
+    assertState("hellolo world\n");
   }
 
   // |register| |y| |quote|
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   public void testYankRegisterUsesLastEnteredRegister() {
     typeTextInFile(parseKeys("\"a\"byl", "\"ap"), "hel<caret>lo world\n");
-    myFixture.checkResult("helllo world\n");
+    assertState("helllo world\n");
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   public void testYankAppendRegister() {
     typeTextInFile(parseKeys("\"Ayl", "l", "\"Ayl", "\"Ap"), "hel<caret>lo world\n");
-    myFixture.checkResult("hellolo world\n");
+    assertState("hellolo world\n");
   }
 
   public void testYankWithInvalidRegister() {
@@ -81,7 +85,7 @@ public class CopyActionTest extends VimTestCase {
   // |P|
   public void testYankPutBefore() {
     typeTextInFile(parseKeys("y2l", "P"), "<caret>two\n");
-    myFixture.checkResult("twtwo\n");
+    assertState("twtwo\n");
   }
 
   public void testWrongYankQuoteMotion() {
@@ -94,7 +98,7 @@ public class CopyActionTest extends VimTestCase {
     assertPluginError(false);
     typeTextInFile(parseKeys("y\"", "yy", "p"), "one <caret>two\n" + "three\n" + "four\n");
     assertPluginError(false);
-    myFixture.checkResult("one two\n" + "one two\n" + "three\n" + "four\n");
+    assertState("one two\n" + "one two\n" + "three\n" + "four\n");
   }
 
   public void testWrongYankRegisterMotion() {
@@ -114,7 +118,7 @@ public class CopyActionTest extends VimTestCase {
     //
     // The problem is that the selection range should be 1-char wide when entering the visual block mode
 
-    myFixture.checkResult("* * one\n" + "* * two\n");
+    assertState("* * one\n" + "* * two\n");
     assertSelection(null);
     assertOffset(2);
   }
@@ -151,31 +155,33 @@ public class CopyActionTest extends VimTestCase {
     final Register register = VimPlugin.getRegister().getRegister('*');
     assertNotNull(register);
     assertEquals("foo\n", register.getText());
-    myFixture.checkResult("foo\n" + "<caret>foo\n");
+    assertState("foo\n" + "<caret>foo\n");
   }
 
   // VIM-792 |"*| |CTRL-V| |v_y| |p|
   // TODO: Review this test
   // This doesn't use the system clipboard, but the TestClipboardModel
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   public void testBlockWiseClipboardYankPaste() {
     configureByText("<caret>foo\n" + "bar\n" + "baz\n");
     typeText(parseKeys("<C-V>j", "\"*y", "\"*p"));
     final Register register = VimPlugin.getRegister().getRegister('*');
     assertNotNull(register);
     assertEquals("f\n" + "b", register.getText());
-    myFixture.checkResult("ffoo\n" + "bbar\n" + "baz\n");
+    assertState("ffoo\n" + "bbar\n" + "baz\n");
   }
 
   // VIM-1431
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   public void testPutInEmptyFile() {
     VimPlugin.getRegister().setKeys('a', parseKeys("test"));
     typeTextInFile(parseKeys("\"ap"), "");
-    myFixture.checkResult("test");
+    assertState("test");
   }
 
   public void testOverridingRegisterWithEmptyTag() {
     configureByText("<root>\n" + "<a><caret>value</a>\n" + "<b></b>\n" + "</root>\n");
     typeText(parseKeys("dit", "j", "cit", "<C-R>\""));
-    myFixture.checkResult("<root>\n" + "<a></a>\n" + "<b>value</b>\n" + "</root>\n");
+    assertState("<root>\n" + "<a></a>\n" + "<b>value</b>\n" + "</root>\n");
   }
 }
