@@ -21,6 +21,8 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /*
@@ -36,7 +38,8 @@ CTRL-D                  Scroll window Downwards in the buffer.  The number of
                         See also 'startofline' option.
  */
 class ScrollHalfPageDownActionTest : VimTestCase() {
-  fun `test scroll half window downwards keeps cursor on same relative line`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll half window downwards keeps cursor on same relative line`() {
     configureByPages(5)
     setPositionAndScroll(20, 25)
     typeText(parseKeys("<C-D>"))
@@ -44,7 +47,8 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
     assertVisibleArea(37, 71)
   }
 
-  fun `test scroll downwards on last line causes beep`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll downwards on last line causes beep`() {
     configureByPages(5)
     setPositionAndScroll(146, 175)
     typeText(parseKeys("<C-D>"))
@@ -53,7 +57,8 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
     assertTrue(VimPlugin.isError())
   }
 
-  fun `test scroll downwards in bottom half of last page moves to the last line`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll downwards in bottom half of last page moves to the last line`() {
     configureByPages(5)
     setPositionAndScroll(146, 165)
     typeText(parseKeys("<C-D>"))
@@ -61,7 +66,8 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
     assertVisibleArea(146, 175)
   }
 
-  fun `test scroll downwards in top half of last page moves cursor down half a page`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll downwards in top half of last page moves cursor down half a page`() {
     configureByPages(5)
     setPositionAndScroll(146, 150)
     typeText(parseKeys("<C-D>"))
@@ -69,7 +75,8 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
     assertVisibleArea(146, 175)
   }
 
-  fun `test scroll count lines downwards`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll count lines downwards`() {
     configureByPages(5)
     setPositionAndScroll(100, 130)
     typeText(parseKeys("10<C-D>"))
@@ -77,14 +84,16 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
     assertVisibleArea(110, 144)
   }
 
-  fun `test scroll count downwards modifies scroll option`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll count downwards modifies scroll option`() {
     configureByPages(5)
     setPositionAndScroll(100, 110)
     typeText(parseKeys("10<C-D>"))
     assertEquals(OptionsManager.scroll.value(), 10)
   }
 
-  fun `test scroll downwards uses scroll option`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll downwards uses scroll option`() {
     OptionsManager.scroll.set(10)
     configureByPages(5)
     setPositionAndScroll(100, 110)
@@ -93,7 +102,8 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
     assertVisibleArea(110, 144)
   }
 
-  fun `test count scroll downwards is limited to single page`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test count scroll downwards is limited to single page`() {
     configureByPages(5)
     setPositionAndScroll(100, 110)
     typeText(parseKeys("1000<C-D>"))
@@ -101,7 +111,8 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
     assertVisibleArea(135, 169)
   }
 
-  fun `test scroll downwards puts cursor on first non-blank column`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll downwards puts cursor on first non-blank column`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 25, 14)
     typeText(parseKeys("<C-D>"))
@@ -109,7 +120,8 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
     assertVisibleArea(37, 71)
   }
 
-  fun `test scroll downwards keeps same column with nostartofline`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll downwards keeps same column with nostartofline`() {
     OptionsManager.startofline.reset()
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 25, 14)

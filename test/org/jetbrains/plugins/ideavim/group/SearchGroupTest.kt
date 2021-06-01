@@ -241,6 +241,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(22)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test search e+10 motion offset wraps at exactly end of file`() {
     typeTextInFile(
       parseKeys("/", "ass./e+10", "<Enter>", "n"),
@@ -290,6 +291,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(0)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test reverse search s-20 motion offset wraps at beginning of file`() {
     typeTextInFile(
       parseKeys("?", "it?s-20", "<Enter>", "N"),
@@ -439,6 +441,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(14)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test incsearch moves caret to start of first match`() {
     setIncrementalSearch()
     configureByText(
@@ -451,6 +454,7 @@ class SearchGroupTest : VimTestCase() {
     assertPosition(1, 14)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test incsearch + hlsearch moves caret to start of first match`() {
     setHighlightSearch()
     setIncrementalSearch()
@@ -464,6 +468,7 @@ class SearchGroupTest : VimTestCase() {
     assertPosition(1, 14)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test incsearch moves caret to start of first match (backwards)`() {
     setIncrementalSearch()
     configureByText(
@@ -476,6 +481,7 @@ class SearchGroupTest : VimTestCase() {
     assertPosition(0, 26)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test incsearch + hlsearch moves caret to start of first match (backwards)`() {
     setHighlightSearch()
     setIncrementalSearch()
@@ -541,6 +547,7 @@ class SearchGroupTest : VimTestCase() {
     assertPosition(1, 0)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test incsearch resets caret on backspace`() {
     setIncrementalSearch()
     configureByText(
@@ -555,6 +562,7 @@ class SearchGroupTest : VimTestCase() {
     assertPosition(1, 0)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test incsearch + hlsearch resets caret on backspace`() {
     setHighlightSearch()
     setIncrementalSearch()

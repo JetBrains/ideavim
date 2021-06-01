@@ -21,9 +21,12 @@ package org.jetbrains.plugins.ideavim.action.motion.screen
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionMiddleScreenLineActionTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test move caret to middle line of full screen with odd number of lines`() {
     assertEquals(35, screenHeight)
     configureByLines(50, "    I found it in a legendary land")
@@ -32,6 +35,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertPosition(17, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test move caret to middle line of full screen with even number of lines`() {
     configureByLines(50, "    I found it in a legendary land")
     setEditorVisibleSize(screenWidth, 34)
@@ -40,6 +44,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertPosition(17, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test move caret to middle line of scrolled down screen`() {
     assertEquals(35, screenHeight)
     configureByLines(100, "    I found it in a legendary land")
@@ -48,6 +53,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertPosition(67, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test move caret to middle line when file is shorter than screen`() {
     assertEquals(35, screenHeight)
     configureByLines(20, "    I found it in a legendary land")
@@ -56,6 +62,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertPosition(10, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test move caret to middle line when file is shorter than screen 2`() {
     assertEquals(35, screenHeight)
     configureByLines(21, "    I found it in a legendary land")
@@ -64,6 +71,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertPosition(10, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test move caret to middle line when file is shorter than screen 3`() {
     configureByLines(20, "    I found it in a legendary land")
     setEditorVisibleSize(screenWidth, 34)
@@ -72,6 +80,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertPosition(10, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test move caret to middle line when file is shorter than screen 4`() {
     configureByLines(21, "    I found it in a legendary land")
     setEditorVisibleSize(screenWidth, 34)
@@ -80,6 +89,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertPosition(10, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test move caret to middle line of visible lines with virtual space enabled`() {
     configureByLines(30, "    I found it in a legendary land")
     setEditorVirtualSpace()
@@ -88,6 +98,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertPosition(25, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test move caret to same column with nostartofline`() {
     OptionsManager.startofline.reset()
     configureByLines(50, "    I found it in a legendary land")
@@ -96,6 +107,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertPosition(17, 10)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test move caret to end of shorter line with nostartofline`() {
     OptionsManager.startofline.reset()
     configureByLines(70, "    I found it in a legendary land")
@@ -105,6 +117,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertPosition(17, 33)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test operator pending acts to middle line`() {
     configureByLines(20, "    I found it in a legendary land")
     setPositionAndScroll(0, 4, 10)
@@ -113,6 +126,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertLineCount(13)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test operator pending acts to middle line with nostartofline`() {
     OptionsManager.startofline.reset()
     configureByLines(20, "    I found it in a legendary land")
@@ -122,6 +136,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertLineCount(13)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test move caret to middle line of screen with block inlays above`() {
     // Move the caret to the line that is closest to the middle of the screen, rather than the numerically middle line
     configureByLines(50, "    I found it in a legendary land")
@@ -130,6 +145,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertPosition(12, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test move caret to middle line of screen with block inlays below`() {
     // Move the caret to the line that is closest to the middle of the screen, rather than the numerically middle line
     configureByLines(50, "    I found it in a legendary land")
@@ -138,6 +154,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertPosition(17, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test move caret to middle line of screen with block inlays above and below`() {
     // Move the caret to the line that is closest to the middle of the screen, rather than the numerically middle line
     configureByLines(50, "    I found it in a legendary land")
@@ -147,6 +164,7 @@ class MotionMiddleScreenLineActionTest : VimTestCase() {
     assertPosition(12, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test move caret to middle line of screen with block inlays and a file shorter than the screen`() {
     assertEquals(35, screenHeight)
     configureByLines(21, "    I found it in a legendary land")

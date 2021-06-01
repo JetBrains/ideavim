@@ -20,6 +20,8 @@ package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /*
@@ -68,6 +70,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
     assertVisibleArea(64, 98)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test count z^ puts count line at bottom of screen then scrolls back a page`() {
     configureByPages(5)
     setPositionAndScroll(140, 150)
@@ -77,6 +80,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
     assertVisibleArea(31, 65)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test z^ on first page puts cursor on first line 1`() {
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 25)

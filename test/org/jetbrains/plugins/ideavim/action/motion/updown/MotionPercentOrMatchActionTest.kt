@@ -256,6 +256,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     assertPosition(4, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test count percent keeps same column with nostartline`() {
     OptionsManager.startofline.reset()
     configureByLines(100, "    I found it in a legendary land")
@@ -264,6 +265,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     assertPosition(24, 14)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test count percent handles shorter line with nostartline`() {
     OptionsManager.startofline.reset()
     configureByLines(100, "    I found it in a legendary land")

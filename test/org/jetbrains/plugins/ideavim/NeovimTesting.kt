@@ -99,10 +99,12 @@ internal object NeovimTesting {
 
   fun assertState(editor: Editor, test: VimTestCase) {
     if (!neovimEnabled(test)) return
-    currentTestName = ""
-    neovimTestsCounter++
+    if (currentTestName != "") {
+      currentTestName = ""
+      neovimTestsCounter++
+    }
     assertText(editor)
-    assertCaret(editor)
+    assertCaret(editor, test)
     assertMode(editor)
     assertRegisters()
   }
@@ -115,7 +117,12 @@ internal object NeovimTesting {
   private fun getCaret(): VimCoords = neovimApi.currentWindow.get().cursor.get()
   private fun getText(): String = neovimApi.currentBuffer.get().getLines(0, -1, false).get().joinToString("\n")
 
-  private fun assertCaret(editor: Editor) {
+  fun assertCaret(editor: Editor, test: VimTestCase) {
+    if (!neovimEnabled(test)) return
+    if (currentTestName != "") {
+      currentTestName = ""
+      neovimTestsCounter++
+    }
     val vimCoords = getCaret()
     val resultVimCoords = CharacterPosition.atCaret(editor).toVimCoords()
     assertEquals(vimCoords.toString(), resultVimCoords.toString())

@@ -21,9 +21,12 @@ package org.jetbrains.plugins.ideavim.action.motion.screen
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionLastScreenLineActionTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret to last line of screen`() {
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 20)
@@ -38,6 +41,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertPosition(19, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret to last line of screen when bottom of file is scrolled up`() {
     assertEquals(35, screenHeight)
     configureByLines(38, "    I found it in a legendary land")
@@ -47,6 +51,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertTopLogicalLine(3)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret to last line of screen when bottom of file is scrolled up with virtual space`() {
     assertEquals(35, screenHeight)
     configureByLines(38, "    I found it in a legendary land")
@@ -57,6 +62,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertTopLogicalLine(15)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret to count line from bottom of screen`() {
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 20)
@@ -78,6 +84,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertPosition(20, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret ignores scrolloff when bottom of screen is bottom of file`() {
     assertEquals(35, screenHeight)
     OptionsManager.scrolloff.set(10)
@@ -86,6 +93,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertPosition(34, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret applies scrolloff when bottom of screen is not bottom of file`() {
     assertEquals(35, screenHeight)
     OptionsManager.scrolloff.set(10)
@@ -94,6 +102,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertPosition(24, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret to last screen line with count and scrolloff at bottom of file`() {
     assertEquals(35, screenHeight)
     OptionsManager.scrolloff.set(10)
@@ -102,6 +111,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertPosition(30, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret to last screen line with count and scrolloff not at bottom of file`() {
     assertEquals(35, screenHeight)
     OptionsManager.scrolloff.set(10)
@@ -120,6 +130,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertTopLogicalLine(0)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret applies scrolloff with large count when not at top of file`() {
     assertEquals(35, screenHeight)
     OptionsManager.scrolloff.set(10)
@@ -150,6 +161,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertLineCount(85)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test operator pending acts on count line from bottom of screen`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
@@ -158,6 +170,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertLineCount(89)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test operator pending acts on large count line from bottom of screen`() {
     // Operator range is from current line to bottom of screen minus count.
     // 35 high screen, 100 high file. Top line is 20, caret is 40, bottom is 54. d25L will delete from 40 to 54-25=29.
@@ -169,6 +182,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertLineCount(89)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test operator pending acts on count line from bottom of screen with scrolloff`() {
     // Current caret location is the start of the operator range and doesn't get moved to the end, so there is no
     // scrolling, and scrolloff does not apply
@@ -181,6 +195,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertLineCount(89)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test operator pending acts on large count from bottom of screen with scrolloff`() {
     // Current caret location is the start of the operator range and doesn't get moved to the end, so there is no
     // scrolling, and scrolloff does not apply
@@ -193,6 +208,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertLineCount(79)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test operator pending acts on large count line from bottom of screen with scrolloff and without virtual space`() {
     // When using a large count, the range is effectively reversed, and the current caret location becomes the end of
     // the range, and is moved, so scrolloff can apply
@@ -207,6 +223,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertLineCount(24)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test operator pending acts on large count line from bottom of screen with scrolloff and virtual space`() {
     // When using a large count, the range is effectively reversed, and the current caret location becomes the end of
     // the range, and is moved, so scrolloff can apply
@@ -222,6 +239,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertLineCount(24)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test operator pending acts to last screen line with nostartofline`() {
     OptionsManager.startofline.reset()
     configureByLines(100, "    I found it in a legendary land")
@@ -231,6 +249,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertLineCount(85)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test operator pending acts on count line from bottom of screen with nostartofline`() {
     OptionsManager.startofline.reset()
     configureByLines(100, "    I found it in a legendary land")
@@ -240,6 +259,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertLineCount(89)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret to same column with nostartofline`() {
     OptionsManager.startofline.reset()
     configureByLines(50, "    I found it in a legendary land")
@@ -248,6 +268,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertPosition(44, 10)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret to end of shorter line with nostartofline`() {
     OptionsManager.startofline.reset()
     configureByLines(50, "    I found it in a legendary land")
@@ -257,6 +278,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertPosition(44, 33)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret to last line of screen with inlays`() {
     // 35 high, with an inlay that is 10 rows high. Bottom line will be 25 (1 based)
     configureByLines(50, "    I found it in a legendary land")
@@ -267,6 +289,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     assertBottomLogicalLine(24)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret to last line of screen with inlays and scrolloff`() {
     // 35 high, with an inlay that is 10 rows high. Bottom line will be 25 (1 based), scrolloff of 10 puts caret at 15
     OptionsManager.scrolloff.set(10)

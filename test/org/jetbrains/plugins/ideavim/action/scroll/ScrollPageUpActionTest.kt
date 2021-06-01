@@ -20,6 +20,8 @@ package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /*
@@ -34,6 +36,7 @@ CTRL-B                  Scroll window [count] pages Backwards (upwards) in the
 <PageUp>        move window one page up        *i_<PageUp>*
  */
 class ScrollPageUpActionTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll single page up with S-Up`() {
     configureByPages(5)
     setPositionAndScroll(129, 149)
@@ -42,6 +45,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertVisibleArea(96, 130)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll single page up with PageUp`() {
     configureByPages(5)
     setPositionAndScroll(129, 149)
@@ -50,6 +54,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertVisibleArea(96, 130)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll single page up with CTRL-B`() {
     configureByPages(5)
     setPositionAndScroll(129, 149)
@@ -58,6 +63,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertVisibleArea(96, 130)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up in insert mode with S-Up`() {
     configureByPages(5)
     setPositionAndScroll(129, 149)
@@ -66,6 +72,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertVisibleArea(96, 130)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up in insert mode with PageUp`() {
     configureByPages(5)
     setPositionAndScroll(129, 149)
@@ -74,6 +81,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertVisibleArea(96, 130)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll count pages up with S-Up`() {
     configureByPages(5)
     setPositionAndScroll(129, 149)
@@ -82,6 +90,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertVisibleArea(30, 64)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll count pages up with PageUp`() {
     configureByPages(5)
     setPositionAndScroll(129, 149)
@@ -90,6 +99,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertVisibleArea(30, 64)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll count pages up with CTRL-B`() {
     configureByPages(5)
     setPositionAndScroll(129, 149)
@@ -98,6 +108,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertVisibleArea(30, 64)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up moves cursor to bottom of screen`() {
     configureByPages(5)
     setPositionAndScroll(129, 149)
@@ -106,6 +117,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertVisibleArea(96, 130)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up in insert mode moves cursor`() {
     configureByPages(5)
     setPositionAndScroll(129, 149)
@@ -114,6 +126,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertVisibleArea(96, 130)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up moves cursor with scrolloff`() {
     OptionsManager.scrolloff.set(10)
     configureByPages(5)
@@ -123,6 +136,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertVisibleArea(96, 130)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up in insert mode cursor with scrolloff`() {
     OptionsManager.scrolloff.set(10)
     configureByPages(5)
@@ -132,6 +146,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertVisibleArea(96, 130)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up ignores scrolljump`() {
     OptionsManager.scrolljump.set(10)
     configureByPages(5)
@@ -141,6 +156,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertVisibleArea(96, 130)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up on first page does not move`() {
     configureByPages(5)
     setPositionAndScroll(0, 25)
@@ -149,6 +165,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertVisibleArea(0, 34)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up on first page causes beep`() {
     configureByPages(5)
     setPositionAndScroll(0, 25)
@@ -156,6 +173,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up too many times causes beep`() {
     configureByPages(5)
     setPositionAndScroll(40, 65)
@@ -163,6 +181,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up too many times moves caret to correct location`() {
     configureByPages(5)
     setPositionAndScroll(40, 65)
@@ -174,6 +193,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up too many times moves caret to correct location 2`() {
     configureByPages(5)
     setPositionAndScroll(50, 65)
@@ -185,6 +205,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up too many times moves caret to correct location 3`() {
     configureByPages(5)
     setPositionAndScroll(66, 90)
@@ -196,6 +217,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up too many times moves caret to bottom of screen plus scrolloff`() {
     OptionsManager.scrolloff.set(10)
     configureByPages(5)
@@ -206,6 +228,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up positions last page with only two lines correctly`() {
     // Vim normally scrolls up window height minus two. When there is a last page with only one or two lines, due to
     // virtual space, it scrolls up window height minus one, or windows height.
@@ -219,6 +242,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertPluginError(false)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up positions last page with only two lines correctly 2`() {
     configureByPages(5)
     setEditorVirtualSpace()
@@ -230,6 +254,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertPluginError(false)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up on second page moves cursor to previous top`() {
     configureByPages(5)
     setPositionAndScroll(10, 35)
@@ -238,6 +263,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertVisibleArea(0, 34)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up puts cursor on first non-blank column`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(50, 60, 14)
@@ -246,6 +272,7 @@ class ScrollPageUpActionTest : VimTestCase() {
     assertVisibleArea(17, 51)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page up keeps same column with nostartofline`() {
     OptionsManager.startofline.reset()
     configureByLines(100, "    I found it in a legendary land")

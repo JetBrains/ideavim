@@ -21,6 +21,8 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /*
@@ -36,7 +38,8 @@ CTRL-U                  Scroll window Upwards in the buffer.  The number of
                         produced.  See also 'startofline' option.
  */
 class ScrollHalfPageUpActionTest : VimTestCase() {
-  fun `test scroll half window upwards keeps cursor on same relative line`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll half window upwards keeps cursor on same relative line`() {
     configureByPages(5)
     setPositionAndScroll(50, 60)
     typeText(parseKeys("<C-U>"))
@@ -44,7 +47,8 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     assertVisibleArea(33, 67)
   }
 
-  fun `test scroll upwards on first line causes beep`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll upwards on first line causes beep`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
     typeText(parseKeys("<C-U>"))
@@ -53,7 +57,8 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     assertTrue(VimPlugin.isError())
   }
 
-  fun `test scroll upwards in first half of first page moves to first line`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll upwards in first half of first page moves to first line`() {
     configureByPages(5)
     setPositionAndScroll(5, 10)
     typeText(parseKeys("<C-U>"))
@@ -61,7 +66,8 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     assertVisibleArea(0, 34)
   }
 
-  fun `test scroll count lines upwards`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll count lines upwards`() {
     configureByPages(5)
     setPositionAndScroll(50, 53)
     typeText(parseKeys("10<C-U>"))
@@ -69,14 +75,16 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     assertVisibleArea(40, 74)
   }
 
-  fun `test scroll count modifies scroll option`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll count modifies scroll option`() {
     configureByPages(5)
     setPositionAndScroll(50, 53)
     typeText(parseKeys("10<C-U>"))
     assertEquals(OptionsManager.scroll.value(), 10)
   }
 
-  fun `test scroll upwards uses scroll option`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll upwards uses scroll option`() {
     OptionsManager.scroll.set(10)
     configureByPages(5)
     setPositionAndScroll(50, 53)
@@ -85,7 +93,8 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     assertVisibleArea(40, 74)
   }
 
-  fun `test count scroll upwards is limited to a single page`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test count scroll upwards is limited to a single page`() {
     configureByPages(5)
     setPositionAndScroll(100, 134)
     typeText(parseKeys("50<C-U>"))
@@ -93,7 +102,8 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     assertVisibleArea(65, 99)
   }
 
-  fun `test scroll up puts cursor on first non-blank column`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll up puts cursor on first non-blank column`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(50, 60, 14)
     typeText(parseKeys("<C-U>"))
@@ -101,7 +111,8 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     assertVisibleArea(33, 67)
   }
 
-  fun `test scroll upwards keeps same column with nostartofline`() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll upwards keeps same column with nostartofline`() {
     OptionsManager.startofline.reset()
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(50, 60, 14)

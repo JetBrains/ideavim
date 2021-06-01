@@ -21,6 +21,8 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /*
@@ -30,42 +32,48 @@ zl                      Move the view on the text [count] characters to the
                         left.  This only works when 'wrap' is off.
  */
 class ScrollColumnLeftActionTest : VimTestCase() {
-  fun `test scrolls column to left`() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  fun`test scrolls column to left`() {
     configureByColumns(200)
     typeText(parseKeys("100|", "zl"))
     assertPosition(0, 99)
     assertVisibleLineBounds(0, 60, 139)
   }
 
-  fun `test scrolls column to left with zRight`() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  fun`test scrolls column to left with zRight`() {
     configureByColumns(200)
     typeText(parseKeys("100|", "z<Right>"))
     assertPosition(0, 99)
     assertVisibleLineBounds(0, 60, 139)
   }
 
-  fun `test scroll first column to left moves cursor`() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  fun`test scroll first column to left moves cursor`() {
     configureByColumns(200)
     typeText(parseKeys("100|", "zs", "zl"))
     assertPosition(0, 100)
     assertVisibleLineBounds(0, 100, 179)
   }
 
-  fun `test scrolls count columns to left`() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  fun`test scrolls count columns to left`() {
     configureByColumns(200)
     typeText(parseKeys("100|", "10zl"))
     assertPosition(0, 99)
     assertVisibleLineBounds(0, 69, 148)
   }
 
-  fun `test scrolls count columns to left with zRight`() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  fun`test scrolls count columns to left with zRight`() {
     configureByColumns(200)
     typeText(parseKeys("100|", "10z<Right>"))
     assertPosition(0, 99)
     assertVisibleLineBounds(0, 69, 148)
   }
 
-  fun `test scrolls column to left with sidescrolloff moves cursor`() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  fun`test scrolls column to left with sidescrolloff moves cursor`() {
     OptionsManager.sidescrolloff.set(10)
     configureByColumns(200)
     typeText(parseKeys("100|", "zs", "zl"))
@@ -73,7 +81,8 @@ class ScrollColumnLeftActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 90, 169)
   }
 
-  fun `test scroll column to left ignores sidescroll`() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  fun`test scroll column to left ignores sidescroll`() {
     OptionsManager.sidescroll.set(10)
     configureByColumns(200)
     typeText(parseKeys("100|"))
@@ -88,7 +97,8 @@ class ScrollColumnLeftActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 21, 100)
   }
 
-  fun `test scroll column to left on last page enters virtual space`() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  fun`test scroll column to left on last page enters virtual space`() {
     configureByColumns(200)
     typeText(parseKeys("200|", "ze", "zl"))
     assertPosition(0, 199)
@@ -102,7 +112,8 @@ class ScrollColumnLeftActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Vim has virtual space at end of line")
-  fun `test scroll columns to left on last page does not have full virtual space`() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  fun`test scroll columns to left on last page does not have full virtual space`() {
     configureByColumns(200)
     typeText(parseKeys("200|", "ze", "50zl"))
     assertPosition(0, 199)
@@ -111,7 +122,8 @@ class ScrollColumnLeftActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 123, 202)
   }
 
-  fun `test scroll column to left correctly scrolls inline inlay associated with preceding text`() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  fun`test scroll column to left correctly scrolls inline inlay associated with preceding text`() {
     configureByColumns(200)
     addInlay(67, true, 5)
     typeText(parseKeys("100|"))
@@ -123,7 +135,8 @@ class ScrollColumnLeftActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 67, 146)
   }
 
-  fun `test scroll column to left correctly scrolls inline inlay associated with following text`() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
+  fun`test scroll column to left correctly scrolls inline inlay associated with following text`() {
     configureByColumns(200)
     addInlay(67, false, 5)
     typeText(parseKeys("100|"))

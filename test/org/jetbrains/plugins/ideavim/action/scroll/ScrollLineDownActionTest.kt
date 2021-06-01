@@ -21,6 +21,8 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /*
@@ -84,6 +86,7 @@ class ScrollLineDownActionTest : VimTestCase() {
     assertVisibleArea(146, 175)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll down uses scrolloff and moves cursor`() {
     OptionsManager.scrolloff.set(10)
     configureByPages(5)

@@ -20,6 +20,8 @@ package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /*
@@ -30,6 +32,7 @@ CTRL-Y                  Scroll window [count] lines upwards in the buffer.
                         remapped to redo.
  */
 class ScrollLineUpActionTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll single line up`() {
     configureByPages(5)
     setPositionAndScroll(29, 29)
@@ -38,6 +41,7 @@ class ScrollLineUpActionTest : VimTestCase() {
     assertVisibleArea(28, 62)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll line up will keep cursor on screen`() {
     configureByPages(5)
     setPositionAndScroll(29, 63)
@@ -46,6 +50,7 @@ class ScrollLineUpActionTest : VimTestCase() {
     assertVisibleArea(28, 62)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll line up will maintain current column at start of line with sidescrolloff`() {
     OptionsManager.sidescrolloff.set(10)
     configureByPages(5)
@@ -55,6 +60,7 @@ class ScrollLineUpActionTest : VimTestCase() {
     assertVisibleArea(28, 62)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll count lines up`() {
     configureByPages(5)
     setPositionAndScroll(29, 29)
@@ -63,6 +69,7 @@ class ScrollLineUpActionTest : VimTestCase() {
     assertVisibleArea(19, 53)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll count lines up will keep cursor on screen`() {
     configureByPages(5)
     setPositionAndScroll(29, 63)
@@ -71,6 +78,7 @@ class ScrollLineUpActionTest : VimTestCase() {
     assertVisibleArea(19, 53)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test too many lines up stops at zero`() {
     configureByPages(5)
     setPositionAndScroll(29, 29)
@@ -79,6 +87,7 @@ class ScrollLineUpActionTest : VimTestCase() {
     assertVisibleArea(0, 34)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test too many lines up stops at zero and keeps cursor on screen`() {
     configureByPages(5)
     setPositionAndScroll(59, 59)
@@ -87,6 +96,7 @@ class ScrollLineUpActionTest : VimTestCase() {
     assertVisibleArea(0, 34)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll up uses scrolloff and moves cursor`() {
     OptionsManager.scrolloff.set(10)
     configureByPages(5)
@@ -96,6 +106,7 @@ class ScrollLineUpActionTest : VimTestCase() {
     assertVisibleArea(19, 53)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll up is not affected by scrolljump`() {
     OptionsManager.scrolljump.set(10)
     configureByPages(5)
@@ -105,6 +116,7 @@ class ScrollLineUpActionTest : VimTestCase() {
     assertVisibleArea(28, 62)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll line up in visual mode`() {
     configureByPages(5)
     setPositionAndScroll(29, 29)
@@ -112,6 +124,7 @@ class ScrollLineUpActionTest : VimTestCase() {
     assertVisibleArea(28, 62)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll line up with virtual space`() {
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
@@ -120,6 +133,7 @@ class ScrollLineUpActionTest : VimTestCase() {
     assertVisibleArea(84, 99)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll line up with virtual space and scrolloff`() {
     OptionsManager.scrolloff.set(10)
     configureByLines(100, "    I found it in a legendary land")
@@ -132,6 +146,7 @@ class ScrollLineUpActionTest : VimTestCase() {
   }
 
   // This actually works, but the set up puts us in the wrong position
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll line up on last line with scrolloff`() {
     OptionsManager.scrolloff.set(10)
     configureByLines(100, "    I found it in a legendary land")

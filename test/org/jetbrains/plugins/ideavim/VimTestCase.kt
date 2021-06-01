@@ -271,6 +271,7 @@ abstract class VimTestCase : UsefulTestCase() {
     Assert.assertEquals("Wrong amount of carets", 1, carets.size)
     val actualPosition = carets[0].logicalPosition
     Assert.assertEquals(LogicalPosition(line, column), actualPosition)
+    NeovimTesting.assertCaret(myFixture.editor, this)
   }
 
   fun assertVisualPosition(visualLine: Int, visualColumn: Int) {

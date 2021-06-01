@@ -21,6 +21,8 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /*
@@ -31,6 +33,7 @@ z+                      Without [count]: Redraw with the line just below the
                         With [count]: just like "z<CR>".
  */
 class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scrolls first line on next page to top of screen`() {
     configureByPages(5)
     setPositionAndScroll(0, 20)
@@ -39,6 +42,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
     assertVisibleArea(35, 69)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scrolls to first non-blank in line`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(0, 20)
@@ -47,6 +51,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
     assertVisibleArea(35, 69)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scrolls first line on next page to scrolloff`() {
     OptionsManager.scrolloff.set(10)
     configureByPages(5)
@@ -56,6 +61,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
     assertVisibleArea(25, 59)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scrolls first line on next page ignores scrolljump`() {
     OptionsManager.scrolljump.set(10)
     configureByPages(5)

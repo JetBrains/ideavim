@@ -21,6 +21,8 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /*
@@ -35,6 +37,7 @@ CTRL-F                  Scroll window [count] pages Forwards (downwards) in
 <PageDown>      move window one page down      *i_<PageDown>*
  */
 class ScrollPageDownActionTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll single page down with S-Down`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
@@ -43,6 +46,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(33, 67)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll single page down with PageDown`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
@@ -51,6 +55,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(33, 67)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll single page down with CTRL-F`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
@@ -59,6 +64,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(33, 67)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down in insert mode with S-Down`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
@@ -67,6 +73,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(33, 67)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down in insert mode with PageDown`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
@@ -75,6 +82,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(33, 67)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll count pages down with S-Down`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
@@ -83,6 +91,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(99, 133)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll count pages down with PageDown`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
@@ -91,6 +100,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(99, 133)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll count pages down with CTRL-F`() {
     configureByPages(5)
     setPositionAndScroll(0, 0)
@@ -99,6 +109,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(99, 133)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down moves cursor to top of screen`() {
     configureByPages(5)
     setPositionAndScroll(0, 20)
@@ -107,6 +118,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(33, 67)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down in insert mode moves cursor`() {
     configureByPages(5)
     setPositionAndScroll(0, 20)
@@ -115,6 +127,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(33, 67)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down moves cursor with scrolloff`() {
     OptionsManager.scrolloff.set(10)
     configureByPages(5)
@@ -124,6 +137,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(33, 67)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down in insert mode moves cursor with scrolloff`() {
     OptionsManager.scrolloff.set(10)
     configureByPages(5)
@@ -133,6 +147,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(33, 67)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down ignores scrolljump`() {
     OptionsManager.scrolljump.set(10)
     configureByPages(5)
@@ -143,6 +158,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "IntelliJ does not have virtual space enabled by default")
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down on last page moves cursor to end of file`() {
     configureByPages(5)
     setPositionAndScroll(145, 150)
@@ -152,6 +168,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "IntelliJ keeps 2 lines at the top of a file even with virtual space")
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down on last page with virtual space`() {
     configureByPages(5)
     setEditorVirtualSpace()
@@ -161,6 +178,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(174, 175)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down on penultimate page`() {
     configureByPages(5)
     setPositionAndScroll(110, 130)
@@ -169,6 +187,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(143, 175)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down on last line scrolls up by default virtual space`() {
     configureByPages(5)
     setPositionAndScroll(146, 175)
@@ -179,6 +198,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "IntelliJ keeps 2 lines at the top of a file even with virtual space")
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down on last line scrolls up by virtual space`() {
     configureByPages(5)
     setEditorVirtualSpace()
@@ -189,6 +209,7 @@ class ScrollPageDownActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "IntelliJ keeps 2 lines at the top of a file even with virtual space")
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down on fully scrolled last line does not move`() {
     configureByPages(5)
     setEditorVirtualSpace()
@@ -199,6 +220,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(174, 175)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down on last line causes beep with default lines of virtual space`() {
     configureByPages(5)
     // 146 is 5 lines of virtual space
@@ -207,6 +229,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down on last line causes beep with virtual space`() {
     configureByPages(5)
     setEditorVirtualSpace()
@@ -215,6 +238,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down too far causes error bell`() {
     configureByPages(5)
     setPositionAndScroll(146, 175)
@@ -222,6 +246,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertPluginError(true)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down puts cursor on first non-blank column`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 25, 14)
@@ -230,6 +255,7 @@ class ScrollPageDownActionTest : VimTestCase() {
     assertVisibleArea(53, 87)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll page down keeps same column with nostartofline`() {
     OptionsManager.startofline.reset()
     configureByLines(100, "    I found it in a legendary land")

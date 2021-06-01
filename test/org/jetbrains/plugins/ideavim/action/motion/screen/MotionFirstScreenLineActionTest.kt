@@ -21,6 +21,8 @@ package org.jetbrains.plugins.ideavim.action.motion.screen
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionFirstScreenLineActionTest : VimTestCase() {
@@ -52,6 +54,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     assertPosition(49, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test move caret to too large count line from top of screen`() {
     assertEquals(35, screenHeight)
     configureByLines(100, "    I found it in a legendary land")
@@ -68,6 +71,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     assertPosition(0, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test move caret applies scrolloff when top of screen is not top of file`() {
     OptionsManager.scrolloff.set(10)
     configureByLines(50, "    I found it in a legendary land")
@@ -76,6 +80,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     assertPosition(11, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test move caret applies scrolloff when top of screen is not top of file 2`() {
     OptionsManager.scrolloff.set(10)
     configureByLines(100, "    I found it in a legendary land")
@@ -92,6 +97,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     assertPosition(4, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test move caret to first screen line with count and scrolloff not at top of file`() {
     OptionsManager.scrolloff.set(10)
     configureByLines(100, "    I found it in a legendary land")
@@ -115,6 +121,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     assertPosition(24, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test operator pending acts to first screen line with nostartofline`() {
     OptionsManager.startofline.reset()
     configureByLines(100, "    I found it in a legendary land")
@@ -123,6 +130,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     assertPosition(20, 10)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test operator pending acts on count line from top of screen with nostartofline`() {
     OptionsManager.startofline.reset()
     configureByLines(100, "    I found it in a legendary land")
@@ -140,6 +148,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     assertVisibleArea(10, 44)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test move caret to same column with nostartofline`() {
     OptionsManager.startofline.reset()
     configureByLines(50, "    I found it in a legendary land")
@@ -148,6 +157,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     assertPosition(0, 10)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test move caret to end of shorter line with nostartofline`() {
     OptionsManager.startofline.reset()
     configureByLines(70, "    I found it in a legendary land")
@@ -166,6 +176,7 @@ class MotionFirstScreenLineActionTest : VimTestCase() {
     assertPosition(0, 4)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test keep caret on screen when count is greater than visible lines plus inlays`() {
     assertEquals(35, screenHeight)
     configureByLines(50, "    I found it in a legendary land")
