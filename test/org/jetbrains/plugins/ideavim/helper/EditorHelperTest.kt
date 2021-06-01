@@ -19,10 +19,13 @@
 package org.jetbrains.plugins.ideavim.helper
 
 import com.maddyhome.idea.vim.helper.EditorHelper
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.Assert
 
 class EditorHelperTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test scroll column to left of screen`() {
     configureByColumns(100)
     EditorHelper.scrollColumnToLeftOfScreen(myFixture.editor, 0, 2)
@@ -31,6 +34,7 @@ class EditorHelperTest : VimTestCase() {
     Assert.assertEquals(2 * columnWidth, visibleArea.x)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test scroll column to right of screen`() {
     configureByColumns(100)
     val column = screenWidth + 2
@@ -40,6 +44,7 @@ class EditorHelperTest : VimTestCase() {
     Assert.assertEquals((column - screenWidth + 1) * columnWidth, visibleArea.x)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test scroll column to middle of screen with even number of columns`() {
     configureByColumns(200)
     // For an 80 column screen, moving a column to the centre should position it in column 41 (1 based) - 40 columns on
@@ -51,6 +56,7 @@ class EditorHelperTest : VimTestCase() {
     Assert.assertEquals(59 * columnWidth, visibleArea.x)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test scroll column to middle of screen with odd number of columns`() {
     configureByColumns(200)
     setEditorVisibleSize(81, 25)

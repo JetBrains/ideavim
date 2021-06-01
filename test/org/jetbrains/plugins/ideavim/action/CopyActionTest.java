@@ -88,6 +88,7 @@ public class CopyActionTest extends VimTestCase {
     assertState("twtwo\n");
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
   public void testWrongYankQuoteMotion() {
     assertPluginError(false);
     typeTextInFile(parseKeys("y\""), "one <caret>two\n" + "three\n" + "four\n");
