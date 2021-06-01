@@ -130,7 +130,7 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(listOf("IC-2020.2.3", "IC-2020.3.2"))
+        ideVersions.set(listOf("IC-2020.2.3", "IC-2020.3.2", "IC-2021.1"))
         downloadDir.set("${project.buildDir}/pluginVerifier/ides")
         teamCityOutputFormat.set(true)
     }
