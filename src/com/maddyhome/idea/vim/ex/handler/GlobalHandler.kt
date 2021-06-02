@@ -190,7 +190,6 @@ class GlobalHandler : CommandHandler.SingleExecution() {
         // TODO: 26.05.2021 break check
       }
     } catch (e: Exception) {
-      // TODO: 27.05.2021 Process this exception
       throw e
     } finally {
       globalBusy = false
@@ -199,15 +198,13 @@ class GlobalHandler : CommandHandler.SingleExecution() {
   }
 
   private fun globalExecuteOne(editor: Editor, context: DataContext, lineStartOffset: Int, cmd: String?) {
-    // TODO: 26.05.2021 Move to line start offset
     // TODO: 26.05.2021 What about folds?
     editor.caretModel.moveToOffset(lineStartOffset)
     if (cmd == null || cmd.isEmpty() || (cmd.length == 1 && cmd[0] == '\n')) {
-      CommandParser.processCommand(editor, context, "p", 1)
+      CommandParser.processCommand(editor, context, "p", 1, skipHistory = true)
     } else {
-      CommandParser.processCommand(editor, context, cmd, 1)
+      CommandParser.processCommand(editor, context, cmd, 1, skipHistory = true)
     }
-    // TODO: 26.05.2021 Do not add the command to the history
   }
 
   private enum class GlobalType {

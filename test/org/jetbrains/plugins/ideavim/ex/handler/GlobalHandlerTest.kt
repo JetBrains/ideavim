@@ -18,7 +18,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.handler
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.group.HistoryGroup
+import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -151,7 +154,7 @@ class GlobalHandlerTest : VimTestCase() {
     )
   }
 
-  fun `test nested works only for current line`() {
+  fun `test nested multiple lines`() {
     doTest(
       "g/it/v/notit/d",
       """
@@ -169,6 +172,23 @@ class GlobalHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass. 
       """.trimIndent(),
     )
+  }
+
+  fun `test check history`() {
+    doTest(
+      "g/found/d",
+      initialText,
+      """
+            A Discovery
+
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass. 
+      """.trimIndent(),
+    )
+    val entries = VimPlugin.getHistory().getEntries(HistoryGroup.COMMAND, 0, 0)
+    val element = assertOneElement(entries)
+    TestCase.assertEquals("g/found/d", element.entry)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)

@@ -112,7 +112,7 @@ public class ProcessGroup {
 
       if (logger.isDebugEnabled()) logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
 
-      CommandParser.INSTANCE.processCommand(editor, context, text, 1);
+      CommandParser.INSTANCE.processCommand(editor, context, text, 1, false);
     }
     catch (ExException e) {
       VimPlugin.showMessage(e.getMessage());

@@ -98,8 +98,8 @@ object CommandParser {
    * @throws ExException if any part of the command is invalid or unknown
    */
   @kotlin.jvm.Throws(ExException::class)
-  fun processCommand(editor: Editor, context: DataContext, cmd: String, count: Int) {
-    processCommand(editor, context, cmd, count, MAX_RECURSION)
+  fun processCommand(editor: Editor, context: DataContext, cmd: String, count: Int, skipHistory: Boolean = false) {
+    processCommand(editor, context, cmd, count, MAX_RECURSION, skipHistory)
   }
 
   @kotlin.jvm.Throws(ExException::class)
@@ -109,6 +109,7 @@ object CommandParser {
     cmd: String,
     count: Int,
     aliasCountdown: Int,
+    skipHistory: Boolean,
   ) {
     // Nothing entered
     if (cmd.isEmpty()) {
@@ -119,7 +120,7 @@ object CommandParser {
     // Only save the command to the history if it is at the top of the stack.
     // We don't want to save the aliases that will be executed, only the actual
     // user input.
-    if (aliasCountdown == MAX_RECURSION) {
+    if (aliasCountdown == MAX_RECURSION && !skipHistory) {
       // Save the command history
       VimPlugin.getHistory().addEntry(HistoryGroup.COMMAND, cmd)
     }
@@ -135,7 +136,7 @@ object CommandParser {
               logger.warn("Command alias is empty")
               return
             }
-            processCommand(editor, context, commandAlias.command, count, aliasCountdown - 1)
+            processCommand(editor, context, commandAlias.command, count, aliasCountdown - 1, skipHistory)
           }
           is GoalCommand.Call -> commandAlias.handler.execute(editor, context)
         }.let { }
