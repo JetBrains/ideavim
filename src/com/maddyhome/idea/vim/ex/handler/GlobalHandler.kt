@@ -66,8 +66,7 @@ class GlobalHandler : CommandHandler.SingleExecution() {
   ): Boolean {
     // When nesting the command works on one line.  This allows for
     // ":g/found/v/notfound/command".
-    if (globalBusy && (range.startLine != 0 || range.endLine != editor.document.lineCount)) {
-      // TODO: 26.05.2021 This is weird (line ranges)
+    if (globalBusy && (range.startLine != 0 || range.endLine != editor.document.lineCount - 1)) {
       VimPlugin.showMessage(message("E147"))
       VimPlugin.indicateError()
       return false

@@ -130,6 +130,47 @@ class GlobalHandlerTest : VimTestCase() {
     )
   }
 
+  fun `test nested global`() {
+    doTest(
+      "g/found/v/notfound/d",
+      """
+                  A Discovery
+      
+                  I found it in ${c}a legendary land
+                  all rocks and lavender and tufted grass,
+                  where it was settled on some sodden sand
+                  hard by the torrent of a mountain pass. 
+      """.trimIndent(),
+      """
+                A Discovery
+    
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass. 
+      """.trimIndent(),
+    )
+  }
+
+  fun `test nested works only for current line`() {
+    doTest(
+      "g/it/v/notit/d",
+      """
+                  A Discovery
+      
+                  I found it in ${c}a legendary land
+                  all rocks and lavender and tufted grass,
+                  where it was settled on some sodden sand
+                  hard by the torrent of a mountain pass. 
+      """.trimIndent(),
+      """
+                A Discovery
+    
+                all rocks and lavender and tufted grass,
+                hard by the torrent of a mountain pass. 
+      """.trimIndent(),
+    )
+  }
+
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test g only`() {
     doTest(
