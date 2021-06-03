@@ -144,10 +144,12 @@ class SetHandlerHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test to notation 4`() {
     var owner = ShortcutOwnerInfo.allPerModeVim
-    owner = owner.copy(normal = ShortcutOwner.IDE,
+    owner = owner.copy(
+      normal = ShortcutOwner.IDE,
       insert = ShortcutOwner.IDE,
       visual = ShortcutOwner.IDE,
-      select = ShortcutOwner.IDE)
+      select = ShortcutOwner.IDE
+    )
     TestCase.assertEquals("a:ide", owner.toNotation())
   }
 }
