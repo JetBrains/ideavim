@@ -325,7 +325,7 @@ fun updateMergedPr(number: Int) {
     val gitHub = org.kohsuke.github.GitHub.connect()
     val repository = gitHub.getRepository("JetBrains/ideavim")
     val pullRequest = repository.getPullRequest(number)
-    if ("dependabot" == pullRequest.user.name) return
+    if (pullRequest.user.login == "dependabot[bot]") return
 
     val authorsFile = File("$projectDir/CHANGES.md")
     val authors = authorsFile.readText()
@@ -383,6 +383,7 @@ fun updateMergedPr(number: Int) {
     }
 
     if (insertOffset < 50) error("Incorrect offset: $insertOffset")
+    if (pullRequest.user.login == "dependabot[bot]") return
 
     val prNumber = pullRequest.number
     val userName = pullRequest.user.name

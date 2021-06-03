@@ -34,7 +34,6 @@ usual beta standards.
 ### Merged PRs:
 * [261](https://github.com/JetBrains/ideavim/pull/261) by [Shrikant Sharat Kandula](https://github.com/sharat87): New extension: Indentation based text objects
 * [308](https://github.com/JetBrains/ideavim/pull/308) by [Matt Ellis](https://github.com/citizenmatt): Fix unnecessary caret movement when switching tabs
-* [319](https://github.com/JetBrains/ideavim/pull/319) by [null](https://github.com/dependabot[bot]): Bump annotations from 20.1.0 to 21.0.1
 
 ## 0.67, 2021-05-20
 
