@@ -25,6 +25,7 @@ usual beta standards.
 ## To Be Released
 
 ### Features:
+* Support `:global` and `:vglobal` commands [VIM-831](https://youtrack.jetbrains.com/issue/VIM-831), [VIM-832](https://youtrack.jetbrains.com/issue/VIM-832)
 * Support `vim-indent-object` extension [VIM-1151](https://youtrack.jetbrains.com/issue/VIM-1151) | [vim-indent-object](https://github.com/michaeljsmith/vim-indent-object)
 * Support `:print` command
 
