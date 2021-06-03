@@ -2,82 +2,31 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-     <h3>Features:</h3>
-     <ul>
-     <li>Support <code>sethandler</code> command to configure shortcuts conflicts via <code>~/.ideavimrc</code> file.
-       See <a href="https://jb.gg/vim-sethandler">docs</a>.
-     </li>
-     <li>Support <code>vim-paragraph-motion</code> extension <a href="https://youtrack.jetbrains.com/issue/VIM-2290">VIM-2290</a> |
-       <a href="https://github.com/dbakker/vim-paragraph-motion">vim-paragraph-motion</a>
-     </li>
-     <li>Add "Reset Handlers" button for "Conflicting Shortcuts" setting table
-     </li>
-     </ul>
+    <h3>Features:</h3>
+    <ul>
+      <li>Support <code>:global</code> and <code>:vglobal</code> commands <a
+          href="https://youtrack.jetbrains.com/issue/VIM-831">VIM-831</a>, <a
+          href="https://youtrack.jetbrains.com/issue/VIM-832">VIM-832</a></li>
+      <li>Support <code>vim-indent-object</code> extension <a
+          href="https://youtrack.jetbrains.com/issue/VIM-1151">VIM-1151</a> | <a
+          href="https://github.com/michaeljsmith/vim-indent-object">vim-indent-object</a></li>
+      <li>Support <code>:print</code> command</li>
+    </ul>
 
-     <h3>Changes:</h3>
-     <ul>
-     <li>Rename "Vim Emulation" in settings to "Vim"</li>
-     </ul>
+    <h3>Fixes:</h3>
+    <ul>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2308">VIM-2308</a> Go to next tab doesn't move scrolling</li>
+    </ul>
 
-     <h3>Fixes:</h3>
-     <ul>
-     <li>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-2230">VIM-2230</a>
-       Tweak caret position with inline rename options inlay
-     </li>
-     <li>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-2177">VIM-2177</a>
-       Fix scrolling issues near bottom of file
-     </li>
-     <li>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-2276">VIM-2276</a>
-       <code>:ls</code> returns correct path for files on Microsoft Windows.
-     </li>
-     <li>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-1953">VIM-1953</a>
-       Execute live testing for <code>:w</code> command
-     </li>
-     <li>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-2289">VIM-2289</a>
-       Fix <code><End></code> command behaviour
-     </li>
-     <li>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-1476">VIM-1476</a>
-       Last inserted text is stored in <code>.</code> register
-     </li>
-     <li>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-2295">VIM-2295</a>
-       Fix <code><S-Space></code> in insert mode with an existing mapping
-     </li>
-     <li>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-1401">VIM-1401</a>
-       IdeaVim triggers readonly handler
-     </li>
-     <li>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-1856">VIM-1856</a>
-       Support defining shortcuts in .ideavimrc
-     </li>
-     <li>
-       <a href="https://youtrack.jetbrains.com/issue/VIM-1523">VIM-1523</a>
-       Allow different shortcut handlers in different modes
-     </li>
-     </ul>
-
-     <h3>Merged PRs:</h3>
-     <ul>
-     <li>
-       <a href="https://github.com/JetBrains/ideavim/pull/280">280</a>
-       by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Caret position and view scrolling fixes
-     </li>
-     <li>
-       <a href="https://github.com/JetBrains/ideavim/pull/289">289</a>
-       by <a href="https://github.com/MichalPlacek">MichalPlacek</a>: VIM-2276 ls returns "absolute path" for files on Microsoft Windows.
-     </li>
-     <li>
-       <a href="https://github.com/JetBrains/ideavim/pull/295">295</a>
-       by <a href="https://github.com/MichalPlacek">MichalPlacek</a>: VIM-1476
-     </li>
-     </ul>
+    <h3>Merged PRs:</h3>
+    <ul>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/261">261</a> by <a href="https://github.com/sharat87">Shrikant
+        Sharat Kandula</a>: New extension: Indentation based text objects
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/308">308</a> by <a href="https://github.com/citizenmatt">Matt
+        Ellis</a>: Fix unnecessary caret movement when switching tabs
+      </li>
+    </ul>
     ]]>
   </change-notes>
   <description><![CDATA[
