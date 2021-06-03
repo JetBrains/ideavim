@@ -120,4 +120,34 @@ class SetHandlerHandlerTest : VimTestCase() {
     val newOwner = SetHandlerHandler.updateOwner(owner, "hau2h2:ide")
     TestCase.assertNull(newOwner)
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test to notation`() {
+    var owner = ShortcutOwnerInfo.allPerModeVim
+    owner = owner.copy(normal = ShortcutOwner.IDE)
+    TestCase.assertEquals("n:ide i-v:vim", owner.toNotation())
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test to notation 2`() {
+    var owner = ShortcutOwnerInfo.allPerModeVim
+    owner = owner.copy(normal = ShortcutOwner.IDE, insert = ShortcutOwner.IDE)
+    TestCase.assertEquals("n-i:ide v:vim", owner.toNotation())
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test to notation 3`() {
+    val owner = ShortcutOwnerInfo.allPerModeVim
+    TestCase.assertEquals("a:vim", owner.toNotation())
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test to notation 4`() {
+    var owner = ShortcutOwnerInfo.allPerModeVim
+    owner = owner.copy(normal = ShortcutOwner.IDE,
+      insert = ShortcutOwner.IDE,
+      visual = ShortcutOwner.IDE,
+      select = ShortcutOwner.IDE)
+    TestCase.assertEquals("a:ide", owner.toNotation())
+  }
 }

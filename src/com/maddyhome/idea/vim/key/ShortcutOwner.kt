@@ -61,16 +61,18 @@ sealed class ShortcutOwnerInfo {
         owners.put(ShortcutOwner.IDE, "a")
       }
 
-      return owners[ShortcutOwner.IDE]
-        .sortedBy { wights[it] ?: 1000 }
-        .joinToString(separator = "-") +
+      val ideOwners = owners[ShortcutOwner.IDE].sortedBy { wights[it] ?: 1000 }.joinToString(separator = "-")
+      val vimOwners = owners[ShortcutOwner.VIM].sortedBy { wights[it] ?: 1000 }.joinToString(separator = "-")
 
-        ":" + ShortcutOwner.IDE.ownerName + " " +
-
-        owners[ShortcutOwner.VIM]
-          .sortedBy { wights[it] ?: 1000 }
-          .joinToString(separator = "-") +
-        ":" + ShortcutOwner.VIM.ownerName
+      return if (ideOwners.isNotEmpty() && vimOwners.isNotEmpty()) {
+        ideOwners + ":" + ShortcutOwner.IDE.ownerName + " " + vimOwners + ":" + ShortcutOwner.VIM.ownerName
+      } else if (ideOwners.isNotEmpty() && vimOwners.isEmpty()) {
+        ideOwners + ":" + ShortcutOwner.IDE.ownerName
+      } else if (ideOwners.isEmpty() && vimOwners.isNotEmpty()) {
+        vimOwners + ":" + ShortcutOwner.VIM.ownerName
+      } else {
+        error("Unexpected state")
+      }
     }
   }
 
