@@ -69,25 +69,29 @@ class SetHandlerHandler : CommandHandler.SingleExecution(), VimScriptCommandHand
     return true
   }
 
-  private fun updateOwner(owner: ShortcutOwnerInfo.PerMode?, newData: String): ShortcutOwnerInfo.PerMode? {
-    if (owner == null) return null
-    val split = newData.split(":", limit = 2)
-    if (split.size != 2) return null
+  companion object {
+    internal fun updateOwner(owner: ShortcutOwnerInfo.PerMode?, newData: String): ShortcutOwnerInfo.PerMode? {
+      if (owner == null) return null
+      val split = newData.split(":", limit = 2)
+      if (split.size != 2) return null
 
-    val left = split[0]
-    val right = ShortcutOwner.fromStringOrNull(split[1]) ?: return null
+      val left = split[0]
+      val right = ShortcutOwner.fromStringOrNull(split[1]) ?: return null
 
-    var currentOwner: ShortcutOwnerInfo.PerMode = owner
-    val modeSplit = left.split("-")
-    modeSplit.forEach {
-      currentOwner = when (it) {
-        "n" -> currentOwner.copy(normal = right)
-        "i" -> currentOwner.copy(insert = right)
-        "v" -> currentOwner.copy(visual = right, select = right)
-        "x" -> currentOwner.copy(visual = right)
-        else -> return null
+      var currentOwner: ShortcutOwnerInfo.PerMode = owner
+      val modeSplit = left.split("-")
+      modeSplit.forEach {
+        currentOwner = when (it) {
+          "n" -> currentOwner.copy(normal = right)
+          "i" -> currentOwner.copy(insert = right)
+          "v" -> currentOwner.copy(visual = right, select = right)
+          "x" -> currentOwner.copy(visual = right)
+          "s" -> currentOwner.copy(select = right)
+          "a" -> currentOwner.copy(normal = right, insert = right, visual = right, select = right)
+          else -> return null
+        }
       }
+      return currentOwner
     }
-    return currentOwner
   }
 }
