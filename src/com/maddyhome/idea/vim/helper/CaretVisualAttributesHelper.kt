@@ -18,11 +18,22 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+
+/**
+ * Force the use of the bar caret
+ *
+ * Avoid this if possible - we should be using caret shape based on mode. This is only used for IntelliJ specific
+ * behaviour, e.g. handling selection updates during mouse drag.
+ */
+fun Caret.forceBarCursor() {
+  setPrimaryCaretShape(editor, false)
+}
 
 fun Editor.updateCaretVisualAttributes() {
   updatePrimaryCaretVisualAttributes(this, mode)
@@ -61,10 +72,6 @@ else {
 }
 
 
-
-fun resetCaret(editor: Editor, insert: Boolean) {
-  setPrimaryCaretShape(editor, !insert)
-}
 
 fun updateCaretState(editor: Editor) {
   editor.updateCaretVisualAttributes()

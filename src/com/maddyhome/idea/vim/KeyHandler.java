@@ -356,7 +356,7 @@ public class KeyHandler {
       }
     }
     reset(editor);
-    resetCaret(editor, false);
+    resetShape(CommandState.Mode.COMMAND, editor);
   }
 
   private boolean handleKeyMapping(final @NotNull Editor editor,
