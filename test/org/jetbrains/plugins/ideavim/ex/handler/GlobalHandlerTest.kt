@@ -175,6 +175,7 @@ class GlobalHandlerTest : VimTestCase() {
   }
 
   fun `test check history`() {
+    val initialEntries = VimPlugin.getHistory().getEntries(HistoryGroup.COMMAND, 0, 0)
     doTest(
       "g/found/d",
       initialText,
@@ -187,7 +188,8 @@ class GlobalHandlerTest : VimTestCase() {
       """.trimIndent(),
     )
     val entries = VimPlugin.getHistory().getEntries(HistoryGroup.COMMAND, 0, 0)
-    val element = assertOneElement(entries)
+    TestCase.assertEquals(1, entries.size - initialEntries.size)
+    val element = entries.last()
     TestCase.assertEquals("g/found/d", element.entry)
   }
 
