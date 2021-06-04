@@ -24,43 +24,52 @@ import com.intellij.openapi.editor.colors.EditorColors
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 
-fun resetCaret(editor: Editor, insert: Boolean) {
-  editor.settings.isBlockCursor = !insert
+fun Editor.updateCaretVisualAttributes() {
+  updatePrimaryCaretVisualAttributes(this, mode)
+  updateSecondaryCaretsVisualAttributes(this, inBlockSubMode)
 }
 
-/**
- * Update caret's colour according to the current state
- *
- * Secondary carets became invisible colour in visual block mode
- */
-fun updateCaretState(editor: Editor) {
-  // Update colour
-  if (editor.inBlockSubMode) {
-    editor.caretModel.allCarets.forEach {
-      if (it != editor.caretModel.primaryCaret) {
-        // Set background color for non-primary carets as selection background color
-        //   to make them invisible
-        val color = editor.colorsScheme.getColor(EditorColors.SELECTION_BACKGROUND_COLOR)
-        val visualAttributes = it.visualAttributes
-        it.visualAttributes = CaretVisualAttributes(color, visualAttributes.weight)
-      }
-    }
-  } else {
-    editor.caretModel.allCarets.forEach { it.visualAttributes = CaretVisualAttributes.DEFAULT }
+private fun setPrimaryCaretShape(editor: Editor, isBlockCursor: Boolean) {
+  editor.settings.isBlockCursor = isBlockCursor
+}
+
+fun updatePrimaryCaretVisualAttributes(editor: Editor, mode: CommandState.Mode) {
+  // Note that Vim uses the VISUAL caret for SELECT. We're matching INSERT
+  when (mode) {
+    CommandState.Mode.COMMAND, CommandState.Mode.VISUAL, CommandState.Mode.REPLACE -> setPrimaryCaretShape(editor, true)
+    CommandState.Mode.SELECT, CommandState.Mode.INSERT -> setPrimaryCaretShape(editor, !VimPlugin.getEditor().isBarCursorSettings)
+    CommandState.Mode.CMD_LINE, CommandState.Mode.OP_PENDING -> Unit
   }
-
-  // Update shape
-  editor.mode.resetShape(editor)
 }
 
-fun CommandState.Mode.resetShape(editor: Editor) = when (this) {
-  CommandState.Mode.COMMAND, CommandState.Mode.VISUAL, CommandState.Mode.REPLACE -> resetCaret(
-    editor,
-    false
-  )
-  CommandState.Mode.SELECT, CommandState.Mode.INSERT -> resetCaret(
-    editor,
-    VimPlugin.getEditor().isBarCursorSettings
-  )
-  CommandState.Mode.CMD_LINE, CommandState.Mode.OP_PENDING -> Unit
+fun updateSecondaryCaretsVisualAttributes(editor: Editor, inBlockSubMode: Boolean) {
+  val attributes = getVisualAttributesForSecondaryCarets(editor, inBlockSubMode)
+  editor.caretModel.allCarets.forEach {
+    if (it != editor.caretModel.primaryCaret) {
+      it.visualAttributes = attributes
+    }
+  }
+}
+
+private fun getVisualAttributesForSecondaryCarets(editor: Editor, inBlockSubMode: Boolean) = if (inBlockSubMode) {
+  // IntelliJ simulates visual block with multiple carets with selections. Do our best to hide them
+  val color = editor.colorsScheme.getColor(EditorColors.SELECTION_BACKGROUND_COLOR)
+  CaretVisualAttributes(color, CaretVisualAttributes.Weight.NORMAL)
+}
+else {
+  CaretVisualAttributes.DEFAULT
+}
+
+
+
+fun resetCaret(editor: Editor, insert: Boolean) {
+  setPrimaryCaretShape(editor, !insert)
+}
+
+fun updateCaretState(editor: Editor) {
+  editor.updateCaretVisualAttributes()
+}
+
+fun CommandState.Mode.resetShape(editor: Editor) {
+  updatePrimaryCaretVisualAttributes(editor, this)
 }
