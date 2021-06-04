@@ -35,7 +35,7 @@ import java.util.*
 import javax.swing.KeyStroke
 
 /**
- * Used to maintain state while entering a Vim command (operator, motion, text object, etc.)
+ * Used to maintain state before and while entering a Vim command (operator, motion, text object, etc.)
  */
 class CommandState private constructor() {
   val commandBuilder = CommandBuilder(getKeyRootNode(MappingMode.NORMAL))
@@ -45,7 +45,7 @@ class CommandState private constructor() {
   var isRecording = false
     set(value) {
       field = value
-      updateStatus()
+      doShowMode()
     }
   var isDotRepeatInProgress = false
 
@@ -78,17 +78,26 @@ class CommandState private constructor() {
 
   fun pushModes(mode: Mode, submode: SubMode) {
     val newModeState = ModeState(mode, submode)
+
     logger.debug("Push new mode state: ${newModeState.toSimpleString()}")
     logger.debug { "Stack of mode states before push: ${toSimpleString()}" }
+
+    val previousMode = currentModeState()
     modeStates.push(newModeState)
     setMappingMode()
-    updateStatus()
+
+    if (previousMode.mode != newModeState.mode) {
+      onModeChanged()
+    }
   }
 
   fun popModes() {
     val popped = modeStates.pop()
     setMappingMode()
-    updateStatus()
+    if (popped.mode != mode) {
+      onModeChanged()
+    }
+
     logger.debug("Popped mode state: ${popped.toSimpleString()}")
     logger.debug { "Stack of mode states after pop: ${toSimpleString()}" }
   }
@@ -107,13 +116,16 @@ class CommandState private constructor() {
 
   private fun resetModes() {
     modeStates.clear()
+    onModeChanged()
     setMappingMode()
   }
 
+  private fun onModeChanged() {
+    doShowMode()
+  }
+
   private fun setMappingMode() {
-    val modeState = currentModeState()
-    val newMappingMode = if (modeState.mode == Mode.OP_PENDING) MappingMode.OP_PENDING else modeToMappingMode(mode)
-    mappingState.mappingMode = newMappingMode
+    mappingState.mappingMode = modeToMappingMode(mode)
   }
 
   @Contract(pure = true)
@@ -124,7 +136,7 @@ class CommandState private constructor() {
       Mode.VISUAL -> MappingMode.VISUAL
       Mode.SELECT -> MappingMode.SELECT
       Mode.CMD_LINE -> MappingMode.CMD_LINE
-      else -> error("Unexpected mode: $mode")
+      Mode.OP_PENDING -> MappingMode.OP_PENDING
     }
   }
 
@@ -137,7 +149,6 @@ class CommandState private constructor() {
       val modeState = currentModeState()
       popModes()
       pushModes(modeState.mode, submode)
-      updateStatus()
     }
 
   fun startDigraphSequence() {
@@ -183,7 +194,6 @@ class CommandState private constructor() {
     resetModes()
     commandBuilder.resetInProgressCommandPart(getKeyRootNode(mappingState.mappingMode))
     digraphSequence.reset()
-    updateStatus()
   }
 
   fun toSimpleString(): String = modeStates.joinToString { it.toSimpleString() }
@@ -262,7 +272,7 @@ class CommandState private constructor() {
     return if (modeStates.size > 0) modeStates.peek() else defaultModeState
   }
 
-  private fun updateStatus() {
+  private fun doShowMode() {
     val msg = StringBuilder()
     if (showmode.isSet) {
       msg.append(getStatusString(modeStates.size - 1))
