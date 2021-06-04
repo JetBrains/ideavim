@@ -363,7 +363,7 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
         }
         val user = ghRepository.getCommit(hash).author
         val htmlUrl = user.htmlUrl.toString()
-        val name = user.name
+        val name = user.name ?: user.login
         users.add(Author(name, htmlUrl, email))
     }
 
