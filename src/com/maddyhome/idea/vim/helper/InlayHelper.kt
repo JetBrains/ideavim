@@ -98,3 +98,16 @@ fun Editor.amountOfInlaysBeforeVisualPosition(pos: VisualPosition): Int {
 }
 
 fun VisualPosition.toInlayAwareOffset(caret: Caret): Int = this.column - caret.amountOfInlaysBeforeCaret
+
+fun Editor.updateCaretsVisualPosition() {
+  // Caret visual position depends on the current mode, especially with respect to inlays. E.g. if an inlay is
+  // related to preceding text, the caret is placed between inlay and preceding text in insert mode (usually bar
+  // caret) but after the inlay in normal mode (block caret).
+  // By repositioning to the same offset, we will recalculate the expected visual position and put the caret in the
+  // right location. Don't open a fold if the caret is inside
+  this.vimForEachCaret {
+    if (!this.foldingModel.isOffsetCollapsed(it.offset)) {
+      it.moveToInlayAwareOffset(it.offset)
+    }
+  }
+}

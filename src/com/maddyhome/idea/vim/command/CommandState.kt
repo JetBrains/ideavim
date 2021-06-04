@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.helper.DigraphSequence
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.option.OptionsManager.showmode
@@ -37,7 +38,7 @@ import javax.swing.KeyStroke
 /**
  * Used to maintain state before and while entering a Vim command (operator, motion, text object, etc.)
  */
-class CommandState private constructor() {
+class CommandState private constructor(private val editor: Editor) {
   val commandBuilder = CommandBuilder(getKeyRootNode(MappingMode.NORMAL))
   private val modeStates = Stack<ModeState>()
   val mappingState = MappingState()
@@ -121,6 +122,7 @@ class CommandState private constructor() {
   }
 
   private fun onModeChanged() {
+    editor.updateCaretsVisualPosition()
     doShowMode()
   }
 
@@ -344,7 +346,7 @@ class CommandState private constructor() {
     fun getInstance(editor: Editor): CommandState {
       var res = editor.vimCommandState
       if (res == null) {
-        res = CommandState()
+        res = CommandState(editor)
         editor.vimCommandState = res
       }
       return res
