@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.updateCaretState
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimLastSelectionType

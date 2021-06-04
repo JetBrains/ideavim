@@ -41,9 +41,7 @@ import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction;
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction;
 import com.maddyhome.idea.vim.action.macro.ToggleRecordingAction;
 import com.maddyhome.idea.vim.command.*;
-import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.group.RegisterGroup;
-import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.handler.ActionBeanClass;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.*;
@@ -67,6 +65,7 @@ import java.util.Map;
 
 import static com.intellij.openapi.actionSystem.CommonDataKeys.*;
 import static com.intellij.openapi.actionSystem.PlatformDataKeys.PROJECT_FILE_DIRECTORY;
+import static com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt.*;
 
 /**
  * This handles every keystroke that the user can argType except those that are still valid hotkeys for various Idea
@@ -357,7 +356,7 @@ public class KeyHandler {
       }
     }
     reset(editor);
-    ChangeGroup.resetCaret(editor, false);
+    resetCaret(editor, false);
   }
 
   private boolean handleKeyMapping(final @NotNull Editor editor,
@@ -883,7 +882,7 @@ public class KeyHandler {
     if (registerGroup != null) {
       registerGroup.resetRegister();
     }
-    VisualGroupKt.updateCaretState(editor);
+    updateCaretState(editor);
     editor.getSelectionModel().removeSelection();
   }
 
@@ -978,7 +977,7 @@ public class KeyHandler {
       if (editorState.getSubMode() == CommandState.SubMode.SINGLE_COMMAND &&
           (!cmd.getFlags().contains(CommandFlags.FLAG_EXPECT_MORE))) {
         editorState.popModes();
-        VisualGroupKt.resetShape(CommandStateHelper.getMode(editor), editor);
+        resetShape(CommandStateHelper.getMode(editor), editor);
       }
 
       if (editorState.getCommandBuilder().isDone()) {

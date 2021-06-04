@@ -19,14 +19,11 @@
 package com.maddyhome.idea.vim.group.visual
 
 import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
-import com.intellij.openapi.editor.colors.EditorColors
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.fileSize
@@ -36,8 +33,10 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
+import com.maddyhome.idea.vim.helper.resetShape
 import com.maddyhome.idea.vim.helper.sort
 import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.updateCaretState
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 
@@ -135,43 +134,6 @@ val Caret.vimLeadSelectionOffset: Int
     }
     return caretOffset
   }
-
-/**
- * Update caret's colour according to the current state
- *
- * Secondary carets became invisible colour in visual block mode
- */
-fun updateCaretState(editor: Editor) {
-  // Update colour
-  if (editor.inBlockSubMode) {
-    editor.caretModel.allCarets.forEach {
-      if (it != editor.caretModel.primaryCaret) {
-        // Set background color for non-primary carets as selection background color
-        //   to make them invisible
-        val color = editor.colorsScheme.getColor(EditorColors.SELECTION_BACKGROUND_COLOR)
-        val visualAttributes = it.visualAttributes
-        it.visualAttributes = CaretVisualAttributes(color, visualAttributes.weight)
-      }
-    }
-  } else {
-    editor.caretModel.allCarets.forEach { it.visualAttributes = CaretVisualAttributes.DEFAULT }
-  }
-
-  // Update shape
-  editor.mode.resetShape(editor)
-}
-
-fun CommandState.Mode.resetShape(editor: Editor) = when (this) {
-  CommandState.Mode.COMMAND, CommandState.Mode.VISUAL, CommandState.Mode.REPLACE -> ChangeGroup.resetCaret(
-    editor,
-    false
-  )
-  CommandState.Mode.SELECT, CommandState.Mode.INSERT -> ChangeGroup.resetCaret(
-    editor,
-    VimPlugin.getEditor().isBarCursorSettings
-  )
-  CommandState.Mode.CMD_LINE, CommandState.Mode.OP_PENDING -> Unit
-}
 
 fun charToNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.Mode): Pair<Int, Int> {
   val (nativeStart, nativeEnd) = sort(start, end)

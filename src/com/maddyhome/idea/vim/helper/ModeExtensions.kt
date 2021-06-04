@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.group.visual.updateCaretState
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 
 /**

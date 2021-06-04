@@ -78,6 +78,8 @@ import java.awt.event.KeyEvent;
 import java.math.BigInteger;
 import java.util.*;
 
+import static com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt.updateCaretState;
+
 /**
  * Provides all the insert/replace related functionality
  */
@@ -447,7 +449,7 @@ public class ChangeGroup {
       setInsertEditorState(editor, mode == CommandState.Mode.INSERT);
       state.pushModes(mode, CommandState.SubMode.NONE);
 
-      VisualGroupKt.updateCaretState(editor);
+      updateCaretState(editor);
     }
 
     notifyListeners(editor);
@@ -551,7 +553,7 @@ public class ChangeGroup {
     CommandState.getInstance(editor).popModes();
     exitAllSingleCommandInsertModes(editor);
 
-    VisualGroupKt.updateCaretState(editor);
+    updateCaretState(editor);
   }
 
   /**
@@ -1827,10 +1829,6 @@ public class ChangeGroup {
     }
 
     return false;
-  }
-
-  public static void resetCaret(@NotNull Editor editor, boolean insert) {
-    editor.getSettings().setBlockCursor(!insert);
   }
 
   /**

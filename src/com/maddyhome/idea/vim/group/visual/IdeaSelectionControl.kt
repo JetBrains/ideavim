@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.popAllModes
+import com.maddyhome.idea.vim.helper.updateCaretState
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import com.maddyhome.idea.vim.option.OptionsManager

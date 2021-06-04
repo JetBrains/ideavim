@@ -43,7 +43,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimTypedActionHandler
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.ExOutputModel
-import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.FileGroup
 import com.maddyhome.idea.vim.group.MotionGroup
@@ -62,6 +61,7 @@ import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
+import com.maddyhome.idea.vim.helper.resetCaret
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
@@ -252,11 +252,11 @@ object VimListenerManager {
         if (onLineEnd(caret)) {
           // UX protection for case when user performs a small dragging while putting caret on line end
           caret.removeSelection()
-          ChangeGroup.resetCaret(e.editor, true)
+          resetCaret(e.editor, true)
         }
       }
       if (mouseDragging && e.editor.caretModel.primaryCaret.hasSelection()) {
-        ChangeGroup.resetCaret(e.editor, true)
+        resetCaret(e.editor, true)
 
         if (!cutOffFixed && ComponentMouseListener.cutOffEnd) {
           cutOffFixed = true
