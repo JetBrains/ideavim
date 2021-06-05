@@ -36,7 +36,7 @@ import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.resetShape
 import com.maddyhome.idea.vim.helper.sort
 import com.maddyhome.idea.vim.helper.subMode
-import com.maddyhome.idea.vim.helper.updateCaretState
+import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 
@@ -227,6 +227,9 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
       val lastColumn = editor.caretModel.primaryCaret.vimLastColumn
       editor.selectionModel.vimSetSystemBlockSelectionSilently(blockStart, blockEnd)
 
+      // We've just added secondary carets again, hide them to better emulate block selection
+      editor.updateCaretsVisualAttributes()
+
       for (aCaret in editor.caretModel.allCarets) {
         if (!aCaret.isValid) continue
         val line = aCaret.logicalPosition.line
@@ -259,5 +262,4 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
     }
     else -> Unit
   }
-  updateCaretState(editor)
 }

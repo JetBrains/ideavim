@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.helper.DigraphSequence
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.noneOfEnum
+import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.key.CommandPartNode
@@ -122,6 +123,7 @@ class CommandState private constructor(private val editor: Editor) {
   }
 
   private fun onModeChanged() {
+    editor.updateCaretsVisualAttributes()
     editor.updateCaretsVisualPosition()
     doShowMode()
   }

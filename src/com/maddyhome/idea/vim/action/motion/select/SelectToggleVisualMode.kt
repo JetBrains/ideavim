@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
-import com.maddyhome.idea.vim.helper.updateCaretState
 
 /**
  * @author Alex Plate
@@ -60,7 +59,6 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
         }
       }
     }
-    updateCaretState(editor)
     return true
   }
 }

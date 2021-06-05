@@ -882,7 +882,6 @@ public class KeyHandler {
     if (registerGroup != null) {
       registerGroup.resetRegister();
     }
-    updateCaretState(editor);
     editor.getSelectionModel().removeSelection();
   }
 

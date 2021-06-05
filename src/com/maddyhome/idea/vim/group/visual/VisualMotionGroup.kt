@@ -34,7 +34,6 @@ import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.subMode
-import com.maddyhome.idea.vim.helper.updateCaretState
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimLastSelectionType
@@ -209,14 +208,12 @@ class VisualMotionGroup {
     } else {
       editor.caretModel.allCarets.forEach { it.vimSelectionStart = it.vimLeadSelectionOffset }
     }
-    updateCaretState(editor)
     return true
   }
 
   fun enterSelectMode(editor: Editor, subMode: CommandState.SubMode): Boolean {
     editor.commandState.pushModes(CommandState.Mode.SELECT, subMode)
     editor.vimForEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
-    updateCaretState(editor)
     return true
   }
 

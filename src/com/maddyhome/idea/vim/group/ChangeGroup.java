@@ -56,7 +56,6 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
-import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.handler.Motion;
@@ -77,8 +76,6 @@ import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.math.BigInteger;
 import java.util.*;
-
-import static com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt.updateCaretState;
 
 /**
  * Provides all the insert/replace related functionality
@@ -448,8 +445,6 @@ public class ChangeGroup {
       oldOffset = editor.getCaretModel().getOffset();
       setInsertEditorState(editor, mode == CommandState.Mode.INSERT);
       state.pushModes(mode, CommandState.SubMode.NONE);
-
-      updateCaretState(editor);
     }
 
     notifyListeners(editor);
@@ -552,8 +547,6 @@ public class ChangeGroup {
 
     CommandState.getInstance(editor).popModes();
     exitAllSingleCommandInsertModes(editor);
-
-    updateCaretState(editor);
   }
 
   /**

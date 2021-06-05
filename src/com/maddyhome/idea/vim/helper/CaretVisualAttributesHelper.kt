@@ -35,7 +35,7 @@ fun Caret.forceBarCursor() {
   setPrimaryCaretShape(editor, false)
 }
 
-fun Editor.updateCaretVisualAttributes() {
+fun Editor.updateCaretsVisualAttributes() {
   updatePrimaryCaretVisualAttributes(this, mode)
   updateSecondaryCaretsVisualAttributes(this, inBlockSubMode)
 }
@@ -71,11 +71,6 @@ else {
   CaretVisualAttributes.DEFAULT
 }
 
-
-
-fun updateCaretState(editor: Editor) {
-  editor.updateCaretVisualAttributes()
-}
 
 fun CommandState.Mode.resetShape(editor: Editor) {
   updatePrimaryCaretVisualAttributes(editor, this)
