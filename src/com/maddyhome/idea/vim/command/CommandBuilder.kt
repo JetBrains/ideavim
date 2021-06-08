@@ -187,6 +187,10 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<ActionB
     prevExpectedArgumentType = null
   }
 
+  fun resetCount() {
+    count = 0
+  }
+
   fun resetInProgressCommandPart(commandPartNode: CommandPartNode<ActionBeanClass>) {
     count = 0
     setCurrentCommandPartNode(commandPartNode)
