@@ -179,6 +179,13 @@ abstract class VimTestCase : UsefulTestCase() {
     return myFixture.editor
   }
 
+  private fun configureByText(fileName: String, content: String): Editor {
+    @Suppress("IdeaVimAssertState")
+    myFixture.configureByText(fileName, content)
+    setEditorVisibleSize(screenWidth, screenHeight)
+    return myFixture.editor
+  }
+
   protected fun configureByFileName(fileName: String): Editor {
     @Suppress("IdeaVimAssertState")
     myFixture.configureByText(fileName, "\n")
@@ -469,6 +476,42 @@ abstract class VimTestCase : UsefulTestCase() {
     subModeAfter: SubMode,
   ) {
     configureByText(before)
+
+    performTest(keys, after, modeAfter, subModeAfter)
+
+    NeovimTesting.assertState(myFixture.editor, this)
+  }
+
+  fun doTest(
+    keys: String,
+    before: String,
+    after: String,
+    modeAfter: CommandState.Mode,
+    subModeAfter: SubMode,
+    fileType: FileType
+  ) {
+    configureByText(fileType, before)
+
+    NeovimTesting.setupEditor(myFixture.editor, this)
+    NeovimTesting.typeCommand(keys, this)
+
+    performTest(keys, after, modeAfter, subModeAfter)
+
+    NeovimTesting.assertState(myFixture.editor, this)
+  }
+
+  fun doTest(
+    keys: String,
+    before: String,
+    after: String,
+    modeAfter: CommandState.Mode,
+    subModeAfter: SubMode,
+    fileName: String
+  ) {
+    configureByText(fileName, before)
+
+    NeovimTesting.setupEditor(myFixture.editor, this)
+    NeovimTesting.typeCommand(keys, this)
 
     performTest(keys, after, modeAfter, subModeAfter)
 

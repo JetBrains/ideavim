@@ -109,6 +109,13 @@
         <alias name="vim-indent-object"/>
       </aliases>
     </vimExtension>
+
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.matchit.Matchit" name="matchit">
+      <aliases>
+        <alias name="vim-matchit"/>
+        <alias name="chrisbra/matchit"/>
+      </aliases>
+    </vimExtension>
   </extensions>
 
   <!--  IdeaVim extensions-->
