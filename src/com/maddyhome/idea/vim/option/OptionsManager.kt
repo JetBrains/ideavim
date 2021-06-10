@@ -54,7 +54,7 @@ object OptionsManager {
   val gdefault = addOption(ToggleOption("gdefault", "gd", false))
   val history = addOption(NumberOption("history", "hi", 50, 1, Int.MAX_VALUE))
   val hlsearch = addOption(ToggleOption("hlsearch", "hls", false))
-  val ideamarks = addOption(IdeaMarkskOptionsData.option)
+  val ideamarks = addOption(IdeaMarksOptionsData.option)
   val ignorecase = addOption(ToggleOption(IgnoreCaseOptionsData.name, IgnoreCaseOptionsData.abbr, false))
   val incsearch = addOption(ToggleOption("incsearch", "is", false))
   val iskeyword = addOption(KeywordOption("iskeyword", "isk", arrayOf("@", "48-57", "_")))
@@ -452,7 +452,7 @@ object IdeaJoinOptionsData {
 }
 
 @NonNls
-object IdeaMarkskOptionsData {
+object IdeaMarksOptionsData {
   const val name = "ideamarks"
   private const val defaultValue = true
 
