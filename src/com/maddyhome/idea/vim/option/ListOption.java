@@ -49,6 +49,14 @@ public abstract class ListOption<T> extends TextOption {
     this.value = new ArrayList<>(this.defaultValues);
   }
 
+  public ListOption(String name, String abbrev, String defaultValue) {
+    super(name, abbrev);
+
+    final List<T> defaultValues = parseVals(defaultValue);
+    this.defaultValues = defaultValues != null ? new ArrayList<>(defaultValues) : new ArrayList<>();
+    this.value = new ArrayList<>(this.defaultValues);
+  }
+
   /**
    * Gets the value of the option as a comma separated list of values
    *

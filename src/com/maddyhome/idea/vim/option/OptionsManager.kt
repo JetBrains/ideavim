@@ -52,6 +52,7 @@ object OptionsManager {
   val clipboard = addOption(StringListOption(ClipboardOptionsData.name, ClipboardOptionsData.abbr, arrayOf(ClipboardOptionsData.ideaput, "autoselect,exclude:cons\\|linux")))
   val digraph = addOption(ToggleOption("digraph", "dg", false))
   val gdefault = addOption(ToggleOption("gdefault", "gd", false))
+  val guicursor = addOption(GuiCursorOptionData.option)
   val history = addOption(NumberOption("history", "hi", 50, 1, Int.MAX_VALUE))
   val hlsearch = addOption(ToggleOption("hlsearch", "hls", false))
   val ideamarks = addOption(IdeaMarksOptionsData.option)
@@ -441,6 +442,21 @@ object ClipboardOptionsData {
       ideaputDisabled = true
     }
   }
+}
+
+@Suppress("SpellCheckingInspection")
+@NonNls
+object GuiCursorOptionData {
+  const val name = "guicursor"
+  private const val abbr = "gcr"
+  const val defaultValue = "n-v-c:block-Cursor/lCursor," +
+    "ve:ver35-Cursor," +
+    "o:hor50-Cursor," +
+    "i-ci:ver25-Cursor/lCursor," +
+    "r-cr:hor20-Cursor/lCursor," +
+    "sm:block-Cursor-blinkwait175-blinkoff150-blinkon175"
+
+  val option = GuiCursorOption(name, abbr, defaultValue)
 }
 
 @NonNls
