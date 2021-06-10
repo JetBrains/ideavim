@@ -33,7 +33,6 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
-import com.maddyhome.idea.vim.helper.resetShape
 import com.maddyhome.idea.vim.helper.sort
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
@@ -180,7 +179,6 @@ fun blockToNativeSelection(
 }
 
 fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: CommandState.Mode) {
-  predictedMode.resetShape(editor)
   if (predictedMode != CommandState.Mode.VISUAL) {
     if (!predictedMode.isEndAllowed) {
       editor.caretModel.allCarets.forEach { caret ->

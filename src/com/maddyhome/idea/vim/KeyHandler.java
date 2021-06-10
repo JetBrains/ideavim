@@ -65,7 +65,6 @@ import java.util.Map;
 
 import static com.intellij.openapi.actionSystem.CommonDataKeys.*;
 import static com.intellij.openapi.actionSystem.PlatformDataKeys.PROJECT_FILE_DIRECTORY;
-import static com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt.*;
 
 /**
  * This handles every keystroke that the user can argType except those that are still valid hotkeys for various Idea
@@ -356,7 +355,6 @@ public class KeyHandler {
       }
     }
     reset(editor);
-    resetShape(CommandState.Mode.COMMAND, editor);
   }
 
   private boolean handleKeyMapping(final @NotNull Editor editor,
@@ -976,7 +974,6 @@ public class KeyHandler {
       if (editorState.getSubMode() == CommandState.SubMode.SINGLE_COMMAND &&
           (!cmd.getFlags().contains(CommandFlags.FLAG_EXPECT_MORE))) {
         editorState.popModes();
-        resetShape(CommandStateHelper.getMode(editor), editor);
       }
 
       if (editorState.getCommandBuilder().isDone()) {

@@ -44,7 +44,7 @@ private fun setPrimaryCaretShape(editor: Editor, isBlockCursor: Boolean) {
   editor.settings.isBlockCursor = isBlockCursor
 }
 
-fun updatePrimaryCaretVisualAttributes(editor: Editor, mode: CommandState.Mode) {
+private fun updatePrimaryCaretVisualAttributes(editor: Editor, mode: CommandState.Mode) {
   // Note that Vim uses the VISUAL caret for SELECT. We're matching INSERT
   when (mode) {
     CommandState.Mode.COMMAND, CommandState.Mode.VISUAL, CommandState.Mode.REPLACE -> setPrimaryCaretShape(editor, true)
@@ -53,7 +53,7 @@ fun updatePrimaryCaretVisualAttributes(editor: Editor, mode: CommandState.Mode) 
   }
 }
 
-fun updateSecondaryCaretsVisualAttributes(editor: Editor, inBlockSubMode: Boolean) {
+private fun updateSecondaryCaretsVisualAttributes(editor: Editor, inBlockSubMode: Boolean) {
   val attributes = getVisualAttributesForSecondaryCarets(editor, inBlockSubMode)
   editor.caretModel.allCarets.forEach {
     if (it != editor.caretModel.primaryCaret) {
@@ -69,9 +69,4 @@ private fun getVisualAttributesForSecondaryCarets(editor: Editor, inBlockSubMode
 }
 else {
   CaretVisualAttributes.DEFAULT
-}
-
-
-fun CommandState.Mode.resetShape(editor: Editor) {
-  updatePrimaryCaretVisualAttributes(editor, this)
 }

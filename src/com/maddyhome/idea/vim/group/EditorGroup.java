@@ -43,7 +43,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt.resetShape;
+import static com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt.updateCaretsVisualAttributes;
 
 /**
  * @author vlan
@@ -228,7 +228,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
       VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext.init(editor, null));
       KeyHandler.getInstance().reset(editor);
     }
-    resetShape(CommandStateHelper.getMode(editor), editor);
+    updateCaretsVisualAttributes(editor);
     editor.getSettings().setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
   }
 

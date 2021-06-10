@@ -63,6 +63,7 @@ import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.remove
@@ -331,6 +332,9 @@ object VimListenerManager {
           IdeaSelectionControl.controlNonVimSelectionChange(editor, SelectionSource.MOUSE)
           // TODO: This should only be for 'selection'=inclusive
           moveCaretOneCharLeftFromSelectionEnd(editor, predictedMode)
+
+          // Reset caret after forceBarShape while dragging
+          editor.updateCaretsVisualAttributes()
           caret.vimLastColumn = editor.caretModel.visualPosition.column
         }
 
