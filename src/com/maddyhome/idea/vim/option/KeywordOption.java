@@ -30,17 +30,19 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public final class KeywordOption extends ListOption {
+public final class KeywordOption extends StringListOption {
   @NonNls private static final String allLettersRegex = "\\p{L}";
+  @NonNls private static final String PATTERN =
+    "(\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9^]|[0-9]{1,3})),)*\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9]|[0-9]{1,3})),?$";
+
   private final @NotNull Pattern validationPattern;
 
   // KeywordSpecs are the option values in reverse order
   private @NotNull List<KeywordSpec> keywordSpecs = new ArrayList<>();
 
   public KeywordOption(@NotNull @NonNls String name, @NotNull @NonNls String abbrev, @NotNull String[] defaultValue) {
-    super(name, abbrev, defaultValue,
-          "(\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9^]|[0-9]{1,3})),)*\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9]|[0-9]{1,3})),?$");
-    validationPattern = Pattern.compile(pattern);
+    super(name, abbrev, defaultValue, PATTERN);
+    validationPattern = Pattern.compile(PATTERN);
     initialSet(defaultValue);
   }
 

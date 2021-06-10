@@ -34,8 +34,8 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import com.maddyhome.idea.vim.option.StringListOption;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import kotlin.Pair;
@@ -2613,14 +2613,14 @@ public class SearchHelper {
 
   private static @NotNull String getPairChars() {
     if (pairsChars == null) {
-      ListOption lo = OptionsManager.INSTANCE.getMatchpairs();
+      StringListOption lo = OptionsManager.INSTANCE.getMatchpairs();
       lo.addOptionChangeListenerAndExecute((oldValue, newValue) -> pairsChars = parseOption(lo));
     }
 
     return pairsChars;
   }
 
-  private static @NotNull String parseOption(@NotNull ListOption option) {
+  private static @NotNull String parseOption(@NotNull StringListOption option) {
     List<String> vals = option.values();
     StringBuilder res = new StringBuilder();
     for (String s : vals) {

@@ -18,17 +18,17 @@
 
 package org.jetbrains.plugins.ideavim.option
 
-import com.maddyhome.idea.vim.option.ListOption
+import com.maddyhome.idea.vim.option.StringListOption
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class ListOptionTest {
+class StringListOptionTest {
   @Test
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `append existing value`() {
-    val option = ListOption("myOpt", "myOpt", emptyArray(), null)
+    val option = StringListOption("myOpt", "myOpt", emptyArray())
 
     option.append("123")
     option.append("456")
@@ -40,7 +40,7 @@ class ListOptionTest {
   @Test
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `prepend existing value`() {
-    val option = ListOption("myOpt", "myOpt", emptyArray(), null)
+    val option = StringListOption("myOpt", "myOpt", emptyArray())
 
     option.append("456")
     option.append("123")

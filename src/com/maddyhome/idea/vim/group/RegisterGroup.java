@@ -56,8 +56,8 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import com.maddyhome.idea.vim.option.StringListOption;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
 import kotlin.Pair;
 import org.jdom.Element;
@@ -111,7 +111,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
   private @Nullable List<KeyStroke> recordList = null;
 
   public RegisterGroup() {
-    final ListOption clipboardOption = OptionsManager.INSTANCE.getClipboard();
+    final StringListOption clipboardOption = OptionsManager.INSTANCE.getClipboard();
     clipboardOption.addOptionChangeListenerAndExecute((oldValue, newValue) -> {
       if (clipboardOption.contains("unnamed")) {
         defaultRegister = '*';

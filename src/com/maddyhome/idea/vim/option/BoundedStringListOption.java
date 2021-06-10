@@ -26,20 +26,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class BoundedListOption extends ListOption {
+public class BoundedStringListOption extends StringListOption {
   protected final @NotNull List<String> allowedValues;
 
-  public BoundedListOption(@NonNls String name,
-                           @NonNls String abbrev,
-                           @NonNls String[] defaultValues,
-                           @NonNls String[] allowedValues) {
+  public BoundedStringListOption(@NonNls String name,
+                                 @NonNls String abbrev,
+                                 @NonNls String[] defaultValues,
+                                 @NonNls String[] allowedValues) {
     super(name, abbrev, defaultValues);
 
     this.allowedValues = new ArrayList<>(Arrays.asList(allowedValues));
   }
 
   @Override
-  protected @Nullable String ConvertToken(String token) {
+  protected @Nullable String convertToken(@NotNull String token) {
     return allowedValues.contains(token) ? token : null;
   }
 }
