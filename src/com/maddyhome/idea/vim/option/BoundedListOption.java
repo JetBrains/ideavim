@@ -20,58 +20,26 @@ package com.maddyhome.idea.vim.option;
 
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 public class BoundedListOption extends ListOption {
-  protected final @NotNull List<String> values;
+  protected final @NotNull List<String> allowedValues;
 
-  public BoundedListOption(@NonNls String name, @NonNls String abbrev, @NonNls String[] dflt, @NonNls String[] values) {
-    super(name, abbrev, dflt, null);
+  public BoundedListOption(@NonNls String name,
+                           @NonNls String abbrev,
+                           @NonNls String[] defaultValues,
+                           @NonNls String[] allowedValues) {
+    super(name, abbrev, defaultValues);
 
-    this.values = new ArrayList<>(Arrays.asList(values));
+    this.allowedValues = new ArrayList<>(Arrays.asList(allowedValues));
   }
 
   @Override
-  public boolean set(String val) {
-    List<String> vals = parseVals(val);
-    if (vals != null && values.containsAll(vals)) {
-      set(vals);
-    }
-
-    return true;
-  }
-
-  @Override
-  public boolean append(String val) {
-    List<String> vals = parseVals(val);
-    if (vals != null && values.containsAll(vals)) {
-      append(vals);
-    }
-
-    return true;
-  }
-
-  @Override
-  public boolean prepend(String val) {
-    List<String> vals = parseVals(val);
-    if (vals != null && values.containsAll(vals)) {
-      prepend(vals);
-    }
-
-    return true;
-  }
-
-  @Override
-  public boolean remove(String val) {
-    List<String> vals = parseVals(val);
-    if (vals != null && values.containsAll(vals)) {
-      remove(vals);
-    }
-
-    return true;
+  protected @Nullable String ConvertToken(String token) {
+    return allowedValues.contains(token) ? token : null;
   }
 }

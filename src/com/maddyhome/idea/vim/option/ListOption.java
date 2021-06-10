@@ -179,14 +179,28 @@ public class ListOption extends TextOption {
    *
    * @param name    The name of the option
    * @param abbrev  The short name
-   * @param dflt    The option's default values
+   * @param defaultValues    The option's default values
+   */
+  public ListOption(@VimNlsSafe String name, @VimNlsSafe String abbrev, @VimNlsSafe String[] defaultValues) {
+    this(name, abbrev, defaultValues, null);
+  }
+
+  /**
+   * Creates the option
+   *
+   * @param name    The name of the option
+   * @param abbrev  The short name
+   * @param defaultValues    The option's default values
    * @param pattern A regular expression that is used to validate new values. null if no check needed
    */
-  public ListOption(@VimNlsSafe String name, @VimNlsSafe String abbrev, @VimNlsSafe String[] dflt, @VimNlsSafe String pattern) {
+  public ListOption(@VimNlsSafe String name,
+                    @VimNlsSafe String abbrev,
+                    @VimNlsSafe String[] defaultValues,
+                    @VimNlsSafe @Nullable String pattern) {
     super(name, abbrev);
 
-    this.dflt = new ArrayList<>(Arrays.asList(dflt));
-    this.value = new ArrayList<>(this.dflt);
+    this.defaultValues = new ArrayList<>(Arrays.asList(defaultValues));
+    this.value = new ArrayList<>(this.defaultValues);
     this.pattern = pattern;
   }
 
@@ -197,7 +211,7 @@ public class ListOption extends TextOption {
    */
   @Override
   public boolean isDefault() {
-    return dflt.equals(value);
+    return defaultValues.equals(value);
   }
 
   protected @Nullable List<String> parseVals(String val) {
@@ -205,8 +219,9 @@ public class ListOption extends TextOption {
     StringTokenizer tokenizer = new StringTokenizer(val, ",");
     while (tokenizer.hasMoreTokens()) {
       String token = tokenizer.nextToken().trim();
-      if (pattern == null || token.matches(pattern)) {
-        res.add(token);
+      String item = ConvertToken(token);
+      if (item != null) {
+        res.add(item);
       }
       else {
         return null;
@@ -214,6 +229,13 @@ public class ListOption extends TextOption {
     }
 
     return res;
+  }
+
+  protected @Nullable String ConvertToken(String token) {
+    if (pattern == null) {
+      return token;
+    }
+    return token.matches(pattern) ? token : null;
   }
 
   /**
@@ -225,18 +247,18 @@ public class ListOption extends TextOption {
     return "  " + getName() + "=" + getValue();
   }
 
-  protected final @NotNull List<String> dflt;
+  protected final @NotNull List<String> defaultValues;
   protected @NotNull List<String> value;
-  protected final String pattern;
+  protected final @Nullable String pattern;
 
   /**
    * Resets the option to its default value
    */
   @Override
   public void resetDefault() {
-    if (!dflt.equals(value)) {
+    if (!defaultValues.equals(value)) {
       String oldValue = getValue();
-      value = new ArrayList<>(dflt);
+      value = new ArrayList<>(defaultValues);
       fireOptionChangeEvent(oldValue, getValue());
     }
   }
