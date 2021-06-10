@@ -62,13 +62,13 @@ object OptionsManager {
   val lookupKeys = addOption(ListOption(LookupKeysData.name, LookupKeysData.name, LookupKeysData.defaultValues, null))
   val matchpairs = addOption(ListOption("matchpairs", "mps", arrayOf("(:)", "{:}", "[:]"), ".:."))
   val more = addOption(ToggleOption("more", "more", true))
-  val nrformats = addOption(BoundListOption("nrformats", "nf", arrayOf("hex"), arrayOf("octal", "hex", "alpha"))) // Octal is disabled as in neovim
+  val nrformats = addOption(BoundedListOption("nrformats", "nf", arrayOf("hex"), arrayOf("octal", "hex", "alpha"))) // Octal is disabled as in neovim
   val number = addOption(ToggleOption("number", "nu", false))
   val relativenumber = addOption(ToggleOption("relativenumber", "rnu", false))
   val scroll = addOption(NumberOption("scroll", "scr", 0))
   val scrolljump = addOption(NumberOption(ScrollJumpData.name, "sj", 1, -100, Integer.MAX_VALUE))
   val scrolloff = addOption(NumberOption(ScrollOffData.name, "so", 0))
-  val selection = addOption(BoundStringOption("selection", "sel", "inclusive", arrayOf("old", "inclusive", "exclusive")))
+  val selection = addOption(BoundedStringOption("selection", "sel", "inclusive", arrayOf("old", "inclusive", "exclusive")))
   val selectmode = addOption(SelectModeOptionData.option)
   val showcmd = addOption(ToggleOption("showcmd", "sc", true)) // Vim: Off by default on platforms with possibly slow tty. On by default elsewhere.
   val showmode = addOption(ToggleOption("showmode", "smd", false))
@@ -81,15 +81,15 @@ object OptionsManager {
   val timeoutlen = addOption(NumberOption("timeoutlen", "tm", 1000, -1, Int.MAX_VALUE))
   val undolevels = addOption(NumberOption("undolevels", "ul", 1000, -1, Int.MAX_VALUE))
   val viminfo = addOption(ListOption("viminfo", "vi", arrayOf("'100", "<50", "s10", "h"), null))
-  val virtualedit = addOption(BoundStringOption(VirtualEditData.name, "ve", "", VirtualEditData.allValues))
+  val virtualedit = addOption(BoundedStringOption(VirtualEditData.name, "ve", "", VirtualEditData.allValues))
   val visualbell = addOption(ToggleOption("visualbell", "vb", false))
   val wrapscan = addOption(ToggleOption("wrapscan", "ws", true))
   val visualEnterDelay = addOption(NumberOption("visualdelay", "visualdelay", 100, 0, Int.MAX_VALUE))
-  val idearefactormode = addOption(BoundStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues))
-  val ideastatusicon = addOption(BoundStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues))
+  val idearefactormode = addOption(BoundedStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues))
+  val ideastatusicon = addOption(BoundedStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues))
   val ideastrictmode = addOption(ToggleOption("ideastrictmode", "ideastrictmode", false))
-  val ideawrite = addOption(BoundStringOption("ideawrite", "ideawrite", IdeaWriteData.all, IdeaWriteData.allValues))
-  val ideavimsupport = addOption(BoundListOption("ideavimsupport", "ideavimsupport", arrayOf("dialog"), arrayOf("dialog", "singleline", "dialoglegacy")))
+  val ideawrite = addOption(BoundedStringOption("ideawrite", "ideawrite", IdeaWriteData.all, IdeaWriteData.allValues))
+  val ideavimsupport = addOption(BoundedListOption("ideavimsupport", "ideavimsupport", arrayOf("dialog"), arrayOf("dialog", "singleline", "dialoglegacy")))
 
   // TODO The default value if 1000, but we can't increase it because of terrible performance of our mappings
   val maxmapdepth = addOption(NumberOption("maxmapdepth", "mmd", 20))
@@ -389,7 +389,7 @@ object KeyModelOptionData {
 
   val options = arrayOf(startsel, stopsel, stopselect, stopvisual, continueselect, continuevisual)
   val default = arrayOf(continueselect, stopselect)
-  val option = BoundListOption(name, abbr, default, options)
+  val option = BoundedListOption(name, abbr, default, options)
 }
 
 @NonNls
@@ -406,7 +406,7 @@ object SelectModeOptionData {
   @Suppress("DEPRECATION")
   val options = arrayOf(mouse, key, cmd, ideaselection)
   val default = emptyArray<String>()
-  val option = BoundListOption(name, abbr, default, options)
+  val option = BoundedListOption(name, abbr, default, options)
 
   fun ideaselectionEnabled(): Boolean {
     return ideaselection in OptionsManager.selectmode

@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim
 
-import com.maddyhome.idea.vim.option.BoundStringOption
+import com.maddyhome.idea.vim.option.BoundedStringOption
 import com.maddyhome.idea.vim.option.ListOption
 import com.maddyhome.idea.vim.option.NumberOption
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -78,7 +78,7 @@ abstract class VimOptionTestCase(option: String, vararg otherOptions: String) : 
             option.set(it.values.joinToString(","))
           }
           VimTestOptionType.VALUE -> {
-            if (option !is BoundStringOption) kotlin.test.fail("${it.option} is not a value option. Change it for method `${testMethod.name}`")
+            if (option !is BoundedStringOption) kotlin.test.fail("${it.option} is not a value option. Change it for method `${testMethod.name}`")
 
             option.set(it.values.first())
           }

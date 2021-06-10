@@ -21,10 +21,10 @@ package com.maddyhome.idea.vim.option;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
-public class BoundStringOption extends StringOption {
+public class BoundedStringOption extends StringOption {
   protected final String[] values;
 
-  BoundStringOption(@NonNls String name, @NonNls String abbrev, @NonNls String dflt, String[] values) {
+  BoundedStringOption(@NonNls String name, @NonNls String abbrev, @NonNls String dflt, String[] values) {
     super(name, abbrev, dflt);
 
     this.values = values;

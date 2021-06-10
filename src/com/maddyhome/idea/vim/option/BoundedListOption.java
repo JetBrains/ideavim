@@ -26,10 +26,10 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class BoundListOption extends ListOption {
+public class BoundedListOption extends ListOption {
   protected final @NotNull List<String> values;
 
-  BoundListOption(@NonNls String name, @NonNls String abbrev, @NonNls String[] dflt, @NonNls String[] values) {
+  public BoundedListOption(@NonNls String name, @NonNls String abbrev, @NonNls String[] dflt, @NonNls String[] values) {
     super(name, abbrev, dflt, null);
 
     this.values = new ArrayList<>(Arrays.asList(values));
