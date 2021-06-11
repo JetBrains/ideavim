@@ -17,31 +17,27 @@
  */
 package com.maddyhome.idea.vim.option
 
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 class GuiCursorOption(name: String, abbrev: String, defaultValue: String) :
   ListOption<GuiCursorEntry>(name, abbrev, defaultValue) {
 
-  override fun convertToken(token: String): GuiCursorEntry? {
-    // TODO: Figure out how to return errors to display
-
+  override fun convertToken(token: String): GuiCursorEntry {
     val split = token.split(':')
     if (split.size == 1) {
-      // E545: Missing colon: {token}
-      return null
+      throw ExException.message("E545", token)
     }
     if (split.size != 2) {
-      // E546: Illegal mode: {token}
-      return null
+      throw ExException.message("E546", token)
     }
     val modeList = split[0]
     val argumentList = split[1]
 
     val modes = enumSetOf<GuiCursorMode>()
     modes.addAll(modeList.split('-').map {
-      // E546: Illegal mode: {token}
-      GuiCursorMode.fromString(it) ?: return null
+      GuiCursorMode.fromString(it) ?: throw ExException.message("E546", token)
     })
 
     var type = GuiCursorType.BLOCK
@@ -54,20 +50,16 @@ class GuiCursorOption(name: String, abbrev: String, defaultValue: String) :
         it == "block" -> type = GuiCursorType.BLOCK
         it.startsWith("ver") -> {
           type = GuiCursorType.VER
-          // E548: digit expected
-          thickness = it.slice(3 until it.length).toIntOrNull() ?: return null
+          thickness = it.slice(3 until it.length).toIntOrNull() ?: throw ExException.message("E548", token)
           if (thickness == 0) {
-            // E549: Illegal percentage (if thickness == 0)
-            return null
+            throw ExException.message("E549", token)
           }
         }
         it.startsWith("hor") -> {
           type = GuiCursorType.HOR
-          // E548: digit expected
-          thickness = it.slice(3 until it.length).toIntOrNull() ?: return null
+          thickness = it.slice(3 until it.length).toIntOrNull() ?: throw ExException.message("E548", token)
           if (thickness == 0) {
-            // E549: Illegal percentage (if thickness == 0)
-            return null
+            throw ExException.message("E549", token)
           }
         }
         it.startsWith("blink") -> {

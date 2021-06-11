@@ -27,6 +27,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -261,14 +262,21 @@ object OptionsManager {
             if (opt != null) {
               // If not a boolean
               if (opt is TextOption) {
-                val res = when (op) {
-                  '+' -> opt.append(value)
-                  '-' -> opt.remove(value)
-                  '^' -> opt.prepend(value)
-                  else -> opt.set(value)
+                try {
+                  val res = when (op) {
+                    '+' -> opt.append(value)
+                    '-' -> opt.remove(value)
+                    '^' -> opt.prepend(value)
+                    else -> opt.set(value)
+                  }
+                  if (!res) {
+                    error = Msg.e_invarg
+                  }
                 }
-                if (!res) {
-                  error = Msg.e_invarg
+                catch (e: ExException) {
+                  // Retrieve the message code, if possible and throw again with the entire set arg string. This assumes
+                  // that any thrown exception has a message code that accepts a single parameter
+                  error = e.code ?: Msg.e_invarg
                 }
               } else {
                 error = Msg.e_invarg

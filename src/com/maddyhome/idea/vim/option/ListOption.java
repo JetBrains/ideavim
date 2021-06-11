@@ -18,6 +18,8 @@
 
 package com.maddyhome.idea.vim.option;
 
+import com.intellij.openapi.diagnostic.Logger;
+import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +34,8 @@ import java.util.StringTokenizer;
  * This is an option that accepts an arbitrary list of values
  */
 public abstract class ListOption<T> extends TextOption {
+  private static final Logger logger = Logger.getInstance(ListOption.class.getName());
+
   protected final @NotNull List<T> defaultValues;
   protected @NotNull List<T> value;
 
@@ -49,7 +53,7 @@ public abstract class ListOption<T> extends TextOption {
     this.value = new ArrayList<>(this.defaultValues);
   }
 
-  public ListOption(String name, String abbrev, String defaultValue) {
+  public ListOption(String name, String abbrev, String defaultValue) throws ExException {
     super(name, abbrev);
 
     final List<T> defaultValues = parseVals(defaultValue);
@@ -94,7 +98,14 @@ public abstract class ListOption<T> extends TextOption {
    * @return True if all the supplied values are set in this option, false if not
    */
   public boolean contains(@NonNls String val) {
-    final List<T> vals = parseVals(val);
+    final List<T> vals;
+    try {
+      vals = parseVals(val);
+    }
+    catch (ExException e) {
+      logger.warn("Error parsing option", e);
+      return false;
+    }
     return vals != null && value.containsAll(vals);
   }
 
@@ -106,7 +117,7 @@ public abstract class ListOption<T> extends TextOption {
    * @return True if all the supplied values were correct, false if not
    */
   @Override
-  public boolean set(String val) {
+  public boolean set(String val) throws ExException {
     return set(parseVals(val));
   }
 
@@ -118,7 +129,7 @@ public abstract class ListOption<T> extends TextOption {
    * @return True if all the supplied values were correct, false if not
    */
   @Override
-  public boolean append(String val) {
+  public boolean append(String val) throws ExException {
     return append(parseVals(val));
   }
 
@@ -130,7 +141,7 @@ public abstract class ListOption<T> extends TextOption {
    * @return True if all the supplied values were correct, false if not
    */
   @Override
-  public boolean prepend(String val) {
+  public boolean prepend(String val) throws ExException {
     return prepend(parseVals(val));
   }
 
@@ -142,7 +153,7 @@ public abstract class ListOption<T> extends TextOption {
    * @return True if all the supplied values were correct, false if not
    */
   @Override
-  public boolean remove(String val) {
+  public boolean remove(String val) throws ExException {
     return remove(parseVals(val));
   }
 
@@ -206,7 +217,7 @@ public abstract class ListOption<T> extends TextOption {
     return defaultValues.equals(value);
   }
 
-  protected @Nullable List<T> parseVals(String val) {
+  protected @Nullable List<T> parseVals(String val) throws ExException {
     List<T> res = new ArrayList<>();
     StringTokenizer tokenizer = new StringTokenizer(val, ",");
     while (tokenizer.hasMoreTokens()) {
@@ -223,7 +234,7 @@ public abstract class ListOption<T> extends TextOption {
     return res;
   }
 
-  protected abstract @Nullable T convertToken(@NotNull String token);
+  protected abstract @Nullable T convertToken(@NotNull String token) throws ExException;
 
   /**
    * Gets the string representation appropriate for output to :set all

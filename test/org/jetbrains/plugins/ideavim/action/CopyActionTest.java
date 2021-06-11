@@ -22,8 +22,9 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Register;
-import com.maddyhome.idea.vim.option.ListOption;
+import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import com.maddyhome.idea.vim.option.StringListOption;
 import org.jetbrains.plugins.ideavim.SkipNeovimReason;
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
@@ -135,9 +136,9 @@ public class CopyActionTest extends VimTestCase {
   // VIM-476 |yy| |'clipboard'|
   // TODO: Review this test
   // This doesn't use the system clipboard, but the TestClipboardModel
-  public void testClipboardUnnamed() {
+  public void testClipboardUnnamed() throws ExException {
     assertEquals('\"', VimPlugin.getRegister().getDefaultRegister());
-    final ListOption clipboardOption = OptionsManager.INSTANCE.getClipboard();
+    final StringListOption clipboardOption = OptionsManager.INSTANCE.getClipboard();
     assertNotNull(clipboardOption);
     clipboardOption.set("unnamed");
     assertEquals('*', VimPlugin.getRegister().getDefaultRegister());
