@@ -370,6 +370,10 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     // Initialize extensions
     VimExtensionRegistrar.enableDelayedExtensions();
 
+    // Some options' default values are based on values set in .ideavimrc, e.g. 'shellxquote' on Windows when 'shell'
+    // is cmd.exe has a different default to when 'shell' contains "sh"
+    OptionsManager.INSTANCE.completeInitialisation();
+
     // Turing on should be performed after all commands registration
     getSearch().turnOn();
     VimListenerManager.INSTANCE.turnOn();

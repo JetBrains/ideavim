@@ -41,13 +41,14 @@ import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.InvalidCommandException;
 import com.maddyhome.idea.vim.helper.UiHelper;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.io.*;
-import java.util.List;
+import java.util.ArrayList;
 
 
 public class ProcessGroup {
@@ -173,13 +174,40 @@ public class ProcessGroup {
   public @Nullable String executeCommand(@NotNull Editor editor, @NotNull String command, @Nullable CharSequence input)
     throws ExecutionException, ProcessCanceledException {
 
-    // TODO: This is much simpler than what Vim does. We should pass execution through the OS shell
+    // This is a much simplified version of how Vim does this. We're using stdin/stdout directly, while Vim will
+    // redirect to temp files ('shellredir' and 'shelltemp') or use pipes. We don't support 'shellquote', because we're
+    // not handling redirection, but we do use 'shellxquote' and 'shellxescape', because these have defaults that work
+    // better with Windows. We also don't bother using ShellExecute for Windows commands beginning with `start`.
+    // Finally, we're also not bothering with the crazy space and backslash handling of the 'shell' options content.
     return ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
+      final String shell = OptionsManager.INSTANCE.getShell().getValue();
+      final String shellcmdflag = OptionsManager.INSTANCE.getShellcmdflag().getValue();
+      final String shellxescape = OptionsManager.INSTANCE.getShellxescape().getValue();
+      final String shellxquote = OptionsManager.INSTANCE.getShellxquote().getValue();
+
+      // For Win32. See :help 'shellxescape'
+      final String escapedCommand = shellxquote.equals("(")
+                                    ? doEscape(command, shellxescape, "^")
+                                    : command;
+      // Required for Win32+cmd.exe, defaults to "(". See :help 'shellxquote'
+      final String quotedCommand = shellxquote.equals("(")
+                                   ? "(" + escapedCommand + ")"
+                                   : (shellxquote.equals("\"(")
+                                      ? "\"(" + escapedCommand + ")\""
+                                      : shellxquote + escapedCommand + shellxquote);
+
+      final ArrayList<String> commands = new ArrayList<>();
+      commands.add(shell);
+      if (!shellcmdflag.isEmpty()) {
+        // Note that Vim also does a simple whitespace split for multiple parameters
+        commands.addAll(ParametersListUtil.parse(shellcmdflag));
+      }
+      commands.add(quotedCommand);
+
       if (logger.isDebugEnabled()) {
-        logger.debug("command=" + command);
+        logger.debug(String.format("shell=%s shellcmdflag=%s command=%s", shell, shellcmdflag, quotedCommand));
       }
 
-      final List<String> commands = ParametersListUtil.parse(command, false, true);
       final GeneralCommandLine commandLine = new GeneralCommandLine(commands);
       final CapturingProcessHandler handler = new CapturingProcessHandler(commandLine);
       if (input != null) {
@@ -218,9 +246,18 @@ public class ProcessGroup {
       }
 
       return output.getStdout();
-    }, "IdeaVim filter command", true, editor.getProject());
+    }, "IdeaVim - !" + command, true, editor.getProject());
   }
 
+  private String doEscape(String original, String charsToEscape, String escapeChar) {
+    String result = original;
+    for (char c : charsToEscape.toCharArray()) {
+      result = result.replace("" + c, escapeChar + c);
+    }
+    return result;
+  }
+
+  // TODO: Java 10 has a transferTo method we could use instead
   private void copy(@NotNull Reader from, @NotNull Writer to) throws IOException {
     char[] buf = new char[2048];
     int cnt;

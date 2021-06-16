@@ -24,7 +24,8 @@ import org.jetbrains.annotations.NotNull;
  * An option that has an arbitrary string value
  */
 public class StringOption extends TextOption {
-  protected final String dflt;
+  private final String dflt;
+
   protected String value;
 
   /**
@@ -122,7 +123,7 @@ public class StringOption extends TextOption {
    */
   @Override
   public boolean isDefault() {
-    return dflt.equals(value);
+    return getDefaultValue().equals(value);
   }
 
   /**
@@ -130,9 +131,9 @@ public class StringOption extends TextOption {
    */
   @Override
   public void resetDefault() {
-    if (!dflt.equals(value)) {
+    if (!getDefaultValue().equals(value)) {
       String oldValue = getValue();
-      value = dflt;
+      value = getDefaultValue();
       fireOptionChangeEvent(oldValue, getValue());
     }
   }
@@ -143,7 +144,10 @@ public class StringOption extends TextOption {
    * @return The option as a string for display
    */
   public @NotNull String toString() {
-
     return "  " + getName() + "=" + value;
+  }
+
+  protected @NotNull String getDefaultValue() {
+    return dflt;
   }
 }
