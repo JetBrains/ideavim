@@ -31,7 +31,6 @@ import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.helper.Msg
 
 class CmdFilterHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
@@ -39,18 +38,39 @@ class CmdFilterHandler : CommandHandler.SingleExecution() {
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     logger.debug("execute")
 
-    var command = cmd.argument
-    if (command.isEmpty()) {
-      return false
+    val command = buildString {
+      var inBackslash = false
+      cmd.argument.forEach { c ->
+        when {
+          !inBackslash && c == '!' -> {
+            val last = VimPlugin.getProcess().lastCommand
+            if (last.isNullOrEmpty()) {
+              VimPlugin.showMessage(MessageHelper.message("e_noprev"))
+              return false
+            }
+            append(last)
+          }
+          !inBackslash && c == '%' -> {
+            val virtualFile = EditorHelper.getVirtualFile(editor)
+            if (virtualFile == null) {
+              // Note that we use a slightly different error message to Vim, because we don't support alternate files or file
+              // name modifiers. (I also don't know what the :p:h means)
+              // (Vim) E499: Empty file name for '%' or '#', only works with ":p:h"
+              // (IdeaVim) E499: Empty file name for '%'
+              VimPlugin.showMessage(MessageHelper.message("E499"))
+              return false
+            }
+            append(virtualFile.path)
+          }
+          else -> append(c)
+        }
+
+        inBackslash = c == '\\'
+      }
     }
 
-    if ('!' in command) {
-      val last = VimPlugin.getProcess().lastCommand
-      if (last.isNullOrEmpty()) {
-        VimPlugin.showMessage(MessageHelper.message(Msg.e_noprev))
-        return false
-      }
-      command = command.replace("!".toRegex(), last)
+    if (command.isEmpty()) {
+      return false
     }
 
     return try {
