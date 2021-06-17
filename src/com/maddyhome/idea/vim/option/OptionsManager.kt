@@ -601,7 +601,7 @@ object ShellCmdFlagOptionData {
     return if (SystemInfo.isWindows && !shell.contains("sh")) "/c" else "-c"
   }
 
-  val option = object: StringOption(name, "shcf", defaultValue) {
+  val option = object : StringOption(name, "shcf", defaultValue) {
     override fun getDefaultValue() = ShellCmdFlagOptionData.defaultValue
   }
 }
@@ -635,7 +635,7 @@ object ShellXQuoteOptionData {
     }
   }
 
-  val option = object: StringOption(name, "sxq", defaultValue) {
+  val option = object : StringOption(name, "sxq", defaultValue) {
     override fun getDefaultValue() = ShellXQuoteOptionData.defaultValue
   }
 }
