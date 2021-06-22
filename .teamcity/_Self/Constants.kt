@@ -5,6 +5,6 @@ object Constants {
   const val EAP = "eap"
   const val DEV = "Dev"
 
-  const val VERSION = "0.67"
-  const val DEV_VERSION = "0.68"
+  const val VERSION = "0.68"
+  const val DEV_VERSION = "0.69"
 }
