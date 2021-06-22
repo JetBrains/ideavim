@@ -268,9 +268,17 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
     val gitHub = org.kohsuke.github.GitHub.connect()
     val searchUsers = gitHub.searchUsers()
     val users = mutableListOf<Author>()
+    println("Start emails processing")
     for (email in emails) {
-        if (email in uncheckedEmails) continue
-        if ("dependabot[bot]@users.noreply.github.com" in email) continue
+        println("Processing '$email'...")
+        if (email in uncheckedEmails) {
+            println("Email '$email' is in unchecked emails. Skip it")
+            continue
+        }
+        if ("dependabot[bot]@users.noreply.github.com" in email) {
+            println("Email '$email' is from dependabot. Skip it")
+            continue
+        }
         val githubUsers = searchUsers.q(email).list().toList()
         if (githubUsers.isEmpty()) error("Cannot find user $email")
         val user = githubUsers.single()
@@ -279,6 +287,7 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
         users.add(Author(name, htmlUrl, email))
     }
 
+    println("Emails processed")
     val authorsFile = File("$projectDir/AUTHORS.md")
     val authors = authorsFile.readText()
     val parser =
