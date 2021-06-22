@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.Constants.GITHUB_TESTS
 import _Self.vcsRoots.GitHubPullRequest
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
@@ -19,7 +20,7 @@ sealed class Github(command: String, desc: String) : BuildType({
 
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
-    param("env.ORG_GRADLE_PROJECT_ideaVersion", "2020.3")
+    param("env.ORG_GRADLE_PROJECT_ideaVersion", GITHUB_TESTS)
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
   }
 
