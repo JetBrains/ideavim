@@ -204,10 +204,10 @@ tasks.register("slackNotification") {
                 "text": "New version of IdeaVim",
                 "blocks": [
                     {
-                        "type": "selection",
+                        "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "IdeaVim $version has been released\\n$slackDown"
+                            "text": "IdeaVim $version has been released\n$slackDown"
                         }
                     }
                 ]

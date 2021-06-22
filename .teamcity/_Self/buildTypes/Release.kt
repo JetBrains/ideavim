@@ -30,6 +30,11 @@ object Release : BuildType({
     param("env.ORG_GRADLE_PROJECT_version", "%build.number%")
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
     param("env.ORG_GRADLE_PROJECT_publishChannels", "$DEFAULT,$EAP,$DEV")
+    password(
+      "env.ORG_GRADLE_PROJECT_slackUrl",
+      "credentialsJSON:a8ab8150-e6f8-4eaf-987c-bcd65eac50b5",
+      label = "Slack Token"
+    )
   }
 
   vcs {
