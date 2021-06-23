@@ -42,9 +42,7 @@ val publishToken: String by project
 val slackUrl: String by project
 
 repositories {
-    mavenLocal()
     mavenCentral()
-    jcenter()
     maven { url = uri("https://cache-redirector.jetbrains.com/intellij-dependencies") }
 }
 
@@ -317,7 +315,7 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
 }
 
 fun List<Author>.toMdString(): String {
-    return this.joinToString() {
+    return this.joinToString {
         """
           |
           |* [![icon][mail]](mailto:${it.mail})
