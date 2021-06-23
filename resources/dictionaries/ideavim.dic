@@ -41,9 +41,12 @@ ideavimsupport
 maxmapdepth
 ideacopypreprocess
 ideatracetime
+swapfile
+noswapfile
 
 sethandler
 
+nvim
 
 easymotion
 
