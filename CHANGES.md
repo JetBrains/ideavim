@@ -22,6 +22,11 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Fixes:
+* [VIM-2317](https://youtrack.jetbrains.com/issue/VIM-2317) Fix memory leak
+
 ## 0.68, 2021-06-22
 
 ### Features:
