@@ -28,6 +28,7 @@ import com.intellij.openapi.editor.toolbar.floating.AbstractFloatingToolbarProvi
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
@@ -104,6 +105,10 @@ object VimRcFileState {
     }
     saveStateListeners.add(action)
   }
+
+  fun unregisterStateListener(action: () -> Unit) {
+    saveStateListeners.remove(action)
+  }
 }
 
 class ReloadVimRc : DumbAwareAction() {
@@ -149,8 +154,12 @@ class ReloadFloatingToolbar : AbstractFloatingToolbarProvider(ACTION_GROUP) {
 
   override fun register(component: FloatingToolbarComponent, parentDisposable: Disposable) {
     super.register(component, parentDisposable)
-    VimRcFileState.whenFileStateSaved {
+    val action = {
       component.scheduleShow()
+    }
+    VimRcFileState.whenFileStateSaved(action)
+    Disposer.register(parentDisposable) {
+      VimRcFileState.unregisterStateListener(action)
     }
   }
 }

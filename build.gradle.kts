@@ -12,7 +12,7 @@ buildscript {
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.0")
         classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
-        classpath("org.eclipse.jgit:org.eclipse.jgit:5.11.1.202105131744-r")
+        classpath("org.eclipse.jgit:org.eclipse.jgit:5.12.0.202106070339-r")
         classpath("org.kohsuke:github-api:1.129")
         classpath("org.jetbrains:markdown:0.2.4")
     }
@@ -42,9 +42,7 @@ val publishToken: String by project
 val slackUrl: String by project
 
 repositories {
-    mavenLocal()
     mavenCentral()
-    jcenter()
     maven { url = uri("https://cache-redirector.jetbrains.com/intellij-dependencies") }
 }
 
@@ -204,10 +202,10 @@ tasks.register("slackNotification") {
                 "text": "New version of IdeaVim",
                 "blocks": [
                     {
-                        "type": "selection",
+                        "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "IdeaVim $version has been released\\n$slackDown"
+                            "text": "IdeaVim $version has been released\n$slackDown"
                         }
                     }
                 ]
@@ -268,9 +266,17 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
     val gitHub = org.kohsuke.github.GitHub.connect()
     val searchUsers = gitHub.searchUsers()
     val users = mutableListOf<Author>()
+    println("Start emails processing")
     for (email in emails) {
-        if (email in uncheckedEmails) continue
-        if ("dependabot[bot]@users.noreply.github.com" in email) continue
+        println("Processing '$email'...")
+        if (email in uncheckedEmails) {
+            println("Email '$email' is in unchecked emails. Skip it")
+            continue
+        }
+        if ("dependabot[bot]@users.noreply.github.com" in email) {
+            println("Email '$email' is from dependabot. Skip it")
+            continue
+        }
         val githubUsers = searchUsers.q(email).list().toList()
         if (githubUsers.isEmpty()) error("Cannot find user $email")
         val user = githubUsers.single()
@@ -279,6 +285,7 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
         users.add(Author(name, htmlUrl, email))
     }
 
+    println("Emails processed")
     val authorsFile = File("$projectDir/AUTHORS.md")
     val authors = authorsFile.readText()
     val parser =
@@ -308,7 +315,7 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
 }
 
 fun List<Author>.toMdString(): String {
-    return this.joinToString() {
+    return this.joinToString {
         """
           |
           |* [![icon][mail]](mailto:${it.mail})

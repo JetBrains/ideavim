@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.Constants.LINTING_TESTS
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
@@ -10,7 +11,7 @@ object LintingFormatting : BuildType({
   name = "Formatting and linting checks"
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
-    param("env.ORG_GRADLE_PROJECT_ideaVersion", "LATEST-EAP-SNAPSHOT")
+    param("env.ORG_GRADLE_PROJECT_ideaVersion", LINTING_TESTS)
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
   }
 
