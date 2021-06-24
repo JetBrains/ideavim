@@ -26,6 +26,11 @@ usual beta standards.
 
 ### Fixes:
 * [VIM-2317](https://youtrack.jetbrains.com/issue/VIM-2317) Fix memory leak
+* [VIM-1357](https://youtrack.jetbrains.com/issue/VIM-1357)
+  [VIM-1566](https://youtrack.jetbrains.com/issue/VIM-1566) Fix external filters
+
+### Merged PRs:
+* [332](https://github.com/JetBrains/ideavim/pull/332) by [Matt Ellis](https://github.com/citizenmatt): VIM-1357+VIM-1566: Use OS shell to run filter command
 
 ## 0.68, 2021-06-22
 
