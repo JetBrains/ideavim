@@ -32,10 +32,10 @@
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.MarkHandler" names="ma[rk],k"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.MarksHandler" names="marks"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.MoveTextHandler" names="m[ove]"/>
-    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.NextFileHandler" names="n[ext]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.NextFileHandler" names="n[ext],bn"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.NoHLSearchHandler" names="noh[lsearch]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.OnlyHandler" names="on[ly]"/>
-    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PreviousFileHandler" names="N[ext],prev[ious]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PreviousFileHandler" names="N[ext],prev[ious],bp"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PromptFindHandler" names="pro[mptfind]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PrintHandler" names="p[rint],P[rint]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PromptReplaceHandler" names="promptr[epl]"/>
@@ -71,5 +71,6 @@
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.BufferListHandler" names="buffers,ls,files"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.BufferHandler" names="b[uffer]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.PlugHandler" names="Plug[in]"/>
+    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.BufferCloseHandler" names="bd"/>
   </extensions>
 </idea-plugin>
