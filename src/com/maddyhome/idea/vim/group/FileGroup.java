@@ -163,18 +163,13 @@ public class FileGroup {
   /**
    * Closes editor.
    */
-  public void closeFile(int number, @NotNull Editor editor, @NotNull DataContext context) {
+  public void closeFile(int number, @NotNull DataContext context) {
     final Project project = PlatformDataKeys.PROJECT.getData(context);
     final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
     final EditorWindow window = fileEditorManager.getCurrentWindow();
     VirtualFile[] editors = fileEditorManager.getOpenFiles();
-    if (number == 99) {
-      number = editors.length - 1;
-    }
     if (number >= 0 && number < editors.length) {
       fileEditorManager.closeFile(editors[number], window);
-    }
-    if (number < 0 || number >= editors.length) {
     }
   }
 
