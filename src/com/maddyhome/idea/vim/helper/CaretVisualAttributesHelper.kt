@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
+import com.intellij.openapi.editor.ex.EditorEx
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.option.GuiCursorMode
@@ -128,6 +129,10 @@ private class DefaultCaretVisualAttributesProvider : CaretVisualAttributesProvid
 
   override fun setPrimaryCaretVisualAttributes(editor: Editor) {
     editor.caretModel.primaryCaret.visualAttributes = getCaretVisualAttributes(editor)
+
+    // If the caret is blinking, make sure it's made visible as soon as the mode changes
+    // See also EditorImpl.updateCaretCursor (called when changing EditorSettings.setBlockCursor)
+    (editor as? EditorEx)?.setCaretVisible(true)
   }
 
   override fun getSecondaryCaretVisualAttributes(editor: Editor, inBlockSubMode: Boolean): CaretVisualAttributes {
