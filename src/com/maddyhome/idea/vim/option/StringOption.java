@@ -60,7 +60,7 @@ public class StringOption extends TextOption {
   public boolean set(String val) {
     String oldValue = getValue();
     value = val;
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
 
     return true;
   }
@@ -75,7 +75,7 @@ public class StringOption extends TextOption {
   public boolean append(String val) {
     String oldValue = getValue();
     value += val;
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
 
     return true;
   }
@@ -90,7 +90,7 @@ public class StringOption extends TextOption {
   public boolean prepend(String val) {
     String oldValue = getValue();
     value = val + value;
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
 
     return true;
   }
@@ -107,7 +107,7 @@ public class StringOption extends TextOption {
     if (pos != -1) {
       String oldValue = getValue();
       value = value.substring(0, pos) + value.substring(pos + val.length());
-      fireOptionChangeEvent(oldValue, getValue());
+      onChanged(oldValue, getValue());
 
       return true;
     }
@@ -133,7 +133,7 @@ public class StringOption extends TextOption {
     if (!dflt.equals(value)) {
       String oldValue = getValue();
       value = dflt;
-      fireOptionChangeEvent(oldValue, getValue());
+      onChanged(oldValue, getValue());
     }
   }
 

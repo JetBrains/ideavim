@@ -56,7 +56,7 @@ public final class KeywordOption extends StringListOption {
     }
     this.value.addAll(vals);
     keywordSpecs.addAll(0, specs);
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
     return true;
   }
 
@@ -70,7 +70,7 @@ public final class KeywordOption extends StringListOption {
     }
     value.addAll(0, vals);
     keywordSpecs.addAll(specs);
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
     return true;
   }
 
@@ -85,7 +85,7 @@ public final class KeywordOption extends StringListOption {
     }
     value.removeAll(vals);
     keywordSpecs.removeAll(specs);
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
     return true;
   }
 
@@ -95,7 +95,7 @@ public final class KeywordOption extends StringListOption {
     final List<KeywordSpec> specs = valsToReversedSpecs(vals);
     value = vals;
     keywordSpecs = specs;
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
   }
 
   @Override
@@ -108,7 +108,7 @@ public final class KeywordOption extends StringListOption {
     }
     value = vals;
     keywordSpecs = specs;
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
     return true;
   }
 

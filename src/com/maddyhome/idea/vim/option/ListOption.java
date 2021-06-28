@@ -164,7 +164,7 @@ public abstract class ListOption<T> extends TextOption {
 
     String oldValue = getValue();
     this.value = vals;
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
 
     return true;
   }
@@ -177,7 +177,7 @@ public abstract class ListOption<T> extends TextOption {
     String oldValue = getValue();
     value.removeAll(vals);
     value.addAll(vals);
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
 
     return true;
   }
@@ -190,7 +190,7 @@ public abstract class ListOption<T> extends TextOption {
     String oldValue = getValue();
     value.removeAll(vals);
     value.addAll(0, vals);
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
 
     return true;
   }
@@ -202,7 +202,7 @@ public abstract class ListOption<T> extends TextOption {
 
     String oldValue = getValue();
     value.removeAll(vals);
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
 
     return true;
   }
@@ -253,7 +253,7 @@ public abstract class ListOption<T> extends TextOption {
     if (!defaultValues.equals(value)) {
       String oldValue = getValue();
       value = new ArrayList<>(defaultValues);
-      fireOptionChangeEvent(oldValue, getValue());
+      onChanged(oldValue, getValue());
     }
   }
 }
