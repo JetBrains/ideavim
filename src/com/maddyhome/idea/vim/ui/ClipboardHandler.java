@@ -21,14 +21,15 @@ package com.maddyhome.idea.vim.ui;
 import com.intellij.codeInsight.editorActions.CopyPastePostProcessor;
 import com.intellij.codeInsight.editorActions.TextBlockTransferable;
 import com.intellij.codeInsight.editorActions.TextBlockTransferableData;
+import com.intellij.ide.CopyPasteManagerEx;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.RawText;
 import com.maddyhome.idea.vim.helper.TestClipboardModel;
 import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -45,11 +46,12 @@ public class ClipboardHandler {
    *
    * @return The clipboard string or null if data isn't plain text
    */
-  public static @NotNull Pair<String, List<TextBlockTransferableData>> getClipboardTextAndTransferableData() {
+  public static @Nullable Pair<String, List<TextBlockTransferableData>> getClipboardTextAndTransferableData() {
     String res = null;
     List<TextBlockTransferableData> transferableData = new ArrayList<>();
     try {
       Transferable trans = getContents();
+      if (trans == null) return null;
       Object data = trans.getTransferData(DataFlavor.stringFlavor);
 
       res = data.toString();
@@ -88,13 +90,13 @@ public class ClipboardHandler {
     }
   }
 
-  private static @NotNull Transferable getContents() {
+  private static @Nullable Transferable getContents() {
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       return TestClipboardModel.INSTANCE.getContents();
     }
 
-    Clipboard board = Toolkit.getDefaultToolkit().getSystemClipboard();
-    return board.getContents(null);
+    CopyPasteManagerEx manager = CopyPasteManagerEx.getInstanceEx();
+    return manager.getContents();
   }
 
   private static void setContents(@NotNull Transferable contents) {
@@ -102,8 +104,8 @@ public class ClipboardHandler {
       TestClipboardModel.INSTANCE.setContents(contents);
     }
     else {
-      Clipboard board = Toolkit.getDefaultToolkit().getSystemClipboard();
-      board.setContents(contents, null);
+      CopyPasteManagerEx copyPasteManager = CopyPasteManagerEx.getInstanceEx();
+      copyPasteManager.setContents(contents);
     }
   }
 }
