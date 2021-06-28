@@ -34,21 +34,20 @@ import com.intellij.openapi.editor.VisualPosition
  * after the related text and on/before the inlay. If it relates to the following text, it's placed at the visual
  * column of the text, after the inlay.
  *
- * This behaviour is fine for the bar caret, but for inlays related to preceding text, the block caret will be drawn
- * over the inlay, which is a poor experience for Vim users (e.g. hitting `x` in this location will delete the text
- * after the inlay, which is at the same offset as the inlay).
+ * This behaviour is fine for a bar caret, but for inlays related to preceding text, a block or underscore caret will be
+ * drawn over the inlay, which is a poor experience for Vim users (e.g. hitting `x` in this location will delete the
+ * text after the inlay, which is at the same offset as the inlay).
  *
- * This method replaces moveToOffset, and makes sure the block caret is not positioned over an inlay. We assume that
- * insert/replace and select modes use the bar caret and let the existing moveToOffset position the caret correctly
- * between the inlay and its related text. Otherwise, it's a block caret, so we always position it on the visual column
- * of the text, after the inlay.
+ * This method replaces moveToOffset, and makes sure a block or underscore caret is not positioned over an inlay. A bar
+ * caret uses the existing moveToOffset to position the caret correctly between the inlay and its related text.
+ * Otherwise, it's a block caret, so we always position it on the visual column of the text, after the inlay.
  *
  * It is recommended to call this method even if the caret hasn't been moved. It will handle the situation where the
  * document has been changed to add an inlay at the caret position, and will move the caret appropriately.
  */
 fun Caret.moveToInlayAwareOffset(offset: Int) {
   // If the target is inside a fold, call the standard moveToOffset to expand and move
-  if (editor.foldingModel.isOffsetCollapsed(offset) || isBarCaret(this)) {
+  if (editor.foldingModel.isOffsetCollapsed(offset) || !editor.hasBlockOrUnderscoreCaret()) {
     moveToOffset(offset)
   } else {
     val newVisualPosition = getVisualPositionForTextAtOffset(editor, offset)
@@ -60,11 +59,6 @@ fun Caret.moveToInlayAwareOffset(offset: Int) {
 
 fun Caret.moveToInlayAwareLogicalPosition(pos: LogicalPosition) {
   moveToInlayAwareOffset(editor.logicalPositionToOffset(pos))
-}
-
-private fun isBarCaret(caret: Caret): Boolean {
-  // TODO: This should ideally be based on caret shape, rather than mode. We can't guarantee that insert means bar
-  return caret.editor.inInsertMode || caret.editor.inSelectMode
 }
 
 private fun getVisualPositionForTextAtOffset(editor: Editor, offset: Int): VisualPosition {

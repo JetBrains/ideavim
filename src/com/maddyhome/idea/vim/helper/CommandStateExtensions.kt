@@ -21,7 +21,6 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.option.OptionsManager
 
@@ -39,23 +38,6 @@ val CommandState.Mode.isEndAllowedIgnoringOnemore: Boolean
   get() = when (this) {
     CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
     CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -> false
-  }
-
-/**
- * Should this caret behave like the block caret?
- * Keep in mind that in insert mode the caret can have a block shape, but it doesn't behave like the block one
- * If you're looking for a shape, check [isBlockCaretShape]
- */
-val CommandState.Mode.isBlockCaretBehaviour
-  get() = when (this) {
-    CommandState.Mode.VISUAL, CommandState.Mode.COMMAND, CommandState.Mode.OP_PENDING -> true
-    CommandState.Mode.INSERT, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.SELECT -> false
-  }
-
-val CommandState.Mode.isBlockCaretShape
-  get() = when (this) {
-    CommandState.Mode.VISUAL, CommandState.Mode.COMMAND, CommandState.Mode.OP_PENDING -> true
-    CommandState.Mode.INSERT, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.SELECT -> !VimPlugin.getEditor().isBarCursorSettings
   }
 
 val CommandState.Mode.hasVisualSelection

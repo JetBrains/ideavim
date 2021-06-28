@@ -30,7 +30,6 @@ import com.intellij.openapi.editor.LineNumberConverter;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
-import com.intellij.openapi.editor.ex.EditorSettingsExternalizable;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -210,10 +209,6 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     }
   }
 
-  public boolean isBarCursorSettings() {
-    return !EditorSettingsExternalizable.getInstance().isBlockCursor();
-  }
-
   public void editorCreated(@NotNull Editor editor) {
     isBlockCursor = editor.getSettings().isBlockCursor();
     isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
@@ -236,7 +231,9 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     deinitLineNumbers(editor, isReleased);
     UserDataManager.unInitializeEditor(editor);
     VimPlugin.getKey().unregisterShortcutKeys(editor);
-    editor.getSettings().setBlockCursor(isBlockCursor);
+    if (CaretVisualAttributesHelperKt.usesBlockCursorEditorSettings()) {
+      editor.getSettings().setBlockCursor(isBlockCursor);
+    }
     editor.getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
     DocumentManager.INSTANCE.removeListeners(editor.getDocument());
   }

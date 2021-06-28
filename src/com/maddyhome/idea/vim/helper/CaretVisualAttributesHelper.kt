@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.ex.EditorEx
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.option.GuiCursorMode
 import com.maddyhome.idea.vim.option.GuiCursorType
@@ -65,6 +64,14 @@ fun Editor.guicursorMode(): GuiCursorMode {
     CommandState.Mode.CMD_LINE -> GuiCursorMode.CMD_LINE
   }
 }
+
+fun Editor.hasBlockOrUnderscoreCaret() = OptionsManager.guicursor.getAttributes(guicursorMode()).type.let {
+  it == GuiCursorType.BLOCK || it == GuiCursorType.HOR
+}
+
+// [VERSION UPDATE] 2021.2+
+// Don't bother saving/restoring EditorSettings.blockCursor if we're not using it
+fun usesBlockCursorEditorSettings() = ApplicationInfo.getInstance().build.baselineVersion < 212
 
 private fun Editor.updatePrimaryCaretVisualAttributes() {
   provider.setPrimaryCaretVisualAttributes(this)
@@ -154,7 +161,7 @@ private class LegacyCaretVisualAttributesProvider : CaretVisualAttributesProvide
   override fun setPrimaryCaretVisualAttributes(editor: Editor) {
     when (OptionsManager.guicursor.getAttributes(editor.guicursorMode()).type) {
       GuiCursorType.BLOCK, GuiCursorType.HOR -> editor.settings.isBlockCursor = true
-      GuiCursorType.VER -> editor.settings.isBlockCursor = !VimPlugin.getEditor().isBarCursorSettings
+      GuiCursorType.VER -> editor.settings.isBlockCursor = false
     }
   }
 
