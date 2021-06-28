@@ -36,27 +36,27 @@ fun Caret.forceBarCursor() {
 }
 
 fun Editor.updateCaretsVisualAttributes() {
-  updatePrimaryCaretVisualAttributes(this, mode)
-  updateSecondaryCaretsVisualAttributes(this, inBlockSubMode)
+  updatePrimaryCaretVisualAttributes()
+  updateSecondaryCaretsVisualAttributes()
 }
 
 private fun setPrimaryCaretShape(editor: Editor, isBlockCursor: Boolean) {
   editor.settings.isBlockCursor = isBlockCursor
 }
 
-private fun updatePrimaryCaretVisualAttributes(editor: Editor, mode: CommandState.Mode) {
+private fun Editor.updatePrimaryCaretVisualAttributes() {
   // Note that Vim uses the VISUAL caret for SELECT. We're matching INSERT
   when (mode) {
-    CommandState.Mode.COMMAND, CommandState.Mode.VISUAL, CommandState.Mode.REPLACE -> setPrimaryCaretShape(editor, true)
-    CommandState.Mode.SELECT, CommandState.Mode.INSERT -> setPrimaryCaretShape(editor, !VimPlugin.getEditor().isBarCursorSettings)
+    CommandState.Mode.COMMAND, CommandState.Mode.VISUAL, CommandState.Mode.REPLACE -> setPrimaryCaretShape(this, true)
+    CommandState.Mode.SELECT, CommandState.Mode.INSERT -> setPrimaryCaretShape(this, !VimPlugin.getEditor().isBarCursorSettings)
     CommandState.Mode.CMD_LINE, CommandState.Mode.OP_PENDING -> Unit
   }
 }
 
-private fun updateSecondaryCaretsVisualAttributes(editor: Editor, inBlockSubMode: Boolean) {
-  val attributes = getVisualAttributesForSecondaryCarets(editor, inBlockSubMode)
-  editor.caretModel.allCarets.forEach {
-    if (it != editor.caretModel.primaryCaret) {
+private fun Editor.updateSecondaryCaretsVisualAttributes() {
+  val attributes = getVisualAttributesForSecondaryCarets(this, this.inBlockSubMode)
+  this.caretModel.allCarets.forEach {
+    if (it != this.caretModel.primaryCaret) {
       it.visualAttributes = attributes
     }
   }
