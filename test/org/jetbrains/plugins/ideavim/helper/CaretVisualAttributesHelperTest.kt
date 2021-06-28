@@ -96,6 +96,62 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test replace character uses replace mode caret`() {
+    configureByText("I ${c}found it in a legendary land")
+    typeText(parseKeys("r"))
+    assertCaretVisualAttributes(CaretVisualAttributes.Shape.UNDERSCORE, 0.2F)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test caret reset after replacing character`() {
+    configureByText("I ${c}found it in a legendary land")
+    typeText(parseKeys("r", "z"))
+    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test caret reset after escaping replace character`() {
+    configureByText("I ${c}found it in a legendary land")
+    typeText(parseKeys("r", "<Esc>"))
+    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test caret reset after cancelling replace character`() {
+    configureByText("I ${c}found it in a legendary land")
+    typeText(parseKeys("r", "<Left>"))
+    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test visual replace character uses replace mode caret`() {
+    configureByText("I ${c}found it in a legendary land")
+    typeText(parseKeys("ve", "r"))
+    assertCaretVisualAttributes(CaretVisualAttributes.Shape.UNDERSCORE, 0.2F)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test caret reset after completing visual replace character`() {
+    configureByText("I ${c}found it in a legendary land")
+    typeText(parseKeys("ve", "r", "z"))
+    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test caret reset after escaping visual replace character`() {
+    configureByText("I ${c}found it in a legendary land")
+    typeText(parseKeys("ve", "r", "<Esc>"))
+    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test caret reset after cancelling visual replace character`() {
+    configureByText("I ${c}found it in a legendary land")
+    typeText(parseKeys("ve", "r", "<Left>"))
+    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test changing guicursor option updates caret immediately`() {
     configureByText("I found it in a legendary land")
     enterCommand("set guicursor=n:hor22")

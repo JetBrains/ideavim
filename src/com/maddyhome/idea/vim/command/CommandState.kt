@@ -88,7 +88,7 @@ class CommandState private constructor(private val editor: Editor) {
     modeStates.push(newModeState)
     setMappingMode()
 
-    if (previousMode.mode != newModeState.mode) {
+    if (previousMode != newModeState) {
       onModeChanged()
     }
   }
@@ -96,7 +96,7 @@ class CommandState private constructor(private val editor: Editor) {
   fun popModes() {
     val popped = modeStates.pop()
     setMappingMode()
-    if (popped.mode != mode) {
+    if (popped != currentModeState()) {
       onModeChanged()
     }
 
@@ -106,6 +106,12 @@ class CommandState private constructor(private val editor: Editor) {
 
   fun resetOpPending() {
     if (mode == Mode.OP_PENDING) {
+      popModes()
+    }
+  }
+
+  fun resetReplaceCharacter() {
+    if (subMode == SubMode.REPLACE_CHARACTER) {
       popModes()
     }
   }
@@ -333,10 +339,10 @@ class CommandState private constructor(private val editor: Editor) {
   }
 
   enum class SubMode {
-    NONE, SINGLE_COMMAND, REGISTER_PENDING, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
+    NONE, SINGLE_COMMAND, REGISTER_PENDING, REPLACE_CHARACTER, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
   }
 
-  private class ModeState(val mode: Mode, val subMode: SubMode) {
+  private data class ModeState(val mode: Mode, val subMode: SubMode) {
     fun toSimpleString(): String = "$mode:$subMode"
   }
 

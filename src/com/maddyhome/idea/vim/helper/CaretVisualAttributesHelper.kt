@@ -48,15 +48,21 @@ fun Editor.updateCaretsVisualAttributes() {
   updateSecondaryCaretsVisualAttributes()
 }
 
-fun Editor.guicursorMode() = when (mode) {
-  CommandState.Mode.COMMAND -> GuiCursorMode.NORMAL
-  CommandState.Mode.VISUAL -> GuiCursorMode.VISUAL  // TODO: VISUAL_EXCLUSIVE
-  CommandState.Mode.SELECT -> GuiCursorMode.VISUAL
-  CommandState.Mode.INSERT -> GuiCursorMode.INSERT
-  CommandState.Mode.OP_PENDING -> GuiCursorMode.OP_PENDING
-  CommandState.Mode.REPLACE -> GuiCursorMode.REPLACE
-  // This doesn't handle ci and cr, but we don't care - our CMD_LINE will never call this
-  CommandState.Mode.CMD_LINE -> GuiCursorMode.CMD_LINE
+fun Editor.guicursorMode(): GuiCursorMode {
+  if (subMode == CommandState.SubMode.REPLACE_CHARACTER) {
+    // Can be true for NORMAL and VISUAL
+    return GuiCursorMode.REPLACE
+  }
+  return when (mode) {
+    CommandState.Mode.COMMAND -> GuiCursorMode.NORMAL
+    CommandState.Mode.VISUAL -> GuiCursorMode.VISUAL  // TODO: VISUAL_EXCLUSIVE
+    CommandState.Mode.SELECT -> GuiCursorMode.VISUAL
+    CommandState.Mode.INSERT -> GuiCursorMode.INSERT
+    CommandState.Mode.OP_PENDING -> GuiCursorMode.OP_PENDING
+    CommandState.Mode.REPLACE -> GuiCursorMode.REPLACE
+    // This doesn't handle ci and cr, but we don't care - our CMD_LINE will never call this
+    CommandState.Mode.CMD_LINE -> GuiCursorMode.CMD_LINE
+  }
 }
 
 private fun Editor.updatePrimaryCaretVisualAttributes() {
