@@ -408,7 +408,7 @@ abstract class VimTestCase : UsefulTestCase() {
     Assertions.assertThat(VimPlugin.getMessage()).contains(message)
   }
 
-  protected fun assertCaretVisualAttributes() {
+  protected fun assertCaretsVisualAttributes() {
     val editor = myFixture.editor
     val attributes = OptionsManager.guicursor.getAttributes(editor.guicursorMode())
     val shape = when (attributes.type) {
@@ -432,11 +432,6 @@ abstract class VimTestCase : UsefulTestCase() {
         }
       }
     }
-  }
-
-  // TODO: Replace calls to this with assertCaretVisualAttributes
-  protected fun assertCaretsColour() {
-    assertCaretVisualAttributes()
   }
 
   fun doTest(
@@ -502,7 +497,7 @@ abstract class VimTestCase : UsefulTestCase() {
   protected fun assertState(modeAfter: CommandState.Mode, subModeAfter: SubMode) {
     assertMode(modeAfter)
     assertSubMode(subModeAfter)
-    assertCaretVisualAttributes()
+    assertCaretsVisualAttributes()
   }
 
   protected val fileManager: FileEditorManagerEx
