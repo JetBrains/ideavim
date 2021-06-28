@@ -550,7 +550,7 @@ public class MotionGroup {
       case LAST_T:
         res = moveCaretToBeforeNextCharacterOnLine(editor, caret, -count, lastFTChar);
         if (res == startPos && Math.abs(count) == 1) {
-          res = moveCaretToBeforeNextCharacterOnLine(editor, caret, 2 * count, lastFTChar);
+          res = moveCaretToBeforeNextCharacterOnLine(editor, caret, -2 * count, lastFTChar);
         }
         break;
       case LAST_t:
