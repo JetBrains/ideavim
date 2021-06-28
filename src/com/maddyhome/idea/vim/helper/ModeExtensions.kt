@@ -44,7 +44,6 @@ fun Editor.exitVisualMode() {
   val selectionType = SelectionType.fromSubMode(this.subMode)
   SelectionVimListenerSuppressor.lock().use {
     if (inBlockSubMode) {
-      this.caretModel.allCarets.forEach { it.visualAttributes = this.caretModel.primaryCaret.visualAttributes }
       this.caretModel.removeSecondaryCarets()
     }
     if (!this.vimKeepingVisualOperatorAction) {

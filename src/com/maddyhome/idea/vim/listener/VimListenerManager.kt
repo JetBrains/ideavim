@@ -52,6 +52,7 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.UpdatesChecker
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
@@ -108,6 +109,7 @@ object VimListenerManager {
       OptionsManager.relativenumber.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
       OptionsManager.scrolloff.addOptionChangeListener(MotionGroup.ScrollOptionsChangeListener.INSTANCE)
       OptionsManager.showcmd.addOptionChangeListener(ShowCmdOptionChangeListener)
+      OptionsManager.guicursor.addOptionChangeListener(GuicursorChangeListener)
 
       EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance())
     }
@@ -119,6 +121,7 @@ object VimListenerManager {
       OptionsManager.relativenumber.removeOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
       OptionsManager.scrolloff.removeOptionChangeListener(MotionGroup.ScrollOptionsChangeListener.INSTANCE)
       OptionsManager.showcmd.removeOptionChangeListener(ShowCmdOptionChangeListener)
+      OptionsManager.guicursor.removeOptionChangeListener(GuicursorChangeListener)
 
       EventFacade.getInstance().removeEditorFactoryListener(VimEditorFactoryListener)
     }

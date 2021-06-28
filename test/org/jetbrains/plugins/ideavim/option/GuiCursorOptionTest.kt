@@ -118,4 +118,32 @@ class GuiCursorOptionTest: VimTestCase() {
     assertEquals("MyHighlightGroup", values[0]!!.attributes.highlightGroup)
     assertEquals("", values[0]!!.attributes.lmapHighlightGroup)
   }
+
+  fun `test get effective values`() {
+    option.set("n:hor20-Cursor,i:hor50,a:ver25,n:ver75")
+    val attributes = option.getAttributes(GuiCursorMode.NORMAL)
+    assertEquals(GuiCursorType.VER, attributes.type)
+    assertEquals(75, attributes.thickness)
+    assertEquals("Cursor", attributes.highlightGroup)
+  }
+
+  fun `test get effective values 2`() {
+    option.set("n:hor20-Cursor,i:hor50,a:ver25,n:ver75")
+    val attributes = option.getAttributes(GuiCursorMode.INSERT)
+    assertEquals(GuiCursorType.VER, attributes.type)
+    assertEquals(25, attributes.thickness)
+  }
+
+  fun `test get effective values on update`() {
+    option.set("n:hor20-Cursor")
+    var attributes = option.getAttributes(GuiCursorMode.NORMAL)
+    assertEquals(GuiCursorType.HOR, attributes.type)
+    assertEquals(20, attributes.thickness)
+    assertEquals("Cursor", attributes.highlightGroup)
+    option.append("n:ver75-OtherCursor")
+    attributes = option.getAttributes(GuiCursorMode.NORMAL)
+    assertEquals(GuiCursorType.VER, attributes.type)
+    assertEquals(75, attributes.thickness)
+    assertEquals("OtherCursor", attributes.highlightGroup)
+  }
 }

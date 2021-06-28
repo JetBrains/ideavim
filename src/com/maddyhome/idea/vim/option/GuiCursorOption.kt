@@ -24,6 +24,8 @@ import java.util.*
 class GuiCursorOption(name: String, abbrev: String, defaultValue: String) :
   ListOption<GuiCursorEntry>(name, abbrev, defaultValue) {
 
+  private val effectiveValues = mutableMapOf<GuiCursorMode, GuiCursorAttributes>()
+
   override fun convertToken(token: String): GuiCursorEntry {
     val split = token.split(':')
     if (split.size == 1) {
@@ -76,6 +78,37 @@ class GuiCursorOption(name: String, abbrev: String, defaultValue: String) :
     }
 
     return GuiCursorEntry(token, modes, GuiCursorAttributes(type, thickness, highlightGroup, lmapHighlightGroup, blinkModes))
+  }
+
+  override fun onChanged(oldValue: String?, newValue: String?) {
+    effectiveValues.clear()
+    super.onChanged(oldValue, newValue)
+  }
+
+  fun getAttributes(mode: GuiCursorMode): GuiCursorAttributes {
+    return effectiveValues.computeIfAbsent(mode) {
+      var type = GuiCursorType.BLOCK
+      var thickness = 0
+      var highlightGroup = ""
+      var lmapHighlightGroup = ""
+      var blinkModes = emptyList<String>()
+      values().forEach { state ->
+        if (state.modes.contains(mode) || state.modes.contains(GuiCursorMode.ALL)) {
+          type = state.attributes.type
+          thickness = state.attributes.thickness
+          if (state.attributes.highlightGroup.isNotEmpty()) {
+            highlightGroup = state.attributes.highlightGroup
+          }
+          if (state.attributes.lmapHighlightGroup.isNotEmpty()) {
+            lmapHighlightGroup = state.attributes.lmapHighlightGroup
+          }
+          if (state.attributes.blinkModes.isNotEmpty()) {
+            blinkModes = state.attributes.blinkModes
+          }
+        }
+      }
+      GuiCursorAttributes(type, thickness, highlightGroup, lmapHighlightGroup, blinkModes)
+    }
   }
 }
 
