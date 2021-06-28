@@ -354,6 +354,7 @@ object VimListenerManager {
       when (e.clickCount) {
         1 -> {
           if (!predictedMode.isEndAllowed) {
+            @Suppress("ideavimRunForEachCaret")
             editor.caretModel.runForEachCaret { caret ->
               val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
               val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)

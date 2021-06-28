@@ -226,7 +226,7 @@ public class MotionGroup {
       col = newColumn;
     }
 
-    newColumn = normalizeVisualColumn(editor, newVisualLine, newColumn, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
+    newColumn = normalizeVisualColumn(editor, newVisualLine, newColumn, CommandStateHelper.isEndAllowed(editor));
 
     if (newVisualLine != caretVisualLine || newColumn != oldColumn) {
       int offset = visualPositionToOffset(editor, new VisualPosition(newVisualLine, newColumn));
@@ -1315,7 +1315,7 @@ public class MotionGroup {
       else {
         int newInlineElements = InlayHelperKt.amountOfInlaysBeforeVisualPosition(editor, new VisualPosition(line, col));
 
-        col = normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
+        col = normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(editor));
         col += newInlineElements;
       }
 

@@ -29,6 +29,7 @@ usual beta standards.
 * [VIM-1357](https://youtrack.jetbrains.com/issue/VIM-1357)
   [VIM-1566](https://youtrack.jetbrains.com/issue/VIM-1566) Fix external filters
 * [VIM-2336](https://youtrack.jetbrains.com/issue/VIM-2336) Fix repeat for the `T` movement
+* [VIM-1192](https://youtrack.jetbrains.com/issue/VIM-1192) Fix dollar motion from single command
 
 ### Merged PRs:
 * [332](https://github.com/JetBrains/ideavim/pull/332) by [Matt Ellis](https://github.com/citizenmatt): VIM-1357+VIM-1566: Use OS shell to run filter command
