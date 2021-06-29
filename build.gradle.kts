@@ -1,3 +1,4 @@
+
 import dev.feedforward.markdownto.DownParser
 import org.intellij.markdown.ast.getTextInNode
 import java.net.HttpURLConnection
@@ -255,6 +256,22 @@ tasks.register("updateMergedPr") {
     }
 }
 
+tasks.register("testUpdateChangelog") {
+    group = "verification"
+    description = "This is a task to manually assert the correctness of the update tasks"
+    doLast {
+        val changesFile = File("$projectDir/CHANGES.md")
+        val changes = changesFile.readText()
+
+        val changesBuilder = StringBuilder(changes)
+        val insertOffset = setupSection(changes, changesBuilder, "### Changes:")
+
+        changesBuilder.insert(insertOffset, "--Hello--\n")
+
+        changesFile.writeText(changesBuilder.toString())
+    }
+}
+
 fun updateAuthors(uncheckedEmails: Set<String>) {
     println("Start update authors")
     println(projectDir)
@@ -334,39 +351,65 @@ fun updateMergedPr(number: Int) {
     val pullRequest = repository.getPullRequest(number)
     if (pullRequest.user.login == "dependabot[bot]") return
 
-    val authorsFile = File("$projectDir/CHANGES.md")
-    val authors = authorsFile.readText()
+    val changesFile = File("$projectDir/CHANGES.md")
+    val changes = changesFile.readText()
+
+    val changesBuilder = StringBuilder(changes)
+    val insertOffset = setupSection(changes, changesBuilder, "### Merged PRs:")
+
+    if (insertOffset < 50) error("Incorrect offset: $insertOffset")
+    if (pullRequest.user.login == "dependabot[bot]") return
+
+    val prNumber = pullRequest.number
+    val userName = pullRequest.user.name
+    val login = pullRequest.user.login
+    val title = pullRequest.title
+    val section =
+        "* [$prNumber](https://github.com/JetBrains/ideavim/pull/$prNumber) by [$userName](https://github.com/$login): $title\n"
+    changesBuilder.insert(insertOffset, section)
+
+    changesFile.writeText(changesBuilder.toString())
+}
+
+fun setupSection(
+    changes: String,
+    authorsBuilder: StringBuilder,
+    sectionName: String,
+): Int {
     val parser =
         org.intellij.markdown.parser.MarkdownParser(org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor())
-    val tree = parser.buildMarkdownTreeFromString(authors)
+    val tree = parser.buildMarkdownTreeFromString(changes)
 
     var idx = -1
     for (index in tree.children.indices) {
-        if (tree.children[index].getTextInNode(authors).startsWith("## ")) {
+        if (tree.children[index].getTextInNode(changes).startsWith("## ")) {
             idx = index
             break
         }
     }
 
-    val authorsBuilder = StringBuilder(authors)
-    val hasToBeReleased = tree.children[idx].getTextInNode(authors).contains("To Be Released")
-    val insertOffset = if (hasToBeReleased) {
+    val hasToBeReleased = tree.children[idx].getTextInNode(changes).contains("To Be Released")
+    return if (hasToBeReleased) {
         var mrgIdx = -1
         for (index in (idx + 1) until tree.children.lastIndex) {
-            val textInNode = tree.children[index].getTextInNode(authors)
-            val foundIndex = textInNode.startsWith("### Merged PRs:")
+            val textInNode = tree.children[index].getTextInNode(changes)
+            val foundIndex = textInNode.startsWith(sectionName)
             if (foundIndex) {
                 var filledPr = index + 2
-                while (tree.children[filledPr].getTextInNode(authors).startsWith("*")) {
+                while (tree.children[filledPr].getTextInNode(changes).startsWith("*")) {
                     filledPr++
                 }
                 mrgIdx = tree.children[filledPr].startOffset + 1
                 break
             } else {
-                val nextSection = textInNode.startsWith("## ")
-                if (nextSection) {
+                val currentSectionIndex = sections.indexOf(sectionName)
+                val insertHere = textInNode.startsWith("## ") ||
+                        textInNode.startsWith("### ")
+                        && sections.indexOfFirst { textInNode.startsWith(it) }
+                    .let { if (it < 0) false else it > currentSectionIndex }
+                if (insertHere) {
                     val section = """
-                        ### Merged PRs:
+                        $sectionName
                         
                         
                     """.trimIndent()
@@ -381,23 +424,18 @@ fun updateMergedPr(number: Int) {
         val section = """
             ## To Be Released
             
-            ### Merged PRs:
+            $sectionName
             
             
         """.trimIndent()
         authorsBuilder.insert(tree.children[idx].startOffset, section)
         tree.children[idx].startOffset + (section.length - 1)
     }
-
-    if (insertOffset < 50) error("Incorrect offset: $insertOffset")
-    if (pullRequest.user.login == "dependabot[bot]") return
-
-    val prNumber = pullRequest.number
-    val userName = pullRequest.user.name
-    val login = pullRequest.user.login
-    val title = pullRequest.title
-    val section = "* [$prNumber](https://github.com/JetBrains/ideavim/pull/$prNumber) by [$userName](https://github.com/$login): $title\n"
-    authorsBuilder.insert(insertOffset, section)
-
-    authorsFile.writeText(authorsBuilder.toString())
 }
+
+val sections = listOf(
+    "### Features:",
+    "### Changes:",
+    "### Fixes:",
+    "### Merged PRs:",
+)
