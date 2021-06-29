@@ -1,5 +1,6 @@
 
 import dev.feedforward.markdownto.DownParser
+import org.eclipse.jgit.revwalk.RevCommit
 import org.intellij.markdown.ast.getTextInNode
 import java.net.HttpURLConnection
 import java.net.URL
@@ -256,6 +257,12 @@ tasks.register("updateMergedPr") {
     }
 }
 
+tasks.register("updateChangelog") {
+    doLast {
+        updateChangelog()
+    }
+}
+
 tasks.register("testUpdateChangelog") {
     group = "verification"
     description = "This is a task to manually assert the correctness of the update tasks"
@@ -270,6 +277,66 @@ tasks.register("testUpdateChangelog") {
 
         changesFile.writeText(changesBuilder.toString())
     }
+}
+
+fun updateChangelog() {
+    println("Start update authors")
+    println(projectDir)
+    val repository = org.eclipse.jgit.lib.RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
+    val git = org.eclipse.jgit.api.Git(repository)
+    val messages = getLog(git).map { it.shortMessage }
+
+    // Collect fixes
+    val newFixes = mutableListOf<Change>()
+    println("Start emails processing")
+    for (message in messages) {
+        println("Processing '$message'...")
+        val lowercaseMessage = message.toLowerCase()
+        val regex = "^fix\\((vim-\\d+)\\):".toRegex()
+        val findResult = regex.find(lowercaseMessage)
+        if (findResult != null) {
+            println("Message matches")
+            val value = findResult.groups[1]!!.value.toUpperCase()
+            val shortMessage = message.drop(findResult.range.last + 1).trim()
+            newFixes += Change(value, shortMessage)
+        } else {
+            println("Message doesn't match")
+        }
+    }
+
+    // Update changes file
+    val changesFile = File("$projectDir/CHANGES.md")
+    val changes = changesFile.readText()
+
+    val changesBuilder = StringBuilder(changes)
+    val insertOffset = setupSection(changes, changesBuilder, "### Fixes:")
+
+    if (insertOffset < 50) error("Incorrect offset: $insertOffset")
+
+    val newUpdates =
+        newFixes.joinToString { "* [${it.id}](https://youtrack.jetbrains.com/issue/${it.id}) ${it.text}\n" }
+
+    changesBuilder.insert(insertOffset, newUpdates)
+    changesFile.writeText(changesBuilder.toString())
+
+    setProcessedHash(git)
+}
+
+fun getLog(git: org.eclipse.jgit.api.Git): List<RevCommit> {
+    val lastProcessed = File("$projectDir/.github/last_processed_hash")
+    var firstCommits = git.log().call().take(40)
+    if (lastProcessed.exists()) {
+        val lastHash = lastProcessed.readText()
+        firstCommits = firstCommits.takeWhile { it.name != lastHash }
+    }
+    return firstCommits
+}
+
+fun setProcessedHash(git: org.eclipse.jgit.api.Git) {
+    val lastProcessed = File("$projectDir/.github/last_processed_hash")
+    lastProcessed.createNewFile()
+    val hash = git.log().call().first().name
+    lastProcessed.writeText(hash)
 }
 
 fun updateAuthors(uncheckedEmails: Set<String>) {
@@ -344,6 +411,7 @@ fun List<Author>.toMdString(): String {
 }
 
 data class Author(val name: String, val url: String, val mail: String)
+data class Change(val id: String, val text: String)
 
 fun updateMergedPr(number: Int) {
     val gitHub = org.kohsuke.github.GitHub.connect()
