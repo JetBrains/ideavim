@@ -28,6 +28,10 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.VimProjectService;
 import com.maddyhome.idea.vim.group.HistoryGroup;
 import com.maddyhome.idea.vim.helper.UiHelper;
+import com.maddyhome.idea.vim.option.GuiCursorAttributes;
+import com.maddyhome.idea.vim.option.GuiCursorMode;
+import com.maddyhome.idea.vim.option.GuiCursorType;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import kotlin.text.StringsKt;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -403,38 +407,25 @@ public class ExTextField extends JTextField {
   // see :help 'guicursor'
   // Note that we can't easily support guicursor because we don't have arbitrary control over the IntelliJ editor caret
   private void setNormalModeCaret() {
-    caret.setBlockMode();
+    caret.setAttributes(OptionsManager.INSTANCE.getGuicursor().getAttributes(GuiCursorMode.CMD_LINE));
   }
 
   private void setInsertModeCaret() {
-    caret.setMode(CommandLineCaret.CaretMode.VER, 25);
+    caret.setAttributes(OptionsManager.INSTANCE.getGuicursor().getAttributes(GuiCursorMode.CMD_LINE_INSERT));
   }
 
   private void setReplaceModeCaret() {
-    caret.setMode(CommandLineCaret.CaretMode.HOR, 20);
+    caret.setAttributes(OptionsManager.INSTANCE.getGuicursor().getAttributes(GuiCursorMode.CMD_LINE_REPLACE));
   }
 
   private static class CommandLineCaret extends DefaultCaret {
 
-    private CaretMode mode;
-    private int blockPercentage = 100;
+    private GuiCursorType mode;
+    private int thickness = 100;
     private int lastBlinkRate = 0;
     private boolean hasFocus;
 
-    public enum CaretMode {
-      BLOCK,
-      VER,
-      HOR
-    }
-
-    void setBlockMode() {
-      setMode(CaretMode.BLOCK, 100);
-    }
-
-    void setMode(CaretMode mode, int blockPercentage) {
-      if (this.mode == mode && this.blockPercentage == blockPercentage) {
-        return;
-      }
+    public void setAttributes(GuiCursorAttributes attributes) {
 
       // Hide the current caret and redraw without it. Then make the new caret visible, but only if it was already
       // (logically) visible/active. Always making it visible can start the flasher timer unnecessarily.
@@ -442,8 +433,8 @@ public class ExTextField extends JTextField {
       if (isVisible()) {
         setVisible(false);
       }
-      this.mode = mode;
-      this.blockPercentage = blockPercentage;
+      mode = attributes.getType();
+      thickness = mode == GuiCursorType.BLOCK ? 100 : attributes.getThickness();
       if (active) {
         setVisible(true);
       }
@@ -500,7 +491,7 @@ public class ExTextField extends JTextField {
           g.drawRect(r.x, r.y, r.width, r.height);
         }
         else {
-          r.setBounds(r.x, r.y, getCaretWidth(fm, blockPercentage), getBlockHeight(boundsHeight));
+          r.setBounds(r.x, r.y, getCaretWidth(fm, thickness), getBlockHeight(boundsHeight));
           g.fillRect(r.x, r.y + boundsHeight - r.height, r.width, r.height);
         }
       }
@@ -521,7 +512,7 @@ public class ExTextField extends JTextField {
           height = blockHeight;
         }
         else {
-          width = this.getCaretWidth(fm, blockPercentage);
+          width = this.getCaretWidth(fm, thickness);
           height = getBlockHeight(blockHeight);
         }
         x = r.x;
@@ -531,7 +522,7 @@ public class ExTextField extends JTextField {
     }
 
     private int getCaretWidth(FontMetrics fm, int widthPercentage) {
-      if (mode == CaretMode.VER) {
+      if (mode == GuiCursorType.VER) {
         // Don't show a proportional width of a proportional font
         final int fullWidth = fm.charWidth('o');
         return max(1, fullWidth * widthPercentage / 100);
@@ -542,8 +533,8 @@ public class ExTextField extends JTextField {
     }
 
     private int getBlockHeight(int fullHeight) {
-      if (mode == CaretMode.HOR) {
-        return max(1, fullHeight * blockPercentage / 100);
+      if (mode == GuiCursorType.HOR) {
+        return max(1, fullHeight * thickness / 100);
       }
       return fullHeight;
     }
@@ -552,7 +543,7 @@ public class ExTextField extends JTextField {
   @TestOnly
   public @NonNls String getCaretShape() {
     CommandLineCaret caret = (CommandLineCaret) getCaret();
-    return String.format("%s %d", caret.mode, caret.blockPercentage);
+    return String.format("%s %d", caret.mode, caret.thickness);
   }
 
   private Editor editor;
