@@ -31,6 +31,7 @@ usual beta standards.
 * [VIM-2336](https://youtrack.jetbrains.com/issue/VIM-2336) Fix repeat for the `T` movement
 * [VIM-1192](https://youtrack.jetbrains.com/issue/VIM-1192) Fix dollar motion from single command
 * [VIM-1672](https://youtrack.jetbrains.com/issue/VIM-1672) IdeaVim correctly populates clipboard history
+* [VIM-123](https://youtrack.jetbrains.com/issue/VIM-123) This is not a fix, just testing the automation
 
 ### Merged PRs:
 * [332](https://github.com/JetBrains/ideavim/pull/332) by [Matt Ellis](https://github.com/citizenmatt): VIM-1357+VIM-1566: Use OS shell to run filter command
