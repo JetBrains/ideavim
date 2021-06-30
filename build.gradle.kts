@@ -328,14 +328,14 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
     println(projectDir)
     val repository = org.eclipse.jgit.lib.RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
     val git = org.eclipse.jgit.api.Git(repository)
-    val emails = git.log().call().take(40).mapTo(HashSet()) { it.authorIdent.emailAddress }
+    val hashesAndEmailes = git.log().call().take(40).mapTo(HashSet()) { it.name to it.authorIdent.emailAddress }
 
-    println("Emails: $emails")
+    println("Emails: ${hashesAndEmailes.map { it.second }}")
     val gitHub = org.kohsuke.github.GitHub.connect()
-    val searchUsers = gitHub.searchUsers()
-    val users = mutableListOf<Author>()
+    val ghRepository = gitHub.getRepository("JetBrains/ideavim")
+    val users = mutableSetOf<Author>()
     println("Start emails processing")
-    for (email in emails) {
+    for ((hash, email) in hashesAndEmailes) {
         println("Processing '$email'...")
         if (email in uncheckedEmails) {
             println("Email '$email' is in unchecked emails. Skip it")
@@ -345,9 +345,7 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
             println("Email '$email' is from dependabot. Skip it")
             continue
         }
-        val githubUsers = searchUsers.q(email).list().toList()
-        if (githubUsers.isEmpty()) error("Cannot find user $email")
-        val user = githubUsers.single()
+        val user = ghRepository.getCommit(hash).author
         val htmlUrl = user.htmlUrl.toString()
         val name = user.name
         users.add(Author(name, htmlUrl, email))
