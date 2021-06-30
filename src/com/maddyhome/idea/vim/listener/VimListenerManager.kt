@@ -270,6 +270,12 @@ object VimListenerManager {
                 //   last character in line and has a negative direction.
                 caret.setSelection(caret.selectionStart, caret.selectionEnd + 1)
               }
+              // This is the same correction, but for the newer versions of the IDE: 213+
+              if (caret.selectionEnd == e.editor.document.getLineEndOffset(caret.logicalPosition.line) &&
+                caret.selectionEnd == caret.selectionStart + 1
+              ) {
+                caret.setSelection(caret.selectionEnd, caret.selectionEnd)
+              }
             }
           }
         }
