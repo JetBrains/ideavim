@@ -21,6 +21,7 @@ package org.jetbrains.plugins.ideavim.helper
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.CaretVisualAttributes
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -86,13 +87,13 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
     }
   }
 
+  @VimBehaviorDiffers(description = "Vim does not change the caret for select mode", shouldBeFixed = false)
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
-  fun `test select mode uses visual mode caret`() {
+  fun `test select mode uses insert mode caret`() {
     // Vim doesn't have a different caret for SELECT, and doesn't have an option in guicursor to change SELECT mode
-    // TODO: Perhaps SELECT should match INSERT?
     configureByText("I found it in a legendary land")
     typeText(parseKeys("v7l", "<C-G>"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.25F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)

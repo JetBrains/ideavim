@@ -53,10 +53,15 @@ fun Editor.guicursorMode(): GuiCursorMode {
     // Can be true for NORMAL and VISUAL
     return GuiCursorMode.REPLACE
   }
+
+  // Note that Vim does not change the caret for SELECT mode and continues to use VISUAL or VISUAL_EXCLUSIVE. IdeaVim
+  // makes much more use of SELECT than Vim does (e.g. it's the default for idearefactormode) so it makes sense for us
+  // to more visually distinguish VISUAL and SELECT. So we use INSERT; a selection and the insert caret is intuitively
+  // the same as SELECT
   return when (mode) {
     CommandState.Mode.COMMAND -> GuiCursorMode.NORMAL
     CommandState.Mode.VISUAL -> GuiCursorMode.VISUAL  // TODO: VISUAL_EXCLUSIVE
-    CommandState.Mode.SELECT -> GuiCursorMode.VISUAL
+    CommandState.Mode.SELECT -> GuiCursorMode.INSERT
     CommandState.Mode.INSERT -> GuiCursorMode.INSERT
     CommandState.Mode.OP_PENDING -> GuiCursorMode.OP_PENDING
     CommandState.Mode.REPLACE -> GuiCursorMode.REPLACE
