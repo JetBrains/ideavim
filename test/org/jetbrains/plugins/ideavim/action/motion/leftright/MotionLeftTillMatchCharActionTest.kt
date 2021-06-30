@@ -23,34 +23,42 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionLeftTillMatchCharActionTest : VimTestCase() {
   fun `test move and repeat`() {
-    doTest("Tx;",
-      "hello x hello x hello${c}",
-      "hello x${c} hello x hello",
+    doTest(
+      "Tx;",
+      "hello x hello x hello$c",
+      "hello x$c hello x hello",
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   fun `test move and repeat twice`() {
-    doTest("Tx;;",
-      "hello x hello x hello x hello${c}",
-      "hello x${c} hello x hello x hello",
+    doTest(
+      "Tx;;",
+      "hello x hello x hello x hello$c",
+      "hello x$c hello x hello x hello",
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   fun `test move and repeat two`() {
-    doTest("Tx2;",
-      "hello x hello x hello x hello${c}",
-      "hello x hello x${c} hello x hello",
+    doTest(
+      "Tx2;",
+      "hello x hello x hello x hello$c",
+      "hello x hello x$c hello x hello",
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   fun `test move and repeat three`() {
-    doTest("Tx3;",
-      "hello x hello x hello x hello${c}",
-      "hello x${c} hello x hello x hello",
+    doTest(
+      "Tx3;",
+      "hello x hello x hello x hello$c",
+      "hello x$c hello x hello x hello",
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 }

@@ -46,7 +46,8 @@ open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
   override fun getOffset(
-    editor: Editor, caret: Caret,
+    editor: Editor,
+    caret: Caret,
     context: DataContext,
     count: Int,
     rawCount: Int,

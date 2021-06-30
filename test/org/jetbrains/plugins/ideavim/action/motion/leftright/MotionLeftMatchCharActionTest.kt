@@ -23,34 +23,42 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionLeftMatchCharActionTest : VimTestCase() {
   fun `test move and repeat`() {
-    doTest("Fx;",
-      "hello x hello x hello${c}",
+    doTest(
+      "Fx;",
+      "hello x hello x hello$c",
       "hello ${c}x hello x hello",
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   fun `test move and repeat twice`() {
-    doTest("Fx;;",
-      "hello x hello x hello x hello${c}",
+    doTest(
+      "Fx;;",
+      "hello x hello x hello x hello$c",
       "hello ${c}x hello x hello x hello",
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   fun `test move and repeat two`() {
-    doTest("Fx2;",
-      "hello x hello x hello x hello${c}",
+    doTest(
+      "Fx2;",
+      "hello x hello x hello x hello$c",
       "hello ${c}x hello x hello x hello",
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   fun `test move and repeat three`() {
-    doTest("Fx3;",
-      "hello x hello x hello x hello x hello${c}",
+    doTest(
+      "Fx3;",
+      "hello x hello x hello x hello x hello$c",
       "hello ${c}x hello x hello x hello x hello",
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 }

@@ -45,7 +45,6 @@ class MotionRightMatchCharAction : TillCharacterMotion(Direction.FORWARDS, TillC
 class MotionRightTillMatchCharAction :
   TillCharacterMotion(Direction.FORWARDS, TillCharacterMotionType.LAST_SMALL_T, true)
 
-
 sealed class TillCharacterMotion(
   private val direction: Direction,
   private val tillCharacterMotionType: TillCharacterMotionType,

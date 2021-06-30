@@ -454,9 +454,9 @@ fun setupSection(
             } else {
                 val currentSectionIndex = sections.indexOf(sectionName)
                 val insertHere = textInNode.startsWith("## ") ||
-                        textInNode.startsWith("### ")
-                        && sections.indexOfFirst { textInNode.startsWith(it) }
-                    .let { if (it < 0) false else it > currentSectionIndex }
+                    textInNode.startsWith("### ") &&
+                    sections.indexOfFirst { textInNode.startsWith(it) }
+                        .let { if (it < 0) false else it > currentSectionIndex }
                 if (insertHere) {
                     val section = """
                         $sectionName

@@ -140,14 +140,17 @@ class MotionLastColumnActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviorDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(
+    originalVimAfter = """
             A Discovery
 
             I${c} 
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-  """, description = "Not sure how to fix it right")
+  """,
+    description = "Not sure how to fix it right"
+  )
   fun `test dollar motion from insert mode with deletion`() {
     val keys = "i<C-O>d$"
     val before = """
