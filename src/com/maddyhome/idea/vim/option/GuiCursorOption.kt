@@ -38,9 +38,11 @@ class GuiCursorOption(name: String, abbrev: String, defaultValue: String) :
     val argumentList = split[1]
 
     val modes = enumSetOf<GuiCursorMode>()
-    modes.addAll(modeList.split('-').map {
-      GuiCursorMode.fromString(it) ?: throw ExException.message("E546", token)
-    })
+    modes.addAll(
+      modeList.split('-').map {
+        GuiCursorMode.fromString(it) ?: throw ExException.message("E546", token)
+      }
+    )
 
     var type = GuiCursorType.BLOCK
     var thickness = 0
@@ -71,7 +73,7 @@ class GuiCursorOption(name: String, abbrev: String, defaultValue: String) :
         it.contains('/') -> {
           val i = it.indexOf('/')
           highlightGroup = it.slice(0 until i)
-          lmapHighlightGroup = it.slice(i+1 until it.length)
+          lmapHighlightGroup = it.slice(i + 1 until it.length)
         }
         else -> highlightGroup = it
       }
@@ -138,17 +140,21 @@ enum class GuiCursorType(val token: String) {
   HOR("hor")
 }
 
-class GuiCursorEntry(private val originalString: String,
-                     val modes: EnumSet<GuiCursorMode>,
-                     val attributes: GuiCursorAttributes) {
+class GuiCursorEntry(
+  private val originalString: String,
+  val modes: EnumSet<GuiCursorMode>,
+  val attributes: GuiCursorAttributes
+) {
   override fun toString(): String {
     // We need to match the original string for output and remove purposes
     return originalString
   }
 }
 
-data class GuiCursorAttributes(val type: GuiCursorType,
-                               val thickness: Int,
-                               val highlightGroup: String,
-                               val lmapHighlightGroup: String,
-                               val blinkModes: List<String>)
+data class GuiCursorAttributes(
+  val type: GuiCursorType,
+  val thickness: Int,
+  val highlightGroup: String,
+  val lmapHighlightGroup: String,
+  val blinkModes: List<String>
+)

@@ -283,8 +283,7 @@ object OptionsManager {
                   if (!res) {
                     error = Msg.e_invarg
                   }
-                }
-                catch (e: ExException) {
+                } catch (e: ExException) {
                   // Retrieve the message code, if possible and throw again with the entire set arg string. This assumes
                   // that any thrown exception has a message code that accepts a single parameter
                   error = e.code ?: Msg.e_invarg

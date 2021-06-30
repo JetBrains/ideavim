@@ -423,8 +423,7 @@ abstract class VimTestCase : UsefulTestCase() {
       if (caret !== editor.caretModel.primaryCaret && editor.inBlockSubMode) {
         assertEquals(CaretVisualAttributes.Shape.BAR, caret.visualAttributes.shape)
         assertEquals(0F, caret.visualAttributes.thickness)
-      }
-      else {
+      } else {
         assertEquals(shape, editor.caretModel.primaryCaret.visualAttributes.shape)
         assertEquals(attributes.thickness / 100.0F, editor.caretModel.primaryCaret.visualAttributes.thickness)
         editor.caretModel.primaryCaret.visualAttributes.color?.let {

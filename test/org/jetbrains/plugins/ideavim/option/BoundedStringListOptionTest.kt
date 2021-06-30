@@ -21,7 +21,7 @@ package org.jetbrains.plugins.ideavim.option
 import com.maddyhome.idea.vim.option.BoundedStringListOption
 import junit.framework.TestCase
 
-class BoundedStringListOptionTest: TestCase() {
+class BoundedStringListOptionTest : TestCase() {
   private val option =
     BoundedStringListOption(
       "myOpt", "myOpt", arrayOf("Monday", "Tuesday"),

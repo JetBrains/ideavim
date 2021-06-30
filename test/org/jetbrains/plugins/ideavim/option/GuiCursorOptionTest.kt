@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.option.GuiCursorType
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class GuiCursorOptionTest: VimTestCase() {
+class GuiCursorOptionTest : VimTestCase() {
   private lateinit var option: GuiCursorOption
 
   override fun setUp() {

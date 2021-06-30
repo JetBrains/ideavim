@@ -19,7 +19,6 @@
 package org.jetbrains.plugins.ideavim
 
 import com.maddyhome.idea.vim.option.BoundedStringOption
-import com.maddyhome.idea.vim.option.ListOption
 import com.maddyhome.idea.vim.option.NumberOption
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.StringListOption

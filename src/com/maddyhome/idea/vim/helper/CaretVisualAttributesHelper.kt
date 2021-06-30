@@ -60,7 +60,7 @@ fun Editor.guicursorMode(): GuiCursorMode {
   // the same as SELECT
   return when (mode) {
     CommandState.Mode.COMMAND -> GuiCursorMode.NORMAL
-    CommandState.Mode.VISUAL -> GuiCursorMode.VISUAL  // TODO: VISUAL_EXCLUSIVE
+    CommandState.Mode.VISUAL -> GuiCursorMode.VISUAL // TODO: VISUAL_EXCLUSIVE
     CommandState.Mode.SELECT -> GuiCursorMode.INSERT
     CommandState.Mode.INSERT -> GuiCursorMode.INSERT
     CommandState.Mode.OP_PENDING -> GuiCursorMode.OP_PENDING
@@ -99,14 +99,12 @@ object GuicursorChangeListener : OptionChangeListener<String> {
   }
 }
 
-
 // [VERSION UPDATE] 2021.2+
 // Once the plugin requires 2021.2 as a base version, get rid of all this and just set the attributes directly
 private val provider: CaretVisualAttributesProvider by lazy {
   if (ApplicationInfo.getInstance().build.baselineVersion >= 212) {
     DefaultCaretVisualAttributesProvider()
-  }
-  else {
+  } else {
     LegacyCaretVisualAttributesProvider()
   }
 }
@@ -175,8 +173,7 @@ private class LegacyCaretVisualAttributesProvider : CaretVisualAttributesProvide
       // Do our best to hide the caret
       val color = editor.colorsScheme.getColor(EditorColors.SELECTION_BACKGROUND_COLOR)
       CaretVisualAttributes(color, CaretVisualAttributes.Weight.NORMAL)
-    }
-    else {
+    } else {
       CaretVisualAttributes.DEFAULT
     }
 

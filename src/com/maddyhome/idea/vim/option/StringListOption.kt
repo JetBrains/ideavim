@@ -29,10 +29,12 @@ import java.util.regex.Pattern
  * @param defaultValues    The option's default values
  * @param pattern A regular expression that is used to validate new values. null if no check needed
  */
-open class StringListOption @JvmOverloads constructor(@VimNlsSafe name: String,
-                                                      @VimNlsSafe abbrev: String,
-                                                      @VimNlsSafe defaultValues: Array<String>,
-                                                      @VimNlsSafe protected val pattern: String? = null):
+open class StringListOption @JvmOverloads constructor(
+  @VimNlsSafe name: String,
+  @VimNlsSafe abbrev: String,
+  @VimNlsSafe defaultValues: Array<String>,
+  @VimNlsSafe protected val pattern: String? = null
+) :
   ListOption<String>(name, abbrev, defaultValues) {
 
   companion object {

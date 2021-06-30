@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.ui.ex
 
-import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.project.DumbAwareAction
