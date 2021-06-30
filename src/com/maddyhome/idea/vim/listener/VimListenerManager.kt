@@ -255,7 +255,7 @@ object VimListenerManager {
           ChangeGroup.resetCaret(e.editor, true)
         }
       }
-      if (mouseDragging && e.editor.caretModel.primaryCaret.hasSelection())    {
+      if (mouseDragging && e.editor.caretModel.primaryCaret.hasSelection()) {
         ChangeGroup.resetCaret(e.editor, true)
 
         if (!cutOffFixed && ComponentMouseListener.cutOffEnd) {
