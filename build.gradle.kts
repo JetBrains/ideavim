@@ -315,6 +315,8 @@ fun updateChangelog() {
     val firstPartOfChanges = changes.take(insertOffset)
     val newUpdates = newFixes
         .filterNot { it.id in firstPartOfChanges }
+        // Temporally disable this example
+        .filterNot { it.id == "VIM-123" }
         .joinToString { "* [${it.id}](https://youtrack.jetbrains.com/issue/${it.id}) ${it.text}\n" }
 
     changesBuilder.insert(insertOffset, newUpdates)
