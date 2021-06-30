@@ -35,3 +35,4 @@ jobs:
           commit_user_name: Alex Plate
           commit_user_email: aleksei.plate@jetbrains.com
           commit_author: Alex Plate <aleksei.plate@jetbrains.com>
+          file_pattern: !settings.xml
