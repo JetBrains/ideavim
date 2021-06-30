@@ -31,7 +31,6 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
@@ -160,7 +159,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
             if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
               VimPlugin.getMark().saveJumpLocation(editor)
             }
-            if (!editor.commandState.mode.isEndAllowed) {
+            if (!editor.isEndAllowed) {
               resultOffset = EditorHelper.normalizeOffset(editor, resultOffset, false)
             }
             preMove(editor, context, cmd)
@@ -207,7 +206,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
         if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
           VimPlugin.getMark().saveJumpLocation(editor)
         }
-        if (!editor.commandState.mode.isEndAllowed) {
+        if (!editor.isEndAllowed) {
           resultMotion = EditorHelper.normalizeOffset(editor, resultMotion, false)
         }
         preMove(editor, caret, context, cmd)

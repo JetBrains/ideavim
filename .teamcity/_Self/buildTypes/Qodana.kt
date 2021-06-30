@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.Constants.QODANA_TESTS
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
@@ -12,7 +13,7 @@ object Qodana : BuildType({
   name = "Qodana checks"
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
-    param("env.ORG_GRADLE_PROJECT_ideaVersion", "LATEST-EAP-SNAPSHOT")
+    param("env.ORG_GRADLE_PROJECT_ideaVersion", QODANA_TESTS)
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
   }
 

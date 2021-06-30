@@ -1,5 +1,6 @@
 package _Self.buildTypes
 
+import _Self.Constants.NVIM_TESTS
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
@@ -15,7 +16,7 @@ object Nvim : BuildType({
 
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
-    param("env.ORG_GRADLE_PROJECT_ideaVersion", "LATEST-EAP-SNAPSHOT")
+    param("env.ORG_GRADLE_PROJECT_ideaVersion", NVIM_TESTS)
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
     param("env.ideavim.nvim.path", "./nvim-linux64/bin/nvim")
   }

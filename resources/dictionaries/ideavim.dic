@@ -17,6 +17,9 @@ relativenumber
 scrolljump
 scrolloff
 selectmode
+shellcmdflag
+shellxescape
+shellxquote
 showcmd
 showmode
 sidescroll
@@ -39,9 +42,12 @@ ideavimsupport
 maxmapdepth
 ideacopypreprocess
 ideatracetime
+swapfile
+noswapfile
 
 sethandler
 
+nvim
 
 easymotion
 

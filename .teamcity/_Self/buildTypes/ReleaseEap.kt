@@ -1,6 +1,7 @@
 package _Self.buildTypes
 
 import _Self.Constants.EAP
+import _Self.Constants.RELEASE_EAP
 import _Self.Constants.VERSION
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
@@ -18,7 +19,7 @@ object ReleaseEap : BuildType({
   buildNumberPattern = "$VERSION.%build.counter%"
 
   params {
-    param("env.ORG_GRADLE_PROJECT_ideaVersion", "2020.2")
+    param("env.ORG_GRADLE_PROJECT_ideaVersion", RELEASE_EAP)
     password(
       "env.ORG_GRADLE_PROJECT_publishToken",
       "credentialsJSON:61a36031-4da1-4226-a876-b8148bf32bde",

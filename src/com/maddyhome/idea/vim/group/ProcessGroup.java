@@ -18,25 +18,37 @@
 
 package com.maddyhome.idea.vim.group;
 
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.process.CapturingProcessHandler;
+import com.intellij.execution.process.ProcessAdapter;
+import com.intellij.execution.process.ProcessEvent;
+import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.progress.ProcessCanceledException;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressIndicatorProvider;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.util.execution.ParametersListUtil;
 import com.intellij.util.text.CharSequenceReader;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.InvalidCommandException;
 import com.maddyhome.idea.vim.helper.UiHelper;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.io.*;
+import java.util.ArrayList;
 
 
 public class ProcessGroup {
@@ -159,38 +171,93 @@ public class ProcessGroup {
     return initText;
   }
 
-  public boolean executeFilter(@NotNull Editor editor, @NotNull TextRange range,
-                               @NotNull String command) throws IOException {
-    final CharSequence charsSequence = editor.getDocument().getCharsSequence();
-    final int startOffset = range.getStartOffset();
-    final int endOffset = range.getEndOffset();
-    final String output = executeCommand(command, charsSequence.subSequence(startOffset, endOffset));
-    editor.getDocument().replaceString(startOffset, endOffset, output);
-    return true;
+  public @Nullable String executeCommand(@NotNull Editor editor, @NotNull String command, @Nullable CharSequence input)
+    throws ExecutionException, ProcessCanceledException {
+
+    // This is a much simplified version of how Vim does this. We're using stdin/stdout directly, while Vim will
+    // redirect to temp files ('shellredir' and 'shelltemp') or use pipes. We don't support 'shellquote', because we're
+    // not handling redirection, but we do use 'shellxquote' and 'shellxescape', because these have defaults that work
+    // better with Windows. We also don't bother using ShellExecute for Windows commands beginning with `start`.
+    // Finally, we're also not bothering with the crazy space and backslash handling of the 'shell' options content.
+    return ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
+      final String shell = OptionsManager.INSTANCE.getShell().getValue();
+      final String shellcmdflag = OptionsManager.INSTANCE.getShellcmdflag().getValue();
+      final String shellxescape = OptionsManager.INSTANCE.getShellxescape().getValue();
+      final String shellxquote = OptionsManager.INSTANCE.getShellxquote().getValue();
+
+      // For Win32. See :help 'shellxescape'
+      final String escapedCommand = shellxquote.equals("(")
+                                    ? doEscape(command, shellxescape, "^")
+                                    : command;
+      // Required for Win32+cmd.exe, defaults to "(". See :help 'shellxquote'
+      final String quotedCommand = shellxquote.equals("(")
+                                   ? "(" + escapedCommand + ")"
+                                   : (shellxquote.equals("\"(")
+                                      ? "\"(" + escapedCommand + ")\""
+                                      : shellxquote + escapedCommand + shellxquote);
+
+      final ArrayList<String> commands = new ArrayList<>();
+      commands.add(shell);
+      if (!shellcmdflag.isEmpty()) {
+        // Note that Vim also does a simple whitespace split for multiple parameters
+        commands.addAll(ParametersListUtil.parse(shellcmdflag));
+      }
+      commands.add(quotedCommand);
+
+      if (logger.isDebugEnabled()) {
+        logger.debug(String.format("shell=%s shellcmdflag=%s command=%s", shell, shellcmdflag, quotedCommand));
+      }
+
+      final GeneralCommandLine commandLine = new GeneralCommandLine(commands);
+      final CapturingProcessHandler handler = new CapturingProcessHandler(commandLine);
+      if (input != null) {
+        handler.addProcessListener(new ProcessAdapter() {
+          @Override
+          public void startNotified(@NotNull ProcessEvent event) {
+            try {
+              final CharSequenceReader charSequenceReader = new CharSequenceReader(input);
+              final BufferedWriter outputStreamWriter = new BufferedWriter(new OutputStreamWriter(handler.getProcessInput()));
+              copy(charSequenceReader, outputStreamWriter);
+              outputStreamWriter.close();
+            }
+            catch (IOException e) {
+              logger.error(e);
+            }
+          }
+        });
+      }
+
+      final ProgressIndicator progressIndicator = ProgressIndicatorProvider.getInstance().getProgressIndicator();
+      final ProcessOutput output = handler.runProcessWithProgressIndicator(progressIndicator);
+
+      lastCommand = command;
+
+      if (output.isCancelled()) {
+        // TODO: Vim will use whatever text has already been written to stdout
+        // For whatever reason, we're not getting any here, so just throw an exception
+        throw new ProcessCanceledException();
+      }
+
+      final Integer exitCode = handler.getExitCode();
+      if (exitCode != null && exitCode != 0) {
+        VimPlugin.showMessage("shell returned " + exitCode);
+        VimPlugin.indicateError();
+        return output.getStderr() + output.getStdout();
+      }
+
+      return output.getStdout();
+    }, "IdeaVim - !" + command, true, editor.getProject());
   }
 
-  public @NotNull String executeCommand(@NotNull String command, @Nullable CharSequence input) throws IOException {
-    if (logger.isDebugEnabled()) {
-      logger.debug("command=" + command);
+  private String doEscape(String original, String charsToEscape, String escapeChar) {
+    String result = original;
+    for (char c : charsToEscape.toCharArray()) {
+      result = result.replace("" + c, escapeChar + c);
     }
-
-    final Process process = Runtime.getRuntime().exec(command);
-
-    if (input != null) {
-      final BufferedWriter outputWriter = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-      copy(new CharSequenceReader(input), outputWriter);
-      outputWriter.close();
-    }
-
-    final BufferedReader inputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-    final StringWriter writer = new StringWriter();
-    copy(inputReader, writer);
-    writer.close();
-
-    lastCommand = command;
-    return writer.toString();
+    return result;
   }
 
+  // TODO: Java 10 has a transferTo method we could use instead
   private void copy(@NotNull Reader from, @NotNull Writer to) throws IOException {
     char[] buf = new char[2048];
     int cnt;

@@ -1889,7 +1889,7 @@ public class SearchHelper {
     int found = 0;
     int step = count >= 0 ? 1 : -1;
     int pos = caret.getOffset() + step;
-    while (pos >= start && pos < end && pos >= 0 && pos < chars.length()) {
+    while (pos >= start && pos < end && pos < chars.length()) {
       if (chars.charAt(pos) == ch) {
         found++;
         if (found == Math.abs(count)) {

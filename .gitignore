@@ -19,3 +19,6 @@
 .teamcity/.idea
 .teamcity/target
 .teamcity/*.iml
+
+# Created by github automation
+settings.xml

@@ -1,3 +1,4 @@
+
 import dev.feedforward.markdownto.DownParser
 import org.intellij.markdown.ast.getTextInNode
 import java.net.HttpURLConnection
@@ -12,9 +13,9 @@ buildscript {
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.0")
         classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
-        classpath("org.eclipse.jgit:org.eclipse.jgit:5.11.1.202105131744-r")
+        classpath("org.eclipse.jgit:org.eclipse.jgit:5.12.0.202106070339-r")
         classpath("org.kohsuke:github-api:1.129")
-        classpath("org.jetbrains:markdown:0.2.3")
+        classpath("org.jetbrains:markdown:0.2.4")
     }
 }
 
@@ -42,9 +43,7 @@ val publishToken: String by project
 val slackUrl: String by project
 
 repositories {
-    mavenLocal()
     mavenCentral()
-    jcenter()
     maven { url = uri("https://cache-redirector.jetbrains.com/intellij-dependencies") }
 }
 
@@ -204,10 +203,10 @@ tasks.register("slackNotification") {
                 "text": "New version of IdeaVim",
                 "blocks": [
                     {
-                        "type": "selection",
+                        "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "IdeaVim $version has been released\\n$slackDown"
+                            "text": "IdeaVim $version has been released\n$slackDown"
                         }
                     }
                 ]
@@ -257,28 +256,102 @@ tasks.register("updateMergedPr") {
     }
 }
 
+tasks.register("updateChangelog") {
+    doLast {
+        updateChangelog()
+    }
+}
+
+tasks.register("testUpdateChangelog") {
+    group = "verification"
+    description = "This is a task to manually assert the correctness of the update tasks"
+    doLast {
+        val changesFile = File("$projectDir/CHANGES.md")
+        val changes = changesFile.readText()
+
+        val changesBuilder = StringBuilder(changes)
+        val insertOffset = setupSection(changes, changesBuilder, "### Changes:")
+
+        changesBuilder.insert(insertOffset, "--Hello--\n")
+
+        changesFile.writeText(changesBuilder.toString())
+    }
+}
+
+fun updateChangelog() {
+    println("Start update authors")
+    println(projectDir)
+    val repository = org.eclipse.jgit.lib.RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
+    val git = org.eclipse.jgit.api.Git(repository)
+    val messages = git.log().call().take(40).map { it.shortMessage }
+
+    // Collect fixes
+    val newFixes = mutableListOf<Change>()
+    println("Start emails processing")
+    for (message in messages) {
+        println("Processing '$message'...")
+        val lowercaseMessage = message.toLowerCase()
+        val regex = "^fix\\((vim-\\d+)\\):".toRegex()
+        val findResult = regex.find(lowercaseMessage)
+        if (findResult != null) {
+            println("Message matches")
+            val value = findResult.groups[1]!!.value.toUpperCase()
+            val shortMessage = message.drop(findResult.range.last + 1).trim()
+            newFixes += Change(value, shortMessage)
+        } else {
+            println("Message doesn't match")
+        }
+    }
+
+    // Update changes file
+    val changesFile = File("$projectDir/CHANGES.md")
+    val changes = changesFile.readText()
+
+    val changesBuilder = StringBuilder(changes)
+    val insertOffset = setupSection(changes, changesBuilder, "### Fixes:")
+
+    if (insertOffset < 50) error("Incorrect offset: $insertOffset")
+
+    val firstPartOfChanges = changes.take(insertOffset)
+    val newUpdates = newFixes
+        .filterNot { it.id in firstPartOfChanges }
+        // Temporally disable this example
+        .filterNot { it.id == "VIM-123" }
+        .joinToString { "* [${it.id}](https://youtrack.jetbrains.com/issue/${it.id}) ${it.text}\n" }
+
+    changesBuilder.insert(insertOffset, newUpdates)
+    changesFile.writeText(changesBuilder.toString())
+}
+
 fun updateAuthors(uncheckedEmails: Set<String>) {
     println("Start update authors")
     println(projectDir)
     val repository = org.eclipse.jgit.lib.RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
     val git = org.eclipse.jgit.api.Git(repository)
-    val emails = git.log().call().take(40).mapTo(HashSet()) { it.authorIdent.emailAddress }
+    val hashesAndEmailes = git.log().call().take(40).mapTo(HashSet()) { it.name to it.authorIdent.emailAddress }
 
-    println("Emails: $emails")
+    println("Emails: ${hashesAndEmailes.map { it.second }}")
     val gitHub = org.kohsuke.github.GitHub.connect()
-    val searchUsers = gitHub.searchUsers()
-    val users = mutableListOf<Author>()
-    for (email in emails) {
-        if (email in uncheckedEmails) continue
-        if ("dependabot[bot]@users.noreply.github.com" in email) continue
-        val githubUsers = searchUsers.q(email).list().toList()
-        if (githubUsers.isEmpty()) error("Cannot find user $email")
-        val user = githubUsers.single()
+    val ghRepository = gitHub.getRepository("JetBrains/ideavim")
+    val users = mutableSetOf<Author>()
+    println("Start emails processing")
+    for ((hash, email) in hashesAndEmailes) {
+        println("Processing '$email'...")
+        if (email in uncheckedEmails) {
+            println("Email '$email' is in unchecked emails. Skip it")
+            continue
+        }
+        if ("dependabot[bot]@users.noreply.github.com" in email) {
+            println("Email '$email' is from dependabot. Skip it")
+            continue
+        }
+        val user = ghRepository.getCommit(hash).author
         val htmlUrl = user.htmlUrl.toString()
         val name = user.name
         users.add(Author(name, htmlUrl, email))
     }
 
+    println("Emails processed")
     val authorsFile = File("$projectDir/AUTHORS.md")
     val authors = authorsFile.readText()
     val parser =
@@ -308,7 +381,7 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
 }
 
 fun List<Author>.toMdString(): String {
-    return this.joinToString() {
+    return this.joinToString {
         """
           |
           |* [![icon][mail]](mailto:${it.mail})
@@ -320,6 +393,7 @@ fun List<Author>.toMdString(): String {
 }
 
 data class Author(val name: String, val url: String, val mail: String)
+data class Change(val id: String, val text: String)
 
 fun updateMergedPr(number: Int) {
     val gitHub = org.kohsuke.github.GitHub.connect()
@@ -327,39 +401,65 @@ fun updateMergedPr(number: Int) {
     val pullRequest = repository.getPullRequest(number)
     if (pullRequest.user.login == "dependabot[bot]") return
 
-    val authorsFile = File("$projectDir/CHANGES.md")
-    val authors = authorsFile.readText()
+    val changesFile = File("$projectDir/CHANGES.md")
+    val changes = changesFile.readText()
+
+    val changesBuilder = StringBuilder(changes)
+    val insertOffset = setupSection(changes, changesBuilder, "### Merged PRs:")
+
+    if (insertOffset < 50) error("Incorrect offset: $insertOffset")
+    if (pullRequest.user.login == "dependabot[bot]") return
+
+    val prNumber = pullRequest.number
+    val userName = pullRequest.user.name
+    val login = pullRequest.user.login
+    val title = pullRequest.title
+    val section =
+        "* [$prNumber](https://github.com/JetBrains/ideavim/pull/$prNumber) by [$userName](https://github.com/$login): $title\n"
+    changesBuilder.insert(insertOffset, section)
+
+    changesFile.writeText(changesBuilder.toString())
+}
+
+fun setupSection(
+    changes: String,
+    authorsBuilder: StringBuilder,
+    sectionName: String,
+): Int {
     val parser =
         org.intellij.markdown.parser.MarkdownParser(org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor())
-    val tree = parser.buildMarkdownTreeFromString(authors)
+    val tree = parser.buildMarkdownTreeFromString(changes)
 
     var idx = -1
     for (index in tree.children.indices) {
-        if (tree.children[index].getTextInNode(authors).startsWith("## ")) {
+        if (tree.children[index].getTextInNode(changes).startsWith("## ")) {
             idx = index
             break
         }
     }
 
-    val authorsBuilder = StringBuilder(authors)
-    val hasToBeReleased = tree.children[idx].getTextInNode(authors).contains("To Be Released")
-    val insertOffset = if (hasToBeReleased) {
+    val hasToBeReleased = tree.children[idx].getTextInNode(changes).contains("To Be Released")
+    return if (hasToBeReleased) {
         var mrgIdx = -1
         for (index in (idx + 1) until tree.children.lastIndex) {
-            val textInNode = tree.children[index].getTextInNode(authors)
-            val foundIndex = textInNode.startsWith("### Merged PRs:")
+            val textInNode = tree.children[index].getTextInNode(changes)
+            val foundIndex = textInNode.startsWith(sectionName)
             if (foundIndex) {
                 var filledPr = index + 2
-                while (tree.children[filledPr].getTextInNode(authors).startsWith("*")) {
+                while (tree.children[filledPr].getTextInNode(changes).startsWith("*")) {
                     filledPr++
                 }
                 mrgIdx = tree.children[filledPr].startOffset + 1
                 break
             } else {
-                val nextSection = textInNode.startsWith("## ")
-                if (nextSection) {
+                val currentSectionIndex = sections.indexOf(sectionName)
+                val insertHere = textInNode.startsWith("## ") ||
+                    textInNode.startsWith("### ") &&
+                    sections.indexOfFirst { textInNode.startsWith(it) }
+                        .let { if (it < 0) false else it > currentSectionIndex }
+                if (insertHere) {
                     val section = """
-                        ### Merged PRs:
+                        $sectionName
                         
                         
                     """.trimIndent()
@@ -374,23 +474,18 @@ fun updateMergedPr(number: Int) {
         val section = """
             ## To Be Released
             
-            ### Merged PRs:
+            $sectionName
             
             
         """.trimIndent()
         authorsBuilder.insert(tree.children[idx].startOffset, section)
         tree.children[idx].startOffset + (section.length - 1)
     }
-
-    if (insertOffset < 50) error("Incorrect offset: $insertOffset")
-    if (pullRequest.user.login == "dependabot[bot]") return
-
-    val prNumber = pullRequest.number
-    val userName = pullRequest.user.name
-    val login = pullRequest.user.login
-    val title = pullRequest.title
-    val section = "* [$prNumber](https://github.com/JetBrains/ideavim/pull/$prNumber) by [$userName](https://github.com/$login): $title\n"
-    authorsBuilder.insert(insertOffset, section)
-
-    authorsFile.writeText(authorsBuilder.toString())
 }
+
+val sections = listOf(
+    "### Features:",
+    "### Changes:",
+    "### Fixes:",
+    "### Merged PRs:",
+)
