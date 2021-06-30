@@ -1,6 +1,5 @@
 
 import dev.feedforward.markdownto.DownParser
-import org.eclipse.jgit.revwalk.RevCommit
 import org.intellij.markdown.ast.getTextInNode
 import java.net.HttpURLConnection
 import java.net.URL
@@ -284,7 +283,7 @@ fun updateChangelog() {
     println(projectDir)
     val repository = org.eclipse.jgit.lib.RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
     val git = org.eclipse.jgit.api.Git(repository)
-    val messages = getLog(git).map { it.shortMessage }
+    val messages = git.log().call().take(40).map { it.shortMessage }
 
     // Collect fixes
     val newFixes = mutableListOf<Change>()
@@ -313,30 +312,13 @@ fun updateChangelog() {
 
     if (insertOffset < 50) error("Incorrect offset: $insertOffset")
 
-    val newUpdates =
-        newFixes.joinToString { "* [${it.id}](https://youtrack.jetbrains.com/issue/${it.id}) ${it.text}\n" }
+    val firstPartOfChanges = changes.take(insertOffset)
+    val newUpdates = newFixes
+        .filterNot { it.id in firstPartOfChanges }
+        .joinToString { "* [${it.id}](https://youtrack.jetbrains.com/issue/${it.id}) ${it.text}\n" }
 
     changesBuilder.insert(insertOffset, newUpdates)
     changesFile.writeText(changesBuilder.toString())
-
-    setProcessedHash(git)
-}
-
-fun getLog(git: org.eclipse.jgit.api.Git): List<RevCommit> {
-    val lastProcessed = File("$projectDir/.github/last_processed_hash")
-    var firstCommits = git.log().call().take(40)
-    if (lastProcessed.exists()) {
-        val lastHash = lastProcessed.readText()
-        firstCommits = firstCommits.takeWhile { it.name != lastHash }
-    }
-    return firstCommits
-}
-
-fun setProcessedHash(git: org.eclipse.jgit.api.Git) {
-    val lastProcessed = File("$projectDir/.github/last_processed_hash")
-    lastProcessed.createNewFile()
-    val hash = git.log().call().first().name
-    lastProcessed.writeText(hash)
 }
 
 fun updateAuthors(uncheckedEmails: Set<String>) {
