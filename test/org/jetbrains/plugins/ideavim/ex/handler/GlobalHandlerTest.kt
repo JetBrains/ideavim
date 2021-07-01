@@ -175,6 +175,7 @@ class GlobalHandlerTest : VimTestCase() {
   }
 
   fun `test check history`() {
+    VimPlugin.getHistory().clear()
     val initialEntries = VimPlugin.getHistory().getEntries(HistoryGroup.COMMAND, 0, 0)
     doTest(
       "g/found/d",
