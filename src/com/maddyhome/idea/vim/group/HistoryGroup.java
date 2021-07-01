@@ -30,6 +30,7 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.TestOnly;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -185,6 +186,11 @@ public class HistoryGroup implements PersistentStateComponent<Element> {
   @Override
   public void loadState(@NotNull Element state) {
     readData(state);
+  }
+
+  @TestOnly
+  public void clear() {
+    histories.clear();
   }
 
   private static class HistoryBlock {

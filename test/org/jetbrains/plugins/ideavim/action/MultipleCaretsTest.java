@@ -135,12 +135,6 @@ public class MultipleCaretsTest extends VimTestCase {
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
-  public void testMotionLastLeftTillMatchChar() {
-    typeTextInFile(parseKeys("Ta,"), "b<caret>aba<caret>a<caret>a<caret>ba<caret>b");
-    assertState("ba<caret>baa<caret>a<caret>ba<caret>b");
-  }
-
-  @TestWithoutNeovim(reason = SkipNeovimReason.MULTICARET)
   public void testMotionLastRightTillMatchChar() {
     typeTextInFile(parseKeys("ta;"), "<caret>b<caret>a<caret>b<caret>a<caret>a<caret>a<caret>ba<caret>b");
     assertState("ba<caret>b<caret>a<caret>aa<caret>ba<caret>b");

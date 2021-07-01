@@ -127,7 +127,7 @@ public class KeyHandler {
   @SuppressWarnings("deprecation")
   public static boolean executeAction(@NotNull AnAction action, @NotNull DataContext context) {
     final AnActionEvent event =
-      new AnActionEvent(null, context, ActionPlaces.ACTION_SEARCH, action.getTemplatePresentation(),
+      new AnActionEvent(null, context, ActionPlaces.KEYBOARD_SHORTCUT, action.getTemplatePresentation(),
                         ActionManager.getInstance(), 0);
 
     if (action instanceof ActionGroup && !((ActionGroup)action).canBePerformed(context)) {

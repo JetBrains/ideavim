@@ -1477,6 +1477,7 @@ class SearchGroupTest : VimTestCase() {
   private fun assertSearchHighlights(tooltip: String, expected: String) {
     val allHighlighters = myFixture.editor.markupModel.allHighlighters
 
+    LOG.debug("Current text: ${myFixture.editor.document.text}")
     val actual = StringBuilder(myFixture.editor.document.text)
     val inserts = mutableMapOf<Int, String>()
 

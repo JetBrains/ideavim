@@ -51,6 +51,8 @@ class BufferHandler : CommandHandler.SingleExecution() {
           VimPlugin.showMessage(MessageHelper.message("buffer.0.does.not.exist", bufNum))
           result = false
         }
+      } else if (buffer == "#") {
+        VimPlugin.getFile().selectPreviousTab(context)
       } else {
         val editors = findPartialMatch(context, buffer)
 

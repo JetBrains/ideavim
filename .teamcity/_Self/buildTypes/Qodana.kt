@@ -7,6 +7,8 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.qodana
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
 import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.ScheduleTrigger
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object Qodana : BuildType({
@@ -30,12 +32,30 @@ object Qodana : BuildType({
       failBuildOnErrors = ""
       codeInspectionXmlConfig = "Custom"
       codeInspectionCustomXmlConfigPath = ".idea/inspectionProfiles/Qodana.xml"
+      reportAsTestsEnable = "true"
+      param("clonefinder-languages", "Java")
+      param("clonefinder-mode", "")
+      param("report-version", "")
+      param("clonefinder-languages-container", "Java Kotlin")
+      param("namesAndTagsCustom", "repo.labs.intellij.net/static-analyser/qodana")
+      param("clonefinder-queried-project", "src")
+      param("clonefinder-enable", "true")
+      param("clonefinder-reference-projects", "src")
+      param("yaml-configuration", "")
     }
   }
 
   triggers {
     vcs {
+      enabled = false
       branchFilter = ""
+    }
+    schedule {
+      schedulingPolicy = weekly {
+        dayOfWeek = ScheduleTrigger.DAY.Tuesday
+      }
+      branchFilter = ""
+      triggerBuild = always()
     }
   }
 
@@ -45,6 +65,7 @@ object Qodana : BuildType({
       units = BuildFailureOnMetric.MetricUnit.DEFAULT_UNIT
       comparison = BuildFailureOnMetric.MetricComparison.MORE
       compareTo = value()
+      metric = BuildFailureOnMetric.MetricType.TEST_FAILED_COUNT
       param("metricKey", "QodanaProblemsTotal")
     }
   }

@@ -127,3 +127,5 @@ lmapclear
 cmapclear
 tmapclear
 
+getreg
+getregtype

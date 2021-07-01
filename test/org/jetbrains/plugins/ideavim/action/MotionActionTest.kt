@@ -586,7 +586,7 @@ class MotionActionTest : VimTestCase() {
 
   // |]}|
   fun testUnmatchedCloseBracket() {
-    typeTextInFile(StringHelper.parseKeys("]}"), "{bar, ${c}baz}\n")
+    typeTextInFile(parseKeys("]}"), "{bar, ${c}baz}\n")
     assertOffset(9)
   }
 

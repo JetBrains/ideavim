@@ -161,19 +161,6 @@ public class FileGroup {
   }
 
   /**
-   * Closes editor.
-   */
-  public void closeFile(int number, @NotNull DataContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(context);
-    final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
-    final EditorWindow window = fileEditorManager.getCurrentWindow();
-    VirtualFile[] editors = fileEditorManager.getOpenFiles();
-    if (number >= 0 && number < editors.length) {
-      fileEditorManager.closeFile(editors[number], window);
-    }
-  }
-
-  /**
    * Saves specific file in the project.
    */
   public void saveFile(DataContext context) {
@@ -262,12 +249,13 @@ public class FileGroup {
     return null;
   }
 
-  @Nullable Editor selectEditor(Project project, @NotNull VirtualFile file) {
+  @Nullable
+  Editor selectEditor(Project project, @NotNull VirtualFile file) {
     FileEditorManager fMgr = FileEditorManager.getInstance(project);
     FileEditor[] feditors = fMgr.openFile(file, true);
     if (feditors.length > 0) {
       if (feditors[0] instanceof TextEditor) {
-        Editor editor = ((TextEditor)feditors[0]).getEditor();
+        Editor editor = ((TextEditor) feditors[0]).getEditor();
         if (!editor.isDisposed()) {
           return editor;
         }
@@ -325,8 +313,7 @@ public class FileGroup {
     else {
       msg.append("Selected ");
 
-      TextRange vr = new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
-                                   editor.getSelectionModel().getBlockSelectionEnds());
+      TextRange vr = new TextRange(editor.getSelectionModel().getBlockSelectionStarts(), editor.getSelectionModel().getBlockSelectionEnds());
       vr.normalize();
 
       int lines;

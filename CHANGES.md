@@ -24,13 +24,21 @@ usual beta standards.
 
 ## To Be Released
 
+### Features:
+* Support several buffer management commands [VIM-1062](https://youtrack.jetbrains.com/issue/VIM-1062),  [VIM-2335](https://youtrack.jetbrains.com/issue/VIM-2335)
+
 ### Fixes:
 * [VIM-2317](https://youtrack.jetbrains.com/issue/VIM-2317) Fix memory leak
 * [VIM-1357](https://youtrack.jetbrains.com/issue/VIM-1357)
   [VIM-1566](https://youtrack.jetbrains.com/issue/VIM-1566) Fix external filters
+* [VIM-2336](https://youtrack.jetbrains.com/issue/VIM-2336) Fix repeat for the `T` movement
+* [VIM-1192](https://youtrack.jetbrains.com/issue/VIM-1192) Fix dollar motion from single command
+* [VIM-1672](https://youtrack.jetbrains.com/issue/VIM-1672) IdeaVim correctly populates clipboard history
 
 ### Merged PRs:
 * [332](https://github.com/JetBrains/ideavim/pull/332) by [Matt Ellis](https://github.com/citizenmatt): VIM-1357+VIM-1566: Use OS shell to run filter command
+* [333](https://github.com/JetBrains/ideavim/pull/333) by [Michal Placek](https://github.com/MichalPlacek): VIM-1062
+* [334](https://github.com/JetBrains/ideavim/pull/334) by [Michal Placek](https://github.com/MichalPlacek): vim-2335 Support for navigation to previous buffer with :b#
 
 ## 0.68, 2021-06-22
 

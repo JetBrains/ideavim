@@ -32,6 +32,7 @@ import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.util.MathUtil;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.motion.leftright.TillCharacterMotionType;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
@@ -69,10 +70,6 @@ import static java.lang.Math.min;
  * This handles all motion related commands and marks
  */
 public class MotionGroup {
-  public static final int LAST_F = 1;
-  public static final int LAST_f = 2;
-  public static final int LAST_T = 3;
-  public static final int LAST_t = 4;
   public static final int LAST_COLUMN = 9999;
 
   /**
@@ -229,7 +226,7 @@ public class MotionGroup {
       col = newColumn;
     }
 
-    newColumn = normalizeVisualColumn(editor, newVisualLine, newColumn, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
+    newColumn = normalizeVisualColumn(editor, newVisualLine, newColumn, CommandStateHelper.isEndAllowed(editor));
 
     if (newVisualLine != caretVisualLine || newColumn != oldColumn) {
       int offset = visualPositionToOffset(editor, new VisualPosition(newVisualLine, newColumn));
@@ -532,7 +529,7 @@ public class MotionGroup {
     return SearchHelper.findMethodEnd(editor, caret, count);
   }
 
-  public void setLastFTCmd(int lastFTCmd, char lastChar) {
+  public void setLastFTCmd(TillCharacterMotionType lastFTCmd, char lastChar) {
     this.lastFTCmd = lastFTCmd;
     this.lastFTChar = lastChar;
   }
@@ -544,16 +541,16 @@ public class MotionGroup {
       case LAST_F:
         res = moveCaretToNextCharacterOnLine(editor, caret, -count, lastFTChar);
         break;
-      case LAST_f:
+      case LAST_SMALL_F:
         res = moveCaretToNextCharacterOnLine(editor, caret, count, lastFTChar);
         break;
       case LAST_T:
         res = moveCaretToBeforeNextCharacterOnLine(editor, caret, -count, lastFTChar);
         if (res == startPos && Math.abs(count) == 1) {
-          res = moveCaretToBeforeNextCharacterOnLine(editor, caret, 2 * count, lastFTChar);
+          res = moveCaretToBeforeNextCharacterOnLine(editor, caret, -2 * count, lastFTChar);
         }
         break;
-      case LAST_t:
+      case LAST_SMALL_T:
         res = moveCaretToBeforeNextCharacterOnLine(editor, caret, count, lastFTChar);
         if (res == startPos && Math.abs(count) == 1) {
           res = moveCaretToBeforeNextCharacterOnLine(editor, caret, 2 * count, lastFTChar);
@@ -1318,7 +1315,7 @@ public class MotionGroup {
       else {
         int newInlineElements = InlayHelperKt.amountOfInlaysBeforeVisualPosition(editor, new VisualPosition(line, col));
 
-        col = normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
+        col = normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(editor));
         col += newInlineElements;
       }
 
@@ -1356,7 +1353,7 @@ public class MotionGroup {
     }
   }
 
-  public int getLastFTCmd() {
+  public @NotNull TillCharacterMotionType getLastFTCmd() {
     return lastFTCmd;
   }
 
@@ -1377,7 +1374,7 @@ public class MotionGroup {
     return forwards ? max(range.getEndOffset() - adj, 0) : range.getStartOffset();
   }
 
-  private int lastFTCmd = 0;
+  private @NotNull TillCharacterMotionType lastFTCmd = TillCharacterMotionType.LAST_SMALL_T;
   private char lastFTChar;
 
   // visualLineOffset is a zero based offset to subtract from the direction of travel, where zero is the same as a count

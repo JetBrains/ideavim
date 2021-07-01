@@ -270,6 +270,12 @@ object VimListenerManager {
                 //   last character in line and has a negative direction.
                 caret.setSelection(caret.selectionStart, caret.selectionEnd + 1)
               }
+              // This is the same correction, but for the newer versions of the IDE: 213+
+              if (caret.selectionEnd == e.editor.document.getLineEndOffset(caret.logicalPosition.line) &&
+                caret.selectionEnd == caret.selectionStart + 1
+              ) {
+                caret.setSelection(caret.selectionEnd, caret.selectionEnd)
+              }
             }
           }
         }
@@ -354,6 +360,7 @@ object VimListenerManager {
       when (e.clickCount) {
         1 -> {
           if (!predictedMode.isEndAllowed) {
+            @Suppress("ideavimRunForEachCaret")
             editor.caretModel.runForEachCaret { caret ->
               val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
               val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)

@@ -30,14 +30,19 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
+import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.option.OptionsManager
 import java.util.*
 
-class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
+class MotionLastColumnInsertAction : MotionLastColumnAction() {
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
+}
+
+open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
   override val motionType: MotionType = MotionType.INCLUSIVE
 
   override fun getOffset(
@@ -48,79 +53,21 @@ class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
     rawCount: Int,
     argument: Argument?,
   ): Motion {
-    var allow = false
-    if (editor.inInsertMode) {
-      allow = true
-    } else if (editor.inVisualMode) {
+    val allow = if (editor.inVisualMode) {
       val opt = OptionsManager.selection
-      if (opt.value != "old") {
-        allow = true
-      }
+      opt.value != "old"
+    } else {
+      if (editor.commandState.isOperatorPending) false else editor.isEndAllowed
     }
 
     return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow).toMotion()
   }
 
-  override fun postMove(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
-    cmd: Command,
-  ) {
+  override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
     caret.vimLastColumn = MotionGroup.LAST_COLUMN
   }
 
-  override fun preMove(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
-    cmd: Command,
-  ) {
-    caret.vimLastColumn = MotionGroup.LAST_COLUMN
-  }
-}
-
-class MotionLastColumnInsertAction : MotionActionHandler.ForEachCaret() {
-  override val motionType: MotionType = MotionType.EXCLUSIVE
-
-  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_SAVE_STROKE)
-
-  override fun getOffset(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
-    count: Int,
-    rawCount: Int,
-    argument: Argument?,
-  ): Motion {
-    var allow = false
-    if (editor.inInsertMode) {
-      allow = true
-    } else if (editor.inVisualMode) {
-      val opt = OptionsManager.selection
-      if (opt.value != "old") {
-        allow = true
-      }
-    }
-
-    return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow).toMotion()
-  }
-
-  override fun postMove(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
-    cmd: Command,
-  ) {
-    caret.vimLastColumn = MotionGroup.LAST_COLUMN
-  }
-
-  override fun preMove(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
-    cmd: Command,
-  ) {
+  override fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
     caret.vimLastColumn = MotionGroup.LAST_COLUMN
   }
 }

@@ -572,6 +572,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
 
   private @Nullable Register refreshClipboardRegister(char r) {
     final Pair<String, List<TextBlockTransferableData>> clipboardData = ClipboardHandler.getClipboardTextAndTransferableData();
+    if (clipboardData == null) return null;
     final Register currentRegister = registers.get(r);
     final String text = clipboardData.getFirst();
     final List<TextBlockTransferableData> transferableData = clipboardData.getSecond();
