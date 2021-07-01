@@ -165,6 +165,7 @@ public class FileGroup {
    */
   public void closeFile(int number, @NotNull DataContext context) {
     final Project project = PlatformDataKeys.PROJECT.getData(context);
+    if (project == null) return;
     final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
     final EditorWindow window = fileEditorManager.getCurrentWindow();
     VirtualFile[] editors = fileEditorManager.getOpenFiles();

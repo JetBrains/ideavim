@@ -1353,7 +1353,7 @@ public class MotionGroup {
     }
   }
 
-  public TillCharacterMotionType getLastFTCmd() {
+  public @NotNull TillCharacterMotionType getLastFTCmd() {
     return lastFTCmd;
   }
 
