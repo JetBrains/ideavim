@@ -19,7 +19,6 @@
 package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.option.OptionsManager
-import org.jetbrains.annotations.TestOnly
 import java.awt.event.ActionListener
 import javax.swing.KeyStroke
 import javax.swing.Timer
@@ -48,9 +47,6 @@ class MappingState {
     timer.stop()
     timer.actionListeners.forEach { timer.removeActionListener(it) }
   }
-
-  @TestOnly
-  fun isTimerRunning(): Boolean = timer.isRunning
 
   fun addKey(key: KeyStroke) {
     keyList.add(key)
