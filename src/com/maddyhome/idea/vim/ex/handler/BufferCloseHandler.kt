@@ -29,7 +29,7 @@ class BufferCloseHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val arg = cmd.argument.trim()
-    val bufNum = arg.toIntOrNull();
+    val bufNum = arg.toIntOrNull()
     if (bufNum != null) {
       VimPlugin.getFile().closeFile(bufNum - 1, context)
     } else {
