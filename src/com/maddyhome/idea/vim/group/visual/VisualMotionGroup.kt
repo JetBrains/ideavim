@@ -208,14 +208,12 @@ class VisualMotionGroup {
     } else {
       editor.caretModel.allCarets.forEach { it.vimSelectionStart = it.vimLeadSelectionOffset }
     }
-    updateCaretState(editor)
     return true
   }
 
   fun enterSelectMode(editor: Editor, subMode: CommandState.SubMode): Boolean {
     editor.commandState.pushModes(CommandState.Mode.SELECT, subMode)
     editor.vimForEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
-    updateCaretState(editor)
     return true
   }
 

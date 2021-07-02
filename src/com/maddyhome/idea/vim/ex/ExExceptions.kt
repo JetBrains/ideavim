@@ -17,7 +17,18 @@
  */
 package com.maddyhome.idea.vim.ex
 
-open class ExException(s: String? = null) : Exception(s)
+import com.maddyhome.idea.vim.helper.MessageHelper
+import org.jetbrains.annotations.PropertyKey
+
+open class ExException(s: String? = null) : Exception(s) {
+  var code: String? = null
+    private set
+
+  companion object {
+    fun message(@PropertyKey(resourceBundle = MessageHelper.BUNDLE) code: String, vararg params: Any) =
+      ExException(MessageHelper.message(code, *params)).apply { this.code = code }
+  }
+}
 
 class InvalidCommandException(message: String, cmd: String?) : ExException(message + if (cmd != null) " | $cmd" else "")
 

@@ -18,16 +18,18 @@
 
 package com.maddyhome.idea.vim.option;
 
+import com.maddyhome.idea.vim.ex.ExException;
+
 public abstract class TextOption extends Option<String> {
   TextOption(String name, String abbrev) {
     super(name, abbrev);
   }
 
-  public abstract boolean set(String val);
+  public abstract boolean set(String val) throws ExException;
 
-  public abstract boolean append(String val);
+  public abstract boolean append(String val) throws ExException;
 
-  public abstract boolean prepend(String val);
+  public abstract boolean prepend(String val) throws ExException;
 
-  public abstract boolean remove(String val);
+  public abstract boolean remove(String val) throws ExException;
 }

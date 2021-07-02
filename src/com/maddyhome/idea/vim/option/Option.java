@@ -61,7 +61,7 @@ public abstract class Option<T> {
   public void addOptionChangeListenerAndExecute(OptionChangeListener<T> listener) {
     addOptionChangeListener(listener);
     T value = getValue();
-    fireOptionChangeEvent(value, value);
+    onChanged(value, value);
   }
 
   /**
@@ -107,7 +107,11 @@ public abstract class Option<T> {
    * Lets all listeners know that the value has changed. Subclasses are responsible for calling this when their
    * value changes.
    */
-  protected void fireOptionChangeEvent(T oldValue, T newValue) {
+  protected void onChanged(T oldValue, T newValue) {
+    fireOptionChangeEvent(oldValue, newValue);
+  }
+
+  private void fireOptionChangeEvent(T oldValue, T newValue) {
     for (OptionChangeListener<T> listener : listeners) {
       listener.valueChange(oldValue, newValue);
     }

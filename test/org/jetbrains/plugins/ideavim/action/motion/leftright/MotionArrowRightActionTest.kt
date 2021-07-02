@@ -33,8 +33,6 @@ import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
 
-  // Kotlin type hints should be an obvious example of an inlay related to preceding text, but they are actually
-  // related to following (KTIJ-3768). The inline rename options inlay is a better example
   @TestWithoutNeovim(SkipNeovimReason.INLAYS)
   @VimOptionDefaultAll
   fun `test with inlay related to preceding text and block caret`() {
@@ -117,23 +115,31 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     configureByText(before)
     assertOffset(4)
 
+    assertVisualPosition(0, 4)
+
     // Inlay shares offset 4 with the 'u' in "found", inserts a new visual column 4 and is related to the text at
     // offset 3/visual column 3.
     // Moving <Right> from offset 4 (visual column 4 because bar caret and related to preceding text!) will move to
     // offset 3, which is also visual column 3.
-    // Before: "I fo|«:test»und it in a legendary land."
-    // After: "I fo«:test»u|nd it in a legendary land."
+    // Initially (normal):  "I fo|u|nd it in a legendary land" (caret = vp4)
+    // With inlay (normal): "I fo«:test»|u|nd it in a legendary land" (caret = vp5)
+    // In insert mode:      "I fo|«:test»und it in a legendary land" (caret = vp4)
+    // <Right>:             "I fo«:test»u|nd it in a legendary land" (caret = vp6)
+    // <Esc>:               "I fo«:test»|u|nd it in a legendary land" (caret = vp5)
     addInlay(4, true, 5)
 
-    typeText(parseKeys("i", "<Right>"))
-    assertState(after)
+    typeText(parseKeys("i"))
+    assertVisualPosition(0, 4)
+
+    typeText(parseKeys("<Right>"))
+    myFixture.checkResult(after)
 
     assertOffset(5)
     assertVisualPosition(0, 6)
 
     typeText(parseKeys("<Esc>"))
     assertOffset(4)
-    assertVisualPosition(0, 4)
+    assertVisualPosition(0, 5)
   }
 
   // Kotlin parameter hints are a good example of inlays related to following text

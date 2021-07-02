@@ -18,9 +18,9 @@
 
 package com.maddyhome.idea.vim.ui.ex
 
-import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.KeyboardShortcut
+import com.intellij.openapi.project.DumbAwareAction
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import java.awt.event.KeyEvent
@@ -38,7 +38,7 @@ import javax.swing.KeyStroke
  * component has focus. It registers all shortcuts used by the Swing actions and forwards them directly to the key
  * handler.
  */
-class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : AnAction() {
+class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : DumbAwareAction() {
 
   override fun actionPerformed(e: AnActionEvent) {
     val keyStroke = getKeyStroke(e)

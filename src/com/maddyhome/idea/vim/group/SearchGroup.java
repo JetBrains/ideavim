@@ -37,9 +37,9 @@ import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import com.maddyhome.idea.vim.option.StringListOption;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
@@ -1273,7 +1273,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     }
 
     Element show = search.getChild("show-last");
-    final ListOption vimInfo = OptionsManager.INSTANCE.getViminfo();
+    final StringListOption vimInfo = OptionsManager.INSTANCE.getViminfo();
     final boolean disableHighlight = vimInfo.contains("h");
     showSearchHighlight = !disableHighlight && Boolean.parseBoolean(show.getText());
     if (logger.isDebugEnabled()) {

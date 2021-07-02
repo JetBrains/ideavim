@@ -23,15 +23,16 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorGutter;
+import com.intellij.openapi.editor.EditorSettings;
+import com.intellij.openapi.editor.LineNumberConverter;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
-import com.intellij.openapi.editor.ex.EditorSettingsExternalizable;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -40,6 +41,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static com.maddyhome.idea.vim.helper.CaretVisualAttributesHelperKt.updateCaretsVisualAttributes;
 
 /**
  * @author vlan
@@ -206,10 +209,6 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     }
   }
 
-  public boolean isBarCursorSettings() {
-    return !EditorSettingsExternalizable.getInstance().isBlockCursor();
-  }
-
   public void editorCreated(@NotNull Editor editor) {
     isBlockCursor = editor.getSettings().isBlockCursor();
     isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
@@ -224,7 +223,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
       VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext.init(editor, null));
       KeyHandler.getInstance().reset(editor);
     }
-    VisualGroupKt.resetShape(CommandStateHelper.getMode(editor), editor);
+    updateCaretsVisualAttributes(editor);
     editor.getSettings().setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
   }
 
@@ -232,7 +231,9 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     deinitLineNumbers(editor, isReleased);
     UserDataManager.unInitializeEditor(editor);
     VimPlugin.getKey().unregisterShortcutKeys(editor);
-    editor.getSettings().setBlockCursor(isBlockCursor);
+    if (CaretVisualAttributesHelperKt.usesBlockCursorEditorSettings()) {
+      editor.getSettings().setBlockCursor(isBlockCursor);
+    }
     editor.getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
     DocumentManager.INSTANCE.removeListeners(editor.getDocument());
   }

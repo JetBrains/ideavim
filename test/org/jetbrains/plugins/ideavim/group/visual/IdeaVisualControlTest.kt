@@ -61,7 +61,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     assertMode(CommandState.Mode.COMMAND)
     assertSubMode(CommandState.SubMode.NONE)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -82,7 +82,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("l"))
     assertState(
@@ -97,7 +97,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimBehaviorDiffers(
@@ -128,7 +128,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("l"))
     assertState(
@@ -143,7 +143,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -164,7 +164,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("l"))
     assertState(
@@ -179,7 +179,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -200,7 +200,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("l"))
     assertState(
@@ -215,7 +215,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -236,7 +236,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("l"))
     assertState(
@@ -251,7 +251,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -272,7 +272,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("l"))
     assertState(
@@ -287,7 +287,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -308,7 +308,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("l"))
     assertState(
@@ -323,7 +323,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -344,7 +344,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("l"))
     assertState(
@@ -359,7 +359,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -380,7 +380,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("l"))
     assertState(
@@ -395,7 +395,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("j"))
     assertState(
@@ -410,7 +410,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -431,7 +431,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("j"))
     assertState(
@@ -446,7 +446,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -467,7 +467,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("j"))
     assertState(
@@ -482,7 +482,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -503,7 +503,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("j"))
     assertState(
@@ -518,7 +518,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -539,7 +539,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("j"))
     assertState(
@@ -554,7 +554,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -575,7 +575,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("k"))
     assertState(
@@ -590,7 +590,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -611,7 +611,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -632,7 +632,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("l"))
     assertState(
@@ -647,7 +647,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -668,7 +668,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("j"))
     assertState(
@@ -683,7 +683,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionDefaultAll
@@ -704,7 +704,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
 
     typeText(parseKeys("l"))
     assertState(
@@ -719,7 +719,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     )
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionTestConfiguration(
@@ -787,7 +787,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssert { myFixture.editor.subMode == CommandState.SubMode.VISUAL_CHARACTER }
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @VimOptionTestConfiguration(VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [""]))
@@ -814,7 +814,7 @@ class IdeaVisualControlTest : VimOptionTestCase(SelectModeOptionData.name) {
     waitAndAssert { myFixture.editor.subMode == CommandState.SubMode.VISUAL_CHARACTER }
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   private fun startDummyTemplate() {

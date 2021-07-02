@@ -18,7 +18,8 @@
 
 package com.maddyhome.idea.vim.option;
 
-import com.intellij.util.ArrayUtil;
+import com.intellij.openapi.diagnostic.Logger;
+import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -32,8 +33,33 @@ import java.util.StringTokenizer;
 /**
  * This is an option that accepts an arbitrary list of values
  */
-public class ListOption extends TextOption {
-  public static final @NotNull ListOption empty = new ListOption("", "", ArrayUtil.EMPTY_STRING_ARRAY, "");
+public abstract class ListOption<T> extends TextOption {
+  private static final Logger logger = Logger.getInstance(ListOption.class.getName());
+
+  protected final @NotNull List<T> defaultValues;
+  protected @NotNull List<T> value;
+
+  /**
+   * Creates the option
+   *
+   * @param name    The name of the option
+   * @param abbrev  The short name
+   * @param defaultValues    The option's default values
+   */
+  public ListOption(String name, String abbrev, @VimNlsSafe T[] defaultValues) {
+    super(name, abbrev);
+
+    this.defaultValues = new ArrayList<>(Arrays.asList(defaultValues));
+    this.value = new ArrayList<>(this.defaultValues);
+  }
+
+  public ListOption(String name, String abbrev, String defaultValue) throws ExException {
+    super(name, abbrev);
+
+    final List<T> defaultValues = parseVals(defaultValue);
+    this.defaultValues = defaultValues != null ? new ArrayList<>(defaultValues) : new ArrayList<>();
+    this.value = new ArrayList<>(this.defaultValues);
+  }
 
   /**
    * Gets the value of the option as a comma separated list of values
@@ -44,7 +70,7 @@ public class ListOption extends TextOption {
   public @NotNull String getValue() {
     StringBuilder res = new StringBuilder();
     int cnt = 0;
-    for (String s : value) {
+    for (T s : value) {
       if (cnt > 0) {
         res.append(",");
       }
@@ -61,7 +87,7 @@ public class ListOption extends TextOption {
    *
    * @return The option's values
    */
-  public @NotNull List<String> values() {
+  public @NotNull List<T> values() {
     return value;
   }
 
@@ -72,7 +98,14 @@ public class ListOption extends TextOption {
    * @return True if all the supplied values are set in this option, false if not
    */
   public boolean contains(@NonNls String val) {
-    final List<String> vals = parseVals(val);
+    final List<T> vals;
+    try {
+      vals = parseVals(val);
+    }
+    catch (ExException e) {
+      logger.warn("Error parsing option", e);
+      return false;
+    }
     return vals != null && value.containsAll(vals);
   }
 
@@ -84,7 +117,7 @@ public class ListOption extends TextOption {
    * @return True if all the supplied values were correct, false if not
    */
   @Override
-  public boolean set(String val) {
+  public boolean set(String val) throws ExException {
     return set(parseVals(val));
   }
 
@@ -96,7 +129,7 @@ public class ListOption extends TextOption {
    * @return True if all the supplied values were correct, false if not
    */
   @Override
-  public boolean append(String val) {
+  public boolean append(String val) throws ExException {
     return append(parseVals(val));
   }
 
@@ -108,7 +141,7 @@ public class ListOption extends TextOption {
    * @return True if all the supplied values were correct, false if not
    */
   @Override
-  public boolean prepend(String val) {
+  public boolean prepend(String val) throws ExException {
     return prepend(parseVals(val));
   }
 
@@ -120,23 +153,23 @@ public class ListOption extends TextOption {
    * @return True if all the supplied values were correct, false if not
    */
   @Override
-  public boolean remove(String val) {
+  public boolean remove(String val) throws ExException {
     return remove(parseVals(val));
   }
 
-  protected boolean set(@Nullable List<String> vals) {
+  protected boolean set(@Nullable List<T> vals) {
     if (vals == null) {
       return false;
     }
 
     String oldValue = getValue();
     this.value = vals;
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
 
     return true;
   }
 
-  protected boolean append(@Nullable List<String> vals) {
+  protected boolean append(@Nullable List<T> vals) {
     if (vals == null) {
       return false;
     }
@@ -144,12 +177,12 @@ public class ListOption extends TextOption {
     String oldValue = getValue();
     value.removeAll(vals);
     value.addAll(vals);
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
 
     return true;
   }
 
-  protected boolean prepend(@Nullable List<String> vals) {
+  protected boolean prepend(@Nullable List<T> vals) {
     if (vals == null) {
       return false;
     }
@@ -157,37 +190,21 @@ public class ListOption extends TextOption {
     String oldValue = getValue();
     value.removeAll(vals);
     value.addAll(0, vals);
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
 
     return true;
   }
 
-  protected boolean remove(@Nullable List<String> vals) {
+  protected boolean remove(@Nullable List<T> vals) {
     if (vals == null) {
       return false;
     }
 
     String oldValue = getValue();
     value.removeAll(vals);
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
 
     return true;
-  }
-
-  /**
-   * Creates the option
-   *
-   * @param name    The name of the option
-   * @param abbrev  The short name
-   * @param dflt    The option's default values
-   * @param pattern A regular expression that is used to validate new values. null if no check needed
-   */
-  public ListOption(@VimNlsSafe String name, @VimNlsSafe String abbrev, @VimNlsSafe String[] dflt, @VimNlsSafe String pattern) {
-    super(name, abbrev);
-
-    this.dflt = new ArrayList<>(Arrays.asList(dflt));
-    this.value = new ArrayList<>(this.dflt);
-    this.pattern = pattern;
   }
 
   /**
@@ -197,16 +214,17 @@ public class ListOption extends TextOption {
    */
   @Override
   public boolean isDefault() {
-    return dflt.equals(value);
+    return defaultValues.equals(value);
   }
 
-  protected @Nullable List<String> parseVals(String val) {
-    List<String> res = new ArrayList<>();
+  protected @Nullable List<T> parseVals(String val) throws ExException {
+    List<T> res = new ArrayList<>();
     StringTokenizer tokenizer = new StringTokenizer(val, ",");
     while (tokenizer.hasMoreTokens()) {
       String token = tokenizer.nextToken().trim();
-      if (pattern == null || token.matches(pattern)) {
-        res.add(token);
+      T item = convertToken(token);
+      if (item != null) {
+        res.add(item);
       }
       else {
         return null;
@@ -215,6 +233,8 @@ public class ListOption extends TextOption {
 
     return res;
   }
+
+  protected abstract @Nullable T convertToken(@NotNull String token) throws ExException;
 
   /**
    * Gets the string representation appropriate for output to :set all
@@ -225,19 +245,15 @@ public class ListOption extends TextOption {
     return "  " + getName() + "=" + getValue();
   }
 
-  protected final @NotNull List<String> dflt;
-  protected @NotNull List<String> value;
-  protected final String pattern;
-
   /**
    * Resets the option to its default value
    */
   @Override
   public void resetDefault() {
-    if (!dflt.equals(value)) {
+    if (!defaultValues.equals(value)) {
       String oldValue = getValue();
-      value = new ArrayList<>(dflt);
-      fireOptionChangeEvent(oldValue, getValue());
+      value = new ArrayList<>(defaultValues);
+      onChanged(oldValue, getValue());
     }
   }
 }

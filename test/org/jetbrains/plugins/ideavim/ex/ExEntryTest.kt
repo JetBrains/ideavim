@@ -103,6 +103,28 @@ class ExEntryTest : VimTestCase() {
     assertEquals("VER 25", exEntryPanel.entry.caretShape)
   }
 
+  fun `test caret shape comes from guicursor`() {
+    enterCommand("set guicursor=c:ver50,ci:hor75,cr:block")
+
+    typeExInput(":")
+    assertEquals("VER 50", exEntryPanel.entry.caretShape)
+
+    typeText("set")
+    assertEquals("VER 50", exEntryPanel.entry.caretShape)
+
+    deactivateExEntry()
+    typeExInput(":set<Home>")
+    assertEquals("HOR 75", exEntryPanel.entry.caretShape)
+
+    deactivateExEntry()
+    typeExInput(":set<Home><Insert>")
+    assertEquals("BLOCK 100", exEntryPanel.entry.caretShape)
+
+    deactivateExEntry()
+    typeExInput(":set<Home><Insert><Insert>")
+    assertEquals("HOR 75", exEntryPanel.entry.caretShape)
+  }
+
   fun `test move caret to beginning of line`() {
     typeExInput(":set incsearch<C-B>")
     assertExOffset(0)

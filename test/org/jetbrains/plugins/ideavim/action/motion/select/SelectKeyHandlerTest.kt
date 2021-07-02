@@ -346,7 +346,7 @@ class SelectKeyHandlerTest : VimTestCase() {
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE
     )
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
     assertMode(CommandState.Mode.COMMAND)
   }
 }

@@ -82,20 +82,6 @@ public class ExDocument extends PlainDocument {
     }
   }
 
-  public char getCharacter(int offset) {
-    // If we're a proportional font, 'o' is a good char to use. If we're fixed width, it's still a good char to use
-    if (offset >= getLength()) return 'o';
-
-    try {
-      final Segment segment = new Segment();
-      getContent().getChars(offset, 1, segment);
-      return segment.charAt(0);
-    }
-    catch (BadLocationException e) {
-      return 'o';
-    }
-  }
-
   // Mac apps will show a highlight for text being composed as part of an input method or dead keys (e.g. <A-N> N will
   // combine a ~ and n to produce ñ on a UK/US keyboard, and `, ' or ~ will combine to add accents on US International
   // keyboards. Java only adds a highlight when the Input Method tells it to, so normal text fields don't get the

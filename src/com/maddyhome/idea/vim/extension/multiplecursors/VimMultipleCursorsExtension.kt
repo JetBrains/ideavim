@@ -43,6 +43,7 @@ import com.maddyhome.idea.vim.helper.endOffsetInclusive
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.userData
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.annotations.NonNls
@@ -173,6 +174,7 @@ class VimMultipleCursorsExtension : VimExtension {
         if (newPositions.size > 0) {
           editor.exitVisualMode()
           newPositions.forEach { editor.caretModel.addCaret(it, true) ?: return }
+          editor.updateCaretsVisualAttributes()
           return
         }
 
@@ -216,6 +218,7 @@ class VimMultipleCursorsExtension : VimExtension {
           }
 
           val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(nextOffset), true) ?: return
+          editor.updateCaretsVisualAttributes()
           editor.vimMultipleCursorsLastSelection = selectText(caret, pattern, nextOffset)
         } else {
           VimPlugin.showMessage(MessageHelper.message("message.no.more.matches"))
@@ -254,6 +257,7 @@ class VimMultipleCursorsExtension : VimExtension {
           selectText(caret, text, match.startOffset)
         }
       }
+      editor.updateCaretsVisualAttributes()
     }
   }
 

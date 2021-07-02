@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.group.visual.updateCaretState
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 
 /**
@@ -45,7 +44,6 @@ fun Editor.exitVisualMode() {
   val selectionType = SelectionType.fromSubMode(this.subMode)
   SelectionVimListenerSuppressor.lock().use {
     if (inBlockSubMode) {
-      this.caretModel.allCarets.forEach { it.visualAttributes = this.caretModel.primaryCaret.visualAttributes }
       this.caretModel.removeSecondaryCarets()
     }
     if (!this.vimKeepingVisualOperatorAction) {
@@ -83,7 +81,6 @@ fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
       }
     }
   }
-  updateCaretState(this)
 }
 
 fun Editor.exitInsertMode(context: DataContext) {
