@@ -84,6 +84,10 @@ fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
     }
   }
   updateCaretState(this)
+
+  if (this.inInsertMode) {
+    this.exitInsertModeHardReset();
+  }
 }
 
 fun Editor.exitInsertMode(context: DataContext) {
