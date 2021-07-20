@@ -22,7 +22,7 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## To Be Released
+## 0.69, 2021-07-20
 
 ### Features:
 * Support several buffer management commands [VIM-1062](https://youtrack.jetbrains.com/issue/VIM-1062),  [VIM-2335](https://youtrack.jetbrains.com/issue/VIM-2335)

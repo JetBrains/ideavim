@@ -19,6 +19,9 @@
       <li><a href="https://youtrack.jetbrains.com/issue/VIM-1192">VIM-1192</a> Fix dollar motion from single command</li>
       <li><a href="https://youtrack.jetbrains.com/issue/VIM-1672">VIM-1672</a> IdeaVim correctly populates clipboard history
       </li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2351">VIM-2351</a> Correctly select last character when
+        selecting with mouse
+      </li>
     </ul>
 
     <h3>Merged PRs:</h3>
