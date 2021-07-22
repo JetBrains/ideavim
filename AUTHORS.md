@@ -360,6 +360,10 @@ Contributors:
   [![icon][github]](https://github.com/MichalPlacek)
   &nbsp;
   Michal Placek
+* [![icon][mail]](mailto:eugene.nizienko@jetbrains.com)
+  [![icon][github]](https://github.com/nizienko)
+  &nbsp;
+  eugene nizienko
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.

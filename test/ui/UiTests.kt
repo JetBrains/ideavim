@@ -23,7 +23,6 @@ import com.intellij.remoterobot.fixtures.ContainerFixture
 import com.intellij.remoterobot.search.locators.byXpath
 import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.keyboard
-import com.intellij.remoterobot.utils.waitFor
 import org.assertj.swing.core.MouseButton
 import org.junit.Test
 import ui.pages.Editor
@@ -53,7 +52,7 @@ class UiTests {
   }
 
   @Test
-  fun ideaVimTest() = uiTest {
+  fun ideaVimTest() = uiTest("ideaVimTest") {
     val sharedSteps = JavaExampleSteps(this)
 
     welcomeFrame {
@@ -69,12 +68,14 @@ class UiTests {
         button("Finish").click()
       }
     }
-    sharedSteps.closeTipOfTheDay()
+    with(sharedSteps) {
+      closeIdeaVimDialog()
+      closeTipOfTheDay()
+    }
     idea {
       step("Create App file") {
         with(projectViewTree) {
-          findText(projectName).doubleClick()
-          waitFor { hasText("src") }
+          expand(projectName, "src")
           findText("src").click(MouseButton.RIGHT_BUTTON)
         }
         actionMenu("New").click()
