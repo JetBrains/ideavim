@@ -54,8 +54,19 @@ class Editor(
   val caretOffset: Int
     get() = callJs("component.getEditor().getCaretModel().getOffset()", runInEdt = true)
 
+  val isBlockCursor: Boolean
+    get() = callJs("component.getEditor().getSettings().isBlockCursor()", true)
+
   fun injectText(text: String) {
-    runJs("component.getEditor().getDocument().setText('${text.escape()}')", runInEdt = true)
+    runJs("""
+      const app = com.intellij.openapi.application.ApplicationManager.getApplication()
+
+      app.invokeLaterOnWriteThread(()=>{
+          app['runWriteAction(com.intellij.openapi.util.Computable)'](()=>{
+              component.getEditor().getDocument().setText('${text.escape()}')
+          })
+        })
+""")
   }
 
   @Suppress("unused")
