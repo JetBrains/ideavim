@@ -29,4 +29,4 @@ jobs:
         with:
           name: ui-test-fails-report-mac
           path: |
-            ui-test-example/build/reports
+            build/reports
