@@ -12,9 +12,9 @@ jobs:
           distribution: zulu
           java-version: 11
       - name: Clean
-        run: gradle :ui-test-example:clean
+        run: gradle clean
       - name: Run Idea
-        run: gradle :ui-test-example:runIdeForUiTests &
+        run: gradle runIdeForUiTests &
       - name: Wait for Idea started
         uses: jtalk/url-health-check-action@1.5
         with:
@@ -22,7 +22,7 @@ jobs:
           max-attempts: 15
           retry-delay: 30s
       - name: Tests
-        run: gradle :ui-test-example:test
+        run: gradle testUi
       - name: Save fails report
         if: ${{ failure() }}
         uses: actions/upload-artifact@v2
