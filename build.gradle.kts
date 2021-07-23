@@ -169,11 +169,11 @@ tasks.register<Test>("testUi") {
 // --- Changelog
 
 changelog {
-    groups = listOf("Features:", "Changes:", "Deprecations:", "Fixes:", "Merged PRs:")
-    itemPrefix = "*"
-    path = "${project.projectDir}/CHANGES.md"
-    unreleasedTerm = "To Be Released"
-    headerParserRegex = "0\\.\\d{2}(.\\d+)?".toRegex()
+    groups.set(listOf("Features:", "Changes:", "Deprecations:", "Fixes:", "Merged PRs:"))
+    itemPrefix.set("*")
+    path.set("${project.projectDir}/CHANGES.md")
+    unreleasedTerm.set("To Be Released")
+    headerParserRegex.set("0\\.\\d{2}(.\\d+)?".toRegex())
 //    header = { "${project.version}" }
 //    version = "0.60"
 }
