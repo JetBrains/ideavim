@@ -105,6 +105,7 @@ class UiTests {
   }
 
   private fun ContainerFixture.testSelectTextWithMouseInGutter(editor: Editor) {
+    println("Run testSelectTextWithMouseInGutter...")
     gutter {
       val from = findText("1")
       val to = findText("2")
@@ -123,6 +124,7 @@ class UiTests {
   }
 
   private fun ContainerFixture.testSelectTextUsingMouse(editor: Editor) {
+    println("Run testSelectTextUsingMouse...")
     val from = editor.findText("One")
     val to = editor.findText("Four")
 
@@ -140,6 +142,7 @@ class UiTests {
   }
 
   private fun ContainerFixture.testSelectForthAndBack(editor: Editor) {
+    println("Run testSelectForthAndBack...")
     val from = editor.findText("Two")
     val to = editor.findText("Four")
 
@@ -156,6 +159,7 @@ class UiTests {
   }
 
   private fun ContainerFixture.testTripleClickRightFromLineEnd(editor: Editor) {
+    println("Run testTripleClickRightFromLineEnd...")
     editor.findText("Two").tripleClickOnRight(40, editor)
 
     assertEquals("One Two\n", editor.selectedText)
@@ -175,6 +179,7 @@ class UiTests {
   }
 
   private fun ContainerFixture.testClickRightFromLineEnd(editor: Editor) {
+    println("Run testClickRightFromLineEnd...")
     editor.findText("Two").doubleClickOnRight(40, editor)
 
     assertEquals("Two", editor.selectedText)
@@ -189,6 +194,7 @@ class UiTests {
   }
 
   private fun ContainerFixture.testClickOnWord(editor: Editor) {
+    println("Run testClickOnWord...")
     editor.findText("One").doubleClick(MouseButton.LEFT_BUTTON)
 
     assertEquals("One", editor.selectedText)
@@ -203,6 +209,7 @@ class UiTests {
   }
 
   private fun ContainerFixture.testGutterClick(editor: Editor) {
+    println("Run testGutterClick...")
     gutter {
       findText("2").click()
     }

@@ -26,6 +26,9 @@ usual beta standards.
 
 ### Fixes:
 
+### Merged PRs:
+* [349](https://github.com/JetBrains/ideavim/pull/349) by [eugene nizienko](https://github.com/nizienko): Run UI test ci
+
 ## 0.69, 2021-07-20
 
 ### Features:
