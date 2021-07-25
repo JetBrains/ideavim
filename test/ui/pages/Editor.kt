@@ -58,7 +58,8 @@ class Editor(
     get() = callJs("component.getEditor().getSettings().isBlockCursor()", true)
 
   fun injectText(text: String) {
-    runJs("""
+    runJs(
+      """
       const app = com.intellij.openapi.application.ApplicationManager.getApplication()
 
       app.invokeLaterOnWriteThread(()=>{
@@ -66,7 +67,8 @@ class Editor(
               component.getEditor().getDocument().setText('${text.escape()}')
           })
         })
-""")
+"""
+    )
   }
 
   @Suppress("unused")

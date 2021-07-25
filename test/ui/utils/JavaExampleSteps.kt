@@ -38,7 +38,6 @@ class JavaExampleSteps(private val remoteRobot: RemoteRobot) {
     }
   }
 
-
   fun closeTipOfTheDay() = optionalStep("Close Tip of the Day if it appears") {
     val idea: IdeaFrame = remoteRobot.find(IdeaFrame::class.java)
     idea.dumbAware {
@@ -47,13 +46,11 @@ class JavaExampleSteps(private val remoteRobot: RemoteRobot) {
     closeAllGotIt()
   }
 
-
   fun closeAllGotIt() = step("Close Got It") {
     remoteRobot.findAll<JButtonFixture>(byXpath("//div[@accessiblename='Got It']")).forEach {
       it.click()
     }
   }
-
 
   private fun optionalStep(stepName: String, code: () -> Unit) = step(stepName) {
     try {
