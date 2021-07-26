@@ -41,6 +41,7 @@ import ui.utils.doubleClickOnRight
 import ui.utils.moveMouseForthAndBack
 import ui.utils.moveMouseInGutterTo
 import ui.utils.moveMouseTo
+import ui.utils.saveScreenshot
 import ui.utils.tripleClickOnRight
 import ui.utils.uiTest
 import ui.utils.vimExit
@@ -153,7 +154,9 @@ class UiTests {
 
   private fun IdeaFrame.reenableIdeaVim(editor: Editor) {
     println("Run reenableIdeaVim...")
+    saveScreenshot("reenableIdeaVim-start", editor.remoteRobot)
     toggleIdeaVim()
+    saveScreenshot("reenableIdeaVim-toggling", editor.remoteRobot)
 
     val from = editor.findText("One")
     from.doubleClick()
