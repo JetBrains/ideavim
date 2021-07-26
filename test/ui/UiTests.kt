@@ -38,14 +38,13 @@ import ui.pages.welcomeFrame
 import ui.utils.JavaExampleSteps
 import ui.utils.StepsLogger
 import ui.utils.doubleClickOnRight
+import ui.utils.invokeActionJs
 import ui.utils.moveMouseForthAndBack
 import ui.utils.moveMouseInGutterTo
 import ui.utils.moveMouseTo
-import ui.utils.saveScreenshot
 import ui.utils.tripleClickOnRight
 import ui.utils.uiTest
 import ui.utils.vimExit
-import java.time.Duration
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -121,7 +120,7 @@ class UiTests {
 
   private fun IdeaFrame.wrapWithIf(editor: Editor) {
     editor.findText("System").click()
-    globalAction("Surround With", false)
+    remoteRobot.invokeActionJs("SurroundWith")
     editor.keyboard { enter() }
 
     assertFalse(editor.isBlockCursor)
@@ -154,9 +153,7 @@ class UiTests {
 
   private fun IdeaFrame.reenableIdeaVim(editor: Editor) {
     println("Run reenableIdeaVim...")
-    saveScreenshot("reenableIdeaVim-start", editor.remoteRobot)
     toggleIdeaVim()
-    saveScreenshot("reenableIdeaVim-toggling", editor.remoteRobot)
 
     val from = editor.findText("One")
     from.doubleClick()
@@ -185,18 +182,7 @@ class UiTests {
   }
 
   private fun IdeaFrame.toggleIdeaVim() {
-    globalAction("Vim Emulator", true)
-  }
-
-  private fun IdeaFrame.globalAction(actionName: String, escape: Boolean) {
-    find<ContainerFixture>(byXpath("//div[@accessiblename='Search Everywhere' and @class='ActionButton' and @myaction='Search Everywhere (Searches for classes, files, tool windows, action and preferences)']")).click()
-    keyboard {
-      enterText(actionName)
-      enter()
-      if (escape) {
-        escape(waitAfter = Duration.ofSeconds(1))
-      }
-    }
+    this.remoteRobot.invokeActionJs("VimPluginToggle")
   }
 
   private fun ContainerFixture.testSelectTextWithMouseInGutter(editor: Editor) {
