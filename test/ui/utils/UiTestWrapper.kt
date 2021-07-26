@@ -72,6 +72,8 @@ private fun saveFile(url: String, folder: String, name: String): File {
   return File(folder).apply {
     mkdirs()
   }.resolve(name).apply {
-    writeText(response.body?.string() ?: "")
+    // [VERSION UPDATE] 211+
+    @Suppress("DEPRECATION_ERROR")
+    writeText(response.body()?.string() ?: "")
   }
 }
