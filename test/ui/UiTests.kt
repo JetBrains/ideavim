@@ -18,6 +18,7 @@
 
 package ui
 
+import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.fixtures.ComponentFixture
 import com.intellij.remoterobot.fixtures.ContainerFixture
 import com.intellij.remoterobot.search.locators.byXpath
@@ -46,6 +47,7 @@ import ui.utils.vimExit
 import java.time.Duration
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class UiTests {
   init {
@@ -74,15 +76,7 @@ class UiTests {
       closeTipOfTheDay()
     }
     idea {
-      step("Create App file") {
-        with(projectViewTree) {
-          expand(projectName, "src")
-          findText("src").click(MouseButton.RIGHT_BUTTON)
-        }
-        actionMenu("New").click()
-        actionMenuItem("File").click()
-        keyboard { enterText("MyDoc.txt"); enter() }
-      }
+      createFile("MyDoc.txt", this@uiTest)
       val editor = editor("MyDoc.txt") {
         step("Write a text") {
           injectText(
@@ -103,6 +97,56 @@ class UiTests {
       testClickOnWord(editor)
       testGutterClick(editor)
       reenableIdeaVim(editor)
+
+      createFile("MyTest.java", this@uiTest)
+      val javaEditor = editor("MyTest.java") {
+        step("Write a text") {
+          injectText(
+            """
+                |class Main {
+                |  public static void main() {
+                |    System.out.println("Hello");
+                |  }
+                |}
+            """.trimMargin()
+          )
+        }
+      }
+
+      wrapWithIf(javaEditor)
+    }
+  }
+
+  private fun IdeaFrame.wrapWithIf(editor: Editor) {
+    editor.findText("System").click()
+    globalAction("Surround With", false)
+    editor.keyboard { enter() }
+
+    assertFalse(editor.isBlockCursor)
+
+    editor.keyboard {
+      enterText("true")
+      escape()
+    }
+    assertTrue(editor.isBlockCursor)
+    editor.keyboard {
+      enterText("h")
+      enterText("v")
+    }
+    assertEquals("u", editor.selectedText)
+
+    vimExit()
+  }
+
+  private fun IdeaFrame.createFile(fileName: String, remoteRobot: RemoteRobot) {
+    step("Create $fileName file") {
+      with(projectViewTree) {
+        expand(projectName, "src")
+        findText("src").click(MouseButton.RIGHT_BUTTON)
+      }
+      remoteRobot.actionMenu("New").click()
+      remoteRobot.actionMenuItem("File").click()
+      keyboard { enterText(fileName); enter() }
     }
   }
 
@@ -134,11 +178,17 @@ class UiTests {
   }
 
   private fun IdeaFrame.toggleIdeaVim() {
+    globalAction("Vim Emulator", true)
+  }
+
+  private fun IdeaFrame.globalAction(actionName: String, escape: Boolean) {
     find<ContainerFixture>(byXpath("//div[@accessiblename='Search Everywhere' and @class='ActionButton' and @myaction='Search Everywhere (Searches for classes, files, tool windows, action and preferences)']")).click()
     keyboard {
-      enterText("Vim Emulator")
+      enterText(actionName)
       enter()
-      escape(waitAfter = Duration.ofSeconds(1))
+      if (escape) {
+        escape(waitAfter = Duration.ofSeconds(1))
+      }
     }
   }
 
