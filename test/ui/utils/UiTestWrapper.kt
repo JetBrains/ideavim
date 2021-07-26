@@ -31,8 +31,13 @@ fun uiTest(testName: String = "test_${System.currentTimeMillis()}", url: String 
   try {
     remoteRobot.test()
   } catch (e: Throwable) {
-    saveScreenshot(testName, remoteRobot)
-    saveHierarchy(testName, url)
+    try {
+      saveScreenshot(testName, remoteRobot)
+      saveHierarchy(testName, url)
+    } catch (another: Throwable) {
+      another.initCause(e)
+      throw another
+    }
     throw e
   }
 }
