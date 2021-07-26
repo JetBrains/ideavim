@@ -74,6 +74,7 @@ class UiTests {
     with(sharedSteps) {
       closeIdeaVimDialog()
       closeTipOfTheDay()
+      closeAllTabs()
     }
     idea {
       createFile("MyDoc.txt", this@uiTest)

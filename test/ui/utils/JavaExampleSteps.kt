@@ -18,6 +18,8 @@
 package ui.utils
 
 import com.intellij.remoterobot.RemoteRobot
+import com.intellij.remoterobot.fixtures.CommonContainerFixture
+import com.intellij.remoterobot.fixtures.ComponentFixture
 import com.intellij.remoterobot.fixtures.JButtonFixture
 import com.intellij.remoterobot.search.locators.byXpath
 import com.intellij.remoterobot.stepsProcessing.step
@@ -49,6 +51,12 @@ class JavaExampleSteps(private val remoteRobot: RemoteRobot) {
   fun closeAllGotIt() = step("Close Got It") {
     remoteRobot.findAll<JButtonFixture>(byXpath("//div[@accessiblename='Got It']")).forEach {
       it.click()
+    }
+  }
+
+  fun closeAllTabs() = step("Close all existing tabs") {
+    remoteRobot.findAll<CommonContainerFixture>(byXpath("//div[@class='EditorTabs']//div[@class='SingleHeightLabel']")).forEach {
+      it.find<ComponentFixture>(byXpath("//div[@class='InplaceButton']")).click()
     }
   }
 
