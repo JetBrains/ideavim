@@ -170,11 +170,14 @@ class UiTests {
       enterText("4h")
       enterText("5x")
     }
-    assertEquals("""
+    assertEquals(
+      """
       One Two
       Three Four
       Five
-    """.trimIndent(), editor.text)
+      """.trimIndent(),
+      editor.text
+    )
   }
 
   private fun IdeaFrame.toggleIdeaVim() {
