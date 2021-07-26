@@ -72,6 +72,7 @@ import kotlin.text.StringsKt;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.TestOnly;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -2072,6 +2073,11 @@ public class ChangeGroup {
 
   private void notifyListeners(Editor editor) {
     insertListeners.forEach(listener -> listener.insertModeStarted(editor));
+  }
+
+  @TestOnly
+  public void resetRepeat() {
+    setInsertRepeat(0, 0, false);
   }
 
   private void updateLastInsertedTextRegister() {
