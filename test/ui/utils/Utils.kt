@@ -85,10 +85,13 @@ fun RemoteText.moveMouseForthAndBack(middle: RemoteText, editor: Editor) {
 fun String.escape(): String = this.replace("\n", "\\n")
 
 fun RemoteRobot.invokeActionJs(actionId: String) {
-  runJs("""
+  runJs(
+    """
             const actionId = "$actionId";
             const actionManager = com.intellij.openapi.actionSystem.ActionManager.getInstance();
             const action = actionManager.getAction(actionId);
             actionManager.tryToExecute(action, com.intellij.openapi.ui.playback.commands.ActionCommand.getInputEvent(actionId), null, null, true);
-        """, runInEdt = true)
+        """,
+    runInEdt = true
+  )
 }
