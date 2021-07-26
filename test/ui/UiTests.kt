@@ -26,6 +26,7 @@ import com.intellij.remoterobot.utils.keyboard
 import org.assertj.swing.core.MouseButton
 import org.junit.Test
 import ui.pages.Editor
+import ui.pages.IdeaFrame
 import ui.pages.actionMenu
 import ui.pages.actionMenuItem
 import ui.pages.dialog
@@ -42,7 +43,7 @@ import ui.utils.moveMouseTo
 import ui.utils.tripleClickOnRight
 import ui.utils.uiTest
 import ui.utils.vimExit
-import java.awt.event.KeyEvent
+import java.time.Duration
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
@@ -63,7 +64,7 @@ class UiTests {
           ComponentFixture::class.java,
           byXpath("//div[@class='FrameworksTree']")
         ).findText("Kotlin/JVM").click()
-        runJs("robot.pressAndReleaseKey(${KeyEvent.VK_SPACE})")
+        runJs("robot.pressAndReleaseKey(${java.awt.event.KeyEvent.VK_SPACE})")
         button("Next").click()
         button("Finish").click()
       }
@@ -101,6 +102,43 @@ class UiTests {
       testClickRightFromLineEnd(editor)
       testClickOnWord(editor)
       testGutterClick(editor)
+      reenableIdeaVim(editor)
+    }
+  }
+
+  private fun IdeaFrame.reenableIdeaVim(editor: Editor) {
+    println("Run reenableIdeaVim...")
+    toggleIdeaVim()
+
+    val from = editor.findText("One")
+    from.doubleClick()
+
+    editor.click()
+
+    toggleIdeaVim()
+
+    from.click()
+
+    editor.keyboard {
+      enterText("i")
+      enterText("Hello")
+      escape()
+      enterText("4h")
+      enterText("5x")
+    }
+    assertEquals("""
+      One Two
+      Three Four
+      Five
+    """.trimIndent(), editor.text)
+  }
+
+  private fun IdeaFrame.toggleIdeaVim() {
+    find<ContainerFixture>(byXpath("//div[@accessiblename='Search Everywhere' and @class='ActionButton' and @myaction='Search Everywhere (Searches for classes, files, tool windows, action and preferences)']")).click()
+    keyboard {
+      enterText("Vim Emulator")
+      enter()
+      escape(waitAfter = Duration.ofSeconds(1))
     }
   }
 
