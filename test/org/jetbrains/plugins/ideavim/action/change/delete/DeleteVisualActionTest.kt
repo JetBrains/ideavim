@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.waitAndAssertMode
 
@@ -37,7 +39,7 @@ class DeleteVisualActionTest : VimTestCase() {
             al|l roc|ks and lavender and tufted grass,
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -45,7 +47,7 @@ class DeleteVisualActionTest : VimTestCase() {
             al||ks and lavender and tufted grass,
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -58,7 +60,7 @@ class DeleteVisualActionTest : VimTestCase() {
             al|l roc|ks and lavender and tufted grass,
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -66,7 +68,7 @@ class DeleteVisualActionTest : VimTestCase() {
             al||ks and lavender and tufted grass,
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -79,7 +81,7 @@ class DeleteVisualActionTest : VimTestCase() {
             al|l roc|ks and lavender and tufted grass,
             wh|ere ${c}i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -87,7 +89,7 @@ class DeleteVisualActionTest : VimTestCase() {
             al||ks and lavender and tufted grass,
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -100,7 +102,7 @@ class DeleteVisualActionTest : VimTestCase() {
             al|l roc|ks and lavender and tufted grass,
             wh|${c}ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -108,29 +110,34 @@ class DeleteVisualActionTest : VimTestCase() {
             al||ks and lavender and tufted grass,
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test delete after extend selection`() {
     // This test emulates deletion after structural selection
     // In short, when caret is not on the selection end
-    configureByText("""
+    configureByText(
+      """
             A Discovery
 
             ${s}I found it in a legendary land
             all rocks ${c}and lavender and tufted grass,
             where it was settled on some sodden sand
             ${se}hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     IdeaSelectionControl.controlNonVimSelectionChange(myFixture.editor)
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     typeText(parseKeys("d"))
-    myFixture.checkResult("""
+    assertState(
+      """
             A Discovery
 
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -143,7 +150,7 @@ class DeleteVisualActionTest : VimTestCase() {
             al|l rocks and lavender and tufted grass,[ additional symbols]
             wh|ere it was settled on some sodden sand
             ha|rd by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -151,7 +158,7 @@ class DeleteVisualActionTest : VimTestCase() {
             al|
             wh|
             ha|
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 }

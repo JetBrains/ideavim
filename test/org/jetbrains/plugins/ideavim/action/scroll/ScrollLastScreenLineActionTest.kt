@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
-import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -30,7 +30,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
   fun `test scroll current line to bottom of screen`() {
     configureByPages(5)
     setPositionAndScroll(40, 60)
-    typeText(StringHelper.parseKeys("zb"))
+    typeText(parseKeys("zb"))
     assertPosition(60, 0)
     assertVisibleArea(26, 60)
   }
@@ -38,7 +38,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
   fun `test scroll current line to bottom of screen and leave cursor in current column`() {
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(40, 60, 14)
-    typeText(StringHelper.parseKeys("zb"))
+    typeText(parseKeys("zb"))
     assertPosition(60, 14)
     assertVisibleArea(26, 60)
   }
@@ -47,7 +47,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
     OptionsManager.scrolloff.set(10)
     configureByPages(5)
     setPositionAndScroll(40, 60)
-    typeText(StringHelper.parseKeys("zb"))
+    typeText(parseKeys("zb"))
     assertPosition(60, 0)
     assertVisibleArea(36, 70)
   }
@@ -55,7 +55,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
   fun `test scrolls count line to bottom of screen`() {
     configureByPages(5)
     setPositionAndScroll(40, 60)
-    typeText(StringHelper.parseKeys("100zb"))
+    typeText(parseKeys("100zb"))
     assertPosition(99, 0)
     assertVisibleArea(65, 99)
   }
@@ -64,7 +64,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
     OptionsManager.scrolloff.set(10)
     configureByPages(5)
     setPositionAndScroll(40, 60)
-    typeText(StringHelper.parseKeys("100zb"))
+    typeText(parseKeys("100zb"))
     assertPosition(99, 0)
     assertVisibleArea(75, 109)
   }
@@ -73,7 +73,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
     OptionsManager.scrolljump.set(10)
     configureByPages(5)
     setPositionAndScroll(40, 60)
-    typeText(StringHelper.parseKeys("zb"))
+    typeText(parseKeys("zb"))
     assertPosition(60, 0)
     assertVisibleArea(26, 60)
   }
@@ -81,8 +81,27 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
   fun `test scrolls correctly when less than a page to scroll`() {
     configureByPages(5)
     setPositionAndScroll(5, 15)
-    typeText(StringHelper.parseKeys("zb"))
+    typeText(parseKeys("zb"))
     assertPosition(15, 0)
     assertVisibleArea(0, 34)
+  }
+
+  fun `test scrolls last line to bottom of screen with virtual space`() {
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    setPositionAndScroll(80, 99, 4)
+    typeText(parseKeys("zb"))
+    assertPosition(99, 4)
+    assertVisibleArea(65, 99)
+  }
+
+  fun `test scrolls last line to bottom of screen with virtual space when caret less than scrolloff from bottom`() {
+    OptionsManager.scrolloff.set(10)
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    setPositionAndScroll(80, 97, 4)
+    typeText(parseKeys("zb"))
+    assertPosition(97, 4)
+    assertVisibleArea(65, 99)
   }
 }

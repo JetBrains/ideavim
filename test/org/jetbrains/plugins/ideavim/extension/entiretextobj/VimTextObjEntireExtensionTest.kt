@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,14 +33,14 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
 
   // |gU| |ae|
   fun testUpperCaseEntireBuffer() {
-    doTest(StringHelper.parseKeys("gUae"), poem,"<caret>${poemUC}")
+    doTest(StringHelper.parseKeys("gUae"), poem, "<caret>$poemUC")
     assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |gu| |ae|
   fun testLowerCaseEntireBuffer() {
-    doTest(StringHelper.parseKeys("guae"), poem, "<caret>${poemLC}")
+    doTest(StringHelper.parseKeys("guae"), poem, "<caret>$poemLC")
     assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
@@ -61,54 +61,63 @@ class VimTextObjEntireExtensionTest : JavaVimTestCase() {
 
   // |y| |ae|
   fun testYankEntireBuffer() {
-    doTest(StringHelper.parseKeys("yae"), poem, "<caret>${poemNoCaret}")
+    doTest(StringHelper.parseKeys("yae"), poem, "<caret>$poemNoCaret")
     assertMode(CommandState.Mode.COMMAND)
     myFixture.checkResult(poemNoCaret)
     assertSelection(null)
   }
 
-
   // |gU| |ie|
   fun testUpperCaseEntireBufferIgnoreLeadingTrailing() {
-    doTest(StringHelper.parseKeys("gUie"),
+    doTest(
+      StringHelper.parseKeys("gUie"),
       "\n  \n \n${poem}\n \n  \n",
-      "\n  \n \n<caret>${poemUC}\n \n  \n")
+      "\n  \n \n<caret>${poemUC}\n \n  \n"
+    )
     assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |gu| |ae|
   fun testLowerCaseEntireBufferIgnoreLeadingTrailing() {
-    doTest(StringHelper.parseKeys("guie"),
+    doTest(
+      StringHelper.parseKeys("guie"),
       "\n  \n \n${poem}\n \n  \n",
-      "\n  \n \n<caret>${poemLC}\n \n  \n")
+      "\n  \n \n<caret>${poemLC}\n \n  \n"
+    )
     assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |c| |ae|
   fun testChangeEntireBufferIgnoreLeadingTrailing() {
-    doTest(StringHelper.parseKeys("cie"),
+    doTest(
+      StringHelper.parseKeys("cie"),
       "\n  \n \n${poem}\n  \n \n",
-      "\n  \n \n<caret>\n\n  \n \n") // additional \n because poem ends with a \n
+      "\n  \n \n<caret>\n\n  \n \n"
+    ) // additional \n because poem ends with a \n
     assertMode(CommandState.Mode.INSERT)
     assertSelection(null)
   }
 
   // |d| |ae|
   fun testDeleteEntireBufferIgnoreLeadingTrailing() {
-    doTest(StringHelper.parseKeys("die"),
+    doTest(
+      StringHelper.parseKeys("die"),
       "\n  \n \n${poem}\n  \n \n",
-      "\n  \n \n<caret>\n\n  \n \n") // additional \n because poem ends with a \n
+      "\n  \n \n<caret>\n\n  \n \n"
+    ) // additional \n because poem ends with a \n
     assertMode(CommandState.Mode.COMMAND)
     assertSelection(null)
   }
 
   // |y| |ae|
   fun testYankEntireBufferIgnoreLeadingTrailing() {
-    doTest(StringHelper.parseKeys("yie"),
+    doTest(
+      StringHelper.parseKeys("yie"),
       "\n  \n \n${poem}\n  \n \n",
-      "\n  \n \n<caret>${poemNoCaret}\n  \n \n")
+      "\n  \n \n<caret>${poemNoCaret}\n  \n \n"
+    )
     assertMode(CommandState.Mode.COMMAND)
     myFixture.checkResult("\n  \n \n${poemNoCaret}\n  \n \n")
     assertSelection(null)

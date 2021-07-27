@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,73 +37,105 @@ class ChangeLineActionTest : VimTestCase() {
   }
 
   fun `test on last line with S`() {
-    doTest("S", """
+    doTest(
+      "S",
+      """
             I found it in a legendary land
             all ${c}rocks and lavender and tufted grass,
-    """.trimIndent(), """
+      """.trimIndent(),
+      """
             I found it in a legendary land
             $c
-    """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
   }
 
   fun `test on last line with new line with S`() {
-    doTest("S", """
+    doTest(
+      "S",
+      """
             I found it in a legendary land
             all ${c}rocks and lavender and tufted grass,
             
-    """.trimIndent(), """
+      """.trimIndent(),
+      """
             I found it in a legendary land
             $c
             
-    """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
   }
 
   fun `test on very last line with new line with S`() {
-    doTest("S", """
+    doTest(
+      "S",
+      """
             I found it in a legendary land
             all ${c}rocks and lavender and tufted grass,
-    """.trimIndent(), """
+      """.trimIndent(),
+      """
             I found it in a legendary land
             $c
-    """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
   }
 
   fun `test on first line with new line with S`() {
-    doTest("S", """
+    doTest(
+      "S",
+      """
             I ${c}found it in a legendary land
             all rocks and lavender and tufted grass,
-    """.trimIndent(), """
+      """.trimIndent(),
+      """
             $c
             all rocks and lavender and tufted grass,
-    """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
   }
 
   fun `test on last line with new line with cc`() {
-    doTest("cc", """
+    doTest(
+      "cc",
+      """
             I found it in a legendary land
             all ${c}rocks and lavender and tufted grass,
             
-    """.trimIndent(), """
+      """.trimIndent(),
+      """
             I found it in a legendary land
             $c
             
-    """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
   }
 
   fun `test on last line`() {
-    doTest("cc", """
+    doTest(
+      "cc",
+      """
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             $c
-    """.trimIndent(), """
+      """.trimIndent(),
+      """
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             $c
-    """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
   }
 
   fun `test S with count`() {
-    doTest("3S", """
+    doTest(
+      "3S",
+      """
             ${c}I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
@@ -118,7 +150,8 @@ class ChangeLineActionTest : VimTestCase() {
             corroded tissues could no longer hide
             that priceless mote now dimpling the convex
             and limpid teardrop on a lighted slide.
-    """.trimIndent(), """
+      """.trimIndent(),
+      """
             $c
             hard by the torrent of a mountain pass.
 
@@ -131,6 +164,8 @@ class ChangeLineActionTest : VimTestCase() {
             corroded tissues could no longer hide
             that priceless mote now dimpling the convex
             and limpid teardrop on a lighted slide.
-    """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
   }
 }

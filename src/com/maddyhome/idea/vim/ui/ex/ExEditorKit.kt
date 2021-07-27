@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,45 @@ import javax.swing.text.Document
 import javax.swing.text.TextAction
 
 object ExEditorKit : DefaultEditorKit() {
+
+  @NonNls
+  val CancelEntry: String = "cancel-entry"
+
+  @NonNls
+  val CompleteEntry: String = "complete-entry"
+
+  @NonNls
+  val EscapeChar: String = "escape"
+
+  @NonNls
+  val DeleteToCursor: String = "delete-to-cursor"
+
+  @NonNls
+  val ToggleInsertReplace: String = "toggle-insert"
+
+  @NonNls
+  val InsertRegister: String = "insert-register"
+
+  @NonNls
+  val HistoryUp: String = "history-up"
+
+  @NonNls
+  val HistoryDown: String = "history-down"
+
+  @NonNls
+  val HistoryUpFilter: String = "history-up-filter"
+
+  @NonNls
+  val HistoryDownFilter: String = "history-down-filter"
+
+  @NonNls
+  val StartDigraph: String = "start-digraph"
+
+  @NonNls
+  val StartLiteral: String = "start-literal"
+
+  private val logger = logger<ExEditorKit>()
+
   /**
    * Gets the MIME type of the data that this
    * kit represents support for.
@@ -95,7 +134,7 @@ object ExEditorKit : DefaultEditorKit() {
             if (target.useHandleKeyFromEx) {
               val entry = ExEntryPanel.getInstance().entry
               val editor = entry.editor
-              KeyHandler.getInstance().handleKey(editor, key, EditorDataContext(editor, entry.context))
+              KeyHandler.getInstance().handleKey(editor, key, EditorDataContext.init(editor, entry.context))
             } else {
               val event = ActionEvent(e.source, e.id, c.toString(), e.getWhen(), e.modifiers)
               super.actionPerformed(event)
@@ -109,7 +148,6 @@ object ExEditorKit : DefaultEditorKit() {
       }
     }
   }
-
 
   fun convert(event: ActionEvent): KeyStroke? {
     val cmd = event.actionCommand
@@ -126,42 +164,4 @@ object ExEditorKit : DefaultEditorKit() {
     }
     return null
   }
-
-  @NonNls
-  val CancelEntry: String = "cancel-entry"
-
-  @NonNls
-  val CompleteEntry: String = "complete-entry"
-
-  @NonNls
-  val EscapeChar: String = "escape"
-
-  @NonNls
-  val DeleteToCursor: String = "delete-to-cursor"
-
-  @NonNls
-  val ToggleInsertReplace: String = "toggle-insert"
-
-  @NonNls
-  val InsertRegister: String = "insert-register"
-
-  @NonNls
-  val HistoryUp: String = "history-up"
-
-  @NonNls
-  val HistoryDown: String = "history-down"
-
-  @NonNls
-  val HistoryUpFilter: String = "history-up-filter"
-
-  @NonNls
-  val HistoryDownFilter: String = "history-down-filter"
-
-  @NonNls
-  val StartDigraph: String = "start-digraph"
-
-  @NonNls
-  val StartLiteral: String = "start-literal"
-
-  private val logger = logger<ExEditorKit>()
 }

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +23,10 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.extension.highlightedyank.DEFAULT_HIGHLIGHT_DURATION
 import com.maddyhome.idea.vim.helper.StringHelper
-import junit.framework.Assert
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.assertHappened
-
 
 class VimHighlightedYankTest : VimTestCase() {
   override fun setUp() {
@@ -72,15 +70,19 @@ class VimHighlightedYankTest : VimTestCase() {
     typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_duration = \"500.15\"<CR>"))
     typeText(StringHelper.parseKeys("yy"))
 
-    Assert.assertEquals(VimPlugin.getMessage(), "highlightedyank: Invalid value of g:highlightedyank_highlight_duration -- For input string: \"500.15\"")
+    assertEquals(
+      VimPlugin.getMessage(),
+      "highlightedyank: Invalid value of g:highlightedyank_highlight_duration -- For input string: \"500.15\""
+    )
   }
+
   fun `test not indicating error when correct highlight duration was provided by user`() {
 
     configureByJavaText(code)
     typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_duration = \"-1\"<CR>"))
     typeText(StringHelper.parseKeys("yy"))
 
-    Assert.assertEquals(VimPlugin.getMessage(), "")
+    assertEquals(VimPlugin.getMessage(), "")
   }
 
   fun `test indicating error when incorrect highlight color was provided by user`() {
@@ -90,7 +92,10 @@ class VimHighlightedYankTest : VimTestCase() {
       typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_color = \"$color\"<CR>"))
       typeText(StringHelper.parseKeys("yy"))
 
-      Assert.assertTrue(color, VimPlugin.getMessage().contains("highlightedyank: Invalid value of g:highlightedyank_highlight_color"))
+      assertTrue(
+        color,
+        VimPlugin.getMessage().contains("highlightedyank: Invalid value of g:highlightedyank_highlight_color")
+      )
     }
   }
 
@@ -101,7 +106,7 @@ class VimHighlightedYankTest : VimTestCase() {
       typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_color = \"$color\"<CR>"))
       typeText(StringHelper.parseKeys("yy"))
 
-      Assert.assertEquals("", VimPlugin.getMessage())
+      assertEquals("", VimPlugin.getMessage())
     }
   }
 
@@ -132,6 +137,7 @@ class VimHighlightedYankTest : VimTestCase() {
     }
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test highlighting for a correct user provided amount of time`() {
     configureByJavaText(code)
     typeText(StringHelper.parseKeys(":let g:highlightedyank_highlight_duration = \"1000\"<CR>"))
@@ -154,14 +160,13 @@ fun sum(x: ${c}Int, y: ${c}Int, z: ${c}Int): Int {
 }
 """
 
-
   private fun assertHighlighterRange(start: Int, end: Int, highlighter: RangeHighlighter) {
     assertEquals(start, highlighter.startOffset)
     assertEquals(end, highlighter.endOffset)
   }
 
   private fun assertAllHighlightersCount(count: Int) {
-    Assert.assertEquals(count, getAllHighlightersCount())
+    assertEquals(count, getAllHighlightersCount())
   }
 
   private fun getAllHighlightersCount() = myFixture.editor.markupModel.allHighlighters.size

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@ import java.util.List;
 
 
 public class BoundListOption extends ListOption {
+  protected final @NotNull List<String> values;
+
   BoundListOption(@NonNls String name, @NonNls String abbrev, @NonNls String[] dflt, @NonNls String[] values) {
     super(name, abbrev, dflt, null);
 
@@ -72,6 +74,4 @@ public class BoundListOption extends ListOption {
 
     return true;
   }
-
-  protected final @NotNull List<String> values;
 }

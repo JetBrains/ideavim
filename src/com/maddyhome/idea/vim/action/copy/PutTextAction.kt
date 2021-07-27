@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.helper.StringHelper
 sealed class PutTextBaseAction(
   private val insertTextBeforeCaret: Boolean,
   private val indent: Boolean,
-  private val caretAfterInsertedText: Boolean
+  private val caretAfterInsertedText: Boolean,
 ) : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
@@ -54,4 +54,3 @@ class PutTextBeforeCursorNoIndentAction : PutTextBaseAction(insertTextBeforeCare
 
 class PutTextBeforeCursorAction : PutTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = false)
 class PutTextBeforeCursorActionMoveCursor : PutTextBaseAction(insertTextBeforeCaret = true, indent = true, caretAfterInsertedText = true)
-

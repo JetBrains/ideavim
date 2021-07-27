@@ -1,9 +1,28 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2021 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.maddyhome.idea.vim.command
 
 import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.action.ResetModeAction
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction
+import com.maddyhome.idea.vim.handler.ActionBeanClass
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.key.CommandPartNode
 import com.maddyhome.idea.vim.key.Node
@@ -12,7 +31,7 @@ import org.jetbrains.annotations.TestOnly
 import java.util.*
 import javax.swing.KeyStroke
 
-class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
+class CommandBuilder(private var currentCommandPartNode: CommandPartNode<ActionBeanClass>) {
   private val commandParts = ArrayDeque<Command>()
   private var keyList = mutableListOf<KeyStroke>()
 
@@ -27,8 +46,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
   var expectedArgumentType: Argument.Type? = null
     private set
 
-  var prevExpectedArgumentType: Argument.Type? = null
-    private set
+  private var prevExpectedArgumentType: Argument.Type? = null
 
   val isReady get() = commandState == CurrentCommandState.READY
   val isBad get() = commandState == CurrentCommandState.BAD_COMMAND
@@ -66,7 +84,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
   fun fallbackToCharacterArgument() {
     // Finished handling DIGRAPH. We either succeeded, in which case handle the converted character, or failed to parse,
     // in which case try to handle input as a character argument.
-    assert(expectedArgumentType == Argument.Type.DIGRAPH) { "Cannot move state from $expectedArgumentType to CHARACTER"}
+    assert(expectedArgumentType == Argument.Type.DIGRAPH) { "Cannot move state from $expectedArgumentType to CHARACTER" }
     expectedArgumentType = Argument.Type.CHARACTER
   }
 
@@ -90,11 +108,11 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     keyList.removeAt(keyList.size - 1)
   }
 
-  fun setCurrentCommandPartNode(newNode: CommandPartNode) {
+  fun setCurrentCommandPartNode(newNode: CommandPartNode<ActionBeanClass>) {
     currentCommandPartNode = newNode
   }
 
-  fun getChildNode(key: KeyStroke): Node? {
+  fun getChildNode(key: KeyStroke): Node<ActionBeanClass>? {
     return currentCommandPartNode[key]
   }
 
@@ -151,8 +169,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
         next.register = command.register
         command.register = null
         command = next
-      }
-      else {
+      } else {
         command.argument = Argument(next)
         assert(commandParts.size == 0)
       }
@@ -161,7 +178,7 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     return command
   }
 
-  fun resetAll(commandPartNode: CommandPartNode) {
+  fun resetAll(commandPartNode: CommandPartNode<ActionBeanClass>) {
     resetInProgressCommandPart(commandPartNode)
     commandState = CurrentCommandState.NEW_COMMAND
     commandParts.clear()
@@ -170,11 +187,11 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode) {
     prevExpectedArgumentType = null
   }
 
-  fun resetInProgressCommandPart(commandPartNode: CommandPartNode) {
+  fun resetInProgressCommandPart(commandPartNode: CommandPartNode<ActionBeanClass>) {
     count = 0
     setCurrentCommandPartNode(commandPartNode)
   }
 
   @TestOnly
-  fun getCurrentTrie(): CommandPartNode = currentCommandPartNode
+  fun getCurrentTrie(): CommandPartNode<ActionBeanClass> = currentCommandPartNode
 }

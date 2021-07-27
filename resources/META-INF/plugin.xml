@@ -2,22 +2,41 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-    <h3>Merged PRs:</h3>
+    <h3>Features:</h3>
     <ul>
-    <li>
-      <a href="https://github.com/JetBrains/ideavim/pull/260">260</a>
-      by <a href="https://github.com/citizenmatt">Matt Ellis</a>: Refactor SearchGroup
-    </li>
+      <li>Support several buffer management commands <a href="https://youtrack.jetbrains.com/issue/VIM-1062">VIM-1062</a>,
+        <a href="https://youtrack.jetbrains.com/issue/VIM-2335">VIM-2335</a></li>
     </ul>
 
     <h3>Fixes:</h3>
     <ul>
-    <li>
-      <a href="https://youtrack.jetbrains.com/issue/VIM-2194">VIM-2194</a>
-      Fix caret shape during editing a new file
-    </li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2317">VIM-2317</a> Fix memory leak</li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1357">VIM-1357</a>
+        <a href="https://youtrack.jetbrains.com/issue/VIM-1566">VIM-1566</a> Fix external filters
+      </li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2336">VIM-2336</a> Fix repeat for the <code>T</code> movement
+      </li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1192">VIM-1192</a> Fix dollar motion from single command</li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1672">VIM-1672</a> IdeaVim correctly populates clipboard history
+      </li>
+      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2351">VIM-2351</a> Correctly select last character when
+        selecting with mouse
+      </li>
     </ul>
-  ]]>
+
+    <h3>Merged PRs:</h3>
+    <ul>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/332">332</a> by <a href="https://github.com/citizenmatt">Matt
+        Ellis</a>: VIM-1357+VIM-1566: Use OS shell to run filter command
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/333">333</a> by <a href="https://github.com/MichalPlacek">Michal
+        Placek</a>: VIM-1062
+      </li>
+      <li><a href="https://github.com/JetBrains/ideavim/pull/334">334</a> by <a href="https://github.com/MichalPlacek">Michal
+        Placek</a>: vim-2335 Support for navigation to previous buffer with :b#
+      </li>
+    </ul>
+    ]]>
   </change-notes>
   <description><![CDATA[
       <p>Vim emulation plugin for IntelliJ Platform-based IDEs.</p>
@@ -78,6 +97,10 @@
     <postStartupActivity implementation="com.maddyhome.idea.vim.PluginStartup" order="first"/>
 
     <editorFloatingToolbarProvider implementation="com.maddyhome.idea.vim.ui.ReloadFloatingToolbar"/>
+
+    <actionPromoter implementation="com.maddyhome.idea.vim.key.VimActionsPromoter" order="last"/>
+
+    <spellchecker.bundledDictionaryProvider implementation="com.maddyhome.idea.vim.VimBundledDictionaryProvider"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
@@ -92,23 +115,17 @@
     </action>
 
     <!-- Internal -->
+    <!--suppress PluginXmlI18n -->
     <action id="VimInternalAddBlockInlays" class="com.maddyhome.idea.vim.action.internal.AddBlockInlaysAction" text="Add Test Block Inlays | IdeaVim Internal" internal="true"/>
+    <!--suppress PluginXmlI18n -->
     <action id="VimInternalAddInlineInlays" class="com.maddyhome.idea.vim.action.internal.AddInlineInlaysAction" text="Add Test Inline Inlays | IdeaVim Internal" internal="true"/>
 
     <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction"/>
     <action id="VimActions" class="com.maddyhome.idea.vim.ui.VimActions"/>
 
-    <!--    [Version Update] 202+ use-shortcut-of="ExternalSystem.ProjectRefreshAction" -->
     <group id="IdeaVim.ReloadVimRc.group" class="com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup">
-      <action id="IdeaVim.ReloadVimRc.reload" class="com.maddyhome.idea.vim.ui.ReloadVimRc">
-        <keyboard-shortcut first-keystroke="control shift O" keymap="$default"/>
-        <keyboard-shortcut first-keystroke="control shift O" keymap="Eclipse" remove="true"/>
-        <keyboard-shortcut first-keystroke="control shift O" keymap="NetBeans 6.5" remove="true"/>
-        <keyboard-shortcut first-keystroke="control shift O" keymap="Visual Studio" remove="true"/>
-        <keyboard-shortcut first-keystroke="meta shift O" keymap="Mac OS X" replace-all="true"/>
-        <keyboard-shortcut first-keystroke="meta shift O" keymap="Eclipse (Mac OS X)" replace-all="true" remove="true"/>
-        <keyboard-shortcut first-keystroke="meta shift O" keymap="Xcode" replace-all="true" remove="true"/>
-        <keyboard-shortcut first-keystroke="meta shift I" keymap="Mac OS X 10.5+" replace-all="true"/>
+      <action id="IdeaVim.ReloadVimRc.reload" class="com.maddyhome.idea.vim.ui.ReloadVimRc"
+              use-shortcut-of="ExternalSystem.ProjectRefreshAction">
       </action>
     </group>
 

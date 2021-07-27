@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.actionSystem.TypedActionHandler
 import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
+import com.maddyhome.idea.vim.option.OptionsManager
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -36,6 +37,7 @@ import javax.swing.KeyStroke
  */
 class VimTypedActionHandler(origHandler: TypedActionHandler?) : TypedActionHandlerEx {
   private val handler = KeyHandler.getInstance()
+  private val traceTime = OptionsManager.ideatracetime.isSet
 
   init {
     handler.originalHandler = origHandler
@@ -61,7 +63,12 @@ class VimTypedActionHandler(origHandler: TypedActionHandler?) : TypedActionHandl
     try {
       val modifiers = if (charTyped == ' ' && VimKeyListener.isSpaceShift) KeyEvent.SHIFT_DOWN_MASK else 0
       val keyStroke = KeyStroke.getKeyStroke(charTyped, modifiers)
-      handler.handleKey(editor, keyStroke, EditorDataContext(editor, context))
+      val startTime = if (traceTime) System.currentTimeMillis() else null
+      handler.handleKey(editor, keyStroke, EditorDataContext.init(editor, context))
+      if (startTime != null) {
+        val duration = System.currentTimeMillis() - startTime
+        logger.info("VimTypedAction '$charTyped': $duration ms")
+      }
     } catch (e: Throwable) {
       logger.error(e)
     }

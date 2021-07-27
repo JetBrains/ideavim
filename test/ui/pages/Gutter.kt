@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,11 +27,15 @@ import com.intellij.remoterobot.search.locators.byXpath
 
 @JvmOverloads
 fun ContainerFixture.gutter(function: Gutter.() -> Unit = {}): ContainerFixture {
-    return find<Gutter>(
-            byXpath("//div[@class='EditorGutterComponentImpl']"))
-            .apply { runJs("robot.moveMouse(component);") }
-            .apply(function)
+  return find<Gutter>(
+    byXpath("//div[@class='EditorGutterComponentImpl']")
+  )
+    .apply { runJs("robot.moveMouse(component);") }
+    .apply(function)
 }
 
 @FixtureName("Gutter")
-class Gutter(remoteRobot: RemoteRobot, remoteComponent: RemoteComponent) : CommonContainerFixture(remoteRobot, remoteComponent)
+class Gutter(
+  remoteRobot: RemoteRobot,
+  remoteComponent: RemoteComponent,
+) : CommonContainerFixture(remoteRobot, remoteComponent)

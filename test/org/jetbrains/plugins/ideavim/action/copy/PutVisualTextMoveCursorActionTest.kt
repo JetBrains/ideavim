@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.VimPlugin
@@ -24,6 +23,8 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.Ignore
 
@@ -33,15 +34,17 @@ import org.junit.Ignore
 
 class PutVisualTextMoveCursorActionTest : VimTestCase() {
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("v2e", "2gp"))
     val after = "legendarylegendary$c in a legendary land"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text linewise`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
@@ -51,19 +54,21 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
 
             legendary
             $c in a legendary land
-            """.trimIndent()
-    myFixture.checkResult(after)
+    """.trimIndent()
+    assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text line linewise`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("V", "gp"))
     val after = "legendary\n$c"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test replace row`() {
     val file = """
             A Discovery
@@ -72,7 +77,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val newFile = """
             A Discovery
 
@@ -80,14 +85,15 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             ${c}all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val editor = configureByText(file)
     VimPlugin.getRegister().storeText(editor, TextRange(2, 11), SelectionType.LINE_WISE, false)
     typeText(parseKeys("V", "gp"))
-    myFixture.checkResult(newFile)
+    assertState(newFile)
   }
 
-  @VimBehaviorDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(
+    originalVimAfter = """
             A Discovery
 
             ound it in a legendary land
@@ -95,7 +101,8 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             re it was settled on some sodden sand
             d by the torrent of a mountain pass.
             ${c}A Discovery
-    """)
+    """
+  )
   fun `test put line in block selection`() {
     val file = """
             ${c}A Discovery
@@ -104,7 +111,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val newFile = """
             A Discovery
 
@@ -114,11 +121,12 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             d by the torrent of a mountain pass.
             A Discovery
             $c
-        """.trimIndent()
+    """.trimIndent()
     typeTextInFile(parseKeys("Y", "2j", "<C-v>", "2l", "3j", "gp"), file)
-    myFixture.checkResult(newFile)
+    assertState(newFile)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test Put visual text linewise`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
@@ -128,35 +136,38 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
 
             legendary
             $c in a legendary land
-            """.trimIndent()
-    myFixture.checkResult(after)
+    """.trimIndent()
+    assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test Put visual text`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("v2e", "2gP"))
     val after = "legendarylegendary$c in a legendary land"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test Put visual text full line`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("v$", "2gP"))
     val after = "legendarylegendar${c}y"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test Put visual text line linewise`() {
     val before = "${c}I found it in a legendary land"
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("V", "gP"))
     val after = "legendary\n$c"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test Put line in block selection`() {
@@ -167,7 +178,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val newFile = """
             A Discovery
 
@@ -176,20 +187,20 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
              rocks and lavender and tufted grass,
             re it was settled on some sodden sand
             d by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     typeTextInFile(parseKeys("Y", "2j", "<C-v>", "2l", "3j", "gP"), file)
-    myFixture.checkResult(newFile)
+    assertState(newFile)
   }
 
-
   // Legacy tests
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual text linewise multicaret`() {
     val before = """
             q${c}werty
             as${c}dfgh
             ${c}zxcvbn
 
-            """.trimIndent()
+    """.trimIndent()
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor, TextRange(14, 21), SelectionType.LINE_WISE, false)
     typeText(parseKeys("vl", "gp"))
@@ -204,11 +215,11 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             zxcvbn
             ${c}cvbn
 
-            """.trimIndent()
-    myFixture.checkResult(after)
+    """.trimIndent()
+    assertState(after)
   }
 
-
+  @Suppress("unused")
   @Ignore
   fun `ingoretest put visual block visual line mode`() {
     val before = """
@@ -218,7 +229,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             rty
             fgh
             vbn
-            """.trimIndent()
+    """.trimIndent()
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.BLOCK_WISE, false)
     typeText(parseKeys("<S-v>", "gp"))
@@ -229,10 +240,11 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             rty
             fgh
             vbn
-            """.trimIndent()
-    myFixture.checkResult(after)
+    """.trimIndent()
+    assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test put visual block linewise`() {
     val before = """
             qw${c}e
@@ -241,7 +253,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             rty
             fgh
             vbn
-            """.trimIndent()
+    """.trimIndent()
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.LINE_WISE, false)
     typeText(parseKeys("<C-v>", "h", "gp"))
@@ -254,11 +266,11 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             rty
             fgh
             vbn
-            """.trimIndent()
-    myFixture.checkResult(after)
+    """.trimIndent()
+    assertState(after)
   }
 
-
+  @Suppress("unused")
   @Ignore
   fun `ignoretest put visual text multicaret`() {
     val before = "${c}qwe asd ${c}zxc rty ${c}fgh vbn"
@@ -266,6 +278,6 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(parseKeys("v2e", "2gp"))
     val after = "fghfgh$c fghfgh$c fghfgh$c"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 }

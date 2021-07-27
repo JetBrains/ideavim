@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,18 +21,21 @@ package com.maddyhome.idea.vim;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.IdeEventQueue;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorModificationUtil;
 import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.DocCommandGroupId;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
+import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.action.change.VimRepeater;
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction;
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction;
@@ -41,6 +44,7 @@ import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
+import com.maddyhome.idea.vim.handler.ActionBeanClass;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.*;
@@ -120,9 +124,10 @@ public class KeyHandler {
    * @param action  The action to execute
    * @param context The context to run it in
    */
+  @SuppressWarnings("deprecation")
   public static boolean executeAction(@NotNull AnAction action, @NotNull DataContext context) {
     final AnActionEvent event =
-      new AnActionEvent(null, context, ActionPlaces.ACTION_SEARCH, action.getTemplatePresentation(),
+      new AnActionEvent(null, context, ActionPlaces.KEYBOARD_SHORTCUT, action.getTemplatePresentation(),
                         ActionManager.getInstance(), 0);
 
     if (action instanceof ActionGroup && !((ActionGroup)action).canBePerformed(context)) {
@@ -146,7 +151,16 @@ public class KeyHandler {
       //   because rider use async update method. See VIM-1819.
       action.beforeActionPerformedUpdate(event);
       if (event.getPresentation().isEnabled()) {
+        // Executing listeners for action. I can't be sure that this code is absolutely correct,
+        //   action execution process in IJ seems to be more complicated.
+        ActionManagerEx actionManager = ActionManagerEx.getInstanceEx();
+        // [VERSION UPDATE] 212+
+        actionManager.fireBeforeActionPerformed(action, event.getDataContext(), event);
+
         action.actionPerformed(event);
+
+        // [VERSION UPDATE] 212+
+        actionManager.fireAfterActionPerformed(action, event.getDataContext(), event);
         return true;
       }
     }
@@ -162,7 +176,7 @@ public class KeyHandler {
    * @param context The data context
    */
   public void handleKey(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context) {
-    handleKey(editor, key, context, true);
+    handleKey(editor, key, context, true, false);
   }
 
   /**
@@ -187,10 +201,25 @@ public class KeyHandler {
     }
   }
 
+  /**
+   * Handling input keys with additional parameters
+   *
+   * @param allowKeyMappings - If we allow key mappings or not
+   * @param mappingCompleted - if true, we don't check if the mapping is incomplete
+   *
+   * TODO mappingCompleted and recursionCounter - we should find a more beautiful way to use them
+   */
   public void handleKey(@NotNull Editor editor,
                         @NotNull KeyStroke key,
                         @NotNull DataContext context,
-                        boolean allowKeyMappings) {
+                        boolean allowKeyMappings,
+                        boolean mappingCompleted) {
+    if (handleKeyRecursionCount >= OptionsManager.INSTANCE.getMaxmapdepth().value()) {
+      VimPlugin.showMessage(MessageHelper.message("E223"));
+      VimPlugin.indicateError();
+      return;
+    }
+
     VimPlugin.clearError();
     // All the editor actions should be performed with top level editor!!!
     // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
@@ -207,7 +236,7 @@ public class KeyHandler {
     handleKeyRecursionCount++;
 
     try {
-      if (!allowKeyMappings || !handleKeyMapping(editor, key, context)) {
+      if (!allowKeyMappings || !handleKeyMapping(editor, key, context, mappingCompleted)) {
         if (isCommandCountKey(chKey, editorState)) {
           commandBuilder.addCountCharacter(key);
         } else if (isDeleteCommandCountKey(key, editorState)) {
@@ -229,13 +258,13 @@ public class KeyHandler {
         else if (!handleDigraph(editor, key, context, editorState)) {
           // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
           // return the node matching this keystroke
-          final Node node = mapOpCommand(key, commandBuilder.getChildNode(key), editorState);
+          final Node<ActionBeanClass> node = mapOpCommand(key, commandBuilder.getChildNode(key), editorState);
 
           if (node instanceof CommandNode) {
-            handleCommandNode(editor, context, key, (CommandNode) node, editorState);
+            handleCommandNode(editor, context, key, (CommandNode<ActionBeanClass>) node, editorState);
             commandBuilder.addKey(key);
           } else if (node instanceof CommandPartNode) {
-            commandBuilder.setCurrentCommandPartNode((CommandPartNode) node);
+            commandBuilder.setCurrentCommandPartNode((CommandPartNode<ActionBeanClass>) node);
             commandBuilder.addKey(key);
           } else if (isSelectRegister(key, editorState)) {
             editorState.pushModes(CommandState.Mode.COMMAND, CommandState.SubMode.REGISTER_PENDING);
@@ -288,7 +317,7 @@ public class KeyHandler {
   /**
    * See the description for {@link com.maddyhome.idea.vim.action.DuplicableOperatorAction}
    */
-  private Node mapOpCommand(KeyStroke key, Node node, @NotNull CommandState editorState) {
+  private Node<ActionBeanClass> mapOpCommand(KeyStroke key, Node<ActionBeanClass> node, @NotNull CommandState editorState) {
     if (editorState.isDuplicateOperatorKeyStroke(key)) {
       return editorState.getCommandBuilder().getChildNode(KeyStroke.getKeyStroke('_'));
     }
@@ -311,11 +340,20 @@ public class KeyHandler {
     if (editorState.getCommandBuilder().isAtDefaultState()) {
       RegisterGroup register = VimPlugin.getRegister();
       if (register.getCurrentRegister() == register.getDefaultRegister()) {
+        boolean indicateError = true;
+
         if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
+          Ref<Boolean> executed = Ref.create();
           CommandProcessor.getInstance()
-            .executeCommand(editor.getProject(), () -> KeyHandler.executeAction("EditorEscape", context), "", null);
+            .executeCommand(editor.getProject(),
+                            () -> executed.set(KeyHandler.executeAction(IdeActions.ACTION_EDITOR_ESCAPE, context)),
+                            "", null);
+          indicateError = !executed.get();
         }
-        VimPlugin.indicateError();
+
+        if (indicateError) {
+          VimPlugin.indicateError();
+        }
       }
     }
     reset(editor);
@@ -324,7 +362,8 @@ public class KeyHandler {
 
   private boolean handleKeyMapping(final @NotNull Editor editor,
                                    final @NotNull KeyStroke key,
-                                   final @NotNull DataContext context) {
+                                   final @NotNull DataContext context,
+                                   boolean mappingCompleted) {
 
     final CommandState commandState = CommandState.getInstance(editor);
     final MappingState mappingState = commandState.getMappingState();
@@ -346,8 +385,8 @@ public class KeyHandler {
 
     // Returns true if any of these methods handle the key. False means that the key is unrelated to mapping and should
     // be processed as normal.
-    return handleUnfinishedMappingSequence(editor, mappingState, mapping)
-      || handleCompleteMappingSequence(editor, context, commandState, mappingState, mapping, key)
+    return (handleUnfinishedMappingSequence(editor, mappingState, mapping, mappingCompleted))
+      || handleCompleteMappingSequence(editor, context, mappingState, mapping, key)
       || handleAbandonedMappingSequence(editor, mappingState, context);
   }
 
@@ -360,7 +399,10 @@ public class KeyHandler {
 
   private boolean handleUnfinishedMappingSequence(@NotNull Editor editor,
                                                   @NotNull MappingState mappingState,
-                                                  @NotNull KeyMapping mapping) {
+                                                  @NotNull KeyMapping mapping,
+                                                  boolean mappingCompleted) {
+    if (mappingCompleted) return false;
+
     // Is there at least one mapping that starts with the current sequence? This does not include complete matches,
     // unless a sequence is also a prefix for another mapping. We eagerly evaluate the shortest mapping, so even if a
     // mapping is a prefix, it will get evaluated when the next character is entered.
@@ -375,19 +417,17 @@ public class KeyHandler {
     // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
     // delete a word)
     final Application application = ApplicationManager.getApplication();
-    if (!application.isUnitTestMode() && OptionsManager.INSTANCE.getTimeout().isSet()) {
+    if (OptionsManager.INSTANCE.getTimeout().isSet()) {
       mappingState.startMappingTimer(actionEvent -> application.invokeLater(() -> {
 
         final List<KeyStroke> unhandledKeys = mappingState.detachKeys();
 
-        // TODO: I'm not sure why we abandon plugin commands here
-        // Would be useful to have a comment or a helpfully named helper method here
-        if (editor.isDisposed() || unhandledKeys.get(0).equals(StringHelper.PlugKeyStroke)) {
+        if (editor.isDisposed() || isPluginMapping(unhandledKeys)) {
           return;
         }
 
         for (KeyStroke keyStroke : unhandledKeys) {
-          handleKey(editor, keyStroke, new EditorDataContext(editor, null), false);
+          handleKey(editor, keyStroke, EditorDataContext.init(editor, null), true, true);
         }
       }, ModalityState.stateForComponent(editor.getComponent())));
     }
@@ -397,7 +437,6 @@ public class KeyHandler {
 
   private boolean handleCompleteMappingSequence(@NotNull Editor editor,
                                                 @NotNull DataContext context,
-                                                @NotNull CommandState commandState,
                                                 @NotNull MappingState mappingState,
                                                 @NotNull KeyMapping mapping,
                                                 KeyStroke key) {
@@ -430,13 +469,13 @@ public class KeyHandler {
 
     mappingState.resetMappingSequence();
 
-    final EditorDataContext currentContext = new EditorDataContext(editor, context);
+    final EditorDataContext currentContext = EditorDataContext.init(editor, context);
 
     mappingInfo.execute(editor, context);
 
     // If we've just evaluated the previous key sequence, make sure to also handle the current key
     if (mappingInfo != currentMappingInfo) {
-      handleKey(editor, key, currentContext, true);
+      handleKey(editor, key, currentContext, true, false);
     }
 
     return true;
@@ -464,25 +503,28 @@ public class KeyHandler {
     // If user enters `dI`, the first `d` will be caught be this handler because it's a prefix for `ds` command.
     //  After the user enters `I`, the caught `d` should be processed without mapping, and the rest of keys
     //  should be processed with mappings (to make I work)
-    //
-    // Additionally, the <Plug>mappings are not executed if the fail to map to something.
-    //   E.g.
-    //   - map <Plug>iA someAction
-    //   - map I <Plug>i
-    //   For `IA` someAction should be executed.
-    //   But if the user types `Ib`, `<Plug>i` won't be executed again. Only `b` will be passed to keyHandler.
 
-    if (unhandledKeyStrokes.get(0).equals(StringHelper.PlugKeyStroke)) {
-      handleKey(editor, unhandledKeyStrokes.get(unhandledKeyStrokes.size() - 1), context, true);
+    if (isPluginMapping(unhandledKeyStrokes)) {
+      handleKey(editor, unhandledKeyStrokes.get(unhandledKeyStrokes.size() - 1), context, true, false);
     } else {
-      handleKey(editor, unhandledKeyStrokes.get(0), context, false);
+      handleKey(editor, unhandledKeyStrokes.get(0), context, false, false);
 
       for (KeyStroke keyStroke : unhandledKeyStrokes.subList(1, unhandledKeyStrokes.size())) {
-        handleKey(editor, keyStroke, context, true);
+        handleKey(editor, keyStroke, context, true, false);
       }
     }
 
     return true;
+  }
+
+  // The <Plug>mappings are not executed if they fail to map to something.
+  //   E.g.
+  //   - map <Plug>iA someAction
+  //   - map I <Plug>i
+  //   For `IA` someAction should be executed.
+  //   But if the user types `Ib`, `<Plug>i` won't be executed again. Only `b` will be passed to keyHandler.
+  private boolean isPluginMapping(List<KeyStroke> unhandledKeyStrokes) {
+    return unhandledKeyStrokes.get(0).equals(StringHelper.PlugKeyStroke);
   }
 
   @SuppressWarnings("RedundantIfStatement")
@@ -660,9 +702,14 @@ public class KeyHandler {
 
     Project project = editor.getProject();
     final Command.Type type = command.getType();
-    if (type.isWrite() && !editor.getDocument().isWritable()) {
-      VimPlugin.indicateError();
-      reset(editor);
+    if (type.isWrite()) {
+      boolean modificationAllowed = EditorModificationUtil.checkModificationAllowed(editor);
+      boolean writeRequested = EditorModificationUtil.requestWriting(editor);
+      if (!modificationAllowed || !writeRequested) {
+        VimPlugin.indicateError();
+        reset(editor);
+        return;
+      }
     }
 
     if (!command.getFlags().contains(CommandFlags.FLAG_TYPEAHEAD_SELF_MANAGE)) {
@@ -689,7 +736,7 @@ public class KeyHandler {
   private void handleCommandNode(Editor editor,
                                  DataContext context,
                                  KeyStroke key,
-                                 @NotNull CommandNode node,
+                                 @NotNull CommandNode<ActionBeanClass> node,
                                  CommandState editorState) {
     // The user entered a valid command. Create the command and add it to the stack.
     final EditorActionHandlerBase action = node.getActionHolder().getInstance();
@@ -738,7 +785,7 @@ public class KeyHandler {
     }
   }
 
-  private boolean stopMacroRecord(CommandNode node, @NotNull CommandState editorState) {
+  private boolean stopMacroRecord(CommandNode<ActionBeanClass> node, @NotNull CommandState editorState) {
     return editorState.isRecording() && node.getActionHolder().getInstance() instanceof ToggleRecordingAction;
   }
 
@@ -801,7 +848,7 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  public void partialReset(@Nullable Editor editor) {
+  public void partialReset(@NotNull Editor editor) {
     CommandState editorState = CommandState.getInstance(editor);
     editorState.getMappingState().resetMappingSequence();
     editorState.getCommandBuilder().resetInProgressCommandPart(getKeyRoot(editorState.getMappingState().getMappingMode()));
@@ -812,13 +859,13 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  public void reset(@Nullable Editor editor) {
+  public void reset(@NotNull Editor editor) {
     partialReset(editor);
     CommandState editorState = CommandState.getInstance(editor);
     editorState.getCommandBuilder().resetAll(getKeyRoot(editorState.getMappingState().getMappingMode()));
   }
 
-  private @NotNull CommandPartNode getKeyRoot(MappingMode mappingMode) {
+  private @NotNull CommandPartNode<ActionBeanClass> getKeyRoot(MappingMode mappingMode) {
     return VimPlugin.getKey().getKeyRoot(mappingMode);
   }
 
@@ -828,7 +875,7 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  public void fullReset(@Nullable Editor editor) {
+  public void fullReset(@NotNull Editor editor) {
     VimPlugin.clearError();
     CommandState.getInstance(editor).reset();
     reset(editor);
@@ -836,10 +883,8 @@ public class KeyHandler {
     if (registerGroup != null) {
       registerGroup.resetRegister();
     }
-    if (editor != null) {
-      VisualGroupKt.updateCaretState(editor);
-      editor.getSelectionModel().removeSelection();
-    }
+    VisualGroupKt.updateCaretState(editor);
+    editor.getSelectionModel().removeSelection();
   }
 
   // This method is copied from com.intellij.openapi.editor.actionSystem.EditorAction.getProjectAwareDataContext
@@ -875,8 +920,7 @@ public class KeyHandler {
     private final Map<String, Object> values = new HashMap<>();
 
     DialogAwareDataContext(DataContext context) {
-      //noinspection rawtypes
-      for (DataKey key : keys) {
+      for (DataKey<?> key : keys) {
         values.put(key.getName(), key.getData(context));
       }
     }

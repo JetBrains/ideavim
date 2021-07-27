@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,144 +20,171 @@ package org.jetbrains.plugins.ideavim.group.motion
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
  * @author Alex Plate
  */
-@Suppress("ClassName")
+@Suppress("ClassName", "DEPRECATION")
 class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable character selection`() {
-    configureByText("""
+    configureByText(
+      """
             A Discovery
 
             I ${s}found it$se in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.COMMAND)
     VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable character selection multicaret`() {
-    configureByText("""
+    configureByText(
+      """
             A Discovery
 
             I ${s}found it$c$se in a legendary land
             all rocks and lavender ${s}and tufted$c$se grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.COMMAND)
     VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable line selection`() {
-    configureByText("""
+    configureByText(
+      """
             A Discovery
 
             ${s}I found it in a legendary land$se
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.COMMAND)
     VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable line selection multicaret`() {
-    configureByText("""
+    configureByText(
+      """
             A Discovery
 
             ${s}I found it in a legendary land$c$se
             all rocks and lavender and tufted grass,
             ${s}where it was settled on some sodden sand$c$se
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.COMMAND)
     VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable line selection till next line`() {
-    configureByText("""
+    configureByText(
+      """
             A Discovery
 
             ${s}I found it in a legendary land
             ${se}all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.COMMAND)
     VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable line selection till next line multicaret`() {
-    configureByText("""
+    configureByText(
+      """
             ${s}A Discovery
             $c$se
             ${s}I found it in a legendary land
             $c${se}all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.COMMAND)
     VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_LINE)
   }
 
-
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable block selection`() {
-    configureByText("""
+    configureByText(
+      """
             A Discovery
 
             I ${s}found$c$se it in a legendary land
             al${s}l roc$c${se}ks and lavender and tufted grass,
             wh${s}ere i$c${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.COMMAND)
     VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable block selection with different line size`() {
-    configureByText("""
+    configureByText(
+      """
             A Discovery
 
             I ${s}found it in a legendary land$c$se
             al${s}l rocks and lavender and tufted grass,$c$se
             wh${s}ere it was settled on some sodden sand$c$se
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.COMMAND)
     VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
     assertMode(CommandState.Mode.VISUAL)
     assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT, description = "Deprecated function test")
   fun `test enable block selection with long line`() {
-    configureByText("""
+    configureByText(
+      """
             A Discovery
 
             I ${s}found it in a legendary land$c$se
             al${s}l rocks and lavender and tufted grass,$c$se
             wh${s}ere it was settled on some sodden sand12345$c${se}6789
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.COMMAND)
     VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
     assertMode(CommandState.Mode.VISUAL)

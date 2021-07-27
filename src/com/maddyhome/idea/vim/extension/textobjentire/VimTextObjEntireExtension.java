@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,8 +34,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
+import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
 import static com.maddyhome.idea.vim.group.visual.VisualGroupKt.vimSetSelection;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
@@ -76,8 +75,8 @@ public class VimTextObjEntireExtension implements VimExtension {
     putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>textobj-entire-i"), getOwner(),
       new VimTextObjEntireExtension.EntireHandler(true), false);
 
-    putKeyMapping(MappingMode.XO, parseKeys("ae"), getOwner(), parseKeys("<Plug>textobj-entire-a"), true);
-    putKeyMapping(MappingMode.XO, parseKeys("ie"), getOwner(), parseKeys("<Plug>textobj-entire-i"), true);
+    putKeyMappingIfMissing(MappingMode.XO, parseKeys("ae"), getOwner(), parseKeys("<Plug>textobj-entire-a"), true);
+    putKeyMappingIfMissing(MappingMode.XO, parseKeys("ie"), getOwner(), parseKeys("<Plug>textobj-entire-i"), true);
   }
 
   static class EntireHandler implements VimExtensionHandler {
@@ -135,6 +134,7 @@ public class VimTextObjEntireExtension implements VimExtension {
       int count = Math.max(1, commandState.getCommandBuilder().getCount());
 
       final EntireTextObjectHandler textObjectHandler = new EntireTextObjectHandler(ignoreLeadingAndTrailing);
+      //noinspection DuplicatedCode
       if (!commandState.isOperatorPending()) {
         editor.getCaretModel().runForEachCaret((Caret caret) -> {
           final TextRange range = textObjectHandler.getRange(editor, caret, context, count, 0, null);

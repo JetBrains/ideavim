@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /*
@@ -44,6 +46,15 @@ class ScrollLineDownActionTest : VimTestCase() {
     typeText(parseKeys("<C-E>"))
     assertPosition(1, 0)
     assertVisibleArea(1, 35)
+  }
+
+  fun `test scroll line down will maintain current column at start of line with sidescrolloff`() {
+    OptionsManager.sidescrolloff.set(10)
+    configureByPages(5)
+    setPositionAndScroll(30, 50, 5)
+    typeText(parseKeys("<C-E>"))
+    assertPosition(50, 5)
+    assertTopLogicalLine(31)
   }
 
   fun `test scroll count lines down`() {
@@ -75,6 +86,7 @@ class ScrollLineDownActionTest : VimTestCase() {
     assertVisibleArea(146, 175)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll down uses scrolloff and moves cursor`() {
     OptionsManager.scrolloff.set(10)
     configureByPages(5)
@@ -98,5 +110,24 @@ class ScrollLineDownActionTest : VimTestCase() {
     setPositionAndScroll(20, 30)
     typeText(parseKeys("Vjjjj", "<C-E>"))
     assertVisibleArea(21, 55)
+  }
+
+  fun `test scroll last line down at end of file with virtual space`() {
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    setPositionAndScroll(75, 99, 4)
+    typeText(parseKeys("<C-E>"))
+    assertPosition(99, 4)
+    assertVisibleArea(76, 99)
+  }
+
+  fun `test scroll line down at end of file with virtual space and scrolloff`() {
+    OptionsManager.scrolloff.set(10)
+    configureByLines(100, "    I found it in a legendary land")
+    setEditorVirtualSpace()
+    setPositionAndScroll(75, 95, 4)
+    typeText(parseKeys("<C-E>"))
+    assertPosition(95, 4)
+    assertVisibleArea(76, 99)
   }
 }

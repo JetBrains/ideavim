@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,10 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotion
+import com.maddyhome.idea.vim.handler.toMotionOrError
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.option.KeyModelOptionData
@@ -39,7 +42,14 @@ class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
 
   override val motionType: MotionType = MotionType.EXCLUSIVE
 
-  override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+  override fun getOffset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?,
+  ): Motion {
     val keymodel = OptionsManager.keymodel
     if (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel) {
       logger.debug("Keymodel option has stopselect. Exiting select mode")
@@ -50,12 +60,12 @@ class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
         logger.debug("Template is active. Activate insert mode")
         VimPlugin.getChange().insertBeforeCursor(editor, context)
         if (caret.offset in startSelection..endSelection) {
-          return startSelection
+          return startSelection.toMotion()
         }
       }
       // No return statement, perform motion to left
     }
-    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -count, false)
+    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -count, false).toMotionOrError()
   }
 
   companion object {

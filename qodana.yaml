@@ -1,0 +1,20 @@
+version: 1.0
+profile:
+  name: Qodana
+exclude:
+  - name: MoveVariableDeclarationIntoWhen
+  - name: PluginXmlValidity
+  - name: RedundantThrows
+  - name: SuperTearDownInFinally
+  - name: UnusedReturnValue
+  - name: All
+    paths:
+      - build.gradle
+      - gradle/wrapper/gradle-wrapper.properties
+      - resources/icons/youtrack.svg
+      - src/com/maddyhome/idea/vim/ex/vimscript/VimScriptCommandHandler.java
+      - src/com/maddyhome/idea/vim/helper/SearchHelper.java
+      - src/com/maddyhome/idea/vim/regexp/RegExp.java
+      - test/org/jetbrains/plugins/ideavim/propertybased/samples/JavaText.kt
+      - test/org/jetbrains/plugins/ideavim/propertybased/samples/LoremText.kt
+      - test/org/jetbrains/plugins/ideavim/propertybased/samples/SimpleText.kt

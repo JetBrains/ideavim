@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,34 +26,38 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 class ChangeVisualNumberAvalancheIncActionTest : VimTestCase() {
   fun `test inc visual avalanche`() {
-    doTest("VGg<C-A>",
+    doTest(
+      "VGg<C-A>",
       """
                     ${c}number 1
                     number 1
                     number 1
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                     ${c}number 2
                     number 3
                     number 4
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   fun `test inc visual avalanche multiple times`() {
-    doTest("VG2g<C-A>",
+    doTest(
+      "VG2g<C-A>",
       """
                     ${c}number 1
                     number 1
                     number 1
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                     ${c}number 3
                     number 5
                     number 7
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 }

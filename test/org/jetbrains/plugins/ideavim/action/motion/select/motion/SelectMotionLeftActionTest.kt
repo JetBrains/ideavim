@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,9 +31,16 @@ import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class SelectMotionLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopselect]
+    )
+  )
   fun `test char select simple move`() {
-    doTest(listOf("viw", "<C-G>", "<Left>"),
+    doTest(
+      listOf("viw", "<C-G>", "<Left>"),
       """
                 A Discovery
 
@@ -41,7 +48,7 @@ class SelectMotionLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -49,37 +56,49 @@ class SelectMotionLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopselect]
+    )
+  )
   fun `test select multiple carets`() {
-    doTest(listOf("viwo", "<C-G>", "<Left>"),
+    doTest(
+      listOf("viwo", "<C-G>", "<Left>"),
       """
                 A Discovery
 
                 I ${c}found it in a legendary land
                 all rocks and lavender and tufted grass,
                 ${c}where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
       """
                 A Discovery
 
                 I${c} found it in a legendary land
                 all rocks and lavender and tufted grass,
                 ${c}where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []))
   fun `test without stopsel`() {
-    doTest(listOf("viw", "<C-G>", "<Left>"),
+    doTest(
+      listOf("viw", "<C-G>", "<Left>"),
       """
                 A Discovery
 
@@ -87,7 +106,7 @@ class SelectMotionLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -95,8 +114,9 @@ class SelectMotionLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_CHARACTER)
+      CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 }

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,8 +56,14 @@ import static com.maddyhome.idea.vim.helper.SearchHelperKtKt.shouldIgnoreCase;
  */
 public class SearchHelper {
 
+  public static String makeSearchPattern(String pattern, Boolean whole) {
+    return whole ? "\\<" + pattern + "\\>" : pattern;
+  }
+
   /**
    * Find text matching the given pattern.
+   *
+   * <p>See search.c:searchit</p>
    *
    * @param editor          The editor to search in
    * @param pattern         The pattern to search for
@@ -347,7 +353,7 @@ public class SearchHelper {
    *
    * @param editor      The editor to search in
    * @param pattern     The pattern to search for
-   * @param startLine   The start line of the range to search for, or -1 for the whole document
+   * @param startLine   The start line of the range to search for
    * @param endLine     The end line of the range to search for, or -1 for the whole document
    * @param ignoreCase  Case sensitive or insensitive searching
    * @return            A list of TextRange objects representing the results
@@ -1883,7 +1889,7 @@ public class SearchHelper {
     int found = 0;
     int step = count >= 0 ? 1 : -1;
     int pos = caret.getOffset() + step;
-    while (pos >= start && pos < end && pos >= 0 && pos < chars.length()) {
+    while (pos >= start && pos < end && pos < chars.length()) {
       if (chars.charAt(pos) == ch) {
         found++;
         if (found == Math.abs(count)) {

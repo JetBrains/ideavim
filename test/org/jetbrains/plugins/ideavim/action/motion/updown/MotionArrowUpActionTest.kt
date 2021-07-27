@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,9 @@
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
@@ -34,7 +36,8 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test visual default options`() {
-    doTest(listOf("v", "<Up>"),
+    doTest(
+      listOf("v", "<Up>"),
       """
                 A Discovery
 
@@ -42,7 +45,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all ${c}rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -50,14 +53,22 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all r${se}ocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopsel]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopsel]
+    )
+  )
   fun `test visual stopsel`() {
-    doTest(listOf("v", "<Up>"),
+    doTest(
+      listOf("v", "<Up>"),
       """
                 A Discovery
 
@@ -65,7 +76,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all ${c}rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -73,14 +84,22 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopselect]
+    )
+  )
   fun `test visual stopselect`() {
-    doTest(listOf("v", "<Up>"),
+    doTest(
+      listOf("v", "<Up>"),
       """
                 A Discovery
 
@@ -88,7 +107,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all ${c}rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -96,14 +115,22 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all r${se}ocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopvisual]
+    )
+  )
   fun `test visual stopvisual`() {
-    doTest(listOf("v", "<Up>"),
+    doTest(
+      listOf("v", "<Up>"),
       """
                 A Discovery
 
@@ -111,7 +138,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all ${c}rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -119,14 +146,22 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopvisual]
+    )
+  )
   fun `test visual stopvisual multicaret`() {
-    doTest(listOf("v", "<Up>"),
+    doTest(
+      listOf("v", "<Up>"),
       """
                 A Discovery
 
@@ -134,7 +169,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all ${c}rocks and lavender and tufted grass,
                 where it was ${c}settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -142,14 +177,22 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all rocks and${c} lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopselect]
+    )
+  )
   fun `test char select simple move`() {
-    doTest(listOf("gH", "<Up>"),
+    doTest(
+      listOf("gH", "<Up>"),
       """
                 A Discovery
 
@@ -157,7 +200,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
                 ${c}
@@ -165,15 +208,17 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []))
   fun `test char select stopsel`() {
-    doTest(listOf("gh", "<Up>"),
+    doTest(
+      listOf("gh", "<Up>"),
       """
                 A Discovery
 
@@ -181,7 +226,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all ${c}rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -189,30 +234,55 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
                 all ${se}rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_CHARACTER)
+      CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(
+    VimTestOption(
+      KeyModelOptionData.name,
+      VimTestOptionType.LIST,
+      [KeyModelOptionData.stopselect]
+    )
+  )
   fun `test select multiple carets`() {
-    doTest(listOf("gH", "<Up>"),
+    doTest(
+      listOf("gH", "<Up>"),
       """
                 A ${c}Discovery
 
                 ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
       """
                 A ${c}Discovery
                 ${c}
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionDefaultAll
+  fun `test arrow up in insert mode scrolls caret at scrolloff`() {
+    OptionsManager.scrolljump.set(10)
+    OptionsManager.scrolloff.set(5)
+    configureByPages(5)
+    setPositionAndScroll(19, 24)
+
+    typeText(parseKeys("i", "<Up>"))
+
+    assertPosition(23, 0)
+    assertVisibleArea(9, 43)
   }
 }

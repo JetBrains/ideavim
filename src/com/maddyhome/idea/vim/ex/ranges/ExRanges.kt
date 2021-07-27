@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,8 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.helper.Direction
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 
 /**
@@ -33,7 +32,7 @@ import java.util.*
 sealed class Range(
   // Line offset
   protected val offset: Int,
-  val isMove: Boolean
+  val isMove: Boolean,
 ) {
   /**
    * Gets the line number (0 based) specificied by this range. Includes the offset.
@@ -145,8 +144,9 @@ class LineNumberRange : Range {
   }
 
   override fun getRangeLine(
-    editor: Editor, caret: Caret,
-    lastZero: Boolean
+    editor: Editor,
+    caret: Caret,
+    lastZero: Boolean,
   ): Int {
     line = if (line == LAST_LINE) EditorHelper.getLineCount(editor) - 1 else caret.logicalPosition.line
     return line
@@ -181,7 +181,6 @@ class MarkRange(private val mark: Char, offset: Int, move: Boolean) : Range(offs
   override fun getRangeLine(editor: Editor, caret: Caret, lastZero: Boolean): Int = getRangeLine(editor, lastZero)
 
   override fun toString(): String = "MarkRange[mark=$mark, ${super.toString()}]"
-
 }
 
 /**
@@ -196,31 +195,34 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
    */
   private fun setPattern(pattern: String) {
     logger.debug { "pattern=$pattern" }
+    // Search range patterns such as `/one//two/` will be separated by a NULL character, rather than handled as separate
+    // ranges. A range with an offset, such as `/one/+3/two/` will be treated as two ranges.
     val tok = StringTokenizer(pattern, "\u0000")
     while (tok.hasMoreTokens()) {
       var pat = tok.nextToken()
       when (pat) {
         "\\/" -> {
-          patterns.add(VimPlugin.getSearch().lastSearch)
-          flags.add(enumSetOf(CommandFlags.FLAG_SEARCH_FWD))
+          patterns.add(VimPlugin.getSearch().lastSearchPattern)
+          directions.add(Direction.FORWARDS)
         }
         "\\?" -> {
-          patterns.add(VimPlugin.getSearch().lastSearch)
-          flags.add(enumSetOf(CommandFlags.FLAG_SEARCH_REV))
+          patterns.add(VimPlugin.getSearch().lastSearchPattern)
+          directions.add(Direction.BACKWARDS)
         }
         "\\&" -> {
-          patterns.add(VimPlugin.getSearch().lastPattern)
-          flags.add(enumSetOf(CommandFlags.FLAG_SEARCH_FWD))
+          patterns.add(VimPlugin.getSearch().lastSubstitutePattern)
+          directions.add(Direction.FORWARDS)
         }
         else -> {
           if (pat[0] == '/') {
-            flags.add(enumSetOf(CommandFlags.FLAG_SEARCH_FWD))
+            directions.add(Direction.FORWARDS)
           } else {
-            flags.add(enumSetOf(CommandFlags.FLAG_SEARCH_REV))
+            directions.add(Direction.BACKWARDS)
           }
-          pat = pat.substring(1)
-          if (pat.last() == pat[0]) {
-            pat = pat.substring(0, pat.length - 1)
+          pat = if (pat.last() == pat[0]) {
+            pat.substring(1, pat.length - 1)
+          } else {
+            pat.substring(1)
           }
           patterns.add(pat)
         }
@@ -237,54 +239,48 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
    */
   override fun getRangeLine(
     editor: Editor,
-    lastZero: Boolean
+    lastZero: Boolean,
   ): Int { // Each subsequent pattern is searched for starting in the line after the previous search match
-    var line = editor.caretModel.logicalPosition.line
-    var pos = -1
-    for (i in patterns.indices) {
-      val pattern = patterns[i]
-      val flag = flags[i]
-      pos = if (CommandFlags.FLAG_SEARCH_FWD in flag && !lastZero) {
-        VimPlugin.getMotion().moveCaretToLineEnd(editor, line, true)
-      } else {
-        VimPlugin.getMotion().moveCaretToLineStart(editor, line)
-      }
-      pos = VimPlugin.getSearch().search(editor, pattern!!, pos, 1, flag)
-      line = if (pos == -1) {
-        break
-      } else {
-        editor.offsetToLogicalPosition(pos).line
-      }
-    }
-    return if (pos != -1) line else -1
+    return getRangeLine(editor, editor.caretModel.currentCaret, lastZero)
   }
 
   override fun getRangeLine(
-    editor: Editor, caret: Caret,
-    lastZero: Boolean
+    editor: Editor,
+    caret: Caret,
+    lastZero: Boolean,
   ): Int {
     var line = caret.logicalPosition.line
-    var offset = -1
+    var searchOffset = -1
     for (i in patterns.indices) {
       val pattern = patterns[i]
-      val flag = flags[i]
-      offset = VimPlugin.getSearch().search(editor, pattern!!, getSearchOffset(editor, line, flag, lastZero), 1, flag)
-      if (offset == -1) break
-      line = editor.offsetToLogicalPosition(offset).line
+      val direction = directions[i]
+
+      // TODO: Handling of line offset is kinda hacky
+      // We pass it in, but don't apply it to the search result. It should only be applied to the last pattern, and so
+      // is applied by the base class in getLine. But we need to pass it into processSearchRange so that
+      // lastPatternOffset is updated for future searches
+      val patternOffset = if (i == patterns.size - 1) offset else 0
+
+      searchOffset = getSearchOffset(editor, line, direction, lastZero)
+      searchOffset = VimPlugin.getSearch().processSearchRange(editor, pattern!!, patternOffset, searchOffset, direction)
+      if (searchOffset == -1) break
+      line = editor.offsetToLogicalPosition(searchOffset).line
     }
-    return if (offset != -1) line else -1
+    return if (searchOffset != -1) line else -1
   }
 
-  private fun getSearchOffset(editor: Editor, line: Int, flag: EnumSet<CommandFlags>, lastZero: Boolean): Int {
-    return if (flag.contains(CommandFlags.FLAG_SEARCH_FWD) && !lastZero) {
+  private fun getSearchOffset(editor: Editor, line: Int, direction: Direction, lastZero: Boolean): Int {
+    return if (direction == Direction.FORWARDS && !lastZero) {
       VimPlugin.getMotion().moveCaretToLineEnd(editor, line, true)
-    } else VimPlugin.getMotion().moveCaretToLineStart(editor, line)
+    } else {
+      VimPlugin.getMotion().moveCaretToLineStart(editor, line)
+    }
   }
 
   override fun toString(): String = "SearchRange[patterns=$patterns, ${super.toString()}]"
 
   private val patterns: MutableList<String?> = mutableListOf()
-  private val flags: MutableList<EnumSet<CommandFlags>> = mutableListOf()
+  private val directions: MutableList<Direction> = mutableListOf()
 
   companion object {
     private val logger = logger<SearchRange>()

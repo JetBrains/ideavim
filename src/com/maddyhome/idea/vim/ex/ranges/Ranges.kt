@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -153,7 +153,7 @@ class Ranges {
       if (range.isMove) {
         MotionGroup.moveCaret(
           editor, editor.caretModel.primaryCaret,
-          VimPlugin.getMotion().moveCaretToLine(editor, endLine, editor.caretModel.primaryCaret)
+          VimPlugin.getMotion().moveCaretToLineWithSameColumn(editor, endLine, editor.caretModel.primaryCaret)
         )
       }
       // Did that last range represent the start of the file?
@@ -177,7 +177,7 @@ class Ranges {
       if (range.isMove) MotionGroup.moveCaret(
         editor,
         caret,
-        VimPlugin.getMotion().moveCaretToLine(editor, endLine, editor.caretModel.primaryCaret)
+        VimPlugin.getMotion().moveCaretToLineWithSameColumn(editor, endLine, editor.caretModel.primaryCaret)
       )
       lastZero = endLine < 0
       ++count

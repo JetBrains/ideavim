@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,8 +35,10 @@ class MotionScrollFirstScreenLinePageStartAction : VimActionHandler.SingleExecut
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     var rawCount = cmd.rawCount
     if (rawCount == 0) {
-      val nextVisualLine = EditorHelper.normalizeVisualLine(editor,
-        EditorHelper.getVisualLineAtBottomOfScreen(editor) + 1)
+      val nextVisualLine = EditorHelper.normalizeVisualLine(
+        editor,
+        EditorHelper.getVisualLineAtBottomOfScreen(editor) + 1
+      )
       rawCount = EditorHelper.visualLineToLogicalLine(editor, nextVisualLine) + 1 // rawCount is 1 based
     }
     return VimPlugin.getMotion().scrollLineToFirstScreenLine(editor, rawCount, true)

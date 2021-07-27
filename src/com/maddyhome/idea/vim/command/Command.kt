@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,10 +34,15 @@ data class Command(
   var rawCount: Int,
   var action: EditorActionHandlerBase,
   val type: Type,
-  var flags: EnumSet<CommandFlags>
+  var flags: EnumSet<CommandFlags>,
 ) {
 
-  constructor(rawCount: Int, register: Char): this(rawCount, NonExecutableActionHandler, Type.SELECT_REGISTER, EnumSet.of(CommandFlags.FLAG_EXPECT_MORE)) {
+  constructor(rawCount: Int, register: Char) : this(
+    rawCount,
+    NonExecutableActionHandler,
+    Type.SELECT_REGISTER,
+    EnumSet.of(CommandFlags.FLAG_EXPECT_MORE)
+  ) {
     this.register = register
   }
 
@@ -67,29 +72,35 @@ data class Command(
      * Represents commands that actually move the cursor and can be arguments to operators.
      */
     MOTION,
+
     /**
      * Represents commands that insert new text into the editor.
      */
     INSERT,
+
     /**
      * Represents commands that remove text from the editor.
      */
     DELETE,
+
     /**
      * Represents commands that change text in the editor.
      */
     CHANGE,
+
     /**
      * Represents commands that copy text in the editor.
      */
     COPY,
     PASTE,
+
     /**
      * Represents commands that select the register.
      */
     SELECT_REGISTER,
     OTHER_READONLY,
     OTHER_WRITABLE,
+
     /**
      * Represent commands that don't require an outer read or write action for synchronization.
      */

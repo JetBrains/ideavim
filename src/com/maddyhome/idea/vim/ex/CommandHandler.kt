@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -138,12 +138,15 @@ sealed class CommandHandler {
     try {
       when (this) {
         is ForEachCaret -> {
-          editor.caretModel.runForEachCaret({ caret ->
-            var i = 0
-            while (i++ < count && res.get()) {
-              res.set(execute(editor, caret, context, cmd))
-            }
-          }, true)
+          editor.caretModel.runForEachCaret(
+            { caret ->
+              var i = 0
+              while (i++ < count && res.get()) {
+                res.set(execute(editor, caret, context, cmd))
+              }
+            },
+            true
+          )
         }
         is SingleExecution -> {
           var i = 0
@@ -197,5 +200,5 @@ data class CommandHandlerFlags(
   val rangeFlag: CommandHandler.RangeFlag,
   val argumentFlag: CommandHandler.ArgumentFlag,
   val access: CommandHandler.Access,
-  val flags: Set<CommandHandler.Flag>
+  val flags: Set<CommandHandler.Flag>,
 )

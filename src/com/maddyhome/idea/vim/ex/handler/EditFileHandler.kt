@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ class EditFileHandler : CommandHandler.SingleExecution() {
 
     // Don't open a choose file dialog under a write action
     ApplicationManager.getApplication().invokeLater {
-      KeyHandler.executeAction("OpenFile", EditorDataContext(editor, context))
+      KeyHandler.executeAction("OpenFile", EditorDataContext.init(editor, context))
     }
 
     return true

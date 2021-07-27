@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class DeleteJoinLinesAction : ChangeEditorActionHandler.SingleExecution() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     if (editor.isOneLineMode) return false
     if (ideajoin.isSet) {
@@ -43,9 +43,12 @@ class DeleteJoinLinesAction : ChangeEditorActionHandler.SingleExecution() {
     }
     VimPlugin.getEditor().notifyIdeaJoin(editor.project)
     val res = Ref.create(true)
-    editor.caretModel.runForEachCaret({ caret: Caret ->
-      if (!VimPlugin.getChange().deleteJoinLines(editor, caret, count, false)) res.set(false)
-    }, true)
+    editor.caretModel.runForEachCaret(
+      { caret: Caret ->
+        if (!VimPlugin.getChange().deleteJoinLines(editor, caret, count, false)) res.set(false)
+      },
+      true
+    )
     return res.get()
   }
 }

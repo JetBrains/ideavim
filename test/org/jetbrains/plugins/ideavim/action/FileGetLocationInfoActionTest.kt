@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class FileGetLocationInfoActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(keys)
     assertEquals("Col 1 of 11; Line 1 of 6; Word 1 of 34; Character 1 of 165", VimPlugin.getMessage())
@@ -51,7 +51,7 @@ class FileGetLocationInfoActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(keys)
     assertEquals("Col 1 of 11; Line 1 of 7; Word 1 of 35; Character 1 of 166", VimPlugin.getMessage())
@@ -68,7 +68,7 @@ class FileGetLocationInfoActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(keys)
     assertEquals("Col 11 of 40; Line 4 of 7; Word 13 of 35; Character 55 of 166", VimPlugin.getMessage())
@@ -85,7 +85,7 @@ class FileGetLocationInfoActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             $c
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(keys)
     assertEquals("Col 1 of 1; Line 7 of 7; Word 35 of 35; Character 167 of 166", VimPlugin.getMessage())

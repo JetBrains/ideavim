@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,8 +43,8 @@ class ExCommand(val ranges: Ranges, val command: String, var argument: String) {
 
   fun getLineRange(editor: Editor): LineRange = ranges.getLineRange(editor, -1)
 
-  fun getLineRange(editor: Editor, caret: Caret): LineRange {
-    return ranges.getLineRange(editor, caret, -1)
+  fun getLineRange(editor: Editor, caret: Caret, checkCount: Boolean = false): LineRange {
+    return ranges.getLineRange(editor, caret, if (checkCount) countArgument else -1)
   }
 
   fun getTextRange(editor: Editor, checkCount: Boolean): TextRange {

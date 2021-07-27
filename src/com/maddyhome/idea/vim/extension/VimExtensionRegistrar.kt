@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.extensions.ExtensionPointListener
 import com.intellij.openapi.extensions.PluginDescriptor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.OptionsManager.addOption
@@ -34,6 +35,8 @@ object VimExtensionRegistrar {
   private var extensionRegistered = false
   private val logger = logger<VimExtensionRegistrar>()
 
+  private val delayedExtensionEnabling = mutableListOf<ExtensionBeanClass>()
+
   @JvmStatic
   fun registerExtensions() {
     if (extensionRegistered) return
@@ -41,15 +44,18 @@ object VimExtensionRegistrar {
 
     VimExtension.EP_NAME.extensions.forEach(this::registerExtension)
 
-    VimExtension.EP_NAME.point.addExtensionPointListener(object : ExtensionPointListener<ExtensionBeanClass> {
-      override fun extensionAdded(extension: ExtensionBeanClass, pluginDescriptor: PluginDescriptor) {
-        registerExtension(extension)
-      }
+    VimExtension.EP_NAME.point.addExtensionPointListener(
+      object : ExtensionPointListener<ExtensionBeanClass> {
+        override fun extensionAdded(extension: ExtensionBeanClass, pluginDescriptor: PluginDescriptor) {
+          registerExtension(extension)
+        }
 
-      override fun extensionRemoved(extension: ExtensionBeanClass, pluginDescriptor: PluginDescriptor) {
-        unregisterExtension(extension)
-      }
-    }, false, VimPlugin.getInstance())
+        override fun extensionRemoved(extension: ExtensionBeanClass, pluginDescriptor: PluginDescriptor) {
+          unregisterExtension(extension)
+        }
+      },
+      false, VimPlugin.getInstance()
+    )
   }
 
   @Synchronized
@@ -62,13 +68,30 @@ object VimExtensionRegistrar {
     val option = ToggleOption(name, name, false)
     option.addOptionChangeListener { _, _ ->
       if (isSet(name)) {
-        extensionBean.instance.init()
-        logger.info("IdeaVim extension '$name' initialized")
+        initExtension(extensionBean, name)
       } else {
         extensionBean.instance.dispose()
       }
     }
     addOption(option)
+  }
+
+  private fun initExtension(extensionBean: ExtensionBeanClass, name: String) {
+    if (VimScriptParser.executingVimScript) {
+      delayedExtensionEnabling += extensionBean
+    } else {
+      extensionBean.instance.init()
+      logger.info("IdeaVim extension '$name' initialized")
+    }
+  }
+
+  @JvmStatic
+  fun enableDelayedExtensions() {
+    delayedExtensionEnabling.forEach {
+      it.instance.init()
+      logger.info("IdeaVim extension '${it.name}' initialized")
+    }
+    delayedExtensionEnabling.clear()
   }
 
   @Synchronized

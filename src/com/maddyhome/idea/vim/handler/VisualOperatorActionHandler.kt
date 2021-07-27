@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,14 +74,25 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
      * This method is executed once for each caret except case with block selection. If there is block selection,
      *   the method will be executed only once with [Caret#primaryCaret].
      */
-    abstract fun executeAction(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: VimSelection): Boolean
+    abstract fun executeAction(
+      editor: Editor,
+      caret: Caret,
+      context: DataContext,
+      cmd: Command,
+      range: VimSelection,
+    ): Boolean
 
     /**
      * This method executes before [executeAction] and only once for all carets.
      * [caretsAndSelections] contains a map of all current carets and corresponding selections.
      *   If there is block selection, only one caret is in [caretsAndSelections].
      */
-    open fun beforeExecution(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>) = true
+    open fun beforeExecution(
+      editor: Editor,
+      context: DataContext,
+      cmd: Command,
+      caretsAndSelections: Map<Caret, VimSelection>,
+    ) = true
 
     /**
      * This method executes after [executeAction] and only once for all carets.
@@ -104,7 +115,12 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
      *
      * This method is executed once for all carets.
      */
-    abstract fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean
+    abstract fun executeForAllCarets(
+      editor: Editor,
+      context: DataContext,
+      cmd: Command,
+      caretsAndSelections: Map<Caret, VimSelection>,
+    ): Boolean
   }
 
   final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
@@ -133,12 +149,23 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
         when {
           selections.keys.isEmpty() -> return false
-          selections.keys.size == 1 -> res.set(executeAction(editor, selections.keys.first(), context, cmd, selections.values.first()))
-          else -> editor.caretModel.runForEachCaret({ currentCaret ->
-            val range = selections.getValue(currentCaret)
-            val loopRes = executeAction(editor, currentCaret, context, cmd, range)
-            res.set(loopRes and res.get())
-          }, true)
+          selections.keys.size == 1 -> res.set(
+            executeAction(
+              editor,
+              selections.keys.first(),
+              context,
+              cmd,
+              selections.values.first()
+            )
+          )
+          else -> editor.caretModel.runForEachCaret(
+            { currentCaret ->
+              val range = selections.getValue(currentCaret)
+              val loopRes = executeAction(editor, currentCaret, context, cmd, range)
+              res.set(loopRes and res.get())
+            },
+            true
+          )
         }
 
         logger.debug("Calling 'after execution'")
@@ -162,10 +189,13 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
           val primaryCaret = caretModel.primaryCaret
           val range = primaryCaret.vimLastVisualOperatorRange ?: return null
           val end = VisualOperation.calculateRange(this, range, 1, primaryCaret)
-          mapOf(primaryCaret to VimBlockSelection(
-            primaryCaret.offset,
-            end,
-            this, range.columns >= MotionGroup.LAST_COLUMN))
+          mapOf(
+            primaryCaret to VimBlockSelection(
+              primaryCaret.offset,
+              end,
+              this, range.columns >= MotionGroup.LAST_COLUMN
+            )
+          )
         } else {
           val carets = mutableMapOf<Caret, VimSelection>()
           this.caretModel.allCarets.forEach { caret ->
@@ -178,10 +208,13 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
       }
       this.inBlockSubMode -> {
         val primaryCaret = caretModel.primaryCaret
-        mapOf(primaryCaret to VimBlockSelection(
-          primaryCaret.vimSelectionStart,
-          primaryCaret.offset,
-          this, primaryCaret.vimLastColumn >= MotionGroup.LAST_COLUMN))
+        mapOf(
+          primaryCaret to VimBlockSelection(
+            primaryCaret.vimSelectionStart,
+            primaryCaret.offset,
+            this, primaryCaret.vimLastColumn >= MotionGroup.LAST_COLUMN
+          )
+        )
       }
       else -> this.caretModel.allCarets.associateWith { caret ->
 
@@ -206,9 +239,10 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
       editor.vimKeepingVisualOperatorAction = CommandFlags.FLAG_EXIT_VISUAL !in cmd.flags
 
       editor.vimForEachCaret {
-        val change = if (this@VisualStartFinishWrapper.editor.inVisualMode && !this@VisualStartFinishWrapper.editor.inRepeatMode) {
-          VisualOperation.getRange(this@VisualStartFinishWrapper.editor, it, this@VisualStartFinishWrapper.cmd.flags)
-        } else null
+        val change =
+          if (this@VisualStartFinishWrapper.editor.inVisualMode && !this@VisualStartFinishWrapper.editor.inRepeatMode) {
+            VisualOperation.getRange(this@VisualStartFinishWrapper.editor, it, this@VisualStartFinishWrapper.cmd.flags)
+          } else null
         this@VisualStartFinishWrapper.visualChanges[it] = change
       }
       logger.debug { visualChanges.values.joinToString("\n") { "Caret: $visualChanges" } }

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,9 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.handler.toMotionOrError
 import java.util.*
 
 class MotionGotoFileMarkAction : MotionActionHandler.ForEachCaret() {
@@ -35,16 +37,18 @@ class MotionGotoFileMarkAction : MotionActionHandler.ForEachCaret() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_JUMP)
 
-  override fun getOffset(editor: Editor,
-                         caret: Caret,
-                         context: DataContext,
-                         count: Int,
-                         rawCount: Int,
-                         argument: Argument?): Int {
-    if (argument == null) return -1
+  override fun getOffset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?,
+  ): Motion {
+    if (argument == null) return Motion.Error
 
     val mark = argument.character
-    return VimPlugin.getMotion().moveCaretToFileMark(editor, mark, false)
+    return VimPlugin.getMotion().moveCaretToFileMark(editor, mark, false).toMotionOrError()
   }
 }
 
@@ -53,15 +57,17 @@ class MotionGotoFileMarkNoSaveJumpAction : MotionActionHandler.ForEachCaret() {
 
   override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
-  override fun getOffset(editor: Editor,
-                         caret: Caret,
-                         context: DataContext,
-                         count: Int,
-                         rawCount: Int,
-                         argument: Argument?): Int {
-    if (argument == null) return -1
+  override fun getOffset(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    count: Int,
+    rawCount: Int,
+    argument: Argument?,
+  ): Motion {
+    if (argument == null) return Motion.Error
 
     val mark = argument.character
-    return VimPlugin.getMotion().moveCaretToFileMark(editor, mark, false)
+    return VimPlugin.getMotion().moveCaretToFileMark(editor, mark, false).toMotionOrError()
   }
 }

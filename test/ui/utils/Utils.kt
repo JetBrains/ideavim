@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,12 @@
 
 package ui.utils
 
+import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.fixtures.Fixture
 import com.intellij.remoterobot.fixtures.dataExtractor.RemoteText
 import com.intellij.remoterobot.utils.waitFor
 import org.assertj.swing.core.MouseButton
+import ui.pages.Editor
 import java.awt.Point
 
 fun RemoteText.doubleClickOnRight(shiftX: Int, fixture: Fixture, button: MouseButton = MouseButton.LEFT_BUTTON) {
@@ -38,22 +40,13 @@ fun RemoteText.tripleClickOnRight(shiftX: Int, fixture: Fixture, button: MouseBu
   }
 }
 
-fun RemoteText.moveMouseTo(goal: RemoteText, fixture: Fixture): Boolean {
+fun RemoteText.moveMouseTo(goal: RemoteText, editor: Editor): Boolean {
   this.moveMouse()
-  val goalPoint = goal.point
-
-  val caretDuringDragging = fixture.callJs<Boolean>(
-    """
-    const point = new java.awt.Point(${goalPoint.x}, ${goalPoint.y});
-    let isBlock = true;
-    robot.pressMouseWhileRunning(MouseButton.LEFT_BUTTON, () => {
-      robot.moveMouse(component, point)
-      isBlock = component.getEditor().getSettings().isBlockCursor();
-    })
-    isBlock
-    """
-  )
-  waitFor { fixture.callJs("component.getEditor().getSettings().isBlockCursor()") }
+  editor.runJs("robot.pressMouse(MouseButton.LEFT_BUTTON)")
+  goal.moveMouse()
+  val caretDuringDragging = editor.isBlockCursor
+  editor.runJs("robot.releaseMouse(MouseButton.LEFT_BUTTON)")
+  waitFor { editor.isBlockCursor }
   return caretDuringDragging
 }
 
@@ -61,7 +54,7 @@ fun RemoteText.moveMouseInGutterTo(goal: RemoteText, fixture: Fixture) {
   this.moveMouse()
   val goalPoint = goal.point
 
-  val caretDuringDragging = fixture.runJs(
+  fixture.runJs(
     """
     const point = new java.awt.Point(${goalPoint.x}, ${goalPoint.y});
     robot.pressMouseWhileRunning(MouseButton.LEFT_BUTTON, () => {
@@ -71,22 +64,34 @@ fun RemoteText.moveMouseInGutterTo(goal: RemoteText, fixture: Fixture) {
   )
 }
 
-fun RemoteText.moveMouseForthAndBack(middle: RemoteText, fixture: Fixture) {
+fun RemoteText.moveMouseForthAndBack(middle: RemoteText, editor: Editor) {
   this.moveMouse()
   val initialPoint = this.point
   val middlePoint = middle.point
 
-  fixture.runJs(
+  editor.runJs(
     """
-    const initialPoint = new java.awt.Point(${initialPoint.x}, ${initialPoint.y});
-    const point = new java.awt.Point(${middlePoint.x}, ${middlePoint.y});
+    const initialPoint = new Point(${initialPoint.x}, ${initialPoint.y});
+    const point = new Point(${middlePoint.x}, ${middlePoint.y});
     robot.pressMouseWhileRunning(MouseButton.LEFT_BUTTON, () => {
       robot.moveMouse(component, point)
       robot.moveMouse(component, initialPoint)
     })
     """
   )
-  waitFor { fixture.callJs("component.getEditor().getSettings().isBlockCursor()") }
+  waitFor { editor.isBlockCursor }
 }
 
 fun String.escape(): String = this.replace("\n", "\\n")
+
+fun RemoteRobot.invokeActionJs(actionId: String) {
+  runJs(
+    """
+            const actionId = "$actionId";
+            const actionManager = com.intellij.openapi.actionSystem.ActionManager.getInstance();
+            const action = actionManager.getAction(actionId);
+            actionManager.tryToExecute(action, com.intellij.openapi.ui.playback.commands.ActionCommand.getInputEvent(actionId), null, null, true);
+        """,
+    runInEdt = true
+  )
+}

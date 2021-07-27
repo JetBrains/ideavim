@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,11 @@
 
 package com.maddyhome.idea.vim.ui
 
+import com.intellij.icons.AllIcons
 import com.intellij.ide.BrowserUtil
 import com.intellij.ide.DataManager
 import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -38,6 +40,7 @@ import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.Consumer
+import com.intellij.util.ui.LafIconLookup
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -133,10 +136,6 @@ class VimStatusBar : StatusBarWidget, StatusBarWidget.IconPresentation {
 
 class VimActions : DumbAwareAction() {
 
-  companion object {
-    const val actionPlace = "VimActionsPopup"
-  }
-
   override fun actionPerformed(e: AnActionEvent) {
     val project = e.project ?: return
     VimActionsPopup.getPopup(e.dataContext).showCenteredInCurrentWindow(project)
@@ -155,7 +154,7 @@ private object VimActionsPopup {
       .createActionGroupPopup(
         STATUS_BAR_DISPLAY_NAME, actions,
         dataContext, JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, false,
-        VimActions.actionPlace
+        ActionPlaces.POPUP
       )
     popup.setAdText(MessageHelper.message("popup.advertisement.version", VimPlugin.getVersion()), SwingConstants.CENTER)
 
@@ -172,10 +171,10 @@ private object VimActionsPopup {
     actionGroup.add(ShortcutConflictsSettings)
     actionGroup.addSeparator()
 
-    val eapGroup = DefaultActionGroup(
-      MessageHelper.message("action.eap.choice.active.text", if (JoinEap.eapActive()) 0 else 1),
-      true
-    )
+    val eapGroup = DefaultActionGroup(MessageHelper.message("action.eap.choice.active.text"), true)
+    if (JoinEap.eapActive()) {
+      eapGroup.templatePresentation.icon = LafIconLookup.getIcon("checkmark")
+    }
     eapGroup.add(JoinEap)
     eapGroup.add(
       HelpLink(
@@ -205,7 +204,7 @@ private object VimActionsPopup {
       HelpLink(
         MessageHelper.message("action.contribute.on.github.text"),
         "https://github.com/JetBrains/ideavim",
-        VimIcons.GITHUB
+        AllIcons.Vcs.Vendors.Github
       )
     )
     actionGroup.add(helpGroup)
@@ -216,9 +215,10 @@ private object VimActionsPopup {
 
 private class HelpLink(
   // [VERSION UPDATE] 203+ uncomment
-  /*@ActionText*/ name: String,
-                  val link: String,
-                  icon: Icon?
+  /*@ActionText*/
+  name: String,
+  val link: String,
+  icon: Icon?,
 ) : DumbAwareAction(name, null, icon)/*, LightEditCompatible*/ {
   override fun actionPerformed(e: AnActionEvent) {
     BrowserUtil.browse(link)
@@ -227,7 +227,7 @@ private class HelpLink(
 
 private object ShortcutConflictsSettings : DumbAwareAction(MessageHelper.message("action.settings.text"))/*, LightEditCompatible*/ {
   override fun actionPerformed(e: AnActionEvent) {
-    ShowSettingsUtil.getInstance().editConfigurable(e.project, VimEmulationConfigurable())
+    ShowSettingsUtil.getInstance().showSettingsDialog(e.project, VimEmulationConfigurable::class.java)
   }
 }
 

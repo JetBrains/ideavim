@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,8 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
@@ -56,34 +58,42 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     TemplateManagerImpl.setTemplateTesting(myFixture.testRootDisposable)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   @VimOptionDefaultAll
   fun `test simple rename`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     doInlineRename(VariableInplaceRenameHandler(), "myNewVar", myFixture)
-    myFixture.checkResult("""
+    assertState(
+      """
             class Hello {
                 public static void main() {
                     int my${c}NewVar = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test type rename`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
@@ -91,25 +101,30 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     typeText(parseKeys("myNewVar", "<CR>"))
 
     assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-    myFixture.checkResult("""
+    assertState(
+      """
             class Hello {
                 public static void main() {
                     int myNewVar${c} = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test selectmode without template`() {
     OptionsManager.idearefactormode.set(IdeaRefactorMode.visual)
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
@@ -118,14 +133,17 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test prepend`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
@@ -135,96 +153,116 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     typeText(parseKeys("pre", "<CR>"))
 
     assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-    myFixture.checkResult("""
+    assertState(
+      """
             class Hello {
                 public static void main() {
                     int pre${c}myVar = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test motion right`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
     typeText(parseKeys("<Right>"))
     assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-    myFixture.checkResult("""
+    assertState(
+      """
             class Hello {
                 public static void main() {
                     int myVar${c} = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test motion left on age`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int ${c}myVar = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
     typeText(parseKeys("<Left>"))
     assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-    myFixture.checkResult("""
+    assertState(
+      """
             class Hello {
                 public static void main() {
                     int ${c}myVar = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test motion right on age`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int myVa${c}r = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
     typeText(parseKeys("<Right>"))
     assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-    myFixture.checkResult("""
+    assertState(
+      """
             class Hello {
                 public static void main() {
                     int myVar${c} = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test escape`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
@@ -232,24 +270,29 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     typeText(parseKeys("<ESC>"))
 
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    myFixture.checkResult("""
+    assertState(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test escape after typing`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
@@ -257,167 +300,203 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
     typeText(parseKeys("Hello", "<ESC>"))
 
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    myFixture.checkResult("""
+    assertState(
+      """
             class Hello {
                 public static void main() {
                     int Hell${c}o = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.keep]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template in normal mode`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     startRenaming(VariableInplaceRenameHandler())
     assertDoesntChange { myFixture.editor.inNormalMode }
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.keep]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test save mode for insert mode`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("i"))
     startRenaming(VariableInplaceRenameHandler())
     assertDoesntChange { myFixture.editor.inInsertMode }
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.keep]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test save mode for visual mode`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("vll"))
     startRenaming(VariableInplaceRenameHandler())
     assertDoesntChange { myFixture.editor.inVisualMode }
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.select]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to select in normal mode`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.select]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to select in insert mode`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("i"))
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.select]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to select in visual mode`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("vll"))
     startRenaming(VariableInplaceRenameHandler())
     assertDoesntChange { myFixture.editor.inVisualMode }
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.select]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to select in select mode`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("vll<C-G>"))
     startRenaming(VariableInplaceRenameHandler())
     assertDoesntChange { myFixture.editor.inSelectMode }
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.visual]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to visual in normal mode`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.visual]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to visual in insert mode`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("i"))
     startRenaming(VariableInplaceRenameHandler())
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.visual]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to visual in visual mode`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("vll"))
     startRenaming(VariableInplaceRenameHandler())
     assertDoesntChange { myFixture.editor.inVisualMode }
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.visual]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template to visual in select mode`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     typeText(parseKeys("vll<C-G>"))
     startRenaming(VariableInplaceRenameHandler())
     assertDoesntChange { myFixture.editor.inSelectMode }
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.keep]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template with multiple times`() {
     configureByJavaText(c)
     val manager = TemplateManager.getInstance(myFixture.project)
@@ -438,24 +517,29 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   }
 
   @VimOptionTestConfiguration(VimTestOption(IdeaRefactorMode.name, VimTestOptionType.VALUE, [IdeaRefactorMode.keep]))
+  @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test template with lookup`() {
-    configureByJavaText("""
+    configureByJavaText(
+      """
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
     startRenaming(VariableInplaceRenameHandler())
     val lookupValue = myFixture.lookupElementStrings?.get(0) ?: kotlin.test.fail()
     myFixture.finishLookup(Lookup.NORMAL_SELECT_CHAR)
-    myFixture.checkResult("""
+    assertState(
+      """
             class Hello {
                 public static void main() {
                     int $lookupValue = 5;
                 }
             }
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   private fun startRenaming(handler: VariableInplaceRenameHandler): Editor {

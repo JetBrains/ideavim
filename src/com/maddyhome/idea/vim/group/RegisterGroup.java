@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -344,13 +344,19 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     final PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
     if (file == null) return text;
     String rawText = TextBlockTransferable.convertLineSeparators(text, "\n", transferableDatas);
-    String escapedText;
-    for (CopyPastePreProcessor processor : CopyPastePreProcessor.EP_NAME.getExtensionList()) {
-      escapedText = processor.preprocessOnCopy(file, textRange.getStartOffsets(), textRange.getEndOffsets(), rawText);
-      if (escapedText != null) {
-        return escapedText;
+
+
+    if (OptionsManager.INSTANCE.getIdeacopypreprocess().getValue()) {
+      String escapedText;
+      for (CopyPastePreProcessor processor : CopyPastePreProcessor.EP_NAME.getExtensionList()) {
+        escapedText = processor.preprocessOnCopy(file, textRange.getStartOffsets(), textRange.getEndOffsets(), rawText);
+        if (escapedText != null) {
+          return escapedText;
+        }
       }
     }
+
+
     return text;
   }
 
@@ -566,6 +572,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
 
   private @Nullable Register refreshClipboardRegister(char r) {
     final Pair<String, List<TextBlockTransferableData>> clipboardData = ClipboardHandler.getClipboardTextAndTransferableData();
+    if (clipboardData == null) return null;
     final Register currentRegister = registers.get(r);
     final String text = clipboardData.getFirst();
     final List<TextBlockTransferableData> transferableData = clipboardData.getSecond();

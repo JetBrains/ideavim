@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.MotionGroup
@@ -44,7 +44,6 @@ import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.key.OperatorFunction
 import org.jetbrains.annotations.NonNls
 
-
 class ReplaceWithRegister : VimExtension {
 
   override fun getName(): String = "ReplaceWithRegister"
@@ -54,9 +53,9 @@ class ReplaceWithRegister : VimExtension {
     VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, parseKeys(RWR_LINE), owner, RwrLine(), false)
     VimExtensionFacade.putExtensionHandlerMapping(MappingMode.X, parseKeys(RWR_VISUAL), owner, RwrVisual(), false)
 
-    putKeyMapping(MappingMode.N, parseKeys("gr"), owner, parseKeys(RWR_OPERATOR), true)
-    putKeyMapping(MappingMode.N, parseKeys("grr"), owner, parseKeys(RWR_LINE), true)
-    putKeyMapping(MappingMode.X, parseKeys("gr"), owner, parseKeys(RWR_VISUAL), true)
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("gr"), owner, parseKeys(RWR_OPERATOR), true)
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("grr"), owner, parseKeys(RWR_LINE), true)
+    putKeyMappingIfMissing(MappingMode.X, parseKeys("gr"), owner, parseKeys(RWR_VISUAL), true)
   }
 
   private class RwrVisual : VimExtensionHandler {
@@ -111,7 +110,17 @@ class ReplaceWithRegister : VimExtension {
   private class Operator : OperatorFunction {
     override fun apply(editor: Editor, context: DataContext, selectionType: SelectionType): Boolean {
       val range = getRange(editor) ?: return false
-      val visualSelection = PutData.VisualSelection(mapOf(editor.caretModel.primaryCaret to VimSelection.create(range.startOffset, range.endOffset - 1, selectionType, editor)), selectionType)
+      val visualSelection = PutData.VisualSelection(
+        mapOf(
+          editor.caretModel.primaryCaret to VimSelection.create(
+            range.startOffset,
+            range.endOffset - 1,
+            selectionType,
+            editor
+          )
+        ),
+        selectionType
+      )
       doReplace(editor, visualSelection)
       return true
     }
@@ -126,8 +135,10 @@ class ReplaceWithRegister : VimExtension {
   companion object {
     @NonNls
     private const val RWR_OPERATOR = "<Plug>ReplaceWithRegisterOperator"
+
     @NonNls
     private const val RWR_LINE = "<Plug>ReplaceWithRegisterLine"
+
     @NonNls
     private const val RWR_VISUAL = "<Plug>ReplaceWithRegisterVisual"
 
@@ -144,8 +155,16 @@ class ReplaceWithRegister : VimExtension {
 
       val textData = PutData.TextData(usedText, usedType, savedRegister.transferableData)
 
-      val putData = PutData(textData, visualSelection, 1, insertTextBeforeCaret = true, rawIndent = true, caretAfterInsertedText = false, putToLine = -1)
-      VimPlugin.getPut().putText(editor, EditorDataContext(editor), putData)
+      val putData = PutData(
+        textData,
+        visualSelection,
+        1,
+        insertTextBeforeCaret = true,
+        rawIndent = true,
+        caretAfterInsertedText = false,
+        putToLine = -1
+      )
+      VimPlugin.getPut().putText(editor, EditorDataContext.init(editor), putData)
 
       VimPlugin.getRegister().saveRegister(savedRegister.name, savedRegister)
       VimPlugin.getRegister().saveRegister(VimPlugin.getRegister().defaultRegister, savedRegister)

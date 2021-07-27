@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,8 @@ import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionSentencePreviousStartActionTest : VimTestCase() {
-  @VimBehaviorDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(
+    originalVimAfter = """
         
         
         ${c}all rocks and lavender and tufted grass,
@@ -32,17 +33,18 @@ class MotionSentencePreviousStartActionTest : VimTestCase() {
       """
   )
   fun `test with two empty lines`() {
-    doTest("(",
+    doTest(
+      "(",
       """
         
         
         all rocks and lavender and tufted grass,
         where it was settled on some sodden sand
-        hard by the torrent of a mountain pass${c}.
+        hard by the torrent of a mountain pass$c.
       """.trimIndent(),
       """
         
-        ${c}
+        $c
         all rocks and lavender and tufted grass,
         where it was settled on some sodden sand
         hard by the torrent of a mountain pass.

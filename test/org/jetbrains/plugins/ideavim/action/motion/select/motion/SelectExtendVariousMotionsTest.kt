@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,9 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.select.motion
 
-import com.intellij.openapi.fileTypes.PlainTextFileType
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -31,6 +32,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 class SelectExtendVariousMotionsTest : VimTestCase() {
 
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun `test with tabs`() {
     val code = """
         class Scratch {
@@ -46,11 +48,12 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
         ${c}}
     """.trimIndent().dotToTab()
 
-    myFixture.configureByText(PlainTextFileType.INSTANCE, code)
+    configureByText(code)
 
     typeText(parseKeys("g<C-H>", "<S-UP>".repeat(2), "<S-Right>".repeat(2)))
 
-    myFixture.checkResult("""
+    assertState(
+      """
         class Scratch {
         .public static void main(String[] args) {
         ..try {
@@ -62,12 +65,13 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
         ${s}fu${c}${se}nc myFunc() {
         ${s}${c}${se}.return anything
         ${s}}${c}${se}
-    """.trimIndent().dotToTab()
+      """.trimIndent().dotToTab()
     )
 
     typeText(parseKeys("<S-UP>".repeat(7), "<S-Right>".repeat(3)))
 
-    myFixture.checkResult("""
+    assertState(
+      """
         class Scratch {
         ${s}.pu${c}${se}blic static void main(String[] args) {
         ${s}.${c}${se}.try {
@@ -79,12 +83,13 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
         ${s}func m${c}${se}yFunc() {
         ${s}.re${c}${se}turn anything
         ${s}}${c}${se}
-    """.trimIndent().dotToTab()
+      """.trimIndent().dotToTab()
     )
 
     typeText(parseKeys("<S-Right>".repeat(2)))
 
-    myFixture.checkResult("""
+    assertState(
+      """
         class Scratch {
         ${s}.publ${c}${se}ic static void main(String[] args) {
         ${s}..${c}${se}try {
@@ -96,8 +101,7 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
         ${s}func myF${c}${se}unc() {
         ${s}.retu${c}${se}rn anything
         ${s}}${c}${se}
-    """.trimIndent().dotToTab()
+      """.trimIndent().dotToTab()
     )
   }
-
 }

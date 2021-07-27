@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ class RandomActionsPropertyTest : VimPropertyTest() {
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-            """.trimIndent()
+    """.trimIndent()
   }
 }
 
@@ -109,7 +109,8 @@ private class AvailableActions(private val editor: Editor) : ImperativeCommand {
   }
 }
 
-private val stinkyKeysList = arrayListOf("K", "u", "H", "<C-Y>",
+private val stinkyKeysList = arrayListOf(
+  "K", "u", "H", "<C-Y>",
   StringHelper.toKeyNotation(KeyStroke.getKeyStroke(KeyEvent.VK_UNDO, 0)), "L", "!", "<C-D>", "z", "<C-W>",
   "g", "<C-U>",
 

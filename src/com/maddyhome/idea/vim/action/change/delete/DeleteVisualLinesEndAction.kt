@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,11 +40,13 @@ class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_EXIT_VISUAL)
 
-  override fun executeAction(editor: Editor,
-                             caret: Caret,
-                             context: DataContext,
-                             cmd: Command,
-                             range: VimSelection): Boolean {
+  override fun executeAction(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    range: VimSelection,
+  ): Boolean {
     val vimTextRange = range.toVimTextRange(true)
     return if (range.type == SelectionType.BLOCK_WISE) {
       val starts = vimTextRange.startOffsets
@@ -60,7 +62,10 @@ class DeleteVisualLinesEndAction : VisualOperatorActionHandler.ForEachCaret() {
     } else {
       val lineEndForOffset = EditorHelper.getLineEndForOffset(editor, vimTextRange.endOffset)
       val endsWithNewLine = if (lineEndForOffset == editor.fileSize) 0 else 1
-      val lineRange = TextRange(EditorHelper.getLineStartForOffset(editor, vimTextRange.startOffset), lineEndForOffset + endsWithNewLine)
+      val lineRange = TextRange(
+        EditorHelper.getLineStartForOffset(editor, vimTextRange.startOffset),
+        lineEndForOffset + endsWithNewLine
+      )
       VimPlugin.getChange().deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false)
     }
   }

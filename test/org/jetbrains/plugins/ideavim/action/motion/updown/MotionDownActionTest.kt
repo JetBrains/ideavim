@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ class MotionDownActionTest : VimTestCase() {
             al|l roc|ks and lavender and tufted grass,
             wh|${c}ere i|t was settled on some sodden sand
             ha|rd by| the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -46,7 +46,7 @@ class MotionDownActionTest : VimTestCase() {
             al|l roc|ks and lavender and tufted grass,
             wh|${s}e${se}re i|t was settled on some sodden sand
             ha|${s}r${se}d by| the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 
@@ -59,7 +59,7 @@ class MotionDownActionTest : VimTestCase() {
             al|l rocks and lavender and tufted grass,
             wh|ere it was settled on some sodden sand[additional Chars]
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -67,7 +67,7 @@ class MotionDownActionTest : VimTestCase() {
             al|${s}l rocks and lavender and tufted grass${c},${se}
             wh|${s}ere it was settled on some sodden sand[additional Chars]${c}${se}
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
 
@@ -77,11 +77,11 @@ class MotionDownActionTest : VimTestCase() {
             I found it in a ${c}legendary land
             
             all rocks and lavender and tufted grass,
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             
             ${c}all rocks and lavender and tufted grass,
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -90,15 +90,15 @@ class MotionDownActionTest : VimTestCase() {
     val before = """
             I found it in a ${c}legendary land
             all rocks and lavender and tufted grass,
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             I found it in a legendary land
             all rocks and la${c}vender and tufted grass,
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     myFixture.editor.inlayModel.addInlineElement(2, HintRenderer("Hello"))
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test with inlays 2`() {
@@ -106,15 +106,15 @@ class MotionDownActionTest : VimTestCase() {
     val before = """
             I found it in a ${c}legendary land
             all rocks and lavender and tufted grass,
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             I found it in a legendary land
             all rocks and la${c}vender and tufted grass,
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test with inlays 3`() {
@@ -122,16 +122,16 @@ class MotionDownActionTest : VimTestCase() {
     val before = """
             I found it in a ${c}legendary land
             all rocks and lavender and tufted grass,
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             I found it in a legendary land
             all rocks and la${c}vender and tufted grass,
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
     myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test with inlays 4`() {
@@ -139,15 +139,15 @@ class MotionDownActionTest : VimTestCase() {
     val before = """
             I found it in a legendary ${c}land
             all rocks and lavender
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             I found it in a legendary land
             all rocks and lavende${c}r
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test with inlays 5`() {
@@ -155,15 +155,15 @@ class MotionDownActionTest : VimTestCase() {
     val before = """
             I found it in a legendary ${c}land
             all rocks and lavender
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             I found it in a legendary ${c}land
             all rocks and lavender
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test motion up down without inlays`() {
@@ -171,14 +171,14 @@ class MotionDownActionTest : VimTestCase() {
     val before = """
             I found ${c}it in a legendary land
             all rocks and lavender
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             I found ${c}it in a legendary land
             all rocks and lavender
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test with inlays 6`() {
@@ -186,15 +186,15 @@ class MotionDownActionTest : VimTestCase() {
     val before = """
             I found it in a legendary ${c}land
             all rocks and lavender
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             I found it in a legendary land
             all rocks and lavende${c}r
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test with inlays 7`() {
@@ -202,15 +202,15 @@ class MotionDownActionTest : VimTestCase() {
     val before = """
             I found it in a legendary ${c}land
             all rocks and lavender
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             I found it in a legendary ${c}land
             all rocks and lavender
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test with inlays 8`() {
@@ -218,28 +218,29 @@ class MotionDownActionTest : VimTestCase() {
     val before = """
             I found it in a ${c}legendary land
             all rocks and lavender and tufted grass,
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             I found it in a legendary land
             all rocks and lav${c}ender and tufted grass,
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     myFixture.editor.inlayModel.addInlineElement(before.indexOf("rocks"), HintRenderer("Hello"))
     myFixture.editor.inlayModel.addInlineElement(before.indexOf("found"), HintRenderer("Hello"))
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test motion to the last empty line`() {
-    doTest("j",
+    doTest(
+      "j",
       """
             I found it in a legendary ${c}land
             
-        """.trimIndent(),
+      """.trimIndent(),
       """
             I found it in a legendary land
             ${c}
-        """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }

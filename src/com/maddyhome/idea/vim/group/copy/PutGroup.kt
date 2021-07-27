@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,27 +66,27 @@ data class PutData(
   val insertTextBeforeCaret: Boolean,
   private val rawIndent: Boolean,
   val caretAfterInsertedText: Boolean,
-  val putToLine: Int = -1
+  val putToLine: Int = -1,
 ) {
   val indent: Boolean =
     if (rawIndent && textData?.typeInRegister != SelectionType.LINE_WISE && visualSelection?.typeInEditor != SelectionType.LINE_WISE) false else rawIndent
 
   data class VisualSelection(
     val caretsAndSelections: Map<Caret, VimSelection>,
-    val typeInEditor: SelectionType
+    val typeInEditor: SelectionType,
   )
 
   data class TextData(
     val rawText: String?,
     val typeInRegister: SelectionType,
-    val transferableData: List<TextBlockTransferableData>
+    val transferableData: List<TextBlockTransferableData>,
   )
 }
 
 private data class ProcessedTextData(
   val text: String,
   val typeInRegister: SelectionType,
-  val transferableData: List<TextBlockTransferableData>
+  val transferableData: List<TextBlockTransferableData>,
 )
 
 class PutGroup {
@@ -158,7 +158,7 @@ class PutGroup {
     context: DataContext,
     text: ProcessedTextData,
     data: PutData,
-    additionalData: Map<String, Any>
+    additionalData: Map<String, Any>,
   ) {
     val subMode = data.visualSelection?.typeInEditor?.toSubMode() ?: CommandState.SubMode.NONE
     if (ClipboardOptionsData.ideaput in OptionsManager.clipboard) {
@@ -188,7 +188,7 @@ class PutGroup {
     data: PutData,
     additionalData: Map<String, Any>,
     context: DataContext,
-    text: ProcessedTextData
+    text: ProcessedTextData,
   ) {
     if (data.visualSelection?.typeInEditor?.isLine == true && editor.isOneLineMode) return
     val startOffsets = prepareDocumentAndGetStartOffsets(editor, caret, text.typeInRegister, data, additionalData)
@@ -217,7 +217,7 @@ class PutGroup {
     caret: Caret,
     typeInRegister: SelectionType,
     data: PutData,
-    additionalData: Map<String, Any>
+    additionalData: Map<String, Any>,
   ): List<Int> {
     val application = ApplicationManager.getApplication()
     if (data.visualSelection != null) {
@@ -294,7 +294,7 @@ class PutGroup {
   private fun getProviderForPasteViaIde(
     context: DataContext,
     typeInRegister: SelectionType,
-    data: PutData
+    data: PutData,
   ): PasteProvider? {
     if (data.visualSelection != null && data.visualSelection.typeInEditor.isBlock) return null
     if ((typeInRegister.isLine || typeInRegister.isChar) && data.count == 1) {
@@ -311,7 +311,7 @@ class PutGroup {
     text: ProcessedTextData,
     subMode: CommandState.SubMode,
     data: PutData,
-    additionalData: Map<String, Any>
+    additionalData: Map<String, Any>,
   ) {
     val carets: MutableMap<Caret, RangeMarker> = mutableMapOf()
     EditorHelper.getOrderedCaretsList(editor).forEach { caret ->
@@ -373,9 +373,16 @@ class PutGroup {
   }
 
   private fun putTextInternal(
-    editor: Editor, caret: Caret, context: DataContext,
-    text: String, type: SelectionType, mode: CommandState.SubMode,
-    startOffset: Int, count: Int, indent: Boolean, cursorAfter: Boolean
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    text: String,
+    type: SelectionType,
+    mode: CommandState.SubMode,
+    startOffset: Int,
+    count: Int,
+    indent: Boolean,
+    cursorAfter: Boolean,
   ): Int =
     when (type) {
       SelectionType.CHARACTER_WISE -> putTextCharacterwise(
@@ -406,9 +413,16 @@ class PutGroup {
     }
 
   private fun putTextLinewise(
-    editor: Editor, caret: Caret, context: DataContext,
-    text: String, type: SelectionType, mode: CommandState.SubMode,
-    startOffset: Int, count: Int, indent: Boolean, cursorAfter: Boolean
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    text: String,
+    type: SelectionType,
+    mode: CommandState.SubMode,
+    startOffset: Int,
+    count: Int,
+    indent: Boolean,
+    cursorAfter: Boolean,
   ): Int {
     val caretModel = editor.caretModel
     val overlappedCarets = ArrayList<Caret>(caretModel.caretCount)
@@ -438,9 +452,16 @@ class PutGroup {
   }
 
   private fun putTextBlockwise(
-    editor: Editor, caret: Caret, context: DataContext,
-    text: String, type: SelectionType, mode: CommandState.SubMode,
-    startOffset: Int, count: Int, indent: Boolean, cursorAfter: Boolean
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    text: String,
+    type: SelectionType,
+    mode: CommandState.SubMode,
+    startOffset: Int,
+    count: Int,
+    indent: Boolean,
+    cursorAfter: Boolean,
   ): Int {
     val startPosition = editor.offsetToLogicalPosition(startOffset)
     val currentColumn = if (mode == CommandState.SubMode.VISUAL_LINE) 0 else startPosition.column
@@ -500,10 +521,16 @@ class PutGroup {
   }
 
   private fun putTextCharacterwise(
-    editor: Editor, caret: Caret, context: DataContext,
-    text: String, type: SelectionType,
-    mode: CommandState.SubMode, startOffset: Int, count: Int, indent: Boolean,
-    cursorAfter: Boolean
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    text: String,
+    type: SelectionType,
+    mode: CommandState.SubMode,
+    startOffset: Int,
+    count: Int,
+    indent: Boolean,
+    cursorAfter: Boolean,
   ): Int {
     MotionGroup.moveCaret(editor, caret, startOffset)
     val insertedText = text.repeat(count)
@@ -525,7 +552,7 @@ class PutGroup {
     endOffset: Int,
     typeInRegister: SelectionType,
     modeInEditor: CommandState.SubMode,
-    caretAfterInsertedText: Boolean
+    caretAfterInsertedText: Boolean,
   ) {
     val cursorMode = when (typeInRegister) {
       SelectionType.BLOCK_WISE -> when (modeInEditor) {
@@ -575,9 +602,9 @@ class PutGroup {
   }
 
   private fun notifyAboutIdeaPut(project: Project?) {
-    if (VimPlugin.getVimState().isIdeaPutNotified
-      || ClipboardOptionsData.ideaput in OptionsManager.clipboard
-      || ClipboardOptionsData.ideaputDisabled
+    if (VimPlugin.getVimState().isIdeaPutNotified ||
+      ClipboardOptionsData.ideaput in OptionsManager.clipboard ||
+      ClipboardOptionsData.ideaputDisabled
     ) return
 
     VimPlugin.getVimState().isIdeaPutNotified = true

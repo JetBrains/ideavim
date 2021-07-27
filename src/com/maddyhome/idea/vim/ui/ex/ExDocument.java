@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,8 @@ import java.util.Map;
  * Note that PlainDocument will remove CRs from text for single line text fields
  */
 public class ExDocument extends PlainDocument {
+  private boolean overwrite = false;
+
   /**
    * Toggles the insert/overwrite state
    */
@@ -82,14 +84,14 @@ public class ExDocument extends PlainDocument {
 
   public char getCharacter(int offset) {
     // If we're a proportional font, 'o' is a good char to use. If we're fixed width, it's still a good char to use
-    if (offset >= getLength())
-      return 'o';
+    if (offset >= getLength()) return 'o';
 
     try {
       final Segment segment = new Segment();
-      getContent().getChars(offset,1, segment);
+      getContent().getChars(offset, 1, segment);
       return segment.charAt(0);
-    } catch (BadLocationException e) {
+    }
+    catch (BadLocationException e) {
       return 'o';
     }
   }
@@ -106,15 +108,15 @@ public class ExDocument extends PlainDocument {
       return;
     }
 
-    final Object attribute = attributeSet != null ? attributeSet.getAttribute(StyleConstants.ComposedTextAttribute) : null;
+    final Object attribute =
+      attributeSet != null ? attributeSet.getAttribute(StyleConstants.ComposedTextAttribute) : null;
     if (attribute instanceof AttributedString) {
-      final AttributedString as = (AttributedString) attribute;
+      final AttributedString as = (AttributedString)attribute;
       final Map<AttributedCharacterIterator.Attribute, Object> attributes = as.getIterator().getAttributes();
-      if (!attributes.containsKey(TextAttribute.INPUT_METHOD_HIGHLIGHT) && !attributes.containsKey(TextAttribute.INPUT_METHOD_UNDERLINE)) {
+      if (!attributes.containsKey(TextAttribute.INPUT_METHOD_HIGHLIGHT) &&
+          !attributes.containsKey(TextAttribute.INPUT_METHOD_UNDERLINE)) {
         as.addAttribute(TextAttribute.INPUT_METHOD_HIGHLIGHT, InputMethodHighlight.UNSELECTED_CONVERTED_TEXT_HIGHLIGHT);
       }
     }
   }
-
-  private boolean overwrite = false;
 }

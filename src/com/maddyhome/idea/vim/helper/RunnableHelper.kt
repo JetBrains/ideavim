@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,12 +32,14 @@ object RunnableHelper {
   @JvmStatic
   fun runReadCommand(project: Project?, cmd: Runnable, name: String?, groupId: Any?) {
     logger.debug { "Run read command: $name" }
-    CommandProcessor.getInstance().executeCommand(project, { ApplicationManager.getApplication().runReadAction(cmd) }, name, groupId)
+    CommandProcessor.getInstance()
+      .executeCommand(project, { ApplicationManager.getApplication().runReadAction(cmd) }, name, groupId)
   }
 
   @JvmStatic
   fun runWriteCommand(project: Project?, cmd: Runnable, name: String?, groupId: Any?) {
     logger.debug { "Run write command: $name" }
-    CommandProcessor.getInstance().executeCommand(project, { ApplicationManager.getApplication().runWriteAction(cmd) }, name, groupId)
+    CommandProcessor.getInstance()
+      .executeCommand(project, { ApplicationManager.getApplication().runWriteAction(cmd) }, name, groupId)
   }
 }

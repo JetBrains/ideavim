@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,11 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
-class DeleteCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
+class DeleteCharacterAction : DeleteCharacter({ 1 })
+class DeleteCharacterLeftAction : DeleteCharacter({ -it })
+class DeleteCharacterRightAction : DeleteCharacter({ it })
+
+abstract class DeleteCharacter(private val countModifier: (Int) -> Int) : ChangeEditorActionHandler.ForEachCaret() {
   override val type: Command.Type = Command.Type.DELETE
 
   override fun execute(
@@ -34,8 +38,8 @@ class DeleteCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
-    return VimPlugin.getChange().deleteCharacter(editor, caret, 1, false)
+    return VimPlugin.getChange().deleteCharacter(editor, caret, countModifier(count), false)
   }
 }

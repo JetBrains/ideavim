@@ -10,10 +10,6 @@ The original author:
 
 The current maintainers:
 
-* [![icon][mail]](mailto:andrey.vlasovskikh@gmail.com)
-  [![icon][github]](https://github.com/vlasovskikh)
-  &nbsp;
-  Andrey Vlasovskikh
 * [![icon][mail]](mailto:alexpl292@gmail.com)
   [![icon][github]](https://github.com/AlexPl292)
   &nbsp;
@@ -25,8 +21,13 @@ Previous maintainers:
   [![icon][github]](https://github.com/olegs)
   &nbsp;
   Oleg Shpynov
+* [![icon][mail]](mailto:andrey.vlasovskikh@gmail.com)
+  [![icon][github]](https://github.com/vlasovskikh)
+  &nbsp;
+  Andrey Vlasovskikh
 
 Contributors:
+
 * [![icon][mail]](mailto:yole@jetbrains.com)
   [![icon][github]](https://github.com/yole)
   &nbsp;
@@ -343,13 +344,33 @@ Contributors:
   [![icon][github]](https://github.com/DeveloperHacker)
   &nbsp;
   Sergei Vorobyov
+* [![icon][mail]](mailto:daya0576@gmail.com)
+  [![icon][github]](https://github.com/daya0576)
+  &nbsp;
+  大牙(Henry Zhu)
+* [![icon][mail]](mailto:mplacek@skilltech.pl)
+  [![icon][github]](https://github.com/MichalPlacek)
+  &nbsp;
+  MichalPlacek
+* [![icon][mail]](mailto:shrikantsharat.k@gmail.com)
+  [![icon][github]](https://github.com/sharat87)
+  &nbsp;
+  Shrikant Sharat Kandula
+* [![icon][mail]](mailto:michal.placek@yandex.com)
+  [![icon][github]](https://github.com/MichalPlacek)
+  &nbsp;
+  Michal Placek
+* [![icon][mail]](mailto:eugene.nizienko@jetbrains.com)
+  [![icon][github]](https://github.com/nizienko)
+  &nbsp;
+  eugene nizienko
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
 
 <a href="https://icons8.com">Icons by Icons8</a>
 
-[mail]: resources/icons/mail.png
-[github]: resources/icons/github.png
+[mail]: assets/icons/mail.png
+[github]: assets/icons/github.png
 
-[github-off]: resources/icons/github-off.png
+[github-off]: assets/icons/github-off.png

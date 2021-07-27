@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import com.intellij.openapi.editor.toolbar.floating.AbstractFloatingToolbarProvi
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.DumbAwareAction
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
@@ -56,6 +57,7 @@ object VimRcFileState {
   private var modificationStamp = 0L
 
   // This is a pattern used in ideavimrc parsing for a long time. It removes all trailing/leading spaced and blank lines
+  @Suppress("unused")
   private val EOL_SPLIT_PATTERN = Pattern.compile(" *(\r\n|\n)+ *")
 
   var filePath: String? = null
@@ -103,11 +105,27 @@ object VimRcFileState {
     }
     saveStateListeners.add(action)
   }
+
+  fun unregisterStateListener(action: () -> Unit) {
+    saveStateListeners.remove(action)
+  }
 }
 
 class ReloadVimRc : DumbAwareAction() {
   override fun update(e: AnActionEvent) {
-    val editor = e.getData(PlatformDataKeys.EDITOR) ?: return
+    val editor = e.getData(PlatformDataKeys.EDITOR) ?: run {
+      e.presentation.isEnabledAndVisible = false
+      return
+    }
+    val virtualFile = e.getData(PlatformDataKeys.VIRTUAL_FILE) ?: run {
+      e.presentation.isEnabledAndVisible = false
+      return
+    }
+
+    if (virtualFile.path != VimRcFileState.filePath) {
+      e.presentation.isEnabledAndVisible = false
+      return
+    }
 
     // XXX: Actually, it worth to add e.presentation.description, but it doesn't work because of some reason
     val sameDoc = VimRcFileState.equalTo(editor.document)
@@ -115,8 +133,7 @@ class ReloadVimRc : DumbAwareAction() {
     e.presentation.text = if (sameDoc) MessageHelper.message("action.no.changes.text")
     else MessageHelper.message("action.reload.text")
 
-    val virtualFile = e.getData(PlatformDataKeys.VIRTUAL_FILE)
-    e.presentation.isEnabledAndVisible = virtualFile != null && virtualFile.path == VimRcFileState.filePath
+    e.presentation.isEnabledAndVisible = true
   }
 
   override fun actionPerformed(e: AnActionEvent) {
@@ -131,12 +148,18 @@ class ReloadVimRc : DumbAwareAction() {
 class ReloadFloatingToolbar : AbstractFloatingToolbarProvider(ACTION_GROUP) {
   override val autoHideable: Boolean = false
 
+  // [VERSION UPDATE] 212+
+  @Suppress("OverridingDeprecatedMember")
   override val priority: Int = 0
 
-  override fun register(toolbar: FloatingToolbarComponent, parentDisposable: Disposable) {
-    super.register(toolbar, parentDisposable)
-    VimRcFileState.whenFileStateSaved {
-      toolbar.scheduleShow()
+  override fun register(component: FloatingToolbarComponent, parentDisposable: Disposable) {
+    super.register(component, parentDisposable)
+    val action = {
+      component.scheduleShow()
+    }
+    VimRcFileState.whenFileStateSaved(action)
+    Disposer.register(parentDisposable) {
+      VimRcFileState.unregisterStateListener(action)
     }
   }
 }

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,8 +29,10 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.VirtualFileSystem;
+import com.intellij.util.MathUtil;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.motion.leftright.TillCharacterMotionType;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
@@ -38,7 +40,9 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
+import com.maddyhome.idea.vim.handler.Motion;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
+import com.maddyhome.idea.vim.handler.MotionActionHandlerKt;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.IdeaSpecifics;
@@ -51,6 +55,7 @@ import kotlin.ranges.IntProgression;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.awt.*;
 import java.io.File;
@@ -58,15 +63,13 @@ import java.util.EnumSet;
 
 import static com.maddyhome.idea.vim.group.ChangeGroup.*;
 import static com.maddyhome.idea.vim.helper.EditorHelper.*;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 /**
  * This handles all motion related commands and marks
  */
 public class MotionGroup {
-  public static final int LAST_F = 1;
-  public static final int LAST_f = 2;
-  public static final int LAST_T = 3;
-  public static final int LAST_t = 4;
   public static final int LAST_COLUMN = 9999;
 
   /**
@@ -109,10 +112,12 @@ public class MotionGroup {
         start = caret.getOffset();
 
         // Execute the motion (without moving the cursor) and get where we end
-        end = action.getHandlerOffset(editor, caret, context, cnt, raw, cmd.getArgument());
+        Motion motion = action.getHandlerOffset(editor, caret, context, cnt, raw, cmd.getArgument());
 
         // Invalid motion
-        if (end == -1) return null;
+        if (Motion.Error.INSTANCE.equals(motion)) return null;
+        if (Motion.NoMotion.INSTANCE.equals(motion)) return null;
+        end = ((Motion.AbsoluteOffset)motion).getOffset();
 
         // If inclusive, add the last character to the range
         if (action.getMotionType() == MotionType.INCLUSIVE && end < EditorHelperRt.getFileSize(editor)) {
@@ -151,7 +156,7 @@ public class MotionGroup {
       if (cmd.isLinewiseMotion()) {
         if (caret.getLogicalPosition().line != getLineCount(editor) - 1) {
           start = getLineStartForOffset(editor, start);
-          end = Math.min(getLineEndForOffset(editor, end) + 1, EditorHelperRt.getFileSize(editor));
+          end = min(getLineEndForOffset(editor, end) + 1, EditorHelperRt.getFileSize(editor));
         }
         else {
           start = getLineStartForOffset(editor, start);
@@ -183,11 +188,13 @@ public class MotionGroup {
     final int topVisualLine = getVisualLineAtTopOfScreen(editor);
     final int bottomVisualLine = getVisualLineAtBottomOfScreen(editor);
     final int caretVisualLine = editor.getCaretModel().getVisualPosition().line;
+    final int lastVisualLine = EditorHelper.getVisualLineCount(editor) - 1;
+
     final int newVisualLine;
     if (caretVisualLine < topVisualLine + scrollOffset) {
       newVisualLine = normalizeVisualLine(editor, topVisualLine + scrollOffset);
     }
-    else if (caretVisualLine > bottomVisualLine - scrollOffset) {
+    else if (bottomVisualLine < lastVisualLine && caretVisualLine > bottomVisualLine - scrollOffset) {
       newVisualLine = normalizeVisualLine(editor, bottomVisualLine - scrollOffset);
     }
     else {
@@ -208,7 +215,7 @@ public class MotionGroup {
     int newColumn = caretColumn;
 
     // TODO: Visual column arithmetic will be inaccurate as it include columns for inlays and folds
-    if (caretColumn < leftVisualColumn + sideScrollOffset) {
+    if (leftVisualColumn > 0 && caretColumn < leftVisualColumn + sideScrollOffset) {
       newColumn = leftVisualColumn + sideScrollOffset;
     }
     else if (caretColumn > rightVisualColumn - sideScrollOffset) {
@@ -219,7 +226,7 @@ public class MotionGroup {
       col = newColumn;
     }
 
-    newColumn = normalizeVisualColumn(editor, newVisualLine, newColumn, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
+    newColumn = normalizeVisualColumn(editor, newVisualLine, newColumn, CommandStateHelper.isEndAllowed(editor));
 
     if (newVisualLine != caretVisualLine || newColumn != oldColumn) {
       int offset = visualPositionToOffset(editor, new VisualPosition(newVisualLine, newColumn));
@@ -267,8 +274,8 @@ public class MotionGroup {
     return targetCaretVisualLine;
   }
 
-  public int moveCaretToNthCharacter(@NotNull Editor editor, int count) {
-    return Math.max(0, Math.min(count, EditorHelperRt.getFileSize(editor) - 1));
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToNthCharacter(@NotNull Editor editor, int count) {
+    return max(0, min(count, EditorHelperRt.getFileSize(editor) - 1));
   }
 
   private static int getScrollOption(int rawCount) {
@@ -302,15 +309,18 @@ public class MotionGroup {
       return;
     }
 
-    // Always move the caret. It will be smart enough to not do anything if the offsets are the same, but it will also
-    // ensure that it's in the correct location relative to any inline inlays
+    // Make sure to always reposition the caret, even if the offset hasn't changed. We might need to reposition due to
+    // changes in surrounding text, especially with inline inlays.
     final int oldOffset = caret.getOffset();
     InlayHelperKt.moveToInlayAwareOffset(caret, offset);
     if (oldOffset != offset) {
       UserDataManager.setVimLastColumn(caret, InlayHelperKt.getInlayAwareVisualColumn(caret));
-      if (caret == editor.getCaretModel().getPrimaryCaret()) {
-        scrollCaretIntoView(editor);
-      }
+    }
+
+    // Similarly, always make sure the caret is positioned within the view. Adding or removing text could move the caret
+    // position relative to the view, without changing offset.
+    if (caret == editor.getCaretModel().getPrimaryCaret()) {
+      scrollCaretIntoView(editor);
     }
 
     if (CommandStateHelper.inVisualMode(editor) || CommandStateHelper.inSelectMode(editor)) {
@@ -397,12 +407,12 @@ public class MotionGroup {
    * @param bigWord If true then find WORD, if false then find word
    * @return position
    */
-  public int findOffsetOfNextWord(@NotNull Editor editor, int searchFrom, int count, boolean bigWord) {
+  public Motion findOffsetOfNextWord(@NotNull Editor editor, int searchFrom, int count, boolean bigWord) {
     final int size = EditorHelperRt.getFileSize(editor);
     if ((searchFrom == 0 && count < 0) || (searchFrom >= size - 1 && count > 0)) {
-      return -1;
+      return Motion.Error.INSTANCE;
     }
-    return SearchHelper.findNextWord(editor, searchFrom, count, bigWord);
+    return MotionActionHandlerKt.toMotionOrError(SearchHelper.findNextWord(editor, searchFrom, count, bigWord));
   }
 
   /**
@@ -414,10 +424,10 @@ public class MotionGroup {
    * @param bigWord If true then find WORD, if false then find word
    * @return position
    */
-  public int moveCaretToNextWordEnd(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
+  public Motion moveCaretToNextWordEnd(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
     if ((caret.getOffset() == 0 && count < 0) ||
         (caret.getOffset() >= EditorHelperRt.getFileSize(editor) - 1 && count > 0)) {
-      return -1;
+      return Motion.Error.INSTANCE;
     }
 
     // If we are doing this move as part of a change command (e.q. cw), we need to count the current end of
@@ -426,14 +436,14 @@ public class MotionGroup {
     int pos = SearchHelper.findNextWordEnd(editor, caret, count, bigWord);
     if (pos == -1) {
       if (count < 0) {
-        return moveCaretToLineStart(editor, 0);
+        return new Motion.AbsoluteOffset(moveCaretToLineStart(editor, 0));
       }
       else {
-        return moveCaretToLineEnd(editor, getLineCount(editor) - 1, false);
+        return new Motion.AbsoluteOffset(moveCaretToLineEnd(editor, getLineCount(editor) - 1, false));
       }
     }
     else {
-      return pos;
+      return new Motion.AbsoluteOffset(pos);
     }
   }
 
@@ -519,7 +529,7 @@ public class MotionGroup {
     return SearchHelper.findMethodEnd(editor, caret, count);
   }
 
-  public void setLastFTCmd(int lastFTCmd, char lastChar) {
+  public void setLastFTCmd(TillCharacterMotionType lastFTCmd, char lastChar) {
     this.lastFTCmd = lastFTCmd;
     this.lastFTChar = lastChar;
   }
@@ -531,16 +541,16 @@ public class MotionGroup {
       case LAST_F:
         res = moveCaretToNextCharacterOnLine(editor, caret, -count, lastFTChar);
         break;
-      case LAST_f:
+      case LAST_SMALL_F:
         res = moveCaretToNextCharacterOnLine(editor, caret, count, lastFTChar);
         break;
       case LAST_T:
         res = moveCaretToBeforeNextCharacterOnLine(editor, caret, -count, lastFTChar);
         if (res == startPos && Math.abs(count) == 1) {
-          res = moveCaretToBeforeNextCharacterOnLine(editor, caret, 2 * count, lastFTChar);
+          res = moveCaretToBeforeNextCharacterOnLine(editor, caret, -2 * count, lastFTChar);
         }
         break;
-      case LAST_t:
+      case LAST_SMALL_T:
         res = moveCaretToBeforeNextCharacterOnLine(editor, caret, count, lastFTChar);
         if (res == startPos && Math.abs(count) == 1) {
           res = moveCaretToBeforeNextCharacterOnLine(editor, caret, 2 * count, lastFTChar);
@@ -611,7 +621,7 @@ public class MotionGroup {
     final VisualPosition caretVisualPosition = editor.getCaretModel().getVisualPosition();
     final int scrollOffset = getNormalizedSideScrollOffset(editor);
     // TODO: Should the offset be applied to visual columns? This includes inline inlays and folds
-    final int column = Math.max(0, caretVisualPosition.column - scrollOffset);
+    final int column = max(0, caretVisualPosition.column - scrollOffset);
     scrollColumnToLeftOfScreen(editor, caretVisualPosition.line, column);
     return true;
   }
@@ -643,22 +653,23 @@ public class MotionGroup {
 
     final int topLine = getVisualLineAtTopOfScreen(editor);
     final int bottomLine = getVisualLineAtBottomOfScreen(editor);
+    final int lastLine = EditorHelper.getVisualLineCount(editor) - 1;
 
     // We need the non-normalised value here, so we can handle cases such as so=999 to keep the current line centred
     final int scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();
     final int topBound = topLine + scrollOffset;
-    final int bottomBound = Math.max(topBound, bottomLine - scrollOffset);
+    final int bottomBound = max(topBound, bottomLine - scrollOffset);
 
     // If we need to scroll the current line more than half a screen worth of lines then we just centre the new
     // current line. This mimics vim behavior of e.g. 100G in a 300 line file with a screen size of 25 centering line
     // 100. It also handles so=999 keeping the current line centred.
     // Note that block inlays means that the pixel height we are scrolling can be larger than half the screen, even if
     // the number of lines is less. I'm not sure what impact this has.
-    final int height = bottomLine - topLine + 1;
+    final int height = getNonNormalizedVisualLineAtBottomOfScreen(editor) - topLine + 1;
 
     // Scrolljump isn't handled as you might expect. It is the minimal number of lines to scroll, but that doesn't mean
     // newLine = caretLine +/- MAX(sj, so)
-    //
+    // <editor-fold desc="// Details">
     // When scrolling up (`k` - scrolling window up in the buffer; more lines are visible at the top of the window), Vim
     // will start at the new cursor line and repeatedly advance lines above and below. The new top line must be at least
     // scrolloff above caretLine. If this takes the new top line above the current top line, we must scroll at least
@@ -680,6 +691,7 @@ public class MotionGroup {
     // On top of that, if the scroll distance is "too large", the new cursor line is positioned in the centre of the
     // screen. What "too large" means depends on scroll direction. There is an initial approximate check before working
     // out correct scroll locations
+    // </editor-fold>
     final int scrollJump = getScrollJump(editor, height);
 
     // Unavoidable fudge value. Multiline rendered doc comments can mean we have very few actual lines, and scrolling
@@ -697,48 +709,49 @@ public class MotionGroup {
     // optionally checks and moves the top line, then optionally checks the bottom line. This gives us the same results
     // via the tests.
     if (height > inlayAwareMinHeightFudge && scrollOffset > height / 2) {
-      scrollVisualLineToMiddleOfScreen(editor, caretLine);
+      scrollVisualLineToMiddleOfScreen(editor, caretLine, false);
     } else if (caretLine < topBound) {
       // Scrolling up, put the cursor at the top of the window (minus scrolloff)
       // Initial approximation in move.c:update_topline (including same calculation for halfHeight)
-      if (topLine + scrollOffset - caretLine >= Math.max(2, (height / 2) - 1)) {
-        scrollVisualLineToMiddleOfScreen(editor, caretLine);
+      if (topLine + scrollOffset - caretLine >= max(2, (height / 2) - 1)) {
+        scrollVisualLineToMiddleOfScreen(editor, caretLine, false);
       }
       else {
         // New top line must be at least scrolloff above caretLine. If this is above current top line, we must scroll
         // at least scrolljump. If caretLine was already above topLine, this counts as one scroll, and we scroll from
         // here. Otherwise, we scroll from topLine
-        final int scrollJumpTopLine = Math.max(0, (caretLine < topLine) ? caretLine - scrollJump + 1 : topLine - scrollJump);
-        final int scrollOffsetTopLine = Math.max(0, caretLine - scrollOffset);
-        final int newTopLine = Math.min(scrollOffsetTopLine, scrollJumpTopLine);
+        final int scrollJumpTopLine = max(0, (caretLine < topLine) ? caretLine - scrollJump + 1 : topLine - scrollJump);
+        final int scrollOffsetTopLine = max(0, caretLine - scrollOffset);
+        final int newTopLine = min(scrollOffsetTopLine, scrollJumpTopLine);
 
         // Used is set to the line height of caretLine (1 or how many lines soft wraps take up), and then incremented by
         // the line heights of the lines above and below caretLine (up to scrolloff or end of file).
         // Our implementation ignores soft wrap line heights. Folds already have a line height of 1.
         final int usedAbove = caretLine - newTopLine;
-        final int usedBelow = Math.min(scrollOffset, getVisualLineCount(editor) - caretLine);
+        final int usedBelow = min(scrollOffset, getVisualLineCount(editor) - caretLine);
         final int used = 1 + usedAbove + usedBelow;
         if (used > height) {
-          scrollVisualLineToMiddleOfScreen(editor, caretLine);
+          scrollVisualLineToMiddleOfScreen(editor, caretLine, false);
         }
         else {
           scrollVisualLineToTopOfScreen(editor, newTopLine);
         }
       }
     }
-    else if (caretLine > bottomBound) {
+    else if (caretLine > bottomBound && bottomLine < lastLine) {
       // Scrolling down, put the cursor at the bottom of the window (minus scrolloff)
+      // Do nothing if the bottom of the file is already above the bottom of the screen
       // Vim does a quick approximation before going through the full algorithm. It checks the line below the bottom
       // line in the window (bottomLine + 1). See move.c:update_topline
       int lineCount = caretLine - (bottomLine + 1) + 1 + scrollOffset;
       if (lineCount > height) {
-        scrollVisualLineToMiddleOfScreen(editor, caretLine);
+        scrollVisualLineToMiddleOfScreen(editor, caretLine, false);
       } else {
         // Vim expands out from caretLine at least scrolljump lines. It stops expanding above when it hits the
         // current bottom line, or (because it's expanding above and below) when it's scrolled scrolljump/2. It expands
         // above first, and the initial scroll count is 1, so we used (scrolljump+1)/2
         final int scrolledAbove = caretLine - bottomLine;
-        final int extra = Math.max(scrollOffset, scrollJump - Math.min(scrolledAbove, Math.round((scrollJump + 1) / 2.0f)));
+        final int extra = max(scrollOffset, scrollJump - min(scrolledAbove, Math.round((scrollJump + 1) / 2.0f)));
         final int scrolled = scrolledAbove + extra;
 
         // "used" is the count of lines expanded above and below. We expand below until we hit EOF (or when we've
@@ -748,14 +761,14 @@ public class MotionGroup {
         // The minus one is for the current line
         //noinspection UnnecessaryLocalVariable
         final int usedAbove = scrolledAbove;
-        final int usedBelow = Math.min(getVisualLineCount(editor) - caretLine, usedAbove - 1);
-        final int used = Math.min(height + 1, usedAbove + usedBelow);
+        final int usedBelow = min(getVisualLineCount(editor) - caretLine, usedAbove - 1);
+        final int used = min(height + 1, usedAbove + usedBelow);
 
         // If we've expanded more than a screen full, redraw with the cursor in the middle of the screen. If we're going
         // scroll more than a screen full or more than scrolloff, redraw with the cursor in the middle of the screen.
         lineCount = used > height ? used : scrolled;
         if (lineCount >= height && lineCount > scrollOffset) {
-          scrollVisualLineToMiddleOfScreen(editor, caretLine);
+          scrollVisualLineToMiddleOfScreen(editor, caretLine, false);
         }
         else {
           scrollVisualLineToBottomOfScreen(editor, caretLine + extra);
@@ -773,10 +786,10 @@ public class MotionGroup {
     if (scrollJump) {
       final int scrollJumpSize = OptionsManager.INSTANCE.getScrolljump().value();
       if (scrollJumpSize < 0) {
-        return (int) (height * (Math.min(100, -scrollJumpSize) / 100.0));
+        return (int) (height * (min(100, -scrollJumpSize) / 100.0));
       }
       else {
-        return Math.max(1, scrollJumpSize);
+        return max(1, scrollJumpSize);
       }
     }
     return 1;
@@ -808,7 +821,7 @@ public class MotionGroup {
           diff = sidescroll;
         }
         if (offsetLeft < 0) {
-          scrollColumnToLeftOfScreen(editor, position.line, Math.max(0, currentVisualLeftColumn - diff));
+          scrollColumnToLeftOfScreen(editor, position.line, max(0, currentVisualLeftColumn - diff));
         } else {
           scrollColumnToRightOfScreen(editor, position.line,
             normalizeVisualColumn(editor, position.line, currentVisualRightColumn + diff, false));
@@ -817,16 +830,16 @@ public class MotionGroup {
     }
   }
 
-  public int moveCaretToFirstScreenLine(@NotNull Editor editor, int count) {
-    return moveCaretToScreenLocation(editor, ScreenLocation.TOP, count);
+  public int moveCaretToFirstScreenLine(@NotNull Editor editor, @NotNull Caret caret, int count, boolean normalizeToScreen) {
+    return moveCaretToScreenLocation(editor, caret, ScreenLocation.TOP, count - 1, normalizeToScreen);
   }
 
-  public int moveCaretToLastScreenLine(@NotNull Editor editor, int count) {
-    return moveCaretToScreenLocation(editor, ScreenLocation.BOTTOM, count);
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLastScreenLine(@NotNull Editor editor, @NotNull Caret caret, int count, boolean normalizeToScreen) {
+    return moveCaretToScreenLocation(editor, caret, ScreenLocation.BOTTOM, count - 1, normalizeToScreen);
   }
 
-  public int moveCaretToMiddleScreenLine(@NotNull Editor editor) {
-    return moveCaretToScreenLocation(editor, ScreenLocation.MIDDLE, 0);
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToMiddleScreenLine(@NotNull Editor editor, @NotNull Caret caret) {
+    return moveCaretToScreenLocation(editor, caret, ScreenLocation.MIDDLE, 0, false);
   }
 
   public boolean scrollLine(@NotNull Editor editor, int lines) {
@@ -837,7 +850,7 @@ public class MotionGroup {
       scrollVisualLineToTopOfScreen(editor, visualLine + lines);
     }
     else {
-      final int visualLine = getVisualLineAtBottomOfScreen(editor);
+      final int visualLine = getNonNormalizedVisualLineAtBottomOfScreen(editor);
       scrollVisualLineToBottomOfScreen(editor, visualLine + lines);
     }
 
@@ -943,18 +956,18 @@ public class MotionGroup {
     }
   }
 
-  public int moveCaretToMiddleColumn(@NotNull Editor editor, @NotNull Caret caret) {
+  public Motion moveCaretToMiddleColumn(@NotNull Editor editor, @NotNull Caret caret) {
     final int width = getApproximateScreenWidth(editor) / 2;
     final int len = getLineLength(editor);
 
-    return moveCaretToColumn(editor, caret, Math.max(0, Math.min(len - 1, width)), false);
+    return moveCaretToColumn(editor, caret, max(0, min(len - 1, width)), false);
   }
 
-  public int moveCaretToColumn(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowEnd) {
+  public Motion moveCaretToColumn(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowEnd) {
     int line = caret.getLogicalPosition().line;
     int pos = normalizeColumn(editor, line, count, allowEnd);
 
-    return editor.logicalPositionToOffset(new LogicalPosition(line, pos));
+    return new Motion.AbsoluteOffset(editor.logicalPositionToOffset(new LogicalPosition(line, pos)));
   }
 
   public int moveCaretToLineStartSkipLeading(@NotNull Editor editor, @NotNull Caret caret) {
@@ -962,11 +975,11 @@ public class MotionGroup {
     return moveCaretToLineStartSkipLeading(editor, logicalLine);
   }
 
-  public int moveCaretToLineStartSkipLeading(@NotNull Editor editor, int line) {
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineStartSkipLeading(@NotNull Editor editor, int line) {
     return getLeadingCharacterOffset(editor, line);
   }
 
-  public int moveCaretToLineStartSkipLeadingOffset(@NotNull Editor editor, @NotNull Caret caret, int linesOffset) {
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineStartSkipLeadingOffset(@NotNull Editor editor, @NotNull Caret caret, int linesOffset) {
     int line = normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset);
     return moveCaretToLineStartSkipLeading(editor, visualLineToLogicalLine(editor, line));
   }
@@ -1005,30 +1018,30 @@ public class MotionGroup {
     return true;
   }
 
-  public int moveCaretToLineStart(@NotNull Editor editor, @NotNull Caret caret) {
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineStart(@NotNull Editor editor, @NotNull Caret caret) {
     int logicalLine = caret.getLogicalPosition().line;
     return moveCaretToLineStart(editor, logicalLine);
   }
 
-  public int moveCaretToLineStart(@NotNull Editor editor, int line) {
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineStart(@NotNull Editor editor, int line) {
     if (line >= getLineCount(editor)) {
       return EditorHelperRt.getFileSize(editor);
     }
     return getLineStartOffset(editor, line);
   }
 
-  public int moveCaretToLineScreenStart(@NotNull Editor editor, @NotNull Caret caret) {
+  public Motion moveCaretToLineScreenStart(@NotNull Editor editor, @NotNull Caret caret) {
     final int col = getVisualColumnAtLeftOfScreen(editor, caret.getVisualPosition().line);
     return moveCaretToColumn(editor, caret, col, false);
   }
 
-  public int moveCaretToLineScreenStartSkipLeading(@NotNull Editor editor, @NotNull Caret caret) {
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineScreenStartSkipLeading(@NotNull Editor editor, @NotNull Caret caret) {
     final int col = getVisualColumnAtLeftOfScreen(editor, caret.getVisualPosition().line);
     final int logicalLine = caret.getLogicalPosition().line;
     return getLeadingCharacterOffset(editor, logicalLine, col);
   }
 
-  public int moveCaretToLineScreenEnd(@NotNull Editor editor, @NotNull Caret caret, boolean allowEnd) {
+  public Motion moveCaretToLineScreenEnd(@NotNull Editor editor, @NotNull Caret caret, boolean allowEnd) {
     final int col = getVisualColumnAtRightOfScreen(editor, caret.getVisualPosition().line);
     return moveCaretToColumn(editor, caret, col, allowEnd);
   }
@@ -1036,7 +1049,7 @@ public class MotionGroup {
   public int moveCaretHorizontalWrap(@NotNull Editor editor, @NotNull Caret caret, int count) {
     // FIX - allows cursor over newlines
     int oldOffset = caret.getOffset();
-    int offset = Math.min(Math.max(0, caret.getOffset() + count), EditorHelperRt.getFileSize(editor));
+    int offset = min(max(0, caret.getOffset() + count), EditorHelperRt.getFileSize(editor));
     if (offset == oldOffset) {
       return -1;
     }
@@ -1071,40 +1084,54 @@ public class MotionGroup {
     }
   }
 
-  public boolean scrollFullPage(@NotNull Editor editor, int pages) {
-    int caretVisualLine = EditorHelper.scrollFullPage(editor, pages);
-    if (caretVisualLine != -1) {
-      final int scrollOffset = getNormalizedScrollOffset(editor);
-      boolean success = true;
+  public boolean scrollFullPage(@NotNull Editor editor, @NotNull Caret caret, int pages) {
+    assert pages != 0;
+    return pages > 0 ? scrollFullPageDown(editor, caret, pages) : scrollFullPageUp(editor, caret, Math.abs(pages));
+  }
 
-      if (pages > 0) {
-        // If the caret is ending up passed the end of the file, we need to beep
-        if (caretVisualLine > getVisualLineCount(editor) - 1) {
-          success = false;
-        }
+  private boolean scrollFullPageDown(@NotNull Editor editor, @NotNull Caret caret, int pages) {
+    final Pair<Boolean, Integer> result = EditorHelper.scrollFullPageDown(editor, pages);
 
-        int topVisualLine = getVisualLineAtTopOfScreen(editor);
-        if (caretVisualLine < topVisualLine + scrollOffset) {
-          caretVisualLine = normalizeVisualLine(editor, caretVisualLine + scrollOffset);
-        }
-      }
-      else if (pages < 0) {
-        int bottomVisualLine = getVisualLineAtBottomOfScreen(editor);
-        if (caretVisualLine > bottomVisualLine - scrollOffset) {
-          caretVisualLine = normalizeVisualLine(editor, caretVisualLine - scrollOffset);
-        }
-      }
+    final int scrollOffset = getNormalizedScrollOffset(editor);
+    final int topVisualLine = getVisualLineAtTopOfScreen(editor);
+    int caretVisualLine = result.getSecond();
+    if (caretVisualLine < topVisualLine + scrollOffset) {
+      caretVisualLine = normalizeVisualLine(editor, caretVisualLine + scrollOffset);
+    }
 
-      int offset =
-        moveCaretToLineStartSkipLeading(editor, visualLineToLogicalLine(editor, caretVisualLine));
-      moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
-      return success;
+    if (caretVisualLine != caret.getVisualPosition().line) {
+      final int offset = moveCaretToLineWithStartOfLineOption(editor, visualLineToLogicalLine(editor, caretVisualLine), caret);
+      moveCaret(editor, caret, offset);
+      return result.getFirst();
     }
 
     return false;
   }
 
-  public int moveCaretToLine(@NotNull Editor editor, int logicalLine, @NotNull Caret caret) {
+  private boolean scrollFullPageUp(@NotNull Editor editor, @NotNull Caret caret, int pages) {
+    final Pair<Boolean, Integer> result = EditorHelper.scrollFullPageUp(editor, pages);
+
+    final int scrollOffset = getNormalizedScrollOffset(editor);
+    final int bottomVisualLine = getVisualLineAtBottomOfScreen(editor);
+    int caretVisualLine = result.getSecond();
+    if (caretVisualLine > bottomVisualLine - scrollOffset) {
+      caretVisualLine = normalizeVisualLine(editor, caretVisualLine - scrollOffset);
+    }
+
+    if (caretVisualLine != caret.getVisualPosition().line && caretVisualLine != -1) {
+      final int offset = moveCaretToLineWithStartOfLineOption(editor, visualLineToLogicalLine(editor, caretVisualLine), caret);
+      moveCaret(editor, caret, offset);
+      return result.getFirst();
+    }
+
+    // We normally error if we didn't move the caret, but we have a special case for a page showing only the last two
+    // lines of the file and virtual space. Vim normally scrolls window height minus two, but when the caret is on last
+    // line minus one, this becomes window height minus one, meaning the top line of the current page becomes the bottom
+    // line of the new page, and the caret doesn't move. Make sure we don't beep in this scenario.
+    return caretVisualLine == EditorHelper.getVisualLineCount(editor) - 2;
+  }
+
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineWithSameColumn(@NotNull Editor editor, int logicalLine, @NotNull Caret caret) {
     int col = UserDataManager.getVimLastColumn(caret);
     int line = logicalLine;
     if (logicalLine < 0) {
@@ -1121,7 +1148,16 @@ public class MotionGroup {
     return editor.logicalPositionToOffset(newPos);
   }
 
-  public boolean scrollScreen(final @NotNull Editor editor, int rawCount, boolean down) {
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineWithStartOfLineOption(@NotNull Editor editor, int logicalLine, @NotNull Caret caret) {
+    if (OptionsManager.INSTANCE.getStartofline().isSet()) {
+      return moveCaretToLineStartSkipLeading(editor, logicalLine);
+    }
+    else {
+      return moveCaretToLineWithSameColumn(editor, logicalLine, caret);
+    }
+  }
+
+  public boolean scrollScreen(final @NotNull Editor editor, final @NotNull Caret caret, int rawCount, boolean down) {
     final CaretModel caretModel = editor.getCaretModel();
     final int currentLogicalLine = caretModel.getLogicalPosition().line;
 
@@ -1161,17 +1197,17 @@ public class MotionGroup {
       final int visualTop = getVisualLineAtTopOfScreen(editor) + scrollOffset;
       final int visualBottom = getVisualLineAtBottomOfScreen(editor) - scrollOffset;
 
-      targetCaretVisualLine = Math.max(visualTop, Math.min(visualBottom, targetCaretVisualLine));
+      targetCaretVisualLine = max(visualTop, min(visualBottom, targetCaretVisualLine));
     }
 
     int logicalLine = visualLineToLogicalLine(editor, targetCaretVisualLine);
-    int caretOffset = moveCaretToLineStartSkipLeading(editor, logicalLine);
-    moveCaret(editor, caretModel.getPrimaryCaret(), caretOffset);
+    int caretOffset = moveCaretToLineWithStartOfLineOption(editor, logicalLine, caret);
+    moveCaret(editor, caret, caretOffset);
 
     return true;
   }
 
-  public int moveCaretToLineEndSkipLeadingOffset(@NotNull Editor editor, @NotNull Caret caret, int linesOffset) {
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineEndSkipLeadingOffset(@NotNull Editor editor, @NotNull Caret caret, int linesOffset) {
     int line = visualLineToLogicalLine(editor, normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset));
     int start = getLineStartOffset(editor, line);
     int end = getLineEndOffset(editor, line, true);
@@ -1191,12 +1227,8 @@ public class MotionGroup {
     return pos;
   }
 
-  public int moveCaretToLineEnd(@NotNull Editor editor, int line, boolean allowPastEnd) {
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineEnd(@NotNull Editor editor, int line, boolean allowPastEnd) {
     return normalizeOffset(editor, line, getLineEndOffset(editor, line, allowPastEnd), allowPastEnd);
-  }
-
-  public int moveCaretGotoLineFirst(@NotNull Editor editor, int line) {
-    return moveCaretToLineStartSkipLeading(editor, line);
   }
 
   // Scrolls current or [count] line to given screen location
@@ -1218,10 +1250,11 @@ public class MotionGroup {
         scrollVisualLineToTopOfScreen(editor, visualLine - scrollOffset);
         break;
       case MIDDLE:
-        scrollVisualLineToMiddleOfScreen(editor, visualLine);
+        scrollVisualLineToMiddleOfScreen(editor, visualLine, true);
         break;
       case BOTTOM:
-        scrollVisualLineToBottomOfScreen(editor, visualLine + scrollOffset);
+        // Make sure we scroll to an actual line, not virtual space
+        scrollVisualLineToBottomOfScreen(editor, normalizeVisualLine(editor, visualLine + scrollOffset));
         break;
     }
 
@@ -1282,7 +1315,7 @@ public class MotionGroup {
       else {
         int newInlineElements = InlayHelperKt.amountOfInlaysBeforeVisualPosition(editor, new VisualPosition(line, col));
 
-        col = normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
+        col = normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(editor));
         col += newInlineElements;
       }
 
@@ -1291,20 +1324,13 @@ public class MotionGroup {
     }
   }
 
-  public int moveCaretToLinePercent(@NotNull Editor editor, int count) {
-    if (count > 100) count = 100;
-
-    return moveCaretToLineStartSkipLeading(editor, normalizeLine(editor, (getLineCount(editor) * count + 99) / 100 - 1));
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLinePercent(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    return moveCaretToLineWithStartOfLineOption(editor,
+      normalizeLine(editor, (getLineCount(editor) * MathUtil.clamp(count, 0, 100) + 99) /100 - 1),
+      caret);
   }
 
-  public int moveCaretGotoLineLast(@NotNull Editor editor, int rawCount) {
-    final int line =
-      rawCount == 0 ? normalizeLine(editor, getLineCount(editor) - 1) : rawCount - 1;
-
-    return moveCaretToLineStartSkipLeading(editor, line);
-  }
-
-  public int moveCaretGotoLineLastEnd(@NotNull Editor editor, int rawCount, int line, boolean pastEnd) {
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretGotoLineLastEnd(@NotNull Editor editor, int rawCount, int line, boolean pastEnd) {
     return moveCaretToLineEnd(editor, rawCount == 0
                                       ? normalizeLine(editor, getLineCount(editor) - 1)
                                       : line, pastEnd);
@@ -1327,7 +1353,7 @@ public class MotionGroup {
     }
   }
 
-  public int getLastFTCmd() {
+  public @NotNull TillCharacterMotionType getLastFTCmd() {
     return lastFTCmd;
   }
 
@@ -1341,53 +1367,61 @@ public class MotionGroup {
     if (range == null) return -1;
     final int adj = VimPlugin.getVisualMotion().getSelectionAdj();
     if (!CommandStateHelper.inVisualMode(editor)) {
-      final int startOffset = forwards ? range.getStartOffset() : Math.max(range.getEndOffset() - adj, 0);
+      final int startOffset = forwards ? range.getStartOffset() : max(range.getEndOffset() - adj, 0);
       MotionGroup.moveCaret(editor, caret, startOffset);
       VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_CHARACTER);
     }
-    return forwards ? Math.max(range.getEndOffset() - adj, 0) : range.getStartOffset();
+    return forwards ? max(range.getEndOffset() - adj, 0) : range.getStartOffset();
   }
 
-  private int lastFTCmd = 0;
+  private @NotNull TillCharacterMotionType lastFTCmd = TillCharacterMotionType.LAST_SMALL_T;
   private char lastFTChar;
 
-  // [count] is a visual line offset, which means it's 1 based. The value is ignored for ScreenLocation.MIDDLE
-  private int moveCaretToScreenLocation(@NotNull Editor editor,
-                                        @NotNull ScreenLocation screenLocation,
-                                        int visualLineOffset) {
-    final int scrollOffset = getNormalizedScrollOffset(editor);
+  // visualLineOffset is a zero based offset to subtract from the direction of travel, where zero is the same as a count
+  // of 1. I.e. 1L = L, which is an offset of zero. 2L is an offset of 1 extra line
+  // When normalizeToScreen is true, the offset is bounded to the current screen dimensions, and scrolloff is applied.
+  // When false, the offset is used directly, and scrolloff is not applied. This is used for op pending motions
+  // (scrolloff is applied after)
+  private @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToScreenLocation(@NotNull Editor editor,
+                                                                                 @NotNull Caret caret,
+                                                                                 @NotNull ScreenLocation screenLocation,
+                                                                                 int visualLineOffset,
+                                                                                 boolean normalizeToScreen) {
 
-    int topVisualLine = getVisualLineAtTopOfScreen(editor);
-    int bottomVisualLine = getVisualLineAtBottomOfScreen(editor);
+    final int scrollOffset = normalizeToScreen ? getNormalizedScrollOffset(editor) : 0;
 
-    // Don't apply scrolloff if we're at the top or bottom of the file
-    int offsetTopVisualLine = topVisualLine > 0 ? topVisualLine + scrollOffset : topVisualLine;
-    int offsetBottomVisualLine =
-      bottomVisualLine < getVisualLineCount(editor) ? bottomVisualLine - scrollOffset : bottomVisualLine;
+    final int maxVisualLine = getVisualLineCount(editor);
 
-    // [count]H/[count]L moves caret to that screen line, bounded by top/bottom scroll offsets
+    final int topVisualLine = getVisualLineAtTopOfScreen(editor);
+    final int topScrollOff = topVisualLine > 0 ? scrollOffset : 0;
+
+    final int bottomVisualLine = getVisualLineAtBottomOfScreen(editor);
+    final int bottomScrollOff = bottomVisualLine < (maxVisualLine - 1) ? scrollOffset : 0;
+
+    final int topMaxVisualLine = normalizeToScreen ? bottomVisualLine - bottomScrollOff : maxVisualLine;
+    final int bottomMinVisualLine = normalizeToScreen ? topVisualLine + topScrollOff : 0;
+
     int targetVisualLine = 0;
     switch (screenLocation) {
       case TOP:
-        targetVisualLine = Math.max(offsetTopVisualLine, topVisualLine + visualLineOffset - 1);
-        targetVisualLine = Math.min(targetVisualLine, offsetBottomVisualLine);
+        targetVisualLine = min(topVisualLine + max(topScrollOff, visualLineOffset), topMaxVisualLine);
         break;
       case MIDDLE:
         targetVisualLine = getVisualLineAtMiddleOfScreen(editor);
         break;
       case BOTTOM:
-        targetVisualLine = Math.min(offsetBottomVisualLine, bottomVisualLine - visualLineOffset + 1);
-        targetVisualLine = Math.max(targetVisualLine, offsetTopVisualLine);
+        targetVisualLine = max(bottomVisualLine - max(bottomScrollOff, visualLineOffset), bottomMinVisualLine);
         break;
     }
 
-    return moveCaretToLineStartSkipLeading(editor, visualLineToLogicalLine(editor, targetVisualLine));
+    final int targetLogicalLine = visualLineToLogicalLine(editor, targetVisualLine);
+    return moveCaretToLineWithStartOfLineOption(editor, targetLogicalLine, caret);
   }
 
-  public int moveCaretToLineEndOffset(@NotNull Editor editor,
-                                      @NotNull Caret caret,
-                                      int cntForward,
-                                      boolean allowPastEnd) {
+  public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineEndOffset(@NotNull Editor editor,
+                                                                               @NotNull Caret caret,
+                                                                               int cntForward,
+                                                                               boolean allowPastEnd) {
     int line = normalizeVisualLine(editor, caret.getVisualPosition().line + cntForward);
 
     if (line < 0) {
@@ -1407,7 +1441,7 @@ public class MotionGroup {
 
     @Override
     public void valueChange(String oldValue, String newValue) {
-      for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
+      for (Editor editor : HelperKt.localEditors()) {
         if (UserDataManager.getVimEditorGroup(editor)) {
           MotionGroup.scrollCaretIntoView(editor);
         }

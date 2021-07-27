@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,10 +29,23 @@ import com.maddyhome.idea.vim.option.OptionsManager
 val usesVirtualSpace
   get() = OptionsManager.virtualedit.value == "onemore"
 
+/**
+ * Please use `isEndAllowed` based on `Editor` (another extension function)
+ * It takes "single command" into account.
+ */
 val CommandState.Mode.isEndAllowed: Boolean
   get() = when (this) {
     CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
     CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -> usesVirtualSpace
+  }
+
+val Editor.isEndAllowed: Boolean
+  get() = when (this.mode) {
+    CommandState.Mode.INSERT, CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
+    CommandState.Mode.COMMAND, CommandState.Mode.CMD_LINE, CommandState.Mode.REPLACE, CommandState.Mode.OP_PENDING -> {
+      // One day we'll use a proper insert_normal mode
+      if (this.subMode == CommandState.SubMode.SINGLE_COMMAND) true else usesVirtualSpace
+    }
   }
 
 val CommandState.Mode.isEndAllowedIgnoringOnemore: Boolean
@@ -102,5 +115,5 @@ val Editor.inSingleCommandMode
   get() = this.subMode == CommandState.SubMode.SINGLE_COMMAND && this.inNormalMode
 
 @get:JvmName("commandState")
-val Editor?.commandState
+val Editor.commandState
   get() = CommandState.getInstance(this)

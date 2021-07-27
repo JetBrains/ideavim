@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
     val after = "I ${c}ound it in a legendary land"
     configureByText(before)
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test delete multiple characters`() {
@@ -38,7 +38,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
     val after = "I $c it in a legendary land"
     configureByText(before)
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test deletes min of count and end of line`() {
@@ -50,7 +50,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -58,10 +58,10 @@ class DeleteCharacterRightActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test delete with inlay relating to preceding text`() {
@@ -80,7 +80,7 @@ class DeleteCharacterRightActionTest : VimTestCase() {
     addInlay(4, true, 5)
 
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
 
     // It doesn't matter if the inlay is related to preceding or following text. Deleting visual column 3 moves the
     // inlay one visual column to the left, from column 4 to 3. 'x' doesn't move the logical position/offset of the
@@ -104,10 +104,10 @@ class DeleteCharacterRightActionTest : VimTestCase() {
     // Hitting 'x' on the character before the inlay should place the cursor after the inlay
     // Before: "I f|o|«test:»und it in a legendary land."
     // After: "I f«test:»|u|nd it in a legendary land."
-    addInlay(4, true, 5)
+    addInlay(4, false, 5)
 
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
 
     // It doesn't matter if the inlay is related to preceding or following text. Deleting visual column 3 moves the
     // inlay one visual column to the left, from column 4 to 3. 'x' doesn't move the logical position/offset of the

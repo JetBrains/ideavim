@@ -6,21 +6,127 @@ History of changes in IdeaVim for the IntelliJ platform.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project DOES NOT adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Stable versions use X.Y format.
-EAP versions use X.Y.Z format.
+Stable versions use X.Y format.  
+EAP ([Early Access Program](https://jb.gg/ideavim-eap)) versions use X.Y.Z format.
 
 
 Get an Early Access
 -------------------
 
 Would you like to try new features and fixes? Join the Early Access Program and
-receive EAP builds as updates! Use the `EAP` option in the status bar or
+receive EAP builds as updates! Use the `Early Access Program` option in the status bar or
 add this URL to "Settings | Plugins | Manage Plugin Repositories":
 `https://plugins.jetbrains.com/plugins/eap/ideavim`
 
 It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
+
+## To Be Released
+
+### Fixes:
+
+### Merged PRs:
+* [349](https://github.com/JetBrains/ideavim/pull/349) by [eugene nizienko](https://github.com/nizienko): Run UI test ci
+
+## 0.69, 2021-07-20
+
+### Features:
+* Support several buffer management commands [VIM-1062](https://youtrack.jetbrains.com/issue/VIM-1062),  [VIM-2335](https://youtrack.jetbrains.com/issue/VIM-2335)
+
+### Fixes:
+* [VIM-2317](https://youtrack.jetbrains.com/issue/VIM-2317) Fix memory leak
+* [VIM-1357](https://youtrack.jetbrains.com/issue/VIM-1357)
+  [VIM-1566](https://youtrack.jetbrains.com/issue/VIM-1566) Fix external filters
+* [VIM-2336](https://youtrack.jetbrains.com/issue/VIM-2336) Fix repeat for the `T` movement
+* [VIM-1192](https://youtrack.jetbrains.com/issue/VIM-1192) Fix dollar motion from single command
+* [VIM-1672](https://youtrack.jetbrains.com/issue/VIM-1672) IdeaVim correctly populates clipboard history
+* [VIM-2351](https://youtrack.jetbrains.com/issue/VIM-2351) Correctly select last character when selecting with mouse
+
+### Merged PRs:
+* [332](https://github.com/JetBrains/ideavim/pull/332) by [Matt Ellis](https://github.com/citizenmatt): VIM-1357+VIM-1566: Use OS shell to run filter command
+* [333](https://github.com/JetBrains/ideavim/pull/333) by [Michal Placek](https://github.com/MichalPlacek): VIM-1062
+* [334](https://github.com/JetBrains/ideavim/pull/334) by [Michal Placek](https://github.com/MichalPlacek): vim-2335 Support for navigation to previous buffer with :b#
+
+## 0.68, 2021-06-22
+
+### Features:
+* Support `:global` and `:vglobal` commands [VIM-831](https://youtrack.jetbrains.com/issue/VIM-831), [VIM-832](https://youtrack.jetbrains.com/issue/VIM-832)
+* Support `vim-indent-object` extension [VIM-1151](https://youtrack.jetbrains.com/issue/VIM-1151) | [vim-indent-object](https://github.com/michaeljsmith/vim-indent-object)
+* Support `:print` command
+
+### Fixes:
+* [VIM-2308](https://youtrack.jetbrains.com/issue/VIM-2308) Go to next tab doesn't move scrolling
+
+### Merged PRs:
+* [261](https://github.com/JetBrains/ideavim/pull/261) by [Shrikant Sharat Kandula](https://github.com/sharat87): New extension: Indentation based text objects
+* [308](https://github.com/JetBrains/ideavim/pull/308) by [Matt Ellis](https://github.com/citizenmatt): Fix unnecessary caret movement when switching tabs
+
+## 0.67, 2021-05-20
+
+### Features:
+* Support `sethandler` command to configure shortcuts conflicts via `~/.ideavimrc` file. See [docs](https://jb.gg/vim-sethandler).
+* Support `vim-paragraph-motion` extension [VIM-2290](https://youtrack.jetbrains.com/issue/VIM-2290) | [vim-paragraph-motion](https://github.com/dbakker/vim-paragraph-motion) 
+* Add "Reset Handlers" button for "Conflicting Shortcuts" setting table
+
+### Changes:
+* Rename "Vim Emulation" in settings to "Vim"
+
+### Fixes:
+* [VIM-2230](https://youtrack.jetbrains.com/issue/VIM-2230) Tweak caret position with inline rename options inlay
+* [VIM-2177](https://youtrack.jetbrains.com/issue/VIM-2177) Fix scrolling issues near bottom of file
+* [VIM-2276](https://youtrack.jetbrains.com/issue/VIM-2276) `:ls` returns correct path for files on Microsoft Windows.
+* [VIM-1953](https://youtrack.jetbrains.com/issue/VIM-1953) Execute live testing for `:w` command
+* [VIM-2284](https://youtrack.jetbrains.com/issue/VIM-2284) Values are not duplicated in set command
+* [VIM-2289](https://youtrack.jetbrains.com/issue/VIM-2289) Fix `<End>` command behaviour
+* [VIM-1476](https://youtrack.jetbrains.com/issue/VIM-1476) Last inserted text is stored in `.` register
+* [VIM-2295](https://youtrack.jetbrains.com/issue/VIM-2295) Fix `<S-Space>` in insert mode with an existing mapping
+* [VIM-1401](https://youtrack.jetbrains.com/issue/VIM-1401) IdeaVim triggers readonly handler
+* [VIM-1856](https://youtrack.jetbrains.com/issue/VIM-1856) Support defining shortcuts in .ideavimrc
+* [VIM-1523](https://youtrack.jetbrains.com/issue/VIM-1523) Allow different shortcut handlers in different modes
+
+### Merged PRs:
+* [280](https://github.com/JetBrains/ideavim/pull/280) by [Matt Ellis](https://github.com/citizenmatt): Caret position and view scrolling fixes
+* [289](https://github.com/JetBrains/ideavim/pull/289) by [MichalPlacek](https://github.com/MichalPlacek): VIM-2276 ls returns "absolute path" for files on Microsoft Windows.
+* [295](https://github.com/JetBrains/ideavim/pull/295) by [MichalPlacek](https://github.com/MichalPlacek): VIM-1476
+
+## 0.66, 2021-04-09
+
+Not a lot of changes for this release. Focused on internal improvements.
+
+### Features:
+* Support `startofline` option
+
+### Fixes:
+* [VIM-2238](https://youtrack.jetbrains.com/issue/VIM-2238) Fix `M` command for small files
+
+### Merged PRs:
+* [275](https://github.com/JetBrains/ideavim/pull/275) by [Matt Ellis](https://github.com/citizenmatt): Fix edge cases for H, L and M and introduce 'startofline' option
+* [276](https://github.com/JetBrains/ideavim/pull/276) by [Matt Ellis](https://github.com/citizenmatt): More refactoring of SearchGroup
+
+## 0.65, 2021-02-17
+
+### Features:
+* Support `NERDTree` extension [VIM-1042](https://youtrack.jetbrains.com/issue/VIM-1042) | [NERDTree](https://github.com/preservim/nerdtree)
+  
+    * <details>
+            <summary><strong>Click to see details</strong></summary>
+            <img src="assets/changes/0.65/nerdtree.gif" alt="NERDTree example"/>
+    </details>
+* Support `maxmapdepth` option to define the maximum depth of mappings
+
+### Fixes:
+* [VIM-2202](https://youtrack.jetbrains.com/issue/VIM-2202) Fix macro recording for ex command and search
+* [VIM-1799](https://youtrack.jetbrains.com/issue/VIM-1799)
+  [VIM-1794](https://youtrack.jetbrains.com/issue/VIM-1794)
+  Special characters are not interpreted on yanking
+* [VIM-2218](https://youtrack.jetbrains.com/issue/VIM-2218) Fix some shortcuts for 2021.+
+* [VIM-2217](https://youtrack.jetbrains.com/issue/VIM-2217) Fix adding new line at the end of the file for the AppCode
+* [VIM-2220](https://youtrack.jetbrains.com/issue/VIM-2220) Do not try to get a commandState for null editor
+* [VIM-2153](https://youtrack.jetbrains.com/issue/VIM-2153) Fix storing special characters after IDE closing
+
+### Merged PRs:
+* [269](https://github.com/JetBrains/ideavim/pull/269) by [大牙(Henry Zhu)](https://github.com/daya0576): fix invalid link of submodule docs
 
 ## 0.64, 2020-12-23
 
@@ -138,7 +244,7 @@ Use `set ideavimsupport=` to disable IdeaVim in dialog editors.
 
     * <details>
             <summary><strong>Click to see details</strong></summary>
-            <img src="resources/changes/0.59/highlight_yank.gif" alt="highlight yank"/>
+            <img src="assets/changes/0.59/highlight_yank.gif" alt="highlight yank"/>
       </details>
 
 * [VIM-2068](https://youtrack.jetbrains.com/issue/VIM-2068) `:tabclose` command
@@ -163,7 +269,7 @@ Use `set ideavimsupport=` to disable IdeaVim in dialog editors.
 
     * <details>
             <summary><strong>Click to see details</strong></summary>
-            <img src="resources/changes/0.58/reload_ideavimrc.png" alt="IdeaVimRc reload"/>
+            <img src="assets/changes/0.58/reload_ideavimrc.png" alt="IdeaVimRc reload"/>
       </details>
 
 * Add `:buffer` command.

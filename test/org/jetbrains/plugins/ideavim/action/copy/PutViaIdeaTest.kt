@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 import java.util.*
@@ -47,26 +49,30 @@ class PutViaIdeaTest : VimTestCase() {
     super.tearDown()
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test simple insert via idea`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
 
-    VimPlugin.getRegister().storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister()
+      .storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
 
     typeText(StringHelper.parseKeys("ve", "p"))
     val after = "legendar${c}y it in a legendary land"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test insert several times`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
 
-    VimPlugin.getRegister().storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister()
+      .storeText(myFixture.editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
 
     typeText(StringHelper.parseKeys("ppp"))
     val after = "Ilegendarylegendarylegendar${c}y found it in a legendary land"
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test insert doesn't clear existing elements`() {
@@ -77,13 +83,15 @@ class PutViaIdeaTest : VimTestCase() {
     CopyPasteManager.getInstance().setContents(TextBlockTransferable("Fill", emptyList(), null))
     CopyPasteManager.getInstance().setContents(TextBlockTransferable("Buffer", emptyList(), null))
 
-    VimPlugin.getRegister().storeText(myFixture.editor, before rangeOf "legendary$randomUUID", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister()
+      .storeText(myFixture.editor, before rangeOf "legendary$randomUUID", SelectionType.CHARACTER_WISE, false)
 
     val sizeBefore = CopyPasteManager.getInstance().allContents.size
     typeText(StringHelper.parseKeys("ve", "p"))
     assertEquals(sizeBefore, CopyPasteManager.getInstance().allContents.size)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun `test insert block with newline`() {
     val before = """
             A Discovery
@@ -91,10 +99,15 @@ class PutViaIdeaTest : VimTestCase() {
             I found it in a legendary land
             
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
 
-    VimPlugin.getRegister().storeText(myFixture.editor, before rangeOf "\nI found it in a legendary land\n", SelectionType.CHARACTER_WISE, false)
+    VimPlugin.getRegister().storeText(
+      myFixture.editor,
+      before rangeOf "\nI found it in a legendary land\n",
+      SelectionType.CHARACTER_WISE,
+      false
+    )
 
     typeText(StringHelper.parseKeys("p"))
     val after = """
@@ -105,7 +118,7 @@ class PutViaIdeaTest : VimTestCase() {
             I found it in a legendary land
             
             hard by the torrent of a mountain pass.
-        """.trimIndent()
-    myFixture.checkResult(after)
+    """.trimIndent()
+    assertState(after)
   }
 }

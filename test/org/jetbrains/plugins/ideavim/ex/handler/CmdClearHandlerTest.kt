@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,11 +41,13 @@ class CmdClearHandlerTest : VimTestCase() {
     typeText(commandToKeys("command"))
     assertPluginError(false)
     // The added alias should be listed
-    assertExOutput("""Name        Args       Definition
+    assertExOutput(
+      """Name        Args       Definition
             |Vs          0          vs
             |Wq          0          wq
             |WQ          0          wq
-        """.trimMargin())
+        """.trimMargin()
+    )
 
     // Delete all of the aliases and then list aliases again.
     typeText(commandToKeys("comclear"))

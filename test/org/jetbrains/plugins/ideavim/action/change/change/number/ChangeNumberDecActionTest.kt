@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,13 @@ class ChangeNumberDecActionTest : VimTestCase() {
   }
 
   fun `test decrement oct to negative value`() {
-    doTest(":set nrformats+=octal<CR><C-X>", "00000", "01777777777777777777777", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(
+      ":set nrformats+=octal<CR><C-X>",
+      "00000",
+      "01777777777777777777777",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    )
   }
 
   fun `test decrement incorrect octal`() {
@@ -39,6 +45,12 @@ class ChangeNumberDecActionTest : VimTestCase() {
   }
 
   fun `test decrement oct to negative value by 10`() {
-    doTest(":set nrformats+=octal<CR>10<C-X>", "00005", "01777777777777777777773", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(
+      ":set nrformats+=octal<CR>10<C-X>",
+      "00005",
+      "01777777777777777777773",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    )
   }
 }

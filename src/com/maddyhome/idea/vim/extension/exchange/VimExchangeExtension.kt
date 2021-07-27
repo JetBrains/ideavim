@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormalWithoutMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegister
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
-import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
+import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
@@ -74,22 +74,25 @@ class VimExchangeExtension : VimExtension {
     putExtensionHandlerMapping(MappingMode.N, parseKeys(EXCHANGE_CLEAR_CMD), owner, ExchangeClearHandler(), false)
     putExtensionHandlerMapping(MappingMode.N, parseKeys(EXCHANGE_LINE_CMD), owner, ExchangeHandler(true), false)
 
-    putKeyMapping(MappingMode.N, parseKeys("cx"), owner, parseKeys(EXCHANGE_CMD), true)
-    putKeyMapping(MappingMode.X, parseKeys("X"), owner, parseKeys(EXCHANGE_CMD), true)
-    putKeyMapping(MappingMode.N, parseKeys("cxc"), owner, parseKeys(EXCHANGE_CLEAR_CMD), true)
-    putKeyMapping(MappingMode.N, parseKeys("cxx"), owner, parseKeys(EXCHANGE_LINE_CMD), true)
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("cx"), owner, parseKeys(EXCHANGE_CMD), true)
+    putKeyMappingIfMissing(MappingMode.X, parseKeys("X"), owner, parseKeys(EXCHANGE_CMD), true)
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("cxc"), owner, parseKeys(EXCHANGE_CLEAR_CMD), true)
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("cxx"), owner, parseKeys(EXCHANGE_LINE_CMD), true)
   }
 
   companion object {
     @NonNls
     const val EXCHANGE_CMD = "<Plug>(Exchange)"
+
     @NonNls
     const val EXCHANGE_CLEAR_CMD = "<Plug>(ExchangeClear)"
+
     @NonNls
     const val EXCHANGE_LINE_CMD = "<Plug>(ExchangeLine)"
 
     val EXCHANGE_KEY = Key<Exchange>("exchange")
 
+    // End mark has always greater of eq offset than start mark
     class Exchange(val type: CommandState.SubMode, val start: Mark, val end: Mark, val text: String) {
       private var myHighlighter: RangeHighlighter? = null
       fun setHighlighter(highlighter: RangeHighlighter) {
@@ -97,7 +100,6 @@ class VimExchangeExtension : VimExtension {
       }
 
       fun getHighlighter(): RangeHighlighter? = myHighlighter
-
     }
 
     fun clearExchange(editor: Editor) {
@@ -199,7 +201,10 @@ class VimExchangeExtension : VimExtension {
 
     private fun exchange(editor: Editor, ex1: Exchange, ex2: Exchange, reverse: Boolean, expand: Boolean) {
       fun pasteExchange(sourceExchange: Exchange, targetExchange: Exchange) {
-        VimPlugin.getMark().setChangeMarks(editor, TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end) + 1))
+        VimPlugin.getMark().setChangeMarks(
+          editor,
+          TextRange(editor.getMarkOffset(targetExchange.start), editor.getMarkOffset(targetExchange.end) + 1)
+        )
         // do this instead of direct text manipulation to set change marks
         setRegister('z', stringToKeys(sourceExchange.text), SelectionType.fromSubMode(sourceExchange.type))
         executeNormalWithoutMapping(stringToKeys("`[${targetExchange.type.getString()}`]\"zp"), editor)
@@ -212,10 +217,20 @@ class VimExchangeExtension : VimExtension {
         } else {
           if (ex1.start.logicalLine == ex2.start.logicalLine) {
             val horizontalOffset = ex1.end.col - ex2.end.col
-            primaryCaret.moveToInlayAwareLogicalPosition(LogicalPosition(ex1.start.logicalLine, ex1.start.col - horizontalOffset))
+            primaryCaret.moveToInlayAwareLogicalPosition(
+              LogicalPosition(
+                ex1.start.logicalLine,
+                ex1.start.col - horizontalOffset
+              )
+            )
           } else if (ex1.end.logicalLine - ex1.start.logicalLine != ex2.end.logicalLine - ex2.start.logicalLine) {
             val verticalOffset = ex1.end.logicalLine - ex2.end.logicalLine
-            primaryCaret.moveToInlayAwareLogicalPosition(LogicalPosition(ex1.start.logicalLine - verticalOffset, ex1.start.col))
+            primaryCaret.moveToInlayAwareLogicalPosition(
+              LogicalPosition(
+                ex1.start.logicalLine - verticalOffset,
+                ex1.start.col
+              )
+            )
           }
         }
       }
@@ -227,7 +242,7 @@ class VimExchangeExtension : VimExtension {
       runWriteAction {
         // TODO handle:
         // 	" Compare using =~ because "'==' != 0" returns 0
-        //	let indent = s:get_setting('exchange_indent', 1) !~ 0 && a:x.type ==# 'V' && a:y.type ==# 'V'
+        // 	let indent = s:get_setting('exchange_indent', 1) !~ 0 && a:x.type ==# 'V' && a:y.type ==# 'V'
         pasteExchange(ex1, ex2)
         if (!expand) {
           pasteExchange(ex2, ex1)
@@ -325,8 +340,8 @@ class VimExchangeExtension : VimExtension {
       if (isVisual) {
         executeNormalWithoutMapping(parseKeys("gvy"), editor)
         // TODO: handle
-        //if &selection ==# 'exclusive' && start != end
-        //			let end.column -= len(matchstr(@@, '\_.$'))
+        // if &selection ==# 'exclusive' && start != end
+        // 			let end.column -= len(matchstr(@@, '\_.$'))
       } else {
         selectionEnd = selectionEnd.let {
           VimMark.create(
@@ -350,12 +365,11 @@ class VimExchangeExtension : VimExtension {
       setRegister('*', starRegText)
       setRegister('+', plusRegText)
 
-      return Exchange(
-        selectionType.toSubMode(),
-        selectionStart,
-        selectionEnd,
-        text
-      )
+      return if (selectionStart.offset(editor) <= selectionEnd.offset(editor)) {
+        Exchange(selectionType.toSubMode(), selectionStart, selectionEnd, text)
+      } else {
+        Exchange(selectionType.toSubMode(), selectionEnd, selectionStart, text)
+      }
     }
   }
 }

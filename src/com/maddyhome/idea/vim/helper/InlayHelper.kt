@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,26 +27,31 @@ import com.intellij.openapi.editor.VisualPosition
 /**
  * Move the caret to the given offset, handling inline inlays
  *
- * Inline inlays take up a single visual column. The caret can be positioned on the visual column of the inlay or the
- * text. For Vim, we always want to position the caret before the text (when rendered as a block, this means over the
- * text, and not over the inlay). Caret.moveToOffset will position itself correctly when an inlay relates to following
- * text - it correctly adds one to the visual column. However, it does not add one if the inlay relates to preceding
- * text.
+ * Caret.moveToOffset tries to position the caret between an inlay and the text it relates to. An inlay is added at an
+ * offset, which can be considered as the start of a character, and is treated as a new variable width visual column.
+ * This column is always inserted before the text at that offset, regardless of how the inlay relates to preceding or
+ * following text. If it relates to preceding text, moveToOffset will place the caret at the visual column of the inlay,
+ * after the related text and on/before the inlay. If it relates to the following text, it's placed at the visual
+ * column of the text, after the inlay.
  *
- * I believe this is an incorrect implementation of EditorUtil.inlayAwareOffsetToVisualPosition. When adding an
- * inlay, it is added at an offset, and a new visual column is inserted there. When moving to an offset, that visual
- * column is always there, regardless of whether the inlay relates to preceding or following text.
+ * This behaviour is fine for the bar caret, but for inlays related to preceding text, the block caret will be drawn
+ * over the inlay, which is a poor experience for Vim users (e.g. hitting `x` in this location will delete the text
+ * after the inlay, which is at the same offset as the inlay).
  *
- * It is safe to call this method if the caret hasn't actually moved. In fact, it is a good idea to do so, as it will
- * make sure that if the document has changed to place an inlay at the caret position, the caret is re-positioned
- * appropriately
+ * This method replaces moveToOffset, and makes sure the block caret is not positioned over an inlay. We assume that
+ * insert/replace and select modes use the bar caret and let the existing moveToOffset position the caret correctly
+ * between the inlay and its related text. Otherwise, it's a block caret, so we always position it on the visual column
+ * of the text, after the inlay.
+ *
+ * It is recommended to call this method even if the caret hasn't been moved. It will handle the situation where the
+ * document has been changed to add an inlay at the caret position, and will move the caret appropriately.
  */
 fun Caret.moveToInlayAwareOffset(offset: Int) {
-  // If the target offset is collapsed inside a fold, move directly to the offset, expanding the fold
-  if (editor.foldingModel.isOffsetCollapsed(offset)) {
+  // If the target is inside a fold, call the standard moveToOffset to expand and move
+  if (editor.foldingModel.isOffsetCollapsed(offset) || isBarCaret(this)) {
     moveToOffset(offset)
   } else {
-    val newVisualPosition = inlayAwareOffsetToVisualPosition(editor, offset)
+    val newVisualPosition = getVisualPositionForTextAtOffset(editor, offset)
     if (newVisualPosition != visualPosition) {
       moveToVisualPosition(newVisualPosition)
     }
@@ -57,9 +62,12 @@ fun Caret.moveToInlayAwareLogicalPosition(pos: LogicalPosition) {
   moveToInlayAwareOffset(editor.logicalPositionToOffset(pos))
 }
 
-// This is the same as EditorUtil.inlayAwareOffsetToVisualPosition, except it always skips the inlay, regardless of
-// its "relates to preceding text" state
-private fun inlayAwareOffsetToVisualPosition(editor: Editor, offset: Int): VisualPosition {
+private fun isBarCaret(caret: Caret): Boolean {
+  // TODO: This should ideally be based on caret shape, rather than mode. We can't guarantee that insert means bar
+  return caret.editor.inInsertMode || caret.editor.inSelectMode
+}
+
+private fun getVisualPositionForTextAtOffset(editor: Editor, offset: Int): VisualPosition {
   var logicalPosition = editor.offsetToLogicalPosition(offset)
   val e = if (editor is EditorWindow) {
     logicalPosition = editor.injectedToHost(logicalPosition)
@@ -89,4 +97,4 @@ fun Editor.amountOfInlaysBeforeVisualPosition(pos: VisualPosition): Int {
   return this.inlayModel.getInlineElementsInRange(lineStartNewOffset, newOffset).size
 }
 
-fun VisualPosition.toInlayAwareOffset(caret: Caret): Int =this.column - caret.amountOfInlaysBeforeCaret
+fun VisualPosition.toInlayAwareOffset(caret: Caret): Int = this.column - caret.amountOfInlaysBeforeCaret

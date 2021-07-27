@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,27 +25,31 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class MotionSectionForwardEndActionTest : VimTestCase() {
   @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
   fun `test remove full text`() {
-    doTest("d]]",
+    doTest(
+      "d]]",
       """
           ${c}I found it in a legendary land
           all rocks and lavender and tufted grass,
           where it was settled on some sodden sand
           hard by the torrent of a mountain pass.
-        """.trimIndent(), "$c.",
+      """.trimIndent(),
+      "$c.",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
 
   @VimBehaviorDiffers(originalVimAfter = c, description = "Full text is deleted")
   fun `test remove full text with new line at the end`() {
-    doTest("d]]",
+    doTest(
+      "d]]",
       """
           ${c}I found it in a legendary land
           all rocks and lavender and tufted grass,
           where it was settled on some sodden sand
           hard by the torrent of a mountain pass.
           
-        """.trimIndent(), "$c.\n",
+      """.trimIndent(),
+      "$c.\n",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }

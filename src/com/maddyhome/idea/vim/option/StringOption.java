@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,10 @@ import org.jetbrains.annotations.NotNull;
  * An option that has an arbitrary string value
  */
 public class StringOption extends TextOption {
+  private final String dflt;
+
+  protected String value;
+
   /**
    * Creates the string option
    *
@@ -119,7 +123,7 @@ public class StringOption extends TextOption {
    */
   @Override
   public boolean isDefault() {
-    return dflt.equals(value);
+    return getDefaultValue().equals(value);
   }
 
   /**
@@ -127,9 +131,9 @@ public class StringOption extends TextOption {
    */
   @Override
   public void resetDefault() {
-    if (!dflt.equals(value)) {
+    if (!getDefaultValue().equals(value)) {
       String oldValue = getValue();
-      value = dflt;
+      value = getDefaultValue();
       fireOptionChangeEvent(oldValue, getValue());
     }
   }
@@ -140,10 +144,10 @@ public class StringOption extends TextOption {
    * @return The option as a string for display
    */
   public @NotNull String toString() {
-
     return "  " + getName() + "=" + value;
   }
 
-  protected final String dflt;
-  protected String value;
+  protected @NotNull String getDefaultValue() {
+    return dflt;
+  }
 }

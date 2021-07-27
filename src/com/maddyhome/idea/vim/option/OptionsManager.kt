@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -70,11 +71,16 @@ object OptionsManager {
   val scrolloff = addOption(NumberOption(ScrollOffData.name, "so", 0))
   val selection = addOption(BoundStringOption("selection", "sel", "inclusive", arrayOf("old", "inclusive", "exclusive")))
   val selectmode = addOption(SelectModeOptionData.option)
-  val showcmd = addOption(ToggleOption("showcmd", "sc", true))  // Vim: Off by default on platforms with possibly slow tty. On by default elsewhere.
+  val shell = addOption(ShellOptionData.option)
+  val shellcmdflag = addOption(ShellCmdFlagOptionData.option)
+  val shellxescape = addOption(ShellXEscapeOptionData.option)
+  val shellxquote = addOption(ShellXQuoteOptionData.option)
+  val showcmd = addOption(ToggleOption("showcmd", "sc", true)) // Vim: Off by default on platforms with possibly slow tty. On by default elsewhere.
   val showmode = addOption(ToggleOption("showmode", "smd", false))
   val sidescroll = addOption(NumberOption("sidescroll", "ss", 0))
   val sidescrolloff = addOption(NumberOption("sidescrolloff", "siso", 0))
   val smartcase = addOption(ToggleOption(SmartCaseOptionsData.name, SmartCaseOptionsData.abbr, false))
+  val startofline = addOption(ToggleOption("startofline", "sol", true))
   val ideajoin = addOption(IdeaJoinOptionsData.option)
   val timeout = addOption(ToggleOption("timeout", "to", true))
   val timeoutlen = addOption(NumberOption("timeoutlen", "tm", 1000, -1, Int.MAX_VALUE))
@@ -89,6 +95,20 @@ object OptionsManager {
   val ideastrictmode = addOption(ToggleOption("ideastrictmode", "ideastrictmode", false))
   val ideawrite = addOption(BoundStringOption("ideawrite", "ideawrite", IdeaWriteData.all, IdeaWriteData.allValues))
   val ideavimsupport = addOption(BoundListOption("ideavimsupport", "ideavimsupport", arrayOf("dialog"), arrayOf("dialog", "singleline", "dialoglegacy")))
+
+  // TODO The default value if 1000, but we can't increase it because of terrible performance of our mappings
+  val maxmapdepth = addOption(NumberOption("maxmapdepth", "mmd", 20))
+
+  // This should be removed in the next versions
+  val ideacopypreprocess = addOption(ToggleOption("ideacopypreprocess", "ideacopypreprocess", false))
+
+  val ideatracetime = addOption(ToggleOption("ideatracetime", "ideatracetime", false))
+
+  fun completeInitialisation() {
+    // These options have default values that are based on the contents of 'shell', which can be set in .ideavimrc
+    ShellCmdFlagOptionData.updateDefaultValue(shell)
+    ShellXQuoteOptionData.updateDefaultValue(shell)
+  }
 
   fun isSet(name: String): Boolean {
     val option = getOption(name)
@@ -262,7 +282,7 @@ object OptionsManager {
                 }
               } else {
                 error = Msg.e_invarg
-              }// boolean option - no good
+              } // boolean option - no good
             } else {
               error = Msg.unkopt
             }
@@ -474,7 +494,6 @@ object IdeaRefactorMode {
 
   fun keepMode(): Boolean = OptionsManager.idearefactormode.value == keep
   fun selectMode(): Boolean = OptionsManager.idearefactormode.value == select
-  fun visualMode(): Boolean = OptionsManager.idearefactormode.value == visual
 
   fun correctSelection(editor: Editor) {
     val action: () -> Unit = {
@@ -554,6 +573,71 @@ object ScrollOffData {
 @NonNls
 object ScrollJumpData {
   const val name = "scrolljump"
+}
+
+object ShellOptionData {
+  const val name = "shell"
+
+  val defaultValue = if (SystemInfo.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"
+
+  val option = StringOption(name, "sh", defaultValue)
+}
+
+@Suppress("SpellCheckingInspection")
+object ShellCmdFlagOptionData {
+  const val name = "shellcmdflag"
+
+  fun updateDefaultValue(shell: StringOption) {
+    val resetOption = option.isDefault
+    defaultValue = calculateDefaultValue(shell.value)
+    if (resetOption) {
+      option.resetDefault()
+    }
+  }
+
+  private var defaultValue = calculateDefaultValue(ShellOptionData.defaultValue)
+
+  private fun calculateDefaultValue(shell: String): String {
+    return if (SystemInfo.isWindows && !shell.contains("sh")) "/c" else "-c"
+  }
+
+  val option = object : StringOption(name, "shcf", defaultValue) {
+    override fun getDefaultValue() = ShellCmdFlagOptionData.defaultValue
+  }
+}
+
+@Suppress("SpellCheckingInspection")
+object ShellXEscapeOptionData {
+  const val name = "shellxescape"
+
+  val option = StringOption(name, "sxe", if (SystemInfo.isWindows) "\"&|<>()@^" else "")
+}
+
+@Suppress("SpellCheckingInspection")
+object ShellXQuoteOptionData {
+  const val name = "shellxquote"
+
+  fun updateDefaultValue(shell: StringOption) {
+    val resetOption = option.isDefault
+    defaultValue = calculateDefaultValue(shell.value)
+    if (resetOption) {
+      option.resetDefault()
+    }
+  }
+
+  private var defaultValue = calculateDefaultValue(ShellOptionData.defaultValue)
+
+  private fun calculateDefaultValue(shell: String): String {
+    return when {
+      SystemInfo.isWindows && shell == "cmd.exe" -> "("
+      SystemInfo.isWindows && shell.contains("sh") -> "\""
+      else -> ""
+    }
+  }
+
+  val option = object : StringOption(name, "sxq", defaultValue) {
+    override fun getDefaultValue() = ShellXQuoteOptionData.defaultValue
+  }
 }
 
 object StrictMode {

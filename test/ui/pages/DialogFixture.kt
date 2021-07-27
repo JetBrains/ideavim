@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,22 +28,25 @@ import com.intellij.remoterobot.stepsProcessing.step
 import java.time.Duration
 
 fun ContainerFixture.dialog(
-        title: String,
-        timeout: Duration = Duration.ofSeconds(20),
-        function: DialogFixture.() -> Unit = {}): DialogFixture = step("Search for dialog with title $title") {
-    find<DialogFixture>(DialogFixture.byTitle(title), timeout).apply(function)
+  title: String,
+  timeout: Duration = Duration.ofSeconds(20),
+  function: DialogFixture.() -> Unit = {},
+): DialogFixture = step("Search for dialog with title $title") {
+  find<DialogFixture>(DialogFixture.byTitle(title), timeout).apply(function)
 }
 
 @FixtureName("Dialog")
 class DialogFixture(
-        remoteRobot: RemoteRobot,
-        remoteComponent: RemoteComponent) : CommonContainerFixture(remoteRobot, remoteComponent) {
+  remoteRobot: RemoteRobot,
+  remoteComponent: RemoteComponent,
+) : CommonContainerFixture(remoteRobot, remoteComponent) {
 
-    companion object {
-        @JvmStatic
-        fun byTitle(title: String) = byXpath("title $title", "//div[@title='$title' and @class='MyDialog']")
-    }
+  companion object {
+    @JvmStatic
+    fun byTitle(title: String) = byXpath("title $title", "//div[@title='$title' and @class='MyDialog']")
+  }
 
-    val title: String
-        get() = callJs("component.getTitle();")
+  @Suppress("unused")
+  val title: String
+    get() = callJs("component.getTitle();")
 }

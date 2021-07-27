@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,13 +65,16 @@ public class EventFacade {
     }
   }
 
-  public void registerCustomShortcutSet(@NotNull AnAction action, @NotNull ShortcutSet shortcutSet,
+  public void registerCustomShortcutSet(@NotNull AnAction action,
+                                        @NotNull ShortcutSet shortcutSet,
                                         @Nullable JComponent component) {
     action.registerCustomShortcutSet(shortcutSet, component);
   }
 
-  public void registerCustomShortcutSet(@NotNull AnAction action, @NotNull ShortcutSet shortcutSet,
-                                        @Nullable JComponent component, @NotNull Disposable disposable) {
+  public void registerCustomShortcutSet(@NotNull AnAction action,
+                                        @NotNull ShortcutSet shortcutSet,
+                                        @Nullable JComponent component,
+                                        @NotNull Disposable disposable) {
     action.registerCustomShortcutSet(shortcutSet, component, disposable);
   }
 
@@ -91,9 +94,9 @@ public class EventFacade {
     EditorFactory.getInstance().addEditorFactoryListener(listener, parentDisposable);
   }
 
+  @SuppressWarnings("deprecation")
   public void removeEditorFactoryListener(@NotNull EditorFactoryListener listener) {
     // Listener is removed not only if application is disposed
-    //noinspection deprecation
     EditorFactory.getInstance().removeEditorFactoryListener(listener);
   }
 
@@ -129,11 +132,15 @@ public class EventFacade {
     editor.getSelectionModel().removeSelectionListener(listener);
   }
 
+  // [VERSION UPDATE] 203+
+  @SuppressWarnings("deprecation")
   public void registerLookupListener(@NotNull Project project, @NotNull PropertyChangeListener propertyChangeListener) {
     VimProjectService parentDisposable = VimProjectService.getInstance(project);
     LookupManager.getInstance(project).addPropertyChangeListener(propertyChangeListener, parentDisposable);
   }
 
+  // [VERSION UPDATE] 203+
+  @SuppressWarnings("deprecation")
   public void removeLookupListener(@NotNull Project project, @NotNull PropertyChangeListener propertyChangeListener) {
     LookupManager.getInstance(project).removePropertyChangeListener(propertyChangeListener);
   }

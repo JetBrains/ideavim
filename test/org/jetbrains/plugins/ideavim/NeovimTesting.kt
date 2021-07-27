@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,26 +38,45 @@ internal object NeovimTesting {
 
   private var neovimTestsCounter = 0
 
+  private var currentTestName = ""
+  private val untested = mutableListOf<String>()
+
+  private lateinit var exitCommand: String
+  private lateinit var escapeCommand: String
+  private lateinit var ctrlcCommand: String
+
   fun setUp(test: VimTestCase) {
     if (!neovimEnabled(test)) return
     val nvimPath = System.getenv("ideavim.nvim.path") ?: "nvim"
-    val pb = ProcessBuilder(nvimPath, "-u", "NONE", "--embed", "--headless", "--clean")
+    val pb = ProcessBuilder(nvimPath, "-u", "NONE", "--embed", "--headless", "--clean", "--cmd", "set noswapfile")
     neovim = pb.start()
     val neovimConnection = ProcessRpcConnection(neovim, true)
     neovimApi = NeovimApis.getApiForConnection(neovimConnection)
+    exitCommand = neovimApi.replaceTermcodes("<esc><esc>:qa!", true, false, true).get()
+    escapeCommand = neovimApi.replaceTermcodes("<esc>", true, false, true).get()
+    ctrlcCommand = neovimApi.replaceTermcodes("<C-C>", true, false, true).get()
+    currentTestName = test.name
   }
 
   fun tearDown(test: VimTestCase) {
     if (!neovimEnabled(test)) return
     println("Tested with neovim: $neovimTestsCounter")
+    if (VimTestCase.Checks.neoVim.exitOnTearDown) {
+      neovimApi.input(exitCommand).get()
+    }
     neovim.destroy()
+    if (currentTestName.isNotBlank()) {
+      untested.add(currentTestName)
+      println("----")
+      println("$untested : ${untested.size}")
+    }
   }
 
   private fun neovimEnabled(test: VimTestCase): Boolean {
     val method = test.javaClass.getMethod(test.name)
-    return !method.isAnnotationPresent(VimBehaviorDiffers::class.java)
-      && !method.isAnnotationPresent(TestWithoutNeovim::class.java)
-      && System.getProperty("ideavim.nvim.test", "false")!!.toBoolean()
+    return !method.isAnnotationPresent(VimBehaviorDiffers::class.java) &&
+      !method.isAnnotationPresent(TestWithoutNeovim::class.java) &&
+      System.getProperty("ideavim.nvim.test", "false")!!.toBoolean()
   }
 
   fun setupEditor(editor: Editor, test: VimTestCase) {
@@ -69,14 +88,21 @@ internal object NeovimTesting {
 
   fun typeCommand(keys: String, test: VimTestCase) {
     if (!neovimEnabled(test)) return
-    neovimApi.input(neovimApi.replaceTermcodes(keys, true, false, true).get()).get()
+    when {
+      keys.equals("<esc>", ignoreCase = true) -> neovimApi.input(escapeCommand).get()
+      keys.equals("<C-C>", ignoreCase = true) -> neovimApi.input(ctrlcCommand).get()
+      else -> neovimApi.input(neovimApi.replaceTermcodes(keys, true, false, true).get()).get()
+    }
   }
 
   fun assertState(editor: Editor, test: VimTestCase) {
     if (!neovimEnabled(test)) return
-    neovimTestsCounter++
+    if (currentTestName != "") {
+      currentTestName = ""
+      neovimTestsCounter++
+    }
     assertText(editor)
-    assertCaret(editor)
+    assertCaret(editor, test)
     assertMode(editor)
     assertRegisters()
   }
@@ -89,7 +115,12 @@ internal object NeovimTesting {
   private fun getCaret(): VimCoords = neovimApi.currentWindow.get().cursor.get()
   private fun getText(): String = neovimApi.currentBuffer.get().getLines(0, -1, false).get().joinToString("\n")
 
-  private fun assertCaret(editor: Editor) {
+  fun assertCaret(editor: Editor, test: VimTestCase) {
+    if (!neovimEnabled(test)) return
+    if (currentTestName != "") {
+      currentTestName = ""
+      neovimTestsCounter++
+    }
     val vimCoords = getCaret()
     val resultVimCoords = CharacterPosition.atCaret(editor).toVimCoords()
     assertEquals(vimCoords.toString(), resultVimCoords.toString())
@@ -146,6 +177,8 @@ annotation class TestWithoutNeovim(val reason: SkipNeovimReason, val description
 enum class SkipNeovimReason {
   PLUGIN,
   MULTICARET,
+
+  @Suppress("unused")
   INLAYS,
   OPTION,
   UNCLEAR,
@@ -154,6 +187,22 @@ enum class SkipNeovimReason {
   SELECT_MODE,
   VISUAL_BLOCK_MODE,
   DIFFERENT,
+
+  // This test doesn't check vim behaviour
+  NOT_VIM_TESTING,
+
+  SHOW_CMD,
+  SCROLL,
+  TEMPLATES,
+  EDITOR_MODIFICATION,
+
+  CMD,
+  IDEAVIMRC,
+  ACTION_COMMAND,
+  PLUG,
+  FOLDING,
+  TABS,
+  PLUGIN_ERROR,
 }
 
 fun LogicalPosition.toVimCoords(): VimCoords {

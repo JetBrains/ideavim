@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -199,7 +199,7 @@ fun blockToNativeSelection(
   editor: Editor,
   start: Int,
   end: Int,
-  mode: CommandState.Mode
+  mode: CommandState.Mode,
 ): Pair<LogicalPosition, LogicalPosition> {
   var blockStart = editor.offsetToLogicalPosition(start)
   var blockEnd = editor.offsetToLogicalPosition(end)
@@ -232,8 +232,8 @@ fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: CommandS
   editor.caretModel.allCarets.forEach { caret ->
     if (caret.hasSelection() && caret.selectionEnd == caret.offset) {
       if (caret.selectionEnd <= 0) return@forEach
-      if (EditorHelper.getLineStartForOffset(editor, caret.selectionEnd - 1) != caret.selectionEnd - 1
-        && caret.selectionEnd > 1 && editor.document.text[caret.selectionEnd - 1] == '\n'
+      if (EditorHelper.getLineStartForOffset(editor, caret.selectionEnd - 1) != caret.selectionEnd - 1 &&
+        caret.selectionEnd > 1 && editor.document.text[caret.selectionEnd - 1] == '\n'
       ) {
         caret.moveToInlayAwareOffset(caret.selectionEnd - 2)
       } else {
@@ -282,11 +282,11 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
           // Put right caret position for tab character
           aCaret.moveToVisualPosition(visualPosition)
         }
-        if (mode != CommandState.Mode.SELECT
-          && !EditorHelper.isLineEmpty(editor, line, false)
-          && aCaret.offset == aCaret.selectionEnd
-          && aCaret.selectionEnd - 1 >= lineStartOffset
-          && aCaret.selectionEnd - aCaret.selectionStart != 0
+        if (mode != CommandState.Mode.SELECT &&
+          !EditorHelper.isLineEmpty(editor, line, false) &&
+          aCaret.offset == aCaret.selectionEnd &&
+          aCaret.selectionEnd - 1 >= lineStartOffset &&
+          aCaret.selectionEnd - aCaret.selectionStart != 0
         ) {
           // Move all carets one char left in case if it's on selection end
           aCaret.moveToVisualPosition(VisualPosition(visualPosition.line, visualPosition.column - 1))

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ package com.maddyhome.idea.vim.handler
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.ReadOnlyFragmentModificationException
+import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.change.VimRepeater
@@ -45,7 +47,14 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
    * @see [ChangeEditorActionHandler.SingleExecution] for only one execution.
    */
   abstract class ForEachCaret : ChangeEditorActionHandler() {
-    abstract fun execute(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean
+    abstract fun execute(
+      editor: Editor,
+      caret: Caret,
+      context: DataContext,
+      count: Int,
+      rawCount: Int,
+      argument: Argument?,
+    ): Boolean
   }
 
   /**
@@ -63,21 +72,34 @@ sealed class ChangeEditorActionHandler : EditorActionHandlerBase(false) {
     // to be worked after each task. So here we override the deprecated execute function which
     // is called for each task and call the handlers for each caret, if implemented.
 
+    // Shouldn't we just use [EditorWriteActionHandler]?
     editor.vimChangeActionSwitchMode = null
 
+    val doc = editor.document
+    doc.startGuardedBlockChecking()
+
     val worked = Ref.create(true)
-    when (this) {
-      is ForEachCaret -> {
-        editor.caretModel.runForEachCaret({ current ->
-          if (!current.isValid) return@runForEachCaret
-          if (!execute(editor, current, context, cmd.count, cmd.rawCount, cmd.argument)) {
-            worked.set(false)
-          }
-        }, true)
+    try {
+      when (this) {
+        is ForEachCaret -> {
+          editor.caretModel.runForEachCaret(
+            { current ->
+              if (!current.isValid) return@runForEachCaret
+              if (!execute(editor, current, context, cmd.count, cmd.rawCount, cmd.argument)) {
+                worked.set(false)
+              }
+            },
+            true
+          )
+        }
+        is SingleExecution -> {
+          worked.set(execute(editor, context, cmd.count, cmd.rawCount, cmd.argument))
+        }
       }
-      is SingleExecution -> {
-        worked.set(execute(editor, context, cmd.count, cmd.rawCount, cmd.argument))
-      }
+    } catch (e: ReadOnlyFragmentModificationException) {
+      EditorActionManager.getInstance().getReadonlyFragmentModificationHandler(doc).handle(e)
+    } finally {
+      doc.stopGuardedBlockChecking()
     }
 
     if (worked.get()) {

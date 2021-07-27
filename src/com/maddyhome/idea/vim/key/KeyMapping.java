@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -150,5 +150,16 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
     int firstChar = keyList.get(0).getKeyCode();
     char lastChar = keyList.get(keyList.size() - 1).getKeyChar();
     return firstChar == StringHelper.VK_ACTION && lastChar != ')';
+  }
+
+  public boolean hasmapto(@NotNull List<KeyStroke> toKeys) {
+    return myKeys.values().stream()
+      .anyMatch(o -> o instanceof ToKeysMappingInfo && ((ToKeysMappingInfo)o).getToKeys().equals(toKeys));
+  }
+
+  public List<Pair<List<KeyStroke>, MappingInfo>> getMapTo(@NotNull List<KeyStroke> toKeys) {
+    return myKeys.entrySet().stream().filter(
+      o -> o.getValue() instanceof ToKeysMappingInfo && ((ToKeysMappingInfo)o.getValue()).getToKeys().equals(toKeys))
+      .map(o -> new Pair<>(o.getKey(), o.getValue())).collect(Collectors.toList());
   }
 }

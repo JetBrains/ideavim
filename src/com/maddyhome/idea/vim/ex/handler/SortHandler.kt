@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ class SortHandler : CommandHandler.SingleExecution() {
         LineRange(startLine, endLine)
       } else {
         LineRange(0, editor.document.lineCount - 1)
-      }// If we have a generic selection, i.e. "sort" entire document
+      } // If we have a generic selection, i.e. "sort" entire document
     }
 
     return normalizedRange
@@ -98,7 +98,7 @@ class SortHandler : CommandHandler.SingleExecution() {
   private class LineComparator(
     private val myIgnoreCase: Boolean,
     private val myNumber: Boolean,
-    private val myReverse: Boolean
+    private val myReverse: Boolean,
   ) : Comparator<String> {
 
     override fun compare(o1: String, o2: String): Int {

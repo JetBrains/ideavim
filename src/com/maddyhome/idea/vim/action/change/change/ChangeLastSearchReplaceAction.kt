@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,12 +33,12 @@ class ChangeLastSearchReplaceAction : ChangeEditorActionHandler.SingleExecution(
     context: DataContext,
     count: Int,
     rawCount: Int,
-    argument: Argument?
+    argument: Argument?,
   ): Boolean {
     var result = true
     for (caret in editor.caretModel.allCarets) {
       val line = caret.logicalPosition.line
-      if (!VimPlugin.getSearch().searchAndReplace(editor, caret, LineRange(line, line), "s", "//~/")) {
+      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, LineRange(line, line), "s", "//~/")) {
         result = false
       }
     }

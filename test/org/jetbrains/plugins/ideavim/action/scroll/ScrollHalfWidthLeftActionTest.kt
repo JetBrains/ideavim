@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ package org.jetbrains.plugins.ideavim.action.scroll
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /*
@@ -37,12 +39,14 @@ zH                      Move the view on the text half a screenwidth to the
 [count] is used but undocumented.
  */
 class ScrollHalfWidthLeftActionTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll half page width`() {
     configureByColumns(200)
     typeText(parseKeys("zL"))
     assertVisibleLineBounds(0, 40, 119)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll keeps cursor in place if already in scrolled area`() {
     configureByColumns(200)
     typeText(parseKeys("50|", "zL"))
@@ -50,6 +54,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 40, 119)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll moves cursor if moves off screen 1`() {
     configureByColumns(200)
     typeText(parseKeys("zL"))
@@ -57,6 +62,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 40, 119)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll moves cursor if moves off screen 2`() {
     configureByColumns(200)
     typeText(parseKeys("10|", "zL"))
@@ -64,6 +70,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 40, 119)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll count half page widths`() {
     configureByColumns(300)
     typeText(parseKeys("3zL"))
@@ -71,6 +78,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 120, 199)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll half page width with sidescrolloff`() {
     OptionsManager.sidescrolloff.set(10)
     configureByColumns(200)
@@ -79,6 +87,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 40, 119)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll half page width ignores sidescroll`() {
     OptionsManager.sidescroll.set(10)
     configureByColumns(200)
@@ -88,6 +97,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Vim has virtual space at end of line")
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll at end of line does not use full virtual space`() {
     configureByColumns(200)
     typeText(parseKeys("200|", "ze", "zL"))
@@ -96,6 +106,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
   }
 
   @VimBehaviorDiffers(description = "Vim has virtual space at end of line")
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll near end of line does not use full virtual space`() {
     configureByColumns(200)
     typeText(parseKeys("190|", "ze", "zL"))
@@ -103,6 +114,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 123, 202)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll includes inlay visual column in half page width`() {
     configureByColumns(200)
     addInlay(20, true, 5)
@@ -112,6 +124,7 @@ class ScrollHalfWidthLeftActionTest : VimTestCase() {
     assertVisibleLineBounds(0, 39, 118)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll with inlay in scrolled area and left of the cursor`() {
     configureByColumns(200)
     addInlay(20, true, 5)

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -114,7 +114,7 @@ sealed class VimSimpleSelection : VimSelection() {
       nativeStart: Int,
       nativeEnd: Int,
       type: SelectionType,
-      editor: Editor
+      editor: Editor,
     ) =
       when (type) {
         CHARACTER_WISE -> VimCharacterSelection(vimStart, vimEnd, nativeStart, nativeEnd, editor)
@@ -129,7 +129,7 @@ class VimCharacterSelection(
   override val vimEnd: Int,
   override val nativeStart: Int,
   override val nativeEnd: Int,
-  override val editor: Editor
+  override val editor: Editor,
 ) : VimSimpleSelection() {
   override val normNativeStart = min(nativeStart, nativeEnd)
   override val normNativeEnd = max(nativeStart, nativeEnd)
@@ -143,7 +143,7 @@ class VimLineSelection(
   override val vimEnd: Int,
   override val nativeStart: Int,
   override val nativeEnd: Int,
-  override val editor: Editor
+  override val editor: Editor,
 ) : VimSimpleSelection() {
   override val normNativeStart = min(nativeStart, nativeEnd)
   override val normNativeEnd = max(nativeStart, nativeEnd)
@@ -161,7 +161,7 @@ class VimBlockSelection(
   override val vimStart: Int,
   override val vimEnd: Int,
   override val editor: Editor,
-  private val toLineEnd: Boolean
+  private val toLineEnd: Boolean,
 ) : VimSelection() {
   override fun getNativeStartAndEnd() = blockToNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL).let {
     editor.logicalPositionToOffset(it.first) to editor.logicalPositionToOffset(it.second)

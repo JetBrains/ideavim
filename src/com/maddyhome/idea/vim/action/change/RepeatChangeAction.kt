@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,7 +52,12 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
     try {
       if (repeatHandler && lastHandler != null) {
         val processor = CommandProcessor.getInstance()
-        processor.executeCommand(editor.project, { lastHandler.execute(editor, context) }, "Vim " + lastHandler.javaClass.simpleName, null)
+        processor.executeCommand(
+          editor.project,
+          { lastHandler.execute(editor, context) },
+          "Vim " + lastHandler.javaClass.simpleName,
+          null
+        )
       } else if (!repeatHandler && lastCommand != null) {
         if (cmd.rawCount > 0) {
           lastCommand.count = cmd.count

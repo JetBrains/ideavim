@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 public class BoundStringOption extends StringOption {
+  protected final String[] values;
+
   BoundStringOption(@NonNls String name, @NonNls String abbrev, @NonNls String dflt, String[] values) {
     super(name, abbrev, dflt);
 
@@ -73,6 +75,4 @@ public class BoundStringOption extends StringOption {
 
     return false;
   }
-
-  protected final String[] values;
 }

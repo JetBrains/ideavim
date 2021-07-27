@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 
 package com.maddyhome.idea.vim.action
 
+import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAwareToggleAction
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.MessageHelper
-import com.maddyhome.idea.vim.ui.VimActions
 
 /**
  * This class is used to handle the Vim Plugin enabled/disabled toggle. This is most likely used as a menu option
@@ -38,7 +38,7 @@ class VimPluginToggleAction : DumbAwareToggleAction()/*, LightEditCompatible*/ {
   override fun update(e: AnActionEvent) {
     super.update(e)
 
-    e.presentation.text = if (VimActions.actionPlace == e.place) {
+    e.presentation.text = if (ActionPlaces.POPUP == e.place) {
       if (VimPlugin.isEnabled()) MessageHelper.message("action.VimPluginToggle.enabled") else MessageHelper.message("action.VimPluginToggle.enable")
     } else MessageHelper.message("action.VimPluginToggle.text")
   }

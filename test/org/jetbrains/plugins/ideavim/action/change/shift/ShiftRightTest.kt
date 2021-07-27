@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,13 @@
 package org.jetbrains.plugins.ideavim.action.change.shift
 
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ShiftRightTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun `test shift till new line`() {
     val file = """
             A Discovery
@@ -30,92 +34,153 @@ class ShiftRightTest : VimTestCase() {
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     typeTextInFile(StringHelper.parseKeys(">W"), file)
-    myFixture.checkResult("""
+    assertState(
+      """
             A Discovery
 
-                  I found it in a legendary land
+                  ${c}I found it in a legendary land
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   // VIM-407
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftShiftsOneCharacterSingleLine() {
-    myFixture.configureByText("a.txt", "<caret>w\n")
+    configureByText("<caret>w\n")
     typeText(StringHelper.parseKeys(">>"))
-    myFixture.checkResult("    w\n")
+    assertState("    w\n")
   }
 
   // VIM-407
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftShiftsOneCharacterMultiLine() {
-    myFixture.configureByText("a.txt", "Hello\n<caret>w\nWorld")
+    configureByText("Hello\n<caret>w\nWorld")
     typeText(StringHelper.parseKeys(">>"))
-    myFixture.checkResult("Hello\n    w\nWorld")
+    assertState("Hello\n    w\nWorld")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftShiftsMultipleCharactersOneLine() {
-    myFixture.configureByText("a.txt", "<caret>Hello, world!\n")
+    configureByText("<caret>Hello, world!\n")
     typeText(StringHelper.parseKeys(">>"))
-    myFixture.checkResult("    Hello, world!\n")
+    assertState("    Hello, world!\n")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftShiftsMultipleCharactersMultipleLines() {
-    myFixture.configureByText("a.txt", "<caret>Hello,\nworld!\n")
+    configureByText("<caret>Hello,\nworld!\n")
     typeText(StringHelper.parseKeys("j>>"))
-    myFixture.checkResult("Hello,\n    world!\n")
+    assertState("Hello,\n    world!\n")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftsSingleLineSelection() {
-    myFixture.configureByText("a.txt", "<caret>Hello,\nworld!\n")
+    configureByText("<caret>Hello,\nworld!\n")
     typeText(StringHelper.parseKeys("jv$>>"))
-    myFixture.checkResult("Hello,\n    world!\n")
+    assertState("Hello,\n    world!\n")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftsMultiLineSelection() {
-    myFixture.configureByText("a.txt", "<caret>Hello,\nworld!\n")
+    configureByText("<caret>Hello,\nworld!\n")
     typeText(StringHelper.parseKeys("vj$>>"))
-    myFixture.checkResult("    Hello,\n    world!\n")
+    assertState("    Hello,\n    world!\n")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftsMultiLineSelectionSkipsNewline() {
-    myFixture.configureByText("a.txt", "<caret>Hello,\nworld!\n\n")
+    configureByText("<caret>Hello,\nworld!\n\n")
     typeText(StringHelper.parseKeys("vG$>>"))
-    myFixture.checkResult("    Hello,\n    world!\n\n")
+    assertState("    Hello,\n    world!\n\n")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftsMultiLineSelectionSkipsNewlineWhenCursorNotInFirstColumn() {
-    myFixture.configureByText("a.txt", "<caret>Hello,\n\nworld!\n")
+    configureByText("<caret>Hello,\n\nworld!\n")
     typeText(StringHelper.parseKeys("lVG>"))
-    myFixture.checkResult("    Hello,\n\n    world!\n")
+    assertState("    Hello,\n\n    world!\n")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftsMultiLineSelectionAddsTrailingWhitespaceIfTherePreviouslyWas() {
-    myFixture.configureByText("a.txt", "<caret>Hello,\n    \nworld!\n")
+    configureByText("<caret>Hello,\n    \nworld!\n")
     typeText(StringHelper.parseKeys("lVG>"))
-    myFixture.checkResult("    Hello,\n        \n    world!\n")
+    assertState("    Hello,\n        \n    world!\n")
   }
 
   // VIM-705 repeating a multiline indent would only affect last line
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftsMultiLineSelectionRepeat() {
-    myFixture.configureByText("a.txt", "<caret>a\nb\n")
+    configureByText("<caret>a\nb\n")
     typeText(StringHelper.parseKeys("Vj>."))
-    myFixture.checkResult("        a\n        b\n")
+    assertState("        a\n        b\n")
   }
 
   fun testShiftsDontCrashKeyHandler() {
-    myFixture.configureByText("a.txt", "\n")
+    configureByText("\n")
     typeText(StringHelper.parseKeys("<I<>", "<I<>"))
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun testShiftsVisualBlockMode() {
-    myFixture.configureByText("a.txt", "foo<caret>foo\nfoobar\nfoobaz\n")
+    configureByText("foo<caret>foo\nfoobar\nfoobaz\n")
     typeText(StringHelper.parseKeys("<C-V>jjl>"))
-    myFixture.checkResult("foo    foo\nfoo    bar\nfoo    baz\n")
+    assertState("foo    foo\nfoo    bar\nfoo    baz\n")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
+  fun `test shift right positions caret at first non-blank char`() {
+    val file = """
+      |A Discovery
+      |
+      |       I found it in a legendary l${c}and
+      |       all rocks and lavender and tufted grass,
+      |       where it was settled on some sodden sand
+      |       hard by the torrent of a mountain pass.
+    """.trimMargin()
+    typeTextInFile(StringHelper.parseKeys(">>"), file)
+    assertState(
+      """
+      |A Discovery
+
+      |           ${c}I found it in a legendary land
+      |       all rocks and lavender and tufted grass,
+      |       where it was settled on some sodden sand
+      |       hard by the torrent of a mountain pass.
+      """.trimMargin()
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
+  fun `test shift right does not move caret with nostartofline`() {
+    OptionsManager.startofline.reset()
+    val file = """
+      |A Discovery
+      |
+      |       I found it in a ${c}legendary land
+      |       all rocks and lavender and tufted grass,
+      |       where it was settled on some sodden sand
+      |       hard by the torrent of a mountain pass.
+    """.trimMargin()
+    typeTextInFile(StringHelper.parseKeys(">>"), file)
+    assertState(
+      """
+      |A Discovery
+
+      |           I found it i${c}n a legendary land
+      |       all rocks and lavender and tufted grass,
+      |       where it was settled on some sodden sand
+      |       hard by the torrent of a mountain pass.
+      """.trimMargin()
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun `test shift ctrl-t`() {
     val file = """
             A Discovery
@@ -124,15 +189,17 @@ class ShiftRightTest : VimTestCase() {
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     typeTextInFile(StringHelper.parseKeys("i<C-T>"), file)
-    myFixture.checkResult("""
+    assertState(
+      """
             A Discovery
 
                   I found it in a legendary land
               all rocks and lavender and tufted grass,
               where it was settled on some sodden sand
               hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
   }
 }

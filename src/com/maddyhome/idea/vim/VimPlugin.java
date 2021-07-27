@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,6 +77,8 @@ import static com.maddyhome.idea.vim.group.KeyGroup.SHORTCUT_CONFLICTS_ELEMENT;
  * This is an application level plugin meaning that all open projects will share a common instance of the plugin.
  * Registers and marks are shared across open projects so you can copy and paste between files of different projects.
  */
+@SuppressWarnings("deprecation")
+// [VERSION UPDATE] 212+ getService
 @State(name = "VimSettings", storages = {@Storage("$APP_CONFIG$/vim_settings.xml")})
 public class VimPlugin implements PersistentStateComponent<Element>, Disposable {
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
@@ -236,7 +238,13 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     ideavimrcRegistered = true;
 
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      executeIdeaVimRc();
+      try {
+        VimScriptParser.INSTANCE.setExecutingVimScript(true);
+        executeIdeaVimRc();
+      }
+      finally {
+        VimScriptParser.INSTANCE.setExecutingVimScript(false);
+      }
     }
   }
 
@@ -351,7 +359,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     RegisterActions.registerActions();
 
     // Register ex handlers
-    CommandParser.getInstance().registerHandlers();
+    CommandParser.INSTANCE.registerHandlers();
 
     // Register extensions
     VimExtensionRegistrar.registerExtensions();
@@ -359,14 +367,19 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     // Execute ~/.ideavimrc
     registerIdeavimrc();
 
+    // Initialize extensions
+    VimExtensionRegistrar.enableDelayedExtensions();
+
+    // Some options' default values are based on values set in .ideavimrc, e.g. 'shellxquote' on Windows when 'shell'
+    // is cmd.exe has a different default to when 'shell' contains "sh"
+    OptionsManager.INSTANCE.completeInitialisation();
+
     // Turing on should be performed after all commands registration
     getSearch().turnOn();
     VimListenerManager.INSTANCE.turnOn();
   }
 
   private void turnOffPlugin() {
-    KeyHandler.getInstance().fullReset(null);
-
     SearchGroup searchGroup = getSearchIfCreated();
     if (searchGroup != null) {
       searchGroup.turnOff();
@@ -378,7 +391,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     RegisterActions.unregisterActions();
 
     // Unregister ex handlers
-    CommandParser.getInstance().unregisterHandlers();
+    CommandParser.INSTANCE.unregisterHandlers();
   }
 
   private boolean stateUpdated = false;
@@ -414,7 +427,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
         VimPlugin.getNotifications().specialKeymap(keymap, new NotificationListener.Adapter() {
           @Override
           protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
-            ShowSettingsUtil.getInstance().editConfigurable((Project)null, new VimEmulationConfigurable());
+            ShowSettingsUtil.getInstance().showSettingsDialog(null, VimEmulationConfigurable.class);
           }
         });
         manager.setActiveKeymap(keymap);

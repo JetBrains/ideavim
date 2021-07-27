@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(parseKeys("v"))
     val startOffset = (before rangeOf "found").startOffset
@@ -54,7 +54,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(parseKeys("vl"))
     val startOffset = (before rangeOf "found").startOffset
@@ -69,7 +69,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was ${c}settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(parseKeys("vl"))
     val startOffset1 = (before rangeOf "found").startOffset
@@ -86,7 +86,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was ${c}settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(parseKeys("v2e"))
     val startOffset1 = (before rangeOf "legendary").startOffset
@@ -103,7 +103,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was ${c}settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(parseKeys("v2b"))
     val startOffset1 = (before rangeOf "legendary").startOffset
@@ -113,7 +113,8 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
   }
 
   fun `test enter visual with count`() {
-    doTest("1v",
+    doTest(
+      "1v",
       """
                     A Discovery
 
@@ -121,7 +122,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -129,12 +130,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   fun `test enter visual with count multicaret`() {
-    doTest("1v",
+    doTest(
+      "1v",
       """
                     A Discovery
 
@@ -142,7 +145,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and ${c}lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -150,12 +153,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and ${s}${c}l${se}avender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   fun `test enter visual with five count`() {
-    doTest("5v",
+    doTest(
+      "5v",
       """
                     A Discovery
 
@@ -163,7 +168,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -171,12 +176,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   fun `test enter visual with 100 count`() {
-    doTest("100v",
+    doTest(
+      "100v",
       """
                     A Discovery
 
@@ -184,7 +191,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -192,12 +199,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   fun `test enter visual with count after visual operation`() {
-    doTest(listOf("vedx", "1v"),
+    doTest(
+      listOf("vedx", "1v"),
       """
                     A Discovery
 
@@ -205,7 +214,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -213,13 +222,15 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test enter visual with count after visual operation multicaret`() {
-    doTest(listOf("vedx", "1v"),
+    doTest(
+      listOf("vedx", "1v"),
       """
                     A Discovery
 
@@ -227,7 +238,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and ${c}lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -235,12 +246,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and ${s}and tuf${c}t${se}ed grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   fun `test enter visual with count after visual operation multiple time`() {
-    doTest(listOf("vedx", "1v", "<ESC>bb", "1v"),
+    doTest(
+      listOf("vedx", "1v", "<ESC>bb", "1v"),
       """
                     A Discovery
 
@@ -248,7 +261,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -256,12 +269,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   fun `test enter visual with double count after visual operation`() {
-    doTest(listOf("vedx", "2v"),
+    doTest(
+      listOf("vedx", "2v"),
       """
                     A Discovery
 
@@ -269,7 +284,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -277,12 +292,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   fun `test enter visual with ten count after visual operation`() {
-    doTest(listOf("vedx", "10v"),
+    doTest(
+      listOf("vedx", "10v"),
       """
                     A Discovery
 
@@ -290,7 +307,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -298,12 +315,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   fun `test enter visual with double count after visual operation multiline`() {
-    doTest(listOf("vjld", "2v"),
+    doTest(
+      listOf("vjld", "2v"),
       """
                     A Discovery
 
@@ -311,19 +330,21 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
                     I ${s}rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     har${c}d${se} by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   fun `test enter visual with ten count after visual operation multiline`() {
-    doTest(listOf("vjld", "10v"),
+    doTest(
+      listOf("vjld", "10v"),
       """
                     A Discovery
 
@@ -331,19 +352,21 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
                     I ${s}rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     har${c}d${se} by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   fun `test enter visual with count after multiline visual operation`() {
-    doTest(listOf("vjld", "1v"),
+    doTest(
+      listOf("vjld", "1v"),
       """
                     A Discovery
 
@@ -351,20 +374,22 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
                     I ${s}rocks and lavender and tufted grass,
                     whe${c}r${se}e it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   @VimBehaviorDiffers(description = "Different caret postion")
   fun `test enter visual with count with dollar motion`() {
-    doTest(listOf("v\$dj", "1v"),
+    doTest(
+      listOf("v\$dj", "1v"),
       """
                     A Discovery
 
@@ -372,7 +397,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -380,22 +405,24 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     ${s}all rocks and lavender and tufted grass,${c}${se}
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       // Correct vim behaviour:
       /*"""
-                    A Discovery
+                  A Discovery
 
-                    Iall rocks and lavender and tufted grass,
-                    w${s}here it was settled on some sodden sand${c}${se}
-                    hard by the torrent of a mountain pass.
-                """.trimIndent(),*/
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+                  Iall rocks and lavender and tufted grass,
+                  w${s}here it was settled on some sodden sand${c}${se}
+                  hard by the torrent of a mountain pass.
+              """.trimIndent(),*/
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
   fun `test enter visual with count with dollar motion and down movement`() {
     // expect to see switches v, $, d, v.
-    doTest(listOf("v\$dj", "1v", "j"),
+    doTest(
+      listOf("v\$dj", "1v", "j"),
       """
                     A Discovery
 
@@ -403,7 +430,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand[long line]
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -411,21 +438,23 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     ${s}all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand[long line]${c}${se}
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-     // Correct vim behaviour:
-     /* """
-                    A Discovery
+      """.trimIndent(),
+      // Correct vim behaviour:
+      /* """
+                   A Discovery
 
-                    I
-                    all rocks and lavender and tufted grass,
-                    w${s}here it was settled on some sodden sand[long line]
-                    hard by the torrent of a mountain pass.${c}${se}
-                """.trimIndent(),*/
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+                   I
+                   all rocks and lavender and tufted grass,
+                   w${s}here it was settled on some sodden sand[long line]
+                   hard by the torrent of a mountain pass.${c}${se}
+               """.trimIndent(),*/
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   fun `test enter visual with count after line visual operation`() {
-    doTest(listOf("Vd", "1v"),
+    doTest(
+      listOf("Vd", "1v"),
       """
                     A Discovery
 
@@ -433,19 +462,21 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
                     ${s}${c}all rocks and lavender and tufted grass,
                     ${se}where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE
+    )
   }
 
   fun `test enter visual with count after line visual operation to line end`() {
-    doTest(listOf("V3jd3k", "1v"),
+    doTest(
+      listOf("V3jd3k", "1v"),
       """
                     A Discovery
 
@@ -458,7 +489,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     to science: shape and shade -- the special tinge,
                     akin to moonlight, tempering its blue,
                     the dingy underside, the checquered fringe.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -467,30 +498,36 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
                     ${c}${se}
-                    """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE
+    )
   }
 
   @VimBehaviorDiffers(description = "Different caret position")
   fun `test enter visual with count after line visual operation multicaret`() {
-    doTest(listOf("Vd", "1v"),
+    doTest(
+      listOf("Vd", "1v"),
       """
                     A ${c}Discovery
 
                     I found it in a legendary land
                     all ${c}rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.""".trimIndent(),
+                    hard by the torrent of a mountain pass.
+      """.trimIndent(),
       """
                     ${s}${c}
                     ${se}I found it in a legendary land
                     ${s}${c}where it was settled on some sodden sand
-                    ${se}hard by the torrent of a mountain pass.""".trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE)
+                    ${se}hard by the torrent of a mountain pass.
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE
+    )
   }
 
   fun `test enter visual with double count after line visual operation`() {
-    doTest(listOf("Vd", "2v"),
+    doTest(
+      listOf("Vd", "2v"),
       """
                     A Discovery
 
@@ -498,38 +535,21 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
                     ${s}all rocks and lavender and tufted grass,
                     ${c}where it was settled on some sodden sand
                     ${se}hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE
+    )
   }
 
   fun `test enter visual with ten count after line visual operation`() {
-    doTest(listOf("Vd", "10v"),
-      """
-                    A Discovery
-
-                    I ${c}found it in a legendary land
-                    all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand
-                    hard by the torrent of a mountain pass.""".trimIndent(),
-      """
-                    A Discovery
-
-                    ${s}all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand
-                    ${c}hard by the torrent of a mountain pass.${se}""".trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE)
-  }
-
-  @VimBehaviorDiffers(description = "Different caret position")
-  fun `test enter visual with count after line visual operation with dollar motion`() {
-    doTest(listOf("V\$d", "1v"),
+    doTest(
+      listOf("Vd", "10v"),
       """
                     A Discovery
 
@@ -537,19 +557,44 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
+      """
+                    A Discovery
+
+                    ${s}all rocks and lavender and tufted grass,
+                    where it was settled on some sodden sand
+                    ${c}hard by the torrent of a mountain pass.${se}
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE
+    )
+  }
+
+  @VimBehaviorDiffers(description = "Different caret position")
+  fun `test enter visual with count after line visual operation with dollar motion`() {
+    doTest(
+      listOf("V\$d", "1v"),
+      """
+                    A Discovery
+
+                    I ${c}found it in a legendary land
+                    all rocks and lavender and tufted grass,
+                    where it was settled on some sodden sand
+                    hard by the torrent of a mountain pass.
+      """.trimIndent(),
       """
                     A Discovery
 
                     ${s}${c}all rocks and lavender and tufted grass,
                     ${se}where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE
+    )
   }
 
   fun `test enter visual with count after block visual operation`() {
-    doTest(listOf("<C-V>jld", "1v"),
+    doTest(
+      listOf("<C-V>jld", "1v"),
       """
                     A Discovery
 
@@ -557,7 +602,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -565,12 +610,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     al${s}r${c}o${se}cks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK
+    )
   }
 
   fun `test enter visual with count after block visual operation multiple time`() {
-    doTest(listOf("<C-V>jld", "1v", "<ESC>kh", "1v"),
+    doTest(
+      listOf("<C-V>jld", "1v", "<ESC>kh", "1v"),
       """
                     A Discovery
 
@@ -578,7 +625,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -586,12 +633,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     al${s}r${c}o${se}cks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK
+    )
   }
 
   fun `test enter visual with double count after block visual operation`() {
-    doTest(listOf("<C-V>jld", "2v"),
+    doTest(
+      listOf("<C-V>jld", "2v"),
       """
                     A Discovery
 
@@ -599,7 +648,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -607,12 +656,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     al${s}roc${c}k${se}s and lavender and tufted grass,
                     wh${s}ere${c} ${se}it was settled on some sodden sand
                     ha${s}rd ${c}b${se}y the torrent of a mountain pass.
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK
+    )
   }
 
   fun `test enter visual with ten count after block visual operation`() {
-    doTest(listOf("<C-V>jld", "20v"),
+    doTest(
+      listOf("<C-V>jld", "20v"),
       """
                     A Discovery
 
@@ -620,7 +671,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand[long line]
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -628,12 +679,14 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     al${s}rocks and lavender and tufted grass${c},${se}
                     wh${s}ere it was settled on some sodden sa${c}n${se}d[long line]
                     ha${s}rd by the torrent of a mountain pass.${c}${se}
-                """.trimIndent(),
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+      """.trimIndent(),
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK
+    )
   }
 
   fun `test enter visual with dollar motion count after block visual operation`() {
-    doTest(listOf("<C-V>j\$d2j", "1v"),
+    doTest(
+      listOf("<C-V>j\$d2j", "1v"),
       """
                     A Discovery
 
@@ -641,7 +694,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand[long line]
                     hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                     A Discovery
 
@@ -649,28 +702,31 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     a
                     ${s}where it was settled on some sodden sand[long line${c}]${se}
                     ${s}hard by the torrent of a mountain pass.${c}${se}
-                """.trimIndent(),
+      """.trimIndent(),
       // correct vim behaviour
       /*"""
-                    A Discovery
+                  A Discovery
 
-                    I
-                    a
-                    w${s}here it was settled on some sodden sand[long line${c}]${se}
-                    h${s}ard by the torrent of a mountain pass.${c}${se}
-                """.trimIndent(),*/
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+                  I
+                  a
+                  w${s}here it was settled on some sodden sand[long line${c}]${se}
+                  h${s}ard by the torrent of a mountain pass.${c}${se}
+              """.trimIndent(),*/
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK
+    )
   }
 
   fun `test selectmode option`() {
-    configureByText("""
+    configureByText(
+      """
                     A Discovery
 
                     I${c} found it in a legendary land
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand[long line]
                     hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     OptionsManager.selectmode.set("cmd")
     typeText(parseKeys("v"))
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ class MotionScrollHalfWidthRightAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     // Vim's screen width is the full screen width, including columns used for gutters.
-    return VimPlugin.getMotion().scrollColumns(editor, -cmd.count * (EditorHelper.getApproximateScreenWidth(editor) / 2))
+    return VimPlugin.getMotion()
+      .scrollColumns(editor, -cmd.count * (EditorHelper.getApproximateScreenWidth(editor) / 2))
   }
 }

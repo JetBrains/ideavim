@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,15 @@
 
 package org.jetbrains.plugins.ideavim.ex.handler
 
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
  * @author Alex Plate
  */
 class ShiftLeftHandlerTest : VimTestCase() {
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad replce term codes")
   fun `test simple left shift`() {
     val before = """        I found it in a legendary land
                       |        ${c}all rocks and lavender and tufted grass,
@@ -39,9 +42,10 @@ class ShiftLeftHandlerTest : VimTestCase() {
                       |        where it was settled on some sodden sand
                       |        hard by the torrent of a mountain pass.
                        """.trimMargin()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad replce term codes")
   fun `test double left shift`() {
     val before = """        I found it in a legendary land
                       |        ${c}all rocks and lavender and tufted grass,
@@ -57,9 +61,10 @@ class ShiftLeftHandlerTest : VimTestCase() {
                       |        where it was settled on some sodden sand
                       |        hard by the torrent of a mountain pass.
                        """.trimMargin()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad replce term codes")
   fun `test left shift no space`() {
     val before = """I found it in a legendary land
                       |${c}all rocks and lavender and tufted grass,
@@ -75,9 +80,10 @@ class ShiftLeftHandlerTest : VimTestCase() {
                       |where it was settled on some sodden sand
                       |hard by the torrent of a mountain pass.
                        """.trimMargin()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad replce term codes")
   fun `test range left shift`() {
     val before = """        I found it in a legendary land
                       |        ${c}all rocks and lavender and tufted grass,
@@ -93,9 +99,10 @@ class ShiftLeftHandlerTest : VimTestCase() {
                       |    ${c}where it was settled on some sodden sand
                       |    hard by the torrent of a mountain pass.
                        """.trimMargin()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test multiple carets`() {
     val before = """    I found it in a legendary land
                       |${c}all rocks and lavender and tufted grass,
@@ -111,6 +118,6 @@ class ShiftLeftHandlerTest : VimTestCase() {
                       |${c}where it was settled on some sodden sand
                       |${c}hard by the torrent of a mountain pass.
                        """.trimMargin()
-    myFixture.checkResult(after)
+    assertState(after)
   }
 }

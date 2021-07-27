@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.colors.EditorColorsScheme
 import com.intellij.openapi.editor.markup.EffectType
@@ -45,7 +44,7 @@ fun updateSearchHighlights(
   pattern: String?,
   shouldIgnoreSmartCase: Boolean,
   showHighlights: Boolean,
-  forceUpdate: Boolean
+  forceUpdate: Boolean,
 ) {
   updateSearchHighlights(pattern, shouldIgnoreSmartCase, showHighlights, -1, null, true, forceUpdate)
 }
@@ -55,7 +54,7 @@ fun updateIncsearchHighlights(
   pattern: String,
   forwards: Boolean,
   caretOffset: Int,
-  searchRange: LineRange?
+  searchRange: LineRange?,
 ): Int {
   val searchStartOffset =
     if (searchRange != null) EditorHelper.getLineStartOffset(editor, searchRange.startLine) else caretOffset
@@ -80,15 +79,20 @@ fun addSubstitutionConfirmationHighlight(editor: Editor, start: Int, end: Int): 
  * Refreshes current search highlights for all editors of currently active text editor/document
  */
 private fun updateSearchHighlights(
-  pattern: String?, shouldIgnoreSmartCase: Boolean, showHighlights: Boolean,
-  initialOffset: Int, searchRange: LineRange?, forwards: Boolean, forceUpdate: Boolean
+  pattern: String?,
+  shouldIgnoreSmartCase: Boolean,
+  showHighlights: Boolean,
+  initialOffset: Int,
+  searchRange: LineRange?,
+  forwards: Boolean,
+  forceUpdate: Boolean,
 ): Int {
   var currentMatchOffset = -1
   val projectManager = ProjectManager.getInstanceIfCreated() ?: return currentMatchOffset
   for (project in projectManager.openProjects) {
     val current = FileEditorManager.getInstance(project).selectedTextEditor ?: continue
     // [VERSION UPDATE] 202+ Use editors
-    val editors = EditorFactory.getInstance().getEditors(current.document, project) ?: continue
+    val editors = localEditors(current.document, project)
     for (editor in editors) {
       // Try to keep existing highlights if possible. Update if hlsearch has changed or if the pattern has changed.
       // Force update for the situations where the text is the same, but the ignore case values have changed.

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,16 +45,39 @@ import javax.swing.KeyStroke
 object VimExtensionFacade {
   /** The 'map' command for mapping keys to handlers defined in extensions. */
   @JvmStatic
-  fun putExtensionHandlerMapping(modes: Set<MappingMode>, fromKeys: List<KeyStroke>,
-                                 pluginOwner: MappingOwner, extensionHandler: VimExtensionHandler, recursive: Boolean) {
+  fun putExtensionHandlerMapping(
+    modes: Set<MappingMode>,
+    fromKeys: List<KeyStroke>,
+    pluginOwner: MappingOwner,
+    extensionHandler: VimExtensionHandler,
+    recursive: Boolean,
+  ) {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, extensionHandler, recursive)
   }
 
   /** The 'map' command for mapping keys to other keys. */
   @JvmStatic
-  fun putKeyMapping(modes: Set<MappingMode>, fromKeys: List<KeyStroke>,
-                    pluginOwner: MappingOwner, toKeys: List<KeyStroke>, recursive: Boolean) {
+  fun putKeyMapping(
+    modes: Set<MappingMode>,
+    fromKeys: List<KeyStroke>,
+    pluginOwner: MappingOwner,
+    toKeys: List<KeyStroke>,
+    recursive: Boolean,
+  ) {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, pluginOwner, toKeys, recursive)
+  }
+
+  /** The 'map' command for mapping keys to other keys if there is no other mapping to these keys */
+  @JvmStatic
+  fun putKeyMappingIfMissing(
+    modes: Set<MappingMode>,
+    fromKeys: List<KeyStroke>,
+    pluginOwner: MappingOwner,
+    toKeys: List<KeyStroke>,
+    recursive: Boolean,
+  ) {
+    val filteredModes = modes.filterNotTo(HashSet()) { VimPlugin.getKey().hasmapto(it, toKeys) }
+    VimPlugin.getKey().putKeyMapping(filteredModes, fromKeys, pluginOwner, toKeys, recursive)
   }
 
   /** Sets the value of 'operatorfunc' to be used as the operator function in 'g@'. */
@@ -72,8 +95,8 @@ object VimExtensionFacade {
    */
   @JvmStatic
   fun executeNormalWithoutMapping(keys: List<KeyStroke>, editor: Editor) {
-    val context = EditorDataContext(editor)
-    keys.forEach { KeyHandler.getInstance().handleKey(editor, it, context, false) }
+    val context = EditorDataContext.init(editor)
+    keys.forEach { KeyHandler.getInstance().handleKey(editor, it, context, false, false) }
   }
 
   /** Returns a single key stroke from the user input similar to 'getchar()'. */
@@ -111,9 +134,10 @@ object VimExtensionFacade {
       val builder = StringBuilder()
       val inputModel = TestInputModel.getInstance(editor)
       var key: KeyStroke? = inputModel.nextKeyStroke()
-      while (key != null
-        && !StringHelper.isCloseKeyStroke(key) && key.keyCode != KeyEvent.VK_ENTER
-        && (finishOn == null || key.keyChar != finishOn)) {
+      while (key != null &&
+        !StringHelper.isCloseKeyStroke(key) && key.keyCode != KeyEvent.VK_ENTER &&
+        (finishOn == null || key.keyChar != finishOn)
+      ) {
         val c = key.keyChar
         if (c != KeyEvent.CHAR_UNDEFINED) {
           builder.append(c)
@@ -129,7 +153,7 @@ object VimExtensionFacade {
       var text = ""
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for input()
       val exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts()
-      exEntryPanel.activate(editor, EditorDataContext(editor), prompt.ifEmpty { " " }, "", 1)
+      exEntryPanel.activate(editor, EditorDataContext.init(editor), prompt.ifEmpty { " " }, "", 1)
       ModalEntry.activate { key: KeyStroke ->
         return@activate when {
           StringHelper.isCloseKeyStroke(key) -> {

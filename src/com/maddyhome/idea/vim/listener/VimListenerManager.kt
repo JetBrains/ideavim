@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.listener
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.actionSystem.TypedAction
 import com.intellij.openapi.editor.event.EditorFactoryEvent
 import com.intellij.openapi.editor.event.EditorFactoryListener
@@ -54,13 +53,14 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.StatisticReporter
+import com.maddyhome.idea.vim.helper.UpdatesChecker
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
+import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -99,8 +99,7 @@ object VimListenerManager {
       if (typedAction.rawHandler !is VimTypedActionHandler) {
         // Actually this if should always be true, but just as protection
         EventFacade.getInstance().setupTypedActionHandler(VimTypedActionHandler(typedAction.rawHandler))
-      }
-      else {
+      } else {
         StrictMode.fail("typeAction expected to be non-vim.")
       }
 
@@ -131,7 +130,8 @@ object VimListenerManager {
 
     fun removeAll() {
       // Project listeners are self-disposable, so there is no need to unregister them on project close
-      ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }.forEach { IdeaSpecifics.removeIdeaSpecificsListeners(it) }
+      ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }
+        .forEach { IdeaSpecifics.removeIdeaSpecificsListeners(it) }
     }
 
     fun addAll() {
@@ -141,13 +141,13 @@ object VimListenerManager {
 
   object EditorListeners {
     fun addAll() {
-      EditorFactory.getInstance().allEditors.forEach { editor ->
+      localEditors().forEach { editor ->
         this.add(editor)
       }
     }
 
     fun removeAll() {
-      EditorFactory.getInstance().allEditors.forEach { editor ->
+      localEditors().forEach { editor ->
         this.remove(editor, false)
       }
     }
@@ -193,7 +193,7 @@ object VimListenerManager {
   private object VimEditorFactoryListener : EditorFactoryListener {
     override fun editorCreated(event: EditorFactoryEvent) {
       add(event.editor)
-      StatisticReporter.report()
+      UpdatesChecker.check()
     }
 
     override fun editorReleased(event: EditorFactoryEvent) {
@@ -226,10 +226,9 @@ object VimListenerManager {
       try {
         // Synchronize selections between editors
         val newRange = selectionEvent.newRange
-        for (e in EditorFactory.getInstance().getEditors(document)) {
+        for (e in localEditors(document)) {
           if (e != editor) {
-            e.selectionModel
-              .vimSetSystemSelectionSilently(newRange.startOffset, newRange.endOffset)
+            e.selectionModel.vimSetSystemSelectionSilently(newRange.startOffset, newRange.endOffset)
           }
         }
       } finally {
@@ -263,12 +262,19 @@ object VimListenerManager {
           cutOffFixed = true
           SelectionVimListenerSuppressor.lock().use {
             e.editor.caretModel.primaryCaret.let { caret ->
-              if (caret.selectionEnd == e.editor.document.getLineEndOffset(caret.logicalPosition.line) - 1
-                && caret.leadSelectionOffset == caret.selectionEnd) {
+              if (caret.selectionEnd == e.editor.document.getLineEndOffset(caret.logicalPosition.line) - 1 &&
+                caret.leadSelectionOffset == caret.selectionEnd
+              ) {
                 // A small but important customization. Because IdeaVim doesn't allow to put the caret on the line end,
                 //   the selection can omit the last character if the selection was started in the middle on the
                 //   last character in line and has a negative direction.
                 caret.setSelection(caret.selectionStart, caret.selectionEnd + 1)
+              }
+              // This is the same correction, but for the newer versions of the IDE: 213+
+              if (caret.selectionEnd == e.editor.document.getLineEndOffset(caret.logicalPosition.line) &&
+                caret.selectionEnd == caret.selectionStart + 1
+              ) {
+                caret.setSelection(caret.selectionEnd, caret.selectionEnd)
               }
             }
           }
@@ -331,7 +337,8 @@ object VimListenerManager {
         caretModel.primaryCaret.vimLastColumn = caretModel.visualPosition.column
       } else if (event.area != EditorMouseEventArea.ANNOTATIONS_AREA &&
         event.area != EditorMouseEventArea.FOLDING_OUTLINE_AREA &&
-        event.mouseEvent.button != MouseEvent.BUTTON3) {
+        event.mouseEvent.button != MouseEvent.BUTTON3
+      ) {
         VimPlugin.getMotion()
         if (ExEntryPanel.getInstance().isActive) {
           VimPlugin.getProcess().cancelExEntry(event.editor, false)
@@ -353,6 +360,7 @@ object VimListenerManager {
       when (e.clickCount) {
         1 -> {
           if (!predictedMode.isEndAllowed) {
+            @Suppress("ideavimRunForEachCaret")
             editor.caretModel.runForEachCaret { caret ->
               val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
               val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)

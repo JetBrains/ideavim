@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,8 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test visual down`() {
-    doTest(listOf("<S-Down>"),
+    doTest(
+      listOf("<S-Down>"),
       """
                 A Discovery
 
@@ -45,7 +46,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -53,7 +54,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 al${c}l${se} rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
     )
   }
@@ -64,7 +65,8 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test visual down twice`() {
-    doTest(listOf("<S-Down><S-Down>"),
+    doTest(
+      listOf("<S-Down><S-Down>"),
       """
                 A Discovery
 
@@ -72,7 +74,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -80,7 +82,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,
                 wh${c}e${se}re it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
     )
   }
@@ -91,7 +93,8 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test save column`() {
-    doTest(listOf("<S-Down><S-Down><S-Down>"),
+    doTest(
+      listOf("<S-Down><S-Down><S-Down>"),
       """
                 A Discovery
 
@@ -99,7 +102,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,[additional chars]
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.[additional chars]
-                """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -107,7 +110,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,[additional chars]
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.[additio${c}n${se}al chars]
-                """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
     )
   }
@@ -118,7 +121,8 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
   )
   fun `test select down`() {
-    doTest(listOf("<S-Down>"),
+    doTest(
+      listOf("<S-Down>"),
       """
                 A Discovery
 
@@ -126,7 +130,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -134,7 +138,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 al${c}${se}l rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER
     )
   }
@@ -145,7 +149,8 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
   )
   fun `test select down twice`() {
-    doTest(listOf("<S-Down><S-Down>"),
+    doTest(
+      listOf("<S-Down><S-Down>"),
       """
                 A Discovery
 
@@ -153,7 +158,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -161,7 +166,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,
                 wh${c}${se}ere it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER
     )
   }
@@ -172,7 +177,8 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test char select simple move`() {
-    doTest(listOf("gh", "<S-Down>"),
+    doTest(
+      listOf("gh", "<S-Down>"),
       """
                 A Discovery
 
@@ -180,7 +186,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -188,9 +194,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 a$c${se}ll rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_CHARACTER)
+      CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -199,7 +206,8 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test char select move to empty line`() {
-    doTest(listOf("gh", "<S-Down>"),
+    doTest(
+      listOf("gh", "<S-Down>"),
       """
                 A ${c}Discovery
 
@@ -207,7 +215,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A ${s}Discovery
                 $c$se
@@ -215,9 +223,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_CHARACTER)
+      CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -226,7 +235,8 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test char select move from empty line`() {
-    doTest(listOf("gh", "<S-Down>"),
+    doTest(
+      listOf("gh", "<S-Down>"),
       """
                 A Discovery
                 $c
@@ -234,7 +244,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
                 $s
@@ -242,9 +252,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_CHARACTER)
+      CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -253,23 +264,27 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test char select move to file end`() {
-    doTest(listOf("gh", "<S-Down>"),
+    doTest(
+      listOf("gh", "<S-Down>"),
       """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard ${c}by the torrent of a mountain pass.""".trimIndent(),
+                hard ${c}by the torrent of a mountain pass.
+      """.trimIndent(),
       """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard ${s}b$c${se}y the torrent of a mountain pass.""".trimIndent(),
+                hard ${s}b$c${se}y the torrent of a mountain pass.
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_CHARACTER)
+      CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -278,23 +293,27 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test char select move multicaret`() {
-    doTest(listOf("gh", "<S-Down>"),
+    doTest(
+      listOf("gh", "<S-Down>"),
       """
                 A Discovery
 
                 I ${c}found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard ${c}by the torrent of a mountain pass.""".trimIndent(),
+                hard ${c}by the torrent of a mountain pass.
+      """.trimIndent(),
       """
                 A Discovery
 
                 I ${s}found it in a legendary land
                 all$c$se rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard ${s}b$c${se}y the torrent of a mountain pass.""".trimIndent(),
+                hard ${s}b$c${se}y the torrent of a mountain pass.
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_CHARACTER)
+      CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -303,7 +322,8 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line select simple move`() {
-    doTest(listOf("gH", "<S-Down>"),
+    doTest(
+      listOf("gH", "<S-Down>"),
       """
                 A Discovery
 
@@ -311,7 +331,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
 
@@ -319,9 +339,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 ${c}all rocks and lavender and tufted grass,
                 ${se}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_LINE)
+      CommandState.SubMode.VISUAL_LINE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -330,7 +351,8 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line select to empty line`() {
-    doTest(listOf("gH", "<S-Down>"),
+    doTest(
+      listOf("gH", "<S-Down>"),
       """
                 A ${c}Discovery
 
@@ -338,7 +360,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 ${s}A Discovery
                 $c
@@ -346,9 +368,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_LINE)
+      CommandState.SubMode.VISUAL_LINE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -357,7 +380,8 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line select from empty line`() {
-    doTest(listOf("gH", "<S-Down>"),
+    doTest(
+      listOf("gH", "<S-Down>"),
       """
                 A Discovery
                 $c
@@ -365,7 +389,7 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       """
                 A Discovery
                 $s
@@ -373,9 +397,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
                 ${se}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_LINE)
+      CommandState.SubMode.VISUAL_LINE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -384,23 +409,27 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line select to file end`() {
-    doTest(listOf("gH", "<S-Down>"),
+    doTest(
+      listOf("gH", "<S-Down>"),
       """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the ${c}torrent of a mountain pass.""".trimIndent(),
+                hard by the ${c}torrent of a mountain pass.
+      """.trimIndent(),
       """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                ${s}hard by the ${c}torrent of a mountain pass.$se""".trimIndent(),
+                ${s}hard by the ${c}torrent of a mountain pass.$se
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_LINE)
+      CommandState.SubMode.VISUAL_LINE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -409,23 +438,27 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test line select multicaret`() {
-    doTest(listOf("gH", "<S-Down>"),
+    doTest(
+      listOf("gH", "<S-Down>"),
       """
                 A Discovery
 
                 I found ${c}it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the ${c}torrent of a mountain pass.""".trimIndent(),
+                hard by the ${c}torrent of a mountain pass.
+      """.trimIndent(),
       """
                 A Discovery
 
                 ${s}I found it in a legendary land
                 all rock${c}s and lavender and tufted grass,
                 ${se}where it was settled on some sodden sand
-                ${s}hard by the ${c}torrent of a mountain pass.$se""".trimIndent(),
+                ${s}hard by the ${c}torrent of a mountain pass.$se
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_LINE)
+      CommandState.SubMode.VISUAL_LINE
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -434,23 +467,27 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test block select simple move`() {
-    doTest(listOf("g<C-H>", "<S-Down>"),
+    doTest(
+      listOf("g<C-H>", "<S-Down>"),
       """
                 A Discovery
 
                 I found ${c}it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
       """
                 A Discovery
 
                 I found ${s}i$c${se}t in a legendary land
                 all rock${s}s$c$se and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_BLOCK)
+      CommandState.SubMode.VISUAL_BLOCK
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -459,23 +496,27 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test block select to empty line`() {
-    doTest(listOf("g<C-H>", "<S-Down>"),
+    doTest(
+      listOf("g<C-H>", "<S-Down>"),
       """
                 A ${c}Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
       """
                 ${s}A ${se}Discovery
                 $c
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_BLOCK)
+      CommandState.SubMode.VISUAL_BLOCK
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -484,23 +525,27 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test block select from empty line`() {
-    doTest(listOf("g<C-H>", "<S-Down>"),
+    doTest(
+      listOf("g<C-H>", "<S-Down>"),
       """
                 A Discovery
                 $c
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
       """
                 A Discovery
                 $s$c$se
                 $s$c${se}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                hard by the torrent of a mountain pass.
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_BLOCK)
+      CommandState.SubMode.VISUAL_BLOCK
+    )
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -509,22 +554,26 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
   )
   fun `test block select to file end`() {
-    doTest(listOf("g<C-H>", "<S-Down>"),
+    doTest(
+      listOf("g<C-H>", "<S-Down>"),
       """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the ${c}torrent of a mountain pass.""".trimIndent(),
+                hard by the ${c}torrent of a mountain pass.
+      """.trimIndent(),
       """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the ${s}t$c${se}orrent of a mountain pass.""".trimIndent(),
+                hard by the ${s}t$c${se}orrent of a mountain pass.
+      """.trimIndent(),
       CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_BLOCK)
+      CommandState.SubMode.VISUAL_BLOCK
+    )
   }
 }

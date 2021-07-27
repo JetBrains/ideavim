@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,18 +85,18 @@ class ToKeysMappingInfo(
   val toKeys: List<KeyStroke>,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
-  owner: MappingOwner
+  owner: MappingOwner,
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = toKeyNotation(toKeys)
 
   override fun execute(editor: Editor, context: DataContext) {
-    val editorDataContext = EditorDataContext(editor, context)
+    val editorDataContext = EditorDataContext.init(editor, context)
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     var first = true
     for (keyStroke in toKeys) {
       val recursive = isRecursive && !(first && fromIsPrefix)
       val keyHandler = KeyHandler.getInstance()
-      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive)
+      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false)
       first = false
     }
   }
@@ -106,7 +106,7 @@ class ToHandlerMappingInfo(
   private val extensionHandler: VimExtensionHandler,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
-  owner: MappingOwner
+  owner: MappingOwner,
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = "call ${extensionHandler.javaClass.canonicalName}"
 
@@ -158,7 +158,7 @@ class ToHandlerMappingInfo(
           }
           val vimSelection = create(startOffset, endOffset, SelectionType.CHARACTER_WISE, editor)
           offsets[caret] = vimSelection
-          SelectionVimListenerSuppressor.lock().use { ignored ->
+          SelectionVimListenerSuppressor.lock().use {
             // Move caret to the initial offset for better undo action
             //  This is not a necessary thing, but without it undo action look less convenient
             editor.caretModel.moveToOffset(startOffset)
@@ -176,12 +176,12 @@ class ToActionMappingInfo(
   val action: String,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
-  owner: MappingOwner
+  owner: MappingOwner,
 ) : MappingInfo(fromKeys, isRecursive, owner) {
   override fun getPresentableString(): String = "action $action"
 
   override fun execute(editor: Editor, context: DataContext) {
-    val editorDataContext = EditorDataContext(editor, context)
+    val editorDataContext = EditorDataContext.init(editor, context)
     val dataContext = CaretSpecificDataContext(editorDataContext, editor.caretModel.currentCaret)
     KeyHandler.executeAction(action, dataContext)
   }

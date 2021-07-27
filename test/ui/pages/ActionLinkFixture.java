@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,16 +27,15 @@ import org.jetbrains.annotations.NotNull;
 
 @FixtureName(name = "Action Link")
 public class ActionLinkFixture extends ComponentFixture {
-    public ActionLinkFixture(@NotNull RemoteRobot remoteRobot, @NotNull RemoteComponent remoteComponent) {
-        super(remoteRobot, remoteComponent);
-    }
+  public ActionLinkFixture(@NotNull RemoteRobot remoteRobot, @NotNull RemoteComponent remoteComponent) {
+    super(remoteRobot, remoteComponent);
+  }
 
-    public void click() {
-        runJs("const offset = component.getHeight()/2;\n" +
-                "robot.click(" +
-                "component, " +
-                "new Point(offset, offset), " +
-                "MouseButton.LEFT_BUTTON, 1);"
-        );
-    }
+  public void click() {
+    runJs("const offset = component.getHeight()/2;\n" +
+          "robot.click(" +
+          "component, " +
+          "new Point(offset, offset), " +
+          "MouseButton.LEFT_BUTTON, 1);");
+  }
 }

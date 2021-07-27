@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@ package org.jetbrains.plugins.ideavim.action.change.change
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ChangeVisualActionTest : VimTestCase() {
@@ -35,14 +37,14 @@ class ChangeVisualActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             Hello
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -55,25 +57,27 @@ class ChangeVisualActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
             ${c}
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviorDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(
+    originalVimAfter = """
             A Discovery
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             
             ${c}
-  """)
+  """
+  )
   fun `test multiple line change till the end`() {
     val keys = "Vjc"
     val before = """
@@ -84,7 +88,7 @@ class ChangeVisualActionTest : VimTestCase() {
             
             ${c}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -92,7 +96,7 @@ class ChangeVisualActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             ${c}
             
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
@@ -108,7 +112,7 @@ class ChangeVisualActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
             
             
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -118,7 +122,7 @@ class ChangeVisualActionTest : VimTestCase() {
             ${c}
             
             
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
@@ -132,7 +136,7 @@ class ChangeVisualActionTest : VimTestCase() {
             al|l rocks and lavender and tufted grass,[ additional symbols]
             wh|ere it was settled on some sodden sand
             ha|rd by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -140,7 +144,7 @@ class ChangeVisualActionTest : VimTestCase() {
             al|Hello
             wh|Hello
             ha|Hello
-        """.trimIndent()
+    """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
@@ -151,51 +155,57 @@ class ChangeVisualActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test change visual action`() {
-    typeTextInFile(parseKeys("v2lc", "aaa", "<ESC>"),
-      "abcd${c}ffffff${c}abcde${c}aaaa\n")
+    typeTextInFile(
+      parseKeys("v2lc", "aaa", "<ESC>"),
+      "abcd${c}ffffff${c}abcde${c}aaaa\n"
+    )
     assertMode(CommandState.Mode.COMMAND)
-    myFixture.checkResult("abcdaa${c}afffaa${c}adeaa${c}aa\n")
+    assertState("abcdaa${c}afffaa${c}adeaa${c}aa\n")
   }
 
   // VIM-1379 |CTRL-V| |j| |v_b_c|
   @VimBehaviorDiffers(description = "Different caret position")
   fun `test change visual block with empty line in the middle`() {
-    doTest(listOf("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
+    doTest(
+      listOf("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
       """
         foo foo
         
         bar bar
         
-        """.trimIndent(),
+      """.trimIndent(),
       """
         fo_quux_foo
         
         ba_quux_bar
         
-        """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
-
 
   // VIM-1379 |CTRL-V| |j| |v_b_c|
   @VimBehaviorDiffers(description = "Different caret position")
   fun `test change visual block with shorter line in the middle`() {
-    doTest(listOf("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
+    doTest(
+      listOf("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
       """
         foo foo
         x
         bar bar
         
-        """.trimIndent(),
+      """.trimIndent(),
       """
         fo_quux_foo
         x
         ba_quux_bar
         
-        """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND,
-      CommandState.SubMode.NONE)
+      CommandState.SubMode.NONE
+    )
   }
 }

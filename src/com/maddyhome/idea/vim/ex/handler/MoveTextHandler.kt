@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
     val texts = ArrayList<String>(caretCount)
     val ranges = ArrayList<TextRange>(caretCount)
     var line = editor.fileSize
-    val command = CommandParser.getInstance().parse(cmd.argument)
+    val command = CommandParser.parse(cmd.argument)
 
     var lastRange: TextRange? = null
     for (caret in carets) {
@@ -90,8 +90,10 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
 
   @Throws
   private fun normalizeLine(
-    editor: Editor, caret: Caret, command: ExCommand,
-    lineRange: LineRange
+    editor: Editor,
+    caret: Caret,
+    command: ExCommand,
+    lineRange: LineRange,
   ): Int {
     var line = command.ranges.getFirstLine(editor, caret)
     val adj = lineRange.endLine - lineRange.startLine + 1

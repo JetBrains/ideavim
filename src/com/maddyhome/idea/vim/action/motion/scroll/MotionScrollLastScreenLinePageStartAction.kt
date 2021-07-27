@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,8 +38,10 @@ class MotionScrollLastScreenLinePageStartAction : VimActionHandler.SingleExecuti
     // Without [count]: Redraw with the line just above the window at the bottom of the window. Put the cursor in that
     // line, at the first non-blank in the line.
     if (cmd.rawCount == 0) {
-      val prevVisualLine = EditorHelper.normalizeVisualLine(editor,
-        EditorHelper.getVisualLineAtTopOfScreen(editor) - 1)
+      val prevVisualLine = EditorHelper.normalizeVisualLine(
+        editor,
+        EditorHelper.getVisualLineAtTopOfScreen(editor) - 1
+      )
       val logicalLine = EditorHelper.visualLineToLogicalLine(editor, prevVisualLine)
       return motion.scrollLineToLastScreenLine(editor, logicalLine + 1, true)
     }

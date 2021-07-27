@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim.key
 
-import com.maddyhome.idea.vim.handler.ActionBeanClass
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import javax.swing.KeyStroke
 
 /**
@@ -45,13 +45,38 @@ import javax.swing.KeyStroke
  *   and the user should complete the sequence, it's [CommandPartNode]
  */
 @Suppress("GrazieInspection")
-interface Node
+interface Node<T>
 
 /** Represents a complete command */
-class CommandNode(val actionHolder: ActionBeanClass) : Node
+class CommandNode<T>(val actionHolder: T) : Node<T>
 
 /** Represents a part of the command */
-open class CommandPartNode : Node, HashMap<KeyStroke, Node>()
+open class CommandPartNode<T> : Node<T>, HashMap<KeyStroke, Node<T>>()
 
 /** Represents a root node for the mode */
-class RootNode : CommandPartNode()
+class RootNode<T> : CommandPartNode<T>()
+
+fun <T> Node<T>.addLeafs(keys: String, actionHolder: T) {
+  addLeafs(parseKeys(keys), actionHolder)
+}
+
+fun <T> Node<T>.addLeafs(keyStrokes: List<KeyStroke>, actionHolder: T) {
+  var node: Node<T> = this
+  val len = keyStrokes.size
+  // Add a child for each keystroke in the shortcut for this action
+  for (i in 0 until len) {
+    if (node !is CommandPartNode<*>) {
+      error("Error in tree constructing")
+    }
+    node = addNode(node as CommandPartNode<T>, actionHolder, keyStrokes[i], i == len - 1)
+  }
+}
+
+private fun <T> addNode(base: CommandPartNode<T>, actionHolder: T, key: KeyStroke, isLastInSequence: Boolean): Node<T> {
+  val existing = base[key]
+  if (existing != null) return existing
+
+  val newNode: Node<T> = if (isLastInSequence) CommandNode(actionHolder) else CommandPartNode()
+  base[key] = newNode
+  return newNode
+}

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@ package com.maddyhome.idea.vim.common
 
 import com.intellij.ide.bookmarks.Bookmark
 import com.intellij.ide.bookmarks.BookmarkManager
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.project.Project
 import com.maddyhome.idea.vim.group.MarkGroup
 import org.jetbrains.annotations.NonNls
@@ -35,8 +37,11 @@ interface Mark {
   fun isClear(): Boolean
   fun clear()
 
+  fun offset(editor: Editor): Int = editor.logicalPositionToOffset(LogicalPosition(logicalLine, col))
+
   object KeySorter : Comparator<Mark> {
-    @NonNls private const val ORDER = "'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\"[]^.<>"
+    @NonNls
+    private const val ORDER = "'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\"[]^.<>"
 
     override fun compare(o1: Mark, o2: Mark): Int {
       return ORDER.indexOf(o1.key) - ORDER.indexOf(o2.key)
@@ -49,7 +54,7 @@ data class VimMark(
   override var logicalLine: Int,
   override val col: Int,
   override val filename: String,
-  override val protocol: String
+  override val protocol: String,
 ) : Mark {
 
   private var cleared = false

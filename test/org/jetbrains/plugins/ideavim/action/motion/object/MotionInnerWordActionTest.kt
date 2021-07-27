@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,9 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionInnerWordActionTest : VimTestCase() {
   fun `test empty text`() {
-    doTest("viw", "", "",
-      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    doTest(
+      "viw", "", "",
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+    )
   }
 }

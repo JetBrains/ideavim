@@ -8,6 +8,7 @@
 !/.idea/inspectionProfiles
 !/.idea/fileTemplates
 !/.idea/runConfigurations
+!/.idea/codeStyles
 
 /build/
 /out/
@@ -18,3 +19,6 @@
 .teamcity/.idea
 .teamcity/target
 .teamcity/*.iml
+
+# Created by github automation
+settings.xml

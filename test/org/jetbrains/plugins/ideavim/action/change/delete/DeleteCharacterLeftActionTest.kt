@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 // |X|
@@ -29,7 +30,7 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     val after = "I ${c}ound it in a legendary land"
     configureByText(before)
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test delete multiple characters`() {
@@ -38,7 +39,7 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     val after = "I $c it in a legendary land"
     configureByText(before)
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test deletes min of count and start of line`() {
@@ -50,7 +51,7 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val after = """
             A Discovery
 
@@ -58,10 +59,10 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(before)
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
   }
 
   fun `test delete with inlay relating to preceding text`() {
@@ -80,7 +81,7 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     addInlay(4, true, 5)
 
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
 
     // It doesn't matter if the inlay is related to preceding or following text. Deleting visual column 3 moves the
     // inlay one visual column to the left, from column 4 to 3. The cursor starts at offset 4, pushed to 5 by the inlay.
@@ -102,15 +103,32 @@ class DeleteCharacterLeftActionTest : VimTestCase() {
     // Hitting 'X' on the character before the inlay should place the cursor after the inlay
     // Before: "I fo«test:»|u|nd it in a legendary land."
     // After: "I f«test:»|u|nd it in a legendary land."
-    addInlay(4, true, 5)
+    addInlay(4, false, 5)
 
     typeText(keys)
-    myFixture.checkResult(after)
+    assertState(after)
 
     // It doesn't matter if the inlay is related to preceding or following text. Deleting visual column 3 moves the
     // inlay one visual column to the left, from column 4 to 3. The cursor starts at offset 4, pushed to 5 by the inlay.
     // 'X' moves the cursor one column to the left (along with the text), which puts it at offset 4. But offset 4 can
     // now mean visual column 3 or 4 - the inlay or the text. Make sure the cursor is positioned on the text.
     assertVisualPosition(0, 4)
+  }
+
+  fun `test deleting characters scrolls caret into view`() {
+    OptionsManager.sidescrolloff.set(5)
+    configureByText("Hello world".repeat(200))
+
+    // Scroll 70 characters to the left. First character on line should now be 71. sidescrolloff puts us at 76
+    typeText(parseKeys("70zl"))
+    assertVisualPosition(0, 75)
+    assertVisibleLineBounds(0, 70, 149)
+
+    typeText(parseKeys("20X"))
+
+    // Deleting 20 characters to the left would move us 20 characters to the left, which will force a scroll.
+    // sidescroll=0 scrolls half a page
+    assertVisualPosition(0, 55)
+    assertVisibleLineBounds(0, 15, 94)
   }
 }

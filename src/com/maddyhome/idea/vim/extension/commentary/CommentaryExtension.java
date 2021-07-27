@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,13 +54,16 @@ public class CommentaryExtension implements VimExtension {
 
   @Override
   public void init() {
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentMotion)"), getOwner(), new CommentMotionHandler(), false);
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentLine)"), getOwner(), new CommentLineHandler(), false);
-    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>(CommentMotionV)"), getOwner(), new CommentMotionVHandler(), false);
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentMotion)"), getOwner(),
+                               new CommentMotionHandler(), false);
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentLine)"), getOwner(), new CommentLineHandler(),
+                               false);
+    putExtensionHandlerMapping(MappingMode.XO, parseKeys("<Plug>(CommentMotionV)"), getOwner(),
+                               new CommentMotionVHandler(), false);
 
-    putKeyMapping(MappingMode.N, parseKeys("gc"), getOwner(), parseKeys("<Plug>(CommentMotion)"), true);
-    putKeyMapping(MappingMode.N, parseKeys("gcc"), getOwner(), parseKeys("<Plug>(CommentLine)"), true);
-    putKeyMapping(MappingMode.XO, parseKeys("gc"), getOwner(), parseKeys("<Plug>(CommentMotionV)"), true);
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("gc"), getOwner(), parseKeys("<Plug>(CommentMotion)"), true);
+    putKeyMappingIfMissing(MappingMode.N, parseKeys("gcc"), getOwner(), parseKeys("<Plug>(CommentLine)"), true);
+    putKeyMappingIfMissing(MappingMode.XO, parseKeys("gc"), getOwner(), parseKeys("<Plug>(CommentMotionV)"), true);
   }
 
   private static class CommentMotionHandler implements VimExtensionHandler {
@@ -106,10 +109,9 @@ public class CommentaryExtension implements VimExtension {
         editor.getSelectionModel().setSelection(range.getStartOffset(), range.getEndOffset());
       }
 
-      final MultiCaretCodeInsightActionHandler handler =
-        selectionType == SelectionType.CHARACTER_WISE
-          ? new CommentByBlockCommentHandler()
-          : new CommentByLineCommentHandler();
+      final MultiCaretCodeInsightActionHandler handler = selectionType == SelectionType.CHARACTER_WISE
+                                                         ? new CommentByBlockCommentHandler()
+                                                         : new CommentByLineCommentHandler();
 
       return WriteAction.compute(() -> {
         try {
@@ -127,7 +129,8 @@ public class CommentaryExtension implements VimExtension {
             executeNormalWithoutMapping(parseKeys("`["), editor);
           }
           return true;
-        } finally {
+        }
+        finally {
           // remove the selection
           editor.getSelectionModel().removeSelection();
         }

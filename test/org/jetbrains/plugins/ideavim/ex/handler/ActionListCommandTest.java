@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@ import org.jetbrains.plugins.ideavim.VimTestCase;
  * @author Naoto Ikeno
  */
 public class ActionListCommandTest extends VimTestCase {
+  // [VERSION UPDATE] 203+
+  @SuppressWarnings("deprecation")
   public void testListAllActions() {
     configureByText("\n");
     typeText(commandToKeys("actionlist"));
@@ -53,7 +55,8 @@ public class ActionListCommandTest extends VimTestCase {
       String line = displayedLines[i];
       if (i == 0) {
         assertEquals("--- Actions ---", line);
-      }else {
+      }
+      else {
         assertTrue(line.toLowerCase().contains("quickimpl"));
       }
     }
@@ -68,7 +71,8 @@ public class ActionListCommandTest extends VimTestCase {
       String line = displayedLines[i];
       if (i == 0) {
         assertEquals("--- Actions ---", line);
-      }else {
+      }
+      else {
         assertTrue(line.toLowerCase().contains("<m-s-"));
       }
     }

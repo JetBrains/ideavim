@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -164,10 +164,12 @@
  * |F|                    {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLeftMatchCharAction}
  * |G|                    {@link com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastAction}
  * |H|                    {@link com.maddyhome.idea.vim.action.motion.screen.MotionFirstScreenLineAction}
+ * |H|                    {@link com.maddyhome.idea.vim.action.motion.screen.MotionOpPendingFirstScreenLineAction}
  * |I|                    {@link com.maddyhome.idea.vim.action.change.insert.InsertBeforeFirstNonBlankAction}
  * |J|                    {@link com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesSpacesAction}
  * |K|                    {@link com.maddyhome.idea.vim.action.editor.VimQuickJavaDoc}
  * |L|                    {@link com.maddyhome.idea.vim.action.motion.screen.MotionLastScreenLineAction}
+ * |L|                    {@link com.maddyhome.idea.vim.action.motion.screen.MotionOpPendingLastScreenLineAction}
  * |M|                    {@link com.maddyhome.idea.vim.action.motion.screen.MotionMiddleScreenLineAction}
  * |N|                    {@link com.maddyhome.idea.vim.action.motion.search.SearchAgainPreviousAction}
  * |O|                    {@link com.maddyhome.idea.vim.action.change.insert.InsertNewLineAboveAction}
@@ -408,7 +410,7 @@
  * |gP|                   {@link com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorActionMoveCursor}
  * |gQ|                   TO BE IMPLEMENTED
  * |gR|                   TO BE IMPLEMENTED
- * |gT|                   {@link com.maddyhome.idea.vim.action.motion.tabs.MotionPreviousTabAction}
+ * |gT|                   {@link com.maddyhome.idea.vim.action.window.tabs.PreviousTabAction}
  * |gU|                   {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperMotionAction}
  * |gV|                   TO BE IMPLEMENTED
  * |g]|                   TO BE IMPLEMENTED
@@ -432,7 +434,7 @@
  * |gq|                   {@link com.maddyhome.idea.vim.action.change.change.ReformatCodeMotionAction}
  * |gr|                   TO BE IMPLEMENTED
  * |gs|                   TO BE IMPLEMENTED
- * |gt|                   {@link com.maddyhome.idea.vim.action.motion.tabs.MotionNextTabAction}
+ * |gt|                   {@link com.maddyhome.idea.vim.action.window.tabs.NextTabAction}
  * |gu|                   {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerMotionAction}
  * |gv|                   {@link com.maddyhome.idea.vim.action.motion.visual.VisualSelectPreviousAction}
  * |gw|                   TO BE IMPLEMENTED

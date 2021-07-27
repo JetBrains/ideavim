@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,10 +39,12 @@ class JoinLinesHandler : CommandHandler.ForEachCaret() {
     val textRange = cmd.getTextRange(editor, caret, true)
 
     return VimPlugin.getChange().deleteJoinRange(
-      editor, caret, TextRange(
+      editor, caret,
+      TextRange(
         textRange.startOffset,
         textRange.endOffset - 1
-      ), spaces
+      ),
+      spaces
     )
   }
 }

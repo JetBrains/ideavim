@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -142,6 +142,7 @@ public class ListOption extends TextOption {
     }
 
     String oldValue = getValue();
+    value.removeAll(vals);
     value.addAll(vals);
     fireOptionChangeEvent(oldValue, getValue());
 
@@ -154,6 +155,7 @@ public class ListOption extends TextOption {
     }
 
     String oldValue = getValue();
+    value.removeAll(vals);
     value.addAll(0, vals);
     fireOptionChangeEvent(oldValue, getValue());
 
@@ -180,7 +182,7 @@ public class ListOption extends TextOption {
    * @param dflt    The option's default values
    * @param pattern A regular expression that is used to validate new values. null if no check needed
    */
-  ListOption(@VimNlsSafe String name, @VimNlsSafe String abbrev, @VimNlsSafe String[] dflt, @VimNlsSafe String pattern) {
+  public ListOption(@VimNlsSafe String name, @VimNlsSafe String abbrev, @VimNlsSafe String[] dflt, @VimNlsSafe String pattern) {
     super(name, abbrev);
 
     this.dflt = new ArrayList<>(Arrays.asList(dflt));

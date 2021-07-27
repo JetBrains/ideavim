@@ -1,10 +1,13 @@
 package _Self.buildTypes
 
+import _Self.Constants.NVIM_TESTS
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
+import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
+import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 object Nvim : BuildType({
@@ -13,7 +16,7 @@ object Nvim : BuildType({
 
   params {
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
-    param("env.ORG_GRADLE_PROJECT_ideaVersion", "LATEST-EAP-SNAPSHOT")
+    param("env.ORG_GRADLE_PROJECT_ideaVersion", NVIM_TESTS)
     param("env.ORG_GRADLE_PROJECT_instrumentPluginCode", "false")
     param("env.ideavim.nvim.path", "./nvim-linux64/bin/nvim")
   }
@@ -21,7 +24,7 @@ object Nvim : BuildType({
   vcs {
     root(DslContext.settingsRoot)
 
-    checkoutMode = CheckoutMode.ON_SERVER
+    checkoutMode = CheckoutMode.AUTO
   }
 
   steps {
@@ -50,5 +53,17 @@ object Nvim : BuildType({
 
   requirements {
     noLessThanVer("teamcity.agent.jvm.version", "1.8")
+  }
+
+  failureConditions {
+    failOnMetricChange {
+      metric = BuildFailureOnMetric.MetricType.TEST_COUNT
+      threshold = 20
+      units = BuildFailureOnMetric.MetricUnit.PERCENTS
+      comparison = BuildFailureOnMetric.MetricComparison.LESS
+      compareTo = build {
+        buildRule = lastSuccessful()
+      }
+    }
   }
 })

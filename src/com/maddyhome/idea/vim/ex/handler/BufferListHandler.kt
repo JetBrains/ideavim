@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,6 @@ import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.EditorHelper
 import org.jetbrains.annotations.NonNls
-import java.io.File
 
 /**
  * Handles buffers, files, ls command. Supports +, =, a, %, # filters.
@@ -95,7 +94,7 @@ class BufferListHandler : CommandHandler.SingleExecution() {
 
   private fun buildVirtualFileDisplayMap(project: Project): Map<VirtualFile, String> {
     val openFiles = FileEditorManager.getInstance(project).openFiles
-    val basePath = if (project.basePath != null) project.basePath + File.separator else ""
+    val basePath = if (project.basePath != null) project.basePath + "/" else ""
     val filePaths = mutableMapOf<VirtualFile, String>()
 
     for (file in openFiles) {
@@ -122,7 +121,7 @@ private fun getBufferStatus(
   editor: Editor,
   file: VirtualFile,
   currentFile: VirtualFile,
-  previousFile: VirtualFile?
+  previousFile: VirtualFile?,
 ): String {
   @NonNls val bufStatus = StringBuilder()
 

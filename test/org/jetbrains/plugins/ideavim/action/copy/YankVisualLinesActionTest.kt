@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ class YankVisualLinesActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val yankedTest = """
             I found it in a legendary land
             all rocks and lavender and tufted grass,
@@ -55,20 +55,22 @@ class YankVisualLinesActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was sett${c}led on some sodden sand
-            hard by the torrent of a mountain pass.""".trimIndent()
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
     val textAfter = """
             A Discovery
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             ${c}where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.""".trimIndent()
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
     doTest("vjY", text, textAfter, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     val yankedTest = """
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
             
-            """.trimIndent()
+    """.trimIndent()
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: kotlin.test.fail()
     TestCase.assertEquals(yankedTest, savedText)
   }
@@ -81,7 +83,7 @@ class YankVisualLinesActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val yankedTest = """
             I found it in a legendary land
             all rocks and lavender and tufted grass,

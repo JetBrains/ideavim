@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.VimListenerManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.assertDoesntChange
 import org.jetbrains.plugins.ideavim.rangeOf
@@ -37,17 +39,20 @@ import org.jetbrains.plugins.ideavim.waitAndAssertMode
  * @author Alex Plate
  */
 class NonVimVisualChangeTest : VimTestCase() {
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test save mode after removing text`() {
     // PyCharm uses BackspaceHandler.deleteToTargetPosition to remove indent
     // See https://github.com/JetBrains/ideavim/pull/186#issuecomment-486656093
-    configureByText("""
+    configureByText(
+      """
             A Discovery
 
             I ${c}found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     VimListenerManager.EditorListeners.add(myFixture.editor)
     typeText(parseKeys("i"))
     assertMode(CommandState.Mode.INSERT)
@@ -56,26 +61,31 @@ class NonVimVisualChangeTest : VimTestCase() {
         BackspaceHandler.deleteToTargetPosition(myFixture.editor, LogicalPosition(2, 0))
       }
     }
-    myFixture.checkResult("""
+    assertState(
+      """
             A Discovery
 
             found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     assertMode(CommandState.Mode.INSERT)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable and disable selection`() {
-    configureByText("""
+    configureByText(
+      """
             A Discovery
 
             I ${c}found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     VimListenerManager.EditorListeners.add(myFixture.editor)
     typeText(parseKeys("i"))
     assertMode(CommandState.Mode.INSERT)
@@ -87,15 +97,18 @@ class NonVimVisualChangeTest : VimTestCase() {
     assertDoesntChange { myFixture.editor.mode == CommandState.Mode.INSERT }
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test enable, disable, and enable selection again`() {
-    configureByText("""
+    configureByText(
+      """
             A Discovery
 
             I ${c}found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+      """.trimIndent()
+    )
     VimListenerManager.EditorListeners.add(myFixture.editor)
     typeText(parseKeys("i"))
     assertMode(CommandState.Mode.INSERT)
@@ -108,6 +121,7 @@ class NonVimVisualChangeTest : VimTestCase() {
     waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test switch from char to line visual mode`() {
     val text = """
             A Discovery
@@ -116,7 +130,7 @@ class NonVimVisualChangeTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     configureByText(text)
     VimListenerManager.EditorListeners.add(myFixture.editor)
     typeText(parseKeys("i"))

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import com.intellij.ide.bookmarks.Bookmark
 import com.intellij.ide.bookmarks.BookmarkManager
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.ide.highlighter.XmlFileType
+import com.intellij.json.JsonFileType
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.editor.Caret
@@ -29,6 +30,7 @@ import com.intellij.openapi.editor.Inlay
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.colors.EditorColors
+import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.fileTypes.FileType
@@ -53,6 +55,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
+import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 import com.maddyhome.idea.vim.helper.TestInputModel
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.isBlockCaretShape
@@ -66,6 +69,7 @@ import com.maddyhome.idea.vim.option.OptionsManager.ideastrictmode
 import com.maddyhome.idea.vim.option.OptionsManager.resetAllOptions
 import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
+import org.assertj.core.api.Assertions
 import org.junit.Assert
 import java.util.function.Consumer
 import javax.swing.KeyStroke
@@ -83,12 +87,17 @@ abstract class VimTestCase : UsefulTestCase() {
     val projectDescriptor = LightProjectDescriptor.EMPTY_PROJECT_DESCRIPTOR
     val fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor)
     val fixture = fixtureBuilder.fixture
-    myFixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(fixture,
-      LightTempDirTestFixtureImpl(true))
+    myFixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(
+      fixture,
+      LightTempDirTestFixtureImpl(true)
+    )
     myFixture.setUp()
     myFixture.testDataPath = testDataPath
     // Note that myFixture.editor is usually null here. It's only set once configureByText has been called
-    KeyHandler.getInstance().fullReset(myFixture.editor)
+    val editor = myFixture.editor
+    if (editor != null) {
+      KeyHandler.getInstance().fullReset(editor)
+    }
     resetAllOptions()
     VimPlugin.getKey().resetKeyMappings()
     VimPlugin.getSearch().resetState()
@@ -100,6 +109,8 @@ abstract class VimTestCase : UsefulTestCase() {
     ExEntryPanel.getInstance().entry.setBounds(0, 0, 100, 25)
 
     NeovimTesting.setUp(this)
+
+    VimPlugin.clearError()
   }
 
   private val testDataPath: String
@@ -117,6 +128,7 @@ abstract class VimTestCase : UsefulTestCase() {
     VimPlugin.getRegister().resetRegisters()
     VimPlugin.getSearch().resetState()
     VimPlugin.getMark().resetAllMarks()
+    VimPlugin.getChange().resetRepeat()
 
     // Tear down neovim
     NeovimTesting.tearDown(this)
@@ -144,17 +156,27 @@ abstract class VimTestCase : UsefulTestCase() {
     EditorTestUtil.setEditorVisibleSize(myFixture.editor, width, height)
   }
 
+  protected fun setEditorVirtualSpace() {
+    // Enable virtual space at the bottom of the file and force a layout to pick up the changes
+    myFixture.editor.settings.isAdditionalPageAtBottom = true
+    (myFixture.editor as EditorEx).scrollPane.viewport.doLayout()
+  }
+
   protected fun configureByText(content: String) = configureByText(PlainTextFileType.INSTANCE, content)
   protected fun configureByJavaText(content: String) = configureByText(JavaFileType.INSTANCE, content)
   protected fun configureByXmlText(content: String) = configureByText(XmlFileType.INSTANCE, content)
+  protected fun configureByJsonText(content: String) = configureByText(JsonFileType.INSTANCE, content)
 
   private fun configureByText(fileType: FileType, content: String): Editor {
+    @Suppress("IdeaVimAssertState")
     myFixture.configureByText(fileType, content)
+    NeovimTesting.setupEditor(myFixture.editor, this)
     setEditorVisibleSize(screenWidth, screenHeight)
     return myFixture.editor
   }
 
   protected fun configureByFileName(fileName: String): Editor {
+    @Suppress("IdeaVimAssertState")
     myFixture.configureByText(fileName, "\n")
     setEditorVisibleSize(screenWidth, screenHeight)
     return myFixture.editor
@@ -171,9 +193,10 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected fun configureByLines(lineCount: Int, line: String) {
     val stringBuilder = StringBuilder()
-    repeat(lineCount) {
+    repeat(lineCount - 1) {
       stringBuilder.appendln(line)
     }
+    stringBuilder.append(line)
     configureByText(stringBuilder.toString())
   }
 
@@ -197,28 +220,27 @@ abstract class VimTestCase : UsefulTestCase() {
     OptionsManager.scrolloff.set(0)
     OptionsManager.scrolljump.set(1)
 
-    // Convert to visual lines to handle any collapsed folds
-    val scrollToVisualLine = EditorHelper.logicalLineToVisualLine(myFixture.editor, scrollToLogicalLine)
-    val bottomVisualLine = scrollToVisualLine + EditorHelper.getApproximateScreenHeight(myFixture.editor) - 1
-    val bottomLogicalLine = EditorHelper.visualLineToLogicalLine(myFixture.editor, bottomVisualLine)
-
-    // Make sure we're not trying to put caret in an invalid location
-    val boundsTop = EditorHelper.visualLineToLogicalLine(myFixture.editor, scrollToVisualLine)
-    val boundsBottom = EditorHelper.visualLineToLogicalLine(myFixture.editor, bottomVisualLine)
-    Assert.assertTrue("Caret line $caretLogicalLine not inside legal screen bounds (${boundsTop} - ${boundsBottom})",
-      caretLogicalLine in boundsTop..boundsBottom)
-
-    typeText(parseKeys("${scrollToLogicalLine+1}z<CR>", "${caretLogicalLine+1}G", "${caretLogicalColumn+1}|"))
+    typeText(parseKeys("${scrollToLogicalLine + 1}z<CR>", "${caretLogicalLine + 1}G", "${caretLogicalColumn + 1}|"))
 
     OptionsManager.scrolljump.set(scrolljump)
     OptionsManager.scrolloff.set(scrolloff)
 
-    // Make sure we're where we want to be
-    assertVisibleArea(scrollToLogicalLine, bottomLogicalLine)
+    // Make sure we're where we want to be. If there are block inlays, we can't easily assert the bottom line because
+    // we'd have to duplicate the scrolling logic here. Asserting top when we know height is good enough
+    assertTopLogicalLine(scrollToLogicalLine)
     assertPosition(caretLogicalLine, caretLogicalColumn)
+
+    // Belt and braces. Let's make sure that the caret is fully onscreen
+    val bottomLogicalLine = EditorHelper.visualLineToLogicalLine(
+      myFixture.editor,
+      EditorHelper.getVisualLineAtBottomOfScreen(myFixture.editor)
+    )
+    assertTrue(bottomLogicalLine >= caretLogicalLine)
+    assertTrue(caretLogicalLine >= scrollToLogicalLine)
   }
 
   protected fun typeText(keys: List<KeyStroke?>): Editor {
+    NeovimTesting.typeCommand(keys.filterNotNull().joinToString(separator = "") { toKeyNotation(it) }, this)
     val editor = myFixture.editor
     val project = myFixture.project
     typeText(keys, editor, project)
@@ -239,11 +261,18 @@ abstract class VimTestCase : UsefulTestCase() {
     }
   }
 
+  fun assertState(textAfter: String) {
+    @Suppress("IdeaVimAssertState")
+    myFixture.checkResult(textAfter)
+    NeovimTesting.assertState(myFixture.editor, this)
+  }
+
   fun assertPosition(line: Int, column: Int) {
     val carets = myFixture.editor.caretModel.allCarets
     Assert.assertEquals("Wrong amount of carets", 1, carets.size)
     val actualPosition = carets[0].logicalPosition
     Assert.assertEquals(LogicalPosition(line, column), actualPosition)
+    NeovimTesting.assertCaret(myFixture.editor, this)
   }
 
   fun assertVisualPosition(visualLine: Int, visualColumn: Int) {
@@ -256,12 +285,18 @@ abstract class VimTestCase : UsefulTestCase() {
   fun assertOffset(vararg expectedOffsets: Int) {
     val carets = myFixture.editor.caretModel.allCarets
     if (expectedOffsets.size == 2 && carets.size == 1) {
-      Assert.assertEquals("Wrong amount of carets. Did you mean to use assertPosition?", expectedOffsets.size, carets.size)
+      Assert.assertEquals(
+        "Wrong amount of carets. Did you mean to use assertPosition?",
+        expectedOffsets.size,
+        carets.size
+      )
     }
     Assert.assertEquals("Wrong amount of carets", expectedOffsets.size, carets.size)
     for (i in expectedOffsets.indices) {
       Assert.assertEquals(expectedOffsets[i], carets[i].offset)
     }
+
+    NeovimTesting.assertState(myFixture.editor, this)
   }
 
   fun assertOffsetAt(text: String) {
@@ -272,25 +307,40 @@ abstract class VimTestCase : UsefulTestCase() {
 
   // Use logical rather than visual lines, so we can correctly test handling of collapsed folds and soft wraps
   fun assertVisibleArea(topLogicalLine: Int, bottomLogicalLine: Int) {
+    assertTopLogicalLine(topLogicalLine)
+    assertBottomLogicalLine(bottomLogicalLine)
+  }
+
+  fun assertTopLogicalLine(topLogicalLine: Int) {
     val actualVisualTop = EditorHelper.getVisualLineAtTopOfScreen(myFixture.editor)
     val actualLogicalTop = EditorHelper.visualLineToLogicalLine(myFixture.editor, actualVisualTop)
+
+    Assert.assertEquals("Top logical lines don't match", topLogicalLine, actualLogicalTop)
+  }
+
+  fun assertBottomLogicalLine(bottomLogicalLine: Int) {
     val actualVisualBottom = EditorHelper.getVisualLineAtBottomOfScreen(myFixture.editor)
     val actualLogicalBottom = EditorHelper.visualLineToLogicalLine(myFixture.editor, actualVisualBottom)
 
-    Assert.assertEquals("Top logical lines don't match", topLogicalLine, actualLogicalTop)
     Assert.assertEquals("Bottom logical lines don't match", bottomLogicalLine, actualLogicalBottom)
   }
 
   fun assertVisibleLineBounds(logicalLine: Int, leftLogicalColumn: Int, rightLogicalColumn: Int) {
     val visualLine = EditorHelper.logicalLineToVisualLine(myFixture.editor, logicalLine)
     val actualLeftVisualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(myFixture.editor, visualLine)
-    val actualLeftLogicalColumn = myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualLeftVisualColumn)).column
+    val actualLeftLogicalColumn =
+      myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualLeftVisualColumn)).column
     val actualRightVisualColumn = EditorHelper.getVisualColumnAtRightOfScreen(myFixture.editor, visualLine)
-    val actualRightLogicalColumn =  myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualRightVisualColumn)).column
+    val actualRightLogicalColumn =
+      myFixture.editor.visualToLogicalPosition(VisualPosition(visualLine, actualRightVisualColumn)).column
 
     val expected = ScreenBounds(leftLogicalColumn, rightLogicalColumn)
     val actual = ScreenBounds(actualLeftLogicalColumn, actualRightLogicalColumn)
     Assert.assertEquals(expected, actual)
+  }
+
+  fun assertLineCount(expected: Int) {
+    assertEquals(expected, EditorHelper.getLineCount(myFixture.editor))
   }
 
   fun putMapping(modes: Set<MappingMode>, from: String, to: String, recursive: Boolean) {
@@ -348,6 +398,7 @@ abstract class VimTestCase : UsefulTestCase() {
     val actual = getInstance(myFixture.editor).text
     Assert.assertNotNull("No Ex output", actual)
     Assert.assertEquals(expected, actual)
+    NeovimTesting.typeCommand("<esc>", this)
   }
 
   fun assertPluginError(isError: Boolean) {
@@ -355,7 +406,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   fun assertPluginErrorMessageContains(message: String) {
-    Assert.assertTrue(VimPlugin.getMessage().contains(message))
+    Assertions.assertThat(VimPlugin.getMessage()).contains(message)
   }
 
   protected fun assertCaretsColour() {
@@ -379,23 +430,32 @@ abstract class VimTestCase : UsefulTestCase() {
     }
   }
 
-  fun doTest(keys: List<String>,
-             before: String,
-             after: String,
-             modeAfter: CommandState.Mode,
-             subModeAfter: SubMode) {
+  fun doTest(
+    keys: List<String>,
+    before: String,
+    after: String,
+  ) {
+    doTest(keys, before, after, CommandState.Mode.COMMAND, SubMode.NONE)
+  }
+
+  fun doTest(
+    keys: List<String>,
+    before: String,
+    after: String,
+    modeAfter: CommandState.Mode,
+    subModeAfter: SubMode,
+  ) {
     doTest(keys.joinToString(separator = ""), before, after, modeAfter, subModeAfter)
   }
 
-  fun doTest(keys: String,
-             before: String,
-             after: String,
-             modeAfter: CommandState.Mode,
-             subModeAfter: SubMode) {
+  fun doTest(
+    keys: String,
+    before: String,
+    after: String,
+    modeAfter: CommandState.Mode,
+    subModeAfter: SubMode,
+  ) {
     configureByText(before)
-
-    NeovimTesting.setupEditor(myFixture.editor, this)
-    NeovimTesting.typeCommand(keys, this)
 
     performTest(keys, after, modeAfter, subModeAfter)
 
@@ -404,18 +464,23 @@ abstract class VimTestCase : UsefulTestCase() {
 
   private fun performTest(keys: String, after: String, modeAfter: CommandState.Mode, subModeAfter: SubMode) {
     typeText(parseKeys(keys))
+    @Suppress("IdeaVimAssertState")
     myFixture.checkResult(after)
     assertState(modeAfter, subModeAfter)
   }
 
-  fun doTestWithoutNeovim(keys: List<KeyStroke>,
-                          before: String,
-                          after: String?,
-                          modeAfter: CommandState.Mode, subModeAfter: SubMode,
-                          afterEditorInitialized: (Editor) -> Unit) {
+  fun doTest(
+    keys: List<KeyStroke>,
+    before: String,
+    after: String?,
+    modeAfter: CommandState.Mode,
+    subModeAfter: SubMode,
+    afterEditorInitialized: (Editor) -> Unit,
+  ) {
     configureByText(before)
     afterEditorInitialized(myFixture.editor)
     typeText(keys)
+    @Suppress("IdeaVimAssertState")
     myFixture.checkResult(after!!)
     assertState(modeAfter, subModeAfter)
   }
@@ -429,18 +494,32 @@ abstract class VimTestCase : UsefulTestCase() {
     assertCaretsColour()
     assertMode(modeAfter)
     assertSubMode(subModeAfter)
-    if (Checks.caretShape) assertEquals(myFixture.editor.mode.isBlockCaretShape, myFixture.editor.settings.isBlockCursor)
+    if (Checks.caretShape) assertEquals(
+      myFixture.editor.mode.isBlockCaretShape,
+      myFixture.editor.settings.isBlockCursor
+    )
   }
 
   protected val fileManager: FileEditorManagerEx
     get() = FileEditorManagerEx.getInstanceEx(myFixture.project)
 
+  // Specify width in columns, not pixels, just like we do for visible screen size. The default text char width differs
+  // per platform (e.g. Windows is 7, Mac is 8) so we can't guarantee correct positioning for tests if we use hard coded
+  // pixel widths
   protected fun addInlay(offset: Int, relatesToPrecedingText: Boolean, widthInColumns: Int): Inlay<*> {
-    // Enforce deterministic tests for inlays. Default text char width is different per platform (e.g. Windows is 7 and
-    // Mac is 8) and using the same inlay width on all platforms can cause columns to be on or off screen unexpectedly.
-    // If inlay width is related to character width, we will scale correctly across different platforms
-    val columnWidth = EditorUtil.getPlainSpaceWidth(myFixture.editor)
-    return EditorTestUtil.addInlay(myFixture.editor, offset, relatesToPrecedingText, widthInColumns * columnWidth)!!
+    val widthInPixels = EditorUtil.getPlainSpaceWidth(myFixture.editor) * widthInColumns
+    return EditorTestUtil.addInlay(myFixture.editor, offset, relatesToPrecedingText, widthInPixels)
+  }
+
+  // As for inline inlays, height is specified as a multiplier of line height, as we can't guarantee the same line
+  // height on all platforms, so can't guarantee correct positioning for tests if we use pixels. This currently limits
+  // us to integer multiples of line heights. I don't think this will cause any issues, but we can change this to a
+  // float if necessary. We'd still be working scaled to the line height, so fractional values should still work.
+  protected fun addBlockInlay(offset: Int, showAbove: Boolean, heightInRows: Int): Inlay<*> {
+    val widthInColumns = 10 // Arbitrary width. We don't care.
+    val widthInPixels = EditorUtil.getPlainSpaceWidth(myFixture.editor) * widthInColumns
+    val heightInPixels = myFixture.editor.lineHeight * heightInRows
+    return EditorTestUtil.addBlockInlay(myFixture.editor, offset, false, showAbove, widthInPixels, heightInPixels)
   }
 
   // Disable or enable checks for the particular test
@@ -455,16 +534,20 @@ abstract class VimTestCase : UsefulTestCase() {
 
     fun typeText(keys: List<KeyStroke?>, editor: Editor, project: Project?) {
       val keyHandler = KeyHandler.getInstance()
-      val dataContext = EditorDataContext(editor)
+      val dataContext = EditorDataContext.init(editor)
       TestInputModel.getInstance(editor).setKeyStrokes(keys)
-      runWriteCommand(project, Runnable {
-        val inputModel = TestInputModel.getInstance(editor)
-        var key = inputModel.nextKeyStroke()
-        while (key != null) {
-          keyHandler.handleKey(editor, key, dataContext)
-          key = inputModel.nextKeyStroke()
-        }
-      }, null, null)
+      runWriteCommand(
+        project,
+        Runnable {
+          val inputModel = TestInputModel.getInstance(editor)
+          var key = inputModel.nextKeyStroke()
+          while (key != null) {
+            keyHandler.handleKey(editor, key, dataContext)
+            key = inputModel.nextKeyStroke()
+          }
+        },
+        null, null
+      )
     }
 
     @JvmStatic
@@ -476,17 +559,21 @@ abstract class VimTestCase : UsefulTestCase() {
       return keys
     }
 
-    fun exCommand(command: String) = ":$command<Enter>"
+    fun exCommand(command: String) = ":$command<CR>"
 
     fun searchToKeys(pattern: String, forwards: Boolean): List<KeyStroke> {
       val keys: MutableList<KeyStroke> = ArrayList()
       keys.addAll(parseKeys(if (forwards) "/" else "?"))
       keys.addAll(stringToKeys(pattern))
-      keys.addAll(parseKeys("<Enter>"))
+      keys.addAll(parseKeys("<CR>"))
       return keys
     }
 
+    fun searchCommand(pattern: String) = "$pattern<CR>"
+
     fun String.dotToTab(): String = replace('.', '\t')
+
+    fun String.dotToSpace(): String = replace('.', ' ')
   }
 
   object Checks {
@@ -502,9 +589,11 @@ abstract class VimTestCase : UsefulTestCase() {
 
     class NeoVim {
       var ignoredRegisters: Set<Char> = setOf()
+      var exitOnTearDown = true
 
       fun reset() {
         ignoredRegisters = setOf()
+        exitOnTearDown = true
       }
     }
   }

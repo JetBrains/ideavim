@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2020 The IdeaVim authors
+ * Copyright (C) 2003-2021 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,41 +24,67 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.option.OptionsManager
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class DeleteMotionActionTest : VimTestCase() {
 
-  @VimBehaviorDiffers(originalVimAfter = """
-        def xxx():
-          ${c}expression one
-  """)
   fun `test delete last line`() {
-    typeTextInFile(parseKeys("dd"),
+    typeTextInFile(
+      parseKeys("dd"),
       """
         def xxx():
           expression one
           expression${c} two
-          """.trimIndent())
-    myFixture.checkResult("""
+      """.trimIndent()
+    )
+    assertState(
+      """
         def xxx():
-        ${c}  expression one
-          """.trimIndent())
+          ${c}expression one
+      """.trimIndent()
+    )
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  fun `test delete last line with nostartofline`() {
+    OptionsManager.startofline.reset()
+    typeTextInFile(
+      parseKeys("dd"),
+      """
+        |def xxx():
+        |  expression one
+        |  expression${c} two
+      """.trimMargin()
+    )
+    assertState(
+      """
+        |def xxx():
+        |  expression${c} one
+      """.trimMargin()
+    )
   }
 
   @VimBehaviorDiffers(originalVimAfter = "  expression two\n")
   fun `test delete last line stored with new line`() {
-    typeTextInFile(parseKeys("dd"),
+    typeTextInFile(
+      parseKeys("dd"),
       """
         def xxx():
           expression one
           expression${c} two
-          """.trimIndent())
+      """.trimIndent()
+    )
     val savedText = VimPlugin.getRegister().lastRegister?.text ?: ""
     assertEquals("  expression two\n", savedText)
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test delete line action multicaret`() {
-    typeTextInFile(parseKeys("d3d"),
+    typeTextInFile(
+      parseKeys("d3d"),
       """
         abc${c}de
         abcde
@@ -68,12 +94,15 @@ class DeleteMotionActionTest : VimTestCase() {
         abcde
         abcde
         
-        """.trimIndent())
-    myFixture.checkResult("${c}abcde\n${c}")
+      """.trimIndent()
+    )
+    assertState("${c}abcde\n${c}")
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.MULTICARET)
   fun `test delete motion action multicaret`() {
-    typeTextInFile(parseKeys("dt)"),
+    typeTextInFile(
+      parseKeys("dt)"),
       """|public class Foo {
          |  int foo(int a, int b) {
          |    boolean bar = (a < 0 && (b < 0 || a > 0)${c} || b != 0);
@@ -87,7 +116,7 @@ class DeleteMotionActionTest : VimTestCase() {
          |}
         """.trimMargin()
     )
-    myFixture.checkResult(
+    assertState(
       """|public class Foo {
          |  int foo(int a, int b) {
          |    boolean bar = (a < 0 && (b < 0 || a > 0)${c});
@@ -111,39 +140,41 @@ class DeleteMotionActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     val newFile = """
             A Discovery
             ${c}I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent()
+    """.trimIndent()
     typeTextInFile(parseKeys("dd"), file)
-    myFixture.checkResult(newFile)
+    assertState(newFile)
   }
 
   fun `test delete on last line`() {
-    doTest("dd",
+    doTest(
+      "dd",
       """
             A Discovery
             
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             ${c}
-        """.trimIndent(),
+      """.trimIndent(),
       """
             A Discovery
             
             I found it in a legendary land
             ${c}all rocks and lavender and tufted grass,
-        """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
 
   fun `test empty line`() {
-    doTest("dd",
+    doTest(
+      "dd",
       """
             A Discovery
             
@@ -152,7 +183,7 @@ class DeleteMotionActionTest : VimTestCase() {
             
             I found it in a legendary land
             all rocks and lavender and tufted grass,
-        """.trimIndent(),
+      """.trimIndent(),
       """
             A Discovery
             
@@ -160,7 +191,7 @@ class DeleteMotionActionTest : VimTestCase() {
             
             I found it in a legendary land
             all rocks and lavender and tufted grass,
-        """.trimIndent(),
+      """.trimIndent(),
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE
     )
   }
