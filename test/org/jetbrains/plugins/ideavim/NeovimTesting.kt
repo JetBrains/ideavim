@@ -88,12 +88,10 @@ internal object NeovimTesting {
 
   fun typeCommand(keys: String, test: VimTestCase) {
     if (!neovimEnabled(test)) return
-    if (keys.equals("<esc>", ignoreCase = true)) {
-      neovimApi.input(escapeCommand).get()
-    } else if (keys.equals("<C-C>", ignoreCase = true)) {
-      neovimApi.input(ctrlcCommand).get()
-    } else {
-      neovimApi.input(neovimApi.replaceTermcodes(keys, true, false, true).get()).get()
+    when {
+      keys.equals("<esc>", ignoreCase = true) -> neovimApi.input(escapeCommand).get()
+      keys.equals("<C-C>", ignoreCase = true) -> neovimApi.input(ctrlcCommand).get()
+      else -> neovimApi.input(neovimApi.replaceTermcodes(keys, true, false, true).get()).get()
     }
   }
 

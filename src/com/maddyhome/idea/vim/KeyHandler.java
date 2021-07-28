@@ -27,6 +27,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorModificationUtil;
 import com.intellij.openapi.editor.actionSystem.ActionPlan;
@@ -73,6 +74,9 @@ import static com.intellij.openapi.actionSystem.PlatformDataKeys.PROJECT_FILE_DI
  * actions. This is a singleton.
  */
 public class KeyHandler {
+
+  private static final Logger LOG = Logger.getInstance(KeyHandler.class);
+
   /**
    * Returns a reference to the singleton instance of this class
    *
@@ -127,7 +131,7 @@ public class KeyHandler {
   @SuppressWarnings("deprecation")
   public static boolean executeAction(@NotNull AnAction action, @NotNull DataContext context) {
     final AnActionEvent event =
-      new AnActionEvent(null, context, ActionPlaces.ACTION_SEARCH, action.getTemplatePresentation(),
+      new AnActionEvent(null, context, ActionPlaces.KEYBOARD_SHORTCUT, action.getTemplatePresentation(),
                         ActionManager.getInstance(), 0);
 
     if (action instanceof ActionGroup && !((ActionGroup)action).canBePerformed(context)) {
@@ -214,9 +218,15 @@ public class KeyHandler {
                         @NotNull DataContext context,
                         boolean allowKeyMappings,
                         boolean mappingCompleted) {
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(
+        "Start key processing. allowKeyMappings: " + allowKeyMappings + ", mappingCompleted: " + mappingCompleted);
+    }
     if (handleKeyRecursionCount >= OptionsManager.INSTANCE.getMaxmapdepth().value()) {
       VimPlugin.showMessage(MessageHelper.message("E223"));
       VimPlugin.indicateError();
+      LOG.warn("Key handling, maximum recursion of the key received. maxdepth=" +
+               OptionsManager.INSTANCE.getMaxmapdepth().value());
       return;
     }
 
@@ -236,7 +246,9 @@ public class KeyHandler {
     handleKeyRecursionCount++;
 
     try {
+      LOG.trace("Start key processing...");
       if (!allowKeyMappings || !handleKeyMapping(editor, key, context, mappingCompleted)) {
+        LOG.trace("Mappings processed, continue processing key.");
         if (isCommandCountKey(chKey, editorState)) {
           commandBuilder.addCountCharacter(key);
         } else if (isDeleteCommandCountKey(key, editorState)) {
@@ -250,38 +262,49 @@ public class KeyHandler {
           handleCharArgument(key, chKey, editorState);
         }
         else if (editorState.getSubMode() == CommandState.SubMode.REGISTER_PENDING) {
+          LOG.trace("Pending mode.");
           commandBuilder.addKey(key);
           handleSelectRegister(editorState, chKey);
         }
         // If we are this far, then the user must be entering a command or a non-single-character argument
         // to an entered command. Let's figure out which it is.
         else if (!handleDigraph(editor, key, context, editorState)) {
+          LOG.debug("Digraph is NOT processed");
           // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
           // return the node matching this keystroke
           final Node<ActionBeanClass> node = mapOpCommand(key, commandBuilder.getChildNode(key), editorState);
 
+          LOG.trace("Get the node for the current mode");
           if (node instanceof CommandNode) {
+            LOG.trace("Node is a command node");
             handleCommandNode(editor, context, key, (CommandNode<ActionBeanClass>) node, editorState);
             commandBuilder.addKey(key);
           } else if (node instanceof CommandPartNode) {
+            LOG.trace("Node is a command part node");
             commandBuilder.setCurrentCommandPartNode((CommandPartNode<ActionBeanClass>) node);
             commandBuilder.addKey(key);
           } else if (isSelectRegister(key, editorState)) {
+            LOG.trace("Select register");
             editorState.pushModes(CommandState.Mode.COMMAND, CommandState.SubMode.REGISTER_PENDING);
             commandBuilder.addKey(key);
           }
           else { // node == null
 
+            LOG.trace("We are not able to find a node for this key");
             // If we are in insert/replace mode send this key in for processing
             if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
+              LOG.trace("Process insert or replace");
               shouldRecord &= VimPlugin.getChange().processKey(editor, context, key);
             } else if (editorState.getMode() == CommandState.Mode.SELECT) {
+              LOG.trace("Process select");
               shouldRecord &= VimPlugin.getChange().processKeyInSelectMode(editor, context, key);
             } else if (editorState.getMappingState().getMappingMode() == MappingMode.CMD_LINE) {
+              LOG.trace("Process cmd line");
               shouldRecord &= VimPlugin.getProcess().processExKey(editor, key);
             }
             // If we get here then the user has entered an unrecognized series of keystrokes
             else {
+              LOG.trace("Set command state to bad_command");
               commandBuilder.setCommandState(CurrentCommandState.BAD_COMMAND);
             }
 
@@ -296,9 +319,11 @@ public class KeyHandler {
 
     // Do we have a fully entered command at this point? If so, let's execute it.
     if (commandBuilder.isReady()) {
+      LOG.trace("Ready command builder. Execute command.");
       executeCommand(editor, context, editorState);
     }
     else if (commandBuilder.isBad()) {
+      LOG.trace("Command builder is set to BAD");
       editorState.resetOpPending();
       editorState.resetRegisterPending();
       editorState.resetReplaceCharacter();
@@ -368,6 +393,7 @@ public class KeyHandler {
                                    final @NotNull KeyStroke key,
                                    final @NotNull DataContext context,
                                    boolean mappingCompleted) {
+    LOG.debug("Start processing key mappings.");
 
     final CommandState commandState = CommandState.getInstance(editor);
     final MappingState mappingState = commandState.getMappingState();
@@ -377,35 +403,46 @@ public class KeyHandler {
       || commandBuilder.isBuildingMultiKeyCommand()
       || isMappingDisabledForKey(key, commandState)
       || commandState.getSubMode() == CommandState.SubMode.REGISTER_PENDING) {
+      LOG.debug("Finish key processing, returning false");
       return false;
     }
 
     mappingState.stopMappingTimer();
 
     // Save the unhandled key strokes until we either complete or abandon the sequence.
+    LOG.trace("Add key to mapping state");
     mappingState.addKey(key);
 
     final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mappingState.getMappingMode());
+    if (LOG.isTraceEnabled()) LOG.trace("Get keys for mapping mode. mode = " + mappingState.getMappingMode());
 
     // Returns true if any of these methods handle the key. False means that the key is unrelated to mapping and should
     // be processed as normal.
-    return (handleUnfinishedMappingSequence(editor, mappingState, mapping, mappingCompleted))
-      || handleCompleteMappingSequence(editor, context, mappingState, mapping, key)
-      || handleAbandonedMappingSequence(editor, mappingState, context);
+    boolean mappingProcessed = handleUnfinishedMappingSequence(editor, mappingState, mapping, mappingCompleted) ||
+                               handleCompleteMappingSequence(editor, context, mappingState, mapping, key) ||
+                               handleAbandonedMappingSequence(editor, mappingState, context);
+    if (LOG.isDebugEnabled()) LOG.debug("Finish mapping processing. Return " + mappingProcessed);
+    return mappingProcessed;
   }
 
   private boolean isMappingDisabledForKey(@NotNull KeyStroke key, @NotNull CommandState commandState) {
     // "0" can be mapped, but the mapping isn't applied when entering a count. Other digits are always mapped, even when
     // entering a count.
     // See `:help :map-modes`
-    return key.getKeyChar() == '0' && commandState.getCommandBuilder().getCount() > 0;
+    boolean isMappingDisabled = key.getKeyChar() == '0' && commandState.getCommandBuilder().getCount() > 0;
+    if (LOG.isDebugEnabled()) LOG.debug("Mapping disabled for key: " + isMappingDisabled);
+    return isMappingDisabled;
   }
 
   private boolean handleUnfinishedMappingSequence(@NotNull Editor editor,
                                                   @NotNull MappingState mappingState,
                                                   @NotNull KeyMapping mapping,
                                                   boolean mappingCompleted) {
-    if (mappingCompleted) return false;
+    LOG.trace("Processing unfinished mappings...");
+    if (mappingCompleted) {
+      LOG.trace("Mapping is already completed. Returning false.");
+      return false;
+    }
 
     // Is there at least one mapping that starts with the current sequence? This does not include complete matches,
     // unless a sequence is also a prefix for another mapping. We eagerly evaluate the shortest mapping, so even if a
@@ -413,6 +450,7 @@ public class KeyHandler {
     // Note that currentlyUnhandledKeySequence is the same as the state after commandState.getMappingKeys().add(key). It
     // would be nice to tidy ths up
     if (!mapping.isPrefix(mappingState.getKeys())) {
+      LOG.debug("There are no mappings that start with the current sequence. Returning false.");
       return false;
     }
 
@@ -422,20 +460,24 @@ public class KeyHandler {
     // delete a word)
     final Application application = ApplicationManager.getApplication();
     if (OptionsManager.INSTANCE.getTimeout().isSet()) {
+      LOG.trace("Timeout is set. Schedule a mapping timer");
       mappingState.startMappingTimer(actionEvent -> application.invokeLater(() -> {
-
+        LOG.debug("Delayed mapping timer call");
         final List<KeyStroke> unhandledKeys = mappingState.detachKeys();
 
         if (editor.isDisposed() || isPluginMapping(unhandledKeys)) {
+          LOG.debug("Abandon mapping timer");
           return;
         }
 
+        LOG.trace("Processing unhandled keys...");
         for (KeyStroke keyStroke : unhandledKeys) {
           handleKey(editor, keyStroke, EditorDataContext.init(editor, null), true, true);
         }
       }, ModalityState.stateForComponent(editor.getComponent())));
     }
 
+    LOG.trace("Unfinished mapping processing finished");
     return true;
   }
 
@@ -445,10 +487,12 @@ public class KeyHandler {
                                                 @NotNull KeyMapping mapping,
                                                 KeyStroke key) {
 
+    LOG.trace("Processing complete mapping sequence...");
     // The current sequence isn't a prefix, check to see if it's a completed sequence.
     final MappingInfo currentMappingInfo = mapping.get(mappingState.getKeys());
     MappingInfo mappingInfo = currentMappingInfo;
     if (mappingInfo == null) {
+      LOG.trace("Haven't found any mapping info for the given sequence. Trying to apply mapping to a subsequence.");
       // It's an abandoned sequence, check to see if the previous sequence was a complete sequence.
       // TODO: This is incorrect behaviour
       // What about sequences that were completed N keys ago?
@@ -468,6 +512,7 @@ public class KeyHandler {
     }
 
     if (mappingInfo == null) {
+      LOG.trace("Cannot find any mapping info for the sequence. Return false.");
       return false;
     }
 
@@ -475,13 +520,16 @@ public class KeyHandler {
 
     final EditorDataContext currentContext = EditorDataContext.init(editor, context);
 
+    LOG.trace("Executing mapping info");
     mappingInfo.execute(editor, context);
 
     // If we've just evaluated the previous key sequence, make sure to also handle the current key
     if (mappingInfo != currentMappingInfo) {
+      LOG.trace("Evaluating the current key");
       handleKey(editor, key, currentContext, true, false);
     }
 
+    LOG.trace("Success processing of mapping");
     return true;
   }
 
@@ -489,6 +537,7 @@ public class KeyHandler {
                                                  @NotNull MappingState mappingState,
                                                  DataContext context) {
 
+    LOG.debug("Processing abandoned mapping sequence");
     // The user has terminated a mapping sequence with an unexpected key
     // E.g. if there is a mapping for "hello" and user enters command "help" the processing of "h", "e" and "l" will be
     //   prevented by this handler. Make sure the currently unhandled keys are processed as normal.
@@ -497,6 +546,7 @@ public class KeyHandler {
 
     // If there is only the current key to handle, do nothing
     if (unhandledKeyStrokes.size() == 1) {
+      LOG.trace("There is only one key in mapping. Return false.");
       return false;
     }
 
@@ -509,8 +559,10 @@ public class KeyHandler {
     //  should be processed with mappings (to make I work)
 
     if (isPluginMapping(unhandledKeyStrokes)) {
+      LOG.trace("This is a plugin mapping, process it");
       handleKey(editor, unhandledKeyStrokes.get(unhandledKeyStrokes.size() - 1), context, true, false);
     } else {
+      LOG.trace("Process abandoned keys.");
       handleKey(editor, unhandledKeyStrokes.get(0), context, false, false);
 
       for (KeyStroke keyStroke : unhandledKeyStrokes.subList(1, unhandledKeyStrokes.size())) {
@@ -518,6 +570,7 @@ public class KeyHandler {
       }
     }
 
+    LOG.trace("Return true from abandoned keys processing.");
     return true;
   }
 
@@ -543,25 +596,31 @@ public class KeyHandler {
       if (commandBuilder.isExpectingCount() &&
           Character.isDigit(chKey) &&
           (commandBuilder.getCount() > 0 || chKey != '0')) {
+        LOG.debug("This is a command key count");
         return true;
       }
     }
+    LOG.debug("This is NOT a command key count");
     return false;
   }
 
   private boolean isDeleteCommandCountKey(@NotNull KeyStroke key, @NotNull CommandState editorState) {
     // See `:help N<Del>`
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
-    return (editorState.getMode() == CommandState.Mode.COMMAND ||
-            editorState.getMode() == CommandState.Mode.VISUAL ||
-            editorState.getMode() == CommandState.Mode.OP_PENDING) &&
-           commandBuilder.isExpectingCount() &&
-           commandBuilder.getCount() > 0 &&
-           key.getKeyCode() == KeyEvent.VK_DELETE;
+    boolean isDeleteCommandKeyCount = (editorState.getMode() == CommandState.Mode.COMMAND ||
+                 editorState.getMode() == CommandState.Mode.VISUAL ||
+                 editorState.getMode() == CommandState.Mode.OP_PENDING) &&
+                commandBuilder.isExpectingCount() &&
+                commandBuilder.getCount() > 0 &&
+                key.getKeyCode() == KeyEvent.VK_DELETE;
+    if (LOG.isDebugEnabled()) LOG.debug("This is a delete command key count: " + isDeleteCommandKeyCount);
+    return isDeleteCommandKeyCount;
   }
 
   private boolean isEditorReset(@NotNull KeyStroke key, @NotNull CommandState editorState) {
-    return editorState.getMode() == CommandState.Mode.COMMAND && StringHelper.isCloseKeyStroke(key);
+    boolean editorReset = editorState.getMode() == CommandState.Mode.COMMAND && StringHelper.isCloseKeyStroke(key);
+    if (LOG.isDebugEnabled()) LOG.debug("This is editor reset: " + editorReset);
+    return editorReset;
   }
 
   private boolean isSelectRegister(@NotNull KeyStroke key, @NotNull CommandState editorState) {
@@ -577,20 +636,26 @@ public class KeyHandler {
   }
 
   private void handleSelectRegister(@NotNull CommandState commandState, char chKey) {
+    LOG.trace("Handle select register");
     commandState.resetRegisterPending();
     if (VimPlugin.getRegister().isValid(chKey)) {
+      LOG.trace("Valid register");
       commandState.getCommandBuilder().pushCommandPart(chKey);
     }
     else {
+      LOG.trace("Invalid register, set command state to BAD_COMMAND");
       commandState.getCommandBuilder().setCommandState(CurrentCommandState.BAD_COMMAND);
     }
   }
 
   private boolean isExpectingCharArgument(@NotNull CommandBuilder commandBuilder) {
-    return commandBuilder.getExpectedArgumentType() == Argument.Type.CHARACTER;
+    boolean expectingCharArgument = commandBuilder.getExpectedArgumentType() == Argument.Type.CHARACTER;
+    if (LOG.isDebugEnabled()) LOG.debug("Expecting char argument: " + expectingCharArgument);
+    return expectingCharArgument;
   }
 
   private void handleCharArgument(@NotNull KeyStroke key, char chKey, @NotNull CommandState commandState) {
+    LOG.trace("Handling char argument");
     // We are expecting a character argument - is this a regular character the user typed?
     // Some special keys can be handled as character arguments - let's check for them here.
     if (chKey == 0) {
@@ -606,10 +671,12 @@ public class KeyHandler {
 
     final CommandBuilder commandBuilder = commandState.getCommandBuilder();
     if (chKey != 0) {
+      LOG.trace("Add character argument to the current command");
       // Create the character argument, add it to the current command, and signal we are ready to process the command
       commandBuilder.completeCommandPart(new Argument(chKey));
     }
     else {
+      LOG.trace("This is not a valid character argument. Set command state to BAD_COMMAND");
       // Oops - this isn't a valid character argument
       commandBuilder.setCommandState(CurrentCommandState.BAD_COMMAND);
     }
@@ -622,12 +689,14 @@ public class KeyHandler {
                                 @NotNull DataContext context,
                                 @NotNull CommandState editorState) {
 
+    LOG.debug("Handling digraph");
     // Support starting a digraph/literal sequence if the operator accepts one as an argument, e.g. 'r' or 'f'.
     // Normally, we start the sequence (in Insert or CmdLine mode) through a VimAction that can be mapped. Our
     // VimActions don't work as arguments for operators, so we have to special case here. Helpfully, Vim appears to
     // hardcode the shortcuts, and doesn't support mapping, so everything works nicely.
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
     if (commandBuilder.getExpectedArgumentType() == Argument.Type.DIGRAPH) {
+      LOG.trace("Expected argument is digraph");
       if (DigraphSequence.isDigraphStart(key)) {
         editorState.startDigraphSequence();
         editorState.getCommandBuilder().addKey(key);
@@ -698,6 +767,7 @@ public class KeyHandler {
   private void executeCommand(@NotNull Editor editor,
                               @NotNull DataContext context,
                               @NotNull CommandState editorState) {
+    LOG.trace("Command execution");
     final Command command = editorState.getCommandBuilder().buildCommand();
 
     // If we were in "operator pending" mode, reset back to normal mode.
@@ -714,6 +784,7 @@ public class KeyHandler {
       if (!modificationAllowed || !writeRequested) {
         VimPlugin.indicateError();
         reset(editor);
+        LOG.warn("File is not writable");
         return;
       }
     }
@@ -744,6 +815,7 @@ public class KeyHandler {
                                  KeyStroke key,
                                  @NotNull CommandNode<ActionBeanClass> node,
                                  CommandState editorState) {
+    LOG.trace("Handle command node");
     // The user entered a valid command. Create the command and add it to the stack.
     final EditorActionHandlerBase action = node.getActionHolder().getInstance();
     final CommandBuilder commandBuilder = editorState.getCommandBuilder();
@@ -752,14 +824,17 @@ public class KeyHandler {
     commandBuilder.pushCommandPart(action);
 
     if (!checkArgumentCompatibility(expectedArgumentType, action)) {
+      LOG.trace("Return from command node handling");
       commandBuilder.setCommandState(CurrentCommandState.BAD_COMMAND);
       return;
     }
 
     if (action.getArgumentType() == null || stopMacroRecord(node, editorState)) {
+      LOG.trace("Set command state to READY");
       commandBuilder.setCommandState(CurrentCommandState.READY);
     }
     else {
+      LOG.trace("Set waiting for the argument");
       final Argument.Type argumentType = action.getArgumentType();
       startWaitingForArgument(editor, context, key.getKeyChar(), action, argumentType, editorState);
       partialReset(editor);
@@ -784,6 +859,7 @@ public class KeyHandler {
          and SearchEntry(Fwd|Rev)Action, and the ex command invoked in ProcessExEntryAction, but that breaks any initial
          operator, which would be invoked first (e.g. 'd' in "d/foo").
       */
+      LOG.trace("Processing ex_string");
       String text = VimPlugin.getProcess().endSearchCommand(editor);
       commandBuilder.popCommandPart();  // Pop ProcessExEntryAction
       commandBuilder.completeCommandPart(new Argument(text)); // Set search text on SearchEntry(Fwd|Rev)Action

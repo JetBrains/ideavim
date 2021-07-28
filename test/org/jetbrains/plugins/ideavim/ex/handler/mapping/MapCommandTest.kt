@@ -21,7 +21,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.helper.commandState
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -746,8 +745,13 @@ n  ,f            <Plug>Foo
   private fun checkDelayedMapping(before: String, after: String) {
     assertState(before)
 
-    waitAndAssert(5000) { !myFixture.editor.commandState.mappingState.isTimerRunning() }
-
-    assertState(after)
+    waitAndAssert(5000) {
+      return@waitAndAssert try {
+        assertState(after)
+        true
+      } catch (e: AssertionError) {
+        false
+      }
+    }
   }
 }

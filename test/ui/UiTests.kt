@@ -18,15 +18,16 @@
 
 package ui
 
+import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.fixtures.ComponentFixture
 import com.intellij.remoterobot.fixtures.ContainerFixture
 import com.intellij.remoterobot.search.locators.byXpath
 import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.keyboard
-import com.intellij.remoterobot.utils.waitFor
 import org.assertj.swing.core.MouseButton
 import org.junit.Test
 import ui.pages.Editor
+import ui.pages.IdeaFrame
 import ui.pages.actionMenu
 import ui.pages.actionMenuItem
 import ui.pages.dialog
@@ -37,15 +38,16 @@ import ui.pages.welcomeFrame
 import ui.utils.JavaExampleSteps
 import ui.utils.StepsLogger
 import ui.utils.doubleClickOnRight
+import ui.utils.invokeActionJs
 import ui.utils.moveMouseForthAndBack
 import ui.utils.moveMouseInGutterTo
 import ui.utils.moveMouseTo
 import ui.utils.tripleClickOnRight
 import ui.utils.uiTest
 import ui.utils.vimExit
-import java.awt.event.KeyEvent
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class UiTests {
   init {
@@ -53,7 +55,7 @@ class UiTests {
   }
 
   @Test
-  fun ideaVimTest() = uiTest {
+  fun ideaVimTest() = uiTest("ideaVimTest") {
     val sharedSteps = JavaExampleSteps(this)
 
     welcomeFrame {
@@ -64,23 +66,18 @@ class UiTests {
           ComponentFixture::class.java,
           byXpath("//div[@class='FrameworksTree']")
         ).findText("Kotlin/JVM").click()
-        runJs("robot.pressAndReleaseKey(${KeyEvent.VK_SPACE})")
+        runJs("robot.pressAndReleaseKey(${java.awt.event.KeyEvent.VK_SPACE})")
         button("Next").click()
         button("Finish").click()
       }
     }
-    sharedSteps.closeTipOfTheDay()
+    with(sharedSteps) {
+      closeIdeaVimDialog()
+      closeTipOfTheDay()
+      closeAllTabs()
+    }
     idea {
-      step("Create App file") {
-        with(projectViewTree) {
-          findText(projectName).doubleClick()
-          waitFor { hasText("src") }
-          findText("src").click(MouseButton.RIGHT_BUTTON)
-        }
-        actionMenu("New").click()
-        actionMenuItem("File").click()
-        keyboard { enterText("MyDoc.txt"); enter() }
-      }
+      createFile("MyDoc.txt", this@uiTest)
       val editor = editor("MyDoc.txt") {
         step("Write a text") {
           injectText(
@@ -100,10 +97,96 @@ class UiTests {
       testClickRightFromLineEnd(editor)
       testClickOnWord(editor)
       testGutterClick(editor)
+      reenableIdeaVim(editor)
+
+      createFile("MyTest.java", this@uiTest)
+      val javaEditor = editor("MyTest.java") {
+        step("Write a text") {
+          injectText(
+            """
+                |class Main {
+                |  public static void main() {
+                |    System.out.println("Hello");
+                |  }
+                |}
+            """.trimMargin()
+          )
+        }
+      }
+
+      wrapWithIf(javaEditor)
     }
   }
 
+  private fun IdeaFrame.wrapWithIf(editor: Editor) {
+    editor.findText("System").click()
+    remoteRobot.invokeActionJs("SurroundWith")
+    editor.keyboard { enter() }
+
+    assertFalse(editor.isBlockCursor)
+
+    editor.keyboard {
+      enterText("true")
+      escape()
+    }
+    assertTrue(editor.isBlockCursor)
+    editor.keyboard {
+      enterText("h")
+      enterText("v")
+    }
+    assertEquals("u", editor.selectedText)
+
+    vimExit()
+  }
+
+  private fun IdeaFrame.createFile(fileName: String, remoteRobot: RemoteRobot) {
+    step("Create $fileName file") {
+      with(projectViewTree) {
+        expand(projectName, "src")
+        findText("src").click(MouseButton.RIGHT_BUTTON)
+      }
+      remoteRobot.actionMenu("New").click()
+      remoteRobot.actionMenuItem("File").click()
+      keyboard { enterText(fileName); enter() }
+    }
+  }
+
+  private fun IdeaFrame.reenableIdeaVim(editor: Editor) {
+    println("Run reenableIdeaVim...")
+    toggleIdeaVim()
+
+    val from = editor.findText("One")
+    from.doubleClick()
+
+    editor.click()
+
+    toggleIdeaVim()
+
+    from.click()
+
+    editor.keyboard {
+      enterText("i")
+      enterText("Hello")
+      escape()
+      enterText("4h")
+      enterText("5x")
+    }
+    assertEquals(
+      """
+      One Two
+      Three Four
+      Five
+      """.trimIndent(),
+      editor.text
+    )
+  }
+
+  private fun IdeaFrame.toggleIdeaVim() {
+    this.remoteRobot.invokeActionJs("VimPluginToggle")
+  }
+
   private fun ContainerFixture.testSelectTextWithMouseInGutter(editor: Editor) {
+    println("Run testSelectTextWithMouseInGutter...")
     gutter {
       val from = findText("1")
       val to = findText("2")
@@ -122,6 +205,7 @@ class UiTests {
   }
 
   private fun ContainerFixture.testSelectTextUsingMouse(editor: Editor) {
+    println("Run testSelectTextUsingMouse...")
     val from = editor.findText("One")
     val to = editor.findText("Four")
 
@@ -139,6 +223,7 @@ class UiTests {
   }
 
   private fun ContainerFixture.testSelectForthAndBack(editor: Editor) {
+    println("Run testSelectForthAndBack...")
     val from = editor.findText("Two")
     val to = editor.findText("Four")
 
@@ -155,6 +240,7 @@ class UiTests {
   }
 
   private fun ContainerFixture.testTripleClickRightFromLineEnd(editor: Editor) {
+    println("Run testTripleClickRightFromLineEnd...")
     editor.findText("Two").tripleClickOnRight(40, editor)
 
     assertEquals("One Two\n", editor.selectedText)
@@ -174,6 +260,7 @@ class UiTests {
   }
 
   private fun ContainerFixture.testClickRightFromLineEnd(editor: Editor) {
+    println("Run testClickRightFromLineEnd...")
     editor.findText("Two").doubleClickOnRight(40, editor)
 
     assertEquals("Two", editor.selectedText)
@@ -188,6 +275,7 @@ class UiTests {
   }
 
   private fun ContainerFixture.testClickOnWord(editor: Editor) {
+    println("Run testClickOnWord...")
     editor.findText("One").doubleClick(MouseButton.LEFT_BUTTON)
 
     assertEquals("One", editor.selectedText)
@@ -202,6 +290,7 @@ class UiTests {
   }
 
   private fun ContainerFixture.testGutterClick(editor: Editor) {
+    println("Run testGutterClick...")
     gutter {
       findText("2").click()
     }

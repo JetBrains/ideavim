@@ -24,7 +24,7 @@ plugins {
     kotlin("jvm") version "1.5.0"
 
     id("org.jetbrains.intellij") version "1.0"
-    id("org.jetbrains.changelog") version "1.1.2"
+    id("org.jetbrains.changelog") version "1.2.0"
 
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
     id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
@@ -36,6 +36,7 @@ val kotlinVersion: String by project
 val ideaVersion: String by project
 val downloadIdeaSources: String by project
 val instrumentPluginCode: String by project
+val remoteRobotVersion: String by project
 
 val publishChannels: String by project
 val publishToken: String by project
@@ -55,8 +56,8 @@ dependencies {
     testImplementation("com.ensarsarajcic.neovim.java:neovim-api:0.2.3")
     testImplementation("com.ensarsarajcic.neovim.java:core-rpc:0.2.3")
 
-    testImplementation("com.intellij.remoterobot:remote-robot:0.11.4")
-    testImplementation("com.intellij.remoterobot:remote-fixtures:1.1.18")
+    testImplementation("com.intellij.remoterobot:remote-robot:$remoteRobotVersion")
+    testImplementation("com.intellij.remoterobot:remote-fixtures:$remoteRobotVersion")
 }
 
 // --- Compilation
@@ -116,7 +117,7 @@ intellij {
 
 tasks {
     downloadRobotServerPlugin {
-        version.set("0.10.0")
+        version.set(remoteRobotVersion)
     }
 
     publishPlugin {
@@ -126,6 +127,9 @@ tasks {
 
     runIdeForUiTests {
         systemProperty("robot-server.port", "8082")
+        systemProperty("ide.mac.message.dialogs.as.sheets", "false")
+        systemProperty("jb.privacy.policy.text", "<!--999.999-->")
+        systemProperty("jb.consents.confirmation.enabled", "false")
     }
 
     runPluginVerifier {
@@ -169,11 +173,11 @@ tasks.register<Test>("testUi") {
 // --- Changelog
 
 changelog {
-    groups = listOf("Features:", "Changes:", "Deprecations:", "Fixes:", "Merged PRs:")
-    itemPrefix = "*"
-    path = "${project.projectDir}/CHANGES.md"
-    unreleasedTerm = "To Be Released"
-    headerParserRegex = "0\\.\\d{2}(.\\d+)?".toRegex()
+    groups.set(listOf("Features:", "Changes:", "Deprecations:", "Fixes:", "Merged PRs:"))
+    itemPrefix.set("*")
+    path.set("${project.projectDir}/CHANGES.md")
+    unreleasedTerm.set("To Be Released")
+    headerParserRegex.set("0\\.\\d{2}(.\\d+)?".toRegex())
 //    header = { "${project.version}" }
 //    version = "0.60"
 }

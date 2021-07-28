@@ -73,14 +73,15 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     }
 
     var exarg = _exarg
-    val type = if (exarg.startsWith("!")) {
-      exarg = exarg.drop(1)
-      GlobalType.V
-    } else if (excmd.startsWith("g")) {
-      GlobalType.G
-    } else if (excmd.startsWith("v")) {
-      GlobalType.V
-    } else error("Unexpected command: $excmd")
+    val type = when {
+      exarg.startsWith("!") -> {
+        exarg = exarg.drop(1)
+        GlobalType.V
+      }
+      excmd.startsWith("g") -> GlobalType.G
+      excmd.startsWith("v") -> GlobalType.V
+      else -> error("Unexpected command: $excmd")
+    }
 
     var cmd = CharPointer(StringBuffer(exarg))
 

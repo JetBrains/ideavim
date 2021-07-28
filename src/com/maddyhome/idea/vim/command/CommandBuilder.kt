@@ -18,6 +18,8 @@
 
 package com.maddyhome.idea.vim.command
 
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
 import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.action.ResetModeAction
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction
@@ -119,7 +121,9 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<ActionB
   fun isAwaitingCharOrDigraphArgument(): Boolean {
     if (commandParts.size == 0) return false
     val argumentType = commandParts.peekLast().action.argumentType
-    return argumentType == Argument.Type.CHARACTER || argumentType == Argument.Type.DIGRAPH
+    val awaiting = argumentType == Argument.Type.CHARACTER || argumentType == Argument.Type.DIGRAPH
+    LOG.debug { "Awaiting char of digraph: $awaiting" }
+    return awaiting
   }
 
   fun isBuildingMultiKeyCommand(): Boolean {
@@ -128,7 +132,9 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<ActionB
     //   Similarly, nmap <C-W>a <C-W>s should not try to map the second <C-W> in <C-W><C-W>
     // Note that we might still be at RootNode if we're handling a prefix, because we might be buffering keys until we
     // get a match. This means we'll still process the rest of the keys of the prefix.
-    return currentCommandPartNode !is RootNode
+    val isMultikey = currentCommandPartNode !is RootNode
+    LOG.debug { "Building multikey command: $isMultikey" }
+    return isMultikey
   }
 
   fun isPuttingLiteral(): Boolean {
@@ -194,4 +200,8 @@ class CommandBuilder(private var currentCommandPartNode: CommandPartNode<ActionB
 
   @TestOnly
   fun getCurrentTrie(): CommandPartNode<ActionBeanClass> = currentCommandPartNode
+
+  companion object {
+    private val LOG = logger<CommandBuilder>()
+  }
 }

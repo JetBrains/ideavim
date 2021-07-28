@@ -92,8 +92,7 @@ public class FileGroup {
     }
   }
 
-  @Nullable
-  VirtualFile findFile(@NotNull String filename, @NotNull Project project) {
+  @Nullable VirtualFile findFile(@NotNull String filename, @NotNull Project project) {
     VirtualFile found = null;
     if (filename.length() > 2 && filename.charAt(0) == '~' && filename.charAt(1) == File.separatorChar) {
       String homefile = filename.substring(2);
@@ -158,6 +157,20 @@ public class FileGroup {
       if (virtualFile != null && window != null) {
         window.closeFile(virtualFile);
       }
+    }
+  }
+
+  /**
+   * Closes editor.
+   */
+  public void closeFile(int number, @NotNull DataContext context) {
+    final Project project = PlatformDataKeys.PROJECT.getData(context);
+    if (project == null) return;
+    final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
+    final EditorWindow window = fileEditorManager.getCurrentWindow();
+    VirtualFile[] editors = fileEditorManager.getOpenFiles();
+    if (number >= 0 && number < editors.length) {
+      fileEditorManager.closeFile(editors[number], window);
     }
   }
 
@@ -250,13 +263,12 @@ public class FileGroup {
     return null;
   }
 
-  @Nullable
-  Editor selectEditor(Project project, @NotNull VirtualFile file) {
+  @Nullable Editor selectEditor(Project project, @NotNull VirtualFile file) {
     FileEditorManager fMgr = FileEditorManager.getInstance(project);
     FileEditor[] feditors = fMgr.openFile(file, true);
     if (feditors.length > 0) {
       if (feditors[0] instanceof TextEditor) {
-        Editor editor = ((TextEditor) feditors[0]).getEditor();
+        Editor editor = ((TextEditor)feditors[0]).getEditor();
         if (!editor.isDisposed()) {
           return editor;
         }
@@ -314,7 +326,8 @@ public class FileGroup {
     else {
       msg.append("Selected ");
 
-      TextRange vr = new TextRange(editor.getSelectionModel().getBlockSelectionStarts(), editor.getSelectionModel().getBlockSelectionEnds());
+      TextRange vr = new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
+                                   editor.getSelectionModel().getBlockSelectionEnds());
       vr.normalize();
 
       int lines;

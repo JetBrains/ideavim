@@ -21,9 +21,9 @@ package ui.pages
 import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.data.RemoteComponent
 import com.intellij.remoterobot.fixtures.CommonContainerFixture
-import com.intellij.remoterobot.fixtures.ContainerFixture
 import com.intellij.remoterobot.fixtures.DefaultXpath
 import com.intellij.remoterobot.fixtures.FixtureName
+import com.intellij.remoterobot.fixtures.JTreeFixture
 import com.intellij.remoterobot.search.locators.byXpath
 import com.intellij.remoterobot.stepsProcessing.step
 import com.intellij.remoterobot.utils.waitFor
@@ -41,7 +41,7 @@ class IdeaFrame(
 ) : CommonContainerFixture(remoteRobot, remoteComponent) {
 
   val projectViewTree
-    get() = find<ContainerFixture>(byXpath("ProjectViewTree", "//div[@class='ProjectViewTree']"))
+    get() = find<JTreeFixture>(byXpath("ProjectViewTree", "//div[@class='ProjectViewTree']"), Duration.ofSeconds(10))
 
   val projectName
     get() = step("Get project name") { return@step callJs<String>("component.getProject().getName()") }

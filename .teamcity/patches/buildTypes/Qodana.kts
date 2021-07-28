@@ -3,8 +3,6 @@ package patches.buildTypes
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.Qodana
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.qodana
-import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.BuildFailureOnMetric
-import jetbrains.buildServer.configs.kotlin.v2019_2.failureConditions.failOnMetricChange
 import jetbrains.buildServer.configs.kotlin.v2019_2.ui.*
 
 /*
@@ -16,40 +14,25 @@ changeBuildType(RelativeId("Qodana")) {
     expectSteps {
         qodana {
             name = "Qodana"
-            reportAsTestsEnable = ""
+            reportAsTestsEnable = "true"
             failBuildOnErrors = ""
             codeInspectionXmlConfig = "Custom"
             codeInspectionCustomXmlConfigPath = ".idea/inspectionProfiles/Qodana.xml"
+            param("clonefinder-enable", "true")
+            param("clonefinder-languages", "Java")
+            param("clonefinder-languages-container", "Java Kotlin")
+            param("clonefinder-mode", "")
+            param("clonefinder-queried-project", "src")
+            param("clonefinder-reference-projects", "src")
+            param("namesAndTagsCustom", "repo.labs.intellij.net/static-analyser/qodana")
+            param("report-version", "")
+            param("yaml-configuration", "")
         }
     }
     steps {
         update<Qodana>(0) {
             clearConditions()
-            reportAsTestsEnable = "true"
-            param("clonefinder-languages", "Java")
-            param("clonefinder-languages-container", "Java Kotlin")
-            param("namesAndTagsCustom", "repo.labs.intellij.net/static-analyser/qodana")
-            param("clonefinder-queried-project", "src")
-            param("clonefinder-enable", "true")
-            param("clonefinder-reference-projects", "src")
-            param("clonefinder-mode", "")
-            param("report-version", "")
-            param("yaml-configuration", "")
-        }
-    }
-
-    failureConditions {
-        val feature1 = find<BuildFailureOnMetric> {
-            failOnMetricChange {
-                threshold = 0
-                units = BuildFailureOnMetric.MetricUnit.DEFAULT_UNIT
-                comparison = BuildFailureOnMetric.MetricComparison.MORE
-                compareTo = value()
-                param("metricKey", "QodanaProblemsTotal")
-            }
-        }
-        feature1.apply {
-            metric = BuildFailureOnMetric.MetricType.TEST_FAILED_COUNT
+            param("licenseaudit-enable", "true")
         }
     }
 }

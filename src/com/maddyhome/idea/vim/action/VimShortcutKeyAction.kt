@@ -24,7 +24,8 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.EmptyAction
 import com.intellij.openapi.actionSystem.PlatformDataKeys
-import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.DumbAware
@@ -59,6 +60,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   private val traceTime = OptionsManager.ideatracetime.isSet
 
   override fun actionPerformed(e: AnActionEvent) {
+    LOG.trace("Executing shortcut key action")
     val editor = getEditor(e)
     val keyStroke = getKeyStroke(e)
     if (editor != null && keyStroke != null) {
@@ -72,13 +74,13 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
         KeyHandler.getInstance().handleKey(editor, keyStroke, EditorDataContext.init(editor, e.dataContext))
         if (start != null) {
           val duration = System.currentTimeMillis() - start
-          ourLogger.info("VimShortcut update '$keyStroke': $duration ms")
+          LOG.info("VimShortcut update '$keyStroke': $duration ms")
         }
       } catch (ignored: ProcessCanceledException) {
         // Control-flow exceptions (like ProcessCanceledException) should never be logged
         // See {@link com.intellij.openapi.diagnostic.Logger.checkException}
       } catch (throwable: Throwable) {
-        ourLogger.error(throwable)
+        LOG.error(throwable)
       }
     }
   }
@@ -86,10 +88,11 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   override fun update(e: AnActionEvent) {
     val start = if (traceTime) System.currentTimeMillis() else null
     e.presentation.isEnabled = isEnabled(e)
+    LOG.debug { "Shortcut key. Enabled: ${e.presentation.isEnabled}" }
     if (start != null) {
       val keyStroke = getKeyStroke(e)
       val duration = System.currentTimeMillis() - start
-      ourLogger.info("VimShortcut update '$keyStroke': $duration ms")
+      LOG.info("VimShortcut update '$keyStroke': $duration ms")
     }
   }
 
@@ -98,17 +101,29 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     val editor = getEditor(e)
     val keyStroke = getKeyStroke(e)
     if (editor != null && keyStroke != null) {
-      if (editor.isIdeaVimDisabledHere) return false
+      if (editor.isIdeaVimDisabledHere) {
+        LOG.trace("Do not execute shortcut because it's disabled here")
+        return false
+      }
       // Workaround for smart step into
       @Suppress("DEPRECATION", "LocalVariableName", "VariableNaming")
       val SMART_STEP_INPLACE_DATA = Key.findKeyByName("SMART_STEP_INPLACE_DATA")
-      if (SMART_STEP_INPLACE_DATA != null && editor.getUserData(SMART_STEP_INPLACE_DATA) != null) return false
+      if (SMART_STEP_INPLACE_DATA != null && editor.getUserData(SMART_STEP_INPLACE_DATA) != null) {
+        LOG.trace("Do not execute shortcut because of smart step")
+        return false
+      }
 
-      if (aceJumpActive()) return false
+      if (aceJumpActive()) {
+        LOG.trace("Do not execute shortcut because AceJump is active")
+        return false
+      }
 
       val keyCode = keyStroke.keyCode
 
-      if (LookupManager.getActiveLookup(editor) != null && !LookupKeys.isEnabledForLookup(keyStroke)) return false
+      if (LookupManager.getActiveLookup(editor) != null && !LookupKeys.isEnabledForLookup(keyStroke)) {
+        LOG.trace("Do not execute shortcut because of lookup keys")
+        return false
+      }
 
       if (keyCode == KeyEvent.VK_ESCAPE) return isEnabledForEscape(editor)
 
@@ -300,7 +315,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
       .addAll(getKeyStrokes(KeyEvent.VK_DOWN, 0))
       .build()
 
-    private val ourLogger = Logger.getInstance(VimShortcutKeyAction::class.java.name)
+    private val LOG = logger<VimShortcutKeyAction>()
 
     @JvmStatic
     val instance: AnAction by lazy {
