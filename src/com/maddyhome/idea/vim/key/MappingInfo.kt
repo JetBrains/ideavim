@@ -19,6 +19,7 @@ package com.maddyhome.idea.vim.key
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.command.CommandProcessor
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.CaretSpecificDataContext
@@ -90,6 +91,7 @@ class ToKeysMappingInfo(
   override fun getPresentableString(): String = toKeyNotation(toKeys)
 
   override fun execute(editor: Editor, context: DataContext) {
+    LOG.debug("Executing 'ToKeys' mapping info...")
     val editorDataContext = EditorDataContext.init(editor, context)
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     var first = true
@@ -99,6 +101,10 @@ class ToKeysMappingInfo(
       keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false)
       first = false
     }
+  }
+
+  companion object {
+    private val LOG = logger<ToKeysMappingInfo>()
   }
 }
 
@@ -111,6 +117,7 @@ class ToHandlerMappingInfo(
   override fun getPresentableString(): String = "call ${extensionHandler.javaClass.canonicalName}"
 
   override fun execute(editor: Editor, context: DataContext) {
+    LOG.debug("Executing 'ToHandler' mapping info...")
     val processor = CommandProcessor.getInstance()
     val commandState = CommandState.getInstance(editor)
 
@@ -170,6 +177,10 @@ class ToHandlerMappingInfo(
       }
     }
   }
+
+  companion object {
+    private val LOG = logger<ToHandlerMappingInfo>()
+  }
 }
 
 class ToActionMappingInfo(
@@ -181,8 +192,13 @@ class ToActionMappingInfo(
   override fun getPresentableString(): String = "action $action"
 
   override fun execute(editor: Editor, context: DataContext) {
+    LOG.debug("Executing 'ToAction' mapping...")
     val editorDataContext = EditorDataContext.init(editor, context)
     val dataContext = CaretSpecificDataContext(editorDataContext, editor.caretModel.currentCaret)
     KeyHandler.executeAction(action, dataContext)
+  }
+
+  companion object {
+    private val LOG = logger<ToActionMappingInfo>()
   }
 }

@@ -18,6 +18,8 @@
 
 package com.maddyhome.idea.vim.command
 
+import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.diagnostic.trace
 import com.maddyhome.idea.vim.option.OptionsManager
 import java.awt.event.ActionListener
 import javax.swing.KeyStroke
@@ -44,6 +46,7 @@ class MappingState {
   }
 
   fun stopMappingTimer() {
+    LOG.trace { "Stop mapping timer" }
     timer.stop()
     timer.actionListeners.forEach { timer.removeActionListener(it) }
   }
@@ -59,8 +62,13 @@ class MappingState {
   }
 
   fun resetMappingSequence() {
+    LOG.trace("Reset mapping sequence")
     stopMappingTimer()
     keyList.clear()
     // NOTE: We intentionally don't reset mapping mode here
+  }
+
+  companion object {
+    private val LOG = logger<MappingState>()
   }
 }

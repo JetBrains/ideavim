@@ -79,7 +79,7 @@ import java.awt.event.MouseEvent
 
 object VimListenerManager {
 
-  val logger = Logger.getInstance(VimListenerManager::class.java)
+  private val logger = Logger.getInstance(VimListenerManager::class.java)
 
   fun turnOn() {
     GlobalListeners.enable()
