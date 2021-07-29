@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.option.GuiCursorMode
 import com.maddyhome.idea.vim.option.GuiCursorType
@@ -70,13 +71,18 @@ fun Editor.guicursorMode(): GuiCursorMode {
   }
 }
 
-fun Editor.hasBlockOrUnderscoreCaret() = OptionsManager.guicursor.getAttributes(guicursorMode()).type.let {
-  it == GuiCursorType.BLOCK || it == GuiCursorType.HOR
-}
+fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
+  OptionsManager.guicursor.getAttributes(guicursorMode()).type.let {
+    it == GuiCursorType.BLOCK || it == GuiCursorType.HOR
+  }
 
-// [VERSION UPDATE] 2021.2+
-// Don't bother saving/restoring EditorSettings.blockCursor if we're not using it
-fun usesBlockCursorEditorSettings() = ApplicationInfo.getInstance().build.baselineVersion < 212
+/**
+ * Allow the "use block caret" setting to override guicursor options - if set, we use block caret everywhere, if
+ * not, we use guicursor options.
+ *
+ * Note that we look at the persisted value because for pre-212 at least, we modify the per-editor value.
+ */
+private fun isBlockCursorOverride() = EditorSettingsExternalizable.getInstance().isBlockCursor
 
 private fun Editor.updatePrimaryCaretVisualAttributes() {
   provider.setPrimaryCaretVisualAttributes(this)
@@ -119,11 +125,17 @@ private interface CaretVisualAttributesProvider {
 private class DefaultCaretVisualAttributesProvider : CaretVisualAttributesProvider {
   companion object {
     private val HIDDEN = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BAR, 0F)
+    private val BLOCK = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BLOCK, 1.0F)
+    private val BAR = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BAR, 0.25F)
   }
 
   private val cache = mutableMapOf<GuiCursorMode, CaretVisualAttributes>()
 
   private fun getCaretVisualAttributes(editor: Editor): CaretVisualAttributes {
+    if (isBlockCursorOverride()) {
+      return BLOCK
+    }
+
     val guicursorMode = editor.guicursorMode()
     return cache.getOrPut(guicursorMode) {
       val attributes = OptionsManager.guicursor.getAttributes(guicursorMode)
@@ -150,8 +162,7 @@ private class DefaultCaretVisualAttributesProvider : CaretVisualAttributesProvid
   }
 
   override fun setBarCursor(editor: Editor) {
-    editor.caretModel.primaryCaret.visualAttributes =
-      CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BAR, 0.25F)
+    editor.caretModel.primaryCaret.visualAttributes = BAR
   }
 
   override fun clearCache() {
@@ -162,9 +173,21 @@ private class DefaultCaretVisualAttributesProvider : CaretVisualAttributesProvid
 // For 2021.1 and below
 private class LegacyCaretVisualAttributesProvider : CaretVisualAttributesProvider {
   override fun setPrimaryCaretVisualAttributes(editor: Editor) {
-    when (OptionsManager.guicursor.getAttributes(editor.guicursorMode()).type) {
-      GuiCursorType.BLOCK, GuiCursorType.HOR -> editor.settings.isBlockCursor = true
-      GuiCursorType.VER -> editor.settings.isBlockCursor = false
+    if (isBlockCursorOverride()) {
+      setBlockCursor(editor, true)
+    }
+    else {
+      // The default for REPLACE is hor20. It makes more sense to map HOR to a block, but REPLACE has traditionally been
+      // drawn the same as INSERT, as a bar. If the 'guicursor' option is still at default, keep REPLACE a bar
+      if (OptionsManager.guicursor.isDefault && editor.guicursorMode() == GuiCursorMode.REPLACE) {
+        setBlockCursor(editor, false)
+      }
+      else {
+        when (OptionsManager.guicursor.getAttributes(editor.guicursorMode()).type) {
+          GuiCursorType.BLOCK, GuiCursorType.HOR -> setBlockCursor(editor, true)
+          GuiCursorType.VER -> setBlockCursor(editor, false)
+        }
+      }
     }
   }
 
@@ -178,6 +201,13 @@ private class LegacyCaretVisualAttributesProvider : CaretVisualAttributesProvide
     }
 
   override fun setBarCursor(editor: Editor) {
-    editor.settings.isBlockCursor = false
+    setBlockCursor(editor, false)
+  }
+
+  private fun setBlockCursor(editor: Editor, block: Boolean) {
+    // This setting really means "use block cursor in insert mode". When set, it swaps the bar/block + insert/overwrite
+    // relationship - the editor draws a bar for overwrite. To get a block at all times, the block cursor setting needs
+    // to match the insert mode.
+    editor.settings.isBlockCursor = if (block) editor.isInsertMode else !editor.isInsertMode
   }
 }

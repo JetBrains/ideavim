@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim.helper
 
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.CaretVisualAttributes
+import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -195,6 +196,20 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
     enterCommand("set guicursor+=i:hor75")
     typeText(parseKeys("i"))
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.UNDERSCORE, 0.75F)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test block caret setting overrides guicursor`() {
+    val originalValue = EditorSettingsExternalizable.getInstance().isBlockCursor
+    EditorSettingsExternalizable.getInstance().isBlockCursor = true
+    try {
+      configureByText("I found it in a legendary land")
+      typeText(parseKeys("i"))
+      assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 1.0F)
+    }
+    finally {
+      EditorSettingsExternalizable.getInstance().isBlockCursor = originalValue
+    }
   }
 
   private fun assertCaretVisualAttributes(expectedShape: CaretVisualAttributes.Shape, expectedThickness: Float) {
