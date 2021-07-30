@@ -33,27 +33,32 @@ object Executor {
   var executingVimScript = false
 
   @kotlin.jvm.Throws(ExException::class)
-  fun execute(script: String, editor: Editor?, context: DataContext?, skipHistory: Boolean) {
-    try {
-      val executableUnit = VimscriptParser.parse(script)
-      val vimContext = VimContext()
-      executableUnit.execute(editor, context, vimContext, skipHistory)
-    } catch (e: ExException) {
-      VimPlugin.showMessage(e.message)
-      VimPlugin.indicateError()
+  fun execute(scriptString: String, editor: Editor?, context: DataContext?, skipHistory: Boolean, indicateErrors: Boolean = true) {
+    val script = VimscriptParser.parse(scriptString)
+    val vimContext = VimContext()
+    for (unit in script.units) {
+      try {
+        unit.execute(editor, context, vimContext, skipHistory)
+      } catch (e: ExException) {
+        if (indicateErrors) {
+          VimPlugin.showMessage(e.message)
+          VimPlugin.indicateError()
+        } else {
+          logger.warn("Failed while executing $unit. " + e.message)
+        }
+      }
     }
   }
 
-  fun execute(script: String, skipHistory: Boolean = true) {
-    execute(script, null, null, skipHistory)
+  fun execute(scriptString: String, skipHistory: Boolean = true) {
+    execute(scriptString, null, null, skipHistory)
   }
 
   @JvmStatic
   fun executeFile(file: File) {
     try {
-      execute(file.readText(), false)
-    } catch (ignored: IOException) {
-    }
+      execute(file.readText(), null, null, skipHistory = true, indicateErrors = false)
+    } catch (ignored: IOException) { }
   }
 
   @kotlin.jvm.Throws(ExException::class)
