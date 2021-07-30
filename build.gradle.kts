@@ -20,6 +20,7 @@ buildscript {
 }
 
 plugins {
+    antlr
     java
     kotlin("jvm") version "1.5.0"
 
@@ -58,6 +59,11 @@ dependencies {
 
     testImplementation("com.intellij.remoterobot:remote-robot:$remoteRobotVersion")
     testImplementation("com.intellij.remoterobot:remote-fixtures:$remoteRobotVersion")
+
+    compileOnly("org.antlr:antlr4-runtime:4.9.2")
+    antlr("org.antlr:antlr4:4.9.2")
+
+    implementation("org.reflections:reflections:0.9.12")
 }
 
 // --- Compilation
@@ -136,6 +142,12 @@ tasks {
         ideVersions.set(listOf("IC-2020.2.3", "IC-2020.3.2", "IC-2021.1"))
         downloadDir.set("${project.buildDir}/pluginVerifier/ides")
         teamCityOutputFormat.set(true)
+    }
+
+    generateGrammarSource {
+        maxHeapSize = "128m"
+        arguments.addAll(listOf("-package", "com.maddyhome.idea.vim.vimscript.parser.generated", "-visitor"))
+        outputDirectory = file("src/com/maddyhome/idea/vim/vimscript/parser/generated")
     }
 }
 

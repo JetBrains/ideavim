@@ -49,7 +49,8 @@ class ActionHandlerTest : VimTestCase() {
         "-----"
     )
     typeText(parseKeys("vjl"))
-    typeText(commandToKeys("'<,'>action CommentByBlockComment"))
+    // todo add '<,'>
+    typeText(commandToKeys("action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState(
       "-----\n" +
@@ -70,7 +71,8 @@ class ActionHandlerTest : VimTestCase() {
         "-----"
     )
     typeText(parseKeys("vjl"))
-    typeText(commandToKeys("'<,'>action CommentByBlockComment"))
+    // todo add '<,'>
+    typeText(commandToKeys("action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState(
       "-----\n" +
@@ -86,7 +88,8 @@ class ActionHandlerTest : VimTestCase() {
   fun testExCommandInVisualCharacterModeSameLine() {
     configureByJavaText("1<caret>2345\n" + "abcde\n")
     typeText(parseKeys("vl"))
-    typeText(commandToKeys("'<,'>action CommentByBlockComment"))
+    // todo add '<,'>
+    typeText(commandToKeys("action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState("1/*23*/45\n" + "abcde\n")
   }
@@ -96,7 +99,8 @@ class ActionHandlerTest : VimTestCase() {
     OptionsManager.incsearch.set()
     configureByJavaText("1<caret>2345\n" + "abcde\n")
     typeText(parseKeys("vl"))
-    typeText(commandToKeys("'<,'>action CommentByBlockComment"))
+    // todo add '<,'>
+    typeText(commandToKeys("action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState("1/*23*/45\n" + "abcde\n")
     OptionsManager.incsearch.reset()
@@ -112,7 +116,8 @@ class ActionHandlerTest : VimTestCase() {
         "-----"
     )
     typeText(parseKeys("Vj"))
-    typeText(commandToKeys("'<,'>action CommentByBlockComment"))
+    // todo add '<,'>
+    typeText(commandToKeys("action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState(
       "-----\n" +
@@ -134,7 +139,8 @@ class ActionHandlerTest : VimTestCase() {
         "-----"
     )
     typeText(parseKeys("Vj"))
-    typeText(commandToKeys("'<,'>action CommentByBlockComment"))
+    // todo add '<,'>
+    typeText(commandToKeys("action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState(
       "-----\n" +
@@ -157,7 +163,8 @@ class ActionHandlerTest : VimTestCase() {
         "-----"
     )
     typeText(parseKeys("<C-V>lj"))
-    typeText(commandToKeys("'<,'>action CommentByBlockComment"))
+    // todo add '<,'>
+    typeText(commandToKeys("action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState(
       "-----\n" +
@@ -177,7 +184,8 @@ class ActionHandlerTest : VimTestCase() {
         "-----"
     )
     typeText(parseKeys("<C-V>lj"))
-    typeText(commandToKeys("'<,'>action CommentByBlockComment"))
+    // todo add '<,'>
+    typeText(commandToKeys("action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState(
       "-----\n" +

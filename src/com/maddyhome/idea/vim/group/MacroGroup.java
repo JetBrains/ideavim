@@ -165,4 +165,12 @@ public class MacroGroup {
                         stroke.getKeyChar() == KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_PRESSED : KeyEvent.KEY_TYPED,
                         System.currentTimeMillis(), stroke.getModifiers(), stroke.getKeyCode(), stroke.getKeyChar());
   }
+
+  public char getLastRegister() {
+    return lastRegister;
+  }
+
+  public void setLastRegister(char lastRegister) {
+    this.lastRegister = lastRegister;
+  }
 }

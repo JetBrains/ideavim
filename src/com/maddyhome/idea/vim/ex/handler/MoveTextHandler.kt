@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandParser
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.InvalidRangeException
@@ -36,6 +35,8 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.fileSize
+import com.maddyhome.idea.vim.vimscript.model.commands.Command
+import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import kotlin.math.min
 
 class MoveTextHandler : CommandHandler.SingleExecution() {
@@ -50,7 +51,8 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
     val texts = ArrayList<String>(caretCount)
     val ranges = ArrayList<TextRange>(caretCount)
     var line = editor.fileSize
-    val command = CommandParser.parse(cmd.argument)
+    val goToLineCommand = VimscriptParser.parseCommand(cmd.argument) as Command
+    val command = ExCommand(goToLineCommand.commandRanges, "", "", cmd.argument)
 
     var lastRange: TextRange? = null
     for (caret in carets) {

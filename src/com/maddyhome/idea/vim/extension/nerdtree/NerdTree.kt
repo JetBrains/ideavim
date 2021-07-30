@@ -44,7 +44,6 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.CommandAlias
 import com.maddyhome.idea.vim.common.CommandAliasHandler
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.group.KeyGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -56,6 +55,11 @@ import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.RequiredShortcut
 import com.maddyhome.idea.vim.key.RootNode
 import com.maddyhome.idea.vim.key.addLeafs
+import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
+import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.services.VariableService
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 import javax.swing.SwingConstants
@@ -283,7 +287,7 @@ class NerdTree : VimExtension {
     registerCommand("j", NerdAction.ToIj("Tree-selectNext"))
     registerCommand("k", NerdAction.ToIj("Tree-selectPrevious"))
     registerCommand(
-      "g:NERDTreeMapActivateNode", "o",
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapActivateNode"), "o",
       NerdAction.Code { project, dataContext, _ ->
         val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
 
@@ -301,7 +305,7 @@ class NerdTree : VimExtension {
       }
     )
     registerCommand(
-      "g:NERDTreeMapPreview", "go",
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapPreview"), "go",
       NerdAction.Code { _, dataContext, _ ->
         CommonDataKeys.NAVIGATABLE_ARRAY
           .getData(dataContext)
@@ -310,7 +314,7 @@ class NerdTree : VimExtension {
       }
     )
     registerCommand(
-      "g:NERDTreeMapOpenInTab", "t",
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapOpenInTab"), "t",
       NerdAction.Code { _, dataContext, _ ->
         // FIXME: 22.01.2021 Doesn't work correct
         CommonDataKeys.NAVIGATABLE_ARRAY
@@ -320,7 +324,7 @@ class NerdTree : VimExtension {
       }
     )
     registerCommand(
-      "g:NERDTreeMapOpenInTabSilent", "T",
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapOpenInTabSilent"), "T",
       NerdAction.Code { _, dataContext, _ ->
         // FIXME: 22.01.2021 Doesn't work correct
         CommonDataKeys.NAVIGATABLE_ARRAY
@@ -331,10 +335,10 @@ class NerdTree : VimExtension {
     )
 
     // TODO: 21.01.2021 Should option in left split
-    registerCommand("g:NERDTreeMapOpenVSplit", "s", NerdAction.ToIj("OpenInRightSplit"))
+    registerCommand(Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapOpenVSplit"), "s", NerdAction.ToIj("OpenInRightSplit"))
     // TODO: 21.01.2021 Should option in above split
     registerCommand(
-      "g:NERDTreeMapOpenSplit", "i",
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapOpenSplit"), "i",
       NerdAction.Code { project, _, event ->
         val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
         val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
@@ -343,7 +347,7 @@ class NerdTree : VimExtension {
       }
     )
     registerCommand(
-      "g:NERDTreeMapPreviewVSplit", "gs",
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapPreviewVSplit"), "gs",
       NerdAction.Code { project, context, event ->
         val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
         val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
@@ -355,7 +359,7 @@ class NerdTree : VimExtension {
       }
     )
     registerCommand(
-      "g:NERDTreeMapPreviewSplit", "gi",
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapPreviewSplit"), "gi",
       NerdAction.Code { project, context, event ->
         val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return@Code
         val splitters = FileEditorManagerEx.getInstanceEx(project).splitters
@@ -366,7 +370,7 @@ class NerdTree : VimExtension {
       }
     )
     registerCommand(
-      "g:NERDTreeMapOpenRecursively", "O",
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapOpenRecursively"), "O",
       NerdAction.Code { project, _, _ ->
         val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
         TreeExpandCollapse.expandAll(tree)
@@ -376,7 +380,7 @@ class NerdTree : VimExtension {
       }
     )
     registerCommand(
-      "g:NERDTreeMapCloseChildren", "X",
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapCloseChildren"), "X",
       NerdAction.Code { project, _, _ ->
         val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
         TreeExpandCollapse.collapse(tree)
@@ -386,7 +390,7 @@ class NerdTree : VimExtension {
       }
     )
     registerCommand(
-      "g:NERDTreeMapCloseDir", "x",
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapCloseDir"), "x",
       NerdAction.Code { project, _, _ ->
         val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
         val currentPath = tree.selectionPath ?: return@Code
@@ -402,9 +406,9 @@ class NerdTree : VimExtension {
         }
       }
     )
-    registerCommand("g:NERDTreeMapJumpRoot", "P", NerdAction.ToIj("Tree-selectFirst"))
+    registerCommand(Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapJumpRoot"), "P", NerdAction.ToIj("Tree-selectFirst"))
     registerCommand(
-      "g:NERDTreeMapJumpParent", "p",
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapJumpParent"), "p",
       NerdAction.Code { project, _, _ ->
         val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
         val currentPath = tree.selectionPath ?: return@Code
@@ -417,7 +421,7 @@ class NerdTree : VimExtension {
       }
     )
     registerCommand(
-      "g:NERDTreeMapJumpFirstChild", "K",
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapJumpFirstChild"), "K",
       NerdAction.Code { project, _, _ ->
         val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
         val currentPath = tree.selectionPath ?: return@Code
@@ -429,7 +433,7 @@ class NerdTree : VimExtension {
       }
     )
     registerCommand(
-      "g:NERDTreeMapJumpLastChild", "J",
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapJumpLastChild"), "J",
       NerdAction.Code { project, _, _ ->
         val tree = ProjectView.getInstance(project).currentProjectViewPane.tree
         val currentPath = tree.selectionPath ?: return@Code
@@ -450,13 +454,29 @@ class NerdTree : VimExtension {
         tree.scrollRowToVisible(expectedRow)
       }
     )
-    registerCommand("g:NERDTreeMapJumpNextSibling", "<C-J>", NerdAction.ToIj("Tree-selectNextSibling"))
-    registerCommand("g:NERDTreeMapJumpPrevSibling", "<C-K>", NerdAction.ToIj("Tree-selectPreviousSibling"))
-    registerCommand("g:NERDTreeMapRefresh", "r", NerdAction.ToIj("SynchronizeCurrentFile"))
-    registerCommand("g:NERDTreeMapRefreshRoot", "R", NerdAction.ToIj("Synchronize"))
-    registerCommand("g:NERDTreeMapMenu", "m", NerdAction.ToIj("ShowPopupMenu"))
-    registerCommand("g:NERDTreeMapQuit", "q", NerdAction.ToIj("HideActiveWindow"))
-    registerCommand("g:NERDTreeMapToggleZoom", "A", NerdAction.ToIj("MaximizeToolWindow"))
+    registerCommand(
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapJumpNextSibling"),
+      "<C-J>",
+      NerdAction.ToIj("Tree-selectNextSibling")
+    )
+    registerCommand(
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapJumpPrevSibling"),
+      "<C-K>",
+      NerdAction.ToIj("Tree-selectPreviousSibling")
+    )
+    registerCommand(
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapRefresh"),
+      "r",
+      NerdAction.ToIj("SynchronizeCurrentFile")
+    )
+    registerCommand(Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapRefreshRoot"), "R", NerdAction.ToIj("Synchronize"))
+    registerCommand(Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapMenu"), "m", NerdAction.ToIj("ShowPopupMenu"))
+    registerCommand(Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapQuit"), "q", NerdAction.ToIj("HideActiveWindow"))
+    registerCommand(
+      Variable(Scope.GLOBAL_VARIABLE, "NERDTreeMapToggleZoom"),
+      "A",
+      NerdAction.ToIj("MaximizeToolWindow")
+    )
 
     registerCommand(
       "/",
@@ -501,8 +521,14 @@ class NerdTree : VimExtension {
       VimPlugin.getCommand().setAlias(alias, CommandAlias.Call(0, -1, alias, handler))
     }
 
-    private fun registerCommand(variable: String, default: String, action: NerdAction) {
-      val mappings = VimScriptGlobalEnvironment.getInstance().variables.getOrDefault(variable, default).toString()
+    private fun registerCommand(variable: Variable, default: String, action: NerdAction) {
+      // fixme here we assume that scope is global
+      val variableValue = VariableService.getNullableVariableValue(variable, null, null, VimContext())
+      val mappings = if (variableValue is VimString) {
+        variableValue.value
+      } else {
+        default
+      }
       actionsRoot.addLeafs(mappings, action)
     }
 

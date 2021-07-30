@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.RangeMarker
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandParser
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.ex.ranges.LineRange
@@ -36,6 +35,7 @@ import com.maddyhome.idea.vim.helper.MessageHelper.message
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.regexp.CharPointer
 import com.maddyhome.idea.vim.regexp.RegExp
+import com.maddyhome.idea.vim.vimscript.Executor
 
 class GlobalHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
@@ -202,9 +202,9 @@ class GlobalHandler : CommandHandler.SingleExecution() {
     // TODO: 26.05.2021 What about folds?
     editor.caretModel.moveToOffset(lineStartOffset)
     if (cmd == null || cmd.isEmpty() || (cmd.length == 1 && cmd[0] == '\n')) {
-      CommandParser.processCommand(editor, context, "p", 1, skipHistory = true)
+      Executor.execute("p", editor, context, true)
     } else {
-      CommandParser.processCommand(editor, context, cmd, 1, skipHistory = true)
+      Executor.execute(cmd, editor, context, true)
     }
   }
 

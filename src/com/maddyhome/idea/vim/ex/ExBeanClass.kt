@@ -37,7 +37,7 @@ class ExBeanClass : BaseKeyedLazyInstance<CommandHandler>() {
       logger<ExBeanClass>().error("IdeaVim doesn't accept contributions to `vimActions` extension points. Please create a plugin using `VimExtension`. Plugin to blame: ${this.pluginDescriptor.pluginId}")
       return
     }
-    CommandParser.addHandler(this)
+    ExCommand.addHandler(this)
   }
 }
 

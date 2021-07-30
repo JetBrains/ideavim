@@ -19,8 +19,8 @@ package org.jetbrains.plugins.ideavim.ex.handler.mapping
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.vimscript.Executor
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -259,7 +259,7 @@ n  ,f            <Plug>Foo
   // VIM-676 |:map|
   fun testBackspaceCharacterInVimRc() {
     configureByText("\n")
-    VimScriptParser.executeText(VimScriptParser.readText("inoremap # X\u0008#\n"))
+    Executor.execute("inoremap # X\u0008#\n")
     typeText(StringHelper.parseKeys("i", "#", "<Esc>"))
     assertState("#\n")
     assertMode(CommandState.Mode.COMMAND)
@@ -277,7 +277,7 @@ n  ,f            <Plug>Foo
   
       """.trimIndent()
     )
-    VimScriptParser.executeText(VimScriptParser.readText("map \u0018i dd\n"))
+    Executor.execute("map \u0018i dd\n", true)
     typeText(StringHelper.parseKeys("i", "#", "<Esc>"))
     assertState(
       """
@@ -297,7 +297,7 @@ n  ,f            <Plug>Foo
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT)
   fun testBarCtrlVEscaped() {
     configureByText("${c}foo\n")
-    VimScriptParser.executeText(listOf("imap a b \u0016|\u0016| c |\n"))
+    Executor.execute("imap a b \u0016|\u0016| c |\n")
     typeText(StringHelper.parseKeys("ia"))
     assertState("b || c foo\n")
   }
@@ -306,7 +306,7 @@ n  ,f            <Plug>Foo
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "bad term codes")
   fun testCtrlMCtrlLAsNewLine() {
     configureByText("${c}foo\n")
-    VimScriptParser.executeText(listOf("map A :%s/foo/bar/g\r\u000C\n"))
+    Executor.execute("map A :%s/foo/bar/g\r\u000C\n")
     typeText(StringHelper.parseKeys("A"))
     assertState("bar\n")
   }
@@ -322,7 +322,7 @@ n  ,f            <Plug>Foo
   // VIM-700 |:map|
   fun testRemappingZeroStillAllowsZeroToBeUsedInCount() {
     configureByText("a${c}bcdefghijklmnop\n")
-    VimScriptParser.executeText(listOf("map 0 ^"))
+    Executor.execute("map 0 ^")
     typeText(StringHelper.parseKeys("10~"))
     assertState("aBCDEFGHIJKlmnop\n")
   }

@@ -24,20 +24,15 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 
-class SetHandlerHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
+class SetHandlerHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     return doCommand(cmd)
-  }
-
-  override fun execute(cmd: ExCommand) {
-    doCommand(cmd)
   }
 
   private fun doCommand(cmd: ExCommand): Boolean {

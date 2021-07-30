@@ -61,7 +61,9 @@ If you are looking for:
 
 - Ex commands (`:set`, `:s`, `:nohlsearch`):
     - Any particular ex command: package `com.maddyhome.idea.vim.ex.handler`.
-    - Ex command executor: `CommandHandler`.
+    - Vim script grammar: `Vimscript.g4`.
+    - Vim script parsing: package `com.maddyhome.idea.vim.vimscript.parser`.
+    - Vim script executor: `Executor`.
 
 - Extensions:
     - Extensions handler: `VimExtensionHandler`.

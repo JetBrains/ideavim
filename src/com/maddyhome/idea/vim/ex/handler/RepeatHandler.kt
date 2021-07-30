@@ -25,11 +25,11 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_SAVE_LAST
 import com.maddyhome.idea.vim.ex.CommandHandlerFlags
-import com.maddyhome.idea.vim.ex.CommandParser
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.vimscript.Executor
 
 class RepeatHandler : CommandHandler.ForEachCaret() {
   override val argFlags: CommandHandlerFlags =
@@ -51,13 +51,13 @@ class RepeatHandler : CommandHandler.ForEachCaret() {
     )
 
     if (arg == ':') {
-      return CommandParser.processLastCommand(editor, context, 1)
+      return Executor.executeLastCommand(editor, context)
     }
 
     val reg = VimPlugin.getRegister().getPlaybackRegister(arg) ?: return false
     val text = reg.text ?: return false
 
-    CommandParser.processCommand(editor, context, text, 1)
+    Executor.execute(text, editor, context, false)
     return true
   }
 }

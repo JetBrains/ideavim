@@ -32,18 +32,13 @@ import com.maddyhome.idea.vim.ex.ComplicatedNameExCommand
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 
-class UnMapHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler, ComplicatedNameExCommand {
+class UnMapHandler : CommandHandler.SingleExecution(), ComplicatedNameExCommand {
   override val argFlags: CommandHandlerFlags = flags(RANGE_FORBIDDEN, ARGUMENT_REQUIRED, READ_ONLY)
   override val names: Array<CommandName> = COMMAND_NAMES
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean = executeCommand(cmd)
-
-  override fun execute(cmd: ExCommand) {
-    executeCommand(cmd)
-  }
 
   private fun executeCommand(cmd: ExCommand): Boolean {
     val commandInfo = COMMAND_INFOS.find { cmd.command.startsWith(it.prefix) } ?: return false

@@ -25,7 +25,6 @@ import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
@@ -33,6 +32,7 @@ import com.maddyhome.idea.vim.helper.TestInputModel;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
+import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,7 +62,7 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
   @Override
   protected void tearDown() throws Exception {
     ExEntryPanel.getInstance().deactivate(false);
-    VimScriptGlobalEnvironment.getInstance().getVariables().clear();
+    VariableService.INSTANCE.clear();
     Timer swingTimer = VimVisualTimer.INSTANCE.getSwingTimer();
     if (swingTimer != null) {
       swingTimer.stop();

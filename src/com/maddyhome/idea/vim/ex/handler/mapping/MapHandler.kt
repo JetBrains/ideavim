@@ -32,7 +32,6 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.ex.handler.mapping.MapHandler.SpecialArgument.EXPR
 import com.maddyhome.idea.vim.ex.handler.mapping.MapHandler.SpecialArgument.SCRIPT
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.MappingOwner
 import org.jetbrains.annotations.NonNls
@@ -42,7 +41,7 @@ import javax.swing.KeyStroke
 /**
  * @author vlan
  */
-class MapHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler, ComplicatedNameExCommand {
+class MapHandler : CommandHandler.SingleExecution(), ComplicatedNameExCommand {
   override val names: Array<CommandName> = COMMAND_NAMES
   override val argFlags: CommandHandlerFlags =
     flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
@@ -50,11 +49,6 @@ class MapHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler, Co
   @Throws(ExException::class)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     return executeCommand(cmd, editor)
-  }
-
-  @Throws(ExException::class)
-  override fun execute(cmd: ExCommand) {
-    executeCommand(cmd, null)
   }
 
   @Throws(ExException::class)

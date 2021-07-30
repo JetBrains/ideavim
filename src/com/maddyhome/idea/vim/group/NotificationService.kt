@@ -39,7 +39,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
@@ -47,6 +46,7 @@ import com.maddyhome.idea.vim.listener.FindActionId
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
+import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import java.awt.datatransfer.StringSelection
 import java.io.File
 import javax.swing.KeyStroke
@@ -238,12 +238,12 @@ class NotificationService(private val project: Project?) {
 
   @Suppress("DialogTitleCapitalization")
   class OpenIdeaVimRcAction(private val notification: Notification?) : DumbAwareAction(
-    if (VimScriptParser.findIdeaVimRc() != null) "Open ~/.ideavimrc" else "Create ~/.ideavimrc"
+    if (VimRcService.findIdeaVimRc() != null) "Open ~/.ideavimrc" else "Create ~/.ideavimrc"
   )/*, LightEditCompatible*/ {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project
       if (eventProject != null) {
-        val ideaVimRc = VimScriptParser.findOrCreateIdeaVimRc()
+        val ideaVimRc = VimRcService.findOrCreateIdeaVimRc()
         if (ideaVimRc != null) {
           OpenFileAction.openFile(ideaVimRc.path, eventProject)
           // Do not expire a notification. The user should see what they are entering
@@ -259,7 +259,7 @@ class NotificationService(private val project: Project?) {
 
     override fun update(e: AnActionEvent) {
       super.update(e)
-      val actionText = if (VimScriptParser.findIdeaVimRc() != null) "Open ~/.ideavimrc" else "Create ~/.ideavimrc"
+      val actionText = if (VimRcService.findIdeaVimRc() != null) "Open ~/.ideavimrc" else "Create ~/.ideavimrc"
       e.presentation.text = actionText
     }
   }
@@ -275,7 +275,7 @@ class NotificationService(private val project: Project?) {
       val eventProject = e.project
       enableOption()
       if (eventProject != null) {
-        val ideaVimRc = VimScriptParser.findOrCreateIdeaVimRc()
+        val ideaVimRc = VimRcService.findOrCreateIdeaVimRc()
         if (ideaVimRc != null && ideaVimRc.canWrite()) {
           ideaVimRc.appendText(appendableText)
           notification.expire()

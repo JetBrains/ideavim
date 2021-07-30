@@ -21,13 +21,13 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.extensions.ExtensionPointListener
 import com.intellij.openapi.extensions.PluginDescriptor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.OptionsManager.addOption
 import com.maddyhome.idea.vim.option.OptionsManager.isSet
 import com.maddyhome.idea.vim.option.OptionsManager.removeOption
 import com.maddyhome.idea.vim.option.ToggleOption
+import com.maddyhome.idea.vim.vimscript.Executor
 
 object VimExtensionRegistrar {
   private val registeredExtensions: MutableSet<String> = HashSet()
@@ -77,7 +77,7 @@ object VimExtensionRegistrar {
   }
 
   private fun initExtension(extensionBean: ExtensionBeanClass, name: String) {
-    if (VimScriptParser.executingVimScript) {
+    if (Executor.executingVimScript) {
       delayedExtensionEnabling += extensionBean
     } else {
       extensionBean.instance.init()

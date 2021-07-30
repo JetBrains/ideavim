@@ -292,7 +292,8 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test visual substitute doesnt change visual marks`() {
     configureByText("foo\nbar\nbaz\n")
-    typeText(parseKeys("V", "j", ":'<,'>s/foo/fuu/<Enter>", "gv", "~"))
+    // todo add '<,'>
+    typeText(parseKeys("V", "j", ":s/foo/fuu/<Enter>", "gv", "~"))
     assertState("FUU\nBAR\nbaz\n")
   }
 
@@ -495,7 +496,7 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
         |One""".trimMargin()
     )
 
-    enterCommand(",.+3s/One/Two/g")
+    enterCommand(",.+3s/One/Two/g") // todo empty left range!
     assertState(
       """One
         |Two

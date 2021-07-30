@@ -30,7 +30,6 @@ import com.maddyhome.idea.vim.ex.CommandHandlerFlags
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
 import com.maddyhome.idea.vim.group.CommandGroup.Companion.BLACKLISTED_ALIASES
 import com.maddyhome.idea.vim.helper.MessageHelper
 import org.jetbrains.annotations.NonNls
@@ -38,7 +37,7 @@ import org.jetbrains.annotations.NonNls
 /**
  * @author Elliot Courant
  */
-class CmdHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
+class CmdHandler : CommandHandler.SingleExecution() {
   override val argFlags: CommandHandlerFlags = flags(RANGE_FORBIDDEN, ARGUMENT_OPTIONAL, READ_ONLY)
 
   // Static definitions needed for aliases.
@@ -53,11 +52,6 @@ class CmdHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
     const val zeroOrOneArguments = "?"
     const val moreThanZeroArguments = "+"
   }
-
-  override fun execute(cmd: ExCommand) {
-    this.addAlias(cmd, null)
-  }
-
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     if (cmd.argument.trim().isEmpty()) {
       return this.listAlias(editor, "")

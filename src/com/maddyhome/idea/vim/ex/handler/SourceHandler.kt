@@ -23,23 +23,18 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
+import com.maddyhome.idea.vim.vimscript.Executor
 import java.io.File
 
 /**
  * @author vlan
  */
-class SourceHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
+class SourceHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-    execute(cmd)
-    return true
-  }
-
-  override fun execute(cmd: ExCommand) {
     val path = expandUser(cmd.argument.trim())
-    VimScriptParser.executeFile(File(path))
+    Executor.executeFile(File(path))
+    return true
   }
 
   private fun expandUser(path: String): String {

@@ -72,7 +72,10 @@
       <with attribute="implementation" implements="com.maddyhome.idea.vim.extension.VimExtension"/>
 
     </extensionPoint>
-
+    <extensionPoint name="vimLibraryFunction"
+                    beanClass="com.maddyhome.idea.vim.vimscript.model.functions.FunctionBeanClass" dynamic="true">
+      <with attribute="implementation" implements="com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler"/>
+    </extensionPoint>
     <!--    For internal use only -->
     <extensionPoint name="vimExCommand" beanClass="com.maddyhome.idea.vim.ex.ExBeanClass" dynamic="true">
       <with attribute="implementation" implements="com.maddyhome.idea.vim.ex.CommandHandler"/>
@@ -108,6 +111,7 @@
   <xi:include href="/META-INF/includes/VimExCommands.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/includes/VimExtensions.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/includes/VimListeners.xml" xpointer="xpointer(/idea-plugin/*)"/>
+  <xi:include href="/META-INF/includes/VimLibraryFunctions.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
   <actions resource-bundle="messages.IdeaVimBundle">
     <action id="VimPluginToggle" class="com.maddyhome.idea.vim.action.VimPluginToggleAction">

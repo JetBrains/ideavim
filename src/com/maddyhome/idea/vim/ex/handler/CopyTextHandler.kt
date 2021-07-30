@@ -23,11 +23,12 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandParser
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.vimscript.model.commands.Command
+import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 
 class CopyTextHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
@@ -38,7 +39,8 @@ class CopyTextHandler : CommandHandler.SingleExecution() {
       val range = cmd.getTextRange(editor, caret, false)
       val text = EditorHelper.getText(editor, range.startOffset, range.endOffset)
 
-      val arg = CommandParser.parse(cmd.argument)
+      val goToLineCommand = VimscriptParser.parseCommand(cmd.argument) as Command
+      val arg = ExCommand(goToLineCommand.commandRanges, "", "", cmd.argument)
       val line = arg.ranges.getFirstLine(editor, caret)
 
       val transferableData = VimPlugin.getRegister().getTransferableData(editor, range, text)

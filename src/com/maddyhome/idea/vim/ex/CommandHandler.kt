@@ -126,7 +126,7 @@ sealed class CommandHandler {
    * @throws ExException if the range or argument is invalid or unable to run the command
    */
   @Throws(ExException::class)
-  fun process(editor: Editor, context: DataContext, cmd: ExCommand, count: Int): Boolean {
+  fun process(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
 
     checkArgs(cmd)
 
@@ -140,8 +140,7 @@ sealed class CommandHandler {
         is ForEachCaret -> {
           editor.caretModel.runForEachCaret(
             { caret ->
-              var i = 0
-              while (i++ < count && res.get()) {
+              if (res.get()) {
                 res.set(execute(editor, caret, context, cmd))
               }
             },
@@ -149,10 +148,7 @@ sealed class CommandHandler {
           )
         }
         is SingleExecution -> {
-          var i = 0
-          while (i++ < count && res.get()) {
-            res.set(execute(editor, context, cmd))
-          }
+          res.set(execute(editor, context, cmd))
         }
       }
 

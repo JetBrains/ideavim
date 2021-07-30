@@ -92,4 +92,25 @@ class MacroActionTest : VimTestCase() {
     val registerSize = register!!.keys.size
     TestCase.assertEquals(9, registerSize)
   }
+
+  fun `test last command`() {
+    val content = "${c}0\n1\n2\n3\n"
+    configureByText(content)
+    typeText(parseKeys(":d<CR>", "@:"))
+    assertState("2\n3\n")
+  }
+
+  fun `test last command with count`() {
+    val content = "${c}0\n1\n2\n3\n4\n5\n"
+    configureByText(content)
+    typeText(parseKeys(":d<CR>", "4@:"))
+    assertState("5\n")
+  }
+
+  fun `test last command as last macro with count`() {
+    val content = "${c}0\n1\n2\n3\n4\n5\n"
+    configureByText(content)
+    typeText(parseKeys(":d<CR>", "@:", "3@@"))
+    assertState("5\n")
+  }
 }

@@ -42,8 +42,6 @@ import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
 import com.maddyhome.idea.vim.config.VimState;
 import com.maddyhome.idea.vim.config.migration.ApplicationConfigurationMigrator;
-import com.maddyhome.idea.vim.ex.CommandParser;
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser;
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar;
 import com.maddyhome.idea.vim.group.*;
 import com.maddyhome.idea.vim.group.copy.PutGroup;
@@ -54,8 +52,9 @@ import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
-import com.maddyhome.idea.vim.ui.VimRcFileState;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
+import com.maddyhome.idea.vim.ex.ExCommand;
+import com.maddyhome.idea.vim.vimscript.services.FunctionStorage;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -63,11 +62,10 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
-import java.io.File;
-import java.util.List;
 
 import static com.maddyhome.idea.vim.group.EditorGroup.EDITOR_STORE_ELEMENT;
 import static com.maddyhome.idea.vim.group.KeyGroup.SHORTCUT_CONFLICTS_ELEMENT;
+import static com.maddyhome.idea.vim.vimscript.services.VimRcService.executeIdeaVimRc;
 
 /**
  * This plugin attempts to emulate the key binding and general functionality of Vim and gVim. See the supplied
@@ -238,27 +236,10 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     ideavimrcRegistered = true;
 
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      try {
-        VimScriptParser.INSTANCE.setExecutingVimScript(true);
-        executeIdeaVimRc();
-      }
-      finally {
-        VimScriptParser.INSTANCE.setExecutingVimScript(false);
-      }
+      executeIdeaVimRc();
     }
   }
 
-  public void executeIdeaVimRc() {
-    final File ideaVimRc = VimScriptParser.findIdeaVimRc();
-    if (ideaVimRc != null) {
-      LOG.info("Execute ideavimrc file: " + ideaVimRc.getAbsolutePath());
-      List<String> parsedLines = VimScriptParser.executeFile(ideaVimRc);
-      VimRcFileState.INSTANCE.saveFileState(ideaVimRc.getAbsolutePath(), parsedLines);
-    }
-    else {
-      LOG.info("ideavimrc file isn't found");
-    }
-  }
 
   public static @NotNull PluginId getPluginId() {
     return PluginId.getId(IDEAVIM_PLUGIN_ID);
@@ -359,10 +340,13 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     RegisterActions.registerActions();
 
     // Register ex handlers
-    CommandParser.INSTANCE.registerHandlers();
+    ExCommand.CommandHandlersTree.registerHandlers();
 
     // Register extensions
     VimExtensionRegistrar.registerExtensions();
+
+    // Register functions
+    FunctionStorage.INSTANCE.registerHandlers();
 
     // Execute ~/.ideavimrc
     registerIdeavimrc();
@@ -391,7 +375,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     RegisterActions.unregisterActions();
 
     // Unregister ex handlers
-    CommandParser.INSTANCE.unregisterHandlers();
+    ExCommand.CommandHandlersTree.unregisterHandlers();
   }
 
   private boolean stateUpdated = false;

@@ -32,13 +32,17 @@ import com.intellij.openapi.util.Disposer
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimProjectService
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.listener.VimYankListener
 import com.maddyhome.idea.vim.option.StrictMode
+import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
+import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.services.VariableService
 import org.jetbrains.annotations.NonNls
 import java.awt.Color
 import java.awt.Font
@@ -48,10 +52,10 @@ import java.util.concurrent.TimeUnit
 const val DEFAULT_HIGHLIGHT_DURATION: Long = 300
 
 @NonNls
-private const val HIGHLIGHT_DURATION_VARIABLE_NAME = "g:highlightedyank_highlight_duration"
+private val HIGHLIGHT_DURATION_VARIABLE_NAME = Variable(Scope.GLOBAL_VARIABLE, "highlightedyank_highlight_duration")
 
 @NonNls
-private const val HIGHLIGHT_COLOR_VARIABLE_NAME = "g:highlightedyank_highlight_color"
+private val HIGHLIGHT_COLOR_VARIABLE_NAME = Variable(Scope.GLOBAL_VARIABLE, "highlightedyank_highlight_color")
 private var defaultHighlightTextColor: Color? = null
 
 private fun getDefaultHighlightTextColor(): Color {
@@ -199,17 +203,17 @@ class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
       }
     }
 
-    private fun <T> extractVariable(variableName: String, default: T, extractFun: (value: String) -> T): T {
-      val env = VimScriptGlobalEnvironment.getInstance()
-      val value = env.variables[variableName]
+    private fun <T> extractVariable(variable: Variable, default: T, extractFun: (value: String) -> T): T {
+      // todo something smarter
+      val value = VariableService.getNullableVariableValue(variable, null, null, VimContext())
 
-      if (value is String) {
+      if (value is VimString) {
         return try {
-          extractFun(value)
+          extractFun(value.value)
         } catch (e: Exception) {
           @VimNlsSafe val message = MessageHelper.message(
             "highlightedyank.invalid.value.of.0.1",
-            variableName,
+            (if (variable.scope != null) variable.scope.c + ":" + variable.name else variable.name),
             e.message ?: ""
           )
           VimPlugin.showMessage(message)

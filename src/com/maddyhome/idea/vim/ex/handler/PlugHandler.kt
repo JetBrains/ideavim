@@ -27,20 +27,15 @@ import com.maddyhome.idea.vim.ex.CommandHandler.RangeFlag.RANGE_FORBIDDEN
 import com.maddyhome.idea.vim.ex.CommandHandlerFlags
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 
 /**
  * This handler is created to support `Plug` command from vim-plug and `Plugin` command from vundle.
  */
-class PlugHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
+class PlugHandler : CommandHandler.SingleExecution() {
   override val argFlags: CommandHandlerFlags = flags(RANGE_FORBIDDEN, ARGUMENT_REQUIRED, READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean = doExecute(cmd)
-
-  override fun execute(cmd: ExCommand) {
-    doExecute(cmd)
-  }
 
   private fun doExecute(cmd: ExCommand): Boolean {
     val argument = cmd.argument

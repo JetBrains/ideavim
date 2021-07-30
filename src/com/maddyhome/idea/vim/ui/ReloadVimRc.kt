@@ -30,14 +30,13 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
-import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup.Companion.ACTION_GROUP
+import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import com.maddyhome.idea.vim.vimscript.services.VimRcService
+import com.maddyhome.idea.vim.vimscript.services.VimRcService.executeIdeaVimRc
 import icons.VimIcons
-import it.unimi.dsi.fastutil.ints.IntArrayList
 import org.jetbrains.annotations.TestOnly
-import java.util.regex.Pattern
 
 /**
  * This file contains a "reload ~/.ideavimrc file" action functionality.
@@ -50,43 +49,38 @@ import java.util.regex.Pattern
  */
 
 object VimRcFileState {
-  // List of hashes of non-empty trimmed lines
-  private val state = IntArrayList()
+  // Hash of .ideavimrc parsed to Script class
+  private var state: Int? = null
 
   // ModificationStamp. Can be taken only from document. Doesn't play a big role, but can help speed up [equalTo]
   private var modificationStamp = 0L
-
-  // This is a pattern used in ideavimrc parsing for a long time. It removes all trailing/leading spaced and blank lines
-  @Suppress("unused")
-  private val EOL_SPLIT_PATTERN = Pattern.compile(" *(\r\n|\n)+ *")
 
   var filePath: String? = null
 
   private val saveStateListeners = ArrayList<() -> Unit>()
 
-  fun saveFileState(filePath: String, data: List<String>) {
+  fun saveFileState(filePath: String, text: String) {
     this.filePath = FileUtil.toSystemDependentName(filePath)
-
-    state.clear()
-    for (line in data) {
-      state.add(line.hashCode())
-    }
-
+    val script = VimscriptParser.parse(text)
+    state = script.hashCode()
     saveStateListeners.forEach { it() }
+  }
+
+  fun saveFileState(filePath: String) {
+    val vimRcFile = VimRcService.findIdeaVimRc()
+    val ideaVimRcText = vimRcFile?.readText() ?: ""
+    saveFileState(filePath, ideaVimRcText)
   }
 
   fun equalTo(document: Document): Boolean {
     val fileModificationStamp = document.modificationStamp
     if (fileModificationStamp == modificationStamp) return true
 
-    val stateSize = state.size
-    var i = 0
-    VimScriptParser.readText(document.charsSequence).forEach { line ->
-      if (i >= stateSize) return false
-      if (state.getInt(i) != line.hashCode()) return false
-      i++
+    val documentString = document.charsSequence.toString()
+    val script = VimscriptParser.parse(documentString)
+    if (script.hashCode() != state) {
+      return false
     }
-    if (i < stateSize) return false
 
     modificationStamp = fileModificationStamp
     return true
@@ -94,7 +88,7 @@ object VimRcFileState {
 
   @TestOnly
   fun clear() {
-    state.clear()
+    state = null
     modificationStamp = 0
     filePath = null
   }
@@ -138,10 +132,8 @@ class ReloadVimRc : DumbAwareAction() {
 
   override fun actionPerformed(e: AnActionEvent) {
     val editor = e.getData(PlatformDataKeys.EDITOR) ?: return
-
     FileDocumentManager.getInstance().saveDocumentAsIs(editor.document)
-
-    VimPlugin.getInstance().executeIdeaVimRc()
+    executeIdeaVimRc()
   }
 }
 

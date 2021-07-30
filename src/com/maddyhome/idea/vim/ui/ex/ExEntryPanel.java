@@ -29,7 +29,6 @@ import com.intellij.openapi.editor.ScrollingModel;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
@@ -39,6 +38,7 @@ import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ExPanelBorder;
+import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -312,7 +312,7 @@ public class ExEntryPanel extends JPanel {
     private @Nullable ExCommand getIncsearchCommand(@Nullable String commandText) {
       if (commandText == null) return null;
       try {
-        final ExCommand exCommand = CommandParser.INSTANCE.parse(commandText);
+        final ExCommand exCommand = (ExCommand) VimscriptParser.INSTANCE.parseCommand(commandText);
         final String command = exCommand.getCommand();
         // TODO: Add global, vglobal, smagic and snomagic here when the commands are supported
         if ("substitute".startsWith(command)) {

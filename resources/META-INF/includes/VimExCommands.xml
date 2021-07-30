@@ -13,7 +13,6 @@
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.DumpLineHandler" names="dump[line]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.EditFileHandler" names="bro[wse],e[dit]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.ActionHandler" names="action"/>
-    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.EchoHandler" names="ec[ho]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.ExitHandler" names="qa[ll],quita[ll],wqa[ll],xa[ll]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.FileHandler" names="f[ile]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.FindClassHandler" names="cla[ss]"/>
@@ -25,7 +24,6 @@
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.HistoryHandler" names="his[tory]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.JoinLinesHandler" names="j[oin]"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.JumpsHandler" names="ju[mps]"/>
-    <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.LetHandler" names="let"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.mapping.MapHandler"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.mapping.UnMapHandler"/>
     <vimExCommand implementation="com.maddyhome.idea.vim.ex.handler.mapping.MapClearHandler"/>

@@ -48,7 +48,6 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.CommandState.SubMode
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -69,6 +68,7 @@ import com.maddyhome.idea.vim.option.OptionsManager.ideastrictmode
 import com.maddyhome.idea.vim.option.OptionsManager.resetAllOptions
 import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
+import com.maddyhome.idea.vim.vimscript.services.VariableService
 import org.assertj.core.api.Assertions
 import org.junit.Assert
 import java.util.function.Consumer
@@ -124,7 +124,7 @@ abstract class VimTestCase : UsefulTestCase() {
     bookmarkManager.validBookmarks.forEach(Consumer { bookmark: Bookmark? -> bookmarkManager.removeBookmark(bookmark!!) })
     SelectionVimListenerSuppressor.lock().use { myFixture.tearDown() }
     ExEntryPanel.getInstance().deactivate(false)
-    VimScriptGlobalEnvironment.getInstance().variables.clear()
+    VariableService.clear()
     VimPlugin.getRegister().resetRegisters()
     VimPlugin.getSearch().resetState()
     VimPlugin.getMark().resetAllMarks()
@@ -399,6 +399,11 @@ abstract class VimTestCase : UsefulTestCase() {
     Assert.assertNotNull("No Ex output", actual)
     Assert.assertEquals(expected, actual)
     NeovimTesting.typeCommand("<esc>", this)
+  }
+
+  fun assertNoExOutput() {
+    val actual = getInstance(myFixture.editor).text
+    Assert.assertNull("Ex output not null", actual)
   }
 
   fun assertPluginError(isError: Boolean) {
