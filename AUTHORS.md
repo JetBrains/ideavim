@@ -364,6 +364,10 @@ Contributors:
   [![icon][github]](https://github.com/nizienko)
   &nbsp;
   eugene nizienko
+* [![icon][mail]](mailto:x@lipp.fi)
+  [![icon][github]](https://github.com/lippfi)
+  &nbsp;
+  Filipp Vakhitov
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
