@@ -8,11 +8,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimContext
 
 object ContinueStatement : Executable {
 
-  override fun execute(
-    editor: Editor?,
-    context: DataContext?,
-    vimContext: VimContext,
-  ): ExecutionResult {
+  override fun execute(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
     return ExecutionResult.Continue
   }
 }

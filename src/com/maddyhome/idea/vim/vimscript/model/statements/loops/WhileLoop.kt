@@ -9,11 +9,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
 data class WhileLoop(val condition: Expression, val body: List<Executable>) : Executable {
 
-  override fun execute(
-    editor: Editor?,
-    context: DataContext?,
-    vimContext: VimContext,
-  ): ExecutionResult {
+  override fun execute(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
     while (condition.evaluate(editor, context, vimContext).asBoolean()) {
       for (statement in body) {

@@ -11,11 +11,7 @@ import com.maddyhome.idea.vim.vimscript.services.PatternService
 data class TryStatement(val tryBlock: TryBlock, val catchBlocks: List<CatchBlock>, val finallyBlock: FinallyBlock?) :
   Executable {
 
-  override fun execute(
-    editor: Editor?,
-    context: DataContext?,
-    vimContext: VimContext,
-  ): ExecutionResult {
+  override fun execute(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
     var uncaughtException: ExException? = null
     var result: ExecutionResult = ExecutionResult.Success
     try {
@@ -50,31 +46,19 @@ data class TryStatement(val tryBlock: TryBlock, val catchBlocks: List<CatchBlock
 }
 
 data class TryBlock(val body: List<Executable>) : Executable {
-  override fun execute(
-    editor: Editor?,
-    context: DataContext?,
-    vimContext: VimContext,
-  ): ExecutionResult {
+  override fun execute(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
     return executeBody(body, editor, context, vimContext)
   }
 }
 
 data class CatchBlock(val pattern: String, val body: List<Executable>) : Executable {
-  override fun execute(
-    editor: Editor?,
-    context: DataContext?,
-    vimContext: VimContext,
-  ): ExecutionResult {
+  override fun execute(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
     return executeBody(body, editor, context, vimContext)
   }
 }
 
 data class FinallyBlock(val body: List<Executable>) : Executable {
-  override fun execute(
-    editor: Editor?,
-    context: DataContext?,
-    vimContext: VimContext,
-  ): ExecutionResult {
+  override fun execute(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
     return executeBody(body, editor, context, vimContext)
   }
 }

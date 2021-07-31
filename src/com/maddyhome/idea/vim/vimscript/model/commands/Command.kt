@@ -40,11 +40,7 @@ sealed class Command(var commandRanges: Ranges) : Executable {
   }
 
   @Throws(ExException::class)
-  override fun execute(
-    editor: Editor?,
-    context: DataContext?,
-    vimContext: VimContext,
-  ): ExecutionResult {
+  override fun execute(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
 
     checkRanges()
 

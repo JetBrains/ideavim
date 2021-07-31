@@ -9,11 +9,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
 data class IfStatement(val conditionToBody: List<Pair<Expression, List<Executable>>>) : Executable {
 
-  override fun execute(
-    editor: Editor?,
-    context: DataContext?,
-    vimContext: VimContext,
-  ): ExecutionResult {
+  override fun execute(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
     var statementsToExecute: List<Executable>? = null
     for ((condition, statements) in conditionToBody) {
