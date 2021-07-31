@@ -56,9 +56,9 @@ functionRef:            (anyScope ':')? functionName;
 argumentsDeclaration:   (variableName WS* (WS*  ',' WS* variableName)*)?;
 command:
                         ':'* WS* range WS*                                                                              #GoToLineCommand
-                    |   ':'* WS* range? WS* ':'* WS* ECHO (WS+ expr)* WS*                                               #EchoCommand
-                    |   ':'* WS* range? WS* ':'* WS* LET WS* expr WS* assignmentOperator WS* expr WS*                   #LetCommand
-                    |   ':'* WS* range? DELF (replace)? WS+ functionRef                                                 #DelfunctionCommand
+                    |   ':'* WS* range? WS* ':'* WS* ECHO (WS+ expr)* WS* comment?                                      #EchoCommand
+                    |   ':'* WS* range? WS* ':'* WS* LET WS* expr WS* assignmentOperator WS* expr WS* comment?          #LetCommand
+                    |   ':'* WS* range? DELF (replace)? WS+ functionRef comment?                                        #DelfunctionCommand
                     |   ':'* WS* range? WS* ':'* WS* commandName (WS* commandArgument)?                                 #OtherCommand
 ;
 assignmentOperator:     '='|'+='|'-='|'*='|'/='|'%='|'.=';

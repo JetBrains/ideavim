@@ -14,8 +14,7 @@ data class DelfunctionCommand(
   val scope: Scope?,
   val name: String,
   val ignoreIfMissing: Boolean,
-  val commandString: String,
-) : Command.SingleExecution(ranges, commandString) {
+) : Command.SingleExecution(ranges) {
 
   override val argFlags = CommandHandlerFlags(RangeFlag.RANGE_FORBIDDEN, Access.READ_ONLY, emptySet())
 

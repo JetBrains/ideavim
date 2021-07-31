@@ -9,12 +9,11 @@ data class Script(val units: List<Executable>) : Executable {
     editor: Editor?,
     context: DataContext?,
     vimContext: VimContext,
-    skipHistory: Boolean,
   ): ExecutionResult {
     var latestResult: ExecutionResult = ExecutionResult.Success
     for (unit in units) {
       if (latestResult is ExecutionResult.Success) {
-        latestResult = unit.execute(editor, context, vimContext, skipHistory)
+        latestResult = unit.execute(editor, context, vimContext)
       } else {
         break
       }

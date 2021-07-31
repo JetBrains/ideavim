@@ -8,8 +8,8 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
-class EchoCommand(val ranges: Ranges, val args: List<Expression>, val commandString: String) :
-  Command.SingleExecution(ranges, commandString) {
+class EchoCommand(val ranges: Ranges, val args: List<Expression>) :
+  Command.SingleExecution(ranges) {
 
   override val argFlags = CommandHandlerFlags(RangeFlag.RANGE_FORBIDDEN, Access.READ_ONLY, emptySet())
 

@@ -23,6 +23,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.group.HistoryGroup
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import java.io.File
@@ -34,11 +35,14 @@ object Executor {
 
   @kotlin.jvm.Throws(ExException::class)
   fun execute(scriptString: String, editor: Editor?, context: DataContext?, skipHistory: Boolean, indicateErrors: Boolean = true) {
+    if (!skipHistory) {
+      VimPlugin.getHistory().addEntry(HistoryGroup.COMMAND, scriptString)
+    }
     val script = VimscriptParser.parse(scriptString)
     val vimContext = VimContext()
     for (unit in script.units) {
       try {
-        unit.execute(editor, context, vimContext, skipHistory)
+        unit.execute(editor, context, vimContext)
       } catch (e: ExException) {
         if (indicateErrors) {
           VimPlugin.showMessage(e.message)

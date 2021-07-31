@@ -12,7 +12,6 @@ object BreakStatement : Executable {
     editor: Editor?,
     context: DataContext?,
     vimContext: VimContext,
-    skipHistory: Boolean,
   ): ExecutionResult {
     return ExecutionResult.Break
   }

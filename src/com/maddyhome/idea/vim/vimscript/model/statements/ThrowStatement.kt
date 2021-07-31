@@ -14,7 +14,6 @@ data class ThrowStatement(val expression: Expression) : Executable {
     editor: Editor?,
     context: DataContext?,
     vimContext: VimContext,
-    skipHistory: Boolean,
   ): ExecutionResult {
     throw ExException(expression.evaluate(editor, context, vimContext).toString())
   }

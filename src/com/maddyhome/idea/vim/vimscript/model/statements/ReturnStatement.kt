@@ -13,7 +13,6 @@ data class ReturnStatement(val expression: Expression) : Executable {
     editor: Editor?,
     context: DataContext?,
     vimContext: VimContext,
-    skipHistory: Boolean,
   ): ExecutionResult {
     return ExecutionResult.Return(expression.evaluate(editor, context, vimContext))
   }

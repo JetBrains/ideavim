@@ -9,7 +9,6 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.MissingRangeException
 import com.maddyhome.idea.vim.ex.NoRangeAllowedException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.group.HistoryGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.exitVisualMode
@@ -20,13 +19,13 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 import java.util.*
 
-sealed class Command(var commandRanges: Ranges, val originalString: String) : Executable {
+sealed class Command(var commandRanges: Ranges) : Executable {
 
   abstract val argFlags: CommandHandlerFlags
   protected open val optFlags: EnumSet<CommandFlags> = noneOfEnum()
 
-  abstract class ForEachCaret(ranges: Ranges, originalString: String) :
-    Command(ranges, originalString = originalString) {
+  abstract class ForEachCaret(ranges: Ranges) :
+    Command(ranges) {
     abstract fun processCommand(
       editor: Editor,
       caret: Caret,
@@ -35,8 +34,8 @@ sealed class Command(var commandRanges: Ranges, val originalString: String) : Ex
     ): ExecutionResult
   }
 
-  abstract class SingleExecution(ranges: Ranges, originalString: String) :
-    Command(ranges, originalString = originalString) {
+  abstract class SingleExecution(ranges: Ranges) :
+    Command(ranges) {
     abstract fun processCommand(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult
   }
 
@@ -45,12 +44,8 @@ sealed class Command(var commandRanges: Ranges, val originalString: String) : Ex
     editor: Editor?,
     context: DataContext?,
     vimContext: VimContext,
-    skipHistory: Boolean,
   ): ExecutionResult {
 
-    if (!skipHistory) {
-      VimPlugin.getHistory().addEntry(HistoryGroup.COMMAND, originalString)
-    }
     checkRanges()
 
     var result: ExecutionResult = ExecutionResult.Success

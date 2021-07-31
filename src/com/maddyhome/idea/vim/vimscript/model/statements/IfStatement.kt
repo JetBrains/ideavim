@@ -13,7 +13,6 @@ data class IfStatement(val conditionToBody: List<Pair<Expression, List<Executabl
     editor: Editor?,
     context: DataContext?,
     vimContext: VimContext,
-    skipHistory: Boolean,
   ): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
     var statementsToExecute: List<Executable>? = null
@@ -26,7 +25,7 @@ data class IfStatement(val conditionToBody: List<Pair<Expression, List<Executabl
     if (statementsToExecute != null) {
       for (statement in statementsToExecute) {
         if (result is ExecutionResult.Success) {
-          result = statement.execute(editor, context, vimContext, skipHistory)
+          result = statement.execute(editor, context, vimContext)
         } else {
           break
         }

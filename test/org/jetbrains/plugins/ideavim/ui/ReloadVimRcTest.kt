@@ -71,6 +71,28 @@ class ReloadVimRcTest : VimTestCase() {
 //  }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test equalTo with whitespaces and comments`() {
+    val s = " " // Just to see whitespaces in the following code
+    val origFile = """
+      map x y|"comment
+      let g:x = 5
+      let g:y = 3 " another comment
+    """.trimIndent()
+    val changedFile = """
+      " comment
+      map x y
+      let g:x = ${s}${s}${s}5
+      let g:y = 3
+    """.trimIndent()
+
+    VimRcFileState.saveFileState("", origFile)
+
+    val document = editorFactory.createDocument(changedFile)
+
+    assertTrue(VimRcFileState.equalTo(document))
+  }
+
+  @TestWithoutNeovim(reason = SkipNeovimReason.NOT_VIM_TESTING)
   fun `test equalTo add line`() {
     val origFile = """
       map x y

@@ -11,8 +11,8 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 import java.lang.Integer.min
 
-data class GoToLineCommand(val ranges: Ranges, val commandString: String) :
-  Command.ForEachCaret(ranges, commandString) {
+data class GoToLineCommand(val ranges: Ranges) :
+  Command.ForEachCaret(ranges) {
 
   override val argFlags = CommandHandlerFlags(RangeFlag.RANGE_REQUIRED, Access.READ_ONLY, emptySet())
 

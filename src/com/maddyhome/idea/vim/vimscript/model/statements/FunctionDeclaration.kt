@@ -21,7 +21,6 @@ data class FunctionDeclaration(
     editor: Editor?,
     context: DataContext?,
     vimContext: VimContext,
-    skipHistory: Boolean,
   ): ExecutionResult {
     FunctionStorage.storeFunction(this, vimContext)
     return ExecutionResult.Success

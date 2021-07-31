@@ -14,8 +14,7 @@ data class SubstituteCommand(
   val variable: Expression,
   val operator: AssignmentOperator,
   val expression: Expression,
-  val commandString: String,
-) : Command.SingleExecution(ranges, commandString) {
+) : Command.SingleExecution(ranges) {
 
   override val argFlags = CommandHandlerFlags(RangeFlag.RANGE_OPTIONAL, Access.SELF_SYNCHRONIZED, emptySet())
 

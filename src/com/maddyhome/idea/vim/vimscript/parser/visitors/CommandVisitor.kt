@@ -121,7 +121,7 @@ object CommandVisitor : VimscriptBaseVisitor<Executable>() {
     val variable: Expression = expressionVisitor.visit(ctx.expr(0))
     val operator = getByValue(ctx.assignmentOperator().text)
     val expression: Expression = expressionVisitor.visit(ctx.expr(1))
-    return LetCommand(ranges, variable, operator, expression, nameFromContext(ctx))
+    return LetCommand(ranges, variable, operator, expression)
   }
 
   override fun visitEchoCommand(ctx: EchoCommandContext): Command {
@@ -131,7 +131,7 @@ object CommandVisitor : VimscriptBaseVisitor<Executable>() {
         expressionVisitor.visit(tree)
       }
       .collect(Collectors.toList())
-    return EchoCommand(ranges, expressions, nameFromContext(ctx))
+    return EchoCommand(ranges, expressions)
   }
 
   override fun visitDelfunctionCommand(ctx: DelfunctionCommandContext): Executable {
@@ -140,12 +140,12 @@ object CommandVisitor : VimscriptBaseVisitor<Executable>() {
       if (ctx.functionRef().anyScope() != null) Scope.getByValue(ctx.functionRef().anyScope().text) else null
     val functionName = ctx.functionRef().functionName().text
     val ignoreIfMissing = ctx.replace().childCount > 0
-    return DelfunctionCommand(ranges, functionScope, functionName, ignoreIfMissing, ctx.text)
+    return DelfunctionCommand(ranges, functionScope, functionName, ignoreIfMissing)
   }
 
   override fun visitGoToLineCommand(ctx: VimscriptParser.GoToLineCommandContext): Command {
     val ranges: Ranges = parseRanges(ctx.range())
-    return GoToLineCommand(ranges, nameFromContext(ctx))
+    return GoToLineCommand(ranges)
   }
 
   override fun visitOtherCommand(ctx: OtherCommandContext): ExCommand {

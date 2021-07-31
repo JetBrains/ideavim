@@ -15,7 +15,6 @@ data class TryStatement(val tryBlock: TryBlock, val catchBlocks: List<CatchBlock
     editor: Editor?,
     context: DataContext?,
     vimContext: VimContext,
-    skipHistory: Boolean,
   ): ExecutionResult {
     var uncaughtException: ExException? = null
     var result: ExecutionResult = ExecutionResult.Success
@@ -55,7 +54,6 @@ data class TryBlock(val body: List<Executable>) : Executable {
     editor: Editor?,
     context: DataContext?,
     vimContext: VimContext,
-    skipHistory: Boolean,
   ): ExecutionResult {
     return executeBody(body, editor, context, vimContext)
   }
@@ -66,7 +64,6 @@ data class CatchBlock(val pattern: String, val body: List<Executable>) : Executa
     editor: Editor?,
     context: DataContext?,
     vimContext: VimContext,
-    skipHistory: Boolean,
   ): ExecutionResult {
     return executeBody(body, editor, context, vimContext)
   }
@@ -77,7 +74,6 @@ data class FinallyBlock(val body: List<Executable>) : Executable {
     editor: Editor?,
     context: DataContext?,
     vimContext: VimContext,
-    skipHistory: Boolean,
   ): ExecutionResult {
     return executeBody(body, editor, context, vimContext)
   }

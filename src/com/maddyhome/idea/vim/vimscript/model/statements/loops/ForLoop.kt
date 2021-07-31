@@ -20,7 +20,6 @@ data class ForLoop(val variable: String, val iterable: Expression, val body: Lis
     editor: Editor?,
     context: DataContext?,
     vimContext: VimContext,
-    skipHistory: Boolean,
   ): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
     var iterableValue = iterable.evaluate(editor, context, vimContext)
@@ -29,7 +28,7 @@ data class ForLoop(val variable: String, val iterable: Expression, val body: Lis
         VariableService.storeVariable(Variable(null, variable), VimString(i.toString()), editor, context, vimContext)
         for (statement in body) {
           if (result is ExecutionResult.Success) {
-            result = statement.execute(editor, context, vimContext, skipHistory)
+            result = statement.execute(editor, context, vimContext)
           } else {
             break
           }
@@ -54,7 +53,7 @@ data class ForLoop(val variable: String, val iterable: Expression, val body: Lis
         )
         for (statement in body) {
           if (result is ExecutionResult.Success) {
-            result = statement.execute(editor, context, vimContext, skipHistory)
+            result = statement.execute(editor, context, vimContext)
           } else {
             break
           }

@@ -13,13 +13,12 @@ data class WhileLoop(val condition: Expression, val body: List<Executable>) : Ex
     editor: Editor?,
     context: DataContext?,
     vimContext: VimContext,
-    skipHistory: Boolean,
   ): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
     while (condition.evaluate(editor, context, vimContext).asBoolean()) {
       for (statement in body) {
         if (result is ExecutionResult.Success) {
-          result = statement.execute(editor, context, vimContext, skipHistory)
+          result = statement.execute(editor, context, vimContext)
         } else {
           break
         }

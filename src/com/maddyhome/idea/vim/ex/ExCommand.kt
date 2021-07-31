@@ -32,7 +32,6 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExCommand.Constants.MAX_RECURSION
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.group.HistoryGroup
 import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
@@ -55,9 +54,8 @@ data class ExCommand(val ranges: Ranges, var command: String, var argument: Stri
     editor: Editor?,
     context: DataContext?,
     vimContext: VimContext,
-    skipHistory: Boolean,
   ): ExecutionResult {
-    processCommand(editor, context, MAX_RECURSION, skipHistory)
+    processCommand(editor, context, MAX_RECURSION)
     return ExecutionResult.Success
   }
 
@@ -66,12 +64,7 @@ data class ExCommand(val ranges: Ranges, var command: String, var argument: Stri
     editor: Editor?,
     context: DataContext?,
     aliasCountdown: Int,
-    skipHistory: Boolean,
   ) {
-
-    if (aliasCountdown == MAX_RECURSION && !skipHistory) {
-      VimPlugin.getHistory().addEntry(HistoryGroup.COMMAND, originalString)
-    }
 
     if (command.isEmpty()) {
       logger.warn("CMD is empty")
@@ -93,7 +86,7 @@ data class ExCommand(val ranges: Ranges, var command: String, var argument: Stri
               logger.warn("Command alias is empty")
               return
             }
-            Executor.execute(commandAlias.command, editor, context, skipHistory)
+            Executor.execute(commandAlias.command, editor, context, skipHistory = true, indicateErrors = true)
           }
           // todo nullable editor & context
 
