@@ -5,7 +5,7 @@ import com.intellij.openapi.editor.Editor
 
 data class Script(val units: List<Executable>) : Executable {
 
-  override fun execute(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
+  override fun execute(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
     var latestResult: ExecutionResult = ExecutionResult.Success
     for (unit in units) {
       if (latestResult is ExecutionResult.Success) {

@@ -8,7 +8,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimContext
 
 object BreakStatement : Executable {
 
-  override fun execute(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
+  override fun execute(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
     return ExecutionResult.Break
   }
 }

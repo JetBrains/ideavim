@@ -13,13 +13,11 @@ class EchoCommand(val ranges: Ranges, val args: List<Expression>) :
 
   override val argFlags = CommandHandlerFlags(RangeFlag.RANGE_FORBIDDEN, Access.READ_ONLY, emptySet())
 
-  override fun processCommand(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult.Success {
-    if (editor != null) {
-      val text = args.joinToString(separator = " ", postfix = "\n") {
-        it.evaluate(editor, context, vimContext).toString()
-      }
-      ExOutputModel.getInstance(editor).output(text)
+  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult.Success {
+    val text = args.joinToString(separator = " ", postfix = "\n") {
+      it.evaluate(editor, context, vimContext).toString()
     }
+    ExOutputModel.getInstance(editor).output(text)
     return ExecutionResult.Success
   }
 }

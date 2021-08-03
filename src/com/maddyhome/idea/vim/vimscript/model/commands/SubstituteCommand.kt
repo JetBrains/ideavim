@@ -18,7 +18,7 @@ data class SubstituteCommand(
 
   override val argFlags = CommandHandlerFlags(RangeFlag.RANGE_OPTIONAL, Access.SELF_SYNCHRONIZED, emptySet())
 
-  override fun processCommand(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
 //    if (editor != null) {
 //      for (caret in editor.caretModel.allCarets) {

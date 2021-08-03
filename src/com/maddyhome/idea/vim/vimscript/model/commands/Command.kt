@@ -36,41 +36,31 @@ sealed class Command(var commandRanges: Ranges) : Executable {
 
   abstract class SingleExecution(ranges: Ranges) :
     Command(ranges) {
-    abstract fun processCommand(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult
+    abstract fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult
   }
 
   @Throws(ExException::class)
-  override fun execute(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
+  override fun execute(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
+    var result: ExecutionResult = ExecutionResult.Success
 
     checkRanges()
 
-    var result: ExecutionResult = ExecutionResult.Success
-    if (editor != null && context != null) {
+    if (editor.inVisualMode && Flag.SAVE_VISUAL !in argFlags.flags) {
+      editor.exitVisualMode()
+    }
 
-      if (editor.inVisualMode && Flag.SAVE_VISUAL !in argFlags.flags) {
-        editor.exitVisualMode()
+    when (this) {
+      is ForEachCaret -> {
+        editor.caretModel.runForEachCaret(
+          { caret ->
+            if (result is ExecutionResult.Success) {
+              result = processCommand(editor, caret, context, vimContext)
+            }
+          },
+          true
+        )
       }
-
-      when (this) {
-        is ForEachCaret -> {
-          editor.caretModel.runForEachCaret(
-            { caret ->
-              if (result is ExecutionResult.Success) {
-                result = processCommand(editor, caret, context, vimContext)
-              }
-            },
-            true
-          )
-        }
-        is SingleExecution -> result = processCommand(editor, context, vimContext)
-      }
-    } else {
-      if (this is SingleExecution) {
-        result = processCommand(editor, context, vimContext)
-      } else {
-        // todo something smarter
-        throw RuntimeException("ForEachCaret command was passed with nullable Editor or DataContext")
-      }
+      is SingleExecution -> result = processCommand(editor, context, vimContext)
     }
 
     if (result !is ExecutionResult.Success) {

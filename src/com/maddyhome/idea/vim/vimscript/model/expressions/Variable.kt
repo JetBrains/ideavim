@@ -8,7 +8,7 @@ import com.maddyhome.idea.vim.vimscript.services.VariableService
 
 data class Variable(val scope: Scope?, val name: String) : Expression() {
 
-  override fun evaluate(editor: Editor?, context: DataContext?, vimContext: VimContext): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimContext): VimDataType {
     return VariableService.getNonNullVariableValue(this, editor, context, vimContext)
   }
 }

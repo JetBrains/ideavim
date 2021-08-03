@@ -31,7 +31,7 @@ data class LetCommand(
   override val argFlags = CommandHandlerFlags(RangeFlag.RANGE_FORBIDDEN, Access.READ_ONLY, emptySet())
 
   @Throws(ExException::class)
-  override fun processCommand(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
     when (variable) {
       is Variable -> {
         VariableService.storeVariable(

@@ -1,12 +1,12 @@
 package org.jetbrains.plugins.ideavim.ex.parser.expressions
 
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.jetbrains.plugins.ideavim.ex.parser.ParserTest
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -17,7 +17,7 @@ class DictionaryTests : ParserTest() {
   fun `empty dictionary test`() {
     assertEquals(
       VimDictionary(linkedMapOf()),
-      VimscriptParser.parseExpression("{}").evaluate(null, null, VimContext())
+      VimscriptParser.parseExpression("{}").evaluate()
     )
   }
 
@@ -35,7 +35,7 @@ class DictionaryTests : ParserTest() {
             VimString("b") to VimList(mutableListOf(VimInt(1), VimInt(2))),
           )
         ),
-        VimscriptParser.parseExpression(s).evaluate(null, null, VimContext())
+        VimscriptParser.parseExpression(s).evaluate()
       )
     }
   }
@@ -54,7 +54,7 @@ class DictionaryTests : ParserTest() {
             VimString("d") to VimInt(5),
           )
         ),
-        VimscriptParser.parseExpression(s).evaluate(null, null, VimContext())
+        VimscriptParser.parseExpression(s).evaluate()
       )
     }
   }
@@ -71,7 +71,7 @@ class DictionaryTests : ParserTest() {
             VimString("e") to VimFloat(4.2)
           )
         ),
-        VimscriptParser.parseExpression(s).evaluate(null, null, VimContext())
+        VimscriptParser.parseExpression(s).evaluate()
       )
     }
   }
@@ -80,7 +80,7 @@ class DictionaryTests : ParserTest() {
   fun `empty literal dictionary test`() {
     assertEquals(
       VimDictionary(linkedMapOf()),
-      VimscriptParser.parseExpression("#{}").evaluate(null, null, VimContext())
+      VimscriptParser.parseExpression("#{}").evaluate()
     )
   }
 
@@ -97,7 +97,7 @@ class DictionaryTests : ParserTest() {
             VimString("2-1") to VimString("string value")
           )
         ),
-        VimscriptParser.parseExpression(s).evaluate(null, null, VimContext())
+        VimscriptParser.parseExpression(s).evaluate()
       )
     }
   }

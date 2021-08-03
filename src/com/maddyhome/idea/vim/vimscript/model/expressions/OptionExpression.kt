@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 data class OptionExpression(val optionName: String) : Expression() {
 
-  override fun evaluate(editor: Editor?, context: DataContext?, vimContext: VimContext): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimContext): VimDataType {
     val option = OptionsManager.getOption(optionName) ?: throw ExException("E518: Unknown option: $optionName")
     return when (option) {
       is ListOption -> VimList(option.values().map { VimString(it) }.toMutableList())

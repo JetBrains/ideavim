@@ -41,8 +41,8 @@ data class DefinedFunctionHandler(
 
   override fun doFunction(
     argumentValues: List<Expression>,
-    editor: Editor?,
-    context: DataContext?,
+    editor: Editor,
+    context: DataContext,
     vimContext: VimContext,
   ): VimDataType {
     initializeFunctionVariables(argumentValues, editor, context, vimContext)
@@ -65,8 +65,8 @@ data class DefinedFunctionHandler(
 
   private fun initializeFunctionVariables(
     argumentValues: List<Expression>,
-    editor: Editor?,
-    context: DataContext?,
+    editor: Editor,
+    context: DataContext,
     vimContext: VimContext,
   ) {
     for ((index, name) in argumentNames.withIndex()) {

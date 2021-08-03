@@ -9,7 +9,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
 data class ReturnStatement(val expression: Expression) : Executable {
 
-  override fun execute(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
+  override fun execute(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
     return ExecutionResult.Return(expression.evaluate(editor, context, vimContext))
   }
 }

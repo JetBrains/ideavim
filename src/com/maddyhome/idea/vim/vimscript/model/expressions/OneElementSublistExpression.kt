@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 data class OneElementSublistExpression(val index: Expression, val expression: Expression) : Expression() {
 
-  override fun evaluate(editor: Editor?, context: DataContext?, vimContext: VimContext): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimContext): VimDataType {
     val expressionValue = expression.evaluate(editor, context, vimContext)
     if (expressionValue is VimDictionary) {
       return expressionValue.dictionary[VimString(index.evaluate(editor, context, vimContext).asString())]

@@ -5,5 +5,5 @@ import com.intellij.openapi.editor.Editor
 
 interface Executable {
 
-  fun execute(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult
+  fun execute(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult
 }

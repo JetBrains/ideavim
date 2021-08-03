@@ -9,7 +9,7 @@ import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 data class FunctionCallExpression(val scope: Scope?, val functionName: String, val arguments: List<Expression>) :
   Expression() {
 
-  override fun evaluate(editor: Editor?, context: DataContext?, vimContext: VimContext): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimContext): VimDataType {
     val handler = FunctionStorage.getFunctionHandler(functionName, vimContext, scope = scope)
     return handler.executeFunction(this, editor, context, vimContext)
   }

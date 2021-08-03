@@ -16,29 +16,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.vimscript.model.functions.handlers
+package org.jetbrains.plugins.ideavim.ex
 
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
-import kotlin.math.sin
+import javax.swing.JTextArea
 
-object SinFunctionHandler : FunctionHandler() {
-
-  override val minimumNumberOfArguments = 1
-  override val maximumNumberOfArguments = 1
-
-  override fun doFunction(
-    argumentValues: List<Expression>,
-    editor: Editor,
-    context: DataContext,
-    vimContext: VimContext,
-  ): VimDataType {
-    val argument = argumentValues[0].evaluate(editor, context, vimContext)
-    return VimFloat(sin(argument.asDouble()))
-  }
+fun Expression.evaluate(): VimDataType {
+  val editor = TextComponentEditorImpl(null, JTextArea())
+  val context = DataContext.EMPTY_CONTEXT
+  return this.evaluate(editor, context, VimContext())
 }

@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.vimscript
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.group.HistoryGroup
@@ -30,13 +31,14 @@ import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import java.io.File
 import java.io.IOException
+import javax.swing.JTextArea
 
 object Executor {
   private val logger = logger<Executor>()
   var executingVimScript = false
 
   @kotlin.jvm.Throws(ExException::class)
-  fun execute(scriptString: String, editor: Editor?, context: DataContext?, skipHistory: Boolean, indicateErrors: Boolean = true) {
+  fun execute(scriptString: String, editor: Editor, context: DataContext, skipHistory: Boolean, indicateErrors: Boolean = true) {
     val script = VimscriptParser.parse(scriptString)
 
     if (!skipHistory) {
@@ -62,13 +64,17 @@ object Executor {
   }
 
   fun execute(scriptString: String, skipHistory: Boolean = true) {
-    execute(scriptString, null, null, skipHistory)
+    val editor = TextComponentEditorImpl(null, JTextArea())
+    val context = DataContext.EMPTY_CONTEXT
+    execute(scriptString, editor, context, skipHistory)
   }
 
   @JvmStatic
   fun executeFile(file: File) {
+    val editor = TextComponentEditorImpl(null, JTextArea())
+    val context = DataContext.EMPTY_CONTEXT
     try {
-      execute(file.readText(), null, null, skipHistory = true, indicateErrors = false)
+      execute(file.readText(), editor, context, skipHistory = true, indicateErrors = false)
     } catch (ignored: IOException) { }
   }
 

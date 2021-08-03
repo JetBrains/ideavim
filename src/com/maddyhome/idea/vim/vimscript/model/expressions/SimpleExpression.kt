@@ -7,7 +7,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 data class SimpleExpression(val data: VimDataType) : Expression() {
 
-  override fun evaluate(editor: Editor?, context: DataContext?, vimContext: VimContext): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimContext): VimDataType {
     return data
   }
 }

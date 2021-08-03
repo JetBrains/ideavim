@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 data class DictionaryExpression(val dictionary: LinkedHashMap<Expression, Expression>) : Expression() {
 
-  override fun evaluate(editor: Editor?, context: DataContext?, vimContext: VimContext): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimContext): VimDataType {
     val dict: LinkedHashMap<VimString, VimDataType> = linkedMapOf()
     for ((key, value) in dictionary) {
       dict[VimString(key.evaluate(editor, context, vimContext).asString())] = value.evaluate(editor, context, vimContext)

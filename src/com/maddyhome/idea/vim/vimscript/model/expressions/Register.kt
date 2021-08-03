@@ -10,7 +10,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 data class Register(val char: Char) : Expression() {
 
-  override fun evaluate(editor: Editor?, context: DataContext?, vimContext: VimContext): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimContext): VimDataType {
     val register = VimPlugin.getRegister().getRegister(char) ?: throw ExException("Register is not supported yet")
     return register.rawText?.let { VimString(it) } ?: VimString("")
   }

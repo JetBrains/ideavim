@@ -17,7 +17,7 @@ data class FunctionDeclaration(
   val scriptName: String? = null,
 ) : Executable {
 
-  override fun execute(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
+  override fun execute(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
     FunctionStorage.storeFunction(this, vimContext)
     return ExecutionResult.Success
   }

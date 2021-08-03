@@ -18,7 +18,7 @@ data class DelfunctionCommand(
 
   override val argFlags = CommandHandlerFlags(RangeFlag.RANGE_FORBIDDEN, Access.READ_ONLY, emptySet())
 
-  override fun processCommand(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
     if (ignoreIfMissing) {
       try {
         FunctionStorage.deleteFunction(name, vimContext, scope)

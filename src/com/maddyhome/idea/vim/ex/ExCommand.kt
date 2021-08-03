@@ -50,15 +50,15 @@ data class ExCommand(val ranges: Ranges, var command: String, var argument: Stri
     const val MAX_RECURSION = 100
   }
 
-  override fun execute(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
+  override fun execute(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
     processCommand(editor, context, MAX_RECURSION)
     return ExecutionResult.Success
   }
 
   @kotlin.jvm.Throws(ExException::class)
   private fun processCommand(
-    editor: Editor?,
-    context: DataContext?,
+    editor: Editor,
+    context: DataContext,
     aliasCountdown: Int,
   ) {
 

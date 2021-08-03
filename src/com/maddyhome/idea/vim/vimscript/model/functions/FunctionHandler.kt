@@ -33,15 +33,15 @@ abstract class FunctionHandler {
 
   protected abstract fun doFunction(
     argumentValues: List<Expression>,
-    editor: Editor?,
-    context: DataContext?,
+    editor: Editor,
+    context: DataContext,
     vimContext: VimContext,
   ): VimDataType
 
   fun executeFunction(
     functionCall: FunctionCallExpression,
-    editor: Editor?,
-    context: DataContext?,
+    editor: Editor,
+    context: DataContext,
     vimContext: VimContext,
   ): VimDataType {
     checkFunctionCall(functionCall)

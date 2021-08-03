@@ -18,7 +18,6 @@
 
 package org.jetbrains.plugins.ideavim.ex.parser.commands
 
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -28,6 +27,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -51,7 +51,7 @@ class CommandTests {
     assertTrue(expressions[0] is SimpleExpression)
     assertEquals(VimInt(4), (expressions[0] as SimpleExpression).data)
     assertTrue(expressions[1] is BinExpression)
-    assertEquals(VimInt(12), expressions[1].evaluate(null, null, VimContext()))
+    assertEquals(VimInt(12), expressions[1].evaluate())
     assertTrue(expressions[2] is SimpleExpression)
     assertEquals(VimString("hi doggy"), (expressions[2] as SimpleExpression).data)
   }

@@ -30,8 +30,8 @@ enum class AssignmentOperator(val value: String) {
   fun getNewValue(
     variable: Expression,
     value: Expression,
-    editor: Editor?,
-    context: DataContext?,
+    editor: Editor,
+    context: DataContext,
     vimContext: VimContext,
   ): VimDataType {
     val valueValue = value.evaluate(editor, context, vimContext)

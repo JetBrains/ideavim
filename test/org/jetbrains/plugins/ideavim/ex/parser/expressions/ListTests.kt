@@ -1,12 +1,12 @@
 package org.jetbrains.plugins.ideavim.ex.parser.expressions
 
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -14,7 +14,7 @@ class ListTests {
 
   @Test
   fun `empty list test`() {
-    assertEquals(VimList(mutableListOf()), VimscriptParser.parseExpression("[]").evaluate(null, null, VimContext()))
+    assertEquals(VimList(mutableListOf()), VimscriptParser.parseExpression("[]").evaluate())
   }
 
   @Test
@@ -30,7 +30,7 @@ class ListTests {
         )
       ),
       VimscriptParser.parseExpression("[1, 4.6, 'bla bla', [5, 9], {'key' : 'value'}]")
-        .evaluate(null, null, VimContext())
+        .evaluate()
     )
   }
 }

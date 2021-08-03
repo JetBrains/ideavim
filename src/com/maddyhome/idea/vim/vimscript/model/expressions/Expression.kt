@@ -7,5 +7,5 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 abstract class Expression {
 
-  abstract fun evaluate(editor: Editor?, context: DataContext?, vimContext: VimContext): VimDataType
+  abstract fun evaluate(editor: Editor, context: DataContext, vimContext: VimContext): VimDataType
 }

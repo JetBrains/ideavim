@@ -16,7 +16,7 @@ import com.maddyhome.idea.vim.vimscript.services.VariableService
 data class ForLoop(val variable: String, val iterable: Expression, val body: List<Executable>) : Executable {
 
   // todo refactoring
-  override fun execute(editor: Editor?, context: DataContext?, vimContext: VimContext): ExecutionResult {
+  override fun execute(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
     var iterableValue = iterable.evaluate(editor, context, vimContext)
     if (iterableValue is VimString) {
