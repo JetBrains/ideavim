@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.vimLine
 import org.jetbrains.annotations.NonNls
 
 /**
@@ -76,7 +77,7 @@ class BufferListHandler : CommandHandler.SingleExecution() {
       val bufStatus = getBufferStatus(editor, file, currentFile, previousFile)
 
       if (bufStatusMatchesFilter(filter, bufStatus)) {
-        val lineNum = editor.caretModel.currentCaret.logicalPosition.line + 1
+        val lineNum = editor.vimLine
         val lineNumPad =
           if (displayFileName.length < FILE_NAME_PAD) (FILE_NAME_PAD - displayFileName.length).toString() else ""
 
