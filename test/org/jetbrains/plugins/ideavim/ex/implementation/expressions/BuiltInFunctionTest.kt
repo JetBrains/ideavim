@@ -33,4 +33,16 @@ class BuiltInFunctionTest : VimTestCase() {
     typeText(commandToKeys("echo sin(0) sin(1)"))
     assertExOutput("0.0 0.841471\n")
   }
+
+  fun `test empty`() {
+    configureByText("\n")
+    typeText(commandToKeys("echo empty(0) empty(1)"))
+    assertExOutput("1 0\n")
+    typeText(commandToKeys("echo empty(\"123\") empty(\"\")"))
+    assertExOutput("0 1\n")
+    typeText(commandToKeys("echo empty([1, 2]) empty([])"))
+    assertExOutput("0 1\n")
+    typeText(commandToKeys("echo empty({1:2}) empty({})"))
+    assertExOutput("0 1\n")
+  }
 }
