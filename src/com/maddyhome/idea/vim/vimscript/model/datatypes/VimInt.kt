@@ -25,18 +25,10 @@ data class VimInt(val value: Int) : VimDataType() {
 private fun parseNumber(octalDecimalOrHexNumber: String): Int {
   val n = octalDecimalOrHexNumber.toLowerCase()
   return when {
-    n.matches(Regex("[-]?0[x][0-9a-f]+")) -> {
-      n.replaceFirst("0x", "").toInt(16)
-    }
-    n.matches(Regex("[-]?[0][0-7]+")) -> {
-      n.toInt(8)
-    }
-    n.matches(Regex("[-]?[0-9]+")) -> {
-      n.toInt()
-    }
-    else -> {
-      0
-    }
+    n.matches(Regex("[-]?0[x][0-9a-f]+")) -> n.replaceFirst("0x", "").toInt(16)
+    n.matches(Regex("[-]?[0][0-7]+")) -> n.toInt(8)
+    n.matches(Regex("[-]?[0-9]+")) -> n.toInt()
+    else -> 0
   }
 }
 
