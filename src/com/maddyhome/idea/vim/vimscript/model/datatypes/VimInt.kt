@@ -35,3 +35,9 @@ private fun parseNumber(octalDecimalOrHexNumber: String): Int {
 }
 
 fun Boolean.asVimInt(): VimInt = if (this) VimInt.ONE else VimInt.ZERO
+
+fun Int.asVimInt(): VimInt = when (this) {
+  0 -> VimInt.ZERO
+  1 -> VimInt.ONE
+  else -> VimInt(this)
+}

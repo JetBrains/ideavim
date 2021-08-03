@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.expressions
 
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class BuiltInFunctionTest : VimTestCase() {
@@ -44,5 +45,90 @@ class BuiltInFunctionTest : VimTestCase() {
     assertExOutput("0 1\n")
     typeText(commandToKeys("echo empty({1:2}) empty({})"))
     assertExOutput("0 1\n")
+  }
+
+  fun `test line`() {
+    configureByText("1\n2\n${c}3\n4\n5")
+    typeText(commandToKeys("echo line('.')"))
+    assertExOutput("3\n")
+
+    typeText(commandToKeys("echo line('$')"))
+    assertExOutput("5\n")
+
+    typeText(parseKeys("ma"))
+    typeText(commandToKeys("""echo line("'a") line("'x")"""))
+    assertExOutput("3 0\n")
+
+    setEditorVisibleSize(screenWidth, 3)
+    setPositionAndScroll(2, 2)
+    typeText(commandToKeys("""echo line("w0") line("w$")"""))
+    assertExOutput("3 5\n")
+
+    // Without selection - current line
+    typeText(commandToKeys("""echo line("v")"""))
+    assertExOutput("3\n")
+    // With selection
+    typeText(parseKeys("vj"))
+    typeText(commandToKeys("""echo line("v")"""))
+    assertExOutput("3\n")
+    // Remove selection and check again
+    typeText(parseKeys("<esc>"))
+    typeText(commandToKeys("""echo line("v")"""))
+    assertExOutput("4\n")
+
+    typeText(commandToKeys("""echo line("abs") line(1) line([])"""))
+    assertExOutput("0 0 0\n")
+
+    typeText(commandToKeys("""echo line([1, 1]) line(['.', '$']) line(['$', '$'])"""))
+    assertExOutput("1 4 5\n")
+
+    typeText(commandToKeys("""echo line([0, 1]) line([1, 1]) line([5, 1]) line([6, 1]) line([5, 2])"""))
+    assertExOutput("0 1 5 0 0\n")
+  }
+
+  // XXX virtualedit is not tested
+  fun `test col`() {
+    configureByText(
+      """
+  1
+  2
+  1234${c}567890
+  4
+  5
+      """.trimIndent()
+    )
+    typeText(commandToKeys("echo col('.')"))
+    assertExOutput("5\n")
+
+    typeText(commandToKeys("echo col('$')"))
+    assertExOutput("10\n")
+
+    typeText(parseKeys("ma"))
+    typeText(commandToKeys("""echo col("'a") col("'z")"""))
+    assertExOutput("5 0\n")
+
+    // Without selection - current line
+    typeText(commandToKeys("""echo col("v")"""))
+    assertExOutput("5\n")
+    // With selection
+    typeText(parseKeys("vll"))
+    typeText(commandToKeys("""echo col("v")"""))
+    assertExOutput("5\n")
+    // Remove selection and check again
+    typeText(parseKeys("<esc>"))
+    typeText(commandToKeys("""echo col("v")"""))
+    assertExOutput("7\n")
+
+    typeText(commandToKeys("echo col('$')"))
+    assertExOutput("10\n")
+
+    typeText(commandToKeys("""echo col("abs") col(1) col([])"""))
+    assertExOutput("0 0 0\n")
+
+    typeText(commandToKeys("""echo col([1, 1]) col(['.', '$']) col(['$', '$'])"""))
+    assertExOutput("1 10 0\n")
+
+    typeText(commandToKeys("""echo col([0, 1]) col([1, 1]) col([5, 1]) col([6, 1]) col([5, 2])"""))
+    assertExOutput("0 1 1 0 0\n")
   }
 }

@@ -1,7 +1,9 @@
 <idea-plugin>
   <extensions defaultExtensionNs="IdeaVIM">
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.AbsFunctionHandler" name="abs"/>
+    <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.ColFunctionHandler" name="col"/>
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.EmptyFunctionHandler" name="empty"/>
+    <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.LineFunctionHandler" name="line"/>
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.SinFunctionHandler" name="sin"/>
   </extensions>
 </idea-plugin>
