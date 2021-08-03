@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
@@ -53,6 +54,6 @@ object EmptyFunctionHandler : FunctionHandler() {
       is VimFloat -> argument.value == 0.0
       is VimBlob -> TODO("Not yet implemented")
     }
-    return if (isEmpty) VimInt(1) else VimInt(0)
+    return isEmpty.asVimInt()
   }
 }

@@ -2,8 +2,7 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 data class VimInt(val value: Int) : VimDataType() {
 
-  constructor(octalDecimalOrHexNumber: String) :
-    this(parseNumber(octalDecimalOrHexNumber))
+  constructor(octalDecimalOrHexNumber: String) : this(parseNumber(octalDecimalOrHexNumber))
 
   override fun asDouble(): Double {
     return value.toDouble()
@@ -15,6 +14,11 @@ data class VimInt(val value: Int) : VimDataType() {
 
   override fun toString(): String {
     return value.toString()
+  }
+
+  companion object {
+    val ZERO = VimInt(0)
+    val ONE = VimInt(1)
   }
 }
 
@@ -35,3 +39,5 @@ private fun parseNumber(octalDecimalOrHexNumber: String): Int {
     }
   }
 }
+
+fun Boolean.asVimInt(): VimInt = if (this) VimInt.ONE else VimInt.ZERO
