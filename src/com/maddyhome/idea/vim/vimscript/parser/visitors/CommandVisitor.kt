@@ -119,7 +119,7 @@ object CommandVisitor : VimscriptBaseVisitor<Executable>() {
   override fun visitLetCommand(ctx: LetCommandContext): Command {
     val ranges: Ranges = parseRanges(ctx.range())
     val variable: Expression = expressionVisitor.visit(ctx.expr(0))
-    val operator = getByValue(ctx.assignmentOperator().text)
+    val operator = getByValue(ctx.assignmentOperator.text)
     val expression: Expression = expressionVisitor.visit(ctx.expr(1))
     return LetCommand(ranges, variable, operator, expression)
   }
@@ -137,9 +137,9 @@ object CommandVisitor : VimscriptBaseVisitor<Executable>() {
   override fun visitDelfunctionCommand(ctx: DelfunctionCommandContext): Executable {
     val ranges: Ranges = parseRanges(ctx.range())
     val functionScope =
-      if (ctx.functionRef().anyScope() != null) Scope.getByValue(ctx.functionRef().anyScope().text) else null
-    val functionName = ctx.functionRef().functionName().text
-    val ignoreIfMissing = ctx.replace().childCount > 0
+      if (ctx.functionScope() != null) Scope.getByValue(ctx.functionScope().text) else null
+    val functionName = ctx.functionName().text
+    val ignoreIfMissing = ctx.replace != null
     return DelfunctionCommand(ranges, functionScope, functionName, ignoreIfMissing)
   }
 

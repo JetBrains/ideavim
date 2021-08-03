@@ -64,11 +64,11 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
   }
 
   override fun visitFunctionDefinition(ctx: VimscriptParser.FunctionDefinitionContext): Executable {
-    val functionScope = if (ctx.functionRef().anyScope() != null) Scope.getByValue(ctx.functionRef().anyScope().text) else null
-    val functionName = ctx.functionRef().functionName().text
+    val functionScope = if (ctx.functionScope() != null) Scope.getByValue(ctx.functionScope().text) else null
+    val functionName = ctx.functionName().text
     val args = ctx.argumentsDeclaration().variableName().map { it.text }
     val body = ctx.blockMember().mapNotNull { visitBlockMember(it) }
-    val replaceExisting = ctx.replace().childCount != 0
+    val replaceExisting = ctx.replace != null
     return FunctionDeclaration(functionScope, functionName, args, body, replaceExisting)
   }
 
