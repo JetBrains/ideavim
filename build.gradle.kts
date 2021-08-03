@@ -149,6 +149,10 @@ tasks {
         arguments.addAll(listOf("-package", "com.maddyhome.idea.vim.vimscript.parser.generated", "-visitor"))
         outputDirectory = file("src/com/maddyhome/idea/vim/vimscript/parser/generated")
     }
+
+    named("compileKotlin") {
+        dependsOn("generateGrammarSource")
+    }
 }
 
 // --- Linting
