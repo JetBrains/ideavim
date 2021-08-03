@@ -12,6 +12,10 @@ data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) 
     throw ExException("E731: Using a Dictionary as a String")
   }
 
+  override fun toVimNumber(): VimInt {
+    throw ExException("E728: Using a Dictionary as a Number")
+  }
+
   override fun toString(): String {
     val result = StringBuffer("{")
     result.append(dictionary.map { it.stringOfEntry() }.joinToString(separator = ", "))

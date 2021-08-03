@@ -10,6 +10,10 @@ class VimBlob : VimDataType() {
     TODO("Not yet implemented")
   }
 
+  override fun toVimNumber(): VimInt {
+    TODO("Not yet implemented")
+  }
+
   override fun asBoolean(): Boolean {
     TODO("empty must be falsy (0z), otherwise - truthy (like 0z00 0z01 etc)")
   }

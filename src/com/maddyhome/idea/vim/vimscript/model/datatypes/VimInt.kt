@@ -12,6 +12,8 @@ data class VimInt(val value: Int) : VimDataType() {
     return value.toString()
   }
 
+  override fun toVimNumber(): VimInt = this
+
   override fun toString(): String {
     return value.toString()
   }

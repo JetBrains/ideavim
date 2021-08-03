@@ -14,6 +14,10 @@ data class VimFloat(val value: Double) : VimDataType() {
     throw ExException("E806: using Float as a String")
   }
 
+  override fun toVimNumber(): VimInt {
+    throw ExException("E805: Using a Float as a Number")
+  }
+
   override fun toString(): String {
     val bigDecimal = BigDecimal(value).setScale(6, RoundingMode.HALF_UP)
     return bigDecimal.toDouble().toString()

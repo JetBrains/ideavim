@@ -12,6 +12,10 @@ data class VimList(val values: MutableList<VimDataType>) : VimDataType() {
     throw ExException("E730: Using a List as a String")
   }
 
+  override fun toVimNumber(): VimInt {
+    throw ExException("E745: Using a List as a Number")
+  }
+
   override fun toString(): String {
     val result = StringBuffer("[")
     result.append(values.joinToString(separator = ", ") { if (it is VimString) "'$it'" else it.toString() })
