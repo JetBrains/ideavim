@@ -48,7 +48,17 @@ internal object NeovimTesting {
   fun setUp(test: VimTestCase) {
     if (!neovimEnabled(test)) return
     val nvimPath = System.getenv("ideavim.nvim.path") ?: "nvim"
-    val pb = ProcessBuilder(nvimPath, "-u", "NONE", "--embed", "--headless", "--clean", "--cmd", "set noswapfile")
+
+    val pb = ProcessBuilder(
+      nvimPath,
+      "-u", "NONE",
+      "--embed",
+      "--headless",
+      "--clean",
+      "--cmd", "set noswapfile",
+      "--cmd", "set sol"
+    )
+
     neovim = pb.start()
     val neovimConnection = ProcessRpcConnection(neovim, true)
     neovimApi = NeovimApis.getApiForConnection(neovimConnection)
@@ -56,9 +66,6 @@ internal object NeovimTesting {
     escapeCommand = neovimApi.replaceTermcodes("<esc>", true, false, true).get()
     ctrlcCommand = neovimApi.replaceTermcodes("<C-C>", true, false, true).get()
     currentTestName = test.name
-
-    // Update neovim defaults to vim defaults
-    neovimApi.input(neovimApi.replaceTermcodes(":set sol<CR>", true, false, true).get()).get()
   }
 
   fun tearDown(test: VimTestCase) {
