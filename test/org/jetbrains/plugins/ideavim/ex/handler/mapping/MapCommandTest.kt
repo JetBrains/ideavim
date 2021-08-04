@@ -241,6 +241,7 @@ n  ,f            <Plug>Foo
   }
 
   // VIM-666 |:imap|
+  @TestWithoutNeovim(reason = SkipNeovimReason.UNCLEAR)
   fun testBarEscapedSeveralSpaces() {
     configureByText("${c}foo\n")
     typeText(commandToKeys("imap a b \\| c    |"))
@@ -257,6 +258,7 @@ n  ,f            <Plug>Foo
   }
 
   // VIM-676 |:map|
+  @TestWithoutNeovim(reason = SkipNeovimReason.VIM_SCRIPT)
   fun testBackspaceCharacterInVimRc() {
     configureByText("\n")
     Executor.execute("inoremap # X\u0008#\n")
@@ -320,6 +322,7 @@ n  ,f            <Plug>Foo
   }
 
   // VIM-700 |:map|
+  @TestWithoutNeovim(reason = SkipNeovimReason.VIM_SCRIPT)
   fun testRemappingZeroStillAllowsZeroToBeUsedInCount() {
     configureByText("a${c}bcdefghijklmnop\n")
     Executor.execute("map 0 ^")

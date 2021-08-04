@@ -216,6 +216,8 @@ enum class SkipNeovimReason {
   FOLDING,
   TABS,
   PLUGIN_ERROR,
+
+  VIM_SCRIPT,
 }
 
 fun LogicalPosition.toVimCoords(): VimCoords {
