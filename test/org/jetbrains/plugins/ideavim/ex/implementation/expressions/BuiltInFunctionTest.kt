@@ -80,10 +80,10 @@ class BuiltInFunctionTest : VimTestCase() {
     assertExOutput("0 0 0\n")
 
     typeText(commandToKeys("""echo line([1, 1]) line(['.', '$']) line(['$', '$'])"""))
-    assertExOutput("1 4 5\n")
+    assertExOutput("1 0 0\n")
 
-    typeText(commandToKeys("""echo line([0, 1]) line([1, 1]) line([5, 1]) line([6, 1]) line([5, 2])"""))
-    assertExOutput("0 1 5 0 0\n")
+    typeText(commandToKeys("""echo line([0, 1]) line([1, 1]) line([5, 1]) line([6, 1]) line([5, 2]) line([5, 3])"""))
+    assertExOutput("0 1 5 0 5 0\n")
   }
 
   // XXX virtualedit is not tested
@@ -125,10 +125,10 @@ class BuiltInFunctionTest : VimTestCase() {
     typeText(commandToKeys("""echo col("abs") col(1) col([])"""))
     assertExOutput("0 0 0\n")
 
-    typeText(commandToKeys("""echo col([1, 1]) col(['.', '$']) col(['$', '$'])"""))
-    assertExOutput("1 10 0\n")
+    typeText(commandToKeys("""echo col([1, 1]) col([3, '$'])  col(['.', '$']) col(['$', '$'])"""))
+    assertExOutput("1 11 0 0\n")
 
     typeText(commandToKeys("""echo col([0, 1]) col([1, 1]) col([5, 1]) col([6, 1]) col([5, 2])"""))
-    assertExOutput("0 1 1 0 0\n")
+    assertExOutput("0 1 1 0 2\n")
   }
 }

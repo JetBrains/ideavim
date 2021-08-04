@@ -18,6 +18,8 @@ data class VimInt(val value: Int) : VimDataType() {
     return value.toString()
   }
 
+  operator fun compareTo(b: Int): Int = this.value.compareTo(b)
+
   companion object {
     val ZERO = VimInt(0)
     val ONE = VimInt(1)

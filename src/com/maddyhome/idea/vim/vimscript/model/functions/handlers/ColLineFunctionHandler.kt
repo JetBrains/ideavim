@@ -21,9 +21,8 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -31,7 +30,6 @@ import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.asVimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
@@ -51,14 +49,7 @@ object LineFunctionHandler : FunctionHandler() {
     if (editor == null) return VimInt.ZERO
     val argument = argumentValues[0].evaluate(editor, context, vimContext)
 
-    if (argument is VimList) {
-      val (line, _) = getLineAndCol(argument, editor) ?: return VimInt.ZERO
-      return line
-    }
-
-    if (argument !is VimString) return VimInt.ZERO
-    val stringValue = argument.value
-    return getLine(stringValue, editor)
+    return variableToPosition(editor, argument, true)?.first ?: VimInt.ZERO
   }
 }
 
@@ -76,101 +67,13 @@ object ColFunctionHandler : FunctionHandler() {
     val argument = argumentValues[0].evaluate(editor, context, vimContext)
     if (editor == null) return VimInt.ZERO
 
-    if (argument is VimList) {
-      val (_, col) = getLineAndCol(argument, editor) ?: return VimInt.ZERO
-      return col
-    }
-
-    if (argument !is VimString) return VimInt.ZERO
-    val argumentValue = argument.value
-    return getColumn(argumentValue, editor)
-  }
-}
-
-private fun getLineAndCol(
-  argument: VimList,
-  editor: Editor,
-): Pair<VimInt, VimInt>? {
-  if (argument.values.size < 2) return null
-
-  val firstArgument = argument.values[0]
-  val line: VimInt
-  if (firstArgument is VimString) {
-    // Try to get line for '.', '$', etc.
-    val calculatedLine = getLine(firstArgument.value, editor)
-    if (calculatedLine == VimInt.ZERO) {
-      // Try to get line as number
-      val parsedInt = firstArgument.toVimNumber()
-      if (parsedInt == VimInt.ZERO) {
-        return null
-      } else {
-        line = parsedInt
-      }
-    } else {
-      line = calculatedLine
-    }
-  } else {
-    line = firstArgument.toVimNumber()
-  }
-  if (line.value - 1 < 0 || line.value - 1 >= editor.document.lineCount) return null
-  val lineLength = lineLength(editor, line.value - 1)
-
-  val columnArgument = argument.values[1]
-
-  val col: VimInt = if (columnArgument is VimString) {
-    val calculatedColumn = getColumn(columnArgument.value, editor)
-    if (calculatedColumn == VimInt.ZERO) {
-      val parsedInt = columnArgument.toVimNumber()
-      if (parsedInt == VimInt.ZERO) {
-        return null
-      } else {
-        parsedInt
-      }
-    } else {
-      calculatedColumn
-    }
-  } else {
-    columnArgument.toVimNumber()
-  }
-
-  if (col.value - 1 < 0 || col.value - 1 >= lineLength) return null
-  return line to col
-}
-
-private fun lineLength(editor: Editor, line: Int): Int {
-  return editor.document.getLineEndOffset(line) - editor.document.getLineStartOffset(line)
-}
-
-private fun getColumn(argumentValue: String, editor: Editor): VimInt {
-  return when {
-    argumentValue.isEmpty() -> VimInt.ZERO
-
-    // Current line
-    argumentValue == "." -> currentCol(editor)
-
-    // Last column of current line
-    argumentValue == "$" -> lastCol(editor)
-
-    // Mark line
-    argumentValue.length == 2 && argumentValue[0] == '\'' -> {
-      val markLogicalLine = VimPlugin.getMark().getMark(editor, argumentValue[1])?.col ?: return VimInt.ZERO
-      (markLogicalLine + 1).asVimInt()
-    }
-
-    // Start of the visual position
-    argumentValue == "v" -> {
-      if (editor.mode != CommandState.Mode.VISUAL) return currentCol(editor)
-      val vimStart = editor.caretModel.currentCaret.vimSelectionStart
-      (editor.offsetToLogicalPosition(vimStart).column + 1).asVimInt()
-    }
-
-    else -> VimInt.ZERO
+    return variableToPosition(editor, argument, false)?.second ?: VimInt.ZERO
   }
 }
 
 private fun currentCol(editor: Editor): VimInt {
   val logicalPosition = editor.caretModel.currentCaret.logicalPosition
-  var lineLength = lineLength(editor, logicalPosition.line)
+  var lineLength = EditorHelper.getLineLength(editor, logicalPosition.line)
 
   // If virtualedit is set, the col is one more
   // XXX Should we also check the current mode?
@@ -181,50 +84,91 @@ private fun currentCol(editor: Editor): VimInt {
   return (logicalPosition.column + 1).coerceAtMost(lineLength).asVimInt()
 }
 
-private fun lastCol(editor: Editor): VimInt {
-  val logicalPosition = editor.caretModel.currentCaret.logicalPosition
-  val lineLength = lineLength(editor, logicalPosition.line)
-  return lineLength.asVimInt()
+// Analog of var2fpos function
+// Translate variable to position
+private fun variableToPosition(editor: Editor, variable: VimDataType, dollarForLine: Boolean): Pair<VimInt, VimInt>? {
+  if (variable is VimList) {
+    if (variable.values.size < 2) return null
+
+    val line = indexAsNumber(variable, 0) ?: return null
+    if (line <= 0 || line > editor.document.lineCount) {
+      return null
+    }
+
+    var column = indexAsNumber(variable, 1) ?: return null
+    val lineLength = EditorHelper.getLineLength(editor, line.value - 1)
+
+    if (variable[1].asString() == "$") {
+      column = (lineLength + 1).asVimInt()
+    }
+
+    if (column.value == 0 || column > lineLength + 1) {
+      return null
+    }
+
+    return line to column
+  }
+
+  val name = variable.asString()
+  if (name.isEmpty()) return null
+
+  // Current caret line
+  if (name[0] == '.') return editor.vimLine.asVimInt() to currentCol(editor)
+
+  // Visual start
+  if (name == "v") {
+    if (editor.inVisualMode) {
+      return editor.vimLine.asVimInt() to currentCol(editor)
+    }
+
+    val vimStart = editor.caretModel.currentCaret.vimSelectionStart
+    val visualLine = (editor.offsetToLogicalPosition(vimStart).line + 1).asVimInt()
+    val visualCol = (editor.offsetToLogicalPosition(vimStart).column + 1).asVimInt()
+
+    return visualLine to visualCol
+  }
+
+  // Mark
+  if (name.length >= 2 && name[0] == '\'') {
+    val mark = VimPlugin.getMark().getMark(editor, name[1]) ?: return null
+    val markLogicalLine = (mark.logicalLine + 1).asVimInt()
+    val markLogicalCol = (mark.col + 1).asVimInt()
+    return markLogicalLine to markLogicalCol
+  }
+
+  // First visual line
+  if (name.length >= 2 && name[0] == 'w' && name[1] == '0') {
+    if (!dollarForLine) return null
+    val actualVisualTop = EditorHelper.getVisualLineAtTopOfScreen(editor)
+    val actualLogicalTop = EditorHelper.visualLineToLogicalLine(editor, actualVisualTop)
+    return (actualLogicalTop + 1).asVimInt() to currentCol(editor)
+  }
+
+  // Last visual line
+  if (name.length >= 2 && name[0] == 'w' && name[1] == '$') {
+    if (!dollarForLine) return null
+    val actualVisualBottom = EditorHelper.getVisualLineAtBottomOfScreen(editor)
+    val actualLogicalBottom = EditorHelper.visualLineToLogicalLine(editor, actualVisualBottom)
+    return (actualLogicalBottom + 1).asVimInt() to currentCol(editor)
+  }
+
+  // Last column or line
+  if (name[0] == '$') {
+    return if (dollarForLine) {
+      editor.document.lineCount.asVimInt() to VimInt.ZERO
+    } else {
+      val line = editor.caretModel.currentCaret.logicalPosition.line
+      val lineLength = EditorHelper.getLineLength(editor, line)
+      (line + 1).asVimInt() to lineLength.asVimInt()
+    }
+  }
+
+  return null
 }
 
-fun getLine(stringValue: String, editor: Editor): VimInt {
-  return when {
-    stringValue.isEmpty() -> VimInt.ZERO
-
-    // Current caret line
-    stringValue == "." -> editor.vimLine.asVimInt()
-
-    // Last line in document
-    // Line count because vim counts lines 1-based
-    stringValue == "$" -> editor.document.lineCount.asVimInt()
-
-    // Mark line
-    stringValue.length == 2 && stringValue[0] == '\'' -> {
-      val markLogicalLine = VimPlugin.getMark().getMark(editor, stringValue[1])?.logicalLine ?: return VimInt.ZERO
-      (markLogicalLine + 1).asVimInt()
-    }
-
-    // First visible line
-    stringValue == "w0" -> {
-      val actualVisualTop = EditorHelper.getVisualLineAtTopOfScreen(editor)
-      val actualLogicalTop = EditorHelper.visualLineToLogicalLine(editor, actualVisualTop)
-      (actualLogicalTop + 1).asVimInt()
-    }
-
-    // Last visible line
-    stringValue == "w$" -> {
-      val actualVisualBottom = EditorHelper.getVisualLineAtBottomOfScreen(editor)
-      val actualLogicalBottom = EditorHelper.visualLineToLogicalLine(editor, actualVisualBottom)
-      (actualLogicalBottom + 1).asVimInt()
-    }
-
-    // Start of the visual position
-    stringValue == "v" -> {
-      if (editor.mode != CommandState.Mode.VISUAL) return editor.vimLine.asVimInt()
-      val vimStart = editor.caretModel.currentCaret.vimSelectionStart
-      (editor.offsetToLogicalPosition(vimStart).line + 1).asVimInt()
-    }
-
-    else -> VimInt.ZERO
-  }
+// Analog of tv_list_find_nr
+// Get value as number by index
+private fun indexAsNumber(list: VimList, index: Int): VimInt? {
+  val value = list.values.getOrNull(index) ?: return null
+  return value.toVimNumber()
 }
