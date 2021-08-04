@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.handler
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -44,6 +45,32 @@ class GotoLineHandlerTest : VimTestCase() {
       hard by the torrent of a mountain pass.
     """.trimIndent()
     assertState(after)
+  }
+
+  fun `test goto explicit line check history`() {
+    val before = """
+      A Discovery
+
+      I found it in a legendary land
+      all rocks and lavender and tufted grass,
+      where it was settled on some sodden sand
+      hard by the ${c}torrent of a mountain pass.
+    """.trimIndent()
+    configureByText(before)
+    enterCommand("3")
+    val after = """
+      A Discovery
+
+      ${c}I found it in a legendary land
+      all rocks and lavender and tufted grass,
+      where it was settled on some sodden sand
+      hard by the torrent of a mountain pass.
+    """.trimIndent()
+    assertState(after)
+
+    val register = VimPlugin.getRegister().getRegister(':')
+    kotlin.test.assertNotNull(register)
+    kotlin.test.assertEquals("3", register.text)
   }
 
   fun `test goto positive relative line`() {
