@@ -119,8 +119,7 @@ data class ExCommand(val ranges: Ranges, var command: String, var argument: Stri
       // todo nullable editor & context
       val ok = handler.process(nonNullEditor, nonNullContext, this)
       if (ok && !handler.argFlags.flags.contains(CommandHandler.Flag.DONT_SAVE_LAST)) {
-        val commandAsString = command + if (argument.isNotBlank()) " $argument" else ""
-        VimPlugin.getRegister().storeTextSpecial(RegisterGroup.LAST_COMMAND_REGISTER, commandAsString)
+        VimPlugin.getRegister().storeTextSpecial(RegisterGroup.LAST_COMMAND_REGISTER, originalString)
       }
       null
     }
