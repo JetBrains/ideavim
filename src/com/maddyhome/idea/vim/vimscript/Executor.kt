@@ -24,7 +24,9 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.group.HistoryGroup
+import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import java.io.File
 import java.io.IOException
@@ -35,10 +37,15 @@ object Executor {
 
   @kotlin.jvm.Throws(ExException::class)
   fun execute(scriptString: String, editor: Editor?, context: DataContext?, skipHistory: Boolean, indicateErrors: Boolean = true) {
+    val script = VimscriptParser.parse(scriptString)
+
     if (!skipHistory) {
       VimPlugin.getHistory().addEntry(HistoryGroup.COMMAND, scriptString)
+      if (script.units.size == 1 && script.units[0] is Command) { // todo add condition that script.units[0] !is RepeatCommand (after RepeatCommand is added)
+        VimPlugin.getRegister().storeTextSpecial(RegisterGroup.LAST_COMMAND_REGISTER, scriptString)
+      }
     }
-    val script = VimscriptParser.parse(scriptString)
+
     val vimContext = VimContext()
     for (unit in script.units) {
       try {
