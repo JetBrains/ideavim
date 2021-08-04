@@ -71,11 +71,13 @@ class UiTests {
         button("Finish").click()
       }
     }
+    Thread.sleep(1000)
     with(sharedSteps) {
       closeIdeaVimDialog()
       closeTipOfTheDay()
       closeAllTabs()
     }
+    Thread.sleep(1000)
     idea {
       createFile("MyDoc.txt", this@uiTest)
       val editor = editor("MyDoc.txt") {
