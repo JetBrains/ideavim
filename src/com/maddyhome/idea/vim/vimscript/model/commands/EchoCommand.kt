@@ -8,10 +8,10 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
-class EchoCommand(val ranges: Ranges, val args: List<Expression>) :
+data class EchoCommand(val ranges: Ranges, val args: List<Expression>) :
   Command.SingleExecution(ranges) {
 
-  override val argFlags = CommandHandlerFlags(RangeFlag.RANGE_FORBIDDEN, Access.READ_ONLY, emptySet())
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult.Success {
     val text = args.joinToString(separator = " ", postfix = "\n") {

@@ -21,20 +21,33 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 
-data class SubstituteCommand(val ranges: Ranges, val argument: String, val command: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+data class RegistersCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
-    var result = true
-    for (caret in editor.caretModel.allCarets) {
-      val lineRange = getLineRange(editor, caret)
-      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, lineRange, command, argument)) {
-        result = false
+
+    val registerGroup = VimPlugin.getRegister()
+    val regs = registerGroup.registers
+      .filter { argument.isEmpty() || argument.contains(it.name) }
+      .joinToString("\n", prefix = "Type Name Content\n") { reg ->
+        val type = when (reg.type) {
+          SelectionType.LINE_WISE -> "l"
+          SelectionType.CHARACTER_WISE -> "c"
+          SelectionType.BLOCK_WISE -> "b"
+        }
+        val text = reg.rawText?.let { parseKeys(it) } ?: reg.keys
+        "  $type  \"${reg.name}   ${StringHelper.toPrintableCharacters(text).take(200)}"
       }
-    }
-    return if (result) ExecutionResult.Success else ExecutionResult.Error
+
+    ExOutputModel.getInstance(editor).output(regs)
+
+    return ExecutionResult.Success
   }
 }

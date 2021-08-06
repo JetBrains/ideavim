@@ -77,10 +77,6 @@
       <with attribute="implementation" implements="com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler"/>
     </extensionPoint>
     <!--    For internal use only -->
-    <extensionPoint name="vimExCommand" beanClass="com.maddyhome.idea.vim.ex.ExBeanClass" dynamic="true">
-      <with attribute="implementation" implements="com.maddyhome.idea.vim.ex.CommandHandler"/>
-    </extensionPoint>
-    <!--    For internal use only -->
     <extensionPoint name="vimAction" beanClass="com.maddyhome.idea.vim.handler.ActionBeanClass" dynamic="true">
       <with attribute="implementation" implements="com.maddyhome.idea.vim.handler.EditorActionHandlerBase"/>
     </extensionPoint>
@@ -108,7 +104,6 @@
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/includes/VimActions.xml" xpointer="xpointer(/idea-plugin/*)"/>
-  <xi:include href="/META-INF/includes/VimExCommands.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/includes/VimExtensions.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/includes/VimListeners.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/includes/VimLibraryFunctions.xml" xpointer="xpointer(/idea-plugin/*)"/>

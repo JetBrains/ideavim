@@ -16,7 +16,7 @@ data class DelfunctionCommand(
   val ignoreIfMissing: Boolean,
 ) : Command.SingleExecution(ranges) {
 
-  override val argFlags = CommandHandlerFlags(RangeFlag.RANGE_FORBIDDEN, Access.READ_ONLY, emptySet())
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
     if (ignoreIfMissing) {

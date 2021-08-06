@@ -22,18 +22,25 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 
-data class SubstituteCommand(val ranges: Ranges, val argument: String, val command: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+data class MarkCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
+
   override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
-    var result = true
-    for (caret in editor.caretModel.allCarets) {
-      val lineRange = getLineRange(editor, caret)
-      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, lineRange, command, argument)) {
-        result = false
-      }
+    val mark = argument[0]
+    val line = getLine(editor)
+    val offset = EditorHelper.getLineStartOffset(editor, line)
+
+    val result = if (mark.isLetter() || mark in "'`") {
+      VimPlugin.getMark().setMark(editor, mark, offset)
+    } else {
+      VimPlugin.showMessage(MessageHelper.message(Msg.E191))
+      false
     }
     return if (result) ExecutionResult.Success else ExecutionResult.Error
   }

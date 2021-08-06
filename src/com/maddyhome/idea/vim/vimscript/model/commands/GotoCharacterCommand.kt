@@ -19,22 +19,26 @@
 package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 
-data class SubstituteCommand(val ranges: Ranges, val argument: String, val command: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
-  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
-    var result = true
-    for (caret in editor.caretModel.allCarets) {
-      val lineRange = getLineRange(editor, caret)
-      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, lineRange, command, argument)) {
-        result = false
-      }
-    }
-    return if (result) ExecutionResult.Success else ExecutionResult.Error
+data class GotoCharacterCommand(val ranges: Ranges, val argument: String) : Command.ForEachCaret(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
+  override fun processCommand(editor: Editor, caret: Caret, context: DataContext, vimContext: VimContext): ExecutionResult {
+    val count = getCount(editor, caret, 1, true)
+    if (count <= 0) return ExecutionResult.Error
+
+    val offset = VimPlugin.getMotion().moveCaretToNthCharacter(editor, count - 1)
+    if (offset == -1) return ExecutionResult.Error
+
+    MotionGroup.moveCaret(editor, caret, offset)
+
+    return ExecutionResult.Success
   }
 }

@@ -19,22 +19,32 @@
 package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 
-data class SubstituteCommand(val ranges: Ranges, val argument: String, val command: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
-  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
-    var result = true
-    for (caret in editor.caretModel.allCarets) {
-      val lineRange = getLineRange(editor, caret)
-      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, lineRange, command, argument)) {
-        result = false
-      }
+data class DeleteLinesCommand(val ranges: Ranges, var argument: String) : Command.ForEachCaret(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
+
+  override fun processCommand(editor: Editor, caret: Caret, context: DataContext, vimContext: VimContext): ExecutionResult {
+    val argument = this.argument
+    val register = if (argument.isNotEmpty() && !argument[0].isDigit()) {
+      this.argument = argument.substring(1)
+      argument[0]
+    } else {
+      VimPlugin.getRegister().defaultRegister
     }
-    return if (result) ExecutionResult.Success else ExecutionResult.Error
+
+    if (!VimPlugin.getRegister().selectRegister(register)) return ExecutionResult.Error
+
+    val textRange = getTextRange(editor, caret, true)
+    return if (VimPlugin.getChange()
+      .deleteRange(editor, caret, textRange, SelectionType.LINE_WISE, false)
+    ) ExecutionResult.Success
+    else ExecutionResult.Error
   }
 }

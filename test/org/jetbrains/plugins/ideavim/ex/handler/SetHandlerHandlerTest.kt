@@ -18,9 +18,9 @@
 
 package org.jetbrains.plugins.ideavim.ex.handler
 
-import com.maddyhome.idea.vim.ex.handler.SetHandlerHandler
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
+import com.maddyhome.idea.vim.vimscript.model.commands.SetHandlerCommand
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -30,7 +30,7 @@ class SetHandlerHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test parse a mappings`() {
     val owner = ShortcutOwnerInfo.allPerModeVim
-    val newOwner = SetHandlerHandler.updateOwner(owner, "a:ide")!!
+    val newOwner = SetHandlerCommand.updateOwner(owner, "a:ide")!!
     TestCase.assertEquals(ShortcutOwner.IDE, newOwner.insert)
     TestCase.assertEquals(ShortcutOwner.IDE, newOwner.normal)
     TestCase.assertEquals(ShortcutOwner.IDE, newOwner.select)
@@ -40,7 +40,7 @@ class SetHandlerHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test i mapping`() {
     val owner = ShortcutOwnerInfo.allPerModeVim
-    val newOwner = SetHandlerHandler.updateOwner(owner, "i:ide")!!
+    val newOwner = SetHandlerCommand.updateOwner(owner, "i:ide")!!
     TestCase.assertEquals(ShortcutOwner.IDE, newOwner.insert)
     TestCase.assertEquals(ShortcutOwner.VIM, newOwner.normal)
     TestCase.assertEquals(ShortcutOwner.VIM, newOwner.select)
@@ -50,7 +50,7 @@ class SetHandlerHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test n mapping`() {
     val owner = ShortcutOwnerInfo.allPerModeVim
-    val newOwner = SetHandlerHandler.updateOwner(owner, "n:ide")!!
+    val newOwner = SetHandlerCommand.updateOwner(owner, "n:ide")!!
     TestCase.assertEquals(ShortcutOwner.VIM, newOwner.insert)
     TestCase.assertEquals(ShortcutOwner.IDE, newOwner.normal)
     TestCase.assertEquals(ShortcutOwner.VIM, newOwner.select)
@@ -60,7 +60,7 @@ class SetHandlerHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test n-v mapping`() {
     val owner = ShortcutOwnerInfo.allPerModeVim
-    val newOwner = SetHandlerHandler.updateOwner(owner, "n-v:ide")!!
+    val newOwner = SetHandlerCommand.updateOwner(owner, "n-v:ide")!!
     TestCase.assertEquals(ShortcutOwner.VIM, newOwner.insert)
     TestCase.assertEquals(ShortcutOwner.IDE, newOwner.normal)
     TestCase.assertEquals(ShortcutOwner.IDE, newOwner.select)
@@ -70,7 +70,7 @@ class SetHandlerHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test v mapping`() {
     val owner = ShortcutOwnerInfo.allPerModeVim
-    val newOwner = SetHandlerHandler.updateOwner(owner, "v:ide")!!
+    val newOwner = SetHandlerCommand.updateOwner(owner, "v:ide")!!
     TestCase.assertEquals(ShortcutOwner.VIM, newOwner.insert)
     TestCase.assertEquals(ShortcutOwner.VIM, newOwner.normal)
     TestCase.assertEquals(ShortcutOwner.IDE, newOwner.select)
@@ -80,7 +80,7 @@ class SetHandlerHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test x mapping`() {
     val owner = ShortcutOwnerInfo.allPerModeVim
-    val newOwner = SetHandlerHandler.updateOwner(owner, "x:ide")!!
+    val newOwner = SetHandlerCommand.updateOwner(owner, "x:ide")!!
     TestCase.assertEquals(ShortcutOwner.VIM, newOwner.insert)
     TestCase.assertEquals(ShortcutOwner.VIM, newOwner.normal)
     TestCase.assertEquals(ShortcutOwner.VIM, newOwner.select)
@@ -90,7 +90,7 @@ class SetHandlerHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test s mapping`() {
     val owner = ShortcutOwnerInfo.allPerModeVim
-    val newOwner = SetHandlerHandler.updateOwner(owner, "s:ide")!!
+    val newOwner = SetHandlerCommand.updateOwner(owner, "s:ide")!!
     TestCase.assertEquals(ShortcutOwner.VIM, newOwner.insert)
     TestCase.assertEquals(ShortcutOwner.VIM, newOwner.normal)
     TestCase.assertEquals(ShortcutOwner.IDE, newOwner.select)
@@ -100,7 +100,7 @@ class SetHandlerHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test i-n-v mapping`() {
     val owner = ShortcutOwnerInfo.allPerModeVim
-    val newOwner = SetHandlerHandler.updateOwner(owner, "i-n-v:ide")!!
+    val newOwner = SetHandlerCommand.updateOwner(owner, "i-n-v:ide")!!
     TestCase.assertEquals(ShortcutOwner.IDE, newOwner.insert)
     TestCase.assertEquals(ShortcutOwner.IDE, newOwner.normal)
     TestCase.assertEquals(ShortcutOwner.IDE, newOwner.select)
@@ -110,14 +110,14 @@ class SetHandlerHandlerTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test broken mapping`() {
     val owner = ShortcutOwnerInfo.allPerModeVim
-    val newOwner = SetHandlerHandler.updateOwner(owner, "l:ide")
+    val newOwner = SetHandlerCommand.updateOwner(owner, "l:ide")
     TestCase.assertNull(newOwner)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test broken mapping 2`() {
     val owner = ShortcutOwnerInfo.allPerModeVim
-    val newOwner = SetHandlerHandler.updateOwner(owner, "hau2h2:ide")
+    val newOwner = SetHandlerCommand.updateOwner(owner, "hau2h2:ide")
     TestCase.assertNull(newOwner)
   }
 

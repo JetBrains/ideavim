@@ -20,21 +20,30 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
+import java.io.File
 
-data class SubstituteCommand(val ranges: Ranges, val argument: String, val command: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+/**
+ * @author vlan
+ */
+data class SourceCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
   override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
-    var result = true
-    for (caret in editor.caretModel.allCarets) {
-      val lineRange = getLineRange(editor, caret)
-      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, lineRange, command, argument)) {
-        result = false
+    val path = expandUser(argument.trim())
+    Executor.executeFile(File(path))
+    return ExecutionResult.Success
+  }
+
+  private fun expandUser(path: String): String {
+    if (path.startsWith("~")) {
+      val home = System.getProperty("user.home")
+      if (home != null) {
+        return home + path.substring(1)
       }
     }
-    return if (result) ExecutionResult.Success else ExecutionResult.Error
+    return path
   }
 }

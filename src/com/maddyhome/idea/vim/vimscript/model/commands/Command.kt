@@ -1,13 +1,20 @@
 package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.util.ThrowableComputable
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.MissingArgumentException
 import com.maddyhome.idea.vim.ex.MissingRangeException
+import com.maddyhome.idea.vim.ex.NoArgumentAllowedException
 import com.maddyhome.idea.vim.ex.NoRangeAllowedException
+import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
@@ -19,36 +26,42 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 import java.util.*
 
-sealed class Command(var commandRanges: Ranges) : Executable {
+sealed class Command(var commandRanges: Ranges, val commandArgument: String) : Executable {
 
   abstract val argFlags: CommandHandlerFlags
   protected open val optFlags: EnumSet<CommandFlags> = noneOfEnum()
+  private val logger = logger<Command>()
 
-  abstract class ForEachCaret(ranges: Ranges) :
-    Command(ranges) {
-    abstract fun processCommand(
-      editor: Editor,
-      caret: Caret,
-      context: DataContext,
-      vimContext: VimContext,
-    ): ExecutionResult
+  abstract class ForEachCaret(ranges: Ranges, argument: String = "") : Command(ranges, argument) {
+    abstract fun processCommand(editor: Editor, caret: Caret, context: DataContext, vimContext: VimContext): ExecutionResult
   }
 
-  abstract class SingleExecution(ranges: Ranges) :
-    Command(ranges) {
+  abstract class SingleExecution(ranges: Ranges, argument: String = "") : Command(ranges, argument) {
     abstract fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult
   }
 
   @Throws(ExException::class)
   override fun execute(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
-    var result: ExecutionResult = ExecutionResult.Success
-
     checkRanges()
-
+    checkArgument()
     if (editor.inVisualMode && Flag.SAVE_VISUAL !in argFlags.flags) {
       editor.exitVisualMode()
     }
+    if (argFlags.access == Access.WRITABLE && !editor.document.isWritable) {
+      logger.info("Trying to modify readonly document")
+      return ExecutionResult.Error
+    }
 
+    val runCommand = ThrowableComputable<ExecutionResult, ExException> { runCommand(editor, context, vimContext) }
+    return when (argFlags.access) {
+      Access.WRITABLE -> ApplicationManager.getApplication().runWriteAction(runCommand)
+      Access.READ_ONLY -> ApplicationManager.getApplication().runReadAction(runCommand)
+      Access.SELF_SYNCHRONIZED -> runCommand.compute()
+    }
+  }
+
+  private fun runCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
+    var result: ExecutionResult = ExecutionResult.Success
     when (this) {
       is ForEachCaret -> {
         editor.caretModel.runForEachCaret(
@@ -61,10 +74,6 @@ sealed class Command(var commandRanges: Ranges) : Executable {
         )
       }
       is SingleExecution -> result = processCommand(editor, context, vimContext)
-    }
-
-    if (result !is ExecutionResult.Success) {
-      VimPlugin.indicateError()
     }
     return result
   }
@@ -82,6 +91,18 @@ sealed class Command(var commandRanges: Ranges) : Executable {
 
     if (RangeFlag.RANGE_IS_COUNT == argFlags.rangeFlag) {
       commandRanges.setDefaultLine(1)
+    }
+  }
+
+  private fun checkArgument() {
+    if (ArgumentFlag.ARGUMENT_FORBIDDEN == argFlags.argumentFlag && commandArgument.isNotBlank()) {
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_argforb))
+      throw NoArgumentAllowedException()
+    }
+
+    if (ArgumentFlag.ARGUMENT_REQUIRED == argFlags.argumentFlag && commandArgument.isBlank()) {
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_argreq))
+      throw MissingArgumentException()
     }
   }
 
@@ -143,8 +164,6 @@ sealed class Command(var commandRanges: Ranges) : Executable {
   }
 
   enum class Flag {
-    DONT_SAVE_LAST,
-
     /**
      * This command should not exit visual mode.
      *
@@ -156,9 +175,45 @@ sealed class Command(var commandRanges: Ranges) : Executable {
 
   data class CommandHandlerFlags(
     val rangeFlag: RangeFlag,
+    val argumentFlag: ArgumentFlag,
     val access: Access,
     val flags: Set<Flag>,
   )
 
+  fun flags(rangeFlag: RangeFlag, argumentFlag: ArgumentFlag, access: Access, vararg flags: Flag) =
+    CommandHandlerFlags(rangeFlag, argumentFlag, access, flags.toSet())
+
+  fun getLine(editor: Editor): Int = commandRanges.getLine(editor)
+
   fun getLine(editor: Editor, caret: Caret): Int = commandRanges.getLine(editor, caret)
+
+  fun getCount(editor: Editor, defaultCount: Int, checkCount: Boolean): Int {
+    val count = if (checkCount) countArgument else -1
+
+    val res = commandRanges.getCount(editor, count)
+    return if (res == -1) defaultCount else res
+  }
+
+  fun getCount(editor: Editor, caret: Caret, defaultCount: Int, checkCount: Boolean): Int {
+    val count = commandRanges.getCount(editor, caret, if (checkCount) countArgument else -1)
+    return if (count == -1) defaultCount else count
+  }
+
+  fun getLineRange(editor: Editor): LineRange = commandRanges.getLineRange(editor, -1)
+
+  fun getLineRange(editor: Editor, caret: Caret, checkCount: Boolean = false): LineRange {
+    return commandRanges.getLineRange(editor, caret, if (checkCount) countArgument else -1)
+  }
+
+  fun getTextRange(editor: Editor, checkCount: Boolean): TextRange {
+    val count = if (checkCount) countArgument else -1
+    return commandRanges.getTextRange(editor, count)
+  }
+
+  fun getTextRange(editor: Editor, caret: Caret, checkCount: Boolean): TextRange {
+    return commandRanges.getTextRange(editor, caret, if (checkCount) countArgument else -1)
+  }
+
+  private val countArgument: Int
+    get() = commandArgument.toIntOrNull() ?: -1
 }

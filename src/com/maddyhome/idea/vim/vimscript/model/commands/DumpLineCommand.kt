@@ -19,22 +19,36 @@
 package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 
-data class SubstituteCommand(val ranges: Ranges, val argument: String, val command: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+data class DumpLineCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
-    var result = true
-    for (caret in editor.caretModel.allCarets) {
-      val lineRange = getLineRange(editor, caret)
-      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, lineRange, command, argument)) {
-        result = false
+    if (!logger.isDebugEnabled) return ExecutionResult.Error
+
+    val range = getLineRange(editor)
+    val chars = editor.document.charsSequence
+    for (l in range.startLine..range.endLine) {
+      val start = editor.document.getLineStartOffset(l)
+      val end = editor.document.getLineEndOffset(l)
+
+      logger.debug("Line $l, start offset=$start, end offset=$end")
+
+      for (i in start..end) {
+        logger.debug(
+          "Offset $i, char=${chars[i]}, lp=${editor.offsetToLogicalPosition(i)}, vp=${editor.offsetToVisualPosition(i)}"
+        )
       }
     }
-    return if (result) ExecutionResult.Success else ExecutionResult.Error
+
+    return ExecutionResult.Success
+  }
+
+  companion object {
+    private val logger = Logger.getInstance(DumpLineCommand::class.java.name)
   }
 }

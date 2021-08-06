@@ -25,16 +25,21 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 
-data class SubstituteCommand(val ranges: Ranges, val argument: String, val command: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+data class SelectFileCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
   override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
-    var result = true
-    for (caret in editor.caretModel.allCarets) {
-      val lineRange = getLineRange(editor, caret)
-      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, lineRange, command, argument)) {
-        result = false
+    val count = getCount(editor, 0, true)
+
+    if (count > 0) {
+      val res = VimPlugin.getFile().selectFile(count - 1, context)
+      if (res) {
+        VimPlugin.getMark().saveJumpLocation(editor)
       }
+
+      return if (res) ExecutionResult.Success else ExecutionResult.Error
     }
-    return if (result) ExecutionResult.Success else ExecutionResult.Error
+
+    return ExecutionResult.Success
   }
 }

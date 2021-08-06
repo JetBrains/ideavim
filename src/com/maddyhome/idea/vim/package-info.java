@@ -681,7 +681,7 @@
  * tag                    handler
  * -------------------------------------------------------------------------------------------------------------------
  *
- * |:map|                 {@link com.maddyhome.idea.vim.ex.handler.mapping.MapHandler}
+ * |:map|                 {@link com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand}
  * |:nmap|                ...
  * |:vmap|                ...
  * |:omap|                ...
@@ -693,17 +693,17 @@
  * |:onoremap|            ...
  * |:inoremap|            ...
  * |:cnoremap|            ...
- * |:shell|               {@link com.maddyhome.idea.vim.ex.handler.ShellHandler}
- * |:sort|                {@link com.maddyhome.idea.vim.ex.handler.SortHandler}
- * |:source|              {@link com.maddyhome.idea.vim.ex.handler.SourceHandler}
- * |:qall|                {@link com.maddyhome.idea.vim.ex.handler.ExitHandler}
- * |:quitall|             {@link com.maddyhome.idea.vim.ex.handler.ExitHandler}
- * |:quitall|             {@link com.maddyhome.idea.vim.ex.handler.ExitHandler}
- * |:wqall|               {@link com.maddyhome.idea.vim.ex.handler.ExitHandler}
- * |:xall|                {@link com.maddyhome.idea.vim.ex.handler.ExitHandler}
- * |:command|             {@link com.maddyhome.idea.vim.ex.handler.CmdHandler}
- * |:delcommand|          {@link com.maddyhome.idea.vim.ex.handler.DelCmdHandler}
- * |:comclear|            {@link com.maddyhome.idea.vim.ex.handler.CmdClearHandler}
+ * |:shell|               {@link com.maddyhome.idea.vim.vimscript.model.commands.ShellCommand}
+ * |:sort|                {@link com.maddyhome.idea.vim.vimscript.model.commands.SortCommand}
+ * |:source|              {@link com.maddyhome.idea.vim.vimscript.model.commands.SourceCommand}
+ * |:qall|                {@link com.maddyhome.idea.vim.vimscript.model.commands.ExitCommand}
+ * |:quitall|             {@link com.maddyhome.idea.vim.vimscript.model.commands.ExitCommand}
+ * |:quitall|             {@link com.maddyhome.idea.vim.vimscript.model.commands.ExitCommand}
+ * |:wqall|               {@link com.maddyhome.idea.vim.vimscript.model.commands.ExitCommand}
+ * |:xall|                {@link com.maddyhome.idea.vim.vimscript.model.commands.ExitCommand}
+ * |:command|             {@link com.maddyhome.idea.vim.vimscript.model.commands.CmdCommand}
+ * |:delcommand|          {@link com.maddyhome.idea.vim.vimscript.model.commands.DelCmdCommand}
+ * |:comclear|            {@link com.maddyhome.idea.vim.vimscript.model.commands.CmdClearCommand}
  * ...
  *
  * The list of supported Ex commands is incomplete.

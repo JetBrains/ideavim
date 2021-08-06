@@ -28,7 +28,7 @@ data class LetCommand(
   val expression: Expression,
 ) : Command.SingleExecution(ranges) {
 
-  override val argFlags = CommandHandlerFlags(RangeFlag.RANGE_FORBIDDEN, Access.READ_ONLY, emptySet())
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
   override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {

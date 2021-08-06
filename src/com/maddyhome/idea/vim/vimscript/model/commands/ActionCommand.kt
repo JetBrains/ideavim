@@ -18,23 +18,39 @@
 
 package com.maddyhome.idea.vim.vimscript.model.commands
 
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.helper.MessageHelper
+import com.maddyhome.idea.vim.helper.runAfterGotFocus
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 
-data class SubstituteCommand(val ranges: Ranges, val argument: String, val command: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+/**
+ * @author smartbomb
+ */
+data class ActionCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
+
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY, Flag.SAVE_VISUAL)
+
   override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
-    var result = true
-    for (caret in editor.caretModel.allCarets) {
-      val lineRange = getLineRange(editor, caret)
-      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, lineRange, command, argument)) {
-        result = false
-      }
+    val actionName = argument.trim()
+    val action = ActionManager.getInstance().getAction(actionName) ?: throw ExException(MessageHelper.message("action.not.found.0", actionName))
+    val application = ApplicationManager.getApplication()
+    if (application.isUnitTestMode) {
+      executeAction(action, context)
+    } else {
+      runAfterGotFocus { executeAction(action, context) }
     }
-    return if (result) ExecutionResult.Success else ExecutionResult.Error
+    return ExecutionResult.Success
+  }
+
+  private fun executeAction(action: AnAction, context: DataContext) {
+    KeyHandler.executeAction(action, context)
   }
 }

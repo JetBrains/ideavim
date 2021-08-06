@@ -93,10 +93,231 @@ command:
     range? ws_cols DELF (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName comment?
     #DelfunctionCommand|
 
+    range? ws_cols ACTION (WS* commandArgument) comment?
+    #ActionCommand|
+
+    range? ws_cols ACTIONLIST (WS* commandArgument) comment?
+    #ActionListCommand|
+
+    range? ws_cols ASCII (WS* commandArgument)? comment?
+    #AsciiCommand|
+
+    range? ws_cols (B_LOWERCASE | BUFFER) (WS* commandArgument)? comment?
+    #BufferCommand|
+
+    range? ws_cols BUFFER_CLOSE (WS* commandArgument)? comment?
+    #BufferCloseCommand|
+
+    range? ws_cols BUFFER_LIST (WS* commandArgument)? comment?
+    #BufferListCommand|
+
+    range? ws_cols CMD (WS* commandArgument)? comment?
+    #CmdCommand|
+
+    range? ws_cols EXCLAMATION (WS* commandArgument)? comment?
+    #CmdFilterCommand|
+
+    range? ws_cols CMD_CLEAR (WS* commandArgument)? comment?
+    #CmdClearCommand|
+
+    range? ws_cols (T_LOWERCASE | COPY) (WS* commandArgument)? comment?
+    #CopyTextCommand|
+
+    range? ws_cols DELCMD (WS* commandArgument)? comment?
+    #DelCmdCommand|
+
+    range? ws_cols (D_LOWERCASE | DEL_LINES) (WS* commandArgument)? comment?
+    #DeleteLinesCommand|
+
+    range? ws_cols DEL_MARKS (WS* commandArgument)? comment?
+    #DeleteMarksCommand|
+
+    range? ws_cols DIGRAPH (WS* commandArgument)? comment?
+    #DigraphCommand|
+
+    range? ws_cols DUMP_LINE (WS* commandArgument)? comment?
+    #DumpLineCommand|
+
+    range? ws_cols (E_LOWERCASE | EDIT_FILE) (WS* commandArgument)? comment?
+    #EditFileCommand|
+
+    range? ws_cols EXIT (WS* commandArgument)? comment?
+    #ExitCommand|
+
+    range? ws_cols (F_LOWERCASE | FILE) (WS* commandArgument)? comment?
+    #FileCommand|
+
+    range? ws_cols CLASS (WS* commandArgument)? comment?
+    #FindClassCommand|
+
+    range? ws_cols FIND (WS* commandArgument)? comment?
+    #FindFileCommand|
+
+    range? ws_cols SYMBOL (WS* commandArgument)? comment?
+    #FindSymbolCommand|
+
+    range? ws_cols (G_LOWERCASE | GLOBAL) (invert = EXCLAMATION)? (WS* commandArgument)? comment?
+    #GlobalCommand|
+
+    range? ws_cols (V_LOWERCASE | V_GLOBAL) (WS* commandArgument)? comment?
+    #VglobalCommand|
+
+    range? ws_cols GO_TO_CHAR (WS* commandArgument)? comment?
+    #GoToCharacterCommand|
+
+    range? ws_cols (H_LOWERCASE | HELP) (WS* commandArgument)? comment?
+    #HelpCommand|
+
+    range? ws_cols HISTORY (WS* commandArgument)? comment?
+    #HistoryCommand|
+
+    range? ws_cols (J_LOWERCASE | JOIN_LINES) (WS* commandArgument)? comment?
+    #JoinLinesCommand|
+
+    range? ws_cols JUMPS (WS* commandArgument)? comment?
+    #JumpsCommand|
+
+    range? ws_cols (K_LOWERCASE | MARK_COMMAND) (WS* commandArgument)? comment?
+    #MarkCommand|
+
+    range? ws_cols MARKS (WS* commandArgument)? comment?
+    #MarksCommand|
+
+    range? ws_cols (M_LOWERCASE | MOVE_TEXT) (WS* commandArgument)? comment?
+    #MoveTextCommand|
+
+    range? ws_cols (N_LOWERCASE | NEXT_FILE) (WS* commandArgument)? comment?
+    #NextFileCommand|
+
+    range? ws_cols NEXT_TAB (WS* commandArgument)? comment?
+    #NextTabCommand|
+
+    range? ws_cols NO_HL_SEARCH (WS* commandArgument)? comment?
+    #NoHlSearchCommand|
+
+    range? ws_cols ONLY (WS* commandArgument)? comment?
+    #OnlyCommand|
+
+    range? ws_cols PLUG (WS* commandArgument)? comment?
+    #PlugCommand|
+
+    range? ws_cols (N_UPPERCASE | PREVIOUS_FILE) (WS* commandArgument)? comment?
+    #PreviousFileCommand|
+
+    range? ws_cols PREVIOUS_TAB (WS* commandArgument)? comment?
+    #PreviousTabCommand|
+
+    range? ws_cols (P_LOWERCASE | P_UPPERCASE | PRINT) (WS* commandArgument)? comment?
+    #PrintCommand|
+
+    range? ws_cols PROMPT_FIND (WS* commandArgument)? comment?
+    #PromptFindCommand|
+
+    range? ws_cols PROMPT_REPLACE (WS* commandArgument)? comment?
+    #PromptReplaceCommand|
+
+    range? ws_cols PUT_LINES (WS* commandArgument)? comment?
+    #PutLinesCommand|
+
+    range? ws_cols (Q_LOWERCASE | QUIT) (WS* commandArgument)? comment?
+    #QuitCommand|
+
+    range? ws_cols REDO (WS* commandArgument)? comment?
+    #RedoCommand|
+
+    range? ws_cols REGISTERS (WS* commandArgument)? comment?
+    #RegistersCommand|
+
+    range? ws_cols AT (WS* commandArgument)? comment?
+    #RepeatCommand|
+
+    range? ws_cols SELECT_FILE (WS* commandArgument)? comment?
+    #SelectFileCommand|
+
+    range? ws_cols SELECT_FIRST_FILE (WS* commandArgument)? comment?
+    #SelectFirstFileCommand|
+
+    range? ws_cols SELECT_LAST_FILE (WS* commandArgument)? comment?
+    #SelectLastFileCommand|
+
+    range? ws_cols SET (WS* commandArgument)? comment?
+    #SetCommand|
+
+    range? ws_cols SET_HANDLER (WS* commandArgument)? comment?
+    #SetHandlerCommand|
+
+    range? ws_cols SHELL (WS* commandArgument)? comment?
+    #ShellCommand|
+
+    range? ws_cols lShift (WS* commandArgument)? comment?
+    #ShiftLeftCommand|
+
+    range? ws_cols rShift (WS* commandArgument)? comment?
+    #ShiftRightCommand|
+
+    range? ws_cols SORT (WS* commandArgument)? comment?
+    #SortCommand|
+
+    range? ws_cols SPLIT (WS* commandArgument)? comment?
+    #SplitCommand|
+
+    range? ws_cols V_SPLIT (WS* commandArgument)? comment?
+    #VSplitCommand|
+
+    range? ws_cols SOURCE (WS* commandArgument)? comment?
+    #SourceCommand|
+
+    range? ws_cols substituteCommandName = (S_LOWERCASE | SUBSTITUTE | TILDE | AMPERSAND) (WS* commandArgument)? comment?
+    #SubstituteCommand|
+
+    range? ws_cols TAB_CLOSE (WS* commandArgument)? comment?
+    #TabCloseCommand|
+
+    range? ws_cols TAB_ONLY (WS* commandArgument)? comment?
+    #TabOnlyCommand|
+
+    range? ws_cols (U_LOWERCASE | UNDO) (WS* commandArgument)? comment?
+    #UndoCommand|
+
+    range? ws_cols WRITE_ALL (WS* commandArgument)? comment?
+    #WriteAllCommand|
+
+    range? ws_cols (W_LOWERCASE | WRITE) (WS* commandArgument)? comment?
+    #WriteCommand|
+
+    range? ws_cols WRITE_NEXT (WS* commandArgument)? comment?
+    #WriteNextCommand|
+
+    range? ws_cols WRITE_PREVIOUS (WS* commandArgument)? comment?
+    #WritePreviousCommand|
+
+    range? ws_cols (X_LOWERCASE | WRITE_QUIT) (WS* commandArgument)? comment?
+    #WriteQuitCommand|
+
+    range? ws_cols (Y_LOWERCASE | YANK_LINES) (WS* commandArgument)? comment?
+    #YankLinesCommand|
+
+    range? ws_cols MAP (WS* commandArgument)?
+    #MapCommand|
+
+    range? ws_cols MAP_CLEAR (WS* commandArgument)?
+    #MapClearCommand|
+
+    range? ws_cols UNMAP (WS* commandArgument)?
+    #UnmapCommand|
+
+//  Command rule pattern:
+//    range? COMMAND_TOKEN ws_cols (WS* commandArgument)? comment?
+//    #ID|
+//
     // add new rules above this one
-    range? ws_cols commandName (WS* commandArgument)?
+    range? ws_cols commandName (WS commandArgument)?
     #OtherCommand
 ;
+lShift:
+    (LESS)+;
+rShift:
+    (GREATER)+;
 
 commandArgument:
     (. | ESCAPED_BAR)*?;
@@ -133,14 +354,6 @@ commandName:
 |   IDENTIFIER_LOWERCASE_WITH_DIGITS
 |   IDENTIFIER_ANY_CASE_WITH_DIGITS
 |   IDENTIFIER_ANY_CASE_WITH_DIGITS_AND_UNDERSCORES
-    // some odd command names (containing non-alphabetic chars)
-|   PLUG
-|   LSHIFT
-|   RSHIFT
-|   LESS
-|   GREATER
-|   AMPERSAND
-|   TILDE
 ;
 
 
@@ -223,14 +436,14 @@ literalDictionaryKey:   anyCaseNameWithDigitsAndUnderscores
                     |   literalDictionaryKey MINUS+
 ;
 
-anyScope:               BUFFER_VARIABLE
-                    |   WINDOW_VARIABLE
-                    |   TABPAGE_VARIABLE
-                    |   GLOBAL_VARIABLE
-                    |   LOCAL_VARIABLE
-                    |   SCRIPT_VARIABLE
-                    |   FUNCTION_VARIABLE
-                    |   VIM_VARIABLE
+anyScope:               B_LOWERCASE // buffer variable
+                    |   W_LOWERCASE // window variable
+                    |   T_LOWERCASE // tabpage variable
+                    |   G_LOWERCASE // global variable
+                    |   L_LOWERCASE // local variable
+                    |   S_LOWERCASE // script variable
+                    |   A_LOWERCASE // function variable
+                    |   V_LOWERCASE // vim variable
 ;
 
 
@@ -242,31 +455,17 @@ anyScope:               BUFFER_VARIABLE
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 string:
                         EMPTY_DOUBLE_QUOTED_STRING
-                    |   EMPTY_SINGLE_QUOTED_STRING
                     |   STRING_DOUBLE_QUOTED
-                    |   (SINGLE_QUOTE | MARK_WITH_SINGLE_QUOTE)  (BACKSLASH | ~(SINGLE_QUOTE | MARK_WITH_SINGLE_QUOTE))*? SINGLE_QUOTE
+                    |   ESCAPED_SINGLE_QUOTE
+                    |   ESCAPED_SINGLE_QUOTE ESCAPED_SINGLE_QUOTE
+                    |   (SINGLE_QUOTE | (ESCAPED_SINGLE_QUOTE SINGLE_QUOTE))  ~(SINGLE_QUOTE)*? SINGLE_QUOTE
 ;
 unsignedFloat:          FLOAT;
 unsignedInt:            DIGIT | INT;
 blob:                   BLOB;
 
-mark:                   MARK_WITH_SINGLE_QUOTE
-                    |   MARK_WITH_BACKTICK
-                    |   EMPTY_SINGLE_QUOTED_STRING  // '' is also a mark in vim
-                    // we can't put below cases to MARK_WITH_SINGLE_QUOTE lexer rule, because part of "'10'<5" or "list['0']" etc will be recognized as marks ('< and '])
-                    |   SINGLE_QUOTE (
-                            LESS
-                        |   GREATER
-                        |   L_PAREN
-                        |   R_PAREN
-                        |   L_CURLY
-                        |   R_CURLY
-                        |   L_BRACKET
-                        |   R_BRACKET
-                        |   QUOTE
-                        |   CARET
-                        |   DOT
-                    )
+mark:                   SINGLE_QUOTE (lowercaseAlphabeticChar | uppercaseAlphabeticChar | DIGIT | LESS | GREATER | L_PAREN | R_PAREN | L_CURLY | R_CURLY | L_BRACKET | R_BRACKET | QUOTE | CARET | DOT | BACKTICK | SINGLE_QUOTE)
+                    |   BACKTICK (lowercaseAlphabeticChar | uppercaseAlphabeticChar | DIGIT | LESS | GREATER | L_PAREN | R_PAREN | L_CURLY | R_CURLY | L_BRACKET | R_BRACKET | QUOTE | CARET | DOT | BACKTICK | SINGLE_QUOTE)
 ;
 comment:                WS* (QUOTE | EMPTY_DOUBLE_QUOTED_STRING) ~STATEMENT_SEPARATOR *?;
 
@@ -292,17 +491,60 @@ alphabeticChar:         lowercaseAlphabeticChar
                     |   uppercaseAlphabeticChar
 ;
 uppercaseAlphabeticChar:
-                        UPPERCASE_CHAR;
+                        A_UPPERCASE
+                    |   B_UPPERCASE
+                    |   C_UPPERCASE
+                    |   D_UPPERCASE
+                    |   E_UPPERCASE
+                    |   F_UPPERCASE
+                    |   G_UPPERCASE
+                    |   H_UPPERCASE
+                    |   I_UPPERCASE
+                    |   J_UPPERCASE
+                    |   K_UPPERCASE
+                    |   L_UPPERCASE
+                    |   M_UPPERCASE
+                    |   N_UPPERCASE
+                    |   O_UPPERCASE
+                    |   P_UPPERCASE
+                    |   Q_UPPERCASE
+                    |   R_UPPERCASE
+                    |   S_UPPERCASE
+                    |   T_UPPERCASE
+                    |   U_UPPERCASE
+                    |   V_UPPERCASE
+                    |   W_UPPERCASE
+                    |   X_UPPERCASE
+                    |   Y_UPPERCASE
+                    |   Z_UPPERCASE
+;
 lowercaseAlphabeticChar:
-                        LOWERCASE_CHAR
-                    |   BUFFER_VARIABLE
-                    |   WINDOW_VARIABLE
-                    |   TABPAGE_VARIABLE
-                    |   GLOBAL_VARIABLE
-                    |   LOCAL_VARIABLE
-                    |   SCRIPT_VARIABLE
-                    |   FUNCTION_VARIABLE
-                    |   VIM_VARIABLE
+                        A_LOWERCASE
+                    |   B_LOWERCASE
+                    |   C_LOWERCASE
+                    |   D_LOWERCASE
+                    |   E_LOWERCASE
+                    |   F_LOWERCASE
+                    |   G_LOWERCASE
+                    |   H_LOWERCASE
+                    |   I_LOWERCASE
+                    |   J_LOWERCASE
+                    |   K_LOWERCASE
+                    |   L_LOWERCASE
+                    |   M_LOWERCASE
+                    |   N_LOWERCASE
+                    |   O_LOWERCASE
+                    |   P_LOWERCASE
+                    |   Q_LOWERCASE
+                    |   R_LOWERCASE
+                    |   S_LOWERCASE
+                    |   T_LOWERCASE
+                    |   U_LOWERCASE
+                    |   V_LOWERCASE
+                    |   W_LOWERCASE
+                    |   X_LOWERCASE
+                    |   Y_LOWERCASE
+                    |   Z_LOWERCASE
 ;
 
 keyword:                FUNCTION
@@ -329,6 +571,73 @@ existingCommands:       RETURN
                     |   LET
                     |   ECHO
                     |   DELF
+                    |   ACTION
+                    |   ACTIONLIST
+                    |   ASCII
+                    |   BUFFER
+                    |   BUFFER_CLOSE
+                    |   BUFFER_LIST
+                    |   CMD
+                    |   CMD_CLEAR
+                    |   COPY
+                    |   DELCMD
+                    |   DEL_LINES
+                    |   DEL_MARKS
+                    |   DIGRAPH
+                    |   DUMP_LINE
+                    |   EDIT_FILE
+                    |   EXIT
+                    |   FILE
+                    |   CLASS
+                    |   FIND
+                    |   SYMBOL
+                    |   GLOBAL
+                    |   V_GLOBAL
+                    |   GO_TO_CHAR
+                    |   HELP
+                    |   HISTORY
+                    |   JOIN_LINES
+                    |   JUMPS
+                    |   MARK_COMMAND
+                    |   MARKS
+                    |   MOVE_TEXT
+                    |   NEXT_FILE
+                    |   NEXT_TAB
+                    |   NO_HL_SEARCH
+                    |   ONLY
+                    |   PLUG
+                    |   PREVIOUS_FILE
+                    |   PREVIOUS_TAB
+                    |   PRINT
+                    |   PROMPT_FIND
+                    |   PROMPT_REPLACE
+                    |   PUT_LINES
+                    |   QUIT
+                    |   REDO
+                    |   REGISTERS
+                    |   SELECT_FILE
+                    |   SELECT_FIRST_FILE
+                    |   SELECT_LAST_FILE
+                    |   SET
+                    |   SET_HANDLER
+                    |   SHELL
+                    |   SORT
+                    |   SPLIT
+                    |   V_SPLIT
+                    |   SOURCE
+                    |   SUBSTITUTE
+                    |   TAB_CLOSE
+                    |   TAB_ONLY
+                    |   UNDO
+                    |   WRITE_ALL
+                    |   WRITE
+                    |   WRITE_NEXT
+                    |   WRITE_PREVIOUS
+                    |   WRITE_QUIT
+                    |   YANK_LINES
+                    |   MAP
+                    |   MAP_CLEAR
+                    |   UNMAP
 ;
 
 ws_cols:                 (WS | COLON)*;
@@ -339,6 +648,62 @@ ws_cols:                 (WS | COLON)*;
 //  Lexer rules
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Lowercase chars
+A_LOWERCASE:            'a';
+B_LOWERCASE:            'b';
+C_LOWERCASE:            'c';
+D_LOWERCASE:            'd';
+E_LOWERCASE:            'e';
+F_LOWERCASE:            'f';
+G_LOWERCASE:            'g';
+H_LOWERCASE:            'h';
+I_LOWERCASE:            'i';
+J_LOWERCASE:            'j';
+K_LOWERCASE:            'k';
+L_LOWERCASE:            'l';
+M_LOWERCASE:            'm';
+N_LOWERCASE:            'n';
+O_LOWERCASE:            'o';
+P_LOWERCASE:            'p';
+Q_LOWERCASE:            'q';
+R_LOWERCASE:            'r';
+S_LOWERCASE:            's';
+T_LOWERCASE:            't';
+U_LOWERCASE:            'u';
+V_LOWERCASE:            'v';
+W_LOWERCASE:            'w';
+X_LOWERCASE:            'x';
+Y_LOWERCASE:            'y';
+Z_LOWERCASE:            'z';
+
+// Uppercase chars
+A_UPPERCASE:            'A';
+B_UPPERCASE:            'B';
+C_UPPERCASE:            'C';
+D_UPPERCASE:            'D';
+E_UPPERCASE:            'E';
+F_UPPERCASE:            'F';
+G_UPPERCASE:            'G';
+H_UPPERCASE:            'H';
+I_UPPERCASE:            'I';
+J_UPPERCASE:            'J';
+K_UPPERCASE:            'K';
+L_UPPERCASE:            'L';
+M_UPPERCASE:            'M';
+N_UPPERCASE:            'N';
+O_UPPERCASE:            'O';
+P_UPPERCASE:            'P';
+Q_UPPERCASE:            'Q';
+R_UPPERCASE:            'R';
+S_UPPERCASE:            'S';
+T_UPPERCASE:            'T';
+U_UPPERCASE:            'U';
+V_UPPERCASE:            'V';
+W_UPPERCASE:            'W';
+X_UPPERCASE:            'X';
+Y_UPPERCASE:            'Y';
+Z_UPPERCASE:            'Z';
+
 // Keywords
 FUNCTION:               'function';
 ENDFUNCTION:            'endfunction';
@@ -360,14 +725,95 @@ ENDTRY:                 'endtry';
 THROW:                  'throw';
 
 // Commands
-RETURN:                 'return';
+ACTION:                 'action';
+ACTIONLIST:             'actionlist';
+ASCII:                  'as' | 'asc' | 'asci' | 'ascii';
+BUFFER:                 'bu' | 'buf' | 'buff' | 'buffe' | 'buffer';
+BUFFER_CLOSE:           'bd';
+BUFFER_LIST:            'buffers' | 'ls' | 'files';
+CLASS:                  'cla' | 'clas' | 'class';
+CMD:                    'com' | 'comm' | 'comma' | 'comman' | 'command';
+CMD_CLEAR:              'comc' | 'comcl' | 'comcle' | 'comclea' | 'comclear';
+COPY:                   'co' | 'cop' | 'copy';
+DELCMD:                 'delc' | 'delco' | 'delcom' | 'delcomm' | 'delcomma' | 'delcomman' | 'delcommand';
+DELF:                   'delf' | 'delfu' | 'delfun' | 'delfunc'| 'delfunct' | 'delfuncti' | 'delfunctio' | 'delfunction';
+DEL_LINES:              'de' | 'del' | 'dele' | 'delet' | 'delete';
+DEL_MARKS:              'delm' | 'delma' | 'delmar' | 'delmark' | 'delmarks';
+DIGRAPH:                'dig' | 'digr' | 'digra' | 'digrap' | 'digraph' | 'digraphs';
+DUMP_LINE:              'dump' | 'dumpl' | 'dumpli' | 'dumplin' | 'dumpline';
+ECHO:                   'ec' | 'ech' | 'echo';
+EDIT_FILE:              'bro' | 'brow' | 'brows' | 'browse' | 'ed' | 'edi' | 'edit';
+EXIT:                   'wqa' | 'wqal' | 'wqall' | 'qa' | 'qal' | 'qall' | 'xa' | 'xal' | 'xall' | 'quita' | 'quital' | 'quitall';
+FILE:                   'fi' | 'fil' | 'file';
+FIND:                   'fin' | 'find';
+GLOBAL:                 'gl' | 'glo' | 'glob' | 'globa' | 'global';
+GO_TO_CHAR:             'go' | 'got' | 'goto';
+HELP:                   'he' | 'hel' | 'help';
+HISTORY:                'his' | 'hist' | 'histo' | 'histor' | 'history';
+JOIN_LINES:             'jo' | 'joi' | 'join';
+JUMPS:                  'ju' | 'jum' | 'jump' | 'jumps';
 LET:                    'let';
-ECHO:                   'ec' | 'echo';
-DELF:                   'delf' | 'delfunction';
-// Odd command names
-LSHIFT:                 '<<';
-RSHIFT:                 '>>';
-PLUG:                   '<Plug>';
+MARKS:                  'marks';
+MARK_COMMAND:           'ma' | 'mar' | 'mark';
+MOVE_TEXT:              'mo' | 'mov' | 'move';
+NEXT_FILE:              'ne' | 'nex' | 'next' | 'bn' | 'bne' | 'bnex' | 'bnext';
+NEXT_TAB:               'tabn' | 'tabne' | 'tabnex' | 'tabnext';
+NO_HL_SEARCH:           'noh' | 'nohl' | 'nohls' | 'nohlse' | 'nohlsea' | 'nohlsear' | 'nohlsearc' | 'nohlsearch';
+ONLY:                   'on' | 'onl' | 'only';
+PLUG:                   'Plug' | 'Plugi' | 'Plugin';
+PREVIOUS_FILE:          'Ne' | 'Nex' | 'Next' | 'prev'| 'previ' | 'previo' | 'previou' | 'previous' | 'bp' | 'bpr' | 'bpre' |'bprev'| 'bprevi' | 'bprevio' | 'bpreviou' | 'bprevious';
+PREVIOUS_TAB:           'tabp' | 'tabpr' | 'tabpre' | 'tabprev' | 'tabprevi' | 'tabprevio' | 'tabpreviou' | 'tabprevious' | 'tabN' | 'tabNe' | 'tabNex' | 'tabNext';
+PRINT:                  'pr' | 'pri' | 'prin' | 'print' | 'Pr' | 'Pri' | 'Prin' | 'Print';
+PROMPT_FIND:            'pro' | 'prom' | 'promp' | 'prompt' | 'promptf' | 'promptfi' | 'promptfin' | 'promptfind';
+PROMPT_REPLACE:         'promptr' | 'promptre' | 'promptrep' | 'promptrepl';
+PUT_LINES:              'pu' | 'put';
+QUIT:                   'qu' | 'qui' | 'quit' | 'clo' | 'clos' | 'close' | 'hid' | 'hide';
+REDO:                   'red' | 'redo';
+REGISTERS:              'di' | 'dis' | 'disp' | 'displ' | 'displa' | 'display' | 'reg' | 'regi' | 'regis' | 'regist' | 'registe' | 'register' | 'registers';
+RETURN:                 'return';
+SYMBOL:                 'sym' | 'symb' | 'symbo' | 'symbol';
+V_GLOBAL:               'vg' | 'vgl' | 'vglo' | 'vglob' | 'vgloba' | 'vglobal';
+SELECT_FILE:            'argu' | 'argum' | 'argume' | 'argumen' | 'argument';
+SELECT_FIRST_FILE:      'fir' | 'firs' | 'first';
+SELECT_LAST_FILE:       'la' | 'las' | 'last';
+SET:                    'set';
+SET_HANDLER:            'sethandler';
+SHELL:                  'sh' | 'she' | 'shel' | 'shell';
+SORT:                   'sor' | 'sort';
+SPLIT:                  'sp' | 'spl' | 'spli' | 'split';
+V_SPLIT:                'vs' | 'vsp' | 'vspl' | 'vspli' | 'vsplit';
+SOURCE:                 'so' | 'sou' | 'sour' | 'sourc' | 'source';
+SUBSTITUTE:             'su' | 'sub' | 'subs' | 'subst' | 'substi' | 'substit' | 'substitu' | 'substitut' | 'substitute';
+TAB_CLOSE:              'tabc' | 'tabcl' | 'tabclo' | 'tabclos' | 'tabclose';
+TAB_ONLY:               'tabo' | 'tabon' | 'tabonl' | 'tabonly';
+UNDO:                   'un' | 'und' | 'undo';
+WRITE_ALL:              'wa' | 'wal' | 'wall';
+WRITE:                  'wr' | 'wri' | 'writ' | 'write';
+WRITE_NEXT:             'wn' | 'wne' | 'wnex' | 'wnext';
+WRITE_PREVIOUS:         'wN' | 'wNe' | 'wNex' | 'wNext';
+WRITE_QUIT:             'wq' | 'exi' | 'exit' | 'xi' | 'xit';
+YANK_LINES:             'ya' | 'yan' | 'yank';
+MAP_CLEAR:              ('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc')
+                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'l')
+                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'le')
+                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'lea')
+                    |   (('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc') 'lear');
+MAP:                    'map'
+                    |   'nm' | 'vm' | 'xm' | 'om' | 'im' | 'cm'
+                    |   (('nm' | 'vm' | 'xm' | 'om' | 'im' | 'cm') 'a')
+                    |   (('nm' | 'vm' | 'xm' | 'om' | 'im' | 'cm') 'ap')
+                    |   'no' | 'nn' | 'vn' | 'xn' | 'ono' | 'ino' | 'cno'
+                    |   'nno' | 'vno' | 'xno'
+                    |   (('no' | 'nn' | 'vn' | 'xn' | 'ono' | 'ino' | 'cno') 'r')
+                    |   (('no' | 'nn' | 'vn' | 'xn' | 'ono' | 'ino' | 'cno') 're')
+                    |   (('no' | 'nn' | 'vn' | 'xn' | 'ono' | 'ino' | 'cno') 'rem')
+                    |   (('no' | 'nn' | 'vn' | 'xn' | 'ono' | 'ino' | 'cno') 'rema')
+                    |   (('no' | 'nn' | 'vn' | 'xn' | 'ono' | 'ino' | 'cno') 'remap');
+UNMAP:                  'unm' | 'nun' | 'vu' | 'xu' | 'sunm' | 'ou' | 'iu' | 'cu'
+                    |   'vun' | 'xun' | 'oun' | 'iun' | 'cun'
+                    |   'nunm' | 'vunm' | 'xunm' | 'ounm' | 'iunm' | 'cunm'
+                    |   'unma' | 'nunma' | 'vunma' | 'xunma' | 'sunma' | 'ounma' | 'iunma' | 'cunma'
+                    |   'unmap' | 'nunmap' | 'vunmap' | 'xunmap' | 'sunmap' | 'ounmap' | 'iunmap' | 'cunmap';
 
 // Types
 DIGIT:                  [0-9];
@@ -379,52 +825,13 @@ FLOAT:                  [0-9]+'.'[0-9]+
 BLOB:                   '0'[zZ][0-9a-fA-F]+;
 EMPTY_DOUBLE_QUOTED_STRING:
                         '""';
-EMPTY_SINGLE_QUOTED_STRING:
-                        '\'\'';
 QUOTE:                  '"';
 SINGLE_QUOTE:           '\'';
+ESCAPED_SINGLE_QUOTE:   '\'\'';
 ESCAPED_DOUBLE_QUOTE:   '\\"';
 STRING_DOUBLE_QUOTED:   (QUOTE (ESCAPED_DOUBLE_QUOTE | ~[\n])*? QUOTE);
-MARK_WITH_SINGLE_QUOTE:
-                        SINGLE_QUOTE
-                            (
-                                    UPPERCASE_CHAR
-                                |   DIGIT
-                            )
-;
-MARK_WITH_BACKTICK:
-                        BACKTICK
-                            (
-                                    UPPERCASE_CHAR
-                                |   DIGIT
-                                |   LESS
-                                |   GREATER
-                                |   L_PAREN
-                                |   R_PAREN
-                                |   L_CURLY
-                                |   R_CURLY
-                                |   L_BRACKET
-                                |   R_BRACKET
-                                |   QUOTE
-                                |   CARET
-                                |   DOT
-                                |   BACKTICK
-                            )
-;
-
-// SCOPES
-BUFFER_VARIABLE:        'b';
-WINDOW_VARIABLE:        'w';
-TABPAGE_VARIABLE:       't';
-GLOBAL_VARIABLE:        'g';
-LOCAL_VARIABLE:         'l';
-SCRIPT_VARIABLE:        's';
-FUNCTION_VARIABLE:      'a';
-VIM_VARIABLE:           'v';
 
 // Identifiers
-LOWERCASE_CHAR:         [a-z];
-UPPERCASE_CHAR:         [A-Z];
 IDENTIFIER_LOWERCASE:   [a-z]+;
 IDENTIFIER_ANY_CASE:    [a-zA-Z]+;
 IDENTIFIER_LOWERCASE_WITH_DIGITS:   [a-z][a-z0-9]+;

@@ -25,16 +25,21 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 
-data class SubstituteCommand(val ranges: Ranges, val argument: String, val command: String) : Command.SingleExecution(ranges, argument) {
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
+data class SplitCommand(val ranges: Ranges, val argument: String, val splitType: SplitType) : Command.SingleExecution(ranges, argument) {
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
+
   override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
-    var result = true
-    for (caret in editor.caretModel.allCarets) {
-      val lineRange = getLineRange(editor, caret)
-      if (!VimPlugin.getSearch().processSubstituteCommand(editor, caret, lineRange, command, argument)) {
-        result = false
-      }
+    if (splitType == SplitType.VERTICAL) {
+      VimPlugin.getWindow().splitWindowVertical(context, argument)
+    } else {
+      VimPlugin.getWindow().splitWindowHorizontal(context, argument)
     }
-    return if (result) ExecutionResult.Success else ExecutionResult.Error
+
+    return ExecutionResult.Success
   }
+}
+
+enum class SplitType {
+  VERTICAL,
+  HORIZONTAL
 }
