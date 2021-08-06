@@ -75,14 +75,14 @@ class ReloadVimRcTest : VimTestCase() {
     val s = " " // Just to see whitespaces in the following code
     val origFile = """
       map x y|"comment
-      let g:x = 5
-      let g:y = 3 " another comment
+      set nu
+      set relativenumber " another comment
     """.trimIndent()
     val changedFile = """
       " comment
       map x y
-      let g:x = ${s}${s}${s}5
-      let g:y = 3
+      set ${s}${s}${s}nu$s
+      set relativenumber
     """.trimIndent()
 
     VimRcFileState.saveFileState("", origFile)

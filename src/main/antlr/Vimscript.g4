@@ -82,12 +82,12 @@ command:
     range ws_cols
     #GoToLineCommand|
 
-    range? ws_cols ECHO (WS+ expr)* WS* comment?
+    range? ws_cols ECHO (WS+ expr)* WS*
     #EchoCommand|
 
     range? ws_cols LET WS+ expr WS*
         assignmentOperator =  (ASSIGN | PLUS_ASSIGN | MINUS_ASSIGN | STAR_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | DOT_ASSIGN)
-        WS* expr WS* comment?
+        WS* expr WS*
     #LetCommand|
 
     range? ws_cols DELF (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName comment?
@@ -111,7 +111,7 @@ command:
     range? ws_cols BUFFER_LIST (WS* commandArgument)? comment?
     #BufferListCommand|
 
-    range? ws_cols CMD (WS* commandArgument)? comment?
+    range? ws_cols CMD (WS* commandArgument)?
     #CmdCommand|
 
     range? ws_cols EXCLAMATION (WS* commandArgument)? comment?
@@ -165,7 +165,7 @@ command:
     range? ws_cols GO_TO_CHAR (WS* commandArgument)? comment?
     #GoToCharacterCommand|
 
-    range? ws_cols (H_LOWERCASE | HELP) (WS* commandArgument)? comment?
+    range? ws_cols (H_LOWERCASE | HELP) (WS* commandArgument)?
     #HelpCommand|
 
     range? ws_cols HISTORY (WS* commandArgument)? comment?
@@ -225,7 +225,7 @@ command:
     range? ws_cols REDO (WS* commandArgument)? comment?
     #RedoCommand|
 
-    range? ws_cols REGISTERS (WS* commandArgument)? comment?
+    range? ws_cols REGISTERS (WS* commandArgument)?
     #RegistersCommand|
 
     range? ws_cols AT (WS* commandArgument)? comment?
@@ -255,7 +255,7 @@ command:
     range? ws_cols rShift (WS* commandArgument)? comment?
     #ShiftRightCommand|
 
-    range? ws_cols SORT (WS* commandArgument)? comment?
+    range? ws_cols SORT (WS* commandArgument)?
     #SortCommand|
 
     range? ws_cols SPLIT (WS* commandArgument)? comment?
