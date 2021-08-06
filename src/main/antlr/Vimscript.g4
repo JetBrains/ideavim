@@ -303,6 +303,9 @@ command:
     range? ws_cols MAP_CLEAR (WS* commandArgument)?
     #MapClearCommand|
 
+    range? ws_cols EXECUTE WS+ (expr WS*)*
+    #ExecuteCommand|
+
     range? ws_cols UNMAP (WS* commandArgument)?
     #UnmapCommand|
 
@@ -638,6 +641,7 @@ existingCommands:       RETURN
                     |   MAP
                     |   MAP_CLEAR
                     |   UNMAP
+                    |   EXECUTE
 ;
 
 ws_cols:                 (WS | COLON)*;
@@ -814,6 +818,7 @@ UNMAP:                  'unm' | 'nun' | 'vu' | 'xu' | 'sunm' | 'ou' | 'iu' | 'cu
                     |   'nunm' | 'vunm' | 'xunm' | 'ounm' | 'iunm' | 'cunm'
                     |   'unma' | 'nunma' | 'vunma' | 'xunma' | 'sunma' | 'ounma' | 'iunma' | 'cunma'
                     |   'unmap' | 'nunmap' | 'vunmap' | 'xunmap' | 'sunmap' | 'ounmap' | 'iunmap' | 'cunmap';
+EXECUTE:                'exe' | 'exec' | 'execu' | 'execut' | 'execute';
 
 // Types
 DIGIT:                  [0-9];

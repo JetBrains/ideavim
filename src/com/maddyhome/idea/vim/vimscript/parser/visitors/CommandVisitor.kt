@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.DigraphCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.DumpLineCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.EditFileCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.ExecuteCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ExitCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.FileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.FindClassCommand
@@ -646,6 +647,16 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     val argument = ctx.commandArgument().text
     val cmd = ctx.MAP_CLEAR().text
     return MapClearCommand(ranges, argument, cmd)
+  }
+
+  override fun visitExecuteCommand(ctx: VimscriptParser.ExecuteCommandContext): ExecuteCommand {
+    val ranges = parseRanges(ctx.range())
+    val expressions = ctx.expr().stream()
+      .map { tree: ExprContext ->
+        expressionVisitor.visit(tree)
+      }
+      .collect(Collectors.toList())
+    return ExecuteCommand(ranges, expressions)
   }
 
   override fun visitOtherCommand(ctx: OtherCommandContext): UnknownCommand {

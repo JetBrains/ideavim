@@ -40,7 +40,9 @@ object Executor {
   var executingVimScript = false
 
   @kotlin.jvm.Throws(ExException::class)
-  fun execute(scriptString: String, editor: Editor, context: DataContext, skipHistory: Boolean, indicateErrors: Boolean = true) {
+  fun execute(scriptString: String, editor: Editor, context: DataContext, skipHistory: Boolean, indicateErrors: Boolean = true): ExecutionResult {
+    var finalResult: ExecutionResult = ExecutionResult.Success
+
     val script = VimscriptParser.parse(scriptString)
     val vimContext = VimContext()
 
@@ -48,9 +50,11 @@ object Executor {
       try {
         val result = unit.execute(editor, context, vimContext)
         if (result is ExecutionResult.Error) {
+          finalResult = ExecutionResult.Error
           VimPlugin.indicateError()
         }
       } catch (e: ExException) {
+        finalResult = ExecutionResult.Error
         if (indicateErrors) {
           VimPlugin.showMessage(e.message)
           VimPlugin.indicateError()
@@ -66,6 +70,7 @@ object Executor {
         VimPlugin.getRegister().storeTextSpecial(RegisterGroup.LAST_COMMAND_REGISTER, scriptString)
       }
     }
+    return finalResult
   }
 
   fun execute(scriptString: String, skipHistory: Boolean = true) {
