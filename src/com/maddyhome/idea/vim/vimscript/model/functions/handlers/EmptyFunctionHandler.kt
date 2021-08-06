@@ -39,8 +39,8 @@ object EmptyFunctionHandler : FunctionHandler() {
 
   override fun doFunction(
     argumentValues: List<Expression>,
-    editor: Editor?,
-    context: DataContext?,
+    editor: Editor,
+    context: DataContext,
     vimContext: VimContext,
   ): VimDataType {
     val argument = argumentValues[0].evaluate(editor, context, vimContext)

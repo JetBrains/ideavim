@@ -42,8 +42,8 @@ object LineFunctionHandler : FunctionHandler() {
 
   override fun doFunction(
     argumentValues: List<Expression>,
-    editor: Editor?,
-    context: DataContext?,
+    editor: Editor,
+    context: DataContext,
     vimContext: VimContext,
   ): VimInt {
     if (editor == null) return VimInt.ZERO
@@ -60,8 +60,8 @@ object ColFunctionHandler : FunctionHandler() {
 
   override fun doFunction(
     argumentValues: List<Expression>,
-    editor: Editor?,
-    context: DataContext?,
+    editor: Editor,
+    context: DataContext,
     vimContext: VimContext,
   ): VimDataType {
     val argument = argumentValues[0].evaluate(editor, context, vimContext)
