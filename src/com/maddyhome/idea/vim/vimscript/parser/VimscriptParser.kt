@@ -18,8 +18,8 @@
 
 package com.maddyhome.idea.vim.vimscript.parser
 
-import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.Script
+import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptLexer
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser
@@ -46,8 +46,7 @@ object VimscriptParser {
     return ExpressionVisitor.visit(AST)
   }
 
-  // todo should return Command after all the oldCommands genocide
-  fun parseCommand(text: String): Executable {
+  fun parseCommand(text: String): Command {
     val parser = getParser(text)
     val AST: ParseTree = parser.command()
     return CommandVisitor.visit(AST)

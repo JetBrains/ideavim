@@ -29,7 +29,6 @@ import com.intellij.openapi.editor.ScrollingModel;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
@@ -38,6 +37,8 @@ import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ExPanelBorder;
+import com.maddyhome.idea.vim.vimscript.model.commands.Command;
+import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand;
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -268,13 +269,13 @@ public class ExEntryPanel extends JPanel {
       String searchText = entry.getActualText();
       if (label.getText().equals(":")) {
         if (searchText.isEmpty()) return;
-        final ExCommand command = getIncsearchCommand(searchText);
+        final Command command = getIncsearchCommand(searchText);
         if (command == null) {
           return;
         }
         searchCommand = true;
         searchText = "";
-        final String argument = command.getArgument();
+        final String argument = command.getCommandArgument();
         if (argument.length() > 1) {  // E.g. skip '/' in `:%s/`. `%` is range, `s` is command, `/` is argument
           separator = argument.charAt(0);
           searchText = argument.substring(1);
@@ -309,13 +310,12 @@ public class ExEntryPanel extends JPanel {
     }
 
     @Contract("null -> null")
-    private @Nullable ExCommand getIncsearchCommand(@Nullable String commandText) {
+    private @Nullable Command getIncsearchCommand(@Nullable String commandText) {
       if (commandText == null) return null;
       try {
-        final ExCommand exCommand = (ExCommand) VimscriptParser.INSTANCE.parseCommand(commandText);
-        final String command = exCommand.getCommand();
+        final Command exCommand = (Command) VimscriptParser.INSTANCE.parseCommand(commandText);
         // TODO: Add global, vglobal, smagic and snomagic here when the commands are supported
-        if ("substitute".startsWith(command)) {
+        if (exCommand instanceof SubstituteCommand) {
           return exCommand;
         }
       }

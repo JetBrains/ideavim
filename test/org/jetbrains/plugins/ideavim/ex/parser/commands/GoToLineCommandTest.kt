@@ -27,13 +27,13 @@ class GoToLineCommandTest {
 
   @Test
   fun `digit as go to line command`() {
-    val c = VimscriptParser.parseCommand("4\n")
+    val c = VimscriptParser.parseCommand("4")
     assertTrue(c is GoToLineCommand)
   }
 
   @Test
   fun `number as go to line command`() {
-    val c = VimscriptParser.parseCommand("14\n")
+    val c = VimscriptParser.parseCommand("14")
     assertTrue(c is GoToLineCommand)
   }
 }

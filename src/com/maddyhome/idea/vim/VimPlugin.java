@@ -53,7 +53,6 @@ import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
-import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
@@ -339,9 +338,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     // Register vim actions in command mode
     RegisterActions.registerActions();
 
-    // Register ex handlers
-    ExCommand.CommandHandlersTree.registerHandlers();
-
     // Register extensions
     VimExtensionRegistrar.registerExtensions();
 
@@ -373,9 +369,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
 
     // Unregister vim actions in command mode
     RegisterActions.unregisterActions();
-
-    // Unregister ex handlers
-    ExCommand.CommandHandlersTree.unregisterHandlers();
   }
 
   private boolean stateUpdated = false;
