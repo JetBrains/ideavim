@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -118,5 +119,23 @@ class LetCommandTest : VimTestCase() {
     typeText(commandToKeys("let s[1:] = [5, 5, 5, 5]"))
     typeText(commandToKeys("echo s"))
     assertExOutput("[1, 5, 5, 5, 5]\n")
+  }
+
+  fun `test let option`() {
+    configureByText("\n")
+    typeText(commandToKeys("set noincsearch"))
+    assertFalse(OptionsManager.incsearch.isSet)
+    typeText(commandToKeys("let &incsearch = 12"))
+    assertTrue(OptionsManager.incsearch.isSet)
+    typeText(commandToKeys("set noincsearch"))
+    assertFalse(OptionsManager.incsearch.isSet)
+  }
+
+  fun `test let option2`() {
+    configureByText("\n")
+    typeText(commandToKeys("set incsearch"))
+    assertTrue(OptionsManager.incsearch.isSet)
+    typeText(commandToKeys("let &incsearch = 0"))
+    assertFalse(OptionsManager.incsearch.isSet)
   }
 }
