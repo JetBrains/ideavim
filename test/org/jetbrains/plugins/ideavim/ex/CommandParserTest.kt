@@ -20,6 +20,8 @@ package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
+import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -71,5 +73,36 @@ class CommandParserTest : VimTestCase() {
       VimPlugin.setEnabled(true)
       VimPlugin.setEnabled(true)
     }
+  }
+
+  fun `test multiline command input`() {
+    val script1 = VimscriptParser.parse(
+      """
+     let s:patBR = substitute(match_words.',',
+      \ s:notslash.'\zs[,:]*,[,:]*', ',', 'g') 
+      """.trimIndent()
+    )
+    val script2 = VimscriptParser.parse(
+      """
+     let s:patBR = substitute(match_words.',',s:notslash.'\zs[,:]*,[,:]*', ',', 'g')
+      """.trimIndent()
+    )
+    assertEquals(1, script1.units.size)
+    assertTrue(script1.units[0] is LetCommand)
+    assertEquals(script1, script2)
+  }
+
+  fun `test multiline expression input`() {
+    configureByText("\n")
+    val script1 = VimscriptParser.parse(
+      """
+      let dict = {'one': 1,
+      \ 'two': 2}
+      """.trimIndent()
+    )
+    val script2 = VimscriptParser.parse("let dict = {'one': 1, 'two': 2}")
+    assertEquals(1, script1.units.size)
+    assertTrue(script1.units[0] is LetCommand)
+    assertEquals(script1, script2)
   }
 }

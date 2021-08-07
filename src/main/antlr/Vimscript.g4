@@ -935,3 +935,4 @@ BACKSLASH:              '\\';
 // Separators
 STATEMENT_SEPARATOR:    [|\r\n]+;
 WS:                     [ \t]+;
+INLINE_SEPARATOR:       '\n' ' '* BACKSLASH -> skip;
