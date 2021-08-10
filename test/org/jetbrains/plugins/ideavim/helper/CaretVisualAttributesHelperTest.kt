@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -151,6 +152,30 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("ve", "r", "<Left>"))
     assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test nested visual mode in ide gets visual caret`() {
+    OptionsManager.keymodel.set("startsel,stopsel")
+    configureByText("I ${c}found it in a legendary land")
+    typeText(parseKeys("i", "<S-Right><S-Right><S-Right>"))
+    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test caret reset to insert after leaving nested visual mode`() {
+    OptionsManager.keymodel.set("startsel,stopsel")
+    configureByText("I ${c}found it in a legendary land")
+    typeText(parseKeys("i", "<S-Right><S-Right><S-Right>", "<Right>"))
+    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.25F)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test caret reset to insert after cancelling nested visual mode`() {
+    OptionsManager.keymodel.set("startsel,stopsel")
+    configureByText("I ${c}found it in a legendary land")
+    typeText(parseKeys("i", "<S-Right><S-Right><S-Right>", "<Esc>"))
+    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.25F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
