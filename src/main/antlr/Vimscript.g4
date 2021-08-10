@@ -730,7 +730,7 @@ ACTION:                 'action';
 ACTIONLIST:             'actionlist';
 ASCII:                  'as' | 'asc' | 'asci' | 'ascii';
 BUFFER:                 'bu' | 'buf' | 'buff' | 'buffe' | 'buffer';
-BUFFER_CLOSE:           'bd';
+BUFFER_CLOSE:           'bd' | 'bde' | 'bdel' | 'bdele' | 'bdelet' | 'bdelete';
 BUFFER_LIST:            'buffers' | 'ls' | 'files';
 CLASS:                  'cla' | 'clas' | 'class';
 CMD:                    'com' | 'comm' | 'comma' | 'comman' | 'command';
@@ -791,7 +791,7 @@ UNDO:                   'un' | 'und' | 'undo';
 WRITE_ALL:              'wa' | 'wal' | 'wall';
 WRITE:                  'wr' | 'wri' | 'writ' | 'write';
 WRITE_NEXT:             'wn' | 'wne' | 'wnex' | 'wnext';
-WRITE_PREVIOUS:         'wN' | 'wNe' | 'wNex' | 'wNext';
+WRITE_PREVIOUS:         'wN' | 'wNe' | 'wNex' | 'wNext' | 'wp' | 'wpr' | 'wpre' | 'wprev' | 'wprevi' | 'wprevio' | 'wpreviou' | 'wprevious';
 WRITE_QUIT:             'wq' | 'exi' | 'exit' | 'xi' | 'xit';
 YANK_LINES:             'ya' | 'yan' | 'yank';
 MAP_CLEAR:              ('mapc' | 'nmapc' | 'vmapc' | 'xmapc' | 'smapc' | 'omapc' | 'imapc' | 'cmapc')
