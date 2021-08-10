@@ -36,7 +36,7 @@ class DelfunctionCommandTest : VimTestCase() {
           )
       )
     )
-    typeText(commandToKeys("delfunction F1()"))
+    typeText(commandToKeys("delfunction F1"))
     assertPluginError(false)
     typeText(commandToKeys("echo F1()"))
     assertPluginError(true)
@@ -55,7 +55,7 @@ class DelfunctionCommandTest : VimTestCase() {
           )
       )
     )
-    typeText(commandToKeys("delf F1()"))
+    typeText(commandToKeys("delf F1"))
     assertPluginError(false)
     typeText(commandToKeys("echo F1()"))
     assertPluginError(true)
@@ -65,7 +65,7 @@ class DelfunctionCommandTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
   fun `test delete nonexistent function`() {
     configureByText("\n")
-    typeText(commandToKeys("delfunction F1()"))
+    typeText(commandToKeys("delfunction F1"))
     assertPluginError(true)
     assertPluginErrorMessageContains("E130: Unknown function: F1")
   }
