@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.vimscript.parser
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
+import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptLexer
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.parser.visitors.CommandVisitor
@@ -34,7 +35,7 @@ import org.antlr.v4.runtime.tree.ParseTree
 object VimscriptParser {
 
   fun parse(text: String): Script {
-    val parser = getParser(text)
+    val parser = getParser(text + "\n") // grammar expects that any script ends with a newline character
     val AST: ParseTree = parser.script()
     val scriptVisitor = ScriptVisitor
     return scriptVisitor.visit(AST)
@@ -47,7 +48,7 @@ object VimscriptParser {
   }
 
   fun parseCommand(text: String): Command {
-    val parser = getParser(text)
+    val parser = getParser(text + "\n") // grammar expects that any command ends with a newline character
     val AST: ParseTree = parser.command()
     return CommandVisitor.visit(AST)
   }
@@ -56,6 +57,9 @@ object VimscriptParser {
     val input: CharStream = CharStreams.fromString(text)
     val lexer = VimscriptLexer(input)
     val tokens = CommonTokenStream(lexer)
-    return VimscriptParser(tokens)
+    val parser = VimscriptParser(tokens)
+    parser.errorListeners.clear()
+    parser.addErrorListener(IdeavimErrorListener())
+    return parser
   }
 }

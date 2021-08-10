@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -104,5 +105,32 @@ class CommandParserTest : VimTestCase() {
     assertEquals(1, script1.units.size)
     assertTrue(script1.units[0] is LetCommand)
     assertEquals(script1, script2)
+  }
+
+  fun `test errors`() {
+    configureByText("\n")
+    VimscriptParser.parse(
+      """
+        echo 4
+        let x = 3
+        echo ^523
+        echo 6
+      """.trimIndent()
+    )
+    assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 3:5") })
+  }
+
+  fun `test errors 2`() {
+    VimscriptParser.parse(
+      """
+        delfunction F1()
+        echo 4
+        echo 6
+        *(
+        let x = 5
+      """.trimIndent()
+    )
+    assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 1:14") })
+    assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 4:0") })
   }
 }
