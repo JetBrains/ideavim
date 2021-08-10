@@ -310,7 +310,7 @@ command:
 //    #ID|
 //
     // add new rules above this one
-    ws_cols range? ws_cols commandName (WS commandArgument)? STATEMENT_SEPARATOR
+    ws_cols range? ws_cols commandName (WS? commandArgument)? STATEMENT_SEPARATOR
     #OtherCommand
 ;
 lShift:
@@ -805,11 +805,11 @@ MAP:                    'map'
                     |   (('nm' | 'vm' | 'xm' | 'om' | 'im' | 'cm') 'ap')
                     |   'no' | 'nn' | 'vn' | 'xn' | 'ono' | 'ino' | 'cno'
                     |   'nno' | 'vno' | 'xno'
-                    |   (('no' | 'nn' | 'vn' | 'xn' | 'ono' | 'ino' | 'cno') 'r')
-                    |   (('no' | 'nn' | 'vn' | 'xn' | 'ono' | 'ino' | 'cno') 're')
-                    |   (('no' | 'nn' | 'vn' | 'xn' | 'ono' | 'ino' | 'cno') 'rem')
-                    |   (('no' | 'nn' | 'vn' | 'xn' | 'ono' | 'ino' | 'cno') 'rema')
-                    |   (('no' | 'nn' | 'vn' | 'xn' | 'ono' | 'ino' | 'cno') 'remap');
+                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 'r')
+                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 're')
+                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 'rem')
+                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 'rema')
+                    |   (('no' | 'nno' | 'vno' | 'xno' | 'ono' | 'ino' | 'cno') 'remap');
 UNMAP:                  'unm' | 'nun' | 'vu' | 'xu' | 'sunm' | 'ou' | 'iu' | 'cu'
                     |   'vun' | 'xun' | 'oun' | 'iun' | 'cun'
                     |   'nunm' | 'vunm' | 'xunm' | 'ounm' | 'iunm' | 'cunm'
