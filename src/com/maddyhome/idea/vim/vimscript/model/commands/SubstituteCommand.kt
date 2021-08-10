@@ -25,6 +25,9 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 
+/**
+ * see "h :substitute"
+ */
 data class SubstituteCommand(val ranges: Ranges, val argument: String, val command: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
   override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {

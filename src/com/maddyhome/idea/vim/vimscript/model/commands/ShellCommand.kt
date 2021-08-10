@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimContext
 
 /**
  * @author John Grib
+ * see "h :shell"
  */
 data class ShellCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)

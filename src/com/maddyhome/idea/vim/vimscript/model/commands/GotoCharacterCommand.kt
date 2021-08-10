@@ -27,6 +27,9 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 
+/**
+ * see "h :goto"
+ */
 data class GotoCharacterCommand(val ranges: Ranges, val argument: String) : Command.ForEachCaret(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 

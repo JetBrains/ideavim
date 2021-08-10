@@ -9,6 +9,9 @@ import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 
+/**
+ * see "h :delfunction"
+ */
 data class DelfunctionCommand(
   val ranges: Ranges,
   val scope: Scope?,

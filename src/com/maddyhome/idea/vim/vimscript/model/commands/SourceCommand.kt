@@ -28,6 +28,7 @@ import java.io.File
 
 /**
  * @author vlan
+ * see "h :source"
  */
 data class SourceCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)

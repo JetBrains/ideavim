@@ -38,6 +38,9 @@ import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import kotlin.math.min
 
+/**
+ * see "h :move"
+ */
 data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
 

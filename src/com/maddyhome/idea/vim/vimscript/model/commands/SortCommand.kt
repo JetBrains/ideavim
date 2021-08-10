@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimContext
 
 /**
  * @author Alex Selesse
+ * see "h :sort"
  */
 data class SortCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)

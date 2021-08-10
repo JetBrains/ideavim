@@ -32,6 +32,9 @@ import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.commands.UnknownCommand.Constants.MAX_RECURSION
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 
+/**
+ * any command with no parser rule. we assume that it is an alias
+ */
 data class UnknownCommand(val ranges: Ranges, val name: String, val argument: String) :
   Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)

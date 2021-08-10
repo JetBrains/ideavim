@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimContext
 
 /**
  * @author Rieon Ke
+ * see "h :tabclose"
  */
 data class TabCloseCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
 

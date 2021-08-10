@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NonNls
 
 /**
  * @author Elliot Courant
+ * see "h :command"
  */
 data class CmdCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)

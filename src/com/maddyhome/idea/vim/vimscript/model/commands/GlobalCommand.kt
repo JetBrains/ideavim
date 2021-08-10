@@ -37,6 +37,9 @@ import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 
+/**
+ * see "h :global" / "h :vglobal"
+ */
 data class GlobalCommand(val ranges: Ranges, val argument: String, val invert: Boolean) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 

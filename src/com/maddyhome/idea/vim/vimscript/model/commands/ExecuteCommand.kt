@@ -26,6 +26,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
+/**
+ * see "h :execute"
+ */
 class ExecuteCommand(val ranges: Ranges, val expressions: List<Expression>) : Command.SingleExecution(ranges) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 

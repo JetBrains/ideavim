@@ -27,6 +27,9 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 
+/**
+ * see "h :class"
+ */
 data class FindClassCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {

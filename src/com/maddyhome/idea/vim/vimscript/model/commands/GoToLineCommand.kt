@@ -11,6 +11,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 import java.lang.Integer.min
 
+/**
+ * see "h :[range]"
+ */
 data class GoToLineCommand(val ranges: Ranges) :
   Command.ForEachCaret(ranges) {
 

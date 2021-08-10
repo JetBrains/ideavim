@@ -30,6 +30,7 @@ import java.net.URLEncoder
 
 /**
  * @author vlan
+ * see "h :help"
  */
 data class HelpCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)

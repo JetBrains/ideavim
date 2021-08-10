@@ -8,6 +8,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
+/**
+ * see "h :echo"
+ */
 data class EchoCommand(val ranges: Ranges, val args: List<Expression>) :
   Command.SingleExecution(ranges) {
 

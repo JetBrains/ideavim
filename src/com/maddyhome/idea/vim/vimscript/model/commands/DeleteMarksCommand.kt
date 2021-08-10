@@ -41,6 +41,7 @@ private const val UNESCAPED_QUOTE = "\""
 
 /**
  * @author Jørgen Granseth
+ * see "h :delmarks"
  */
 data class DeleteMarksCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)

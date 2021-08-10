@@ -29,6 +29,9 @@ import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 
+/**
+ * see "h :@"
+ */
 data class RepeatCommand(val ranges: Ranges, val argument: String) : Command.ForEachCaret(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.SELF_SYNCHRONIZED)
 

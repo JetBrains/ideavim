@@ -28,6 +28,9 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOp
 import com.maddyhome.idea.vim.vimscript.model.expressions.toVimDataType
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 
+/**
+ * see "h :let"
+ */
 data class LetCommand(
   val ranges: Ranges,
   val variable: Expression,

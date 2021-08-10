@@ -30,6 +30,9 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 import kotlin.math.absoluteValue
 
+/**
+ * see "h :jumps"
+ */
 data class JumpsCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_FORBIDDEN, Access.READ_ONLY)
   override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
