@@ -6,7 +6,7 @@ grammar Vimscript;
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 script:
-    executable+ EOF;
+    STATEMENT_SEPARATOR* executable+ EOF;
 
 executable:
     comment | forLoop | whileLoop | functionDefinition | ifStatement | tryStatement | command;
@@ -34,10 +34,10 @@ ifStatement:            ifBlock
                         elseBlock?
                         ws_cols ENDIF WS* STATEMENT_SEPARATOR
 ;
-ifBlock:                ws_cols IF WS+ expr WS* STATEMENT_SEPARATOR
+ifBlock:                ws_cols IF WS* expr WS* STATEMENT_SEPARATOR
                            blockMember*
 ;
-elifBlock:              ws_cols ELSEIF WS+ expr WS* STATEMENT_SEPARATOR
+elifBlock:              ws_cols ELSEIF WS* expr WS* STATEMENT_SEPARATOR
                            blockMember*
 ;
 elseBlock:              ws_cols ELSE WS* STATEMENT_SEPARATOR
@@ -52,7 +52,7 @@ tryStatement:           tryBlock
 tryBlock:               ws_cols TRY WS* STATEMENT_SEPARATOR
                             blockMember*
 ;
-catchBlock:             ws_cols CATCH WS+ pattern WS* STATEMENT_SEPARATOR
+catchBlock:             ws_cols CATCH WS* pattern WS* STATEMENT_SEPARATOR
                             blockMember*
 ;
 pattern:                DIV patternBody DIV;
@@ -466,7 +466,7 @@ blob:                   BLOB;
 mark:                   (SINGLE_QUOTE (lowercaseAlphabeticChar | uppercaseAlphabeticChar | DIGIT | LESS | GREATER | L_PAREN | R_PAREN | L_CURLY | R_CURLY | L_BRACKET | R_BRACKET | QUOTE | CARET | DOT | BACKTICK | SINGLE_QUOTE))
                     |   (BACKTICK (lowercaseAlphabeticChar | uppercaseAlphabeticChar | DIGIT | LESS | GREATER | L_PAREN | R_PAREN | L_CURLY | R_CURLY | L_BRACKET | R_BRACKET | QUOTE | CARET | DOT | BACKTICK | SINGLE_QUOTE))
 ;
-comment:                inline_comment STATEMENT_SEPARATOR;
+comment:                (inline_comment | WS*) STATEMENT_SEPARATOR;
 inline_comment:         (WS* (QUOTE | EMPTY_DOUBLE_QUOTED_STRING) ~STATEMENT_SEPARATOR*?)
                     |   (STRING_DOUBLE_QUOTED ~STATEMENT_SEPARATOR*?);
 anyCaseNameWithDigitsAndUnderscores:
