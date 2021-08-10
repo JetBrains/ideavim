@@ -1,5 +1,6 @@
 package com.maddyhome.idea.vim.vimscript.parser.visitors
 
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.ex.ranges.Range.Companion.createRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
@@ -158,7 +159,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
           if (range != null) {
             ranges.addRange(range)
           } else {
-            throw RuntimeException("Could not create range")
+            throw ExException("Could not create range")
           }
         } else {
           continue
@@ -169,7 +170,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
         if (range != null) {
           ranges.addRange(range)
         } else {
-          throw RuntimeException("Could not create range")
+          throw ExException("Could not create range")
         }
       }
       if (ctx.children[ctx.childCount - 1] is VimscriptParser.RangeSeparatorContext) {
@@ -177,7 +178,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
         if (range != null) {
           ranges.addRange(range)
         } else {
-          throw RuntimeException("Could not create range")
+          throw ExException("Could not create range")
         }
         ranges.addRange(range)
       }

@@ -61,6 +61,11 @@ object Executor {
         } else {
           logger.warn("Failed while executing $unit. " + e.message)
         }
+      } catch (e: NotImplementedError) {
+        if (indicateErrors) {
+          VimPlugin.showMessage("Not implemented yet :(")
+          VimPlugin.indicateError()
+        }
       }
     }
 
