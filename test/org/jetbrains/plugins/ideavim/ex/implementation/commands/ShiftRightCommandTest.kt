@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -25,7 +25,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 /**
  * @author Alex Plate
  */
-class ShiftRightHandlerTest : VimTestCase() {
+class ShiftRightCommandTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.DIFFERENT, "Replace term codes issues")
   fun `test simple right shift`() {
     val before = """        I found it in a legendary land

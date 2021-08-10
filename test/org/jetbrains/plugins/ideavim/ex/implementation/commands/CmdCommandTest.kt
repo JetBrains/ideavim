@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -24,7 +24,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 /**
  * @author Elliot Courant
  */
-class CmdHandlerTest : VimTestCase() {
+class CmdCommandTest : VimTestCase() {
   fun `test recursive`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")

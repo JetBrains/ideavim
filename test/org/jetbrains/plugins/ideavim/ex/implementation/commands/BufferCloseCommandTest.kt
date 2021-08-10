@@ -16,34 +16,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class ExecuteCommandTest : VimTestCase() {
+/**
+ * @author Michal Placek
+ */
+class BufferCloseCommandTest : VimTestCase() {
+  fun `test close file by bd command`() {
 
-  fun `test execute with one expression`() {
-    configureByText("\n")
-    typeText(commandToKeys("execute 'echo 42'"))
-    assertExOutput("42\n")
-  }
+    val psiFile1 = myFixture.configureByText("A_Discovery1", "I found it in a legendary land")
+    val psiFile2 = myFixture.configureByText("A_Discovery2", "all rocks and lavender and tufted grass,")
 
-  fun `test execute with range`() {
-    configureByText("\n")
-    typeText(commandToKeys("1,2execute 'echo 42'"))
-    assertNoExOutput()
-    assertPluginError(true)
-  }
+    fileManager.openFile(psiFile1.virtualFile, false)
+    fileManager.openFile(psiFile2.virtualFile, true)
+    assertPluginError(false)
 
-  fun `test execute multiple expressions`() {
-    configureByText("\n")
-    typeText(commandToKeys("execute 'echo' 4 + 2 * 3"))
-    assertExOutput("10\n")
-  }
+    typeText(commandToKeys("bd"))
 
-  fun `test execute adds space between expressions if missing`() {
-    configureByText("\n")
-    typeText(commandToKeys("execute 'echo ' . \"'result =\"4+2*3.\"'\""))
-    assertExOutput("result = 10\n")
+    assertPluginError(false)
   }
 }

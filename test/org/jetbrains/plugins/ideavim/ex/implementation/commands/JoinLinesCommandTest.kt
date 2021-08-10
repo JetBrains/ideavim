@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
@@ -25,7 +25,7 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class JoinLinesHandlerTest : VimTestCase() {
+class JoinLinesCommandTest : VimTestCase() {
   @VimBehaviorDiffers(description = "Different caret position")
   fun `test simple join`() {
     doTest(

@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -24,7 +24,7 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class GotoLineHandlerTest : VimTestCase() {
+class GotoLineCommandTest : VimTestCase() {
   fun `test goto explicit line`() {
     val before = """
       A Discovery

@@ -16,11 +16,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class PrintHandlerTest : VimTestCase() {
+class PrintCommandTest : VimTestCase() {
   fun `test default range`() {
     configureByText(initialText)
     typeText(commandToKeys("p"))

@@ -16,12 +16,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler.mapping
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.command.MappingMode
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class UnMapHandlerTest : VimTestCase() {
+class MapClearCommandTest : VimTestCase() {
   override fun setUp() {
     super.setUp()
     configureByText(
@@ -39,7 +39,7 @@ class UnMapHandlerTest : VimTestCase() {
   fun testMapKtoJ() {
     putMapping(MappingMode.N, "k", "j", false)
 
-    typeText(commandToKeys("unmap k"))
+    typeText(commandToKeys("mapclear"))
 
     assertNoMapping("k")
   }
@@ -47,25 +47,18 @@ class UnMapHandlerTest : VimTestCase() {
   fun `test mappings in insert mode`() {
     putMapping(MappingMode.I, "jk", "<Esc>", false)
 
-    typeText(commandToKeys("iunmap jk"))
+    typeText(commandToKeys("imapclear"))
 
     assertNoMapping("jk")
   }
 
   fun `test removing only part of keys`() {
     putMapping(MappingMode.I, "jk", "<Esc>", false)
+    putMapping(MappingMode.N, "jk", "<Esc>", false)
 
-    typeText(commandToKeys("unmap j"))
+    typeText(commandToKeys("imapclear"))
 
-    assertNoMapping("j")
-    assertMappingExists("jk", "<Esc>", MappingMode.I)
-  }
-
-  fun `test removing keys from a different mode`() {
-    putMapping(MappingMode.I, "jk", "<Esc>", false)
-
-    typeText(commandToKeys("unmap jk"))
-
-    assertMappingExists("jk", "<Esc>", MappingMode.I)
+    assertNoMapping("jk", MappingMode.I)
+    assertMappingExists("jk", "<Esc>", MappingMode.N)
   }
 }

@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.Mark
@@ -27,7 +27,7 @@ import kotlin.test.assertNull
 /**
  * @author Jørgen Granseth
  */
-class DeleteMarksHandlerTest : VimTestCase() {
+class DeleteMarksCommandTest : VimTestCase() {
   private fun setUpMarks(marks: String) {
     configureByText(
       """I found it in a legendary land

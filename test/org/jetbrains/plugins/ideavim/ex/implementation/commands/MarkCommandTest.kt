@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import junit.framework.TestCase
@@ -25,7 +25,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 /**
  * @author Alex Plate
  */
-class MarkHandlerTest : VimTestCase() {
+class MarkCommandTest : VimTestCase() {
   fun `test simple mark`() {
     configureByText(
       """I found it in a legendary land

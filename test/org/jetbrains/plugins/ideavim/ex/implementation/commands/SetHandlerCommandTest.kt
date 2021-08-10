@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
@@ -26,7 +26,7 @@ import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class SetHandlerHandlerTest : VimTestCase() {
+class SetHandlerCommandTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test parse a mappings`() {
     val owner = ShortcutOwnerInfo.allPerModeVim

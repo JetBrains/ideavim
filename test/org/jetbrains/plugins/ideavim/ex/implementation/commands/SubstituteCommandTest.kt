@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.IgnoreCaseOptionsData
@@ -34,7 +34,7 @@ import org.jetbrains.plugins.ideavim.VimTestOptionType
 /**
  * @author Alex Plate
  */
-class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, IgnoreCaseOptionsData.name) {
+class SubstituteCommandTest : VimOptionTestCase(SmartCaseOptionsData.name, IgnoreCaseOptionsData.name) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test one letter`() {

@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -24,7 +24,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 /**
  * @author Alex Plate
  */
-class ExitHandlerTest : VimTestCase() {
+class ExitCommandTest : VimTestCase() {
   fun `test single file`() {
     setupChecks {
       neoVim.exitOnTearDown = false

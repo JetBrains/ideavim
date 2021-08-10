@@ -16,12 +16,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class YankLinesHandlerTest : VimTestCase() {
+class YankLinesCommandTest : VimTestCase() {
   fun `test copy with range`() {
     configureByText(
       """

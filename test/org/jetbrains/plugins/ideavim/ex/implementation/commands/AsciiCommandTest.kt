@@ -16,12 +16,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class AsciiHandlerTest : VimTestCase() {
+class AsciiCommandTest : VimTestCase() {
   fun `test shows ascii value under caret`() {
     configureByText("${c}Hello world")
     enterCommand("ascii")

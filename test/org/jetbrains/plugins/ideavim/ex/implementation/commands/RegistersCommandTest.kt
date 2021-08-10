@@ -16,14 +16,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.TestClipboardModel
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class RegistersHandlerTest : VimTestCase() {
+class RegistersCommandTest : VimTestCase() {
   override fun tearDown() {
     super.tearDown()
     TestClipboardModel.clearClipboard()

@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -24,7 +24,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 /**
  * @author Alex Plate
  */
-class PutHandlerTest : VimTestCase() {
+class PutCommandTest : VimTestCase() {
   // VIM-550 |:put|
   fun `test put creates new line`() {
     configureByText("Test\n" + "Hello <caret>World!\n")

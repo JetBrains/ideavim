@@ -16,13 +16,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class MarksHandlerTest : VimTestCase() {
+class MarksCommandTest : VimTestCase() {
   fun `test list empty marks`() {
     configureByText("")
     enterCommand("marks")

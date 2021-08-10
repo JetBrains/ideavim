@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.helper.StringHelper
@@ -26,7 +26,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 /**
  * @author John Weigel
  */
-class BufferListHandlerTest : VimTestCase() {
+class BufferListCommandTest : VimTestCase() {
   companion object {
     const val DEFAULT_LS_OUTPUT = "   1 %a   \"/src/aaa.txt\"                 line: 1"
   }

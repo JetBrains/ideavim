@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
@@ -29,7 +29,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  * @author Alex Plate
  */
 
-class ActionHandlerTest : VimTestCase() {
+class ActionCommandTest : VimTestCase() {
   // VIM-652 |:action|
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   fun testEditorRightAction() {

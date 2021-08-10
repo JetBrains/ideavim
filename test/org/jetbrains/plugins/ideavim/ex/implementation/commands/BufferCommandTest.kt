@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-package org.jetbrains.plugins.ideavim.ex.handler
+package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
 import com.maddyhome.idea.vim.helper.StringHelper
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -23,7 +23,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 /**
  * @author John Weigel
  */
-class BufferHandlerTest : VimTestCase() {
+class BufferCommandTest : VimTestCase() {
   fun testBufferActionByNumber() {
     configureByFileName("aaa.txt")
     configureByFileName("bbb.txt")
