@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.vimscript.parser.errors
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.logger
+import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
@@ -38,6 +39,7 @@ class IdeavimErrorListener : BaseErrorListener() {
     msg: String?,
     e: RecognitionException?
   ) {
+    VimscriptParser.linesWithErrors.add(line)
     val message = "line $line:$charPositionInLine $msg"
     if (ApplicationManager.getApplication().isUnitTestMode) {
       testLogger.add(message)

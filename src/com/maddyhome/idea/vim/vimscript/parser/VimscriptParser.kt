@@ -34,32 +34,54 @@ import org.antlr.v4.runtime.tree.ParseTree
 
 object VimscriptParser {
 
+  val linesWithErrors = mutableListOf<Int>()
+
   fun parse(text: String): Script {
-    val parser = getParser(text + "\n") // grammar expects that any script ends with a newline character
+    val preprocessedText = getTextWithoutErrors(text)
+    linesWithErrors.clear()
+    val parser = getParser(preprocessedText + "\n", true) // grammar expects that any script ends with a newline character
     val AST: ParseTree = parser.script()
-    val scriptVisitor = ScriptVisitor
-    return scriptVisitor.visit(AST)
+    val script = ScriptVisitor.visit(AST)
+    return if (linesWithErrors.isNotEmpty()) {
+      parse(preprocessedText)
+    } else {
+      script
+    }
   }
 
   fun parseExpression(text: String): Expression {
     val parser = getParser(text)
     val AST: ParseTree = parser.expr()
-    return ExpressionVisitor.visit(AST)
+    val expression = ExpressionVisitor.visit(AST)
+    return expression
   }
 
   fun parseCommand(text: String): Command {
     val parser = getParser(text + "\n") // grammar expects that any command ends with a newline character
     val AST: ParseTree = parser.command()
-    return CommandVisitor.visit(AST)
+    val command = CommandVisitor.visit(AST)
+    return command
   }
 
-  private fun getParser(text: String): VimscriptParser {
+  private fun getParser(text: String, addListener: Boolean = false): VimscriptParser {
     val input: CharStream = CharStreams.fromString(text)
     val lexer = VimscriptLexer(input)
     val tokens = CommonTokenStream(lexer)
     val parser = VimscriptParser(tokens)
     parser.errorListeners.clear()
-    parser.addErrorListener(IdeavimErrorListener())
+    if (addListener) {
+      parser.addErrorListener(IdeavimErrorListener())
+    }
     return parser
+  }
+
+  private fun getTextWithoutErrors(text: String): String {
+    linesWithErrors.sortDescending()
+    val lineNumbersToDelete = linesWithErrors
+    val lines = text.split("\n").toMutableList()
+    for (lineNumber in lineNumbersToDelete) {
+      lines.removeAt(lineNumber - 1)
+    }
+    return lines.joinToString(separator = "\n")
   }
 }
