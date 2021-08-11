@@ -934,6 +934,7 @@ STATEMENT_SEPARATOR:    [|\n]+;
 RETURN_CARET:           '\r';
 WS:                     [ \t]+;
 INLINE_SEPARATOR:       '\n' ' '* BACKSLASH -> skip;
+LUA_CODE:               'lua' WS* '<<' WS* 'EOF' .*? 'EOF' -> skip;
 
 // All the other symbols
 UNICODE_CHAR:           '\u0000'..'\uFFFE';
