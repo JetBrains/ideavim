@@ -2,40 +2,19 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-    <h3>Features:</h3>
-    <ul>
-      <li>Support several buffer management commands <a href="https://youtrack.jetbrains.com/issue/VIM-1062">VIM-1062</a>,
-        <a href="https://youtrack.jetbrains.com/issue/VIM-2335">VIM-2335</a></li>
-    </ul>
+      <h3>Features:</h3>
+      <ul>
+        <li><a href="https://jb.gg/vim-script-discussion">Secret link</a>. Wow, you read the changelogs! Check out the most
+          interesting change in IdeaVim.
+        </li>
+      </ul>
 
-    <h3>Fixes:</h3>
-    <ul>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2317">VIM-2317</a> Fix memory leak</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1357">VIM-1357</a>
-        <a href="https://youtrack.jetbrains.com/issue/VIM-1566">VIM-1566</a> Fix external filters
-      </li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2336">VIM-2336</a> Fix repeat for the <code>T</code> movement
-      </li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1192">VIM-1192</a> Fix dollar motion from single command</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1672">VIM-1672</a> IdeaVim correctly populates clipboard history
-      </li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2351">VIM-2351</a> Correctly select last character when
-        selecting with mouse
-      </li>
-    </ul>
-
-    <h3>Merged PRs:</h3>
-    <ul>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/332">332</a> by <a href="https://github.com/citizenmatt">Matt
-        Ellis</a>: VIM-1357+VIM-1566: Use OS shell to run filter command
-      </li>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/333">333</a> by <a href="https://github.com/MichalPlacek">Michal
-        Placek</a>: VIM-1062
-      </li>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/334">334</a> by <a href="https://github.com/MichalPlacek">Michal
-        Placek</a>: vim-2335 Support for navigation to previous buffer with :b#
-      </li>
-    </ul>
+      <h3>Merged PRs:</h3>
+      <ul>
+        <li><a href="https://github.com/JetBrains/ideavim/pull/349">349</a> by <a href="https://github.com/nizienko">eugene
+          nizienko</a>: Run UI test ci
+        </li>
+      </ul>
     ]]>
   </change-notes>
   <description><![CDATA[

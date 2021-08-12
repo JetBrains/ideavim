@@ -24,7 +24,8 @@ usual beta standards.
 
 ## To Be Released
 
-### Fixes:
+### Features:
+* [Secret link](https://jb.gg/vim-script-discussion). Wow, you read the changelogs! Check out the most interesting change in IdeaVim.
 
 ### Merged PRs:
 * [349](https://github.com/JetBrains/ideavim/pull/349) by [eugene nizienko](https://github.com/nizienko): Run UI test ci
