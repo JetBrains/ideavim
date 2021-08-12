@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.ex.vimscript;
 
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -26,10 +25,7 @@ import java.util.Map;
 
 /**
  * @author vlan
- * @deprecated use {@link com.maddyhome.idea.vim.vimscript.services.VariableService} instead
  */
-@Deprecated
-@ApiStatus.ScheduledForRemoval(inVersion = "0.72")
 public class VimScriptGlobalEnvironment {
   private static final VimScriptGlobalEnvironment ourInstance = new VimScriptGlobalEnvironment();
 
