@@ -68,6 +68,7 @@ import com.maddyhome.idea.vim.option.OptionsManager.ideastrictmode
 import com.maddyhome.idea.vim.option.OptionsManager.resetAllOptions
 import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
+import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import org.assertj.core.api.Assertions
 import org.junit.Assert
@@ -125,6 +126,7 @@ abstract class VimTestCase : UsefulTestCase() {
     SelectionVimListenerSuppressor.lock().use { myFixture.tearDown() }
     ExEntryPanel.getInstance().deactivate(false)
     VariableService.clear()
+    IdeavimErrorListener.testLogger.clear()
     VimPlugin.getRegister().resetRegisters()
     VimPlugin.getSearch().resetState()
     VimPlugin.getMark().resetAllMarks()
