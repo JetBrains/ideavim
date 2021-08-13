@@ -337,14 +337,17 @@ fun updateChangelog() {
     if (insertOffset < 50) error("Incorrect offset: $insertOffset")
 
     val firstPartOfChanges = changes.take(insertOffset)
-    val newUpdates = newFixes
+    val actualFixes = newFixes
         .filterNot { it.id in firstPartOfChanges }
         // Temporally disable this example
         .filterNot { it.id == "VIM-123" }
+    val newUpdates = actualFixes
         .joinToString { "* [${it.id}](https://youtrack.jetbrains.com/issue/${it.id}) ${it.text}\n" }
 
     changesBuilder.insert(insertOffset, newUpdates)
-    changesFile.writeText(changesBuilder.toString())
+    if (actualFixes.isNotEmpty()) {
+        changesFile.writeText(changesBuilder.toString())
+    }
 }
 
 fun updateAuthors(uncheckedEmails: Set<String>) {
