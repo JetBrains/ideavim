@@ -138,4 +138,11 @@ class LetCommandTest : VimTestCase() {
     typeText(commandToKeys("let &incsearch = 0"))
     assertFalse(OptionsManager.incsearch.isSet)
   }
+
+  fun `test comment`() {
+    configureByText("\n")
+    typeText(commandToKeys("let s = [1, 2, 3] \" my list for storing numbers"))
+    typeText(commandToKeys("echo s"))
+    assertExOutput("[1, 2, 3]\n")
+  }
 }

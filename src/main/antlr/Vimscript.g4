@@ -61,7 +61,7 @@ finallyBlock:           ws_cols FINALLY WS* STATEMENT_SEPARATOR
                             blockMember*
 ;
 
-functionDefinition:     ws_cols FUNCTION (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName WS* L_PAREN argumentsDeclaration R_PAREN WS* STATEMENT_SEPARATOR
+functionDefinition:     ws_cols FUNCTION (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName WS* L_PAREN argumentsDeclaration R_PAREN WS* (flag = ~(STATEMENT_SEPARATOR)*?) WS* STATEMENT_SEPARATOR
                             blockMember*
                         ws_cols ENDFUNCTION WS* STATEMENT_SEPARATOR
 ;
@@ -83,7 +83,7 @@ command:
 
     ws_cols range? ws_cols LET WS+ expr WS*
         assignmentOperator =  (ASSIGN | PLUS_ASSIGN | MINUS_ASSIGN | STAR_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | DOT_ASSIGN)
-        WS* expr WS* STATEMENT_SEPARATOR
+        WS* expr WS* inline_comment? STATEMENT_SEPARATOR
     #LetCommand|
 
     ws_cols range? ws_cols DELF (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName inline_comment? STATEMENT_SEPARATOR

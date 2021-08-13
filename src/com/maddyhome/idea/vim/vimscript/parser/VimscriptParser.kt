@@ -41,11 +41,10 @@ object VimscriptParser {
     linesWithErrors.clear()
     val parser = getParser(preprocessedText + "\n", true) // grammar expects that any script ends with a newline character
     val AST: ParseTree = parser.script()
-    val script = ScriptVisitor.visit(AST)
     return if (linesWithErrors.isNotEmpty()) {
       parse(preprocessedText)
     } else {
-      script
+      ScriptVisitor.visit(AST)
     }
   }
 
