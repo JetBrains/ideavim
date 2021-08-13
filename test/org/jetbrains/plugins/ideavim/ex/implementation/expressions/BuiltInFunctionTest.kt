@@ -131,4 +131,16 @@ class BuiltInFunctionTest : VimTestCase() {
     typeText(commandToKeys("""echo col([0, 1]) col([1, 1]) col([5, 1]) col([6, 1]) col([5, 2])"""))
     assertExOutput("0 1 1 0 2\n")
   }
+
+  fun `test exists`() {
+    configureByText("\n")
+    typeText(commandToKeys("echo exists(5)"))
+    assertExOutput("0\n")
+
+    typeText(commandToKeys("echo exists(\"&nu\")"))
+    assertExOutput("1\n")
+
+    typeText(commandToKeys("echo exists(\"&unknownOptionName\")"))
+    assertExOutput("0\n")
+  }
 }
