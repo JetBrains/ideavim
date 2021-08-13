@@ -23,6 +23,7 @@ import com.intellij.codeInsight.lookup.LookupListener
 import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
+import com.intellij.openapi.application.ApplicationNamesInfo
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
@@ -96,6 +97,7 @@ object OptionsManager {
   val ideastrictmode = addOption(ToggleOption("ideastrictmode", "ideastrictmode", false))
   val ideawrite = addOption(BoundStringOption("ideawrite", "ideawrite", IdeaWriteData.all, IdeaWriteData.allValues))
   val ideavimsupport = addOption(BoundListOption("ideavimsupport", "ideavimsupport", arrayOf("dialog"), arrayOf("dialog", "singleline", "dialoglegacy")))
+  val ide = addOption(StringOption("ide", "ide", ApplicationNamesInfo.getInstance().fullProductNameWithEdition))
 
   // TODO The default value if 1000, but we can't increase it because of terrible performance of our mappings
   val maxmapdepth = addOption(NumberOption("maxmapdepth", "mmd", 20))
