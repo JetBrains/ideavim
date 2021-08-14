@@ -36,11 +36,14 @@ import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.group.visual.VimSelection.Companion.create
 import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 import kotlin.math.min
@@ -105,6 +108,34 @@ class ToKeysMappingInfo(
 
   companion object {
     private val LOG = logger<ToKeysMappingInfo>()
+  }
+}
+
+class ToExpressionMappingInfo(
+  private val toExpression: Expression,
+  fromKeys: List<KeyStroke>,
+  isRecursive: Boolean,
+  owner: MappingOwner,
+  private val originalString: String,
+) : MappingInfo(fromKeys, isRecursive, owner) {
+  override fun getPresentableString(): String = originalString
+
+  override fun execute(editor: Editor, context: DataContext) {
+    LOG.debug("Executing 'ToExpression' mapping info...")
+    val editorDataContext = EditorDataContext.init(editor, context)
+    val toKeys = parseKeys(toExpression.evaluate(editor, context, VimContext()).toString())
+    val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
+    var first = true
+    for (keyStroke in toKeys) {
+      val recursive = isRecursive && !(first && fromIsPrefix)
+      val keyHandler = KeyHandler.getInstance()
+      keyHandler.handleKey(editor, keyStroke, editorDataContext, recursive, false)
+      first = false
+    }
+  }
+
+  companion object {
+    private val LOG = logger<ToExpressionMappingInfo>()
   }
 }
 

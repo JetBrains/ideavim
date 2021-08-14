@@ -31,6 +31,10 @@ import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand.SpecialArgument.EXPR
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand.SpecialArgument.SCRIPT
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
+import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
+import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.annotations.NonNls
 import java.util.*
 import javax.swing.KeyStroke
@@ -65,8 +69,14 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
       }
     }
 
-    VimPlugin.getKey()
-      .putKeyMapping(modes, arguments.fromKeys, MappingOwner.IdeaVim, arguments.toKeys, commandInfo.isRecursive)
+    if (arguments.specialArguments.contains(EXPR)) {
+      VimPlugin.getKey()
+        .putKeyMapping(modes, arguments.fromKeys, MappingOwner.IdeaVim, arguments.toExpr, arguments.secondArgument, commandInfo.isRecursive)
+    } else {
+      val toKeys = parseKeys(arguments.secondArgument)
+      VimPlugin.getKey()
+        .putKeyMapping(modes, arguments.fromKeys, MappingOwner.IdeaVim, toKeys, commandInfo.isRecursive)
+    }
 
     return true
   }
@@ -101,7 +111,8 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
   private class CommandArguments(
     val specialArguments: Set<SpecialArgument>,
     val fromKeys: List<KeyStroke>,
-    val toKeys: List<KeyStroke>,
+    val toExpr: Expression,
+    val secondArgument: String,
   )
 
   companion object {
@@ -125,7 +136,7 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
       CommandInfo("ino", "remap", MappingMode.I, false),
       CommandInfo("cno", "remap", MappingMode.C, false)
     )
-    private val UNSUPPORTED_SPECIAL_ARGUMENTS = EnumSet.of(EXPR, SCRIPT)
+    private val UNSUPPORTED_SPECIAL_ARGUMENTS = EnumSet.of(SCRIPT)
   }
 
   private fun parseCommandArguments(input: String): CommandArguments? {
@@ -156,8 +167,12 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
       }
     }
     return fromKeys?.let {
-      val toKeys = parseKeys(toKeysBuilder.toString().trimStart())
-      CommandArguments(specialArguments, it, toKeys)
+      val toExpr = if (specialArguments.contains(EXPR)) {
+        VimscriptParser.parseExpression(toKeysBuilder.toString().trim())
+      } else {
+        SimpleExpression(VimString(toKeysBuilder.toString().trimStart()))
+      }
+      CommandArguments(specialArguments, it, toExpr, toKeysBuilder.toString().trimStart())
     }
   }
 

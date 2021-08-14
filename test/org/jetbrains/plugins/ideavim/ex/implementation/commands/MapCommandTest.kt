@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim.ex.implementation.commands
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.vimscript.Executor
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
@@ -181,7 +182,7 @@ n  ,f            <Plug>Foo
     typeText(commandToKeys("nmap <silent> ,c /c<CR>"))
     typeText(commandToKeys("nmap <special> ,d /d<CR>"))
     typeText(commandToKeys("nmap <script> ,e /e<CR>"))
-    typeText(commandToKeys("nmap <expr> ,f /f<CR>"))
+    typeText(commandToKeys("nmap <expr> ,f '/f<CR>'"))
     typeText(commandToKeys("nmap <unique> ,g /g<CR>"))
     typeText(commandToKeys("nmap"))
     assertExOutput(
@@ -190,6 +191,7 @@ n  ,f            <Plug>Foo
   n  ,b            /b<CR>
   n  ,c            /c<CR>
   n  ,d            /d<CR>
+  n  ,f            '/f<CR>'
   n  ,g            /g<CR>
   
       """.trimIndent()
@@ -743,6 +745,29 @@ n  ,f            <Plug>Foo
     typeText(StringHelper.parseKeys("b"))
 
     TestCase.assertTrue(VimPlugin.isError())
+  }
+
+  fun `test map with expression`() {
+    // we test that ternary expression works and cursor stays at the same place after leaving normal mode
+    val text = """
+          -----
+          1${c}2345
+          abcde
+          -----
+    """.trimIndent()
+    configureByJavaText(text)
+    typeText(commandToKeys("inoremap <expr> jk col(\".\") == 1? '<Esc>' : '<Esc><Right>'"))
+    typeText(parseKeys("ijk"))
+    assertState(text)
+    val text2 = """
+          -----
+          ${c}12345
+          abcde
+          -----
+    """.trimIndent()
+    configureByJavaText(text2)
+    typeText(parseKeys("ijk"))
+    assertState(text2)
   }
 
   private fun checkDelayedMapping(before: String, after: String) {
