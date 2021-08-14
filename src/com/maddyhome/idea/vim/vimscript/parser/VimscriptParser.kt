@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.vimscript.parser
 
+import com.intellij.openapi.diagnostic.logger
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
@@ -34,7 +35,10 @@ import org.antlr.v4.runtime.tree.ParseTree
 
 object VimscriptParser {
 
+  private val logger = logger<VimscriptParser>()
   val linesWithErrors = mutableListOf<Int>()
+  private const val MAX_NUMBER_OF_TRIES = 5
+  var tries = 0
 
   fun parse(text: String): Script {
     val preprocessedText = getTextWithoutErrors(text)
@@ -42,8 +46,18 @@ object VimscriptParser {
     val parser = getParser(preprocessedText + "\n", true) // grammar expects that any script ends with a newline character
     val AST: ParseTree = parser.script()
     return if (linesWithErrors.isNotEmpty()) {
-      parse(preprocessedText)
+      if (tries > MAX_NUMBER_OF_TRIES) {
+        // I don't think, that it's possible to enter an infinite recursion with any vimrc, but let's have it just in case
+        logger.warn("Reached the maximum number of tries to fix a script. Parsing is stopped.")
+        linesWithErrors.clear()
+        tries = 0
+        return Script(listOf())
+      } else {
+        tries += 1
+        parse(preprocessedText)
+      }
     } else {
+      tries = 0
       ScriptVisitor.visit(AST)
     }
   }
@@ -79,7 +93,12 @@ object VimscriptParser {
     val lineNumbersToDelete = linesWithErrors
     val lines = text.split("\n").toMutableList()
     for (lineNumber in lineNumbersToDelete) {
-      lines.removeAt(lineNumber - 1)
+      // this may happen if we have an error somewhere at the end and parser can't find any matching token till EOF (EOF's line number is lines.size)
+      if (lines.size <= lineNumber) {
+        logger.warn("Parsing error affects lines till EOF")
+      } else {
+        lines.removeAt(lineNumber - 1)
+      }
     }
     return lines.joinToString(separator = "\n")
   }
