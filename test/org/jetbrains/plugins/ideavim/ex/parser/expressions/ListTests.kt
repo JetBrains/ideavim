@@ -14,7 +14,7 @@ class ListTests {
 
   @Test
   fun `empty list test`() {
-    assertEquals(VimList(mutableListOf()), VimscriptParser.parseExpression("[]").evaluate())
+    assertEquals(VimList(mutableListOf()), VimscriptParser.parseExpression("[]")!!.evaluate())
   }
 
   @Test
@@ -29,8 +29,7 @@ class ListTests {
           VimDictionary(linkedMapOf(VimString("key") to VimString("value")))
         )
       ),
-      VimscriptParser.parseExpression("[1, 4.6, 'bla bla', [5, 9], {'key' : 'value'}]")
-        .evaluate()
+      VimscriptParser.parseExpression("[1, 4.6, 'bla bla', [5, 9], {'key' : 'value'}]")!!.evaluate()
     )
   }
 }

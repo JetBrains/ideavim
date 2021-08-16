@@ -57,12 +57,7 @@ data class UnknownCommand(val ranges: Ranges, val name: String, val argument: St
               val message = MessageHelper.message(Msg.NOT_EX_CMD, name)
               throw InvalidCommandException(message, null)
             }
-            val parsedCommand: Command?
-            try {
-              parsedCommand = VimscriptParser.parseCommand(commandAlias.command)
-            } catch (e: Exception) {
-              throw ExException("E492: Not an editor command: ${commandAlias.command}")
-            }
+            val parsedCommand = VimscriptParser.parseCommand(commandAlias.command) ?: throw ExException("E492: Not an editor command: ${commandAlias.command}")
             return if (parsedCommand is UnknownCommand) {
               processPossiblyAliasCommand(commandAlias.command, editor, context, vimContext, aliasCountdown - 1)
             } else {

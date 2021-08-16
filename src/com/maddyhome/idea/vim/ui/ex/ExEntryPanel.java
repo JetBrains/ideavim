@@ -313,7 +313,7 @@ public class ExEntryPanel extends JPanel {
     private @Nullable Command getIncsearchCommand(@Nullable String commandText) {
       if (commandText == null) return null;
       try {
-        final Command exCommand = (Command) VimscriptParser.INSTANCE.parseCommand(commandText);
+        final Command exCommand = VimscriptParser.INSTANCE.parseCommand(commandText);
         // TODO: Add global, vglobal, smagic and snomagic here when the commands are supported
         if (exCommand instanceof SubstituteCommand) {
           return exCommand;

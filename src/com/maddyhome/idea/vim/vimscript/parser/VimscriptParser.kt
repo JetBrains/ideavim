@@ -62,18 +62,24 @@ object VimscriptParser {
     }
   }
 
-  fun parseExpression(text: String): Expression {
-    val parser = getParser(text)
-    val AST: ParseTree = parser.expr()
-    val expression = ExpressionVisitor.visit(AST)
-    return expression
+  fun parseExpression(text: String): Expression? {
+    return try {
+      val parser = getParser(text)
+      val AST: ParseTree = parser.expr()
+      ExpressionVisitor.visit(AST)
+    } catch (e: Exception) {
+      null
+    }
   }
 
-  fun parseCommand(text: String): Command {
-    val parser = getParser(text + "\n") // grammar expects that any command ends with a newline character
-    val AST: ParseTree = parser.command()
-    val command = CommandVisitor.visit(AST)
-    return command
+  fun parseCommand(text: String): Command? {
+    return try {
+      val parser = getParser(text + "\n") // grammar expects that any command ends with a newline character
+      val AST: ParseTree = parser.command()
+      CommandVisitor.visit(AST)
+    } catch (e: Exception) {
+      null
+    }
   }
 
   private fun getParser(text: String, addListener: Boolean = false): VimscriptParser {

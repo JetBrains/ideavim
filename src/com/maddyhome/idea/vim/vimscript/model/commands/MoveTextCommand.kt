@@ -53,7 +53,7 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
     val texts = ArrayList<String>(caretCount)
     val ranges = ArrayList<TextRange>(caretCount)
     var line = editor.fileSize
-    val goToLineCommand = VimscriptParser.parseCommand(argument)
+    val goToLineCommand = VimscriptParser.parseCommand(argument) ?: throw ExException("E16: Invalid range")
 
     var lastRange: TextRange? = null
     for (caret in carets) {
