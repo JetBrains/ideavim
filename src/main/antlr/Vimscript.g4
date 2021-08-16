@@ -930,8 +930,7 @@ ESCAPED_BAR:            '\\|' | '\u0016|';
 BACKSLASH:              '\\';
 
 // Separators
-STATEMENT_SEPARATOR:    [|\n]+;
-RETURN_CARET:           '\r';
+STATEMENT_SEPARATOR:    ('|' | '\n' | '\r\n')+;
 WS:                     [ \t]+;
 INLINE_SEPARATOR:       '\n' ' '* BACKSLASH -> skip;
 LUA_CODE:               'lua' WS* '<<' WS* 'EOF' .*? 'EOF' -> skip;

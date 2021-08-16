@@ -91,7 +91,7 @@ object VimscriptParser {
   private fun getTextWithoutErrors(text: String): String {
     linesWithErrors.sortDescending()
     val lineNumbersToDelete = linesWithErrors
-    val lines = text.split("\n").toMutableList()
+    val lines = text.split("\n", "\r\n").toMutableList()
     for (lineNumber in lineNumbersToDelete) {
       // this may happen if we have an error somewhere at the end and parser can't find any matching token till EOF (EOF's line number is lines.size)
       if (lines.size <= lineNumber) {
