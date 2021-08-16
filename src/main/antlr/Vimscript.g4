@@ -322,16 +322,19 @@ commandArgument:
     ~STATEMENT_SEPARATOR*?;
 
 range:
-    rangeExpression | (rangeExpression? (rangeSeparator rangeExpression)+ rangeSeparator?);
+    rangeUnit+;
+
+rangeUnit:
+    (rangeExpression? rangeSeparator) | (rangeExpression rangeSeparator?);
 
 rangeExpression:
-    rangeMember | rangeOffset | (rangeMember rangeOffset);
-
-rangeSeparator:
-    COMMA | SEMI;
+    (rangeMember rangeOffset?) | (rangeMember? rangeOffset);
 
 rangeMember:
     unsignedInt | DOT | MOD | DOLLAR | ESCAPED_QUESTION | ESCAPED_AMPERSAND | ESCAPED_SLASH  | mark | search+;
+
+rangeSeparator:
+    COMMA | SEMI;
 
 search:
     (QUESTION (~QUESTION)*? QUESTION)

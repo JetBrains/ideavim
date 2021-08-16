@@ -1,5 +1,6 @@
 package com.maddyhome.idea.vim.vimscript.parser.visitors
 
+import com.intellij.openapi.diagnostic.logger
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Range
 import com.maddyhome.idea.vim.ex.ranges.Range.Companion.createRange
@@ -93,23 +94,12 @@ import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.LetComm
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.OtherCommandContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.RangeContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.RangeOffsetContext
-import org.antlr.v4.runtime.ParserRuleContext
-import org.antlr.v4.runtime.tree.ErrorNode
 import java.util.stream.Collectors
 
 object CommandVisitor : VimscriptBaseVisitor<Command>() {
 
+  private val logger = logger<CommandVisitor>()
   private val expressionVisitor: ExpressionVisitor = ExpressionVisitor
-
-  private fun nameFromContext(ctx: ParserRuleContext): String {
-    val stringBuffer = StringBuffer()
-    for (child in ctx.children) {
-      if (child !is ErrorNode) {
-        stringBuffer.append(child.text)
-      }
-    }
-    return stringBuffer.toString()
-  }
 
   private fun parseRangeOffset(ctx: RangeOffsetContext?): Int {
     var offset = 0
@@ -123,64 +113,36 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     return offset
   }
 
+  private fun parseRangeExpression(ctx: VimscriptParser.RangeExpressionContext?): Pair<String, Int> {
+    val offset = parseRangeOffset(ctx?.rangeOffset())
+    return if (ctx == null) {
+      return Pair(".", offset)
+    } else if (ctx.rangeMember() == null) {
+      Pair(".", offset)
+    } else if (ctx.rangeMember().search() == null || ctx.rangeMember().search().isEmpty()) {
+      Pair(ctx.rangeMember().text, offset)
+    } else {
+      val memberString = ctx.rangeMember().search().joinToString("\u0000") { it.text }
+      Pair(memberString, offset)
+    }
+  }
+
+  private fun parseRangesUnit(ctx: VimscriptParser.RangeUnitContext): Array<Range> {
+    val valueAndOffset = parseRangeExpression(ctx.rangeExpression())
+    val move = ctx.rangeSeparator()?.text == ";"
+    val ranges = createRange(valueAndOffset.first, valueAndOffset.second, move)
+    if (ranges == null) {
+      logger.warn("Could not create a range for node ${ctx.text}")
+      throw ExException("Could not create a range")
+    }
+    return ranges
+  }
+
   private fun parseRanges(ctx: RangeContext?): Ranges {
     val ranges = Ranges()
-    if (ctx?.children != null) {
-      var unprocessedRange: Pair<String, Int>? = null
-      for (child in ctx.children) {
-        if (child is VimscriptParser.RangeExpressionContext && child.children != null) {
-          if (child.rangeMember() == null || (
-            child.rangeMember().search() == null || child.rangeMember().search()
-              .isEmpty()
-            )
-          ) {
-            val memberString = if (child.rangeMember() == null) {
-              "."
-            } else {
-              child.rangeMember().text
-            }
-            unprocessedRange = Pair(memberString, parseRangeOffset(child.rangeOffset()))
-          } else {
-            val memberString = child.rangeMember().search().map { it.text }.joinToString("\u0000")
-            unprocessedRange = Pair(memberString, parseRangeOffset(child.rangeOffset()))
-          }
-        } else if (child is VimscriptParser.RangeSeparatorContext && child.children != null) {
-          var range: Array<Range>?
-          if (unprocessedRange != null) {
-            range = createRange(
-              unprocessedRange.first,
-              unprocessedRange.second,
-              child.text == ";"
-            )
-            unprocessedRange = null
-          } else {
-            range = createRange(".", 0, child.text == ";")
-          }
-          if (range != null) {
-            ranges.addRange(range)
-          } else {
-            throw ExException("Could not create range")
-          }
-        } else {
-          continue
-        }
-      }
-      if (unprocessedRange != null) {
-        val range = createRange(unprocessedRange.first, unprocessedRange.second, false)
-        if (range != null) {
-          ranges.addRange(range)
-        } else {
-          throw ExException("Could not create range")
-        }
-      }
-      if (ctx.children[ctx.childCount - 1] is VimscriptParser.RangeSeparatorContext) {
-        val range = createRange(".", 0, false)
-        if (range != null) {
-          ranges.addRange(range)
-        } else {
-          throw ExException("Could not create range")
-        }
-        ranges.addRange(range)
+    if (ctx?.rangeUnit() != null) {
+      for (unit in ctx.rangeUnit()) {
+        ranges.addRange(parseRangesUnit(unit))
       }
     }
     return ranges

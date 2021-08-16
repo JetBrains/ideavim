@@ -87,8 +87,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   fun `test scroll up with collapsed folds`() {
     configureByPages(5)
     // TODO: Implement zf
-    // todo add '<,'>
-    typeText(parseKeys("40G", "Vjjjj", ":action CollapseSelection<CR>", "V"))
+    typeText(parseKeys("40G", "Vjjjj", ":'<,'>action CollapseSelection<CR>", "V"))
     setPositionAndScroll(29, 49)
 
     typeText(parseKeys("30k"))
