@@ -51,7 +51,9 @@ object Executor {
         val result = unit.execute(editor, context, vimContext)
         if (result is ExecutionResult.Error) {
           finalResult = ExecutionResult.Error
-          VimPlugin.indicateError()
+          if (indicateErrors) {
+            VimPlugin.indicateError()
+          }
         }
       } catch (e: ExException) {
         finalResult = ExecutionResult.Error

@@ -28,6 +28,7 @@ import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -303,8 +304,7 @@ object OptionsManager {
     }
 
     if (editor != null && error != null) {
-      VimPlugin.showMessage(MessageHelper.message(error, token))
-      VimPlugin.indicateError()
+      throw ExException(MessageHelper.message(error, token))
     }
 
     return error == null
