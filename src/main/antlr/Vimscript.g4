@@ -934,6 +934,7 @@ STATEMENT_SEPARATOR:    ('|' | '\n' | '\r\n')+;
 WS:                     [ \t]+;
 INLINE_SEPARATOR:       '\n' ' '* BACKSLASH -> skip;
 LUA_CODE:               'lua' WS* '<<' WS* 'EOF' .*? 'EOF' -> skip;
+IGNORE:                 '"ideaVim ignore' .*? '"ideaVim ignore end' STATEMENT_SEPARATOR -> skip;
 
 // All the other symbols
 UNICODE_CHAR:           '\u0000'..'\uFFFE';
