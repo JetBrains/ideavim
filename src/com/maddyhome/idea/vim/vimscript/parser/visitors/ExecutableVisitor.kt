@@ -78,7 +78,7 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
     for (catchBlock in ctx.catchBlock()) {
       catchBlocks.add(
         CatchBlock(
-          catchBlock.pattern().patternBody().text,
+          catchBlock.pattern()?.patternBody()?.text ?: ".",
           catchBlock.blockMember().mapNotNull { visitBlockMember(it) }
         )
       )

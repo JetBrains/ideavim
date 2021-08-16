@@ -52,7 +52,7 @@ tryStatement:           tryBlock
 tryBlock:               ws_cols TRY WS* STATEMENT_SEPARATOR
                             blockMember*
 ;
-catchBlock:             ws_cols CATCH WS* pattern WS* STATEMENT_SEPARATOR
+catchBlock:             ws_cols CATCH WS* pattern? WS* STATEMENT_SEPARATOR
                             blockMember*
 ;
 pattern:                DIV patternBody DIV;
@@ -61,11 +61,11 @@ finallyBlock:           ws_cols FINALLY WS* STATEMENT_SEPARATOR
                             blockMember*
 ;
 
-functionDefinition:     ws_cols FUNCTION (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName WS* L_PAREN argumentsDeclaration R_PAREN WS* (flag = ~(STATEMENT_SEPARATOR)*?) WS* STATEMENT_SEPARATOR
+functionDefinition:     ws_cols FUNCTION (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName WS* L_PAREN WS* argumentsDeclaration R_PAREN WS* (flag = ~(STATEMENT_SEPARATOR)*?) WS* STATEMENT_SEPARATOR
                             blockMember*
                         ws_cols ENDFUNCTION WS* STATEMENT_SEPARATOR
 ;
-argumentsDeclaration:   (variableName WS* (WS* COMMA WS* variableName)*)?;
+argumentsDeclaration:   (variableName (WS* COMMA WS* variableName)* WS*)?;
 
 
 
@@ -423,10 +423,10 @@ functionArguments:      (expr WS* (COMMA WS* expr WS*)*)?;
 
 list:                   L_BRACKET WS* (expr WS* (COMMA WS* expr WS*)*)? R_BRACKET;
 
-dictionary:             L_CURLY (WS* dictionaryEntry WS* (COMMA WS* dictionaryEntry WS*)*)? R_CURLY;
+dictionary:             L_CURLY WS* (dictionaryEntry WS* (COMMA WS* dictionaryEntry WS*)*)? R_CURLY;
 dictionaryEntry:        expr WS* COLON WS* expr;
 
-literalDictionary:      NUM L_CURLY (WS* literalDictionaryEntry WS* (COMMA WS* literalDictionaryEntry WS*)*)? R_CURLY;
+literalDictionary:      NUM L_CURLY WS* (literalDictionaryEntry WS* (COMMA WS* literalDictionaryEntry WS*)*)? R_CURLY;
 literalDictionaryEntry: literalDictionaryKey WS* COLON WS* expr;
 literalDictionaryKey:   anyCaseNameWithDigitsAndUnderscores
                     |   unsignedInt
@@ -720,9 +720,9 @@ ELSE:                   'el' | 'els' | 'else';
 ELSEIF:                 'elsei' | 'elseif';
 ENDIF:                  'en' | 'end' | 'endi' | 'endif';
 TRY:                    'try';
-CATCH:                  'catch';
-FINALLY:                'finally';
-ENDTRY:                 'endtry';
+CATCH:                  'cat' | 'catc'| 'catch';
+FINALLY:                'fina' | 'final' | 'finall' | 'finally';
+ENDTRY:                 'endt' | 'endtr' | 'endtry';
 THROW:                  'throw';
 
 // Commands
