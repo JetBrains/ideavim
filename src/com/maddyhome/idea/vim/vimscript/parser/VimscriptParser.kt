@@ -43,7 +43,8 @@ object VimscriptParser {
   fun parse(text: String): Script {
     val preprocessedText = getTextWithoutErrors(text)
     linesWithErrors.clear()
-    val parser = getParser(preprocessedText + "\n", true) // grammar expects that any script ends with a newline character
+    val parser =
+      getParser(preprocessedText + "\n", true) // grammar expects that any script ends with a newline character
     val AST: ParseTree = parser.script()
     return if (linesWithErrors.isNotEmpty()) {
       if (tries > MAX_NUMBER_OF_TRIES) {
@@ -63,23 +64,23 @@ object VimscriptParser {
   }
 
   fun parseExpression(text: String): Expression? {
-    return try {
-      val parser = getParser(text)
-      val AST: ParseTree = parser.expr()
-      ExpressionVisitor.visit(AST)
-    } catch (e: Exception) {
-      null
+    val parser = getParser(text, true)
+    val AST: ParseTree = parser.expr()
+    if (linesWithErrors.isNotEmpty()) {
+      linesWithErrors.clear()
+      return null
     }
+    return ExpressionVisitor.visit(AST)
   }
 
   fun parseCommand(text: String): Command? {
-    return try {
-      val parser = getParser(text + "\n") // grammar expects that any command ends with a newline character
-      val AST: ParseTree = parser.command()
-      CommandVisitor.visit(AST)
-    } catch (e: Exception) {
-      null
+    val parser = getParser(text + "\n", true) // grammar expects that any command ends with a newline character
+    val AST: ParseTree = parser.command()
+    if (linesWithErrors.isNotEmpty()) {
+      linesWithErrors.clear()
+      return null
     }
+    return CommandVisitor.visit(AST)
   }
 
   private fun getParser(text: String, addListener: Boolean = false): VimscriptParser {
