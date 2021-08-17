@@ -68,6 +68,9 @@ object Executor {
           VimPlugin.showMessage("Not implemented yet :(")
           VimPlugin.indicateError()
         }
+      } catch (e: Exception) {
+        logger.warn("Caught: ${e.message}")
+        logger.warn(e.stackTrace.toString())
       }
     }
 
