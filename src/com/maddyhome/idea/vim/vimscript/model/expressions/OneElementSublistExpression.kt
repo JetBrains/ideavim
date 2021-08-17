@@ -41,7 +41,7 @@ data class OneElementSublistExpression(val index: Expression, val expression: Ex
         )
     } else {
       val indexValue = Integer.parseInt(index.evaluate(editor, context, vimContext).asString())
-      if (expressionValue is VimList && (indexValue >= expressionValue.values.size || indexValue < expressionValue.values.size)) {
+      if (expressionValue is VimList && (indexValue >= expressionValue.values.size || indexValue < 0)) {
         throw ExException("E684: list index out of range: $indexValue")
       }
       if (indexValue < 0) {

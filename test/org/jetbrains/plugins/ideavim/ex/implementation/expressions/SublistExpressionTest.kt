@@ -52,6 +52,12 @@ class SublistExpressionTest : VimTestCase() {
     assertPluginErrorMessageContains("E684: list index out of range: 1000")
   }
 
+  fun `test list with correct index`() {
+    configureByText("\n")
+    typeText(commandToKeys("echo [1, 2][1]"))
+    assertExOutput("2\n")
+  }
+
   fun `test negative first index`() {
     configureByText("\n")
     typeText(commandToKeys("echo 'abc'[-1:]"))
