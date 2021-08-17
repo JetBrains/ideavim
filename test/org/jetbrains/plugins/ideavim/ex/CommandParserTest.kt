@@ -18,8 +18,11 @@
 
 package org.jetbrains.plugins.ideavim.ex
 
+import com.intellij.openapi.actionSystem.DataContext
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -257,6 +260,21 @@ class CommandParserTest : VimTestCase() {
     assertEquals(SimpleExpression(VimInt(3)), (script.units[1] as EchoCommand).args[0])
     assertTrue(script.units[2] is EchoCommand)
     assertEquals(SimpleExpression(VimInt(6)), (script.units[2] as EchoCommand).args[0])
+    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+  }
+
+  fun `test bug with caret return symbol`() {
+    configureByText("----------\n1234${c}567890\n----------\n")
+    Executor.execute(
+      """
+        " Map perso ---------------------------------------------
+        nnoremap Y y${'$'}
+
+      """.trimIndent().replace("\n", "\r\n"),
+      myFixture.editor, DataContext.EMPTY_CONTEXT, true
+    )
+    typeText(StringHelper.parseKeys("Yp"))
+    assertState("----------\n1234556789${c}067890\n----------\n")
     assertTrue(IdeavimErrorListener.testLogger.isEmpty())
   }
 }
