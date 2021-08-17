@@ -143,4 +143,28 @@ class BuiltInFunctionTest : VimTestCase() {
     typeText(commandToKeys("echo exists(\"&unknownOptionName\")"))
     assertExOutput("0\n")
   }
+
+  fun `test len`() {
+    configureByText("\n")
+    typeText(commandToKeys("echo len(123)"))
+    assertExOutput("3\n")
+
+    typeText(commandToKeys("echo len('abcd')"))
+    assertExOutput("4\n")
+
+    typeText(commandToKeys("echo len([1])"))
+    assertExOutput("1\n")
+
+    typeText(commandToKeys("echo len({})"))
+    assertExOutput("0\n")
+
+    typeText(commandToKeys("echo len(#{1: 'one'})"))
+    assertExOutput("1\n")
+
+    typeText(commandToKeys("echo len(12 . 4)"))
+    assertExOutput("3\n")
+
+    typeText(commandToKeys("echo len(4.2)"))
+    assertPluginErrorMessageContains("E701: Invalid type for len()")
+  }
 }
