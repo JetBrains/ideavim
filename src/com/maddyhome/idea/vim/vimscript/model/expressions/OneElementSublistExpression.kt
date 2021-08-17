@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 data class OneElementSublistExpression(val index: Expression, val expression: Expression) : Expression() {
@@ -38,7 +40,14 @@ data class OneElementSublistExpression(val index: Expression, val expression: Ex
           }\""
         )
     } else {
-      return SublistExpression(index, index, expression).evaluate(editor, context, vimContext)
+      val indexValue = Integer.parseInt(index.evaluate(editor, context, vimContext).asString())
+      if (expressionValue is VimList && (indexValue >= expressionValue.values.size || indexValue < expressionValue.values.size)) {
+        throw ExException("E684: list index out of range: $indexValue")
+      }
+      if (indexValue < 0) {
+        return VimString("")
+      }
+      return SublistExpression(SimpleExpression(VimInt(indexValue)), SimpleExpression(VimInt(indexValue)), SimpleExpression(expressionValue)).evaluate(editor, context, vimContext)
     }
   }
 }

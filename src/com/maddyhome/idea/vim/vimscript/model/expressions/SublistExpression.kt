@@ -27,14 +27,24 @@ data class SublistExpression(val from: Expression?, val to: Expression?, val exp
       toInt += arraySize
     }
     return if (expressionValue is VimList) {
-      if (fromInt <= toInt) {
+      if (fromInt > arraySize) {
+        VimList(mutableListOf())
+      } else if (fromInt == toInt) {
+        expressionValue.values[fromInt]
+      } else if (fromInt <= toInt) {
         VimList(expressionValue.values.subList(fromInt, toInt + 1))
       } else {
         VimList(mutableListOf())
       }
     } else {
-      if (fromInt <= toInt) {
-        VimString(expressionValue.asString().substring(fromInt, toInt + 1))
+      if (fromInt > arraySize) {
+        VimString("")
+      } else if (fromInt <= toInt) {
+        if (toInt > expressionValue.asString().length - 1) {
+          VimString(expressionValue.asString().substring(fromInt))
+        } else {
+          VimString(expressionValue.asString().substring(fromInt, toInt + 1))
+        }
       } else {
         VimString("")
       }
