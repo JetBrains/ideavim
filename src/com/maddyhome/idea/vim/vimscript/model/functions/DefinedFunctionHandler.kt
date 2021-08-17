@@ -45,15 +45,20 @@ data class DefinedFunctionHandler(
     context: DataContext,
     vimContext: VimContext,
   ): VimDataType {
-    initializeFunctionVariables(argumentValues, editor, context, vimContext)
-
     var result: ExecutionResult = ExecutionResult.Success
-    for (statement in body) {
-      if (result is ExecutionResult.Success) {
-        result = statement.execute(editor, context, vimContext)
+    vimContext.enterFunction()
+    try {
+      initializeFunctionVariables(argumentValues, editor, context, vimContext)
+      for (statement in body) {
+        if (result is ExecutionResult.Success) {
+          result = statement.execute(editor, context, vimContext)
+        }
       }
+    } catch (e: ExException) {
+      vimContext.leaveFunction()
+      throw e
     }
-
+    vimContext.leaveFunction()
     return when (result) {
       is ExecutionResult.Break -> throw ExException("E587: :break without :while or :for: break")
       is ExecutionResult.Continue -> throw ExException("E586: :continue without :while or :for: continue")

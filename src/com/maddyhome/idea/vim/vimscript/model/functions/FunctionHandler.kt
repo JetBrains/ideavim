@@ -45,17 +45,7 @@ abstract class FunctionHandler {
     vimContext: VimContext,
   ): VimDataType {
     checkFunctionCall(functionCall)
-
-    vimContext.enterFunction()
-    val result: VimDataType
-    try {
-      result = doFunction(functionCall.arguments, editor, context, vimContext)
-    } catch (e: ExException) {
-      vimContext.leaveFunction()
-      throw e
-    }
-    vimContext.leaveFunction()
-    return result
+    return doFunction(functionCall.arguments, editor, context, vimContext)
   }
 
   private fun checkFunctionCall(functionCall: FunctionCallExpression) {
