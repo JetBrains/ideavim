@@ -366,6 +366,8 @@ commandName:
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 expr:                   WS* EXCLAMATION WS* expr                                                                        #UnaryExpression
+                    |   expr L_BRACKET expr R_BRACKET                                                                   #OneElementSublistExpression
+                    |   expr L_BRACKET WS* from = expr? WS* COLON WS* to = expr? WS* R_BRACKET                          #SublistExpression
                     |   expr WS* binaryOperator1 WS* expr                                                               #BinExpression1
                     |   expr WS* binaryOperator2 WS* expr                                                               #BinExpression2
                     |   expr WS* binaryOperator3 WS* expr                                                               #BinExpression3
@@ -386,8 +388,6 @@ expr:                   WS* EXCLAMATION WS* expr                                
                     |   literalDictionary                                                                               #LiteralDictionaryExpression
                     |   L_PAREN WS* expr WS* R_PAREN                                                                    #WrappedExpression
                     |   expr WS* QUESTION WS* expr WS* COLON WS* expr                                                   #TernaryExpression
-                    |   expr L_BRACKET WS* from = expr? WS* COLON WS* to = expr? WS* R_BRACKET                          #SublistExpression
-                    |   expr L_BRACKET expr R_BRACKET                                                                   #OneElementSublistExpression
 ;
 
 binaryOperator1:        STAR | DIV | MOD;

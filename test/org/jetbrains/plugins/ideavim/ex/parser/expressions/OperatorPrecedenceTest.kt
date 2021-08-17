@@ -56,4 +56,9 @@ class OperatorPrecedenceTest {
   fun `comparison operators`() {
     assertEquals(VimInt(1), VimscriptParser.parseExpression("10 < 5 + 29")!!.evaluate())
   }
+
+  @Test
+  fun `sublist operator`() {
+    assertEquals(VimString("ab"), VimscriptParser.parseExpression("'a' . 'bc'[0]")!!.evaluate())
+  }
 }
