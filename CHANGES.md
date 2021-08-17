@@ -26,6 +26,7 @@ usual beta standards.
 
 ### Features:
 * [Secret link](https://jb.gg/vim-script-discussion). Wow, you read the changelogs! Check out the most interesting change in IdeaVim.
+* Mapping keys to expressions (map \<expr>)
 
 ### Fixes:
 
