@@ -770,6 +770,19 @@ n  ,f            <Plug>Foo
     assertState(text2)
   }
 
+  fun `test map with invalid expression`() {
+    val text = """
+          -----
+          1${c}2345
+          abcde
+          -----
+    """.trimIndent()
+    configureByJavaText(text)
+    typeText(commandToKeys("nnoremap <expr> t ^f8a"))
+    typeText(parseKeys("t"))
+    assertPluginErrorMessageContains("E15: Invalid expression: ^f8a")
+  }
+
   private fun checkDelayedMapping(before: String, after: String) {
     assertState(before)
 
