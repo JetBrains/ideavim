@@ -381,6 +381,9 @@ commandName:
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 expr:                   WS* EXCLAMATION WS* expr                                                                        #UnaryExpression
+                    |   expr WS* ARROW functionName L_PAREN WS* functionArguments WS* R_PAREN                           #FunctionAsMethodCall1
+                    |   expr WS* ARROW lambda L_PAREN WS* functionArguments WS* R_PAREN                                 #FunctionAsMethodCall2
+                    |   lambda                                                                                          #LambdaExpression
                     |   expr L_BRACKET expr R_BRACKET                                                                   #OneElementSublistExpression
                     |   expr L_BRACKET WS* from = expr? WS* COLON WS* to = expr? WS* R_BRACKET                          #SublistExpression
                     |   expr WS* binaryOperator1 WS* expr                                                               #BinExpression1
@@ -420,6 +423,8 @@ binaryOperator3:        LESS | LESS_IC | LESS_CS
 ;
 binaryOperator4:        AMPERSAND AMPERSAND;
 binaryOperator5:        LOGICAL_OR;
+
+lambda:                 L_CURLY WS* functionArguments WS* ARROW WS* expr WS* R_CURLY;
 
 register:               AT (DIGIT | alphabeticChar | MINUS | COLON | DOT | MOD | NUM | ASSIGN | STAR | PLUS | TILDE | UNDERSCORE | DIV);
 
@@ -888,6 +893,7 @@ CARET:                  '^';
 BACKTICK:               '`';
 BAR:                    '|';
 ETC:                    '...';
+ARROW:                  '->';
 
 // Mixed operators
 PLUS:                   '+';
