@@ -69,7 +69,7 @@ finallyBlock:           ws_cols FINALLY WS* (comment | statementSeparator)
                             blockMember*
 ;
 
-functionDefinition:     ws_cols FUNCTION (replace = EXCLAMATION)? WS+ (SID | SNR)*(functionScope COLON)? functionName WS* L_PAREN WS* argumentsDeclaration R_PAREN WS* (flag = ~(BAR | NEW_LINE)*?) WS* (comment | statementSeparator)
+functionDefinition:     ws_cols FUNCTION (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName WS* L_PAREN WS* argumentsDeclaration R_PAREN WS* (functionFlag WS*)* (comment | statementSeparator)
                             blockMember*
                         ws_cols ENDFUNCTION WS* (comment | statementSeparator)
 ;
@@ -78,6 +78,7 @@ dictFunctionDefinition:
                             blockMember*
                         ws_cols ENDFUNCTION WS* (comment | statementSeparator)
 ;
+functionFlag:           RANGE | ABORT | DICT | CLOSURE;
 argumentsDeclaration:   (variableName (WS* COMMA WS* variableName)* (WS* COMMA WS* ETC WS*)? WS*)?;
 
 augroup:                ws_cols AUGROUP ~(NEW_LINE | BAR)* statementSeparator
@@ -598,6 +599,10 @@ keyword:                FUNCTION
                     |   CATCH
                     |   FINALLY
                     |   ENDTRY
+                    |   RANGE
+                    |   ABORT
+                    |   DICT
+                    |   CLOSURE
                     |   existingCommands
 ;
 existingCommands:       RETURN
@@ -742,6 +747,10 @@ Z_UPPERCASE:            'Z';
 // Keywords
 FUNCTION:               'fu' | 'fun' | 'func' | 'funct' | 'functi' | 'functio' | 'function';
 ENDFUNCTION:            'endf' | 'endfu' | 'endfun' | 'endfunc' | 'endfunct' | 'endfuncti' | 'endfunctio' | 'endfunction';
+RANGE:                  'range';
+ABORT:                  'abort';
+DICT:                   'dict';
+CLOSURE:                'closure';
 FOR:                    'for';
 ENDFOR:                 'endfo' | 'endfor';
 IN:                     'in';

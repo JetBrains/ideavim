@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.vimscript.model.functions
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -29,15 +28,16 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
+import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 
 data class DefinedFunctionHandler(
-  private val argumentNames: List<String>,
-  private val body: List<Executable>,
+  private val function: FunctionDeclaration,
 ) : FunctionHandler() {
 
-  override val minimumNumberOfArguments = argumentNames.size
-  override val maximumNumberOfArguments = argumentNames.size
+  override val minimumNumberOfArguments = function.args.size
+  override val maximumNumberOfArguments = function.args.size
 
   override fun doFunction(
     argumentValues: List<Expression>,
@@ -46,10 +46,10 @@ data class DefinedFunctionHandler(
     vimContext: VimContext,
   ): VimDataType {
     var result: ExecutionResult = ExecutionResult.Success
-    vimContext.enterFunction()
+    vimContext.enterFunction(function.name, function.flags.contains(FunctionFlag.CLOSURE))
     try {
       initializeFunctionVariables(argumentValues, editor, context, vimContext)
-      for (statement in body) {
+      for (statement in function.body) {
         if (result is ExecutionResult.Success) {
           result = statement.execute(editor, context, vimContext)
         }
@@ -74,7 +74,7 @@ data class DefinedFunctionHandler(
     context: DataContext,
     vimContext: VimContext,
   ) {
-    for ((index, name) in argumentNames.withIndex()) {
+    for ((index, name) in function.args.withIndex()) {
       VariableService.storeVariable(
         Variable(Scope.FUNCTION_VARIABLE, name),
         argumentValues[index].evaluate(editor, context, vimContext),

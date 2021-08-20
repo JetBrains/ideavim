@@ -8,6 +8,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.statements.CatchBlock
 import com.maddyhome.idea.vim.vimscript.model.statements.FinallyBlock
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
+import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.model.statements.IfStatement
 import com.maddyhome.idea.vim.vimscript.model.statements.ReturnStatement
 import com.maddyhome.idea.vim.vimscript.model.statements.ThrowStatement
@@ -69,7 +70,11 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
     val args = ctx.argumentsDeclaration().variableName().map { it.text }
     val body = ctx.blockMember().mapNotNull { visitBlockMember(it) }
     val replaceExisting = ctx.replace != null
-    return FunctionDeclaration(functionScope, functionName, args, body, replaceExisting)
+    val flags = mutableSetOf<FunctionFlag?>()
+    for (flag in ctx.functionFlag()) {
+      flags.add(FunctionFlag.getByName(flag.text))
+    }
+    return FunctionDeclaration(functionScope, functionName, args, body, replaceExisting, flags.filterNotNull().toSet())
   }
 
   override fun visitTryStatement(ctx: VimscriptParser.TryStatementContext): Executable {

@@ -94,7 +94,7 @@ object FunctionStorage {
       if (autoloadFunctionHandlers.containsKey(fullName) && !declaration.replaceExisting) {
         throw ExException("E122: Function $fullName already exists, add ! to replace it")
       }
-      autoloadFunctionHandlers[fullName] = DefinedFunctionHandler(declaration.args, declaration.body)
+      autoloadFunctionHandlers[fullName] = DefinedFunctionHandler(declaration)
       return
     }
     val scope: Scope = declaration.scope ?: getDefaultFunctionScope(vimContext)
@@ -103,7 +103,7 @@ object FunctionStorage {
         if (globalFunctionHandlers.containsKey(declaration.name) && !declaration.replaceExisting) {
           throw ExException("E122: Function ${declaration.name} already exists, add ! to replace it")
         } else {
-          globalFunctionHandlers[declaration.name] = DefinedFunctionHandler(declaration.args, declaration.body)
+          globalFunctionHandlers[declaration.name] = DefinedFunctionHandler(declaration)
         }
       }
       Scope.SCRIPT_VARIABLE -> {
@@ -115,10 +115,10 @@ object FunctionStorage {
         } else {
           if (scriptFunctionHandlers.containsKey(vimContext.getScriptName())) {
             scriptFunctionHandlers[vimContext.getScriptName()]!![declaration.name] =
-              DefinedFunctionHandler(declaration.args, declaration.body)
+              DefinedFunctionHandler(declaration)
           } else {
             scriptFunctionHandlers[vimContext.getScriptName()] =
-              mutableMapOf(declaration.name to DefinedFunctionHandler(declaration.args, declaration.body))
+              mutableMapOf(declaration.name to DefinedFunctionHandler(declaration))
           }
         }
       }

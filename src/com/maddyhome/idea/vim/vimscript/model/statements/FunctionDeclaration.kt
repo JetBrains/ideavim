@@ -14,11 +14,25 @@ data class FunctionDeclaration(
   val args: List<String>,
   val body: List<Executable>,
   val replaceExisting: Boolean,
+  val flags: Set<FunctionFlag>,
   val scriptName: String? = null,
 ) : Executable {
 
   override fun execute(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
     FunctionStorage.storeFunction(this, vimContext)
     return ExecutionResult.Success
+  }
+}
+
+enum class FunctionFlag(val abbrev: String) {
+  RANGE("range"),
+  ABORT("abort"),
+  DICT("dict"),
+  CLOSURE("closure");
+
+  companion object {
+    fun getByName(abbrev: String): FunctionFlag? {
+      return values().firstOrNull { it.abbrev == abbrev }
+    }
   }
 }
