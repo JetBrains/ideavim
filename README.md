@@ -36,7 +36,7 @@ Setup
 - IdeaVim can be installed via `Settings | Plugins`.
 See the [detailed instructions](https://www.jetbrains.com/help/idea/managing-plugins.html#).
 
-- Use `Tools | Vim Emulator` to enable or disable emulation.
+- Use `Tools | Vim Emulator` in the menu to enable or disable emulation.
 
 - Use the `~/.ideavimrc` file as an analog of `~/.vimrc` ([learn more](#Files)). The XDG standard is supported, as well.
 
