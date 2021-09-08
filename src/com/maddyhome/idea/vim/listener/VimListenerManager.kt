@@ -72,6 +72,7 @@ import com.maddyhome.idea.vim.ui.ShowCmdOptionChangeListener
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import javax.swing.SwingUtilities
 
 /**
  * @author Alex Plate
@@ -325,7 +326,14 @@ object VimListenerManager {
           caretModel.removeSecondaryCarets()
         }
 
-        if (event.mouseEvent.clickCount == 1) {
+        // Removing selection on just clicking.
+        //
+        // Actually, this event should not be fired on right click (when the menu appears), but since 202 it happens
+        //   sometimes. To prevent unwanted selection removing, an assertion for isRightClick was added.
+        // See:
+        //   https://youtrack.jetbrains.com/issue/IDEA-277716
+        //   https://youtrack.jetbrains.com/issue/VIM-2368
+        if (event.mouseEvent.clickCount == 1 && !SwingUtilities.isRightMouseButton(event.mouseEvent)) {
           if (editor.inVisualMode) {
             editor.exitVisualMode()
           } else if (editor.inSelectMode) {
@@ -333,6 +341,7 @@ object VimListenerManager {
             KeyHandler.getInstance().reset(editor)
           }
         }
+
         // TODO: 2019-03-22 Multi?
         caretModel.primaryCaret.vimLastColumn = caretModel.visualPosition.column
       } else if (event.area != EditorMouseEventArea.ANNOTATIONS_AREA &&

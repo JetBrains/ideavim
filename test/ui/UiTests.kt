@@ -92,6 +92,7 @@ class UiTests {
         }
       }
 
+      testSelectAndRightClick(editor)
       testSelectTextWithMouseInGutter(editor)
       testSelectForthAndBack(editor)
       testSelectTextUsingMouse(editor)
@@ -221,6 +222,28 @@ class UiTests {
     keyboard { enterText("l") }
     assertEquals("One Two\nThree F", editor.selectedText)
 
+    vimExit()
+  }
+
+  private fun ContainerFixture.testSelectAndRightClick(editor: Editor) {
+    println("Run testSelectTextUsingMouse...")
+    val from = editor.findText("One")
+    val to = editor.findText("Five")
+
+    val caretIsBlockWhileDragging = from.moveMouseTo(to, editor)
+    assertFalse(caretIsBlockWhileDragging)
+
+    Thread.sleep(1000)
+
+    // Right click
+    editor.findText("Two").click(MouseButton.RIGHT_BUTTON)
+
+    Thread.sleep(1000)
+
+    assertTrue(editor.selectedText.isNotEmpty())
+
+    // Reset state
+    editor.findText("One").click()
     vimExit()
   }
 
