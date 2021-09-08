@@ -30,6 +30,7 @@ usual beta standards.
 
 ### Fixes:
 
+* [VIM-2368](https://youtrack.jetbrains.com/issue/VIM-2368) Do not remove selection on right click
 ### Merged PRs:
 * [349](https://github.com/JetBrains/ideavim/pull/349) by [eugene nizienko](https://github.com/nizienko): Run UI test ci
 
