@@ -368,6 +368,8 @@ object VimListenerManager {
       val predictedMode = IdeaSelectionControl.predictMode(editor, SelectionSource.MOUSE)
       when (e.clickCount) {
         1 -> {
+          // If you click after the line, the caret is placed by IJ after the last symbol.
+          // This is not allowed in some vim modes, so we move the caret over the last symbol.
           if (!predictedMode.isEndAllowed) {
             @Suppress("ideavimRunForEachCaret")
             editor.caretModel.runForEachCaret { caret ->
@@ -382,6 +384,8 @@ object VimListenerManager {
             }
           } else cutOffEnd = false
         }
+        // If you double-click on word, the caret jumps to the selection end.
+        // Here we move the caret because it should be located one character left.
         2 -> moveCaretOneCharLeftFromSelectionEnd(editor, predictedMode)
       }
     }
