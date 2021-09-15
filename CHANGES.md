@@ -31,6 +31,7 @@ usual beta standards.
 ### Fixes:
 * [VIM-2368](https://youtrack.jetbrains.com/issue/VIM-2368) Do not remove selection on right click
 * [VIM-2392](https://youtrack.jetbrains.com/issue/VIM-2392) Fix possible out of bounds exception
+* [VIM-2387](https://youtrack.jetbrains.com/issue/VIM-2387) Fix coping with unnamed and ideaput
 
 ### Merged PRs:
 * [349](https://github.com/JetBrains/ideavim/pull/349) by [eugene nizienko](https://github.com/nizienko): Run UI test ci
