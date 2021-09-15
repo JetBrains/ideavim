@@ -322,13 +322,17 @@ class PutGroup {
       carets[caret] = pointMarker
     }
 
-    val sizeBeforeInsert = CopyPasteManager.getInstance().allContents.size
+    val allContentsBefore = CopyPasteManager.getInstance().allContents
+    val sizeBeforeInsert = allContentsBefore.size
+    val firstItemBefore = allContentsBefore.firstOrNull()
     val origContent: TextBlockTransferable = setClipboardText(text.text, text.transferableData)
-    val sizeAfterInsert = CopyPasteManager.getInstance().allContents.size
+    val allContentsAfter = CopyPasteManager.getInstance().allContents
+    val sizeAfterInsert = allContentsAfter.size
+    val firstItemAfter = allContentsAfter.firstOrNull()
     try {
       pasteProvider.performPaste(context)
     } finally {
-      if (sizeBeforeInsert != sizeAfterInsert) {
+      if (sizeBeforeInsert != sizeAfterInsert || firstItemBefore != firstItemAfter) {
         // Sometimes inserted text replaces existing one. E.g. on insert with + or * register
         (CopyPasteManager.getInstance() as? CopyPasteManagerEx)?.run { removeContent(origContent) }
       }
