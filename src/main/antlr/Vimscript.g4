@@ -29,7 +29,8 @@ whileLoop:
 ;
 blockMember:
     command | continueStatement | breakStatement | forLoop | forLoop2 | whileLoop | ifStatement
-|   returnStatement | throwStatement | functionDefinition | dictFunctionDefinition | comment | tryStatement;
+|   returnStatement | throwStatement | functionDefinition | dictFunctionDefinition | comment | tryStatement
+|   augroup | autocmd;
 continueStatement:      ws_cols CONTINUE WS* statementSeparator;
 breakStatement:         ws_cols BREAK WS* statementSeparator;
 returnStatement:        ws_cols range? ws_cols RETURN WS+ expr WS* statementSeparator;
@@ -76,12 +77,10 @@ dictFunctionDefinition:
 ;
 argumentsDeclaration:   (variableName (WS* COMMA WS* variableName)* (WS* COMMA WS* ETC WS*)? WS*)?;
 
-augroup:                AUGROUP EXCLAMATION? WS+ anyCaseNameWithDigitsAndUnderscores WS* statementSeparator
-                            (WS* autocmd WS* statementSeparator)*
-                        AUGROUP WS* END WS* statementSeparator
+augroup:                ws_cols AUGROUP .*? AUGROUP WS+ END WS* statementSeparator
 ;
 
-autocmd:                AUTOCMD ~(NEW_LINE)* NEW_LINE
+autocmd:                ws_cols AUTOCMD ~(NEW_LINE)* NEW_LINE
 ;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
