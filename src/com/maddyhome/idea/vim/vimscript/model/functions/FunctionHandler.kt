@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.vimscript.model.functions
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
@@ -31,21 +31,11 @@ abstract class FunctionHandler {
   abstract val minimumNumberOfArguments: Int?
   abstract val maximumNumberOfArguments: Int?
 
-  protected abstract fun doFunction(
-    argumentValues: List<Expression>,
-    editor: Editor,
-    context: DataContext,
-    vimContext: VimContext,
-  ): VimDataType
+  protected abstract fun doFunction(argumentValues: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType
 
-  fun executeFunction(
-    functionCall: FunctionCallExpression,
-    editor: Editor,
-    context: DataContext,
-    vimContext: VimContext,
-  ): VimDataType {
+  fun executeFunction(functionCall: FunctionCallExpression, editor: Editor, context: DataContext, parent: Executable): VimDataType {
     checkFunctionCall(functionCall)
-    return doFunction(functionCall.arguments, editor, context, vimContext)
+    return doFunction(functionCall.arguments, editor, context, parent)
   }
 
   private fun checkFunctionCall(functionCall: FunctionCallExpression) {

@@ -21,44 +21,30 @@ package com.maddyhome.idea.vim.vimscript.model.functions
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
-import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 
-data class DefinedFunctionHandler(
-  private val function: FunctionDeclaration,
-) : FunctionHandler() {
+data class DefinedFunctionHandler(private val function: FunctionDeclaration) : FunctionHandler() {
 
   override val minimumNumberOfArguments = function.args.size
   override val maximumNumberOfArguments = function.args.size
 
-  override fun doFunction(
-    argumentValues: List<Expression>,
-    editor: Editor,
-    context: DataContext,
-    vimContext: VimContext,
-  ): VimDataType {
+  override fun doFunction(argumentValues: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType {
     var result: ExecutionResult = ExecutionResult.Success
-    vimContext.enterFunction(function.name, function.flags.contains(FunctionFlag.CLOSURE))
-    try {
-      initializeFunctionVariables(argumentValues, editor, context, vimContext)
-      for (statement in function.body) {
-        if (result is ExecutionResult.Success) {
-          result = statement.execute(editor, context, vimContext)
-        }
+    initializeFunctionVariables(argumentValues, editor, context)
+    for (statement in function.body) {
+      statement.parent = function
+      if (result is ExecutionResult.Success) {
+        result = statement.execute(editor, context)
       }
-    } catch (e: ExException) {
-      vimContext.leaveFunction()
-      throw e
     }
-    vimContext.leaveFunction()
     return when (result) {
       is ExecutionResult.Break -> throw ExException("E587: :break without :while or :for: break")
       is ExecutionResult.Continue -> throw ExException("E586: :continue without :while or :for: continue")
@@ -68,19 +54,14 @@ data class DefinedFunctionHandler(
     }
   }
 
-  private fun initializeFunctionVariables(
-    argumentValues: List<Expression>,
-    editor: Editor,
-    context: DataContext,
-    vimContext: VimContext,
-  ) {
+  private fun initializeFunctionVariables(argumentValues: List<Expression>, editor: Editor, context: DataContext) {
     for ((index, name) in function.args.withIndex()) {
       VariableService.storeVariable(
         Variable(Scope.FUNCTION_VARIABLE, name),
-        argumentValues[index].evaluate(editor, context, vimContext),
+        argumentValues[index].evaluate(editor, context, function),
         editor,
         context,
-        vimContext
+        function
       )
     }
   }

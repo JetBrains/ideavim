@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -40,7 +40,7 @@ object ExistsFunctionHandler : FunctionHandler() {
     argumentValues: List<Expression>,
     editor: Editor,
     context: DataContext,
-    vimContext: VimContext,
+    parent: Executable,
   ): VimDataType {
     val expression = argumentValues[0]
     return if (expression is SimpleExpression && expression.data is VimString) {

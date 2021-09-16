@@ -44,6 +44,7 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.HelperKt;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.*;
+import com.maddyhome.idea.vim.vimscript.model.Executable;
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression;
 import kotlin.Pair;
 import kotlin.text.StringsKt;
@@ -151,8 +152,9 @@ public class KeyGroup implements PersistentStateComponent<Element> {
                             @NotNull MappingOwner owner,
                             @NotNull Expression toExpr,
                             @NotNull String originalString,
+                            @NotNull Executable parent,
                             boolean recursive) {
-    modes.stream().map(this::getKeyMapping).forEach(o -> o.put(fromKeys, toExpr, owner, originalString, recursive));
+    modes.stream().map(this::getKeyMapping).forEach(o -> o.put(fromKeys, toExpr, owner, originalString, parent, recursive));
     registerKeyMapping(fromKeys, owner);
   }
 

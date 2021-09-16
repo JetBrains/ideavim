@@ -20,7 +20,8 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
@@ -41,9 +42,9 @@ object EmptyFunctionHandler : FunctionHandler() {
     argumentValues: List<Expression>,
     editor: Editor,
     context: DataContext,
-    vimContext: VimContext,
+    parent: Executable,
   ): VimDataType {
-    val argument = argumentValues[0].evaluate(editor, context, vimContext)
+    val argument = argumentValues[0].evaluate(editor, context, Script(listOf()))
     // TODO: 03.08.2021
     // - |v:false|, |v:none| and |v:null| are empty, |v:true| is not.
     val isEmpty = when (argument) {

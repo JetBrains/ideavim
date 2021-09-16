@@ -70,7 +70,7 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
 
     if (arguments.specialArguments.contains(EXPR)) {
       VimPlugin.getKey()
-        .putKeyMapping(modes, arguments.fromKeys, MappingOwner.IdeaVim, arguments.toExpr, arguments.secondArgument, commandInfo.isRecursive)
+        .putKeyMapping(modes, arguments.fromKeys, MappingOwner.IdeaVim, arguments.toExpr, arguments.secondArgument, this, commandInfo.isRecursive)
     } else {
       val toKeys = parseKeys(arguments.secondArgument)
       VimPlugin.getKey()

@@ -5,7 +5,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
-data class Script(val units: List<Executable>) : Executable {
+data class Script(val units: List<Executable>) : Executable() {
 
   /**
    * we store the "s:" scope variables and functions here
@@ -14,11 +14,12 @@ data class Script(val units: List<Executable>) : Executable {
   val scriptVariables: MutableMap<String, VimDataType> = mutableMapOf()
   val scriptFunctions: MutableMap<String, FunctionHandler> = mutableMapOf()
 
-  override fun execute(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
+  override fun execute(editor: Editor, context: DataContext): ExecutionResult {
     var latestResult: ExecutionResult = ExecutionResult.Success
     for (unit in units) {
+      unit.parent = this
       if (latestResult is ExecutionResult.Success) {
-        latestResult = unit.execute(editor, context, vimContext)
+        latestResult = unit.execute(editor, context)
       } else {
         break
       }
