@@ -217,7 +217,7 @@ class CommandParserTest : VimTestCase() {
         let g:y = 10
       """.trimIndent()
     )
-    assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 2:14") })
+    assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 2:") })
     assertEquals(2, script.units.size)
     assertTrue(script.units[0] is LetCommand)
     val let1 = script.units[0] as LetCommand
