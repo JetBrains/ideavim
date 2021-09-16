@@ -19,10 +19,7 @@
 package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.util.text.StringUtil;
-import com.maddyhome.idea.vim.vimscript.model.VimContext;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import com.maddyhome.idea.vim.vimscript.model.expressions.Scope;
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import org.apache.commons.codec.binary.Base64;
 import org.jdom.Element;
@@ -169,10 +166,8 @@ public class StringHelper {
   }
 
   private static @Nullable List<KeyStroke> parseMapLeader(@NotNull String s) {
-    // todo global scope != good
     if ("leader".equalsIgnoreCase(s)) {
-      final Object mapLeader = VariableService.INSTANCE
-        .getNullableVariableValue(new Variable(Scope.GLOBAL_VARIABLE, "mapleader"), null, null, new VimContext());
+      final Object mapLeader = VariableService.INSTANCE.getGlobalVariable("mapleader");
       if (mapLeader instanceof VimString) {
         return stringToKeys(((VimString)mapLeader).getValue());
       }

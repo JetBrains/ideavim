@@ -142,4 +142,130 @@ class FunctionDeclarationTest : VimTestCase() {
 
     typeText(commandToKeys("delf! F1"))
   }
+
+  fun `test closure function`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        "" +
+          "function F1() |" +
+          "  let x = 5 |" +
+          "  function F2() closure |" +
+          "    return 10 * x |" +
+          "  endfunction |" +
+          "  return F2() |" +
+          "endfunction"
+      )
+    )
+    typeText(commandToKeys("echo F1()"))
+    assertExOutput("50\n")
+
+    typeText(commandToKeys("delf! F1"))
+    typeText(commandToKeys("delf! F2"))
+  }
+
+  fun `test outer variable cannot be reached from inner function`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        "" +
+          "function F1() |" +
+          "  let x = 5 |" +
+          "  function F2() |" +
+          "    return 10 * x |" +
+          "  endfunction |" +
+          "  return F2() |" +
+          "endfunction"
+      )
+    )
+    typeText(commandToKeys("echo F1()"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E121: Undefined variable: x")
+    assertNoExOutput()
+
+    typeText(commandToKeys("delf! F1"))
+    typeText(commandToKeys("delf! F2"))
+  }
+
+  fun `test call closure function multiple times`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        "" +
+          "function F1() |" +
+          "  let x = 0 |" +
+          "  function F2() closure |" +
+          "    let x += 1 |" +
+          "    return x |" +
+          "  endfunction |" +
+          "endfunction"
+      )
+    )
+    typeText(commandToKeys("echo F1()"))
+    typeText(commandToKeys("echo F2()"))
+    assertExOutput("1\n")
+    typeText(commandToKeys("echo F2()"))
+    assertExOutput("2\n")
+    typeText(commandToKeys("echo F2()"))
+    assertExOutput("3\n")
+
+    typeText(commandToKeys("delf! F1"))
+    typeText(commandToKeys("delf! F2"))
+  }
+
+  fun `test local variables exist after delfunction command`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        "" +
+          "function F1() |" +
+          "  let x = 0 |" +
+          "  function F2() closure |" +
+          "    let x += 1 |" +
+          "    return x |" +
+          "  endfunction |" +
+          "endfunction"
+      )
+    )
+    typeText(commandToKeys("echo F1()"))
+    typeText(commandToKeys("echo F2()"))
+    assertExOutput("1\n")
+    typeText(commandToKeys("delf! F1"))
+    typeText(commandToKeys("echo F2()"))
+    assertExOutput("2\n")
+
+    typeText(commandToKeys("delf! F1"))
+    typeText(commandToKeys("delf! F2"))
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  fun `test outer function does not see inner closure function variable`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        "" +
+          "function F1() |" +
+          "  function! F2() closure |" +
+          "    let x = 1 |" +
+          "    return 10 |" +
+          "  endfunction |" +
+          "  echo x |" +
+          "endfunction"
+      )
+    )
+    typeText(commandToKeys("echo F1()"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E121: Undefined variable: x")
+
+    typeText(commandToKeys("echo F2()"))
+    assertExOutput("10\n")
+    assertPluginError(false)
+
+    typeText(commandToKeys("echo F1()"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E121: Undefined variable: x")
+
+    typeText(commandToKeys("delf! F1"))
+    typeText(commandToKeys("delf! F2"))
+  }
 }

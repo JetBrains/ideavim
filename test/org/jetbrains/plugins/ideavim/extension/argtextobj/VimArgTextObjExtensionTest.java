@@ -42,10 +42,7 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
   }
 
   private void setArgTextObjPairsVariable(String value) {
-    // todo let
-    VariableService.INSTANCE
-      .storeVariable(new Variable(Scope.GLOBAL_VARIABLE, "argtextobj_pairs"), new VimString(value), null, null,
-                     new VimContext());
+    VariableService.INSTANCE.storeGlobalVariable("argtextobj_pairs", new VimString(value));
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)

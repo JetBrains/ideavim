@@ -38,7 +38,6 @@ import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.listener.VimYankListener
 import com.maddyhome.idea.vim.option.StrictMode
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
@@ -204,8 +203,7 @@ class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
     }
 
     private fun <T> extractVariable(variable: Variable, default: T, extractFun: (value: String) -> T): T {
-      // todo something smarter
-      val value = VariableService.getNullableVariableValue(variable, null, null, VimContext())
+      val value = VariableService.getGlobalVariable(variable.name)
 
       if (value is VimString) {
         return try {

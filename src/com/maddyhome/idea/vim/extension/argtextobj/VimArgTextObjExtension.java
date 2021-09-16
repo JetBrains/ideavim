@@ -176,9 +176,7 @@ public class VimArgTextObjExtension implements VimExtension {
 
   @Nullable
   private static String bracketPairsVariable() {
-    // todo global scope & nullable editor context != good
-    final Object value = VariableService.INSTANCE
-      .getNullableVariableValue(new Variable(Scope.GLOBAL_VARIABLE, "argtextobj_pairs"), null, null, new VimContext());
+    final Object value = VariableService.INSTANCE.getGlobalVariable("argtextobj_pairs");
     if (value instanceof VimString) {
       return ((VimString)value).getValue();
     }

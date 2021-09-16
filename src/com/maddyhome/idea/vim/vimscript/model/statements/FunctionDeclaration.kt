@@ -18,6 +18,13 @@ data class FunctionDeclaration(
   val scriptName: String? = null,
 ) : Executable {
 
+  /**
+   * we store the "a:" and "l:" scope variables here
+   * see ":h scope"
+   */
+  val functionVariables: MutableMap<String, VimDataType> = mutableMapOf()
+  val localVariables: MutableMap<String, VimDataType> = mutableMapOf()
+
   override fun execute(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
     FunctionStorage.storeFunction(this, vimContext)
     return ExecutionResult.Success
