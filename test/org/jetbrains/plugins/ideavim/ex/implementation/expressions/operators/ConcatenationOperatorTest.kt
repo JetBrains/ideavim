@@ -22,126 +22,137 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.ex.evaluate
-import org.junit.Test
+import org.junit.experimental.theories.DataPoints
+import org.junit.experimental.theories.FromDataPoints
+import org.junit.experimental.theories.Theories
+import org.junit.experimental.theories.Theory
+import org.junit.runner.RunWith
 import kotlin.test.assertEquals
 
+@RunWith(Theories::class)
 class ConcatenationOperatorTest {
 
-  @Test
-  fun `integer and integer`() {
-    assertEquals(VimString("23"), VimscriptParser.parseExpression("2 . 3")!!.evaluate())
+  companion object {
+    @JvmStatic
+    val operator = listOf(".", "..")
+      @DataPoints("operator") get
   }
 
-  @Test
-  fun `integer and float`() {
+  @Theory
+  fun `integer and integer`(@FromDataPoints("operator") operator: String) {
+    assertEquals(VimString("23"), VimscriptParser.parseExpression("2 $operator 3")!!.evaluate())
+  }
+
+  @Theory
+  fun `integer and float`(@FromDataPoints("operator") operator: String) {
     try {
-      VimscriptParser.parseExpression("3.4 . 2")!!.evaluate()
+      VimscriptParser.parseExpression("3.4 $operator 2")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E806: using Float as a String", e.message)
     }
   }
 
-  @Test
-  fun `float and float`() {
+  @Theory
+  fun `float and float`(@FromDataPoints("operator") operator: String) {
     try {
-      VimscriptParser.parseExpression("3.4 . 2.2")!!.evaluate()
+      VimscriptParser.parseExpression("3.4 $operator 2.2")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E806: using Float as a String", e.message)
     }
   }
 
-  @Test
-  fun `string and float`() {
+  @Theory
+  fun `string and float`(@FromDataPoints("operator") operator: String) {
     try {
-      VimscriptParser.parseExpression("'string' . 3.4")!!.evaluate()
+      VimscriptParser.parseExpression("'string' $operator 3.4")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E806: using Float as a String", e.message)
     }
   }
 
-  @Test
-  fun `string and string`() {
+  @Theory
+  fun `string and string`(@FromDataPoints("operator") operator: String) {
     assertEquals(
       VimString("stringtext"),
-      VimscriptParser.parseExpression("'string' . 'text'")!!.evaluate()
+      VimscriptParser.parseExpression("'string' $operator 'text'")!!.evaluate()
     )
   }
 
-  @Test
-  fun `string and integer`() {
+  @Theory
+  fun `string and integer`(@FromDataPoints("operator") operator: String) {
     assertEquals(
       VimString("string3"),
-      VimscriptParser.parseExpression("'string' . 3")!!.evaluate()
+      VimscriptParser.parseExpression("'string' $operator 3")!!.evaluate()
     )
   }
 
-  @Test
-  fun `String and list`() {
+  @Theory
+  fun `String and list`(@FromDataPoints("operator") operator: String) {
     try {
-      VimscriptParser.parseExpression("2 . [1, 2]")!!.evaluate()
+      VimscriptParser.parseExpression("2 $operator [1, 2]")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E730: Using a List as a String", e.message)
     }
   }
 
-  @Test
-  fun `string and list`() {
+  @Theory
+  fun `string and list`(@FromDataPoints("operator") operator: String) {
     try {
-      VimscriptParser.parseExpression("'string' . [1, 2]")!!.evaluate()
+      VimscriptParser.parseExpression("'string' $operator [1, 2]")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E730: Using a List as a String", e.message)
     }
   }
 
-  @Test
-  fun `list and list`() {
+  @Theory
+  fun `list and list`(@FromDataPoints("operator") operator: String) {
     try {
-      VimscriptParser.parseExpression("[3] . [1, 2]")!!.evaluate()
+      VimscriptParser.parseExpression("[3] $operator [1, 2]")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E730: Using a List as a String", e.message)
     }
   }
 
-  @Test
-  fun `dict and integer`() {
+  @Theory
+  fun `dict and integer`(@FromDataPoints("operator") operator: String) {
     try {
-      VimscriptParser.parseExpression("{'key' : 21} . 1")!!.evaluate()
+      VimscriptParser.parseExpression("{'key' : 21} $operator 1")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E731: Using a Dictionary as a String", e.message)
     }
   }
 
-  @Test
-  fun `dict and float`() {
+  @Theory
+  fun `dict and float`(@FromDataPoints("operator") operator: String) {
     try {
-      VimscriptParser.parseExpression("{'key' : 21} . 1.4")!!.evaluate()
+      VimscriptParser.parseExpression("{'key' : 21} $operator 1.4")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E731: Using a Dictionary as a String", e.message)
     }
   }
 
-  @Test
-  fun `dict and string`() {
+  @Theory
+  fun `dict and string`(@FromDataPoints("operator") operator: String) {
     try {
-      VimscriptParser.parseExpression("{'key' : 21} . 'string'")!!.evaluate()
+      VimscriptParser.parseExpression("{'key' : 21} $operator 'string'")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E731: Using a Dictionary as a String", e.message)
     }
   }
 
-  @Test
-  fun `dict and list`() {
+  @Theory
+  fun `dict and list`(@FromDataPoints("operator") operator: String) {
     try {
-      VimscriptParser.parseExpression("{'key' : 21} . [1]")!!.evaluate()
+      VimscriptParser.parseExpression("{'key' : 21} $operator [1]")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E731: Using a Dictionary as a String", e.message)
     }
   }
 
-  @Test
-  fun `dict and dict`() {
+  @Theory
+  fun `dict and dict`(@FromDataPoints("operator") operator: String) {
     try {
-      VimscriptParser.parseExpression("{'key' : 21} . {'key2': 33}")!!.evaluate()
+      VimscriptParser.parseExpression("{'key' : 21} $operator {'key2': 33}")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E731: Using a Dictionary as a String", e.message)
     }

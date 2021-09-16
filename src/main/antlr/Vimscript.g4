@@ -423,7 +423,7 @@ expr:                   WS* EXCLAMATION WS* expr                                
 ;
 
 binaryOperator1:        STAR | DIV | MOD;
-binaryOperator2:        PLUS | MINUS | DOT;
+binaryOperator2:        PLUS | MINUS | DOT | (DOT DOT);
 binaryOperator3:        LESS | LESS_IC | LESS_CS
                     |   GREATER | GREATER_IC | GREATER_CS
                     |   LESS_OR_EQUALS | LESS_OR_EQUALS_IC | LESS_OR_EQUALS_CS
