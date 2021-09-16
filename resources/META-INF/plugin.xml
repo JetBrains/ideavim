@@ -4,9 +4,22 @@
   <change-notes><![CDATA[
       <h3>Features:</h3>
       <ul>
-        <li><a href="https://jb.gg/vim-script-discussion">Secret link</a>. Wow, you read the changelogs! Check out the most
-          interesting change in IdeaVim.
+        <li>New engine for Vim Script execution. Check out the <a href="https://jb.gg/vim-script-discussion">GitHub
+          Discussion</a>.
         </li>
+        <li>Mapping keys to expressions (map &lt;expr&gt;). See <code>:h map-expression</code>.</li>
+      </ul>
+
+      <h3>Fixes:</h3>
+      <ul>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2368">VIM-2368</a> Do not remove selection on right click</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2392">VIM-2392</a> Fix possible out of bounds exception</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2387">VIM-2387</a> Fix coping with unnamed and ideaput</li>
+      </ul>
+
+      <h3>Changes:</h3>
+      <ul>
+        <li>New versioning scheme. Current version is <code>1.7.0</code> instead of <code>0.70</code>.</li>
       </ul>
 
       <h3>Merged PRs:</h3>

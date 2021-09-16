@@ -4,8 +4,9 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project DOES NOT adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+Before version 1.7.0:  
 Stable versions use X.Y format.  
 EAP ([Early Access Program](https://jb.gg/ideavim-eap)) versions use X.Y.Z format.
 
@@ -22,16 +23,19 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## To Be Released
+## 1.7.0, 2021-09-16
 
 ### Features:
-* [Secret link](https://jb.gg/vim-script-discussion). Wow, you read the changelogs! Check out the most interesting change in IdeaVim.
-* Mapping keys to expressions (map \<expr>)
+* New engine for Vim Script execution. Check out the [GitHub Discussion](https://jb.gg/vim-script-discussion).
+* Mapping keys to expressions (map \<expr>). See `:h map-expression`.
 
 ### Fixes:
 * [VIM-2368](https://youtrack.jetbrains.com/issue/VIM-2368) Do not remove selection on right click
 * [VIM-2392](https://youtrack.jetbrains.com/issue/VIM-2392) Fix possible out of bounds exception
 * [VIM-2387](https://youtrack.jetbrains.com/issue/VIM-2387) Fix coping with unnamed and ideaput
+
+### Changes:
+* New versioning scheme. Current version is `1.7.0` instead of `0.70`.
 
 ### Merged PRs:
 * [349](https://github.com/JetBrains/ideavim/pull/349) by [eugene nizienko](https://github.com/nizienko): Run UI test ci

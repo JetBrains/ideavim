@@ -188,10 +188,6 @@ You can read your `~/.vimrc` file from `~/.ideavimrc` with this command:
 
     source ~/.vimrc
 
-> :warning: Please note that IdeaVim currently parses `~/.ideavimrc` & `~/.vimrc` files via simple pattern-matching.
-See [VIM-669](https://youtrack.jetbrains.com/issue/VIM-669) for proper parsing
-of VimL files.
-
 Also note that if you have overridden the `user.home` JVM option, this
 will affect where IdeaVim looks for your `.ideavimrc` file. For example, if you
 have `-Duser.home=/my/alternate/home` then IdeaVim will source
@@ -274,10 +270,6 @@ IdeaVim tips and tricks
     - Check out more [ex commands](https://github.com/JetBrains/ideavim/wiki/%22set%22-commands).
 
 - Use your vim settings with IdeaVim. Put `source ~/.vimrc` in `~/.ideavimrc`.
-    > :warning: Please note that IdeaVim currently parses `~/.ideavimrc` & `~/.vimrc` files via simple pattern-matching.
-    See [VIM-669](https://youtrack.jetbrains.com/issue/VIM-669) for proper parsing
-    of VimL files.
-
 - Control the status bar icon via the [`ideastatusicon` option](https://github.com/JetBrains/ideavim/wiki/%22set%22-commands).
 - Not familiar with the default behaviour during a refactoring? See the [`idearefactormode` option](https://github.com/JetBrains/ideavim/wiki/%22set%22-commands).
 
