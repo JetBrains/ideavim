@@ -197,7 +197,7 @@ changelog {
     itemPrefix.set("*")
     path.set("${project.projectDir}/CHANGES.md")
     unreleasedTerm.set("To Be Released")
-    headerParserRegex.set("0\\.\\d{2}(.\\d+)?".toRegex())
+    headerParserRegex.set("\\d\\.\\d+(.\\d+)?".toRegex())
 //    header = { "${project.version}" }
 //    version = "0.60"
 }
@@ -237,6 +237,7 @@ tasks.register("slackNotification") {
             }
         """.trimIndent()
 
+        println("Parsed data: $slackDown")
         val post = URL(slackUrl)
         with(post.openConnection() as HttpURLConnection) {
             requestMethod = "POST"
