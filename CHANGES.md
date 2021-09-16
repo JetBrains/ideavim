@@ -23,6 +23,13 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Fixes:
+* [VIM-2387](https://youtrack.jetbrains.com/issue/VIM-2387) Fix coping with unnamed and ideaput
+, * [VIM-2392](https://youtrack.jetbrains.com/issue/VIM-2392) Fix possible out of bounds exception
+, * [VIM-2368](https://youtrack.jetbrains.com/issue/VIM-2368) Do not remove selection on right click
+
 ## 1.7.0, 2021-09-16
 
 ### Features:
