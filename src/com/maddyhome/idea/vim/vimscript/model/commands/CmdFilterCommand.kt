@@ -30,7 +30,6 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 
 /**
  * see "h :!"
@@ -38,7 +37,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimContext
 data class CmdFilterCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
-  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     logger.debug("execute")
     val command = buildString {
       var inBackslash = false

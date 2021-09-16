@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 
 /**
  * see "h :>"
@@ -33,7 +32,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimContext
 data class ShiftRightCommand(val ranges: Ranges, val argument: String, val length: Int) : Command.ForEachCaret(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
-  override fun processCommand(editor: Editor, caret: Caret, context: DataContext, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, caret: Caret, context: DataContext): ExecutionResult {
     val range = getTextRange(editor, caret, true)
     val endOffsets = range.endOffsets.map { it - 1 }.toIntArray()
     VimPlugin.getChange().indentRange(

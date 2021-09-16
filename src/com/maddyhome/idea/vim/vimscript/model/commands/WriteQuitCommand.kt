@@ -23,14 +23,13 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 
 /**
  * see "h :exit"
  */
 data class WriteQuitCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
-  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     VimPlugin.getFile().saveFile(context)
     VimPlugin.getFile().closeFile(editor, context)
 

@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 
 /**
  * see "h :@"
@@ -38,7 +37,7 @@ data class RepeatCommand(val ranges: Ranges, val argument: String) : Command.For
   private var lastArg = ':'
 
   @Throws(ExException::class)
-  override fun processCommand(editor: Editor, caret: Caret, context: DataContext, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, caret: Caret, context: DataContext): ExecutionResult {
     var arg = argument[0]
     if (arg == '@') arg = lastArg
     lastArg = arg

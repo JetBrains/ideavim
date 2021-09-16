@@ -34,7 +34,6 @@ import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import kotlin.math.min
 
@@ -45,7 +44,7 @@ data class MoveTextCommand(val ranges: Ranges, val argument: String) : Command.S
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
 
   @Throws(ExException::class)
-  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     val carets = EditorHelper.getOrderedCaretsList(editor)
     val caretModel = editor.caretModel
     val caretCount = caretModel.caretCount

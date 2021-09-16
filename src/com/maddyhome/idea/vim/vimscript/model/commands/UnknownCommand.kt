@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.commands.UnknownCommand.Constants.MAX_RECURSION
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 
@@ -43,11 +42,11 @@ data class UnknownCommand(val ranges: Ranges, val name: String, val argument: St
     const val MAX_RECURSION = 100
   }
 
-  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
-    return processPossiblyAliasCommand("$name $argument", editor, context, vimContext, MAX_RECURSION)
+  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+    return processPossiblyAliasCommand("$name $argument", editor, context, MAX_RECURSION)
   }
 
-  private fun processPossiblyAliasCommand(name: String, editor: Editor, context: DataContext, vimContext: VimContext, aliasCountdown: Int): ExecutionResult {
+  private fun processPossiblyAliasCommand(name: String, editor: Editor, context: DataContext, aliasCountdown: Int): ExecutionResult {
     if (VimPlugin.getCommand().isAlias(name)) {
       if (aliasCountdown > 0) {
         val commandAlias = VimPlugin.getCommand().getAliasCommand(name, 1)
@@ -59,9 +58,10 @@ data class UnknownCommand(val ranges: Ranges, val name: String, val argument: St
             }
             val parsedCommand = VimscriptParser.parseCommand(commandAlias.command) ?: throw ExException("E492: Not an editor command: ${commandAlias.command}")
             return if (parsedCommand is UnknownCommand) {
-              processPossiblyAliasCommand(commandAlias.command, editor, context, vimContext, aliasCountdown - 1)
+              processPossiblyAliasCommand(commandAlias.command, editor, context, aliasCountdown - 1)
             } else {
-              parsedCommand.execute(editor, context, vimContext)
+              parsedCommand.parent = this.parent
+              parsedCommand.execute(editor, context)
               ExecutionResult.Success
             }
           }

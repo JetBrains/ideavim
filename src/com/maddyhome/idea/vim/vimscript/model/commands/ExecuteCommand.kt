@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 
 /**
@@ -32,8 +31,8 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 class ExecuteCommand(val ranges: Ranges, val expressions: List<Expression>) : Command.SingleExecution(ranges) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
-  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
-    val command = expressions.joinToString(separator = " ") { it.evaluate(editor, context, vimContext).asString() }
+  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+    val command = expressions.joinToString(separator = " ") { it.evaluate(editor, context, this).asString() }
     return Executor.execute(command, editor, context, skipHistory = true, indicateErrors = true)
   }
 }

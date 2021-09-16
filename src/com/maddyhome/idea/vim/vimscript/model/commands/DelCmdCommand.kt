@@ -24,14 +24,13 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 
 /**
  * see "h :delcommand"
  */
 data class DelCmdCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
-  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     if (!VimPlugin.getCommand().hasAlias(argument)) {
       VimPlugin.showMessage(MessageHelper.message("e184.no.such.user.defined.command.0", argument))
       return ExecutionResult.Error

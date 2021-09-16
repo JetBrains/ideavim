@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 
 /**
  * This handler is created to support `Plug` command from vim-plug and `Plugin` command from vundle.
@@ -31,7 +30,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimContext
 data class PlugCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
-  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     val argument = argument
     val firstChar = argument[0]
     if (firstChar != '"' && firstChar != '\'') return ExecutionResult.Error

@@ -10,7 +10,6 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.StringOption
 import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -41,21 +40,21 @@ data class LetCommand(
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
-  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     when (variable) {
       is Variable -> {
         VariableService.storeVariable(
-          variable, operator.getNewValue(variable, expression, editor, context, vimContext),
-          editor, context, vimContext
+          variable, operator.getNewValue(variable, expression, editor, context, this),
+          editor, context, this
         )
       }
 
       is OneElementSublistExpression -> {
         if (variable.expression is Variable) {
-          val variableValue = VariableService.getNonNullVariableValue(variable.expression, editor, context, vimContext)
+          val variableValue = VariableService.getNonNullVariableValue(variable.expression, editor, context, this)
           when (variableValue) {
             is VimDictionary -> {
-              val dictKey = VimString(variable.index.evaluate(editor, context, vimContext).asString())
+              val dictKey = VimString(variable.index.evaluate(editor, context, this).asString())
               if (operator != AssignmentOperator.ASSIGNMENT && !variableValue.dictionary.containsKey(dictKey)) {
                 throw ExException("E716: Key not present in Dictionary: $dictKey")
               }
@@ -63,21 +62,21 @@ data class LetCommand(
                 variableValue.dictionary[dictKey] =
                   operator.getNewValue(
                     SimpleExpression(variableValue.dictionary[dictKey]!!), expression, editor,
-                    context, vimContext
+                    context, this
                   )
               } else {
-                variableValue.dictionary[dictKey] = expression.evaluate(editor, context, vimContext)
+                variableValue.dictionary[dictKey] = expression.evaluate(editor, context, this)
               }
             }
             is VimList -> {
               // we use Integer.parseInt(........asString()) because in case if index's type is Float, List, Dictionary etc
               // vim throws the same error as the asString() method
-              val index = Integer.parseInt(variable.index.evaluate(editor, context, vimContext).asString())
+              val index = Integer.parseInt(variable.index.evaluate(editor, context, this).asString())
               if (index > variableValue.values.size - 1) {
                 throw ExException("E684: list index out of range: $index")
               }
               variableValue.values[index] = operator.getNewValue(
-                SimpleExpression(variableValue.values[index]), expression, editor, context, vimContext
+                SimpleExpression(variableValue.values[index]), expression, editor, context, this
               )
             }
             is VimBlob -> TODO()
@@ -90,17 +89,17 @@ data class LetCommand(
 
       is SublistExpression -> {
         if (variable.expression is Variable) {
-          val variableValue = VariableService.getNonNullVariableValue(variable.expression, editor, context, vimContext)
+          val variableValue = VariableService.getNonNullVariableValue(variable.expression, editor, context, this)
           if (variableValue is VimList) {
             // we use Integer.parseInt(........asString()) because in case if index's type is Float, List, Dictionary etc
             // vim throws the same error as the asString() method
-            val from = Integer.parseInt(variable.from?.evaluate(editor, context, vimContext)?.toString() ?: "0")
+            val from = Integer.parseInt(variable.from?.evaluate(editor, context, this)?.toString() ?: "0")
             val to = Integer.parseInt(
-              variable.to?.evaluate(editor, context, vimContext)?.toString()
+              variable.to?.evaluate(editor, context, this)?.toString()
                 ?: (variableValue.values.size - 1).toString()
             )
 
-            val expressionValue = expression.evaluate(editor, context, vimContext)
+            val expressionValue = expression.evaluate(editor, context, this)
             if (expressionValue !is VimList && expressionValue !is VimBlob) {
               throw ExException("E709: [:] requires a List or Blob value")
             } else if (expressionValue is VimList) {
@@ -142,7 +141,7 @@ data class LetCommand(
         if (operator == AssignmentOperator.ASSIGNMENT || operator == AssignmentOperator.CONCATENATION ||
           operator == AssignmentOperator.ADDITION || operator == AssignmentOperator.SUBTRACTION
         ) {
-          val newValue = operator.getNewValue(SimpleExpression(optionValue), expression, editor, context, vimContext)
+          val newValue = operator.getNewValue(SimpleExpression(optionValue), expression, editor, context, this)
           when (option) {
             is ToggleOption -> {
               if (newValue.asBoolean()) {

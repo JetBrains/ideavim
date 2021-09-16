@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 
 /**
  * @author Rieon Ke
@@ -36,7 +35,7 @@ data class TabCloseCommand(val ranges: Ranges, val argument: String) : Command.S
 
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
-  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
 
     val project = PlatformDataKeys.PROJECT.getData(context) ?: return ExecutionResult.Error
     val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)

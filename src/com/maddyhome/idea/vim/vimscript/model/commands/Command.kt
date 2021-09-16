@@ -23,25 +23,24 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 import java.util.*
 
-sealed class Command(var commandRanges: Ranges, val commandArgument: String) : Executable {
+sealed class Command(var commandRanges: Ranges, val commandArgument: String) : Executable() {
 
   abstract val argFlags: CommandHandlerFlags
   protected open val optFlags: EnumSet<CommandFlags> = noneOfEnum()
   private val logger = logger<Command>()
 
   abstract class ForEachCaret(ranges: Ranges, argument: String = "") : Command(ranges, argument) {
-    abstract fun processCommand(editor: Editor, caret: Caret, context: DataContext, vimContext: VimContext): ExecutionResult
+    abstract fun processCommand(editor: Editor, caret: Caret, context: DataContext): ExecutionResult
   }
 
   abstract class SingleExecution(ranges: Ranges, argument: String = "") : Command(ranges, argument) {
-    abstract fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult
+    abstract fun processCommand(editor: Editor, context: DataContext): ExecutionResult
   }
 
   @Throws(ExException::class)
-  override fun execute(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
+  override fun execute(editor: Editor, context: DataContext): ExecutionResult {
     checkRanges()
     checkArgument()
     if (editor.inVisualMode && Flag.SAVE_VISUAL !in argFlags.flags) {
@@ -52,7 +51,7 @@ sealed class Command(var commandRanges: Ranges, val commandArgument: String) : E
       return ExecutionResult.Error
     }
 
-    val runCommand = ThrowableComputable<ExecutionResult, ExException> { runCommand(editor, context, vimContext) }
+    val runCommand = ThrowableComputable<ExecutionResult, ExException> { runCommand(editor, context) }
     return when (argFlags.access) {
       Access.WRITABLE -> ApplicationManager.getApplication().runWriteAction(runCommand)
       Access.READ_ONLY -> ApplicationManager.getApplication().runReadAction(runCommand)
@@ -60,20 +59,20 @@ sealed class Command(var commandRanges: Ranges, val commandArgument: String) : E
     }
   }
 
-  private fun runCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
+  private fun runCommand(editor: Editor, context: DataContext): ExecutionResult {
     var result: ExecutionResult = ExecutionResult.Success
     when (this) {
       is ForEachCaret -> {
         editor.caretModel.runForEachCaret(
           { caret ->
             if (result is ExecutionResult.Success) {
-              result = processCommand(editor, caret, context, vimContext)
+              result = processCommand(editor, caret, context)
             }
           },
           true
         )
       }
-      is SingleExecution -> result = processCommand(editor, context, vimContext)
+      is SingleExecution -> result = processCommand(editor, context)
     }
     return result
   }

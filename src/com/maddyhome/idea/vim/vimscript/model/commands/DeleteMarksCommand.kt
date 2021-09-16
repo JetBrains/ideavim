@@ -30,7 +30,6 @@ import com.maddyhome.idea.vim.group.MarkGroup.WR_REGULAR_FILE_MARKS
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 
 private val VIML_COMMENT = Regex("(?<!\\\\)\".*")
 private val TRAILING_SPACES = Regex("\\s*$")
@@ -46,7 +45,7 @@ private const val UNESCAPED_QUOTE = "\""
 data class DeleteMarksCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
-  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     val processedArg = argument
       .replace(VIML_COMMENT, "")
       .replace(ESCAPED_QUOTE, UNESCAPED_QUOTE)
