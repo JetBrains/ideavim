@@ -20,14 +20,14 @@ package com.maddyhome.idea.vim.vimscript.model.expressions
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 
 data class ListExpression(val list: MutableList<Expression>) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimContext): VimDataType {
-    val evaluatedList = list.map { it.evaluate(editor, context, vimContext) }.toMutableList()
+  override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
+    val evaluatedList = list.map { it.evaluate(editor, context, parent) }.toMutableList()
     return VimList(evaluatedList)
   }
 }

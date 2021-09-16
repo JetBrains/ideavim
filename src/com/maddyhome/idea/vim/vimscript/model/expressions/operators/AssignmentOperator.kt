@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.vimscript.model.expressions.operators
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.AdditionHandler
@@ -32,20 +32,20 @@ enum class AssignmentOperator(val value: String) {
     value: Expression,
     editor: Editor,
     context: DataContext,
-    vimContext: VimContext,
+    parent: Executable,
   ): VimDataType {
-    val valueValue = value.evaluate(editor, context, vimContext)
+    val valueValue = value.evaluate(editor, context, parent)
     return when (this) {
       ASSIGNMENT -> valueValue
-      ADDITION -> AdditionHandler.performOperation(variable.evaluate(editor, context, vimContext), valueValue)
-      SUBTRACTION -> SubtractionHandler.performOperation(variable.evaluate(editor, context, vimContext), valueValue)
+      ADDITION -> AdditionHandler.performOperation(variable.evaluate(editor, context, parent), valueValue)
+      SUBTRACTION -> SubtractionHandler.performOperation(variable.evaluate(editor, context, parent), valueValue)
       MULTIPLICATION -> MultiplicationHandler.performOperation(
-        variable.evaluate(editor, context, vimContext),
+        variable.evaluate(editor, context, parent),
         valueValue
       )
-      DIVISION -> DivisionHandler.performOperation(variable.evaluate(editor, context, vimContext), valueValue)
-      MODULUS -> ModulusHandler.performOperation(variable.evaluate(editor, context, vimContext), valueValue)
-      CONCATENATION -> ConcatenationHandler.performOperation(variable.evaluate(editor, context, vimContext), valueValue)
+      DIVISION -> DivisionHandler.performOperation(variable.evaluate(editor, context, parent), valueValue)
+      MODULUS -> ModulusHandler.performOperation(variable.evaluate(editor, context, parent), valueValue)
+      CONCATENATION -> ConcatenationHandler.performOperation(variable.evaluate(editor, context, parent), valueValue)
     }
   }
 }

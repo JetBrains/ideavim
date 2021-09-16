@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.vimscript.model.expressions
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -30,24 +30,24 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 data class OneElementSublistExpression(val index: Expression, val expression: Expression) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimContext): VimDataType {
-    val expressionValue = expression.evaluate(editor, context, vimContext)
+  override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
+    val expressionValue = expression.evaluate(editor, context, parent)
     if (expressionValue is VimDictionary) {
-      return expressionValue.dictionary[VimString(index.evaluate(editor, context, vimContext).asString())]
+      return expressionValue.dictionary[VimString(index.evaluate(editor, context, parent).asString())]
         ?: throw ExException(
           "E716: Key not present in Dictionary: \"${
-          index.evaluate(editor, context, vimContext).asString()
+          index.evaluate(editor, context, parent).asString()
           }\""
         )
     } else {
-      val indexValue = Integer.parseInt(index.evaluate(editor, context, vimContext).asString())
+      val indexValue = Integer.parseInt(index.evaluate(editor, context, parent).asString())
       if (expressionValue is VimList && (indexValue >= expressionValue.values.size || indexValue < 0)) {
         throw ExException("E684: list index out of range: $indexValue")
       }
       if (indexValue < 0) {
         return VimString("")
       }
-      return SublistExpression(SimpleExpression(VimInt(indexValue)), SimpleExpression(VimInt(indexValue)), SimpleExpression(expressionValue)).evaluate(editor, context, vimContext)
+      return SublistExpression(SimpleExpression(VimInt(indexValue)), SimpleExpression(VimInt(indexValue)), SimpleExpression(expressionValue)).evaluate(editor, context, parent)
     }
   }
 }

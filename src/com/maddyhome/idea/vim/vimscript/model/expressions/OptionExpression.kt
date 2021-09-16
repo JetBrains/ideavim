@@ -9,7 +9,7 @@ import com.maddyhome.idea.vim.option.Option
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.StringOption
 import com.maddyhome.idea.vim.option.ToggleOption
-import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
 data class OptionExpression(val optionName: String) : Expression() {
 
-  override fun evaluate(editor: Editor, context: DataContext, vimContext: VimContext): VimDataType {
+  override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
     val option = OptionsManager.getOption(optionName) ?: throw ExException("E518: Unknown option: $optionName")
     return option.toVimDataType()
   }
