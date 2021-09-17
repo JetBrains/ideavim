@@ -11,5 +11,6 @@ accordingly, and delete the patch script.
 changeBuildType(RelativeId("Release")) {
     vcs {
         remove(DslContext.settingsRoot.id!!)
+        add(RelativeId("Branch_Release"))
     }
 }
