@@ -92,6 +92,7 @@ class UiTests {
         }
       }
 
+      testUnnamedClipboard(editor)
       testSelectAndRightClick(editor)
       testSelectTextWithMouseInGutter(editor)
       testSelectForthAndBack(editor)
@@ -118,6 +119,39 @@ class UiTests {
       }
 
       wrapWithIf(javaEditor)
+    }
+  }
+
+  private fun IdeaFrame.testUnnamedClipboard(editor: Editor) {
+    keyboard {
+      enterText(":set clipboard+=unnamed")
+      enter()
+
+      enterText("gg")
+      enterText("yy")
+      enterText("jyy")
+      enterText("jyy")
+      enterText("p")
+      enterText("p")
+      enterText("p")
+    }
+
+    assertEquals(
+      """
+      One Two
+      Three Four
+      Five
+      Five
+      Five
+      Five
+      
+      """.trimIndent(),
+      editor.text
+    )
+
+    keyboard {
+      enterText(":set clipboard-=unnamed")
+      enter()
     }
   }
 

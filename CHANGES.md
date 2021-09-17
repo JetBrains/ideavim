@@ -24,9 +24,11 @@ Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
 ## To Be Released
+
 ### Fixes:
 * [VIM-2400](https://youtrack.jetbrains.com/issue/VIM-2400) Fix vim script parser
 * [VIM-2401](https://youtrack.jetbrains.com/issue/VIM-2401) Exceptions occurred during execution of `map<expr>` are now shown in status bar
+* [VIM-2404](https://youtrack.jetbrains.com/issue/VIM-2404) Fix multiple pastes from unnamed clipboard
 
 ## 1.7.0, 2021-09-16
 
