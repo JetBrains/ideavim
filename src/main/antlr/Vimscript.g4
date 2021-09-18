@@ -19,7 +19,9 @@ forLoop:
 
 // other for loops that are not supported yet
 forLoop2:
-    ws_cols FOR .*? ENDFOR WS* statementSeparator
+    ws_cols FOR ~(BAR | NEW_LINE)*? statementSeparator
+        blockMember*
+    ws_cols ENDFOR WS* statementSeparator
 ;
 
 whileLoop:
@@ -63,7 +65,7 @@ catchBlock:             ws_cols CATCH WS* pattern? WS* statementSeparator
                             blockMember*
 ;
 pattern:                DIV patternBody DIV;
-patternBody:            .*?;
+patternBody:            ~(NEW_LINE | BAR)*?;
 finallyBlock:           ws_cols FINALLY WS* statementSeparator
                             blockMember*
 ;
@@ -73,11 +75,15 @@ functionDefinition:     ws_cols FUNCTION (replace = EXCLAMATION)? WS+ (SID | SNR
                         ws_cols ENDFUNCTION WS* statementSeparator
 ;
 dictFunctionDefinition:
-                        ws_cols FUNCTION .*? ENDFUNCTION WS* statementSeparator
+                        ws_cols FUNCTION ~(BAR | NEW_LINE)*? statementSeparator
+                            blockMember*
+                        ws_cols ENDFUNCTION WS* statementSeparator
 ;
 argumentsDeclaration:   (variableName (WS* COMMA WS* variableName)* (WS* COMMA WS* ETC WS*)? WS*)?;
 
-augroup:                ws_cols AUGROUP .*? AUGROUP WS+ END WS* statementSeparator
+augroup:                ws_cols AUGROUP ~(NEW_LINE | BAR)* statementSeparator
+                            blockMember*
+                        ws_cols AUGROUP WS+ END WS* statementSeparator
 ;
 
 autocmd:                ws_cols AUTOCMD ~(NEW_LINE)* NEW_LINE
@@ -99,6 +105,9 @@ command:
         assignmentOperator =  (ASSIGN | PLUS_ASSIGN | MINUS_ASSIGN | STAR_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | DOT_ASSIGN)
         WS* expr WS* inline_comment? statementSeparator
     #LetCommand|
+
+    ws_cols range? ws_cols LET ~(BAR | NEW_LINE)*? statementSeparator
+    #UnknowLetCase|
 
     ws_cols range? ws_cols DELF (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName inline_comment? statementSeparator
     #DelfunctionCommand|
@@ -425,7 +434,7 @@ binaryOperator5:        LOGICAL_OR;
 
 lambda:                 L_CURLY WS* functionArguments WS* ARROW WS* expr WS* R_CURLY;
 
-register:               AT (DIGIT | alphabeticChar | MINUS | COLON | DOT | MOD | NUM | ASSIGN | STAR | PLUS | TILDE | UNDERSCORE | DIV);
+register:               AT (DIGIT | alphabeticChar | MINUS | COLON | DOT | MOD | NUM | ASSIGN | STAR | PLUS | TILDE | UNDERSCORE | DIV | AT);
 
 variable:               (variableScope COLON)? variableName;
 variableName:           anyCaseNameWithDigitsAndUnderscores | unsignedInt;
