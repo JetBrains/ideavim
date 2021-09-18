@@ -488,7 +488,7 @@ blob:                   BLOB;
 mark:                   (SINGLE_QUOTE (lowercaseAlphabeticChar | uppercaseAlphabeticChar | DIGIT | LESS | GREATER | L_PAREN | R_PAREN | L_CURLY | R_CURLY | L_BRACKET | R_BRACKET | QUOTE | CARET | DOT | BACKTICK | SINGLE_QUOTE))
                     |   (BACKTICK (lowercaseAlphabeticChar | uppercaseAlphabeticChar | DIGIT | LESS | GREATER | L_PAREN | R_PAREN | L_CURLY | R_CURLY | L_BRACKET | R_BRACKET | QUOTE | CARET | DOT | BACKTICK | SINGLE_QUOTE))
 ;
-comment:                WS* (inline_comment | WS*) statementSeparator;
+comment:                WS* inline_comment? NEW_LINE;
 inline_comment:         (WS* (QUOTE | EMPTY_DOUBLE_QUOTED_STRING) ~(NEW_LINE)*?)
                     |   (STRING_DOUBLE_QUOTED ~(NEW_LINE)*?);
 anyCaseNameWithDigitsAndUnderscores:
