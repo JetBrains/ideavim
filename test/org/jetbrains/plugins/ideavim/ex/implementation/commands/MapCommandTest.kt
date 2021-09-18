@@ -783,6 +783,22 @@ n  ,f            <Plug>Foo
     assertPluginErrorMessageContains("E15: Invalid expression: ^f8a")
   }
 
+  @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
+  fun `test exception during expression evaluation in map with expression`() {
+    val text = """
+          -----
+          ${c}12345
+          abcde
+          -----
+    """.trimIndent()
+    configureByJavaText(text)
+    typeText(commandToKeys("inoremap <expr> <cr> unknownFunction() ? '\\<C-y>' : '\\<C-g>u\\<CR>'"))
+    typeText(parseKeys("i<CR>"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E117: Unknown function: unknownFunction")
+    assertState(text)
+  }
+
   private fun checkDelayedMapping(before: String, after: String) {
     assertState(before)
 

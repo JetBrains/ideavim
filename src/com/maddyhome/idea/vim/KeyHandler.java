@@ -522,7 +522,13 @@ public class KeyHandler {
     final EditorDataContext currentContext = EditorDataContext.init(editor, context);
 
     LOG.trace("Executing mapping info");
-    mappingInfo.execute(editor, context);
+    try {
+      mappingInfo.execute(editor, context);
+    } catch (Exception e) {
+      VimPlugin.showMessage(e.getMessage());
+      VimPlugin.indicateError();
+      LOG.warn("Caught exception during " + mappingInfo.getPresentableString() + "\n" + e.getMessage());
+    }
 
     // If we've just evaluated the previous key sequence, make sure to also handle the current key
     if (mappingInfo != currentMappingInfo) {
