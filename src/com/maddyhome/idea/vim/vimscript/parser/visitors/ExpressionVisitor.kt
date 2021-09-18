@@ -181,7 +181,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitRegisterExpression(ctx: RegisterExpressionContext): Expression {
-    return Register(ctx.text.replace("@", "")[0])
+    return Register(ctx.text.replaceFirst("@", "")[0])
   }
 
   override fun visitVariable(ctx: VariableContext): Expression {

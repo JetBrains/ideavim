@@ -17,4 +17,9 @@ class RegisterTests {
   fun `non-empty register`() {
     assertEquals(Register('s'), VimscriptParser.parseExpression("@s"))
   }
+
+  @Test
+  fun `unnamed register`() {
+    assertEquals(Register('@'), VimscriptParser.parseExpression("@@"))
+  }
 }
