@@ -51,4 +51,16 @@ class ForLoopTests {
     assertTrue(f.iterable is ListExpression)
     assertEquals(0, f.body.size)
   }
+
+  @Theory
+  fun `unknown for loop type`(sp1: String, sp2: String, sp3: String) {
+    val script = VimscriptParser.parse(
+      """
+        for [key, value] in dict$sp1
+        endfor$sp2
+      """.trimIndent()
+    )
+    // it will be implemented later but for now it's good to ignore such blocks and do not throw any exceptions during parsing
+    assertEquals(0, script.units.size)
+  }
 }

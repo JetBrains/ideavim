@@ -32,4 +32,9 @@ class ListTests {
       VimscriptParser.parseExpression("[1, 4.6, 'bla bla', [5, 9], {'key' : 'value'}]")!!.evaluate()
     )
   }
+
+  @Test
+  fun `comma at the list end test`() {
+    assertEquals(VimList(mutableListOf(VimInt(1), VimInt(2))), VimscriptParser.parseExpression("[1, 2,]")!!.evaluate())
+  }
 }

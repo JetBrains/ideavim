@@ -110,4 +110,18 @@ class FunctionDeclarationTests {
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is FunctionDeclaration)
   }
+
+  @Theory
+  fun `dictionary function`() {
+    val script = VimscriptParser.parse(
+      """
+        " prefix with s: for local script-only functions
+        function! s:dict.something.Initialize()
+            return 'true'
+        endfunction
+      """.trimIndent()
+    )
+    // it will be implemented later but for now it's good to ignore such blocks and do not throw any exceptions during parsing
+    assertEquals(0, script.units.size)
+  }
 }

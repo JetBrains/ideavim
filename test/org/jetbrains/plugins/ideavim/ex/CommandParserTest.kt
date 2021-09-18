@@ -213,7 +213,7 @@ class CommandParserTest : VimTestCase() {
     val script = VimscriptParser.parse(
       """
         let g:auto_save = 2
-        let g:prettier#autoformat = 1
+        echo (*
         let g:y = 10
       """.trimIndent()
     )
@@ -275,6 +275,50 @@ class CommandParserTest : VimTestCase() {
     )
     typeText(StringHelper.parseKeys("Yp"))
     assertState("----------\n1234556789${c}067890\n----------\n")
+    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+  }
+
+  fun `test bars do not break comments`() {
+    configureByText("\n")
+    val script = VimscriptParser.parse(
+      """
+        " comment | let x = 10 | echo x
+      """.trimIndent()
+    )
+    assertEquals(0, script.units.size)
+    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+  }
+
+  fun `test autocmd is parsed without any errors`() {
+    configureByText("\n")
+    var script = VimscriptParser.parse(
+      """
+        autocmd BufReadPost *
+        \ if line("'\"") > 0 && line ("'\"") <= line("$") |
+        \   exe "normal! g'\"" |
+        \ endif
+      """.trimIndent()
+    )
+    assertEquals(0, script.units.size)
+    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+
+    script = VimscriptParser.parse(
+      """
+        autocmd BufReadPost * echo "oh, hi Mark"
+      """.trimIndent()
+    )
+    assertEquals(0, script.units.size)
+    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+  }
+
+  fun `test unknown let command's cases are ignored`() {
+    configureByText("\n")
+    val script = VimscriptParser.parse(
+      """
+        let x[a, b; c] = something()
+      """.trimIndent()
+    )
+    assertEquals(0, script.units.size)
     assertTrue(IdeavimErrorListener.testLogger.isEmpty())
   }
 }
