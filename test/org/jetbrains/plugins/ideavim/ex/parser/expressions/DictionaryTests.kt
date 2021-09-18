@@ -101,4 +101,20 @@ class DictionaryTests : ParserTest() {
       )
     }
   }
+
+  @Test
+  fun `comma at dictionary end test`() {
+    assertEquals(
+      VimDictionary(linkedMapOf(VimString("one") to VimInt(1))),
+      VimscriptParser.parseExpression("{'one': 1,}")!!.evaluate()
+    )
+  }
+
+  @Test
+  fun `comma at literal dictionary end test`() {
+    assertEquals(
+      VimDictionary(linkedMapOf(VimString("one") to VimInt(1))),
+      VimscriptParser.parseExpression("#{one: 1,}")!!.evaluate()
+    )
+  }
 }

@@ -457,7 +457,7 @@ list:                   L_BRACKET WS* (expr WS* (COMMA WS* expr WS*)*)? COMMA? W
 dictionary:             L_CURLY WS* (dictionaryEntry WS* (COMMA WS* dictionaryEntry WS*)*)? COMMA? WS* R_CURLY;
 dictionaryEntry:        expr WS* COLON WS* expr;
 
-literalDictionary:      NUM L_CURLY WS* (literalDictionaryEntry WS* (COMMA WS* literalDictionaryEntry WS*)*)? R_CURLY;
+literalDictionary:      NUM L_CURLY WS* (literalDictionaryEntry WS* (COMMA WS* literalDictionaryEntry WS*)* COMMA? WS*)? R_CURLY;
 literalDictionaryEntry: literalDictionaryKey WS* COLON WS* expr;
 literalDictionaryKey:   anyCaseNameWithDigitsAndUnderscores
                     |   unsignedInt
