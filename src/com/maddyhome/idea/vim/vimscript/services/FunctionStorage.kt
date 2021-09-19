@@ -99,34 +99,34 @@ object FunctionStorage {
 
   fun getFunctionHandler(name: String, scope: Scope? = null, parent: Executable):
     FunctionHandler {
-      if (builtInFunctionHandlers.containsKey(name)) {
-        return builtInFunctionHandlers[name]!!
-      }
-
-      if (scope != null)
-        return when (scope) {
-          Scope.GLOBAL_VARIABLE -> {
-            if (globalFunctionHandlers.containsKey(name)) {
-              globalFunctionHandlers[name]!!
-            } else {
-              throw ExException("E117: Unknown function: ${scope.c}:$name")
-            }
-          }
-          Scope.SCRIPT_VARIABLE -> {
-            getScriptFunction(name, parent) ?: throw ExException("E117: Unknown function: ${scope.c}:$name")
-          }
-          else -> throw ExException("E117: Unknown function: ${scope.c}:$name")
-        }
-
-      if (globalFunctionHandlers.containsKey(name)) {
-        return globalFunctionHandlers[name]!!
-      }
-      val scriptFunctionHandler = getScriptFunction(name, parent)
-      if (scriptFunctionHandler != null) {
-        return scriptFunctionHandler
-      }
-      throw ExException("E117: Unknown function: $name")
+    if (builtInFunctionHandlers.containsKey(name)) {
+      return builtInFunctionHandlers[name]!!
     }
+
+    if (scope != null)
+      return when (scope) {
+        Scope.GLOBAL_VARIABLE -> {
+          if (globalFunctionHandlers.containsKey(name)) {
+            globalFunctionHandlers[name]!!
+          } else {
+            throw ExException("E117: Unknown function: ${scope.c}:$name")
+          }
+        }
+        Scope.SCRIPT_VARIABLE -> {
+          getScriptFunction(name, parent) ?: throw ExException("E117: Unknown function: ${scope.c}:$name")
+        }
+        else -> throw ExException("E117: Unknown function: ${scope.c}:$name")
+      }
+
+    if (globalFunctionHandlers.containsKey(name)) {
+      return globalFunctionHandlers[name]!!
+    }
+    val scriptFunctionHandler = getScriptFunction(name, parent)
+    if (scriptFunctionHandler != null) {
+      return scriptFunctionHandler
+    }
+    throw ExException("E117: Unknown function: $name")
+  }
 
   private fun getDefaultFunctionScope(): Scope {
     return Scope.GLOBAL_VARIABLE // todd what is default scope?..
