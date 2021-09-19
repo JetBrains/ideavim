@@ -7,6 +7,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.BinExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.DictionaryExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
+import com.maddyhome.idea.vim.vimscript.model.expressions.FalsyExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.ListExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
@@ -25,6 +26,7 @@ import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.BlobExpressionContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.DictionaryExpressionContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.EnvVariableExpressionContext
+import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.FalsyExpressionContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.FloatExpressionContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.FunctionCallExpressionContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.IntExpressionContext
@@ -187,6 +189,12 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   override fun visitVariable(ctx: VariableContext): Expression {
     val scope = if (ctx.variableScope() == null) null else Scope.getByValue(ctx.variableScope().text)
     return Variable(scope, ctx.variableName().text)
+  }
+
+  override fun visitFalsyExpression(ctx: FalsyExpressionContext): Expression {
+    val left = visit(ctx.expr(0))
+    val right = visit(ctx.expr(1))
+    return FalsyExpression(left, right)
   }
 
   override fun visitBlobExpression(ctx: BlobExpressionContext?): Expression {

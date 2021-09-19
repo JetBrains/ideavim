@@ -419,6 +419,7 @@ expr:                   WS* EXCLAMATION WS* expr                                
                     |   dictionary                                                                                      #DictionaryExpression
                     |   literalDictionary                                                                               #LiteralDictionaryExpression
                     |   L_PAREN WS* expr WS* R_PAREN                                                                    #WrappedExpression
+                    |   expr WS* QUESTION QUESTION WS* expr                                                             #FalsyExpression
                     |   expr WS* QUESTION WS* expr WS* COLON WS* expr                                                   #TernaryExpression
 ;
 
