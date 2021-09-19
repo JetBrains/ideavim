@@ -128,45 +128,45 @@ object FunctionStorage {
 
   fun getFunctionHandler(name: String, vimContext: VimContext, scope: Scope? = null, scriptName: String? = null):
     FunctionHandler {
-      if (scriptName != null) {
-        val fullName = "$scriptName#$name"
-        return autoloadFunctionHandlers[fullName] ?: throw throw ExException("E117: Unknown function: $fullName")
-      }
-      if (builtInFunctionHandlers.containsKey(name)) {
-        return builtInFunctionHandlers[name]!!
-      }
-
-      if (scope != null)
-        when (scope) {
-          Scope.GLOBAL_VARIABLE -> {
-            if (globalFunctionHandlers.containsKey(name)) {
-              return globalFunctionHandlers[name]!!
-            } else {
-              throw ExException("E117: Unknown function: ${scope.c}:$name")
-            }
-          }
-          Scope.SCRIPT_VARIABLE -> {
-            if (scriptFunctionHandlers.containsKey(vimContext.getScriptName()) &&
-              scriptFunctionHandlers[vimContext.getScriptName()]!!.containsKey(name)
-            ) {
-              return scriptFunctionHandlers[vimContext.getScriptName()]!![name]!!
-            } else {
-              throw ExException("E117: Unknown function: ${scope.c}:$name")
-            }
-          }
-          else -> throw ExException("E117: Unknown function: ${scope.c}:$name")
-        }
-
-      if (globalFunctionHandlers.containsKey(name)) {
-        return globalFunctionHandlers[name]!!
-      }
-      if (scriptFunctionHandlers.containsKey(vimContext.getScriptName()) &&
-        scriptFunctionHandlers[vimContext.getScriptName()]!!.containsKey(name)
-      ) {
-        return scriptFunctionHandlers[vimContext.getScriptName()]!![name]!!
-      }
-      throw ExException("E117: Unknown function: $name")
+    if (scriptName != null) {
+      val fullName = "$scriptName#$name"
+      return autoloadFunctionHandlers[fullName] ?: throw throw ExException("E117: Unknown function: $fullName")
     }
+    if (builtInFunctionHandlers.containsKey(name)) {
+      return builtInFunctionHandlers[name]!!
+    }
+
+    if (scope != null)
+      when (scope) {
+        Scope.GLOBAL_VARIABLE -> {
+          if (globalFunctionHandlers.containsKey(name)) {
+            return globalFunctionHandlers[name]!!
+          } else {
+            throw ExException("E117: Unknown function: ${scope.c}:$name")
+          }
+        }
+        Scope.SCRIPT_VARIABLE -> {
+          if (scriptFunctionHandlers.containsKey(vimContext.getScriptName()) &&
+            scriptFunctionHandlers[vimContext.getScriptName()]!!.containsKey(name)
+          ) {
+            return scriptFunctionHandlers[vimContext.getScriptName()]!![name]!!
+          } else {
+            throw ExException("E117: Unknown function: ${scope.c}:$name")
+          }
+        }
+        else -> throw ExException("E117: Unknown function: ${scope.c}:$name")
+      }
+
+    if (globalFunctionHandlers.containsKey(name)) {
+      return globalFunctionHandlers[name]!!
+    }
+    if (scriptFunctionHandlers.containsKey(vimContext.getScriptName()) &&
+      scriptFunctionHandlers[vimContext.getScriptName()]!!.containsKey(name)
+    ) {
+      return scriptFunctionHandlers[vimContext.getScriptName()]!![name]!!
+    }
+    throw ExException("E117: Unknown function: $name")
+  }
 
   private fun getDefaultFunctionScope(vimContext: VimContext): Scope {
     return Scope.SCRIPT_VARIABLE

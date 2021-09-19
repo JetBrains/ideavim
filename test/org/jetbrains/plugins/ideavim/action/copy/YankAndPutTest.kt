@@ -42,10 +42,12 @@ class YankAndPutTest : VimOptionTestCase(ClipboardOptionsData.name) {
     // Replace previous word
     typeText(parseKeys("bbvep"))
 
-    assertState("""
+    assertState(
+      """
             I it found in a legendary land
             all rocks and lavender and tufted grass,
-    """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @VimOptionTestConfiguration(
@@ -68,10 +70,12 @@ class YankAndPutTest : VimOptionTestCase(ClipboardOptionsData.name) {
     // Replace previous word
     typeText(parseKeys("bbvep"))
 
-    assertState("""
+    assertState(
+      """
             I it found in a legendary land
             all rocks and lavender and tufted grass,
-    """.trimIndent())
+      """.trimIndent()
+    )
   }
 
   @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, []))
@@ -88,9 +92,11 @@ class YankAndPutTest : VimOptionTestCase(ClipboardOptionsData.name) {
     // Replace previous word
     typeText(parseKeys("bbvep"))
 
-    assertState("""
+    assertState(
+      """
             I it found in a legendary land
             all rocks and lavender and tufted grass,
-    """.trimIndent())
+      """.trimIndent()
+    )
   }
 }
