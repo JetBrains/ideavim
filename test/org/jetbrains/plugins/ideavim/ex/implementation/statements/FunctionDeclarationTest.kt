@@ -268,4 +268,50 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delf! F1"))
     typeText(commandToKeys("delf! F2"))
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  fun `test function without abort flag`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        "" +
+          "function! F1() |" +
+          "  echo unknownVar |" +
+          "  let g:x = 10 |" +
+          "endfunction"
+      )
+    )
+    typeText(commandToKeys("echo F1()"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E121: Undefined variable: unknownVar")
+
+    typeText(commandToKeys("echo x"))
+    assertExOutput("10\n")
+    assertPluginError(false)
+
+    typeText(commandToKeys("delf! F1"))
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  fun `test function with abort flag`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        "" +
+          "function! F1() abort |" +
+          "  echo unknownVar |" +
+          "  let g:x = 10 |" +
+          "endfunction"
+      )
+    )
+    typeText(commandToKeys("echo F1()"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E121: Undefined variable: unknownVar")
+
+    typeText(commandToKeys("echo x"))
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E121: Undefined variable: x")
+
+    typeText(commandToKeys("delf! F1"))
+  }
 }
