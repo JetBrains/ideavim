@@ -1,5 +1,6 @@
 package com.maddyhome.idea.vim.vimscript.parser.visitors
 
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -42,6 +43,7 @@ import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.UnaryEx
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.VariableContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.VariableExpressionContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.WrappedExpressionContext
+import org.antlr.v4.runtime.ParserRuleContext
 
 object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
 
@@ -95,10 +97,41 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
 
   override fun visitBinExpression2(ctx: VimscriptParser.BinExpression2Context): Expression {
     val left = visit(ctx.expr(0))
-    val right = visit(ctx.expr(1))
     val operatorString = ctx.binaryOperator2().text
-    val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
-    return BinExpression(left, right, operator)
+
+    return if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && matchesLiteralDictionaryKey(ctx.expr(1).text)) {
+      val index = SimpleExpression(VimString(ctx.expr(1).text))
+      OneElementSublistExpression(index, left)
+      // todo dictionary function calls
+    } else if (operatorString == "-" && left is OneElementSublistExpression && !containsSpaces(ctx) && matchesLiteralDictionaryKey(ctx.expr(1).text)) {
+      // todo dictionary function calls
+      val postfix = "-" + ctx.expr(1).text
+      val newIndex = SimpleExpression(VimString((left.index as SimpleExpression).data.asString() + postfix))
+      OneElementSublistExpression(newIndex, left.expression)
+    } else {
+      val right = visit(ctx.expr(1))
+      val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
+      BinExpression(left, right, operator)
+    }
+  }
+
+  private fun containsSpaces(ctx: ParserRuleContext): Boolean {
+    for (child in ctx.children) {
+      if (child.text.isBlank()) return true
+    }
+    return false
+  }
+
+  private fun matchesLiteralDictionaryKey(string: String): Boolean {
+    return string.matches(Regex("[a-zA-Z_-]+"))
+  }
+
+  private fun evaluationResultCouldBeADictionary(ctx: Expression): Boolean {
+    return when (ctx) {
+      is ListExpression, is UnaryExpression -> false
+      is SimpleExpression -> ctx.data is VimDictionary
+      else -> true
+    }
   }
 
   override fun visitBinExpression3(ctx: VimscriptParser.BinExpression3Context): Expression {

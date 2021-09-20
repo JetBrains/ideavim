@@ -36,123 +36,127 @@ class ConcatenationOperatorTest {
     @JvmStatic
     val operator = listOf(".", "..")
       @DataPoints("operator") get
+    @JvmStatic
+    val spaces = listOf("", " ")
+      @DataPoints("spaces") get
   }
 
   @Theory
-  fun `integer and integer`(@FromDataPoints("operator") operator: String) {
-    assertEquals(VimString("23"), VimscriptParser.parseExpression("2 $operator 3")!!.evaluate())
+  fun `integer and integer`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp: String) {
+    assertEquals(VimString("23"), VimscriptParser.parseExpression("2$sp$operator 3")!!.evaluate())
+    assertEquals(VimString("23"), VimscriptParser.parseExpression("2 $operator${sp}3")!!.evaluate())
   }
 
   @Theory
-  fun `integer and float`(@FromDataPoints("operator") operator: String) {
+  fun `integer and float`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp1: String, @FromDataPoints("spaces") sp2: String) {
     try {
-      VimscriptParser.parseExpression("3.4 $operator 2")!!.evaluate()
+      VimscriptParser.parseExpression("3.4$sp1$operator${sp2}2")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E806: using Float as a String", e.message)
     }
   }
 
   @Theory
-  fun `float and float`(@FromDataPoints("operator") operator: String) {
+  fun `float and float`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp1: String, @FromDataPoints("spaces") sp2: String) {
     try {
-      VimscriptParser.parseExpression("3.4 $operator 2.2")!!.evaluate()
+      VimscriptParser.parseExpression("3.4$sp1$operator${sp2}2.2")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E806: using Float as a String", e.message)
     }
   }
 
   @Theory
-  fun `string and float`(@FromDataPoints("operator") operator: String) {
+  fun `string and float`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp1: String, @FromDataPoints("spaces") sp2: String) {
     try {
-      VimscriptParser.parseExpression("'string' $operator 3.4")!!.evaluate()
+      VimscriptParser.parseExpression("'string'$sp1$operator${sp2}3.4")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E806: using Float as a String", e.message)
     }
   }
 
   @Theory
-  fun `string and string`(@FromDataPoints("operator") operator: String) {
+  fun `string and string`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp1: String, @FromDataPoints("spaces") sp2: String) {
     assertEquals(
       VimString("stringtext"),
-      VimscriptParser.parseExpression("'string' $operator 'text'")!!.evaluate()
+      VimscriptParser.parseExpression("'string'$sp1$operator$sp2'text'")!!.evaluate()
     )
   }
 
   @Theory
-  fun `string and integer`(@FromDataPoints("operator") operator: String) {
+  fun `string and integer`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp1: String, @FromDataPoints("spaces") sp2: String) {
     assertEquals(
       VimString("string3"),
-      VimscriptParser.parseExpression("'string' $operator 3")!!.evaluate()
+      VimscriptParser.parseExpression("'string'$sp1$operator${sp2}3")!!.evaluate()
     )
   }
 
   @Theory
-  fun `String and list`(@FromDataPoints("operator") operator: String) {
+  fun `String and list`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp1: String, @FromDataPoints("spaces") sp2: String) {
     try {
-      VimscriptParser.parseExpression("2 $operator [1, 2]")!!.evaluate()
+      VimscriptParser.parseExpression("2$sp1$operator$sp2[1, 2]")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E730: Using a List as a String", e.message)
     }
   }
 
   @Theory
-  fun `string and list`(@FromDataPoints("operator") operator: String) {
+  fun `string and list`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp1: String, @FromDataPoints("spaces") sp2: String) {
     try {
-      VimscriptParser.parseExpression("'string' $operator [1, 2]")!!.evaluate()
+      VimscriptParser.parseExpression("'string'$sp1$operator$sp2[1, 2]")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E730: Using a List as a String", e.message)
     }
   }
 
   @Theory
-  fun `list and list`(@FromDataPoints("operator") operator: String) {
+  fun `list and list`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp1: String, @FromDataPoints("spaces") sp2: String) {
     try {
-      VimscriptParser.parseExpression("[3] $operator [1, 2]")!!.evaluate()
+      VimscriptParser.parseExpression("[3]$sp1$operator$sp2[1, 2]")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E730: Using a List as a String", e.message)
     }
   }
 
   @Theory
-  fun `dict and integer`(@FromDataPoints("operator") operator: String) {
+  fun `dict and integer`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp1: String, @FromDataPoints("spaces") sp2: String) {
     try {
-      VimscriptParser.parseExpression("{'key' : 21} $operator 1")!!.evaluate()
+      VimscriptParser.parseExpression("{'key' : 21}$sp1$operator${sp2}1")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E731: Using a Dictionary as a String", e.message)
     }
   }
 
   @Theory
-  fun `dict and float`(@FromDataPoints("operator") operator: String) {
+  fun `dict and float`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp1: String, @FromDataPoints("spaces") sp2: String) {
     try {
-      VimscriptParser.parseExpression("{'key' : 21} $operator 1.4")!!.evaluate()
+      VimscriptParser.parseExpression("{'key' : 21}$sp1$operator${sp2}1.4")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E731: Using a Dictionary as a String", e.message)
     }
   }
 
   @Theory
-  fun `dict and string`(@FromDataPoints("operator") operator: String) {
+  fun `dict and string`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp1: String, @FromDataPoints("spaces") sp2: String) {
     try {
-      VimscriptParser.parseExpression("{'key' : 21} $operator 'string'")!!.evaluate()
+      VimscriptParser.parseExpression("{'key' : 21}$sp1$operator$sp2'string'")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E731: Using a Dictionary as a String", e.message)
     }
   }
 
   @Theory
-  fun `dict and list`(@FromDataPoints("operator") operator: String) {
+  fun `dict and list`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp1: String, @FromDataPoints("spaces") sp2: String) {
     try {
-      VimscriptParser.parseExpression("{'key' : 21} $operator [1]")!!.evaluate()
+      VimscriptParser.parseExpression("{'key' : 21}$sp1$operator$sp2[1]")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E731: Using a Dictionary as a String", e.message)
     }
   }
 
   @Theory
-  fun `dict and dict`(@FromDataPoints("operator") operator: String) {
+  fun `dict and dict`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp1: String, @FromDataPoints("spaces") sp2: String) {
     try {
-      VimscriptParser.parseExpression("{'key' : 21} $operator {'key2': 33}")!!.evaluate()
+      VimscriptParser.parseExpression("{'key' : 21}$sp1$operator$sp2{'key2': 33}")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E731: Using a Dictionary as a String", e.message)
     }
