@@ -96,7 +96,7 @@ object VariableService {
           // todo nullable editor exception or something
         }
       }
-      Scope.VIM_VARIABLE -> TODO()
+      Scope.VIM_VARIABLE -> throw ExException("The 'v:' scope is not implemented yet :(")
     }
   }
 
@@ -127,7 +127,7 @@ object VariableService {
           TODO()
         }
       }
-      Scope.VIM_VARIABLE -> TODO()
+      Scope.VIM_VARIABLE -> throw ExException("The 'v:' scope is not implemented yet :(")
     }
   }
 

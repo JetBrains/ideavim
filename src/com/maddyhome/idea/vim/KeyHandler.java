@@ -52,6 +52,7 @@ import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.ShowCmd;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
+import kotlin.NotImplementedError;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -524,7 +525,7 @@ public class KeyHandler {
     LOG.trace("Executing mapping info");
     try {
       mappingInfo.execute(editor, context);
-    } catch (Exception e) {
+    } catch (Exception | NotImplementedError e) {
       VimPlugin.showMessage(e.getMessage());
       VimPlugin.indicateError();
       LOG.warn("Caught exception during " + mappingInfo.getPresentableString() + "\n" + e.getMessage());
