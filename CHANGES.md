@@ -23,7 +23,7 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## To Be Released
+## 1.7.1, 2021-09-20
 
 ### Fixes:
 * [VIM-2400](https://youtrack.jetbrains.com/issue/VIM-2400) Fix vim script parser

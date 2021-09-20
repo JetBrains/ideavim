@@ -15,6 +15,12 @@
         <li><a href="https://youtrack.jetbrains.com/issue/VIM-2368">VIM-2368</a> Do not remove selection on right click</li>
         <li><a href="https://youtrack.jetbrains.com/issue/VIM-2392">VIM-2392</a> Fix possible out of bounds exception</li>
         <li><a href="https://youtrack.jetbrains.com/issue/VIM-2387">VIM-2387</a> Fix coping with unnamed and ideaput</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2400">VIM-2400</a> Fix vim script parser</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2401">VIM-2401</a> Exceptions occurred during execution of
+          <code>map&lt;expr&gt;</code> are now shown in status bar
+        </li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2404">VIM-2404</a> Fix multiple pastes from unnamed clipboard
+        </li>
       </ul>
 
       <h3>Changes:</h3>
