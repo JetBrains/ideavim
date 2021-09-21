@@ -46,6 +46,7 @@ import ui.utils.tripleClickOnRight
 import ui.utils.uiTest
 import ui.utils.vimExit
 import java.awt.Point
+import java.awt.event.KeyEvent
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -59,26 +60,12 @@ class UiTests {
   fun ideaVimTest() = uiTest("ideaVimTest") {
     val sharedSteps = JavaExampleSteps(this)
 
-    welcomeFrame {
-      createNewProjectLink.click()
-      dialog("New Project") {
-        findText("Java").click()
-        find(
-          ComponentFixture::class.java,
-          byXpath("//div[@class='FrameworksTree']")
-        ).findText("Kotlin/JVM").click()
-        runJs("robot.pressAndReleaseKey(${java.awt.event.KeyEvent.VK_SPACE})")
-        button("Next").click()
-        button("Finish").click()
-      }
-    }
+    startNewProject()
     Thread.sleep(1000)
-    with(sharedSteps) {
-      closeIdeaVimDialog()
-      closeTipOfTheDay()
-      closeAllTabs()
-    }
+
+    closeUnrelated(sharedSteps)
     Thread.sleep(1000)
+
     idea {
       createFile("MyDoc.txt", this@uiTest)
       val editor = editor("MyDoc.txt") {
@@ -124,6 +111,30 @@ class UiTests {
 
       wrapWithIf(javaEditor)
     }
+  }
+
+  private fun closeUnrelated(sharedSteps: JavaExampleSteps) {
+    with(sharedSteps) {
+      closeIdeaVimDialog()
+      closeTipOfTheDay()
+      closeAllTabs()
+      }
+  }
+
+  private fun RemoteRobot.startNewProject() {
+    welcomeFrame {
+      createNewProjectLink.click()
+      dialog("New Project") {
+        findText("Java").click()
+        find(
+          ComponentFixture::class.java,
+          byXpath("//div[@class='FrameworksTree']")
+        ).findText("Kotlin/JVM").click()
+        runJs("robot.pressAndReleaseKey(${KeyEvent.VK_SPACE})")
+        button("Next").click()
+        button("Finish").click()
+      }
+      }
   }
 
   private fun IdeaFrame.testUnnamedClipboard(editor: Editor) {
