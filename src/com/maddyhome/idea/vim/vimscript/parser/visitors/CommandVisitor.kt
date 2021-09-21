@@ -11,6 +11,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.AsciiCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.BufferCloseCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.BufferCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.BufferListCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.CallCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.CmdClearCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.CmdCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.CmdFilterCommand
@@ -87,6 +88,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOperator.Companion.getByValue
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptBaseVisitor
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser
+import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.CallCommandContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.DelfunctionCommandContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.EchoCommandContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.ExprContext
@@ -164,6 +166,12 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
       }
       .collect(Collectors.toList())
     return EchoCommand(ranges, expressions)
+  }
+
+  override fun visitCallCommand(ctx: CallCommandContext): Command {
+    val ranges: Ranges = parseRanges(ctx.range())
+    val functionCall = ExpressionVisitor.visitFunctionCall(ctx.functionCall())
+    return CallCommand(ranges, functionCall)
   }
 
   override fun visitDelfunctionCommand(ctx: DelfunctionCommandContext): DelfunctionCommand {

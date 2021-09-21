@@ -188,12 +188,16 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitFunctionCallExpression(ctx: FunctionCallExpressionContext): Expression {
-    val functionName = ctx.functionCall().functionName().text
+    return visitFunctionCall(ctx.functionCall())
+  }
+
+  override fun visitFunctionCall(ctx: VimscriptParser.FunctionCallContext): FunctionCallExpression {
+    val functionName = ctx.functionName().text
     var scope: Scope? = null
-    if (ctx.functionCall().functionScope() != null) {
-      scope = Scope.getByValue(ctx.functionCall().functionScope().text)
+    if (ctx.functionScope() != null) {
+      scope = Scope.getByValue(ctx.functionScope().text)
     }
-    val functionArguments = ctx.functionCall().functionArguments().expr()
+    val functionArguments = ctx.functionArguments().expr()
       .mapNotNull { visit(it) }
     return FunctionCallExpression(scope, functionName, functionArguments)
   }

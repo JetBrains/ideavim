@@ -112,6 +112,9 @@ command:
     ws_cols range? ws_cols DELF (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName (comment | statementSeparator)
     #DelfunctionCommand|
 
+    ws_cols range? ws_cols CALL WS+ functionCall WS* (comment | statementSeparator)
+    #CallCommand|
+
     ws_cols range? ws_cols ACTION (WS* commandArgument) (comment | statementSeparator)
     #ActionCommand|
 
@@ -781,6 +784,7 @@ ASCII:                  'as' | 'asc' | 'asci' | 'ascii';
 BUFFER:                 'bu' | 'buf' | 'buff' | 'buffe' | 'buffer';
 BUFFER_CLOSE:           'bd' | 'bde' | 'bdel' | 'bdele' | 'bdelet' | 'bdelete';
 BUFFER_LIST:            'buffers' | 'ls' | 'files';
+CALL:                   'cal' | 'call';
 CLASS:                  'cla' | 'clas' | 'class';
 CMD:                    'com' | 'comm' | 'comma' | 'comman' | 'command';
 CMD_CLEAR:              'comc' | 'comcl' | 'comcle' | 'comclea' | 'comclear';
