@@ -22,7 +22,7 @@
 - [x] `range` function flag  
 - [x] `call` command
 - [ ] function as method
-- [ ] optional arguments `...`
+- [x] optional arguments `...`
 - [ ] funcref type
 - [ ] lambdas
 - [ ] default value in functions e.g. `function F1(a, b = 10)`

@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
@@ -42,7 +43,7 @@ data class DefinedFunctionHandler(private val function: FunctionDeclaration) : F
   private val logger = logger<DefinedFunctionHandler>()
 
   override val minimumNumberOfArguments = function.args.size
-  override val maximumNumberOfArguments = function.args.size
+  override val maximumNumberOfArguments get() = if (function.hasOptionalArguments) null else function.args.size
 
   override fun doFunction(argumentValues: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType {
     var returnValue: VimDataType? = null
@@ -130,6 +131,15 @@ data class DefinedFunctionHandler(private val function: FunctionDeclaration) : F
       VariableService.storeVariable(
         Variable(Scope.FUNCTION_VARIABLE, name),
         argumentValues[index].evaluate(editor, context, function),
+        editor,
+        context,
+        function
+      )
+    }
+    if (function.hasOptionalArguments) {
+      VariableService.storeVariable(
+        Variable(Scope.FUNCTION_VARIABLE, "000"),
+        VimList(argumentValues.subList(function.args.size, argumentValues.size).map { it.evaluate(editor, context, function) }.toMutableList()),
         editor,
         context,
         function

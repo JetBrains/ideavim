@@ -16,7 +16,7 @@ data class FunctionDeclaration(
   val body: List<Executable>,
   val replaceExisting: Boolean,
   val flags: Set<FunctionFlag>,
-  val scriptName: String? = null,
+  val hasOptionalArguments: Boolean,
 ) : Executable() {
 
   /**

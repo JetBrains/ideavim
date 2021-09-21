@@ -71,10 +71,11 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
     val body = ctx.blockMember().mapNotNull { visitBlockMember(it) }
     val replaceExisting = ctx.replace != null
     val flags = mutableSetOf<FunctionFlag?>()
+    val hasOptionalArguments = ctx.argumentsDeclaration().ETC() != null
     for (flag in ctx.functionFlag()) {
       flags.add(FunctionFlag.getByName(flag.text))
     }
-    return FunctionDeclaration(functionScope, functionName, args, body, replaceExisting, flags.filterNotNull().toSet())
+    return FunctionDeclaration(functionScope, functionName, args, body, replaceExisting, flags.filterNotNull().toSet(), hasOptionalArguments)
   }
 
   override fun visitTryStatement(ctx: VimscriptParser.TryStatementContext): Executable {
