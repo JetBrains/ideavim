@@ -64,6 +64,8 @@ import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipEvents
+import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipNDragEvents
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.add
 import com.maddyhome.idea.vim.listener.VimListenerManager.EditorListeners.remove
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -214,6 +216,23 @@ object VimListenerManager {
       val editor = selectionEvent.editor
       val document = editor.document
 
+      //region Not selected last character protection
+      // Here is currently a bug in IJ for IdeaVim. If you start selection right from the line end, then
+      //  move to the left, the last character remains unselected.
+      //  It's not clear why this happens, but this code fixes it.
+      val caret = editor.caretModel.currentCaret
+      val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+      val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
+      if (skipNDragEvents < skipEvents
+        && lineEnd != lineStart
+        && selectionEvent.newRange.startOffset == selectionEvent.newRange.endOffset
+        && selectionEvent.newRange.startOffset == lineEnd - 1
+        && selectionEvent.newRange.startOffset == caret.offset
+      ) {
+        caret.setSelection(lineEnd, lineEnd - 1)
+      }
+      //endregion
+
       if (SelectionVimListenerSuppressor.isNotLocked) {
         logger.debug("Adjust non vim selection change")
         IdeaSelectionControl.controlNonVimSelectionChange(editor)
@@ -244,18 +263,7 @@ object VimListenerManager {
 
     override fun mouseDragged(e: EditorMouseEvent) {
       if (e.editor.isIdeaVimDisabledHere) return
-      if (!mouseDragging) {
-        logger.debug("Mouse dragging")
-        SelectionVimListenerSuppressor.lock()
-        VimVisualTimer.swingTimer?.stop()
-        mouseDragging = true
-        val caret = e.editor.caretModel.primaryCaret
-        if (onLineEnd(caret)) {
-          // UX protection for case when user performs a small dragging while putting caret on line end
-          caret.removeSelection()
-          ChangeGroup.resetCaret(e.editor, true)
-        }
-      }
+      clearFirstSelectionEvents(e)
       if (mouseDragging && e.editor.caretModel.primaryCaret.hasSelection()) {
         ChangeGroup.resetCaret(e.editor, true)
 
@@ -281,6 +289,25 @@ object VimListenerManager {
           }
         }
       }
+      skipNDragEvents -= 1
+    }
+
+    // When user puts the caret, sometimes they perform a small drag. This doesn't affect clear IJ, but
+    // with IdeaVim it may introduce unwanted selection. Here we remove any selection if "dragging" was happened for
+    // less than 3 events.
+    private fun clearFirstSelectionEvents(e: EditorMouseEvent) {
+      if (skipNDragEvents > 0) {
+        logger.debug("Mouse dragging")
+        SelectionVimListenerSuppressor.lock()
+        VimVisualTimer.swingTimer?.stop()
+        mouseDragging = true
+        val caret = e.editor.caretModel.primaryCaret
+        if (onLineEnd(caret)) {
+          // UX protection for case when user performs a small dragging while putting caret on line end
+          caret.removeSelection()
+          ChangeGroup.resetCaret(e.editor, true)
+        }
+      }
     }
 
     private fun onLineEnd(caret: Caret): Boolean {
@@ -292,6 +319,8 @@ object VimListenerManager {
 
     override fun mouseReleased(event: EditorMouseEvent) {
       if (event.editor.isIdeaVimDisabledHere) return
+      clearFirstSelectionEvents(event)
+      skipNDragEvents = skipEvents
       if (mouseDragging) {
         logger.debug("Release mouse after dragging")
         val editor = event.editor
@@ -395,4 +424,9 @@ object VimListenerManager {
     MOUSE,
     OTHER
   }
+}
+
+private object MouseEventsDataHolder {
+  const val skipEvents = 3
+  var skipNDragEvents = skipEvents
 }

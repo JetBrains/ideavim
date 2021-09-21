@@ -45,6 +45,7 @@ import ui.utils.moveMouseTo
 import ui.utils.tripleClickOnRight
 import ui.utils.uiTest
 import ui.utils.vimExit
+import java.awt.Point
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -92,6 +93,9 @@ class UiTests {
         }
       }
 
+      testLargerDragSelection(editor)
+      testSelectLastCharacter(editor)
+      testMicrodragSelection(editor)
       testUnnamedClipboard(editor)
       testSelectAndRightClick(editor)
       testSelectTextWithMouseInGutter(editor)
@@ -244,6 +248,55 @@ class UiTests {
 
     keyboard { enterText("j") }
     assertEquals("One Two\nThree Four\nFive", editor.selectedText)
+
+    vimExit()
+  }
+
+  private fun ContainerFixture.testMicrodragSelection(editor: Editor) {
+    println("Run testMicrodragSelection...")
+
+    val point = editor.findText("Four").point
+    val startPoint = Point(point.x + 50, point.y)
+    val endPoint = Point(point.x + 49, point.y)
+
+    startPoint.moveMouseTo(endPoint, editor)
+
+    // Assert there was no selection
+    keyboard {
+      enterText("v")
+    }
+    assertEquals("r", editor.selectedText)
+
+    vimExit()
+  }
+
+  private fun ContainerFixture.testLargerDragSelection(editor: Editor) {
+    println("Run testMicrodragSelection...")
+
+    val point = editor.findText("Four").point
+    val startPoint = Point(point.x + 50, point.y)
+    val endPoint = Point(point.x + 40, point.y)
+
+    startPoint.moveMouseTo(endPoint, editor)
+
+    // Assert there was no selection
+    keyboard {
+      enterText("v")
+    }
+    assertEquals("r", editor.selectedText)
+
+    vimExit()
+  }
+
+  private fun ContainerFixture.testSelectLastCharacter(editor: Editor) {
+    println("Run testSelectLastCharacter...")
+
+    val point = editor.findText("Four").point
+    val startPoint = Point(point.x + 50, point.y)
+
+    startPoint.moveMouseTo(point, editor)
+
+    assertEquals("Four", editor.selectedText)
 
     vimExit()
   }
