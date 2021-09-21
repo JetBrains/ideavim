@@ -149,6 +149,13 @@ class UiTests {
       editor.text
     )
 
+    editor.injectText(
+      """
+                |One Two
+                |Three Four
+                |Five
+            """.trimMargin()
+    )
     keyboard {
       enterText(":set clipboard-=unnamed")
       enter()
