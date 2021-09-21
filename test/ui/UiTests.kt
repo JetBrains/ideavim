@@ -426,14 +426,12 @@ class UiTests {
     }
 
     assertEquals("Three Four\n", editor.selectedText)
-    assertEquals(8, editor.caretOffset)
 
     keyboard {
       enterText("k")
     }
 
     assertEquals("One Two\nThree Four\n", editor.selectedText)
-    assertEquals(0, editor.caretOffset)
 
     vimExit()
   }

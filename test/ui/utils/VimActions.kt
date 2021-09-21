@@ -27,7 +27,11 @@ fun Fixture.insertMode() {
 }
 
 fun Fixture.vimExit() {
-  keyboard { escape() }
+  keyboard {
+    escape()
+    enterText("gg")
+    enterText("0")
+  }
 }
 
 fun Fixture.type(keys: String) {
