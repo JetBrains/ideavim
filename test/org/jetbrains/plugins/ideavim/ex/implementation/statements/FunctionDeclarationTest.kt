@@ -164,6 +164,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delf! F2"))
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
   fun `test outer variable cannot be reached from inner function`() {
     configureByText("\n")
     typeText(
@@ -181,7 +182,7 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("echo F1()"))
     assertPluginError(true)
     assertPluginErrorMessageContains("E121: Undefined variable: x")
-    assertNoExOutput()
+    assertExOutput("0\n")
 
     typeText(commandToKeys("delf! F1"))
     typeText(commandToKeys("delf! F2"))
@@ -311,6 +312,231 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("echo x"))
     assertPluginError(true)
     assertPluginErrorMessageContains("E121: Undefined variable: x")
+
+    typeText(commandToKeys("delf! F1"))
+  }
+
+  fun `test function without range flag`() {
+    configureByText(
+      """
+        -----
+        ${c}12345
+        abcde
+        -----
+      """.trimIndent()
+    )
+    typeText(
+      commandToKeys(
+        "" +
+          "let rangesConcatenation = '' |" +
+          "function! F1() |" +
+          "  let g:rangesConcatenation .= line('.') |" +
+          "endfunction |"
+      )
+    )
+    typeText(commandToKeys("1,3call F1()"))
+    typeText(commandToKeys("echo rangesConcatenation"))
+    assertPluginError(false)
+    assertExOutput("123\n")
+
+    assertState(
+      """
+        -----
+        12345
+        ${c}abcde
+        -----
+      """.trimIndent()
+    )
+    typeText(commandToKeys("delf! F1"))
+  }
+
+  fun `test function with range flag`() {
+    configureByText(
+      """
+        -----
+        12345
+        abcde
+        $c-----
+      """.trimIndent()
+    )
+    typeText(
+      commandToKeys(
+        "" +
+          "let rangesConcatenation = '' |" +
+          "function! F1() range |" +
+          "  let g:rangesConcatenation .= line('.') |" +
+          "endfunction |"
+      )
+    )
+    typeText(commandToKeys("1,3call F1()"))
+    typeText(commandToKeys("echo rangesConcatenation"))
+    assertPluginError(false)
+    assertExOutput("1\n")
+
+    assertState(
+      """
+        $c-----
+        12345
+        abcde
+        -----
+      """.trimIndent()
+    )
+    typeText(commandToKeys("delf! F1"))
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  fun `test trying to create a function with firstline or lastline argument`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        "" +
+          "function! F1(firstline) |" +
+          "  echo unknownVar |" +
+          "  let g:x = 10 |" +
+          "endfunction"
+      )
+    )
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E125: Illegal argument: firstline")
+
+    typeText(
+      commandToKeys(
+        "" +
+          "function! F1(lastline) |" +
+          "  echo unknownVar |" +
+          "  let g:x = 10 |" +
+          "endfunction"
+      )
+    )
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E125: Illegal argument: lastline")
+
+    typeText(commandToKeys("delf! F1"))
+    typeText(commandToKeys("delf! F2"))
+  }
+
+  fun `test firstline and lastline default value if no range specified`() {
+    configureByText(
+      """
+        -----
+        12${c}345
+        abcde
+        -----
+      """.trimIndent()
+    )
+    typeText(
+      commandToKeys(
+        "" +
+          "function! F1() range |" +
+          "  echo a:firstline .. ':' .. a:lastline |" +
+          "endfunction |"
+      )
+    )
+    typeText(commandToKeys("call F1()"))
+    assertPluginError(false)
+    assertExOutput("2:2\n")
+    assertState(
+      """
+        -----
+        12${c}345
+        abcde
+        -----
+      """.trimIndent()
+    )
+    typeText(commandToKeys("delf! F1"))
+  }
+
+  fun `test firstline and lastline default value if range is specified`() {
+    configureByText(
+      """
+        -----
+        12${c}345
+        abcde
+        -----
+      """.trimIndent()
+    )
+    typeText(
+      commandToKeys(
+        "" +
+          "function! F1() |" +
+          "  echo a:firstline .. ':' .. a:lastline |" +
+          "endfunction |"
+      )
+    )
+    typeText(commandToKeys("1,4call F1()"))
+    assertPluginError(false)
+    assertExOutput("1:4\n")
+    assertState(
+      """
+        -----
+        12345
+        abcde
+        $c-----
+      """.trimIndent()
+    )
+    typeText(commandToKeys("delf! F1"))
+  }
+
+  fun `test functions without range flag columns`() {
+    configureByText(
+      """
+        -----
+        12345
+        abcde
+        ---$c--
+      """.trimIndent()
+    )
+    typeText(
+      commandToKeys(
+        "" +
+          "let columns = '' |" +
+          "function! F1() |" +
+          "  let g:columns .= col('.') .. ',' |" +
+          "endfunction |"
+      )
+    )
+    typeText(commandToKeys("call F1()"))
+    typeText(commandToKeys("echo columns"))
+    assertPluginError(false)
+    assertExOutput("4,\n")
+
+    typeText(commandToKeys("let columns = ''"))
+    typeText(commandToKeys("1,3call F1()"))
+    typeText(commandToKeys("echo columns"))
+    assertPluginError(false)
+    assertExOutput("1,1,1,\n")
+
+    typeText(commandToKeys("delf! F1"))
+  }
+
+  fun `test functions with range flag columns`() {
+    configureByText(
+      """
+        -----
+        12345
+        abcde
+        ---$c--
+      """.trimIndent()
+    )
+    typeText(
+      commandToKeys(
+        "" +
+          "let columns = '' |" +
+          "function! F1() range |" +
+          "  let g:columns .= col('.') .. ',' |" +
+          "endfunction |"
+      )
+    )
+    typeText(commandToKeys("call F1()"))
+    typeText(commandToKeys("echo columns"))
+    assertPluginError(false)
+    assertExOutput("4,\n")
+
+    typeText(commandToKeys("let columns = ''"))
+    typeText(commandToKeys("1,3call F1()"))
+    typeText(commandToKeys("echo columns"))
+    assertPluginError(false)
+    assertExOutput("1,\n")
 
     typeText(commandToKeys("delf! F1"))
   }
