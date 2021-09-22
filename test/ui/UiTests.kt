@@ -118,7 +118,7 @@ class UiTests {
       closeIdeaVimDialog()
       closeTipOfTheDay()
       closeAllTabs()
-      }
+    }
   }
 
   private fun RemoteRobot.startNewProject() {
@@ -134,7 +134,7 @@ class UiTests {
         button("Next").click()
         button("Finish").click()
       }
-      }
+    }
   }
 
   private fun IdeaFrame.testUnnamedClipboard(editor: Editor) {

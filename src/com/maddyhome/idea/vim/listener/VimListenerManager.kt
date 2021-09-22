@@ -223,11 +223,11 @@ object VimListenerManager {
       val caret = editor.caretModel.currentCaret
       val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
       val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
-      if (skipNDragEvents < skipEvents
-        && lineEnd != lineStart
-        && selectionEvent.newRange.startOffset == selectionEvent.newRange.endOffset
-        && selectionEvent.newRange.startOffset == lineEnd - 1
-        && selectionEvent.newRange.startOffset == caret.offset
+      if (skipNDragEvents < skipEvents &&
+        lineEnd != lineStart &&
+        selectionEvent.newRange.startOffset == selectionEvent.newRange.endOffset &&
+        selectionEvent.newRange.startOffset == lineEnd - 1 &&
+        selectionEvent.newRange.startOffset == caret.offset
       ) {
         caret.setSelection(lineEnd, lineEnd - 1)
       }
