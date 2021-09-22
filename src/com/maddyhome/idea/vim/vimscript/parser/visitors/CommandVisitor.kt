@@ -308,14 +308,14 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
 
   override fun visitGlobalCommand(ctx: VimscriptParser.GlobalCommandContext): GlobalCommand {
     val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
+    val argument = ctx.commandArgumentWithBars().text.trim()
     val invert = ctx.invert != null
     return GlobalCommand(ranges, argument, invert)
   }
 
   override fun visitVglobalCommand(ctx: VimscriptParser.VglobalCommandContext): GlobalCommand {
     val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
+    val argument = ctx.commandArgumentWithBars().text.trim()
     return GlobalCommand(ranges, argument, true)
   }
 

@@ -175,10 +175,12 @@ command:
     ws_cols range? ws_cols SYMBOL (WS* commandArgument)? inline_comment? statementSeparator
     #FindSymbolCommand|
 
-    ws_cols range? ws_cols (G_LOWERCASE | GLOBAL) (invert = EXCLAMATION)? (WS* commandArgument)? inline_comment? statementSeparator
+    // we use "~NEWLINE*?" instead of commandArgument because bar can be used if 'very magic' is set
+    ws_cols range? ws_cols (G_LOWERCASE | GLOBAL) (invert = EXCLAMATION)? (WS* commandArgumentWithBars)? inline_comment? NEW_LINE
     #GlobalCommand|
 
-    ws_cols range? ws_cols (V_LOWERCASE | V_GLOBAL) (WS* commandArgument)? inline_comment? statementSeparator
+    // we use "~NEWLINE*?" instead of commandArgument because bar can be used if 'very magic' is set
+    ws_cols range? ws_cols (V_LOWERCASE | V_GLOBAL) (WS* commandArgumentWithBars)? inline_comment? NEW_LINE
     #VglobalCommand|
 
     ws_cols range? ws_cols GO_TO_CHAR (WS* commandArgument)? inline_comment? statementSeparator
@@ -343,6 +345,8 @@ rShift:
 
 commandArgument:
     ~(BAR | NEW_LINE)*?;
+commandArgumentWithBars:
+    ~(NEW_LINE)*?;
 
 range:
     rangeUnit+;
