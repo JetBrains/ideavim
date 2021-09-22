@@ -972,3 +972,4 @@ IGNORE:                 '"ideaVim ignore' .*? '"ideaVim ignore end' NEW_LINE -> 
 
 // All the other symbols
 UNICODE_CHAR:           '\u0000'..'\uFFFE';
+EMOJI:                  [\p{Emoji}];
