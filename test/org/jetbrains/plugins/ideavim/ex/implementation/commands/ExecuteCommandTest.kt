@@ -46,4 +46,10 @@ class ExecuteCommandTest : VimTestCase() {
     typeText(commandToKeys("execute 'echo ' . \"'result =\"4+2*3.\"'\""))
     assertExOutput("result = 10\n")
   }
+
+  fun `test execute without spaces`() {
+    configureByText("\n")
+    typeText(commandToKeys("execute('echo '.42)"))
+    assertExOutput("42\n")
+  }
 }

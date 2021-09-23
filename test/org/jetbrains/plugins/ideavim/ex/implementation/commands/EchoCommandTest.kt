@@ -45,4 +45,10 @@ class EchoCommandTest : VimTestCase() {
     typeText(commandToKeys("ec 3"))
     assertExOutput("3\n")
   }
+
+  fun `test echo without spaces`() {
+    configureByText("\n")
+    typeText(commandToKeys("echo(42)(999)"))
+    assertExOutput("42 999\n")
+  }
 }

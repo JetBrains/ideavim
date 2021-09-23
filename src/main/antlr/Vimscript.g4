@@ -12,7 +12,7 @@ executable:
     comment | forLoop | forLoop2 | whileLoop | functionDefinition | dictFunctionDefinition | ifStatement | tryStatement | command | autocmd | augroup;
 
 forLoop:
-    ws_cols FOR WS+ variableName WS+ IN WS+ expr WS* statementSeparator
+    ws_cols FOR WS+ variableName WS+ IN WS* expr WS* statementSeparator
         blockMember*
     ws_cols ENDFOR WS* statementSeparator
 ;
@@ -25,7 +25,7 @@ forLoop2:
 ;
 
 whileLoop:
-    ws_cols WHILE WS+ expr WS* statementSeparator
+    ws_cols WHILE WS* expr WS* statementSeparator
         blockMember*
     ws_cols ENDWHILE WS* statementSeparator
 ;
@@ -98,7 +98,7 @@ command:
     ws_cols range ws_cols statementSeparator
     #GoToLineCommand|
 
-    ws_cols range? ws_cols ECHO (WS+ expr)* WS* statementSeparator
+    ws_cols range? ws_cols ECHO (WS* expr)* WS* statementSeparator
     #EchoCommand|
 
     ws_cols range? ws_cols LET WS+ expr WS*
@@ -324,7 +324,7 @@ command:
     ws_cols range? ws_cols MAP_CLEAR (WS* commandArgument)? statementSeparator
     #MapClearCommand|
 
-    ws_cols range? ws_cols EXECUTE WS+ (expr WS*)* statementSeparator
+    ws_cols range? ws_cols EXECUTE WS* (expr WS*)* statementSeparator
     #ExecuteCommand|
 
     ws_cols range? ws_cols UNMAP (WS* commandArgument)? statementSeparator
