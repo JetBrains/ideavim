@@ -288,7 +288,7 @@ command:
     ws_cols range? ws_cols SOURCE (WS* commandArgument)? inline_comment? statementSeparator
     #SourceCommand|
 
-    ws_cols range? ws_cols substituteCommandName = (S_LOWERCASE | SUBSTITUTE | TILDE | AMPERSAND) (WS* commandArgument)? inline_comment? statementSeparator
+    ws_cols range? ws_cols substituteCommandName = (S_LOWERCASE | SUBSTITUTE | TILDE | AMPERSAND) (WS* commandArgument)? statementSeparator
     #SubstituteCommand|
 
     ws_cols range? ws_cols TAB_CLOSE (WS* commandArgument)? inline_comment? statementSeparator

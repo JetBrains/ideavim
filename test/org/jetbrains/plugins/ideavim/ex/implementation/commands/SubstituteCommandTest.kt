@@ -783,6 +783,17 @@ class SubstituteCommandTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     doTest(listOf(exCommand("s/i/zzz"), exCommand("s/l/aa~bb~")), before, after)
   }
 
+  // VIM-2409
+  @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test inline comment is a part of substitute command`() {
+    doTest(
+      "s/'/\"/g",
+      "'quoted string'",
+      "\"quoted string\""
+    )
+  }
+
   // Incsearch highlights handled by SearchGroupTest
 
   private fun doTest(command: String, before: String, after: String) {
