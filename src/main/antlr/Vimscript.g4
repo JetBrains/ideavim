@@ -95,7 +95,7 @@ autocmd:                ws_cols AUTOCMD ~(NEW_LINE)* NEW_LINE
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 command:
-    ws_cols range ws_cols statementSeparator
+    ws_cols (range | shortRange) ws_cols statementSeparator
     #GoToLineCommand|
 
     ws_cols range? ws_cols ECHO (WS* expr)* WS* statementSeparator
@@ -348,6 +348,8 @@ commandArgument:
 commandArgumentWithBars:
     ~(NEW_LINE)*?;
 
+shortRange:
+    ((QUESTION (~QUESTION)* QUESTION?) | (DIV (~DIV)* DIV?));
 range:
     rangeUnit+;
 

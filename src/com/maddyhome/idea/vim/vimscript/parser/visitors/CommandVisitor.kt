@@ -176,7 +176,16 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
   }
 
   override fun visitGoToLineCommand(ctx: VimscriptParser.GoToLineCommandContext): Command {
-    val ranges: Ranges = parseRanges(ctx.range())
+    val ranges: Ranges
+    if (ctx.range() != null) {
+      ranges = parseRanges(ctx.range())
+    } else {
+      ranges = Ranges()
+      ranges.addRange(
+        createRange(ctx.shortRange().text, 0, false)
+          ?: throw ExException("Could not create a range")
+      )
+    }
     return GoToLineCommand(ranges)
   }
 

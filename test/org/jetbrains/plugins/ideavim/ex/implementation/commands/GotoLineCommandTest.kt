@@ -95,6 +95,50 @@ class GotoLineCommandTest : VimTestCase() {
     assertState(after)
   }
 
+  fun `test goto using forward search range`() {
+    val before = """
+      A Discovery
+
+      I found it ${c}in a legendary land
+      all rocks and lavender and tufted grass,
+      where it was settled on some sodden sand
+      hard by the torrent of a mountain pass.
+    """.trimIndent()
+    configureByText(before)
+    enterCommand("/settled")
+    val after = """
+      A Discovery
+
+      I found it in a legendary land
+      all rocks and lavender and tufted grass,
+      ${c}where it was settled on some sodden sand
+      hard by the torrent of a mountain pass.
+    """.trimIndent()
+    assertState(after)
+  }
+
+  fun `test goto using backward search range`() {
+    val before = """
+      A Discovery
+
+      I found it in a legendary land
+      all rocks and lavender and tufted grass,
+      where it was settled on some sodden sand
+      hard by the ${c}torrent of a mountain pass.
+    """.trimIndent()
+    configureByText(before)
+    enterCommand("/lavender")
+    val after = """
+      A Discovery
+
+      I found it in a legendary land
+      ${c}all rocks and lavender and tufted grass,
+      where it was settled on some sodden sand
+      hard by the torrent of a mountain pass.
+    """.trimIndent()
+    assertState(after)
+  }
+
   fun `test goto negative relative line`() {
     val before = """
       A Discovery
