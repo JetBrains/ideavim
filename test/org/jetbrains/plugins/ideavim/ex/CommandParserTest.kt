@@ -101,6 +101,23 @@ class CommandParserTest : VimTestCase() {
     assertEquals(script1, script2)
   }
 
+  fun `test multiline command input with tabs`() {
+    val script1 = VimscriptParser.parse(
+      """
+     let s:patBR = substitute(match_words.',',
+      ${"\t"}\ s:notslash.'\zs[,:]*,[,:]*', ',', 'g') 
+      """.trimIndent()
+    )
+    val script2 = VimscriptParser.parse(
+      """
+     let s:patBR = substitute(match_words.',',s:notslash.'\zs[,:]*,[,:]*', ',', 'g')
+      """.trimIndent()
+    )
+    assertEquals(1, script1.units.size)
+    assertTrue(script1.units[0] is LetCommand)
+    assertEquals(script1, script2)
+  }
+
   fun `test multiline expression input`() {
     configureByText("\n")
     val script1 = VimscriptParser.parse(
