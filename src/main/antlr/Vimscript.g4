@@ -974,6 +974,7 @@ NEW_LINE:               '\n' | '\r\n';
 WS:                     [ \t]+;
 INLINE_SEPARATOR:       '\n' (' ' | '\t')* BACKSLASH -> skip;
 LUA_CODE:               'lua' WS* '<<' WS* 'EOF' .*? 'EOF' -> skip;
+LUA_CODE2:              'lua' WS* '<<' WS* 'END' .*? 'END' -> skip;
 IGNORE:                 '"ideaVim ignore' .*? '"ideaVim ignore end' NEW_LINE -> skip;
 
 // All the other symbols
