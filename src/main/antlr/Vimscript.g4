@@ -485,8 +485,7 @@ anyScope:               B_LOWERCASE // buffer variable
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 string:
-                        EMPTY_DOUBLE_QUOTED_STRING
-                    |   STRING_DOUBLE_QUOTED
+                        QUOTE .*? QUOTE
                     |   ESCAPED_SINGLE_QUOTE
                     |   ESCAPED_SINGLE_QUOTE ESCAPED_SINGLE_QUOTE
                     |   (SINGLE_QUOTE | (ESCAPED_SINGLE_QUOTE SINGLE_QUOTE))  ~(SINGLE_QUOTE)*? SINGLE_QUOTE
@@ -499,8 +498,7 @@ mark:                   (SINGLE_QUOTE (lowercaseAlphabeticChar | uppercaseAlphab
                     |   (BACKTICK (lowercaseAlphabeticChar | uppercaseAlphabeticChar | DIGIT | LESS | GREATER | L_PAREN | R_PAREN | L_CURLY | R_CURLY | L_BRACKET | R_BRACKET | QUOTE | CARET | DOT | BACKTICK | SINGLE_QUOTE))
 ;
 comment:                WS* inline_comment? NEW_LINE;
-inline_comment:         (WS* (QUOTE | EMPTY_DOUBLE_QUOTED_STRING) ~(NEW_LINE)*?)
-                    |   (STRING_DOUBLE_QUOTED ~(NEW_LINE)*?);
+inline_comment:         (WS* QUOTE ~(NEW_LINE)*?);
 anyCaseNameWithDigitsAndUnderscores:
                         anyCaseNameWithDigits
                     |   IDENTIFIER_ANY_CASE_WITH_DIGITS_AND_UNDERSCORES
@@ -863,13 +861,10 @@ FLOAT:                  [0-9]+'.'[0-9]+
                     |   [0-9]+'.'[0-9]+'e'[+-]?[0-9]+
 ;
 BLOB:                   '0'[zZ][0-9a-fA-F]+;
-EMPTY_DOUBLE_QUOTED_STRING:
-                        '""';
 QUOTE:                  '"';
 SINGLE_QUOTE:           '\'';
 ESCAPED_SINGLE_QUOTE:   '\'\'';
 ESCAPED_DOUBLE_QUOTE:   '\\"';
-STRING_DOUBLE_QUOTED:   (QUOTE (ESCAPED_DOUBLE_QUOTE | ~[\n])*? QUOTE);
 
 // Identifiers
 IDENTIFIER_LOWERCASE:   [a-z]+;
