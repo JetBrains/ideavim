@@ -52,6 +52,7 @@ import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.ShowCmd;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
+import kotlin.NotImplementedError;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -461,6 +462,11 @@ public class KeyHandler {
     final Application application = ApplicationManager.getApplication();
     if (OptionsManager.INSTANCE.getTimeout().isSet()) {
       LOG.trace("Timeout is set. Schedule a mapping timer");
+      // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.
+      //   At the moment, I see the only one possibility this to happen - other key is handled after the timer executed,
+      //   but before invoke later is handled. This is a rare case, so I'll just add a check to isPluginMapping.
+      //   But this "unexpected behaviour" exists and it would be better not to relay on mutable state with delays.
+      //   https://youtrack.jetbrains.com/issue/VIM-2392
       mappingState.startMappingTimer(actionEvent -> application.invokeLater(() -> {
         LOG.debug("Delayed mapping timer call");
         final List<KeyStroke> unhandledKeys = mappingState.detachKeys();
@@ -521,7 +527,13 @@ public class KeyHandler {
     final EditorDataContext currentContext = EditorDataContext.init(editor, context);
 
     LOG.trace("Executing mapping info");
-    mappingInfo.execute(editor, context);
+    try {
+      mappingInfo.execute(editor, context);
+    } catch (Exception | NotImplementedError e) {
+      VimPlugin.showMessage(e.getMessage());
+      VimPlugin.indicateError();
+      LOG.warn("Caught exception during " + mappingInfo.getPresentableString() + "\n" + e.getMessage());
+    }
 
     // If we've just evaluated the previous key sequence, make sure to also handle the current key
     if (mappingInfo != currentMappingInfo) {
@@ -581,7 +593,7 @@ public class KeyHandler {
   //   For `IA` someAction should be executed.
   //   But if the user types `Ib`, `<Plug>i` won't be executed again. Only `b` will be passed to keyHandler.
   private boolean isPluginMapping(List<KeyStroke> unhandledKeyStrokes) {
-    return unhandledKeyStrokes.get(0).equals(StringHelper.PlugKeyStroke);
+    return !unhandledKeyStrokes.isEmpty() && unhandledKeyStrokes.get(0).equals(StringHelper.PlugKeyStroke);
   }
 
   @SuppressWarnings("RedundantIfStatement")

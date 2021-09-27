@@ -13,13 +13,14 @@ buildscript {
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.0")
         classpath("com.github.AlexPl292:mark-down-to-slack:1.1.2")
-        classpath("org.eclipse.jgit:org.eclipse.jgit:5.12.0.202106070339-r")
-        classpath("org.kohsuke:github-api:1.129")
+        classpath("org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r")
+        classpath("org.kohsuke:github-api:1.133")
         classpath("org.jetbrains:markdown:0.2.4")
     }
 }
 
 plugins {
+    antlr
     java
     kotlin("jvm") version "1.5.0"
 
@@ -27,7 +28,7 @@ plugins {
     id("org.jetbrains.changelog") version "1.2.0"
 
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
-    id("org.jlleitschuh.gradle.ktlint") version "10.0.0"
+    id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
 }
 
 // Import variables from gradle.properties file
@@ -58,6 +59,15 @@ dependencies {
 
     testImplementation("com.intellij.remoterobot:remote-robot:$remoteRobotVersion")
     testImplementation("com.intellij.remoterobot:remote-fixtures:$remoteRobotVersion")
+
+    runtimeOnly("org.antlr:antlr4-runtime:4.9.2")
+    antlr("org.antlr:antlr4:4.9.2")
+}
+
+configurations {
+    runtimeClasspath {
+        exclude(group = "org.antlr", module = "antlr4")
+    }
 }
 
 // --- Compilation
@@ -137,6 +147,16 @@ tasks {
         downloadDir.set("${project.buildDir}/pluginVerifier/ides")
         teamCityOutputFormat.set(true)
     }
+
+    generateGrammarSource {
+        maxHeapSize = "128m"
+        arguments.addAll(listOf("-package", "com.maddyhome.idea.vim.vimscript.parser.generated", "-visitor"))
+        outputDirectory = file("src/com/maddyhome/idea/vim/vimscript/parser/generated")
+    }
+
+    named("compileKotlin") {
+        dependsOn("generateGrammarSource")
+    }
 }
 
 // --- Linting
@@ -177,7 +197,7 @@ changelog {
     itemPrefix.set("*")
     path.set("${project.projectDir}/CHANGES.md")
     unreleasedTerm.set("To Be Released")
-    headerParserRegex.set("0\\.\\d{2}(.\\d+)?".toRegex())
+    headerParserRegex.set("\\d\\.\\d+(.\\d+)?".toRegex())
 //    header = { "${project.version}" }
 //    version = "0.60"
 }
@@ -217,6 +237,7 @@ tasks.register("slackNotification") {
             }
         """.trimIndent()
 
+        println("Parsed data: $slackDown")
         val post = URL(slackUrl)
         with(post.openConnection() as HttpURLConnection) {
             requestMethod = "POST"
@@ -317,14 +338,17 @@ fun updateChangelog() {
     if (insertOffset < 50) error("Incorrect offset: $insertOffset")
 
     val firstPartOfChanges = changes.take(insertOffset)
-    val newUpdates = newFixes
+    val actualFixes = newFixes
         .filterNot { it.id in firstPartOfChanges }
         // Temporally disable this example
         .filterNot { it.id == "VIM-123" }
+    val newUpdates = actualFixes
         .joinToString { "* [${it.id}](https://youtrack.jetbrains.com/issue/${it.id}) ${it.text}\n" }
 
     changesBuilder.insert(insertOffset, newUpdates)
-    changesFile.writeText(changesBuilder.toString())
+    if (actualFixes.isNotEmpty()) {
+        changesFile.writeText(changesBuilder.toString())
+    }
 }
 
 fun updateAuthors(uncheckedEmails: Set<String>) {
@@ -351,7 +375,7 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
         }
         val user = ghRepository.getCommit(hash).author
         val htmlUrl = user.htmlUrl.toString()
-        val name = user.name
+        val name = user.name ?: user.login
         users.add(Author(name, htmlUrl, email))
     }
 

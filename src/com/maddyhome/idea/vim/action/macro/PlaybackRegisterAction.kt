@@ -25,10 +25,10 @@ import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.ex.CommandParser
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.vimscript.Executor
 
 class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
@@ -41,19 +41,27 @@ class PlaybackRegisterAction : VimActionHandler.SingleExecution() {
     val project = PlatformDataKeys.PROJECT.getData(context)
     val application = ApplicationManager.getApplication()
     val res = Ref.create(false)
-    when (reg) {
-      '@' -> {
+    when {
+      reg == RegisterGroup.LAST_COMMAND_REGISTER || (reg == '@' && VimPlugin.getMacro().lastRegister == RegisterGroup.LAST_COMMAND_REGISTER) -> { // No write action
+        try {
+          var i = 0
+          while (i < cmd.count) {
+            res.set(Executor.executeLastCommand(editor, context))
+            if (!res.get()) {
+              break
+            }
+            i += 1
+          }
+          VimPlugin.getMacro().setLastRegister(reg)
+        } catch (e: ExException) {
+          res.set(false)
+        }
+      }
+      reg == '@' -> {
         application.runWriteAction {
           res.set(
             VimPlugin.getMacro().playbackLastRegister(editor, context, project, cmd.count)
           )
-        }
-      }
-      RegisterGroup.LAST_COMMAND_REGISTER -> { // No write action
-        try {
-          res.set(CommandParser.processLastCommand(editor, context, cmd.count))
-        } catch (e: ExException) {
-          res.set(false)
         }
       }
       else -> {

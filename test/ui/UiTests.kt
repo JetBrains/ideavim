@@ -45,6 +45,8 @@ import ui.utils.moveMouseTo
 import ui.utils.tripleClickOnRight
 import ui.utils.uiTest
 import ui.utils.vimExit
+import java.awt.Point
+import java.awt.event.KeyEvent
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -58,24 +60,12 @@ class UiTests {
   fun ideaVimTest() = uiTest("ideaVimTest") {
     val sharedSteps = JavaExampleSteps(this)
 
-    welcomeFrame {
-      createNewProjectLink.click()
-      dialog("New Project") {
-        findText("Java").click()
-        find(
-          ComponentFixture::class.java,
-          byXpath("//div[@class='FrameworksTree']")
-        ).findText("Kotlin/JVM").click()
-        runJs("robot.pressAndReleaseKey(${java.awt.event.KeyEvent.VK_SPACE})")
-        button("Next").click()
-        button("Finish").click()
-      }
-    }
-    with(sharedSteps) {
-      closeIdeaVimDialog()
-      closeTipOfTheDay()
-      closeAllTabs()
-    }
+    startNewProject()
+    Thread.sleep(1000)
+
+    closeUnrelated(sharedSteps)
+    Thread.sleep(1000)
+
     idea {
       createFile("MyDoc.txt", this@uiTest)
       val editor = editor("MyDoc.txt") {
@@ -90,6 +80,11 @@ class UiTests {
         }
       }
 
+      testLargerDragSelection(editor)
+      testSelectLastCharacter(editor)
+      testMicrodragSelection(editor)
+      testUnnamedClipboard(editor)
+      testSelectAndRightClick(editor)
       testSelectTextWithMouseInGutter(editor)
       testSelectForthAndBack(editor)
       testSelectTextUsingMouse(editor)
@@ -115,6 +110,70 @@ class UiTests {
       }
 
       wrapWithIf(javaEditor)
+    }
+  }
+
+  private fun closeUnrelated(sharedSteps: JavaExampleSteps) {
+    with(sharedSteps) {
+      closeIdeaVimDialog()
+      closeTipOfTheDay()
+      closeAllTabs()
+    }
+  }
+
+  private fun RemoteRobot.startNewProject() {
+    welcomeFrame {
+      createNewProjectLink.click()
+      dialog("New Project") {
+        findText("Java").click()
+        find(
+          ComponentFixture::class.java,
+          byXpath("//div[@class='FrameworksTree']")
+        ).findText("Kotlin/JVM").click()
+        runJs("robot.pressAndReleaseKey(${KeyEvent.VK_SPACE})")
+        button("Next").click()
+        button("Finish").click()
+      }
+    }
+  }
+
+  private fun IdeaFrame.testUnnamedClipboard(editor: Editor) {
+    keyboard {
+      enterText(":set clipboard+=unnamed")
+      enter()
+
+      enterText("gg")
+      enterText("yy")
+      enterText("jyy")
+      enterText("jyy")
+      enterText("p")
+      enterText("p")
+      enterText("p")
+    }
+
+    assertEquals(
+      """
+      One Two
+      Three Four
+      Five
+      Five
+      Five
+      Five
+      
+      """.trimIndent(),
+      editor.text
+    )
+
+    editor.injectText(
+      """
+                |One Two
+                |Three Four
+                |Five
+            """.trimMargin()
+    )
+    keyboard {
+      enterText(":set clipboard-=unnamed")
+      enter()
     }
   }
 
@@ -204,6 +263,55 @@ class UiTests {
     vimExit()
   }
 
+  private fun ContainerFixture.testMicrodragSelection(editor: Editor) {
+    println("Run testMicrodragSelection...")
+
+    val point = editor.findText("Four").point
+    val startPoint = Point(point.x + 50, point.y)
+    val endPoint = Point(point.x + 49, point.y)
+
+    startPoint.moveMouseTo(endPoint, editor)
+
+    // Assert there was no selection
+    keyboard {
+      enterText("v")
+    }
+    assertEquals("r", editor.selectedText)
+
+    vimExit()
+  }
+
+  private fun ContainerFixture.testLargerDragSelection(editor: Editor) {
+    println("Run testMicrodragSelection...")
+
+    val point = editor.findText("Four").point
+    val startPoint = Point(point.x + 50, point.y)
+    val endPoint = Point(point.x + 40, point.y)
+
+    startPoint.moveMouseTo(endPoint, editor)
+
+    // Assert there was no selection
+    keyboard {
+      enterText("v")
+    }
+    assertEquals("r", editor.selectedText)
+
+    vimExit()
+  }
+
+  private fun ContainerFixture.testSelectLastCharacter(editor: Editor) {
+    println("Run testSelectLastCharacter...")
+
+    val point = editor.findText("Four").point
+    val startPoint = Point(point.x + 50, point.y)
+
+    startPoint.moveMouseTo(point, editor)
+
+    assertEquals("Four", editor.selectedText)
+
+    vimExit()
+  }
+
   private fun ContainerFixture.testSelectTextUsingMouse(editor: Editor) {
     println("Run testSelectTextUsingMouse...")
     val from = editor.findText("One")
@@ -219,6 +327,28 @@ class UiTests {
     keyboard { enterText("l") }
     assertEquals("One Two\nThree F", editor.selectedText)
 
+    vimExit()
+  }
+
+  private fun ContainerFixture.testSelectAndRightClick(editor: Editor) {
+    println("Run testSelectTextUsingMouse...")
+    val from = editor.findText("One")
+    val to = editor.findText("Five")
+
+    val caretIsBlockWhileDragging = from.moveMouseTo(to, editor)
+    assertFalse(caretIsBlockWhileDragging)
+
+    Thread.sleep(1000)
+
+    // Right click
+    editor.findText("Two").click(MouseButton.RIGHT_BUTTON)
+
+    Thread.sleep(1000)
+
+    assertTrue(editor.selectedText.isNotEmpty())
+
+    // Reset state
+    editor.findText("One").click()
     vimExit()
   }
 
@@ -296,14 +426,12 @@ class UiTests {
     }
 
     assertEquals("Three Four\n", editor.selectedText)
-    assertEquals(8, editor.caretOffset)
 
     keyboard {
       enterText("k")
     }
 
     assertEquals("One Two\nThree Four\n", editor.selectedText)
-    assertEquals(0, editor.caretOffset)
 
     vimExit()
   }

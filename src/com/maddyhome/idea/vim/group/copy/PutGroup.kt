@@ -51,6 +51,7 @@ import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
+import java.awt.datatransfer.DataFlavor
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.max
@@ -322,13 +323,18 @@ class PutGroup {
       carets[caret] = pointMarker
     }
 
-    val sizeBeforeInsert = CopyPasteManager.getInstance().allContents.size
+    val allContentsBefore = CopyPasteManager.getInstance().allContents
+    val sizeBeforeInsert = allContentsBefore.size
+    val firstItemBefore = allContentsBefore.firstOrNull()
     val origContent: TextBlockTransferable = setClipboardText(text.text, text.transferableData)
-    val sizeAfterInsert = CopyPasteManager.getInstance().allContents.size
+    val allContentsAfter = CopyPasteManager.getInstance().allContents
+    val sizeAfterInsert = allContentsAfter.size
     try {
       pasteProvider.performPaste(context)
     } finally {
-      if (sizeBeforeInsert != sizeAfterInsert) {
+      val textOnTop =
+        ((firstItemBefore as? TextBlockTransferable)?.getTransferData(DataFlavor.stringFlavor) as? String) != text.text
+      if (sizeBeforeInsert != sizeAfterInsert || textOnTop) {
         // Sometimes inserted text replaces existing one. E.g. on insert with + or * register
         (CopyPasteManager.getInstance() as? CopyPasteManagerEx)?.run { removeContent(origContent) }
       }

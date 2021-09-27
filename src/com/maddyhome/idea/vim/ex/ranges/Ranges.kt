@@ -188,6 +188,29 @@ class Ranges {
 
   @NonNls
   override fun toString(): String = "Ranges[ranges=$ranges]"
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is Ranges) return false
+
+    if (startLine != other.startLine) return false
+    if (endLine != other.endLine) return false
+    if (count != other.count) return false
+    if (defaultLine != other.defaultLine) return false
+    if (done != other.done) return false
+    if (ranges != other.ranges) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = startLine
+    result = 31 * result + endLine
+    result = 31 * result + count
+    result = 31 * result + defaultLine
+    result = 31 * result + done.hashCode()
+    result = 31 * result + ranges.hashCode()
+    return result
+  }
 
   private var startLine = 0
   private var endLine = 0

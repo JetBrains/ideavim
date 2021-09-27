@@ -61,7 +61,9 @@ If you are looking for:
 
 - Ex commands (`:set`, `:s`, `:nohlsearch`):
     - Any particular ex command: package `com.maddyhome.idea.vim.ex.handler`.
-    - Ex command executor: `CommandHandler`.
+    - Vim script grammar: `Vimscript.g4`.
+    - Vim script parsing: package `com.maddyhome.idea.vim.vimscript.parser`.
+    - Vim script executor: `Executor`.
 
 - Extensions:
     - Extensions handler: `VimExtensionHandler`.
@@ -136,7 +138,7 @@ This is just terrible. [You know what to do](https://github.com/JetBrains/ideavi
 * [Continuous integration builds](https://teamcity.jetbrains.com/project.html?projectId=IdeaVim&guest=1)
 * [Bug tracker](https://youtrack.jetbrains.com/issues/VIM)
 * [Chat on gitter](https://gitter.im/JetBrains/ideavim)
-* [Unofficial discord server](https://jb.gg/bi6zp7)
+* [IdeaVim Channel](https://jb.gg/bi6zp7) on [JetBrains Server](https://discord.gg/jetbrains)
 * [Plugin homepage](https://plugins.jetbrains.com/plugin/164-ideavim)
 * [Changelog](CHANGES.md)
 * [Contributors listing](AUTHORS.md)

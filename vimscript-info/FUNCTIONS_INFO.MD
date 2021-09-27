@@ -1,0 +1,3 @@
+# Implemented functions
+* abs
+* sin

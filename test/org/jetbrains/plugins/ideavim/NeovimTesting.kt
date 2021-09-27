@@ -48,7 +48,17 @@ internal object NeovimTesting {
   fun setUp(test: VimTestCase) {
     if (!neovimEnabled(test)) return
     val nvimPath = System.getenv("ideavim.nvim.path") ?: "nvim"
-    val pb = ProcessBuilder(nvimPath, "-u", "NONE", "--embed", "--headless", "--clean", "--cmd", "set noswapfile")
+
+    val pb = ProcessBuilder(
+      nvimPath,
+      "-u", "NONE",
+      "--embed",
+      "--headless",
+      "--clean",
+      "--cmd", "set noswapfile",
+      "--cmd", "set sol"
+    )
+
     neovim = pb.start()
     val neovimConnection = ProcessRpcConnection(neovim, true)
     neovimApi = NeovimApis.getApiForConnection(neovimConnection)
@@ -74,9 +84,12 @@ internal object NeovimTesting {
 
   private fun neovimEnabled(test: VimTestCase): Boolean {
     val method = test.javaClass.getMethod(test.name)
-    return !method.isAnnotationPresent(VimBehaviorDiffers::class.java) &&
-      !method.isAnnotationPresent(TestWithoutNeovim::class.java) &&
-      System.getProperty("ideavim.nvim.test", "false")!!.toBoolean()
+    val noBehaviourDiffers = !method.isAnnotationPresent(VimBehaviorDiffers::class.java)
+    val noTestingWithoutNeovim = !method.isAnnotationPresent(TestWithoutNeovim::class.java)
+    val neovimTestingEnabled = System.getProperty("ideavim.nvim.test", "false")!!.toBoolean()
+    val notParserTest = "org.jetbrains.plugins.ideavim.ex.parser" !in test.javaClass.packageName
+    val notScriptImplementation = "org.jetbrains.plugins.ideavim.ex.implementation" !in test.javaClass.packageName
+    return noBehaviourDiffers && noTestingWithoutNeovim && neovimTestingEnabled && notParserTest && notScriptImplementation
   }
 
   fun setupEditor(editor: Editor, test: VimTestCase) {
@@ -203,6 +216,8 @@ enum class SkipNeovimReason {
   FOLDING,
   TABS,
   PLUGIN_ERROR,
+
+  VIM_SCRIPT,
 }
 
 fun LogicalPosition.toVimCoords(): VimCoords {

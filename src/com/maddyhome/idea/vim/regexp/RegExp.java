@@ -2075,6 +2075,80 @@ public class RegExp {
     return r;
   }
 
+  public boolean vim_string_contains_regexp(@NotNull regmmatch_T rmp, @NotNull String string) {
+    reg_match = null;
+    reg_mmatch = rmp;
+    ireg_ic = rmp.rmm_ic;
+
+    regprog_T prog;
+    CharPointer s;
+    int retval = 0;
+    reg_tofree = null;
+
+    prog = reg_mmatch.regprog;
+    CharPointer line = new CharPointer(string);
+    reg_startpos = reg_mmatch.startpos;
+    reg_endpos = reg_mmatch.endpos;
+
+    /* Be paranoid... */
+    if (prog == null) {
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_null));
+      return false;
+    }
+
+    /* Check validity of program. */
+    if (prog_magic_wrong()) {
+      return false;
+    }
+
+    /* If pattern contains "\c" or "\C": overrule value of ireg_ic */
+    if ((prog.regflags & RF_ICASE) != 0) {
+      ireg_ic = true;
+    }
+    else if ((prog.regflags & RF_NOICASE) != 0) {
+      ireg_ic = false;
+    }
+
+    /* If there is a "must appear" string, look for it. */
+    if (prog.regmust != null) {
+      char c;
+
+      c = prog.regmust.charAt();
+      s = line;
+      while ((s = cstrchr(s, c)) != null) {
+        if (cstrncmp(s, prog.regmust, prog.regmlen) == 0) {
+          break;          /* Found it. */
+        }
+        s.inc();
+      }
+      if (s == null)          /* Not present. */ {
+        // goto the end;
+        return false;
+      }
+    }
+
+    regline = line.ref(0);
+    reglnum = 0;
+    out_of_stack = false;
+
+    int col = 0;
+    /* Simplest case: Anchored match need be tried only once. */
+    char c;
+
+    c = regline.charAt(col);
+    if (prog.regstart == '\u0000' ||
+        prog.regstart == c ||
+        (ireg_ic && Character.toLowerCase(prog.regstart) == Character.toLowerCase(c))) {
+      retval = regtry(prog, col);
+    }
+
+    if (out_of_stack) {
+      VimPlugin.showMessage(MessageHelper.message(Msg.E363));
+    }
+
+    return retval > 0;
+  }
+
   /*
      * Match a regexp against a string ("line" points to the string) or multiple
      * lines ("line" is null, use reg_getline()).

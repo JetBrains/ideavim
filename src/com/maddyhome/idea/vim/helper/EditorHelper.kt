@@ -21,6 +21,7 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.codeWithMe.ClientId
+import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
@@ -86,3 +87,15 @@ fun Editor.endsWithNewLine(): Boolean {
   if (textLength == 0) return false
   return this.document.charsSequence[textLength - 1] == '\n'
 }
+
+/**
+ * Get caret line in vim notation (1-based)
+ */
+val Caret.vimLine: Int
+  get() = this.logicalPosition.line + 1
+
+/**
+ * Get current caret line in vim notation (1-based)
+ */
+val Editor.vimLine: Int
+  get() = this.caretModel.currentCaret.vimLine

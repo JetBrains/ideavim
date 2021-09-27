@@ -25,7 +25,6 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
 import com.maddyhome.idea.vim.extension.VimExtension;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
@@ -34,6 +33,11 @@ import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
+import com.maddyhome.idea.vim.vimscript.model.VimContext;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.model.expressions.Scope;
+import com.maddyhome.idea.vim.vimscript.model.expressions.Variable;
+import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -172,10 +176,11 @@ public class VimArgTextObjExtension implements VimExtension {
 
   @Nullable
   private static String bracketPairsVariable() {
-    final VimScriptGlobalEnvironment env = VimScriptGlobalEnvironment.getInstance();
-    final Object value = env.getVariables().get("g:argtextobj_pairs");
-    if (value instanceof String) {
-      return (String) value;
+    // todo global scope & nullable editor context != good
+    final Object value = VariableService.INSTANCE
+      .getNullableVariableValue(new Variable(Scope.GLOBAL_VARIABLE, "argtextobj_pairs"), null, null, new VimContext());
+    if (value instanceof VimString) {
+      return ((VimString)value).getValue();
     }
     return null;
   }

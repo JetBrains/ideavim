@@ -311,8 +311,7 @@ object OptionsManager {
     }
 
     if (editor != null && error != null) {
-      VimPlugin.showMessage(MessageHelper.message(error, token))
-      VimPlugin.indicateError()
+      throw ExException(MessageHelper.message(error, token))
     }
 
     return error == null
@@ -678,7 +677,11 @@ object VirtualEditData {
   const val name = "virtualedit"
 
   const val onemore = "onemore"
-  val allValues = arrayOf("block", "insert", "all", onemore)
+  const val block = "block"
+  const val insert = "insert"
+  const val all = "all"
+
+  val allValues = arrayOf(block, insert, all, onemore)
 }
 
 @NonNls

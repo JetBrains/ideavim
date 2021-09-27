@@ -63,6 +63,22 @@ sealed class Range(
 
   protected abstract fun getRangeLine(editor: Editor, caret: Caret, lastZero: Boolean): Int
 
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is Range) return false
+
+    if (offset != other.offset) return false
+    if (isMove != other.isMove) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = offset
+    result = 31 * result + isMove.hashCode()
+    return result
+  }
+
   companion object {
     /**
      * Factory method used to create an appropriate range based on the range text
@@ -153,6 +169,23 @@ class LineNumberRange : Range {
   }
 
   override fun toString(): String = "LineNumberRange[line=$line, ${super.toString()}]"
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as LineNumberRange
+
+    if (line != other.line) return false
+    if (offset != other.offset) return false
+    if (isMove != other.isMove) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    val prime = 31
+    return isMove.hashCode() + prime * offset.hashCode() + prime * prime * line.hashCode()
+  }
 
   private var line: Int
 
@@ -181,6 +214,23 @@ class MarkRange(private val mark: Char, offset: Int, move: Boolean) : Range(offs
   override fun getRangeLine(editor: Editor, caret: Caret, lastZero: Boolean): Int = getRangeLine(editor, lastZero)
 
   override fun toString(): String = "MarkRange[mark=$mark, ${super.toString()}]"
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as MarkRange
+
+    if (mark != other.mark) return false
+    if (offset != other.offset) return false
+    if (isMove != other.isMove) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    val prime = 31
+    return prime * prime * mark.hashCode() + prime * offset.hashCode() + isMove.hashCode()
+  }
 }
 
 /**
@@ -278,6 +328,28 @@ class SearchRange(pattern: String, offset: Int, move: Boolean) : Range(offset, m
   }
 
   override fun toString(): String = "SearchRange[patterns=$patterns, ${super.toString()}]"
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as SearchRange
+
+    if (patterns != other.patterns) return false
+    if (directions != other.directions) return false
+    if (offset != other.offset) return false
+    if (isMove != other.isMove) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = patterns.hashCode()
+    result = 31 * result + directions.hashCode()
+    result = 31 * result + offset.hashCode()
+    result = 31 * result + isMove.hashCode()
+    return result
+  }
 
   private val patterns: MutableList<String?> = mutableListOf()
   private val directions: MutableList<Direction> = mutableListOf()

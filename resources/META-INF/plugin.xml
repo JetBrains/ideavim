@@ -2,40 +2,38 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-    <h3>Features:</h3>
-    <ul>
-      <li>Support several buffer management commands <a href="https://youtrack.jetbrains.com/issue/VIM-1062">VIM-1062</a>,
-        <a href="https://youtrack.jetbrains.com/issue/VIM-2335">VIM-2335</a></li>
-    </ul>
+      <h3>Features:</h3>
+      <ul>
+        <li>New engine for Vim Script execution. Check out the <a href="https://jb.gg/vim-script-discussion">GitHub
+          Discussion</a>.
+        </li>
+        <li>Mapping keys to expressions (map &lt;expr&gt;). See <code>:h map-expression</code>.</li>
+      </ul>
 
-    <h3>Fixes:</h3>
-    <ul>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2317">VIM-2317</a> Fix memory leak</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1357">VIM-1357</a>
-        <a href="https://youtrack.jetbrains.com/issue/VIM-1566">VIM-1566</a> Fix external filters
-      </li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2336">VIM-2336</a> Fix repeat for the <code>T</code> movement
-      </li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1192">VIM-1192</a> Fix dollar motion from single command</li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-1672">VIM-1672</a> IdeaVim correctly populates clipboard history
-      </li>
-      <li><a href="https://youtrack.jetbrains.com/issue/VIM-2351">VIM-2351</a> Correctly select last character when
-        selecting with mouse
-      </li>
-    </ul>
+      <h3>Fixes:</h3>
+      <ul>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2368">VIM-2368</a> Do not remove selection on right click</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2392">VIM-2392</a> Fix possible out of bounds exception</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2387">VIM-2387</a> Fix coping with unnamed and ideaput</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2400">VIM-2400</a> Fix vim script parser</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2401">VIM-2401</a> Exceptions occurred during execution of
+          <code>map&lt;expr&gt;</code> are now shown in status bar
+        </li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2404">VIM-2404</a> Fix multiple pastes from unnamed clipboard
+        </li>
+      </ul>
 
-    <h3>Merged PRs:</h3>
-    <ul>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/332">332</a> by <a href="https://github.com/citizenmatt">Matt
-        Ellis</a>: VIM-1357+VIM-1566: Use OS shell to run filter command
-      </li>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/333">333</a> by <a href="https://github.com/MichalPlacek">Michal
-        Placek</a>: VIM-1062
-      </li>
-      <li><a href="https://github.com/JetBrains/ideavim/pull/334">334</a> by <a href="https://github.com/MichalPlacek">Michal
-        Placek</a>: vim-2335 Support for navigation to previous buffer with :b#
-      </li>
-    </ul>
+      <h3>Changes:</h3>
+      <ul>
+        <li>New versioning scheme. Current version is <code>1.7.0</code> instead of <code>0.70</code>.</li>
+      </ul>
+
+      <h3>Merged PRs:</h3>
+      <ul>
+        <li><a href="https://github.com/JetBrains/ideavim/pull/349">349</a> by <a href="https://github.com/nizienko">eugene
+          nizienko</a>: Run UI test ci
+        </li>
+      </ul>
     ]]>
   </change-notes>
   <description><![CDATA[
@@ -72,10 +70,9 @@
       <with attribute="implementation" implements="com.maddyhome.idea.vim.extension.VimExtension"/>
 
     </extensionPoint>
-
-    <!--    For internal use only -->
-    <extensionPoint name="vimExCommand" beanClass="com.maddyhome.idea.vim.ex.ExBeanClass" dynamic="true">
-      <with attribute="implementation" implements="com.maddyhome.idea.vim.ex.CommandHandler"/>
+    <extensionPoint name="vimLibraryFunction"
+                    beanClass="com.maddyhome.idea.vim.vimscript.model.functions.FunctionBeanClass" dynamic="true">
+      <with attribute="implementation" implements="com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler"/>
     </extensionPoint>
     <!--    For internal use only -->
     <extensionPoint name="vimAction" beanClass="com.maddyhome.idea.vim.handler.ActionBeanClass" dynamic="true">
@@ -105,9 +102,9 @@
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/includes/VimActions.xml" xpointer="xpointer(/idea-plugin/*)"/>
-  <xi:include href="/META-INF/includes/VimExCommands.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/includes/VimExtensions.xml" xpointer="xpointer(/idea-plugin/*)"/>
   <xi:include href="/META-INF/includes/VimListeners.xml" xpointer="xpointer(/idea-plugin/*)"/>
+  <xi:include href="/META-INF/includes/VimLibraryFunctions.xml" xpointer="xpointer(/idea-plugin/*)"/>
 
   <actions resource-bundle="messages.IdeaVimBundle">
     <action id="VimPluginToggle" class="com.maddyhome.idea.vim.action.VimPluginToggleAction">

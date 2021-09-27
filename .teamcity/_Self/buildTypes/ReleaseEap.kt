@@ -1,8 +1,8 @@
 package _Self.buildTypes
 
+import _Self.Constants.DEV_VERSION
 import _Self.Constants.EAP
 import _Self.Constants.RELEASE_EAP
-import _Self.Constants.VERSION
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
 import jetbrains.buildServer.configs.kotlin.v2019_2.DslContext
@@ -16,7 +16,7 @@ object ReleaseEap : BuildType({
   description = "Build and publish EAP of IdeaVim plugin"
 
   artifactRules = "build/distributions/*"
-  buildNumberPattern = "$VERSION.%build.counter%"
+  buildNumberPattern = "$DEV_VERSION-eap.%build.counter%"
 
   params {
     param("env.ORG_GRADLE_PROJECT_ideaVersion", RELEASE_EAP)

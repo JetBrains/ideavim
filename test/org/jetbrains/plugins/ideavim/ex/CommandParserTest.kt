@@ -18,15 +18,19 @@
 
 package org.jetbrains.plugins.ideavim.ex
 
+import com.intellij.openapi.actionSystem.DataContext
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.ex.CommandParser
-import com.maddyhome.idea.vim.ex.CommandParser.EX_COMMAND_EP
-import com.maddyhome.idea.vim.ex.ExBeanClass
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.commands
-import com.maddyhome.idea.vim.ex.ranges.Ranges
-import junit.framework.TestCase
+import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.vimscript.Executor
+import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
+import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
+import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -35,26 +39,6 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  * @author Alex Plate
  */
 class CommandParserTest : VimTestCase() {
-  fun `test one letter without optional`() {
-    val commands = commands("a")
-    assertEquals(1, commands.size)
-    assertEquals("a", commands[0].required)
-    assertEquals("", commands[0].optional)
-  }
-
-  fun `test without optional`() {
-    val commands = commands("a_discovery")
-    TestCase.assertEquals(1, commands.size)
-    assertEquals("a_discovery", commands[0].required)
-    assertEquals("", commands[0].optional)
-  }
-
-  fun `test with optional`() {
-    val commands = commands("a[discovery]")
-    TestCase.assertEquals(1, commands.size)
-    assertEquals("a", commands[0].required)
-    assertEquals("discovery", commands[0].optional)
-  }
 
   @TestWithoutNeovim(SkipNeovimReason.UNCLEAR, "Caret different position")
   fun `test simple ex command execution`() {
@@ -100,26 +84,324 @@ class CommandParserTest : VimTestCase() {
     }
   }
 
-  @TestWithoutNeovim(reason = SkipNeovimReason.EDITOR_MODIFICATION)
-  fun `test unregister extension`() {
-    val keys = commandToKeys(">>")
-    val before = "I ${c}found it in a legendary land"
-    val after = "        ${c}I found it in a legendary land"
-    var extension: ExBeanClass? = null
-    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE) {
-      extension = EX_COMMAND_EP.extensions().findFirst().get()
+  fun `test multiline command input`() {
+    val script1 = VimscriptParser.parse(
+      """
+     let s:patBR = substitute(match_words.',',
+      \ s:notslash.'\zs[,:]*,[,:]*', ',', 'g') 
+      """.trimIndent()
+    )
+    val script2 = VimscriptParser.parse(
+      """
+     let s:patBR = substitute(match_words.',',s:notslash.'\zs[,:]*,[,:]*', ',', 'g')
+      """.trimIndent()
+    )
+    assertEquals(1, script1.units.size)
+    assertTrue(script1.units[0] is LetCommand)
+    assertEquals(script1, script2)
+  }
 
-      // TODO: 08.02.2020 I'm sorry if your tests have been failed because of this code. Please update it properly
-      assertNotNull(CommandParser.getCommandHandler(ExCommand(Ranges(), "actionlist", "")))
+  fun `test multiline command input with tabs`() {
+    val script1 = VimscriptParser.parse(
+      """
+     let s:patBR = substitute(match_words.',',
+      ${"\t"}\ s:notslash.'\zs[,:]*,[,:]*', ',', 'g') 
+      """.trimIndent()
+    )
+    val script2 = VimscriptParser.parse(
+      """
+     let s:patBR = substitute(match_words.',',s:notslash.'\zs[,:]*,[,:]*', ',', 'g')
+      """.trimIndent()
+    )
+    assertEquals(1, script1.units.size)
+    assertTrue(script1.units[0] is LetCommand)
+    assertEquals(script1, script2)
+  }
 
-      @Suppress("DEPRECATION")
-      EX_COMMAND_EP.getPoint(null).unregisterExtension(extension!!)
+  fun `test multiline expression input`() {
+    configureByText("\n")
+    val script1 = VimscriptParser.parse(
+      """
+      let dict = {'one': 1,
+      \ 'two': 2}
+      """.trimIndent()
+    )
+    val script2 = VimscriptParser.parse("let dict = {'one': 1, 'two': 2}")
+    assertEquals(1, script1.units.size)
+    assertTrue(script1.units[0] is LetCommand)
+    assertEquals(script1, script2)
+  }
 
-      assertNull(CommandParser.getCommandHandler(ExCommand(Ranges(), "actionlist", "")))
-    }
-    @Suppress("DEPRECATION")
-    EX_COMMAND_EP.getPoint(null).registerExtension(extension!!)
+  fun `test errors`() {
+    configureByText("\n")
+    VimscriptParser.parse(
+      """
+        echo 4
+        let x = 3
+        echo ^523
+        echo 6
+      """.trimIndent()
+    )
+    assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 3:5") })
+  }
 
-    TestCase.assertNotNull(CommandParser.getCommandHandler(ExCommand(Ranges(), "actionlist", "")))
+  fun `test errors 2`() {
+    VimscriptParser.parse(
+      """
+        delfunction F1()
+        echo 4
+        echo 6
+        *(
+        let x = 5
+      """.trimIndent()
+    )
+    assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 1:14") })
+    assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 4:0") })
+  }
+
+  fun `test lua code in vimrc with 'lua EOF'`() {
+    VimscriptParser.parse(
+      """
+        " telescope
+        nnoremap <leader>ff <cmd>Telescope find_files<cr>
+        nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+        nnoremap <leader>b <cmd>Telescope buffers<cr>
+        nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+
+        " undotree
+        nnoremap <leader>u <cmd>UndotreeToggle<cr><cmd>UndotreeFocus<cr>
+
+        let g:airline_theme='angr'
+
+        " telescope default config
+        lua << EOF
+        require('telescope').setup{
+          defaults = {
+            vimgrep_arguments = {
+              'rg',
+              '--color=never',
+              '--no-heading',
+              '--with-filename',
+              '--line-number',
+              '--column',
+              '--smart-case'
+            },
+            prompt_prefix = "> ",
+            selection_caret = "> ",
+            entry_prefix = "  ",
+            initial_mode = "insert",
+            selection_strategy = "reset",
+            sorting_strategy = "descending",
+            layout_strategy = "horizontal",
+            layout_config = {
+              horizontal = {
+                mirror = false,
+              },
+              vertical = {
+                mirror = false,
+              },
+            },
+            file_sorter =  require'telescope.sorters'.get_fuzzy_file,
+            file_ignore_patterns = {},
+            generic_sorter =  require'telescope.sorters'.get_generic_fuzzy_sorter,
+            winblend = 0,
+            border = {},
+            borderchars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
+            color_devicons = true,
+            use_less = true,
+            path_display = {},
+            set_env = { ['COLORTERM'] = 'truecolor' }, -- default = nil,
+            file_previewer = require'telescope.previewers'.vim_buffer_cat.new,
+            grep_previewer = require'telescope.previewers'.vim_buffer_vimgrep.new,
+            qflist_previewer = require'telescope.previewers'.vim_buffer_qflist.new,
+
+            -- Developer configurations: Not meant for general override
+            buffer_previewer_maker = require'telescope.previewers'.buffer_previewer_maker
+          }
+        }
+        EOF
+      """.trimIndent()
+    )
+    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+  }
+
+  fun `test lua code in vimrc with 'lua END'`() {
+    VimscriptParser.parse(
+      """
+        " telescope
+        nnoremap <leader>ff <cmd>Telescope find_files<cr>
+        nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+        nnoremap <leader>b <cmd>Telescope buffers<cr>
+        nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+
+        " undotree
+        nnoremap <leader>u <cmd>UndotreeToggle<cr><cmd>UndotreeFocus<cr>
+
+        let g:airline_theme='angr'
+
+        " telescope default config
+        lua << END
+        require('telescope').setup{
+          defaults = {
+            vimgrep_arguments = {
+              'rg',
+              '--color=never',
+              '--no-heading',
+              '--with-filename',
+              '--line-number',
+              '--column',
+              '--smart-case'
+            },
+            prompt_prefix = "> ",
+            selection_caret = "> ",
+            entry_prefix = "  ",
+            initial_mode = "insert",
+            selection_strategy = "reset",
+            sorting_strategy = "descending",
+            layout_strategy = "horizontal",
+            layout_config = {
+              horizontal = {
+                mirror = false,
+              },
+              vertical = {
+                mirror = false,
+              },
+            },
+            file_sorter =  require'telescope.sorters'.get_fuzzy_file,
+            file_ignore_patterns = {},
+            generic_sorter =  require'telescope.sorters'.get_generic_fuzzy_sorter,
+            winblend = 0,
+            border = {},
+            borderchars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
+            color_devicons = true,
+            use_less = true,
+            path_display = {},
+            set_env = { ['COLORTERM'] = 'truecolor' }, -- default = nil,
+            file_previewer = require'telescope.previewers'.vim_buffer_cat.new,
+            grep_previewer = require'telescope.previewers'.vim_buffer_vimgrep.new,
+            qflist_previewer = require'telescope.previewers'.vim_buffer_qflist.new,
+
+            -- Developer configurations: Not meant for general override
+            buffer_previewer_maker = require'telescope.previewers'.buffer_previewer_maker
+          }
+        }
+        END
+      """.trimIndent()
+    )
+    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+  }
+
+  fun `test lines with errors are skipped`() {
+    configureByText("\n")
+    val script = VimscriptParser.parse(
+      """
+        let g:auto_save = 2
+        echo (*
+        let g:y = 10
+      """.trimIndent()
+    )
+    assertTrue(IdeavimErrorListener.testLogger.any { it.startsWith("line 2:") })
+    assertEquals(2, script.units.size)
+    assertTrue(script.units[0] is LetCommand)
+    val let1 = script.units[0] as LetCommand
+    assertEquals(Variable(Scope.GLOBAL_VARIABLE, "auto_save"), let1.variable)
+    assertEquals(SimpleExpression(VimInt(2)), let1.expression)
+    val let2 = script.units[1] as LetCommand
+    assertEquals(Variable(Scope.GLOBAL_VARIABLE, "y"), let2.variable)
+    assertEquals(SimpleExpression(VimInt(10)), let2.expression)
+  }
+
+  fun `test ignore commands between comments`() {
+    configureByText("\n")
+    val script = VimscriptParser.parse(
+      """
+        echo 1
+        "ideaVim ignore
+        echo 2
+        "ideaVim ignore end
+
+        echo 3
+
+        "ideaVim ignore
+        echo 4
+        echo 5
+        "ideaVim ignore end
+
+        echo 6
+
+        "ideaVim ignore
+        fa;sdlk 
+        *(-78fa=09*&
+        dfas;dlkfj afjldkfja s;d
+        "ideaVim ignore end
+      """.trimIndent()
+    )
+    assertEquals(3, script.units.size)
+    assertTrue(script.units[0] is EchoCommand)
+    assertEquals(SimpleExpression(VimInt(1)), (script.units[0] as EchoCommand).args[0])
+    assertTrue(script.units[1] is EchoCommand)
+    assertEquals(SimpleExpression(VimInt(3)), (script.units[1] as EchoCommand).args[0])
+    assertTrue(script.units[2] is EchoCommand)
+    assertEquals(SimpleExpression(VimInt(6)), (script.units[2] as EchoCommand).args[0])
+    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+  }
+
+  fun `test bug with caret return symbol`() {
+    configureByText("----------\n1234${c}567890\n----------\n")
+    Executor.execute(
+      """
+        " Map perso ---------------------------------------------
+        nnoremap Y y${'$'}
+
+      """.trimIndent().replace("\n", "\r\n"),
+      myFixture.editor, DataContext.EMPTY_CONTEXT, true
+    )
+    typeText(StringHelper.parseKeys("Yp"))
+    assertState("----------\n1234556789${c}067890\n----------\n")
+    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+  }
+
+  fun `test bars do not break comments`() {
+    configureByText("\n")
+    val script = VimscriptParser.parse(
+      """
+        " comment | let x = 10 | echo x
+      """.trimIndent()
+    )
+    assertEquals(0, script.units.size)
+    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+  }
+
+  fun `test autocmd is parsed without any errors`() {
+    configureByText("\n")
+    var script = VimscriptParser.parse(
+      """
+        autocmd BufReadPost *
+        \ if line("'\"") > 0 && line ("'\"") <= line("$") |
+        \   exe "normal! g'\"" |
+        \ endif
+      """.trimIndent()
+    )
+    assertEquals(0, script.units.size)
+    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+
+    script = VimscriptParser.parse(
+      """
+        autocmd BufReadPost * echo "oh, hi Mark"
+      """.trimIndent()
+    )
+    assertEquals(0, script.units.size)
+    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+  }
+
+  fun `test unknown let command's cases are ignored`() {
+    configureByText("\n")
+    val script = VimscriptParser.parse(
+      """
+        let x[a, b; c] = something()
+      """.trimIndent()
+    )
+    assertEquals(0, script.units.size)
+    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
   }
 }

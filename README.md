@@ -17,7 +17,7 @@ IdeaVim is a Vim emulation plugin for IntelliJ Platform-based IDEs.
 * [Bug tracker](https://youtrack.jetbrains.com/issues/VIM)
 * [@IdeaVim](https://twitter.com/ideavim) on Twitter
 * [Chat on gitter](https://gitter.im/JetBrains/ideavim)
-* [Unofficial discord server](https://jb.gg/bi6zp7)
+* [IdeaVim Channel](https://jb.gg/bi6zp7) on [JetBrains Server](https://discord.gg/jetbrains)
 
 ##### Resources:
 
@@ -36,7 +36,7 @@ Setup
 - IdeaVim can be installed via `Settings | Plugins`.
 See the [detailed instructions](https://www.jetbrains.com/help/idea/managing-plugins.html#).
 
-- Use `Tools | Vim Emulator` to enable or disable emulation.
+- Use `Tools | Vim Emulator` in the menu to enable or disable emulation.
 
 - Use the `~/.ideavimrc` file as an analog of `~/.vimrc` ([learn more](#Files)). The XDG standard is supported, as well.
 
@@ -107,7 +107,8 @@ See also:
 
 * [The list of all supported commands](src/com/maddyhome/idea/vim/package-info.java)
 * [Top feature requests and bugs](https://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+sort+by%3A+votes)
-
+* [Vimscript support roadmap](vimscript-info/VIMSCRIPT_ROADMAP.md)
+* [List of supported in-build functions](vimscript-info/FUNCTIONS_INFO.MD)
 
 Files
 -----
@@ -186,10 +187,6 @@ map Q gq
 You can read your `~/.vimrc` file from `~/.ideavimrc` with this command:
 
     source ~/.vimrc
-
-> :warning: Please note that IdeaVim currently parses `~/.ideavimrc` & `~/.vimrc` files via simple pattern-matching.
-See [VIM-669](https://youtrack.jetbrains.com/issue/VIM-669) for proper parsing
-of VimL files.
 
 Also note that if you have overridden the `user.home` JVM option, this
 will affect where IdeaVim looks for your `.ideavimrc` file. For example, if you
@@ -273,10 +270,6 @@ IdeaVim tips and tricks
     - Check out more [ex commands](https://github.com/JetBrains/ideavim/wiki/%22set%22-commands).
 
 - Use your vim settings with IdeaVim. Put `source ~/.vimrc` in `~/.ideavimrc`.
-    > :warning: Please note that IdeaVim currently parses `~/.ideavimrc` & `~/.vimrc` files via simple pattern-matching.
-    See [VIM-669](https://youtrack.jetbrains.com/issue/VIM-669) for proper parsing
-    of VimL files.
-
 - Control the status bar icon via the [`ideastatusicon` option](https://github.com/JetBrains/ideavim/wiki/%22set%22-commands).
 - Not familiar with the default behaviour during a refactoring? See the [`idearefactormode` option](https://github.com/JetBrains/ideavim/wiki/%22set%22-commands).
 

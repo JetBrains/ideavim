@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
 import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.helper.vimLine
 import java.util.*
 
 /*
@@ -60,7 +61,7 @@ abstract class MotionLastScreenLineActionBase(private val operatorPending: Boole
   override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
     if (operatorPending) {
       // Convert current caret line from a 0-based logical line to a 1-based logical line
-      VimPlugin.getMotion().scrollLineToFirstScreenLine(editor, caret.logicalPosition.line + 1, false)
+      VimPlugin.getMotion().scrollLineToFirstScreenLine(editor, caret.vimLine, false)
     }
   }
 }

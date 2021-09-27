@@ -20,13 +20,18 @@ package org.jetbrains.plugins.ideavim.extension.argtextobj;
 
 import com.google.common.collect.Lists;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers;
+import com.maddyhome.idea.vim.vimscript.model.VimContext;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.model.expressions.Scope;
+import com.maddyhome.idea.vim.vimscript.model.expressions.Variable;
+import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import org.jetbrains.plugins.ideavim.SkipNeovimReason;
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import java.util.Collections;
+
 
 public class VimArgTextObjExtensionTest extends VimTestCase {
 
@@ -37,7 +42,10 @@ public class VimArgTextObjExtensionTest extends VimTestCase {
   }
 
   private void setArgTextObjPairsVariable(String value) {
-    VimScriptGlobalEnvironment.getInstance().getVariables().put("g:argtextobj_pairs", value);
+    // todo let
+    VariableService.INSTANCE
+      .storeVariable(new Variable(Scope.GLOBAL_VARIABLE, "argtextobj_pairs"), new VimString(value), null, null,
+                     new VimContext());
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
