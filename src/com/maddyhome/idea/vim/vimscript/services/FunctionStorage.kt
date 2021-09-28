@@ -28,16 +28,14 @@ import com.maddyhome.idea.vim.vimscript.model.functions.FunctionBeanClass
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 
-// todo create DeclaredFunction to replace DefinedFunctionHandler(functionDefinition)
-// todo lots of refactoring
 object FunctionStorage {
 
   private val logger = logger<FunctionStorage>()
 
-  private val globalFunctionHandlers: MutableMap<String, FunctionHandler> = mutableMapOf()
+  private val globalFunctions: MutableMap<String, FunctionDeclaration> = mutableMapOf()
 
   private val extensionPoint = ExtensionPointName.create<FunctionBeanClass>("IdeaVIM.vimLibraryFunction")
-  private val builtInFunctionHandlers: MutableMap<String, FunctionHandler> = mutableMapOf()
+  private val builtInFunctions: MutableMap<String, FunctionHandler> = mutableMapOf()
 
   fun deleteFunction(name: String, scope: Scope? = null, parent: Executable) {
     if (name[0].isLowerCase() && scope != Scope.SCRIPT_VARIABLE) {
@@ -47,8 +45,8 @@ object FunctionStorage {
     if (scope != null)
       when (scope) {
         Scope.GLOBAL_VARIABLE -> {
-          if (globalFunctionHandlers.containsKey(name)) {
-            globalFunctionHandlers.remove(name)
+          if (globalFunctions.containsKey(name)) {
+            globalFunctions.remove(name)
             return
           } else {
             throw ExException("E130: Unknown function: ${scope.c}:$name")
@@ -65,8 +63,8 @@ object FunctionStorage {
         else -> throw ExException("E130: Unknown function: ${scope.c}:$name")
       }
 
-    if (globalFunctionHandlers.containsKey(name)) {
-      globalFunctionHandlers.remove(name)
+    if (globalFunctions.containsKey(name)) {
+      globalFunctions.remove(name)
       return
     }
     if (getScriptFunction(name, parent) != null) {
@@ -80,56 +78,61 @@ object FunctionStorage {
     val scope: Scope = declaration.scope ?: getDefaultFunctionScope()
     when (scope) {
       Scope.GLOBAL_VARIABLE -> {
-        if (globalFunctionHandlers.containsKey(declaration.name) && !declaration.replaceExisting) {
+        if (globalFunctions.containsKey(declaration.name) && !declaration.replaceExisting) {
           throw ExException("E122: Function ${declaration.name} already exists, add ! to replace it")
         } else {
-          globalFunctionHandlers[declaration.name] = DefinedFunctionHandler(declaration)
+          globalFunctions[declaration.name] = declaration
         }
       }
       Scope.SCRIPT_VARIABLE -> {
         if (getScriptFunction(declaration.name, declaration) != null && !declaration.replaceExisting) {
           throw ExException("E122: Function ${declaration.name} already exists, add ! to replace it")
         } else {
-          storeScriptFunction(declaration.name, DefinedFunctionHandler(declaration), declaration)
+          storeScriptFunction(declaration)
         }
       }
       else -> throw ExException("E884: Function name cannot contain a colon: ${scope.c}:${declaration.name}")
     }
   }
 
-  fun getFunctionHandler(name: String, scope: Scope? = null, parent: Executable):
-    FunctionHandler {
-    if (builtInFunctionHandlers.containsKey(name)) {
-      return builtInFunctionHandlers[name]!!
-    }
-
-    if (scope != null)
-      return when (scope) {
-        Scope.GLOBAL_VARIABLE -> {
-          if (globalFunctionHandlers.containsKey(name)) {
-            globalFunctionHandlers[name]!!
-          } else {
-            throw ExException("E117: Unknown function: ${scope.c}:$name")
-          }
-        }
-        Scope.SCRIPT_VARIABLE -> {
-          getScriptFunction(name, parent) ?: throw ExException("E117: Unknown function: ${scope.c}:$name")
-        }
-        else -> throw ExException("E117: Unknown function: ${scope.c}:$name")
-      }
-
-    if (globalFunctionHandlers.containsKey(name)) {
-      return globalFunctionHandlers[name]!!
-    }
-    val scriptFunctionHandler = getScriptFunction(name, parent)
-    if (scriptFunctionHandler != null) {
-      return scriptFunctionHandler
-    }
-    throw ExException("E117: Unknown function: $name")
+  fun getFunctionHandler(scope: Scope?, name: String, parent: Executable): FunctionHandler {
+    return getFunctionHandlerOrNull(scope, name, parent)
+      ?: throw ExException("E117: Unknown function: ${if (scope != null) scope.c + ":" else ""}$name")
   }
 
-  private fun getDefaultFunctionScope(): Scope {
-    return Scope.GLOBAL_VARIABLE // todd what is default scope?..
+  fun getFunctionHandlerOrNull(scope: Scope?, name: String, parent: Executable): FunctionHandler? {
+    val builtInFunction = getBuiltInFunction(name)
+    if (builtInFunction != null) {
+      return builtInFunction
+    }
+    val definedFunction = getUserDefinedFunction(scope, name, parent)
+    if (definedFunction != null) {
+      return DefinedFunctionHandler(definedFunction)
+    }
+    return null
+  }
+
+  fun getUserDefinedFunction(scope: Scope?, name: String, parent: Executable): FunctionDeclaration? {
+    return when (scope) {
+      Scope.GLOBAL_VARIABLE -> globalFunctions[name]
+      Scope.SCRIPT_VARIABLE -> getScriptFunction(name, parent)
+      null -> globalFunctions[name] ?: getScriptFunction(name, parent)
+      else -> null
+    }
+  }
+
+  fun getBuiltInFunction(name: String): FunctionHandler? {
+    return builtInFunctions[name]
+  }
+
+  private fun storeScriptFunction(functionDeclaration: FunctionDeclaration) {
+    val script = functionDeclaration.getScript()
+    script.scriptFunctions[functionDeclaration.name] = functionDeclaration
+  }
+
+  private fun getScriptFunction(name: String, parent: Executable): FunctionDeclaration? {
+    val script = parent.getScript()
+    return script.scriptFunctions[name]
   }
 
   private fun deleteScriptFunction(name: String, parent: Executable) {
@@ -137,14 +140,8 @@ object FunctionStorage {
     script.scriptFunctions.remove(name)
   }
 
-  private fun getScriptFunction(name: String, parent: Executable): FunctionHandler? {
-    val script = parent.getScript()
-    return script.scriptFunctions[name]
-  }
-
-  private fun storeScriptFunction(name: String, value: FunctionHandler, parent: Executable) {
-    val script = parent.getScript()
-    script.scriptFunctions[name] = value
+  private fun getDefaultFunctionScope(): Scope {
+    return Scope.GLOBAL_VARIABLE
   }
 
   fun registerHandlers() {
@@ -153,7 +150,7 @@ object FunctionStorage {
 
   fun addHandler(handlerHolder: FunctionBeanClass) {
     if (handlerHolder.name != null) {
-      builtInFunctionHandlers[handlerHolder.name!!] = handlerHolder.instance
+      builtInFunctions[handlerHolder.name!!] = handlerHolder.instance
     } else {
       logger.error("Received function handler with null name")
     }

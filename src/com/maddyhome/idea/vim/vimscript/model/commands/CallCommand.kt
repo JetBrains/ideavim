@@ -33,7 +33,7 @@ class CallCommand(val ranges: Ranges, val functionCall: FunctionCallExpression) 
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
-    val function = FunctionStorage.getFunctionHandler(functionCall.functionName, functionCall.scope, this)
+    val function = FunctionStorage.getFunctionHandler(functionCall.scope, functionCall.functionName, parent)
     function.ranges = ranges
     function.executeFunction(functionCall, editor, context, this)
     return ExecutionResult.Success

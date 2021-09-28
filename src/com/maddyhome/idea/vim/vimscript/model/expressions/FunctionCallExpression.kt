@@ -10,7 +10,7 @@ data class FunctionCallExpression(val scope: Scope?, val functionName: String, v
   Expression() {
 
   override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
-    val handler = FunctionStorage.getFunctionHandler(functionName, scope = scope, parent)
+    val handler = FunctionStorage.getFunctionHandler(scope, functionName, parent)
     return handler.executeFunction(this, editor, context, parent)
   }
 }
