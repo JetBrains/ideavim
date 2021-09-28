@@ -25,7 +25,8 @@ import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import java.util.*
 
-sealed class Command(var commandRanges: Ranges, val commandArgument: String) : Executable() {
+sealed class Command(var commandRanges: Ranges, val commandArgument: String) : Executable {
+  override lateinit var parent: Executable
 
   abstract val argFlags: CommandHandlerFlags
   protected open val optFlags: EnumSet<CommandFlags> = noneOfEnum()

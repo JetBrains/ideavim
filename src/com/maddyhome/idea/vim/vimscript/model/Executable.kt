@@ -5,17 +5,11 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
-abstract class Executable {
+interface Executable {
 
-  var parent: Executable? = null
-    get() {
-      if (field == null && field !is Script) {
-        throw RuntimeException("Object of ${this::class.java} class has no parent")
-      }
-      return field
-    }
+  var parent: Executable
 
-  abstract fun execute(editor: Editor, context: DataContext): ExecutionResult
+  fun execute(editor: Editor, context: DataContext): ExecutionResult
 
   fun getContext(): ExecutableContext {
     var node: Executable? = this

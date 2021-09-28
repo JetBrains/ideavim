@@ -17,7 +17,8 @@ data class FunctionDeclaration(
   val replaceExisting: Boolean,
   val flags: Set<FunctionFlag>,
   val hasOptionalArguments: Boolean,
-) : Executable() {
+) : Executable {
+  override lateinit var parent: Executable
 
   /**
    * we store the "a:" and "l:" scope variables here

@@ -12,7 +12,8 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 
-data class ForLoop(val variable: String, val iterable: Expression, val body: List<Executable>) : Executable() {
+data class ForLoop(val variable: String, val iterable: Expression, val body: List<Executable>) : Executable {
+  override lateinit var parent: Executable
 
   // todo refactoring
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {

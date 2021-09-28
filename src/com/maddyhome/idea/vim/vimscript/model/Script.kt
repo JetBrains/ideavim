@@ -5,7 +5,8 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
-data class Script(val units: List<Executable>) : Executable() {
+data class Script(val units: List<Executable>) : Executable {
+  override lateinit var parent: Executable
 
   /**
    * we store the "s:" scope variables and functions here
