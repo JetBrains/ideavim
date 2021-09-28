@@ -298,7 +298,6 @@ object VimListenerManager {
     private fun clearFirstSelectionEvents(e: EditorMouseEvent) {
       if (skipNDragEvents > 0) {
         logger.debug("Mouse dragging")
-        SelectionVimListenerSuppressor.lock()
         VimVisualTimer.swingTimer?.stop()
         mouseDragging = true
         val caret = e.editor.caretModel.primaryCaret
@@ -317,15 +316,26 @@ object VimListenerManager {
       return caret.offset == lineEnd && lineEnd != lineStart && caret.offset - 1 == caret.selectionStart && caret.offset == caret.selectionEnd
     }
 
+    override fun mousePressed(event: EditorMouseEvent) {
+      if (event.editor.isIdeaVimDisabledHere) return
+
+      // Contract: Single execution of this method on mousePressed
+      SelectionVimListenerSuppressor.lock()
+    }
+
     override fun mouseReleased(event: EditorMouseEvent) {
       if (event.editor.isIdeaVimDisabledHere) return
+
+      // Contract: Single execution of this method on mouseReleased
+      SelectionVimListenerSuppressor.unlock()
+
       clearFirstSelectionEvents(event)
       skipNDragEvents = skipEvents
       if (mouseDragging) {
         logger.debug("Release mouse after dragging")
         val editor = event.editor
         val caret = editor.caretModel.primaryCaret
-        SelectionVimListenerSuppressor.unlock {
+        SelectionVimListenerSuppressor.lock().use {
           val predictedMode = IdeaSelectionControl.predictMode(editor, SelectionSource.MOUSE)
           IdeaSelectionControl.controlNonVimSelectionChange(editor, SelectionSource.MOUSE)
           moveCaretOneCharLeftFromSelectionEnd(editor, predictedMode)

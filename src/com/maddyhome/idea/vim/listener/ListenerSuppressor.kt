@@ -66,16 +66,8 @@ sealed class VimListenerSuppressor {
     return Locked()
   }
 
-  fun unlock(action: (() -> Unit)? = null) {
-    if (action != null) {
-      try {
-        action()
-      } finally {
-        caretListenerSuppressor--
-      }
-    } else {
-      caretListenerSuppressor--
-    }
+  fun unlock() {
+    caretListenerSuppressor--
   }
 
   val isNotLocked: Boolean
