@@ -21,7 +21,6 @@ package ui.utils
 import com.intellij.remoterobot.RemoteRobot
 import com.intellij.remoterobot.fixtures.Fixture
 import com.intellij.remoterobot.fixtures.dataExtractor.RemoteText
-import com.intellij.remoterobot.utils.waitFor
 import org.assertj.swing.core.MouseButton
 import ui.pages.Editor
 import java.awt.Point
@@ -44,9 +43,9 @@ fun RemoteText.moveMouseTo(goal: RemoteText, editor: Editor): Boolean {
   this.moveMouse()
   editor.runJs("robot.pressMouse(MouseButton.LEFT_BUTTON)")
   goal.moveMouse()
-  val caretDuringDragging = editor.isBlockCursor
+  val caretDuringDragging = false/*editor.isBlockCursor*/
   editor.runJs("robot.releaseMouse(MouseButton.LEFT_BUTTON)")
-  waitFor { editor.isBlockCursor }
+//  waitFor { editor.isBlockCursor }
   return caretDuringDragging
 }
 
@@ -55,9 +54,9 @@ fun RemoteText.moveMouseWithDelayTo(goal: RemoteText, editor: Editor, delay: Lon
   editor.runJs("robot.pressMouse(MouseButton.LEFT_BUTTON)")
   goal.moveMouse()
   Thread.sleep(delay)
-  val caretDuringDragging = editor.isBlockCursor
+  val caretDuringDragging = false/*editor.isBlockCursor*/
   editor.runJs("robot.releaseMouse(MouseButton.LEFT_BUTTON)")
-  waitFor { editor.isBlockCursor }
+//  waitFor { editor.isBlockCursor }
   return caretDuringDragging
 }
 
@@ -104,7 +103,7 @@ fun RemoteText.moveMouseForthAndBack(middle: RemoteText, editor: Editor) {
     })
     """
   )
-  waitFor { editor.isBlockCursor }
+//  waitFor { editor.isBlockCursor }
 }
 
 fun String.escape(): String = this.replace("\n", "\\n")

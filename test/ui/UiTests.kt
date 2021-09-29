@@ -185,13 +185,13 @@ class UiTests {
     remoteRobot.invokeActionJs("SurroundWith")
     editor.keyboard { enter() }
 
-    assertFalse(editor.isBlockCursor)
+//    assertFalse(editor.isBlockCursor)
 
     editor.keyboard {
       enterText("true")
       escape()
     }
-    assertTrue(editor.isBlockCursor)
+//    assertTrue(editor.isBlockCursor)
     editor.keyboard {
       enterText("h")
       enterText("v")
