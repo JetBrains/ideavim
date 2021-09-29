@@ -50,6 +50,17 @@ fun RemoteText.moveMouseTo(goal: RemoteText, editor: Editor): Boolean {
   return caretDuringDragging
 }
 
+fun RemoteText.moveMouseWithDelayTo(goal: RemoteText, editor: Editor, delay: Long = 1000): Boolean {
+  this.moveMouse()
+  editor.runJs("robot.pressMouse(MouseButton.LEFT_BUTTON)")
+  goal.moveMouse()
+  Thread.sleep(delay)
+  val caretDuringDragging = editor.isBlockCursor
+  editor.runJs("robot.releaseMouse(MouseButton.LEFT_BUTTON)")
+  waitFor { editor.isBlockCursor }
+  return caretDuringDragging
+}
+
 fun RemoteText.moveMouseInGutterTo(goal: RemoteText, fixture: Fixture) {
   this.moveMouse()
   val goalPoint = goal.point

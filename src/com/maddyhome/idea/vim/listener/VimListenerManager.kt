@@ -356,11 +356,23 @@ object VimListenerManager {
       return caret.offset == lineEnd && lineEnd != lineStart && caret.offset - 1 == caret.selectionStart && caret.offset == caret.selectionEnd
     }
 
-    // Note that the MacBook's trackpad has a small delay before mouseReleased is received, presumably to allow
-    // repositioning fingers to continue a drag operation. This can cause confusion when observing some of the effects
-    // in this handler!
+    override fun mousePressed(event: EditorMouseEvent) {
+      if (event.editor.isIdeaVimDisabledHere) return
+
+      SelectionVimListenerSuppressor.reset()
+      SelectionVimListenerSuppressor.lock()
+    }
+
+    /**
+     * This method may not be called
+     * Known cases:
+     * - Click-hold and close editor (ctrl-w)
+     * - Click-hold and switch editor (ctrl-tab)
+     */
     override fun mouseReleased(event: EditorMouseEvent) {
       if (event.editor.isIdeaVimDisabledHere) return
+
+      SelectionVimListenerSuppressor.unlock()
 
       clearFirstSelectionEvents(event)
       skipNDragEvents = skipEvents

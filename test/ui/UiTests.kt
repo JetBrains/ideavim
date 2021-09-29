@@ -42,6 +42,7 @@ import ui.utils.invokeActionJs
 import ui.utils.moveMouseForthAndBack
 import ui.utils.moveMouseInGutterTo
 import ui.utils.moveMouseTo
+import ui.utils.moveMouseWithDelayTo
 import ui.utils.tripleClickOnRight
 import ui.utils.uiTest
 import ui.utils.vimExit
@@ -80,6 +81,7 @@ class UiTests {
         }
       }
 
+      testSelectTextWithDelay(editor)
       testExtendSelection(editor)
       testLargerDragSelection(editor)
       testSelectLastCharacter(editor)
@@ -321,6 +323,24 @@ class UiTests {
     }
 
     assertEquals("ne", editor.selectedText)
+
+    vimExit()
+  }
+
+  private fun ContainerFixture.testSelectTextWithDelay(editor: Editor) {
+    println("Run testSelectTextUsingMouse...")
+    val from = editor.findText("One")
+    val to = editor.findText("Four")
+
+    val caretIsBlockWhileDragging = from.moveMouseWithDelayTo(to, editor)
+    assertFalse(caretIsBlockWhileDragging)
+
+    Thread.sleep(1000)
+
+    assertEquals("One Two\nThree ", editor.selectedText)
+
+    keyboard { enterText("l") }
+    assertEquals("One Two\nThree F", editor.selectedText)
 
     vimExit()
   }
