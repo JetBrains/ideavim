@@ -68,8 +68,12 @@ sealed class VimListenerSuppressor {
 
   // Please try not to use lock/unlock without scoping
   // Prefer try-with-resources
-  private fun unlock() {
+  fun unlock() {
     caretListenerSuppressor--
+  }
+
+  fun reset() {
+    caretListenerSuppressor = 0
   }
 
   val isNotLocked: Boolean

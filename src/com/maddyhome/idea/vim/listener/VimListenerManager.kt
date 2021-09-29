@@ -318,8 +318,23 @@ object VimListenerManager {
       return caret.offset == lineEnd && lineEnd != lineStart && caret.offset - 1 == caret.selectionStart && caret.offset == caret.selectionEnd
     }
 
+    override fun mousePressed(event: EditorMouseEvent) {
+      if (event.editor.isIdeaVimDisabledHere) return
+
+      SelectionVimListenerSuppressor.reset()
+      SelectionVimListenerSuppressor.lock()
+    }
+
+    /**
+     * This method may not be called
+     * Known cases:
+     * - Click-hold and close editor (ctrl-w)
+     * - Click-hold and switch editor (ctrl-tab)
+     */
     override fun mouseReleased(event: EditorMouseEvent) {
       if (event.editor.isIdeaVimDisabledHere) return
+
+      SelectionVimListenerSuppressor.unlock()
 
       clearFirstSelectionEvents(event)
       skipNDragEvents = skipEvents
