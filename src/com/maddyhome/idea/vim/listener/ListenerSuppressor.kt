@@ -33,15 +33,15 @@ import java.io.Closeable
  *
  *  Locks can be nested:
  * ```
- *      CaretVimListenerSuppressor.lock()
- *      moveCaret(caret) // vim's caret listener will not be executed
- *      CaretVimListenerSuppressor.unlock()
+ * CaretVimListenerSuppressor.lock()
+ * moveCaret(caret) // vim's caret listener will not be executed
+ * CaretVimListenerSuppressor.unlock()
  *
- *  fun moveCaret(caret: Caret) {
- *      CaretVimListenerSuppressor.lock()
- *      caret.moveToOffset(10)
- *      CaretVimListenerSuppressor.unlock()
- *  }
+ * fun moveCaret(caret: Caret) {
+ *     CaretVimListenerSuppressor.lock()
+ *     caret.moveToOffset(10)
+ *     CaretVimListenerSuppressor.unlock()
+ * }
  * ```
  *
  * [Locked] implements [Closeable], so you can use try-with-resources block
@@ -66,16 +66,10 @@ sealed class VimListenerSuppressor {
     return Locked()
   }
 
-  fun unlock(action: (() -> Unit)? = null) {
-    if (action != null) {
-      try {
-        action()
-      } finally {
-        caretListenerSuppressor--
-      }
-    } else {
-      caretListenerSuppressor--
-    }
+  // Please try not to use lock/unlock without scoping
+  // Prefer try-with-resources
+  private fun unlock() {
+    caretListenerSuppressor--
   }
 
   val isNotLocked: Boolean

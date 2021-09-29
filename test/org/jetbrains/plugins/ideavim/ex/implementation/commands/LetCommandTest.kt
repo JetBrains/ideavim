@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -144,5 +145,13 @@ class LetCommandTest : VimTestCase() {
     typeText(commandToKeys("let s = [1, 2, 3] \" my list for storing numbers"))
     typeText(commandToKeys("echo s"))
     assertExOutput("[1, 2, 3]\n")
+  }
+
+  fun `test vimScriptGlobalEnvironment`() {
+    configureByText("\n")
+    typeText(commandToKeys("let g:WhichKey_ShowVimActions = \"true\""))
+    typeText(commandToKeys("echo g:WhichKey_ShowVimActions"))
+    assertExOutput("true\n")
+    assertEquals("true", VimScriptGlobalEnvironment.getInstance().variables["g:WhichKey_ShowVimActions"])
   }
 }

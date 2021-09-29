@@ -80,6 +80,7 @@ class UiTests {
         }
       }
 
+      testExtendSelection(editor)
       testLargerDragSelection(editor)
       testSelectLastCharacter(editor)
       testMicrodragSelection(editor)
@@ -295,6 +296,31 @@ class UiTests {
       enterText("v")
     }
     assertEquals("r", editor.selectedText)
+
+    vimExit()
+  }
+
+  private fun ContainerFixture.testExtendSelection(editor: Editor) {
+    println("Run testExtendSelection...")
+
+    // Preparations
+    val from = editor.findText("One")
+    val to = editor.findText("Four")
+    from.moveMouseTo(to, editor)
+    vimExit()
+
+    keyboard {
+      enterText(":action EditorSelectWord")
+      enter()
+    }
+
+    assertEquals("One", editor.selectedText)
+
+    keyboard {
+      enterText("l")
+    }
+
+    assertEquals("ne", editor.selectedText)
 
     vimExit()
   }

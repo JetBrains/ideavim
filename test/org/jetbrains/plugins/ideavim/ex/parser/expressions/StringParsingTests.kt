@@ -55,4 +55,16 @@ class StringParsingTests {
       VimscriptParser.parseExpression("'oh, hi ''Mark'''")!!.evaluate()
     )
   }
+
+  @Test
+  fun `single quoted string inside a double quoted string`() {
+    assertEquals(
+      VimString(" :echo \"no mapping for 45\"<CR>"),
+      VimscriptParser.parseExpression(
+        """
+         ' :echo "no mapping for ' . 45 . '"<CR>'
+        """.trimIndent()
+      )!!.evaluate()
+    )
+  }
 }

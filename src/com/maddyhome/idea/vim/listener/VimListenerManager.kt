@@ -336,15 +336,15 @@ object VimListenerManager {
     private fun clearFirstSelectionEvents(e: EditorMouseEvent) {
       if (skipNDragEvents > 0) {
         logger.debug("Mouse dragging")
-
-        SelectionVimListenerSuppressor.lock()
         VimVisualTimer.swingTimer?.stop()
         mouseDragging = true
 
         val caret = e.editor.caretModel.primaryCaret
         if (onLineEnd(caret)) {
-          caret.removeSelection()
-          caret.forceBarCursor()
+          SelectionVimListenerSuppressor.lock().use {
+            caret.removeSelection()
+            caret.forceBarCursor()
+          }
         }
       }
     }
@@ -361,13 +361,14 @@ object VimListenerManager {
     // in this handler!
     override fun mouseReleased(event: EditorMouseEvent) {
       if (event.editor.isIdeaVimDisabledHere) return
+
       clearFirstSelectionEvents(event)
       skipNDragEvents = skipEvents
       if (mouseDragging) {
         logger.debug("Release mouse after dragging")
         val editor = event.editor
         val caret = editor.caretModel.primaryCaret
-        SelectionVimListenerSuppressor.unlock {
+        SelectionVimListenerSuppressor.lock().use {
           val predictedMode = IdeaSelectionControl.predictMode(editor, SelectionSource.MOUSE)
           IdeaSelectionControl.controlNonVimSelectionChange(editor, SelectionSource.MOUSE)
           // TODO: This should only be for 'selection'=inclusive
