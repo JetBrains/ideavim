@@ -303,8 +303,10 @@ object VimListenerManager {
         val caret = e.editor.caretModel.primaryCaret
         if (onLineEnd(caret)) {
           // UX protection for case when user performs a small dragging while putting caret on line end
-          caret.removeSelection()
-          ChangeGroup.resetCaret(e.editor, true)
+          SelectionVimListenerSuppressor.lock().use {
+            caret.removeSelection()
+            ChangeGroup.resetCaret(e.editor, true)
+          }
         }
       }
     }
@@ -316,18 +318,8 @@ object VimListenerManager {
       return caret.offset == lineEnd && lineEnd != lineStart && caret.offset - 1 == caret.selectionStart && caret.offset == caret.selectionEnd
     }
 
-    override fun mousePressed(event: EditorMouseEvent) {
-      if (event.editor.isIdeaVimDisabledHere) return
-
-      // Contract: Single execution of this method on mousePressed
-      SelectionVimListenerSuppressor.lock()
-    }
-
     override fun mouseReleased(event: EditorMouseEvent) {
       if (event.editor.isIdeaVimDisabledHere) return
-
-      // Contract: Single execution of this method on mouseReleased
-      SelectionVimListenerSuppressor.unlock()
 
       clearFirstSelectionEvents(event)
       skipNDragEvents = skipEvents
