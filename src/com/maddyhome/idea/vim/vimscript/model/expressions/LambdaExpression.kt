@@ -1,0 +1,54 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2021 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.maddyhome.idea.vim.vimscript.model.expressions
+
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
+import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOperator
+import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
+import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
+import com.maddyhome.idea.vim.vimscript.model.statements.ReturnStatement
+
+data class LambdaExpression(val args: List<String>, val expr: Expression) : Expression() {
+
+  override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimFuncref {
+    val function = FunctionDeclaration(null, getFunctionName(), args, buildBody(), false, setOf(FunctionFlag.CLOSURE), false)
+    function.parent = parent
+    return VimFuncref(function, VimList(mutableListOf()), VimDictionary(LinkedHashMap()), VimFuncref.Type.LAMBDA, false)
+  }
+
+  private fun getFunctionName(): String {
+    return "<lambda>" + VimFuncref.lambdaCounter++
+  }
+
+  private fun buildBody(): List<Executable> {
+    val body = mutableListOf<Executable>()
+    for (argument in args) {
+      body.add(LetCommand(Ranges(), Variable(Scope.LOCAL_VARIABLE, argument), AssignmentOperator.ASSIGNMENT, Variable(Scope.FUNCTION_VARIABLE, argument)))
+    }
+    body.add(ReturnStatement(expr))
+    return body
+  }
+}

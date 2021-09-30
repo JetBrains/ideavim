@@ -197,9 +197,24 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     if (ctx.functionScope() != null) {
       scope = Scope.getByValue(ctx.functionScope().text)
     }
-    val functionArguments = ctx.functionArguments().expr()
-      .mapNotNull { visit(it) }
+    val functionArguments = ctx.functionArguments().expr().mapNotNull { visit(it) }.toMutableList()
     return FunctionCallExpression(scope, functionName, functionArguments)
+  }
+
+  override fun visitLambdaFunctionCallExpression(ctx: VimscriptParser.LambdaFunctionCallExpressionContext): LambdaFunctionCallExpression {
+    val lambda = visitLambda(ctx.lambda())
+    val arguments = ctx.functionArguments().expr().mapNotNull { visit(it) }
+    return LambdaFunctionCallExpression(lambda, arguments)
+  }
+
+  override fun visitLambdaExpression(ctx: VimscriptParser.LambdaExpressionContext?): Expression {
+    return super.visitLambdaExpression(ctx)
+  }
+
+  override fun visitLambda(ctx: VimscriptParser.LambdaContext): LambdaExpression {
+    val arguments = ctx.argumentsDeclaration().variableName().map { it.text }
+    val expr = visit(ctx.expr())
+    return LambdaExpression(arguments, expr)
   }
 
   override fun visitSublistExpression(ctx: SublistExpressionContext): Expression {

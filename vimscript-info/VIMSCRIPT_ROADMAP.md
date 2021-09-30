@@ -23,7 +23,7 @@
 - [x] `call` command
 - [x] optional arguments `...`
 - [x] funcref type
-- [ ] lambdas
+- [x] lambdas
 - [ ] function as method
 - [ ] `function` function
 - [ ] `funcref` function

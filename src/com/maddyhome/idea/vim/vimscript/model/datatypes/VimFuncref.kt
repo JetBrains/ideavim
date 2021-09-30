@@ -50,7 +50,7 @@ data class VimFuncref(
 
   override fun toString(): String {
     return when (type) {
-      Type.LAMBDA -> "function('<lambda>${this.definition.name}')"
+      Type.LAMBDA -> "function('${this.definition.name}')"
       Type.FUNCREF -> "function('${this.definition.name}')"
       Type.FUNCTION -> this.definition.name
     }
