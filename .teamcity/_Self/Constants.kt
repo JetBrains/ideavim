@@ -5,7 +5,7 @@ object Constants {
   const val EAP = "eap"
   const val DEV = "Dev"
 
-  const val VERSION = "1.7.1"
+  const val VERSION = "1.7.2"
   const val DEV_VERSION = "1.8.0"
 
   const val GITHUB_TESTS = "LATEST-EAP-SNAPSHOT"

@@ -23,7 +23,8 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-## To Be Released
+## 1.7.2, 2021-09-30
+
 ### Fixes:
 * [VIM-2405](https://youtrack.jetbrains.com/issue/VIM-2405) ExExceptions during `map <expr>` execution are now displayed in status bar
 * [VIM-2406](https://youtrack.jetbrains.com/issue/VIM-2406) Fix go to line command 
