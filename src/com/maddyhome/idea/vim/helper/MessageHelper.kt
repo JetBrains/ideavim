@@ -18,14 +18,14 @@
 
 package com.maddyhome.idea.vim.helper
 
-import com.intellij.AbstractBundle
+import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 @NonNls
 private const val BUNDLE = "messages.IdeaVimBundle"
 
-object MessageHelper : AbstractBundle(BUNDLE) {
+object MessageHelper : DynamicBundle(BUNDLE) {
 
   @JvmStatic
   fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any) = getMessage(key, *params)
