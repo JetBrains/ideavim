@@ -24,7 +24,7 @@ plugins {
     java
     kotlin("jvm") version "1.5.0"
 
-    id("org.jetbrains.intellij") version "1.0"
+    id("org.jetbrains.intellij") version "1.2.0"
     id("org.jetbrains.changelog") version "1.2.0"
 
     // ktlint linter - read more: https://github.com/JLLeitschuh/ktlint-gradle
@@ -143,7 +143,6 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(listOf("IC-2020.2.3", "IC-2020.3.2", "IC-2021.1"))
         downloadDir.set("${project.buildDir}/pluginVerifier/ides")
         teamCityOutputFormat.set(true)
     }
