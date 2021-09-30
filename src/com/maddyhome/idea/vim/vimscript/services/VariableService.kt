@@ -25,10 +25,12 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutableContext
+import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -142,7 +144,12 @@ object VariableService {
           break
         }
       }
-      node = node.parent
+      // todo better parent logic
+      node = if (node is Script) {
+        null
+      } else {
+        node.parent
+      }
     }
 
     visibleVariables.reverse()
@@ -163,7 +170,12 @@ object VariableService {
           break
         }
       }
-      node = node.parent
+      // todo better parent logic
+      node = if (node is Script) {
+        null
+      } else {
+        node.parent
+      }
     }
 
     visibleVariables.reverse()
@@ -225,7 +237,8 @@ object VariableService {
       is VimFloat -> this.value
       is VimList -> this.values
       is VimDictionary -> this.dictionary
-      is VimBlob -> throw NotImplementedError("Blobs are not implemented yet :(")
+      is VimBlob -> "blob"
+      is VimFuncref -> "funcref"
     }
   }
 }

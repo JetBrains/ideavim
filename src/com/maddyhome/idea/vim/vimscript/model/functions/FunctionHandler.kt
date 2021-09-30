@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
 
 abstract class FunctionHandler {
 
@@ -35,19 +34,19 @@ abstract class FunctionHandler {
 
   protected abstract fun doFunction(argumentValues: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType
 
-  fun executeFunction(functionCall: FunctionCallExpression, editor: Editor, context: DataContext, parent: Executable): VimDataType {
-    checkFunctionCall(functionCall)
-    val result = doFunction(functionCall.arguments, editor, context, parent)
+  fun executeFunction(name: String, arguments: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType {
+    checkFunctionCall(name, arguments)
+    val result = doFunction(arguments, editor, context, parent)
     ranges = null
     return result
   }
 
-  private fun checkFunctionCall(functionCall: FunctionCallExpression) {
-    if (minimumNumberOfArguments != null && functionCall.arguments.size < minimumNumberOfArguments!!) {
-      throw ExException("E119: Not enough arguments for function: ${functionCall.functionName}")
+  private fun checkFunctionCall(name: String, arguments: List<Expression>) {
+    if (minimumNumberOfArguments != null && arguments.size < minimumNumberOfArguments!!) {
+      throw ExException("E119: Not enough arguments for function: $name")
     }
-    if (maximumNumberOfArguments != null && functionCall.arguments.size > maximumNumberOfArguments!!) {
-      throw ExException("E118: Too many arguments for function: ${functionCall.functionName}")
+    if (maximumNumberOfArguments != null && arguments.size > maximumNumberOfArguments!!) {
+      throw ExException("E118: Too many arguments for function: $name")
     }
   }
 }

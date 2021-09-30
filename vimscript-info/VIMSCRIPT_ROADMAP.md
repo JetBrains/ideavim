@@ -21,14 +21,16 @@
 - [x] `abort` function flag  
 - [x] `range` function flag  
 - [x] `call` command
-- [ ] function as method
 - [x] optional arguments `...`
-- [ ] funcref type
+- [x] funcref type
 - [ ] lambdas
-- [ ] default value in functions e.g. `function F1(a, b = 10)`
+- [ ] function as method
+- [ ] `function` function
+- [ ] `funcref` function
 - [ ] dictionary functions  
 - [ ] anonymous functions  
 - [ ] `dict` function flag
+- [ ] default value in functions e.g. `function F1(a, b = 10)`
 - [ ] pass Lists and Dictionaries by reference  
 - [ ] variable locking (`lock`, `unlock`, `const`)  
 - [ ] rewrite OptionManager to vim data types  
@@ -50,6 +52,7 @@
 - [ ] delayed parsing of if/for/while etc.  
 - [ ] `has("ide")` or "ide" option  
 - [ ] `normal` command  
+- [ ] `finish` statement
 - [ ] context dependent parsing e.g. `dict.key`  
 - [ ] improve `w:` and `t:` scopes  
 - [ ] `v:` scope  

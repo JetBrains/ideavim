@@ -20,10 +20,14 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
+import com.maddyhome.idea.vim.vimscript.services.VariableService
 
 /**
  * see "h :call"
@@ -33,9 +37,19 @@ class CallCommand(val ranges: Ranges, val functionCall: FunctionCallExpression) 
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
 
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
-    val function = FunctionStorage.getFunctionHandler(functionCall.scope, functionCall.functionName, parent)
-    function.ranges = ranges
-    function.executeFunction(functionCall, editor, context, this)
-    return ExecutionResult.Success
+    val function = FunctionStorage.getFunctionHandlerOrNull(functionCall.scope, functionCall.functionName, parent)
+    if (function != null) {
+      function.ranges = ranges
+      function.executeFunction(functionCall.functionName, functionCall.arguments, editor, context, this)
+      return ExecutionResult.Success
+    }
+
+    val funcref = VariableService.getNullableVariableValue(Variable(functionCall.scope, functionCall.functionName), editor, context, parent)
+    if (funcref is VimFuncref) {
+      funcref.execute(functionCall.arguments, editor, context, parent)
+      return ExecutionResult.Success
+    }
+
+    throw ExException("E117: Unknown function: ${if (functionCall.scope != null) functionCall.scope.c + ":" else ""}${functionCall.functionName}")
   }
 }
