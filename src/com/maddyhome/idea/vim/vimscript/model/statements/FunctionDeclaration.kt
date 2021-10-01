@@ -19,6 +19,7 @@ data class FunctionDeclaration(
   val hasOptionalArguments: Boolean,
 ) : Executable {
   override lateinit var parent: Executable
+  var isDeleted = false
 
   /**
    * we store the "a:" and "l:" scope variables here

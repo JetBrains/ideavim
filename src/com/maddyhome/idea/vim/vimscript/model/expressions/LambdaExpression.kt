@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOperator
+import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.model.statements.ReturnStatement
@@ -36,7 +37,7 @@ data class LambdaExpression(val args: List<String>, val expr: Expression) : Expr
   override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimFuncref {
     val function = FunctionDeclaration(null, getFunctionName(), args, buildBody(), false, setOf(FunctionFlag.CLOSURE), false)
     function.parent = parent
-    return VimFuncref(function, VimList(mutableListOf()), VimDictionary(LinkedHashMap()), VimFuncref.Type.LAMBDA, false)
+    return VimFuncref(DefinedFunctionHandler(function), VimList(mutableListOf()), VimDictionary(LinkedHashMap()), VimFuncref.Type.LAMBDA)
   }
 
   private fun getFunctionName(): String {

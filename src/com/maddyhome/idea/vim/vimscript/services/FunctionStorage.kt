@@ -46,6 +46,7 @@ object FunctionStorage {
       when (scope) {
         Scope.GLOBAL_VARIABLE -> {
           if (globalFunctions.containsKey(name)) {
+            globalFunctions[name]!!.isDeleted = true
             globalFunctions.remove(name)
             return
           } else {
@@ -64,6 +65,7 @@ object FunctionStorage {
       }
 
     if (globalFunctions.containsKey(name)) {
+      globalFunctions[name]!!.isDeleted = true
       globalFunctions.remove(name)
       return
     }
@@ -100,6 +102,7 @@ object FunctionStorage {
       ?: throw ExException("E117: Unknown function: ${if (scope != null) scope.c + ":" else ""}$name")
   }
 
+  // todo g:abs should be unknown function !!!
   fun getFunctionHandlerOrNull(scope: Scope?, name: String, parent: Executable): FunctionHandler? {
     val builtInFunction = getBuiltInFunction(name)
     if (builtInFunction != null) {
@@ -137,6 +140,9 @@ object FunctionStorage {
 
   private fun deleteScriptFunction(name: String, parent: Executable) {
     val script = parent.getScript()
+    if (script.scriptFunctions[name] != null) {
+      script.scriptFunctions[name]!!.isDeleted = true
+    }
     script.scriptFunctions.remove(name)
   }
 

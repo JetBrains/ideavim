@@ -25,15 +25,14 @@ import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
-import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
+import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 
 data class VimFuncref(
-  private val definition: FunctionDeclaration,
+  private val handler: FunctionHandler,
   val arguments: VimList,
   val dictionary: VimDictionary, // todo notice me senpai :(
   val type: Type,
-  val isDeleted: Boolean,
 ) : VimDataType() {
 
   companion object {
@@ -49,10 +48,14 @@ data class VimFuncref(
   }
 
   override fun toString(): String {
-    return when (type) {
-      Type.LAMBDA -> "function('${this.definition.name}')"
-      Type.FUNCREF -> "function('${this.definition.name}')"
-      Type.FUNCTION -> this.definition.name
+    return if (arguments.values.isEmpty()) {
+      when (type) {
+        Type.LAMBDA -> "function('${handler.name}')"
+        Type.FUNCREF -> "function('${handler.name}')"
+        Type.FUNCTION -> handler.name
+      }
+    } else {
+      "function('${handler.name}', $arguments)"
     }
   }
 
@@ -62,17 +65,17 @@ data class VimFuncref(
 
   fun execute(args: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType {
     val allArguments = listOf(this.arguments.values.map { SimpleExpression(it) }, args).flatten()
-      if (isDeleted) {
-        throw ExException("E933: Function was deleted: ${this.definition.name}")
+      if (handler is DefinedFunctionHandler && handler.function.isDeleted) {
+        throw ExException("E933: Function was deleted: ${handler.name}")
       }
-      val definition = when (type) {
-        Type.LAMBDA, Type.FUNCREF -> this.definition
+      val handler = when (type) {
+        Type.LAMBDA, Type.FUNCREF -> this.handler
         Type.FUNCTION -> {
-          FunctionStorage.getUserDefinedFunction(definition.scope, definition.name, parent)
-            ?: throw ExException("E117: Unknown function: ${this.definition.name}")
+          FunctionStorage.getFunctionHandlerOrNull(handler.scope, handler.name, parent)
+            ?: throw ExException("E117: Unknown function: ${handler.name}")
         }
       }
-      return DefinedFunctionHandler(definition).executeFunction(definition.name, allArguments, editor, context, parent)
+      return handler.executeFunction(allArguments, editor, context, parent)
     }
 
     enum class Type {
