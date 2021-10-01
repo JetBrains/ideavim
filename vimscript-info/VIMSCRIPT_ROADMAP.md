@@ -24,7 +24,7 @@
 - [x] optional arguments `...`
 - [x] funcref type
 - [x] lambdas
-- [ ] function as method
+- [x] function as method
 - [ ] `function` function
 - [ ] `funcref` function
 - [ ] dictionary functions  

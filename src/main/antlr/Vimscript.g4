@@ -398,9 +398,6 @@ commandName:
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 expr:                   WS* EXCLAMATION WS* expr                                                                        #UnaryExpression
-                    |   expr WS* ARROW functionName L_PAREN WS* functionArguments WS* R_PAREN                           #FunctionAsMethodCall1
-                    |   expr WS* ARROW lambda L_PAREN WS* functionArguments WS* R_PAREN                                 #FunctionAsMethodCall2
-                    |   lambda                                                                                          #LambdaExpression
                     |   expr L_BRACKET expr R_BRACKET                                                                   #OneElementSublistExpression
                     |   expr L_BRACKET WS* from = expr? WS* COLON WS* to = expr? WS* R_BRACKET                          #SublistExpression
                     |   expr WS* binaryOperator1 WS* expr                                                               #BinExpression1
@@ -409,11 +406,15 @@ expr:                   WS* EXCLAMATION WS* expr                                
                     |   expr WS* binaryOperator4 WS* expr                                                               #BinExpression4
                     |   expr WS* binaryOperator5 WS* expr                                                               #BinExpression5
                     |   WS* unaryOperator = (PLUS | MINUS) WS* expr                                                     #UnaryExpression
+                    |   expr WS* ARROW WS* functionCall                                                                 #FunctionAsMethodCall1
+                    |   expr WS* ARROW WS* lambda L_PAREN WS* functionArguments WS* R_PAREN                             #FunctionAsMethodCall2
+                    |   functionCall                                                                                    #FunctionCallExpression
+                    |   lambda L_PAREN WS* functionArguments WS* R_PAREN                                                #LambdaFunctionCallExpression
+                    |   lambda                                                                                          #LambdaExpression
                     |	unsignedInt                                                                                     #IntExpression
                     |   unsignedFloat                                                                                   #FloatExpression
                     |   string                                                                                          #StringExpression
                     |   blob                                                                                            #BlobExpression
-                    |   functionCall                                                                                    #FunctionCallExpression
                     |   variable                                                                                        #VariableExpression
                     |   option                                                                                          #OptionExpression
                     |   envVariable                                                                                     #EnvVariableExpression
@@ -443,7 +444,7 @@ binaryOperator4:        AMPERSAND AMPERSAND;
 binaryOperator5:        LOGICAL_OR;
 
 register:               AT (DIGIT | alphabeticChar | MINUS | COLON | DOT | MOD | NUM | ASSIGN | STAR | PLUS | TILDE | UNDERSCORE | DIV | AT);
-lambda:                 L_CURLY WS* functionArguments WS* ARROW WS* expr WS* R_CURLY;
+lambda:                 L_CURLY WS* argumentsDeclaration WS* ARROW WS* expr WS* R_CURLY;
 
 variable:               (variableScope COLON)? variableName;
 variableName:           anyCaseNameWithDigitsAndUnderscores | unsignedInt;

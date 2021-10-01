@@ -10,6 +10,8 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FalsyExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaFunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.ListExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OptionExpression
@@ -185,6 +187,19 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     val then = visit(ctx.expr(1))
     val otherwise = visit(ctx.expr(2))
     return TernaryExpression(condition, then, otherwise)
+  }
+
+  override fun visitFunctionAsMethodCall1(ctx: VimscriptParser.FunctionAsMethodCall1Context): FunctionCallExpression {
+    val functionCall = visitFunctionCall(ctx.functionCall())
+    functionCall.arguments.add(0, visit(ctx.expr()))
+    return functionCall
+  }
+
+  override fun visitFunctionAsMethodCall2(ctx: VimscriptParser.FunctionAsMethodCall2Context): LambdaFunctionCallExpression {
+    val lambda = visitLambda(ctx.lambda())
+    val arguments = mutableListOf(visit(ctx.expr()))
+    arguments.addAll(ctx.functionArguments().expr().mapNotNull { visit(it) })
+    return LambdaFunctionCallExpression(lambda, arguments)
   }
 
   override fun visitFunctionCallExpression(ctx: FunctionCallExpressionContext): Expression {
