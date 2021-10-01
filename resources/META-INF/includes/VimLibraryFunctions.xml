@@ -8,5 +8,6 @@
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.ExistsFunctionHandler" name="exists"/>
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.LenFunctionHandler" name="len"/>
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.FunctionFunctionHandler" name="function"/>
+    <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.FuncrefFunctionHandler" name="funcref"/>
   </extensions>
 </idea-plugin>

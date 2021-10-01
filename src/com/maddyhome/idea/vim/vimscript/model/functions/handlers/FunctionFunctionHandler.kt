@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
+import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 
@@ -72,14 +73,58 @@ object FunctionFunctionHandler : FunctionHandler() {
     }
     return VimFuncref(function, arglist ?: VimList(mutableListOf()), dictionary ?: VimDictionary(LinkedHashMap()), VimFuncref.Type.FUNCTION)
   }
+}
 
-  private fun String.extractScopeAndName(): Pair<Scope?, String> {
-    val colonIndex = this.indexOf(":")
-    if (colonIndex == -1) {
-      return Pair(null, this)
+object FuncrefFunctionHandler : FunctionHandler() {
+  override val name = "function"
+  override val minimumNumberOfArguments: Int = 1
+  override val maximumNumberOfArguments: Int = 3
+
+  override fun doFunction(
+    argumentValues: List<Expression>,
+    editor: Editor,
+    context: DataContext,
+    parent: Executable,
+  ): VimFuncref {
+    val arg1 = argumentValues[0].evaluate(editor, context, parent)
+    if (arg1 !is VimString) {
+      throw ExException("E129: Function name required")
     }
-    val scopeString = this.substring(0, colonIndex)
-    val nameString = this.substring(colonIndex + 1)
-    return Pair(Scope.getByValue(scopeString), nameString)
+    val scopeAndName = arg1.value.extractScopeAndName()
+    val function = FunctionStorage.getUserDefinedFunction(scopeAndName.first, scopeAndName.second, parent)
+      ?: throw ExException("E700: Unknown function: ${if (scopeAndName.first != null) scopeAndName.first!!.c + ":" else ""}${scopeAndName.second}")
+    val handler = DefinedFunctionHandler(function)
+
+    var arglist: VimList? = null
+    var dictionary: VimDictionary? = null
+    val arg2 = argumentValues.getOrNull(1)?.evaluate(editor, context, parent)
+    val arg3 = argumentValues.getOrNull(2)?.evaluate(editor, context, parent)
+
+    if (arg2 is VimDictionary && arg3 is VimDictionary) {
+      throw ExException("E923: Second argument of function() must be a list or a dict")
+    }
+
+    if (arg2 != null) {
+      when (arg2) {
+        is VimList -> arglist = arg2
+        is VimDictionary -> dictionary = arg2
+        else -> throw ExException("E923: Second argument of function() must be a list or a dict")
+      }
+    }
+
+    if (arg3 != null && arg3 !is VimDictionary) {
+      throw ExException("E922: expected a dict")
+    }
+    return VimFuncref(handler, arglist ?: VimList(mutableListOf()), dictionary ?: VimDictionary(LinkedHashMap()), VimFuncref.Type.FUNCREF)
   }
+}
+
+private fun String.extractScopeAndName(): Pair<Scope?, String> {
+  val colonIndex = this.indexOf(":")
+  if (colonIndex == -1) {
+    return Pair(null, this)
+  }
+  val scopeString = this.substring(0, colonIndex)
+  val nameString = this.substring(colonIndex + 1)
+  return Pair(Scope.getByValue(scopeString), nameString)
 }
