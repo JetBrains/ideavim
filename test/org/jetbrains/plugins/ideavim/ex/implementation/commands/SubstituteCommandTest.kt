@@ -794,6 +794,17 @@ class SubstituteCommandTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     )
   }
 
+  // VIM-2417
+  @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test bar in subsitute command`() {
+    doTest(
+      "%s/|/\\&",
+      "true | true = true",
+      "true & true = true"
+    )
+  }
+
   // Incsearch highlights handled by SearchGroupTest
 
   private fun doTest(command: String, before: String, after: String) {

@@ -291,7 +291,7 @@ command:
     ws_cols range? ws_cols SOURCE (WS* commandArgument)? (comment | statementSeparator)
     #SourceCommand|
 
-    ws_cols range? ws_cols substituteCommandName = (S_LOWERCASE | SUBSTITUTE | TILDE | AMPERSAND) (WS* commandArgument)? statementSeparator
+    ws_cols range? ws_cols substituteCommandName = (S_LOWERCASE | SUBSTITUTE | TILDE | AMPERSAND) (WS* commandArgumentWithBars)? NEW_LINE
     #SubstituteCommand|
 
     ws_cols range? ws_cols TAB_CLOSE (WS* commandArgument)? (comment | statementSeparator)

@@ -550,7 +550,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
 
   override fun visitSubstituteCommand(ctx: VimscriptParser.SubstituteCommandContext): SubstituteCommand {
     val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
+    val argument = ctx.commandArgumentWithBars().text.trim()
     return SubstituteCommand(ranges, argument, ctx.substituteCommandName.text)
   }
 
