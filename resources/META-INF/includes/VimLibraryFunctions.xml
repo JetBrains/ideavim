@@ -7,5 +7,6 @@
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.SinFunctionHandler" name="sin"/>
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.ExistsFunctionHandler" name="exists"/>
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.LenFunctionHandler" name="len"/>
+    <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.FunctionFunctionHandler" name="function"/>
   </extensions>
 </idea-plugin>

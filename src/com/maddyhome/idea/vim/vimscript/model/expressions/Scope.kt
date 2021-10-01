@@ -30,8 +30,8 @@ enum class Scope(val c: String) {
   VIM_VARIABLE("v");
 
   companion object {
-    fun getByValue(s: String): Scope {
-      return values().first { it.c == s }
+    fun getByValue(s: String): Scope? {
+      return values().firstOrNull { it.c == s }
     }
   }
 }

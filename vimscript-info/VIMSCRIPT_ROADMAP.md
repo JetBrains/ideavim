@@ -25,7 +25,7 @@
 - [x] funcref type
 - [x] lambdas
 - [x] function as method
-- [ ] `function` function
+- [x] `function` function
 - [ ] `funcref` function
 - [ ] dictionary functions  
 - [ ] anonymous functions  
