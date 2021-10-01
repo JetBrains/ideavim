@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 
 object ExistsFunctionHandler : FunctionHandler() {
 
+  override val name = "exists"
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 1
 

@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 object LenFunctionHandler : FunctionHandler() {
 
+  override val name = "len"
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 1
 

@@ -15,7 +15,7 @@ data class FunctionCallExpression(val scope: Scope?, val functionName: String, v
   override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
     val handler = FunctionStorage.getFunctionHandlerOrNull(scope, functionName, parent)
     if (handler != null) {
-      return handler.executeFunction(this.functionName, this.arguments, editor, context, parent)
+      return handler.executeFunction(this.arguments, editor, context, parent)
     }
 
     val funcref = VariableService.getNullableVariableValue(Variable(scope, functionName), editor, context, parent)

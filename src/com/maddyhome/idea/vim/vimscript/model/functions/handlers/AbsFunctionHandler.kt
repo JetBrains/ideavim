@@ -30,6 +30,7 @@ import kotlin.math.abs
 
 object AbsFunctionHandler : FunctionHandler() {
 
+  override val name = "abs"
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 1
 

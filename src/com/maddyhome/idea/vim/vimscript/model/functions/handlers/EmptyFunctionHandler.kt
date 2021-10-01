@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 object EmptyFunctionHandler : FunctionHandler() {
 
+  override val name = "empty"
   override val minimumNumberOfArguments: Int = 1
   override val maximumNumberOfArguments: Int = 1
 

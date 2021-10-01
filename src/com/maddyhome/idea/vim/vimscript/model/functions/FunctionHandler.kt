@@ -25,23 +25,26 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
+import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 
 abstract class FunctionHandler {
 
+  abstract val name: String
+  open val scope: Scope? = null
   abstract val minimumNumberOfArguments: Int?
   abstract val maximumNumberOfArguments: Int?
   var ranges: Ranges? = null
 
   protected abstract fun doFunction(argumentValues: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType
 
-  fun executeFunction(name: String, arguments: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType {
-    checkFunctionCall(name, arguments)
+  fun executeFunction(arguments: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType {
+    checkFunctionCall(arguments)
     val result = doFunction(arguments, editor, context, parent)
     ranges = null
     return result
   }
 
-  private fun checkFunctionCall(name: String, arguments: List<Expression>) {
+  private fun checkFunctionCall(arguments: List<Expression>) {
     if (minimumNumberOfArguments != null && arguments.size < minimumNumberOfArguments!!) {
       throw ExException("E119: Not enough arguments for function: $name")
     }

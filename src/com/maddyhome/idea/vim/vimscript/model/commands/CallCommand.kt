@@ -40,7 +40,7 @@ class CallCommand(val ranges: Ranges, val functionCall: FunctionCallExpression) 
     val function = FunctionStorage.getFunctionHandlerOrNull(functionCall.scope, functionCall.functionName, parent)
     if (function != null) {
       function.ranges = ranges
-      function.executeFunction(functionCall.functionName, functionCall.arguments, editor, context, this)
+      function.executeFunction(functionCall.arguments, editor, context, this)
       return ExecutionResult.Success
     }
 

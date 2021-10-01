@@ -38,10 +38,11 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 
-data class DefinedFunctionHandler(private val function: FunctionDeclaration) : FunctionHandler() {
+data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionHandler() {
 
   private val logger = logger<DefinedFunctionHandler>()
-
+  override val name = function.name
+  override val scope = function.scope
   override val minimumNumberOfArguments = function.args.size
   override val maximumNumberOfArguments get() = if (function.hasOptionalArguments) null else function.args.size
 

@@ -30,6 +30,7 @@ import kotlin.math.sin
 
 object SinFunctionHandler : FunctionHandler() {
 
+  override val name = "sin"
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 1
 
