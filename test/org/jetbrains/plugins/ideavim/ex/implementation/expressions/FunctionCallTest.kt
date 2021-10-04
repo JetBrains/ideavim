@@ -18,6 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.expressions
 
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class FunctionCallTest : VimTestCase() {
@@ -66,5 +68,24 @@ class FunctionCallTest : VimTestCase() {
     configureByText("\n")
     typeText(commandToKeys("echo 52->{x,y -> x-y}(10)"))
     assertExOutput("42\n")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  fun `test read-only variable`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+          function! ThrowException(number) |
+            let a:number = 20 |
+          endfunction |
+          call ThrowException(20)
+        """.trimIndent()
+      )
+    )
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E46: Cannot change read-only variable \"a:number\"")
+
+    typeText(commandToKeys("delfunction! ThrowException"))
   }
 }

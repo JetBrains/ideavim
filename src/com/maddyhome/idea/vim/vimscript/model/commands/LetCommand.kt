@@ -9,7 +9,9 @@ import com.maddyhome.idea.vim.option.NumberOption
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.StringOption
 import com.maddyhome.idea.vim.option.ToggleOption
+import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -20,11 +22,14 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OptionExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Register
+import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOperator
 import com.maddyhome.idea.vim.vimscript.model.expressions.toVimDataType
+import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
+import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 
 /**
@@ -43,6 +48,9 @@ data class LetCommand(
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     when (variable) {
       is Variable -> {
+        if (isReadOnlyVariable(variable)) {
+          throw ExException("E46: Cannot change read-only variable \"$variable\"")
+        }
         VariableService.storeVariable(
           variable, operator.getNewValue(variable, expression, editor, context, this),
           editor, context, this
@@ -182,5 +190,22 @@ data class LetCommand(
       else -> throw ExException("E121: Undefined variable")
     }
     return ExecutionResult.Success
+  }
+
+  private fun isReadOnlyVariable(variable: Variable): Boolean {
+    if (variable.scope == Scope.FUNCTION_VARIABLE) return true
+    if (variable.scope == null && variable.name == "self" && isInsideDictionaryFunction()) return true
+    return false
+  }
+
+  private fun isInsideDictionaryFunction(): Boolean {
+    var node: Executable = this
+    while (node !is Script) {
+      if (node is FunctionDeclaration && node.flags.contains(FunctionFlag.DICT)) {
+        return true
+      }
+      node = node.parent
+    }
+    return false
   }
 }

@@ -11,4 +11,8 @@ data class Variable(val scope: Scope?, val name: String) : Expression() {
   override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
     return VariableService.getNonNullVariableValue(this, editor, context, parent)
   }
+
+  override fun toString(): String {
+    return (if (scope != null) scope.c + ":" else "") + name
+  }
 }
