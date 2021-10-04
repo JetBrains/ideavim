@@ -9,6 +9,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.DictionaryExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FalsyExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.FuncrefCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaFunctionCallExpression
@@ -99,19 +100,26 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
 
   override fun visitBinExpression2(ctx: VimscriptParser.BinExpression2Context): Expression {
     val left = visit(ctx.expr(0))
+    val right = visit(ctx.expr(1))
     val operatorString = ctx.binaryOperator2().text
 
-    return if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && matchesLiteralDictionaryKey(ctx.expr(1).text)) {
+    return if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && matchesLiteralDictionaryKey(
+        ctx.expr(1).text
+      )
+    ) {
       val index = SimpleExpression(VimString(ctx.expr(1).text))
       OneElementSublistExpression(index, left)
-      // todo dictionary function calls
-    } else if (operatorString == "-" && left is OneElementSublistExpression && !containsSpaces(ctx) && matchesLiteralDictionaryKey(ctx.expr(1).text)) {
-      // todo dictionary function calls
+    } else if (operatorString == "-" && left is OneElementSublistExpression && !containsSpaces(ctx) && matchesLiteralDictionaryKey(
+        ctx.expr(1).text
+      )
+    ) {
       val postfix = "-" + ctx.expr(1).text
       val newIndex = SimpleExpression(VimString((left.index as SimpleExpression).data.asString() + postfix))
       OneElementSublistExpression(newIndex, left.expression)
+    } else if (operatorString == "." && !containsSpaces(ctx) && right is FunctionCallExpression && evaluationResultCouldBeADictionary(left)) {
+      val index = SimpleExpression(VimString(right.functionName))
+      FuncrefCallExpression(OneElementSublistExpression(index, left), right.arguments)
     } else {
-      val right = visit(ctx.expr(1))
       val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
       BinExpression(left, right, operator)
     }

@@ -88,4 +88,22 @@ class FunctionCallTest : VimTestCase() {
 
     typeText(commandToKeys("delfunction! ThrowException"))
   }
+
+  fun `test dict function call`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+        function! Power2(number) |
+          return a:number * a:number |
+        endfunction |
+        """.trimIndent()
+      )
+    )
+    typeText(commandToKeys("let dict = {'power': function('Power2')}"))
+    typeText(commandToKeys("echo dict.power(9)"))
+    assertExOutput("81\n")
+
+    typeText(commandToKeys("delfunction! Power2"))
+  }
 }
