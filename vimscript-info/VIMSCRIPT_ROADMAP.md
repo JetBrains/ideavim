@@ -31,13 +31,11 @@
 - [ ] anonymous functions  
 - [ ] `dict` function flag
 - [ ] default value in functions e.g. `function F1(a, b = 10)`
-- [ ] pass Lists and Dictionaries by reference  
-- [ ] variable locking (`lock`, `unlock`, `const`)  
-- [ ] rewrite OptionManager to vim data types  
-- [ ] scoped options  
+- [ ] delayed parsing of if/for/while etc.
+- [ ] `has("ide")` or "ide" option
+- [ ] reduce number of rules in grammar
 - [ ] classic package structure  
-- [ ] loggers loggers loggers  
-- [ ] more loggers
+- [ ] loggers
 
 ### IdeaVim 1.9.0   
 
@@ -49,9 +47,11 @@
 - [ ] expression register (`<C-R>=`)  
 - [ ] update tests to JUnit 5  
 - [ ] rethink vimscript tests  
-- [ ] delayed parsing of if/for/while etc.  
-- [ ] `has("ide")` or "ide" option  
-- [ ] `normal` command  
+- [ ] pass Lists and Dictionaries by reference
+- [ ] variable locking (`lock`, `unlock`, `const`)
+- [ ] rewrite OptionManager to vim data types
+- [ ] scoped options
+- [ ] `normal` command
 - [ ] `finish` statement
 - [ ] context dependent parsing e.g. `dict.key`  
 - [ ] improve `w:` and `t:` scopes  
