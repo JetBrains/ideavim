@@ -30,17 +30,19 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public final class KeywordOption extends ListOption {
+public final class KeywordOption extends StringListOption {
   @NonNls private static final String allLettersRegex = "\\p{L}";
+  @NonNls private static final String PATTERN =
+    "(\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9^]|[0-9]{1,3})),)*\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9]|[0-9]{1,3})),?$";
+
   private final @NotNull Pattern validationPattern;
 
   // KeywordSpecs are the option values in reverse order
   private @NotNull List<KeywordSpec> keywordSpecs = new ArrayList<>();
 
   public KeywordOption(@NotNull @NonNls String name, @NotNull @NonNls String abbrev, @NotNull String[] defaultValue) {
-    super(name, abbrev, defaultValue,
-          "(\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9^]|[0-9]{1,3})),)*\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9]|[0-9]{1,3})),?$");
-    validationPattern = Pattern.compile(pattern);
+    super(name, abbrev, defaultValue, PATTERN);
+    validationPattern = Pattern.compile(PATTERN);
     initialSet(defaultValue);
   }
 
@@ -54,7 +56,7 @@ public final class KeywordOption extends ListOption {
     }
     this.value.addAll(vals);
     keywordSpecs.addAll(0, specs);
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
     return true;
   }
 
@@ -68,7 +70,7 @@ public final class KeywordOption extends ListOption {
     }
     value.addAll(0, vals);
     keywordSpecs.addAll(specs);
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
     return true;
   }
 
@@ -83,7 +85,7 @@ public final class KeywordOption extends ListOption {
     }
     value.removeAll(vals);
     keywordSpecs.removeAll(specs);
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
     return true;
   }
 
@@ -93,7 +95,7 @@ public final class KeywordOption extends ListOption {
     final List<KeywordSpec> specs = valsToReversedSpecs(vals);
     value = vals;
     keywordSpecs = specs;
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
   }
 
   @Override
@@ -106,14 +108,14 @@ public final class KeywordOption extends ListOption {
     }
     value = vals;
     keywordSpecs = specs;
-    fireOptionChangeEvent(oldValue, getValue());
+    onChanged(oldValue, getValue());
     return true;
   }
 
   @Override
   public void resetDefault() {
-    if (!dflt.equals(value)) {
-      value = dflt;
+    if (!defaultValues.equals(value)) {
+      value = defaultValues;
       set(getValue());
     }
   }

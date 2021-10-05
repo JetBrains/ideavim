@@ -3,6 +3,7 @@ ideavimrc
 
 
 gdefault
+guicursor
 hlsearch
 ideamarks
 ignorecase

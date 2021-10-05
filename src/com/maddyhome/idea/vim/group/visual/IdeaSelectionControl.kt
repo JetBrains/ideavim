@@ -88,7 +88,6 @@ object IdeaSelectionControl {
       }
 
       KeyHandler.getInstance().reset(editor)
-      updateCaretState(editor)
       logger.debug("${editor.mode} is enabled")
     }
   }

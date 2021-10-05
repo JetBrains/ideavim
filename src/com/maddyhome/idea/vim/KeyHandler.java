@@ -38,13 +38,13 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.action.change.VimRepeater;
+import com.maddyhome.idea.vim.action.change.change.ChangeCharacterAction;
+import com.maddyhome.idea.vim.action.change.change.ChangeVisualCharacterAction;
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedDigraphAction;
 import com.maddyhome.idea.vim.action.change.insert.InsertCompletedLiteralAction;
 import com.maddyhome.idea.vim.action.macro.ToggleRecordingAction;
 import com.maddyhome.idea.vim.command.*;
-import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.group.RegisterGroup;
-import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.handler.ActionBeanClass;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.*;
@@ -327,6 +327,7 @@ public class KeyHandler {
       LOG.trace("Command builder is set to BAD");
       editorState.resetOpPending();
       editorState.resetRegisterPending();
+      editorState.resetReplaceCharacter();
       VimPlugin.indicateError();
       reset(editor);
     }
@@ -363,7 +364,11 @@ public class KeyHandler {
   }
 
   private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, final @NotNull DataContext context, @NotNull CommandState editorState) {
-    if (editorState.getCommandBuilder().isAtDefaultState()) {
+    final CommandBuilder commandBuilder = editorState.getCommandBuilder();
+    if (commandBuilder.isAwaitingCharOrDigraphArgument()) {
+      editorState.resetReplaceCharacter();
+    }
+    if (commandBuilder.isAtDefaultState()) {
       RegisterGroup register = VimPlugin.getRegister();
       if (register.getCurrentRegister() == register.getDefaultRegister()) {
         boolean indicateError = true;
@@ -383,7 +388,6 @@ public class KeyHandler {
       }
     }
     reset(editor);
-    ChangeGroup.resetCaret(editor, false);
   }
 
   private boolean handleKeyMapping(final @NotNull Editor editor,
@@ -688,6 +692,8 @@ public class KeyHandler {
       // Oops - this isn't a valid character argument
       commandBuilder.setCommandState(CurrentCommandState.BAD_COMMAND);
     }
+
+    commandState.resetReplaceCharacter();
   }
 
   private boolean handleDigraph(@NotNull Editor editor,
@@ -899,7 +905,8 @@ public class KeyHandler {
         if (action instanceof InsertCompletedDigraphAction) {
           editorState.startDigraphSequence();
           setPromptCharacterEx('?');
-        } else if (action instanceof InsertCompletedLiteralAction) {
+        }
+        else if (action instanceof InsertCompletedLiteralAction) {
           editorState.startLiteralSequence();
           setPromptCharacterEx('^');
         }
@@ -911,6 +918,11 @@ public class KeyHandler {
         commandBuilder.setCommandState(CurrentCommandState.NEW_COMMAND);
         editorState.pushModes(CommandState.Mode.CMD_LINE, CommandState.SubMode.NONE);
         break;
+    }
+
+    // Another special case. Force a mode change to update the caret shape
+    if (action instanceof ChangeCharacterAction || action instanceof ChangeVisualCharacterAction) {
+      editorState.pushModes(editorState.getMode(), CommandState.SubMode.REPLACE_CHARACTER);
     }
   }
 
@@ -971,7 +983,6 @@ public class KeyHandler {
     if (registerGroup != null) {
       registerGroup.resetRegister();
     }
-    VisualGroupKt.updateCaretState(editor);
     editor.getSelectionModel().removeSelection();
   }
 
@@ -1066,7 +1077,6 @@ public class KeyHandler {
       if (editorState.getSubMode() == CommandState.SubMode.SINGLE_COMMAND &&
           (!cmd.getFlags().contains(CommandFlags.FLAG_EXPECT_MORE))) {
         editorState.popModes();
-        VisualGroupKt.resetShape(CommandStateHelper.getMode(editor), editor);
       }
 
       if (editorState.getCommandBuilder().isDone()) {

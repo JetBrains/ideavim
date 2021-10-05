@@ -84,7 +84,7 @@ public class ToggleOption extends Option<Boolean> {
     boolean old = value;
     value = val;
     if (val != old) {
-      fireOptionChangeEvent(old, val);
+      onChanged(old, val);
     }
   }
 

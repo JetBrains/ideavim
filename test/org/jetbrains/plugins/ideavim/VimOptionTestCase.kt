@@ -18,10 +18,10 @@
 
 package org.jetbrains.plugins.ideavim
 
-import com.maddyhome.idea.vim.option.BoundStringOption
-import com.maddyhome.idea.vim.option.ListOption
+import com.maddyhome.idea.vim.option.BoundedStringOption
 import com.maddyhome.idea.vim.option.NumberOption
 import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.option.StringListOption
 import com.maddyhome.idea.vim.option.ToggleOption
 
 /**
@@ -73,12 +73,12 @@ abstract class VimOptionTestCase(option: String, vararg otherOptions: String) : 
             if (it.values.first().toBoolean()) option.set() else option.reset()
           }
           VimTestOptionType.LIST -> {
-            if (option !is ListOption) kotlin.test.fail("${it.option} is not a list option. Change it for method `${testMethod.name}`")
+            if (option !is StringListOption) kotlin.test.fail("${it.option} is not a string list option. Change it for method `${testMethod.name}`")
 
             option.set(it.values.joinToString(","))
           }
           VimTestOptionType.VALUE -> {
-            if (option !is BoundStringOption) kotlin.test.fail("${it.option} is not a value option. Change it for method `${testMethod.name}`")
+            if (option !is BoundedStringOption) kotlin.test.fail("${it.option} is not a value option. Change it for method `${testMethod.name}`")
 
             option.set(it.values.first())
           }

@@ -547,7 +547,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
       CommandState.Mode.SELECT,
       CommandState.SubMode.VISUAL_BLOCK
     )
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -577,7 +577,7 @@ class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
       CommandState.Mode.SELECT,
       CommandState.SubMode.VISUAL_BLOCK
     )
-    assertCaretsColour()
+    assertCaretsVisualAttributes()
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)

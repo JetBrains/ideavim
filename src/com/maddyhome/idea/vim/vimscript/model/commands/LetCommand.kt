@@ -4,9 +4,9 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.option.ListOption
 import com.maddyhome.idea.vim.option.NumberOption
 import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.option.StringListOption
 import com.maddyhome.idea.vim.option.StringOption
 import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.Executable
@@ -168,7 +168,7 @@ data class LetCommand(
             is StringOption -> {
               option.set(newValue.asString())
             }
-            is ListOption -> {
+            is StringListOption -> {
               if (newValue is VimList) {
                 option.set(newValue.values.joinToString(separator = ",") { it.asString() })
               } else {

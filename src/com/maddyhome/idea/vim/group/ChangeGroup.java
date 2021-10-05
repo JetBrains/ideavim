@@ -56,7 +56,6 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
-import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.handler.Motion;
@@ -64,7 +63,7 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimInsertListener;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
-import com.maddyhome.idea.vim.option.BoundListOption;
+import com.maddyhome.idea.vim.option.BoundedStringListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.option.StrictMode;
 import kotlin.Pair;
@@ -447,8 +446,6 @@ public class ChangeGroup {
       oldOffset = editor.getCaretModel().getOffset();
       setInsertEditorState(editor, mode == CommandState.Mode.INSERT);
       state.pushModes(mode, CommandState.SubMode.NONE);
-
-      VisualGroupKt.updateCaretState(editor);
     }
 
     notifyListeners(editor);
@@ -551,8 +548,6 @@ public class ChangeGroup {
 
     CommandState.getInstance(editor).popModes();
     exitAllSingleCommandInsertModes(editor);
-
-    VisualGroupKt.updateCaretState(editor);
   }
 
   /**
@@ -1830,10 +1825,6 @@ public class ChangeGroup {
     return false;
   }
 
-  public static void resetCaret(@NotNull Editor editor, boolean insert) {
-    editor.getSettings().setBlockCursor(!insert);
-  }
-
   /**
    * Sort range of text with a given comparator
    *
@@ -1894,7 +1885,7 @@ public class ChangeGroup {
                                         @NotNull TextRange selectedRange,
                                         final int count,
                                         boolean avalanche) {
-    BoundListOption nf = OptionsManager.INSTANCE.getNrformats();
+    BoundedStringListOption nf = OptionsManager.INSTANCE.getNrformats();
     boolean alpha = nf.contains("alpha");
     boolean hex = nf.contains("hex");
     boolean octal = nf.contains("octal");
@@ -1936,7 +1927,7 @@ public class ChangeGroup {
   private @Nullable List<Object> lastStrokes;
 
   public boolean changeNumber(final @NotNull Editor editor, @NotNull Caret caret, final int count) {
-    final BoundListOption nf = OptionsManager.INSTANCE.getNrformats();
+    final BoundedStringListOption nf = OptionsManager.INSTANCE.getNrformats();
     final boolean alpha = nf.contains("alpha");
     final boolean hex = nf.contains("hex");
     final boolean octal = nf.contains("octal");

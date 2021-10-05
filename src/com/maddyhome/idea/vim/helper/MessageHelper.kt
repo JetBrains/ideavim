@@ -23,9 +23,11 @@ import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 @NonNls
-private const val BUNDLE = "messages.IdeaVimBundle"
+private const val IDEAVIM_BUNDLE = "messages.IdeaVimBundle"
 
-object MessageHelper : DynamicBundle(BUNDLE) {
+object MessageHelper : DynamicBundle(IDEAVIM_BUNDLE) {
+
+  const val BUNDLE = IDEAVIM_BUNDLE
 
   @JvmStatic
   fun message(@PropertyKey(resourceBundle = BUNDLE) key: String, vararg params: Any) = getMessage(key, *params)

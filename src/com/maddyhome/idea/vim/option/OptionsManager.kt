@@ -34,8 +34,8 @@ import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.helper.hasBlockOrUnderscoreCaret
 import com.maddyhome.idea.vim.helper.hasVisualSelection
-import com.maddyhome.idea.vim.helper.isBlockCaretBehaviour
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
@@ -52,26 +52,27 @@ object OptionsManager {
   private val options: MutableMap<String, Option<*>> = mutableMapOf()
   private val abbrevs: MutableMap<String, Option<*>> = mutableMapOf()
 
-  val clipboard = addOption(ListOption(ClipboardOptionsData.name, ClipboardOptionsData.abbr, arrayOf(ClipboardOptionsData.ideaput, "autoselect,exclude:cons\\|linux"), null))
+  val clipboard = addOption(StringListOption(ClipboardOptionsData.name, ClipboardOptionsData.abbr, arrayOf(ClipboardOptionsData.ideaput, "autoselect,exclude:cons\\|linux")))
   val digraph = addOption(ToggleOption("digraph", "dg", false))
   val gdefault = addOption(ToggleOption("gdefault", "gd", false))
+  val guicursor = addOption(GuiCursorOptionData.option)
   val history = addOption(NumberOption("history", "hi", 50, 1, Int.MAX_VALUE))
   val hlsearch = addOption(ToggleOption("hlsearch", "hls", false))
-  val ideamarks = addOption(IdeaMarkskOptionsData.option)
+  val ideamarks = addOption(IdeaMarksOptionsData.option)
   val ignorecase = addOption(ToggleOption(IgnoreCaseOptionsData.name, IgnoreCaseOptionsData.abbr, false))
   val incsearch = addOption(ToggleOption("incsearch", "is", false))
   val iskeyword = addOption(KeywordOption("iskeyword", "isk", arrayOf("@", "48-57", "_")))
   val keymodel = addOption(KeyModelOptionData.option)
-  val lookupKeys = addOption(ListOption(LookupKeysData.name, LookupKeysData.name, LookupKeysData.defaultValues, null))
-  val matchpairs = addOption(ListOption("matchpairs", "mps", arrayOf("(:)", "{:}", "[:]"), ".:."))
+  val lookupKeys = addOption(StringListOption(LookupKeysData.name, LookupKeysData.name, LookupKeysData.defaultValues))
+  val matchpairs = addOption(StringListOption("matchpairs", "mps", arrayOf("(:)", "{:}", "[:]"), ".:."))
   val more = addOption(ToggleOption("more", "more", true))
-  val nrformats = addOption(BoundListOption("nrformats", "nf", arrayOf("hex"), arrayOf("octal", "hex", "alpha"))) // Octal is disabled as in neovim
+  val nrformats = addOption(BoundedStringListOption("nrformats", "nf", arrayOf("hex"), arrayOf("octal", "hex", "alpha"))) // Octal is disabled as in neovim
   val number = addOption(ToggleOption("number", "nu", false))
   val relativenumber = addOption(ToggleOption("relativenumber", "rnu", false))
   val scroll = addOption(NumberOption("scroll", "scr", 0))
   val scrolljump = addOption(NumberOption(ScrollJumpData.name, "sj", 1, -100, Integer.MAX_VALUE))
   val scrolloff = addOption(NumberOption(ScrollOffData.name, "so", 0))
-  val selection = addOption(BoundStringOption("selection", "sel", "inclusive", arrayOf("old", "inclusive", "exclusive")))
+  val selection = addOption(BoundedStringOption("selection", "sel", "inclusive", arrayOf("old", "inclusive", "exclusive")))
   val selectmode = addOption(SelectModeOptionData.option)
   val shell = addOption(ShellOptionData.option)
   val shellcmdflag = addOption(ShellCmdFlagOptionData.option)
@@ -87,16 +88,16 @@ object OptionsManager {
   val timeout = addOption(ToggleOption("timeout", "to", true))
   val timeoutlen = addOption(NumberOption("timeoutlen", "tm", 1000, -1, Int.MAX_VALUE))
   val undolevels = addOption(NumberOption("undolevels", "ul", 1000, -1, Int.MAX_VALUE))
-  val viminfo = addOption(ListOption("viminfo", "vi", arrayOf("'100", "<50", "s10", "h"), null))
-  val virtualedit = addOption(BoundStringOption(VirtualEditData.name, "ve", "", VirtualEditData.allValues))
+  val viminfo = addOption(StringListOption("viminfo", "vi", arrayOf("'100", "<50", "s10", "h")))
+  val virtualedit = addOption(BoundedStringOption(VirtualEditData.name, "ve", "", VirtualEditData.allValues))
   val visualbell = addOption(ToggleOption("visualbell", "vb", false))
   val wrapscan = addOption(ToggleOption("wrapscan", "ws", true))
   val visualEnterDelay = addOption(NumberOption("visualdelay", "visualdelay", 100, 0, Int.MAX_VALUE))
-  val idearefactormode = addOption(BoundStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues))
-  val ideastatusicon = addOption(BoundStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues))
+  val idearefactormode = addOption(BoundedStringOption(IdeaRefactorMode.name, IdeaRefactorMode.name, IdeaRefactorMode.select, IdeaRefactorMode.availableValues))
+  val ideastatusicon = addOption(BoundedStringOption(IdeaStatusIcon.name, IdeaStatusIcon.name, IdeaStatusIcon.enabled, IdeaStatusIcon.allValues))
   val ideastrictmode = addOption(ToggleOption("ideastrictmode", "ideastrictmode", false))
-  val ideawrite = addOption(BoundStringOption("ideawrite", "ideawrite", IdeaWriteData.all, IdeaWriteData.allValues))
-  val ideavimsupport = addOption(BoundListOption("ideavimsupport", "ideavimsupport", arrayOf("dialog"), arrayOf("dialog", "singleline", "dialoglegacy")))
+  val ideawrite = addOption(BoundedStringOption("ideawrite", "ideawrite", IdeaWriteData.all, IdeaWriteData.allValues))
+  val ideavimsupport = addOption(BoundedStringListOption("ideavimsupport", "ideavimsupport", arrayOf("dialog"), arrayOf("dialog", "singleline", "dialoglegacy")))
   val ide = addOption(StringOption("ide", "ide", ApplicationNamesInfo.getInstance().fullProductNameWithEdition))
 
   // TODO The default value if 1000, but we can't increase it because of terrible performance of our mappings
@@ -118,7 +119,7 @@ object OptionsManager {
     return option is ToggleOption && option.getValue()
   }
 
-  fun getListOption(name: String): ListOption? = getOption(name) as? ListOption
+  fun getStringListOption(name: String): StringListOption? = getOption(name) as? StringListOption
 
   fun resetAllOptions() = options.values.forEach { it.resetDefault() }
 
@@ -274,14 +275,20 @@ object OptionsManager {
             if (opt != null) {
               // If not a boolean
               if (opt is TextOption) {
-                val res = when (op) {
-                  '+' -> opt.append(value)
-                  '-' -> opt.remove(value)
-                  '^' -> opt.prepend(value)
-                  else -> opt.set(value)
-                }
-                if (!res) {
-                  error = Msg.e_invarg
+                try {
+                  val res = when (op) {
+                    '+' -> opt.append(value)
+                    '-' -> opt.remove(value)
+                    '^' -> opt.prepend(value)
+                    else -> opt.set(value)
+                  }
+                  if (!res) {
+                    error = Msg.e_invarg
+                  }
+                } catch (e: ExException) {
+                  // Retrieve the message code, if possible and throw again with the entire set arg string. This assumes
+                  // that any thrown exception has a message code that accepts a single parameter
+                  error = e.code ?: Msg.e_invarg
                 }
               } else {
                 error = Msg.e_invarg
@@ -402,7 +409,7 @@ object KeyModelOptionData {
 
   val options = arrayOf(startsel, stopsel, stopselect, stopvisual, continueselect, continuevisual)
   val default = arrayOf(continueselect, stopselect)
-  val option = BoundListOption(name, abbr, default, options)
+  val option = BoundedStringListOption(name, abbr, default, options)
 }
 
 @NonNls
@@ -419,7 +426,7 @@ object SelectModeOptionData {
   @Suppress("DEPRECATION")
   val options = arrayOf(mouse, key, cmd, ideaselection)
   val default = emptyArray<String>()
-  val option = BoundListOption(name, abbr, default, options)
+  val option = BoundedStringListOption(name, abbr, default, options)
 
   fun ideaselectionEnabled(): Boolean {
     return ideaselection in OptionsManager.selectmode
@@ -456,6 +463,21 @@ object ClipboardOptionsData {
   }
 }
 
+@Suppress("SpellCheckingInspection")
+@NonNls
+object GuiCursorOptionData {
+  const val name = "guicursor"
+  private const val abbr = "gcr"
+  const val defaultValue = "n-v-c:block-Cursor/lCursor," +
+    "ve:ver35-Cursor," +
+    "o:hor50-Cursor," +
+    "i-ci:ver25-Cursor/lCursor," +
+    "r-cr:hor20-Cursor/lCursor," +
+    "sm:block-Cursor-blinkwait175-blinkoff150-blinkon175"
+
+  val option = GuiCursorOption(name, abbr, defaultValue)
+}
+
 @NonNls
 object IdeaJoinOptionsData {
   const val name = "ideajoin"
@@ -465,7 +487,7 @@ object IdeaJoinOptionsData {
 }
 
 @NonNls
-object IdeaMarkskOptionsData {
+object IdeaMarksOptionsData {
   const val name = "ideamarks"
   private const val defaultValue = true
 
@@ -512,7 +534,7 @@ object IdeaRefactorMode {
         }
       }
 
-      if (editor.mode.isBlockCaretBehaviour) {
+      if (editor.hasBlockOrUnderscoreCaret()) {
         TemplateManagerImpl.getTemplateState(editor)?.currentVariableRange?.let { segmentRange ->
           if (!segmentRange.isEmpty && segmentRange.endOffset == editor.caretModel.offset && editor.caretModel.offset != 0) {
             editor.caretModel.moveToOffset(editor.caretModel.offset - 1)

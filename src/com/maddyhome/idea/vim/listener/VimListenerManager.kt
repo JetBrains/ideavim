@@ -43,7 +43,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimTypedActionHandler
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.ExOutputModel
-import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.EditorGroup
 import com.maddyhome.idea.vim.group.FileGroup
 import com.maddyhome.idea.vim.group.MotionGroup
@@ -53,9 +52,11 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.UpdatesChecker
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
+import com.maddyhome.idea.vim.helper.forceBarCursor
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
@@ -63,6 +64,7 @@ import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.helper.moveToInlayAwareOffset
 import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipEvents
 import com.maddyhome.idea.vim.listener.MouseEventsDataHolder.skipNDragEvents
@@ -110,6 +112,7 @@ object VimListenerManager {
       OptionsManager.relativenumber.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
       OptionsManager.scrolloff.addOptionChangeListener(MotionGroup.ScrollOptionsChangeListener.INSTANCE)
       OptionsManager.showcmd.addOptionChangeListener(ShowCmdOptionChangeListener)
+      OptionsManager.guicursor.addOptionChangeListener(GuicursorChangeListener)
 
       EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, VimPlugin.getInstance())
     }
@@ -121,6 +124,7 @@ object VimListenerManager {
       OptionsManager.relativenumber.removeOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
       OptionsManager.scrolloff.removeOptionChangeListener(MotionGroup.ScrollOptionsChangeListener.INSTANCE)
       OptionsManager.showcmd.removeOptionChangeListener(ShowCmdOptionChangeListener)
+      OptionsManager.guicursor.removeOptionChangeListener(GuicursorChangeListener)
 
       EventFacade.getInstance().removeEditorFactoryListener(VimEditorFactoryListener)
     }
@@ -263,28 +267,54 @@ object VimListenerManager {
 
     override fun mouseDragged(e: EditorMouseEvent) {
       if (e.editor.isIdeaVimDisabledHere) return
+
+      val caret = e.editor.caretModel.primaryCaret
+
       clearFirstSelectionEvents(e)
-      if (mouseDragging && e.editor.caretModel.primaryCaret.hasSelection()) {
-        ChangeGroup.resetCaret(e.editor, true)
+
+      if (mouseDragging && caret.hasSelection()) {
+        /**
+         * We force the bar caret while dragging because it matches IntelliJ's selection model better.
+         * * Vim's drag selection is based on character bounding boxes. When 'selection' is set to "inclusive" (the
+         *   default), Vim selects a character when the mouse cursor drags the text caret into its bounding box (LTR).
+         *   The character at the text caret is selected and the block caret is drawn to cover the character (the bar
+         *   caret would be between the selection and the last character of the selection, which is weird). See "v" in
+         *   'guicursor'. When 'selection' is "exclusive", Vim will select a character when the mouse cursor drags the
+         *   text caret out of its bounding box. The character at the text caret is not selected and the bar caret is
+         *   drawn at the start of this character to make it more obvious that it is unselected. See "ve" in
+         *   'guicursor'.
+         * * IntelliJ's selection is based on character mid-points. E.g. the caret is moved to the start of offset 2
+         *   when the second half of offset 1 is clicked, and a character is selected when the mouse is moved from the
+         *   first half to the second half. This means:
+         *   1) While dragging, the selection is always exclusive - the character at the text caret is not selected. We
+         *   convert to an inclusive selection when the mouse is released, by moving back one character. It makes
+         *   sense to match Vim's bar caret here.
+         *   2) An exclusive selection should trail behind the mouse cursor, but IntelliJ doesn't, because the selection
+         *   boundaries are mid-points - the text caret can be in front of/to the right of the mouse cursor (LTR).
+         *   Using a block caret would push the block further out passed the selection and the mouse cursor, and
+         *   feels wrong. The bar caret is a better user experience.
+         *   RTL probably introduces other fun issues
+         * We can implement inclusive/exclusive 'selection' with normal text movement, but unless we can change the way
+         * selection works while dragging, I don't think we can match Vim's selection behaviour exactly.
+         */
+        caret.forceBarCursor()
 
         if (!cutOffFixed && ComponentMouseListener.cutOffEnd) {
           cutOffFixed = true
           SelectionVimListenerSuppressor.lock().use {
-            e.editor.caretModel.primaryCaret.let { caret ->
-              if (caret.selectionEnd == e.editor.document.getLineEndOffset(caret.logicalPosition.line) - 1 &&
-                caret.leadSelectionOffset == caret.selectionEnd
-              ) {
-                // A small but important customization. Because IdeaVim doesn't allow to put the caret on the line end,
-                //   the selection can omit the last character if the selection was started in the middle on the
-                //   last character in line and has a negative direction.
-                caret.setSelection(caret.selectionStart, caret.selectionEnd + 1)
-              }
-              // This is the same correction, but for the newer versions of the IDE: 213+
-              if (caret.selectionEnd == e.editor.document.getLineEndOffset(caret.logicalPosition.line) &&
-                caret.selectionEnd == caret.selectionStart + 1
-              ) {
-                caret.setSelection(caret.selectionEnd, caret.selectionEnd)
-              }
+            if (caret.selectionEnd == e.editor.document.getLineEndOffset(caret.logicalPosition.line) - 1 &&
+              caret.leadSelectionOffset == caret.selectionEnd
+            ) {
+              // A small but important customization. Because IdeaVim doesn't allow to put the caret on the line end,
+              //   the selection can omit the last character if the selection was started in the middle on the
+              //   last character in line and has a negative direction.
+              caret.setSelection(caret.selectionStart, caret.selectionEnd + 1)
+            }
+            // This is the same correction, but for the newer versions of the IDE: 213+
+            if (caret.selectionEnd == e.editor.document.getLineEndOffset(caret.logicalPosition.line) &&
+              caret.selectionEnd == caret.selectionStart + 1
+            ) {
+              caret.setSelection(caret.selectionEnd, caret.selectionEnd)
             }
           }
         }
@@ -292,20 +322,28 @@ object VimListenerManager {
       skipNDragEvents -= 1
     }
 
-    // When user puts the caret, sometimes they perform a small drag. This doesn't affect clear IJ, but
-    // with IdeaVim it may introduce unwanted selection. Here we remove any selection if "dragging" was happened for
-    // less than 3 events.
+    /**
+     * When user places the caret, sometimes they perform a small drag. This doesn't affect clear IJ, but with IdeaVim
+     * it may introduce unwanted selection. Here we remove any selection if "dragging" happens for less than 3 events.
+     * This is because the first click moves the caret passed the end of the line, is then received in
+     * [ComponentMouseListener] and the caret is moved back to the start of the last character of the line. If there is
+     * a drag, this translates to a selection of the last character. In this case, remove the selection.
+     * We force the bar caret simply because it looks better - the block caret is dragged to the end, becomes a less
+     * intrusive bar caret and snaps back to the last character (and block caret) when the mouse is released.
+     * TODO: Vim supports selection of the character after the end of line
+     * (Both with mouse and with v$. IdeaVim treats v$ as an exclusive selection)
+     */
     private fun clearFirstSelectionEvents(e: EditorMouseEvent) {
       if (skipNDragEvents > 0) {
         logger.debug("Mouse dragging")
         VimVisualTimer.swingTimer?.stop()
         mouseDragging = true
+
         val caret = e.editor.caretModel.primaryCaret
         if (onLineEnd(caret)) {
-          // UX protection for case when user performs a small dragging while putting caret on line end
           SelectionVimListenerSuppressor.lock().use {
             caret.removeSelection()
-            ChangeGroup.resetCaret(e.editor, true)
+            caret.forceBarCursor()
           }
         }
       }
@@ -345,7 +383,11 @@ object VimListenerManager {
         SelectionVimListenerSuppressor.lock().use {
           val predictedMode = IdeaSelectionControl.predictMode(editor, SelectionSource.MOUSE)
           IdeaSelectionControl.controlNonVimSelectionChange(editor, SelectionSource.MOUSE)
+          // TODO: This should only be for 'selection'=inclusive
           moveCaretOneCharLeftFromSelectionEnd(editor, predictedMode)
+
+          // Reset caret after forceBarShape while dragging
+          editor.updateCaretsVisualAttributes()
           caret.vimLastColumn = editor.caretModel.visualPosition.column
         }
 
@@ -430,8 +472,16 @@ object VimListenerManager {
             }
           } else cutOffEnd = false
         }
-        // If you double-click on word, the caret jumps to the selection end.
-        // Here we move the caret because it should be located one character left.
+        // Double-clicking a word in IntelliJ will select the word and locate the caret at the end of the selection,
+        // on the following character. When using a bar caret, this is drawn as between the end of selection and the
+        // following char. With a block caret, this draws the caret "over" the following character.
+        // In Vim, when 'selection' is "inclusive" (default), double clicking a word will select the last character of
+        // the word and leave the caret on the last character, drawn as a block caret. We move one character left to
+        // match this behaviour.
+        // When 'selection' is exclusive, the caret is placed *after* the end of the word, and is drawn using the 've'
+        // option of 'guicursor' - as a bar, so it appears to be in between the end of the word and the start of the
+        // following character.
+        // TODO: Modify this to support 'selection' set to "exclusive"
         2 -> moveCaretOneCharLeftFromSelectionEnd(editor, predictedMode)
       }
     }

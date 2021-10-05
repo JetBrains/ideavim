@@ -18,23 +18,12 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
-import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.maddyhome.idea.vim.command.CommandState
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertBeforeCursorActionTest : VimTestCase() {
   fun `test check caret shape`() {
     doTest("i", "123", "123", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-    assertFalse(myFixture.editor.settings.isBlockCursor)
-  }
-
-  fun `test check caret shape for block caret`() {
-    EditorSettingsExternalizable.getInstance().isBlockCursor = true
-    try {
-      doTest("i", "123", "123", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-      assertTrue(myFixture.editor.settings.isBlockCursor)
-    } finally {
-      EditorSettingsExternalizable.getInstance().isBlockCursor = false
-    }
+    assertCaretsVisualAttributes()
   }
 }
