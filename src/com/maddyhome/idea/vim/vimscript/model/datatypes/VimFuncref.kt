@@ -29,11 +29,13 @@ import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 
 data class VimFuncref(
-  private val handler: FunctionHandler,
+  val handler: FunctionHandler,
   val arguments: VimList,
-  val dictionary: VimDictionary, // todo notice me senpai :(
+  val dictionary: VimDictionary,
   val type: Type,
 ) : VimDataType() {
+
+  var isSelfFixed = false
 
   companion object {
     var lambdaCounter = 0
