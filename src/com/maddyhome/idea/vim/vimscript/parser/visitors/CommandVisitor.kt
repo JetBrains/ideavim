@@ -170,7 +170,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
 
   override fun visitCallCommand(ctx: CallCommandContext): Command {
     val ranges: Ranges = parseRanges(ctx.range())
-    val functionCall = ExpressionVisitor.visitFunctionCall(ctx.functionCall())
+    val functionCall = ExpressionVisitor.visit(ctx.expr())
     return CallCommand(ranges, functionCall)
   }
 

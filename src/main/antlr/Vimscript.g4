@@ -112,7 +112,7 @@ command:
     ws_cols range? ws_cols DELF (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName (comment | statementSeparator)
     #DelfunctionCommand|
 
-    ws_cols range? ws_cols CALL WS+ functionCall WS* (comment | statementSeparator)
+    ws_cols range? ws_cols CALL WS+ expr WS* (comment | statementSeparator)
     #CallCommand|
 
     ws_cols range? ws_cols ACTION (WS* commandArgument) (comment | statementSeparator)
