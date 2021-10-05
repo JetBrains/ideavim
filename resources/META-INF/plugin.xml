@@ -2,37 +2,15 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-      <h3>Features:</h3>
-      <ul>
-        <li>New engine for Vim Script execution. Check out the <a href="https://jb.gg/vim-script-discussion">GitHub
-          Discussion</a>.
-        </li>
-        <li>Mapping keys to expressions (map &lt;expr&gt;). See <code>:h map-expression</code>.</li>
-      </ul>
-
       <h3>Fixes:</h3>
       <ul>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2368">VIM-2368</a> Do not remove selection on right click</li>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2392">VIM-2392</a> Fix possible out of bounds exception</li>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2387">VIM-2387</a> Fix coping with unnamed and ideaput</li>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2400">VIM-2400</a> Fix vim script parser</li>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2401">VIM-2401</a> Exceptions occurred during execution of
-          <code>map&lt;expr&gt;</code> are now shown in status bar
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2405">VIM-2405</a> ExExceptions during <code>map
+          &lt;expr&gt;</code> execution are now displayed in status bar
         </li>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2404">VIM-2404</a> Fix multiple pastes from unnamed clipboard
-        </li>
-      </ul>
-
-      <h3>Changes:</h3>
-      <ul>
-        <li>New versioning scheme. Current version is <code>1.7.0</code> instead of <code>0.70</code>.</li>
-      </ul>
-
-      <h3>Merged PRs:</h3>
-      <ul>
-        <li><a href="https://github.com/JetBrains/ideavim/pull/349">349</a> by <a href="https://github.com/nizienko">eugene
-          nizienko</a>: Run UI test ci
-        </li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2406">VIM-2406</a> Fix go to line command</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2408">VIM-2408</a> Fix vim script parser</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2409">VIM-2409</a> Fix substitute command</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2411">VIM-2411</a> Fix vim script parser</li>
       </ul>
     ]]>
   </change-notes>

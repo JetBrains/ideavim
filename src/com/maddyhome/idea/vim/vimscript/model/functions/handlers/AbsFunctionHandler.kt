@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -30,6 +30,7 @@ import kotlin.math.abs
 
 object AbsFunctionHandler : FunctionHandler() {
 
+  override val name = "abs"
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 1
 
@@ -37,9 +38,9 @@ object AbsFunctionHandler : FunctionHandler() {
     argumentValues: List<Expression>,
     editor: Editor,
     context: DataContext,
-    vimContext: VimContext,
+    parent: Executable,
   ): VimDataType {
-    val argument = argumentValues[0].evaluate(editor, context, vimContext)
+    val argument = argumentValues[0].evaluate(editor, context, parent)
     return if (argument is VimFloat) {
       VimFloat(abs(argument.value))
     } else {

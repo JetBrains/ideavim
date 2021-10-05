@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.group.HistoryGroup
 import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.RepeatCommand
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
@@ -44,11 +43,11 @@ object Executor {
     var finalResult: ExecutionResult = ExecutionResult.Success
 
     val script = VimscriptParser.parse(scriptString)
-    val vimContext = VimContext()
+    script.units.forEach { it.parent = script }
 
     for (unit in script.units) {
       try {
-        val result = unit.execute(editor, context, vimContext)
+        val result = unit.execute(editor, context)
         if (result is ExecutionResult.Error) {
           finalResult = ExecutionResult.Error
           if (indicateErrors) {

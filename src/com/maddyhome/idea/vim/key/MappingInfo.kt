@@ -42,7 +42,7 @@ import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
-import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -113,6 +113,7 @@ class ToKeysMappingInfo(
 
 class ToExpressionMappingInfo(
   private val toExpression: Expression,
+  private val parent: Executable,
   fromKeys: List<KeyStroke>,
   isRecursive: Boolean,
   owner: MappingOwner,
@@ -123,7 +124,7 @@ class ToExpressionMappingInfo(
   override fun execute(editor: Editor, context: DataContext) {
     LOG.debug("Executing 'ToExpression' mapping info...")
     val editorDataContext = EditorDataContext.init(editor, context)
-    val toKeys = parseKeys(toExpression.evaluate(editor, context, VimContext()).toString())
+    val toKeys = parseKeys(toExpression.evaluate(editor, context, parent).toString())
     val fromIsPrefix = KeyHandler.isPrefix(fromKeys, toKeys)
     var first = true
     for (keyStroke in toKeys) {

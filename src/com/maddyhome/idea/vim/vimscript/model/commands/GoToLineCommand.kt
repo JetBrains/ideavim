@@ -8,7 +8,6 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 import java.lang.Integer.min
 
 /**
@@ -23,7 +22,6 @@ data class GoToLineCommand(val ranges: Ranges) :
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    vimContext: VimContext,
   ): ExecutionResult {
     val line = min(this.getLine(editor, caret), EditorHelper.getLineCount(editor) - 1)
 

@@ -21,39 +21,35 @@ package com.maddyhome.idea.vim.vimscript.model.functions
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
-import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 
 abstract class FunctionHandler {
 
+  abstract val name: String
+  open val scope: Scope? = null
   abstract val minimumNumberOfArguments: Int?
   abstract val maximumNumberOfArguments: Int?
+  var ranges: Ranges? = null
 
-  protected abstract fun doFunction(
-    argumentValues: List<Expression>,
-    editor: Editor,
-    context: DataContext,
-    vimContext: VimContext,
-  ): VimDataType
+  protected abstract fun doFunction(argumentValues: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType
 
-  fun executeFunction(
-    functionCall: FunctionCallExpression,
-    editor: Editor,
-    context: DataContext,
-    vimContext: VimContext,
-  ): VimDataType {
-    checkFunctionCall(functionCall)
-    return doFunction(functionCall.arguments, editor, context, vimContext)
+  fun executeFunction(arguments: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType {
+    checkFunctionCall(arguments)
+    val result = doFunction(arguments, editor, context, parent)
+    ranges = null
+    return result
   }
 
-  private fun checkFunctionCall(functionCall: FunctionCallExpression) {
-    if (minimumNumberOfArguments != null && functionCall.arguments.size < minimumNumberOfArguments!!) {
-      throw ExException("E119: Not enough arguments for function: ${functionCall.functionName}")
+  private fun checkFunctionCall(arguments: List<Expression>) {
+    if (minimumNumberOfArguments != null && arguments.size < minimumNumberOfArguments!!) {
+      throw ExException("E119: Not enough arguments for function: $name")
     }
-    if (maximumNumberOfArguments != null && functionCall.arguments.size > maximumNumberOfArguments!!) {
-      throw ExException("E118: Too many arguments for function: ${functionCall.functionName}")
+    if (maximumNumberOfArguments != null && arguments.size > maximumNumberOfArguments!!) {
+      throw ExException("E118: Too many arguments for function: $name")
     }
   }
 }

@@ -18,14 +18,14 @@
 
 package com.maddyhome.idea.vim.helper
 
-import com.intellij.AbstractBundle
+import com.intellij.DynamicBundle
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 
 @NonNls
 private const val IDEAVIM_BUNDLE = "messages.IdeaVimBundle"
 
-object MessageHelper : AbstractBundle(IDEAVIM_BUNDLE) {
+object MessageHelper : DynamicBundle(IDEAVIM_BUNDLE) {
 
   const val BUNDLE = IDEAVIM_BUNDLE
 

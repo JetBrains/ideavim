@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 
 /**
  * see "h :delete"
@@ -33,7 +32,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimContext
 data class DeleteLinesCommand(val ranges: Ranges, var argument: String) : Command.ForEachCaret(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
-  override fun processCommand(editor: Editor, caret: Caret, context: DataContext, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, caret: Caret, context: DataContext): ExecutionResult {
     val argument = this.argument
     val register = if (argument.isNotEmpty() && !argument[0].isDigit()) {
       this.argument = argument.substring(1)

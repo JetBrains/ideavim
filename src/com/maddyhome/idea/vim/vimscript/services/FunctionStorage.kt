@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.vimscript.services
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionBeanClass
@@ -30,43 +30,32 @@ import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 
 object FunctionStorage {
 
-  private val builtInFunctionHandlers: MutableMap<String, FunctionHandler> = mutableMapOf()
-  private val globalFunctionHandlers: MutableMap<String, FunctionHandler> = mutableMapOf()
-  private val scriptFunctionHandlers: MutableMap<String, MutableMap<String, FunctionHandler>> = mutableMapOf()
-  private val autoloadFunctionHandlers: MutableMap<String, FunctionHandler> = mutableMapOf()
   private val logger = logger<FunctionStorage>()
-  private val extensionPoint = ExtensionPointName.create<FunctionBeanClass>("IdeaVIM.vimLibraryFunction")
 
-  fun deleteFunction(name: String, vimContext: VimContext, scope: Scope? = null, scriptName: String? = null) {
+  private val globalFunctions: MutableMap<String, FunctionDeclaration> = mutableMapOf()
+
+  private val extensionPoint = ExtensionPointName.create<FunctionBeanClass>("IdeaVIM.vimLibraryFunction")
+  private val builtInFunctions: MutableMap<String, FunctionHandler> = mutableMapOf()
+
+  fun deleteFunction(name: String, scope: Scope? = null, parent: Executable) {
     if (name[0].isLowerCase() && scope != Scope.SCRIPT_VARIABLE) {
       throw ExException("E128: Function name must start with a capital or \"s:\": $name")
-    }
-
-    if (scriptName != null) {
-      val fullName = "$scriptName#$name"
-      if (autoloadFunctionHandlers.containsKey(fullName)) {
-        autoloadFunctionHandlers.remove(fullName)
-        return
-      } else {
-        throw ExException("E130: Unknown function: $fullName")
-      }
     }
 
     if (scope != null)
       when (scope) {
         Scope.GLOBAL_VARIABLE -> {
-          if (globalFunctionHandlers.containsKey(name)) {
-            globalFunctionHandlers.remove(name)
+          if (globalFunctions.containsKey(name)) {
+            globalFunctions[name]!!.isDeleted = true
+            globalFunctions.remove(name)
             return
           } else {
             throw ExException("E130: Unknown function: ${scope.c}:$name")
           }
         }
         Scope.SCRIPT_VARIABLE -> {
-          if (scriptFunctionHandlers.containsKey(vimContext.getScriptName()) &&
-            scriptFunctionHandlers[vimContext.getScriptName()]!!.containsKey(name)
-          ) {
-            scriptFunctionHandlers[vimContext.getScriptName()]!!.remove(name)
+          if (getScriptFunction(name, parent) != null) {
+            deleteScriptFunction(name, parent)
             return
           } else {
             throw ExException("E130: Unknown function: ${scope.c}:$name")
@@ -75,101 +64,90 @@ object FunctionStorage {
         else -> throw ExException("E130: Unknown function: ${scope.c}:$name")
       }
 
-    if (globalFunctionHandlers.containsKey(name)) {
-      globalFunctionHandlers.remove(name)
+    if (globalFunctions.containsKey(name)) {
+      globalFunctions[name]!!.isDeleted = true
+      globalFunctions.remove(name)
       return
     }
-    if (scriptFunctionHandlers.containsKey(vimContext.getScriptName()) &&
-      scriptFunctionHandlers[vimContext.getScriptName()]!!.containsKey(name)
-    ) {
-      scriptFunctionHandlers[vimContext.getScriptName()]!!.remove(name)
+    if (getScriptFunction(name, parent) != null) {
+      deleteScriptFunction(name, parent)
       return
     }
     throw ExException("E130: Unknown function: $name")
   }
 
-  fun storeFunction(declaration: FunctionDeclaration, vimContext: VimContext) {
-    if (declaration.scriptName != null) {
-      val fullName = "${declaration.scriptName}#${declaration.name}"
-      if (autoloadFunctionHandlers.containsKey(fullName) && !declaration.replaceExisting) {
-        throw ExException("E122: Function $fullName already exists, add ! to replace it")
-      }
-      autoloadFunctionHandlers[fullName] = DefinedFunctionHandler(declaration.args, declaration.body)
-      return
-    }
-    val scope: Scope = declaration.scope ?: getDefaultFunctionScope(vimContext)
+  fun storeFunction(declaration: FunctionDeclaration) {
+    val scope: Scope = declaration.scope ?: getDefaultFunctionScope()
     when (scope) {
       Scope.GLOBAL_VARIABLE -> {
-        if (globalFunctionHandlers.containsKey(declaration.name) && !declaration.replaceExisting) {
+        if (globalFunctions.containsKey(declaration.name) && !declaration.replaceExisting) {
           throw ExException("E122: Function ${declaration.name} already exists, add ! to replace it")
         } else {
-          globalFunctionHandlers[declaration.name] = DefinedFunctionHandler(declaration.args, declaration.body)
+          globalFunctions[declaration.name] = declaration
         }
       }
       Scope.SCRIPT_VARIABLE -> {
-        if (scriptFunctionHandlers.containsKey(vimContext.getScriptName()) &&
-          scriptFunctionHandlers[vimContext.getScriptName()]!!.containsKey(declaration.name) &&
-          !declaration.replaceExisting
-        ) {
+        if (getScriptFunction(declaration.name, declaration) != null && !declaration.replaceExisting) {
           throw ExException("E122: Function ${declaration.name} already exists, add ! to replace it")
         } else {
-          if (scriptFunctionHandlers.containsKey(vimContext.getScriptName())) {
-            scriptFunctionHandlers[vimContext.getScriptName()]!![declaration.name] =
-              DefinedFunctionHandler(declaration.args, declaration.body)
-          } else {
-            scriptFunctionHandlers[vimContext.getScriptName()] =
-              mutableMapOf(declaration.name to DefinedFunctionHandler(declaration.args, declaration.body))
-          }
+          storeScriptFunction(declaration)
         }
       }
       else -> throw ExException("E884: Function name cannot contain a colon: ${scope.c}:${declaration.name}")
     }
   }
 
-  fun getFunctionHandler(name: String, vimContext: VimContext, scope: Scope? = null, scriptName: String? = null):
-    FunctionHandler {
-    if (scriptName != null) {
-      val fullName = "$scriptName#$name"
-      return autoloadFunctionHandlers[fullName] ?: throw throw ExException("E117: Unknown function: $fullName")
-    }
-    if (builtInFunctionHandlers.containsKey(name)) {
-      return builtInFunctionHandlers[name]!!
-    }
-
-    if (scope != null)
-      when (scope) {
-        Scope.GLOBAL_VARIABLE -> {
-          if (globalFunctionHandlers.containsKey(name)) {
-            return globalFunctionHandlers[name]!!
-          } else {
-            throw ExException("E117: Unknown function: ${scope.c}:$name")
-          }
-        }
-        Scope.SCRIPT_VARIABLE -> {
-          if (scriptFunctionHandlers.containsKey(vimContext.getScriptName()) &&
-            scriptFunctionHandlers[vimContext.getScriptName()]!!.containsKey(name)
-          ) {
-            return scriptFunctionHandlers[vimContext.getScriptName()]!![name]!!
-          } else {
-            throw ExException("E117: Unknown function: ${scope.c}:$name")
-          }
-        }
-        else -> throw ExException("E117: Unknown function: ${scope.c}:$name")
-      }
-
-    if (globalFunctionHandlers.containsKey(name)) {
-      return globalFunctionHandlers[name]!!
-    }
-    if (scriptFunctionHandlers.containsKey(vimContext.getScriptName()) &&
-      scriptFunctionHandlers[vimContext.getScriptName()]!!.containsKey(name)
-    ) {
-      return scriptFunctionHandlers[vimContext.getScriptName()]!![name]!!
-    }
-    throw ExException("E117: Unknown function: $name")
+  fun getFunctionHandler(scope: Scope?, name: String, parent: Executable): FunctionHandler {
+    return getFunctionHandlerOrNull(scope, name, parent)
+      ?: throw ExException("E117: Unknown function: ${if (scope != null) scope.c + ":" else ""}$name")
   }
 
-  private fun getDefaultFunctionScope(vimContext: VimContext): Scope {
-    return Scope.SCRIPT_VARIABLE
+  // todo g:abs should be unknown function !!!
+  fun getFunctionHandlerOrNull(scope: Scope?, name: String, parent: Executable): FunctionHandler? {
+    val builtInFunction = getBuiltInFunction(name)
+    if (builtInFunction != null) {
+      return builtInFunction
+    }
+    val definedFunction = getUserDefinedFunction(scope, name, parent)
+    if (definedFunction != null) {
+      return DefinedFunctionHandler(definedFunction)
+    }
+    return null
+  }
+
+  fun getUserDefinedFunction(scope: Scope?, name: String, parent: Executable): FunctionDeclaration? {
+    return when (scope) {
+      Scope.GLOBAL_VARIABLE -> globalFunctions[name]
+      Scope.SCRIPT_VARIABLE -> getScriptFunction(name, parent)
+      null -> globalFunctions[name] ?: getScriptFunction(name, parent)
+      else -> null
+    }
+  }
+
+  fun getBuiltInFunction(name: String): FunctionHandler? {
+    return builtInFunctions[name]
+  }
+
+  private fun storeScriptFunction(functionDeclaration: FunctionDeclaration) {
+    val script = functionDeclaration.getScript()
+    script.scriptFunctions[functionDeclaration.name] = functionDeclaration
+  }
+
+  private fun getScriptFunction(name: String, parent: Executable): FunctionDeclaration? {
+    val script = parent.getScript()
+    return script.scriptFunctions[name]
+  }
+
+  private fun deleteScriptFunction(name: String, parent: Executable) {
+    val script = parent.getScript()
+    if (script.scriptFunctions[name] != null) {
+      script.scriptFunctions[name]!!.isDeleted = true
+    }
+    script.scriptFunctions.remove(name)
+  }
+
+  private fun getDefaultFunctionScope(): Scope {
+    return Scope.GLOBAL_VARIABLE
   }
 
   fun registerHandlers() {
@@ -178,7 +156,7 @@ object FunctionStorage {
 
   fun addHandler(handlerHolder: FunctionBeanClass) {
     if (handlerHolder.name != null) {
-      builtInFunctionHandlers[handlerHolder.name!!] = handlerHolder.instance
+      builtInFunctions[handlerHolder.name!!] = handlerHolder.instance
     } else {
       logger.error("Received function handler with null name")
     }

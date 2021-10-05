@@ -20,11 +20,13 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -34,6 +36,7 @@ import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 
 object EmptyFunctionHandler : FunctionHandler() {
 
+  override val name = "empty"
   override val minimumNumberOfArguments: Int = 1
   override val maximumNumberOfArguments: Int = 1
 
@@ -41,9 +44,9 @@ object EmptyFunctionHandler : FunctionHandler() {
     argumentValues: List<Expression>,
     editor: Editor,
     context: DataContext,
-    vimContext: VimContext,
+    parent: Executable,
   ): VimDataType {
-    val argument = argumentValues[0].evaluate(editor, context, vimContext)
+    val argument = argumentValues[0].evaluate(editor, context, Script(listOf()))
     // TODO: 03.08.2021
     // - |v:false|, |v:none| and |v:null| are empty, |v:true| is not.
     val isEmpty = when (argument) {
@@ -52,6 +55,7 @@ object EmptyFunctionHandler : FunctionHandler() {
       is VimString -> argument.value.isEmpty()
       is VimInt -> argument.value == 0
       is VimFloat -> argument.value == 0.0
+      is VimFuncref -> false
       is VimBlob -> TODO("Not yet implemented")
     }
     return isEmpty.asVimInt()

@@ -23,6 +23,15 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## 1.7.2, 2021-09-30
+
+### Fixes:
+* [VIM-2405](https://youtrack.jetbrains.com/issue/VIM-2405) ExExceptions during `map <expr>` execution are now displayed in status bar
+* [VIM-2406](https://youtrack.jetbrains.com/issue/VIM-2406) Fix go to line command 
+* [VIM-2408](https://youtrack.jetbrains.com/issue/VIM-2408) Fix vim script parser
+* [VIM-2409](https://youtrack.jetbrains.com/issue/VIM-2409) Fix substitute command
+* [VIM-2411](https://youtrack.jetbrains.com/issue/VIM-2411) Fix vim script parser
+
 ## 1.7.1, 2021-09-20
 
 ### Fixes:

@@ -33,10 +33,7 @@ import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
-import com.maddyhome.idea.vim.vimscript.model.VimContext;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import com.maddyhome.idea.vim.vimscript.model.expressions.Scope;
-import com.maddyhome.idea.vim.vimscript.model.expressions.Variable;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -176,9 +173,7 @@ public class VimArgTextObjExtension implements VimExtension {
 
   @Nullable
   private static String bracketPairsVariable() {
-    // todo global scope & nullable editor context != good
-    final Object value = VariableService.INSTANCE
-      .getNullableVariableValue(new Variable(Scope.GLOBAL_VARIABLE, "argtextobj_pairs"), null, null, new VimContext());
+    final Object value = VariableService.INSTANCE.getGlobalVariable("argtextobj_pairs");
     if (value instanceof VimString) {
       return ((VimString)value).getValue();
     }

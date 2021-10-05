@@ -16,38 +16,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.vimscript.model
+package com.maddyhome.idea.vim.vimscript.model.expressions
 
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import java.util.*
 
-class VimContext {
-  val locations: Deque<CurrentLocation> = LinkedList()
-  val functionVariables: Deque<MutableMap<String, VimDataType>> = LinkedList()
-  val localVariables: Deque<MutableMap<String, VimDataType>> = LinkedList()
+class LambdaFunctionCallExpression(val lambda: LambdaExpression, val arguments: List<Expression>) : Expression() {
 
-  init {
-    locations.push(CurrentLocation.SCRIPT)
+  override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
+    val funcref = lambda.evaluate(editor, context, parent)
+    return funcref.execute(arguments, editor, context, parent)
   }
-
-  fun enterFunction() {
-    locations.push(CurrentLocation.FUNCTION)
-    localVariables.push(mutableMapOf())
-    functionVariables.push(mutableMapOf())
-  }
-
-  fun leaveFunction() {
-    locations.pop()
-    localVariables.pop()
-    functionVariables.pop()
-  }
-
-  fun getScriptName(): String {
-    return ".ideavimrc"
-  }
-}
-
-enum class CurrentLocation {
-  FUNCTION, // default variable scope is "l:"
-  SCRIPT, // default variable scope is "g:"
 }

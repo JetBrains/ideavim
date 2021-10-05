@@ -22,6 +22,7 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.helper.StringHelper;
+import com.maddyhome.idea.vim.vimscript.model.Executable;
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression;
 import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -99,8 +100,9 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
                   @NotNull Expression toExpression,
                   @NotNull MappingOwner owner,
                   @NotNull String originalString,
+                  @NotNull Executable parent,
                   boolean recursive) {
-    myKeys.put(new ArrayList<>(fromKeys), new ToExpressionMappingInfo(toExpression, fromKeys, recursive, owner, originalString));
+    myKeys.put(new ArrayList<>(fromKeys), new ToExpressionMappingInfo(toExpression, parent, fromKeys, recursive, owner, originalString));
     fillPrefixes(fromKeys);
   }
 

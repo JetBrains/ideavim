@@ -55,7 +55,6 @@ import com.maddyhome.idea.vim.key.Node
 import com.maddyhome.idea.vim.key.RequiredShortcut
 import com.maddyhome.idea.vim.key.RootNode
 import com.maddyhome.idea.vim.key.addLeafs
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
@@ -522,8 +521,7 @@ class NerdTree : VimExtension {
     }
 
     private fun registerCommand(variable: Variable, default: String, action: NerdAction) {
-      // fixme here we assume that scope is global
-      val variableValue = VariableService.getNullableVariableValue(variable, null, null, VimContext())
+      val variableValue = VariableService.getGlobalVariable(variable.name)
       val mappings = if (variableValue is VimString) {
         variableValue.value
       } else {

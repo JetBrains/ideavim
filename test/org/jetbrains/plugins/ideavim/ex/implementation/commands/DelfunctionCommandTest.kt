@@ -73,7 +73,7 @@ class DelfunctionCommandTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN_ERROR)
   fun `test delete nonexistent function with ignoreError flag`() {
     configureByText("\n")
-    typeText(commandToKeys("delfunction! F1()"))
+    typeText(commandToKeys("delfunction! F1"))
     assertPluginError(false)
   }
 }

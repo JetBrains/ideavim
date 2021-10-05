@@ -3,6 +3,7 @@ package org.jetbrains.plugins.ideavim.ex.parser.statements
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
+import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.model.statements.ReturnStatement
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.junit.experimental.theories.DataPoints
@@ -31,6 +32,10 @@ class FunctionDeclarationTests {
     val endfunctionAlias =
       listOf("endf", "endfu", "endfun", "endfunc", "endfunct", "endfuncti", "endfunctio", "endfunction")
       @DataPoints("endfunction") get
+
+    @JvmStatic
+    val flagAlias = listOf("range", "abort", "dict", "closure")
+      @DataPoints("flags") get
   }
 
   @Theory
@@ -109,6 +114,45 @@ class FunctionDeclarationTests {
     )
     assertEquals(1, script.units.size)
     assertTrue(script.units[0] is FunctionDeclaration)
+  }
+
+  @Theory
+  fun `function flag test`(
+    @FromDataPoints("flags") flag1: String,
+    @FromDataPoints("spaces") sp1: String,
+    @FromDataPoints("spaces") sp2: String,
+    @FromDataPoints("spaces") sp3: String,
+  ) {
+    val script = VimscriptParser.parse(
+      """
+        fun F1()$sp1$flag1$sp2
+        endf$sp3
+      """.trimIndent()
+    )
+    assertEquals(1, script.units.size)
+    assertTrue(script.units[0] is FunctionDeclaration)
+    val f = script.units[0] as FunctionDeclaration
+    assertEquals(f.flags, setOf(FunctionFlag.getByName(flag1)))
+  }
+
+  @Theory
+  fun `function with multiple flags test`(
+    @FromDataPoints("flags") flag1: String,
+    @FromDataPoints("flags") flag2: String,
+    @FromDataPoints("spaces") sp1: String,
+    @FromDataPoints("spaces") sp2: String,
+    @FromDataPoints("spaces") sp3: String,
+  ) {
+    val script = VimscriptParser.parse(
+      """
+        fun F1()$sp1$flag1 $flag2$sp2
+        endf$sp3
+      """.trimIndent()
+    )
+    assertEquals(1, script.units.size)
+    assertTrue(script.units[0] is FunctionDeclaration)
+    val f = script.units[0] as FunctionDeclaration
+    assertEquals(f.flags, setOf(FunctionFlag.getByName(flag1), FunctionFlag.getByName(flag2)))
   }
 
   @Theory

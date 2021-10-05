@@ -12,31 +12,34 @@
 ## Plans for the next releases:
 ### IdeaVim 1.8.0
 
-- [ ] move `s:` scoped variables to `Script` class  
-- [ ] move `l:` and `a:` scoped variables to the `FunctionDeclaration` class  
-- [ ] `closure` function flag  
-- [ ] `..` as concatenation operator    
-- [ ] access dictionary value by `dict.key`  
-- [ ] `abort` function flag  
-- [ ] `range` function flag  
-- [ ] `dict` function flag  
+- [x] move `s:` scoped variables to `Script` class  
+- [x] move `l:` and `a:` scoped variables to the `FunctionDeclaration` class  
+- [x] `closure` function flag  
+- [x] `..` as concatenation operator    
+- [x] falsy operator `??`
+- [x] access dictionary value by `dict.key`  
+- [x] `abort` function flag  
+- [x] `range` function flag  
+- [x] `call` command
+- [x] optional arguments `...`
+- [x] funcref type
+- [x] lambdas
+- [x] function as method
+- [x] `function` function
+- [x] `funcref` function
 - [ ] dictionary functions  
 - [ ] anonymous functions  
-- [ ] lambdas  
-- [ ] function as method  
-- [ ] funcref type  
-- [ ] default value in functions e.g. `function F1(a, b = 10)`  
-- [ ] falsy operator `??`  
-- [ ] pass Lists and Dictionaries by reference  
-- [ ] variable locking (`lock`, `unlock`, `const`)  
-- [ ] rewrite OptionManager to vim data types  
-- [ ] scoped options  
+- [ ] `dict` function flag
+- [ ] default value in functions e.g. `function F1(a, b = 10)`
+- [ ] delayed parsing of if/for/while etc.
+- [ ] `has("ide")` or "ide" option
+- [ ] reduce number of rules in grammar
 - [ ] classic package structure  
-- [ ] loggers loggers loggers  
-- [ ] more loggers
+- [ ] loggers
 
 ### IdeaVim 1.9.0   
-  
+
+- [ ] vim "special" type
 - [ ] make `LibraryFunction` return `Result`  
 - [ ] exception wrapping in try/catch  
 - [ ] store exception messages in property file  
@@ -44,10 +47,12 @@
 - [ ] expression register (`<C-R>=`)  
 - [ ] update tests to JUnit 5  
 - [ ] rethink vimscript tests  
-- [ ] delayed parsing of if/for/while etc.  
-- [ ] `has("ide")` or "ide" option  
-- [ ] `normal` command  
-- [ ] `call` command  
+- [ ] pass Lists and Dictionaries by reference
+- [ ] variable locking (`lock`, `unlock`, `const`)
+- [ ] rewrite OptionManager to vim data types
+- [ ] scoped options
+- [ ] `normal` command
+- [ ] `finish` statement
 - [ ] context dependent parsing e.g. `dict.key`  
 - [ ] improve `w:` and `t:` scopes  
 - [ ] `v:` scope  

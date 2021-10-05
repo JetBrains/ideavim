@@ -217,5 +217,6 @@ class Ranges {
   private var count = 0
   private var defaultLine = -1
   private var done = false
-  private val ranges: MutableList<Range> = mutableListOf()
+  private var ranges: MutableList<Range> = mutableListOf()
+  val rangesCount get() = ranges.size
 }

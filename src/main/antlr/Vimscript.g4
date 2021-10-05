@@ -23,7 +23,6 @@ forLoop2:
         blockMember*
     ws_cols ENDFOR WS* (comment | statementSeparator)
 ;
-
 whileLoop:
     ws_cols WHILE WS* expr WS* (comment | statementSeparator)
         blockMember*
@@ -70,7 +69,7 @@ finallyBlock:           ws_cols FINALLY WS* (comment | statementSeparator)
                             blockMember*
 ;
 
-functionDefinition:     ws_cols FUNCTION (replace = EXCLAMATION)? WS+ (SID | SNR)*(functionScope COLON)? functionName WS* L_PAREN WS* argumentsDeclaration R_PAREN WS* (flag = ~(BAR | NEW_LINE)*?) WS* (comment | statementSeparator)
+functionDefinition:     ws_cols FUNCTION (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName WS* L_PAREN WS* argumentsDeclaration R_PAREN WS* (functionFlag WS*)* (comment | statementSeparator)
                             blockMember*
                         ws_cols ENDFUNCTION WS* (comment | statementSeparator)
 ;
@@ -79,6 +78,7 @@ dictFunctionDefinition:
                             blockMember*
                         ws_cols ENDFUNCTION WS* (comment | statementSeparator)
 ;
+functionFlag:           RANGE | ABORT | DICT | CLOSURE;
 argumentsDeclaration:   (variableName (WS* COMMA WS* variableName)* (WS* COMMA WS* ETC WS*)? WS*)?;
 
 augroup:                ws_cols AUGROUP ~(NEW_LINE | BAR)* statementSeparator
@@ -111,6 +111,9 @@ command:
 
     ws_cols range? ws_cols DELF (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName (comment | statementSeparator)
     #DelfunctionCommand|
+
+    ws_cols range? ws_cols CALL WS+ expr WS* (comment | statementSeparator)
+    #CallCommand|
 
     ws_cols range? ws_cols ACTION (WS* commandArgument) (comment | statementSeparator)
     #ActionCommand|
@@ -288,7 +291,7 @@ command:
     ws_cols range? ws_cols SOURCE (WS* commandArgument)? (comment | statementSeparator)
     #SourceCommand|
 
-    ws_cols range? ws_cols substituteCommandName = (S_LOWERCASE | SUBSTITUTE | TILDE | AMPERSAND) (WS* commandArgument)? statementSeparator
+    ws_cols range? ws_cols substituteCommandName = (S_LOWERCASE | SUBSTITUTE | TILDE | AMPERSAND) (WS* commandArgumentWithBars)? NEW_LINE
     #SubstituteCommand|
 
     ws_cols range? ws_cols TAB_CLOSE (WS* commandArgument)? (comment | statementSeparator)
@@ -403,11 +406,15 @@ expr:                   WS* EXCLAMATION WS* expr                                
                     |   expr WS* binaryOperator4 WS* expr                                                               #BinExpression4
                     |   expr WS* binaryOperator5 WS* expr                                                               #BinExpression5
                     |   WS* unaryOperator = (PLUS | MINUS) WS* expr                                                     #UnaryExpression
+                    |   expr WS* ARROW WS* functionCall                                                                 #FunctionAsMethodCall1
+                    |   expr WS* ARROW WS* lambda L_PAREN WS* functionArguments WS* R_PAREN                             #FunctionAsMethodCall2
+                    |   functionCall                                                                                    #FunctionCallExpression
+                    |   lambda L_PAREN WS* functionArguments WS* R_PAREN                                                #LambdaFunctionCallExpression
+                    |   lambda                                                                                          #LambdaExpression
                     |	unsignedInt                                                                                     #IntExpression
                     |   unsignedFloat                                                                                   #FloatExpression
                     |   string                                                                                          #StringExpression
                     |   blob                                                                                            #BlobExpression
-                    |   functionCall                                                                                    #FunctionCallExpression
                     |   variable                                                                                        #VariableExpression
                     |   option                                                                                          #OptionExpression
                     |   envVariable                                                                                     #EnvVariableExpression
@@ -416,11 +423,12 @@ expr:                   WS* EXCLAMATION WS* expr                                
                     |   dictionary                                                                                      #DictionaryExpression
                     |   literalDictionary                                                                               #LiteralDictionaryExpression
                     |   L_PAREN WS* expr WS* R_PAREN                                                                    #WrappedExpression
+                    |   expr WS* QUESTION QUESTION WS* expr                                                             #FalsyExpression
                     |   expr WS* QUESTION WS* expr WS* COLON WS* expr                                                   #TernaryExpression
 ;
 
 binaryOperator1:        STAR | DIV | MOD;
-binaryOperator2:        PLUS | MINUS | DOT;
+binaryOperator2:        PLUS | MINUS | DOT | (DOT DOT);
 binaryOperator3:        LESS | LESS_IC | LESS_CS
                     |   GREATER | GREATER_IC | GREATER_CS
                     |   LESS_OR_EQUALS | LESS_OR_EQUALS_IC | LESS_OR_EQUALS_CS
@@ -436,6 +444,7 @@ binaryOperator4:        AMPERSAND AMPERSAND;
 binaryOperator5:        LOGICAL_OR;
 
 register:               AT (DIGIT | alphabeticChar | MINUS | COLON | DOT | MOD | NUM | ASSIGN | STAR | PLUS | TILDE | UNDERSCORE | DIV | AT);
+lambda:                 L_CURLY WS* argumentsDeclaration WS* ARROW WS* expr WS* R_CURLY;
 
 variable:               (variableScope COLON)? variableName;
 variableName:           anyCaseNameWithDigitsAndUnderscores | unsignedInt;
@@ -595,6 +604,10 @@ keyword:                FUNCTION
                     |   CATCH
                     |   FINALLY
                     |   ENDTRY
+                    |   RANGE
+                    |   ABORT
+                    |   DICT
+                    |   CLOSURE
                     |   existingCommands
 ;
 existingCommands:       RETURN
@@ -739,6 +752,10 @@ Z_UPPERCASE:            'Z';
 // Keywords
 FUNCTION:               'fu' | 'fun' | 'func' | 'funct' | 'functi' | 'functio' | 'function';
 ENDFUNCTION:            'endf' | 'endfu' | 'endfun' | 'endfunc' | 'endfunct' | 'endfuncti' | 'endfunctio' | 'endfunction';
+RANGE:                  'range';
+ABORT:                  'abort';
+DICT:                   'dict';
+CLOSURE:                'closure';
 FOR:                    'for';
 ENDFOR:                 'endfo' | 'endfor';
 IN:                     'in';
@@ -768,6 +785,7 @@ ASCII:                  'as' | 'asc' | 'asci' | 'ascii';
 BUFFER:                 'bu' | 'buf' | 'buff' | 'buffe' | 'buffer';
 BUFFER_CLOSE:           'bd' | 'bde' | 'bdel' | 'bdele' | 'bdelet' | 'bdelete';
 BUFFER_LIST:            'buffers' | 'ls' | 'files';
+CALL:                   'cal' | 'call';
 CLASS:                  'cla' | 'clas' | 'class';
 CMD:                    'com' | 'comm' | 'comma' | 'comman' | 'command';
 CMD_CLEAR:              'comc' | 'comcl' | 'comcle' | 'comclea' | 'comclear';
@@ -897,6 +915,7 @@ CARET:                  '^';
 BACKTICK:               '`';
 BAR:                    '|';
 ETC:                    '...';
+ARROW:                  '->';
 
 // Mixed operators
 PLUS:                   '+';

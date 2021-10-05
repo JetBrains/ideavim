@@ -1,5 +1,6 @@
 package com.maddyhome.idea.vim.vimscript.parser.visitors
 
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -7,7 +8,11 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.BinExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.DictionaryExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
+import com.maddyhome.idea.vim.vimscript.model.expressions.FalsyExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.FuncrefCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaFunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.ListExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OptionExpression
@@ -25,6 +30,7 @@ import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.BlobExpressionContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.DictionaryExpressionContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.EnvVariableExpressionContext
+import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.FalsyExpressionContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.FloatExpressionContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.FunctionCallExpressionContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.IntExpressionContext
@@ -40,6 +46,7 @@ import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.UnaryEx
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.VariableContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.VariableExpressionContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.WrappedExpressionContext
+import org.antlr.v4.runtime.ParserRuleContext
 
 object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
 
@@ -95,8 +102,46 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     val operatorString = ctx.binaryOperator2().text
-    val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
-    return BinExpression(left, right, operator)
+
+    return if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && matchesLiteralDictionaryKey(
+        ctx.expr(1).text
+      )
+    ) {
+      val index = SimpleExpression(VimString(ctx.expr(1).text))
+      OneElementSublistExpression(index, left)
+    } else if (operatorString == "-" && left is OneElementSublistExpression && !containsSpaces(ctx) && matchesLiteralDictionaryKey(
+        ctx.expr(1).text
+      )
+    ) {
+      val postfix = "-" + ctx.expr(1).text
+      val newIndex = SimpleExpression(VimString((left.index as SimpleExpression).data.asString() + postfix))
+      OneElementSublistExpression(newIndex, left.expression)
+    } else if (operatorString == "." && !containsSpaces(ctx) && right is FunctionCallExpression && evaluationResultCouldBeADictionary(left)) {
+      val index = SimpleExpression(VimString(right.functionName))
+      FuncrefCallExpression(OneElementSublistExpression(index, left), right.arguments)
+    } else {
+      val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
+      BinExpression(left, right, operator)
+    }
+  }
+
+  private fun containsSpaces(ctx: ParserRuleContext): Boolean {
+    for (child in ctx.children) {
+      if (child.text.isBlank()) return true
+    }
+    return false
+  }
+
+  private fun matchesLiteralDictionaryKey(string: String): Boolean {
+    return string.matches(Regex("[a-zA-Z_-]+"))
+  }
+
+  private fun evaluationResultCouldBeADictionary(ctx: Expression): Boolean {
+    return when (ctx) {
+      is ListExpression, is UnaryExpression -> false
+      is SimpleExpression -> ctx.data is VimDictionary
+      else -> true
+    }
   }
 
   override fun visitBinExpression3(ctx: VimscriptParser.BinExpression3Context): Expression {
@@ -152,15 +197,47 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     return TernaryExpression(condition, then, otherwise)
   }
 
+  override fun visitFunctionAsMethodCall1(ctx: VimscriptParser.FunctionAsMethodCall1Context): FunctionCallExpression {
+    val functionCall = visitFunctionCall(ctx.functionCall())
+    functionCall.arguments.add(0, visit(ctx.expr()))
+    return functionCall
+  }
+
+  override fun visitFunctionAsMethodCall2(ctx: VimscriptParser.FunctionAsMethodCall2Context): LambdaFunctionCallExpression {
+    val lambda = visitLambda(ctx.lambda())
+    val arguments = mutableListOf(visit(ctx.expr()))
+    arguments.addAll(ctx.functionArguments().expr().mapNotNull { visit(it) })
+    return LambdaFunctionCallExpression(lambda, arguments)
+  }
+
   override fun visitFunctionCallExpression(ctx: FunctionCallExpressionContext): Expression {
-    val functionName = ctx.functionCall().functionName().text
+    return visitFunctionCall(ctx.functionCall())
+  }
+
+  override fun visitFunctionCall(ctx: VimscriptParser.FunctionCallContext): FunctionCallExpression {
+    val functionName = ctx.functionName().text
     var scope: Scope? = null
-    if (ctx.functionCall().functionScope() != null) {
-      scope = Scope.getByValue(ctx.functionCall().functionScope().text)
+    if (ctx.functionScope() != null) {
+      scope = Scope.getByValue(ctx.functionScope().text)
     }
-    val functionArguments = ctx.functionCall().functionArguments().expr()
-      .mapNotNull { visit(it) }
+    val functionArguments = ctx.functionArguments().expr().mapNotNull { visit(it) }.toMutableList()
     return FunctionCallExpression(scope, functionName, functionArguments)
+  }
+
+  override fun visitLambdaFunctionCallExpression(ctx: VimscriptParser.LambdaFunctionCallExpressionContext): LambdaFunctionCallExpression {
+    val lambda = visitLambda(ctx.lambda())
+    val arguments = ctx.functionArguments().expr().mapNotNull { visit(it) }
+    return LambdaFunctionCallExpression(lambda, arguments)
+  }
+
+  override fun visitLambdaExpression(ctx: VimscriptParser.LambdaExpressionContext?): Expression {
+    return super.visitLambdaExpression(ctx)
+  }
+
+  override fun visitLambda(ctx: VimscriptParser.LambdaContext): LambdaExpression {
+    val arguments = ctx.argumentsDeclaration().variableName().map { it.text }
+    val expr = visit(ctx.expr())
+    return LambdaExpression(arguments, expr)
   }
 
   override fun visitSublistExpression(ctx: SublistExpressionContext): Expression {
@@ -187,6 +264,12 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   override fun visitVariable(ctx: VariableContext): Expression {
     val scope = if (ctx.variableScope() == null) null else Scope.getByValue(ctx.variableScope().text)
     return Variable(scope, ctx.variableName().text)
+  }
+
+  override fun visitFalsyExpression(ctx: FalsyExpressionContext): Expression {
+    val left = visit(ctx.expr(0))
+    val right = visit(ctx.expr(1))
+    return FalsyExpression(left, right)
   }
 
   override fun visitBlobExpression(ctx: BlobExpressionContext?): Expression {

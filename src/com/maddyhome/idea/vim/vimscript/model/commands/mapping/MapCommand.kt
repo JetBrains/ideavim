@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand.SpecialArgument.EXPR
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand.SpecialArgument.SCRIPT
@@ -46,7 +45,7 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
-  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     return if (executeCommand(editor)) ExecutionResult.Success else ExecutionResult.Error
   }
 
@@ -71,7 +70,7 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
 
     if (arguments.specialArguments.contains(EXPR)) {
       VimPlugin.getKey()
-        .putKeyMapping(modes, arguments.fromKeys, MappingOwner.IdeaVim, arguments.toExpr, arguments.secondArgument, commandInfo.isRecursive)
+        .putKeyMapping(modes, arguments.fromKeys, MappingOwner.IdeaVim, arguments.toExpr, arguments.secondArgument, this, commandInfo.isRecursive)
     } else {
       val toKeys = parseKeys(arguments.secondArgument)
       VimPlugin.getKey()

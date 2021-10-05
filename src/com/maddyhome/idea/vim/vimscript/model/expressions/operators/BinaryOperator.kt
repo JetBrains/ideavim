@@ -45,6 +45,7 @@ enum class BinaryOperator(val value: String, val handler: BinaryOperatorHandler)
   ADDITION("+", AdditionHandler),
   SUBTRACTION("-", SubtractionHandler),
   CONCATENATION(".", ConcatenationHandler),
+  CONCATENATION2("..", ConcatenationHandler),
   LESS("<", LessHandler),
   LESS_IGNORE_CASE("<?", LessIgnoreCaseHandler),
   LESS_CASE_SENSITIVE("<#", LessCaseSensitiveHandler),

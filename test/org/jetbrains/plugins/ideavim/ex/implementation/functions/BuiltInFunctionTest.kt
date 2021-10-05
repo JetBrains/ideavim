@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex.implementation.expressions
+package org.jetbrains.plugins.ideavim.ex.implementation.functions
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -130,5 +130,41 @@ class BuiltInFunctionTest : VimTestCase() {
 
     typeText(commandToKeys("""echo col([0, 1]) col([1, 1]) col([5, 1]) col([6, 1]) col([5, 2])"""))
     assertExOutput("0 1 1 0 2\n")
+  }
+
+  fun `test exists`() {
+    configureByText("\n")
+    typeText(commandToKeys("echo exists(5)"))
+    assertExOutput("0\n")
+
+    typeText(commandToKeys("echo exists(\"&nu\")"))
+    assertExOutput("1\n")
+
+    typeText(commandToKeys("echo exists(\"&unknownOptionName\")"))
+    assertExOutput("0\n")
+  }
+
+  fun `test len`() {
+    configureByText("\n")
+    typeText(commandToKeys("echo len(123)"))
+    assertExOutput("3\n")
+
+    typeText(commandToKeys("echo len('abcd')"))
+    assertExOutput("4\n")
+
+    typeText(commandToKeys("echo len([1])"))
+    assertExOutput("1\n")
+
+    typeText(commandToKeys("echo len({})"))
+    assertExOutput("0\n")
+
+    typeText(commandToKeys("echo len(#{1: 'one'})"))
+    assertExOutput("1\n")
+
+    typeText(commandToKeys("echo len(12 . 4)"))
+    assertExOutput("3\n")
+
+    typeText(commandToKeys("echo len(4.2)"))
+    assertPluginErrorMessageContains("E701: Invalid type for len()")
   }
 }

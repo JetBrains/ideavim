@@ -26,7 +26,8 @@ import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLine
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
@@ -37,6 +38,7 @@ import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 // TODO: 03.08.2021 Support second parameter
 object LineFunctionHandler : FunctionHandler() {
 
+  override val name = "line"
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 2
 
@@ -44,10 +46,10 @@ object LineFunctionHandler : FunctionHandler() {
     argumentValues: List<Expression>,
     editor: Editor,
     context: DataContext,
-    vimContext: VimContext,
+    parent: Executable,
   ): VimInt {
     if (editor == null) return VimInt.ZERO
-    val argument = argumentValues[0].evaluate(editor, context, vimContext)
+    val argument = argumentValues[0].evaluate(editor, context, Script(listOf()))
 
     return variableToPosition(editor, argument, true)?.first ?: VimInt.ZERO
   }
@@ -55,6 +57,7 @@ object LineFunctionHandler : FunctionHandler() {
 
 object ColFunctionHandler : FunctionHandler() {
 
+  override val name = "col"
   override val minimumNumberOfArguments = 1
   override val maximumNumberOfArguments = 1
 
@@ -62,9 +65,9 @@ object ColFunctionHandler : FunctionHandler() {
     argumentValues: List<Expression>,
     editor: Editor,
     context: DataContext,
-    vimContext: VimContext,
+    parent: Executable,
   ): VimDataType {
-    val argument = argumentValues[0].evaluate(editor, context, vimContext)
+    val argument = argumentValues[0].evaluate(editor, context, Script(listOf()))
     if (editor == null) return VimInt.ZERO
 
     return variableToPosition(editor, argument, false)?.second ?: VimInt.ZERO

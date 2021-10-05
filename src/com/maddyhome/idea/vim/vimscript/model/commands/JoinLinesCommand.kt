@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 
 /**
  * see "h :join"
@@ -33,7 +32,7 @@ import com.maddyhome.idea.vim.vimscript.model.VimContext
 data class JoinLinesCommand(val ranges: Ranges, val argument: String) : Command.ForEachCaret(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
 
-  override fun processCommand(editor: Editor, caret: Caret, context: DataContext, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, caret: Caret, context: DataContext): ExecutionResult {
     val arg = argument
     val spaces = arg.isEmpty() || arg[0] != '!'
 

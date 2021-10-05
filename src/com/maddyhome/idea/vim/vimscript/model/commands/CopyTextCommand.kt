@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
-import com.maddyhome.idea.vim.vimscript.model.VimContext
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 
 /**
@@ -36,7 +35,7 @@ import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 data class CopyTextCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.WRITABLE)
 
-  override fun processCommand(editor: Editor, context: DataContext, vimContext: VimContext): ExecutionResult {
+  override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     val carets = EditorHelper.getOrderedCaretsList(editor)
     for (caret in carets) {
       val range = getTextRange(editor, caret, false)

@@ -23,55 +23,44 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
-import com.maddyhome.idea.vim.vimscript.model.CurrentLocation
-import com.maddyhome.idea.vim.vimscript.model.VimContext
+import com.maddyhome.idea.vim.vimscript.model.Executable
+import com.maddyhome.idea.vim.vimscript.model.ExecutableContext
+import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
+import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 
 object VariableService {
 
   private var globalVariables: MutableMap<String, VimDataType> = mutableMapOf()
-  private var scriptVariables: MutableMap<String, MutableMap<String, VimDataType>> = mutableMapOf()
   private val tabAndWindowVariablesKey = Key<MutableMap<String, VimDataType>>("TabAndWindowVariables")
   private val bufferVariablesKey = Key<MutableMap<String, VimDataType>>("BufferVariables")
 
-  private fun getDefaultVariableScope(vimContext: VimContext): Scope {
-    return when (vimContext.locations.peek()) {
-      CurrentLocation.SCRIPT -> Scope.GLOBAL_VARIABLE
-      CurrentLocation.FUNCTION -> Scope.LOCAL_VARIABLE
-      null -> throw RuntimeException("VimContexts current location is undefined")
+  private fun getDefaultVariableScope(executable: Executable): Scope {
+    return when (executable.getContext()) {
+      ExecutableContext.SCRIPT -> Scope.GLOBAL_VARIABLE
+      ExecutableContext.FUNCTION -> Scope.LOCAL_VARIABLE
     }
   }
 
-  fun storeVariable(
-    variable: Variable,
-    value: VimDataType,
-    editor: Editor?,
-    context: DataContext?,
-    vimContext: VimContext,
-  ) {
-    val scope = variable.scope ?: getDefaultVariableScope(vimContext)
+  fun storeVariable(variable: Variable, value: VimDataType, editor: Editor?, context: DataContext?, parent: Executable) {
+    val scope = variable.scope ?: getDefaultVariableScope(parent)
     when (scope) {
       Scope.GLOBAL_VARIABLE -> {
-        globalVariables[variable.name] = value
+        storeGlobalVariable(variable.name, value)
         val scopeForGlobalEnvironment = if (variable.scope != null) variable.scope.c + ":" else ""
         VimScriptGlobalEnvironment.getInstance().variables[scopeForGlobalEnvironment + variable.name] = value.simplify()
       }
-      Scope.SCRIPT_VARIABLE -> {
-        val scriptName = vimContext.getScriptName()
-        if (scriptVariables.containsKey(scriptName)) {
-          scriptVariables[scriptName]?.set(variable.name, value)
-        } else {
-          scriptVariables[scriptName] = mutableMapOf(variable.name to value)
-        }
-      }
+      Scope.SCRIPT_VARIABLE -> storeScriptVariable(variable.name, value, parent)
       Scope.WINDOW_VARIABLE, Scope.TABPAGE_VARIABLE -> {
         if (editor != null) {
           val variableKey = scope.c + ":" + variable.name
@@ -84,8 +73,8 @@ object VariableService {
           // todo nullable editor exception or something
         }
       }
-      Scope.FUNCTION_VARIABLE -> vimContext.functionVariables.peek()[variable.name] = value
-      Scope.LOCAL_VARIABLE -> vimContext.localVariables.peek()[variable.name] = value
+      Scope.FUNCTION_VARIABLE -> storeFunctionVariable(variable.name, value, parent)
+      Scope.LOCAL_VARIABLE -> storeLocalVariable(variable.name, value, parent)
       Scope.BUFFER_VARIABLE -> {
         if (editor != null) {
           if (editor.document.getUserData(bufferVariablesKey) == null) {
@@ -101,16 +90,11 @@ object VariableService {
     }
   }
 
-  fun getNullableVariableValue(
-    variable: Variable,
-    editor: Editor?,
-    context: DataContext?,
-    vimContext: VimContext,
-  ): VimDataType? {
-    val scope = variable.scope ?: getDefaultVariableScope(vimContext)
+  fun getNullableVariableValue(variable: Variable, editor: Editor?, context: DataContext?, parent: Executable): VimDataType? {
+    val scope = variable.scope ?: getDefaultVariableScope(parent)
     return when (scope) {
-      Scope.GLOBAL_VARIABLE -> globalVariables[variable.name]
-      Scope.SCRIPT_VARIABLE -> scriptVariables[vimContext.getScriptName()]?.get(variable.name)
+      Scope.GLOBAL_VARIABLE -> getGlobalVariable(variable.name)
+      Scope.SCRIPT_VARIABLE -> getScriptVariable(variable.name, parent)
       Scope.WINDOW_VARIABLE, Scope.TABPAGE_VARIABLE -> {
         val variableKey = scope.c + ":" + variable.name
         if (editor != null) {
@@ -119,8 +103,8 @@ object VariableService {
           TODO()
         }
       }
-      Scope.FUNCTION_VARIABLE -> vimContext.functionVariables.peek()[variable.name]
-      Scope.LOCAL_VARIABLE -> vimContext.localVariables.peek()[variable.name]
+      Scope.FUNCTION_VARIABLE -> getFunctionVariable(variable.name, parent)
+      Scope.LOCAL_VARIABLE -> getLocalVariable(variable.name, parent)
       Scope.BUFFER_VARIABLE -> {
         if (editor != null) {
           editor.document.getUserData(bufferVariablesKey)?.get(variable.name)
@@ -132,13 +116,8 @@ object VariableService {
     }
   }
 
-  fun getNonNullVariableValue(
-    variable: Variable,
-    editor: Editor?,
-    context: DataContext?,
-    vimContext: VimContext,
-  ): VimDataType {
-    return getNullableVariableValue(variable, editor, context, vimContext)
+  fun getNonNullVariableValue(variable: Variable, editor: Editor?, context: DataContext?, parent: Executable): VimDataType {
+    return getNullableVariableValue(variable, editor, context, parent)
       ?: throw ExException(
         "E121: Undefined variable: " +
           (if (variable.scope != null) variable.scope.c + ":" else "") +
@@ -146,10 +125,109 @@ object VariableService {
       )
   }
 
+  fun getGlobalVariable(name: String): VimDataType? {
+    return globalVariables[name]
+  }
+
+  private fun getScriptVariable(name: String, parent: Executable): VimDataType? {
+    val script = parent.getScript()
+    return script.scriptVariables[name]
+  }
+
+  private fun getFunctionVariable(name: String, parent: Executable): VimDataType? {
+    val visibleVariables = mutableListOf<Map<String, VimDataType>>()
+    var node: Executable? = parent
+    while (node != null) {
+      if (node is FunctionDeclaration) {
+        visibleVariables.add(node.functionVariables)
+        if (!node.flags.contains(FunctionFlag.CLOSURE)) {
+          break
+        }
+      }
+      // todo better parent logic
+      node = if (node is Script) {
+        null
+      } else {
+        node.parent
+      }
+    }
+
+    visibleVariables.reverse()
+    val functionVariablesMap = mutableMapOf<String, VimDataType>()
+    for (map in visibleVariables) {
+      functionVariablesMap.putAll(map)
+    }
+    return functionVariablesMap[name]
+  }
+
+  private fun getLocalVariable(name: String, parent: Executable): VimDataType? {
+    val visibleVariables = mutableListOf<Map<String, VimDataType>>()
+    var node: Executable? = parent
+    while (node != null) {
+      if (node is FunctionDeclaration) {
+        visibleVariables.add(node.localVariables)
+        if (!node.flags.contains(FunctionFlag.CLOSURE)) {
+          break
+        }
+      }
+      // todo better parent logic
+      node = if (node is Script) {
+        null
+      } else {
+        node.parent
+      }
+    }
+
+    visibleVariables.reverse()
+    val localVariablesMap = mutableMapOf<String, VimDataType>()
+    for (map in visibleVariables) {
+      localVariablesMap.putAll(map)
+    }
+    return localVariablesMap[name]
+  }
+
+  fun storeGlobalVariable(name: String, value: VimDataType) {
+    globalVariables[name] = value
+  }
+
+  private fun storeScriptVariable(name: String, value: VimDataType, parent: Executable) {
+    val script = parent.getScript()
+    script.scriptVariables[name] = value
+  }
+
+  private fun storeFunctionVariable(name: String, value: VimDataType, parent: Executable) {
+    var node: Executable? = parent
+    while (node != null) {
+      if (node is FunctionDeclaration) {
+        break
+      }
+      node = node.parent
+    }
+    if (node is FunctionDeclaration) {
+      node.functionVariables[name] = value
+    } else {
+      TODO()
+    }
+  }
+
+  private fun storeLocalVariable(name: String, value: VimDataType, parent: Executable) {
+    var node: Executable? = parent
+    while (node != null) {
+      if (node is FunctionDeclaration) {
+        break
+      }
+      node = node.parent
+    }
+    if (node is FunctionDeclaration) {
+      node.localVariables[name] = value
+    } else {
+      TODO()
+    }
+  }
+
   // todo fix me i'm ugly :(
   fun clear() {
     globalVariables = mutableMapOf()
-    scriptVariables = mutableMapOf()
   }
 
   private fun VimDataType.simplify(): Any {
@@ -159,7 +237,8 @@ object VariableService {
       is VimFloat -> this.value
       is VimList -> this.values
       is VimDictionary -> this.dictionary
-      is VimBlob -> throw NotImplementedError("Blobs are not implemented yet :(")
+      is VimBlob -> "blob"
+      is VimFuncref -> "funcref"
     }
   }
 }
