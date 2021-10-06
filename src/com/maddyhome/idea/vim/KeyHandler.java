@@ -220,8 +220,10 @@ public class KeyHandler {
                         boolean allowKeyMappings,
                         boolean mappingCompleted) {
     if (LOG.isTraceEnabled()) {
+      LOG.trace("------- Key Handler -------");
       LOG.trace(
         "Start key processing. allowKeyMappings: " + allowKeyMappings + ", mappingCompleted: " + mappingCompleted);
+      LOG.trace("Key: " + key);
     }
     if (handleKeyRecursionCount >= OptionsManager.INSTANCE.getMaxmapdepth().value()) {
       VimPlugin.showMessage(MessageHelper.message("E223"));
@@ -339,6 +341,7 @@ public class KeyHandler {
 
     // This will update immediately, if we're on the EDT (which we are)
     ShowCmd.INSTANCE.update();
+    LOG.trace("----------- Key Handler Finished -----------");
   }
 
   /**

@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.group.visual
 
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -58,17 +59,21 @@ object IdeaSelectionControl {
 
       if (editor.isIdeaVimDisabledHere) return@singleTask
 
-      logger.debug("Adjust non-vim selection. Source: $selectionSource")
+      logger.debug("Adjust non-vim selection. Source: $selectionSource, initialMode: $initialMode")
 
       // Perform logic in one of the next cases:
       //  - There was no selection and now it is
       //  - There was a selection and now it doesn't exist
       //  - There was a selection and now it exists as well (transforming char selection to line selection, for example)
-      if (initialMode?.hasVisualSelection == false && !editor.selectionModel.hasSelection(true)) return@singleTask
+      if (initialMode?.hasVisualSelection == false && !editor.selectionModel.hasSelection(true)) {
+        logger.trace { "Exiting without selection adjusting" }
+        return@singleTask
+      }
 
       if (editor.selectionModel.hasSelection(true)) {
         if (dontChangeMode(editor)) {
           IdeaRefactorMode.correctSelection(editor)
+          logger.trace { "Selection corrected for refactoring" }
           return@singleTask
         }
 

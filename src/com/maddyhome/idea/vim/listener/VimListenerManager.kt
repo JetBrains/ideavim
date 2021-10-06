@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.listener
 
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.trace
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.TypedAction
@@ -36,6 +37,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
+import com.intellij.util.ExceptionUtil
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimKeyListener
@@ -219,6 +221,9 @@ object VimListenerManager {
       if (selectionEvent.editor.isIdeaVimDisabledHere) return
       val editor = selectionEvent.editor
       val document = editor.document
+
+      logger.trace { "Selection changed" }
+      logger.trace { ExceptionUtil.currentStackTrace() }
 
       //region Not selected last character protection
       // Here is currently a bug in IJ for IdeaVim. If you start selection right from the line end, then
