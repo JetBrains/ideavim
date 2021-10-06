@@ -214,7 +214,7 @@ class PlugExtensionsTest : VimTestCase() {
   }
 }
 
-class PlugMissingKeys : VimTestCase() {
+class PlugMissingKeysTest : VimTestCase() {
 
   private lateinit var extension: ExtensionBeanClass
 
