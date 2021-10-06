@@ -23,6 +23,11 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+## To Be Released
+
+### Merged PRs:
+* [337](https://github.com/JetBrains/ideavim/pull/337) by [Matt Ellis](https://github.com/citizenmatt): guicursor!
+
 ## 1.7.2, 2021-09-30
 
 ### Fixes:
