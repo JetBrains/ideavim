@@ -38,39 +38,44 @@ class MatchitGeneralTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from Java comment start to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
-        /${c}**
+        /$c**
          *
          */
       """.trimIndent(),
       """
         /**
          *
-         *${c}/
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+         *$c/
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from Java comment end to start`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         /**
          *
-         *${c}/
+         *$c/
       """.trimIndent(),
       """
-        ${c}/**
+        $c/**
          *
          */
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, JavaFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test 25 percent jump`() {
-    doTest("25%",
+    doTest(
+      "25%",
       """
         int a;
         int b;
@@ -82,65 +87,74 @@ class MatchitGeneralTest : VimTestCase() {
         int b;
         int c;
         int d;
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   fun `test jump from visual end of line to opening parenthesis`() {
-    doTest("v$%",
+    doTest(
+      "v$%",
       """foo(${c}bar)""",
-      """foo${s}${c}(b${se}ar)""",
+      """foo${s}$c(b${se}ar)""",
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER, HtmlFileType.INSTANCE
     )
   }
 
   fun `test jump from visual end of line to opening parenthesis then back to closing`() {
-    doTest("v$%%",
+    doTest(
+      "v$%%",
       """foo(${c}bar)""",
-      """foo(${s}bar${c})${se}""",
+      """foo(${s}bar$c)$se""",
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test delete everything from opening parenthesis to closing parenthesis`() {
-    doTest("d%",
-      "${c}(x == 123)", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+    doTest(
+      "d%",
+      "$c(x == 123)", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test delete everything from closing parenthesis to opening parenthesis`() {
-    doTest("d%",
-      "(x == 123${c})", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+    doTest(
+      "d%",
+      "(x == 123$c)", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test delete everything from opening curly brace to closing curly brace`() {
-    doTest("d%",
-      "${c}{ foo: 123 }", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+    doTest(
+      "d%",
+      "$c{ foo: 123 }", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test delete everything from closing curly brace to opening curly brace`() {
-    doTest("d%",
-      "{ foo: 123 ${c}}", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+    doTest(
+      "d%",
+      "{ foo: 123 $c}", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test delete everything from opening square bracket to closing square bracket`() {
-    doTest("d%",
-      "${c}[1, 2, 3]", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+    doTest(
+      "d%",
+      "$c[1, 2, 3]", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test delete everything from closing square bracket to opening square bracket`() {
-    doTest("d%",
-      "[1, 2, 3${c}]", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+    doTest(
+      "d%",
+      "[1, 2, 3$c]", "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -149,15 +163,17 @@ class MatchitGeneralTest : VimTestCase() {
    */
 
   fun `test jump from visual end of line to opening angle bracket`() {
-    doTest("v$%",
+    doTest(
+      "v$%",
       """</h${c}tml>""",
-      """${s}${c}</ht${se}ml>""",
+      """${s}$c</ht${se}ml>""",
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER, HtmlFileType.INSTANCE
     )
   }
 
   fun `test jump from visual end of line to start of for loop`() {
-    doTest("v$%",
+    doTest(
+      "v$%",
       """
         for n in [1, 2, 3]
           puts n
@@ -174,7 +190,8 @@ class MatchitGeneralTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test delete from elseif to else`() {
-    doTest("d%",
+    doTest(
+      "d%",
       """
         if x == 0
           puts "Zero"
@@ -190,35 +207,39 @@ class MatchitGeneralTest : VimTestCase() {
         $c
           puts "Positive"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test delete from opening to closing div`() {
-    doTest("d%",
+    doTest(
+      "d%",
       """
         <${c}div>
           <img src="fff">
         </div>
       """.trimIndent(),
-      "${c}<", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      "$c<", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test delete from opening angle bracket to closing angle bracket`() {
-    doTest("d%",
+    doTest(
+      "d%",
       """
-        ${c}<div></div>
+        $c<div></div>
       """.trimIndent(),
-      "${c}</div>", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      "$c</div>", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test delete whole function from def`() {
-    doTest("d%",
+    doTest(
+      "d%",
       """
         ${c}def function
           puts "hello"
@@ -230,7 +251,8 @@ class MatchitGeneralTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test delete whole function from def with reverse motion`() {
-    doTest("dg%",
+    doTest(
+      "dg%",
       """
         ${c}def function
           puts "hello"
@@ -242,7 +264,8 @@ class MatchitGeneralTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test delete whole function from end`() {
-    doTest("d%",
+    doTest(
+      "d%",
       """
         def function
           puts "hello"
@@ -254,7 +277,8 @@ class MatchitGeneralTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test delete whole function from end with reverse motion`() {
-    doTest("dg%",
+    doTest(
+      "dg%",
       """
         def function
           puts "hello"
@@ -263,5 +287,4 @@ class MatchitGeneralTest : VimTestCase() {
       "", CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
-
 }

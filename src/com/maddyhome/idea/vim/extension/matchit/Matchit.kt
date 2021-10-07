@@ -114,8 +114,14 @@ class Matchit : VimExtension {
         matchitAction.reverse = reverse
         matchitAction.isInOpPending = true
 
-        commandState.commandBuilder.completeCommandPart(Argument(Command(count,
-          matchitAction, Command.Type.MOTION, EnumSet.noneOf(CommandFlags::class.java))))
+        commandState.commandBuilder.completeCommandPart(
+          Argument(
+            Command(
+              count,
+              matchitAction, Command.Type.MOTION, EnumSet.noneOf(CommandFlags::class.java)
+            )
+          )
+        )
       } else {
         editor.vimForEachCaret { caret ->
           VimPlugin.getMark().saveJumpLocation(editor)
@@ -124,7 +130,6 @@ class Matchit : VimExtension {
       }
     }
   }
-
 }
 
 /**
@@ -278,7 +283,8 @@ private object MatchitPatterns {
         mapOf(
           blockCommentEnd to blockCommentSearchPair,
           prefixedMiddleAndClosingKeywords to Pair(openingAndMiddleKeywords, middleAndClosingKeywords)
-        ))
+        )
+      )
     } else {
       // Patterns for the regular % motion.
       return MatchitPatternsTable(
@@ -289,10 +295,10 @@ private object MatchitPatterns {
         mapOf(
           blockCommentEnd to blockCommentSearchPair,
           prefixedEndKeyword to Pair(openingKeywords, endKeyword)
-        ))
+        )
+      )
     }
   }
-
 }
 
 /*
@@ -340,7 +346,7 @@ private fun getMatchitOffset(editor: Editor, caret: Caret, count: Int, isInOpPen
   return motion
 }
 
-private fun findMatchingPair(editor: Editor, caretOffset: Int, isInOpPending:Boolean, patternsTable: MatchitPatternsTable): Int {
+private fun findMatchingPair(editor: Editor, caretOffset: Int, isInOpPending: Boolean, patternsTable: MatchitPatternsTable): Int {
   val openingPatternsTable = patternsTable.openingPatterns
   val closingPatternsTable = patternsTable.closingPatterns
 
@@ -548,8 +554,8 @@ private fun matchShouldBeSkipped(editor: Editor, offset: Int, skipComments: Bool
 
   val insideComment = isComment(psiElement)
   val insideQuotes = isQuoted(psiElement)
-  return (skipComments && insideComment) || (!skipComments && !insideComment)
-    || (skipStrings && insideQuotes) || (!skipStrings && !insideQuotes)
+  return (skipComments && insideComment) || (!skipComments && !insideComment) ||
+    (skipStrings && insideQuotes) || (!skipStrings && !insideQuotes)
 }
 
 private fun isSkippedRubyKeyword(psiElement: PsiElement?): Boolean {
@@ -558,8 +564,8 @@ private fun isSkippedRubyKeyword(psiElement: PsiElement?): Boolean {
   // "if" and "unless" expressions (a.k.a conditional modifiers).
   val elementType = psiElement?.node?.elementType?.debugName
 
-  return elementType == "do_cond" || elementType == "if modifier" || elementType == "unless modifier"
-    || elementType == "regexp content" || elementType == "identifier"
+  return elementType == "do_cond" || elementType == "if modifier" || elementType == "unless modifier" ||
+    elementType == "regexp content" || elementType == "identifier"
 }
 
 private fun isComment(psiElement: PsiElement?): Boolean {
@@ -569,8 +575,8 @@ private fun isComment(psiElement: PsiElement?): Boolean {
 
 private fun isQuoted(psiElement: PsiElement?): Boolean {
   val elementType = psiElement?.elementType?.debugName
-  return elementType == "STRING_LITERAL" || elementType == "XML_ATTRIBUTE_VALUE_TOKEN"
-    || elementType == "string content" // Ruby specific.
+  return elementType == "STRING_LITERAL" || elementType == "XML_ATTRIBUTE_VALUE_TOKEN" ||
+    elementType == "string content" // Ruby specific.
 }
 
 private fun isHtmlAttribute(psiElement: PsiElement?): Boolean {

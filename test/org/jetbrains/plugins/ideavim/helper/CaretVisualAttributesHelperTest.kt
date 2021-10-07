@@ -231,8 +231,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
       configureByText("I found it in a legendary land")
       typeText(parseKeys("i"))
       assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 1.0F)
-    }
-    finally {
+    } finally {
       EditorSettingsExternalizable.getInstance().isBlockCursor = originalValue
     }
   }

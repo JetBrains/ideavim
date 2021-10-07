@@ -33,31 +33,36 @@ class MatchitHtmlTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test basic jump to closing tag`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <${c}h1>Heading</h1>
       """.trimIndent(),
       """
-        <h1>Heading<${c}/h1>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <h1>Heading<$c/h1>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test basic jump to opening tag`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <h1>Heading</${c}h1>
       """.trimIndent(),
       """
         <${c}h1>Heading</h1>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test multiline jump to closing tag`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <${c}div>
           <p>paragraph body</p>
@@ -66,14 +71,16 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <div>
           <p>paragraph body</p>
-        <${c}/div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <$c/div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test multiline jump to opening tag`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <div>
           <p>paragraph body</p>
@@ -83,13 +90,15 @@ class MatchitHtmlTest : VimTestCase() {
         <${c}div>
           <p>paragraph body</p>
         </div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump to closing tag while ignoring nested tags`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <${c}div>
           <div>
@@ -102,14 +111,16 @@ class MatchitHtmlTest : VimTestCase() {
           <div>
             <div>contents</div>
           </div>
-        <${c}/div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <$c/div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump to closing tag while ignoring outer tags`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <div>
           <${c}div>contents</div>
@@ -117,15 +128,17 @@ class MatchitHtmlTest : VimTestCase() {
       """.trimIndent(),
       """
         <div>
-          <div>contents<${c}/div>
+          <div>contents<$c/div>
         </div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump to opening tag while ignoring nested tags`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <div>
           <div>
@@ -139,13 +152,15 @@ class MatchitHtmlTest : VimTestCase() {
             <div>contents</div>
           </div>
         </div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump to opening tag while ignoring outer tags`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <div>
           <div>contents</d${c}iv>
@@ -155,41 +170,47 @@ class MatchitHtmlTest : VimTestCase() {
         <div>
           <${c}div>contents</div>
         </div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump to closing tag while in tag attributes`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <h1 class="he${c}adline">Post HeadLine</h1>
       """.trimIndent(),
       """
-        <h1 class="headline">Post HeadLine<${c}/h1>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <h1 class="headline">Post HeadLine<$c/h1>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test don't jump on standalone tags`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <div>
-          <img src=${c}"my-image.png" alt="my-image">
+          <img src=$c"my-image.png" alt="my-image">
         </div>
       """.trimIndent(),
       """
         <div>
-          <img src=${c}"my-image.png" alt="my-image">
+          <img src=$c"my-image.png" alt="my-image">
         </div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test don't jump on empty lines`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <div>
         $c 
@@ -199,154 +220,179 @@ class MatchitHtmlTest : VimTestCase() {
         <div>
         $c 
         </div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump forwards to matching angle bracket on opening tag`() {
-    doTest("%",
+    doTest(
+      "%",
       """
-        ${c}<h1>Heading</h1>
+        $c<h1>Heading</h1>
       """.trimIndent(),
       """
-        <h1${c}>Heading</h1>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <h1$c>Heading</h1>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump forwards to matching angle bracket when on whitespace`() {
-    doTest("%",
+    doTest(
+      "%",
       "$c    <h1>Heading</h1>",
-      "    <h1${c}>Heading</h1>",
+      "    <h1$c>Heading</h1>",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump to last angle bracket when in tag body`() {
-    doTest("%",
+    doTest(
+      "%",
       """
-        <h1 class="headline">Post${c} HeadLine</h1>
+        <h1 class="headline">Post$c HeadLine</h1>
       """.trimIndent(),
       """
-        <h1 class="headline">Post HeadLine</h1${c}>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <h1 class="headline">Post HeadLine</h1$c>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump forwards to matching angle bracket on closing tag`() {
-    doTest("%",
+    doTest(
+      "%",
       """
-        <h1>Heading${c}</h1>
+        <h1>Heading$c</h1>
       """.trimIndent(),
       """
-        <h1>Heading</h1${c}>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <h1>Heading</h1$c>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump backwards to matching angle bracket on opening tag`() {
-    doTest("%",
+    doTest(
+      "%",
       """
-        <h1${c}>Heading</h1>
+        <h1$c>Heading</h1>
       """.trimIndent(),
       """
-        ${c}<h1>Heading</h1>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        $c<h1>Heading</h1>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump backwards to matching angle bracket on closing tag`() {
-    doTest("%",
+    doTest(
+      "%",
       """
-        <h1>Heading</h1${c}>
+        <h1>Heading</h1$c>
       """.trimIndent(),
       """
-        <h1>Heading${c}</h1>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <h1>Heading$c</h1>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump to matching square bracket inside tag`() {
-    doTest("%",
+    doTest(
+      "%",
       """
-        <div ${c}[ngIf]="someCondition()">{{displayValue}}</div>
+        <div $c[ngIf]="someCondition()">{{displayValue}}</div>
       """.trimIndent(),
       """
-        <div [ngIf${c}]="someCondition()">{{displayValue}}</div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <div [ngIf$c]="someCondition()">{{displayValue}}</div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump to matching parenthesis inside tag`() {
-    doTest("%",
+    doTest(
+      "%",
       """
-        <div [ngIf]="someCondition${c}()">{{displayValue}}</div>
+        <div [ngIf]="someCondition$c()">{{displayValue}}</div>
       """.trimIndent(),
       """
-        <div [ngIf]="someCondition(${c})">{{displayValue}}</div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <div [ngIf]="someCondition($c)">{{displayValue}}</div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump to matching curly brace in tag body`() {
-    doTest("%",
+    doTest(
+      "%",
       """
-        <div [ngIf]="someCondition()">${c}{{displayValue}}</div>
+        <div [ngIf]="someCondition()">$c{{displayValue}}</div>
       """.trimIndent(),
       """
-        <div [ngIf]="someCondition()">{{displayValue}${c}}</div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <div [ngIf]="someCondition()">{{displayValue}$c}</div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump to closing tag when inside brackets in opening tag`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <div [ng${c}If]="someCondition()">{{displayValue}}</div>
       """.trimIndent(),
       """
-        <div [ngIf]="someCondition()">{{displayValue}}<${c}/div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <div [ngIf]="someCondition()">{{displayValue}}<$c/div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump to opening curly brace when in tag body`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <div [ngIf]="someCondition()">{{dis${c}playValue}}</div>
       """.trimIndent(),
       """
-        <div [ngIf]="someCondition()">{${c}{displayValue}}</div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <div [ngIf]="someCondition()">{$c{displayValue}}</div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test don't jump on standalone tag with brackets on the same line`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <img ${c}src={{imagePath}} alt={{imageDescription}}>
       """.trimIndent(),
       """
         <img ${c}src={{imagePath}} alt={{imageDescription}}>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from opening to closing tag while ignoring comments`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <!-- <div> -->
         <!-- This div is completely commented out -->
@@ -367,14 +413,16 @@ class MatchitHtmlTest : VimTestCase() {
           <p>paragraph 1</p>
           <!-- </div> -->
           <p>paragraph 2</p>
-        <${c}/div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <$c/div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from closing to opening tag while ignoring comments`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <!-- <div> -->
         <!-- This div is completely commented out -->
@@ -395,14 +443,16 @@ class MatchitHtmlTest : VimTestCase() {
           <!-- This <div> holds paragraphs -->
           <p>paragraph 1</p>
           <p>paragraph 2</p>
-        <${c}/div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <$c/div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from opening to closing tag inside a comment block`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <!-- <${c}div> -->
         <!--   This div is commented out -->
@@ -411,84 +461,95 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <!-- <div> -->
         <!--   This div is commented out -->
-        <!-- <${c}/div> -->
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <!-- <$c/div> -->
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from closing to opening tag inside a comment block`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <!-- <div> -->
         <!--   This div is commented out -->
-        <!-- <${c}/div> -->
+        <!-- <$c/div> -->
       """.trimIndent(),
       """
         <!-- <${c}div> -->
         <!--   This div is commented out -->
         <!-- </div> -->
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from opening to closing angle bracket inside a comment block`() {
-    doTest("%",
+    doTest(
+      "%",
       """
-        <!-- ${c}<div> -->
+        <!-- $c<div> -->
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
       """
-        <!-- <div${c}> -->
+        <!-- <div$c> -->
         <!--   This div is commented out -->
         <!-- </div> -->
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from closing to opening angle bracket inside a comment block`() {
-    doTest("%",
+    doTest(
+      "%",
       """
-        <!-- <div${c}> -->
+        <!-- <div$c> -->
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
       """
-        <!-- ${c}<div> -->
+        <!-- $c<div> -->
         <!--   This div is commented out -->
         <!-- </div> -->
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from opening to closing angle bracket on a comment marker`() {
-    doTest("%",
+    doTest(
+      "%",
       """
-        ${c}<!-- <div> -->
+        $c<!-- <div> -->
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
       """
-        <!-- <div> --${c}>
+        <!-- <div> --$c>
         <!--   This div is commented out -->
         <!-- </div> -->
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from opening to closing angle bracket ignoring bracket in string`() {
-    doTest("%",
+    doTest(
+      "%",
       """
-        ${c}<p *ngIf="count > 0">Count is greater than zero</p>
+        $c<p *ngIf="count > 0">Count is greater than zero</p>
       """.trimIndent(),
       """
-        <p *ngIf="count > 0"${c}>Count is greater than zero</p>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <p *ngIf="count > 0"$c>Count is greater than zero</p>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
@@ -498,31 +559,36 @@ class MatchitHtmlTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump to closing tag`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <${c}h1>Heading</h1>
       """.trimIndent(),
       """
-        <h1>Heading<${c}/h1>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <h1>Heading<$c/h1>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump to opening tag`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <h1>Heading</${c}h1>
       """.trimIndent(),
       """
         <${c}h1>Heading</h1>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump to closing tag while ignoring nested tags`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <${c}div>
           <div>
@@ -535,14 +601,16 @@ class MatchitHtmlTest : VimTestCase() {
           <div>
             <div>contents</div>
           </div>
-        <${c}/div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <$c/div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump to closing tag while ignoring outer tags`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <div>
           <${c}div>contents</div>
@@ -550,15 +618,17 @@ class MatchitHtmlTest : VimTestCase() {
       """.trimIndent(),
       """
         <div>
-          <div>contents<${c}/div>
+          <div>contents<$c/div>
         </div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump to opening tag while ignoring nested tags`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <div>
           <div>
@@ -572,13 +642,15 @@ class MatchitHtmlTest : VimTestCase() {
             <div>contents</div>
           </div>
         </div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump to opening tag while ignoring outer tags`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <div>
           <div>contents</d${c}iv>
@@ -588,41 +660,47 @@ class MatchitHtmlTest : VimTestCase() {
         <div>
           <${c}div>contents</div>
         </div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump to closing tag while in tag attributes`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <h1 class="he${c}adline">Post HeadLine</h1>
       """.trimIndent(),
       """
-        <h1 class="headline">Post HeadLine<${c}/h1>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <h1 class="headline">Post HeadLine<$c/h1>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test don't reverse jump on standalone tags`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <div>
-          <img src=${c}"my-image.png" alt="my-image">
+          <img src=$c"my-image.png" alt="my-image">
         </div>
       """.trimIndent(),
       """
         <div>
-          <img src=${c}"my-image.png" alt="my-image">
+          <img src=$c"my-image.png" alt="my-image">
         </div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test don't reverse jump on empty lines`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <div>
         $c 
@@ -632,130 +710,151 @@ class MatchitHtmlTest : VimTestCase() {
         <div>
         $c 
         </div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump to closing angle bracket`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
-        ${c}<h1>Heading</h1>
+        $c<h1>Heading</h1>
       """.trimIndent(),
       """
-        <h1${c}>Heading</h1>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <h1$c>Heading</h1>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump to closing angle bracket when on whitespace`() {
-    doTest("g%",
+    doTest(
+      "g%",
       "$c    <h1>Heading</h1>",
-      "    <h1${c}>Heading</h1>",
+      "    <h1$c>Heading</h1>",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump to last angle bracket when in tag body`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
-        <h1 class="headline">Post${c} HeadLine</h1>
+        <h1 class="headline">Post$c HeadLine</h1>
       """.trimIndent(),
       """
-        <h1 class="headline">Post HeadLine</h1${c}>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <h1 class="headline">Post HeadLine</h1$c>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump to opening angle bracket`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
-        <h1${c}>Heading</h1>
+        <h1$c>Heading</h1>
       """.trimIndent(),
       """
-        ${c}<h1>Heading</h1>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        $c<h1>Heading</h1>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump to matching square bracket inside tag`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
-        <div ${c}[ngIf]="someCondition()">{{displayValue}}</div>
+        <div $c[ngIf]="someCondition()">{{displayValue}}</div>
       """.trimIndent(),
       """
-        <div [ngIf${c}]="someCondition()">{{displayValue}}</div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <div [ngIf$c]="someCondition()">{{displayValue}}</div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump to matching parenthesis inside tag`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
-        <div [ngIf]="someCondition${c}()">{{displayValue}}</div>
+        <div [ngIf]="someCondition$c()">{{displayValue}}</div>
       """.trimIndent(),
       """
-        <div [ngIf]="someCondition(${c})">{{displayValue}}</div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <div [ngIf]="someCondition($c)">{{displayValue}}</div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump to matching curly brace in tag body`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
-        <div [ngIf]="someCondition()">${c}{{displayValue}}</div>
+        <div [ngIf]="someCondition()">$c{{displayValue}}</div>
       """.trimIndent(),
       """
-        <div [ngIf]="someCondition()">{{displayValue}${c}}</div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <div [ngIf]="someCondition()">{{displayValue}$c}</div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump to closing tag when inside brackets in opening tag`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <div [ng${c}If]="someCondition()">{{displayValue}}</div>
       """.trimIndent(),
       """
-        <div [ngIf]="someCondition()">{{displayValue}}<${c}/div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <div [ngIf]="someCondition()">{{displayValue}}<$c/div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump to opening curly brace when in tag body`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <div [ngIf]="someCondition()">{{dis${c}playValue}}</div>
       """.trimIndent(),
       """
-        <div [ngIf]="someCondition()">{${c}{displayValue}}</div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <div [ngIf]="someCondition()">{$c{displayValue}}</div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test don't reverse jump on standalone tag with brackets on the same line`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <img ${c}src={{imagePath}} alt={{imageDescription}}>
       """.trimIndent(),
       """
         <img ${c}src={{imagePath}} alt={{imageDescription}}>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from opening to closing tag while ignoring comments`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <!-- <div> -->
         <!-- This div is completely commented out -->
@@ -776,14 +875,16 @@ class MatchitHtmlTest : VimTestCase() {
           <p>paragraph 1</p>
           <!-- </div> -->
           <p>paragraph 2</p>
-        <${c}/div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <$c/div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from closing to opening tag while ignoring comments`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <!-- <div> -->
         <!-- This div is completely commented out -->
@@ -804,14 +905,16 @@ class MatchitHtmlTest : VimTestCase() {
           <!-- This <div> holds paragraphs -->
           <p>paragraph 1</p>
           <p>paragraph 2</p>
-        <${c}/div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <$c/div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from opening to closing tag inside a comment block`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <!-- <${c}div> -->
         <!--   This div is commented out -->
@@ -820,90 +923,102 @@ class MatchitHtmlTest : VimTestCase() {
       """
         <!-- <div> -->
         <!--   This div is commented out -->
-        <!-- <${c}/div> -->
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <!-- <$c/div> -->
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from closing to opening tag inside a comment block`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <!-- <div> -->
         <!--   This div is commented out -->
-        <!-- <${c}/div> -->
+        <!-- <$c/div> -->
       """.trimIndent(),
       """
         <!-- <${c}div> -->
         <!--   This div is commented out -->
         <!-- </div> -->
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from opening to closing angle bracket inside a comment block`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
-        <!-- ${c}<div> -->
+        <!-- $c<div> -->
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
       """
-        <!-- <div${c}> -->
+        <!-- <div$c> -->
         <!--   This div is commented out -->
         <!-- </div> -->
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from closing to opening angle bracket inside a comment block`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
-        <!-- <div${c}> -->
+        <!-- <div$c> -->
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
       """
-        <!-- ${c}<div> -->
+        <!-- $c<div> -->
         <!--   This div is commented out -->
         <!-- </div> -->
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from opening to closing angle bracket on a comment marker`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
-        ${c}<!-- <div> -->
+        $c<!-- <div> -->
         <!--   This div is commented out -->
         <!-- </div> -->
       """.trimIndent(),
       """
-        <!-- <div> --${c}>
+        <!-- <div> --$c>
         <!--   This div is commented out -->
         <!-- </div> -->
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from opening to closing angle bracket ignoring bracket in string`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
-        ${c}<p *ngIf="count > 0">Count is greater than zero</p>
+        $c<p *ngIf="count > 0">Count is greater than zero</p>
       """.trimIndent(),
       """
-        <p *ngIf="count > 0"${c}>Count is greater than zero</p>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <p *ngIf="count > 0"$c>Count is greater than zero</p>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from multiline opening tag to closing`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <h1 ${c}id="title"
            class="red right-aligned">
@@ -914,8 +1029,9 @@ class MatchitHtmlTest : VimTestCase() {
         <h1 id="title"
            class="red right-aligned">
            Header Content
-        <${c}/h1>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
+        <$c/h1>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, HtmlFileType.INSTANCE
     )
   }
 }

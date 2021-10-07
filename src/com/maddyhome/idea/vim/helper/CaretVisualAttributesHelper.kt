@@ -175,14 +175,12 @@ private class LegacyCaretVisualAttributesProvider : CaretVisualAttributesProvide
   override fun setPrimaryCaretVisualAttributes(editor: Editor) {
     if (isBlockCursorOverride()) {
       setBlockCursor(editor, true)
-    }
-    else {
+    } else {
       // The default for REPLACE is hor20. It makes more sense to map HOR to a block, but REPLACE has traditionally been
       // drawn the same as INSERT, as a bar. If the 'guicursor' option is still at default, keep REPLACE a bar
       if (OptionsManager.guicursor.isDefault && editor.guicursorMode() == GuiCursorMode.REPLACE) {
         setBlockCursor(editor, false)
-      }
-      else {
+      } else {
         when (OptionsManager.guicursor.getAttributes(editor.guicursorMode()).type) {
           GuiCursorType.BLOCK, GuiCursorType.HOR -> setBlockCursor(editor, true)
           GuiCursorType.VER -> setBlockCursor(editor, false)

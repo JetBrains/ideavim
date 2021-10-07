@@ -32,7 +32,8 @@ class MatchitRubyTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test basic jump from if to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         ${c}if some_boolean
           puts "result is true"
@@ -42,13 +43,15 @@ class MatchitRubyTest : VimTestCase() {
         if some_boolean
           puts "result is true"
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from whitespace before if to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """ $c  if some_boolean puts "result is true" end""",
       """   if some_boolean puts "result is true" ${c}end""",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
@@ -57,7 +60,8 @@ class MatchitRubyTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from whitespace before class to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """ $c class Foo end""",
       """  class Foo ${c}end""",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
@@ -66,7 +70,8 @@ class MatchitRubyTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test basic jump from end to if`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         if some_boolean
           puts "result is true"
@@ -76,13 +81,15 @@ class MatchitRubyTest : VimTestCase() {
         ${c}if some_boolean
           puts "result is true"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test basic jump from if to else`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         ${c}if some_boolean
           puts "result is true"
@@ -96,13 +103,15 @@ class MatchitRubyTest : VimTestCase() {
         ${c}else
           puts "result is false"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test basic jump from else to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         if some_boolean
           puts "result is true"
@@ -116,13 +125,15 @@ class MatchitRubyTest : VimTestCase() {
         else
           puts "result is false"
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from end to if in if-else structure`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         if some_boolean
           puts "result is true"
@@ -136,13 +147,15 @@ class MatchitRubyTest : VimTestCase() {
         else
           puts "result is false"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from if to elsif`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         ${c}if first_value
           puts "first value is true"
@@ -160,13 +173,15 @@ class MatchitRubyTest : VimTestCase() {
         else
           puts "both values are false"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from elsif to else`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         if first_value
           puts "first value is true"
@@ -184,13 +199,15 @@ class MatchitRubyTest : VimTestCase() {
         ${c}else
           puts "both values are false"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from elsif to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         if first_value
           puts "first value is true"
@@ -204,13 +221,15 @@ class MatchitRubyTest : VimTestCase() {
         elsif second_value
           puts "second value is true"
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from elsif to elsif`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         if first_value
           puts "first value is true"
@@ -232,13 +251,15 @@ class MatchitRubyTest : VimTestCase() {
         else
           puts "all values are false"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from for to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         target = "baz"
         ${c}for s in ["foo", "bar", "baz"]
@@ -256,13 +277,15 @@ class MatchitRubyTest : VimTestCase() {
             break
           end
         ${c}end
-     """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from for to end and ignore inner if blocks`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         ${c}for i in 0..5
           if i > 1
@@ -288,13 +311,15 @@ class MatchitRubyTest : VimTestCase() {
             puts "Greater than 4"
           end
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from if to break`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         target = "baz"
         for s in ["foo", "bar", "baz"]
@@ -312,13 +337,15 @@ class MatchitRubyTest : VimTestCase() {
             ${c}break
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from break to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         target = "baz"
         for s in ["foo", "bar", "baz"]
@@ -336,13 +363,15 @@ class MatchitRubyTest : VimTestCase() {
             break
           ${c}end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from end to if`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         target = "baz"
         for s in ["foo", "bar", "baz"]
@@ -360,13 +389,15 @@ class MatchitRubyTest : VimTestCase() {
             break
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from end to for`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         target = "baz"
         for s in ["foo", "bar", "baz"]
@@ -384,13 +415,15 @@ class MatchitRubyTest : VimTestCase() {
             break
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test basic jump from class to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         ${c}class SomeRubyClass
           def some_method
@@ -404,13 +437,15 @@ class MatchitRubyTest : VimTestCase() {
             puts "hello!"
           end
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test basic jump from end to class`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         class SomeRubyClass
           def some_method
@@ -424,13 +459,15 @@ class MatchitRubyTest : VimTestCase() {
             puts "hello!"
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test basic jump from def to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         class SomeRubyClass
           ${c}def some_method
@@ -444,13 +481,15 @@ class MatchitRubyTest : VimTestCase() {
             puts "hello!"
           ${c}end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test basic jump from end to def`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         class SomeRubyClass
           def some_method
@@ -464,13 +503,15 @@ class MatchitRubyTest : VimTestCase() {
             puts "hello!"
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from class to end ignoring nested class`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         ${c}class OuterClass
 
@@ -500,13 +541,15 @@ class MatchitRubyTest : VimTestCase() {
           end
 
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from if to end over inner loop`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         ${c}if some_boolean
           for i in 0..5
@@ -528,13 +571,15 @@ class MatchitRubyTest : VimTestCase() {
             end
           end
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from end to if ignoring malformed code`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         end # Syntax error
  
@@ -548,13 +593,15 @@ class MatchitRubyTest : VimTestCase() {
         ${c}if some_boolean
           puts some_boolean
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from if to end after a semicolon`() {
-    doTest("%",
+    doTest(
+      "%",
       """puts "This line has two statements"; ${c}if true then puts "true" end""",
       """puts "This line has two statements"; if true then puts "true" ${c}end""",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
@@ -563,7 +610,8 @@ class MatchitRubyTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from end to if after a semicolon`() {
-    doTest("%",
+    doTest(
+      "%",
       """puts "This line has two statements"; if true then puts "true" ${c}end""",
       """puts "This line has two statements"; ${c}if true then puts "true" end""",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
@@ -572,7 +620,8 @@ class MatchitRubyTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from before if and semicolon to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """puts "This line has ${c}two statements"; if true then puts "true" end""",
       """puts "This line has two statements"; if true then puts "true" ${c}end""",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
@@ -581,7 +630,8 @@ class MatchitRubyTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from unless to end after a semicolon`() {
-    doTest("%",
+    doTest(
+      "%",
       """puts "This line has two statements"; ${c}unless nil then puts "not nil" end""",
       """puts "This line has two statements"; unless nil then puts "not nil" ${c}end""",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
@@ -590,7 +640,8 @@ class MatchitRubyTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from end to unless after a semicolon`() {
-    doTest("%",
+    doTest(
+      "%",
       """puts "This line has two statements"; unless nil then puts "not nill" ${c}end""",
       """puts "This line has two statements"; ${c}unless nil then puts "not nill" end""",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
@@ -599,7 +650,8 @@ class MatchitRubyTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from end to do when no other opening keyword is present`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         for x in [1, 2, 3] do
           puts x
@@ -613,13 +665,15 @@ class MatchitRubyTest : VimTestCase() {
         end
        
         [1, 2, 3].each ${c}do |x| puts x end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from do to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         for number in [1, 2, 3, 4, 5] ${c}do
           if number.even?
@@ -637,13 +691,15 @@ class MatchitRubyTest : VimTestCase() {
             puts "Odd"
           end
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from module to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         ${c}module MyModule
           def my_function
@@ -657,13 +713,15 @@ class MatchitRubyTest : VimTestCase() {
             return true
           end
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from end to module`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         module MyModule
           def my_function
@@ -677,13 +735,15 @@ class MatchitRubyTest : VimTestCase() {
             return true
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from while to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         def count_down(x)
           ${c}while x >= 0 
@@ -699,13 +759,15 @@ class MatchitRubyTest : VimTestCase() {
             x = x - 1
           ${c}end        
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from begin to rescue`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         def open_file(file_name)
           ${c}begin
@@ -727,13 +789,15 @@ class MatchitRubyTest : VimTestCase() {
             file.close
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from rescue to ensure`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         def open_file(file_name)
           begin
@@ -755,13 +819,15 @@ class MatchitRubyTest : VimTestCase() {
             file.close
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from ensure to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         def open_file(file_name)
           begin
@@ -783,13 +849,15 @@ class MatchitRubyTest : VimTestCase() {
             file.close
           ${c}end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from end to begin`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         def open_file(file_name)
           begin
@@ -811,13 +879,15 @@ class MatchitRubyTest : VimTestCase() {
             file.close
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from rescue to retry`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         begin
           puts "Loop forever"
@@ -833,13 +903,15 @@ class MatchitRubyTest : VimTestCase() {
         rescue
           ${c}retry
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from retry to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         begin
           puts "Loop forever"
@@ -855,13 +927,15 @@ class MatchitRubyTest : VimTestCase() {
         rescue
           retry
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from end to while`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         def count_down(x)
           while x >= 0 
@@ -877,13 +951,15 @@ class MatchitRubyTest : VimTestCase() {
             x = x - 1
           end        
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from case to when`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         ${c}case age
           when 0 .. 12
@@ -903,13 +979,15 @@ class MatchitRubyTest : VimTestCase() {
           else
             puts "Adult"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from when to when`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         case age
           ${c}when 0 .. 12
@@ -929,13 +1007,15 @@ class MatchitRubyTest : VimTestCase() {
           else
             puts "Adult"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from else to end in case block`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         case age
           when 0 .. 12
@@ -955,13 +1035,15 @@ class MatchitRubyTest : VimTestCase() {
           else
             puts "Adult"
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from end to case`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         case age
           when 0 .. 12
@@ -981,13 +1063,15 @@ class MatchitRubyTest : VimTestCase() {
           else
             puts "Adult"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from until to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         ${c}until var == 11
           var = var + 1
@@ -997,13 +1081,15 @@ class MatchitRubyTest : VimTestCase() {
         until var == 11
           var = var + 1
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from if to redo`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         10.times do |i|
           puts "Iteration #{i}"
@@ -1023,13 +1109,15 @@ class MatchitRubyTest : VimTestCase() {
             next
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from redo to elsif`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         10.times do |i|
           puts "Iteration #{i}"
@@ -1049,13 +1137,15 @@ class MatchitRubyTest : VimTestCase() {
             next
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from elsif to next`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         10.times do |i|
           puts "Iteration #{i}"
@@ -1075,13 +1165,15 @@ class MatchitRubyTest : VimTestCase() {
             ${c}next
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from next to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         10.times do |i|
           puts "Iteration #{i}"
@@ -1101,15 +1193,17 @@ class MatchitRubyTest : VimTestCase() {
             next
           ${c}end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from =begin to =end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
-        ${c}=begin
+        $c=begin
           Multiline comment
         =end
       """.trimIndent(),
@@ -1117,29 +1211,33 @@ class MatchitRubyTest : VimTestCase() {
         =begin
           Multiline comment
         =${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from =end to =begin`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         =begin
           Multiline comment
-        ${c}=end
+        $c=end
       """.trimIndent(),
       """
         =${c}begin
           Multiline comment
         =end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from middle of cucumber test to end`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         Given /^ Some ${c}Cucumber test $/ do
           users.each do |group|
@@ -1161,13 +1259,15 @@ class MatchitRubyTest : VimTestCase() {
             end
           end
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from end of cucumber test to do`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         Given /^ Some Cucumber test $/ do
           users.each do |group|
@@ -1189,7 +1289,8 @@ class MatchitRubyTest : VimTestCase() {
             end
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
@@ -1199,7 +1300,8 @@ class MatchitRubyTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test basic reverse jump from end to if `() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         if some_boolean
           puts "result is true"
@@ -1209,13 +1311,15 @@ class MatchitRubyTest : VimTestCase() {
         ${c}if some_boolean
           puts "result is true"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test basic reverse jump from end to if`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         if some_boolean
           puts "result is true"
@@ -1225,13 +1329,15 @@ class MatchitRubyTest : VimTestCase() {
         ${c}if some_boolean
           puts "result is true"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test basic reverse jump from else to if`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         if some_boolean
           puts "result is true"
@@ -1245,13 +1351,15 @@ class MatchitRubyTest : VimTestCase() {
         else
           puts "result is false"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test basic reverse jump from end to else`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         if some_boolean
           puts "result is true"
@@ -1265,13 +1373,15 @@ class MatchitRubyTest : VimTestCase() {
         ${c}else
           puts "result is false"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from if to end in if-else structure`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         ${c}if some_boolean
           puts "result is true"
@@ -1285,13 +1395,15 @@ class MatchitRubyTest : VimTestCase() {
         else
           puts "result is false"
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from elsif to if`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         if first_value
           puts "first value is true"
@@ -1309,13 +1421,15 @@ class MatchitRubyTest : VimTestCase() {
         else
           puts "both values are false"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from else to elsif`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         if first_value
           puts "first value is true"
@@ -1333,13 +1447,15 @@ class MatchitRubyTest : VimTestCase() {
         else
           puts "both values are false"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from end to elsif`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         if first_value
           puts "first value is true"
@@ -1353,13 +1469,15 @@ class MatchitRubyTest : VimTestCase() {
         ${c}elsif second_value
           puts "second value is true"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from elsif to elsif`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         if first_value
           puts "first value is true"
@@ -1381,13 +1499,15 @@ class MatchitRubyTest : VimTestCase() {
         else
           puts "all values are false"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from end to for and ignore inner if blocks`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         for i in 0..5
           if i > 1
@@ -1413,13 +1533,15 @@ class MatchitRubyTest : VimTestCase() {
             puts "Greater than 4"
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from break to if`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         target = "baz"
         for s in ["foo", "bar", "baz"]
@@ -1437,13 +1559,15 @@ class MatchitRubyTest : VimTestCase() {
             break
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from end to break`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         target = "baz"
         for s in ["foo", "bar", "baz"]
@@ -1461,13 +1585,15 @@ class MatchitRubyTest : VimTestCase() {
             ${c}break
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from if to end ignoring break`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         target = "baz"
         for s in ["foo", "bar", "baz"]
@@ -1485,13 +1611,15 @@ class MatchitRubyTest : VimTestCase() {
             break
           ${c}end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from for to end ignoring nested if`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         target = "baz"
         ${c}for s in ["foo", "bar", "baz"]
@@ -1509,13 +1637,15 @@ class MatchitRubyTest : VimTestCase() {
             break
           end
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test basic reverse jump from end to class`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         class SomeRubyClass
           def some_method
@@ -1529,13 +1659,15 @@ class MatchitRubyTest : VimTestCase() {
             puts "hello!"
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test basic reverse jump from class to end`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         ${c}class SomeRubyClass
           def some_method
@@ -1549,13 +1681,15 @@ class MatchitRubyTest : VimTestCase() {
             puts "hello!"
           end
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from def to end`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         class SomeRubyClass
           ${c}def some_method
@@ -1569,13 +1703,15 @@ class MatchitRubyTest : VimTestCase() {
             puts "hello!"
           ${c}end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from end to def across multiple functions`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         def func_one
           puts "I am func_one"
@@ -1601,13 +1737,15 @@ class MatchitRubyTest : VimTestCase() {
         ${c}def func_three
           puts "I am func_three"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from end to def`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         class SomeRubyClass
           def some_method
@@ -1621,13 +1759,15 @@ class MatchitRubyTest : VimTestCase() {
             puts "hello!"
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from end to class ignoring nested class`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         class OuterClass
 
@@ -1657,13 +1797,15 @@ class MatchitRubyTest : VimTestCase() {
           end
 
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from end to if over inner loop`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         if some_boolean
           for i in 0..5
@@ -1685,13 +1827,15 @@ class MatchitRubyTest : VimTestCase() {
             end
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from end to if ignoring malformed code`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         end # Syntax error
  
@@ -1705,13 +1849,15 @@ class MatchitRubyTest : VimTestCase() {
         ${c}if some_boolean
           puts some_boolean
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from do to end`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         for number in [1, 2, 3, 4, 5] ${c}do
           if number.even?
@@ -1729,13 +1875,15 @@ class MatchitRubyTest : VimTestCase() {
             puts "Odd"
           end
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from module to end`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         ${c}module MyModule
           def my_function
@@ -1749,13 +1897,15 @@ class MatchitRubyTest : VimTestCase() {
             return true
           end
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from end to module`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         module MyModule
           def my_function
@@ -1769,13 +1919,15 @@ class MatchitRubyTest : VimTestCase() {
             return true
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from end to ensure`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         def open_file(file_name)
           begin
@@ -1797,13 +1949,15 @@ class MatchitRubyTest : VimTestCase() {
             file.close
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from ensure to rescue`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         def open_file(file_name)
           begin
@@ -1825,13 +1979,15 @@ class MatchitRubyTest : VimTestCase() {
             file.close
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from rescue to begin`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         def open_file(file_name)
           begin
@@ -1853,13 +2009,15 @@ class MatchitRubyTest : VimTestCase() {
             file.close
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from begin to end`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         def open_file(file_name)
           ${c}begin
@@ -1881,13 +2039,15 @@ class MatchitRubyTest : VimTestCase() {
             file.close
           ${c}end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from end to retry`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         begin
           puts "Loop forever"
@@ -1903,13 +2063,15 @@ class MatchitRubyTest : VimTestCase() {
         rescue
           ${c}retry
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from retry to rescue`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         begin
           puts "Loop forever"
@@ -1925,13 +2087,15 @@ class MatchitRubyTest : VimTestCase() {
         ${c}rescue
           retry
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from while to end`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         def count_down(x)
           ${c}while x >= 0 
@@ -1947,13 +2111,15 @@ class MatchitRubyTest : VimTestCase() {
             x = x - 1
           ${c}end        
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from end to while`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         def count_down(x)
           while x >= 0 
@@ -1969,13 +2135,15 @@ class MatchitRubyTest : VimTestCase() {
             x = x - 1
           end        
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from case to end`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         ${c}case age
           when 0 .. 12
@@ -1995,13 +2163,15 @@ class MatchitRubyTest : VimTestCase() {
           else
             puts "Adult"
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from end to else in case block`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         case age
           when 0 .. 12
@@ -2021,13 +2191,15 @@ class MatchitRubyTest : VimTestCase() {
           ${c}else
             puts "Adult"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from else to when`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         case age
           when 0 .. 12
@@ -2047,13 +2219,15 @@ class MatchitRubyTest : VimTestCase() {
           else
             puts "Adult"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from when to when`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         case age
           when 0 .. 12
@@ -2073,13 +2247,15 @@ class MatchitRubyTest : VimTestCase() {
           else
             puts "Adult"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from when to case`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         case age
           ${c}when 0 .. 12
@@ -2099,13 +2275,15 @@ class MatchitRubyTest : VimTestCase() {
           else
             puts "Adult"
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from end to until`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         until var == 11
           var = var + 1
@@ -2115,13 +2293,15 @@ class MatchitRubyTest : VimTestCase() {
         ${c}until var == 11
           var = var + 1
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from until to end`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         ${c}until var == 11
           var = var + 1
@@ -2131,13 +2311,15 @@ class MatchitRubyTest : VimTestCase() {
         until var == 11
           var = var + 1
         ${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from end to next`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         10.times do |i|
           puts "Iteration #{i}"
@@ -2157,13 +2339,15 @@ class MatchitRubyTest : VimTestCase() {
             ${c}next
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from next to elsif`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         10.times do |i|
           puts "Iteration #{i}"
@@ -2183,13 +2367,15 @@ class MatchitRubyTest : VimTestCase() {
             next
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from elsif to redo`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         10.times do |i|
           puts "Iteration #{i}"
@@ -2209,13 +2395,15 @@ class MatchitRubyTest : VimTestCase() {
             next
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from redo to if`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         10.times do |i|
           puts "Iteration #{i}"
@@ -2235,15 +2423,17 @@ class MatchitRubyTest : VimTestCase() {
             next
           end
         end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from =begin to =end`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
-        ${c}=begin
+        $c=begin
           Multiline comment
         =end
       """.trimIndent(),
@@ -2251,29 +2441,33 @@ class MatchitRubyTest : VimTestCase() {
         =begin
           Multiline comment
         =${c}end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from =end to =begin`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         =begin
           Multiline comment
-        ${c}=end
+        $c=end
       """.trimIndent(),
       """
         =${c}begin
           Multiline comment
         =end
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from before if and semicolon to end`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """puts "This line has ${c}two statements"; if true then puts "true" end""",
       """puts "This line has two statements"; if true then puts "true" ${c}end""",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
@@ -2282,7 +2476,8 @@ class MatchitRubyTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from whitespace before class to end`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """ $c  class Foo end""",
       """   class Foo ${c}end""",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby.rb"
@@ -2297,19 +2492,22 @@ class MatchitRubyTest : VimTestCase() {
   fun `test jump from opening to closing HTML tag`() {
     // This is just to test that HTML jumps are working in Ruby files.
     // MatchitHtmlTest is what tests the correctness of the HTML jumps.
-    doTest("%",
+    doTest(
+      "%",
       """
         <div><${c}div>contents</div></div>
       """.trimIndent(),
       """
-        <div><div>contents<${c}/div></div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+        <div><div>contents<$c/div></div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from opening to closing div while on class attribute`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <div ${c}class="container">
           <% flash.each do |message_type, message| %>
@@ -2326,14 +2524,16 @@ class MatchitRubyTest : VimTestCase() {
           <% end %>
           <%= yield %>
           <%= render 'layouts/footer' %>
-        <${c}/div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+        <$c/div>
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from do to end in template block`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <div class="container">
           <% flash.each ${c}do |message_type, message| %>
@@ -2351,13 +2551,15 @@ class MatchitRubyTest : VimTestCase() {
           <%= yield %>
           <%= render 'layouts/footer' %>
         </div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from end to do in template block`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <div class="container">
           <% flash.each do |message_type, message| %>
@@ -2375,13 +2577,15 @@ class MatchitRubyTest : VimTestCase() {
           <%= yield %>
           <%= render 'layouts/footer' %>
         </div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from closing to opening div`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <div class="container">
           <% flash.each do |message_type, message| %>
@@ -2399,31 +2603,35 @@ class MatchitRubyTest : VimTestCase() {
           <%= yield %>
           <%= render 'layouts/footer' %>
         </div>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from opening to closing angle bracket in template`() {
-    doTest("%",
-      """<div class="alert alert-${c}<%= message_type %>"><%= message %></div>""",
-      """<div class="alert alert-<%= message_type %${c}>"><%= message %></div>""",
+    doTest(
+      "%",
+      """<div class="alert alert-$c<%= message_type %>"><%= message %></div>""",
+      """<div class="alert alert-<%= message_type %$c>"><%= message %></div>""",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from opening to closing angle bracket in template`() {
-    doTest("g%",
-      """<div class="alert alert-${c}<%= message_type %>"><%= message %></div>""",
-      """<div class="alert alert-<%= message_type %${c}>"><%= message %></div>""",
+    doTest(
+      "g%",
+      """<div class="alert alert-$c<%= message_type %>"><%= message %></div>""",
+      """<div class="alert alert-<%= message_type %$c>"><%= message %></div>""",
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from do to end in table template`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <tbody>
           <% @books.each ${c}do |book| %>
@@ -2453,13 +2661,15 @@ class MatchitRubyTest : VimTestCase() {
             </tr>
           <% ${c}end %>
         </tbody>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from if to else in table template`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <tbody>
           <% @books.each do |book| %>
@@ -2489,13 +2699,15 @@ class MatchitRubyTest : VimTestCase() {
             </tr>
           <% end %>
         </tbody>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test jump from else to end in table template`() {
-    doTest("%",
+    doTest(
+      "%",
       """
         <tbody>
           <% @books.each do |book| %>
@@ -2525,13 +2737,15 @@ class MatchitRubyTest : VimTestCase() {
             </tr>
           <% end %>
         </tbody>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
     )
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.PLUGIN)
   fun `test reverse jump from end to else in table template`() {
-    doTest("g%",
+    doTest(
+      "g%",
       """
         <tbody>
           <% @books.each do |book| %>
@@ -2561,8 +2775,8 @@ class MatchitRubyTest : VimTestCase() {
             </tr>
           <% end %>
         </tbody>
-      """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
+      """.trimIndent(),
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE, "ruby-template.html.erb"
     )
   }
-
 }
