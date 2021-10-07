@@ -103,10 +103,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     val right = visit(ctx.expr(1))
     val operatorString = ctx.binaryOperator2().text
 
-    return if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && matchesLiteralDictionaryKey(
-        ctx.expr(1).text
-      )
-    ) {
+    return if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && matchesLiteralDictionaryKey(ctx.expr(1).text)) {
       val index = SimpleExpression(VimString(ctx.expr(1).text))
       OneElementSublistExpression(index, left)
     } else if (operatorString == "-" && left is OneElementSublistExpression && !containsSpaces(ctx) && matchesLiteralDictionaryKey(
@@ -133,7 +130,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   private fun matchesLiteralDictionaryKey(string: String): Boolean {
-    return string.matches(Regex("[a-zA-Z_-]+"))
+    return string.matches(Regex("[a-zA-Z0-9_-]+"))
   }
 
   private fun evaluationResultCouldBeADictionary(ctx: Expression): Boolean {
