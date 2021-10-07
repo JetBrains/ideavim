@@ -25,8 +25,12 @@ usual beta standards.
 
 ## To Be Released
 
+### Features:
+* Support `matchit.vim` extension for Ruby and XML/HTML [VIM-539](https://youtrack.jetbrains.com/issue/VIM-539) | [matchit.vim](https://github.com/chrisbra/matchit)
+
 ### Merged PRs:
 * [337](https://github.com/JetBrains/ideavim/pull/337) by [Matt Ellis](https://github.com/citizenmatt): guicursor!
+* [343](https://github.com/JetBrains/ideavim/pull/343) by [Martin Yzeiri](https://github.com/myzeiri): Emulate matchit.vim
 
 ## 1.7.2, 2021-09-30
 

@@ -368,6 +368,10 @@ Contributors:
   [![icon][github]](https://github.com/lippfi)
   &nbsp;
   Filipp Vakhitov
+* [![icon][mail]](mailto:yzeiri.1@osu.edu)
+  [![icon][github]](https://github.com/myzeiri)
+  &nbsp;
+  Martin Yzeiri
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.
