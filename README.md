@@ -211,21 +211,26 @@ Ex commands or via `:map` command mappings:
 
 ### Executing actions:
 * `:action {action_id}`
-    * Execute an action by id. Works from Ex command line.
-* `<Action>(*action_id*)`
+    * Execute an action by `{action_id}`. Works from Ex command line.
+* `<Action>({action_id})`
     * For the mappings you can use a special `<Action>` keyword. Don't forget the parentheses.
+    * E.g. `map gh <Action>(ShowErrorDescription)`  <- execute hover on `gh`.
+    * :warning: Mappings to `<Action>` don't work with `noremap`. 
+      If you know the case when it's needed, please [let us know](https://github.com/JetBrains/ideavim#contact-maintainers).
 
-### Finding actions:
-* `:actionlist [pattern]`
-    * Find IDE actions by id or keymap pattern (E.g. `:actionlist extract`, `:actionlist <C-D`)
-    
-* In addition to `:actionlist` command, IdeaVim provides `IdeaVim: track action Ids` option to 
-extract the ids of executed command. This option can be found in "Search everywhere" (double `shift`).
+### Finding action ids:
+
+* IJ provides `IdeaVim: track action Ids` command to show the id of the executed actions.
+  This command can be found in "Search everywhere" (double `shift`).
 
     <details>
         <summary><strong>"Track action Ids" Details</strong> (click to see)</summary>
         <img src="assets/readme/track_action_id.gif" alt="track action ids"/>
     </details>
+
+
+* `:actionlist [pattern]`
+    * Find IDE actions by id or keymap pattern (E.g. `:actionlist extract`, `:actionlist <C-D`)
 
 ##### Examples:
 
