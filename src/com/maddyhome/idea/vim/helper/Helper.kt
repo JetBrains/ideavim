@@ -89,6 +89,7 @@ fun Editor.getTopLevelEditor() = if (this is EditorWindow) this.delegate else th
 
 /**
  * Return list of editors for local host (for code with me plugin)
+ * [VERSION UPDATE] 212+ ClientEditorManager.editors()
  */
 fun localEditors(): List<Editor> {
   return EditorFactory.getInstance().allEditors.filter { editor -> editor.editorClientId.let { it == null || it == ClientId.currentOrNull } }
