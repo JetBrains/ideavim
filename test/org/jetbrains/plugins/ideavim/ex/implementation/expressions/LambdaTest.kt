@@ -97,21 +97,19 @@ class LambdaTest : VimTestCase() {
     assertExOutput("5 - 2 = 3\n")
   }
 
-  // todo maybe create new lambda handler after refactoring?..
-  // redundant args should be ignored
-//  fun `test lambda with more arguments than needed`() {
-//    configureByText("\n")
-//    typeText(
-//      commandToKeys(
-//        """
-//          let L = { x -> x + 10 } |
-//          echo L(32, 100)
-//        """.trimIndent()
-//      )
-//    )
-//    assertPluginError(false)
-//    assertExOutput("42\n")
-//  }
+  fun `test lambda with more arguments than needed`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+          let L = { x -> x + 10 } |
+          echo L(32, 100)
+        """.trimIndent()
+      )
+    )
+    assertPluginError(false)
+    assertExOutput("42\n")
+  }
 
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
   fun `test lambda with less arguments than needed`() {

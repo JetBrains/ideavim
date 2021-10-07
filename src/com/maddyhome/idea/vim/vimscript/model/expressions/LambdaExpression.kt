@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOperator
@@ -35,9 +34,9 @@ import com.maddyhome.idea.vim.vimscript.model.statements.ReturnStatement
 data class LambdaExpression(val args: List<String>, val expr: Expression) : Expression() {
 
   override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimFuncref {
-    val function = FunctionDeclaration(null, getFunctionName(), args, buildBody(), false, setOf(FunctionFlag.CLOSURE), false)
+    val function = FunctionDeclaration(null, getFunctionName(), args, buildBody(), false, setOf(FunctionFlag.CLOSURE), true)
     function.parent = parent
-    return VimFuncref(DefinedFunctionHandler(function), VimList(mutableListOf()), VimDictionary(LinkedHashMap()), VimFuncref.Type.LAMBDA)
+    return VimFuncref(DefinedFunctionHandler(function), VimList(mutableListOf()), null, VimFuncref.Type.LAMBDA)
   }
 
   private fun getFunctionName(): String {
