@@ -120,6 +120,9 @@ class ConcatenationOperatorTest {
   @Theory
   fun `dict and integer`(@FromDataPoints("operator") operator: String, @FromDataPoints("spaces") sp1: String, @FromDataPoints("spaces") sp2: String) {
     try {
+      if (sp1 == "" && sp2 == "") { // it is not a concatenation, so let's skip this case
+        throw ExException("E731: Using a Dictionary as a String")
+      }
       VimscriptParser.parseExpression("{'key' : 21}$sp1$operator${sp2}1")!!.evaluate()
     } catch (e: ExException) {
       assertEquals("E731: Using a Dictionary as a String", e.message)

@@ -28,7 +28,7 @@
 - [x] `function` function
 - [x] `funcref` function
 - [x] `dict` function flag
-- [ ] anonymous functions  
+- [x] anonymous functions  
 - [ ] default value in functions e.g. `function F1(a, b = 10)`
 - [ ] delayed parsing of if/for/while etc.
 - [ ] `has("ide")` or "ide" option

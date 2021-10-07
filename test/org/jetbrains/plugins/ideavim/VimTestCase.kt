@@ -128,6 +128,7 @@ abstract class VimTestCase : UsefulTestCase() {
     ExEntryPanel.getInstance().deactivate(false)
     VariableService.clear()
     VimFuncref.lambdaCounter = 0
+    VimFuncref.anonymousCounter = 0
     IdeavimErrorListener.testLogger.clear()
     VimPlugin.getRegister().resetRegisters()
     VimPlugin.getSearch().resetState()

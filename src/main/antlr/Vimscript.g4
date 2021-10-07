@@ -74,7 +74,7 @@ functionDefinition:     ws_cols FUNCTION (replace = EXCLAMATION)? WS+ (functionS
                         ws_cols ENDFUNCTION WS* (comment | statementSeparator)
 ;
 dictFunctionDefinition:
-                        ws_cols FUNCTION ~(BAR | NEW_LINE)*? statementSeparator
+                        ws_cols FUNCTION (replace = EXCLAMATION)? WS+ (functionScope COLON)? literalDictionaryKey (DOT literalDictionaryKey)+ WS* L_PAREN WS* argumentsDeclaration R_PAREN WS* (functionFlag WS*)* (comment | statementSeparator)
                             blockMember*
                         ws_cols ENDFUNCTION WS* (comment | statementSeparator)
 ;
