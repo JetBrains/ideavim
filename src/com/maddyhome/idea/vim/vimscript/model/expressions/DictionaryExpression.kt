@@ -23,15 +23,23 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 
 data class DictionaryExpression(val dictionary: LinkedHashMap<Expression, Expression>) : Expression() {
 
   override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
-    val dict: LinkedHashMap<VimString, VimDataType> = linkedMapOf()
+    val dict = VimDictionary(linkedMapOf())
     for ((key, value) in dictionary) {
-      dict[VimString(key.evaluate(editor, context, parent).asString())] = value.evaluate(editor, context, parent)
+      val evaluatedVal = value.evaluate(editor, context, parent)
+      var newFuncref = evaluatedVal
+      if (evaluatedVal is VimFuncref && evaluatedVal.handler is DefinedFunctionHandler && !evaluatedVal.isSelfFixed) {
+        newFuncref = evaluatedVal.copy()
+        newFuncref.dictionary = dict
+      }
+      dict.dictionary[VimString(key.evaluate(editor, context, parent).asString())] = newFuncref
     }
-    return VimDictionary(dict)
+    return dict
   }
 }

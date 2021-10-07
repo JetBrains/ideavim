@@ -23,22 +23,27 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
+import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
+import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
+import com.maddyhome.idea.vim.vimscript.services.VariableService
 
 data class VimFuncref(
   val handler: FunctionHandler,
   val arguments: VimList,
-  val dictionary: VimDictionary,
+  var dictionary: VimDictionary?,
   val type: Type,
-) : VimDataType() {
+) : VimDataType(), Cloneable {
 
   var isSelfFixed = false
 
   companion object {
-    var lambdaCounter = 0
+    var lambdaCounter = 1
+    var anonymousCounter = 1
   }
 
   override fun asDouble(): Double {
@@ -50,14 +55,19 @@ data class VimFuncref(
   }
 
   override fun toString(): String {
-    return if (arguments.values.isEmpty()) {
+    return if (arguments.values.isEmpty() && dictionary == null) {
       when (type) {
         Type.LAMBDA -> "function('${handler.name}')"
         Type.FUNCREF -> "function('${handler.name}')"
         Type.FUNCTION -> handler.name
       }
     } else {
-      "function('${handler.name}', $arguments)"
+      val result = StringBuffer("function('${handler.name}'")
+      if (arguments.values.isNotEmpty()) {
+        result.append(", ").append(arguments.toString())
+      }
+      result.append(")")
+      return result.toString()
     }
   }
 
@@ -65,7 +75,21 @@ data class VimFuncref(
     throw ExException("E703: using Funcref as a Number")
   }
 
-  fun execute(args: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType {
+  fun execute(name: String, args: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType {
+    if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {
+      if (dictionary == null) {
+        throw ExException("E725: Calling dict function without Dictionary: $name")
+      } else {
+        VariableService.storeVariable(
+          Variable(Scope.LOCAL_VARIABLE, "self"),
+          dictionary!!,
+          editor,
+          context,
+          handler.function
+        )
+      }
+    }
+
     val allArguments = listOf(this.arguments.values.map { SimpleExpression(it) }, args).flatten()
       if (handler is DefinedFunctionHandler && handler.function.isDeleted) {
         throw ExException("E933: Function was deleted: ${handler.name}")
@@ -78,6 +102,10 @@ data class VimFuncref(
         }
       }
       return handler.executeFunction(allArguments, editor, context, parent)
+    }
+
+    override fun clone(): Any {
+      return VimFuncref(handler, arguments, dictionary, type)
     }
 
     enum class Type {

@@ -20,7 +20,6 @@ data class FunctionDeclaration(
 ) : Executable {
   override lateinit var parent: Executable
   var isDeleted = false
-  var self: VimDataType? = null
 
   /**
    * we store the "a:" and "l:" scope variables here

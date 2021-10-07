@@ -32,7 +32,7 @@ data class FuncrefCallExpression(val expression: Expression, val args: List<Expr
     val value = expression.evaluate(editor, context, parent)
     if (value is VimFuncref) {
       value.handler.ranges = ranges
-      return value.execute(args, editor, context, parent)
+      return value.execute(value.handler.name, args, editor, context, parent)
     } else {
       // todo more exceptions
       throw ExException("E15: Invalid expression")

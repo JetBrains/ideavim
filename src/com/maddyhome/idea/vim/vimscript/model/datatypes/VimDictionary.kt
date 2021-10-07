@@ -18,14 +18,17 @@ data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) 
 
   override fun toString(): String {
     val result = StringBuffer("{")
-    result.append(dictionary.map { it.stringOfEntry() }.joinToString(separator = ", "))
+    result.append(dictionary.map { stringOfEntry(it) }.joinToString(separator = ", "))
     result.append("}")
     return result.toString()
   }
 
-  private fun Map.Entry<VimString, VimDataType>.stringOfEntry(): String {
-    val valueString = if (this.value is VimString) "'${this.value}'" else this.value.toString()
-    return "'${this.key}': $valueString"
+  private fun stringOfEntry(entry: Map.Entry<VimString, VimDataType>): String {
+    val valueString = when (entry.value) {
+      is VimString -> "'${entry.value}'"
+      else -> entry.value.toString()
+    }
+    return "'${entry.key}': $valueString"
   }
 
   override fun asBoolean(): Boolean {

@@ -55,20 +55,15 @@ class CallCommand(val ranges: Ranges, val functionCall: Expression) : Command.Si
         return ExecutionResult.Success
       }
 
+      val name = (if (functionCall.scope != null) functionCall.scope.c + ":" else "") + functionCall.functionName
       val funcref = VariableService.getNullableVariableValue(Variable(functionCall.scope, functionCall.functionName), editor, context, parent)
       if (funcref is VimFuncref) {
-        if (funcref.handler is DefinedFunctionHandler && funcref.handler.function.flags.contains(FunctionFlag.DICT) && funcref.handler.function.self == null) {
-          throw ExException(
-            "E725: Calling dict function without Dictionary: " +
-              ((if (functionCall.scope != null) functionCall.scope.c + ":" else "") + functionCall.functionName)
-          )
-        }
         funcref.handler.ranges = ranges
-        funcref.execute(functionCall.arguments, editor, context, parent)
+        funcref.execute(name, functionCall.arguments, editor, context, parent)
         return ExecutionResult.Success
       }
 
-      throw ExException("E117: Unknown function: ${if (functionCall.scope != null) functionCall.scope.c + ":" else ""}${functionCall.functionName}")
+      throw ExException("E117: Unknown function: $name")
     } else if (functionCall is FuncrefCallExpression) {
       functionCall.evaluateWithRange(ranges, editor, context, parent)
       return ExecutionResult.Success

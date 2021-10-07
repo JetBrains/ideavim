@@ -71,7 +71,11 @@ object FunctionFunctionHandler : FunctionHandler() {
     if (arg3 != null && arg3 !is VimDictionary) {
       throw ExException("E922: expected a dict")
     }
-    return VimFuncref(function, arglist ?: VimList(mutableListOf()), dictionary ?: VimDictionary(LinkedHashMap()), VimFuncref.Type.FUNCTION)
+    val funcref = VimFuncref(function, arglist ?: VimList(mutableListOf()), dictionary, VimFuncref.Type.FUNCTION)
+    if (dictionary != null) {
+      funcref.isSelfFixed = true
+    }
+    return funcref
   }
 }
 
@@ -115,7 +119,7 @@ object FuncrefFunctionHandler : FunctionHandler() {
     if (arg3 != null && arg3 !is VimDictionary) {
       throw ExException("E922: expected a dict")
     }
-    return VimFuncref(handler, arglist ?: VimList(mutableListOf()), dictionary ?: VimDictionary(LinkedHashMap()), VimFuncref.Type.FUNCREF)
+    return VimFuncref(handler, arglist ?: VimList(mutableListOf()), dictionary, VimFuncref.Type.FUNCREF)
   }
 }
 

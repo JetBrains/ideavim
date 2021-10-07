@@ -25,10 +25,8 @@ data class FunctionCallExpression(val scope: Scope?, val functionName: String, v
 
     val funcref = VariableService.getNullableVariableValue(Variable(scope, functionName), editor, context, parent)
     if (funcref is VimFuncref) {
-      if (funcref.handler is DefinedFunctionHandler && funcref.handler.function.flags.contains(FunctionFlag.DICT) && funcref.handler.function.self == null) {
-        throw ExException("E725: Calling dict function without Dictionary: ${(if (scope != null) scope.c + ":" else "") + functionName}")
-      }
-      return funcref.execute(arguments, editor, context, parent)
+      val name = (if (scope != null) scope.c + ":" else "") + functionName
+      return funcref.execute(name, arguments, editor, context, parent)
     }
     throw ExException("E117: Unknown function: ${if (scope != null) scope.c + ":" else ""}$functionName")
   }

@@ -27,6 +27,6 @@ class LambdaFunctionCallExpression(val lambda: LambdaExpression, val arguments: 
 
   override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
     val funcref = lambda.evaluate(editor, context, parent)
-    return funcref.execute(arguments, editor, context, parent)
+    return funcref.execute("", arguments, editor, context, parent)
   }
 }

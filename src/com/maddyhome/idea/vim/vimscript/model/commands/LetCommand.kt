@@ -14,6 +14,7 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -28,6 +29,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOperator
 import com.maddyhome.idea.vim.vimscript.model.expressions.toVimDataType
+import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.services.VariableService
@@ -66,15 +68,19 @@ data class LetCommand(
               if (operator != AssignmentOperator.ASSIGNMENT && !variableValue.dictionary.containsKey(dictKey)) {
                 throw ExException("E716: Key not present in Dictionary: $dictKey")
               }
-              if (variableValue.dictionary.containsKey(dictKey)) {
-                variableValue.dictionary[dictKey] =
-                  operator.getNewValue(
-                    SimpleExpression(variableValue.dictionary[dictKey]!!), expression, editor,
-                    context, this
-                  )
+              var valueToStore = if (variableValue.dictionary.containsKey(dictKey)) {
+                operator.getNewValue(SimpleExpression(variableValue.dictionary[dictKey]!!), expression, editor, context, this)
               } else {
-                variableValue.dictionary[dictKey] = expression.evaluate(editor, context, this)
+                expression.evaluate(editor, context, this)
               }
+              if (valueToStore is VimFuncref && !valueToStore.isSelfFixed &&
+                valueToStore.handler is DefinedFunctionHandler &&
+                (valueToStore.handler as DefinedFunctionHandler).function.flags.contains(FunctionFlag.DICT)
+              ) {
+                valueToStore = valueToStore.copy()
+                valueToStore.dictionary = variableValue
+              }
+              variableValue.dictionary[dictKey] = valueToStore
             }
             is VimList -> {
               // we use Integer.parseInt(........asString()) because in case if index's type is Float, List, Dictionary etc
