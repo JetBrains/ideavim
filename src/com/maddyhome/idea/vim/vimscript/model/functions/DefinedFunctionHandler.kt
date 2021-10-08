@@ -44,7 +44,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
   override val name = function.name
   override val scope = function.scope
   override val minimumNumberOfArguments = function.args.size
-  override val maximumNumberOfArguments get() = if (function.hasOptionalArguments) null else function.args.size
+  override val maximumNumberOfArguments get() = if (function.hasOptionalArguments) null else function.args.size + function.defaultArgs.size
 
   override fun doFunction(argumentValues: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType {
     var returnValue: VimDataType? = null
@@ -128,6 +128,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
   }
 
   private fun initializeFunctionVariables(argumentValues: List<Expression>, editor: Editor, context: DataContext) {
+    // non-optional function arguments
     for ((index, name) in function.args.withIndex()) {
       VariableService.storeVariable(
         Variable(Scope.FUNCTION_VARIABLE, name),
@@ -137,10 +138,30 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
         function
       )
     }
+    // optional function arguments with default values
+    for (index in 0 until function.defaultArgs.size) {
+      val expressionToStore = if (index + function.args.size < argumentValues.size) argumentValues[index + function.args.size] else function.defaultArgs[index].second
+      VariableService.storeVariable(
+        Variable(Scope.FUNCTION_VARIABLE, function.defaultArgs[index].first),
+        expressionToStore.evaluate(editor, context, function),
+        editor,
+        context,
+        function
+      )
+    }
+    // all the other optional arguments passed to function are stored in a:000 variable
     if (function.hasOptionalArguments) {
+      val remainingArgs = if (function.args.size + function.defaultArgs.size < argumentValues.size) {
+        VimList(
+          argumentValues.subList(function.args.size + function.defaultArgs.size, argumentValues.size)
+            .map { it.evaluate(editor, context, function) }.toMutableList()
+        )
+      } else {
+        VimList(mutableListOf())
+      }
       VariableService.storeVariable(
         Variable(Scope.FUNCTION_VARIABLE, "000"),
-        VimList(argumentValues.subList(function.args.size, argumentValues.size).map { it.evaluate(editor, context, function) }.toMutableList()),
+        remainingArgs,
         editor,
         context,
         function

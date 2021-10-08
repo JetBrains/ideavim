@@ -79,7 +79,8 @@ dictFunctionDefinition:
                         ws_cols ENDFUNCTION WS* (comment | statementSeparator)
 ;
 functionFlag:           RANGE | ABORT | DICT | CLOSURE;
-argumentsDeclaration:   (variableName (WS* COMMA WS* variableName)* (WS* COMMA WS* ETC WS*)? WS*)?;
+argumentsDeclaration:   (variableName (WS* COMMA WS* variableName)* defaultValue* (WS* COMMA WS* ETC WS*)? WS*)?;
+defaultValue:           WS* COMMA WS* variableName WS* ASSIGN WS* expr;
 
 augroup:                ws_cols AUGROUP ~(NEW_LINE | BAR)* statementSeparator
                             blockMember*
@@ -444,6 +445,7 @@ binaryOperator4:        AMPERSAND AMPERSAND;
 binaryOperator5:        LOGICAL_OR;
 
 register:               AT (DIGIT | alphabeticChar | MINUS | COLON | DOT | MOD | NUM | ASSIGN | STAR | PLUS | TILDE | UNDERSCORE | DIV | AT);
+// todo argumentDeclaration but without default values
 lambda:                 L_CURLY WS* argumentsDeclaration WS* ARROW WS* expr WS* R_CURLY;
 
 variable:               (variableScope COLON)? variableName;

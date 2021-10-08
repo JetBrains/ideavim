@@ -29,10 +29,10 @@
 - [x] `funcref` function
 - [x] `dict` function flag
 - [x] anonymous functions  
-- [ ] default value in functions e.g. `function F1(a, b = 10)`
-- [ ] delayed parsing of if/for/while etc.
+- [x] default value in functions e.g. `function F1(a, b = 10)`
 - [ ] `has("ide")` or "ide" option
 - [ ] reduce number of rules in grammar
+- [ ] delayed parsing of if/for/while etc.
 - [ ] classic package structure  
 - [ ] loggers
 

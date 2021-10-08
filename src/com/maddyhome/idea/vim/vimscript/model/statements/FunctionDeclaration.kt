@@ -6,6 +6,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
 
@@ -13,6 +14,7 @@ data class FunctionDeclaration(
   val scope: Scope?,
   val name: String,
   val args: List<String>,
+  val defaultArgs: List<Pair<String, Expression>>,
   val body: List<Executable>,
   val replaceExisting: Boolean,
   val flags: Set<FunctionFlag>,

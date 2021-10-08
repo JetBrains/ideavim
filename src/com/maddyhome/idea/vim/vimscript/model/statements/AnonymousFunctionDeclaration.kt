@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
@@ -34,6 +35,7 @@ import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 data class AnonymousFunctionDeclaration(
   val sublist: OneElementSublistExpression,
   val args: List<String>,
+  val defaultArgs: List<Pair<String, Expression>>,
   val body: List<Executable>,
   val replaceExisting: Boolean,
   val flags: Set<FunctionFlag>,
@@ -55,7 +57,7 @@ data class AnonymousFunctionDeclaration(
         throw ExException("E718: Funcref required")
       }
     }
-    val declaration = FunctionDeclaration(null, VimFuncref.anonymousCounter++.toString(), args, body, replaceExisting, flags + FunctionFlag.DICT, hasOptionalArguments)
+    val declaration = FunctionDeclaration(null, VimFuncref.anonymousCounter++.toString(), args, defaultArgs, body, replaceExisting, flags + FunctionFlag.DICT, hasOptionalArguments)
     container.dictionary[index] = VimFuncref(DefinedFunctionHandler(declaration), VimList(mutableListOf()), container, VimFuncref.Type.FUNCREF)
     return ExecutionResult.Success
   }

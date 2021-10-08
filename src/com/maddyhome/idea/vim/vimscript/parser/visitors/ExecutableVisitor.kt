@@ -74,6 +74,8 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
     val functionScope = if (ctx.functionScope() != null) Scope.getByValue(ctx.functionScope().text) else null
     val functionName = ctx.functionName().text
     val args = ctx.argumentsDeclaration().variableName().map { it.text }
+    val defaultArgs = ctx.argumentsDeclaration().defaultValue()
+      .map { Pair<String, Expression>(it.variableName().text, ExpressionVisitor.visit(it.expr())) }
     val body = ctx.blockMember().mapNotNull { visitBlockMember(it) }
     val replaceExisting = ctx.replace != null
     val flags = mutableSetOf<FunctionFlag?>()
@@ -81,12 +83,14 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
     for (flag in ctx.functionFlag()) {
       flags.add(FunctionFlag.getByName(flag.text))
     }
-    return FunctionDeclaration(functionScope, functionName, args, body, replaceExisting, flags.filterNotNull().toSet(), hasOptionalArguments)
+    return FunctionDeclaration(functionScope, functionName, args, defaultArgs, body, replaceExisting, flags.filterNotNull().toSet(), hasOptionalArguments)
   }
 
   override fun visitDictFunctionDefinition(ctx: VimscriptParser.DictFunctionDefinitionContext): Executable {
     val functionScope = if (ctx.functionScope() != null) Scope.getByValue(ctx.functionScope().text) else null
     val args = ctx.argumentsDeclaration().variableName().map { it.text }
+    val defaultArgs = ctx.argumentsDeclaration().defaultValue()
+      .map { Pair<String, Expression>(it.variableName().text, ExpressionVisitor.visit(it.expr())) }
     val body = ctx.blockMember().mapNotNull { visitBlockMember(it) }
     val replaceExisting = ctx.replace != null
     val flags = mutableSetOf<FunctionFlag?>()
@@ -98,7 +102,7 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
     for (i in 2 until ctx.literalDictionaryKey().size) {
       sublistExpression = OneElementSublistExpression(SimpleExpression(VimString(ctx.literalDictionaryKey(i).text)), sublistExpression)
     }
-    return AnonymousFunctionDeclaration(sublistExpression, args, body, replaceExisting, flags.filterNotNull().toSet(), hasOptionalArguments)
+    return AnonymousFunctionDeclaration(sublistExpression, args, defaultArgs, body, replaceExisting, flags.filterNotNull().toSet(), hasOptionalArguments)
   }
 
   override fun visitTryStatement(ctx: VimscriptParser.TryStatementContext): Executable {

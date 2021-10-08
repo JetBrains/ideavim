@@ -559,5 +559,54 @@ class FunctionDeclarationTest : VimTestCase() {
       )
     )
     assertExOutput("[42, 'optional arg']\n")
+
+    typeText(commandToKeys("delfunction! GetOptionalArgs"))
+  }
+
+  fun `test arguments with default values`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        "" +
+          "function GetOptionalArgs(name, a = 10, b = 20) |" +
+          "  return 'a = ' .. a:a .. ', b = ' .. a:b | " +
+          "endfunction"
+      )
+    )
+    typeText(commandToKeys("echo GetOptionalArgs('this arg is not optional')"))
+    assertExOutput("a = 10, b = 20\n")
+
+    typeText(commandToKeys("echo GetOptionalArgs('this arg is not optional', 42)"))
+    assertExOutput("a = 42, b = 20\n")
+
+    typeText(commandToKeys("echo GetOptionalArgs('this arg is not optional', 100, 200)"))
+    assertExOutput("a = 100, b = 200\n")
+
+    typeText(commandToKeys("delfunction! GetOptionalArgs"))
+  }
+
+  fun `test arguments with default values and optional args`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        "" +
+          "function GetOptionalArgs(name, a = 10, b = 20, ...) |" +
+          "  return {'a': a:a, 'b': a:b, '000': a:000} | " +
+          "endfunction"
+      )
+    )
+    typeText(commandToKeys("echo GetOptionalArgs('this arg is not optional')"))
+    assertExOutput("{'a': 10, 'b': 20, '000': []}\n")
+
+    typeText(commandToKeys("echo GetOptionalArgs('this arg is not optional', 42)"))
+    assertExOutput("{'a': 42, 'b': 20, '000': []}\n")
+
+    typeText(commandToKeys("echo GetOptionalArgs('this arg is not optional', 100, 200)"))
+    assertExOutput("{'a': 100, 'b': 200, '000': []}\n")
+
+    typeText(commandToKeys("echo GetOptionalArgs('this arg is not optional', 100, 200, 300)"))
+    assertExOutput("{'a': 100, 'b': 200, '000': [300]}\n")
+
+    typeText(commandToKeys("delfunction! GetOptionalArgs"))
   }
 }
