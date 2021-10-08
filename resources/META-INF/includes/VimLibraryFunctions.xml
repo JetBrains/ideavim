@@ -9,5 +9,6 @@
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.LenFunctionHandler" name="len"/>
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.FunctionFunctionHandler" name="function"/>
     <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.FuncrefFunctionHandler" name="funcref"/>
+    <vimLibraryFunction implementation="com.maddyhome.idea.vim.vimscript.model.functions.handlers.HasFunctionHandler" name="has"/>
   </extensions>
 </idea-plugin>
