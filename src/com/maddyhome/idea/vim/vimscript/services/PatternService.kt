@@ -15,10 +15,15 @@ object PatternService {
     regMatch.rmm_ic = ignoreCase
 
     regMatch.regprog = regExp.vim_regcomp(pattern, 1)
+    regMatch.regprog
     if (regMatch.regprog == null) {
       return false
     }
 
-    return regExp.vim_string_contains_regexp(regMatch, text)
+    // todo optimize me senpai :(
+    for (i in 0..text.length) {
+      if (regExp.vim_string_contains_regexp(regMatch, text.substring(i))) return true
+    }
+    return false
   }
 }

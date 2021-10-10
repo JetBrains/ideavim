@@ -7,6 +7,6 @@ import com.maddyhome.idea.vim.vimscript.services.PatternService
 object MatchesIgnoreCaseHandler : BinaryOperatorHandler() {
 
   override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {
-    return PatternService.matches(left.asString(), right.asString(), ignoreCase = true).asVimInt()
+    return PatternService.matches(right.asString(), left.asString(), ignoreCase = true).asVimInt()
   }
 }
