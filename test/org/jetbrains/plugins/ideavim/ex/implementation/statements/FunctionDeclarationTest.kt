@@ -541,6 +541,46 @@ class FunctionDeclarationTest : VimTestCase() {
     typeText(commandToKeys("delf! F1"))
   }
 
+  fun `test only optional arguments`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        "" +
+          "function GetOptionalArgs(...) |" +
+          "  return a:000 | " +
+          "endfunction"
+      )
+    )
+    typeText(commandToKeys("echo GetOptionalArgs()"))
+    assertExOutput("[]\n")
+    typeText(
+      commandToKeys(
+        "echo GetOptionalArgs(42, 'optional arg')"
+      )
+    )
+    assertExOutput("[42, 'optional arg']\n")
+
+    typeText(commandToKeys("delfunction! GetOptionalArgs"))
+  }
+
+  fun `test only default arguments`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        "" +
+          "function GetDefaultArgs(a = 10, b = 20) |" +
+          "  return [a:a, a:b] | " +
+          "endfunction"
+      )
+    )
+    typeText(commandToKeys("echo GetDefaultArgs()"))
+    assertExOutput("[10, 20]\n")
+    typeText(commandToKeys("echo GetDefaultArgs(42, 'optional arg')"))
+    assertExOutput("[42, 'optional arg']\n")
+
+    typeText(commandToKeys("delfunction! GetDefaultArgs"))
+  }
+
   fun `test optional arguments`() {
     configureByText("\n")
     typeText(

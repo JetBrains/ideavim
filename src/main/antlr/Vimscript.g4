@@ -63,13 +63,13 @@ finallyBlock:           (WS | COLON)* FINALLY WS* ((inline_comment NEW_LINE) | (
 ;
 
 functionDefinition:
-                        (WS | COLON)* FUNCTION (replace = EXCLAMATION)? WS+ (SID | SNR)? (anyCaseNameWithDigitsAndUnderscores NUM)* (functionScope COLON)? (functionName | (literalDictionaryKey (DOT literalDictionaryKey)+)) WS* L_PAREN WS* argumentsDeclaration R_PAREN WS* (functionFlag WS*)* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
+                        (WS | COLON)* FUNCTION (replace = EXCLAMATION)? WS+ (SID | SNR)? (anyCaseNameWithDigitsAndUnderscores NUM)* (functionScope COLON)? (functionName | (literalDictionaryKey (DOT literalDictionaryKey)+)) WS* L_PAREN WS* argumentsDeclaration WS* R_PAREN WS* (functionFlag WS*)* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
                             blockMember*
                         (WS | COLON)* ENDFUNCTION WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))
 ;
 functionFlag:           RANGE | ABORT | DICT | CLOSURE;
-argumentsDeclaration:   (ETC | (variableName (WS* COMMA WS* variableName)* defaultValue* (WS* COMMA WS* ETC WS*)? WS*))?;
-defaultValue:           WS* COMMA WS* variableName WS* ASSIGN WS* expr;
+argumentsDeclaration:   (ETC | defaultValue (WS* COMMA WS* defaultValue)* (WS* COMMA WS* ETC WS*)? | (variableName (WS* COMMA WS* variableName)* (WS* COMMA WS* defaultValue)* (WS* COMMA WS* ETC WS*)?))?;
+defaultValue:           variableName WS* ASSIGN WS* expr;
 
 autoCmd:                (WS | COLON)* AUTOCMD commandArgument = ~(NEW_LINE)*? NEW_LINE;
 
