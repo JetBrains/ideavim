@@ -112,16 +112,6 @@ gradle.projectsEvaluated {
     }
 }
 
-sourceSets {
-    main {
-        java.srcDir("src")
-        resources.srcDir("resources")
-    }
-    test {
-        java.srcDir("test")
-    }
-}
-
 // --- Intellij plugin
 
 intellij {
@@ -159,7 +149,7 @@ tasks {
     generateGrammarSource {
         maxHeapSize = "128m"
         arguments.addAll(listOf("-package", "com.maddyhome.idea.vim.vimscript.parser.generated", "-visitor"))
-        outputDirectory = file("src/com/maddyhome/idea/vim/vimscript/parser/generated")
+        outputDirectory = file("src/main/java/com/maddyhome/idea/vim/vimscript/parser/generated")
     }
 
     named("compileKotlin") {
