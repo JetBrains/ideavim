@@ -27,10 +27,18 @@ usual beta standards.
 
 ### Features:
 * Support `matchit.vim` extension for Ruby and XML/HTML [VIM-539](https://youtrack.jetbrains.com/issue/VIM-539) | [matchit.vim](https://github.com/chrisbra/matchit)
+* IDE-specific configuration [VIM-1573](https://youtrack.jetbrains.com/issue/VIM-1573)
+* Call command [VIM-2416](https://youtrack.jetbrains.com/issue/VIM-2416)
 
 ### Merged PRs:
 * [337](https://github.com/JetBrains/ideavim/pull/337) by [Matt Ellis](https://github.com/citizenmatt): guicursor!
 * [343](https://github.com/JetBrains/ideavim/pull/343) by [Martin Yzeiri](https://github.com/myzeiri): Emulate matchit.vim
+
+### Fixes:
+* [VIM-2417](https://youtrack.jetbrains.com/issue/VIM-2417) Fix bars in substitute command
+* [VIM-2425](https://youtrack.jetbrains.com/issue/VIM-2425) Fix reload button
+* [VIM-2422](https://youtrack.jetbrains.com/issue/VIM-2422) Fix freeze
+* [VIM-2420](https://youtrack.jetbrains.com/issue/VIM-2420) Fix freeze
 
 ## 1.7.2, 2021-09-30
 
