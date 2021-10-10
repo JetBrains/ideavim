@@ -83,8 +83,11 @@ import com.maddyhome.idea.vim.vimscript.model.commands.YankLinesCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapClearCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.UnMapCommand
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
+import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOperator
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOperator.Companion.getByValue
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptBaseVisitor
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser
@@ -92,11 +95,12 @@ import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.CallCom
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.DelfunctionCommandContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.EchoCommandContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.ExprContext
-import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.LetCommandContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.OtherCommandContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.RangeContext
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser.RangeOffsetContext
 import java.util.stream.Collectors
+import kotlin.reflect.KClass
+import kotlin.reflect.full.primaryConstructor
 
 object CommandVisitor : VimscriptBaseVisitor<Command>() {
 
@@ -150,12 +154,16 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     return ranges
   }
 
-  override fun visitLetCommand(ctx: LetCommandContext): Command {
+  override fun visitLet1Command(ctx: VimscriptParser.Let1CommandContext): Command {
     val ranges: Ranges = parseRanges(ctx.range())
     val variable: Expression = expressionVisitor.visit(ctx.expr(0))
     val operator = getByValue(ctx.assignmentOperator.text)
     val expression: Expression = expressionVisitor.visit(ctx.expr(1))
-    return LetCommand(ranges, variable, operator, expression)
+    return LetCommand(ranges, variable, operator, expression, true)
+  }
+
+  override fun visitLet2Command(ctx: VimscriptParser.Let2CommandContext): Command {
+    return LetCommand(Ranges(), SimpleExpression(VimInt(0)), AssignmentOperator.ASSIGNMENT, SimpleExpression(VimInt(0)), false)
   }
 
   override fun visitEchoCommand(ctx: EchoCommandContext): Command {
@@ -197,436 +205,62 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     return GoToLineCommand(ranges)
   }
 
-  override fun visitActionCommand(ctx: VimscriptParser.ActionCommandContext): ActionCommand {
+  override fun visitCommandWithComment(ctx: VimscriptParser.CommandWithCommentContext): Command {
     val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return ActionCommand(ranges, argument)
+    val commandName = ctx.name.text
+    val argument = ctx.commandArgumentWithoutBars()?.text ?: ""
+    return createCommandByCommandContext(ranges, argument, commandName)
   }
 
-  override fun visitActionListCommand(ctx: VimscriptParser.ActionListCommandContext): ActionListCommand {
+  override fun visitCommandWithoutComments(ctx: VimscriptParser.CommandWithoutCommentsContext): Command {
     val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return ActionListCommand(ranges, argument)
+    val commandName = ctx.name.text
+    val argument = ctx.commandArgumentWithoutBars()?.text ?: ""
+    return createCommandByCommandContext(ranges, argument, commandName)
   }
 
-  override fun visitAsciiCommand(ctx: VimscriptParser.AsciiCommandContext): AsciiCommand {
+  override fun visitCommandWithBars(ctx: VimscriptParser.CommandWithBarsContext): Command {
     val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return AsciiCommand(ranges, argument)
+    val commandName = ctx.name.text
+    val argument = ctx.commandArgumentWithBars()?.text ?: ""
+    return createCommandByCommandContext(ranges, argument, commandName)
   }
 
-  override fun visitBufferCommand(ctx: VimscriptParser.BufferCommandContext): BufferCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return BufferCommand(ranges, argument)
-  }
-
-  override fun visitBufferCloseCommand(ctx: VimscriptParser.BufferCloseCommandContext): BufferCloseCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return BufferCloseCommand(ranges, argument)
-  }
-
-  override fun visitBufferListCommand(ctx: VimscriptParser.BufferListCommandContext): BufferListCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return BufferListCommand(ranges, argument)
-  }
-
-  override fun visitCmdCommand(ctx: VimscriptParser.CmdCommandContext): CmdCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return CmdCommand(ranges, argument)
-  }
-
-  override fun visitCmdClearCommand(ctx: VimscriptParser.CmdClearCommandContext): CmdClearCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return CmdClearCommand(ranges, argument)
-  }
-
-  override fun visitCmdFilterCommand(ctx: VimscriptParser.CmdFilterCommandContext): CmdFilterCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return CmdFilterCommand(ranges, argument)
-  }
-
-  override fun visitCopyTextCommand(ctx: VimscriptParser.CopyTextCommandContext): CopyTextCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return CopyTextCommand(ranges, argument)
-  }
-
-  override fun visitDelCmdCommand(ctx: VimscriptParser.DelCmdCommandContext): DelCmdCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return DelCmdCommand(ranges, argument)
-  }
-
-  override fun visitDeleteLinesCommand(ctx: VimscriptParser.DeleteLinesCommandContext): DeleteLinesCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return DeleteLinesCommand(ranges, argument)
-  }
-
-  override fun visitDeleteMarksCommand(ctx: VimscriptParser.DeleteMarksCommandContext): DeleteMarksCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return DeleteMarksCommand(ranges, argument)
-  }
-
-  override fun visitDigraphCommand(ctx: VimscriptParser.DigraphCommandContext): DigraphCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return DigraphCommand(ranges, argument)
-  }
-
-  override fun visitDumpLineCommand(ctx: VimscriptParser.DumpLineCommandContext): DumpLineCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return DumpLineCommand(ranges, argument)
-  }
-
-  override fun visitEditFileCommand(ctx: VimscriptParser.EditFileCommandContext): EditFileCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return EditFileCommand(ranges, argument)
-  }
-
-  override fun visitExitCommand(ctx: VimscriptParser.ExitCommandContext): ExitCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return ExitCommand(ranges, argument)
-  }
-
-  override fun visitFindFileCommand(ctx: VimscriptParser.FindFileCommandContext): FindFileCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return FindFileCommand(ranges, argument)
-  }
-
-  override fun visitFindClassCommand(ctx: VimscriptParser.FindClassCommandContext): FindClassCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return FindClassCommand(ranges, argument)
-  }
-
-  override fun visitFileCommand(ctx: VimscriptParser.FileCommandContext): FileCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return FileCommand(ranges, argument)
-  }
-
-  override fun visitFindSymbolCommand(ctx: VimscriptParser.FindSymbolCommandContext): FindSymbolCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return FindSymbolCommand(ranges, argument)
-  }
-
-  override fun visitGlobalCommand(ctx: VimscriptParser.GlobalCommandContext): GlobalCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgumentWithBars().text.trim()
-    val invert = ctx.invert != null
-    return GlobalCommand(ranges, argument, invert)
-  }
-
-  override fun visitVglobalCommand(ctx: VimscriptParser.VglobalCommandContext): GlobalCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgumentWithBars().text.trim()
-    return GlobalCommand(ranges, argument, true)
-  }
-
-  override fun visitGoToCharacterCommand(ctx: VimscriptParser.GoToCharacterCommandContext): GotoCharacterCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return GotoCharacterCommand(ranges, argument)
-  }
-
-  override fun visitHelpCommand(ctx: VimscriptParser.HelpCommandContext): HelpCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return HelpCommand(ranges, argument)
-  }
-
-  override fun visitHistoryCommand(ctx: VimscriptParser.HistoryCommandContext): HistoryCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return HistoryCommand(ranges, argument)
-  }
-
-  override fun visitJoinLinesCommand(ctx: VimscriptParser.JoinLinesCommandContext): JoinLinesCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return JoinLinesCommand(ranges, argument)
-  }
-
-  override fun visitJumpsCommand(ctx: VimscriptParser.JumpsCommandContext): JumpsCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return JumpsCommand(ranges, argument)
-  }
-
-  override fun visitMarkCommand(ctx: VimscriptParser.MarkCommandContext): MarkCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return MarkCommand(ranges, argument)
-  }
-
-  override fun visitMarksCommand(ctx: VimscriptParser.MarksCommandContext): MarksCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return MarksCommand(ranges, argument)
-  }
-
-  override fun visitMoveTextCommand(ctx: VimscriptParser.MoveTextCommandContext): MoveTextCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return MoveTextCommand(ranges, argument)
-  }
-
-  override fun visitNextFileCommand(ctx: VimscriptParser.NextFileCommandContext): NextFileCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return NextFileCommand(ranges, argument)
-  }
-
-  override fun visitNextTabCommand(ctx: VimscriptParser.NextTabCommandContext): NextTabCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return NextTabCommand(ranges, argument)
-  }
-
-  override fun visitNoHlSearchCommand(ctx: VimscriptParser.NoHlSearchCommandContext): NoHLSearchCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return NoHLSearchCommand(ranges, argument)
-  }
-
-  override fun visitOnlyCommand(ctx: VimscriptParser.OnlyCommandContext): OnlyCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return OnlyCommand(ranges, argument)
-  }
-
-  override fun visitPlugCommand(ctx: VimscriptParser.PlugCommandContext): PlugCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return PlugCommand(ranges, argument)
-  }
-
-  override fun visitPreviousFileCommand(ctx: VimscriptParser.PreviousFileCommandContext): PreviousFileCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return PreviousFileCommand(ranges, argument)
-  }
-
-  override fun visitPreviousTabCommand(ctx: VimscriptParser.PreviousTabCommandContext): PreviousTabCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return PreviousTabCommand(ranges, argument)
-  }
-
-  override fun visitPrintCommand(ctx: VimscriptParser.PrintCommandContext): PrintCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return PrintCommand(ranges, argument)
-  }
-
-  override fun visitPromptFindCommand(ctx: VimscriptParser.PromptFindCommandContext): PromptFindCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return PromptFindCommand(ranges, argument)
-  }
-
-  override fun visitPromptReplaceCommand(ctx: VimscriptParser.PromptReplaceCommandContext): PromptReplaceCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return PromptReplaceCommand(ranges, argument)
-  }
-
-  override fun visitPutLinesCommand(ctx: VimscriptParser.PutLinesCommandContext): PutLinesCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return PutLinesCommand(ranges, argument)
-  }
-
-  override fun visitQuitCommand(ctx: VimscriptParser.QuitCommandContext): QuitCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return QuitCommand(ranges, argument)
-  }
-
-  override fun visitRedoCommand(ctx: VimscriptParser.RedoCommandContext): RedoCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return RedoCommand(ranges, argument)
-  }
-
-  override fun visitRegistersCommand(ctx: VimscriptParser.RegistersCommandContext): RegistersCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return RegistersCommand(ranges, argument)
-  }
-
-  override fun visitRepeatCommand(ctx: VimscriptParser.RepeatCommandContext): RepeatCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return RepeatCommand(ranges, argument)
-  }
-
-  override fun visitSelectFileCommand(ctx: VimscriptParser.SelectFileCommandContext): SelectFileCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return SelectFileCommand(ranges, argument)
-  }
-
-  override fun visitSelectFirstFileCommand(ctx: VimscriptParser.SelectFirstFileCommandContext): SelectFirstFileCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return SelectFirstFileCommand(ranges, argument)
-  }
-
-  override fun visitSelectLastFileCommand(ctx: VimscriptParser.SelectLastFileCommandContext): SelectLastFileCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return SelectLastFileCommand(ranges, argument)
-  }
-
-  override fun visitSetCommand(ctx: VimscriptParser.SetCommandContext): SetCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return SetCommand(ranges, argument)
-  }
-
-  override fun visitSetHandlerCommand(ctx: VimscriptParser.SetHandlerCommandContext): SetHandlerCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return SetHandlerCommand(ranges, argument)
-  }
-
-  override fun visitShellCommand(ctx: VimscriptParser.ShellCommandContext): ShellCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return ShellCommand(ranges, argument)
+  private fun createCommandByCommandContext(ranges: Ranges, argument: String, commandName: String): Command {
+    return when (getCommandByName(commandName)) {
+      MapCommand::class -> MapCommand(ranges, argument, commandName)
+      MapClearCommand::class -> MapClearCommand(ranges, argument, commandName)
+      UnMapCommand::class -> UnMapCommand(ranges, argument, commandName)
+      GlobalCommand::class -> {
+        if (commandName.startsWith("v")) {
+          GlobalCommand(ranges, argument, true)
+        } else {
+          if (argument.startsWith("!")) GlobalCommand(ranges, argument.substring(1), true) else GlobalCommand(ranges, argument, false)
+        }
+      }
+      SplitCommand::class -> {
+        if (commandName.startsWith("v"))
+          SplitCommand(ranges, argument, SplitType.VERTICAL)
+        else
+          SplitCommand(ranges, argument, SplitType.HORIZONTAL)
+      }
+      SubstituteCommand::class -> SubstituteCommand(ranges, argument, commandName)
+      else -> getCommandByName(commandName).primaryConstructor!!.call(ranges, argument)
+    }
   }
 
   override fun visitShiftLeftCommand(ctx: VimscriptParser.ShiftLeftCommandContext): ShiftLeftCommand {
     val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
+    val argument = (ctx.commandArgument?.text ?: "").trim()
     val length = ctx.lShift().text.length
     return ShiftLeftCommand(ranges, argument, length)
   }
 
   override fun visitShiftRightCommand(ctx: VimscriptParser.ShiftRightCommandContext): ShiftRightCommand {
     val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
+    val argument = (ctx.commandArgument?.text ?: "").trim()
     val length = ctx.rShift().text.length
     return ShiftRightCommand(ranges, argument, length)
-  }
-
-  override fun visitSortCommand(ctx: VimscriptParser.SortCommandContext): SortCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return SortCommand(ranges, argument)
-  }
-
-  override fun visitSplitCommand(ctx: VimscriptParser.SplitCommandContext): SplitCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return SplitCommand(ranges, argument, SplitType.HORIZONTAL)
-  }
-
-  override fun visitVSplitCommand(ctx: VimscriptParser.VSplitCommandContext): SplitCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return SplitCommand(ranges, argument, SplitType.VERTICAL)
-  }
-
-  override fun visitSourceCommand(ctx: VimscriptParser.SourceCommandContext): SourceCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return SourceCommand(ranges, argument)
-  }
-
-  override fun visitSubstituteCommand(ctx: VimscriptParser.SubstituteCommandContext): SubstituteCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgumentWithBars().text.trim()
-    return SubstituteCommand(ranges, argument, ctx.substituteCommandName.text)
-  }
-
-  override fun visitTabOnlyCommand(ctx: VimscriptParser.TabOnlyCommandContext): TabOnlyCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return TabOnlyCommand(ranges, argument)
-  }
-
-  override fun visitTabCloseCommand(ctx: VimscriptParser.TabCloseCommandContext): TabCloseCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return TabCloseCommand(ranges, argument)
-  }
-
-  override fun visitUndoCommand(ctx: VimscriptParser.UndoCommandContext): UndoCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return UndoCommand(ranges, argument)
-  }
-
-  override fun visitWriteAllCommand(ctx: VimscriptParser.WriteAllCommandContext): WriteAllCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return WriteAllCommand(ranges, argument)
-  }
-
-  override fun visitWriteCommand(ctx: VimscriptParser.WriteCommandContext): WriteCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return WriteCommand(ranges, argument)
-  }
-
-  override fun visitWriteNextCommand(ctx: VimscriptParser.WriteNextCommandContext): WriteNextFileCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return WriteNextFileCommand(ranges, argument)
-  }
-
-  override fun visitWritePreviousCommand(ctx: VimscriptParser.WritePreviousCommandContext): WritePreviousFileCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return WritePreviousFileCommand(ranges, argument)
-  }
-
-  override fun visitWriteQuitCommand(ctx: VimscriptParser.WriteQuitCommandContext): WriteQuitCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return WriteQuitCommand(ranges, argument)
-  }
-
-  override fun visitYankLinesCommand(ctx: VimscriptParser.YankLinesCommandContext): YankLinesCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text.trim()
-    return YankLinesCommand(ranges, argument)
-  }
-
-  override fun visitMapCommand(ctx: VimscriptParser.MapCommandContext): MapCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text
-    val cmd = ctx.MAP().text
-    return MapCommand(ranges, argument, cmd)
-  }
-
-  override fun visitUnmapCommand(ctx: VimscriptParser.UnmapCommandContext): UnMapCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text
-    val cmd = ctx.UNMAP().text
-    return UnMapCommand(ranges, argument, cmd)
-  }
-
-  override fun visitMapClearCommand(ctx: VimscriptParser.MapClearCommandContext): MapClearCommand {
-    val ranges = parseRanges(ctx.range())
-    val argument = ctx.commandArgument().text
-    val cmd = ctx.MAP_CLEAR().text
-    return MapClearCommand(ranges, argument, cmd)
   }
 
   override fun visitExecuteCommand(ctx: VimscriptParser.ExecuteCommandContext): ExecuteCommand {
@@ -639,10 +273,521 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     return ExecuteCommand(ranges, expressions)
   }
 
+  override fun visitLetCommand(ctx: VimscriptParser.LetCommandContext): Command {
+    return com.maddyhome.idea.vim.vimscript.parser.VimscriptParser.parseLetCommand(ctx.text)
+      ?: LetCommand(Ranges(), SimpleExpression(VimInt(0)), AssignmentOperator.ASSIGNMENT, SimpleExpression(VimInt(0)), false)
+  }
+
   override fun visitOtherCommand(ctx: OtherCommandContext): UnknownCommand {
     val ranges: Ranges = parseRanges(ctx.range())
     val name = ctx.commandName().text
-    val argument = ctx.commandArgument()?.text ?: ""
+    val argument = ctx.commandArgumentWithBars()?.text ?: ""
+
     return UnknownCommand(ranges, name, argument)
+  }
+
+  // todo I am ashamed of that
+  private val commands = mutableMapOf(
+    "delf" to DelfunctionCommand::class,
+    "delfu" to DelfunctionCommand::class,
+    "delfun" to DelfunctionCommand::class,
+    "delfunc" to DelfunctionCommand::class,
+    "delfunct" to DelfunctionCommand::class,
+    "delfuncti" to DelfunctionCommand::class,
+    "delfunctio" to DelfunctionCommand::class,
+    "delfunction" to DelfunctionCommand::class,
+    "action" to ActionCommand::class,
+    "actionlist" to ActionListCommand::class,
+    "as" to AsciiCommand::class,
+    "asc" to AsciiCommand::class,
+    "asci" to AsciiCommand::class,
+    "ascii" to AsciiCommand::class,
+    "b" to BufferCommand::class,
+    "bu" to BufferCommand::class,
+    "buf" to BufferCommand::class,
+    "buff" to BufferCommand::class,
+    "buffe" to BufferCommand::class,
+    "buffer" to BufferCommand::class,
+    "bd" to BufferCloseCommand::class,
+    "bde" to BufferCloseCommand::class,
+    "bdel" to BufferCloseCommand::class,
+    "bdele" to BufferCloseCommand::class,
+    "bdelet" to BufferCloseCommand::class,
+    "bdelete" to BufferCloseCommand::class,
+    "ls" to BufferListCommand::class,
+    "files" to BufferListCommand::class,
+    "buffers" to BufferListCommand::class,
+    "cal" to CallCommand::class,
+    "call" to CallCommand::class,
+    "cla" to FindClassCommand::class,
+    "clas" to FindClassCommand::class,
+    "class" to FindClassCommand::class,
+    "com" to CmdCommand::class,
+    "comm" to CmdCommand::class,
+    "comma" to CmdCommand::class,
+    "comman" to CmdCommand::class,
+    "command" to CmdCommand::class,
+    "!" to CmdFilterCommand::class,
+    "comc" to CmdClearCommand::class,
+    "comcl" to CmdClearCommand::class,
+    "comcle" to CmdClearCommand::class,
+    "comclea" to CmdClearCommand::class,
+    "comclear" to CmdClearCommand::class,
+    "t" to CopyTextCommand::class,
+    "co" to CopyTextCommand::class,
+    "cop" to CopyTextCommand::class,
+    "copy" to CopyTextCommand::class,
+    "delc" to DelCmdCommand::class,
+    "delco" to DelCmdCommand::class,
+    "delcom" to DelCmdCommand::class,
+    "delcomm" to DelCmdCommand::class,
+    "delcomma" to DelCmdCommand::class,
+    "delcomman" to DelCmdCommand::class,
+    "delcommand" to DelCmdCommand::class,
+    "d" to DeleteLinesCommand::class,
+    "de" to DeleteLinesCommand::class,
+    "del" to DeleteLinesCommand::class,
+    "dele" to DeleteLinesCommand::class,
+    "delet" to DeleteLinesCommand::class,
+    "delete" to DeleteLinesCommand::class,
+    "delm" to DeleteMarksCommand::class,
+    "delma" to DeleteMarksCommand::class,
+    "delmar" to DeleteMarksCommand::class,
+    "delmark" to DeleteMarksCommand::class,
+    "delmarks" to DeleteMarksCommand::class,
+    "dig" to DigraphCommand::class,
+    "digr" to DigraphCommand::class,
+    "digra" to DigraphCommand::class,
+    "digrap" to DigraphCommand::class,
+    "digraph" to DigraphCommand::class,
+    "digraphs" to DigraphCommand::class,
+    "dump" to DumpLineCommand::class,
+    "dumpl" to DumpLineCommand::class,
+    "dumpli" to DumpLineCommand::class,
+    "dumplin" to DumpLineCommand::class,
+    "dumpline" to DumpLineCommand::class,
+    "ec" to EchoCommand::class,
+    "ech" to EchoCommand::class,
+    "echo" to EchoCommand::class,
+    "e" to EditFileCommand::class,
+    "ed" to EditFileCommand::class,
+    "edi" to EditFileCommand::class,
+    "edit" to EditFileCommand::class,
+    "bro" to EditFileCommand::class,
+    "brow" to EditFileCommand::class,
+    "brows" to EditFileCommand::class,
+    "browse" to EditFileCommand::class,
+    "wqa" to ExitCommand::class,
+    "wqal" to ExitCommand::class,
+    "wqall" to ExitCommand::class,
+    "qa" to ExitCommand::class,
+    "qal" to ExitCommand::class,
+    "qall" to ExitCommand::class,
+    "xa" to ExitCommand::class,
+    "xal" to ExitCommand::class,
+    "xall" to ExitCommand::class,
+    "quita" to ExitCommand::class,
+    "quital" to ExitCommand::class,
+    "quitall" to ExitCommand::class,
+    "f" to FileCommand::class,
+    "fi" to FileCommand::class,
+    "fil" to FileCommand::class,
+    "file" to FileCommand::class,
+    "fin" to FindFileCommand::class,
+    "find" to FindFileCommand::class,
+    "sym" to FindSymbolCommand::class,
+    "symb" to FindSymbolCommand::class,
+    "symbo" to FindSymbolCommand::class,
+    "symbol" to FindSymbolCommand::class,
+    "g" to GlobalCommand::class,
+    "gl" to GlobalCommand::class,
+    "glo" to GlobalCommand::class,
+    "glob" to GlobalCommand::class,
+    "globa" to GlobalCommand::class,
+    "global" to GlobalCommand::class,
+    "v" to GlobalCommand::class,
+    "vg" to GlobalCommand::class,
+    "vgl" to GlobalCommand::class,
+    "vglo" to GlobalCommand::class,
+    "vglob" to GlobalCommand::class,
+    "vgloba" to GlobalCommand::class,
+    "vglobal" to GlobalCommand::class,
+    "go" to GotoCharacterCommand::class,
+    "got" to GotoCharacterCommand::class,
+    "goto" to GotoCharacterCommand::class,
+    "h" to HelpCommand::class,
+    "he" to HelpCommand::class,
+    "hel" to HelpCommand::class,
+    "help" to HelpCommand::class,
+    "his" to HistoryCommand::class,
+    "hist" to HistoryCommand::class,
+    "histo" to HistoryCommand::class,
+    "histor" to HistoryCommand::class,
+    "history" to HistoryCommand::class,
+    "j" to JoinLinesCommand::class,
+    "jo" to JoinLinesCommand::class,
+    "joi" to JoinLinesCommand::class,
+    "join" to JoinLinesCommand::class,
+    "ju" to JumpsCommand::class,
+    "jum" to JumpsCommand::class,
+    "jump" to JumpsCommand::class,
+    "jumps" to JumpsCommand::class,
+    "let" to LetCommand::class,
+    "k" to MarkCommand::class,
+    "ma" to MarkCommand::class,
+    "mar" to MarkCommand::class,
+    "mark" to MarkCommand::class,
+    "marks" to MarksCommand::class,
+    "m" to MoveTextCommand::class,
+    "mo" to MoveTextCommand::class,
+    "mov" to MoveTextCommand::class,
+    "move" to MoveTextCommand::class,
+    "n" to NextFileCommand::class,
+    "ne" to NextFileCommand::class,
+    "nex" to NextFileCommand::class,
+    "next" to NextFileCommand::class,
+    "bn" to NextFileCommand::class,
+    "bne" to NextFileCommand::class,
+    "bnex" to NextFileCommand::class,
+    "bnext" to NextFileCommand::class,
+    "tabn" to NextTabCommand::class,
+    "tabne" to NextTabCommand::class,
+    "tabnex" to NextTabCommand::class,
+    "tabnext" to NextTabCommand::class,
+    "noh" to NoHLSearchCommand::class,
+    "nohl" to NoHLSearchCommand::class,
+    "nohls" to NoHLSearchCommand::class,
+    "nohlse" to NoHLSearchCommand::class,
+    "nohlsea" to NoHLSearchCommand::class,
+    "nohlsear" to NoHLSearchCommand::class,
+    "nohlsearc" to NoHLSearchCommand::class,
+    "nohlsearch" to NoHLSearchCommand::class,
+    "on" to OnlyCommand::class,
+    "onl" to OnlyCommand::class,
+    "only" to OnlyCommand::class,
+    "Plug" to PlugCommand::class,
+    "Plugi" to PlugCommand::class,
+    "Plugin" to PlugCommand::class,
+    "N" to PreviousFileCommand::class,
+    "Ne" to PreviousFileCommand::class,
+    "Nex" to PreviousFileCommand::class,
+    "Next" to PreviousFileCommand::class,
+    "prev" to PreviousFileCommand::class,
+    "previ" to PreviousFileCommand::class,
+    "previo" to PreviousFileCommand::class,
+    "previou" to PreviousFileCommand::class,
+    "previous" to PreviousFileCommand::class,
+    "bp" to PreviousFileCommand::class,
+    "bpr" to PreviousFileCommand::class,
+    "bpre" to PreviousFileCommand::class,
+    "bprev" to PreviousFileCommand::class,
+    "bprevi" to PreviousFileCommand::class,
+    "bprevio" to PreviousFileCommand::class,
+    "bpreviou" to PreviousFileCommand::class,
+    "bprevious" to PreviousFileCommand::class,
+    "tabp" to PreviousTabCommand::class,
+    "tabpr" to PreviousTabCommand::class,
+    "tabpre" to PreviousTabCommand::class,
+    "tabprev" to PreviousTabCommand::class,
+    "tabprevi" to PreviousTabCommand::class,
+    "tabprevio" to PreviousTabCommand::class,
+    "tabpreviou" to PreviousTabCommand::class,
+    "tabprevious" to PreviousTabCommand::class,
+    "tabN" to PreviousTabCommand::class,
+    "tabNe" to PreviousTabCommand::class,
+    "tabNex" to PreviousTabCommand::class,
+    "tabNext" to PreviousTabCommand::class,
+    "p" to PrintCommand::class,
+    "pr" to PrintCommand::class,
+    "pri" to PrintCommand::class,
+    "prin" to PrintCommand::class,
+    "print" to PrintCommand::class,
+    "P" to PrintCommand::class,
+    "Pr" to PrintCommand::class,
+    "Pri" to PrintCommand::class,
+    "Prin" to PrintCommand::class,
+    "Print" to PrintCommand::class,
+    "pro" to PromptFindCommand::class,
+    "prom" to PromptFindCommand::class,
+    "promp" to PromptFindCommand::class,
+    "prompt" to PromptFindCommand::class,
+    "promptf" to PromptFindCommand::class,
+    "promptfi" to PromptFindCommand::class,
+    "promptfin" to PromptFindCommand::class,
+    "promptfind" to PromptFindCommand::class,
+    "promptr" to PromptReplaceCommand::class,
+    "promptre" to PromptReplaceCommand::class,
+    "promptrep" to PromptReplaceCommand::class,
+    "promptrepl" to PromptReplaceCommand::class,
+    "promptrepla" to PromptReplaceCommand::class,
+    "promptreplac" to PromptReplaceCommand::class,
+    "promptreplace" to PromptReplaceCommand::class,
+    "pu" to PutLinesCommand::class,
+    "put" to PutLinesCommand::class,
+    "q" to QuitCommand::class,
+    "qu" to QuitCommand::class,
+    "qui" to QuitCommand::class,
+    "quit" to QuitCommand::class,
+    "clo" to QuitCommand::class,
+    "clos" to QuitCommand::class,
+    "close" to QuitCommand::class,
+    "hid" to QuitCommand::class,
+    "hide" to QuitCommand::class,
+    "red" to RedoCommand::class,
+    "redo" to RedoCommand::class,
+    "di" to RegistersCommand::class,
+    "dis" to RegistersCommand::class,
+    "disp" to RegistersCommand::class,
+    "displ" to RegistersCommand::class,
+    "displa" to RegistersCommand::class,
+    "display" to RegistersCommand::class,
+    "exe" to ExecuteCommand::class,
+    "exec" to ExecuteCommand::class,
+    "execu" to ExecuteCommand::class,
+    "execut" to ExecuteCommand::class,
+    "execute" to ExecuteCommand::class,
+    "reg" to RegistersCommand::class,
+    "regi" to RegistersCommand::class,
+    "regis" to RegistersCommand::class,
+    "regist" to RegistersCommand::class,
+    "registe" to RegistersCommand::class,
+    "register" to RegistersCommand::class,
+    "registers" to RegistersCommand::class,
+    "@" to RepeatCommand::class,
+    "argu" to SelectFileCommand::class,
+    "argum" to SelectFileCommand::class,
+    "argume" to SelectFileCommand::class,
+    "argumen" to SelectFileCommand::class,
+    "argument" to SelectFileCommand::class,
+    "fir" to SelectFirstFileCommand::class,
+    "firs" to SelectFirstFileCommand::class,
+    "first" to SelectFirstFileCommand::class,
+    "la" to SelectLastFileCommand::class,
+    "las" to SelectLastFileCommand::class,
+    "last" to SelectLastFileCommand::class,
+    "set" to SetCommand::class,
+    "sethandler" to SetHandlerCommand::class,
+    "sh" to ShellCommand::class,
+    "she" to ShellCommand::class,
+    "shel" to ShellCommand::class,
+    "shell" to ShellCommand::class,
+    "sor" to SortCommand::class,
+    "sort" to SortCommand::class,
+    "sp" to SplitCommand::class,
+    "spl" to SplitCommand::class,
+    "spli" to SplitCommand::class,
+    "split" to SplitCommand::class,
+    "vs" to SplitCommand::class,
+    "vsp" to SplitCommand::class,
+    "vspl" to SplitCommand::class,
+    "vspli" to SplitCommand::class,
+    "vsplit" to SplitCommand::class,
+    "so" to SourceCommand::class,
+    "sou" to SourceCommand::class,
+    "sour" to SourceCommand::class,
+    "sourc" to SourceCommand::class,
+    "source" to SourceCommand::class,
+    "~" to SubstituteCommand::class,
+    "&" to SubstituteCommand::class,
+    "s" to SubstituteCommand::class,
+    "su" to SubstituteCommand::class,
+    "sub" to SubstituteCommand::class,
+    "subs" to SubstituteCommand::class,
+    "subst" to SubstituteCommand::class,
+    "substi" to SubstituteCommand::class,
+    "substit" to SubstituteCommand::class,
+    "substitu" to SubstituteCommand::class,
+    "substitut" to SubstituteCommand::class,
+    "substitute" to SubstituteCommand::class,
+    "tabc" to TabCloseCommand::class,
+    "tabcl" to TabCloseCommand::class,
+    "tabclo" to TabCloseCommand::class,
+    "tabclos" to TabCloseCommand::class,
+    "tabclose" to TabCloseCommand::class,
+    "tabo" to TabOnlyCommand::class,
+    "tabon" to TabOnlyCommand::class,
+    "tabonl" to TabOnlyCommand::class,
+    "tabonly" to TabOnlyCommand::class,
+    "u" to UndoCommand::class,
+    "un" to UndoCommand::class,
+    "und" to UndoCommand::class,
+    "undo" to UndoCommand::class,
+    "wa" to WriteAllCommand::class,
+    "wal" to WriteAllCommand::class,
+    "wall" to WriteAllCommand::class,
+    "w" to WriteCommand::class,
+    "wr" to WriteCommand::class,
+    "wri" to WriteCommand::class,
+    "writ" to WriteCommand::class,
+    "write" to WriteCommand::class,
+    "wn" to WriteNextFileCommand::class,
+    "wne" to WriteNextFileCommand::class,
+    "wnex" to WriteNextFileCommand::class,
+    "wnext" to WriteNextFileCommand::class,
+    "wN" to WritePreviousFileCommand::class,
+    "wNe" to WritePreviousFileCommand::class,
+    "wNex" to WritePreviousFileCommand::class,
+    "wNext" to WritePreviousFileCommand::class,
+    "wp" to WritePreviousFileCommand::class,
+    "wpr" to WritePreviousFileCommand::class,
+    "wpre" to WritePreviousFileCommand::class,
+    "wprev" to WritePreviousFileCommand::class,
+    "wprevi" to WritePreviousFileCommand::class,
+    "wprevio" to WritePreviousFileCommand::class,
+    "wpreviou" to WritePreviousFileCommand::class,
+    "wprevious" to WritePreviousFileCommand::class,
+    "wq" to WriteQuitCommand::class,
+    "x" to WriteQuitCommand::class,
+    "xi" to WriteQuitCommand::class,
+    "xit" to WriteQuitCommand::class,
+    "exi" to WriteQuitCommand::class,
+    "exit" to WriteQuitCommand::class,
+    "y" to YankLinesCommand::class,
+    "ya" to YankLinesCommand::class,
+    "yan" to YankLinesCommand::class,
+    "yank" to YankLinesCommand::class,
+    "map" to MapCommand::class,
+    "nm" to MapCommand::class,
+    "vm" to MapCommand::class,
+    "xm" to MapCommand::class,
+    "om" to MapCommand::class,
+    "im" to MapCommand::class,
+    "cm" to MapCommand::class,
+    "nma" to MapCommand::class,
+    "vma" to MapCommand::class,
+    "xma" to MapCommand::class,
+    "oma" to MapCommand::class,
+    "ima" to MapCommand::class,
+    "cma" to MapCommand::class,
+    "nmap" to MapCommand::class,
+    "vmap" to MapCommand::class,
+    "xmap" to MapCommand::class,
+    "omap" to MapCommand::class,
+    "imap" to MapCommand::class,
+    "cmap" to MapCommand::class,
+    "no" to MapCommand::class,
+    "nn" to MapCommand::class,
+    "vn" to MapCommand::class,
+    "xn" to MapCommand::class,
+    "ono" to MapCommand::class,
+    "ino" to MapCommand::class,
+    "cno" to MapCommand::class,
+    "nno" to MapCommand::class,
+    "vno" to MapCommand::class,
+    "xno" to MapCommand::class,
+    "nor" to MapCommand::class,
+    "nnor" to MapCommand::class,
+    "vnor" to MapCommand::class,
+    "xnor" to MapCommand::class,
+    "onor" to MapCommand::class,
+    "inor" to MapCommand::class,
+    "cnor" to MapCommand::class,
+    "nore" to MapCommand::class,
+    "nnore" to MapCommand::class,
+    "vnore" to MapCommand::class,
+    "xnore" to MapCommand::class,
+    "onore" to MapCommand::class,
+    "inore" to MapCommand::class,
+    "cnore" to MapCommand::class,
+    "norem" to MapCommand::class,
+    "nnorem" to MapCommand::class,
+    "vnorem" to MapCommand::class,
+    "xnorem" to MapCommand::class,
+    "onorem" to MapCommand::class,
+    "inorem" to MapCommand::class,
+    "cnorem" to MapCommand::class,
+    "norema" to MapCommand::class,
+    "nnorema" to MapCommand::class,
+    "vnorema" to MapCommand::class,
+    "xnorema" to MapCommand::class,
+    "onorema" to MapCommand::class,
+    "inorema" to MapCommand::class,
+    "cnorema" to MapCommand::class,
+    "noremap" to MapCommand::class,
+    "nnoremap" to MapCommand::class,
+    "vnoremap" to MapCommand::class,
+    "xnoremap" to MapCommand::class,
+    "onoremap" to MapCommand::class,
+    "inoremap" to MapCommand::class,
+    "cnoremap" to MapCommand::class,
+    "mapc" to MapClearCommand::class,
+    "nmapc" to MapClearCommand::class,
+    "vmapc" to MapClearCommand::class,
+    "xmapc" to MapClearCommand::class,
+    "smapc" to MapClearCommand::class,
+    "omapc" to MapClearCommand::class,
+    "imapc" to MapClearCommand::class,
+    "cmapc" to MapClearCommand::class,
+    "mapcl" to MapClearCommand::class,
+    "nmapcl" to MapClearCommand::class,
+    "vmapcl" to MapClearCommand::class,
+    "xmapcl" to MapClearCommand::class,
+    "smapcl" to MapClearCommand::class,
+    "omapcl" to MapClearCommand::class,
+    "imapcl" to MapClearCommand::class,
+    "cmapcl" to MapClearCommand::class,
+    "mapcle" to MapClearCommand::class,
+    "nmapcle" to MapClearCommand::class,
+    "vmapcle" to MapClearCommand::class,
+    "xmapcle" to MapClearCommand::class,
+    "smapcle" to MapClearCommand::class,
+    "omapcle" to MapClearCommand::class,
+    "imapcle" to MapClearCommand::class,
+    "cmapcle" to MapClearCommand::class,
+    "mapclea" to MapClearCommand::class,
+    "nmapclea" to MapClearCommand::class,
+    "vmapclea" to MapClearCommand::class,
+    "xmapclea" to MapClearCommand::class,
+    "smapclea" to MapClearCommand::class,
+    "omapclea" to MapClearCommand::class,
+    "imapclea" to MapClearCommand::class,
+    "cmapclea" to MapClearCommand::class,
+    "mapclear" to MapClearCommand::class,
+    "nmapclear" to MapClearCommand::class,
+    "vmapclear" to MapClearCommand::class,
+    "xmapclear" to MapClearCommand::class,
+    "smapclear" to MapClearCommand::class,
+    "omapclear" to MapClearCommand::class,
+    "imapclear" to MapClearCommand::class,
+    "cmapclear" to MapClearCommand::class,
+    "vu" to UnMapCommand::class,
+    "xu" to UnMapCommand::class,
+    "ou" to UnMapCommand::class,
+    "iu" to UnMapCommand::class,
+    "cu" to UnMapCommand::class,
+    "nun" to UnMapCommand::class,
+    "vun" to UnMapCommand::class,
+    "xun" to UnMapCommand::class,
+    "oun" to UnMapCommand::class,
+    "iun" to UnMapCommand::class,
+    "cun" to UnMapCommand::class,
+    "unm" to UnMapCommand::class,
+    "nunm" to UnMapCommand::class,
+    "vunm" to UnMapCommand::class,
+    "xunm" to UnMapCommand::class,
+    "sunm" to UnMapCommand::class,
+    "ounm" to UnMapCommand::class,
+    "iunm" to UnMapCommand::class,
+    "cunm" to UnMapCommand::class,
+    "unma" to UnMapCommand::class,
+    "nunma" to UnMapCommand::class,
+    "vunma" to UnMapCommand::class,
+    "xunma" to UnMapCommand::class,
+    "sunma" to UnMapCommand::class,
+    "ounma" to UnMapCommand::class,
+    "iunma" to UnMapCommand::class,
+    "cunma" to UnMapCommand::class,
+    "unmap" to UnMapCommand::class,
+    "nunmap" to UnMapCommand::class,
+    "vunmap" to UnMapCommand::class,
+    "xunmap" to UnMapCommand::class,
+    "sunmap" to UnMapCommand::class,
+    "ounmap" to UnMapCommand::class,
+    "iunmap" to UnMapCommand::class,
+    "cunmap" to UnMapCommand::class,
+  )
+
+  private fun getCommandByName(commandName: String): KClass<out Command> {
+    return commands[commandName]!!
   }
 }

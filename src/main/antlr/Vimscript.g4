@@ -6,89 +6,72 @@ grammar Vimscript;
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 script:
-    statementSeparator* executable+ EOF;
-
-executable:
-    comment | forLoop | forLoop2 | whileLoop | functionDefinition | dictFunctionDefinition | ifStatement | tryStatement | command | autocmd | augroup;
+    blockMember* EOF;
 
 forLoop:
-    ws_cols FOR WS+ variableName WS+ IN WS* expr WS* (comment | statementSeparator)
+    (WS | COLON)* FOR WS+ (variableName | (L_BRACKET argumentsDeclaration R_BRACKET)) WS+ IN WS* expr WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
         blockMember*
-    ws_cols ENDFOR WS* (comment | statementSeparator)
+    (WS | COLON)* ENDFOR WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
 ;
 
-// other for loops that are not supported yet
-forLoop2:
-    ws_cols FOR ~(BAR | NEW_LINE)*? statementSeparator
-        blockMember*
-    ws_cols ENDFOR WS* (comment | statementSeparator)
-;
 whileLoop:
-    ws_cols WHILE WS* expr WS* (comment | statementSeparator)
+    (WS | COLON)* WHILE WS* expr WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))
         blockMember*
-    ws_cols ENDWHILE WS* (comment | statementSeparator)
+    (WS | COLON)* ENDWHILE WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))
 ;
 blockMember:
-    command | continueStatement | breakStatement | forLoop | forLoop2 | whileLoop | ifStatement
-|   returnStatement | throwStatement | functionDefinition | dictFunctionDefinition | comment | tryStatement
-|   augroup | autocmd;
-continueStatement:      ws_cols CONTINUE WS* statementSeparator;
-breakStatement:         ws_cols BREAK WS* statementSeparator;
-returnStatement:        ws_cols range? ws_cols RETURN WS+ expr WS* statementSeparator;
-throwStatement:         ws_cols THROW WS+ expr WS* statementSeparator;
+    command | continueStatement | breakStatement | forLoop| whileLoop | ifStatement
+|   returnStatement | throwStatement | functionDefinition | tryStatement | ((WS | COLON)* (NEW_LINE | BAR)) | autoCmd | comment;
+
+comment:                QUOTE ~(NEW_LINE)* NEW_LINE;
+
+continueStatement:      (WS | COLON)* CONTINUE WS* (NEW_LINE | BAR);
+breakStatement:         (WS | COLON)* BREAK WS* (NEW_LINE | BAR);
+returnStatement:        (WS | COLON)* range? (WS | COLON)* RETURN WS+ expr WS* (NEW_LINE | BAR);
+throwStatement:         (WS | COLON)* THROW WS+ expr WS* (NEW_LINE | BAR);
 
 ifStatement:            ifBlock
                         elifBlock*
                         elseBlock?
-                        ws_cols ENDIF WS* (comment | statementSeparator)
+                        (WS | COLON)* ENDIF WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))
 ;
-ifBlock:                ws_cols IF WS* expr WS* (comment | statementSeparator)
+ifBlock:                (WS | COLON)* IF WS* expr WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))
                            blockMember*
 ;
-elifBlock:              ws_cols ELSEIF WS* expr WS* (comment | statementSeparator)
+elifBlock:              (WS | COLON)* ELSEIF WS* expr WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))
                            blockMember*
 ;
-elseBlock:              ws_cols ELSE WS* (comment | statementSeparator)
+elseBlock:              (WS | COLON)* ELSE WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))
                             blockMember*
 ;
 
 tryStatement:           tryBlock
                         catchBlock*
                         finallyBlock?
-                        ws_cols ENDTRY WS* (comment | statementSeparator)
+                        (WS | COLON)* ENDTRY WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))
 ;
-tryBlock:               ws_cols TRY WS* (comment | statementSeparator)
+tryBlock:               (WS | COLON)* TRY WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))
                             blockMember*
 ;
-catchBlock:             ws_cols CATCH WS* pattern? WS* (comment | statementSeparator)
+catchBlock:             (WS | COLON)* CATCH WS* pattern? WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))
                             blockMember*
 ;
 pattern:                DIV patternBody DIV;
 patternBody:            ~(NEW_LINE | BAR)*?;
-finallyBlock:           ws_cols FINALLY WS* (comment | statementSeparator)
+finallyBlock:           (WS | COLON)* FINALLY WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))
                             blockMember*
 ;
 
-functionDefinition:     ws_cols FUNCTION (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName WS* L_PAREN WS* argumentsDeclaration R_PAREN WS* (functionFlag WS*)* (comment | statementSeparator)
+functionDefinition:
+                        (WS | COLON)* FUNCTION (replace = EXCLAMATION)? WS+ (SID | SNR)? (anyCaseNameWithDigitsAndUnderscores NUM)* (functionScope COLON)? (functionName | (literalDictionaryKey (DOT literalDictionaryKey)+)) WS* L_PAREN WS* argumentsDeclaration R_PAREN WS* (functionFlag WS*)* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
                             blockMember*
-                        ws_cols ENDFUNCTION WS* (comment | statementSeparator)
-;
-dictFunctionDefinition:
-                        ws_cols FUNCTION (replace = EXCLAMATION)? WS+ (functionScope COLON)? literalDictionaryKey (DOT literalDictionaryKey)+ WS* L_PAREN WS* argumentsDeclaration R_PAREN WS* (functionFlag WS*)* (comment | statementSeparator)
-                            blockMember*
-                        ws_cols ENDFUNCTION WS* (comment | statementSeparator)
+                        (WS | COLON)* ENDFUNCTION WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))
 ;
 functionFlag:           RANGE | ABORT | DICT | CLOSURE;
-argumentsDeclaration:   (variableName (WS* COMMA WS* variableName)* defaultValue* (WS* COMMA WS* ETC WS*)? WS*)?;
+argumentsDeclaration:   (ETC | (variableName (WS* COMMA WS* variableName)* defaultValue* (WS* COMMA WS* ETC WS*)? WS*))?;
 defaultValue:           WS* COMMA WS* variableName WS* ASSIGN WS* expr;
 
-augroup:                ws_cols AUGROUP ~(NEW_LINE | BAR)* statementSeparator
-                            blockMember*
-                        ws_cols AUGROUP WS+ END WS* (comment | statementSeparator)
-;
-
-autocmd:                ws_cols AUTOCMD ~(NEW_LINE)* NEW_LINE
-;
+autoCmd:                (WS | COLON)* AUTOCMD commandArgument = ~(NEW_LINE)*? NEW_LINE;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -96,261 +79,76 @@ autocmd:                ws_cols AUTOCMD ~(NEW_LINE)* NEW_LINE
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 command:
-    ws_cols (range | shortRange) ws_cols statementSeparator
+    (WS | COLON)* (range | shortRange) (WS | COLON)* (NEW_LINE | BAR)+
     #GoToLineCommand|
 
-    ws_cols range? ws_cols ECHO (WS* expr)* WS* statementSeparator
-    #EchoCommand|
-
-    ws_cols range? ws_cols LET WS+ expr WS*
-        assignmentOperator =  (ASSIGN | PLUS_ASSIGN | MINUS_ASSIGN | STAR_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | DOT_ASSIGN)
-        WS* expr WS* (comment | statementSeparator)
+    (WS | COLON)* range? (WS | COLON)* LET WS+ (~(NEW_LINE | BAR)+ | string)*? (NEW_LINE | BAR)+
     #LetCommand|
 
-    ws_cols range? ws_cols LET ~(BAR | NEW_LINE)*? statementSeparator
-    #UnknowLetCase|
+    (WS | COLON)* range? (WS | COLON)* ECHO (WS* expr)* WS* (NEW_LINE | BAR)+
+    #EchoCommand|
 
-    ws_cols range? ws_cols DELF (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName (comment | statementSeparator)
+    (WS | COLON)* range? (WS | COLON)* DELF (replace = EXCLAMATION)? WS+ (functionScope COLON)? functionName ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
     #DelfunctionCommand|
 
-    ws_cols range? ws_cols CALL WS+ expr WS* (comment | statementSeparator)
+    (WS | COLON)* range? (WS | COLON)* CALL WS+ expr WS* ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
     #CallCommand|
 
-    ws_cols range? ws_cols ACTION (WS* commandArgument) (comment | statementSeparator)
-    #ActionCommand|
-
-    ws_cols range? ws_cols ACTIONLIST (WS* commandArgument) (comment | statementSeparator)
-    #ActionListCommand|
-
-    ws_cols range? ws_cols ASCII (WS* commandArgument)? (comment | statementSeparator)
-    #AsciiCommand|
-
-    ws_cols range? ws_cols (B_LOWERCASE | BUFFER) (WS* commandArgument)? (comment | statementSeparator)
-    #BufferCommand|
-
-    ws_cols range? ws_cols BUFFER_CLOSE (WS* commandArgument)? (comment | statementSeparator)
-    #BufferCloseCommand|
-
-    ws_cols range? ws_cols BUFFER_LIST (WS* commandArgument)? (comment | statementSeparator)
-    #BufferListCommand|
-
-    ws_cols range? ws_cols CMD (WS* commandArgument)? statementSeparator
-    #CmdCommand|
-
-    ws_cols range? ws_cols EXCLAMATION (WS* commandArgument)? (comment | statementSeparator)
-    #CmdFilterCommand|
-
-    ws_cols range? ws_cols CMD_CLEAR (WS* commandArgument)? (comment | statementSeparator)
-    #CmdClearCommand|
-
-    ws_cols range? ws_cols (T_LOWERCASE | COPY) (WS* commandArgument)? (comment | statementSeparator)
-    #CopyTextCommand|
-
-    ws_cols range? ws_cols DELCMD (WS* commandArgument)? (comment | statementSeparator)
-    #DelCmdCommand|
-
-    ws_cols range? ws_cols (D_LOWERCASE | DEL_LINES) (WS* commandArgument)? (comment | statementSeparator)
-    #DeleteLinesCommand|
-
-    ws_cols range? ws_cols DEL_MARKS (WS* commandArgument)? (comment | statementSeparator)
-    #DeleteMarksCommand|
-
-    ws_cols range? ws_cols DIGRAPH (WS* commandArgument)? (comment | statementSeparator)
-    #DigraphCommand|
-
-    ws_cols range? ws_cols DUMP_LINE (WS* commandArgument)? (comment | statementSeparator)
-    #DumpLineCommand|
-
-    ws_cols range? ws_cols (E_LOWERCASE | EDIT_FILE) (WS* commandArgument)? (comment | statementSeparator)
-    #EditFileCommand|
-
-    ws_cols range? ws_cols EXIT (WS* commandArgument)? (comment | statementSeparator)
-    #ExitCommand|
-
-    ws_cols range? ws_cols (F_LOWERCASE | FILE) (WS* commandArgument)? (comment | statementSeparator)
-    #FileCommand|
-
-    ws_cols range? ws_cols CLASS (WS* commandArgument)? (comment | statementSeparator)
-    #FindClassCommand|
-
-    ws_cols range? ws_cols FIND (WS* commandArgument)? (comment | statementSeparator)
-    #FindFileCommand|
-
-    ws_cols range? ws_cols SYMBOL (WS* commandArgument)? (comment | statementSeparator)
-    #FindSymbolCommand|
-
-    // we use "~NEWLINE*?" instead of commandArgument because bar can be used if 'very magic' is set
-    ws_cols range? ws_cols (G_LOWERCASE | GLOBAL) (invert = EXCLAMATION)? (WS* commandArgumentWithBars)? NEW_LINE
-    #GlobalCommand|
-
-    // we use "~NEWLINE*?" instead of commandArgument because bar can be used if 'very magic' is set
-    ws_cols range? ws_cols (V_LOWERCASE | V_GLOBAL) (WS* commandArgumentWithBars)? NEW_LINE
-    #VglobalCommand|
-
-    ws_cols range? ws_cols GO_TO_CHAR (WS* commandArgument)? (comment | statementSeparator)
-    #GoToCharacterCommand|
-
-    ws_cols range? ws_cols (H_LOWERCASE | HELP) (WS* commandArgument)? statementSeparator
-    #HelpCommand|
-
-    ws_cols range? ws_cols HISTORY (WS* commandArgument)? (comment | statementSeparator)
-    #HistoryCommand|
-
-    ws_cols range? ws_cols (J_LOWERCASE | JOIN_LINES) (WS* commandArgument)? (comment | statementSeparator)
-    #JoinLinesCommand|
-
-    ws_cols range? ws_cols JUMPS (WS* commandArgument)? (comment | statementSeparator)
-    #JumpsCommand|
-
-    ws_cols range? ws_cols (K_LOWERCASE | MARK_COMMAND) (WS* commandArgument)? (comment | statementSeparator)
-    #MarkCommand|
-
-    ws_cols range? ws_cols MARKS (WS* commandArgument)? (comment | statementSeparator)
-    #MarksCommand|
-
-    ws_cols range? ws_cols (M_LOWERCASE | MOVE_TEXT) (WS* commandArgument)? (comment | statementSeparator)
-    #MoveTextCommand|
-
-    ws_cols range? ws_cols (N_LOWERCASE | NEXT_FILE) (WS* commandArgument)? (comment | statementSeparator)
-    #NextFileCommand|
-
-    ws_cols range? ws_cols NEXT_TAB (WS* commandArgument)? (comment | statementSeparator)
-    #NextTabCommand|
-
-    ws_cols range? ws_cols NO_HL_SEARCH (WS* commandArgument)? (comment | statementSeparator)
-    #NoHlSearchCommand|
-
-    ws_cols range? ws_cols ONLY (WS* commandArgument)? (comment | statementSeparator)
-    #OnlyCommand|
-
-    ws_cols range? ws_cols PLUG (WS* commandArgument)? (comment | statementSeparator)
-    #PlugCommand|
-
-    ws_cols range? ws_cols (N_UPPERCASE | PREVIOUS_FILE) (WS* commandArgument)? (comment | statementSeparator)
-    #PreviousFileCommand|
-
-    ws_cols range? ws_cols PREVIOUS_TAB (WS* commandArgument)? (comment | statementSeparator)
-    #PreviousTabCommand|
-
-    ws_cols range? ws_cols (P_LOWERCASE | P_UPPERCASE | PRINT) (WS* commandArgument)? (comment | statementSeparator)
-    #PrintCommand|
-
-    ws_cols range? ws_cols PROMPT_FIND (WS* commandArgument)? (comment | statementSeparator)
-    #PromptFindCommand|
-
-    ws_cols range? ws_cols PROMPT_REPLACE (WS* commandArgument)? (comment | statementSeparator)
-    #PromptReplaceCommand|
-
-    ws_cols range? ws_cols PUT_LINES (WS* commandArgument)? (comment | statementSeparator)
-    #PutLinesCommand|
-
-    ws_cols range? ws_cols (Q_LOWERCASE | QUIT) (WS* commandArgument)? (comment | statementSeparator)
-    #QuitCommand|
-
-    ws_cols range? ws_cols REDO (WS* commandArgument)? (comment | statementSeparator)
-    #RedoCommand|
-
-    ws_cols range? ws_cols REGISTERS (WS* commandArgument)? statementSeparator
-    #RegistersCommand|
-
-    ws_cols range? ws_cols AT (WS* commandArgument)? (comment | statementSeparator)
-    #RepeatCommand|
-
-    ws_cols range? ws_cols SELECT_FILE (WS* commandArgument)? (comment | statementSeparator)
-    #SelectFileCommand|
-
-    ws_cols range? ws_cols SELECT_FIRST_FILE (WS* commandArgument)? (comment | statementSeparator)
-    #SelectFirstFileCommand|
-
-    ws_cols range? ws_cols SELECT_LAST_FILE (WS* commandArgument)? (comment | statementSeparator)
-    #SelectLastFileCommand|
-
-    ws_cols range? ws_cols SET (WS* commandArgument)? (comment | statementSeparator)
-    #SetCommand|
-
-    ws_cols range? ws_cols SET_HANDLER (WS* commandArgument)? (comment | statementSeparator)
-    #SetHandlerCommand|
-
-    ws_cols range? ws_cols SHELL (WS* commandArgument)? (comment | statementSeparator)
-    #ShellCommand|
-
-    ws_cols range? ws_cols lShift (WS* commandArgument)? (comment | statementSeparator)
-    #ShiftLeftCommand|
-
-    ws_cols range? ws_cols rShift (WS* commandArgument)? (comment | statementSeparator)
-    #ShiftRightCommand|
-
-    ws_cols range? ws_cols SORT (WS* commandArgument)? statementSeparator
-    #SortCommand|
-
-    ws_cols range? ws_cols SPLIT (WS* commandArgument)? (comment | statementSeparator)
-    #SplitCommand|
-
-    ws_cols range? ws_cols V_SPLIT (WS* commandArgument)? (comment | statementSeparator)
-    #VSplitCommand|
-
-    ws_cols range? ws_cols SOURCE (WS* commandArgument)? (comment | statementSeparator)
-    #SourceCommand|
-
-    ws_cols range? ws_cols substituteCommandName = (S_LOWERCASE | SUBSTITUTE | TILDE | AMPERSAND) (WS* commandArgumentWithBars)? NEW_LINE
-    #SubstituteCommand|
-
-    ws_cols range? ws_cols TAB_CLOSE (WS* commandArgument)? (comment | statementSeparator)
-    #TabCloseCommand|
-
-    ws_cols range? ws_cols TAB_ONLY (WS* commandArgument)? (comment | statementSeparator)
-    #TabOnlyCommand|
-
-    ws_cols range? ws_cols (U_LOWERCASE | UNDO) (WS* commandArgument)? (comment | statementSeparator)
-    #UndoCommand|
-
-    ws_cols range? ws_cols WRITE_ALL (WS* commandArgument)? (comment | statementSeparator)
-    #WriteAllCommand|
-
-    ws_cols range? ws_cols (W_LOWERCASE | WRITE) (WS* commandArgument)? (comment | statementSeparator)
-    #WriteCommand|
-
-    ws_cols range? ws_cols WRITE_NEXT (WS* commandArgument)? (comment | statementSeparator)
-    #WriteNextCommand|
-
-    ws_cols range? ws_cols WRITE_PREVIOUS (WS* commandArgument)? (comment | statementSeparator)
-    #WritePreviousCommand|
-
-    ws_cols range? ws_cols (X_LOWERCASE | WRITE_QUIT) (WS* commandArgument)? (comment | statementSeparator)
-    #WriteQuitCommand|
-
-    ws_cols range? ws_cols (Y_LOWERCASE | YANK_LINES) (WS* commandArgument)? (comment | statementSeparator)
-    #YankLinesCommand|
-
-    ws_cols range? ws_cols MAP (WS* commandArgument)? statementSeparator
-    #MapCommand|
-
-    ws_cols range? ws_cols MAP_CLEAR (WS* commandArgument)? statementSeparator
-    #MapClearCommand|
-
-    ws_cols range? ws_cols EXECUTE WS* (expr WS*)* statementSeparator
+    (WS | COLON)* range? (WS | COLON)* EXECUTE WS* (expr WS*)* (NEW_LINE | BAR)+
     #ExecuteCommand|
 
-    ws_cols range? ws_cols UNMAP (WS* commandArgument)? statementSeparator
-    #UnmapCommand|
+    (WS | COLON)* range? (WS | COLON)* lShift (WS* commandArgument = ~(NEW_LINE | BAR)+)? ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
+    #ShiftLeftCommand|
 
-//  Command rule pattern:
-//    ws_cols range? COMMAND_TOKEN ws_cols (WS* commandArgument)? (comment | statementSeparator)
-//    #ID|
-//
-    // add new rules above this one
-    ws_cols range? ws_cols commandName (WS? commandArgument)? statementSeparator
+    (WS | COLON)* range? (WS | COLON)* rShift (WS* commandArgument = ~(NEW_LINE | BAR)+)? ((inline_comment NEW_LINE+) | (NEW_LINE | BAR)+)
+    #ShiftRightCommand|
+
+    (WS | COLON)* range? (WS | COLON)*
+      name = (
+        Y_LOWERCASE | YANK_LINES | X_LOWERCASE | WRITE_QUIT | WRITE_PREVIOUS | WRITE_NEXT | W_LOWERCASE | WRITE
+        | WRITE_ALL | U_LOWERCASE | UNDO | TAB_ONLY | TAB_CLOSE | SOURCE | V_SPLIT | SHELL | SET_HANDLER | SET
+        | SELECT_LAST_FILE | SELECT_FIRST_FILE | SELECT_FILE | AT | REDO | Q_LOWERCASE | QUIT | PUT_LINES | PROMPT_FIND
+        | PROMPT_REPLACE | P_LOWERCASE | P_UPPERCASE | PRINT | PREVIOUS_TAB | N_UPPERCASE | PREVIOUS_FILE | PLUG
+        | ONLY | NO_HL_SEARCH | NEXT_TAB | N_LOWERCASE | NEXT_FILE | M_LOWERCASE | MOVE_TEXT | MARKS | K_LOWERCASE
+        | MARK_COMMAND | JUMPS | J_LOWERCASE | JOIN_LINES | HISTORY | GO_TO_CHAR | SYMBOL | FIND | CLASS | F_LOWERCASE
+        | FILE | EXIT | E_LOWERCASE | EDIT_FILE | DUMP_LINE | DIGRAPH | DEL_MARKS | D_LOWERCASE | DEL_LINES | DELCMD
+        | T_LOWERCASE | COPY | CMD_CLEAR | EXCLAMATION | BUFFER_LIST | BUFFER_CLOSE | B_LOWERCASE | BUFFER | ASCII
+        | ACTIONLIST | ACTION
+      )
+    WS* ((commandArgumentWithoutBars? inline_comment NEW_LINE) | (commandArgumentWithoutBars? NEW_LINE) | (commandArgumentWithoutBars? BAR)) (NEW_LINE | BAR)*
+    #CommandWithComment|
+
+    (WS | COLON)* range? (WS | COLON)*
+      name = (
+        MAP | MAP_CLEAR | UNMAP | SORT | REGISTERS | CMD | H_LOWERCASE | HELP
+      )
+    WS* commandArgumentWithoutBars? (NEW_LINE | BAR)+
+    #CommandWithoutComments|
+
+    (WS | COLON)* range? (WS | COLON)*
+      name = (
+        G_LOWERCASE | GLOBAL | V_LOWERCASE | V_GLOBAL | S_LOWERCASE | SUBSTITUTE | TILDE | AMPERSAND
+      )
+    WS* commandArgumentWithBars? NEW_LINE+
+    #CommandWithBars|
+
+    (WS | COLON)* range? (WS | COLON)* commandName WS* commandArgumentWithBars? (NEW_LINE | BAR)+
     #OtherCommand
 ;
-lShift:
-    (LESS)+;
-rShift:
-    (GREATER)+;
+commandArgumentWithBars: ~(NEW_LINE)+;
+commandArgumentWithoutBars: ~(NEW_LINE | BAR)+;
+lShift: LESS+;
+rShift: GREATER+;
 
-commandArgument:
-    ~(BAR | NEW_LINE)*?;
-commandArgumentWithBars:
-    ~(NEW_LINE)*?;
+letCommands:
+    (WS | COLON)* range? (WS | COLON)* LET WS+ expr WS*
+        assignmentOperator =  (ASSIGN | PLUS_ASSIGN | MINUS_ASSIGN | STAR_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | DOT_ASSIGN)
+        WS* expr WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
+    #Let1Command|
+
+    (WS | COLON)* range? (WS | COLON)* LET WS+ commandArgument = ~(NEW_LINE)* NEW_LINE+
+    #Let2Command
+;
 
 shortRange:
     ((QUESTION (~QUESTION)* QUESTION?) | (DIV (~DIV)* DIV?));
@@ -383,12 +181,16 @@ minusOneOffset:
     MINUS;
 
 commandName:
-    alphabeticChar
+    (LESS)+
+|   (GREATER)+
+|   lowercaseAlphabeticChar
+|   uppercaseAlphabeticChar
 |   IDENTIFIER_LOWERCASE
 |   IDENTIFIER_ANY_CASE
 |   IDENTIFIER_LOWERCASE_WITH_DIGITS
 |   IDENTIFIER_ANY_CASE_WITH_DIGITS
 |   IDENTIFIER_ANY_CASE_WITH_DIGITS_AND_UNDERSCORES
+|   commandName EXCLAMATION
 ;
 
 
@@ -444,7 +246,7 @@ binaryOperator3:        LESS | LESS_IC | LESS_CS
 binaryOperator4:        AMPERSAND AMPERSAND;
 binaryOperator5:        LOGICAL_OR;
 
-register:               AT (DIGIT | alphabeticChar | MINUS | COLON | DOT | MOD | NUM | ASSIGN | STAR | PLUS | TILDE | UNDERSCORE | DIV | AT);
+register:               AT (DIGIT | lowercaseAlphabeticChar | uppercaseAlphabeticChar | MINUS | COLON | DOT | MOD | NUM | ASSIGN | STAR | PLUS | TILDE | UNDERSCORE | DIV | AT);
 // todo argumentDeclaration but without default values
 lambda:                 L_CURLY WS* argumentsDeclaration WS* ARROW WS* expr WS* R_CURLY;
 
@@ -462,7 +264,8 @@ envVariableName:        anyCaseNameWithDigitsAndUnderscores;
 functionCall:           (functionScope COLON)? (anyCaseNameWithDigitsAndUnderscores NUM)* functionName WS* L_PAREN WS* functionArguments WS* R_PAREN;
 functionName:           anyCaseNameWithDigitsAndUnderscores;
 functionScope:          anyScope;
-functionArguments:      (expr WS* (COMMA WS* expr WS*)*)?;
+functionArguments:      (functionArgument WS* (COMMA WS* functionArgument WS*)*)?;
+functionArgument:       expr | (anyScope COLON);
 
 list:                   L_BRACKET WS* (expr WS* (COMMA WS* expr WS*)*)? COMMA? WS* R_BRACKET;
 
@@ -496,10 +299,10 @@ anyScope:               B_LOWERCASE // buffer variable
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 string:
-                        QUOTE .*? QUOTE
+                        QUOTE ~(NEW_LINE | QUOTE)* QUOTE
                     |   ESCAPED_SINGLE_QUOTE
                     |   ESCAPED_SINGLE_QUOTE ESCAPED_SINGLE_QUOTE
-                    |   (SINGLE_QUOTE | (ESCAPED_SINGLE_QUOTE SINGLE_QUOTE))  ~(SINGLE_QUOTE)*? SINGLE_QUOTE
+                    |   (SINGLE_QUOTE | (ESCAPED_SINGLE_QUOTE SINGLE_QUOTE))  ~(SINGLE_QUOTE | NEW_LINE)*? SINGLE_QUOTE
 ;
 unsignedFloat:          FLOAT;
 unsignedInt:            DIGIT | INT;
@@ -508,29 +311,18 @@ blob:                   BLOB;
 mark:                   (SINGLE_QUOTE (lowercaseAlphabeticChar | uppercaseAlphabeticChar | DIGIT | LESS | GREATER | L_PAREN | R_PAREN | L_CURLY | R_CURLY | L_BRACKET | R_BRACKET | QUOTE | CARET | DOT | BACKTICK | SINGLE_QUOTE))
                     |   (BACKTICK (lowercaseAlphabeticChar | uppercaseAlphabeticChar | DIGIT | LESS | GREATER | L_PAREN | R_PAREN | L_CURLY | R_CURLY | L_BRACKET | R_BRACKET | QUOTE | CARET | DOT | BACKTICK | SINGLE_QUOTE))
 ;
-comment:                WS* inline_comment? NEW_LINE;
-inline_comment:         (WS* QUOTE ~(NEW_LINE)*?);
+inline_comment:         QUOTE ~(NEW_LINE)*?;
 anyCaseNameWithDigitsAndUnderscores:
-                        anyCaseNameWithDigits
-                    |   IDENTIFIER_ANY_CASE_WITH_DIGITS_AND_UNDERSCORES
-;
-anyCaseNameWithDigits:
-                        anyCaseName
+                        lowercaseAlphabeticChar
+                    |   uppercaseAlphabeticChar
+                    |   keyword
+                    |   IDENTIFIER_LOWERCASE
+                    |   IDENTIFIER_ANY_CASE
                     |   IDENTIFIER_LOWERCASE_WITH_DIGITS
                     |   IDENTIFIER_ANY_CASE_WITH_DIGITS
-;
-anyCaseName:            lowercaseName
-                    |   uppercaseAlphabeticChar
-                    |   IDENTIFIER_ANY_CASE
-;
-lowercaseName:          lowercaseAlphabeticChar
-                    |   IDENTIFIER_LOWERCASE
-                    |   keyword
+                    |   IDENTIFIER_ANY_CASE_WITH_DIGITS_AND_UNDERSCORES
 ;
 
-alphabeticChar:         lowercaseAlphabeticChar
-                    |   uppercaseAlphabeticChar
-;
 uppercaseAlphabeticChar:
                         A_UPPERCASE
                     |   B_UPPERCASE
@@ -684,12 +476,8 @@ existingCommands:       RETURN
                     |   MAP_CLEAR
                     |   UNMAP
                     |   EXECUTE
+                    |   CALL
 ;
-
-ws_cols:                (WS | COLON)*;
-statementSeparator:     (NEW_LINE | BAR)+;
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  Lexer rules
@@ -763,6 +551,7 @@ ENDFOR:                 'endfo' | 'endfor';
 IN:                     'in';
 BREAK:                  'brea' | 'break';
 CONTINUE:               'con' | 'cont' | 'conti' | 'contin' | 'continu' | 'continue';
+RETURN:                 'return';
 WHILE:                  'wh' | 'whi' | 'whil' | 'while';
 ENDWHILE:               'endw' | 'endwh' | 'endwhi' | 'endwhil' |'endwhile';
 IF:                     'if';
@@ -827,7 +616,6 @@ PUT_LINES:              'pu' | 'put';
 QUIT:                   'qu' | 'qui' | 'quit' | 'clo' | 'clos' | 'close' | 'hid' | 'hide';
 REDO:                   'red' | 'redo';
 REGISTERS:              'di' | 'dis' | 'disp' | 'displ' | 'displa' | 'display' | 'reg' | 'regi' | 'regis' | 'regist' | 'registe' | 'register' | 'registers';
-RETURN:                 'return';
 SYMBOL:                 'sym' | 'symb' | 'symbo' | 'symbol';
 V_GLOBAL:               'vg' | 'vgl' | 'vglo' | 'vglob' | 'vgloba' | 'vglobal';
 SELECT_FILE:            'argu' | 'argum' | 'argume' | 'argumen' | 'argument';
@@ -991,7 +779,8 @@ WS:                     [ \t]+;
 INLINE_SEPARATOR:       '\n' (' ' | '\t')* BACKSLASH -> skip;
 LUA_CODE:               'lua' WS* '<<' WS* 'EOF' .*? 'EOF' -> skip;
 LUA_CODE2:              'lua' WS* '<<' WS* 'END' .*? 'END' -> skip;
-COMMENT:               '\n' WS* QUOTE ~('\n' | '\r')* -> skip;
+COMMENT:                '\n' WS* QUOTE ~('\n' | '\r')* -> skip;
+AUGROUP_SKIP:           WS* AUGROUP .*? AUGROUP WS+ END -> skip;
 
 // All the other symbols
 UNICODE_CHAR:           '\u0000'..'\uFFFE';

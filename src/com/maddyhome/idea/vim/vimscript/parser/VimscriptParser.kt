@@ -74,8 +74,20 @@ object VimscriptParser {
   }
 
   fun parseCommand(text: String): Command? {
-    val parser = getParser(text + "\n", true) // grammar expects that any command ends with a newline character
+    val textToParse = text.replace("\n", "") + "\n" // grammar expects that any command ends with a newline character
+    val parser = getParser(textToParse, true)
     val AST: ParseTree = parser.command()
+    if (linesWithErrors.isNotEmpty()) {
+      linesWithErrors.clear()
+      return null
+    }
+    return CommandVisitor.visit(AST)
+  }
+
+  fun parseLetCommand(text: String): Command? {
+    val textToParse = text.replace("\n", "") + "\n" // grammar expects that any command ends with a newline character
+    val parser = getParser(textToParse, true)
+    val AST: ParseTree = parser.letCommands()
     if (linesWithErrors.isNotEmpty()) {
       linesWithErrors.clear()
       return null

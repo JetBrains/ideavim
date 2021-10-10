@@ -42,12 +42,14 @@ data class LetCommand(
   val variable: Expression,
   val operator: AssignmentOperator,
   val expression: Expression,
+  val isSyntaxSupported: Boolean,
 ) : Command.SingleExecution(ranges) {
 
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+    if (!isSyntaxSupported) return ExecutionResult.Error
     when (variable) {
       is Variable -> {
         if (isReadOnlyVariable(variable)) {

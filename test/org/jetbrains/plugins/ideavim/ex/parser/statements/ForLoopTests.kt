@@ -9,6 +9,7 @@ import org.junit.experimental.theories.Theories
 import org.junit.experimental.theories.Theory
 import org.junit.runner.RunWith
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @RunWith(Theories::class)
@@ -61,6 +62,7 @@ class ForLoopTests {
       """.trimIndent()
     )
     // it will be implemented later but for now it's good to ignore such blocks and do not throw any exceptions during parsing
-    assertEquals(0, script.units.size)
+    assertEquals(1, script.units.size)
+    assertFalse((script.units[0] as ForLoop).isSyntaxSupported)
   }
 }

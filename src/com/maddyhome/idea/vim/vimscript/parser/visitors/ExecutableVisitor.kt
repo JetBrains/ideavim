@@ -2,6 +2,7 @@ package com.maddyhome.idea.vim.vimscript.parser.visitors
 
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
@@ -27,19 +28,6 @@ import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser
 
 object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
 
-  override fun visitExecutable(ctx: VimscriptParser.ExecutableContext): Executable? {
-    return when {
-      ctx.command() != null -> CommandVisitor.visit(ctx.command())
-      ctx.ifStatement() != null -> visitIfStatement(ctx.ifStatement())
-      ctx.forLoop() != null -> visitForLoop(ctx.forLoop())
-      ctx.whileLoop() != null -> visitWhileLoop(ctx.whileLoop())
-      ctx.functionDefinition() != null -> visitFunctionDefinition(ctx.functionDefinition())
-      ctx.dictFunctionDefinition() != null -> visitDictFunctionDefinition(ctx.dictFunctionDefinition())
-      ctx.tryStatement() != null -> visitTryStatement(ctx.tryStatement())
-      else -> null
-    }
-  }
-
   override fun visitBlockMember(ctx: VimscriptParser.BlockMemberContext): Executable? {
     return when {
       ctx.command() != null -> CommandVisitor.visit(ctx.command())
@@ -50,7 +38,6 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
       ctx.forLoop() != null -> visitForLoop(ctx.forLoop())
       ctx.whileLoop() != null -> visitWhileLoop(ctx.whileLoop())
       ctx.functionDefinition() != null -> visitFunctionDefinition(ctx.functionDefinition())
-      ctx.dictFunctionDefinition() != null -> visitDictFunctionDefinition(ctx.dictFunctionDefinition())
       ctx.throwStatement() != null -> visitThrowStatement(ctx.throwStatement())
       ctx.tryStatement() != null -> visitTryStatement(ctx.tryStatement())
       else -> null
@@ -64,15 +51,15 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
   }
 
   override fun visitForLoop(ctx: VimscriptParser.ForLoopContext): Executable {
+    if (ctx.argumentsDeclaration() != null) return ForLoop("", SimpleExpression(VimList(mutableListOf())), listOf(), false)
     val variableName = ctx.variableName().text
     val iterable = ExpressionVisitor.visit(ctx.expr())
     val body = ctx.blockMember().mapNotNull { visitBlockMember(it) }
-    return ForLoop(variableName, iterable, body)
+    return ForLoop(variableName, iterable, body, true)
   }
 
   override fun visitFunctionDefinition(ctx: VimscriptParser.FunctionDefinitionContext): Executable {
     val functionScope = if (ctx.functionScope() != null) Scope.getByValue(ctx.functionScope().text) else null
-    val functionName = ctx.functionName().text
     val args = ctx.argumentsDeclaration().variableName().map { it.text }
     val defaultArgs = ctx.argumentsDeclaration().defaultValue()
       .map { Pair<String, Expression>(it.variableName().text, ExpressionVisitor.visit(it.expr())) }
@@ -83,26 +70,16 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
     for (flag in ctx.functionFlag()) {
       flags.add(FunctionFlag.getByName(flag.text))
     }
-    return FunctionDeclaration(functionScope, functionName, args, defaultArgs, body, replaceExisting, flags.filterNotNull().toSet(), hasOptionalArguments)
-  }
-
-  override fun visitDictFunctionDefinition(ctx: VimscriptParser.DictFunctionDefinitionContext): Executable {
-    val functionScope = if (ctx.functionScope() != null) Scope.getByValue(ctx.functionScope().text) else null
-    val args = ctx.argumentsDeclaration().variableName().map { it.text }
-    val defaultArgs = ctx.argumentsDeclaration().defaultValue()
-      .map { Pair<String, Expression>(it.variableName().text, ExpressionVisitor.visit(it.expr())) }
-    val body = ctx.blockMember().mapNotNull { visitBlockMember(it) }
-    val replaceExisting = ctx.replace != null
-    val flags = mutableSetOf<FunctionFlag?>()
-    val hasOptionalArguments = ctx.argumentsDeclaration().ETC() != null
-    for (flag in ctx.functionFlag()) {
-      flags.add(FunctionFlag.getByName(flag.text))
+    return if (ctx.functionName() != null) {
+      val functionName = ctx.functionName().text
+      FunctionDeclaration(functionScope, functionName, args, defaultArgs, body, replaceExisting, flags.filterNotNull().toSet(), hasOptionalArguments)
+    } else {
+      var sublistExpression = OneElementSublistExpression(SimpleExpression(VimString(ctx.literalDictionaryKey(1).text)), Variable(functionScope, ctx.literalDictionaryKey(0).text))
+      for (i in 2 until ctx.literalDictionaryKey().size) {
+        sublistExpression = OneElementSublistExpression(SimpleExpression(VimString(ctx.literalDictionaryKey(i).text)), sublistExpression)
+      }
+      AnonymousFunctionDeclaration(sublistExpression, args, defaultArgs, body, replaceExisting, flags.filterNotNull().toSet(), hasOptionalArguments)
     }
-    var sublistExpression = OneElementSublistExpression(SimpleExpression(VimString(ctx.literalDictionaryKey(1).text)), Variable(functionScope, ctx.literalDictionaryKey(0).text))
-    for (i in 2 until ctx.literalDictionaryKey().size) {
-      sublistExpression = OneElementSublistExpression(SimpleExpression(VimString(ctx.literalDictionaryKey(i).text)), sublistExpression)
-    }
-    return AnonymousFunctionDeclaration(sublistExpression, args, defaultArgs, body, replaceExisting, flags.filterNotNull().toSet(), hasOptionalArguments)
   }
 
   override fun visitTryStatement(ctx: VimscriptParser.TryStatementContext): Executable {

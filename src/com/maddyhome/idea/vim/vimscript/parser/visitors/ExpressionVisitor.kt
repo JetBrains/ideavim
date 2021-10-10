@@ -203,7 +203,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   override fun visitFunctionAsMethodCall2(ctx: VimscriptParser.FunctionAsMethodCall2Context): LambdaFunctionCallExpression {
     val lambda = visitLambda(ctx.lambda())
     val arguments = mutableListOf(visit(ctx.expr()))
-    arguments.addAll(ctx.functionArguments().expr().mapNotNull { visit(it) })
+    arguments.addAll(ctx.functionArguments().functionArgument().mapNotNull { if (it.expr() != null) visit(it.expr()) else null })
     return LambdaFunctionCallExpression(lambda, arguments)
   }
 
@@ -217,13 +217,13 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     if (ctx.functionScope() != null) {
       scope = Scope.getByValue(ctx.functionScope().text)
     }
-    val functionArguments = ctx.functionArguments().expr().mapNotNull { visit(it) }.toMutableList()
+    val functionArguments = ctx.functionArguments().functionArgument().mapNotNull { if (it.expr() != null) visit(it.expr()) else null }.toMutableList()
     return FunctionCallExpression(scope, functionName, functionArguments)
   }
 
   override fun visitLambdaFunctionCallExpression(ctx: VimscriptParser.LambdaFunctionCallExpressionContext): LambdaFunctionCallExpression {
     val lambda = visitLambda(ctx.lambda())
-    val arguments = ctx.functionArguments().expr().mapNotNull { visit(it) }
+    val arguments = ctx.functionArguments().functionArgument().mapNotNull { if (it.expr() != null) visit(it.expr()) else null }
     return LambdaFunctionCallExpression(lambda, arguments)
   }
 

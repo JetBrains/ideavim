@@ -31,8 +31,7 @@
 - [x] anonymous functions  
 - [x] default value in functions e.g. `function F1(a, b = 10)`
 - [ ] `has("ide")` or "ide" option
-- [ ] reduce number of rules in grammar
-- [ ] delayed parsing of if/for/while etc.
+- [x] reduce number of rules in grammar
 - [ ] classic package structure  
 - [ ] loggers
 
@@ -58,6 +57,7 @@
 - [ ] curly-braces-names  
 - [ ] pass scopes to functions e.g. `for k in keys(s:)`  
 - [ ] all the let command's cases (e.g. registers)  
+- [ ] delayed parsing of if/for/while etc.
   
 ## Less important things that might be added soon  
   

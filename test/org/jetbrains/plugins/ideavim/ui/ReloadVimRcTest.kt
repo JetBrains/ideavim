@@ -76,12 +76,12 @@ class ReloadVimRcTest : VimTestCase() {
     val origFile = """
       map x y|"comment
       set nu
-      set relativenumber " another comment
+      set relativenumber" another comment
     """.trimIndent()
     val changedFile = """
       " comment
       map x y
-      set ${s}${s}${s}nu$s
+      set ${s}${s}${s}nu
       set relativenumber
     """.trimIndent()
 

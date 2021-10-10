@@ -358,14 +358,15 @@ class CommandParserTest : VimTestCase() {
     assertTrue(IdeavimErrorListener.testLogger.isEmpty())
   }
 
-  fun `test unknown let command's cases are ignored`() {
+  fun `test unknown let command's cases`() {
     configureByText("\n")
     val script = VimscriptParser.parse(
       """
         let x[a, b; c] = something()
       """.trimIndent()
     )
-    assertEquals(0, script.units.size)
     assertTrue(IdeavimErrorListener.testLogger.isEmpty())
+    assertEquals(1, script.units.size)
+    assertFalse((script.units[0] as LetCommand).isSyntaxSupported)
   }
 }
