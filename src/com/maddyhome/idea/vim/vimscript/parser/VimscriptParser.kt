@@ -41,7 +41,7 @@ object VimscriptParser {
   var tries = 0
 
   fun parse(text: String): Script {
-    val preprocessedText = getTextWithoutErrors(text)
+    val preprocessedText = uncommentIdeaVimIgnore(getTextWithoutErrors(text))
     linesWithErrors.clear()
     val parser =
       getParser(preprocessedText + "\n", true) // grammar expects that any script ends with a newline character
@@ -120,5 +120,9 @@ object VimscriptParser {
       }
     }
     return lines.joinToString(separator = "\n")
+  }
+
+  private fun uncommentIdeaVimIgnore(configuration: String): String {
+    return configuration.replace(Regex("\"( )*ideavim ignore", RegexOption.IGNORE_CASE), "ideavim ignore")
   }
 }

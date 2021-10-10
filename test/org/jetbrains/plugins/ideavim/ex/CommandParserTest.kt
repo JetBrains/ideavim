@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.vimscript.Executor
+import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
@@ -368,5 +369,40 @@ class CommandParserTest : VimTestCase() {
     assertTrue(IdeavimErrorListener.testLogger.isEmpty())
     assertEquals(1, script.units.size)
     assertFalse((script.units[0] as LetCommand).isSyntaxSupported)
+  }
+
+  fun `test ignore commands between comments`() {
+    configureByText("\n")
+    val script = VimscriptParser.parse(
+      """
+        echo 1
+        " ideaVim ignore
+        echo 2
+        " ideaVim ignore end
+
+        echo 3
+
+        "IdeaVim ignore
+        echo 4
+        echo 5
+        "ideaVim ignore end
+
+        echo 6
+
+        "ideaVim ignore
+        fa;sdlk 
+        *(-78fa=09*&
+        dfas;dlkfj afjldkfja s;d
+        "ideaVim ignore end
+      """.trimIndent()
+    )
+    assertEquals(3, script.units.size)
+    assertTrue(script.units[0] is EchoCommand)
+    assertEquals(SimpleExpression(VimInt(1)), (script.units[0] as EchoCommand).args[0])
+    assertTrue(script.units[1] is EchoCommand)
+    assertEquals(SimpleExpression(VimInt(3)), (script.units[1] as EchoCommand).args[0])
+    assertTrue(script.units[2] is EchoCommand)
+    assertEquals(SimpleExpression(VimInt(6)), (script.units[2] as EchoCommand).args[0])
+    assertTrue(IdeavimErrorListener.testLogger.isEmpty())
   }
 }
