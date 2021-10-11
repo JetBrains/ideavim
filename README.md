@@ -1,4 +1,4 @@
-<img src="resources/META-INF/pluginIcon.svg" width="80" height="80" alt="icon" align="left"/>
+<img src="src/main/resources/META-INF/pluginIcon.svg" width="80" height="80" alt="icon" align="left"/>
 
 IdeaVim
 ===
@@ -51,7 +51,7 @@ Get Early Access
 Would you like to try new features and fixes? Join the Early Access Program and
 receive EAP builds as updates!  
 
-1. Click the  IdeaVim icon <img src="resources/META-INF/pluginIcon_noBorders.svg" width="16" height="16" alt="icon"/>
+1. Click the  IdeaVim icon <img src="src/main/resources/META-INF/pluginIcon_noBorders.svg" width="16" height="16" alt="icon"/>
 in the status bar  | `Early Access Program` | `Subscibe to EAP`
 
 
