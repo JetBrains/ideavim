@@ -18,7 +18,6 @@
 
 package org.jetbrains.plugins.ideavim.option
 
-import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.option.GuiCursorMode
 import com.maddyhome.idea.vim.option.GuiCursorOption
@@ -81,31 +80,31 @@ class GuiCursorOptionTest : VimTestCase() {
 
   fun `test ignores set with missing colon`() {
     // E545: Missing colon: {value}
-    assertThrows(ExException::class.java, "E545: Missing colon: whatever") { option.set("whatever") }
+    assertExException("E545: Missing colon: whatever") { option.set("whatever") }
     assertEquals(GuiCursorOptionData.defaultValue, option.value)
   }
 
   fun `test ignores set with invalid mode`() {
     // E546: Illegal mode: {value}
-    assertThrows(ExException::class.java, "E546: Illegal mode: foo:block-Cursor") { option.set("foo:block-Cursor") }
+    assertExException("E546: Illegal mode: foo:block-Cursor") { option.set("foo:block-Cursor") }
     assertEquals(GuiCursorOptionData.defaultValue, option.value)
   }
 
   fun `test ignores set with invalid mode 2`() {
     // E546: Illegal mode: {value}
-    assertThrows(ExException::class.java, "E546: Illegal mode: n-foo:block-Cursor") { option.set("n-foo:block-Cursor") }
+    assertExException("E546: Illegal mode: n-foo:block-Cursor") { option.set("n-foo:block-Cursor") }
     assertEquals(GuiCursorOptionData.defaultValue, option.value)
   }
 
   fun `test ignores set with zero thickness`() {
     // E549: Illegal percentage
-    assertThrows(ExException::class.java, "E549: Illegal percentage: n:ver0-Cursor") { option.set("n:ver0-Cursor") }
+    assertExException("E549: Illegal percentage: n:ver0-Cursor") { option.set("n:ver0-Cursor") }
     assertEquals(GuiCursorOptionData.defaultValue, option.value)
   }
 
   fun `test ignores set with invalid vertical cursor details`() {
     // E548: Digit expected: {value}
-    assertThrows(ExException::class.java, "E548: Digit expected: n:ver-Cursor") { option.set("n:ver-Cursor") }
+    assertExException("E548: Digit expected: n:ver-Cursor") { option.set("n:ver-Cursor") }
     assertEquals(GuiCursorOptionData.defaultValue, option.value)
   }
 

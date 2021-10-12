@@ -41,11 +41,13 @@ import com.intellij.testFramework.UsefulTestCase
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
+import com.intellij.util.ThrowableRunnable
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.CommandState.SubMode
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
 import com.maddyhome.idea.vim.helper.EditorDataContext
@@ -496,7 +498,7 @@ abstract class VimTestCase : UsefulTestCase() {
     after: String,
     modeAfter: CommandState.Mode,
     subModeAfter: SubMode,
-    fileType: FileType
+    fileType: FileType,
   ) {
     configureByText(fileType, before)
 
@@ -514,7 +516,7 @@ abstract class VimTestCase : UsefulTestCase() {
     after: String,
     modeAfter: CommandState.Mode,
     subModeAfter: SubMode,
-    fileName: String
+    fileName: String,
   ) {
     configureByText(fileName, before)
 
@@ -585,6 +587,34 @@ abstract class VimTestCase : UsefulTestCase() {
   // Disable or enable checks for the particular test
   protected inline fun setupChecks(setup: Checks.() -> Unit) {
     Checks.setup()
+  }
+
+  protected fun assertExException(expectedErrorMessage: String, action: () -> Unit) {
+    assertThrowsX(ExException::class.java, expectedErrorMessage, action)
+  }
+
+  // [VERSION UPDATE] 211+ Use assertThrows from super
+  private fun assertThrowsX(
+    exceptionClass: Class<out Throwable?>,
+    expectedErrorMsgPart: String?,
+    runnable: ThrowableRunnable<*>,
+  ) {
+    var wasThrown = false
+    try {
+      runnable.run()
+    } catch (e: Throwable) {
+      wasThrown = true
+      if (!exceptionClass.isInstance(e)) {
+        throw AssertionError("Expected instance of: " + exceptionClass + " actual: " + e.javaClass, e)
+      }
+      if (expectedErrorMsgPart != null) {
+        assertTrue(e.message, e.message!!.contains(expectedErrorMsgPart))
+      }
+    } finally {
+      if (!wasThrown) {
+        fail("$exceptionClass must be thrown.")
+      }
+    }
   }
 
   companion object {
