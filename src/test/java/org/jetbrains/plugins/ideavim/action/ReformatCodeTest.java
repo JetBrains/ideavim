@@ -25,15 +25,11 @@ import org.jetbrains.plugins.ideavim.VimTestCase;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 public class ReformatCodeTest extends VimTestCase {
-
-  /*
-  [VERSION UPDATE] 203+
   public void testEmpty() {
     configureByJavaText("<caret>");
     typeText(parseKeys("gqq"));
-    myFixture.checkResult("<caret>");
+    assertState("<caret>");
   }
-  */
 
   @TestWithoutNeovim(reason = SkipNeovimReason.DIFFERENT)
   public void testWithCount() {

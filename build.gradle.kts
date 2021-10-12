@@ -107,7 +107,7 @@ tasks {
 
 gradle.projectsEvaluated {
     tasks.compileJava {
-        options.compilerArgs.add("-Werror")
+//        options.compilerArgs.add("-Werror")
         options.compilerArgs.add("-Xlint:deprecation")
     }
 }

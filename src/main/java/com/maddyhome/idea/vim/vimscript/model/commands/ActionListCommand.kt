@@ -39,9 +39,7 @@ data class ActionListCommand(val ranges: Ranges, val argument: String) : Command
     val searchPattern = argument.trim().toLowerCase().split("*")
     val actionManager = ActionManager.getInstance()
 
-    // [VERSION UPDATE] 203+
-    @Suppress("DEPRECATION")
-    val actions = actionManager.getActionIds("")
+    val actions = actionManager.getActionIdList("")
       .sortedWith(String.CASE_INSENSITIVE_ORDER)
       .map { actionName ->
         val shortcuts = actionManager.getAction(actionName).shortcutSet.shortcuts.joinToString(" ") {

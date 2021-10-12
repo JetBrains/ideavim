@@ -540,7 +540,6 @@ public class ExTextField extends JTextField {
 
     // [VERSION UPDATE] 203+ Use modelToView2D, which will return a float rect which positions the caret better
     // Java 9+
-    @SuppressWarnings("deprecation")
     private @Nullable Rectangle2D modelToView(int dot) {
       if (dot > getComponent().getDocument().getLength()) {
         return null;

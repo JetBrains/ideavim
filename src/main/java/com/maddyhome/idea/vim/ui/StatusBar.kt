@@ -33,6 +33,7 @@ import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.ui.popup.ListPopup
 import com.intellij.openapi.updateSettings.impl.UpdateSettings
+import com.intellij.openapi.util.NlsActions
 import com.intellij.openapi.wm.StatusBar
 import com.intellij.openapi.wm.StatusBarWidget
 import com.intellij.openapi.wm.StatusBarWidgetFactory
@@ -214,9 +215,7 @@ private object VimActionsPopup {
 }
 
 private class HelpLink(
-  // [VERSION UPDATE] 203+ uncomment
-  /*@ActionText*/
-  name: String,
+  @NlsActions.ActionText name: String,
   val link: String,
   icon: Icon?,
 ) : DumbAwareAction(name, null, icon)/*, LightEditCompatible*/ {

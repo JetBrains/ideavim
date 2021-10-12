@@ -305,8 +305,6 @@ class NotificationService(private val project: Project?) {
   }
 
   companion object {
-    // [VERSION UPDATE] 203+
-    @Suppress("DEPRECATION")
     val IDEAVIM_STICKY_GROUP = NotificationGroup("ideavim-sticky", NotificationDisplayType.STICKY_BALLOON, false)
     const val IDEAVIM_NOTIFICATION_ID = "ideavim"
     const val IDEAVIM_NOTIFICATION_TITLE = "IdeaVim"

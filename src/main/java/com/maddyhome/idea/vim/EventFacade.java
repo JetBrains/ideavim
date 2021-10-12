@@ -132,15 +132,11 @@ public class EventFacade {
     editor.getSelectionModel().removeSelectionListener(listener);
   }
 
-  // [VERSION UPDATE] 203+
-  @SuppressWarnings("deprecation")
   public void registerLookupListener(@NotNull Project project, @NotNull PropertyChangeListener propertyChangeListener) {
     VimProjectService parentDisposable = VimProjectService.getInstance(project);
     LookupManager.getInstance(project).addPropertyChangeListener(propertyChangeListener, parentDisposable);
   }
 
-  // [VERSION UPDATE] 203+
-  @SuppressWarnings("deprecation")
   public void removeLookupListener(@NotNull Project project, @NotNull PropertyChangeListener propertyChangeListener) {
     LookupManager.getInstance(project).removePropertyChangeListener(propertyChangeListener);
   }
