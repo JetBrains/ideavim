@@ -124,9 +124,9 @@ private interface CaretVisualAttributesProvider {
 
 private class DefaultCaretVisualAttributesProvider : CaretVisualAttributesProvider {
   companion object {
-    private val HIDDEN = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BAR, 0F)
-    private val BLOCK = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BLOCK, 1.0F)
-    private val BAR = CaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, CaretVisualAttributes.Shape.BAR, 0.25F)
+    private val HIDDEN = getCaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, "BAR", 0F)
+    private val BLOCK = getCaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, "BLOCK", 1.0F)
+    private val BAR = getCaretVisualAttributes(null, CaretVisualAttributes.Weight.NORMAL, "BAR", 0.25F)
   }
 
   private val cache = mutableMapOf<GuiCursorMode, CaretVisualAttributes>()
@@ -140,12 +140,12 @@ private class DefaultCaretVisualAttributesProvider : CaretVisualAttributesProvid
     return cache.getOrPut(guicursorMode) {
       val attributes = OptionsManager.guicursor.getAttributes(guicursorMode)
       val shape = when (attributes.type) {
-        GuiCursorType.BLOCK -> CaretVisualAttributes.Shape.BLOCK
-        GuiCursorType.VER -> CaretVisualAttributes.Shape.BAR
-        GuiCursorType.HOR -> CaretVisualAttributes.Shape.UNDERSCORE
+        GuiCursorType.BLOCK -> "BLOCK"
+        GuiCursorType.VER -> "BAR"
+        GuiCursorType.HOR -> "UNDERSCORE"
       }
       val colour: Color? = null // Support highlight group?
-      CaretVisualAttributes(colour, CaretVisualAttributes.Weight.NORMAL, shape, attributes.thickness / 100F)
+      getCaretVisualAttributes(colour, CaretVisualAttributes.Weight.NORMAL, shape, attributes.thickness / 100F)
     }
   }
 
