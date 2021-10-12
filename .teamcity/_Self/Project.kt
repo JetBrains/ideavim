@@ -16,6 +16,7 @@ import _Self.vcsRoots.Branch_181
 import _Self.vcsRoots.Branch_183
 import _Self.vcsRoots.Branch_191_193
 import _Self.vcsRoots.Branch_201
+import _Self.vcsRoots.Branch_202
 import _Self.vcsRoots.GitHubPullRequest
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 
@@ -29,10 +30,10 @@ object Project : Project({
   vcsRoot(Branch_181)
   vcsRoot(Branch_191_193)
   vcsRoot(Branch_201)
+  vcsRoot(Branch_202)
   vcsRoot(GitHubPullRequest)
 
   // Builds
-  buildType(TestsForIntelliJ20202)
   buildType(TestsForIntelliJ20203)
   buildType(TestsForIntelliJ20211)
   buildType(TestsForIntelliJ20212)

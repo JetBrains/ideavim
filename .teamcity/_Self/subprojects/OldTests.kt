@@ -7,12 +7,14 @@ import _Self.buildTypes.TestsForIntelliJ20191
 import _Self.buildTypes.TestsForIntelliJ20192
 import _Self.buildTypes.TestsForIntelliJ20193
 import _Self.buildTypes.TestsForIntelliJ20201
+import _Self.buildTypes.TestsForIntelliJ20202
 import jetbrains.buildServer.configs.kotlin.v2019_2.Project
 
 object OldTests : Project({
   name = "Old IdeaVim tests"
   description = "Tests for older versions of IJ"
 
+  buildType(TestsForIntelliJ20202)
   buildType(TestsForIntelliJ20201)
   buildType(TestsForIntelliJ20191)
   buildType(TestsForIntelliJ20181)
