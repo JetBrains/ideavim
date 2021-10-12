@@ -2,15 +2,51 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
+      <h3>Features:</h3>
+      <ul>
+      <li>Support <code>matchit.vim</code> extension for Ruby and XML/HTML <a
+          href="https://youtrack.jetbrains.com/issue/VIM-539">VIM-539
+      </a> |
+        <a href="https://github.com/chrisbra/matchit">matchit.vim</a>
+      </li>
+      <li>IDE-specific configuration
+        <a href="https://youtrack.jetbrains.com/issue/VIM-1573">VIM-1573</a>
+      </li>
+      <li>Call command
+        <a href="https://youtrack.jetbrains.com/issue/VIM-2416">VIM-2416</a>
+      </li>
+      </ul>
+
+      <h3>Merged PRs:</h3>
+      <ul>
+      <li>
+        <a href="https://github.com/JetBrains/ideavim/pull/337">337</a>
+        by <a href="https://github.com/citizenmatt">Matt Ellis</a>: guicursor!
+      </li>
+      <li>
+        <a href="https://github.com/JetBrains/ideavim/pull/343">343</a>
+        by <a href="https://github.com/myzeiri">Martin Yzeiri</a>: Emulate matchit.vim
+      </li>
+      </ul>
+
       <h3>Fixes:</h3>
       <ul>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2405">VIM-2405</a> ExExceptions during <code>map
-          &lt;expr&gt;</code> execution are now displayed in status bar
-        </li>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2406">VIM-2406</a> Fix go to line command</li>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2408">VIM-2408</a> Fix vim script parser</li>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2409">VIM-2409</a> Fix substitute command</li>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2411">VIM-2411</a> Fix vim script parser</li>
+      <li>
+        <a href="https://youtrack.jetbrains.com/issue/VIM-2417">VIM-2417</a>
+        Fix bars in substitute command
+      </li>
+      <li>
+        <a href="https://youtrack.jetbrains.com/issue/VIM-2425">VIM-2425</a>
+        Fix reload button
+      </li>
+      <li>
+        <a href="https://youtrack.jetbrains.com/issue/VIM-2422">VIM-2422</a>
+        Fix freeze
+      </li>
+      <li>
+        <a href="https://youtrack.jetbrains.com/issue/VIM-2420">VIM-2420</a>
+        Fix freeze
+      </li>
       </ul>
     ]]>
   </change-notes>
