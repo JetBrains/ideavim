@@ -24,7 +24,6 @@ import com.intellij.ide.highlighter.XmlFileType
 import com.intellij.json.JsonFileType
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.application.WriteAction
-import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.Inlay
 import com.intellij.openapi.editor.LogicalPosition
@@ -56,8 +55,12 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 import com.maddyhome.idea.vim.helper.TestInputModel
+import com.maddyhome.idea.vim.helper.buildGreater212
+import com.maddyhome.idea.vim.helper.getShape
 import com.maddyhome.idea.vim.helper.guicursorMode
 import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.helper.shape
+import com.maddyhome.idea.vim.helper.thickness
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
@@ -429,21 +432,25 @@ abstract class VimTestCase : UsefulTestCase() {
   protected fun assertCaretsVisualAttributes() {
     val editor = myFixture.editor
     val attributes = OptionsManager.guicursor.getAttributes(editor.guicursorMode())
-    val shape = when (attributes.type) {
-      GuiCursorType.BLOCK -> CaretVisualAttributes.Shape.BLOCK
-      GuiCursorType.VER -> CaretVisualAttributes.Shape.BAR
-      GuiCursorType.HOR -> CaretVisualAttributes.Shape.UNDERSCORE
-    }
     val colour = editor.colorsScheme.getColor(EditorColors.CARET_COLOR)
 
     editor.caretModel.allCarets.forEach { caret ->
       // All carets should be the same except when in block sub mode, where we "hide" them (by drawing a zero width bar)
       if (caret !== editor.caretModel.primaryCaret && editor.inBlockSubMode) {
-        assertEquals(CaretVisualAttributes.Shape.BAR, caret.visualAttributes.shape)
-        assertEquals(0F, caret.visualAttributes.thickness)
+        if (buildGreater212()) {
+          assertEquals(getShape("BAR"), caret.shape())
+          assertEquals(0F, caret.thickness())
+        }
       } else {
-        assertEquals(shape, editor.caretModel.primaryCaret.visualAttributes.shape)
-        assertEquals(attributes.thickness / 100.0F, editor.caretModel.primaryCaret.visualAttributes.thickness)
+        if (buildGreater212()) {
+          val shape = when (attributes.type) {
+            GuiCursorType.BLOCK -> getShape("BLOCK")
+            GuiCursorType.VER -> getShape("BAR")
+            GuiCursorType.HOR -> getShape("UNDERSCORE")
+          }
+          assertEquals(shape, editor.caretModel.primaryCaret.shape())
+          assertEquals(attributes.thickness / 100.0F, editor.caretModel.primaryCaret.thickness())
+        }
         editor.caretModel.primaryCaret.visualAttributes.color?.let {
           assertEquals(colour, it)
         }

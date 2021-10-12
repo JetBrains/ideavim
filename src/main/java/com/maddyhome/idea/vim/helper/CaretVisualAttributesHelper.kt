@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.helper
 
-import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
@@ -108,7 +107,7 @@ object GuicursorChangeListener : OptionChangeListener<String> {
 // [VERSION UPDATE] 2021.2+
 // Once the plugin requires 2021.2 as a base version, get rid of all this and just set the attributes directly
 private val provider: CaretVisualAttributesProvider by lazy {
-  if (ApplicationInfo.getInstance().build.baselineVersion >= 212) {
+  if (buildGreater212()) {
     DefaultCaretVisualAttributesProvider()
   } else {
     LegacyCaretVisualAttributesProvider()

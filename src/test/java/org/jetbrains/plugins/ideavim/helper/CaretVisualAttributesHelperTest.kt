@@ -19,10 +19,13 @@
 package org.jetbrains.plugins.ideavim.helper
 
 import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
+import com.maddyhome.idea.vim.helper.buildGreater212
+import com.maddyhome.idea.vim.helper.getShape
+import com.maddyhome.idea.vim.helper.shape
+import com.maddyhome.idea.vim.helper.thickness
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
@@ -32,59 +35,59 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test default normal mode caret is block`() {
     configureByText("I found it in a legendary land")
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+    assertCaretVisualAttributes("BLOCK", 0F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test default insert mode caret is vertical bar`() {
     configureByText("I found it in a legendary land")
     typeText(parseKeys("i"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.25F)
+    assertCaretVisualAttributes("BAR", 0.25F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test insert mode caret is reset after Escape`() {
     configureByText("I found it in a legendary land")
     typeText(parseKeys("i", "<Esc>"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+    assertCaretVisualAttributes("BLOCK", 0F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test default replace mode caret is underscore`() {
     configureByText("I found it in a legendary land")
     typeText(parseKeys("R"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.UNDERSCORE, 0.2F)
+    assertCaretVisualAttributes("UNDERSCORE", 0.2F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test default op pending caret is thick underscore`() {
     configureByText("I found it in a legendary land")
     typeText(parseKeys("d"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.UNDERSCORE, 0.5F)
+    assertCaretVisualAttributes("UNDERSCORE", 0.5F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test caret is reset after op pending`() {
     configureByText("I found it in a legendary land")
     typeText(parseKeys("d$"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+    assertCaretVisualAttributes("BLOCK", 0F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test default visual mode caret is block`() {
     configureByText("I found it in a legendary land")
     typeText(parseKeys("ve"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+    assertCaretVisualAttributes("BLOCK", 0F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test visual block hides secondary carets`() {
     configureByLines(5, "I found it in a legendary land")
     typeText(parseKeys("w", "<C-V>2j5l"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+    assertCaretVisualAttributes("BLOCK", 0F)
     myFixture.editor.caretModel.allCarets.forEach {
       if (it != myFixture.editor.caretModel.primaryCaret) {
-        assertCaretVisualAttributes(it, CaretVisualAttributes.Shape.BAR, 0F)
+        assertCaretVisualAttributes(it, "BAR", 0F)
       }
     }
   }
@@ -95,63 +98,63 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
     // Vim doesn't have a different caret for SELECT, and doesn't have an option in guicursor to change SELECT mode
     configureByText("I found it in a legendary land")
     typeText(parseKeys("v7l", "<C-G>"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.25F)
+    assertCaretVisualAttributes("BAR", 0.25F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test replace character uses replace mode caret`() {
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("r"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.UNDERSCORE, 0.2F)
+    assertCaretVisualAttributes("UNDERSCORE", 0.2F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test caret reset after replacing character`() {
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("r", "z"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+    assertCaretVisualAttributes("BLOCK", 0F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test caret reset after escaping replace character`() {
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("r", "<Esc>"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+    assertCaretVisualAttributes("BLOCK", 0F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test caret reset after cancelling replace character`() {
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("r", "<Left>"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+    assertCaretVisualAttributes("BLOCK", 0F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test visual replace character uses replace mode caret`() {
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("ve", "r"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.UNDERSCORE, 0.2F)
+    assertCaretVisualAttributes("UNDERSCORE", 0.2F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test caret reset after completing visual replace character`() {
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("ve", "r", "z"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+    assertCaretVisualAttributes("BLOCK", 0F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test caret reset after escaping visual replace character`() {
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("ve", "r", "<Esc>"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+    assertCaretVisualAttributes("BLOCK", 0F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test caret reset after cancelling visual replace character`() {
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("ve", "r", "<Left>"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+    assertCaretVisualAttributes("BLOCK", 0F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -159,7 +162,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
     OptionsManager.keymodel.set("startsel,stopsel")
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("i", "<S-Right><S-Right><S-Right>"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 0F)
+    assertCaretVisualAttributes("BLOCK", 0F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -167,7 +170,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
     OptionsManager.keymodel.set("startsel,stopsel")
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("i", "<S-Right><S-Right><S-Right>", "<Right>"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.25F)
+    assertCaretVisualAttributes("BAR", 0.25F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -175,25 +178,25 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
     OptionsManager.keymodel.set("startsel,stopsel")
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("i", "<S-Right><S-Right><S-Right>", "<Esc>"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.25F)
+    assertCaretVisualAttributes("BAR", 0.25F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test changing guicursor option updates caret immediately`() {
     configureByText("I found it in a legendary land")
     enterCommand("set guicursor=n:hor22")
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.UNDERSCORE, 0.22F)
+    assertCaretVisualAttributes("UNDERSCORE", 0.22F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test changing guicursor option invalidates caches correctly`() {
     configureByText("I found it in a legendary land")
     typeText(parseKeys("i"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.25F)
+    assertCaretVisualAttributes("BAR", 0.25F)
     typeText(parseKeys("<Esc>"))
     enterCommand("set guicursor=i:hor22")
     typeText(parseKeys("i"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.UNDERSCORE, 0.22F)
+    assertCaretVisualAttributes("UNDERSCORE", 0.22F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -203,14 +206,14 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
     enterCommand("set guicursor+=i:ver25")
     enterCommand("set guicursor+=i:hor75")
     typeText(parseKeys("i"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.UNDERSCORE, 0.75F)
+    assertCaretVisualAttributes("UNDERSCORE", 0.75F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test 'all' guicursor option`() {
     configureByText("I found it in a legendary land")
     enterCommand("set guicursor+=a:ver25")
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.BAR, 0.25F)
+    assertCaretVisualAttributes("BAR", 0.25F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -220,7 +223,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
     enterCommand("set guicursor+=a:ver25")
     enterCommand("set guicursor+=i:hor75")
     typeText(parseKeys("i"))
-    assertCaretVisualAttributes(CaretVisualAttributes.Shape.UNDERSCORE, 0.75F)
+    assertCaretVisualAttributes("UNDERSCORE", 0.75F)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
@@ -230,19 +233,20 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
     try {
       configureByText("I found it in a legendary land")
       typeText(parseKeys("i"))
-      assertCaretVisualAttributes(CaretVisualAttributes.Shape.BLOCK, 1.0F)
+      assertCaretVisualAttributes("BLOCK", 1.0F)
     } finally {
       EditorSettingsExternalizable.getInstance().isBlockCursor = originalValue
     }
   }
 
-  private fun assertCaretVisualAttributes(expectedShape: CaretVisualAttributes.Shape, expectedThickness: Float) {
+  private fun assertCaretVisualAttributes(expectedShape: String, expectedThickness: Float) {
     assertCaretVisualAttributes(myFixture.editor.caretModel.primaryCaret, expectedShape, expectedThickness)
   }
 
-  private fun assertCaretVisualAttributes(caret: Caret, expectedShape: CaretVisualAttributes.Shape, expectedThickness: Float) {
-    val visualAttributes = caret.visualAttributes
-    assertEquals(expectedShape, visualAttributes.shape)
-    assertEquals(expectedThickness, visualAttributes.thickness)
+  private fun assertCaretVisualAttributes(caret: Caret, expectedShape: String, expectedThickness: Float) {
+    if (buildGreater212()) {
+      assertEquals(getShape(expectedShape), caret.shape())
+      assertEquals(expectedThickness, caret.thickness())
+    }
   }
 }
