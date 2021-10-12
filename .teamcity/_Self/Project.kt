@@ -7,6 +7,7 @@ import _Self.buildTypes.Qodana
 import _Self.buildTypes.TestsForIntelliJ20202
 import _Self.buildTypes.TestsForIntelliJ20203
 import _Self.buildTypes.TestsForIntelliJ20211
+import _Self.buildTypes.TestsForIntelliJ20212
 import _Self.buildTypes.TestsForIntelliJEAP
 import _Self.subprojects.GitHub
 import _Self.subprojects.OldTests
@@ -34,6 +35,7 @@ object Project : Project({
   buildType(TestsForIntelliJ20202)
   buildType(TestsForIntelliJ20203)
   buildType(TestsForIntelliJ20211)
+  buildType(TestsForIntelliJ20212)
   buildType(TestsForIntelliJEAP)
 
   buildType(PropertyBased)
