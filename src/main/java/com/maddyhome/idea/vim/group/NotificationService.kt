@@ -23,8 +23,8 @@ import com.intellij.ide.BrowserUtil
 import com.intellij.ide.actions.OpenFileAction
 import com.intellij.ide.actions.RevealFileAction
 import com.intellij.notification.Notification
-import com.intellij.notification.NotificationDisplayType
 import com.intellij.notification.NotificationGroup
+import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
@@ -112,7 +112,7 @@ class NotificationService(private val project: Project?) {
   )
 
   fun specialKeymap(keymap: Keymap, listener: NotificationListener.Adapter) {
-    IDEAVIM_STICKY_GROUP.createNotification(
+    val notification = IDEAVIM_STICKY_GROUP.createNotification(
       IDEAVIM_NOTIFICATION_TITLE,
       "IdeaVim plugin doesn't use the special \"Vim\" keymap any longer. " +
         "Switching to \"${keymap.presentableName}\" keymap.<br/><br/>" +
@@ -122,17 +122,22 @@ class NotificationService(private val project: Project?) {
         "<li>IDE action shortcuts in \"File | Settings | Keymap\"</li>" +
         "<li>Vim or IDE handlers for conflicting shortcuts in <a href='#settings'>Vim Emulation</a> settings</li>" +
         "</ul>",
-      NotificationType.INFORMATION, listener
-    ).notify(project)
+      NotificationType.INFORMATION
+    )
+    notification.setListener(listener)
+    notification.notify(project)
   }
 
-  fun noVimrcAsDefault() = IDEAVIM_STICKY_GROUP.createNotification(
-    IDEAVIM_NOTIFICATION_TITLE, "",
-    "The ~/.vimrc file is no longer read by default, use ~/.ideavimrc instead. You can read it from your " +
-      "~/.ideavimrc using this command:<br/><br/>" +
-      "<code>source ~/.vimrc</code>",
-    NotificationType.INFORMATION
-  ).notify(project)
+  fun noVimrcAsDefault() {
+    val notification = IDEAVIM_STICKY_GROUP.createNotification(
+      IDEAVIM_NOTIFICATION_TITLE,
+      "The ~/.vimrc file is no longer read by default, use ~/.ideavimrc instead. You can read it from your " +
+        "~/.ideavimrc using this command:<br/><br/>" +
+        "<code>source ~/.vimrc</code>",
+      NotificationType.INFORMATION
+    )
+    notification.notify(project)
+  }
 
   fun notifyAboutShortcutConflict(keyStroke: KeyStroke) {
     val conflicts = VimPlugin.getKey().savedShortcutConflicts
@@ -305,7 +310,8 @@ class NotificationService(private val project: Project?) {
   }
 
   companion object {
-    val IDEAVIM_STICKY_GROUP = NotificationGroup("ideavim-sticky", NotificationDisplayType.STICKY_BALLOON, false)
+    val IDEAVIM_STICKY_GROUP: NotificationGroup =
+      NotificationGroupManager.getInstance().getNotificationGroup("ideavim-sticky")
     const val IDEAVIM_NOTIFICATION_ID = "ideavim"
     const val IDEAVIM_NOTIFICATION_TITLE = "IdeaVim"
     const val ideajoinExamplesUrl = "https://jb.gg/f9zji9"
