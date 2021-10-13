@@ -45,10 +45,10 @@ public class RegisterActions {
   private static void registerEpListener() {
     // IdeaVim doesn't support contribution to VIM_ACTIONS_EP extension point, so technically we can skip this update,
     //   but let's support dynamic plugins in a more classic way and reload actions on every EP change.
-    VIM_ACTIONS_EP.getPoint().addExtensionPointListener(() -> {
+    VIM_ACTIONS_EP.addChangeListener(() -> {
       unregisterActions();
       registerActions();
-    }, false, VimPlugin.getInstance());
+    }, VimPlugin.getInstance());
   }
 
   public static @Nullable EditorActionHandlerBase findAction(@NotNull String id) {
