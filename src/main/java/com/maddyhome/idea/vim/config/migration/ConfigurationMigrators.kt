@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.config.migration
 
 import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.util.JDOMUtil
+import com.intellij.util.io.exists
 import org.jdom.Element
 
 interface ConfigMigrator {
@@ -36,7 +37,7 @@ object `Version 6 to 7 config migration` : ConfigMigrator {
   private val local = arrayOf("VimHistorySettings", "VimMarksSettings", "VimRegisterSettings", "VimSearchSettings")
 
   override fun versionUp() {
-    val configFile = PathManager.getOptionsFile("vim_settings")
+    val configFile = PathManager.getOptionsFile("vim_settings").toPath()
     if (!configFile.exists()) return
 
     val configuration = JDOMUtil.load(configFile)
@@ -44,7 +45,7 @@ object `Version 6 to 7 config migration` : ConfigMigrator {
     val (localElement, sharedElement) = performMigration(configuration)
 
     JDOMUtil.write(sharedElement, configFile)
-    JDOMUtil.write(localElement, PathManager.getOptionsFile("vim_settings_local"))
+    JDOMUtil.write(localElement, PathManager.getOptionsFile("vim_settings_local").toPath())
   }
 
   fun performMigration(configuration: Element): Pair<Element, Element> {

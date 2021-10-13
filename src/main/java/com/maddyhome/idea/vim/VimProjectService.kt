@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 
 @Service
@@ -31,9 +31,7 @@ class VimProjectService(val project: Project) : Disposable {
 
   companion object {
     @JvmStatic
-    fun getInstance(project: Project): VimProjectService {
-      return ServiceManager.getService(project, VimProjectService::class.java)
-    }
+    fun getInstance(project: Project): VimProjectService = project.service()
   }
 }
 
