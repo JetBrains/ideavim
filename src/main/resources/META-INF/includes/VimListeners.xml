@@ -23,5 +23,8 @@
 
     <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$VimFindModelListener"
               topic="com.intellij.find.FindModelListener"/>
+
+    <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$LookupTopicListener"
+              topic="com.intellij.codeInsight.lookup.LookupManagerListener"/>
   </projectListeners>
 </idea-plugin>

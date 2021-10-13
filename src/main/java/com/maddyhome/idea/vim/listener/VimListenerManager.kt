@@ -35,8 +35,6 @@ import com.intellij.openapi.editor.ex.DocumentEx
 import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectManager
 import com.intellij.util.ExceptionUtil
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler
@@ -90,13 +88,11 @@ object VimListenerManager {
 
   fun turnOn() {
     GlobalListeners.enable()
-    ProjectListeners.addAll()
     EditorListeners.addAll()
   }
 
   fun turnOff() {
     GlobalListeners.disable()
-    ProjectListeners.removeAll()
     EditorListeners.removeAll()
   }
 
@@ -129,22 +125,6 @@ object VimListenerManager {
       OptionsManager.guicursor.removeOptionChangeListener(GuicursorChangeListener)
 
       EventFacade.getInstance().removeEditorFactoryListener(VimEditorFactoryListener)
-    }
-  }
-
-  object ProjectListeners {
-    fun add(project: Project) {
-      IdeaSpecifics.addIdeaSpecificsListeners(project)
-    }
-
-    fun removeAll() {
-      // Project listeners are self-disposable, so there is no need to unregister them on project close
-      ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }
-        .forEach { IdeaSpecifics.removeIdeaSpecificsListeners(it) }
-    }
-
-    fun addAll() {
-      ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }.forEach { add(it) }
     }
   }
 

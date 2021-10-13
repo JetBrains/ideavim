@@ -18,7 +18,8 @@
 
 package com.maddyhome.idea.vim.listener
 
-import com.intellij.codeInsight.lookup.LookupEvent
+import com.intellij.codeInsight.lookup.Lookup
+import com.intellij.codeInsight.lookup.LookupManagerListener
 import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.codeInsight.template.Template
 import com.intellij.codeInsight.template.TemplateEditingAdapter
@@ -38,10 +39,8 @@ import com.intellij.openapi.editor.actionSystem.EditorActionManager
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
 import com.intellij.openapi.project.DumbAwareToggleAction
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.util.PlatformUtils
-import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
@@ -53,24 +52,15 @@ import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inNormalMode
+import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.NotNull
-import java.beans.PropertyChangeEvent
-import java.beans.PropertyChangeListener
 
 /**
  * @author Alex Plate
  */
 object IdeaSpecifics {
-  fun addIdeaSpecificsListeners(project: Project) {
-    EventFacade.getInstance().registerLookupListener(project, LookupListener)
-  }
-
-  fun removeIdeaSpecificsListeners(project: Project) {
-    EventFacade.getInstance().removeLookupListener(project, LookupListener)
-  }
-
   class VimActionListener : AnActionListener {
     @NonNls
     private val surrounderItems = listOf("if", "if / else", "for")
@@ -176,22 +166,23 @@ object IdeaSpecifics {
   //endregion
 
   //region Register shortcuts for lookup and perform partial reset
-  private object LookupListener : PropertyChangeListener {
-    override fun propertyChange(evt: PropertyChangeEvent?) {
-      if (evt == null) return
-      if (evt.propertyName == "activeLookup" && evt.oldValue == null && evt.newValue != null) {
-        val lookup = evt.newValue
-        if (lookup is LookupImpl) {
-          VimPlugin.getKey().registerShortcutsForLookup(lookup)
+  class LookupTopicListener : LookupManagerListener {
+    override fun activeLookupChanged(oldLookup: Lookup?, newLookup: Lookup?) {
+      if (!VimPlugin.isEnabled()) return
 
-          lookup.addLookupListener(object : com.intellij.codeInsight.lookup.LookupListener {
-            override fun itemSelected(event: LookupEvent) {
-              // VIM-1858
-              KeyHandler.getInstance().partialReset(lookup.editor)
-              lookup.removeLookupListener(this)
-            }
-          })
-        }
+      // Lookup opened
+      if (oldLookup == null && newLookup is LookupImpl) {
+        if (newLookup.editor.isIdeaVimDisabledHere) return
+
+        VimPlugin.getKey().registerShortcutsForLookup(newLookup)
+      }
+
+      // Lookup closed
+      if (oldLookup != null && newLookup == null) {
+        val editor = oldLookup.editor
+        if (editor.isIdeaVimDisabledHere) return
+        // VIM-1858
+        KeyHandler.getInstance().partialReset(editor)
       }
     }
   }

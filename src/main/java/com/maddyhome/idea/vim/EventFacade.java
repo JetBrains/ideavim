@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim;
 
-import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.ShortcutSet;
@@ -28,14 +27,12 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.actionSystem.TypedAction;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.event.*;
-import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
-import java.beans.PropertyChangeListener;
 
 /**
  * @author vlan
@@ -130,15 +127,6 @@ public class EventFacade {
 
   public void removeEditorSelectionListener(@NotNull Editor editor, @NotNull SelectionListener listener) {
     editor.getSelectionModel().removeSelectionListener(listener);
-  }
-
-  public void registerLookupListener(@NotNull Project project, @NotNull PropertyChangeListener propertyChangeListener) {
-    VimProjectService parentDisposable = VimProjectService.getInstance(project);
-    LookupManager.getInstance(project).addPropertyChangeListener(propertyChangeListener, parentDisposable);
-  }
-
-  public void removeLookupListener(@NotNull Project project, @NotNull PropertyChangeListener propertyChangeListener) {
-    LookupManager.getInstance(project).removePropertyChangeListener(propertyChangeListener);
   }
 
   private @NotNull TypedAction getTypedAction() {

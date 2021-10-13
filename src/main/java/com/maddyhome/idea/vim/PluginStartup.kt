@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
-import com.maddyhome.idea.vim.listener.VimListenerManager
 
 /**
  * @author Alex Plate
@@ -30,12 +29,6 @@ class PluginStartup : StartupActivity.DumbAware/*, LightEditCompatible*/ {
   private var firstInitializationOccurred = false
 
   override fun runActivity(project: Project) {
-    if (firstInitializationOccurred && VimPlugin.isEnabled()) {
-      // This code should be executed on every project open
-      // Project listeners are self-disposable, so there is no need to unregister them on project close
-      VimListenerManager.ProjectListeners.add(project)
-    }
-
     if (firstInitializationOccurred) return
     firstInitializationOccurred = true
 
