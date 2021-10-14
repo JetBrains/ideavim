@@ -57,7 +57,7 @@ object VariableService {
     when (scope) {
       Scope.GLOBAL_VARIABLE -> {
         storeGlobalVariable(variable.name, value)
-        val scopeForGlobalEnvironment = if (variable.scope != null) variable.scope.c + ":" else ""
+        val scopeForGlobalEnvironment = variable.scope?.toString() ?: ""
         VimScriptGlobalEnvironment.getInstance().variables[scopeForGlobalEnvironment + variable.name] = value.simplify()
       }
       Scope.SCRIPT_VARIABLE -> storeScriptVariable(variable.name, value, parent)

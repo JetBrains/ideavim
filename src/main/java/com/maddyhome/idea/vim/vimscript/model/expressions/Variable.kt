@@ -13,6 +13,6 @@ data class Variable(val scope: Scope?, val name: String) : Expression() {
   }
 
   override fun toString(): String {
-    return (if (scope != null) scope.c + ":" else "") + name
+    return (scope?.toString() ?: "") + name
   }
 }

@@ -96,7 +96,7 @@ object FuncrefFunctionHandler : FunctionHandler() {
     }
     val scopeAndName = arg1.value.extractScopeAndName()
     val function = FunctionStorage.getUserDefinedFunction(scopeAndName.first, scopeAndName.second, parent)
-      ?: throw ExException("E700: Unknown function: ${if (scopeAndName.first != null) scopeAndName.first!!.c + ":" else ""}${scopeAndName.second}")
+      ?: throw ExException("E700: Unknown function: ${scopeAndName.first?.toString() ?: ""}${scopeAndName.second}")
     val handler = DefinedFunctionHandler(function)
 
     var arglist: VimList? = null

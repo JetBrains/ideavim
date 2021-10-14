@@ -34,4 +34,8 @@ enum class Scope(val c: String) {
       return values().firstOrNull { it.c == s }
     }
   }
+
+  override fun toString(): String {
+    return "$c:"
+  }
 }

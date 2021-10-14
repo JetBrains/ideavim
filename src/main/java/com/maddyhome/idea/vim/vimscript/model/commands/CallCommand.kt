@@ -46,8 +46,7 @@ class CallCommand(val ranges: Ranges, val functionCall: Expression) : Command.Si
       if (function != null) {
         if (function is DefinedFunctionHandler && function.function.flags.contains(FunctionFlag.DICT)) {
           throw ExException(
-            "E725: Calling dict function without Dictionary: " +
-              ((if (functionCall.scope != null) functionCall.scope.c + ":" else "") + functionCall.functionName)
+            "E725: Calling dict function without Dictionary: " + (functionCall.scope?.toString() ?: "") + functionCall.functionName
           )
         }
         function.ranges = ranges
@@ -55,7 +54,7 @@ class CallCommand(val ranges: Ranges, val functionCall: Expression) : Command.Si
         return ExecutionResult.Success
       }
 
-      val name = (if (functionCall.scope != null) functionCall.scope.c + ":" else "") + functionCall.functionName
+      val name = (functionCall.scope?.toString() ?: "") + functionCall.functionName
       val funcref = VariableService.getNullableVariableValue(Variable(functionCall.scope, functionCall.functionName), editor, context, parent)
       if (funcref is VimFuncref) {
         funcref.handler.ranges = ranges

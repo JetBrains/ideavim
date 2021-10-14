@@ -211,7 +211,7 @@ class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
         } catch (e: Exception) {
           @VimNlsSafe val message = MessageHelper.message(
             "highlightedyank.invalid.value.of.0.1",
-            (if (variable.scope != null) variable.scope.c + ":" + variable.name else variable.name),
+            (variable.scope?.toString() ?: "") + variable.name,
             e.message ?: ""
           )
           VimPlugin.showMessage(message)

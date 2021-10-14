@@ -99,7 +99,7 @@ object FunctionStorage {
 
   fun getFunctionHandler(scope: Scope?, name: String, parent: Executable): FunctionHandler {
     return getFunctionHandlerOrNull(scope, name, parent)
-      ?: throw ExException("E117: Unknown function: ${if (scope != null) scope.c + ":" else ""}$name")
+      ?: throw ExException("E117: Unknown function: ${scope?.toString() ?: ""}$name")
   }
 
   // todo g:abs should be unknown function !!!

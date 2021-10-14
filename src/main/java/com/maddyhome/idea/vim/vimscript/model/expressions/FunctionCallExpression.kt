@@ -18,7 +18,7 @@ data class FunctionCallExpression(val scope: Scope?, val functionName: String, v
     val handler = FunctionStorage.getFunctionHandlerOrNull(scope, functionName, parent)
     if (handler != null) {
       if (handler is DefinedFunctionHandler && handler.function.flags.contains(FunctionFlag.DICT)) {
-        throw ExException("E725: Calling dict function without Dictionary: ${(if (scope != null) scope.c + ":" else "") + functionName}")
+        throw ExException("E725: Calling dict function without Dictionary: ${(scope?.toString() ?: "") + functionName}")
       }
       return handler.executeFunction(this.arguments, editor, context, parent)
     }
