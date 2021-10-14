@@ -364,6 +364,7 @@ object VimListenerManager {
     override fun mousePressed(event: EditorMouseEvent) {
       if (event.editor.isIdeaVimDisabledHere) return
 
+      skipNDragEvents = skipEvents
       SelectionVimListenerSuppressor.reset()
       SelectionVimListenerSuppressor.lock()
     }
