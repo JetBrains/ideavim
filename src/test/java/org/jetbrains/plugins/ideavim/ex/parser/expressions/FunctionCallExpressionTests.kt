@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.FunctionCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
+import com.maddyhome.idea.vim.vimscript.model.expressions.ScopeExpression
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.ex.evaluate
 import org.junit.Test
@@ -60,6 +61,18 @@ class FunctionCallExpressionTests {
     assertNotNull(ex.arguments)
     assertEquals(2, ex.arguments.size)
     assertEquals(VimInt(0), ex.arguments[0].evaluate())
+    assertEquals(VimString("string"), ex.arguments[1].evaluate())
+  }
+
+  @Test
+  fun `scope as a function call argument`() {
+    val ex = VimscriptParser.parseExpression("f(s:, 'string')")
+    assertTrue(ex is FunctionCallExpression)
+    assertEquals("f", ex.functionName)
+    assertNull(ex.scope)
+    assertNotNull(ex.arguments)
+    assertEquals(2, ex.arguments.size)
+    assertEquals(ScopeExpression(Scope.SCRIPT_VARIABLE), ex.arguments[0])
     assertEquals(VimString("string"), ex.arguments[1].evaluate())
   }
 }

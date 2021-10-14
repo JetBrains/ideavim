@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpre
 import com.maddyhome.idea.vim.vimscript.model.expressions.OptionExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Register
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
+import com.maddyhome.idea.vim.vimscript.model.expressions.ScopeExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.TernaryExpression
@@ -203,7 +204,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   override fun visitFunctionAsMethodCall2(ctx: VimscriptParser.FunctionAsMethodCall2Context): LambdaFunctionCallExpression {
     val lambda = visitLambda(ctx.lambda())
     val arguments = mutableListOf(visit(ctx.expr()))
-    arguments.addAll(ctx.functionArguments().functionArgument().mapNotNull { if (it.expr() != null) visit(it.expr()) else null })
+    arguments.addAll(visitFunctionArgs(ctx.functionArguments()))
     return LambdaFunctionCallExpression(lambda, arguments)
   }
 
@@ -217,14 +218,26 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     if (ctx.functionScope() != null) {
       scope = Scope.getByValue(ctx.functionScope().text)
     }
-    val functionArguments = ctx.functionArguments().functionArgument().mapNotNull { if (it.expr() != null) visit(it.expr()) else null }.toMutableList()
+    val functionArguments = visitFunctionArgs(ctx.functionArguments()).toMutableList()
     return FunctionCallExpression(scope, functionName, functionArguments)
   }
 
   override fun visitLambdaFunctionCallExpression(ctx: VimscriptParser.LambdaFunctionCallExpressionContext): LambdaFunctionCallExpression {
     val lambda = visitLambda(ctx.lambda())
-    val arguments = ctx.functionArguments().functionArgument().mapNotNull { if (it.expr() != null) visit(it.expr()) else null }
+    val arguments = visitFunctionArgs(ctx.functionArguments())
     return LambdaFunctionCallExpression(lambda, arguments)
+  }
+
+  private fun visitFunctionArgs(args: VimscriptParser.FunctionArgumentsContext): List<Expression> {
+    val result = mutableListOf<Expression>()
+    for (arg in args.functionArgument()) {
+      if (arg.anyScope() != null) {
+        result.add(ScopeExpression(Scope.getByValue(arg.anyScope().text)!!))
+      } else if (arg.expr() != null) {
+        result.add(visit(arg.expr()))
+      }
+    }
+    return result
   }
 
   override fun visitLambdaExpression(ctx: VimscriptParser.LambdaExpressionContext?): Expression {
