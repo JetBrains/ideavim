@@ -18,6 +18,8 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.statements
 
+import org.jetbrains.plugins.ideavim.SkipNeovimReason
+import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ForTest : VimTestCase() {
@@ -114,4 +116,100 @@ class ForTest : VimTestCase() {
     )
     assertExOutput("3\n")
   }
+
+  fun `test for with list`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+          let firstElements = '' |
+          let secondElements = '' |
+          for [f, s] in [[1, 'a'], [2, 'b'], [3, 'c']] |
+            let firstElements .= f |
+            let secondElements .= s |
+          endfor |
+          echo firstElements .. ' ' .. secondElements
+        """.trimIndent()
+      )
+    )
+    assertExOutput("123 abc\n")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  fun `test for with list and non-list iterable`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+          let firstElements = '' |
+          let secondElements = '' |
+          for [f, s] in 'abcdef' |
+            let firstElements .= f |
+            let secondElements .= s |
+          endfor |
+        """.trimIndent()
+      )
+    )
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E714: List required")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  fun `test for with list and non-list iterable item`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+          let firstElements = '' |
+          let secondElements = '' |
+          for [f, s] in ['ab', [1, 2]] |
+            let firstElements .= f |
+            let secondElements .= s |
+          endfor |
+        """.trimIndent()
+      )
+    )
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E714: List required")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  fun `test for with list and different length iterable item 1`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+          let firstElements = '' |
+          let secondElements = '' |
+          for [f, s] in [[1]] |
+            let firstElements .= f |
+            let secondElements .= s |
+          endfor |
+        """.trimIndent()
+      )
+    )
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E688: More targets than List items")
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN_ERROR)
+  fun `test for with list and different length iterable item 2`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+          let firstElements = '' |
+          let secondElements = '' |
+          for [f, s] in [[1, 2, 4]] |
+            let firstElements .= f |
+            let secondElements .= s |
+          endfor |
+        """.trimIndent()
+      )
+    )
+    assertPluginError(true)
+    assertPluginErrorMessageContains("E684: Less targets than List items")
+  }
+
+  // todo in 1.9: test for with different default scopes
 }

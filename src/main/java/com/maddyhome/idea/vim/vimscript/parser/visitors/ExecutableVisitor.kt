@@ -2,7 +2,6 @@ package com.maddyhome.idea.vim.vimscript.parser.visitors
 
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
@@ -22,6 +21,7 @@ import com.maddyhome.idea.vim.vimscript.model.statements.TryStatement
 import com.maddyhome.idea.vim.vimscript.model.statements.loops.BreakStatement
 import com.maddyhome.idea.vim.vimscript.model.statements.loops.ContinueStatement
 import com.maddyhome.idea.vim.vimscript.model.statements.loops.ForLoop
+import com.maddyhome.idea.vim.vimscript.model.statements.loops.ForLoopWithList
 import com.maddyhome.idea.vim.vimscript.model.statements.loops.WhileLoop
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptBaseVisitor
 import com.maddyhome.idea.vim.vimscript.parser.generated.VimscriptParser
@@ -51,11 +51,15 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
   }
 
   override fun visitForLoop(ctx: VimscriptParser.ForLoopContext): Executable {
-    if (ctx.argumentsDeclaration() != null) return ForLoop("", SimpleExpression(VimList(mutableListOf())), listOf(), false)
-    val variableName = ctx.variableName().text
     val iterable = ExpressionVisitor.visit(ctx.expr())
     val body = ctx.blockMember().mapNotNull { visitBlockMember(it) }
-    return ForLoop(variableName, iterable, body, true)
+    return if (ctx.argumentsDeclaration() == null) {
+      val variableName = ctx.variableName().text
+      ForLoop(variableName, iterable, body)
+    } else {
+      val variables = ctx.argumentsDeclaration().variableName().map { it.text }
+      ForLoopWithList(variables, iterable, body)
+    }
   }
 
   override fun visitFunctionDefinition(ctx: VimscriptParser.FunctionDefinitionContext): Executable {
