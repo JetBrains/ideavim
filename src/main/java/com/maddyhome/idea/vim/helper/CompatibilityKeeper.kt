@@ -11,8 +11,7 @@ internal fun getCaretVisualAttributes(color: Color?, weight: CaretVisualAttribut
   if (buildGreater212()) {
     val constructor = CaretVisualAttributes::class.java.constructors.find { it.parameterCount == 4 }!!
     return constructor.newInstance(color, weight, getShape(shape), thickness) as CaretVisualAttributes
-  }
-  else {
+  } else {
     val constrcutor = CaretVisualAttributes::class.java.constructors.find { it.parameterCount == 2 }!!
     return constrcutor.newInstance(color, weight) as CaretVisualAttributes
   }
