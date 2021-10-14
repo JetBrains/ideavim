@@ -11,6 +11,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.statements.AnonymousFunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.CatchBlock
 import com.maddyhome.idea.vim.vimscript.model.statements.FinallyBlock
+import com.maddyhome.idea.vim.vimscript.model.statements.FinishStatement
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.model.statements.IfStatement
@@ -33,6 +34,7 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
       ctx.command() != null -> CommandVisitor.visit(ctx.command())
       ctx.breakStatement() != null -> BreakStatement
       ctx.continueStatement() != null -> ContinueStatement
+      ctx.finishStatement() != null -> FinishStatement
       ctx.returnStatement() != null -> ReturnStatement(ExpressionVisitor.visit(ctx.returnStatement().expr()))
       ctx.ifStatement() != null -> visitIfStatement(ctx.ifStatement())
       ctx.forLoop() != null -> visitForLoop(ctx.forLoop())

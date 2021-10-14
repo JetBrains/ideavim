@@ -20,11 +20,12 @@ whileLoop:
     (WS | COLON)* ENDWHILE WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR))
 ;
 blockMember:
-    command | continueStatement | breakStatement | forLoop| whileLoop | ifStatement
+    command | finishStatement | continueStatement | breakStatement | forLoop| whileLoop | ifStatement
 |   returnStatement | throwStatement | functionDefinition | tryStatement | ((WS | COLON)* (NEW_LINE | BAR)) | autoCmd | comment;
 
 comment:                QUOTE ~(NEW_LINE)* NEW_LINE;
 
+finishStatement:        (WS | COLON)* FINISH WS* (NEW_LINE | BAR);
 continueStatement:      (WS | COLON)* CONTINUE WS* (NEW_LINE | BAR);
 breakStatement:         (WS | COLON)* BREAK WS* (NEW_LINE | BAR);
 returnStatement:        (WS | COLON)* range? (WS | COLON)* RETURN WS+ expr WS* (NEW_LINE | BAR);
@@ -551,6 +552,7 @@ ENDFOR:                 'endfo' | 'endfor';
 IN:                     'in';
 BREAK:                  'brea' | 'break';
 CONTINUE:               'con' | 'cont' | 'conti' | 'contin' | 'continu' | 'continue';
+FINISH:                 'fini' | 'finis' | 'finish';
 RETURN:                 'return';
 WHILE:                  'wh' | 'whi' | 'whil' | 'while';
 ENDWHILE:               'endw' | 'endwh' | 'endwhi' | 'endwhil' |'endwhile';

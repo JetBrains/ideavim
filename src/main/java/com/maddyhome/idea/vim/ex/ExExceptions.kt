@@ -41,3 +41,5 @@ class MissingRangeException : ExException()
 class NoArgumentAllowedException : ExException()
 
 class NoRangeAllowedException : ExException()
+
+class FinishException : ExException()

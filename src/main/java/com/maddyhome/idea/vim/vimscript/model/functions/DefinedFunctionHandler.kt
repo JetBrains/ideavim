@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.FinishException
 import com.maddyhome.idea.vim.ex.ranges.LineNumberRange
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.Executable
@@ -119,6 +120,10 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
             is ExecutionResult.Success -> {}
           }
         } catch (e: ExException) {
+          if (e is FinishException) {
+            // todo in 1.9: also throw all caught exceptions
+            throw FinishException()
+          }
           exceptionsCaught.add(e)
           logger.warn("Caught exception during execution of function with [abort] flag. Exception: ${e.message}")
         }

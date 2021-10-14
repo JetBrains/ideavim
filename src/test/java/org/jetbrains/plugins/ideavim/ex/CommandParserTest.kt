@@ -405,4 +405,19 @@ class CommandParserTest : VimTestCase() {
     assertEquals(SimpleExpression(VimInt(6)), (script.units[2] as EchoCommand).args[0])
     assertTrue(IdeavimErrorListener.testLogger.isEmpty())
   }
+
+  fun `test finish statement`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+        let x = 3 |
+        finish |
+        let x = 10
+        """.trimIndent()
+      )
+    )
+    typeText(commandToKeys("echo x"))
+    assertExOutput("3\n")
+  }
 }

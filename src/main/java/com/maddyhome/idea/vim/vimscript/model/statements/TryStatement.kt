@@ -3,6 +3,7 @@ package com.maddyhome.idea.vim.vimscript.model.statements
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.FinishException
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.services.PatternService
@@ -20,6 +21,14 @@ data class TryStatement(val tryBlock: TryBlock, val catchBlocks: List<CatchBlock
         return result
       }
     } catch (e: ExException) {
+      if (e is FinishException) {
+        if (finallyBlock != null) {
+          finallyBlock.parent = this
+          finallyBlock.execute(editor, context)
+        }
+        throw e
+      }
+
       var caught = false
       for (catchBlock in catchBlocks) {
         catchBlock.parent = this

@@ -158,4 +158,24 @@ class TryCatchTest : VimTestCase() {
     assertPluginErrorMessageContains("my exception")
     assertExOutput("finally block\n")
   }
+
+  fun `test finish in try catch`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+        let x = 0 |
+        let y = 0 |
+        try |
+          finish |
+          let x = 1 |
+        finally |
+          let y = 1 |
+        endtry |
+        """.trimIndent()
+      )
+    )
+    typeText(commandToKeys("echo x .. ' ' .. y"))
+    assertExOutput("0 1\n")
+  }
 }

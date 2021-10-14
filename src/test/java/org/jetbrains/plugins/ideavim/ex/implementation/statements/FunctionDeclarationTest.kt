@@ -649,4 +649,24 @@ class FunctionDeclarationTest : VimTestCase() {
 
     typeText(commandToKeys("delfunction! GetOptionalArgs"))
   }
+
+  fun `test finish statement in function`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+        let x = 3 |
+        function! F() |
+          finish |
+          let g:x = 10 |
+        endfunction |
+        """.trimIndent()
+      )
+    )
+    typeText(commandToKeys("call F()"))
+    typeText(commandToKeys("echo x"))
+    assertExOutput("3\n")
+
+    typeText(commandToKeys("delfunction! F"))
+  }
 }

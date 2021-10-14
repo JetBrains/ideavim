@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.textarea.TextComponentEditorImpl
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.FinishException
 import com.maddyhome.idea.vim.group.HistoryGroup
 import com.maddyhome.idea.vim.group.RegisterGroup
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -55,6 +56,9 @@ object Executor {
           }
         }
       } catch (e: ExException) {
+        if (e is FinishException) {
+          break
+        }
         finalResult = ExecutionResult.Error
         if (indicateErrors) {
           VimPlugin.showMessage(e.message)
