@@ -71,8 +71,8 @@ class VimHighlightedYankTest : VimTestCase() {
     typeText(StringHelper.parseKeys("yy"))
 
     assertEquals(
-      VimPlugin.getMessage(),
-      "highlightedyank: Invalid value of g:highlightedyank_highlight_duration -- For input string: \"500.15\""
+      "highlightedyank: Invalid value of g:highlightedyank_highlight_duration -- For input string: \"500.15\"",
+      VimPlugin.getMessage()
     )
   }
 
