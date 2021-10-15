@@ -1,8 +1,6 @@
 package com.maddyhome.idea.vim.vimscript.parser.visitors
 
 import com.maddyhome.idea.vim.vimscript.model.Executable
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
@@ -80,9 +78,9 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
       val functionName = ctx.functionName().text
       FunctionDeclaration(functionScope, functionName, args, defaultArgs, body, replaceExisting, flags.filterNotNull().toSet(), hasOptionalArguments)
     } else {
-      var sublistExpression = OneElementSublistExpression(SimpleExpression(VimString(ctx.literalDictionaryKey(1).text)), Variable(functionScope, ctx.literalDictionaryKey(0).text))
+      var sublistExpression = OneElementSublistExpression(SimpleExpression(ctx.literalDictionaryKey(1).text), Variable(functionScope, ctx.literalDictionaryKey(0).text))
       for (i in 2 until ctx.literalDictionaryKey().size) {
-        sublistExpression = OneElementSublistExpression(SimpleExpression(VimString(ctx.literalDictionaryKey(i).text)), sublistExpression)
+        sublistExpression = OneElementSublistExpression(SimpleExpression(ctx.literalDictionaryKey(i).text), sublistExpression)
       }
       AnonymousFunctionDeclaration(sublistExpression, args, defaultArgs, body, replaceExisting, flags.filterNotNull().toSet(), hasOptionalArguments)
     }
@@ -131,7 +129,7 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
     }
     if (ctx.elseBlock() != null) {
       conditionToBody.add(
-        SimpleExpression(VimInt(1)) to ctx.elseBlock().blockMember()
+        SimpleExpression(1) to ctx.elseBlock().blockMember()
           .mapNotNull { visitBlockMember(it) }
       )
     }

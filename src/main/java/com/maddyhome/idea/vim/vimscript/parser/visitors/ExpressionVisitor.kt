@@ -1,9 +1,7 @@
 package com.maddyhome.idea.vim.vimscript.parser.visitors
 
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.BinExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.CurlyBracesName
 import com.maddyhome.idea.vim.vimscript.model.expressions.DictionaryExpression
@@ -63,7 +61,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   override fun visitLiteralDictionaryExpression(ctx: LiteralDictionaryExpressionContext): Expression {
     val dict: LinkedHashMap<Expression, Expression> = LinkedHashMap()
     for (dictEntry in ctx.literalDictionary().literalDictionaryEntry()) {
-      dict[SimpleExpression(VimString(dictEntry.literalDictionaryKey().text))] = visit(dictEntry.expr())
+      dict[SimpleExpression(dictEntry.literalDictionaryKey().text)] = visit(dictEntry.expr())
     }
     return DictionaryExpression(dict)
   }
@@ -85,7 +83,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
         .substring(1, text.length - 1)
         .replace("''", "'")
     }
-    return SimpleExpression(VimString(text))
+    return SimpleExpression(text)
   }
 
   override fun visitListExpression(ctx: ListExpressionContext): Expression {
@@ -106,14 +104,14 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     val operatorString = ctx.binaryOperator2().text
 
     return if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && matchesLiteralDictionaryKey(ctx.expr(1).text)) {
-      val index = SimpleExpression(VimString(ctx.expr(1).text))
+      val index = SimpleExpression(ctx.expr(1).text)
       OneElementSublistExpression(index, left)
     } else if (operatorString == "-" && left is OneElementSublistExpression && !containsSpaces(ctx) && matchesLiteralDictionaryKey(
         ctx.expr(1).text
       )
     ) {
       val postfix = "-" + ctx.expr(1).text
-      val newIndex = SimpleExpression(VimString((left.index as SimpleExpression).data.asString() + postfix))
+      val newIndex = SimpleExpression((left.index as SimpleExpression).data.asString() + postfix)
       OneElementSublistExpression(newIndex, left.expression)
     } else if (operatorString == "." && !containsSpaces(ctx) && right is FunctionCallExpression && evaluationResultCouldBeADictionary(left)) {
       val index = right.functionName
@@ -174,7 +172,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitFloatExpression(ctx: FloatExpressionContext): Expression {
-    return SimpleExpression(VimFloat(ctx.unsignedFloat().text.toDouble()))
+    return SimpleExpression(ctx.unsignedFloat().text.toDouble())
   }
 
   override fun visitVariableExpression(ctx: VariableExpressionContext): Expression {
@@ -284,7 +282,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitCurlyBracesName(ctx: VimscriptParser.CurlyBracesNameContext): CurlyBracesName {
-    val parts = ctx.element().map { if (it.expr() != null) visit(it.expr()) else SimpleExpression(VimString(it.text)) }
+    val parts = ctx.element().map { if (it.expr() != null) visit(it.expr()) else SimpleExpression(it.text) }
     return CurlyBracesName(parts)
   }
 

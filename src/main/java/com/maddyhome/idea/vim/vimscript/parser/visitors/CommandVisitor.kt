@@ -83,7 +83,6 @@ import com.maddyhome.idea.vim.vimscript.model.commands.YankLinesCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapClearCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.UnMapCommand
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
@@ -163,7 +162,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
   }
 
   override fun visitLet2Command(ctx: VimscriptParser.Let2CommandContext): Command {
-    return LetCommand(Ranges(), SimpleExpression(VimInt(0)), AssignmentOperator.ASSIGNMENT, SimpleExpression(VimInt(0)), false)
+    return LetCommand(Ranges(), SimpleExpression(0), AssignmentOperator.ASSIGNMENT, SimpleExpression(0), false)
   }
 
   override fun visitEchoCommand(ctx: EchoCommandContext): Command {
@@ -275,7 +274,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
 
   override fun visitLetCommand(ctx: VimscriptParser.LetCommandContext): Command {
     return com.maddyhome.idea.vim.vimscript.parser.VimscriptParser.parseLetCommand(ctx.text)
-      ?: LetCommand(Ranges(), SimpleExpression(VimInt(0)), AssignmentOperator.ASSIGNMENT, SimpleExpression(VimInt(0)), false)
+      ?: LetCommand(Ranges(), SimpleExpression(0), AssignmentOperator.ASSIGNMENT, SimpleExpression(0), false)
   }
 
   override fun visitOtherCommand(ctx: OtherCommandContext): UnknownCommand {

@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
@@ -305,10 +304,10 @@ class CommandParserTest : VimTestCase() {
     assertTrue(script.units[0] is LetCommand)
     val let1 = script.units[0] as LetCommand
     assertEquals(Variable(Scope.GLOBAL_VARIABLE, "auto_save"), let1.variable)
-    assertEquals(SimpleExpression(VimInt(2)), let1.expression)
+    assertEquals(SimpleExpression(2), let1.expression)
     val let2 = script.units[1] as LetCommand
     assertEquals(Variable(Scope.GLOBAL_VARIABLE, "y"), let2.variable)
-    assertEquals(SimpleExpression(VimInt(10)), let2.expression)
+    assertEquals(SimpleExpression(10), let2.expression)
   }
 
   fun `test bug with caret return symbol`() {
@@ -398,11 +397,11 @@ class CommandParserTest : VimTestCase() {
     )
     assertEquals(3, script.units.size)
     assertTrue(script.units[0] is EchoCommand)
-    assertEquals(SimpleExpression(VimInt(1)), (script.units[0] as EchoCommand).args[0])
+    assertEquals(SimpleExpression(1), (script.units[0] as EchoCommand).args[0])
     assertTrue(script.units[1] is EchoCommand)
-    assertEquals(SimpleExpression(VimInt(3)), (script.units[1] as EchoCommand).args[0])
+    assertEquals(SimpleExpression(3), (script.units[1] as EchoCommand).args[0])
     assertTrue(script.units[2] is EchoCommand)
-    assertEquals(SimpleExpression(VimInt(6)), (script.units[2] as EchoCommand).args[0])
+    assertEquals(SimpleExpression(6), (script.units[2] as EchoCommand).args[0])
     assertTrue(IdeavimErrorListener.testLogger.isEmpty())
   }
 

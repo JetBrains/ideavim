@@ -30,7 +30,6 @@ import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.commands.Command
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand.SpecialArgument.EXPR
 import com.maddyhome.idea.vim.vimscript.model.commands.mapping.MapCommand.SpecialArgument.SCRIPT
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
@@ -169,7 +168,7 @@ data class MapCommand(val ranges: Ranges, val argument: String, val cmd: String)
       val toExpr = if (specialArguments.contains(EXPR)) {
         VimscriptParser.parseExpression(toKeysBuilder.toString().trim()) ?: throw ExException("E15: Invalid expression: ${toKeysBuilder.toString().trim()}")
       } else {
-        SimpleExpression(VimString(toKeysBuilder.toString().trimStart()))
+        SimpleExpression(toKeysBuilder.toString().trimStart())
       }
       CommandArguments(specialArguments, it, toExpr, toKeysBuilder.toString().trimStart())
     }

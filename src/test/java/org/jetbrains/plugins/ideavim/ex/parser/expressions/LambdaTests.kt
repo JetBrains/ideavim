@@ -18,7 +18,6 @@
 
 package org.jetbrains.plugins.ideavim.ex.parser.expressions
 
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.BinExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.LambdaFunctionCallExpression
@@ -44,7 +43,7 @@ class LambdaTests {
   fun `lambda with no args test`(sp1: String, sp2: String, sp3: String) {
     val lambdaExpression = VimscriptParser.parseExpression("{$sp1->$sp2'error'$sp3}") as LambdaExpression
     assertEquals(0, lambdaExpression.args.size)
-    assertEquals(SimpleExpression(VimString("error")), lambdaExpression.expr)
+    assertEquals(SimpleExpression("error"), lambdaExpression.expr)
   }
 
   @Theory
@@ -59,7 +58,7 @@ class LambdaTests {
     val functionCall = VimscriptParser.parseExpression("{->'error'}()") as LambdaFunctionCallExpression
     assertEquals(0, functionCall.arguments.size)
     assertEquals(0, functionCall.lambda.args.size)
-    assertEquals(SimpleExpression(VimString("error")), functionCall.lambda.expr)
+    assertEquals(SimpleExpression("error"), functionCall.lambda.expr)
   }
 
   @Theory
@@ -68,6 +67,6 @@ class LambdaTests {
     assertEquals(2, functionCall.arguments.size)
     assertEquals(listOf(Variable(null, "a"), Variable(null, "b")), functionCall.arguments)
     assertEquals(0, functionCall.lambda.args.size)
-    assertEquals(SimpleExpression(VimString("error")), functionCall.lambda.expr)
+    assertEquals(SimpleExpression("error"), functionCall.lambda.expr)
   }
 }

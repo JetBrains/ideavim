@@ -18,8 +18,6 @@
 
 package org.jetbrains.plugins.ideavim.ex.parser.expressions
 
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.TernaryExpression
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
@@ -42,8 +40,8 @@ class TernaryExpressionTests {
   fun `simple expression`(sp1: String, sp2: String, sp3: String, sp4: String, sp5: String, sp6: String, sp7: String, sp8: String) {
     val expression = VimscriptParser.parseExpression("1$sp1?$sp2'2'$sp3:3")
     assertTrue(expression is TernaryExpression)
-    assertEquals(SimpleExpression(VimInt(1)), expression.condition)
-    assertEquals(SimpleExpression(VimString("2")), expression.then)
-    assertEquals(SimpleExpression(VimInt(3)), expression.otherwise)
+    assertEquals(SimpleExpression(1), expression.condition)
+    assertEquals(SimpleExpression("2"), expression.then)
+    assertEquals(SimpleExpression(3), expression.otherwise)
   }
 }

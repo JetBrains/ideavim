@@ -39,7 +39,7 @@ class CommandTests {
     val c = VimscriptParser.parseCommand("let g:catSound='Meow'")
     assertTrue(c is LetCommand)
     assertEquals(Variable(Scope.GLOBAL_VARIABLE, "catSound"), c.variable)
-    assertEquals(SimpleExpression(VimString("Meow")), c.expression)
+    assertEquals(SimpleExpression("Meow"), c.expression)
   }
 
   @Test

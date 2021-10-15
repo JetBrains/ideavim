@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 
@@ -47,7 +46,7 @@ data class OneElementSublistExpression(val index: Expression, val expression: Ex
       if (indexValue < 0) {
         return VimString("")
       }
-      return SublistExpression(SimpleExpression(VimInt(indexValue)), SimpleExpression(VimInt(indexValue)), SimpleExpression(expressionValue)).evaluate(editor, context, parent)
+      return SublistExpression(SimpleExpression(indexValue), SimpleExpression(indexValue), SimpleExpression(expressionValue)).evaluate(editor, context, parent)
     }
   }
 }

@@ -6,7 +6,6 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
@@ -15,7 +14,7 @@ import com.maddyhome.idea.vim.vimscript.services.VariableService
 data class FunctionCallExpression(val scope: Scope?, val functionName: CurlyBracesName, val arguments: MutableList<Expression>) :
   Expression() {
   constructor(scope: Scope?, functionName: String, arguments: MutableList<Expression>) :
-    this(scope, CurlyBracesName(listOf(SimpleExpression(VimString(functionName)))), arguments)
+    this(scope, CurlyBracesName(listOf(SimpleExpression(functionName))), arguments)
 
   override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
     val handler = FunctionStorage.getFunctionHandlerOrNull(scope, functionName.evaluate(editor, context, parent).value, parent)
