@@ -65,7 +65,7 @@ object VimExtensionRegistrar {
 
     registeredExtensions.add(name)
     registerAliases(extensionBean)
-    val option = ToggleOption(name, name, false)
+    val option = ToggleOption(name, getAbbrev(name), false)
     option.addOptionChangeListener { _, _ ->
       if (isSet(name)) {
         initExtension(extensionBean, name)
@@ -74,6 +74,10 @@ object VimExtensionRegistrar {
       }
     }
     addOption(option)
+  }
+
+  private fun getAbbrev(name: String): String {
+    return if (name == "NERDTree") "nerdtree" else name
   }
 
   private fun initExtension(extensionBean: ExtensionBeanClass, name: String) {
