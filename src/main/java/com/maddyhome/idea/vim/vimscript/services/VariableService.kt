@@ -52,76 +52,61 @@ object VariableService {
     }
   }
 
-  fun storeVariable(variable: Variable, value: VimDataType, editor: Editor?, context: DataContext?, parent: Executable) {
+  fun storeVariable(variable: Variable, value: VimDataType, editor: Editor, context: DataContext, parent: Executable) {
     val scope = variable.scope ?: getDefaultVariableScope(parent)
     when (scope) {
       Scope.GLOBAL_VARIABLE -> {
-        storeGlobalVariable(variable.name, value)
+        storeGlobalVariable(variable.name.evaluate(editor, context, parent).value, value)
         val scopeForGlobalEnvironment = variable.scope?.toString() ?: ""
-        VimScriptGlobalEnvironment.getInstance().variables[scopeForGlobalEnvironment + variable.name] = value.simplify()
+        VimScriptGlobalEnvironment.getInstance()
+          .variables[scopeForGlobalEnvironment + variable.name.evaluate(editor, context, parent)] = value.simplify()
       }
-      Scope.SCRIPT_VARIABLE -> storeScriptVariable(variable.name, value, parent)
-      Scope.WINDOW_VARIABLE, Scope.TABPAGE_VARIABLE -> {
-        if (editor != null) {
-          val variableKey = scope.c + ":" + variable.name
-          if (editor.getUserData(tabAndWindowVariablesKey) == null) {
-            editor.putUserData(tabAndWindowVariablesKey, mutableMapOf(variableKey to value))
-          } else {
-            editor.getUserData(tabAndWindowVariablesKey)!![variableKey] = value
-          }
-        } else {
-          // todo nullable editor exception or something
-        }
-      }
-      Scope.FUNCTION_VARIABLE -> storeFunctionVariable(variable.name, value, parent)
-      Scope.LOCAL_VARIABLE -> storeLocalVariable(variable.name, value, parent)
-      Scope.BUFFER_VARIABLE -> {
-        if (editor != null) {
-          if (editor.document.getUserData(bufferVariablesKey) == null) {
-            editor.document.putUserData(bufferVariablesKey, mutableMapOf(variable.name to value))
-          } else {
-            editor.document.getUserData(bufferVariablesKey)!![variable.name] = value
-          }
-        } else {
-          // todo nullable editor exception or something
-        }
-      }
-      Scope.VIM_VARIABLE -> throw ExException("The 'v:' scope is not implemented yet :(")
-    }
-  }
-
-  fun getNullableVariableValue(variable: Variable, editor: Editor?, context: DataContext?, parent: Executable): VimDataType? {
-    val scope = variable.scope ?: getDefaultVariableScope(parent)
-    return when (scope) {
-      Scope.GLOBAL_VARIABLE -> getGlobalVariable(variable.name)
-      Scope.SCRIPT_VARIABLE -> getScriptVariable(variable.name, parent)
+      Scope.SCRIPT_VARIABLE -> storeScriptVariable(variable.name.evaluate(editor, context, parent).value, value, parent)
       Scope.WINDOW_VARIABLE, Scope.TABPAGE_VARIABLE -> {
         val variableKey = scope.c + ":" + variable.name
-        if (editor != null) {
-          editor.getUserData(tabAndWindowVariablesKey)?.get(variableKey)
+        if (editor.getUserData(tabAndWindowVariablesKey) == null) {
+          editor.putUserData(tabAndWindowVariablesKey, mutableMapOf(variableKey to value))
         } else {
-          TODO()
+          editor.getUserData(tabAndWindowVariablesKey)!![variableKey] = value
         }
       }
-      Scope.FUNCTION_VARIABLE -> getFunctionVariable(variable.name, parent)
-      Scope.LOCAL_VARIABLE -> getLocalVariable(variable.name, parent)
+      Scope.FUNCTION_VARIABLE -> storeFunctionVariable(variable.name.evaluate(editor, context, parent).value, value, parent)
+      Scope.LOCAL_VARIABLE -> storeLocalVariable(variable.name.evaluate(editor, context, parent).value, value, parent)
       Scope.BUFFER_VARIABLE -> {
-        if (editor != null) {
-          editor.document.getUserData(bufferVariablesKey)?.get(variable.name)
+        if (editor.document.getUserData(bufferVariablesKey) == null) {
+          editor.document.putUserData(bufferVariablesKey, mutableMapOf(variable.name.evaluate(editor, context, parent).value to value))
         } else {
-          TODO()
+          editor.document.getUserData(bufferVariablesKey)!![variable.name.evaluate(editor, context, parent).value] = value
         }
       }
       Scope.VIM_VARIABLE -> throw ExException("The 'v:' scope is not implemented yet :(")
     }
   }
 
-  fun getNonNullVariableValue(variable: Variable, editor: Editor?, context: DataContext?, parent: Executable): VimDataType {
+  fun getNullableVariableValue(variable: Variable, editor: Editor, context: DataContext, parent: Executable): VimDataType? {
+    val scope = variable.scope ?: getDefaultVariableScope(parent)
+    return when (scope) {
+      Scope.GLOBAL_VARIABLE -> getGlobalVariable(variable.name.evaluate(editor, context, parent).value)
+      Scope.SCRIPT_VARIABLE -> getScriptVariable(variable.name.evaluate(editor, context, parent).value, parent)
+      Scope.WINDOW_VARIABLE, Scope.TABPAGE_VARIABLE -> {
+        val variableKey = scope.c + ":" + variable.name
+        editor.getUserData(tabAndWindowVariablesKey)?.get(variableKey)
+      }
+      Scope.FUNCTION_VARIABLE -> getFunctionVariable(variable.name.evaluate(editor, context, parent).value, parent)
+      Scope.LOCAL_VARIABLE -> getLocalVariable(variable.name.evaluate(editor, context, parent).value, parent)
+      Scope.BUFFER_VARIABLE -> {
+        editor.document.getUserData(bufferVariablesKey)?.get(variable.name.evaluate(editor, context, parent).value)
+      }
+      Scope.VIM_VARIABLE -> throw ExException("The 'v:' scope is not implemented yet :(")
+    }
+  }
+
+  fun getNonNullVariableValue(variable: Variable, editor: Editor, context: DataContext, parent: Executable): VimDataType {
     return getNullableVariableValue(variable, editor, context, parent)
       ?: throw ExException(
         "E121: Undefined variable: " +
           (if (variable.scope != null) variable.scope.c + ":" else "") +
-          variable.name
+          variable.name.evaluate(editor, context, parent).value
       )
   }
 

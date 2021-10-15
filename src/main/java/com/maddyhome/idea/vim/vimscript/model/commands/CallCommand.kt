@@ -42,11 +42,16 @@ class CallCommand(val ranges: Ranges, val functionCall: Expression) : Command.Si
 
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     if (functionCall is FunctionCallExpression) {
-      val function = FunctionStorage.getFunctionHandlerOrNull(functionCall.scope, functionCall.functionName, parent)
+      val function = FunctionStorage.getFunctionHandlerOrNull(
+        functionCall.scope,
+        functionCall.functionName.evaluate(editor, context, parent).value,
+        parent
+      )
       if (function != null) {
         if (function is DefinedFunctionHandler && function.function.flags.contains(FunctionFlag.DICT)) {
           throw ExException(
-            "E725: Calling dict function without Dictionary: " + (functionCall.scope?.toString() ?: "") + functionCall.functionName
+            "E725: Calling dict function without Dictionary: " +
+              (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, parent)
           )
         }
         function.ranges = ranges
@@ -54,7 +59,7 @@ class CallCommand(val ranges: Ranges, val functionCall: Expression) : Command.Si
         return ExecutionResult.Success
       }
 
-      val name = (functionCall.scope?.toString() ?: "") + functionCall.functionName
+      val name = (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, parent)
       val funcref = VariableService.getNullableVariableValue(Variable(functionCall.scope, functionCall.functionName), editor, context, parent)
       if (funcref is VimFuncref) {
         funcref.handler.ranges = ranges

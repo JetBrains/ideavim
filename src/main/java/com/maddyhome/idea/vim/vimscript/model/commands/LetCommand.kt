@@ -52,8 +52,8 @@ data class LetCommand(
     if (!isSyntaxSupported) return ExecutionResult.Error
     when (variable) {
       is Variable -> {
-        if (isReadOnlyVariable(variable)) {
-          throw ExException("E46: Cannot change read-only variable \"$variable\"")
+        if (isReadOnlyVariable(variable, editor, context)) {
+          throw ExException("E46: Cannot change read-only variable \"${variable.toString(editor, context, parent)}\"")
         }
         VariableService.storeVariable(
           variable, operator.getNewValue(variable, expression, editor, context, this),
@@ -200,9 +200,9 @@ data class LetCommand(
     return ExecutionResult.Success
   }
 
-  private fun isReadOnlyVariable(variable: Variable): Boolean {
+  private fun isReadOnlyVariable(variable: Variable, editor: Editor, context: DataContext): Boolean {
     if (variable.scope == Scope.FUNCTION_VARIABLE) return true
-    if (variable.scope == null && variable.name == "self" && isInsideDictionaryFunction()) return true
+    if (variable.scope == null && variable.name.evaluate(editor, context, parent).value == "self" && isInsideDictionaryFunction()) return true
     return false
   }
 

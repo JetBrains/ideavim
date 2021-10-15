@@ -252,8 +252,11 @@ register:               AT (DIGIT | lowercaseAlphabeticChar | uppercaseAlphabeti
 lambda:                 L_CURLY WS* argumentsDeclaration WS* ARROW WS* expr WS* R_CURLY;
 
 variable:               (variableScope COLON)? variableName;
-variableName:           anyCaseNameWithDigitsAndUnderscores | unsignedInt;
+variableName:           curlyBracesName;
 variableScope:          anyScope;
+
+curlyBracesName:        element+;
+element:                anyCaseNameWithDigitsAndUnderscores | unsignedInt | L_CURLY WS* expr WS* R_CURLY;
 
 option:                 AMPERSAND (optionScope COLON)? optionName;
 optionName:             anyCaseNameWithDigitsAndUnderscores;
@@ -263,7 +266,7 @@ envVariable:            DOLLAR envVariableName;
 envVariableName:        anyCaseNameWithDigitsAndUnderscores;
 
 functionCall:           (functionScope COLON)? (anyCaseNameWithDigitsAndUnderscores NUM)* functionName WS* L_PAREN WS* functionArguments WS* R_PAREN;
-functionName:           anyCaseNameWithDigitsAndUnderscores;
+functionName:           curlyBracesName;
 functionScope:          anyScope;
 functionArguments:      (functionArgument WS* (COMMA WS* functionArgument WS*)*)?;
 functionArgument:       expr | (anyScope COLON);

@@ -64,7 +64,7 @@ class SublistExpressionTests {
     val ex = VimscriptParser.parseExpression("var[$sp1:${sp2}32$sp3]")
     assertTrue(ex is SublistExpression)
     assertTrue(ex.expression is Variable)
-    assertEquals("var", (ex.expression as Variable).name)
+    assertEquals("var", (ex.expression as Variable).name.evaluate().asString())
     assertNull(ex.from)
     assertEquals(VimInt(32), ex.to!!.evaluate())
   }

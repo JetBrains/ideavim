@@ -5,6 +5,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.BinExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.CurlyBracesName
 import com.maddyhome.idea.vim.vimscript.model.expressions.DictionaryExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
@@ -115,7 +116,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
       val newIndex = SimpleExpression(VimString((left.index as SimpleExpression).data.asString() + postfix))
       OneElementSublistExpression(newIndex, left.expression)
     } else if (operatorString == "." && !containsSpaces(ctx) && right is FunctionCallExpression && evaluationResultCouldBeADictionary(left)) {
-      val index = SimpleExpression(VimString(right.functionName))
+      val index = right.functionName
       FuncrefCallExpression(OneElementSublistExpression(index, left), right.arguments)
     } else {
       val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
@@ -213,7 +214,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitFunctionCall(ctx: VimscriptParser.FunctionCallContext): FunctionCallExpression {
-    val functionName = ctx.functionName().text
+    val functionName = visitCurlyBracesName(ctx.functionName().curlyBracesName())
     var scope: Scope? = null
     if (ctx.functionScope() != null) {
       scope = Scope.getByValue(ctx.functionScope().text)
@@ -271,15 +272,20 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     return Register(ctx.text.replaceFirst("@", "")[0])
   }
 
-  override fun visitVariable(ctx: VariableContext): Expression {
+  override fun visitVariable(ctx: VariableContext): Variable {
     val scope = if (ctx.variableScope() == null) null else Scope.getByValue(ctx.variableScope().text)
-    return Variable(scope, ctx.variableName().text)
+    return Variable(scope, visitCurlyBracesName(ctx.variableName().curlyBracesName()))
   }
 
   override fun visitFalsyExpression(ctx: FalsyExpressionContext): Expression {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     return FalsyExpression(left, right)
+  }
+
+  override fun visitCurlyBracesName(ctx: VimscriptParser.CurlyBracesNameContext): CurlyBracesName {
+    val parts = ctx.element().map { if (it.expr() != null) visit(it.expr()) else SimpleExpression(VimString(it.text)) }
+    return CurlyBracesName(parts)
   }
 
   override fun visitBlobExpression(ctx: BlobExpressionContext?): Expression {

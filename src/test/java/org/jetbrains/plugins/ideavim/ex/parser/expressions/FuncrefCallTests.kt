@@ -21,6 +21,7 @@ package org.jetbrains.plugins.ideavim.ex.parser.expressions
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.BinExpression
+import com.maddyhome.idea.vim.vimscript.model.expressions.CurlyBracesName
 import com.maddyhome.idea.vim.vimscript.model.expressions.FuncrefCallExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
@@ -38,7 +39,7 @@ class FuncrefCallTests {
     val funcrefCall = VimscriptParser.parseExpression("dict.len()")
     assertTrue(funcrefCall is FuncrefCallExpression)
     assertEquals(
-      OneElementSublistExpression(SimpleExpression(VimString("len")), Variable(null, "dict")),
+      OneElementSublistExpression(CurlyBracesName(listOf(SimpleExpression(VimString("len")))), Variable(null, "dict")),
       funcrefCall.expression
     )
     assertEquals(0, funcrefCall.args.size)
@@ -49,7 +50,10 @@ class FuncrefCallTests {
     val funcrefCall = VimscriptParser.parseExpression("dict.innerDict.len()")
     assertTrue(funcrefCall is FuncrefCallExpression)
     assertEquals(
-      OneElementSublistExpression(SimpleExpression(VimString("len")), OneElementSublistExpression(SimpleExpression(VimString("innerDict")), Variable(null, "dict"))),
+      OneElementSublistExpression(
+        CurlyBracesName(listOf(SimpleExpression(VimString("len")))),
+        OneElementSublistExpression(SimpleExpression(VimString("innerDict")), Variable(null, "dict"))
+      ),
       funcrefCall.expression
     )
     assertEquals(0, funcrefCall.args.size)
@@ -60,7 +64,7 @@ class FuncrefCallTests {
     val funcrefCall = VimscriptParser.parseExpression("dict.len(a, 5 + 10)")
     assertTrue(funcrefCall is FuncrefCallExpression)
     assertEquals(
-      OneElementSublistExpression(SimpleExpression(VimString("len")), Variable(null, "dict")),
+      OneElementSublistExpression(CurlyBracesName(listOf(SimpleExpression(VimString("len")))), Variable(null, "dict")),
       funcrefCall.expression
     )
     assertEquals(2, funcrefCall.args.size)
