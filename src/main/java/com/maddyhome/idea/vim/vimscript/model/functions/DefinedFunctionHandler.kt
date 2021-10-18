@@ -137,7 +137,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
     for ((index, name) in function.args.withIndex()) {
       VariableService.storeVariable(
         Variable(Scope.FUNCTION_VARIABLE, name),
-        argumentValues[index].evaluate(editor, context, function),
+        argumentValues[index].evaluate(editor, context, function.parent),
         editor,
         context,
         function
@@ -148,7 +148,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
       val expressionToStore = if (index + function.args.size < argumentValues.size) argumentValues[index + function.args.size] else function.defaultArgs[index].second
       VariableService.storeVariable(
         Variable(Scope.FUNCTION_VARIABLE, function.defaultArgs[index].first),
-        expressionToStore.evaluate(editor, context, function),
+        expressionToStore.evaluate(editor, context, function.parent),
         editor,
         context,
         function
@@ -159,7 +159,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
       val remainingArgs = if (function.args.size + function.defaultArgs.size < argumentValues.size) {
         VimList(
           argumentValues.subList(function.args.size + function.defaultArgs.size, argumentValues.size)
-            .map { it.evaluate(editor, context, function) }.toMutableList()
+            .map { it.evaluate(editor, context, function.parent) }.toMutableList()
         )
       } else {
         VimList(mutableListOf())

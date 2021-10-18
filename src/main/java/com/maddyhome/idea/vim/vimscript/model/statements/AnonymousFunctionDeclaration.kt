@@ -58,7 +58,9 @@ data class AnonymousFunctionDeclaration(
       }
     }
     val declaration = FunctionDeclaration(null, VimFuncref.anonymousCounter++.toString(), args, defaultArgs, body, replaceExisting, flags + FunctionFlag.DICT, hasOptionalArguments)
+    declaration.parent = this.parent
     container.dictionary[index] = VimFuncref(DefinedFunctionHandler(declaration), VimList(mutableListOf()), container, VimFuncref.Type.FUNCREF)
+    container.dictionary[index]
     return ExecutionResult.Success
   }
 }
