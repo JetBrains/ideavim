@@ -538,15 +538,13 @@ public class ExTextField extends JTextField {
       }
     }
 
-    // [VERSION UPDATE] 203+ Use modelToView2D, which will return a float rect which positions the caret better
-    // Java 9+
     private @Nullable Rectangle2D modelToView(int dot) {
       if (dot > getComponent().getDocument().getLength()) {
         return null;
       }
 
       try {
-        return getComponent().getUI().modelToView(getComponent(), dot, getDotBias());
+        return getComponent().getUI().modelToView2D(getComponent(), dot, getDotBias());
       }
       catch (BadLocationException e) {
         return null;
@@ -560,11 +558,7 @@ public class ExTextField extends JTextField {
       double width;
       final Rectangle2D r = modelToView(getDot() + 1);
       if (r != null) {
-        // [VERSION UPDATE] 203+ Remove this +1. It's a fudge factor because we're working with integers
-        // When we use modelToView2D to get accurate measurements this won't be required. E.g. width can be 8.4, with a
-        // starting x of 8.4, which would put the right hand edge at 16.8. Because everything is rounded down, we get 16
-        // So we add one
-        width = r.getX() - dotX + 1;
+        width = r.getX() - dotX;
       }
       else {
         char c = ' ';
