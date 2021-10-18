@@ -22,4 +22,8 @@ data class VimFloat(val value: Double) : VimDataType() {
     val bigDecimal = BigDecimal(value).setScale(6, RoundingMode.HALF_UP)
     return bigDecimal.toDouble().toString()
   }
+
+  override fun deepCopy(level: Int): VimFloat {
+    return copy()
+  }
 }

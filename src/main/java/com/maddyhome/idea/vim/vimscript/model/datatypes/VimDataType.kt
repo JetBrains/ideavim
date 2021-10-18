@@ -17,4 +17,6 @@ sealed class VimDataType {
   open fun asBoolean(): Boolean {
     return asDouble() != 0.0
   }
+
+  abstract fun deepCopy(level: Int = 100): VimDataType
 }

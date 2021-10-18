@@ -61,4 +61,8 @@ data class VimString(val value: String) : VimDataType() {
   override fun toString(): String {
     return value
   }
+
+  override fun deepCopy(level: Int): VimString {
+    return copy()
+  }
 }

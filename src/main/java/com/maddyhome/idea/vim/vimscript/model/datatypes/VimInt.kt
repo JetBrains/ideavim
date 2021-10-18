@@ -18,6 +18,10 @@ data class VimInt(val value: Int) : VimDataType() {
     return value.toString()
   }
 
+  override fun deepCopy(level: Int): VimInt {
+    return copy()
+  }
+
   operator fun compareTo(b: Int): Int = this.value.compareTo(b)
 
   companion object {

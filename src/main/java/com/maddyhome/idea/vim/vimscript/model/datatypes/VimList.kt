@@ -28,4 +28,12 @@ data class VimList(val values: MutableList<VimDataType>) : VimDataType() {
   override fun asBoolean(): Boolean {
     throw ExException("E745: Using a List as a Number")
   }
+
+  override fun deepCopy(level: Int): VimDataType {
+    return if (level > 0) {
+      VimList(values.map { it.deepCopy(level - 1) }.toMutableList())
+    } else {
+      this
+    }
+  }
 }

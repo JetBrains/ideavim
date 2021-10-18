@@ -37,7 +37,7 @@ data class VimFuncref(
   val arguments: VimList,
   var dictionary: VimDictionary?,
   val type: Type,
-) : VimDataType(), Cloneable {
+) : VimDataType() {
 
   var isSelfFixed = false
 
@@ -104,8 +104,8 @@ data class VimFuncref(
       return handler.executeFunction(allArguments, editor, context, parent)
     }
 
-    override fun clone(): Any {
-      return VimFuncref(handler, arguments, dictionary, type)
+    override fun deepCopy(level: Int): VimFuncref {
+      return copy()
     }
 
     enum class Type {
