@@ -26,7 +26,6 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.common.TextRange
 import java.util.*
@@ -119,7 +118,7 @@ private var editorClientKey: Key<*>? = null
 @Suppress("IncorrectParentDisposable")
 fun Editor.isTemplateActive(): Boolean {
   val project = this.project ?: return false
-  if (Disposer.isDisposed(project)) return false
+  if (project.isDisposed) return false
   return TemplateManager.getInstance(project).getActiveTemplate(this) != null
 }
 
