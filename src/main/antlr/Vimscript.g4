@@ -9,7 +9,7 @@ script:
     blockMember* EOF;
 
 forLoop:
-    (WS | COLON)* FOR WS+ (variableName | (L_BRACKET argumentsDeclaration R_BRACKET)) WS+ IN WS* expr WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
+    (WS | COLON)* FOR WS+ ((variableScope COLON)? variableName | (L_BRACKET argumentsDeclaration R_BRACKET)) WS+ IN WS* expr WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
         blockMember*
     (WS | COLON)* ENDFOR WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
 ;

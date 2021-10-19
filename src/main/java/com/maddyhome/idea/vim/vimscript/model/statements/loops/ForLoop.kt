@@ -14,7 +14,7 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 
 // todo refactor us senpai :(
-data class ForLoop(val variable: String, val iterable: Expression, val body: List<Executable>) : Executable {
+data class ForLoop(val variable: Variable, val iterable: Expression, val body: List<Executable>) : Executable {
   override lateinit var parent: Executable
 
   override fun execute(editor: Editor, context: DataContext): ExecutionResult {
@@ -24,7 +24,7 @@ data class ForLoop(val variable: String, val iterable: Expression, val body: Lis
     var iterableValue = iterable.evaluate(editor, context, this)
     if (iterableValue is VimString) {
       for (i in iterableValue.value) {
-        VariableService.storeVariable(Variable(null, variable), VimString(i.toString()), editor, context, this)
+        VariableService.storeVariable(variable, VimString(i.toString()), editor, context, this)
         for (statement in body) {
           if (result is ExecutionResult.Success) {
             result = statement.execute(editor, context)
@@ -43,7 +43,7 @@ data class ForLoop(val variable: String, val iterable: Expression, val body: Lis
     } else if (iterableValue is VimList) {
       var index = 0
       while (index < (iterableValue as VimList).values.size) {
-        VariableService.storeVariable(Variable(null, variable), iterableValue.values[index], editor, context, this)
+        VariableService.storeVariable(variable, iterableValue.values[index], editor, context, this)
         for (statement in body) {
           if (result is ExecutionResult.Success) {
             result = statement.execute(editor, context)

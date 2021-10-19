@@ -54,8 +54,8 @@ object ExecutableVisitor : VimscriptBaseVisitor<Executable>() {
     val iterable = ExpressionVisitor.visit(ctx.expr())
     val body = ctx.blockMember().mapNotNull { visitBlockMember(it) }
     return if (ctx.argumentsDeclaration() == null) {
-      val variableName = ctx.variableName().text
-      ForLoop(variableName, iterable, body)
+      val variable = Variable(Scope.getByValue(ctx.variableScope()?.text ?: ""), ctx.variableName().text)
+      ForLoop(variable, iterable, body)
     } else {
       val variables = ctx.argumentsDeclaration().variableName().map { it.text }
       ForLoopWithList(variables, iterable, body)
