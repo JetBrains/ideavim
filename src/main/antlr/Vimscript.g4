@@ -23,7 +23,7 @@ blockMember:
     command | finishStatement | continueStatement | breakStatement | forLoop| whileLoop | ifStatement
 |   returnStatement | throwStatement | functionDefinition | tryStatement | ((WS | COLON)* (NEW_LINE | BAR)) | autoCmd | comment;
 
-comment:                QUOTE ~(NEW_LINE)* NEW_LINE;
+comment:                (WS | COLON)* QUOTE ~(NEW_LINE)* NEW_LINE;
 
 finishStatement:        (WS | COLON)* FINISH WS* (NEW_LINE | BAR);
 continueStatement:      (WS | COLON)* CONTINUE WS* (NEW_LINE | BAR);
@@ -785,7 +785,6 @@ INLINE_SEPARATOR:       '\n' (' ' | '\t')* BACKSLASH -> skip;
 LUA_CODE:               'lua' WS* '<<' WS* 'EOF' .*? 'EOF' -> skip;
 LUA_CODE2:              'lua' WS* '<<' WS* 'END' .*? 'END' -> skip;
 IDEAVIM_IGNORE:         ('ideavim' | 'ideaVim' | 'IdeaVim') WS 'ignore' .*? ('ideavim' | 'ideaVim' | 'IdeaVim') WS 'ignore end' -> skip;
-COMMENT:                '\n' WS* QUOTE ~('\n' | '\r')* -> skip;
 AUGROUP_SKIP:           WS* AUGROUP .*? AUGROUP WS+ END -> skip;
 
 // All the other symbols
