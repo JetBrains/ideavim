@@ -61,4 +61,9 @@ class OperatorPrecedenceTest {
   fun `sublist operator`() {
     assertEquals(VimString("ab"), VimscriptParser.parseExpression("'a' . 'bc'[0]")!!.evaluate())
   }
+
+  @Test
+  fun `not with sublist`() {
+    assertEquals(VimInt(0), VimscriptParser.parseExpression("!{'a': 1}['a']")!!.evaluate())
+  }
 }

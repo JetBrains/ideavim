@@ -194,8 +194,9 @@ commandName:
 //  Expressions related rules
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-expr:                   WS* EXCLAMATION WS* expr                                                                        #UnaryExpression
-                    |   expr L_BRACKET expr R_BRACKET                                                                   #OneElementSublistExpression
+expr:
+                        expr L_BRACKET expr R_BRACKET                                                                   #OneElementSublistExpression
+                    |   WS* EXCLAMATION WS* expr                                                                        #UnaryExpression
                     |   expr L_BRACKET WS* from = expr? WS* COLON WS* to = expr? WS* R_BRACKET                          #SublistExpression
                     |   expr WS* binaryOperator1 WS* expr                                                               #BinExpression1
                     |   expr WS* binaryOperator2 WS* expr                                                               #BinExpression2
