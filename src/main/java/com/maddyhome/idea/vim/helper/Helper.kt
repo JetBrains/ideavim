@@ -118,7 +118,8 @@ private var editorClientKey: Key<*>? = null
 @Suppress("IncorrectParentDisposable")
 fun Editor.isTemplateActive(): Boolean {
   val project = this.project ?: return false
-  if (project.isDisposed) return false
+  // XXX: I've disabled this check to find the stack trace where the project is disposed
+//  if (project.isDisposed) return false
   return TemplateManager.getInstance(project).getActiveTemplate(this) != null
 }
 
