@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.OneElementSublistExpre
 import com.maddyhome.idea.vim.vimscript.model.expressions.OptionExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Register
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
-import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOperator
@@ -55,51 +54,44 @@ data class LetCommand(
         if (isReadOnlyVariable(variable, editor, context)) {
           throw ExException("E46: Cannot change read-only variable \"${variable.toString(editor, context, parent)}\"")
         }
-        VariableService.storeVariable(
-          variable, operator.getNewValue(variable, expression, editor, context, this),
-          editor, context, this
-        )
+        val leftValue = VariableService.getNullableVariableValue(variable, editor, context, parent)
+        val rightValue = expression.evaluate(editor, context, parent)
+        VariableService.storeVariable(variable, operator.getNewValue(leftValue, rightValue), editor, context, this)
       }
 
       is OneElementSublistExpression -> {
-        if (variable.expression is Variable) {
-          val variableValue = VariableService.getNonNullVariableValue(variable.expression, editor, context, this)
-          when (variableValue) {
-            is VimDictionary -> {
-              val dictKey = VimString(variable.index.evaluate(editor, context, this).asString())
-              if (operator != AssignmentOperator.ASSIGNMENT && !variableValue.dictionary.containsKey(dictKey)) {
-                throw ExException("E716: Key not present in Dictionary: $dictKey")
-              }
-              var valueToStore = if (variableValue.dictionary.containsKey(dictKey)) {
-                operator.getNewValue(SimpleExpression(variableValue.dictionary[dictKey]!!), expression, editor, context, this)
-              } else {
-                expression.evaluate(editor, context, this)
-              }
-              if (valueToStore is VimFuncref && !valueToStore.isSelfFixed &&
-                valueToStore.handler is DefinedFunctionHandler &&
-                (valueToStore.handler as DefinedFunctionHandler).function.flags.contains(FunctionFlag.DICT)
-              ) {
-                valueToStore = valueToStore.copy()
-                valueToStore.dictionary = variableValue
-              }
-              variableValue.dictionary[dictKey] = valueToStore
+        when (val containerValue = variable.expression.evaluate(editor, context, parent)) {
+          is VimDictionary -> {
+            val dictKey = VimString(variable.index.evaluate(editor, context, this).asString())
+            if (operator != AssignmentOperator.ASSIGNMENT && !containerValue.dictionary.containsKey(dictKey)) {
+              throw ExException("E716: Key not present in Dictionary: $dictKey")
             }
-            is VimList -> {
-              // we use Integer.parseInt(........asString()) because in case if index's type is Float, List, Dictionary etc
-              // vim throws the same error as the asString() method
-              val index = Integer.parseInt(variable.index.evaluate(editor, context, this).asString())
-              if (index > variableValue.values.size - 1) {
-                throw ExException("E684: list index out of range: $index")
-              }
-              variableValue.values[index] = operator.getNewValue(
-                SimpleExpression(variableValue.values[index]), expression, editor, context, this
-              )
+            val expressionValue = expression.evaluate(editor, context, this)
+            var valueToStore = if (dictKey in containerValue.dictionary) {
+              operator.getNewValue(containerValue.dictionary[dictKey]!!, expressionValue)
+            } else {
+              expressionValue
             }
-            is VimBlob -> TODO()
-            else -> throw ExException("E689: Can only index a List, Dictionary or Blob")
+            if (valueToStore is VimFuncref && !valueToStore.isSelfFixed &&
+              valueToStore.handler is DefinedFunctionHandler &&
+              (valueToStore.handler as DefinedFunctionHandler).function.flags.contains(FunctionFlag.DICT)
+            ) {
+              valueToStore = valueToStore.copy()
+              valueToStore.dictionary = containerValue
+            }
+            containerValue.dictionary[dictKey] = valueToStore
           }
-        } else {
-          throw ExException("E121: Undefined variable")
+          is VimList -> {
+            // we use Integer.parseInt(........asString()) because in case if index's type is Float, List, Dictionary etc
+            // vim throws the same error as the asString() method
+            val index = Integer.parseInt(variable.index.evaluate(editor, context, this).asString())
+            if (index > containerValue.values.size - 1) {
+              throw ExException("E684: list index out of range: $index")
+            }
+            containerValue.values[index] = operator.getNewValue(containerValue.values[index], expression.evaluate(editor, context, parent))
+          }
+          is VimBlob -> TODO()
+          else -> throw ExException("E689: Can only index a List, Dictionary or Blob")
         }
       }
 
@@ -157,7 +149,7 @@ data class LetCommand(
         if (operator == AssignmentOperator.ASSIGNMENT || operator == AssignmentOperator.CONCATENATION ||
           operator == AssignmentOperator.ADDITION || operator == AssignmentOperator.SUBTRACTION
         ) {
-          val newValue = operator.getNewValue(SimpleExpression(optionValue), expression, editor, context, this)
+          val newValue = operator.getNewValue(optionValue, expression.evaluate(editor, context, this))
           when (option) {
             is ToggleOption -> {
               if (newValue.asBoolean()) {

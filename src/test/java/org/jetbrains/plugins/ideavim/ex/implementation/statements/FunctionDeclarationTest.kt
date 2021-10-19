@@ -669,4 +669,25 @@ class FunctionDeclarationTest : VimTestCase() {
 
     typeText(commandToKeys("delfunction! F"))
   }
+
+  fun `test args are passed to function by reference`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+        function! AddNumbers(dict) |
+          let a:dict.one = 1 |
+          let a:dict['two'] = 2 |
+        endfunction
+        """.trimIndent()
+      )
+    )
+    typeText(commandToKeys("let d = {}"))
+    typeText(commandToKeys("call AddNumbers(d)"))
+    typeText(commandToKeys("echo d"))
+    assertPluginError(false)
+    assertExOutput("{'one': 1, 'two': 2}\n")
+
+    typeText(commandToKeys("delfunction! AddNumbers"))
+  }
 }

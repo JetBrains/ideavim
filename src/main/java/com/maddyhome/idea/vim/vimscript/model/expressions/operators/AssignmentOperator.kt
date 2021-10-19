@@ -1,10 +1,7 @@
 package com.maddyhome.idea.vim.vimscript.model.expressions.operators
 
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.AdditionHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.ConcatenationHandler
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary.DivisionHandler
@@ -27,25 +24,23 @@ enum class AssignmentOperator(val value: String) {
     }
   }
 
-  fun getNewValue(
-    variable: Expression,
-    value: Expression,
-    editor: Editor,
-    context: DataContext,
-    parent: Executable,
-  ): VimDataType {
-    val valueValue = value.evaluate(editor, context, parent)
+  fun getNewValue(left: VimDataType?, right: VimDataType): VimDataType {
     return when (this) {
-      ASSIGNMENT -> valueValue
-      ADDITION -> AdditionHandler.performOperation(variable.evaluate(editor, context, parent), valueValue)
-      SUBTRACTION -> SubtractionHandler.performOperation(variable.evaluate(editor, context, parent), valueValue)
-      MULTIPLICATION -> MultiplicationHandler.performOperation(
-        variable.evaluate(editor, context, parent),
-        valueValue
-      )
-      DIVISION -> DivisionHandler.performOperation(variable.evaluate(editor, context, parent), valueValue)
-      MODULUS -> ModulusHandler.performOperation(variable.evaluate(editor, context, parent), valueValue)
-      CONCATENATION -> ConcatenationHandler.performOperation(variable.evaluate(editor, context, parent), valueValue)
+      ASSIGNMENT -> right
+      ADDITION -> {
+        // in this case we should update existing list instead of creating a new one
+        if (left is VimList && right is VimList) {
+          left.values.addAll(right.values)
+          left
+        } else {
+          AdditionHandler.performOperation(left!!, right)
+        }
+      }
+      SUBTRACTION -> SubtractionHandler.performOperation(left!!, right)
+      MULTIPLICATION -> MultiplicationHandler.performOperation(left!!, right)
+      DIVISION -> DivisionHandler.performOperation(left!!, right)
+      MODULUS -> ModulusHandler.performOperation(left!!, right)
+      CONCATENATION -> ConcatenationHandler.performOperation(left!!, right)
     }
   }
 }

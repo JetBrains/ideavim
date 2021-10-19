@@ -154,4 +154,87 @@ class LetCommandTest : VimTestCase() {
     assertExOutput("true\n")
     assertEquals("true", VimScriptGlobalEnvironment.getInstance().variables["g:WhichKey_ShowVimActions"])
   }
+
+  fun `test list is passed by reference`() {
+    configureByText("\n")
+    typeText(commandToKeys("let list = [1, 2, 3]"))
+    typeText(commandToKeys("let l2 = list"))
+    typeText(commandToKeys("let list += [4]"))
+    typeText(commandToKeys("echo l2"))
+
+    assertExOutput("[1, 2, 3, 4]\n")
+  }
+
+  fun `test list is passed by reference 2`() {
+    configureByText("\n")
+    typeText(commandToKeys("let list = [1, 2, 3, []]"))
+    typeText(commandToKeys("let l2 = list"))
+    typeText(commandToKeys("let list[3] += [4]"))
+    typeText(commandToKeys("echo l2"))
+
+    assertExOutput("[1, 2, 3, [4]]\n")
+  }
+
+  fun `test list is passed by reference 3`() {
+    configureByText("\n")
+    typeText(commandToKeys("let list = [1, 2, 3, []]"))
+    typeText(commandToKeys("let dict = {}"))
+    typeText(commandToKeys("let dict.l2 = list"))
+    typeText(commandToKeys("let list[3] += [4]"))
+    typeText(commandToKeys("echo dict.l2"))
+
+    assertExOutput("[1, 2, 3, [4]]\n")
+  }
+
+  fun `test list is passed by reference 4`() {
+    configureByText("\n")
+    typeText(commandToKeys("let list = [1, 2, 3]"))
+    typeText(commandToKeys("let dict = {}"))
+    typeText(commandToKeys("let dict.l2 = list"))
+    typeText(commandToKeys("let dict.l2 += [4]"))
+    typeText(commandToKeys("echo dict.l2"))
+
+    assertExOutput("[1, 2, 3, 4]\n")
+  }
+
+  fun `test number is passed by value`() {
+    configureByText("\n")
+    typeText(commandToKeys("let number = 10"))
+    typeText(commandToKeys("let n2 = number"))
+    typeText(commandToKeys("let number += 2"))
+    typeText(commandToKeys("echo n2"))
+
+    assertExOutput("10\n")
+  }
+
+  fun `test string is passed by value`() {
+    configureByText("\n")
+    typeText(commandToKeys("let string = 'abc'"))
+    typeText(commandToKeys("let str2 = string"))
+    typeText(commandToKeys("let string .= 'd'"))
+    typeText(commandToKeys("echo str2"))
+
+    assertExOutput("abc\n")
+  }
+
+  fun `test dict is passed by reference`() {
+    configureByText("\n")
+    typeText(commandToKeys("let dictionary = {}"))
+    typeText(commandToKeys("let dict2 = dictionary"))
+    typeText(commandToKeys("let dictionary.one = 1"))
+    typeText(commandToKeys("let dictionary['two'] = 2"))
+    typeText(commandToKeys("echo dict2"))
+
+    assertExOutput("{'one': 1, 'two': 2}\n")
+  }
+
+  fun `test dict is passed by reference 2`() {
+    configureByText("\n")
+    typeText(commandToKeys("let list = [1, 2, 3, {'a': 'b'}]"))
+    typeText(commandToKeys("let dict = list[3]"))
+    typeText(commandToKeys("let list[3].key = 'value'"))
+    typeText(commandToKeys("echo dict"))
+
+    assertExOutput("{'a': 'b', 'key': 'value'}\n")
+  }
 }
