@@ -48,9 +48,7 @@ object LineFunctionHandler : FunctionHandler() {
     context: DataContext,
     parent: Executable,
   ): VimInt {
-    if (editor == null) return VimInt.ZERO
     val argument = argumentValues[0].evaluate(editor, context, Script(listOf()))
-
     return variableToPosition(editor, argument, true)?.first ?: VimInt.ZERO
   }
 }
@@ -68,8 +66,6 @@ object ColFunctionHandler : FunctionHandler() {
     parent: Executable,
   ): VimDataType {
     val argument = argumentValues[0].evaluate(editor, context, Script(listOf()))
-    if (editor == null) return VimInt.ZERO
-
     return variableToPosition(editor, argument, false)?.second ?: VimInt.ZERO
   }
 }

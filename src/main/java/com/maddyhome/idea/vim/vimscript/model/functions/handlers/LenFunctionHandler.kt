@@ -53,6 +53,5 @@ object LenFunctionHandler : FunctionHandler() {
       is VimBlob -> TODO()
       else -> throw ExException("E701: Invalid type for len()")
     }
-    TODO("Not yet implemented")
   }
 }
