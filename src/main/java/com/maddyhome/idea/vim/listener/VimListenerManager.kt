@@ -322,6 +322,9 @@ object VimListenerManager {
       if (skipNDragEvents > 0) {
         logger.debug("Mouse dragging")
         VimVisualTimer.swingTimer?.stop()
+        if (!mouseDragging) {
+          SelectionVimListenerSuppressor.lock()
+        }
         mouseDragging = true
 
         val caret = e.editor.caretModel.primaryCaret
@@ -346,7 +349,6 @@ object VimListenerManager {
 
       skipNDragEvents = skipEvents
       SelectionVimListenerSuppressor.reset()
-      SelectionVimListenerSuppressor.lock()
     }
 
     /**
