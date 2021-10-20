@@ -1,5 +1,7 @@
 package com.maddyhome.idea.vim.vimscript.model.datatypes
 
+import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
+
 sealed class VimDataType {
 
   abstract fun asDouble(): Double
@@ -19,4 +21,10 @@ sealed class VimDataType {
   }
 
   abstract fun deepCopy(level: Int = 100): VimDataType
+
+  var lockOwner: Variable? = null
+  var isLocked: Boolean = false
+
+  abstract fun lockVar(depth: Int)
+  abstract fun unlockVar(depth: Int)
 }

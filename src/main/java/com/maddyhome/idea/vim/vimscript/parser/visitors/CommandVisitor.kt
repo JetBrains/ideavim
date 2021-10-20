@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.HistoryCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.JoinLinesCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.JumpsCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.LockVarCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.MarkCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.MarksCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.MoveTextCommand
@@ -74,6 +75,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.TabCloseCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.TabOnlyCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.UndoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.UnknownCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.UnlockVarCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.WriteAllCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.WriteCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.WriteNextFileCommand
@@ -784,6 +786,15 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     "ounmap" to UnMapCommand::class,
     "iunmap" to UnMapCommand::class,
     "cunmap" to UnMapCommand::class,
+    "lockv" to LockVarCommand::class,
+    "lockva" to LockVarCommand::class,
+    "lockvar" to LockVarCommand::class,
+    "unlo" to UnlockVarCommand::class,
+    "unloc" to UnlockVarCommand::class,
+    "unlock" to UnlockVarCommand::class,
+    "unlockv" to UnlockVarCommand::class,
+    "unlockva" to UnlockVarCommand::class,
+    "unlockvar" to UnlockVarCommand::class,
   )
 
   private fun getCommandByName(commandName: String): KClass<out Command> {

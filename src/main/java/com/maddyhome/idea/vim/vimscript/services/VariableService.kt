@@ -52,6 +52,21 @@ object VariableService {
     }
   }
 
+  fun isVariableLocked(variable: Variable, editor: Editor, context: DataContext, parent: Executable): Boolean {
+    return getNullableVariableValue(variable, editor, context, parent)?.isLocked ?: false
+  }
+
+  fun lockVariable(variable: Variable, depth: Int, editor: Editor, context: DataContext, parent: Executable) {
+    val value = getNullableVariableValue(variable, editor, context, parent) ?: return
+    value.lockOwner = variable
+    value.lockVar(depth)
+  }
+
+  fun unlockVariable(variable: Variable, depth: Int, editor: Editor, context: DataContext, parent: Executable) {
+    val value = getNullableVariableValue(variable, editor, context, parent) ?: return
+    value.unlockVar(depth)
+  }
+
   fun storeVariable(variable: Variable, value: VimDataType, editor: Editor, context: DataContext, parent: Executable) {
     val scope = variable.scope ?: getDefaultVariableScope(parent)
     when (scope) {

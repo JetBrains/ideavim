@@ -42,4 +42,22 @@ data class VimDictionary(val dictionary: LinkedHashMap<VimString, VimDataType>) 
       this
     }
   }
+
+  override fun lockVar(depth: Int) {
+    this.isLocked = true
+    if (depth > 1) {
+      for (value in dictionary.values) {
+        value.lockVar(depth - 1)
+      }
+    }
+  }
+
+  override fun unlockVar(depth: Int) {
+    this.isLocked = false
+    if (depth > 1) {
+      for (value in dictionary.values) {
+        value.unlockVar(depth - 1)
+      }
+    }
+  }
 }

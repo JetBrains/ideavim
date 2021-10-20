@@ -114,7 +114,7 @@ command:
         | MARK_COMMAND | JUMPS | J_LOWERCASE | JOIN_LINES | HISTORY | GO_TO_CHAR | SYMBOL | FIND | CLASS | F_LOWERCASE
         | FILE | EXIT | E_LOWERCASE | EDIT_FILE | DUMP_LINE | DIGRAPH | DEL_MARKS | D_LOWERCASE | DEL_LINES | DELCMD
         | T_LOWERCASE | COPY | CMD_CLEAR | EXCLAMATION | BUFFER_LIST | BUFFER_CLOSE | B_LOWERCASE | BUFFER | ASCII
-        | ACTIONLIST | ACTION
+        | ACTIONLIST | ACTION | LOCKVAR | UNLOCKVAR
       )
     WS* ((commandArgumentWithoutBars? inline_comment NEW_LINE) | (commandArgumentWithoutBars? NEW_LINE) | (commandArgumentWithoutBars? BAR)) (NEW_LINE | BAR)*
     #CommandWithComment|
@@ -666,6 +666,8 @@ UNMAP:                  'unm' | 'nun' | 'vu' | 'xu' | 'sunm' | 'ou' | 'iu' | 'cu
                     |   'unma' | 'nunma' | 'vunma' | 'xunma' | 'sunma' | 'ounma' | 'iunma' | 'cunma'
                     |   'unmap' | 'nunmap' | 'vunmap' | 'xunmap' | 'sunmap' | 'ounmap' | 'iunmap' | 'cunmap';
 EXECUTE:                'exe' | 'exec' | 'execu' | 'execut' | 'execute';
+LOCKVAR:                'lockv' | 'lockva' | 'lockvar';
+UNLOCKVAR:              'unlo' | 'unloc' | 'unlock' | 'unlockv' | 'unlockva' | 'unlockvar';
 
 // Types
 DIGIT:                  [0-9];

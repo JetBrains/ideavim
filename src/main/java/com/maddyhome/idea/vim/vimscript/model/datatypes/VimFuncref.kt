@@ -108,6 +108,14 @@ data class VimFuncref(
       return copy()
     }
 
+    override fun lockVar(depth: Int) {
+      this.isLocked = true
+    }
+
+    override fun unlockVar(depth: Int) {
+      this.isLocked = false
+    }
+
     enum class Type {
       LAMBDA,
       FUNCREF,

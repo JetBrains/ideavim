@@ -55,6 +55,9 @@ data class LetCommand(
           throw ExException("E46: Cannot change read-only variable \"${variable.toString(editor, context, parent)}\"")
         }
         val leftValue = VariableService.getNullableVariableValue(variable, editor, context, parent)
+        if (leftValue?.isLocked == true && leftValue.lockOwner?.name == variable.name) {
+          throw ExException("E741: Value is locked: ${variable.toString(editor, context, parent)}")
+        }
         val rightValue = expression.evaluate(editor, context, parent)
         VariableService.storeVariable(variable, operator.getNewValue(leftValue, rightValue), editor, context, this)
       }
@@ -68,8 +71,16 @@ data class LetCommand(
             }
             val expressionValue = expression.evaluate(editor, context, this)
             var valueToStore = if (dictKey in containerValue.dictionary) {
+              if (containerValue.dictionary[dictKey]!!.isLocked) {
+                // todo better exception message
+                throw ExException("E741: Value is locked: ${variable.originalString}")
+              }
               operator.getNewValue(containerValue.dictionary[dictKey]!!, expressionValue)
             } else {
+              if (containerValue.isLocked) {
+                // todo better exception message
+                throw ExException("E741: Value is locked: ${variable.originalString}")
+              }
               expressionValue
             }
             if (valueToStore is VimFuncref && !valueToStore.isSelfFixed &&
@@ -87,6 +98,9 @@ data class LetCommand(
             val index = Integer.parseInt(variable.index.evaluate(editor, context, this).asString())
             if (index > containerValue.values.size - 1) {
               throw ExException("E684: list index out of range: $index")
+            }
+            if (containerValue.values[index].isLocked) {
+              throw ExException("E741: Value is locked: ${variable.originalString}")
             }
             containerValue.values[index] = operator.getNewValue(containerValue.values[index], expression.evaluate(editor, context, parent))
           }

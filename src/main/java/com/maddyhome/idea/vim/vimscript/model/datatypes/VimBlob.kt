@@ -22,6 +22,14 @@ class VimBlob : VimDataType() {
     TODO("Not yet implemented")
   }
 
+  override fun lockVar(depth: Int) {
+    TODO("Not yet implemented")
+  }
+
+  override fun unlockVar(depth: Int) {
+    TODO("Not yet implemented")
+  }
+
   override fun toString(): String {
     TODO("Not yet implemented")
   }

@@ -65,4 +65,12 @@ data class VimString(val value: String) : VimDataType() {
   override fun deepCopy(level: Int): VimString {
     return copy()
   }
+
+  override fun lockVar(depth: Int) {
+    this.isLocked = true
+  }
+
+  override fun unlockVar(depth: Int) {
+    this.isLocked = false
+  }
 }

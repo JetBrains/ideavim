@@ -22,6 +22,14 @@ data class VimInt(val value: Int) : VimDataType() {
     return copy()
   }
 
+  override fun lockVar(depth: Int) {
+    this.isLocked = true
+  }
+
+  override fun unlockVar(depth: Int) {
+    this.isLocked = false
+  }
+
   operator fun compareTo(b: Int): Int = this.value.compareTo(b)
 
   companion object {
