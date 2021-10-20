@@ -34,32 +34,47 @@
 - [x] reduce number of rules in grammar
 - [x] classic package structure  
 
-### IdeaVim 1.9.0   
+### IdeaVim 1.9.0
+// basic language support
+- [x] support `for [a, b] in {expr}`
+- [x] pass scopes to functions e.g. `for k in keys(s:)`
+- [x] curly-braces-names
+- [x] `finish` statement
 
-- [ ] classloading
-- [ ] pass scopes to functions e.g. `for k in keys(s:)`
-- [ ] support `for [a, b] in {expr}`
-- [ ] curly-braces-names
-- [ ] pass Lists and Dictionaries by reference
-- [ ] variable locking (`lock`, `unlock`, `const`)
+// variable service 
+- [x] pass Lists and Dictionaries by reference
+- [x] variable locking
+
+// option service
 - [ ] rewrite OptionManager to vim data types
 - [ ] scoped options
-- [ ] `normal` command
-- [ ] `finish` statement
-- [ ] vim "special" type
-- [ ] `v:` scope
+
+// exceptions
 - [ ] make `LibraryFunction` return `Result`  
+- [ ] throwing multiple exceptions at once
 - [ ] exception wrapping in try/catch  
 - [ ] store exception messages in property file  
 - [ ] store vim exception stacktrace in ExException  
+
+// big brain things
+- [ ] classloading
+- [ ] executing context (script / command line) & better parent for executable
+- [ ] `normal` command
+- [ ] vim "special" type
+- [ ] `v:` scope
+
+// finishing touches
 - [ ] update tests to JUnit 5  
 - [ ] rethink vimscript tests  
 - [ ] loggers
+- [ ] todos, warnings
 
 ## Less important things that might be added soon  
   
 - [ ] all the let command's cases (e.g. registers)
 - [ ] expression register (`<C-R>=`)
+- [ ] expressions in substitute command (`\=`)
+- [ ] vim status line and beautiful exceptions output
 - [ ] improve `w:` and `t:` scopes
 - [ ] delayed parsing of if/for/while etc.
 - [ ] context dependent parsing e.g. `dict.key`
