@@ -45,4 +45,18 @@ class DictionaryElementByKeyTest : VimTestCase() {
     typeText(commandToKeys("let dict = {'first-key': 42, 'second-key' : {'third-key': 'oh, hi Mark'}} | echo dict.second-key.third-key"))
     assertExOutput("oh, hi Mark\n")
   }
+
+  fun `test get element from inner list by index`() {
+    configureByText("\n")
+    typeText(commandToKeys("let dict = {'list': [42]}"))
+    typeText(commandToKeys("echo dict.list[0]"))
+    assertExOutput("42\n")
+  }
+
+  fun `test get element from inner list by index multiple times`() {
+    configureByText("\n")
+    typeText(commandToKeys("let dict = {'list': [{'key': [42]}]}"))
+    typeText(commandToKeys("echo dict.list[0].key[0]"))
+    assertExOutput("42\n")
+  }
 }

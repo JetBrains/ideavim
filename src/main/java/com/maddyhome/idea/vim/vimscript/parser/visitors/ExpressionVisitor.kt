@@ -55,7 +55,9 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     for (dictEntry in ctx.dictionary().dictionaryEntry()) {
       dict[visit(dictEntry.expr(0))] = visit(dictEntry.expr(1))
     }
-    return DictionaryExpression(dict)
+    val result = DictionaryExpression(dict)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitLiteralDictionaryExpression(ctx: LiteralDictionaryExpressionContext): Expression {
@@ -63,11 +65,15 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     for (dictEntry in ctx.literalDictionary().literalDictionaryEntry()) {
       dict[SimpleExpression(dictEntry.literalDictionaryKey().text)] = visit(dictEntry.expr())
     }
-    return DictionaryExpression(dict)
+    val result = DictionaryExpression(dict)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitIntExpression(ctx: IntExpressionContext): Expression {
-    return SimpleExpression(VimInt(ctx.text))
+    val result = SimpleExpression(VimInt(ctx.text))
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitStringExpression(ctx: StringExpressionContext): Expression {
@@ -83,11 +89,15 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
         .substring(1, text.length - 1)
         .replace("''", "'")
     }
-    return SimpleExpression(text)
+    val result = SimpleExpression(text)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitListExpression(ctx: ListExpressionContext): Expression {
-    return ListExpression((ctx.list().expr().map { visit(it) }.toMutableList()))
+    val result = ListExpression((ctx.list().expr().map { visit(it) }.toMutableList()))
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitBinExpression1(ctx: VimscriptParser.BinExpression1Context): Expression {
@@ -95,15 +105,16 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     val right = visit(ctx.expr(1))
     val operatorString = ctx.binaryOperator1().text
     val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
-    return BinExpression(left, right, operator)
+    val result = BinExpression(left, right, operator)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitBinExpression2(ctx: VimscriptParser.BinExpression2Context): Expression {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
     val operatorString = ctx.binaryOperator2().text
-
-    return if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && matchesLiteralDictionaryKey(ctx.expr(1).text)) {
+    val result = if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && matchesLiteralDictionaryKey(ctx.expr(1).text)) {
       val index = SimpleExpression(ctx.expr(1).text)
       OneElementSublistExpression(index, left)
     } else if (operatorString == "-" && left is OneElementSublistExpression && !containsSpaces(ctx) && matchesLiteralDictionaryKey(
@@ -113,6 +124,8 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
       val postfix = "-" + ctx.expr(1).text
       val newIndex = SimpleExpression((left.index as SimpleExpression).data.asString() + postfix)
       OneElementSublistExpression(newIndex, left.expression)
+    } else if (operatorString == "." && !containsSpaces(ctx) && evaluationResultCouldBeADictionary(left) && right is OneElementSublistExpression && matchesLiteralDictionaryKey(right.expression.originalString)) {
+      OneElementSublistExpression(right.index, OneElementSublistExpression(SimpleExpression(right.expression.originalString), left))
     } else if (operatorString == "." && !containsSpaces(ctx) && right is FunctionCallExpression && evaluationResultCouldBeADictionary(left)) {
       val index = right.functionName
       FuncrefCallExpression(OneElementSublistExpression(index, left), right.arguments)
@@ -120,6 +133,8 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
       val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
       BinExpression(left, right, operator)
     }
+    result.originalString = ctx.text
+    return result
   }
 
   private fun containsSpaces(ctx: ParserRuleContext): Boolean {
@@ -146,7 +161,9 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     val right = visit(ctx.expr(1))
     val operatorString = ctx.binaryOperator3().text
     val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
-    return BinExpression(left, right, operator)
+    val result = BinExpression(left, right, operator)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitBinExpression4(ctx: VimscriptParser.BinExpression4Context): Expression {
@@ -154,7 +171,9 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     val right = visit(ctx.expr(1))
     val operatorString = ctx.binaryOperator4().text
     val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
-    return BinExpression(left, right, operator)
+    val result = BinExpression(left, right, operator)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitBinExpression5(ctx: VimscriptParser.BinExpression5Context): Expression {
@@ -162,41 +181,56 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     val right = visit(ctx.expr(1))
     val operatorString = ctx.binaryOperator5().text
     val operator = BinaryOperator.getByValue(operatorString) ?: throw RuntimeException()
-    return BinExpression(left, right, operator)
+    val result = BinExpression(left, right, operator)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitUnaryExpression(ctx: UnaryExpressionContext): Expression {
     val expression = visit(ctx.expr())
     val operator = UnaryOperator.getByValue(ctx.getChild(0).text)
-    return UnaryExpression(operator, expression)
+    val result = UnaryExpression(operator, expression)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitFloatExpression(ctx: FloatExpressionContext): Expression {
-    return SimpleExpression(ctx.unsignedFloat().text.toDouble())
+    val result = SimpleExpression(ctx.unsignedFloat().text.toDouble())
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitVariableExpression(ctx: VariableExpressionContext): Expression {
-    return visitVariable(ctx.variable())
+    val result = visitVariable(ctx.variable())
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitWrappedExpression(ctx: WrappedExpressionContext): Expression? {
-    return visit(ctx.expr())
+    val result = visit(ctx.expr())
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitOptionExpression(ctx: OptionExpressionContext): Expression {
-    return OptionExpression(ctx.option().optionName().text)
+    val result = OptionExpression(ctx.option().optionName().text)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitTernaryExpression(ctx: TernaryExpressionContext): Expression {
     val condition = visit(ctx.expr(0))
     val then = visit(ctx.expr(1))
     val otherwise = visit(ctx.expr(2))
-    return TernaryExpression(condition, then, otherwise)
+    val result = TernaryExpression(condition, then, otherwise)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitFunctionAsMethodCall1(ctx: VimscriptParser.FunctionAsMethodCall1Context): FunctionCallExpression {
     val functionCall = visitFunctionCall(ctx.functionCall())
     functionCall.arguments.add(0, visit(ctx.expr()))
+    functionCall.originalString = ctx.text
     return functionCall
   }
 
@@ -204,11 +238,15 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     val lambda = visitLambda(ctx.lambda())
     val arguments = mutableListOf(visit(ctx.expr()))
     arguments.addAll(visitFunctionArgs(ctx.functionArguments()))
-    return LambdaFunctionCallExpression(lambda, arguments)
+    val result = LambdaFunctionCallExpression(lambda, arguments)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitFunctionCallExpression(ctx: FunctionCallExpressionContext): Expression {
-    return visitFunctionCall(ctx.functionCall())
+    val result = visitFunctionCall(ctx.functionCall())
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitFunctionCall(ctx: VimscriptParser.FunctionCallContext): FunctionCallExpression {
@@ -218,13 +256,17 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
       scope = Scope.getByValue(ctx.functionScope().text)
     }
     val functionArguments = visitFunctionArgs(ctx.functionArguments()).toMutableList()
-    return FunctionCallExpression(scope, functionName, functionArguments)
+    val result = FunctionCallExpression(scope, functionName, functionArguments)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitLambdaFunctionCallExpression(ctx: VimscriptParser.LambdaFunctionCallExpressionContext): LambdaFunctionCallExpression {
     val lambda = visitLambda(ctx.lambda())
     val arguments = visitFunctionArgs(ctx.functionArguments())
-    return LambdaFunctionCallExpression(lambda, arguments)
+    val result = LambdaFunctionCallExpression(lambda, arguments)
+    result.originalString = ctx.text
+    return result
   }
 
   private fun visitFunctionArgs(args: VimscriptParser.FunctionArgumentsContext): List<Expression> {
@@ -239,51 +281,69 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
     return result
   }
 
-  override fun visitLambdaExpression(ctx: VimscriptParser.LambdaExpressionContext?): Expression {
-    return super.visitLambdaExpression(ctx)
+  override fun visitLambdaExpression(ctx: VimscriptParser.LambdaExpressionContext): Expression {
+    val result = super.visitLambdaExpression(ctx)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitLambda(ctx: VimscriptParser.LambdaContext): LambdaExpression {
     val arguments = ctx.argumentsDeclaration().variableName().map { it.text }
     val expr = visit(ctx.expr())
-    return LambdaExpression(arguments, expr)
+    val result = LambdaExpression(arguments, expr)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitSublistExpression(ctx: SublistExpressionContext): Expression {
     val ex = visit(ctx.expr(0))
     val from = if (ctx.from != null) visit(ctx.from) else null
     val to = if (ctx.to != null) visit(ctx.to) else null
-    return SublistExpression(from, to, ex)
+    val result = SublistExpression(from, to, ex)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitOneElementSublistExpression(ctx: OneElementSublistExpressionContext): Expression {
     val ex = visit(ctx.expr(0))
     val fromTo = visit(ctx.expr(1))
-    return OneElementSublistExpression(fromTo, ex)
+    val result = OneElementSublistExpression(fromTo, ex)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitEnvVariableExpression(ctx: EnvVariableExpressionContext): Expression {
-    return EnvVariableExpression(ctx.envVariable().envVariableName().text)
+    val result = EnvVariableExpression(ctx.envVariable().envVariableName().text)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitRegisterExpression(ctx: RegisterExpressionContext): Expression {
-    return Register(ctx.text.replaceFirst("@", "")[0])
+    val result = Register(ctx.text.replaceFirst("@", "")[0])
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitVariable(ctx: VariableContext): Variable {
     val scope = if (ctx.variableScope() == null) null else Scope.getByValue(ctx.variableScope().text)
-    return Variable(scope, visitCurlyBracesName(ctx.variableName().curlyBracesName()))
+    val result = Variable(scope, visitCurlyBracesName(ctx.variableName().curlyBracesName()))
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitFalsyExpression(ctx: FalsyExpressionContext): Expression {
     val left = visit(ctx.expr(0))
     val right = visit(ctx.expr(1))
-    return FalsyExpression(left, right)
+    val result = FalsyExpression(left, right)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitCurlyBracesName(ctx: VimscriptParser.CurlyBracesNameContext): CurlyBracesName {
     val parts = ctx.element().map { if (it.expr() != null) visit(it.expr()) else SimpleExpression(it.text) }
-    return CurlyBracesName(parts)
+    val result = CurlyBracesName(parts)
+    result.originalString = ctx.text
+    return result
   }
 
   override fun visitBlobExpression(ctx: BlobExpressionContext?): Expression {
