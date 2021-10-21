@@ -106,7 +106,7 @@ Here are some examples of supported vim features and commands:
 
 See also:
 
-* [The list of all supported commands](src/com/maddyhome/idea/vim/package-info.java)
+* [The list of all supported commands](src/main/java/com/maddyhome/idea/vim/package-info.java)
 * [Top feature requests and bugs](https://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+sort+by%3A+votes)
 * [Vimscript support roadmap](vimscript-info/VIMSCRIPT_ROADMAP.md)
 * [List of supported in-build functions](vimscript-info/FUNCTIONS_INFO.MD)
