@@ -67,6 +67,16 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll upwards in first half of first page moves to first line with scrolloff`() {
+    OptionsManager.scrolloff.set(10)
+    configureByPages(5)
+    setPositionAndScroll(5, 15)
+    typeText(parseKeys("<C-U>"))
+    assertPosition(0, 0)
+    assertVisibleArea(0, 34)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scroll count lines upwards`() {
     configureByPages(5)
     setPositionAndScroll(50, 53)

@@ -270,6 +270,8 @@ public class MotionGroup {
     return SearchHelper.findParagraphRange(editor, caret, count, isOuter);
   }
 
+  // Get the visual line that will be in the same screen relative location as the current caret line, after the screen
+  // has been scrolled
   private static int getScrollScreenTargetCaretVisualLine(final @NotNull Editor editor, int rawCount, boolean down) {
     final Rectangle visibleArea = getVisibleArea(editor);
     final int caretVisualLine = editor.getCaretModel().getVisualPosition().line;
@@ -285,7 +287,7 @@ public class MotionGroup {
       targetCaretVisualLine = down ? caretVisualLine + scrollOption : caretVisualLine - scrollOption;
     }
 
-    return targetCaretVisualLine;
+    return EditorHelper.normalizeVisualLine(editor, targetCaretVisualLine);
   }
 
   public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToNthCharacter(@NotNull Editor editor, int count) {
@@ -1207,6 +1209,8 @@ public class MotionGroup {
 
     final Rectangle visibleArea = getVisibleArea(editor);
 
+    // We want to scroll the screen and keep the caret in the same screen-relative position. Calculate which line will
+    // be at the current caret line and work the offsets out from that
     int targetCaretVisualLine = getScrollScreenTargetCaretVisualLine(editor, rawCount, down);
 
     // Scroll at most one screen height
@@ -1230,12 +1234,11 @@ public class MotionGroup {
       }
     }
     else {
-
       scrollVisualLineToCaretLocation(editor, targetCaretVisualLine);
 
       final int scrollOffset = getNormalizedScrollOffset(editor);
-      final int visualTop = getVisualLineAtTopOfScreen(editor) + scrollOffset;
-      final int visualBottom = getVisualLineAtBottomOfScreen(editor) - scrollOffset;
+      final int visualTop = getVisualLineAtTopOfScreen(editor) + (down ? scrollOffset : 0);
+      final int visualBottom = getVisualLineAtBottomOfScreen(editor) - (down ? 0 : scrollOffset);
 
       targetCaretVisualLine = max(visualTop, min(visualBottom, targetCaretVisualLine));
     }
