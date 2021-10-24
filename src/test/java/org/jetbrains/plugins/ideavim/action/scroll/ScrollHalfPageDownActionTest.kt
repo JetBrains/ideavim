@@ -58,9 +58,28 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
-  fun`test scroll downwards in bottom half of last page moves to the last line`() {
+  fun`test scroll downwards in bottom half of last page moves caret to the last line without scrolling`() {
     configureByPages(5)
-    setPositionAndScroll(146, 165)
+    setPositionAndScroll(140, 165)
+    typeText(parseKeys("<C-D>"))
+    assertPosition(175, 0)
+    assertVisibleArea(141, 175)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll downwards in bottom half of last page moves caret to the last line with scrolloff`() {
+    OptionsManager.scrolloff.set(10)
+    configureByPages(5)
+    setPositionAndScroll(140, 164)
+    typeText(parseKeys("<C-D>"))
+    assertPosition(175, 0)
+    assertVisibleArea(141, 175)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.SCROLL)
+  fun`test scroll downwards at end of file with existing virtual space moves caret without scrolling window`() {
+    configureByPages(5)
+    setPositionAndScroll(146, 165) // 146 at top line means bottom line is 181 (out of 175)
     typeText(parseKeys("<C-D>"))
     assertPosition(175, 0)
     assertVisibleArea(146, 175)

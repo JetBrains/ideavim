@@ -635,7 +635,8 @@ public class EditorHelper {
   }
 
   /**
-   * Scrolls the editor to put the given visual line at the current caret location, relative to the screen.
+   * Scrolls the editor to put the given visual line at the current caret location, relative to the screen, as long as
+   * this doesn't add virtual space to the bottom of the file.
    * <p>
    * Due to block inlays, the caret location is maintained as a scroll offset, rather than the number of lines from the
    * top of the screen. This means the line offset can change if the number of inlays above the caret changes during
@@ -668,7 +669,11 @@ public class EditorHelper {
       inlayOffset = -bottomInlayHeight;
     }
 
-    scrollVertically(editor, yVisualLine - caretScreenOffset - inlayOffset);
+    // Scroll the given visual line to the caret location, but do not scroll down passed the end of file, or the current
+    // virtual space at the bottom of the screen
+    final int lastVisualLine = EditorHelper.getVisualLineCount(editor) - 1;
+    final int yBottomLineOffset = max(getOffsetToScrollVisualLineToBottomOfScreen(editor, lastVisualLine), visibleArea.y);
+    scrollVertically(editor, min(yVisualLine - caretScreenOffset - inlayOffset, yBottomLineOffset));
   }
 
   /**
