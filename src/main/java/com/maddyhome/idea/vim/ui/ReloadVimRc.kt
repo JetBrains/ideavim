@@ -116,7 +116,7 @@ class ReloadVimRc : DumbAwareAction() {
       return
     }
 
-    if (virtualFile.path != VimRcFileState.filePath) {
+    if (FileUtil.toSystemDependentName(virtualFile.path) != VimRcFileState.filePath) {
       e.presentation.isEnabledAndVisible = false
       return
     }
