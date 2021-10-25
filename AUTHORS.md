@@ -372,6 +372,10 @@ Contributors:
   [![icon][github]](https://github.com/myzeiri)
   &nbsp;
   Martin Yzeiri
+* [![icon][mail]](mailto:jeyko1@gmail.com)
+  [![icon][github]](https://github.com/wrightwriter)
+  &nbsp;
+  Petar Guglev
                         
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainers.

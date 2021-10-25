@@ -33,6 +33,7 @@ usual beta standards.
 ### Merged PRs:
 * [337](https://github.com/JetBrains/ideavim/pull/337) by [Matt Ellis](https://github.com/citizenmatt): guicursor!
 * [343](https://github.com/JetBrains/ideavim/pull/343) by [Martin Yzeiri](https://github.com/myzeiri): Emulate matchit.vim
+* [387](https://github.com/JetBrains/ideavim/pull/387) by [Petar Guglev](https://github.com/wrightwriter): Update README.md link
 
 ### Fixes:
 * [VIM-2417](https://youtrack.jetbrains.com/issue/VIM-2417) Fix bars in substitute command
