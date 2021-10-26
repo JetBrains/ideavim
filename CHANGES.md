@@ -41,6 +41,9 @@ usual beta standards.
 * [VIM-2422](https://youtrack.jetbrains.com/issue/VIM-2422) Fix freeze
 * [VIM-2420](https://youtrack.jetbrains.com/issue/VIM-2420) Fix freeze
 * [VIM-2359](https://youtrack.jetbrains.com/issue/VIM-2359) Fix selection with VimExchange
+* [VIM-2426](https://youtrack.jetbrains.com/issue/VIM-2426) Fix marks in commands
+* [VIM-2438](https://youtrack.jetbrains.com/issue/VIM-2438) Fix marks in commands
+* [DISCUSSION-386](https://github.com/JetBrains/ideavim/discussions/386) Fixed command with no spaces before argument
 
 ## 1.7.2, 2021-09-30
 
