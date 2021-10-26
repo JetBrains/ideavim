@@ -402,6 +402,40 @@ class VimExchangeExtensionTest : VimTestCase() {
     )
   }
 
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun `test change with down motion`() {
+    val before = """
+         The ${c}quick
+         brown fox
+         catch over
+         the lazy dog
+    """.trimIndent()
+    configureByText(before)
+    typeText(StringHelper.parseKeys("cxj"))
+
+    assertHighlighter(0, 19, HighlighterTargetArea.LINES_IN_RANGE)
+
+    // Exit vim-exchange
+    exitExchange()
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun `test cxx`() {
+    val before = """
+         The ${c}quick
+         brown fox
+         catch over
+         the lazy dog
+    """.trimIndent()
+    configureByText(before)
+    typeText(StringHelper.parseKeys("cxx"))
+
+    assertHighlighter(0, 9, HighlighterTargetArea.LINES_IN_RANGE)
+
+    // Exit vim-exchange
+    exitExchange()
+  }
+
   private fun exitExchange() {
     typeText(StringHelper.parseKeys("cxc"))
   }
