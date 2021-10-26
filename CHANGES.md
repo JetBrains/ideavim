@@ -40,6 +40,7 @@ usual beta standards.
 * [VIM-2425](https://youtrack.jetbrains.com/issue/VIM-2425) Fix reload button
 * [VIM-2422](https://youtrack.jetbrains.com/issue/VIM-2422) Fix freeze
 * [VIM-2420](https://youtrack.jetbrains.com/issue/VIM-2420) Fix freeze
+* [VIM-2359](https://youtrack.jetbrains.com/issue/VIM-2359) Fix selection with VimExchange
 
 ## 1.7.2, 2021-09-30
 
