@@ -18,8 +18,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.parser.commands
 
+import com.maddyhome.idea.vim.ex.ranges.MarkRange
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.BinExpression
@@ -28,13 +30,22 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.SimpleExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import org.jetbrains.plugins.ideavim.ex.evaluate
-import org.junit.Test
+import org.junit.experimental.theories.DataPoints
+import org.junit.experimental.theories.Theories
+import org.junit.experimental.theories.Theory
+import org.junit.runner.RunWith
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@RunWith(Theories::class)
 class CommandTests {
 
-  @Test
+  companion object {
+    @JvmStatic
+    val values = listOf("", " ") @DataPoints get
+  }
+
+  @Theory
   fun `let command`() {
     val c = VimscriptParser.parseCommand("let g:catSound='Meow'")
     assertTrue(c is LetCommand)
@@ -42,7 +53,7 @@ class CommandTests {
     assertEquals(SimpleExpression("Meow"), c.expression)
   }
 
-  @Test
+  @Theory
   fun `echo command`() {
     val c = VimscriptParser.parseCommand("echo 4 5+7 'hi doggy'")
     assertTrue(c is EchoCommand)
@@ -54,5 +65,17 @@ class CommandTests {
     assertEquals(VimInt(12), expressions[1].evaluate())
     assertTrue(expressions[2] is SimpleExpression)
     assertEquals(VimString("hi doggy"), (expressions[2] as SimpleExpression).data)
+  }
+
+  // VIM-2426
+  @Theory
+  fun `command with marks in range`(sp: String) {
+    val command = VimscriptParser.parseCommand("'a,'b${sp}s/a/b/g")
+    assertTrue(command is SubstituteCommand)
+    assertEquals("s", command.command)
+    assertEquals("/a/b/g", command.argument)
+    assertEquals(2, command.ranges.size())
+    assertEquals(MarkRange('a', 0, false), command.ranges.ranges[0])
+    assertEquals(MarkRange('b', 0, false), command.ranges.ranges[1])
   }
 }

@@ -307,14 +307,16 @@ string:
                         QUOTE ~(NEW_LINE | QUOTE)* QUOTE
                     |   ESCAPED_SINGLE_QUOTE
                     |   ESCAPED_SINGLE_QUOTE ESCAPED_SINGLE_QUOTE
-                    |   (SINGLE_QUOTE | (ESCAPED_SINGLE_QUOTE SINGLE_QUOTE))  ~(SINGLE_QUOTE | NEW_LINE)*? SINGLE_QUOTE
+                    |   (SINGLE_QUOTE | MARK_SINGLE_QUOTED | (ESCAPED_SINGLE_QUOTE SINGLE_QUOTE))  ~(SINGLE_QUOTE | NEW_LINE)*? SINGLE_QUOTE
 ;
 unsignedFloat:          FLOAT;
 unsignedInt:            DIGIT | INT;
 blob:                   BLOB;
 
-mark:                   (SINGLE_QUOTE (lowercaseAlphabeticChar | uppercaseAlphabeticChar | DIGIT | LESS | GREATER | L_PAREN | R_PAREN | L_CURLY | R_CURLY | L_BRACKET | R_BRACKET | QUOTE | CARET | DOT | BACKTICK | SINGLE_QUOTE))
-                    |   (BACKTICK (lowercaseAlphabeticChar | uppercaseAlphabeticChar | DIGIT | LESS | GREATER | L_PAREN | R_PAREN | L_CURLY | R_CURLY | L_BRACKET | R_BRACKET | QUOTE | CARET | DOT | BACKTICK | SINGLE_QUOTE))
+mark:                   (SINGLE_QUOTE (DIGIT | LESS | GREATER | L_PAREN | R_PAREN | L_CURLY | R_CURLY | L_BRACKET | R_BRACKET | QUOTE | CARET | DOT | BACKTICK | SINGLE_QUOTE))
+                    |   (BACKTICK (DIGIT | LESS | GREATER | L_PAREN | R_PAREN | L_CURLY | R_CURLY | L_BRACKET | R_BRACKET | QUOTE | CARET | DOT | BACKTICK | SINGLE_QUOTE))
+                    |   MARK_SINGLE_QUOTED
+                    |   MARK_BACKTICK
 ;
 inline_comment:         QUOTE ~(NEW_LINE)*?;
 anyCaseNameWithDigitsAndUnderscores:
@@ -543,6 +545,9 @@ W_UPPERCASE:            'W';
 X_UPPERCASE:            'X';
 Y_UPPERCASE:            'Y';
 Z_UPPERCASE:            'Z';
+
+MARK_SINGLE_QUOTED:     '\''[a-zA-Z];
+MARK_BACKTICK:          '`'[a-zA-Z];
 
 // Keywords
 FUNCTION:               'fu' | 'fun' | 'func' | 'funct' | 'functi' | 'functio' | 'function';
