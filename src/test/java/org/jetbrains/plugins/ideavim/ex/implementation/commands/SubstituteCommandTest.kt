@@ -810,4 +810,14 @@ class SubstituteCommandTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
   private fun doTest(command: String, before: String, after: String) {
     doTest(listOf(exCommand(command)), before, after)
   }
+
+  @VimOptionDefaultAll
+  @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
+  fun `test underscore as delimiter`() {
+    doTest(
+      "s_1_2",
+      "1 + 2 = 4",
+      "2 + 2 = 4"
+    )
+  }
 }
