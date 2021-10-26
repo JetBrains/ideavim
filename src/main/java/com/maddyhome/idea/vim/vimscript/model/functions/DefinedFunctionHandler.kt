@@ -50,7 +50,7 @@ data class DefinedFunctionHandler(val function: FunctionDeclaration) : FunctionH
   override fun doFunction(argumentValues: List<Expression>, editor: Editor, context: DataContext, parent: Executable): VimDataType {
     var returnValue: VimDataType? = null
     val exceptionsCaught = mutableListOf<ExException>()
-    val isRangeGiven = (ranges?.rangesCount ?: 0) > 0
+    val isRangeGiven = (ranges?.size() ?: 0) > 0
 
     if (!isRangeGiven) {
       val currentLine = editor.caretModel.currentCaret.logicalPosition.line
