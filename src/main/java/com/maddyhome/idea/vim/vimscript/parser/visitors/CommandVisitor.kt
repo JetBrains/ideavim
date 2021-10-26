@@ -278,10 +278,15 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
       ?: LetCommand(Ranges(), SimpleExpression(VimInt(0)), AssignmentOperator.ASSIGNMENT, SimpleExpression(VimInt(0)), false)
   }
 
-  override fun visitOtherCommand(ctx: OtherCommandContext): UnknownCommand {
+  override fun visitOtherCommand(ctx: OtherCommandContext): Command {
     val ranges: Ranges = parseRanges(ctx.range())
     val name = ctx.commandName().text
     val argument = ctx.commandArgumentWithBars()?.text ?: ""
+
+    val alphabeticPart = name.split(Regex("\\P{Alpha}"))[0]
+    if (setOf("s", "su", "sub", "subs", "subst", "substi", "substit", "substitu", "substitut", "substitut", "substitute").contains(alphabeticPart)) {
+      return SubstituteCommand(ranges, name.replaceFirst(alphabeticPart, "") + argument, alphabeticPart)
+    }
 
     return UnknownCommand(ranges, name, argument)
   }
