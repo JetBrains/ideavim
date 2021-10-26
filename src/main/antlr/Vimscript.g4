@@ -184,13 +184,7 @@ minusOneOffset:
 commandName:
     (LESS)+
 |   (GREATER)+
-|   lowercaseAlphabeticChar
-|   uppercaseAlphabeticChar
-|   IDENTIFIER_LOWERCASE
-|   IDENTIFIER_ANY_CASE
-|   IDENTIFIER_LOWERCASE_WITH_DIGITS
-|   IDENTIFIER_ANY_CASE_WITH_DIGITS
-|   IDENTIFIER_ANY_CASE_WITH_DIGITS_AND_UNDERSCORES
+|   anyCaseNameWithDigitsAndUnderscoresExceptKeywords
 |   commandName EXCLAMATION
 ;
 
@@ -325,9 +319,15 @@ anyCaseNameWithDigitsAndUnderscores:
                     |   keyword
                     |   IDENTIFIER_LOWERCASE
                     |   IDENTIFIER_ANY_CASE
-                    |   IDENTIFIER_LOWERCASE_WITH_DIGITS
-                    |   IDENTIFIER_ANY_CASE_WITH_DIGITS
-                    |   IDENTIFIER_ANY_CASE_WITH_DIGITS_AND_UNDERSCORES
+                    |   anyCaseNameWithDigitsAndUnderscores (anyCaseNameWithDigitsAndUnderscores | DIGIT | INT | UNDERSCORE)+
+;
+
+anyCaseNameWithDigitsAndUnderscoresExceptKeywords:
+                        lowercaseAlphabeticChar
+                    |   uppercaseAlphabeticChar
+                    |   IDENTIFIER_LOWERCASE
+                    |   IDENTIFIER_ANY_CASE
+                    |   anyCaseNameWithDigitsAndUnderscores (anyCaseNameWithDigitsAndUnderscores | DIGIT | INT | UNDERSCORE)+
 ;
 
 uppercaseAlphabeticChar:
@@ -409,6 +409,8 @@ keyword:                FUNCTION
                     |   ABORT
                     |   DICT
                     |   CLOSURE
+                    |   AUTOCMD
+                    |   AUGROUP
                     |   existingCommands
 ;
 existingCommands:       RETURN
@@ -690,9 +692,6 @@ ESCAPED_DOUBLE_QUOTE:   '\\"';
 // Identifiers
 IDENTIFIER_LOWERCASE:   [a-z]+;
 IDENTIFIER_ANY_CASE:    [a-zA-Z]+;
-IDENTIFIER_LOWERCASE_WITH_DIGITS:   [a-z][a-z0-9]+;
-IDENTIFIER_ANY_CASE_WITH_DIGITS:    [a-zA-Z][a-zA-Z0-9]+;
-IDENTIFIER_ANY_CASE_WITH_DIGITS_AND_UNDERSCORES: [a-zA-Z_][a-zA-Z0-9_]+;
 
 // Unary operators
 EXCLAMATION:            '!';

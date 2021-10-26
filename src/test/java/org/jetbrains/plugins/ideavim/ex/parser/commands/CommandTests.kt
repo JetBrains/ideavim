@@ -19,6 +19,7 @@
 package org.jetbrains.plugins.ideavim.ex.parser.commands
 
 import com.maddyhome.idea.vim.ex.ranges.MarkRange
+import com.maddyhome.idea.vim.vimscript.model.commands.BufferCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand
@@ -77,5 +78,13 @@ class CommandTests {
     assertEquals(2, command.ranges.size())
     assertEquals(MarkRange('a', 0, false), command.ranges.ranges[0])
     assertEquals(MarkRange('b', 0, false), command.ranges.ranges[1])
+  }
+
+  // https://github.com/JetBrains/ideavim/discussions/386
+  @Theory
+  fun `no space between command and argument`(sp: String) {
+    val command = VimscriptParser.parseCommand("b${sp}1")
+    assertTrue(command is BufferCommand)
+    assertEquals("1", command.argument)
   }
 }
