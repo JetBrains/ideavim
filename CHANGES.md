@@ -30,10 +30,6 @@ usual beta standards.
 * IDE-specific configuration [VIM-1573](https://youtrack.jetbrains.com/issue/VIM-1573)
 * Call command [VIM-2416](https://youtrack.jetbrains.com/issue/VIM-2416)
 
-### Merged PRs:
-* [337](https://github.com/JetBrains/ideavim/pull/337) by [Matt Ellis](https://github.com/citizenmatt): guicursor!
-* [343](https://github.com/JetBrains/ideavim/pull/343) by [Martin Yzeiri](https://github.com/myzeiri): Emulate matchit.vim
-
 ### Fixes:
 * [VIM-2417](https://youtrack.jetbrains.com/issue/VIM-2417) Fix bars in substitute command
 * [VIM-2425](https://youtrack.jetbrains.com/issue/VIM-2425) Fix reload button
@@ -43,6 +39,11 @@ usual beta standards.
 * [VIM-2426](https://youtrack.jetbrains.com/issue/VIM-2426) Fix marks in commands
 * [VIM-2438](https://youtrack.jetbrains.com/issue/VIM-2438) Fix marks in commands
 * [DISCUSSION-386](https://github.com/JetBrains/ideavim/discussions/386) Fixed command with no spaces before argument
+
+### Merged PRs:
+* [337](https://github.com/JetBrains/ideavim/pull/337) by [Matt Ellis](https://github.com/citizenmatt): guicursor!
+* [343](https://github.com/JetBrains/ideavim/pull/343) by [Martin Yzeiri](https://github.com/myzeiri): Emulate matchit.vim
+* [387](https://github.com/JetBrains/ideavim/pull/387) by [Petar Guglev](https://github.com/wrightwriter): Update README.md link
 
 ## 1.7.2, 2021-09-30
 
