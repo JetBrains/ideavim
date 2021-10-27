@@ -253,6 +253,52 @@ ShowErrorDescription - Show description of the error under the caret (cursor hov
 QuickImplementations - Quick Definition
 ```
 
+Vim Script
+------------
+
+IdeaVim can execute custom scripts that are written with Vim Script.
+At the moment we support all language features, but not all of the built-in functions and options are supported.
+
+Additionally, you may be interested in the
+[Vim Script Discussion](https://github.com/JetBrains/ideavim/discussions/357) or
+[Vim Script Roadmap](https://github.com/JetBrains/ideavim/blob/master/vimscript-info/VIMSCRIPT_ROADMAP.md).
+
+
+### IDE specific options
+
+You can evaluate the `has('ide')` function call and get `1` if it was called with IdeaVim or `0` if the function was called from Vim/NeoVim.  
+The option `&ide` contains the name and edition of your IDE, for example, "IntelliJ IDEA Ultimate Edition".  
+To see its value for the current IDE you are using, execute the `:echo &ide` command.  
+To write an IDE-specific configuration, use Vim's regexp match operators `=~?` (case-insensitive) / `=~#`  (case-sensitive)
+
+**Example config:**
+
+```vim
+" options and mappings that are supported by both Vim and IdeaVim
+set nu
+set relativenumber
+
+if has('ide')
+  " mappings and options that exist only in IdeaVim
+  map <leader>f <Action>(GotoFile)
+  map <leader>g <Action>(FindInPath)
+  map <leader>b <Action>(Switcher)
+
+  if &ide =~? 'intellij idea'
+    if &ide =~? 'community'
+      " some mappings and options for IntelliJ IDEA Community Edition
+    elseif &ide =~? 'ultimate'
+      " some mappings and options for IntelliJ IDEA Ultimate Edition
+    endif
+  elseif &ide =~? 'pycharm'
+    " PyCharm specific mappings and options
+  endif
+else
+  " some mappings for Vim/Neovim
+  nnoremap <leader>f <cmd>Telescope find_files<cr>
+endif
+```
+
 :gem: Contributing
 ------------
 
