@@ -1,6 +1,6 @@
 package _Self.buildTypes
 
-import _Self.Constants.DEV
+import _Self.Constants.DEV_CHANNEL
 import _Self.Constants.DEV_VERSION
 import _Self.Constants.RELEASE_DEV
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
@@ -27,7 +27,7 @@ object ReleaseDev : BuildType({
     )
     param("env.ORG_GRADLE_PROJECT_version", "%build.number%")
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
-    param("env.ORG_GRADLE_PROJECT_publishChannels", DEV)
+    param("env.ORG_GRADLE_PROJECT_publishChannels", DEV_CHANNEL)
   }
 
   vcs {
