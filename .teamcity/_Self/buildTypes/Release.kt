@@ -1,8 +1,8 @@
 package _Self.buildTypes
 
-import _Self.Constants.DEFAULT
-import _Self.Constants.DEV
-import _Self.Constants.EAP
+import _Self.Constants.DEFAULT_CHANNEL
+import _Self.Constants.DEV_CHANNEL
+import _Self.Constants.EAP_CHANNEL
 import _Self.Constants.RELEASE
 import _Self.Constants.VERSION
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
@@ -29,7 +29,7 @@ object Release : BuildType({
     )
     param("env.ORG_GRADLE_PROJECT_version", "%build.number%")
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
-    param("env.ORG_GRADLE_PROJECT_publishChannels", "$DEFAULT,$EAP,$DEV")
+    param("env.ORG_GRADLE_PROJECT_publishChannels", "$DEFAULT_CHANNEL,$EAP_CHANNEL,$DEV_CHANNEL")
     password(
       "env.ORG_GRADLE_PROJECT_slackUrl",
       "credentialsJSON:a8ab8150-e6f8-4eaf-987c-bcd65eac50b5",

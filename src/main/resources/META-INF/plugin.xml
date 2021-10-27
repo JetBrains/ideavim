@@ -4,49 +4,38 @@
   <change-notes><![CDATA[
       <h3>Features:</h3>
       <ul>
-      <li>Support <code>matchit.vim</code> extension for Ruby and XML/HTML <a
-          href="https://youtrack.jetbrains.com/issue/VIM-539">VIM-539
-      </a> |
-        <a href="https://github.com/chrisbra/matchit">matchit.vim</a>
-      </li>
-      <li>IDE-specific configuration
-        <a href="https://youtrack.jetbrains.com/issue/VIM-1573">VIM-1573</a>
-      </li>
-      <li>Call command
-        <a href="https://youtrack.jetbrains.com/issue/VIM-2416">VIM-2416</a>
-      </li>
-      </ul>
-
-      <h3>Merged PRs:</h3>
-      <ul>
-      <li>
-        <a href="https://github.com/JetBrains/ideavim/pull/337">337</a>
-        by <a href="https://github.com/citizenmatt">Matt Ellis</a>: guicursor!
-      </li>
-      <li>
-        <a href="https://github.com/JetBrains/ideavim/pull/343">343</a>
-        by <a href="https://github.com/myzeiri">Martin Yzeiri</a>: Emulate matchit.vim
-      </li>
+        <li>Support <code>matchit.vim</code> extension for Ruby and XML/HTML <a
+            href="https://youtrack.jetbrains.com/issue/VIM-539">VIM-539</a> | <a href="https://github.com/chrisbra/matchit">matchit.vim</a>
+        </li>
+        <li>IDE-specific configuration <a href="https://youtrack.jetbrains.com/issue/VIM-1573">VIM-1573</a></li>
+        <li>Call command <a href="https://youtrack.jetbrains.com/issue/VIM-2416">VIM-2416</a></li>
       </ul>
 
       <h3>Fixes:</h3>
       <ul>
-      <li>
-        <a href="https://youtrack.jetbrains.com/issue/VIM-2417">VIM-2417</a>
-        Fix bars in substitute command
-      </li>
-      <li>
-        <a href="https://youtrack.jetbrains.com/issue/VIM-2425">VIM-2425</a>
-        Fix reload button
-      </li>
-      <li>
-        <a href="https://youtrack.jetbrains.com/issue/VIM-2422">VIM-2422</a>
-        Fix freeze
-      </li>
-      <li>
-        <a href="https://youtrack.jetbrains.com/issue/VIM-2420">VIM-2420</a>
-        Fix freeze
-      </li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2417">VIM-2417</a> Fix bars in substitute command</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2425">VIM-2425</a> Fix reload button</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2422">VIM-2422</a> Fix freeze</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2420">VIM-2420</a> Fix freeze</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2359">VIM-2359</a> Fix selection with VimExchange</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2426">VIM-2426</a> Fix marks in commands</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2438">VIM-2438</a> Fix marks in commands</li>
+        <li><a href="https://github.com/JetBrains/ideavim/discussions/386">DISCUSSION-386</a> Fixed command with no spaces
+          before argument
+        </li>
+      </ul>
+
+      <h3>Merged PRs:</h3>
+      <ul>
+        <li><a href="https://github.com/JetBrains/ideavim/pull/337">337</a> by <a href="https://github.com/citizenmatt">Matt
+          Ellis</a>: guicursor!
+        </li>
+        <li><a href="https://github.com/JetBrains/ideavim/pull/343">343</a> by <a href="https://github.com/myzeiri">Martin
+          Yzeiri</a>: Emulate matchit.vim
+        </li>
+        <li><a href="https://github.com/JetBrains/ideavim/pull/387">387</a> by <a href="https://github.com/wrightwriter">Petar
+          Guglev</a>: Update README.md link
+        </li>
       </ul>
     ]]>
   </change-notes>

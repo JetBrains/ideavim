@@ -1,7 +1,7 @@
 package _Self.buildTypes
 
 import _Self.Constants.DEV_VERSION
-import _Self.Constants.EAP
+import _Self.Constants.EAP_CHANNEL
 import _Self.Constants.RELEASE_EAP
 import jetbrains.buildServer.configs.kotlin.v2019_2.BuildType
 import jetbrains.buildServer.configs.kotlin.v2019_2.CheckoutMode
@@ -27,7 +27,7 @@ object ReleaseEap : BuildType({
     )
     param("env.ORG_GRADLE_PROJECT_version", "%build.number%")
     param("env.ORG_GRADLE_PROJECT_downloadIdeaSources", "false")
-    param("env.ORG_GRADLE_PROJECT_publishChannels", EAP)
+    param("env.ORG_GRADLE_PROJECT_publishChannels", EAP_CHANNEL)
     password(
       "env.ORG_GRADLE_PROJECT_slackUrl",
       "credentialsJSON:a8ab8150-e6f8-4eaf-987c-bcd65eac50b5",
