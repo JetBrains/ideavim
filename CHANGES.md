@@ -27,6 +27,10 @@ usual beta standards.
 
 ### Fixes:
 * [VIM-2442](https://youtrack.jetbrains.com/issue/VIM-2442) Fix `!` command
+* [VIM-2255](https://youtrack.jetbrains.com/issue/VIM-2255) Fix reload icon on windows
+
+### Merged PRs:
+* [390](https://github.com/JetBrains/ideavim/pull/390) by [chylex](https://github.com/chylex): [VIM-2255] Missing reload icon in .ideavimrc on Windows
 
 ## 1.8.0, 2021-10-27
 
