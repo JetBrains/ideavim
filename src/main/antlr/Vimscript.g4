@@ -156,7 +156,7 @@ range:
     rangeUnit+;
 
 rangeUnit:
-    (rangeExpression? rangeSeparator) | (rangeExpression rangeSeparator?);
+    (rangeExpression? WS* rangeSeparator WS*) | (rangeExpression WS* rangeSeparator? WS*);
 
 rangeExpression:
     (rangeMember rangeOffset?) | (rangeMember? rangeOffset);

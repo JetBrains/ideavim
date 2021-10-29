@@ -18,8 +18,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.parser.commands
 
+import com.maddyhome.idea.vim.ex.ranges.LineNumberRange
 import com.maddyhome.idea.vim.ex.ranges.MarkRange
 import com.maddyhome.idea.vim.vimscript.model.commands.BufferCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.DeleteLinesCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand
@@ -86,5 +88,15 @@ class CommandTests {
     val command = VimscriptParser.parseCommand("b${sp}1")
     assertTrue(command is BufferCommand)
     assertEquals("1", command.argument)
+  }
+
+  // VIM-2445
+  @Theory
+  fun `spaces in range`(sp1: String, sp2: String, sp3: String) {
+    val command = VimscriptParser.parseCommand("10$sp1,${sp2}20${sp3}d")
+    assertTrue(command is DeleteLinesCommand)
+    assertEquals(2, command.ranges.size())
+    assertEquals(LineNumberRange(9, 0, false), command.ranges.ranges[0])
+    assertEquals(LineNumberRange(19, 0, false), command.ranges.ranges[1])
   }
 }
