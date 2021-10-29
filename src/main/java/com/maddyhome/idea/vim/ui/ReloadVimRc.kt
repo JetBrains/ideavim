@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.icons.VimIcons
 import com.maddyhome.idea.vim.ui.ReloadFloatingToolbarActionGroup.Companion.ACTION_GROUP
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
+import com.maddyhome.idea.vim.vimscript.services.VimRcService.VIMRC_FILE_NAME
 import com.maddyhome.idea.vim.vimscript.services.VimRcService.executeIdeaVimRc
 import org.jetbrains.annotations.TestOnly
 
@@ -116,7 +117,15 @@ class ReloadVimRc : DumbAwareAction() {
       return
     }
 
-    if (FileUtil.toSystemDependentName(virtualFile.path) != VimRcFileState.filePath) {
+    if (VimRcFileState.filePath != null && FileUtil.toSystemDependentName(virtualFile.path) != VimRcFileState.filePath) {
+      e.presentation.isEnabledAndVisible = false
+      return
+    } else if (VimRcFileState.filePath == null && !virtualFile.path.endsWith(VIMRC_FILE_NAME)) {
+      // This if is about showing the reload icon if the IJ opens with .ideavimrc file opened.
+      // At this moment VimRcFileState is not yet initialized.
+      // XXX: I believe the proper solution would be to get rid of this if branch and update the action when
+      //    `filePath` is set, but I wasn't able to make it work, the icon just doesn't appear. Maybe the action group
+      //    or the toolbar should be updated along with the action.
       e.presentation.isEnabledAndVisible = false
       return
     }

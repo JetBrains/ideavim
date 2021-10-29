@@ -30,7 +30,7 @@ object VimRcService {
   private val logger = logger<VimRcService>()
 
   @NonNls
-  private const val VIMRC_FILE_NAME = "ideavimrc"
+  const val VIMRC_FILE_NAME = "ideavimrc"
 
   @NonNls
   private val HOME_VIMRC_PATHS = arrayOf(".$VIMRC_FILE_NAME", "_$VIMRC_FILE_NAME")
