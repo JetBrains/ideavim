@@ -1313,6 +1313,11 @@ public class MotionGroup {
         col = normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowedIgnoringOnemore(CommandStateHelper.getMode(editor)));
       }
       else {
+        if (line < 0) {
+          // https://web.ea.pages.jetbrains.team/#/issue/266279
+          // There is a weird exception for line < 0, but I don't understand how this may happen
+          throw new RuntimeException("Line is " + line + " , pos.line=" + pos.line + ", count=" + count);
+        }
         int newInlineElements = InlayHelperKt.amountOfInlaysBeforeVisualPosition(editor, new VisualPosition(line, col));
 
         col = normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(editor));
