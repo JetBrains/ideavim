@@ -25,6 +25,9 @@ usual beta standards.
 
 ## To Be Released
 
+### Features:
+* Make IdeaVim compatible with CodeWithMe | [VIM-2332](https://youtrack.jetbrains.com/issue/VIM-2332)
+
 ### Fixes:
 * [VIM-2442](https://youtrack.jetbrains.com/issue/VIM-2442) Fix `!` command
 * [VIM-2255](https://youtrack.jetbrains.com/issue/VIM-2255) Fix reload icon on windows
