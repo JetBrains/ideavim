@@ -285,7 +285,7 @@ object IdeaSpecifics {
       val charSequence = this.document.charsSequence
       val templateLastIndex = TEMPLATE_START.length
       for (i in start downTo templateLastIndex) {
-        if (charSequence.subSequence(i - templateLastIndex, i + 1).toString() == TEMPLATE_START) {
+        if (charSequence.subSequence(i - templateLastIndex, i).toString() == TEMPLATE_START) {
           return i - templateLastIndex
         }
       }
