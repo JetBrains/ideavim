@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.mode
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.singleTask
 import com.maddyhome.idea.vim.option.OptionsManager
+import java.awt.event.ActionEvent
 import javax.swing.Timer
 
 /**
@@ -72,12 +73,26 @@ object VimVisualTimer {
 
     // Default delay - 100 ms
     val timer = Timer(OptionsManager.visualEnterDelay.value()) {
-      task(mode)
-      swingTimer = null
-      mode = null
+      timerAction(task)
     }
     timer.isRepeats = false
     timer.start()
     swingTimer = timer
+  }
+
+  fun doNow() {
+    val swingTimer1 = swingTimer
+    if (swingTimer1 != null) {
+      swingTimer1.stop()
+      swingTimer1.actionListeners?.forEach {
+        it.actionPerformed(ActionEvent(swingTimer1, 0, swingTimer1.actionCommand, System.currentTimeMillis(), 0))
+      }
+    }
+  }
+
+  inline fun timerAction(task: (initialMode: CommandState.Mode?) -> Unit) {
+    task(mode)
+    swingTimer = null
+    mode = null
   }
 }

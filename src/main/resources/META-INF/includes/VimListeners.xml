@@ -15,6 +15,9 @@
     <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$VimActionListener"
               topic="com.intellij.openapi.actionSystem.ex.AnActionListener"/>
 
+    <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$AppCodeTemplates$ActionListener"
+              topic="com.intellij.openapi.actionSystem.ex.AnActionListener"/>
+
     <listener class="com.maddyhome.idea.vim.listener.IdeaSpecifics$VimTemplateManagerListener"
               topic="com.intellij.codeInsight.template.TemplateManagerListener"/>
 

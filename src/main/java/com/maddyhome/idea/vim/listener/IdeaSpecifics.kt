@@ -43,8 +43,10 @@ import com.intellij.openapi.util.Key
 import com.intellij.util.PlatformUtils
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.IdeaSelectionControl
+import com.maddyhome.idea.vim.group.visual.VimVisualTimer
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -52,6 +54,7 @@ import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.fileSize
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inNormalMode
+import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import org.jetbrains.annotations.NonNls
@@ -214,6 +217,37 @@ object IdeaSpecifics {
 
     private const val TEMPLATE_START = "<#T##"
     private const val TEMPLATE_END = "#>"
+
+    class ActionListener : AnActionListener {
+
+      private var editor: Editor? = null
+
+      override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
+        if (!VimPlugin.isEnabled()) return
+
+        val hostEditor = dataContext.getData(CommonDataKeys.HOST_EDITOR)
+        if (hostEditor != null) {
+          editor = hostEditor
+        }
+      }
+
+      override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
+        if (!VimPlugin.isEnabled()) return
+
+        if (PlatformUtils.isAppCode()) {
+          if (ActionManager.getInstance().getId(action) == IdeActions.ACTION_CHOOSE_LOOKUP_ITEM) {
+            val myEditor = editor
+            if (myEditor != null) {
+              VimVisualTimer.doNow()
+              if (myEditor.inVisualMode) {
+                SelectToggleVisualMode.toggleMode(myEditor)
+                KeyHandler.getInstance().partialReset(myEditor)
+              }
+            }
+          }
+        }
+      }
+    }
 
     @JvmStatic
     fun onMovement(
