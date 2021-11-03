@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.BufferCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.DeleteLinesCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.PlugCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SetCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SplitCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SplitType
@@ -117,5 +118,38 @@ class CommandTests {
     val command = VimscriptParser.parseCommand("sp")
     assertTrue(command is SplitCommand)
     assertEquals(SplitType.HORIZONTAL, command.splitType)
+  }
+
+  // VIM-2452
+  fun `augroup test`() {
+    // augusto was recognized as AUGROUP token ('au') and all the lines were ignored
+    val script = VimscriptParser.parse(
+      """
+        Plug 'danilo-augusto/vim-afterglow'
+        set nu rnu
+
+        augroup myCmds
+        augroup END
+      """.trimIndent()
+    )
+    assertEquals(2, script.units.size)
+    assertTrue(script.units[0] is PlugCommand)
+    assertTrue(script.units[1] is SetCommand)
+  }
+
+  fun `augroup test 2`() {
+    val script = VimscriptParser.parse(
+      """
+        augroup myCmds
+          au smthing
+        augroup END
+        
+        Plug 'danilo-augusto/vim-afterglow'
+        set nu rnu
+      """.trimIndent()
+    )
+    assertEquals(2, script.units.size)
+    assertTrue(script.units[0] is PlugCommand)
+    assertTrue(script.units[1] is SetCommand)
   }
 }
