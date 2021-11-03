@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.BufferCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.DeleteLinesCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.SetCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -98,5 +99,13 @@ class CommandTests {
     assertEquals(2, command.ranges.size())
     assertEquals(LineNumberRange(9, 0, false), command.ranges.ranges[0])
     assertEquals(LineNumberRange(19, 0, false), command.ranges.ranges[1])
+  }
+
+  // VIM-2450
+  @Theory
+  fun `set command`() {
+    val command = VimscriptParser.parseCommand("se nonu")
+    assertTrue(command is SetCommand)
+    assertEquals("nonu", command.argument)
   }
 }

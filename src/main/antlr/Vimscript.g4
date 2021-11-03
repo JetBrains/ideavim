@@ -634,7 +634,7 @@ V_GLOBAL:               'vg' | 'vgl' | 'vglo' | 'vglob' | 'vgloba' | 'vglobal';
 SELECT_FILE:            'argu' | 'argum' | 'argume' | 'argumen' | 'argument';
 SELECT_FIRST_FILE:      'fir' | 'firs' | 'first';
 SELECT_LAST_FILE:       'la' | 'las' | 'last';
-SET:                    'set';
+SET:                    'se' | 'set';
 SET_HANDLER:            'sethandler';
 SHELL:                  'sh' | 'she' | 'shel' | 'shell';
 SORT:                   'sor' | 'sort';
