@@ -27,6 +27,13 @@ usual beta standards.
 
 ### Fixes:
 * [VIM-2442](https://youtrack.jetbrains.com/issue/VIM-2442) Fix `!` command
+* [VIM-2255](https://youtrack.jetbrains.com/issue/VIM-2255) Fix reload icon on windows
+* [VIM-2199](https://youtrack.jetbrains.com/issue/VIM-2199) Fix autocompletion for AppCode
+* [VIM-2445](https://youtrack.jetbrains.com/issue/VIM-2445) Fix spaces in range
+* [VIM-2450](https://youtrack.jetbrains.com/issue/VIM-2450) Fix set command
+* [VIM-2451](https://youtrack.jetbrains.com/issue/VIM-2451) Fix comments
+* [VIM-2452](https://youtrack.jetbrains.com/issue/VIM-2452) Fix augroup
+* [VIM-2453](https://youtrack.jetbrains.com/issue/VIM-2453) Fix split command
 
 ## 1.8.0, 2021-10-27
 
