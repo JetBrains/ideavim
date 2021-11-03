@@ -570,6 +570,7 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     "la" to SelectLastFileCommand::class,
     "las" to SelectLastFileCommand::class,
     "last" to SelectLastFileCommand::class,
+    "se" to SetCommand::class,
     "set" to SetCommand::class,
     "sethandler" to SetHandlerCommand::class,
     "sh" to ShellCommand::class,
