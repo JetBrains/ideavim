@@ -25,6 +25,8 @@ import com.maddyhome.idea.vim.vimscript.model.commands.DeleteLinesCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.EchoCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.LetCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SetCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.SplitCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.SplitType
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -107,5 +109,13 @@ class CommandTests {
     val command = VimscriptParser.parseCommand("se nonu")
     assertTrue(command is SetCommand)
     assertEquals("nonu", command.argument)
+  }
+
+  // VIM-2453
+  @Theory
+  fun `split command`() {
+    val command = VimscriptParser.parseCommand("sp")
+    assertTrue(command is SplitCommand)
+    assertEquals(SplitType.HORIZONTAL, command.splitType)
   }
 }
