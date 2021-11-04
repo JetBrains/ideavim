@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.change.VimRepeater
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.VimBlockSelection
@@ -80,6 +81,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
       context: DataContext,
       cmd: Command,
       range: VimSelection,
+      operatorArguments: OperatorArguments,
     ): Boolean
 
     /**
@@ -120,10 +122,17 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
       context: DataContext,
       cmd: Command,
       caretsAndSelections: Map<Caret, VimSelection>,
+      operatorArguments: OperatorArguments,
     ): Boolean
   }
 
-  final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+  final override fun baseExecute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments
+  ): Boolean {
     logger.info("Execute visual command $cmd")
 
     editor.vimChangeActionSwitchMode = null
@@ -138,7 +147,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
     val res = Ref.create(true)
     when (this) {
       is SingleExecution -> {
-        res.set(executeForAllCarets(editor, context, cmd, selections))
+        res.set(executeForAllCarets(editor, context, cmd, selections, operatorArguments))
       }
       is ForEachCaret -> {
         logger.debug("Calling 'before execution'")
@@ -155,13 +164,14 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
               selections.keys.first(),
               context,
               cmd,
-              selections.values.first()
+              selections.values.first(),
+              operatorArguments
             )
           )
           else -> editor.caretModel.runForEachCaret(
             { currentCaret ->
               val range = selections.getValue(currentCaret)
-              val loopRes = executeAction(editor, currentCaret, context, cmd, range)
+              val loopRes = executeAction(editor, currentCaret, context, cmd, range, operatorArguments)
               res.set(loopRes and res.get())
             },
             true

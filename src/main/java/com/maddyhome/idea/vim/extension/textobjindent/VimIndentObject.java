@@ -97,10 +97,14 @@ public class VimIndentObject implements VimExtension {
         this.includeBelow = includeBelow;
       }
 
+      @Nullable
       @Override
-      public @Nullable
-      TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                         int count, int rawCount, @Nullable Argument argument) {
+      public TextRange getRange(@NotNull Editor editor,
+                                @NotNull Caret caret,
+                                @NotNull DataContext context,
+                                int count,
+                                int rawCount,
+                                @Nullable Argument argument) {
         final CharSequence charSequence = editor.getDocument().getCharsSequence();
         final int caretOffset = caret.getOffset();
 

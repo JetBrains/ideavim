@@ -670,4 +670,23 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
       """.trimIndent()
     )
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.OPTION)
+  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, VimTestOptionType.VALUE, [VirtualEditData.onemore]))
+  fun `test change dollar`() {
+    doTest(
+      "c$",
+      """
+            Yesterday it w${c}orked
+            Today it is not working
+            The test is like that.
+      """.trimIndent(),
+      """
+            Yesterday it w${c}
+            Today it is not working
+            The test is like that.
+      """.trimIndent(),
+      CommandState.Mode.INSERT, CommandState.SubMode.NONE
+    )
+  }
 }

@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.ComplicatedKeysAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -39,11 +40,10 @@ class InsertPreviousInsertExitAction : ChangeEditorActionHandler.SingleExecution
   override fun execute(
     editor: Editor,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Boolean {
-    VimPlugin.getChange().insertPreviousInsert(editor, context, true)
+    VimPlugin.getChange().insertPreviousInsert(editor, context, true, operatorArguments)
     return false
   }
 }

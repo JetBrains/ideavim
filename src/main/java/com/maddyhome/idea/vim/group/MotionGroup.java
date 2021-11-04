@@ -79,17 +79,15 @@ public class MotionGroup {
    * @param editor   The editor the motion takes place in
    * @param caret    The caret the motion takes place on
    * @param context  The data context
-   * @param count    The count applied to the motion
-   * @param rawCount The actual count entered by the user
    * @param argument Any argument needed by the motion
+   * @param operatorArguments
    * @return The motion's range
    */
   public static @Nullable TextRange getMotionRange(@NotNull Editor editor,
                                                    @NotNull Caret caret,
                                                    DataContext context,
-                                                   int count,
-                                                   int rawCount,
-                                                   @NotNull Argument argument) {
+                                                   @NotNull Argument argument,
+                                                   @NotNull OperatorArguments operatorArguments) {
     int start;
     int end;
     if (argument.getType() == Argument.Type.OFFSETS) {
@@ -103,8 +101,8 @@ public class MotionGroup {
     else {
       final Command cmd = argument.getMotion();
       // Normalize the counts between the command and the motion argument
-      int cnt = cmd.getCount() * count;
-      int raw = rawCount == 0 && cmd.getRawCount() == 0 ? 0 : cnt;
+      int cnt = cmd.getCount() * operatorArguments.getCount1();
+      int raw = operatorArguments.getCount0() == 0 && cmd.getRawCount() == 0 ? 0 : cnt;
       if (cmd.getAction() instanceof MotionActionHandler) {
         MotionActionHandler action = (MotionActionHandler)cmd.getAction();
 
@@ -112,7 +110,8 @@ public class MotionGroup {
         start = caret.getOffset();
 
         // Execute the motion (without moving the cursor) and get where we end
-        Motion motion = action.getHandlerOffset(editor, caret, context, cnt, raw, cmd.getArgument());
+        Motion motion =
+          action.getHandlerOffset(editor, caret, context, cmd.getArgument(), operatorArguments.withCount0(raw));
 
         // Invalid motion
         if (Motion.Error.INSTANCE.equals(motion)) return null;

@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState.Companion.getInstance
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.extension.VimExtension
 import com.maddyhome.idea.vim.extension.VimExtensionFacade
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMappingIfMissing
@@ -82,11 +83,10 @@ class Matchit : VimExtension {
       editor: Editor,
       caret: Caret,
       context: DataContext,
-      count: Int,
-      rawCount: Int,
       argument: Argument?,
+      operatorArguments: OperatorArguments,
     ): Motion {
-      return getMatchitOffset(editor, caret, rawCount, isInOpPending, reverse).toMotionOrError()
+      return getMatchitOffset(editor, caret, operatorArguments.count0, isInOpPending, reverse).toMotionOrError()
     }
 
     override fun process(cmd: Command) {

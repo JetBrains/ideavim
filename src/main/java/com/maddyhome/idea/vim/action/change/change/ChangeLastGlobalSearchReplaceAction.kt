@@ -22,6 +22,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.ex.ranges.LineRange
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -32,9 +33,8 @@ class ChangeLastGlobalSearchReplaceAction : ChangeEditorActionHandler.SingleExec
   override fun execute(
     editor: Editor,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     val range = LineRange(0, EditorHelper.getLineCount(editor) - 1)
     return VimPlugin.getSearch()

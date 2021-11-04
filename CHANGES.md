@@ -37,6 +37,7 @@ usual beta standards.
 * [VIM-2451](https://youtrack.jetbrains.com/issue/VIM-2451) Fix comments
 * [VIM-2452](https://youtrack.jetbrains.com/issue/VIM-2452) Fix augroup
 * [VIM-2453](https://youtrack.jetbrains.com/issue/VIM-2453) Fix split command
+* [VIM-2397](https://youtrack.jetbrains.com/issue/VIM-2397) Fix dollar motion as an operator
 
 ### Merged PRs:
 * [390](https://github.com/JetBrains/ideavim/pull/390) by [chylex](https://github.com/chylex): [VIM-2255] Missing reload icon in .ideavimrc on Windows

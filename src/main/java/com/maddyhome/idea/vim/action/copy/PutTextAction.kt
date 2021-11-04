@@ -22,6 +22,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.group.copy.PutData.TextData
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
@@ -34,14 +35,19 @@ sealed class PutTextBaseAction(
 ) : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
-  override fun execute(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean {
+  override fun execute(
+    editor: Editor,
+    context: DataContext,
+    argument: Argument?,
+    operatorArguments: OperatorArguments
+  ): Boolean {
     val lastRegister = VimPlugin.getRegister().lastRegister
     val textData = if (lastRegister != null) TextData(
       lastRegister.text ?: StringHelper.toKeyNotation(lastRegister.keys),
       lastRegister.type,
       lastRegister.transferableData
     ) else null
-    val putData = PutData(textData, null, count, insertTextBeforeCaret, indent, caretAfterInsertedText, -1)
+    val putData = PutData(textData, null, operatorArguments.count1, insertTextBeforeCaret, indent, caretAfterInsertedText, -1)
     return VimPlugin.getPut().putText(editor, context, putData)
   }
 }

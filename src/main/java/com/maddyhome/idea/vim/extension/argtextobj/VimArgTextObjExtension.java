@@ -198,8 +198,14 @@ public class VimArgTextObjExtension implements VimExtension {
         this.isInner = isInner;
       }
 
+      @Nullable
       @Override
-      public @Nullable TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
+      public TextRange getRange(@NotNull Editor editor,
+                                @NotNull Caret caret,
+                                @NotNull DataContext context,
+                                int count,
+                                int rawCount,
+                                @Nullable Argument argument) {
         BracketPairs bracketPairs = DEFAULT_BRACKET_PAIRS;
         final String bracketPairsVar = bracketPairsVariable();
         if (bracketPairsVar != null) {

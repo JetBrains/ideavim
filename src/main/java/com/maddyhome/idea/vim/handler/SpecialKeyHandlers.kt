@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.helper.exitSelectMode
 import com.maddyhome.idea.vim.helper.exitVisualMode
 import com.maddyhome.idea.vim.helper.inSelectMode
@@ -44,7 +45,7 @@ import com.maddyhome.idea.vim.option.SelectModeOptionData
  * Handler is called once for all carets
  */
 abstract class ShiftedSpecialKeyHandler : VimActionHandler.SingleExecution() {
-  final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+  final override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val startSel = KeyModelOptionData.startsel in OptionsManager.keymodel
     if (startSel && !editor.inVisualMode && !editor.inSelectMode) {
       if (SelectModeOptionData.key in OptionsManager.selectmode) {
@@ -73,7 +74,7 @@ abstract class ShiftedSpecialKeyHandler : VimActionHandler.SingleExecution() {
  * Handler is called once for all carets
  */
 abstract class ShiftedArrowKeyHandler : VimActionHandler.SingleExecution() {
-  final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+  final override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val keymodelOption = OptionsManager.keymodel
     val startSel = KeyModelOptionData.startsel in keymodelOption
     val inVisualMode = editor.inVisualMode
@@ -122,9 +123,8 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     val keymodel = OptionsManager.keymodel
     if (editor.inSelectMode && (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel)) {
@@ -134,7 +134,7 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
       editor.exitVisualMode()
     }
 
-    return offset(editor, caret, context, count, rawCount, argument).toMotionOrError()
+    return offset(editor, caret, context, operatorArguments.count1, operatorArguments.count0, argument).toMotionOrError()
   }
 
   /**

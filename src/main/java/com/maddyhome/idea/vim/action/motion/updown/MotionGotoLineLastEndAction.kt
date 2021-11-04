@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
@@ -43,9 +44,8 @@ class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     var allow = false
     if (editor.inInsertMode) {
@@ -57,7 +57,7 @@ class MotionGotoLineLastEndAction : MotionActionHandler.ForEachCaret() {
       }
     }
 
-    return VimPlugin.getMotion().moveCaretGotoLineLastEnd(editor, rawCount, count - 1, allow).toMotion()
+    return VimPlugin.getMotion().moveCaretGotoLineLastEnd(editor, operatorArguments.count0, operatorArguments.count1 - 1, allow).toMotion()
   }
 }
 
@@ -70,9 +70,8 @@ class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCaret() {
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     var allow = false
     if (editor.inInsertMode) {
@@ -84,6 +83,6 @@ class MotionGotoLineLastEndInsertAction : MotionActionHandler.ForEachCaret() {
       }
     }
 
-    return VimPlugin.getMotion().moveCaretGotoLineLastEnd(editor, rawCount, count - 1, allow).toMotion()
+    return VimPlugin.getMotion().moveCaretGotoLineLastEnd(editor, operatorArguments.count0, operatorArguments.count1 - 1, allow).toMotion()
   }
 }

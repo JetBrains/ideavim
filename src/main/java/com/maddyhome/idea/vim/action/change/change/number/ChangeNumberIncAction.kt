@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
 sealed class IncAction(val inc: Int) : ChangeEditorActionHandler.ForEachCaret() {
@@ -32,11 +33,10 @@ sealed class IncAction(val inc: Int) : ChangeEditorActionHandler.ForEachCaret() 
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Boolean {
-    return VimPlugin.getChange().changeNumber(editor, caret, inc * count)
+    return VimPlugin.getChange().changeNumber(editor, caret, inc * operatorArguments.count1)
   }
 }
 

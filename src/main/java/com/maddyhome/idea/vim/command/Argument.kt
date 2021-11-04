@@ -50,7 +50,12 @@ class Argument private constructor(
     val EMPTY_COMMAND = Command(
       0,
       object : MotionActionHandler.SingleExecution() {
-        override fun getOffset(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?) =
+        override fun getOffset(
+          editor: Editor,
+          context: DataContext,
+          argument: Argument?,
+          operatorArguments: OperatorArguments
+        ) =
           Motion.NoMotion
 
         override val motionType: MotionType = MotionType.EXCLUSIVE

@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
 /**
@@ -40,14 +41,13 @@ class AutoIndentMotionAction : ChangeEditorActionHandler.ForEachCaret(), Duplica
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     if (argument == null) {
       return false
     }
-    VimPlugin.getChange().autoIndentMotion(editor, caret, context, count, rawCount, argument)
+    VimPlugin.getChange().autoIndentMotion(editor, caret, context, argument, operatorArguments)
     return true
   }
 }

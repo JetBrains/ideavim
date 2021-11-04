@@ -22,13 +22,14 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.MotionGroup
 
 /**
  * Base class for Vim commands handled by existing IDE actions.
  */
 abstract class IdeActionHandler(private val actionName: String) : VimActionHandler.SingleExecution() {
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+  override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     KeyHandler.executeAction(actionName, context)
     MotionGroup.scrollCaretIntoView(editor)
     return true

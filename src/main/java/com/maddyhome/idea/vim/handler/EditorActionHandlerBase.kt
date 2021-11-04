@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
@@ -69,11 +70,17 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
    */
   open val flags: EnumSet<CommandFlags> = noneOfEnum()
 
-  abstract fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean
+  abstract fun baseExecute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean
 
-  fun execute(editor: Editor, context: DataContext) {
+  fun execute(editor: Editor, context: DataContext, operatorArguments: OperatorArguments) {
     val hostEditor: Editor = CommonDataKeys.HOST_EDITOR.getData(context) ?: editor
-    val action = { caret: Caret -> doExecute(editor, caret, context) }
+    val action = { caret: Caret -> doExecute(editor, caret, context, operatorArguments) }
     if (myRunForEachCaret) {
       hostEditor.caretModel.runForEachCaret(action)
     } else {
@@ -81,7 +88,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
     }
   }
 
-  private fun doExecute(editor: Editor, caret: Caret, context: DataContext) {
+  private fun doExecute(editor: Editor, caret: Caret, context: DataContext, operatorArguments: OperatorArguments) {
     if (!VimPlugin.isEnabled()) return
 
     val topLevelEditor = editor.getTopLevelEditor()
@@ -92,7 +99,7 @@ abstract class EditorActionHandlerBase(private val myRunForEachCaret: Boolean) {
       return
     }
 
-    if (!baseExecute(topLevelEditor, caret, CaretSpecificDataContext(context, caret), cmd)) VimPlugin.indicateError()
+    if (!baseExecute(topLevelEditor, caret, CaretSpecificDataContext(context, caret), cmd, operatorArguments)) VimPlugin.indicateError()
   }
 
   open fun process(cmd: Command) {

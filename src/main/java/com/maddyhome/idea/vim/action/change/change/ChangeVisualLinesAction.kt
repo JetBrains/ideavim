@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandFlags.FLAG_EXIT_VISUAL
 import com.maddyhome.idea.vim.command.CommandFlags.FLAG_MOT_LINEWISE
 import com.maddyhome.idea.vim.command.CommandFlags.FLAG_MULTIKEY_UNDO
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.visual.VimSelection
@@ -49,6 +50,7 @@ class ChangeVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
     context: DataContext,
     cmd: Command,
     range: VimSelection,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     val textRange = range.toVimTextRange(true)
     val lineEndForOffset = EditorHelper.getLineEndForOffset(editor, textRange.endOffset)
@@ -57,6 +59,11 @@ class ChangeVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
       EditorHelper.getLineStartForOffset(editor, textRange.startOffset),
       lineEndForOffset + endsWithNewLine
     )
-    return VimPlugin.getChange().changeRange(editor, caret, lineRange, SelectionType.LINE_WISE, context)
+    return VimPlugin.getChange().changeRange(editor,
+        caret,
+        lineRange,
+        SelectionType.LINE_WISE,
+        context
+    )
   }
 }

@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
 class ChangeCaseToggleCharacterAction : ChangeEditorActionHandler.ForEachCaret() {
@@ -32,10 +33,9 @@ class ChangeCaseToggleCharacterAction : ChangeEditorActionHandler.ForEachCaret()
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Boolean {
-    return VimPlugin.getChange().changeCaseToggleCharacter(editor, caret, count)
+    return VimPlugin.getChange().changeCaseToggleCharacter(editor, caret, operatorArguments.count1)
   }
 }

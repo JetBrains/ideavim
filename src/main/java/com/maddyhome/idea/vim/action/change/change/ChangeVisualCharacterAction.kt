@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
@@ -40,11 +41,12 @@ class ChangeVisualCharacterAction : VisualOperatorActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_ALLOW_DIGRAPH, CommandFlags.FLAG_EXIT_VISUAL)
 
   override fun executeAction(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
-    cmd: Command,
-    range: VimSelection,
+      editor: Editor,
+      caret: Caret,
+      context: DataContext,
+      cmd: Command,
+      range: VimSelection,
+      operatorArguments: OperatorArguments,
   ): Boolean {
     val argument = cmd.argument
     return argument != null &&

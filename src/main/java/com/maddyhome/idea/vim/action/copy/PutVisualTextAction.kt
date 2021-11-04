@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
@@ -44,10 +45,11 @@ sealed class PutVisualTextBaseAction(
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
   override fun executeForAllCarets(
-    editor: Editor,
-    context: DataContext,
-    cmd: Command,
-    caretsAndSelections: Map<Caret, VimSelection>,
+      editor: Editor,
+      context: DataContext,
+      cmd: Command,
+      caretsAndSelections: Map<Caret, VimSelection>,
+      operatorArguments: OperatorArguments,
   ): Boolean {
     if (caretsAndSelections.isEmpty()) return false
     val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type, it.transferableData) }

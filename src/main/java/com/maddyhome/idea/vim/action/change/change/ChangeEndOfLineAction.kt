@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandFlags.FLAG_MULTIKEY_UNDO
 import com.maddyhome.idea.vim.command.CommandFlags.FLAG_NO_REPEAT_INSERT
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
@@ -39,10 +40,9 @@ class ChangeEndOfLineAction : ChangeEditorActionHandler.ForEachCaret() {
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Boolean {
-    return VimPlugin.getChange().changeEndOfLine(editor, caret, count)
+    return VimPlugin.getChange().changeEndOfLine(editor, caret, operatorArguments.count1)
   }
 }

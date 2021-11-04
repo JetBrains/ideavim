@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
@@ -83,6 +84,6 @@ fun Editor.exitSelectMode(adjustCaretPosition: Boolean) {
   }
 }
 
-fun Editor.exitInsertMode(context: DataContext) {
-  VimPlugin.getChange().processEscape(this, context)
+fun Editor.exitInsertMode(context: DataContext, operatorArguments: OperatorArguments) {
+  VimPlugin.getChange().processEscape(this, context, operatorArguments)
 }

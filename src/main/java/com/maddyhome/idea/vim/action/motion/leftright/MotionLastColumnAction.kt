@@ -26,11 +26,11 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
-import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
@@ -49,18 +49,17 @@ open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     val allow = if (editor.inVisualMode) {
       val opt = OptionsManager.selection
       opt.value != "old"
     } else {
-      if (editor.commandState.isOperatorPending) false else editor.isEndAllowed
+      if (operatorArguments.isOperatorPending) false else editor.isEndAllowed
     }
 
-    return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow).toMotion()
+    return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, operatorArguments.count1 - 1, allow).toMotion()
   }
 
   override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {

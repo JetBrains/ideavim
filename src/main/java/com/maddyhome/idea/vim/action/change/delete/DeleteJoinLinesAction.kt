@@ -24,6 +24,7 @@ import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.option.OptionsManager.ideajoin
 
@@ -33,19 +34,18 @@ class DeleteJoinLinesAction : ChangeEditorActionHandler.SingleExecution() {
   override fun execute(
     editor: Editor,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode) return false
     if (ideajoin.isSet) {
-      return VimPlugin.getChange().joinViaIdeaByCount(editor, context, count)
+      return VimPlugin.getChange().joinViaIdeaByCount(editor, context, operatorArguments.count1)
     }
     VimPlugin.getEditor().notifyIdeaJoin(editor.project)
     val res = Ref.create(true)
     editor.caretModel.runForEachCaret(
       { caret: Caret ->
-        if (!VimPlugin.getChange().deleteJoinLines(editor, caret, count, false)) res.set(false)
+        if (!VimPlugin.getChange().deleteJoinLines(editor, caret, operatorArguments.count1, false)) res.set(false)
       },
       true
     )

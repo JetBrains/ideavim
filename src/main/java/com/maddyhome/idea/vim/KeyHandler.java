@@ -116,9 +116,10 @@ public class KeyHandler {
 
   public static void executeVimAction(@NotNull Editor editor,
                                       @NotNull EditorActionHandlerBase cmd,
-                                      DataContext context) {
+                                      DataContext context,
+                                      @NotNull OperatorArguments operatorArguments) {
     CommandProcessor.getInstance()
-      .executeCommand(editor.getProject(), () -> cmd.execute(editor, getProjectAwareDataContext(editor, context)),
+      .executeCommand(editor.getProject(), () -> cmd.execute(editor, getProjectAwareDataContext(editor, context), operatorArguments),
                       cmd.getId(), DocCommandGroupId.noneGroupId(editor.getDocument()), UndoConfirmationPolicy.DEFAULT,
                       editor.getDocument());
   }
@@ -785,6 +786,10 @@ public class KeyHandler {
     LOG.trace("Command execution");
     final Command command = editorState.getCommandBuilder().buildCommand();
 
+    OperatorArguments operatorArguments =
+      new OperatorArguments(editorState.getMappingState().getMappingMode() == MappingMode.OP_PENDING,
+                            command.getRawCount());
+
     // If we were in "operator pending" mode, reset back to normal mode.
     editorState.resetOpPending();
 
@@ -809,7 +814,7 @@ public class KeyHandler {
     }
 
     if (ApplicationManager.getApplication().isDispatchThread()) {
-      Runnable action = new ActionRunner(editor, context, command);
+      Runnable action = new ActionRunner(editor, context, command, operatorArguments);
       EditorActionHandlerBase cmdAction = command.getAction();
       String name = cmdAction.getId();
 
@@ -1045,10 +1050,11 @@ public class KeyHandler {
    */
   static class ActionRunner implements Runnable {
     @Contract(pure = true)
-    ActionRunner(Editor editor, DataContext context, Command cmd) {
+    ActionRunner(Editor editor, DataContext context, Command cmd, OperatorArguments operatorArguments) {
       this.editor = editor;
       this.context = context;
       this.cmd = cmd;
+      this.operatorArguments = operatorArguments;
     }
 
     @Override
@@ -1062,7 +1068,7 @@ public class KeyHandler {
         VimPlugin.getRegister().selectRegister(register);
       }
 
-      executeVimAction(editor, cmd.getAction(), context);
+      executeVimAction(editor, cmd.getAction(), context, operatorArguments);
       if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
         VimPlugin.getChange().processCommand(editor, cmd);
       }
@@ -1090,6 +1096,7 @@ public class KeyHandler {
     private final Editor editor;
     private final DataContext context;
     private final Command cmd;
+    private final OperatorArguments operatorArguments;
   }
 
   private TypedActionHandler origHandler;

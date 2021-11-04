@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.commandState
@@ -32,7 +33,7 @@ import javax.swing.KeyStroke
 class RepeatChangeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_WRITABLE
 
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+  override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val state = editor.commandState
     val lastCommand = VimRepeater.lastChangeCommand
 
@@ -69,7 +70,7 @@ class RepeatChangeAction : VimActionHandler.SingleExecution() {
         }
         state.setExecutingCommand(lastCommand)
 
-        KeyHandler.executeVimAction(editor, lastCommand.action, context)
+        KeyHandler.executeVimAction(editor, lastCommand.action, context, operatorArguments)
 
         VimRepeater.saveLastChange(lastCommand)
       }

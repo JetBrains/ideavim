@@ -109,8 +109,7 @@ public class ChangeGroup {
 
   /**
    * Begin insert before the cursor position
-   *
-   * @param editor  The editor to insert into
+   *  @param editor  The editor to insert into
    * @param context The data context
    */
   public void insertBeforeCursor(@NotNull Editor editor, @NotNull DataContext context) {
@@ -131,8 +130,7 @@ public class ChangeGroup {
 
   /**
    * Begin insert before the start of the current line
-   *
-   * @param editor  The editor to insert into
+   *  @param editor  The editor to insert into
    * @param context The data context
    */
   public void insertLineStart(@NotNull Editor editor, @NotNull DataContext context) {
@@ -144,8 +142,7 @@ public class ChangeGroup {
 
   /**
    * Begin insert after the cursor position
-   *
-   * @param editor  The editor to insert into
+   *  @param editor  The editor to insert into
    * @param context The data context
    */
   public void insertAfterCursor(@NotNull Editor editor, @NotNull DataContext context) {
@@ -235,8 +232,7 @@ public class ChangeGroup {
   /**
    * Begin insert after the current line by creating a new blank line below the current line
    * for all carets
-   *
-   * @param editor  The editor to insert into
+   *  @param editor  The editor to insert into
    * @param context The data context
    */
   public void insertNewLineBelow(final @NotNull Editor editor, final @NotNull DataContext context) {
@@ -299,15 +295,17 @@ public class ChangeGroup {
 
   /**
    * Inserts previously inserted text
-   *
-   * @param editor  The editor to insert into
+   *  @param editor  The editor to insert into
    * @param context The data context
    * @param exit    true if insert mode should be exited after the insert, false should stay in insert mode
    */
-  public void insertPreviousInsert(@NotNull Editor editor, @NotNull DataContext context, boolean exit) {
-    repeatInsertText(editor, context, 1);
+  public void insertPreviousInsert(@NotNull Editor editor,
+                                   @NotNull DataContext context,
+                                   boolean exit,
+                                   @NotNull OperatorArguments operatorArguments) {
+    repeatInsertText(editor, context, 1, operatorArguments);
     if (exit) {
-      ModeHelper.exitInsertMode(editor, context);
+      ModeHelper.exitInsertMode(editor, context, operatorArguments);
     }
   }
 
@@ -398,8 +396,7 @@ public class ChangeGroup {
 
   /**
    * Begin insert/replace mode
-   *
-   * @param editor  The editor to insert into
+   *  @param editor  The editor to insert into
    * @param context The data context
    * @param mode    The mode - indicate insert or replace
    */
@@ -422,10 +419,10 @@ public class ChangeGroup {
         setInsertEditorState(editor, false);
       }
       if (cmd.getFlags().contains(CommandFlags.FLAG_NO_REPEAT_INSERT)) {
-        repeatInsert(editor, context, 1, false);
+        repeatInsert(editor, context, 1, false, new OperatorArguments(false, 1));
       }
       else {
-        repeatInsert(editor, context, cmd.getCount(), false);
+        repeatInsert(editor, context, cmd.getCount(), false, new OperatorArguments(false, cmd.getCount()));
       }
       if (mode == CommandState.Mode.REPLACE) {
         setInsertEditorState(editor, true);
@@ -474,12 +471,14 @@ public class ChangeGroup {
 
   /**
    * This repeats the previous insert count times
-   *
-   * @param editor  The editor to insert into
+   *  @param editor  The editor to insert into
    * @param context The data context
    * @param count   The number of times to repeat the previous insert
    */
-  private void repeatInsertText(@NotNull Editor editor, @NotNull DataContext context, int count) {
+  private void repeatInsertText(@NotNull Editor editor,
+                                @NotNull DataContext context,
+                                int count,
+                                @NotNull OperatorArguments operatorArguments) {
     if (lastStrokes == null) {
       return;
     }
@@ -492,7 +491,7 @@ public class ChangeGroup {
             strokes.add(lastStroke);
           }
           else if (lastStroke instanceof EditorActionHandlerBase) {
-            KeyHandler.executeVimAction(editor, (EditorActionHandlerBase)lastStroke, context);
+            KeyHandler.executeVimAction(editor, (EditorActionHandlerBase)lastStroke, context, operatorArguments);
             strokes.add(lastStroke);
           }
           else if (lastStroke instanceof char[]) {
@@ -509,7 +508,9 @@ public class ChangeGroup {
    * <p>
    * DEPRECATED. Please, don't use this function directly. Use ModeHelper.exitInsert
    */
-  public void processEscape(@NotNull Editor editor, @Nullable DataContext context) {
+  public void processEscape(@NotNull Editor editor,
+                            @Nullable DataContext context,
+                            @NotNull OperatorArguments operatorArguments) {
 
     // Get the offset for marks before we exit insert mode - switching from insert to overtype subtracts one from the
     // column offset.
@@ -535,7 +536,7 @@ public class ChangeGroup {
     lastStrokes = new ArrayList<>(strokes);
 
     if (context != null) {
-      repeatInsert(editor, context, cnt == 0 ? 0 : cnt - 1, true);
+      repeatInsert(editor, context, cnt == 0 ? 0 : cnt - 1, true, operatorArguments);
     }
 
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.INSERT) {
@@ -614,8 +615,7 @@ public class ChangeGroup {
 
   /**
    * Performs a mode switch after change action
-   *
-   * @param editor   The editor to switch mode in
+   *  @param editor   The editor to switch mode in
    * @param context  The data context
    * @param toSwitch The mode to switch to
    */
@@ -629,12 +629,15 @@ public class ChangeGroup {
 
   /**
    * This repeats the previous insert count times
-   *
-   * @param editor  The editor to insert into
+   *  @param editor  The editor to insert into
    * @param context The data context
    * @param count   The number of times to repeat the previous insert
    */
-  private void repeatInsert(@NotNull Editor editor, @NotNull DataContext context, int count, boolean started) {
+  private void repeatInsert(@NotNull Editor editor,
+                            @NotNull DataContext context,
+                            int count,
+                            boolean started,
+                            @NotNull OperatorArguments operatorArguments) {
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
       if (repeatLines > 0) {
         final int visualLine = caret.getVisualPosition().line;
@@ -654,20 +657,20 @@ public class ChangeGroup {
           int updatedCount = started ? (i == 0 ? count : count + 1) : count;
           if (repeatColumn >= MotionGroup.LAST_COLUMN) {
             caret.moveToOffset(VimPlugin.getMotion().moveCaretToLineEnd(editor, logicalLine + i, true));
-            repeatInsertText(editor, context, updatedCount);
+            repeatInsertText(editor, context, updatedCount, operatorArguments);
           }
           else if (EditorHelper.getVisualLineLength(editor, visualLine + i) >= repeatColumn) {
             VisualPosition visualPosition = new VisualPosition(visualLine + i, repeatColumn);
             int inlaysCount = InlayHelperKt.amountOfInlaysBeforeVisualPosition(editor, visualPosition);
             caret.moveToVisualPosition(new VisualPosition(visualLine + i, repeatColumn + inlaysCount));
-            repeatInsertText(editor, context, updatedCount);
+            repeatInsertText(editor, context, updatedCount, operatorArguments);
           }
         }
 
         MotionGroup.moveCaret(editor, caret, position);
       }
       else {
-        repeatInsertText(editor, context, count);
+        repeatInsertText(editor, context, count, operatorArguments);
         final int position = VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -1, false);
 
         MotionGroup.moveCaret(editor, caret, position);
@@ -1044,8 +1047,7 @@ public class ChangeGroup {
 
   /**
    * Begin Replace mode
-   *
-   * @param editor  The editor to replace in
+   *  @param editor  The editor to replace in
    * @param context The data context
    */
   public void changeReplace(@NotNull Editor editor, @NotNull DataContext context) {
@@ -1129,12 +1131,11 @@ public class ChangeGroup {
 
   public @Nullable Pair<TextRange, SelectionType> getDeleteRangeAndType(@NotNull Editor editor,
                                                                         @NotNull Caret caret,
-                                                                        @NotNull DataContext context,
-                                                                        int count,
-                                                                        int rawCount,
-                                                                        final @NotNull Argument argument,
-                                                                        boolean isChange) {
-    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
+                                                                        @NotNull DataContext context, final @NotNull Argument argument,
+                                                                        boolean isChange,
+                                                                        @NotNull OperatorArguments operatorArguments) {
+    final TextRange range =
+      MotionGroup.getMotionRange(editor, caret, context, argument, operatorArguments);
     if (range == null) return null;
 
     // Delete motion commands that are not linewise become linewise if all the following are true:
@@ -1259,17 +1260,15 @@ public class ChangeGroup {
    * @param editor   The editor to change
    * @param caret    The caret on which the motion is supposed to be performed
    * @param context  The data context
-   * @param count    The number of time to repeat the change
-   * @param rawCount The actual count entered by the user
    * @param argument The motion command
    * @return true if able to delete the text, false if not
    */
   public boolean changeMotion(@NotNull Editor editor,
                               @NotNull Caret caret,
                               @NotNull DataContext context,
-                              int count,
-                              int rawCount,
-                              @NotNull Argument argument) {
+                              @NotNull Argument argument,
+                              @NotNull OperatorArguments operatorArguments) {
+    int count0 = operatorArguments.getCount0();
     // Vim treats cw as ce and cW as cE if cursor is on a non-blank character
     final Command motion = argument.getMotion();
 
@@ -1312,20 +1311,19 @@ public class ChangeGroup {
     }
 
     if (kludge) {
-      int cnt = count * motion.getCount();
+      int cnt = operatorArguments.getCount1() * motion.getCount();
       int pos1 = SearchHelper.findNextWordEnd(chars, offset, fileSize, cnt, bigWord, false);
       int pos2 = SearchHelper.findNextWordEnd(chars, pos1, fileSize, -cnt, bigWord, false);
       if (logger.isDebugEnabled()) {
         logger.debug("pos=" + offset);
         logger.debug("pos1=" + pos1);
         logger.debug("pos2=" + pos2);
-        logger.debug("count=" + count);
+        logger.debug("count=" + operatorArguments.getCount1());
         logger.debug("arg.count=" + motion.getCount());
       }
       if (pos2 == offset) {
-        if (count > 1) {
-          count--;
-          rawCount--;
+        if (operatorArguments.getCount1() > 1) {
+          count0--;
         }
         else if (motion.getCount() > 1) {
           motion.setCount(motion.getCount() - 1);
@@ -1337,7 +1335,7 @@ public class ChangeGroup {
     }
 
     Pair<TextRange, SelectionType> deleteRangeAndType =
-      getDeleteRangeAndType(editor, caret, context, count, rawCount, argument, true);
+      getDeleteRangeAndType(editor, caret, context, argument, true, operatorArguments.withCount0(count0));
     if (deleteRangeAndType == null) return false;
 
     return changeRange(editor, caret, deleteRangeAndType.getFirst(), deleteRangeAndType.getSecond(), context);
@@ -1381,7 +1379,8 @@ public class ChangeGroup {
   public boolean blockInsert(@NotNull Editor editor,
                              @NotNull DataContext context,
                              @NotNull TextRange range,
-                             boolean append) {
+                             boolean append,
+                             @NotNull OperatorArguments operatorArguments) {
     final int lines = getLinesCountInVisualBlock(editor, range);
     final LogicalPosition startPosition = editor.offsetToLogicalPosition(range.getStartOffset());
 
@@ -1535,8 +1534,6 @@ public class ChangeGroup {
    * @param editor   The editor to change
    * @param caret    The caret on which motion pretends to be performed
    * @param context  The data context
-   * @param count    The number of times to repeat the change
-   * @param rawCount The actual count entered by the user
    * @param type     The case change type (TOGGLE, UPPER, LOWER)
    * @param argument The motion command
    * @return true if able to delete the text, false if not
@@ -1544,21 +1541,21 @@ public class ChangeGroup {
   public boolean changeCaseMotion(@NotNull Editor editor,
                                   @NotNull Caret caret,
                                   DataContext context,
-                                  int count,
-                                  int rawCount,
                                   char type,
-                                  @NotNull Argument argument) {
-    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
+                                  @NotNull Argument argument,
+                                  @NotNull OperatorArguments operatorArguments) {
+    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, argument,
+                                                       operatorArguments);
     return range != null && changeCaseRange(editor, caret, range, type);
   }
 
   public boolean reformatCodeMotion(@NotNull Editor editor,
                                     @NotNull Caret caret,
                                     DataContext context,
-                                    int count,
-                                    int rawCount,
-                                    @NotNull Argument argument) {
-    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
+                                    @NotNull Argument argument,
+                                    @NotNull OperatorArguments operatorArguments) {
+    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, argument,
+                                                       operatorArguments);
     return range != null && reformatCodeRange(editor, caret, range);
   }
 
@@ -1593,10 +1590,10 @@ public class ChangeGroup {
   public void autoIndentMotion(@NotNull Editor editor,
                                @NotNull Caret caret,
                                @NotNull DataContext context,
-                               int count,
-                               int rawCount,
-                               @NotNull Argument argument) {
-    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
+                               @NotNull Argument argument,
+                               @NotNull OperatorArguments operatorArguments) {
+    final TextRange range =
+      MotionGroup.getMotionRange(editor, caret, context, argument, operatorArguments);
     if (range != null) {
       autoIndentRange(editor, caret, context,
                       new TextRange(range.getStartOffset(), HelperKt.getEndOffsetInclusive(range)));
@@ -1658,11 +1655,11 @@ public class ChangeGroup {
   public void indentMotion(@NotNull Editor editor,
                            @NotNull Caret caret,
                            @NotNull DataContext context,
-                           int count,
-                           int rawCount,
                            @NotNull Argument argument,
-                           int dir) {
-    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument);
+                           int dir,
+                           @NotNull OperatorArguments operatorArguments) {
+    final TextRange range =
+      MotionGroup.getMotionRange(editor, caret, context, argument, operatorArguments);
     if (range != null) {
       indentRange(editor, caret, context, range, 1, dir);
     }

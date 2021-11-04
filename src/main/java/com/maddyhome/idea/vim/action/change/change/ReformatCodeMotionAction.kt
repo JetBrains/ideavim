@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
 class ReformatCodeMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
@@ -37,11 +38,10 @@ class ReformatCodeMotionAction : ChangeEditorActionHandler.ForEachCaret(), Dupli
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     return argument != null &&
-      VimPlugin.getChange().reformatCodeMotion(editor, caret, context, count, rawCount, argument)
+      VimPlugin.getChange().reformatCodeMotion(editor, caret, context, argument, operatorArguments)
   }
 }

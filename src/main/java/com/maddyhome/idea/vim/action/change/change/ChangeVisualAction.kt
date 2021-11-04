@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
@@ -42,7 +43,13 @@ class ChangeVisualAction : VisualOperatorActionHandler.ForEachCaret() {
     context: DataContext,
     cmd: Command,
     range: VimSelection,
+    operatorArguments: OperatorArguments,
   ): Boolean {
-    return VimPlugin.getChange().changeRange(editor, caret, range.toVimTextRange(false), range.type, context)
+    return VimPlugin.getChange().changeRange(editor,
+        caret,
+        range.toVimTextRange(false),
+        range.type,
+        context
+    )
   }
 }

@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.CharacterHelper
 
@@ -38,12 +39,16 @@ class ChangeCaseUpperMotionAction : ChangeEditorActionHandler.ForEachCaret(), Du
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     return argument != null &&
       VimPlugin.getChange()
-        .changeCaseMotion(editor, caret, context, count, rawCount, CharacterHelper.CASE_UPPER, argument)
+        .changeCaseMotion(editor,
+          caret,
+          context,
+          CharacterHelper.CASE_UPPER,
+          argument,
+          operatorArguments)
   }
 }

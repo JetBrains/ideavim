@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
@@ -56,11 +57,10 @@ open class MotionDownAction : MotionDownBase() {
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count).toMotionOrError()
+    return VimPlugin.getMotion().moveCaretVertical(editor, caret, operatorArguments.count1).toMotionOrError()
   }
 }
 
@@ -69,9 +69,8 @@ class MotionDownCtrlNAction : MotionDownAction() {
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     val activeLookup = LookupManager.getActiveLookup(editor)
     return if (activeLookup != null) {
@@ -83,7 +82,7 @@ class MotionDownCtrlNAction : MotionDownAction() {
       }
       caret.offset.toMotion()
     } else {
-      super.getOffset(editor, caret, context, count, rawCount, argument)
+      super.getOffset(editor, caret, context, argument, operatorArguments)
     }
   }
 }
@@ -96,10 +95,9 @@ class MotionDownNotLineWiseAction : MotionDownBase() {
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
-    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count).toMotionOrError()
+    return VimPlugin.getMotion().moveCaretVertical(editor, caret, operatorArguments.count1).toMotionOrError()
   }
 }

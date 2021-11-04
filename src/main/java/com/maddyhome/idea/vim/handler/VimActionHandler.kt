@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.OperatorArguments
 
 /**
  * Handler for common usage.
@@ -37,7 +38,13 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
    * @see [VimActionHandler.SingleExecution] for only one execution.
    */
   abstract class ForEachCaret : VimActionHandler(true) {
-    abstract fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean
+    abstract fun execute(
+      editor: Editor,
+      caret: Caret,
+      context: DataContext,
+      cmd: Command,
+      operatorArguments: OperatorArguments,
+    ): Boolean
   }
 
   /**
@@ -46,13 +53,24 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
    * @see [VimActionHandler.ForEachCaret] for per-caret execution.
    */
   abstract class SingleExecution : VimActionHandler(false) {
-    abstract fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean
+    abstract fun execute(
+      editor: Editor,
+      context: DataContext,
+      cmd: Command,
+      operatorArguments: OperatorArguments,
+    ): Boolean
   }
 
-  final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+  final override fun baseExecute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments
+  ): Boolean {
     return when (this) {
-      is ForEachCaret -> execute(editor, caret, context, cmd)
-      is SingleExecution -> execute(editor, context, cmd)
+      is ForEachCaret -> execute(editor, caret, context, cmd, operatorArguments)
+      is SingleExecution -> execute(editor, context, cmd, operatorArguments)
     }
   }
 }

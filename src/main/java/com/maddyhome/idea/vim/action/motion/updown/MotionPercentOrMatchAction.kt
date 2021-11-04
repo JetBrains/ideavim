@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
@@ -39,14 +40,13 @@ class MotionPercentOrMatchAction : MotionActionHandler.ForEachCaret() {
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
-    return if (rawCount == 0) {
+    return if (operatorArguments.count0 == 0) {
       VimPlugin.getMotion().moveCaretToMatchingPair(editor, caret).toMotionOrError()
     } else {
-      VimPlugin.getMotion().moveCaretToLinePercent(editor, caret, count).toMotion()
+      VimPlugin.getMotion().moveCaretToLinePercent(editor, caret, operatorArguments.count1).toMotion()
     }
   }
 

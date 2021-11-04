@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
@@ -42,11 +43,10 @@ class ShiftLeftLinesAction : ChangeEditorActionHandler.ForEachCaret() {
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Boolean {
-    VimPlugin.getChange().indentLines(editor, caret, context, count, -1)
+    VimPlugin.getChange().indentLines(editor, caret, context, operatorArguments.count1, -1)
 
     return true
   }
@@ -63,13 +63,12 @@ class ShiftLeftMotionAction : ChangeEditorActionHandler.ForEachCaret(), Duplicab
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     argument ?: return false
 
-    VimPlugin.getChange().indentMotion(editor, caret, context, count, rawCount, argument, -1)
+    VimPlugin.getChange().indentMotion(editor, caret, context, argument, -1, operatorArguments)
     return true
   }
 }
@@ -85,6 +84,7 @@ class ShiftLeftVisualAction : VisualOperatorActionHandler.ForEachCaret() {
     context: DataContext,
     cmd: Command,
     range: VimSelection,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     VimPlugin.getChange().indentRange(editor, caret, context, range.toVimTextRange(false), cmd.count, -1)
     return true

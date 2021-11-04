@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 
 class DeleteMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableOperatorAction {
@@ -37,13 +38,13 @@ class DeleteMotionAction : ChangeEditorActionHandler.ForEachCaret(), DuplicableO
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     if (argument == null) return false
     val (first, second) = VimPlugin.getChange()
-      .getDeleteRangeAndType(editor, caret, context, count, rawCount, argument, false) ?: return false
+      .getDeleteRangeAndType(editor, caret, context, argument, false, operatorArguments)
+      ?: return false
     return VimPlugin.getChange().deleteRange(editor, caret, first, second, false)
   }
 }

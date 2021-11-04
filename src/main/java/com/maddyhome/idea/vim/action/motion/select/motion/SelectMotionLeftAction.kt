@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.Motion
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.toMotion
@@ -46,9 +47,8 @@ class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     val keymodel = OptionsManager.keymodel
     if (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel) {
@@ -65,7 +65,7 @@ class SelectMotionLeftAction : MotionActionHandler.ForEachCaret() {
       }
       // No return statement, perform motion to left
     }
-    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -count, false).toMotionOrError()
+    return VimPlugin.getMotion().getOffsetOfHorizontalMotion(editor, caret, -operatorArguments.count1, false).toMotionOrError()
   }
 
   companion object {

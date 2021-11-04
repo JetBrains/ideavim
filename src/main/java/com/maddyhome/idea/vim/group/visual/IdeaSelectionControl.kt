@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.exitSelectMode
@@ -81,14 +82,14 @@ object IdeaSelectionControl {
 
         editor.popAllModes()
 
-        activateMode(editor, chooseSelectionMode(editor, selectionSource, true))
+        activateMode(editor, chooseSelectionMode(editor, selectionSource, true), OperatorArguments(false, 1))
       } else {
         logger.debug("None of carets have selection. State before adjustment: ${editor.commandState.toSimpleString()}")
         if (editor.inVisualMode) editor.exitVisualMode()
         if (editor.inSelectMode) editor.exitSelectMode(false)
 
         if (editor.inNormalMode) {
-          activateMode(editor, chooseNonSelectionMode(editor))
+          activateMode(editor, chooseNonSelectionMode(editor), OperatorArguments(false, 1))
         }
       }
 
@@ -116,13 +117,15 @@ object IdeaSelectionControl {
     }
   }
 
-  private fun activateMode(editor: Editor, mode: CommandState.Mode) {
+  private fun activateMode(editor: Editor, mode: CommandState.Mode, operatorArguments: OperatorArguments) {
     when (mode) {
       CommandState.Mode.VISUAL -> VimPlugin.getVisualMotion()
         .enterVisualMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
       CommandState.Mode.SELECT -> VimPlugin.getVisualMotion()
         .enterSelectMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
-      CommandState.Mode.INSERT -> VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext.init(editor))
+      CommandState.Mode.INSERT -> VimPlugin.getChange().insertBeforeCursor(editor,
+          EditorDataContext.init(editor)
+      )
       CommandState.Mode.COMMAND -> Unit
       else -> error("Unexpected mode: $mode")
     }

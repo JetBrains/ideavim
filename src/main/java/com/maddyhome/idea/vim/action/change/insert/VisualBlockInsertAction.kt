@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
@@ -42,11 +43,12 @@ class VisualBlockInsertAction : VisualOperatorActionHandler.SingleExecution() {
     context: DataContext,
     cmd: Command,
     caretsAndSelections: Map<Caret, VimSelection>,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode) return false
     val vimSelection = caretsAndSelections.values.stream().findFirst().orElse(null) ?: return false
     return if (vimSelection.type == SelectionType.BLOCK_WISE) {
-      VimPlugin.getChange().blockInsert(editor, context, vimSelection.toVimTextRange(false), false)
+      VimPlugin.getChange().blockInsert(editor, context, vimSelection.toVimTextRange(false), false, operatorArguments)
     } else {
       VimPlugin.getChange().insertBeforeFirstNonBlank(editor, context)
       true

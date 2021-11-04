@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandFlags.FLAG_MULTIKEY_UNDO
 import com.maddyhome.idea.vim.command.CommandFlags.FLAG_NO_REPEAT_INSERT
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
@@ -40,13 +41,16 @@ class ChangeLineAction : ChangeEditorActionHandler.ForEachCaret() {
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     // `S` command is a synonym of `cc`
     val motion = MotionDownLess1FirstNonSpaceAction()
     val command = Command(1, motion, motion.type, motion.flags)
-    return VimPlugin.getChange().changeMotion(editor, caret, context, count, rawCount, Argument(command))
+    return VimPlugin.getChange().changeMotion(editor,
+      caret,
+      context,
+      Argument(command),
+      operatorArguments)
   }
 }

@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MotionType
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inBlockSubMode
@@ -62,9 +63,8 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       editor: Editor,
       caret: Caret,
       context: DataContext,
-      count: Int,
-      rawCount: Int,
       argument: Argument?,
+      operatorArguments: OperatorArguments,
     ): Motion
 
     /**
@@ -100,7 +100,12 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
      * It executes once for all carets. That means that if you have 5 carets, [getOffset] will be
      *   called 1 time.
      */
-    abstract fun getOffset(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Motion
+    abstract fun getOffset(
+      editor: Editor,
+      context: DataContext,
+      argument: Argument?,
+      operatorArguments: OperatorArguments
+    ): Motion
 
     /**
      * This method is called before [getOffset].
@@ -131,24 +136,29 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     editor: Editor,
     caret: Caret,
     context: DataContext,
-    count: Int,
-    rawCount: Int,
     argument: Argument?,
+    operatorArguments: OperatorArguments,
   ): Motion {
     return when (this) {
-      is SingleExecution -> getOffset(editor, context, count, rawCount, argument)
-      is ForEachCaret -> getOffset(editor, caret, context, count, rawCount, argument)
+      is SingleExecution -> getOffset(editor, context, argument, operatorArguments)
+      is ForEachCaret -> getOffset(editor, caret, context, argument, operatorArguments)
     }
   }
 
-  final override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+  final override fun baseExecute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments,
+  ): Boolean {
     val blockSubmodeActive = editor.inBlockSubMode
 
     when (this) {
       is SingleExecution -> run {
         if (!preOffsetComputation(editor, context, cmd)) return@run
 
-        val offset = getOffset(editor, context, cmd.count, cmd.rawCount, cmd.argument)
+        val offset = getOffset(editor, context, cmd.argument, operatorArguments)
 
         when (offset) {
           is Motion.AbsoluteOffset -> {
@@ -174,12 +184,16 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
         when {
           blockSubmodeActive || editor.caretModel.caretCount == 1 -> {
             val primaryCaret = editor.caretModel.primaryCaret
-            doExecuteForEach(editor, primaryCaret, context, cmd)
+            doExecuteForEach(editor, primaryCaret, context, cmd, operatorArguments)
           }
           else -> {
             try {
               editor.caretModel.addCaretListener(CaretMergingWatcher)
-              editor.caretModel.runForEachCaret { caret -> doExecuteForEach(editor, caret, context, cmd) }
+              editor.caretModel.runForEachCaret { caret -> doExecuteForEach(editor,
+                caret,
+                context,
+                cmd,
+                operatorArguments) }
             } finally {
               editor.caretModel.removeCaretListener(CaretMergingWatcher)
             }
@@ -191,11 +205,17 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     return true
   }
 
-  private fun doExecuteForEach(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
+  private fun doExecuteForEach(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments
+  ) {
     this as ForEachCaret
     if (!preOffsetComputation(editor, caret, context, cmd)) return
 
-    val offset = getOffset(editor, caret, context, cmd.count, cmd.rawCount, cmd.argument)
+    val offset = getOffset(editor, caret, context, cmd.argument, operatorArguments)
 
     when (offset) {
       is Motion.AbsoluteOffset -> {

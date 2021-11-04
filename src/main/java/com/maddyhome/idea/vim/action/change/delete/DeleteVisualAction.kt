@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
@@ -37,11 +38,12 @@ class DeleteVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
   override fun executeAction(
-    editor: Editor,
-    caret: Caret,
-    context: DataContext,
-    cmd: Command,
-    range: VimSelection,
+      editor: Editor,
+      caret: Caret,
+      context: DataContext,
+      cmd: Command,
+      range: VimSelection,
+      operatorArguments: OperatorArguments,
   ): Boolean {
     val selectionType = range.type
     return VimPlugin.getChange().deleteRange(editor, caret, range.toVimTextRange(false), selectionType, false)

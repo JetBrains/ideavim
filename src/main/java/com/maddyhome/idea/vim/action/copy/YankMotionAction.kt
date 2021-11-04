@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
 
 class YankMotionAction : VimActionHandler.SingleExecution(), DuplicableOperatorAction {
@@ -32,8 +33,8 @@ class YankMotionAction : VimActionHandler.SingleExecution(), DuplicableOperatorA
 
   override val duplicateWith: Char = 'y'
 
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+  override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val argument = cmd.argument ?: return false
-    return VimPlugin.getYank().yankMotion(editor, context, cmd.count, cmd.rawCount, argument)
+    return VimPlugin.getYank().yankMotion(editor, context, argument, operatorArguments)
   }
 }

@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.DuplicableOperatorAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.endOffsetInclusive
@@ -36,12 +37,13 @@ class FilterMotionAction : VimActionHandler.SingleExecution(), DuplicableOperato
 
   override val duplicateWith: Char = '!'
 
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+  override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val argument = cmd.argument ?: return false
     val range = MotionGroup
       .getMotionRange(
-        editor, editor.caretModel.primaryCaret, context, cmd.count, cmd.rawCount,
-        argument
+        editor, editor.caretModel.primaryCaret, context,
+        argument,
+        operatorArguments
       )
       ?: return false
 

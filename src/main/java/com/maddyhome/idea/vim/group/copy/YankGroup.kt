@@ -25,6 +25,7 @@ import com.intellij.util.containers.ContainerUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction
 import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
@@ -55,7 +56,12 @@ class YankGroup {
    * @param argument The motion command argument
    * @return true if able to yank the text, false if not
    */
-  fun yankMotion(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument): Boolean {
+  fun yankMotion(
+    editor: Editor,
+    context: DataContext,
+    argument: Argument,
+    operatorArguments: OperatorArguments
+  ): Boolean {
     val motion = argument.motion
 
     val caretModel = editor.caretModel
@@ -68,7 +74,7 @@ class YankGroup {
       if (argument.motion.action is MotionDownLess1FirstNonSpaceAction) null else HashMap<Caret, Int>(caretModel.caretCount)
 
     for (caret in caretModel.allCarets) {
-      val motionRange = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument)
+      val motionRange = MotionGroup.getMotionRange(editor, caret, context, argument, operatorArguments)
         ?: continue
 
       assert(motionRange.size() == 1)

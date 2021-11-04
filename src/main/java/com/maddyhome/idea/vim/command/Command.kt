@@ -124,7 +124,13 @@ private object NonExecutableActionHandler : EditorActionHandlerBase(false) {
   override val type: Command.Type
     get() = error("This action should not be executed")
 
-  override fun baseExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+  override fun baseExecute(
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    operatorArguments: OperatorArguments
+  ): Boolean {
     error("This action should not be executed")
   }
 }

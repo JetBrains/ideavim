@@ -24,6 +24,7 @@ import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
@@ -39,10 +40,11 @@ class DeleteJoinVisualLinesSpacesAction : VisualOperatorActionHandler.SingleExec
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
   override fun executeForAllCarets(
-    editor: Editor,
-    context: DataContext,
-    cmd: Command,
-    caretsAndSelections: Map<Caret, VimSelection>,
+      editor: Editor,
+      context: DataContext,
+      cmd: Command,
+      caretsAndSelections: Map<Caret, VimSelection>,
+      operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode) return false
     if (ideajoin.isSet) {
