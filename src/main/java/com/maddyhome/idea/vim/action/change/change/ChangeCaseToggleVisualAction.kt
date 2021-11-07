@@ -39,12 +39,12 @@ class ChangeCaseToggleVisualAction : VisualOperatorActionHandler.ForEachCaret() 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
   override fun executeAction(
-      editor: Editor,
-      caret: Caret,
-      context: DataContext,
-      cmd: Command,
-      range: VimSelection,
-      operatorArguments: OperatorArguments,
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    range: VimSelection,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     return VimPlugin.getChange()
       .changeCaseRange(editor, caret, range.toVimTextRange(false), CharacterHelper.CASE_TOGGLE)

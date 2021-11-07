@@ -44,11 +44,13 @@ class ChangeCaseToggleMotionAction : ChangeEditorActionHandler.ForEachCaret(), D
   ): Boolean {
     return argument != null &&
       VimPlugin.getChange()
-        .changeCaseMotion(editor,
+        .changeCaseMotion(
+          editor,
           caret,
           context,
           CharacterHelper.CASE_TOGGLE,
           argument,
-          operatorArguments)
+          operatorArguments
+        )
   }
 }

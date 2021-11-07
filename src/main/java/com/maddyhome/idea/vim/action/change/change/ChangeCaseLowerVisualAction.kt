@@ -40,12 +40,12 @@ class ChangeCaseLowerVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
   override fun executeAction(
-      editor: Editor,
-      caret: Caret,
-      context: DataContext,
-      cmd: Command,
-      range: VimSelection,
-      operatorArguments: OperatorArguments,
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    range: VimSelection,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     val topLevelEditor = editor.getTopLevelEditor()
     return VimPlugin.getChange()

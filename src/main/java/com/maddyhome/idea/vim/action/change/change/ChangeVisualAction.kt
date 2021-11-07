@@ -45,11 +45,12 @@ class ChangeVisualAction : VisualOperatorActionHandler.ForEachCaret() {
     range: VimSelection,
     operatorArguments: OperatorArguments,
   ): Boolean {
-    return VimPlugin.getChange().changeRange(editor,
-        caret,
-        range.toVimTextRange(false),
-        range.type,
-        context
+    return VimPlugin.getChange().changeRange(
+      editor,
+      caret,
+      range.toVimTextRange(false),
+      range.type,
+      context
     )
   }
 }

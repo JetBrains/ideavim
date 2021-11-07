@@ -40,11 +40,11 @@ class YankVisualLinesAction : VisualOperatorActionHandler.SingleExecution() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_EXIT_VISUAL)
 
   override fun executeForAllCarets(
-      editor: Editor,
-      context: DataContext,
-      cmd: Command,
-      caretsAndSelections: Map<Caret, VimSelection>,
-      operatorArguments: OperatorArguments,
+    editor: Editor,
+    context: DataContext,
+    cmd: Command,
+    caretsAndSelections: Map<Caret, VimSelection>,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     val selections = caretsAndSelections.values
     val starts: MutableList<Int> = ArrayList()

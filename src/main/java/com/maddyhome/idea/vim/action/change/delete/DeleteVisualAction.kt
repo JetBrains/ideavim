@@ -38,12 +38,12 @@ class DeleteVisualAction : VisualOperatorActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 
   override fun executeAction(
-      editor: Editor,
-      caret: Caret,
-      context: DataContext,
-      cmd: Command,
-      range: VimSelection,
-      operatorArguments: OperatorArguments,
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    range: VimSelection,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     val selectionType = range.type
     return VimPlugin.getChange().deleteRange(editor, caret, range.toVimTextRange(false), selectionType, false)

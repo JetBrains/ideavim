@@ -189,11 +189,15 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
           else -> {
             try {
               editor.caretModel.addCaretListener(CaretMergingWatcher)
-              editor.caretModel.runForEachCaret { caret -> doExecuteForEach(editor,
-                caret,
-                context,
-                cmd,
-                operatorArguments) }
+              editor.caretModel.runForEachCaret { caret ->
+                doExecuteForEach(
+                  editor,
+                  caret,
+                  context,
+                  cmd,
+                  operatorArguments
+                )
+              }
             } finally {
               editor.caretModel.removeCaretListener(CaretMergingWatcher)
             }

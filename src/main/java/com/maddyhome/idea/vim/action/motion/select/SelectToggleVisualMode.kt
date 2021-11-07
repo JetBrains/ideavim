@@ -56,7 +56,7 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
             }
           }
         }
-        } else {
+      } else {
         commandState.pushModes(CommandState.Mode.VISUAL, subMode)
         if (subMode != CommandState.SubMode.VISUAL_LINE) {
           editor.caretModel.runForEachCaret {
@@ -65,7 +65,7 @@ class SelectToggleVisualMode : VimActionHandler.SingleExecution() {
             }
           }
         }
-        }
+      }
     }
   }
 }

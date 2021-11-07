@@ -42,12 +42,12 @@ class DeleteVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_EXIT_VISUAL)
 
   override fun executeAction(
-      editor: Editor,
-      caret: Caret,
-      context: DataContext,
-      cmd: Command,
-      range: VimSelection,
-      operatorArguments: OperatorArguments,
+    editor: Editor,
+    caret: Caret,
+    context: DataContext,
+    cmd: Command,
+    range: VimSelection,
+    operatorArguments: OperatorArguments,
   ): Boolean {
     val textRange = range.toVimTextRange(false)
     val (usedCaret, usedRange, usedType) = when (range.type) {

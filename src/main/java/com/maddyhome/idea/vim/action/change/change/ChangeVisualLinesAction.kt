@@ -59,11 +59,12 @@ class ChangeVisualLinesAction : VisualOperatorActionHandler.ForEachCaret() {
       EditorHelper.getLineStartForOffset(editor, textRange.startOffset),
       lineEndForOffset + endsWithNewLine
     )
-    return VimPlugin.getChange().changeRange(editor,
-        caret,
-        lineRange,
-        SelectionType.LINE_WISE,
-        context
+    return VimPlugin.getChange().changeRange(
+      editor,
+      caret,
+      lineRange,
+      SelectionType.LINE_WISE,
+      context
     )
   }
 }
