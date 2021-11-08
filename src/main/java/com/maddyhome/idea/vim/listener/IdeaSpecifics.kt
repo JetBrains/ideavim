@@ -77,6 +77,16 @@ object IdeaSpecifics {
       if (hostEditor != null) {
         editor = hostEditor
       }
+
+      //region Track action id
+      if (FindActionId.enabled) {
+        val copyActionText = MessageHelper.message("action.copy.action.id.text")
+        if (copyActionText != action.templateText) {
+          val id: String? = ActionManager.getInstance().getId(action)
+          VimPlugin.getNotifications(dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
+        }
+      }
+      //endregion
     }
 
     override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
@@ -115,16 +125,6 @@ object IdeaSpecifics {
           }
           VimPlugin.getChange().insertBeforeCursor(it, dataContext)
           KeyHandler.getInstance().reset(it)
-        }
-      }
-      //endregion
-
-      //region Track action id
-      if (FindActionId.enabled) {
-        val copyActionText = MessageHelper.message("action.copy.action.id.text")
-        if (copyActionText != action.templateText) {
-          val id: String? = ActionManager.getInstance().getId(action)
-          VimPlugin.getNotifications(dataContext.getData(CommonDataKeys.PROJECT)).notifyActionId(id)
         }
       }
       //endregion
