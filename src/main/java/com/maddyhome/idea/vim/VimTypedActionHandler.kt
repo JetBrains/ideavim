@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.ActionPlan
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler
 import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -75,6 +76,8 @@ class VimTypedActionHandler(origHandler: TypedActionHandler?) : TypedActionHandl
         val duration = System.currentTimeMillis() - startTime
         LOG.info("VimTypedAction '$charTyped': $duration ms")
       }
+    } catch (e: ProcessCanceledException) {
+      // Nothing
     } catch (e: Throwable) {
       LOG.error(e)
     }
