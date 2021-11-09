@@ -39,10 +39,12 @@ usual beta standards.
 * [VIM-2453](https://youtrack.jetbrains.com/issue/VIM-2453) Fix split command
 * [VIM-2397](https://youtrack.jetbrains.com/issue/VIM-2397) Fix dollar motion as an operator
 * [VIM-2432](https://youtrack.jetbrains.com/issue/VIM-2432) Fix ctrl-d and ctrl-u motions with scrolloff
+* [VIM-2462](https://youtrack.jetbrains.com/issue/VIM-2462) Reset caret shape when disabling plugin
 
 ### Merged PRs:
 * [390](https://github.com/JetBrains/ideavim/pull/390) by [chylex](https://github.com/chylex): [VIM-2255] Missing reload icon in .ideavimrc on Windows
 * [391](https://github.com/JetBrains/ideavim/pull/391) by [Matt Ellis](https://github.com/citizenmatt): fix(VIM-2432): handle scrolloff with <C-D> and <C-U>
+* [401](https://github.com/JetBrains/ideavim/pull/401) by [Matt Ellis](https://github.com/citizenmatt): Reset caret shape when disabling plugin
 
 ## 1.8.0, 2021-10-27
 
