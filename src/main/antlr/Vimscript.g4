@@ -6,7 +6,7 @@ grammar Vimscript;
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 script:
-    blockMember* EOF;
+    augroup? blockMember* EOF;
 
 forLoop:
     (WS | COLON)* FOR WS+ ((variableScope COLON)? variableName | (L_BRACKET argumentsDeclaration R_BRACKET)) WS+ IN WS* expr WS* ((inline_comment NEW_LINE) | (NEW_LINE | BAR)+)
@@ -73,6 +73,8 @@ argumentsDeclaration:   (ETC | defaultValue (WS* COMMA WS* defaultValue)* (WS* C
 defaultValue:           variableName WS* ASSIGN WS* expr;
 
 autoCmd:                (WS | COLON)* AUTOCMD commandArgument = ~(NEW_LINE)*? NEW_LINE;
+
+augroup:                (WS | COLON)* AUGROUP .*? AUGROUP WS+ END WS* NEW_LINE;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
