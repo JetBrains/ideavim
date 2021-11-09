@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim.helper
 
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.helper.buildGreater212
@@ -237,6 +238,30 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
     } finally {
       EditorSettingsExternalizable.getInstance().isBlockCursor = originalValue
     }
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test reset caret shape when disable plugin`() {
+    configureByText("I found it in a legendary land")
+    typeText(parseKeys("i"))
+    VimPlugin.setEnabled(false)
+    assertCaretVisualAttributes("DEFAULT", 1.0f)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test reset caret shape when disable plugin 2`() {
+    configureByText("I found it in a legendary land")
+    typeText(parseKeys("v2e"))
+    VimPlugin.setEnabled(false)
+    assertCaretVisualAttributes("DEFAULT", 1.0f)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
+  fun `test reset caret shape when disable plugin 3`() {
+    configureByText("I found it in a legendary land")
+    typeText(parseKeys("r"))
+    VimPlugin.setEnabled(false)
+    assertCaretVisualAttributes("DEFAULT", 1.0f)
   }
 
   private fun assertCaretVisualAttributes(expectedShape: String, expectedThickness: Float) {

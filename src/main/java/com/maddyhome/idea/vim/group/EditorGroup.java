@@ -30,7 +30,6 @@ import com.intellij.openapi.editor.LineNumberConverter;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
-import com.intellij.openapi.editor.ex.EditorSettingsExternalizable;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -230,9 +229,9 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     deinitLineNumbers(editor, isReleased);
     UserDataManager.unInitializeEditor(editor);
     VimPlugin.getKey().unregisterShortcutKeys(editor);
-    editor.getSettings().setBlockCursor(EditorSettingsExternalizable.getInstance().isBlockCursor());
     editor.getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
     DocumentManager.INSTANCE.removeListeners(editor.getDocument());
+    CaretVisualAttributesHelperKt.removeCaretsVisualAttributes(editor);
   }
 
   public void notifyIdeaJoin(@Nullable Project project) {

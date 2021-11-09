@@ -48,6 +48,16 @@ fun Editor.updateCaretsVisualAttributes() {
   updateSecondaryCaretsVisualAttributes()
 }
 
+/**
+ * Remove custom visual attributes and reset to defaults
+ *
+ * Used when Vim emulation is disabled
+ */
+fun removeCaretsVisualAttributes(editor: Editor) {
+  editor.caretModel.allCarets.forEach { it.visualAttributes = CaretVisualAttributes.DEFAULT }
+  editor.settings.isBlockCursor = EditorSettingsExternalizable.getInstance().isBlockCursor
+}
+
 fun Editor.guicursorMode(): GuiCursorMode {
   if (subMode == CommandState.SubMode.REPLACE_CHARACTER) {
     // Can be true for NORMAL and VISUAL
