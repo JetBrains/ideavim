@@ -2,40 +2,16 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-      <h3>Features:</h3>
-      <ul>
-        <li>Support <code>matchit.vim</code> extension for Ruby and XML/HTML <a
-            href="https://youtrack.jetbrains.com/issue/VIM-539">VIM-539</a> | <a href="https://github.com/chrisbra/matchit">matchit.vim</a>
-        </li>
-        <li>IDE-specific configuration <a href="https://youtrack.jetbrains.com/issue/VIM-1573">VIM-1573</a></li>
-        <li>Call command <a href="https://youtrack.jetbrains.com/issue/VIM-2416">VIM-2416</a></li>
-      </ul>
-
       <h3>Fixes:</h3>
       <ul>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2417">VIM-2417</a> Fix bars in substitute command</li>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2425">VIM-2425</a> Fix reload button</li>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2422">VIM-2422</a> Fix freeze</li>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2420">VIM-2420</a> Fix freeze</li>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2359">VIM-2359</a> Fix selection with VimExchange</li>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2426">VIM-2426</a> Fix marks in commands</li>
-        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2438">VIM-2438</a> Fix marks in commands</li>
-        <li><a href="https://github.com/JetBrains/ideavim/discussions/386">DISCUSSION-386</a> Fixed command with no spaces
-          before argument
-        </li>
-      </ul>
-
-      <h3>Merged PRs:</h3>
-      <ul>
-        <li><a href="https://github.com/JetBrains/ideavim/pull/337">337</a> by <a href="https://github.com/citizenmatt">Matt
-          Ellis</a>: guicursor!
-        </li>
-        <li><a href="https://github.com/JetBrains/ideavim/pull/343">343</a> by <a href="https://github.com/myzeiri">Martin
-          Yzeiri</a>: Emulate matchit.vim
-        </li>
-        <li><a href="https://github.com/JetBrains/ideavim/pull/387">387</a> by <a href="https://github.com/wrightwriter">Petar
-          Guglev</a>: Update README.md link
-        </li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2442">VIM-2442</a> Fix <code>!</code> command</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2255">VIM-2255</a> Fix reload icon on windows</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2199">VIM-2199</a> Fix autocompletion for AppCode</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2445">VIM-2445</a> Fix spaces in range</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2450">VIM-2450</a> Fix set command</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2451">VIM-2451</a> Fix comments</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2452">VIM-2452</a> Fix augroup</li>
+        <li><a href="https://youtrack.jetbrains.com/issue/VIM-2453">VIM-2453</a> Fix split command</li>
       </ul>
     ]]>
   </change-notes>
