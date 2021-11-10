@@ -36,9 +36,9 @@ data class PlugCommand(val ranges: Ranges, val argument: String) : Command.Singl
     if (firstChar != '"' && firstChar != '\'') return ExecutionResult.Error
 
     val pluginAlias = argument.drop(1).takeWhile { it != firstChar }
-    val option = VimExtensionRegistrar.getToggleByAlias(pluginAlias) ?: return ExecutionResult.Error
-    option.set()
-
+    if (!VimExtensionRegistrar.setOptionByPluginAlias(pluginAlias)) {
+      return ExecutionResult.Error
+    }
     return ExecutionResult.Success
   }
 }

@@ -3,6 +3,7 @@ package com.maddyhome.idea.vim.vimscript.services
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.option.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.options.Option
 
 interface OptionService {
 
@@ -44,6 +45,11 @@ interface OptionService {
 
   fun showOptions(editor: Editor, nameAndToken: Collection<Pair<String, String>>, scope: Scope, showIntro: Boolean)
 
+  fun addOption(option: Option<out VimDataType>)
+
+  fun removeOption(optionName: String)
+
+  // todo better generics
   fun addListener(optionName: String, listener: OptionChangeListener<VimDataType>, executeOnAdd: Boolean = false)
 
   fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>)

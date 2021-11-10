@@ -21,13 +21,11 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.extensions.ExtensionPointListener
 import com.intellij.openapi.extensions.PluginDescriptor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
-import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.option.OptionsManager.addOption
-import com.maddyhome.idea.vim.option.OptionsManager.isSet
-import com.maddyhome.idea.vim.option.OptionsManager.removeOption
-import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.vimscript.Executor
+import com.maddyhome.idea.vim.vimscript.model.options.ToggleOption
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 object VimExtensionRegistrar {
   private val registeredExtensions: MutableSet<String> = HashSet()
@@ -66,14 +64,14 @@ object VimExtensionRegistrar {
     registeredExtensions.add(name)
     registerAliases(extensionBean)
     val option = ToggleOption(name, getAbbrev(name), false)
+    VimPlugin.getOptionService().addOption(option)
     option.addOptionChangeListener { _, _ ->
-      if (isSet(name)) {
+      if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, name, null)) {
         initExtension(extensionBean, name)
       } else {
         extensionBean.instance.dispose()
       }
     }
-    addOption(option)
   }
 
   private fun getAbbrev(name: String): String {
@@ -105,14 +103,19 @@ object VimExtensionRegistrar {
     registeredExtensions.remove(name)
     removeAliases(extension)
     extension.instance.dispose()
-    removeOption(name)
+    VimPlugin.getOptionService().removeOption(name)
     remove(name)
     logger.info("IdeaVim extension '$name' disposed")
   }
 
-  fun getToggleByAlias(alias: String): ToggleOption? {
-    val name = extensionAliases[alias] ?: return null
-    return OptionsManager.getOption(name) as ToggleOption?
+  fun setOptionByPluginAlias(alias: String): Boolean {
+    val name = extensionAliases[alias] ?: return false
+    try {
+      VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, name, null)
+    } catch (e: ExException) {
+      return false
+    }
+    return true
   }
 
   private fun registerAliases(extension: ExtensionBeanClass) {

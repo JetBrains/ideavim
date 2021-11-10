@@ -8,7 +8,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
 
-internal sealed class Option<T : VimDataType>(val name: String, val abbrev: String, private val defaultValue: T) {
+sealed class Option<T : VimDataType>(val name: String, val abbrev: String, private val defaultValue: T) {
 
   open fun getDefaultValue(): T {
     return defaultValue
@@ -48,7 +48,7 @@ internal sealed class Option<T : VimDataType>(val name: String, val abbrev: Stri
   abstract fun getValueIfRemove(currentValue: VimDataType, value: String, token: String): T
 }
 
-internal class ToggleOption(name: String, abbrev: String, defaultValue: VimInt) : Option<VimInt>(name, abbrev, defaultValue) {
+class ToggleOption(name: String, abbrev: String, defaultValue: VimInt) : Option<VimInt>(name, abbrev, defaultValue) {
   constructor(name: String, abbrev: String, defaultValue: Boolean) : this(name, abbrev, if (defaultValue) VimInt.ONE else VimInt.ZERO)
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
@@ -70,7 +70,7 @@ internal class ToggleOption(name: String, abbrev: String, defaultValue: VimInt) 
   }
 }
 
-internal open class NumberOption(name: String, abbrev: String, defaultValue: VimInt) : Option<VimInt>(name, abbrev, defaultValue) {
+open class NumberOption(name: String, abbrev: String, defaultValue: VimInt) : Option<VimInt>(name, abbrev, defaultValue) {
   constructor(name: String, abbrev: String, defaultValue: Int) : this(name, abbrev, VimInt(defaultValue))
 
   override fun checkIfValueValid(value: VimDataType, token: String) {
@@ -95,7 +95,7 @@ internal open class NumberOption(name: String, abbrev: String, defaultValue: Vim
   }
 }
 
-internal open class StringOption(name: String, abbrev: String, defaultValue: VimString, private val isList: Boolean = false, private val boundedValues: Collection<String>? = null) : Option<VimString>(name, abbrev, defaultValue) {
+open class StringOption(name: String, abbrev: String, defaultValue: VimString, private val isList: Boolean = false, private val boundedValues: Collection<String>? = null) : Option<VimString>(name, abbrev, defaultValue) {
   constructor(name: String, abbrev: String, defaultValue: String, isList: Boolean = false, boundedValues: Collection<String>? = null) : this(name, abbrev, VimString(defaultValue), isList, boundedValues)
 
   override fun checkIfValueValid(value: VimDataType, token: String) {

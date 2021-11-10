@@ -384,6 +384,14 @@ internal object OptionServiceImpl : OptionService {
     }
   }
 
+  override fun addOption(option: Option<out VimDataType>) {
+    options.put(option.name, option.abbrev, option)
+  }
+
+  override fun removeOption(optionName: String) {
+    options.remove(optionName)
+  }
+
   override fun addListener(optionName: String, listener: OptionChangeListener<VimDataType>, executeOnAdd: Boolean) {
     options.get(optionName)!!.addOptionChangeListener(listener)
     if (executeOnAdd) {
@@ -413,8 +421,6 @@ internal object OptionServiceImpl : OptionService {
   }
 }
 
-// todo register options from plugins
-
 class MultikeyMap<T1, T2>(entries: Collection<Triple<T1, T1, T2>>) {
   private val primaryKeyStorage: MutableMap<T1, T2> = mutableMapOf()
   private val secondaryKeyStorage: MutableMap<T1, T2> = mutableMapOf()
@@ -433,6 +439,12 @@ class MultikeyMap<T1, T2>(entries: Collection<Triple<T1, T1, T2>>) {
 
   fun get(key: T1): T2? {
     return primaryKeyStorage[key] ?: secondaryKeyStorage[key]
+  }
+
+  fun remove(key: T1) {
+    val option = primaryKeyStorage[key] ?: secondaryKeyStorage[key]
+    primaryKeyStorage.values.remove(option)
+    secondaryKeyStorage.values.remove(option)
   }
 
   fun contains(key: T1): Boolean {
