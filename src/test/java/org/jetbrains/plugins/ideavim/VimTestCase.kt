@@ -432,6 +432,7 @@ abstract class VimTestCase : UsefulTestCase() {
   }
 
   protected fun assertCaretsVisualAttributes() {
+    if (!Checks.caretShape) return
     val editor = myFixture.editor
     val attributes = OptionsManager.guicursor.getAttributes(editor.guicursorMode())
     val colour = editor.colorsScheme.getColor(EditorColors.CARET_COLOR)
