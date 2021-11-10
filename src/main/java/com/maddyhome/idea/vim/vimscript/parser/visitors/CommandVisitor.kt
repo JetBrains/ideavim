@@ -47,6 +47,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.NextFileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.NextTabCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.NoHLSearchCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.OnlyCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.PackaddCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.PlugCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.PreviousFileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.PreviousTabCommand
@@ -471,6 +472,12 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     "on" to OnlyCommand::class,
     "onl" to OnlyCommand::class,
     "only" to OnlyCommand::class,
+    "pa" to PackaddCommand::class,
+    "pac" to PackaddCommand::class,
+    "pack" to PackaddCommand::class,
+    "packa" to PackaddCommand::class,
+    "packad" to PackaddCommand::class,
+    "packadd" to PackaddCommand::class,
     "Plug" to PlugCommand::class,
     "Plugi" to PlugCommand::class,
     "Plugin" to PlugCommand::class,
