@@ -29,6 +29,7 @@ internal object OptionServiceImpl : OptionService {
   private val logger = logger<OptionServiceImpl>()
   private val options = MultikeyMap(
     listOf(
+      NumberOption("maxmapdepth", "mmd", 20),
       NumberOption("scroll", "scr", 0),
       NumberOption("scrolloff", "so", 0),
       NumberOption("sidescroll", "ss", 0),
@@ -36,9 +37,11 @@ internal object OptionServiceImpl : OptionService {
       ToggleOption("digraph", "dg", false),
       ToggleOption("gdefault", "gd", false),
       ToggleOption("hlsearch", "hls", false),
+      ToggleOption("ideacopypreprocess", "ideacopypreprocess", false),
       ToggleOption("ideajoin", "ideajoin", false),
       ToggleOption("ideamarks", "ideamarks", true),
       ToggleOption("ideastrictmode", "ideastrictmode", false),
+      ToggleOption("ideatracetime", "ideatracetime", false),
       ToggleOption("ignorecase", "ic", false),
       ToggleOption("incsearch", "is", false),
       ToggleOption("more", "more", true),
