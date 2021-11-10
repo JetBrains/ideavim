@@ -54,6 +54,8 @@ import com.maddyhome.idea.vim.ui.StatusBarIconFactory;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
+import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -224,6 +226,10 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     return ServiceManager.getService(PutGroup.class);
   }
 
+  public static @NotNull OptionService getOptionService() {
+    return OptionServiceImpl.INSTANCE;
+  }
+
   private static @NotNull NotificationService getNotifications() {
     return getNotifications(null);
   }
@@ -238,7 +244,6 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
       executeIdeaVimRc();
     }
   }
-
 
   public static @NotNull PluginId getPluginId() {
     return PluginId.getId(IDEAVIM_PLUGIN_ID);
