@@ -19,7 +19,11 @@ package com.maddyhome.idea.vim.option
 
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.helper.enumSetOf
-import java.util.*
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorAttributes
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorEntry
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorMode
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorType
+import org.jetbrains.annotations.ApiStatus
 
 class GuiCursorOption(name: String, abbrev: String, defaultValue: String) :
   ListOption<GuiCursorEntry>(name, abbrev, defaultValue) {
@@ -113,48 +117,3 @@ class GuiCursorOption(name: String, abbrev: String, defaultValue: String) :
     }
   }
 }
-
-enum class GuiCursorMode(val token: String) {
-  NORMAL("n"),
-  VISUAL("v"),
-  VISUAL_EXCLUSIVE("ve"),
-  OP_PENDING("o"),
-  INSERT("i"),
-  REPLACE("r"),
-  CMD_LINE("c"),
-  CMD_LINE_INSERT("ci"),
-  CMD_LINE_REPLACE("cr"),
-  SHOW_MATCH("sm"),
-  ALL("a");
-
-  override fun toString() = token
-
-  companion object {
-    fun fromString(s: String) = values().firstOrNull { it.token == s }
-  }
-}
-
-enum class GuiCursorType(val token: String) {
-  BLOCK("block"),
-  VER("ver"),
-  HOR("hor")
-}
-
-class GuiCursorEntry(
-  private val originalString: String,
-  val modes: EnumSet<GuiCursorMode>,
-  val attributes: GuiCursorAttributes
-) {
-  override fun toString(): String {
-    // We need to match the original string for output and remove purposes
-    return originalString
-  }
-}
-
-data class GuiCursorAttributes(
-  val type: GuiCursorType,
-  val thickness: Int,
-  val highlightGroup: String,
-  val lmapHighlightGroup: String,
-  val blinkModes: List<String>
-)
