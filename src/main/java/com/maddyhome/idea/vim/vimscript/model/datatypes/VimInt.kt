@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 data class VimInt(val value: Int) : VimDataType() {
 
-  constructor(octalDecimalOrHexNumber: String) : this(parseNumber(octalDecimalOrHexNumber))
+  constructor(octalDecimalOrHexNumber: String) : this(parseNumber(octalDecimalOrHexNumber) ?: 0)
 
   override fun asDouble(): Double {
     return value.toDouble()
@@ -38,13 +38,13 @@ data class VimInt(val value: Int) : VimDataType() {
   }
 }
 
-private fun parseNumber(octalDecimalOrHexNumber: String): Int {
+fun parseNumber(octalDecimalOrHexNumber: String): Int? {
   val n = octalDecimalOrHexNumber.toLowerCase()
   return when {
     n.matches(Regex("[-]?0[x][0-9a-f]+")) -> n.replaceFirst("0x", "").toInt(16)
     n.matches(Regex("[-]?[0][0-7]+")) -> n.toInt(8)
     n.matches(Regex("[-]?[0-9]+")) -> n.toInt()
-    else -> 0
+    else -> null
   }
 }
 
