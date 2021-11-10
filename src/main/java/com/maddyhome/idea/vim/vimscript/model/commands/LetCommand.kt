@@ -4,18 +4,12 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.option.NumberOption
-import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.option.StringListOption
-import com.maddyhome.idea.vim.option.StringOption
-import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.expressions.EnvVariableExpression
@@ -27,10 +21,11 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOperator
-import com.maddyhome.idea.vim.vimscript.model.expressions.toVimDataType
+import com.maddyhome.idea.vim.vimscript.model.expressions.toOptionScope
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
+import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 
 /**
@@ -156,43 +151,14 @@ data class LetCommand(
         }
       }
 
-      // todo local options
       is OptionExpression -> {
-        val option = OptionsManager.getOption(variable.optionName) ?: throw ExException("E355: Unknown option: ${variable.optionName}")
-        val optionValue = option.toVimDataType()
+        val optionValue = variable.evaluate(editor, context, parent)
         if (operator == AssignmentOperator.ASSIGNMENT || operator == AssignmentOperator.CONCATENATION ||
           operator == AssignmentOperator.ADDITION || operator == AssignmentOperator.SUBTRACTION
         ) {
           val newValue = operator.getNewValue(optionValue, expression.evaluate(editor, context, this))
-          when (option) {
-            is ToggleOption -> {
-              if (newValue.asBoolean()) {
-                option.set()
-              } else {
-                option.reset()
-              }
-            }
-            is NumberOption -> {
-              if (newValue is VimInt) {
-                option.set(newValue.value)
-              } else {
-                TODO()
-              }
-            }
-            is StringOption -> {
-              option.set(newValue.asString())
-            }
-            is StringListOption -> {
-              if (newValue is VimList) {
-                option.set(newValue.values.joinToString(separator = ",") { it.asString() })
-              } else {
-                TODO()
-              }
-            }
-            else -> TODO()
-          }
+          OptionServiceImpl.setOptionValue(variable.scope.toOptionScope(), variable.optionName, newValue, editor, variable.originalString)
         } else {
-          // one of the nontrivial vim exceptions should be thrown
           TODO()
         }
       }
