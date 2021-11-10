@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
@@ -36,6 +37,7 @@ data class SetCommand(val ranges: Ranges, val argument: String) : Command.Single
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
+    OptionsManager.parseOptionLine(editor, argument, true)
     return if (parseOptionLine(editor, argument, OptionService.Scope.GLOBAL, failOnBad = true)) {
       ExecutionResult.Success
     } else {
