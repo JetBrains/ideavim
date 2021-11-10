@@ -381,11 +381,15 @@ internal object OptionServiceImpl : OptionService {
     }
   }
 
-  internal fun addListener(optionName: String, listener: OptionChangeListener<VimDataType>) {
+  override fun addListener(optionName: String, listener: OptionChangeListener<VimDataType>, executeOnAdd: Boolean) {
     options.get(optionName)!!.addOptionChangeListener(listener)
+    if (executeOnAdd) {
+      val value = getGlobalOptionValue(optionName)
+      listener.valueChange(value, value)
+    }
   }
 
-  internal fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>) {
+  override fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>) {
     options.get(optionName)!!.removeOptionChangeListener(listener)
   }
 

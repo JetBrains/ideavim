@@ -1,6 +1,7 @@
 package com.maddyhome.idea.vim.vimscript.services
 
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.option.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 
 interface OptionService {
@@ -42,6 +43,10 @@ interface OptionService {
   fun showChangedOptions(editor: Editor, scope: Scope, showIntro: Boolean)
 
   fun showOptions(editor: Editor, nameAndToken: Collection<Pair<String, String>>, scope: Scope, showIntro: Boolean)
+
+  fun addListener(optionName: String, listener: OptionChangeListener<VimDataType>, executeOnAdd: Boolean = false)
+
+  fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>)
 
   enum class Scope {
     LOCAL,
