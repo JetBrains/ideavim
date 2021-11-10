@@ -198,4 +198,23 @@ Xbar
     }
     assertMode(CommandState.Mode.COMMAND)
   }
+
+  @TestWithoutNeovim(SkipNeovimReason.VISUAL_BLOCK_MODE)
+  fun `test insert with block on one line`() {
+    val before = """
+                A Discovery
+
+                I found it in ${c}a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """
+    doTest(
+      listOf("<C-V>", "lll", "I"),
+      before.trimIndent(),
+      before.trimIndent(),
+      CommandState.Mode.INSERT,
+      CommandState.SubMode.NONE
+    )
+  }
 }

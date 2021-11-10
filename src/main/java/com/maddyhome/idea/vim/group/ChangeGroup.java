@@ -419,10 +419,14 @@ public class ChangeGroup {
         setInsertEditorState(editor, false);
       }
       if (cmd.getFlags().contains(CommandFlags.FLAG_NO_REPEAT_INSERT)) {
-        repeatInsert(editor, context, 1, false, new OperatorArguments(false, 1));
+        CommandState commandState = CommandState.getInstance(editor);
+        repeatInsert(editor, context, 1, false,
+                     new OperatorArguments(false, 1, commandState.getMode(), commandState.getSubMode()));
       }
       else {
-        repeatInsert(editor, context, cmd.getCount(), false, new OperatorArguments(false, cmd.getCount()));
+        CommandState commandState = CommandState.getInstance(editor);
+        repeatInsert(editor, context, cmd.getCount(), false,
+                     new OperatorArguments(false, cmd.getCount(), commandState.getMode(), commandState.getSubMode()));
       }
       if (mode == CommandState.Mode.REPLACE) {
         setInsertEditorState(editor, true);
@@ -1384,10 +1388,12 @@ public class ChangeGroup {
     final int lines = getLinesCountInVisualBlock(editor, range);
     final LogicalPosition startPosition = editor.offsetToLogicalPosition(range.getStartOffset());
 
+    boolean visualBlockMode = operatorArguments.getMode() == CommandState.Mode.VISUAL &&
+                              operatorArguments.getSubMode() == CommandState.SubMode.VISUAL_BLOCK;
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
       final int line = startPosition.line;
       int column = startPosition.column;
-      if (!range.isMultiple()) {
+      if (!visualBlockMode) {
         column = 0;
       }
       else if (append) {
@@ -1404,15 +1410,15 @@ public class ChangeGroup {
         insertText(editor, caret, offset, pad);
       }
 
-      if (range.isMultiple() || !append) {
+      if (visualBlockMode || !append) {
         InlayHelperKt.moveToInlayAwareLogicalPosition(caret, new LogicalPosition(line, column));
       }
-      if (range.isMultiple()) {
+      if (visualBlockMode) {
         setInsertRepeat(lines, column, append);
       }
     }
 
-    if (range.isMultiple() || !append) {
+    if (visualBlockMode || !append) {
       insertBeforeCursor(editor, context);
     }
     else {

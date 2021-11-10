@@ -788,7 +788,7 @@ public class KeyHandler {
 
     OperatorArguments operatorArguments =
       new OperatorArguments(editorState.getMappingState().getMappingMode() == MappingMode.OP_PENDING,
-                            command.getRawCount());
+                            command.getRawCount(), editorState.getMode(), editorState.getSubMode());
 
     // If we were in "operator pending" mode, reset back to normal mode.
     editorState.resetOpPending();

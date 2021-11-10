@@ -9,6 +9,9 @@ package com.maddyhome.idea.vim.command
 data class OperatorArguments(
   val isOperatorPending: Boolean,
   val count0: Int,
+
+  val mode: CommandState.Mode,
+  val subMode: CommandState.SubMode,
 ) {
   val count1: Int = count0.coerceAtLeast(1)
 
