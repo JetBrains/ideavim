@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.option
 
 import com.maddyhome.idea.vim.helper.VimNlsSafe
+import org.jetbrains.annotations.ApiStatus
 import java.util.regex.Pattern
 
 /**
@@ -28,7 +29,10 @@ import java.util.regex.Pattern
  * @param abbrev  The short name
  * @param defaultValues    The option's default values
  * @param pattern A regular expression that is used to validate new values. null if no check needed
+ * @deprecated use {@link com.maddyhome.idea.vim.vimscript.model.options.Option} instead
  */
+@Deprecated("was replaced by OptionService")
+@ApiStatus.ScheduledForRemoval(inVersion = "1.11")
 open class StringListOption @JvmOverloads constructor(
   @VimNlsSafe name: String,
   @VimNlsSafe abbrev: String,

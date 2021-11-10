@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.option;
 
 import org.apache.commons.lang.math.NumberUtils;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,6 +31,12 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+
+/**
+ * @deprecated use {@link com.maddyhome.idea.vim.vimscript.model.options.helpers.KeywordOptionHelper} instead
+ */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "1.11")
 public final class KeywordOption extends StringListOption {
   @NonNls private static final String allLettersRegex = "\\p{L}";
   @NonNls private static final String PATTERN =

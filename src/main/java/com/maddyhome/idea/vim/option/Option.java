@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.option;
 
 import com.intellij.util.containers.ContainerUtil;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -26,7 +27,10 @@ import java.util.List;
 /**
  * Represents an VIM options that can be set with the :set command. Listeners can be set that are interested in knowing
  * when the value of the option changes.
+ * @deprecated use {@link com.maddyhome.idea.vim.vimscript.model.options.Option} instead
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "1.11")
 public abstract class Option<T> {
   protected final String name;
   protected final String abbrev;

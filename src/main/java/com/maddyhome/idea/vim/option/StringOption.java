@@ -18,11 +18,15 @@
 
 package com.maddyhome.idea.vim.option;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * An option that has an arbitrary string value
- */
+ * @deprecated use {@link com.maddyhome.idea.vim.vimscript.model.options.Option} instead
+  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "1.11")
 public class StringOption extends TextOption {
   private final String dflt;
 

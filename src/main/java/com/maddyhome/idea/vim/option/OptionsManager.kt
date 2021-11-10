@@ -39,12 +39,19 @@ import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.NonNls
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.min
 
+/**
+ * @deprecated use {@link com.maddyhome.idea.vim.vimscript.services.OptionService} instead
+ * (VimPlugin.getOptionService())
+ */
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 @Suppress("unused")
 object OptionsManager {
   private val logger = Logger.getInstance(OptionsManager::class.java)
@@ -396,6 +403,8 @@ object OptionsManager {
 }
 
 @NonNls
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object KeyModelOptionData {
   const val name = "keymodel"
   private const val abbr = "km"
@@ -413,6 +422,8 @@ object KeyModelOptionData {
 }
 
 @NonNls
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object SelectModeOptionData {
   const val name = "selectmode"
   private const val abbr = "slm"
@@ -434,6 +445,8 @@ object SelectModeOptionData {
 }
 
 @NonNls
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object ClipboardOptionsData {
   const val name = "clipboard"
   const val abbr = "cb"
@@ -465,6 +478,8 @@ object ClipboardOptionsData {
 
 @Suppress("SpellCheckingInspection")
 @NonNls
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object GuiCursorOptionData {
   const val name = "guicursor"
   private const val abbr = "gcr"
@@ -479,6 +494,8 @@ object GuiCursorOptionData {
 }
 
 @NonNls
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object IdeaJoinOptionsData {
   const val name = "ideajoin"
   private const val defaultValue = false
@@ -487,6 +504,8 @@ object IdeaJoinOptionsData {
 }
 
 @NonNls
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object IdeaMarksOptionsData {
   const val name = "ideamarks"
   private const val defaultValue = true
@@ -495,18 +514,24 @@ object IdeaMarksOptionsData {
 }
 
 @NonNls
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object SmartCaseOptionsData {
   const val name = "smartcase"
   const val abbr = "scs"
 }
 
 @NonNls
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object IgnoreCaseOptionsData {
   const val name = "ignorecase"
   const val abbr = "ic"
 }
 
 @NonNls
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object IdeaRefactorMode {
   const val name = "idearefactormode"
 
@@ -565,6 +590,8 @@ object IdeaRefactorMode {
 }
 
 @NonNls
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object LookupKeysData {
   const val name = "lookupkeys"
   val defaultValues = arrayOf(
@@ -580,6 +607,8 @@ object LookupKeysData {
 }
 
 @NonNls
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object IdeaStatusIcon {
   const val enabled = "enabled"
   const val gray = "gray"
@@ -590,15 +619,21 @@ object IdeaStatusIcon {
 }
 
 @NonNls
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object ScrollOffData {
   const val name = "scrolloff"
 }
 
 @NonNls
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object ScrollJumpData {
   const val name = "scrolljump"
 }
 
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object ShellOptionData {
   const val name = "shell"
 
@@ -608,6 +643,8 @@ object ShellOptionData {
 }
 
 @Suppress("SpellCheckingInspection")
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object ShellCmdFlagOptionData {
   const val name = "shellcmdflag"
 
@@ -631,6 +668,8 @@ object ShellCmdFlagOptionData {
 }
 
 @Suppress("SpellCheckingInspection")
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object ShellXEscapeOptionData {
   const val name = "shellxescape"
 
@@ -638,6 +677,8 @@ object ShellXEscapeOptionData {
 }
 
 @Suppress("SpellCheckingInspection")
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object ShellXQuoteOptionData {
   const val name = "shellxquote"
 
@@ -664,6 +705,8 @@ object ShellXQuoteOptionData {
   }
 }
 
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object StrictMode {
   val on: Boolean
     get() = OptionsManager.ideastrictmode.isSet
@@ -675,6 +718,8 @@ object StrictMode {
 }
 
 @NonNls
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object VirtualEditData {
   const val name = "virtualedit"
 
@@ -687,6 +732,8 @@ object VirtualEditData {
 }
 
 @NonNls
+@Deprecated("was replaced by OptionService")
+@ScheduledForRemoval(inVersion = "1.11")
 object IdeaWriteData {
   const val all = "all"
 

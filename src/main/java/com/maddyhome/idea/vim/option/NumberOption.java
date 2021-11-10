@@ -19,13 +19,17 @@
 package com.maddyhome.idea.vim.option;
 
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents an option with a numeric value
+ * @deprecated use {@link com.maddyhome.idea.vim.vimscript.model.options.Option} instead
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "1.11")
 public class NumberOption extends TextOption {
   private final int dflt;
   private final int min;

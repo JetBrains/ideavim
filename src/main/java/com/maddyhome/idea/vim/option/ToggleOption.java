@@ -19,12 +19,16 @@
 package com.maddyhome.idea.vim.option;
 
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a boolean option
+ * @deprecated use {@link com.maddyhome.idea.vim.vimscript.model.options.Option} instead
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "1.11")
 public class ToggleOption extends Option<Boolean> {
 
   private static final @NonNls String NO_PREFIX = "no";

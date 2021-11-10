@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.option;
 import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,7 +33,10 @@ import java.util.StringTokenizer;
 
 /**
  * This is an option that accepts an arbitrary list of values
+ * @deprecated use {@link com.maddyhome.idea.vim.vimscript.model.options.Option} instead
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "1.11")
 public abstract class ListOption<T> extends TextOption {
   private static final Logger logger = Logger.getInstance(ListOption.class.getName());
 
