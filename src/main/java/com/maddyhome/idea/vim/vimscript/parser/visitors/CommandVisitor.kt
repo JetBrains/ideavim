@@ -64,6 +64,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.SelectFirstFileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SelectLastFileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SetCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.SetHandlerCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.SetLocalCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ShellCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ShiftLeftCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.ShiftRightCommand
@@ -580,6 +581,11 @@ object CommandVisitor : VimscriptBaseVisitor<Command>() {
     "last" to SelectLastFileCommand::class,
     "se" to SetCommand::class,
     "set" to SetCommand::class,
+    "setl" to SetLocalCommand::class,
+    "setlo" to SetLocalCommand::class,
+    "setloc" to SetLocalCommand::class,
+    "setloca" to SetLocalCommand::class,
+    "setlocal" to SetLocalCommand::class,
     "sethandler" to SetHandlerCommand::class,
     "sh" to ShellCommand::class,
     "she" to ShellCommand::class,
