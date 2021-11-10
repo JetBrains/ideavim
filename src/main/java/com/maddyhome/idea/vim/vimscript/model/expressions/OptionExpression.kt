@@ -3,32 +3,23 @@ package com.maddyhome.idea.vim.vimscript.model.expressions
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.option.NumberOption
-import com.maddyhome.idea.vim.option.Option
-import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.option.StringListOption
-import com.maddyhome.idea.vim.option.StringOption
-import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.OptionService
+import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 
-data class OptionExpression(val optionName: String) : Expression() {
+data class OptionExpression(val scope: Scope, val optionName: String) : Expression() {
 
   override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
-    val option = OptionsManager.getOption(optionName) ?: throw ExException("E518: Unknown option: $optionName")
-    return option.toVimDataType()
+    return OptionServiceImpl.getOptionValue(scope.toOptionScope(), optionName, editor)
   }
 }
 
-fun Option<*>.toVimDataType(): VimDataType {
+// todo clean me up
+fun Scope.toOptionScope(): OptionService.Scope {
   return when (this) {
-    is StringListOption -> VimList(this.values().map { VimString(it) }.toMutableList())
-    is NumberOption -> VimInt(this.value())
-    is StringOption -> VimString(this.value)
-    is ToggleOption -> VimInt(if (this.value) 1 else 0)
-    else -> throw RuntimeException("Unknown option class passed to option expression: ${this.javaClass}")
+    Scope.GLOBAL_VARIABLE -> OptionService.Scope.GLOBAL
+    Scope.LOCAL_VARIABLE -> OptionService.Scope.LOCAL
+    else -> throw ExException("Invalid option scope")
   }
 }

@@ -213,7 +213,7 @@ object ExpressionVisitor : VimscriptBaseVisitor<Expression>() {
   }
 
   override fun visitOptionExpression(ctx: OptionExpressionContext): Expression {
-    val result = OptionExpression(ctx.option().optionName().text)
+    val result = OptionExpression(Scope.getByValue(ctx.option()?.text ?: "") ?: Scope.GLOBAL_VARIABLE, ctx.option().optionName().text)
     result.originalString = ctx.text
     return result
   }
