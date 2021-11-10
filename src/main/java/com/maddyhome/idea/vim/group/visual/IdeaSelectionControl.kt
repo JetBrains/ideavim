@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.commandState
 import com.maddyhome.idea.vim.helper.exitSelectMode
@@ -82,14 +81,14 @@ object IdeaSelectionControl {
 
         editor.popAllModes()
 
-        activateMode(editor, chooseSelectionMode(editor, selectionSource, true), OperatorArguments(false, 1))
+        activateMode(editor, chooseSelectionMode(editor, selectionSource, true))
       } else {
         logger.debug("None of carets have selection. State before adjustment: ${editor.commandState.toSimpleString()}")
         if (editor.inVisualMode) editor.exitVisualMode()
         if (editor.inSelectMode) editor.exitSelectMode(false)
 
         if (editor.inNormalMode) {
-          activateMode(editor, chooseNonSelectionMode(editor), OperatorArguments(false, 1))
+          activateMode(editor, chooseNonSelectionMode(editor))
         }
       }
 
@@ -117,7 +116,7 @@ object IdeaSelectionControl {
     }
   }
 
-  private fun activateMode(editor: Editor, mode: CommandState.Mode, operatorArguments: OperatorArguments) {
+  private fun activateMode(editor: Editor, mode: CommandState.Mode) {
     when (mode) {
       CommandState.Mode.VISUAL -> VimPlugin.getVisualMotion()
         .enterVisualMode(editor, VimPlugin.getVisualMotion().autodetectVisualSubmode(editor))
