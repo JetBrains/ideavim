@@ -13,6 +13,12 @@ jobs:
         with:
           distribution: zulu
           java-version: 11
+      - name: Setup FFmpeg
+        uses: FedericoCarboni/setup-ffmpeg@v1
+        with:
+          # Not strictly necessary, but it may prevent rate limit
+          # errors especially on GitHub-hosted macos machines.
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Plugin
         run: gradle :buildPlugin
       - name: Run Idea
@@ -27,6 +33,9 @@ jobs:
           retry-delay: 10s
       - name: Tests
         run: gradle :testUi
+      - name: Move video
+        if: ${{ failure() }}
+        run: mv video build/reports
       - name: Save fails report
         if: ${{ failure() }}
         uses: actions/upload-artifact@v2
