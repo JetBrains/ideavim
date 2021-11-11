@@ -62,6 +62,12 @@
   <depends>com.intellij.modules.platform</depends>
   <resource-bundle>messages.IdeaVimBundle</resource-bundle>
 
+  <!-- IDE-Specific configurations -->
+  <!--suppress PluginXmlValidity -->
+  <depends optional="true" config-file="ides/ideavim-withRider.xml">com.intellij.modules.rider</depends>
+  <!--suppress PluginXmlValidity -->
+  <depends optional="true" config-file="ides/ideavim-withAppCode.xml">com.intellij.modules.appcode</depends>
+
   <application-components>
     <component>
       <implementation-class>com.maddyhome.idea.vim.DynamicLoaderStopper</implementation-class>

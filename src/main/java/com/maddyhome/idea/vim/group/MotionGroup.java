@@ -45,6 +45,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import com.maddyhome.idea.vim.handler.MotionActionHandlerKt;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.listener.AppCodeTemplates;
 import com.maddyhome.idea.vim.listener.IdeaSpecifics;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
@@ -347,7 +348,7 @@ public class MotionGroup {
       ModeHelper.exitVisualMode(editor);
     }
 
-    IdeaSpecifics.AppCodeTemplates.onMovement(editor, caret, oldOffset < offset);
+    AppCodeTemplates.onMovement(editor, caret, oldOffset < offset);
   }
 
   private @Nullable Editor selectEditor(@NotNull Editor editor, @NotNull Mark mark) {
