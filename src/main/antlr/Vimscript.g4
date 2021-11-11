@@ -116,7 +116,7 @@ command:
         | MARK_COMMAND | JUMPS | J_LOWERCASE | JOIN_LINES | HISTORY | GO_TO_CHAR | SYMBOL | FIND | CLASS | F_LOWERCASE
         | FILE | EXIT | E_LOWERCASE | EDIT_FILE | DUMP_LINE | DIGRAPH | DEL_MARKS | D_LOWERCASE | DEL_LINES | DELCMD
         | T_LOWERCASE | COPY | CMD_CLEAR | BUFFER_LIST | BUFFER_CLOSE | B_LOWERCASE | BUFFER | ASCII
-        | ACTIONLIST | ACTION | LOCKVAR | UNLOCKVAR
+        | ACTIONLIST | ACTION | LOCKVAR | UNLOCKVAR | PACKADD
       )
     WS* ((commandArgumentWithoutBars? inline_comment NEW_LINE) | (commandArgumentWithoutBars? NEW_LINE) | (commandArgumentWithoutBars? BAR)) (NEW_LINE | BAR)*
     #CommandWithComment|
@@ -453,6 +453,7 @@ existingCommands:       RETURN
                     |   NEXT_TAB
                     |   NO_HL_SEARCH
                     |   ONLY
+                    |   PACKADD
                     |   PLUG
                     |   PREVIOUS_FILE
                     |   PREVIOUS_TAB
@@ -622,6 +623,7 @@ NEXT_FILE:              'ne' | 'nex' | 'next' | 'bn' | 'bne' | 'bnex' | 'bnext';
 NEXT_TAB:               'tabn' | 'tabne' | 'tabnex' | 'tabnext';
 NO_HL_SEARCH:           'noh' | 'nohl' | 'nohls' | 'nohlse' | 'nohlsea' | 'nohlsear' | 'nohlsearc' | 'nohlsearch';
 ONLY:                   'on' | 'onl' | 'only';
+PACKADD:                'pa' | 'pac' | 'pack' | 'packa' | 'packad' | 'packadd';
 PLUG:                   'Plug' | 'Plugi' | 'Plugin';
 PREVIOUS_FILE:          'Ne' | 'Nex' | 'Next' | 'prev'| 'previ' | 'previo' | 'previou' | 'previous' | 'bp' | 'bpr' | 'bpre' |'bprev'| 'bprevi' | 'bprevio' | 'bpreviou' | 'bprevious';
 PREVIOUS_TAB:           'tabp' | 'tabpr' | 'tabpre' | 'tabprev' | 'tabprevi' | 'tabprevio' | 'tabpreviou' | 'tabprevious' | 'tabN' | 'tabNe' | 'tabNex' | 'tabNext';
