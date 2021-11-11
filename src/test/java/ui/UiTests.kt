@@ -89,7 +89,6 @@ class UiTests {
           )
         }
       }
-      throw AssertionError("")
       testSelectTextWithDelay(editor)
       testExtendSelection(editor)
       testLargerDragSelection(editor)
