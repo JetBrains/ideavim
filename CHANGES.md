@@ -43,11 +43,13 @@ usual beta standards.
 * [VIM-2449](https://youtrack.jetbrains.com/issue/VIM-2449) Fix `I` for one-line block selection
 * [VIM-2213](https://youtrack.jetbrains.com/issue/VIM-2213) Close VCS change popup on esc
 * [VIM-2435](https://youtrack.jetbrains.com/issue/VIM-2435) Close diff window on esc
+* [VIM-2461](https://youtrack.jetbrains.com/issue/VIM-2461) Show action id before action execution
 
 ### Merged PRs:
 * [390](https://github.com/JetBrains/ideavim/pull/390) by [chylex](https://github.com/chylex): [VIM-2255] Missing reload icon in .ideavimrc on Windows
 * [391](https://github.com/JetBrains/ideavim/pull/391) by [Matt Ellis](https://github.com/citizenmatt): fix(VIM-2432): handle scrolloff with <C-D> and <C-U>
 * [401](https://github.com/JetBrains/ideavim/pull/401) by [Matt Ellis](https://github.com/citizenmatt): Reset caret shape when disabling plugin
+* [407](https://github.com/JetBrains/ideavim/pull/407) by [eugene nizienko](https://github.com/nizienko): Video recording for ui tests
 
 ## 1.8.0, 2021-10-27
 
