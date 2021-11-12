@@ -39,7 +39,7 @@ object Executor {
   private val logger = logger<Executor>()
   var executingVimScript = false
 
-  @kotlin.jvm.Throws(ExException::class)
+  @Throws(ExException::class)
   fun execute(scriptString: String, editor: Editor, context: DataContext, skipHistory: Boolean, indicateErrors: Boolean = true): ExecutionResult {
     var finalResult: ExecutionResult = ExecutionResult.Success
 
@@ -101,7 +101,7 @@ object Executor {
     } catch (ignored: IOException) { }
   }
 
-  @kotlin.jvm.Throws(ExException::class)
+  @Throws(ExException::class)
   fun executeLastCommand(editor: Editor, context: DataContext): Boolean {
     val reg = VimPlugin.getRegister().getRegister(':') ?: return false
     val text = reg.text ?: return false
