@@ -30,12 +30,7 @@ class PackaddCommand(val ranges: Ranges, val argument: String) : Command.SingleE
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
-    val argument = argument
-    val firstChar = argument[0]
-    if (firstChar != '"' && firstChar != '\'') return ExecutionResult.Error
-
-    val pluginAlias = argument.drop(1).takeWhile { it != firstChar }
-    if (pluginAlias == "matchit") {
+    if (argument == "matchit" || (argument.startsWith("!") && argument.drop(1).trim() == "matchit")) {
       VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "matchit", null)
     }
     return ExecutionResult.Success

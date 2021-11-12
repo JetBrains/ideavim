@@ -46,10 +46,14 @@ swapfile
 noswapfile
 
 sethandler
+packadd
 
 nvim
 
 easymotion
+matchit
+textobj
+argtextobj
 
 
 nmap
@@ -130,3 +134,5 @@ tmapclear
 
 getreg
 getregtype
+
+endfunction

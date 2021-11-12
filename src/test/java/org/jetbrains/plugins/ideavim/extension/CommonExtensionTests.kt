@@ -35,6 +35,8 @@ import com.maddyhome.idea.vim.extension.VimExtensionRegistrar
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.Executor.executingVimScript
 import junit.framework.TestCase
@@ -261,6 +263,26 @@ class PlugMissingKeysTest : VimTestCase() {
     val iKeyMappings = VimPlugin.getKey().getMapTo(MappingMode.INSERT, parseKeys("<Plug>TestMissing"))
     TestCase.assertEquals(1, iKeyMappings.size)
     TestCase.assertEquals(parseKeys("L"), iKeyMappings.first().first)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun `test packadd`() {
+    assertFalse((OptionsManager.getOption("matchit") as ToggleOption).isSet)
+    executeLikeVimrc(
+      "packadd matchit",
+    )
+
+    assertTrue((OptionsManager.getOption("matchit") as ToggleOption).isSet)
+  }
+
+  @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
+  fun `test packadd ex`() {
+    assertFalse((OptionsManager.getOption("matchit") as ToggleOption).isSet)
+    executeLikeVimrc(
+      "packadd! matchit",
+    )
+
+    assertTrue((OptionsManager.getOption("matchit") as ToggleOption).isSet)
   }
 
   private fun executeLikeVimrc(vararg text: String) {
