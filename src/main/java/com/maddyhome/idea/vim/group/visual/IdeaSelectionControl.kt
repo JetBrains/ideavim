@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import com.maddyhome.idea.vim.option.SelectModeOptionData
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 object IdeaSelectionControl {
@@ -73,7 +74,7 @@ object IdeaSelectionControl {
 
       if (editor.selectionModel.hasSelection(true)) {
         if (dontChangeMode(editor)) {
-          IdeaRefactorMode.correctSelection(editor)
+          IdeaRefactorModeHelper.correctSelection(editor)
           logger.trace { "Selection corrected for refactoring" }
           return@singleTask
         }
@@ -133,7 +134,7 @@ object IdeaSelectionControl {
   }
 
   private fun dontChangeMode(editor: Editor): Boolean =
-    editor.isTemplateActive() && (IdeaRefactorMode.keepMode() || editor.mode.hasVisualSelection)
+    editor.isTemplateActive() && (IdeaRefactorModeHelper.keepMode() || editor.mode.hasVisualSelection)
 
   private fun chooseNonSelectionMode(editor: Editor): CommandState.Mode {
     val templateActive = editor.isTemplateActive()
@@ -158,7 +159,7 @@ object IdeaSelectionControl {
         if (logReason) logger.debug("Enter select mode. Selection source is mouse and selectMode option has mouse")
         CommandState.Mode.SELECT
       }
-      editor.isTemplateActive() && IdeaRefactorMode.selectMode() -> {
+      editor.isTemplateActive() && IdeaRefactorModeHelper.selectMode() -> {
         if (logReason) logger.debug("Enter select mode. Template is active and selectMode has template")
         CommandState.Mode.SELECT
       }

@@ -57,6 +57,7 @@ import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
 import com.maddyhome.idea.vim.option.IdeaRefactorMode
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.NotNull
 
@@ -146,14 +147,14 @@ object IdeaSpecifics {
           oldIndex: Int,
           newIndex: Int,
         ) {
-          if (IdeaRefactorMode.keepMode()) {
-            IdeaRefactorMode.correctSelection(editor)
+          if (IdeaRefactorModeHelper.keepMode()) {
+            IdeaRefactorModeHelper.correctSelection(editor)
           }
         }
       })
 
-      if (IdeaRefactorMode.keepMode()) {
-        IdeaRefactorMode.correctSelection(editor)
+      if (IdeaRefactorModeHelper.keepMode()) {
+        IdeaRefactorModeHelper.correctSelection(editor)
       } else {
         if (!editor.selectionModel.hasSelection()) {
           // Enable insert mode if there is no selection in template

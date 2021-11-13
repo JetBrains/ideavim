@@ -532,7 +532,6 @@ object IgnoreCaseOptionsData {
   const val abbr = "ic"
 }
 
-// todo create helper
 @NonNls
 @Deprecated("was replaced by OptionService")
 @ScheduledForRemoval(inVersion = "1.11")
