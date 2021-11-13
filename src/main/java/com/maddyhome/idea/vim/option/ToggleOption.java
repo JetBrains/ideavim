@@ -18,7 +18,10 @@
 
 package com.maddyhome.idea.vim.option;
 
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -90,7 +93,12 @@ public class ToggleOption extends Option<Boolean> {
     if (val != old) {
       onChanged(old, val);
     }
-  }
+    try {
+      if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, name, null, name) != val) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimInt(val ? 1 : 0), null, name);
+      }
+    } catch (Exception e) {}
+}
 
   /**
    * The display value of the option [no]{name}
@@ -127,5 +135,10 @@ public class ToggleOption extends Option<Boolean> {
   @Override
   public void resetDefault() {
     value = dflt;
+    try {
+      if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, name, null, name) != dflt) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimInt(dflt ? 1 : 0), null, name);
+      }
+    } catch (Exception e) {}
   }
 }

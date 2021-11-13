@@ -10,6 +10,7 @@ import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.option.OptionChangeListener
+import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
@@ -187,6 +188,20 @@ internal object OptionServiceImpl : OptionService {
       OptionService.Scope.GLOBAL -> setGlobalOptionValue(option.name, value, token)
     }
     option.onChanged(oldValue, value)
+
+    val oldOption = OptionsManager.getOption(optionName)
+    when (oldOption) {
+      is com.maddyhome.idea.vim.option.ToggleOption -> {
+        if (value == VimInt(0)) {
+          oldOption.reset()
+        } else {
+          oldOption.set()
+        }
+      }
+      is com.maddyhome.idea.vim.option.TextOption -> {
+        oldOption.set(value.asString())
+      }
+    }
   }
 
   fun setOptionValue(scope: OptionService.Scope, optionName: String, value: String, editor: Editor, token: String) {

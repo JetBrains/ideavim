@@ -18,6 +18,10 @@
 
 package com.maddyhome.idea.vim.option;
 
+import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -66,6 +70,12 @@ public class StringOption extends TextOption {
     String oldValue = getValue();
     value = val;
     onChanged(oldValue, getValue());
+    try {
+    if (!((VimString)VimPlugin.getOptionService()
+      .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(value)) {
+      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(value), null, name);
+    }
+  } catch (Exception e) {}
 
     return true;
   }
@@ -81,6 +91,12 @@ public class StringOption extends TextOption {
     String oldValue = getValue();
     value += val;
     onChanged(oldValue, getValue());
+    try {
+    if (!((VimString)VimPlugin.getOptionService()
+      .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(value)) {
+      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(value), null, name);
+    }
+    } catch (Exception e) {}
 
     return true;
   }
@@ -96,7 +112,12 @@ public class StringOption extends TextOption {
     String oldValue = getValue();
     value = val + value;
     onChanged(oldValue, getValue());
-
+    try {
+    if (!((VimString)VimPlugin.getOptionService()
+      .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(value)) {
+      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(value), null, name);
+    }
+    } catch (Exception e) {}
     return true;
   }
 
@@ -113,10 +134,14 @@ public class StringOption extends TextOption {
       String oldValue = getValue();
       value = value.substring(0, pos) + value.substring(pos + val.length());
       onChanged(oldValue, getValue());
-
+      try {
+      if (!((VimString)VimPlugin.getOptionService()
+        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(value)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(value), null, name);
+      }
+      } catch (Exception e) {}
       return true;
     }
-
     return false;
   }
 
@@ -140,6 +165,12 @@ public class StringOption extends TextOption {
       value = getDefaultValue();
       onChanged(oldValue, getValue());
     }
+    try {
+      if (!((VimString)VimPlugin.getOptionService()
+        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(dflt)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(dflt), null, name);
+      }
+    } catch (Exception e) {}
   }
 
   /**

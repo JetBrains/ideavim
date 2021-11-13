@@ -18,7 +18,11 @@
 
 package com.maddyhome.idea.vim.option;
 
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -115,6 +119,12 @@ public class NumberOption extends TextOption {
       String oldValue = getValue();
       this.value = num;
       onChanged(oldValue, getValue());
+      try {
+      if (!(((VimInt)VimPlugin.getOptionService()
+        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue() == value)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimInt(value), null, name);
+      }
+      } catch (Exception e) {}
 
       return true;
     }
@@ -142,6 +152,12 @@ public class NumberOption extends TextOption {
       String oldValue = getValue();
       value += num;
       onChanged(oldValue, getValue());
+      try {
+      if (!(((VimInt)VimPlugin.getOptionService()
+        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue() == value)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimInt(value), null, name);
+      }
+      } catch (Exception e) {}
 
       return true;
     }
@@ -169,6 +185,12 @@ public class NumberOption extends TextOption {
       String oldValue = getValue();
       value *= num;
       onChanged(oldValue, getValue());
+      try {
+      if (!(((VimInt)VimPlugin.getOptionService()
+        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue() == value)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimInt(value), null, name);
+      }
+      } catch (Exception e) {}
 
       return true;
     }
@@ -196,7 +218,12 @@ public class NumberOption extends TextOption {
       String oldValue = getValue();
       value -= num;
       onChanged(oldValue, getValue());
-
+      try {
+      if (!(((VimInt)VimPlugin.getOptionService()
+        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue() == value)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimInt(value), null, name);
+      }
+      } catch (Exception e) {}
       return true;
     }
 
@@ -223,6 +250,12 @@ public class NumberOption extends TextOption {
       value = dflt;
       onChanged(oldValue, getValue());
     }
+    try {
+    if (!(((VimInt)VimPlugin.getOptionService()
+      .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue() == value)) {
+      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimInt(value), null, name);
+    }
+    } catch (Exception e) {}
   }
 
   protected @Nullable Integer asNumber(String val) {

@@ -19,8 +19,11 @@
 package com.maddyhome.idea.vim.option;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.helper.VimNlsSafe;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -169,6 +172,13 @@ public abstract class ListOption<T> extends TextOption {
     String oldValue = getValue();
     this.value = vals;
     onChanged(oldValue, getValue());
+    try {
+      String joinedValue = getValue();
+      if (!((VimString)VimPlugin.getOptionService()
+        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(joinedValue)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(joinedValue), null, name);
+      }
+    } catch (Exception e) {}
 
     return true;
   }
@@ -182,6 +192,13 @@ public abstract class ListOption<T> extends TextOption {
     value.removeAll(vals);
     value.addAll(vals);
     onChanged(oldValue, getValue());
+    try {
+    String joinedValue = getValue();
+    if (!((VimString)VimPlugin.getOptionService()
+      .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(joinedValue)) {
+      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(joinedValue), null, name);
+    }
+    } catch (Exception e) {}
 
     return true;
   }
@@ -195,6 +212,13 @@ public abstract class ListOption<T> extends TextOption {
     value.removeAll(vals);
     value.addAll(0, vals);
     onChanged(oldValue, getValue());
+    try {
+    String joinedValue = getValue();
+    if (!((VimString)VimPlugin.getOptionService()
+      .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(joinedValue)) {
+      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(joinedValue), null, name);
+    }
+    } catch (Exception e) {}
 
     return true;
   }
@@ -207,6 +231,13 @@ public abstract class ListOption<T> extends TextOption {
     String oldValue = getValue();
     value.removeAll(vals);
     onChanged(oldValue, getValue());
+    try {
+    String joinedValue = getValue();
+    if (!((VimString)VimPlugin.getOptionService()
+      .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(joinedValue)) {
+      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(joinedValue), null, name);
+    }
+    } catch (Exception e) {}
 
     return true;
   }
@@ -258,6 +289,13 @@ public abstract class ListOption<T> extends TextOption {
       String oldValue = getValue();
       value = new ArrayList<>(defaultValues);
       onChanged(oldValue, getValue());
+      try {
+      String joinedValue = getValue();
+      if (!((VimString)VimPlugin.getOptionService()
+        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(joinedValue)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(joinedValue), null, name);
+      }
+      } catch (Exception e) {}
     }
   }
 }
