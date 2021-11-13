@@ -18,9 +18,11 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -53,7 +55,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scrolls first line on next page to scrolloff`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(0, 20)
     typeText(parseKeys("z+"))
@@ -63,7 +65,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scrolls first line on next page ignores scrolljump`() {
-    OptionsManager.scrolljump.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(0, 20)
     typeText(parseKeys("z+"))
@@ -80,7 +82,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
   }
 
   fun `test count z+ scrolls count line to top of screen plus scrolloff`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(0, 20)
     typeText(parseKeys("100z+"))

@@ -30,11 +30,13 @@ import com.intellij.openapi.wm.WindowManager
 import com.intellij.openapi.wm.impl.status.EditorBasedWidget
 import com.intellij.openapi.wm.impl.status.widget.StatusBarWidgetsManager
 import com.intellij.util.Consumer
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.option.OptionChangeListener
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.annotations.NonNls
 import java.awt.Component
 import java.awt.event.MouseEvent
@@ -64,15 +66,15 @@ object ShowCmd {
   }
 
   fun getFullText(editor: Editor?): String {
-    if (!OptionsManager.showcmd.isSet || editor == null || editor.isDisposed) return ""
+    if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "showcmd", null) || editor == null || editor.isDisposed) return ""
 
     val editorState = editor.vimCommandState ?: return ""
     return StringHelper.toPrintableCharacters(editorState.commandBuilder.keys + editorState.mappingState.keys)
   }
 }
 
-object ShowCmdOptionChangeListener : OptionChangeListener<Boolean> {
-  override fun valueChange(oldValue: Boolean?, newValue: Boolean?) {
+object ShowCmdOptionChangeListener : OptionChangeListener<VimDataType> {
+  override fun valueChange(oldValue: VimDataType, newValue: VimDataType) {
     ShowCmd.update()
 
     val extension = StatusBarWidgetFactory.EP_NAME.findExtension(ShowCmdStatusBarWidgetFactory::class.java) ?: return
@@ -93,7 +95,7 @@ class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEditCompati
     // Nothing
   }
 
-  override fun isAvailable(project: Project): Boolean = OptionsManager.showcmd.isSet
+  override fun isAvailable(project: Project): Boolean = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "showcmd", null)
 
   override fun createWidget(project: Project): StatusBarWidget = Widget(project)
 

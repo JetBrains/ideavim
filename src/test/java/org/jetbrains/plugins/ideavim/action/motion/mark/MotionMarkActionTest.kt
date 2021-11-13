@@ -23,13 +23,13 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.option.IdeaMarksOptionsData
 import junit.framework.TestCase
+import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
-import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class MotionMarkActionTest : VimOptionTestCase(IdeaMarksOptionsData.name) {
-  @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
+  @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, OptionValueType.NUMBER, "1"))
   fun `test simple add mark`() {
     val keys = StringHelper.parseKeys("mA")
     val text = """
@@ -45,7 +45,7 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarksOptionsData.name) {
     checkMarks('A' to 2)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
+  @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, OptionValueType.NUMBER, "1"))
   fun `test simple add multiple marks`() {
     val keys = StringHelper.parseKeys("mAj", "mBj", "mC")
     val text = """
@@ -61,7 +61,7 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarksOptionsData.name) {
     checkMarks('A' to 2, 'B' to 3, 'C' to 4)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
+  @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, OptionValueType.NUMBER, "1"))
   fun `test simple add multiple marks on same line`() {
     val keys = StringHelper.parseKeys("mA", "mB", "mC")
     val text = """
@@ -77,7 +77,7 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarksOptionsData.name) {
     checkMarks('A' to 2, 'B' to 2, 'C' to 2)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
+  @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, OptionValueType.NUMBER, "1"))
   fun `test move to another line`() {
     val keys = StringHelper.parseKeys("mAjj", "mA")
     val text = """
@@ -93,7 +93,7 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarksOptionsData.name) {
     checkMarks('A' to 4)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
+  @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, OptionValueType.NUMBER, "1"))
   fun `test simple system mark`() {
     val text = """
             A Discovery
@@ -113,7 +113,7 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarksOptionsData.name) {
     TestCase.assertEquals('A', vimMarks[0].key)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
+  @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, OptionValueType.NUMBER, "1"))
   fun `test system mark move to another line`() {
     val text = """
             A Discovery

@@ -18,9 +18,12 @@
 
 package org.jetbrains.plugins.ideavim.option;
 
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
-import com.maddyhome.idea.vim.option.KeywordOption;
-import com.maddyhome.idea.vim.option.OptionsManager;
+import com.maddyhome.idea.vim.vimscript.Executor;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.KeywordOptionHelper;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import java.util.ArrayList;
@@ -28,16 +31,18 @@ import java.util.List;
 
 public class KeywordOptionTest extends VimTestCase {
 
-  private KeywordOption option;
+  private List<String> getValues() {
+    return KeywordOptionHelper.INSTANCE.parseValues(getOptionValue());
+  }
 
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
-    option = OptionsManager.INSTANCE.getIskeyword();
+  private String getOptionValue() {
+    return ((VimString)VimPlugin.getOptionService()
+      .getOptionValue(OptionService.Scope.GLOBAL, "iskeyword", null, "iskeyword")).getValue();
   }
 
   private void setKeyword(String val) {
-    OptionsManager.INSTANCE.parseOptionLine(myFixture.getEditor(), "iskeyword" + val, false);
+    VimPlugin.getOptionService()
+      .setOptionValue(OptionService.Scope.GLOBAL, "iskeyword", new VimString(val), null, "testToken");
   }
 
   private void assertIsKeyword(char c) {
@@ -51,99 +56,109 @@ public class KeywordOptionTest extends VimTestCase {
   }
 
   public void testSingleCommaIsAValue() {
-    option.set(",");
-    assertEquals(",", option.values().get(0));
+    setKeyword(",");
+    assertEquals(",", getValues().get(0));
   }
 
   public void testSingleCommaIsAValueAsAppend() {
-    option.append(",");
-    assertTrue(option.values().contains(","));
+    Executor.INSTANCE.execute("set iskeyword^=,", false);
+    assertTrue(getValues().contains(","));
   }
 
   public void testSingleNegatedCommaIsAValue() {
-    option.set("^,");
-    assertEquals("^,", option.values().get(0));
+    setKeyword("^,");
+    assertEquals("^,", getValues().get(0));
   }
 
   public void testCommaInARangeIsAValue() {
-    option.set("+-,");
-    assertEquals("+-,", option.values().get(0));
+    setKeyword("+-,");
+    assertEquals("+-,", getValues().get(0));
   }
 
   public void testSecondCommaIsASeparator() {
-    option.set(",,a");
-    assertEquals(",", option.values().get(0));
-    assertEquals("a", option.values().get(1));
+    setKeyword(",,a");
+    assertEquals(",", getValues().get(0));
+    assertEquals("a", getValues().get(1));
   }
 
   public void testSingleHyphenIsAValue() {
-    option.set("-");
-    assertEquals("-", option.values().get(0));
+    setKeyword("-");
+    assertEquals("-", getValues().get(0));
   }
 
   public void testHyphenBetweenCharNumsIsARange() {
-    option.set("a-b");
-    assertEquals("a-b", option.values().get(0));
+    setKeyword("a-b");
+    assertEquals("a-b", getValues().get(0));
   }
 
   public void testRangeInWhichLeftValueIsHigherThanRightValueIsInvalid() {
-    option.set("b-a");
-    assertDoesntContain(option.values(), new ArrayList<>() {{
+    try {
+      setKeyword("b-a");
+      fail("exception missing");
+    } catch (Exception e) {
+      assertEquals("E474: Invalid argument: testToken", e.getMessage());
+    }
+    assertDoesntContain(getValues(), new ArrayList<>() {{
       add("b-a");
     }});
   }
 
   public void testTwoAdjacentLettersAreInvalid() {
-    option.set("ab");
-    assertDoesntContain(option.values(), new ArrayList<>() {{
+    try {
+      setKeyword("ab");
+      fail("exception missing");
+    } catch (Exception e) {
+      assertEquals("E474: Invalid argument: testToken", e.getMessage());
+    }
+    assertDoesntContain(getValues(), new ArrayList<>() {{
       add("ab");
     }});
   }
 
   public void testAddsACharByChar() {
-    setKeyword("=-");
+    setKeyword("-");
     assertIsKeyword('-');
   }
 
   public void testAddsACharByUnicodeCodePoint() {
-    setKeyword("=" + (int)'-');
+    setKeyword("" + (int)'-');
     assertIsKeyword('-');
   }
 
   public void testAddsARange() {
-    setKeyword("=a-c");
+    setKeyword("a-c");
     assertIsKeyword('a');
     assertIsKeyword('b');
     assertIsKeyword('c');
   }
 
   public void testAtSignRepresentsAllLetters() {
-    setKeyword("=@");
+    setKeyword("@");
     assertIsKeyword('A');
     assertIsKeyword('Ā');
   }
 
   public void testRangeOfAtSignToAtSignRepresentsAtSign() {
-    setKeyword("=@-@");
+    setKeyword("@-@");
     assertIsKeyword('@');
   }
 
   public void testCaretRemovesAChar() {
-    setKeyword("=a");
-    setKeyword("+=^a");
+    setKeyword("a");
+    Executor.INSTANCE.execute("set iskeyword+=^a", true);
     assertIsNotKeyword('a');
   }
 
   public void testCaretRemovesARange() {
-    setKeyword("=a-c");
-    setKeyword("+=^b-c,d");
+    setKeyword("a-c");
+    Executor.INSTANCE.execute("set iskeyword+=^b-c,d", true);
     assertIsKeyword('a');
     assertIsNotKeyword('b');
     assertIsNotKeyword('c');
   }
 
   public void testCaretAloneRepresentsACaret() {
-    setKeyword("=^");
+    setKeyword("^");
     assertIsKeyword('^');
   }
 
@@ -152,16 +167,16 @@ public class KeywordOptionTest extends VimTestCase {
   }
 
   public void testToRegex() {
-    setKeyword("=-,a-c");
-    final List<String> res = option.toRegex();
+    setKeyword("-,a-c");
+    final List<String> res = KeywordOptionHelper.INSTANCE.toRegex();
     assertEquals(2, res.size());
     assertTrue(res.contains("-"));
     assertTrue(res.contains("[a-c]"));
   }
 
   public void testAllLettersToRegex() {
-    setKeyword("=@");
-    final List<String> res = option.toRegex();
+    setKeyword("@");
+    final List<String> res = KeywordOptionHelper.INSTANCE.toRegex();
     assertEquals(res.get(0), "\\p{L}");
   }
 }

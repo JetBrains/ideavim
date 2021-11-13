@@ -40,9 +40,10 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.InvalidCommandException;
 import com.maddyhome.idea.vim.helper.UiHelper;
-import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.Executor;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -180,10 +181,11 @@ public class ProcessGroup {
     // better with Windows. We also don't bother using ShellExecute for Windows commands beginning with `start`.
     // Finally, we're also not bothering with the crazy space and backslash handling of the 'shell' options content.
     return ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
-      final String shell = OptionsManager.INSTANCE.getShell().getValue();
-      final String shellcmdflag = OptionsManager.INSTANCE.getShellcmdflag().getValue();
-      final String shellxescape = OptionsManager.INSTANCE.getShellxescape().getValue();
-      final String shellxquote = OptionsManager.INSTANCE.getShellxquote().getValue();
+
+      final String shell = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "shell", null, "shell")).getValue();
+      final String shellcmdflag = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "shellcmdflag", null, "shellcmdflag")).getValue();
+      final String shellxescape = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "shellxescape", null, "shellxescape")).getValue();
+      final String shellxquote = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "shellxquote", null, "shellxquote")).getValue();
 
       // For Win32. See :help 'shellxescape'
       final String escapedCommand = shellxquote.equals("(")

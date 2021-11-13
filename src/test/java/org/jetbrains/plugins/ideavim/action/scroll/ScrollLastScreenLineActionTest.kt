@@ -18,8 +18,10 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /*
@@ -44,7 +46,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
   }
 
   fun `test scroll current line to bottom of screen minus scrolloff`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(40, 60)
     typeText(parseKeys("zb"))
@@ -61,7 +63,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
   }
 
   fun `test scrolls count line to bottom of screen minus scrolloff`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(40, 60)
     typeText(parseKeys("100zb"))
@@ -70,7 +72,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
   }
 
   fun `test scrolls current line to bottom of screen ignoring scrolljump`() {
-    OptionsManager.scrolljump.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(40, 60)
     typeText(parseKeys("zb"))
@@ -96,7 +98,7 @@ class ScrollLastScreenLineActionTest : VimTestCase() {
   }
 
   fun `test scrolls last line to bottom of screen with virtual space when caret less than scrolloff from bottom`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(80, 97, 4)

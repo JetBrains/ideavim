@@ -31,10 +31,10 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.ui.ColorUtil
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.ranges.LineRange
-import com.maddyhome.idea.vim.option.OptionsManager.hlsearch
-import com.maddyhome.idea.vim.option.OptionsManager.wrapscan
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.annotations.Contract
 import java.awt.Color
 import java.awt.Font
@@ -58,7 +58,7 @@ fun updateIncsearchHighlights(
 ): Int {
   val searchStartOffset =
     if (searchRange != null) EditorHelper.getLineStartOffset(editor, searchRange.startLine) else caretOffset
-  val showHighlights = hlsearch.isSet
+  val showHighlights = VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL, "hlsearch", editor)
   return updateSearchHighlights(pattern, false, showHighlights, searchStartOffset, searchRange, forwards, false)
 }
 
@@ -118,7 +118,9 @@ private fun updateSearchHighlights(
       } else if (shouldAddCurrentMatchSearchHighlight(pattern, showHighlights, initialOffset)) {
         // nohlsearch + incsearch
         val searchOptions = EnumSet.of(SearchOptions.WHOLE_FILE)
-        if (wrapscan.isSet) searchOptions.add(SearchOptions.WRAP)
+        if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "wrapscan", null)) {
+          searchOptions.add(SearchOptions.WRAP)
+        }
         if (shouldIgnoreSmartCase) searchOptions.add(SearchOptions.IGNORE_SMARTCASE)
         if (!forwards) searchOptions.add(SearchOptions.BACKWARDS)
         val result = SearchHelper.findPattern(editor, pattern, initialOffset, 1, searchOptions)
@@ -178,7 +180,7 @@ private fun findClosestMatch(editor: Editor, results: List<TextRange>, initialOf
     }
     d2 - d1
   }
-  if (!wrapscan.isSet) {
+  if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "wrapscan", null)) {
     val start = max.startOffset
     if (forwards && start < initialOffset) {
       return -1

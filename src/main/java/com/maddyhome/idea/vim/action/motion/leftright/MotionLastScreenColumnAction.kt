@@ -31,7 +31,8 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.option.OptionsManager.selection
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
   override fun getOffset(
@@ -45,8 +46,8 @@ class MotionLastScreenColumnAction : MotionActionHandler.ForEachCaret() {
     if (editor.inInsertMode) {
       allow = true
     } else if (editor.inVisualMode) {
-      val opt = selection
-      if (opt.value != "old") {
+      val opt = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL, "selection", editor) as VimString).value
+      if (opt != "old") {
         allow = true
       }
     }

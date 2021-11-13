@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.helper.updateCaretsVisualAttributes
 import com.maddyhome.idea.vim.helper.updateCaretsVisualPosition
 import com.maddyhome.idea.vim.helper.vimCommandState
 import com.maddyhome.idea.vim.key.CommandPartNode
-import com.maddyhome.idea.vim.option.OptionsManager.showmode
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.annotations.Contract
 import java.util.*
 import javax.swing.KeyStroke
@@ -284,7 +284,7 @@ class CommandState private constructor(private val editor: Editor) {
 
   private fun doShowMode() {
     val msg = StringBuilder()
-    if (showmode.isSet) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "showmode", null)) {
       msg.append(getStatusString(modeStates.size - 1))
     }
     if (isRecording) {

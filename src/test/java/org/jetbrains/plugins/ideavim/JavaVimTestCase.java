@@ -29,9 +29,8 @@ import com.maddyhome.idea.vim.group.visual.VimVisualTimer;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.helper.TestInputModel;
-import com.maddyhome.idea.vim.option.OptionsManager;
-import com.maddyhome.idea.vim.option.ToggleOption;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,7 +53,7 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
     if (editor != null) {
       KeyHandler.getInstance().fullReset(editor);
     }
-    OptionsManager.INSTANCE.resetAllOptions();
+    VimPlugin.getOptionService().resetAllOptions();
     VimPlugin.getKey().resetKeyMappings();
     VimPlugin.clearError();
   }
@@ -72,9 +71,7 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
 
   protected void enableExtensions(@NotNull String... extensionNames) {
     for (String name : extensionNames) {
-      ToggleOption option = (ToggleOption)OptionsManager.INSTANCE.getOption(name);
-      assert option != null;
-      option.set();
+      VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, name, null, name);
     }
   }
 

@@ -22,13 +22,13 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.option.KeyModelOptionData
+import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
-import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class MotionEndActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -55,7 +55,7 @@ class MotionEndActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []))
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, ""))
   fun `test continue visual`() {
     val keys = listOf("v", "<End>")
     val before = """
@@ -78,7 +78,7 @@ class MotionEndActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []))
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, ""))
   fun `test continue select`() {
     val keys = listOf("gh", "<End>")
     val before = """
@@ -104,8 +104,8 @@ class MotionEndActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionTestConfiguration(
     VimTestOption(
       KeyModelOptionData.name,
-      VimTestOptionType.LIST,
-      [KeyModelOptionData.stopvisual]
+      OptionValueType.STRING,
+      KeyModelOptionData.stopvisual
     )
   )
   fun `test exit visual`() {
@@ -133,8 +133,8 @@ class MotionEndActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionTestConfiguration(
     VimTestOption(
       KeyModelOptionData.name,
-      VimTestOptionType.LIST,
-      [KeyModelOptionData.stopselect]
+      OptionValueType.STRING,
+      KeyModelOptionData.stopselect
     )
   )
   fun `test exit select`() {

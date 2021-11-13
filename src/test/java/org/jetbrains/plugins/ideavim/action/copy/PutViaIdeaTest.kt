@@ -23,8 +23,8 @@ import com.intellij.openapi.ide.CopyPasteManager
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.option.ClipboardOptionsData
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -40,12 +40,12 @@ class PutViaIdeaTest : VimTestCase() {
 
   override fun setUp() {
     super.setUp()
-    optionsBefore = OptionsManager.clipboard.value
-    OptionsManager.clipboard.set(ClipboardOptionsData.ideaput)
+    optionsBefore = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "clipboard", null) as VimString).value
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "clipboard", VimString("ideaput"), null)
   }
 
   override fun tearDown() {
-    OptionsManager.clipboard.set(optionsBefore)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "clipboard", VimString(optionsBefore), null)
     super.tearDown()
   }
 

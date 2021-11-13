@@ -2,6 +2,7 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.Executable
@@ -25,7 +26,6 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.toOptionScope
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
-import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 
 /**
@@ -157,7 +157,7 @@ data class LetCommand(
           operator == AssignmentOperator.ADDITION || operator == AssignmentOperator.SUBTRACTION
         ) {
           val newValue = operator.getNewValue(optionValue, expression.evaluate(editor, context, this))
-          OptionServiceImpl.setOptionValue(variable.scope.toOptionScope(), variable.optionName, newValue, editor, variable.originalString)
+          VimPlugin.getOptionService().setOptionValue(variable.scope.toOptionScope(), variable.optionName, newValue, editor, variable.originalString)
         } else {
           TODO()
         }

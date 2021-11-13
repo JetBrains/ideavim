@@ -47,7 +47,8 @@ import com.maddyhome.idea.vim.helper.EditorHelperRt;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.option.IdeaWriteData;
-import com.maddyhome.idea.vim.option.OptionsManager;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -179,7 +180,7 @@ public class FileGroup {
    */
   public void saveFile(DataContext context) {
     String action;
-    if (IdeaWriteData.all.equals(OptionsManager.INSTANCE.getIdeawrite().getValue())) {
+    if (IdeaWriteData.all.equals(((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "ideawrite", null, "ideawrite")).getValue())) {
       action = "SaveAll";
     }
     else {

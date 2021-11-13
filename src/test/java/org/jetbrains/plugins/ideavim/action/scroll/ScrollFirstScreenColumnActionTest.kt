@@ -20,9 +20,11 @@ package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.intellij.openapi.editor.Inlay
 import com.intellij.openapi.editor.ex.util.EditorUtil
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.Assert
 
@@ -40,7 +42,7 @@ class ScrollFirstScreenColumnActionTest : VimTestCase() {
   }
 
   fun `test scroll caret column to first screen column with sidescrolloff`() {
-    OptionsManager.sidescrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
     configureByColumns(200)
     typeText(parseKeys("100|", "zs"))
     assertVisibleLineBounds(0, 89, 168)
@@ -53,7 +55,7 @@ class ScrollFirstScreenColumnActionTest : VimTestCase() {
   }
 
   fun `test scroll at or near start of line with sidescrolloff does nothing`() {
-    OptionsManager.sidescrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
     configureByColumns(200)
     typeText(parseKeys("5|", "zs"))
     assertVisibleLineBounds(0, 0, 79)

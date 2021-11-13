@@ -2,16 +2,16 @@ package com.maddyhome.idea.vim.vimscript.model.expressions
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.services.OptionService
-import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 
 data class OptionExpression(val scope: Scope, val optionName: String) : Expression() {
 
   override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
-    return OptionServiceImpl.getOptionValue(scope.toOptionScope(), optionName, editor)
+    return VimPlugin.getOptionService().getOptionValue(scope.toOptionScope(), optionName, editor)
   }
 }
 

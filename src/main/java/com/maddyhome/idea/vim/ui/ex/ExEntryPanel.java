@@ -33,13 +33,13 @@ import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.SearchHighlightsHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
-import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ExPanelBorder;
 import com.maddyhome.idea.vim.vimscript.model.commands.Command;
 import com.maddyhome.idea.vim.vimscript.model.commands.SubstituteCommand;
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -429,7 +429,7 @@ public class ExEntryPanel extends JPanel {
   }
 
   private boolean isIncSearchEnabled() {
-    return OptionsManager.INSTANCE.getIncsearch().isSet();
+    return VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "incsearch", null, "incsearch");
   }
 
   private boolean active;

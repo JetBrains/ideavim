@@ -22,13 +22,13 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.option.VirtualEditData
+import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
-import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class MotionRightActionTest : VimOptionTestCase(VirtualEditData.name) {
   @VimOptionDefaultAll
@@ -104,7 +104,7 @@ class MotionRightActionTest : VimOptionTestCase(VirtualEditData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, VimTestOptionType.VALUE, [VirtualEditData.onemore]))
+  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, OptionValueType.STRING, VirtualEditData.onemore))
   fun `test virtual edit motion to the end`() {
     doTest(
       "3l",
@@ -123,7 +123,7 @@ class MotionRightActionTest : VimOptionTestCase(VirtualEditData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, VimTestOptionType.VALUE, [VirtualEditData.onemore]))
+  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, OptionValueType.STRING, VirtualEditData.onemore))
   fun `test virtual edit motion after dollar`() {
     doTest(
       "\$l",

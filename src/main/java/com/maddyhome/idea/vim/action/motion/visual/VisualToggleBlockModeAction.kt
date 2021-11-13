@@ -24,14 +24,14 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.VimActionHandler
-import com.maddyhome.idea.vim.option.OptionsManager.selectmode
-import com.maddyhome.idea.vim.option.StringListOption
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 class VisualToggleBlockModeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    val listOption: StringListOption = selectmode
+    val listOption = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL, "selectmode", editor) as VimString).value
     return if (listOption.contains("cmd")) {
       VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_BLOCK)
     } else VimPlugin.getVisualMotion()

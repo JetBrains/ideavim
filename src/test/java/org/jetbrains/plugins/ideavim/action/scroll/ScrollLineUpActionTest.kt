@@ -18,8 +18,10 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -52,7 +54,7 @@ class ScrollLineUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll line up will maintain current column at start of line with sidescrolloff`() {
-    OptionsManager.sidescrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(29, 63, 5)
     typeText(parseKeys("<C-Y>"))
@@ -98,7 +100,7 @@ class ScrollLineUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll up uses scrolloff and moves cursor`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(20, 44)
     typeText(parseKeys("<C-Y>"))
@@ -108,7 +110,7 @@ class ScrollLineUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll up is not affected by scrolljump`() {
-    OptionsManager.scrolljump.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(29, 63)
     typeText(parseKeys("<C-Y>"))
@@ -135,7 +137,7 @@ class ScrollLineUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll line up with virtual space and scrolloff`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     // Last line is scrolloff from top. <C-Y> should just move last line down
@@ -148,7 +150,7 @@ class ScrollLineUpActionTest : VimTestCase() {
   // This actually works, but the set up puts us in the wrong position
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll line up on last line with scrolloff`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(65, 99, 4)

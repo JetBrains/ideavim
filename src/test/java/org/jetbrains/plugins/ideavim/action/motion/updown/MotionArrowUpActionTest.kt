@@ -20,17 +20,19 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionService
+import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
-import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -62,8 +64,8 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionTestConfiguration(
     VimTestOption(
       KeyModelOptionData.name,
-      VimTestOptionType.LIST,
-      [KeyModelOptionData.stopsel]
+      OptionValueType.STRING,
+      KeyModelOptionData.stopsel
     )
   )
   fun `test visual stopsel`() {
@@ -93,8 +95,8 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionTestConfiguration(
     VimTestOption(
       KeyModelOptionData.name,
-      VimTestOptionType.LIST,
-      [KeyModelOptionData.stopselect]
+      OptionValueType.STRING,
+      KeyModelOptionData.stopselect
     )
   )
   fun `test visual stopselect`() {
@@ -124,8 +126,8 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionTestConfiguration(
     VimTestOption(
       KeyModelOptionData.name,
-      VimTestOptionType.LIST,
-      [KeyModelOptionData.stopvisual]
+      OptionValueType.STRING,
+      KeyModelOptionData.stopvisual
     )
   )
   fun `test visual stopvisual`() {
@@ -155,8 +157,8 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionTestConfiguration(
     VimTestOption(
       KeyModelOptionData.name,
-      VimTestOptionType.LIST,
-      [KeyModelOptionData.stopvisual]
+      OptionValueType.STRING,
+      KeyModelOptionData.stopvisual
     )
   )
   fun `test visual stopvisual multicaret`() {
@@ -186,8 +188,8 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionTestConfiguration(
     VimTestOption(
       KeyModelOptionData.name,
-      VimTestOptionType.LIST,
-      [KeyModelOptionData.stopselect]
+      OptionValueType.STRING,
+      KeyModelOptionData.stopselect
     )
   )
   fun `test char select simple move`() {
@@ -215,7 +217,7 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []))
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, ""))
   fun `test char select stopsel`() {
     doTest(
       listOf("gh", "<Up>"),
@@ -244,8 +246,8 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionTestConfiguration(
     VimTestOption(
       KeyModelOptionData.name,
-      VimTestOptionType.LIST,
-      [KeyModelOptionData.stopselect]
+      OptionValueType.STRING,
+      KeyModelOptionData.stopselect
     )
   )
   fun `test select multiple carets`() {
@@ -275,8 +277,8 @@ class MotionArrowUpActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionDefaultAll
   fun `test arrow up in insert mode scrolls caret at scrolloff`() {
-    OptionsManager.scrolljump.set(10)
-    OptionsManager.scrolloff.set(5)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5), null)
     configureByPages(5)
     setPositionAndScroll(19, 24)
 

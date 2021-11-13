@@ -24,11 +24,14 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.option.GuiCursorMode
-import com.maddyhome.idea.vim.option.GuiCursorType
 import com.maddyhome.idea.vim.option.OptionChangeListener
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorMode
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorType
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.Color
 
 /**
@@ -81,7 +84,7 @@ fun Editor.guicursorMode(): GuiCursorMode {
 }
 
 fun Editor.hasBlockOrUnderscoreCaret() = isBlockCursorOverride() ||
-  OptionsManager.guicursor.getAttributes(guicursorMode()).type.let {
+  GuiCursorOptionHelper.getAttributes(guicursorMode()).type.let {
     it == GuiCursorType.BLOCK || it == GuiCursorType.HOR
   }
 
@@ -107,9 +110,10 @@ private fun Editor.updateSecondaryCaretsVisualAttributes() {
   }
 }
 
-object GuicursorChangeListener : OptionChangeListener<String> {
-  override fun valueChange(oldValue: String?, newValue: String?) {
+object GuicursorChangeListener : OptionChangeListener<VimDataType> {
+  override fun valueChange(oldValue: VimDataType, newValue: VimDataType) {
     provider.clearCache()
+    GuiCursorOptionHelper.clearEffectiveValues()
     localEditors().forEach { it.updatePrimaryCaretVisualAttributes() }
   }
 }
@@ -147,7 +151,7 @@ private class DefaultCaretVisualAttributesProvider : CaretVisualAttributesProvid
 
     val guicursorMode = editor.guicursorMode()
     return cache.getOrPut(guicursorMode) {
-      val attributes = OptionsManager.guicursor.getAttributes(guicursorMode)
+      val attributes = GuiCursorOptionHelper.getAttributes(guicursorMode)
       val shape = when (attributes.type) {
         GuiCursorType.BLOCK -> "BLOCK"
         GuiCursorType.VER -> "BAR"
@@ -187,10 +191,10 @@ private class LegacyCaretVisualAttributesProvider : CaretVisualAttributesProvide
     } else {
       // The default for REPLACE is hor20. It makes more sense to map HOR to a block, but REPLACE has traditionally been
       // drawn the same as INSERT, as a bar. If the 'guicursor' option is still at default, keep REPLACE a bar
-      if (OptionsManager.guicursor.isDefault && editor.guicursorMode() == GuiCursorMode.REPLACE) {
+      if (VimPlugin.getOptionService().isDefault(OptionService.Scope.LOCAL, "guicursor", editor) && editor.guicursorMode() == GuiCursorMode.REPLACE) {
         setBlockCursor(editor, false)
       } else {
-        when (OptionsManager.guicursor.getAttributes(editor.guicursorMode()).type) {
+        when (GuiCursorOptionHelper.getAttributes(editor.guicursorMode()).type) {
           GuiCursorType.BLOCK, GuiCursorType.HOR -> setBlockCursor(editor, true)
           GuiCursorType.VER -> setBlockCursor(editor, false)
         }

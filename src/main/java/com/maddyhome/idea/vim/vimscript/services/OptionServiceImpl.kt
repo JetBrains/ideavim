@@ -72,7 +72,7 @@ internal object OptionServiceImpl : OptionService {
       object : StringOption("matchpairs", "mps", "(:),{:},[:]", isList = true) {
         override fun checkIfValueValid(value: VimDataType, token: String) {
           super.checkIfValueValid(value, token)
-          for (v in (value as VimString).value.split(",")) {
+          for (v in split((value as VimString).value)!!) {
             if (!v.matches(Regex(".:."))) {
               throw ExException("E474: Invalid argument: $token")
             }

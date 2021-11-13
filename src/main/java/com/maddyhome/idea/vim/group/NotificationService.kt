@@ -44,8 +44,9 @@ import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.FindActionId
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
-import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
+import com.maddyhome.idea.vim.vimscript.services.OptionService
+import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 import com.maddyhome.idea.vim.vimscript.services.VimRcService
 import java.awt.datatransfer.StringSelection
 import java.io.File
@@ -76,7 +77,7 @@ class NotificationService(private val project: Project?) {
         notification,
         "set clipboard+=ideaput",
         "ideaput"
-      ) { OptionsManager.clipboard.append(ClipboardOptionsData.ideaput) }
+      ) { OptionServiceImpl.appendValue(OptionService.Scope.GLOBAL, "clipboard", ClipboardOptionsData.ideaput, null, "clipboard") }
     )
 
     notification.notify(project)
@@ -96,7 +97,7 @@ class NotificationService(private val project: Project?) {
         notification,
         "set ideajoin",
         "ideajoin"
-      ) { OptionsManager.ideajoin.set() }
+      ) { VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "ideajoin", null) }
     )
 
     notification.addAction(HelpLink(ideajoinExamplesUrl))

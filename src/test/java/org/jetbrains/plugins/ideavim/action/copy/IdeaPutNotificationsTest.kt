@@ -24,17 +24,17 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
+import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
-import org.jetbrains.plugins.ideavim.VimTestOptionType
 import org.jetbrains.plugins.ideavim.rangeOf
 
 /**
  * @author Alex Plate
  */
 class IdeaPutNotificationsTest : VimOptionTestCase(ClipboardOptionsData.name) {
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, []))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, ""))
   fun `test notification exists if no ideaput`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)
@@ -51,8 +51,8 @@ class IdeaPutNotificationsTest : VimOptionTestCase(ClipboardOptionsData.name) {
   @VimOptionTestConfiguration(
     VimTestOption(
       ClipboardOptionsData.name,
-      VimTestOptionType.LIST,
-      [ClipboardOptionsData.ideaput]
+      OptionValueType.STRING,
+      ClipboardOptionsData.ideaput
     )
   )
   fun `test no notification on ideaput`() {
@@ -66,7 +66,7 @@ class IdeaPutNotificationsTest : VimOptionTestCase(ClipboardOptionsData.name) {
     assertTrue(notifications.isEmpty() || notifications.last().isExpired || ClipboardOptionsData.ideaput !in notifications.last().content)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, []))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, ""))
   fun `test no notification if already was`() {
     val before = "${c}I found it in a legendary land"
     configureByText(before)

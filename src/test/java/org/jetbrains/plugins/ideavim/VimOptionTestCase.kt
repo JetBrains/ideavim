@@ -18,11 +18,10 @@
 
 package org.jetbrains.plugins.ideavim
 
-import com.maddyhome.idea.vim.option.BoundedStringOption
-import com.maddyhome.idea.vim.option.NumberOption
-import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.option.StringListOption
-import com.maddyhome.idea.vim.option.ToggleOption
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 /**
  * @author Alex Plate
@@ -54,39 +53,15 @@ abstract class VimOptionTestCase(option: String, vararg otherOptions: String) : 
       }
       val defaultOptions = testMethod.getDeclaredAnnotation(VimOptionDefault::class.java)?.values ?: emptyArray()
 
-      val annotationsValueList = annotationValues.value.map { it.option } + defaultOptions
+      val annotationsValueList = annotationValues.value.map { it.optionName } + defaultOptions
       val annotationsValueSet = annotationsValueList.toSet()
       if (annotationsValueSet.size < annotationsValueList.size) kotlin.test.fail("You have duplicated options")
       if (annotationsValueSet != options) kotlin.test.fail("You should present all options in annotations")
 
       annotationValues.value.forEach {
-        val option = OptionsManager.getOption(it.option)
-        when (it.type) {
-          VimTestOptionType.TOGGLE -> {
-            if (option !is ToggleOption) {
-              kotlin.test.fail("${it.option} is not a toggle option. Change it for method `${testMethod.name}`")
-            }
-            if (it.values.size != 1) {
-              kotlin.test.fail("You should provide only one value for Toggle option. Change it for method `${testMethod.name}`")
-            }
-
-            if (it.values.first().toBoolean()) option.set() else option.reset()
-          }
-          VimTestOptionType.LIST -> {
-            if (option !is StringListOption) kotlin.test.fail("${it.option} is not a string list option. Change it for method `${testMethod.name}`")
-
-            option.set(it.values.joinToString(","))
-          }
-          VimTestOptionType.VALUE -> {
-            if (option !is BoundedStringOption) kotlin.test.fail("${it.option} is not a value option. Change it for method `${testMethod.name}`")
-
-            option.set(it.values.first())
-          }
-          VimTestOptionType.NUMBER -> {
-            if (option !is NumberOption) kotlin.test.fail("${it.option} is not a number option. Change it for method `${testMethod.name}`")
-
-            option.set(it.values.first().toInt())
-          }
+        when (it.valueType) {
+          OptionValueType.STRING -> VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, it.optionName, VimString(it.value), null)
+          OptionValueType.NUMBER -> VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, it.optionName, VimInt(it.value), null)
         }
       }
     }
@@ -104,14 +79,12 @@ annotation class VimOptionTestConfiguration(vararg val value: VimTestOption)
 
 @Target(AnnotationTarget.PROPERTY)
 annotation class VimTestOption(
-  val option: String,
-  val type: VimTestOptionType,
-  val values: Array<String>,
+  val optionName: String,
+  val valueType: OptionValueType,
+  val value: String,
 )
 
-enum class VimTestOptionType {
-  LIST,
-  TOGGLE,
-  VALUE,
-  NUMBER
+enum class OptionValueType {
+  STRING,
+  NUMBER,
 }

@@ -102,7 +102,12 @@ open class StringOption(name: String, abbrev: String, defaultValue: VimString, p
     if (value !is VimString) {
       throw ExException("E474: Invalid argument: $token")
     }
-    if (boundedValues != null && !boundedValues.contains(value.value)) {
+
+    if (value.value.isEmpty()) {
+      return
+    }
+
+    if (boundedValues != null && split(value.value)!!.any { !boundedValues.contains(it) }) {
       throw ExException("E474: Invalid argument: $token")
     }
   }

@@ -52,6 +52,7 @@ import com.maddyhome.idea.vim.ex.ExOutputModel.Companion.getInstance
 import com.maddyhome.idea.vim.group.visual.VimVisualTimer.swingTimer
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.GuicursorChangeListener
 import com.maddyhome.idea.vim.helper.RunnableHelper.runWriteCommand
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
@@ -66,15 +67,14 @@ import com.maddyhome.idea.vim.helper.thickness
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
-import com.maddyhome.idea.vim.option.GuiCursorType
-import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.option.OptionsManager.getOption
-import com.maddyhome.idea.vim.option.OptionsManager.ideastrictmode
-import com.maddyhome.idea.vim.option.OptionsManager.resetAllOptions
-import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorType
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import org.assertj.core.api.Assertions
 import org.junit.Assert
@@ -105,11 +105,12 @@ abstract class VimTestCase : UsefulTestCase() {
     if (editor != null) {
       KeyHandler.getInstance().fullReset(editor)
     }
-    resetAllOptions()
+    VimPlugin.getOptionService().resetAllOptions()
     VimPlugin.getKey().resetKeyMappings()
     VimPlugin.getSearch().resetState()
     if (!VimPlugin.isEnabled()) VimPlugin.setEnabled(true)
-    ideastrictmode.set()
+    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "ideastrictmode", null)
+    GuicursorChangeListener.valueChange(VimString(""), VimString(""))
     Checks.reset()
 
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
@@ -148,7 +149,7 @@ abstract class VimTestCase : UsefulTestCase() {
 
   protected fun enableExtensions(vararg extensionNames: String) {
     for (name in extensionNames) {
-      (getOption(name) as ToggleOption).set()
+      VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, name, null)
     }
   }
 
@@ -232,15 +233,15 @@ abstract class VimTestCase : UsefulTestCase() {
     // Note that it is possible to request a position which would be invalid under normal Vim!
     // We disable scrolloff + scrolljump, position as requested, and reset. When resetting scrolloff, Vim will
     // recalculate the correct offsets, and that could move the top and/or caret line
-    val scrolloff = OptionsManager.scrolloff.value()
-    val scrolljump = OptionsManager.scrolljump.value()
-    OptionsManager.scrolloff.set(0)
-    OptionsManager.scrolljump.set(1)
+    val scrolloff = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "scrolloff", null) as VimInt).value
+    val scrolljump = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "scrolljump", null) as VimInt).value
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(0), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(1), null)
 
     typeText(parseKeys("${scrollToLogicalLine + 1}z<CR>", "${caretLogicalLine + 1}G", "${caretLogicalColumn + 1}|"))
 
-    OptionsManager.scrolljump.set(scrolljump)
-    OptionsManager.scrolloff.set(scrolloff)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(scrolloff), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(scrolljump), null)
 
     // Make sure we're where we want to be. If there are block inlays, we can't easily assert the bottom line because
     // we'd have to duplicate the scrolling logic here. Asserting top when we know height is good enough
@@ -434,7 +435,7 @@ abstract class VimTestCase : UsefulTestCase() {
   protected fun assertCaretsVisualAttributes() {
     if (!Checks.caretShape) return
     val editor = myFixture.editor
-    val attributes = OptionsManager.guicursor.getAttributes(editor.guicursorMode())
+    val attributes = GuiCursorOptionHelper.getAttributes(editor.guicursorMode())
     val colour = editor.colorsScheme.getColor(EditorColors.CARET_COLOR)
 
     editor.caretModel.allCarets.forEach { caret ->

@@ -18,9 +18,11 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -49,7 +51,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   }
 
   fun `test scroll line down will maintain current column at start of line with sidescrolloff`() {
-    OptionsManager.sidescrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(30, 50, 5)
     typeText(parseKeys("<C-E>"))
@@ -88,7 +90,7 @@ class ScrollLineDownActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll down uses scrolloff and moves cursor`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(20, 30)
     typeText(parseKeys("<C-E>"))
@@ -97,7 +99,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   }
 
   fun `test scroll down is not affected by scrolljump`() {
-    OptionsManager.scrolljump.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(20, 20)
     typeText(parseKeys("<C-E>"))
@@ -122,7 +124,7 @@ class ScrollLineDownActionTest : VimTestCase() {
   }
 
   fun `test scroll line down at end of file with virtual space and scrolloff`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(75, 95, 4)

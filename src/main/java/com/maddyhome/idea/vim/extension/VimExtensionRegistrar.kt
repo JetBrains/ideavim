@@ -63,15 +63,14 @@ object VimExtensionRegistrar {
 
     registeredExtensions.add(name)
     registerAliases(extensionBean)
-    val option = ToggleOption(name, getAbbrev(name), false)
-    VimPlugin.getOptionService().addOption(option)
-    option.addOptionChangeListener { _, _ ->
+    VimPlugin.getOptionService().addOption(ToggleOption(name, getAbbrev(name), false))
+    VimPlugin.getOptionService().addListener(name, { _, _ ->
       if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, name, null)) {
         initExtension(extensionBean, name)
       } else {
         extensionBean.instance.dispose()
       }
-    }
+    })
   }
 
   private fun getAbbrev(name: String): String {

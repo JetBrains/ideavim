@@ -49,9 +49,10 @@ import com.maddyhome.idea.vim.handler.ActionBeanClass;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.*;
-import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.ShowCmd;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.NotImplementedError;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
@@ -226,11 +227,12 @@ public class KeyHandler {
         "Start key processing. allowKeyMappings: " + allowKeyMappings + ", mappingCompleted: " + mappingCompleted);
       LOG.trace("Key: " + key);
     }
-    if (handleKeyRecursionCount >= OptionsManager.INSTANCE.getMaxmapdepth().value()) {
+    int mapMapDepth = ((VimInt) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "maxmapdepth", null, "maxmapdepth")).getValue();
+    if (handleKeyRecursionCount >= mapMapDepth) {
       VimPlugin.showMessage(MessageHelper.message("E223"));
       VimPlugin.indicateError();
       LOG.warn("Key handling, maximum recursion of the key received. maxdepth=" +
-               OptionsManager.INSTANCE.getMaxmapdepth().value());
+               mapMapDepth);
       return;
     }
 
@@ -464,7 +466,7 @@ public class KeyHandler {
     // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
     // delete a word)
     final Application application = ApplicationManager.getApplication();
-    if (OptionsManager.INSTANCE.getTimeout().isSet()) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL, "timeout", editor, "timeout")) {
       LOG.trace("Timeout is set. Schedule a mapping timer");
       // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.
       //   At the moment, I see the only one possibility this to happen - other key is handled after the timer executed,

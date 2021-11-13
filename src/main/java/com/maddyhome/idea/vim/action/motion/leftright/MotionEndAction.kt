@@ -31,7 +31,8 @@ import com.maddyhome.idea.vim.helper.inInsertMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 class MotionEndAction : NonShiftedSpecialKeyHandler() {
   override val motionType: MotionType = MotionType.INCLUSIVE
@@ -48,8 +49,8 @@ class MotionEndAction : NonShiftedSpecialKeyHandler() {
     if (editor.inInsertMode) {
       allow = true
     } else if (editor.inVisualMode || editor.inSelectMode) {
-      val opt = OptionsManager.selection
-      if (opt.value != "old") {
+      val opt = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL, "selection", editor) as VimString).value
+      if (opt != "old") {
         allow = true
       }
     }

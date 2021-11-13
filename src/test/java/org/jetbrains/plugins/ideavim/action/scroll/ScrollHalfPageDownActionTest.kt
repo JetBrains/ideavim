@@ -20,7 +20,8 @@ package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -68,7 +69,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scroll downwards in bottom half of last page moves caret to the last line with scrolloff`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(140, 164)
     typeText(parseKeys("<C-D>"))
@@ -108,12 +109,12 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(100, 110)
     typeText(parseKeys("10<C-D>"))
-    assertEquals(OptionsManager.scroll.value(), 10)
+    assertEquals((VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "scroll", null) as VimInt).value, 10)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scroll downwards uses scroll option`() {
-    OptionsManager.scroll.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scroll", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(100, 110)
     typeText(parseKeys("<C-D>"))
@@ -141,7 +142,7 @@ class ScrollHalfPageDownActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scroll downwards keeps same column with nostartofline`() {
-    OptionsManager.startofline.reset()
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 25, 14)
     typeText(parseKeys("<C-D>"))

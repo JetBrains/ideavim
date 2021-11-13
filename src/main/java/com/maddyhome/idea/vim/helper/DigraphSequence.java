@@ -22,7 +22,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.option.OptionsManager;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -75,7 +75,8 @@ public class DigraphSequence {
     switch (digraphState) {
       case DIG_STATE_PENDING:
         logger.debug("DIG_STATE_PENDING");
-        if (key.getKeyCode() == KeyEvent.VK_BACK_SPACE && OptionsManager.INSTANCE.getDigraph().isSet()) {
+        if (key.getKeyCode() == KeyEvent.VK_BACK_SPACE
+            && VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL, "digraph", editor, "digraph")) {
           digraphState = DIG_STATE_BACK_SPACE;
         }
         else if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {

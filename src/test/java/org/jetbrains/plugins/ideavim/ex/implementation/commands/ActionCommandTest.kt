@@ -18,9 +18,10 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -62,7 +63,7 @@ class ActionCommandTest : VimTestCase() {
   // https://github.com/JetBrains/ideavim/commit/fe714a90032d0cb5ef0a0e0d8783980b6f1c7d20#r35647600
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   fun testExCommandInVisualCharacterModeWithIncSearch() {
-    OptionsManager.incsearch.set()
+    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "incsearch", null)
     configureByJavaText(
       "-----\n" +
         "1<caret>2345\n" +
@@ -78,7 +79,7 @@ class ActionCommandTest : VimTestCase() {
         "abc*/de\n" +
         "-----"
     )
-    OptionsManager.incsearch.reset()
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "incsearch", null)
   }
 
   // VIM-862 |:action|
@@ -93,13 +94,13 @@ class ActionCommandTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   fun testExCommandInVisualCharacterModeSameLineWithIncsearch() {
-    OptionsManager.incsearch.set()
+    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "incsearch", null)
     configureByJavaText("1<caret>2345\n" + "abcde\n")
     typeText(parseKeys("vl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
     assertMode(CommandState.Mode.VISUAL)
     assertState("1/*23*/45\n" + "abcde\n")
-    OptionsManager.incsearch.reset()
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "incsearch", null)
   }
 
   // VIM-862 |:action| in visual line mode
@@ -126,7 +127,7 @@ class ActionCommandTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   fun testExCommandInVisualLineModeWithIncsearch() {
-    OptionsManager.incsearch.set()
+    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "incsearch", null)
     configureByJavaText(
       "-----\n" +
         "1<caret>2345\n" +
@@ -144,7 +145,7 @@ class ActionCommandTest : VimTestCase() {
         "*/\n" +
         "-----"
     )
-    OptionsManager.incsearch.reset()
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "incsearch", null)
   }
 
   // VIM-862 |:action| in visual block mode
@@ -169,7 +170,7 @@ class ActionCommandTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.ACTION_COMMAND)
   fun testExCommandInVisualBlockModeWithIncsearch() {
-    OptionsManager.incsearch.set()
+    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "incsearch", null)
     configureByJavaText(
       "-----\n" +
         "1<caret>2345\n" +
@@ -185,6 +186,6 @@ class ActionCommandTest : VimTestCase() {
         "a/*bc*/de\n" +
         "-----"
     )
-    OptionsManager.incsearch.reset()
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "incsearch", null)
   }
 }

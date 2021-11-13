@@ -24,12 +24,12 @@ import com.maddyhome.idea.vim.extension.exchange.VimExchangeExtension
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
+import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
-import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name) {
   @Throws(Exception::class)
@@ -39,7 +39,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   }
 
   // |cx|
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words left to right`() {
     doTest(
@@ -52,7 +52,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   }
 
   // |cx|
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words dot repeat`() {
     doTest(
@@ -65,7 +65,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   }
 
   // |cx|
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words right to left`() {
     doTest(
@@ -78,7 +78,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   }
 
   // |cx|
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test exchange words right to left with dot`() {
     doTest(
@@ -91,7 +91,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   }
 
   // |X|
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   @TestWithoutNeovim(SkipNeovimReason.PLUGIN)
   fun `test visual exchange words left to right`() {
     doTest(
@@ -104,7 +104,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   }
 
   // |X|
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   @VimBehaviorDiffers(
     originalVimAfter = "The ${c}brown catch over the lazy dog",
     shouldBeFixed = true
@@ -121,7 +121,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   }
 
   // |X|
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   @VimBehaviorDiffers(
     originalVimAfter = "The brown ${c}catch over the lazy dog",
     shouldBeFixed = true
@@ -138,7 +138,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   }
 
   // |cxx|
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   @VimBehaviorDiffers(
     originalVimAfter =
     """The quick
@@ -168,7 +168,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
   }
 
   // |cxx|
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   @VimBehaviorDiffers(
     originalVimAfter =
     """The quick
@@ -197,7 +197,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
     )
   }
 
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   @VimBehaviorDiffers(
     originalVimAfter = """
          The quick
@@ -225,7 +225,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
     )
   }
 
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   @VimBehaviorDiffers(
     originalVimAfter =
     """
@@ -258,7 +258,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
     )
   }
 
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   fun `test visual char highlighter`() {
     val before = """
          The ${c}quick
@@ -275,7 +275,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
     exitExchange()
   }
 
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   fun `test visual line highdhitligthhter`() {
     val before = """
          The ${c}quick
@@ -292,7 +292,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
     exitExchange()
   }
 
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   fun `test till the line end highlighter`() {
     val before = """
          The ${c}quick
@@ -307,7 +307,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
     exitExchange()
   }
 
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   fun `test pre line end highlighter`() {
     val before = """
          The ${c}quick
@@ -322,7 +322,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
     exitExchange()
   }
 
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   fun `test pre pre line end highlighter`() {
     val before = """
          The ${c}quick
@@ -337,7 +337,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
     exitExchange()
   }
 
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   fun `test to file end highlighter`() {
     val before = """
          The quick
@@ -352,7 +352,7 @@ class VimExchangeWithClipboardTest : VimOptionTestCase(ClipboardOptionsData.name
     exitExchange()
   }
 
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, ["unnamed"]))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, "unnamed"))
   fun `test to file end with new line highlighter`() {
     val before = """
          The quick

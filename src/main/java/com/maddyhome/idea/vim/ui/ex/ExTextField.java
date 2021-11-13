@@ -29,10 +29,10 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.VimProjectService;
 import com.maddyhome.idea.vim.group.HistoryGroup;
 import com.maddyhome.idea.vim.helper.UiHelper;
-import com.maddyhome.idea.vim.option.GuiCursorAttributes;
-import com.maddyhome.idea.vim.option.GuiCursorMode;
-import com.maddyhome.idea.vim.option.GuiCursorType;
-import com.maddyhome.idea.vim.option.OptionsManager;
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorAttributes;
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorMode;
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper;
+import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorType;
 import kotlin.text.StringsKt;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -417,15 +417,15 @@ public class ExTextField extends JTextField {
   // 'cr' command-line replace is hor20
   // see :help 'guicursor'
   private void setNormalModeCaret() {
-    caret.setAttributes(OptionsManager.INSTANCE.getGuicursor().getAttributes(GuiCursorMode.CMD_LINE));
+    caret.setAttributes(GuiCursorOptionHelper.INSTANCE.getAttributes(GuiCursorMode.CMD_LINE));
   }
 
   private void setInsertModeCaret() {
-    caret.setAttributes(OptionsManager.INSTANCE.getGuicursor().getAttributes(GuiCursorMode.CMD_LINE_INSERT));
+    caret.setAttributes(GuiCursorOptionHelper.INSTANCE.getAttributes(GuiCursorMode.CMD_LINE_INSERT));
   }
 
   private void setReplaceModeCaret() {
-    caret.setAttributes(OptionsManager.INSTANCE.getGuicursor().getAttributes(GuiCursorMode.CMD_LINE_REPLACE));
+    caret.setAttributes(GuiCursorOptionHelper.INSTANCE.getAttributes(GuiCursorMode.CMD_LINE_REPLACE));
   }
 
   private static class CommandLineCaret extends DefaultCaret {

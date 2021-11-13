@@ -18,8 +18,10 @@
 
 package org.jetbrains.plugins.ideavim.action.scroll
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -53,7 +55,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
   }
 
   fun `test scrolls last line on previous page to scrolloff`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(99, 119)
     typeText(parseKeys("z^"))
@@ -62,7 +64,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
   }
 
   fun `test scrolls last line on previous page ignores scrolljump`() {
-    OptionsManager.scrolljump.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(99, 119)
     typeText(parseKeys("z^"))
@@ -98,7 +100,7 @@ class ScrollLastScreenLinePageStartActionTest : VimTestCase() {
   }
 
   fun `test z^ on first page ignores scrolloff and puts cursor on last line of previous page`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 6)
     typeText(parseKeys("z^"))

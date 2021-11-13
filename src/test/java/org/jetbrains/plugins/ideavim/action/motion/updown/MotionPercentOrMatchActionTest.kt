@@ -18,9 +18,10 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -258,7 +259,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test count percent keeps same column with nostartline`() {
-    OptionsManager.startofline.reset()
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(0, 0, 14)
     typeText(parseKeys("25%"))
@@ -267,7 +268,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test count percent handles shorter line with nostartline`() {
-    OptionsManager.startofline.reset()
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
     configureByLines(100, "    I found it in a legendary land")
     typeText(parseKeys("A", " extra text", "<Esc>"))
     typeText(parseKeys("25%"))

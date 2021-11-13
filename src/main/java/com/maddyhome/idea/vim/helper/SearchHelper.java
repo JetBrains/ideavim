@@ -34,10 +34,10 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.option.OptionsManager;
-import com.maddyhome.idea.vim.option.StringListOption;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -2613,15 +2613,17 @@ public class SearchHelper {
 
   private static @NotNull String getPairChars() {
     if (pairsChars == null) {
-      StringListOption lo = OptionsManager.INSTANCE.getMatchpairs();
-      lo.addOptionChangeListenerAndExecute((oldValue, newValue) -> pairsChars = parseOption(lo));
+      VimPlugin.getOptionService().addListener("matchpairs", (oldValue, newValue) -> pairsChars = parseMatchPairsOption(), true);
     }
 
     return pairsChars;
   }
 
-  private static @NotNull String parseOption(@NotNull StringListOption option) {
-    List<String> vals = option.values();
+  private static @NotNull String parseMatchPairsOption() {
+    String[] vals = ((VimString) VimPlugin.getOptionService()
+      .getOptionValue(OptionService.Scope.GLOBAL, "matchpairs", null, "matchpairs"))
+      .getValue()
+      .split(",");
     StringBuilder res = new StringBuilder();
     for (String s : vals) {
       if (s.length() == 3) {

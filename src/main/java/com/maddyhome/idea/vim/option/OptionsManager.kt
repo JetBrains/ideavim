@@ -39,6 +39,9 @@ import com.maddyhome.idea.vim.helper.hasVisualSelection
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.OptionService
+import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 import org.jetbrains.annotations.ApiStatus.ScheduledForRemoval
 import org.jetbrains.annotations.Contract
 import org.jetbrains.annotations.NonNls
@@ -440,7 +443,7 @@ object SelectModeOptionData {
   val option = BoundedStringListOption(name, abbr, default, options)
 
   fun ideaselectionEnabled(): Boolean {
-    return ideaselection in OptionsManager.selectmode
+    return ideaselection in (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "selectmode", null) as VimString).value
   }
 }
 
@@ -462,16 +465,16 @@ object ClipboardOptionsData {
    */
   class IdeaputDisabler : AutoCloseable {
     private val containedBefore: Boolean
-    override fun close() {
-      if (containedBefore) OptionsManager.clipboard.append(ideaput)
-      ideaputDisabled = false
+    init {
+      val optionValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "clipboard", null) as VimString).value
+      containedBefore = optionValue.contains(ideaput)
+      OptionServiceImpl.removeValue(OptionService.Scope.GLOBAL, "clipboard", ideaput, null, "clipboard")
+      ideaputDisabled = true
     }
 
-    init {
-      val options = OptionsManager.clipboard
-      containedBefore = options.contains(ideaput)
-      options.remove(ideaput)
-      ideaputDisabled = true
+    override fun close() {
+      if (containedBefore) OptionServiceImpl.appendValue(OptionService.Scope.GLOBAL, "clipboard", ideaput, null, "clipboard")
+      ideaputDisabled = false
     }
   }
 }
@@ -529,6 +532,7 @@ object IgnoreCaseOptionsData {
   const val abbr = "ic"
 }
 
+// todo create helper
 @NonNls
 @Deprecated("was replaced by OptionService")
 @ScheduledForRemoval(inVersion = "1.11")
@@ -541,8 +545,8 @@ object IdeaRefactorMode {
 
   val availableValues = arrayOf(keep, select, visual)
 
-  fun keepMode(): Boolean = OptionsManager.idearefactormode.value == keep
-  fun selectMode(): Boolean = OptionsManager.idearefactormode.value == select
+  fun keepMode(): Boolean = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "idearefactormode", null) as VimString).value == keep
+  fun selectMode(): Boolean = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "idearefactormode", null) as VimString).value == select
 
   fun correctSelection(editor: Editor) {
     val action: () -> Unit = {
@@ -709,7 +713,7 @@ object ShellXQuoteOptionData {
 @ScheduledForRemoval(inVersion = "1.11")
 object StrictMode {
   val on: Boolean
-    get() = OptionsManager.ideastrictmode.isSet
+    get() = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideastrictmode", null)
 
   @NonNls
   fun fail(message: @NonNls String) {

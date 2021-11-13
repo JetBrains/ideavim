@@ -23,13 +23,13 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
+import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
-import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
 
@@ -264,8 +264,8 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionTestConfiguration(
     VimTestOption(
       KeyModelOptionData.name,
-      VimTestOptionType.LIST,
-      [KeyModelOptionData.stopsel]
+      OptionValueType.STRING,
+      KeyModelOptionData.stopsel
     )
   )
   fun `test visual stopsel`() {
@@ -295,8 +295,8 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionTestConfiguration(
     VimTestOption(
       KeyModelOptionData.name,
-      VimTestOptionType.LIST,
-      [KeyModelOptionData.stopselect]
+      OptionValueType.STRING,
+      KeyModelOptionData.stopselect
     )
   )
   fun `test visual stopselect`() {
@@ -326,8 +326,8 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionTestConfiguration(
     VimTestOption(
       KeyModelOptionData.name,
-      VimTestOptionType.LIST,
-      [KeyModelOptionData.stopvisual]
+      OptionValueType.STRING,
+      KeyModelOptionData.stopvisual
     )
   )
   fun `test visual stopvisual`() {
@@ -357,8 +357,8 @@ class MotionArrowLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
   @VimOptionTestConfiguration(
     VimTestOption(
       KeyModelOptionData.name,
-      VimTestOptionType.LIST,
-      [KeyModelOptionData.stopvisual]
+      OptionValueType.STRING,
+      KeyModelOptionData.stopvisual
     )
   )
   fun `test visual stopvisual multicaret`() {

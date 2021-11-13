@@ -23,8 +23,8 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.option.OptionsManager;
-import com.maddyhome.idea.vim.option.StringListOption;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.plugins.ideavim.SkipNeovimReason;
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim;
 import org.jetbrains.plugins.ideavim.VimTestCase;
@@ -138,9 +138,7 @@ public class CopyActionTest extends VimTestCase {
   // This doesn't use the system clipboard, but the TestClipboardModel
   public void testClipboardUnnamed() throws ExException {
     assertEquals('\"', VimPlugin.getRegister().getDefaultRegister());
-    final StringListOption clipboardOption = OptionsManager.INSTANCE.getClipboard();
-    assertNotNull(clipboardOption);
-    clipboardOption.set("unnamed");
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "clipboard", new VimString("unnamed"), null, "clipboard");
     assertEquals('*', VimPlugin.getRegister().getDefaultRegister());
     typeTextInFile(parseKeys("yy"), "foo\n" + "<caret>bar\n" + "baz\n");
     final Register starRegister = VimPlugin.getRegister().getRegister('*');

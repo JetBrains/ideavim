@@ -19,8 +19,10 @@
 package org.jetbrains.plugins.ideavim.group.motion
 
 import com.intellij.openapi.editor.ex.util.EditorUtil
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -59,7 +61,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving right with sidescroll 1`() {
-    OptionsManager.sidescroll.set(1)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescroll", VimInt(1), null)
     configureByColumns(200)
     typeText(parseKeys("80|", "l"))
     assertVisibleLineBounds(0, 1, 80)
@@ -67,7 +69,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving right with sidescroll 2`() {
-    OptionsManager.sidescroll.set(2)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescroll", VimInt(2), null)
     configureByColumns(200)
     typeText(parseKeys("80|", "l"))
     assertVisibleLineBounds(0, 2, 81)
@@ -75,7 +77,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving right with sidescrolloff`() {
-    OptionsManager.sidescrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
     configureByColumns(200)
     typeText(parseKeys("70|", "l"))
     assertVisibleLineBounds(0, 30, 109)
@@ -83,8 +85,8 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving right with sidescroll and sidescrolloff`() {
-    OptionsManager.sidescroll.set(1)
-    OptionsManager.sidescrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescroll", VimInt(1), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
     configureByColumns(200)
     typeText(parseKeys("70|", "l"))
     assertVisibleLineBounds(0, 1, 80)
@@ -92,7 +94,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving right with large sidescrolloff keeps cursor centred`() {
-    OptionsManager.sidescrolloff.set(999)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(999), null)
     configureByColumns(200)
     typeText(parseKeys("50|", "l"))
     assertVisibleLineBounds(0, 10, 89)
@@ -100,7 +102,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving right with inline inlay`() {
-    OptionsManager.sidescroll.set(1)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescroll", VimInt(1), null)
     configureByColumns(200)
     val inlay = addInlay(110, true, 5)
     typeText(parseKeys("100|", "20l"))
@@ -143,7 +145,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving left with sidescroll 1`() {
-    OptionsManager.sidescroll.set(1)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescroll", VimInt(1), null)
     configureByColumns(200)
     typeText(parseKeys("100|zs", "h"))
     assertVisibleLineBounds(0, 98, 177)
@@ -151,7 +153,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving left with sidescroll 2`() {
-    OptionsManager.sidescroll.set(2)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescroll", VimInt(2), null)
     configureByColumns(200)
     typeText(parseKeys("100|zs", "h"))
     assertVisibleLineBounds(0, 97, 176)
@@ -159,7 +161,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving left with sidescrolloff`() {
-    OptionsManager.sidescrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
     configureByColumns(200)
     typeText(parseKeys("120|zs", "h"))
     assertVisibleLineBounds(0, 78, 157)
@@ -167,8 +169,8 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving left with sidescroll and sidescrolloff`() {
-    OptionsManager.sidescroll.set(1)
-    OptionsManager.sidescrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescroll", VimInt(1), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
     configureByColumns(200)
     typeText(parseKeys("120|zs", "h"))
     assertVisibleLineBounds(0, 108, 187)
@@ -176,7 +178,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving left with inline inlay`() {
-    OptionsManager.sidescroll.set(1)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescroll", VimInt(1), null)
     configureByColumns(200)
     val inlay = addInlay(110, true, 5)
     typeText(parseKeys("120|zs", "20h"))
@@ -188,7 +190,7 @@ class MotionGroup_ScrollCaretIntoViewHorizontally_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test moving left with large sidescrolloff keeps cursor centred`() {
-    OptionsManager.sidescrolloff.set(999)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(999), null)
     configureByColumns(200)
     typeText(parseKeys("50|", "h"))
     assertVisibleLineBounds(0, 8, 87)

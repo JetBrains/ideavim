@@ -45,7 +45,8 @@ import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.IdeaSpecifics.AppCodeTemplates.appCodeTemplateCaptured
 import com.maddyhome.idea.vim.listener.IdeaSpecifics.aceJumpActive
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -57,7 +58,7 @@ import javax.swing.KeyStroke
  * These keys are not passed to [com.maddyhome.idea.vim.VimTypedActionHandler] and should be handled by actions.
  */
 class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
-  private val traceTime = OptionsManager.ideatracetime.isSet
+  private val traceTime = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideatracetime", null)
 
   override fun actionPerformed(e: AnActionEvent) {
     LOG.trace("Executing shortcut key action")
@@ -183,9 +184,10 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   }
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
+    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL, "ideavimsupport", editor) as VimString).value
     return editor.isPrimaryEditor() ||
       EditorHelper.isFileEditor(editor) && !editor.inNormalMode ||
-      OptionsManager.ideavimsupport.contains("dialog") && !editor.inNormalMode
+      ideaVimSupportValue.contains("dialog") && !editor.inNormalMode
   }
 
   private fun isShortcutConflict(keyStroke: KeyStroke): Boolean {
@@ -223,22 +225,24 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
    *   should this key be processed by IdeaVim, or by IDE. For example, dot and enter should be processed by IDE, but
    *   <C-W> by IdeaVim.
    *
-   * The list of keys that should be processed by IDE is stored in [OptionsManager.lookupKeys]. So, we should search
+   * The list of keys that should be processed by IDE is stored in the "lookupKeys" option. So, we should search
    *   if the pressed key is presented in this list. The caches are used to speedup the process.
    */
   private object LookupKeys {
     private var parsedLookupKeys: Set<KeyStroke> = parseLookupKeys()
 
     init {
-      OptionsManager.lookupKeys.addOptionChangeListener { _, _ ->
-        parsedLookupKeys = parseLookupKeys()
-      }
+      VimPlugin.getOptionService().addListener("lookupkeys", { _, _ -> parsedLookupKeys = parseLookupKeys() })
     }
 
     fun isEnabledForLookup(keyStroke: KeyStroke): Boolean = keyStroke !in parsedLookupKeys
 
-    private fun parseLookupKeys() = OptionsManager.lookupKeys.values()
-      .map { StringHelper.parseKeys(it) }.filter { it.isNotEmpty() }.map { it.first() }.toSet()
+    private fun parseLookupKeys() = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "lookupkeys", null) as VimString).value
+      .split(",")
+      .map { StringHelper.parseKeys(it) }
+      .filter { it.isNotEmpty() }
+      .map { it.first() }
+      .toSet()
   }
 
   companion object {

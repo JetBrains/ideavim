@@ -46,10 +46,11 @@ import com.maddyhome.idea.vim.handler.MotionActionHandlerKt;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.IdeaSpecifics;
-import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
-import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
 import kotlin.ranges.IntProgression;
 import org.jetbrains.annotations.Contract;
@@ -295,22 +296,21 @@ public class MotionGroup {
   }
 
   private static int getScrollOption(int rawCount) {
-    NumberOption scroll = OptionsManager.INSTANCE.getScroll();
     if (rawCount == 0) {
-      return scroll.value();
+      return ((VimInt) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "scroll", null, "scroll")).getValue();
     }
     // TODO: This needs to be reset whenever the window size changes
-    scroll.set(rawCount);
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scroll", new VimInt(rawCount), null, "scroll");
     return rawCount;
   }
 
   private static int getNormalizedScrollOffset(final @NotNull Editor editor) {
-    final int scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();
+    final int scrollOffset = ((VimInt) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL, "scrolloff", editor, "scrolloff")).getValue();
     return normalizeScrollOffset(editor, scrollOffset);
   }
 
   private static int getNormalizedSideScrollOffset(final @NotNull Editor editor) {
-    final int sideScrollOffset = OptionsManager.INSTANCE.getSidescrolloff().value();
+    final int sideScrollOffset = ((VimInt) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL, "sidescrolloff", editor, "sidescrolloff")).getValue();
     return normalizeSideScrollOffset(editor, sideScrollOffset);
   }
 
@@ -673,7 +673,7 @@ public class MotionGroup {
     final int lastLine = EditorHelper.getVisualLineCount(editor) - 1;
 
     // We need the non-normalised value here, so we can handle cases such as so=999 to keep the current line centred
-    final int scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();
+    final int scrollOffset = ((VimInt) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL, "scrolloff", editor, "scrolloff")).getValue();
     final int topBound = topLine + scrollOffset;
     final int bottomBound = max(topBound, bottomLine - scrollOffset);
 
@@ -803,7 +803,7 @@ public class MotionGroup {
     // Default value is 1. Zero is a valid value, but we normalise to 1 - we always want to scroll at least one line
     // If the value is negative, it's a percentage of the height.
     if (scrollJump) {
-      final int scrollJumpSize = OptionsManager.INSTANCE.getScrolljump().value();
+      final int scrollJumpSize = ((VimInt) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL, "scrolljump", editor, "scrolljump")).getValue();
       if (scrollJumpSize < 0) {
         return (int)(height * (min(100, -scrollJumpSize) / 100.0));
       }
@@ -824,7 +824,7 @@ public class MotionGroup {
 
     final EnumSet<CommandFlags> flags = CommandState.getInstance(editor).getExecutingCommandFlags();
     final boolean allowSidescroll = !flags.contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP);
-    int sidescroll = OptionsManager.INSTANCE.getSidescroll().value();
+    int sidescroll = ((VimInt) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL, "sidescroll", editor, "sidescroll")).getValue();
 
     final int offsetLeft = caretColumn - currentVisualLeftColumn - scrollOffset;
     final int offsetRight = caretColumn - (currentVisualRightColumn - scrollOffset);
@@ -1191,7 +1191,7 @@ public class MotionGroup {
   public @Range(from = 0, to = Integer.MAX_VALUE) int moveCaretToLineWithStartOfLineOption(@NotNull Editor editor,
                                                                                            int logicalLine,
                                                                                            @NotNull Caret caret) {
-    if (OptionsManager.INSTANCE.getStartofline().isSet()) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL, "startofline", editor, "startofline")) {
       return moveCaretToLineStartSkipLeading(editor, logicalLine);
     }
     else {
@@ -1489,7 +1489,7 @@ public class MotionGroup {
     }
   }
 
-  public static class ScrollOptionsChangeListener implements OptionChangeListener<String> {
+  public static class ScrollOptionsChangeListener implements OptionChangeListener<VimDataType> {
     public static ScrollOptionsChangeListener INSTANCE = new ScrollOptionsChangeListener();
 
     @Contract(pure = true)
@@ -1497,7 +1497,7 @@ public class MotionGroup {
     }
 
     @Override
-    public void valueChange(String oldValue, String newValue) {
+    public void valueChange(VimDataType oldValue, VimDataType newValue) {
       for (Editor editor : HelperKt.localEditors()) {
         if (UserDataManager.getVimEditorGroup(editor)) {
           MotionGroup.scrollCaretIntoView(editor);

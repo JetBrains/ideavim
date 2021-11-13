@@ -18,8 +18,9 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -51,7 +52,7 @@ class MotionGotoLineFirstInsertActionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test simple motion ignores nostartofline`() {
-    OptionsManager.startofline.reset()
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
     doTest(
       listOf("i", "<C-Home>", "<Esc>"),
       """

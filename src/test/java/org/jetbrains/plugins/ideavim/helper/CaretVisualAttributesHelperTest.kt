@@ -27,7 +27,8 @@ import com.maddyhome.idea.vim.helper.buildGreater212
 import com.maddyhome.idea.vim.helper.getShape
 import com.maddyhome.idea.vim.helper.shape
 import com.maddyhome.idea.vim.helper.thickness
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -160,7 +161,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test nested visual mode in ide gets visual caret`() {
-    OptionsManager.keymodel.set("startsel,stopsel")
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "keymodel", VimString("startsel,stopsel"), null)
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("i", "<S-Right><S-Right><S-Right>"))
     assertCaretVisualAttributes("BLOCK", 0F)
@@ -168,7 +169,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test caret reset to insert after leaving nested visual mode`() {
-    OptionsManager.keymodel.set("startsel,stopsel")
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "keymodel", VimString("startsel,stopsel"), null)
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("i", "<S-Right><S-Right><S-Right>", "<Right>"))
     assertCaretVisualAttributes("BAR", 0.25F)
@@ -176,7 +177,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test caret reset to insert after cancelling nested visual mode`() {
-    OptionsManager.keymodel.set("startsel,stopsel")
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "keymodel", VimString("startsel,stopsel"), null)
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("i", "<S-Right><S-Right><S-Right>", "<Esc>"))
     assertCaretVisualAttributes("BAR", 0.25F)

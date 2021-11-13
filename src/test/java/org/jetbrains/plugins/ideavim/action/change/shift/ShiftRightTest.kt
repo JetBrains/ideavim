@@ -18,8 +18,9 @@
 
 package org.jetbrains.plugins.ideavim.action.change.shift
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -158,7 +159,7 @@ class ShiftRightTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.TABS)
   fun `test shift right does not move caret with nostartofline`() {
-    OptionsManager.startofline.reset()
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
     val file = """
       |A Discovery
       |

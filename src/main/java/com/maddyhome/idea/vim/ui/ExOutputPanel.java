@@ -27,7 +27,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.option.OptionsManager;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -276,7 +276,7 @@ public class ExOutputPanel extends JPanel {
     setBounds(bounds);
 
     myScrollPane.getVerticalScrollBar().setValue(0);
-    if (!OptionsManager.INSTANCE.getMore().isSet()) {
+    if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "more", null, "more")) {
       // FIX
       scrollOffset(100000);
     }

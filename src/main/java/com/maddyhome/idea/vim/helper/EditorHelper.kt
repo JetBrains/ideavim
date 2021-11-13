@@ -26,7 +26,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.util.ui.table.JBTableRowEditor
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.Component
 import javax.swing.JComponent
 import javax.swing.JTable
@@ -40,10 +42,11 @@ val Editor.fileSize: Int
  */
 val Editor.isIdeaVimDisabledHere: Boolean
   get() {
+    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "ideavimsupport", null) as VimString).value
     return disabledInDialog ||
       (!ClientId.isCurrentlyUnderLocalId) || // CWM-927
-      (!OptionsManager.ideavimsupport.contains("singleline") && isDatabaseCell()) ||
-      (!OptionsManager.ideavimsupport.contains("singleline") && isOneLineMode)
+      (!ideaVimSupportValue.contains("singleline") && isDatabaseCell()) ||
+      (!ideaVimSupportValue.contains("singleline") && isOneLineMode)
   }
 
 private fun Editor.isDatabaseCell(): Boolean {
@@ -51,8 +54,11 @@ private fun Editor.isDatabaseCell(): Boolean {
 }
 
 private val Editor.disabledInDialog: Boolean
-  get() = (!OptionsManager.ideavimsupport.contains("dialog") && !OptionsManager.ideavimsupport.contains("dialoglegacy")) &&
-    (!this.isPrimaryEditor() && !EditorHelper.isFileEditor(this))
+  get() {
+    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "ideavimsupport", null) as VimString).value
+    return (!ideaVimSupportValue.contains("dialog") && !ideaVimSupportValue.contains("dialoglegacy")) &&
+      (!this.isPrimaryEditor() && !EditorHelper.isFileEditor(this))
+  }
 
 /**
  * Checks if the editor is a primary editor in the main editing area.

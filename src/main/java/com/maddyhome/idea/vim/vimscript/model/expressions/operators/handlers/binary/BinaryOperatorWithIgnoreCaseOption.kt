@@ -1,8 +1,8 @@
 package com.maddyhome.idea.vim.vimscript.model.expressions.operators.handlers.binary
 
-import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.option.ToggleOption
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 abstract class BinaryOperatorWithIgnoreCaseOption(
   private val caseInsensitiveImpl: BinaryOperatorHandler,
@@ -10,7 +10,7 @@ abstract class BinaryOperatorWithIgnoreCaseOption(
 ) : BinaryOperatorHandler() {
 
   private fun shouldIgnoreCase(): Boolean {
-    return (OptionsManager.getOption("ignorecase") as ToggleOption).isSet
+    return VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ignorecase", null)
   }
 
   override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {

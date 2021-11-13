@@ -25,16 +25,16 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.option.IdeaJoinOptionsData
+import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
-import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 /**
  * @author Alex Plate
  */
 class JoinNotificationTest : VimOptionTestCase(IdeaJoinOptionsData.name) {
-  @VimOptionTestConfiguration(VimTestOption(IdeaJoinOptionsData.name, VimTestOptionType.TOGGLE, ["false"]))
+  @VimOptionTestConfiguration(VimTestOption(IdeaJoinOptionsData.name, OptionValueType.NUMBER, "0"))
   fun `test notification shown for no ideajoin`() {
     val before = "I found${c} it\n in a legendary land"
     configureByText(before)
@@ -47,7 +47,7 @@ class JoinNotificationTest : VimOptionTestCase(IdeaJoinOptionsData.name) {
     assertEquals(3, notification.actions.size)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaJoinOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
+  @VimOptionTestConfiguration(VimTestOption(IdeaJoinOptionsData.name, OptionValueType.NUMBER, "1"))
   fun `test notification not shown for ideajoin`() {
     val before = "I found${c} it\n in a legendary land"
     configureByText(before)
@@ -58,7 +58,7 @@ class JoinNotificationTest : VimOptionTestCase(IdeaJoinOptionsData.name) {
     assertTrue(notifications.isEmpty() || notifications.last().isExpired || IdeaJoinOptionsData.name !in notifications.last().content)
   }
 
-  @VimOptionTestConfiguration(VimTestOption(IdeaJoinOptionsData.name, VimTestOptionType.TOGGLE, ["false"]))
+  @VimOptionTestConfiguration(VimTestOption(IdeaJoinOptionsData.name, OptionValueType.NUMBER, "0"))
   fun `test notification not shown if was shown already`() {
     val before = "I found${c} it\n in a legendary land"
     configureByText(before)

@@ -20,17 +20,18 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.VirtualEditData
+import com.maddyhome.idea.vim.vimscript.services.OptionService
+import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
-import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
   @VimOptionDefaultAll
@@ -55,7 +56,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, VimTestOptionType.VALUE, [VirtualEditData.onemore]))
+  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, OptionValueType.STRING, VirtualEditData.onemore))
   fun `test virtual edit delete middle to end`() {
     doTest(
       "D",
@@ -74,7 +75,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, VimTestOptionType.VALUE, [VirtualEditData.onemore]))
+  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, OptionValueType.STRING, VirtualEditData.onemore))
   fun `test virtual edit delete end to end`() {
     doTest(
       "D",
@@ -93,7 +94,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, VimTestOptionType.VALUE, [VirtualEditData.onemore]))
+  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, OptionValueType.STRING, VirtualEditData.onemore))
   fun `test virtual edit delete to end from virtual space`() {
     doTest(
       "D",
@@ -135,7 +136,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test simple deletion with indent and nostartofline`() {
-    OptionsManager.startofline.reset()
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
     val keys = listOf("v", "D")
     val before = """
             A Discovery
@@ -368,7 +369,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test line deletion with indent and nostartofline`() {
-    OptionsManager.startofline.reset()
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
     val keys = listOf("V", "D")
     val before = """
             A Discovery
@@ -672,7 +673,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
   }
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
-  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, VimTestOptionType.VALUE, [VirtualEditData.onemore]))
+  @VimOptionTestConfiguration(VimTestOption(VirtualEditData.name, OptionValueType.STRING, VirtualEditData.onemore))
   fun `test change dollar`() {
     doTest(
       "c$",

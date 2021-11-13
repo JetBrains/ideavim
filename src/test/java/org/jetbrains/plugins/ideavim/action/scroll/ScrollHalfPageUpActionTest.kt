@@ -20,7 +20,8 @@ package org.jetbrains.plugins.ideavim.action.scroll
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -68,7 +69,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scroll upwards in first half of first page moves to first line with scrolloff`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(5, 15)
     typeText(parseKeys("<C-U>"))
@@ -90,12 +91,12 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
     configureByPages(5)
     setPositionAndScroll(50, 53)
     typeText(parseKeys("10<C-U>"))
-    assertEquals(OptionsManager.scroll.value(), 10)
+    assertEquals((VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "scroll", null) as VimInt).value, 10)
   }
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scroll upwards uses scroll option`() {
-    OptionsManager.scroll.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scroll", VimInt(10), null)
     configureByPages(5)
     setPositionAndScroll(50, 53)
     typeText(parseKeys("<C-U>"))
@@ -123,7 +124,7 @@ class ScrollHalfPageUpActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scroll upwards keeps same column with nostartofline`() {
-    OptionsManager.startofline.reset()
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(50, 60, 14)
     typeText(parseKeys("<C-U>"))

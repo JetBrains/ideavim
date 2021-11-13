@@ -20,14 +20,14 @@ package org.jetbrains.plugins.ideavim.action.copy
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
+import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
-import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class YankAndPutTest : VimOptionTestCase(ClipboardOptionsData.name) {
   @VimOptionTestConfiguration(
-    VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, [ClipboardOptionsData.unnamed])
+    VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, ClipboardOptionsData.unnamed)
   )
   fun `test yank to number register with unnamed`() {
     val before = """
@@ -53,8 +53,8 @@ class YankAndPutTest : VimOptionTestCase(ClipboardOptionsData.name) {
   @VimOptionTestConfiguration(
     VimTestOption(
       ClipboardOptionsData.name,
-      VimTestOptionType.LIST,
-      [ClipboardOptionsData.unnamed, ClipboardOptionsData.ideaput]
+      OptionValueType.STRING,
+      ClipboardOptionsData.unnamed + "," + ClipboardOptionsData.ideaput
     )
   )
   fun `test yank to number register with unnamed and ideaput`() {
@@ -78,7 +78,7 @@ class YankAndPutTest : VimOptionTestCase(ClipboardOptionsData.name) {
     )
   }
 
-  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, VimTestOptionType.LIST, []))
+  @VimOptionTestConfiguration(VimTestOption(ClipboardOptionsData.name, OptionValueType.STRING, ""))
   fun `test yank to number register`() {
     val before = """
             I ${c}found it in a legendary land

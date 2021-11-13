@@ -24,13 +24,13 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
 import com.maddyhome.idea.vim.option.SelectModeOptionData
+import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
-import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, SelectModeOptionData.name) {
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
@@ -58,8 +58,8 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
-    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.startsel),
+    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
   )
   fun `test start visual`() {
     val keys = listOf("<S-End>")
@@ -84,8 +84,8 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
-    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
+    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, KeyModelOptionData.startsel),
+    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, SelectModeOptionData.key)
   )
   fun `test start select`() {
     val keys = listOf("<S-End>")
@@ -109,8 +109,8 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
   }
 
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []),
-    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, ""),
+    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
   )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test continue visual`() {
@@ -139,8 +139,8 @@ class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, Sele
   }
 
   @VimOptionTestConfiguration(
-    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []),
-    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+    VimTestOption(KeyModelOptionData.name, OptionValueType.STRING, ""),
+    VimTestOption(SelectModeOptionData.name, OptionValueType.STRING, "")
   )
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test continue select`() {

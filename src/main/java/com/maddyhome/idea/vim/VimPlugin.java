@@ -294,7 +294,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       getInstance().error = true;
     }
-    else if (!OptionsManager.INSTANCE.getVisualbell().isSet()) {
+    else if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "visualbell", null, "visualbell")) {
       // Vim only allows a beep once every half second - :help 'visualbell'
       final long currentTimeMillis = System.currentTimeMillis();
       if (currentTimeMillis - lastBeepTimeMillis > 500) {

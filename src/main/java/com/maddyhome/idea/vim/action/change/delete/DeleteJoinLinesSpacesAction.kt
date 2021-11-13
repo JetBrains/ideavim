@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
-import com.maddyhome.idea.vim.option.OptionsManager.ideajoin
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.DELETE
@@ -38,7 +38,7 @@ class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() 
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode) return false
-    if (ideajoin.isSet) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL, "ideajoin", editor)) {
       return VimPlugin.getChange().joinViaIdeaByCount(editor, context, operatorArguments.count1)
     }
     VimPlugin.getEditor().notifyIdeaJoin(editor.project)

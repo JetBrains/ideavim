@@ -18,8 +18,10 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -38,7 +40,7 @@ class InsertTabActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test insert tab scrolls at end of line`() {
-    OptionsManager.sidescrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
     configureByColumns(200)
 
     // TODO: This works for tests, but not in real life. See VimShortcutKeyAction.isEnabled
@@ -48,7 +50,7 @@ class InsertTabActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test insert tab scrolls at end of line 2`() {
-    OptionsManager.sidescrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
     configureByColumns(200)
     typeText(parseKeys("70|", "i", "<C-I>"))
     assertVisibleLineBounds(0, 32, 111)

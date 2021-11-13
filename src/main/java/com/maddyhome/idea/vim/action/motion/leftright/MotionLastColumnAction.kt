@@ -35,7 +35,8 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.util.*
 
 class MotionLastColumnInsertAction : MotionLastColumnAction() {
@@ -53,8 +54,8 @@ open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Motion {
     val allow = if (editor.inVisualMode) {
-      val opt = OptionsManager.selection
-      opt.value != "old"
+      val opt = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL, "selection", editor) as VimString).value
+      opt != "old"
     } else {
       if (operatorArguments.isOperatorPending) false else editor.isEndAllowed
     }

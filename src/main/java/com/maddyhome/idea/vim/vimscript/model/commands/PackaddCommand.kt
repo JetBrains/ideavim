@@ -20,10 +20,10 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ranges.Ranges
-import com.maddyhome.idea.vim.option.OptionsManager
-import com.maddyhome.idea.vim.option.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 // Currently support only matchit
 class PackaddCommand(val ranges: Ranges, val argument: String) : Command.SingleExecution(ranges, argument) {
@@ -36,7 +36,7 @@ class PackaddCommand(val ranges: Ranges, val argument: String) : Command.SingleE
 
     val pluginAlias = argument.drop(1).takeWhile { it != firstChar }
     if (pluginAlias == "matchit") {
-      (OptionsManager.getOption("matchit") as ToggleOption).set()
+      VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "matchit", null)
     }
     return ExecutionResult.Success
   }

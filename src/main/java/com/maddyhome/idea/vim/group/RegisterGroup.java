@@ -56,9 +56,9 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.option.OptionsManager;
-import com.maddyhome.idea.vim.option.StringListOption;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
 import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
@@ -111,19 +111,25 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
   private @Nullable List<KeyStroke> recordList = null;
 
   public RegisterGroup() {
-    final StringListOption clipboardOption = OptionsManager.INSTANCE.getClipboard();
-    clipboardOption.addOptionChangeListenerAndExecute((oldValue, newValue) -> {
-      if (clipboardOption.contains("unnamed")) {
-        defaultRegister = '*';
-      }
-      else if (clipboardOption.contains("unnamedplus")) {
-        defaultRegister = '+';
-      }
-      else {
-        defaultRegister = UNNAMED_REGISTER;
-      }
-      lastRegister = defaultRegister;
-    });
+
+    VimPlugin.getOptionService().addListener(
+      "clipboard",
+      (oldValue, newValue) -> {
+        String clipboardOptionValue = ((VimString) VimPlugin.getOptionService()
+          .getOptionValue(OptionService.Scope.GLOBAL, "clipboard", null, "clipboard")).getValue();
+        if (clipboardOptionValue.contains("unnamed")) {
+          defaultRegister = '*';
+        }
+        else if (clipboardOptionValue.contains("unnamedplus")) {
+          defaultRegister = '+';
+        }
+        else {
+          defaultRegister = UNNAMED_REGISTER;
+        }
+        lastRegister = defaultRegister;
+      },
+      true
+    );
   }
 
   /**
@@ -164,6 +170,8 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
   }
 
   public void resetRegisters() {
+    defaultRegister = UNNAMED_REGISTER;
+    lastRegister = defaultRegister;
     registers.clear();
   }
 
@@ -346,7 +354,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     String rawText = TextBlockTransferable.convertLineSeparators(text, "\n", transferableDatas);
 
 
-    if (OptionsManager.INSTANCE.getIdeacopypreprocess().getValue()) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideacopypreprocess", null, "ideacopypreprocess")) {
       String escapedText;
       for (CopyPastePreProcessor processor : CopyPastePreProcessor.EP_NAME.getExtensionList()) {
         escapedText = processor.preprocessOnCopy(file, textRange.getStartOffsets(), textRange.getEndOffsets(), rawText);

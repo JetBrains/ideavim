@@ -18,9 +18,11 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.plugins.ideavim.SkipNeovimReason
 import org.jetbrains.plugins.ideavim.TestWithoutNeovim
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -143,7 +145,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test moves caret to same column with nostartofline`() {
-    OptionsManager.startofline.reset()
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
     doTest(
       "G",
       """
@@ -221,7 +223,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   }
 
   fun `test go to line in last half screen of file puts last line at bottom of screen ignoring scrolloff`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByLines(100, "    I found it in a legendary land")
     typeText(parseKeys("95G"))
     assertPosition(94, 4)
@@ -247,7 +249,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   }
 
   fun `test go to line does not scroll when last line is less than scrolloff above bottom of file`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(67, 97)
@@ -257,7 +259,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   }
 
   fun `test go to line does not scroll when last line is less than scrolloff above bottom of file with folds`() {
-    OptionsManager.scrolloff.set(10)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     typeText(parseKeys("20G", "V10j", ":'<,'>action CollapseSelection<CR>", "V"))
