@@ -56,7 +56,6 @@ import com.maddyhome.idea.vim.helper.getTopLevelEditor
 import com.maddyhome.idea.vim.helper.inNormalMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isIdeaVimDisabledHere
-import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.NotNull

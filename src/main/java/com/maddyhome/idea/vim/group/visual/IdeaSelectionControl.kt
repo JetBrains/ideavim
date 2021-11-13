@@ -38,7 +38,6 @@ import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.popAllModes
 import com.maddyhome.idea.vim.listener.VimListenerManager
-import com.maddyhome.idea.vim.option.IdeaRefactorMode
 import com.maddyhome.idea.vim.option.SelectModeOptionData
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.IdeaRefactorModeHelper
