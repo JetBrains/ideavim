@@ -46,9 +46,9 @@ object AppCodeTemplates {
       if (ActionManager.getInstance().getId(action) == IdeActions.ACTION_CHOOSE_LOOKUP_ITEM) {
         val myEditor = editor
         if (myEditor != null) {
-            VimVisualTimer.doNow()
+          VimVisualTimer.doNow()
           if (myEditor.inVisualMode) {
-              SelectToggleVisualMode.toggleMode(myEditor)
+            SelectToggleVisualMode.toggleMode(myEditor)
             KeyHandler.getInstance().partialReset(myEditor)
           }
         }
@@ -58,9 +58,9 @@ object AppCodeTemplates {
 
   @JvmStatic
   fun onMovement(
-      editor: @NotNull Editor,
-      caret: @NotNull Caret,
-      toRight: Boolean,
+    editor: @NotNull Editor,
+    caret: @NotNull Caret,
+    toRight: Boolean,
   ) {
     val offset = caret.offset
     val offsetRightEnd = offset + TEMPLATE_START.length
