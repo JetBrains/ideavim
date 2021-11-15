@@ -109,6 +109,8 @@
     <spellchecker.bundledDictionaryProvider implementation="com.maddyhome.idea.vim.VimBundledDictionaryProvider"/>
 
     <notificationGroup displayType="STICKY_BALLOON" id="ideavim-sticky"/>
+
+    <statistics.applicationUsagesCollector implementation="com.maddyhome.idea.vim.statistic.VimStatistic"/>
   </extensions>
 
   <xi:include href="/META-INF/includes/ApplicationServices.xml" xpointer="xpointer(/idea-plugin/*)"/>
