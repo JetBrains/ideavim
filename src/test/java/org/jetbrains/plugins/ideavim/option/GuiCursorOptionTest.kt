@@ -154,7 +154,7 @@ class GuiCursorOptionTest : VimTestCase() {
     assertEquals(GuiCursorType.HOR, attributes.type)
     assertEquals(20, attributes.thickness)
     assertEquals("Cursor", attributes.highlightGroup)
-    OptionServiceImpl.appendValue(OptionService.Scope.GLOBAL, "guicursor", "n:ver75-OtherCursor", null, "guicursor")
+    VimPlugin.getOptionService().appendValue(OptionService.Scope.GLOBAL, "guicursor", "n:ver75-OtherCursor", null, "guicursor")
     attributes = GuiCursorOptionHelper.getAttributes(GuiCursorMode.NORMAL)
     assertEquals(GuiCursorType.VER, attributes.type)
     assertEquals(75, attributes.thickness)

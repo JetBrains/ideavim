@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -89,17 +90,18 @@ data class SetLocalCommand(val ranges: Ranges, val argument: String) : Command.S
 // todo is failOnBad used anywhere?
 fun parseOptionLine(editor: Editor, args: String, scope: OptionService.Scope, failOnBad: Boolean): Boolean {
   // No arguments so we show changed values
+  val optionService = (VimPlugin.getOptionService() as OptionServiceImpl)
   when {
     args.isEmpty() -> {
-      OptionServiceImpl.showChangedOptions(editor, scope, true)
+      optionService.showChangedOptions(editor, scope, true)
       return true
     }
     args == "all" -> {
-      OptionServiceImpl.showAllOptions(editor, scope, true)
+      optionService.showAllOptions(editor, scope, true)
       return true
     }
     args == "all&" -> {
-      OptionServiceImpl.resetAllOptions()
+      optionService.resetAllOptions()
       return true
     }
   }
@@ -121,10 +123,10 @@ fun parseOptionLine(editor: Editor, args: String, scope: OptionService.Scope, fa
 
     when {
       token.endsWith("?") -> toShow.add(Pair(token.dropLast(1), token))
-      token.startsWith("no") -> OptionServiceImpl.unsetOption(scope, token.substring(2), editor, token)
-      token.startsWith("inv") -> OptionServiceImpl.toggleOption(scope, token.substring(3), editor, token)
-      token.endsWith("!") -> OptionServiceImpl.toggleOption(scope, token.dropLast(1), editor, token)
-      token.endsWith("&") -> OptionServiceImpl.resetDefault(scope, token.dropLast(1), editor, token)
+      token.startsWith("no") -> optionService.unsetOption(scope, token.substring(2), editor, token)
+      token.startsWith("inv") -> optionService.toggleOption(scope, token.substring(3), editor, token)
+      token.endsWith("!") -> optionService.toggleOption(scope, token.dropLast(1), editor, token)
+      token.endsWith("&") -> optionService.resetDefault(scope, token.dropLast(1), editor, token)
       else -> {
         // This must be one of =, :, +=, -=, or ^=
         // Look for the = or : first
@@ -134,8 +136,8 @@ fun parseOptionLine(editor: Editor, args: String, scope: OptionService.Scope, fa
         }
         // No operator so only the option name was given
         if (eq == -1) {
-          if (OptionServiceImpl.isToggleOption(token)) {
-            OptionServiceImpl.setOption(scope, token, editor, token)
+          if (optionService.isToggleOption(token)) {
+            optionService.setOption(scope, token, editor, token)
           } else {
             toShow.add(Pair(token, token))
           }
@@ -152,10 +154,10 @@ fun parseOptionLine(editor: Editor, args: String, scope: OptionService.Scope, fa
             val option = token.take(end)
             val value = token.substring(eq + 1)
             when (op) {
-              '+' -> OptionServiceImpl.appendValue(scope, option, value, editor, token)
-              '-' -> OptionServiceImpl.removeValue(scope, option, value, editor, token)
-              '^' -> OptionServiceImpl.prependValue(scope, option, value, editor, token)
-              else -> OptionServiceImpl.setOptionValue(scope, option, value, editor, token)
+              '+' -> optionService.appendValue(scope, option, value, editor, token)
+              '-' -> optionService.removeValue(scope, option, value, editor, token)
+              '^' -> optionService.prependValue(scope, option, value, editor, token)
+              else -> optionService.setOptionValue(scope, option, value, editor, token)
             }
           } else {
             error = Msg.unkopt
@@ -170,7 +172,7 @@ fun parseOptionLine(editor: Editor, args: String, scope: OptionService.Scope, fa
 
   // Now show all options that were individually requested
   if (toShow.size > 0) {
-    OptionServiceImpl.showOptions(editor, toShow, scope, false)
+    optionService.showOptions(editor, toShow, scope, false)
   }
 
   if (error != null) {

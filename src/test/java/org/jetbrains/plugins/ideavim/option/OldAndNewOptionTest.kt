@@ -23,7 +23,6 @@ import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.OptionService
-import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -96,17 +95,17 @@ class OldAndNewOptionTest : VimTestCase() {
 
   fun `test list option 2`() {
     TestCase.assertEquals("'100,<50,s10,h", OptionsManager.viminfo.value)
-    OptionServiceImpl.appendValue(OptionService.Scope.GLOBAL, "vi", "k", null, "vi")
+    VimPlugin.getOptionService().appendValue(OptionService.Scope.GLOBAL, "vi", "k", null, "vi")
     TestCase.assertEquals("'100,<50,s10,h,k", OptionsManager.viminfo.value)
-    OptionServiceImpl.prependValue(OptionService.Scope.GLOBAL, "vi", "j", null, "vi")
+    VimPlugin.getOptionService().prependValue(OptionService.Scope.GLOBAL, "vi", "j", null, "vi")
     TestCase.assertEquals("j,'100,<50,s10,h,k", OptionsManager.viminfo.value)
-    OptionServiceImpl.removeValue(OptionService.Scope.GLOBAL, "vi", "s10", null, "vi")
+    VimPlugin.getOptionService().removeValue(OptionService.Scope.GLOBAL, "vi", "s10", null, "vi")
     TestCase.assertEquals("j,'100,<50,h,k", OptionsManager.viminfo.value)
-    OptionServiceImpl.removeValue(OptionService.Scope.GLOBAL, "vi", "k", null, "vi")
+    VimPlugin.getOptionService().removeValue(OptionService.Scope.GLOBAL, "vi", "k", null, "vi")
     TestCase.assertEquals("j,'100,<50,h", OptionsManager.viminfo.value)
-    OptionServiceImpl.removeValue(OptionService.Scope.GLOBAL, "vi", "j", null, "vi")
+    VimPlugin.getOptionService().removeValue(OptionService.Scope.GLOBAL, "vi", "j", null, "vi")
     TestCase.assertEquals("'100,<50,h", OptionsManager.viminfo.value)
-    OptionServiceImpl.resetDefault(OptionService.Scope.GLOBAL, "vi", null)
+    VimPlugin.getOptionService().resetDefault(OptionService.Scope.GLOBAL, "vi", null)
     TestCase.assertEquals("'100,<50,s10,h", OptionsManager.viminfo.value)
   }
 }

@@ -293,21 +293,21 @@ internal object OptionServiceImpl : OptionService {
     } ?: throw ExException("E518: Unknown option: $token")
   }
 
-  fun appendValue(scope: OptionService.Scope, optionName: String, value: String, editor: Editor?, token: String) {
+  override fun appendValue(scope: OptionService.Scope, optionName: String, value: String, editor: Editor?, token: String) {
     val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
     val currentValue = getOptionValue(scope, optionName, editor)
     val newValue = option.getValueIfAppend(currentValue, value, token)
     setOptionValue(scope, optionName, newValue, editor, token)
   }
 
-  fun prependValue(scope: OptionService.Scope, optionName: String, value: String, editor: Editor?, token: String) {
+  override fun prependValue(scope: OptionService.Scope, optionName: String, value: String, editor: Editor?, token: String) {
     val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
     val currentValue = getOptionValue(scope, optionName, editor)
     val newValue = option.getValueIfPrepend(currentValue, value, token)
     setOptionValue(scope, optionName, newValue, editor, token)
   }
 
-  fun removeValue(scope: OptionService.Scope, optionName: String, value: String, editor: Editor?, token: String) {
+  override fun removeValue(scope: OptionService.Scope, optionName: String, value: String, editor: Editor?, token: String) {
     val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
     val currentValue = getOptionValue(scope, optionName, editor)
     val newValue = option.getValueIfRemove(currentValue, value, token)

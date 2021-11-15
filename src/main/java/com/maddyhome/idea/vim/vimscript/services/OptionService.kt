@@ -30,6 +30,12 @@ interface OptionService {
 
   fun setOptionValue(scope: Scope, optionName: String, value: VimDataType, editor: Editor?, token: String = optionName)
 
+  fun appendValue(scope: Scope, optionName: String, value: String, editor: Editor?, token: String = optionName)
+
+  fun prependValue(scope: Scope, optionName: String, value: String, editor: Editor?, token: String = optionName)
+
+  fun removeValue(scope: Scope, optionName: String, value: String, editor: Editor?, token: String = optionName)
+
   fun isSet(scope: Scope, optionName: String, editor: Editor?, token: String = optionName): Boolean
 
   fun isDefault(scope: Scope, optionName: String, editor: Editor?, token: String = optionName): Boolean

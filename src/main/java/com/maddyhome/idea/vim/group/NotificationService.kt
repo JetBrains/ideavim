@@ -77,7 +77,7 @@ class NotificationService(private val project: Project?) {
         notification,
         "set clipboard+=ideaput",
         "ideaput"
-      ) { OptionServiceImpl.appendValue(OptionService.Scope.GLOBAL, "clipboard", ClipboardOptionsData.ideaput, null, "clipboard") }
+      ) { VimPlugin.getOptionService().appendValue(OptionService.Scope.GLOBAL, "clipboard", ClipboardOptionsData.ideaput, null, "clipboard") }
     )
 
     notification.notify(project)
