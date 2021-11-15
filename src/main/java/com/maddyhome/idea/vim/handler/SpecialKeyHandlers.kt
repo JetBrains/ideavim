@@ -127,7 +127,7 @@ abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() 
     argument: Argument?,
     operatorArguments: OperatorArguments,
   ): Motion {
-    val keymodel = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "keymodel", null) as VimString).value
+    val keymodel = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "keymodel", null) as VimString).value.split(",")
     if (editor.inSelectMode && (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel)) {
       editor.exitSelectMode(false)
     }
