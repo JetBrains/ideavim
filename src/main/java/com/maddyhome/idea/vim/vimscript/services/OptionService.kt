@@ -10,7 +10,23 @@ interface OptionService {
   /**
    * todo doc for each method
    */
+  fun getGlobalOptionValue(optionName: String, token: String = optionName): VimDataType {
+    return getOptionValue(Scope.GLOBAL, optionName, null, token)
+  }
+
+  fun getLocalOptionValue(optionName: String, editor: Editor?, token: String = optionName): VimDataType {
+    return getOptionValue(Scope.LOCAL, optionName, editor, token)
+  }
+
   fun getOptionValue(scope: Scope, optionName: String, editor: Editor?, token: String = optionName): VimDataType
+
+  fun setGlobalOptionValue(optionName: String, value: VimDataType, token: String = optionName) {
+    setOptionValue(Scope.GLOBAL, optionName, value, null, token)
+  }
+
+  fun setLocalOptionValue(optionName: String, value: VimDataType, editor: Editor?, token: String = optionName) {
+    setOptionValue(Scope.LOCAL, optionName, value, editor, token)
+  }
 
   fun setOptionValue(scope: Scope, optionName: String, value: VimDataType, editor: Editor?, token: String = optionName)
 
