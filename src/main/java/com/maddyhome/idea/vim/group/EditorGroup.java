@@ -34,8 +34,8 @@ import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
+import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jdom.Element;
 import org.jetbrains.annotations.Contract;
@@ -258,7 +258,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     readData(state);
   }
 
-  public static class NumberChangeListener implements OptionChangeListener<VimDataType> {
+  public static class NumberChangeListener extends OptionChangeListener<VimDataType> {
     public static NumberChangeListener INSTANCE = new NumberChangeListener();
 
     @Contract(pure = true)
@@ -266,12 +266,18 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     }
 
     @Override
-    public void valueChange(VimDataType oldValue, VimDataType newValue) {
+    public void processGlobalValueChange(@Nullable VimDataType oldValue) {
       for (Editor editor : HelperKt.localEditors()) {
         if (UserDataManager.getVimEditorGroup(editor) && supportsVimLineNumbers(editor)) {
           updateLineNumbers(editor);
         }
       }
+    }
+
+    @Override
+    public void processLocalValueChange(@Nullable VimDataType oldValue, @NotNull Editor editor) {
+      // todo
+      processGlobalValueChange(oldValue);
     }
   }
 

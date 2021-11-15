@@ -34,8 +34,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.VimNlsSafe
 import com.maddyhome.idea.vim.helper.vimCommandState
-import com.maddyhome.idea.vim.option.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.annotations.NonNls
 import java.awt.Component
@@ -73,8 +73,8 @@ object ShowCmd {
   }
 }
 
-object ShowCmdOptionChangeListener : OptionChangeListener<VimDataType> {
-  override fun valueChange(oldValue: VimDataType, newValue: VimDataType) {
+object ShowCmdOptionChangeListener : OptionChangeListener<VimDataType>() {
+  override fun processGlobalValueChange(oldValue: VimDataType?) {
     ShowCmd.update()
 
     val extension = StatusBarWidgetFactory.EP_NAME.findExtension(ShowCmdStatusBarWidgetFactory::class.java) ?: return
@@ -83,6 +83,11 @@ object ShowCmdOptionChangeListener : OptionChangeListener<VimDataType> {
       val statusBarWidgetsManager = project.getService(StatusBarWidgetsManager::class.java) ?: continue
       statusBarWidgetsManager.updateWidget(extension)
     }
+  }
+
+  override fun processLocalValueChange(oldValue: VimDataType?, editor: Editor) {
+    // todo
+    processGlobalValueChange(oldValue)
   }
 }
 

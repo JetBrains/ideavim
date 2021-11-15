@@ -57,7 +57,9 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
 import org.jdom.Element;
@@ -114,19 +116,29 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
 
     VimPlugin.getOptionService().addListener(
       "clipboard",
-      (oldValue, newValue) -> {
-        String clipboardOptionValue = ((VimString) VimPlugin.getOptionService()
-          .getOptionValue(OptionService.Scope.GLOBAL, "clipboard", null, "clipboard")).getValue();
-        if (clipboardOptionValue.contains("unnamed")) {
-          defaultRegister = '*';
+      new OptionChangeListener<VimDataType>() {
+
+        @Override
+        public void processLocalValueChange(@Nullable VimDataType oldValue, @NotNull Editor editor) {
+          // todo
+          processGlobalValueChange(oldValue);
         }
-        else if (clipboardOptionValue.contains("unnamedplus")) {
-          defaultRegister = '+';
+
+        @Override
+        public void processGlobalValueChange(@Nullable VimDataType oldValue) {
+          String clipboardOptionValue = ((VimString) VimPlugin.getOptionService()
+            .getOptionValue(OptionService.Scope.GLOBAL, "clipboard", null, "clipboard")).getValue();
+          if (clipboardOptionValue.contains("unnamed")) {
+            defaultRegister = '*';
+          }
+          else if (clipboardOptionValue.contains("unnamedplus")) {
+            defaultRegister = '+';
+          }
+          else {
+            defaultRegister = UNNAMED_REGISTER;
+          }
+          lastRegister = defaultRegister;
         }
-        else {
-          defaultRegister = UNNAMED_REGISTER;
-        }
-        lastRegister = defaultRegister;
       },
       true
     );

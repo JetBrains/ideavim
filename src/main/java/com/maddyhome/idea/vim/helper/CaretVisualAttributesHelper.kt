@@ -26,8 +26,8 @@ import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.option.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorMode
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorType
@@ -110,11 +110,16 @@ private fun Editor.updateSecondaryCaretsVisualAttributes() {
   }
 }
 
-object GuicursorChangeListener : OptionChangeListener<VimDataType> {
-  override fun valueChange(oldValue: VimDataType, newValue: VimDataType) {
+object GuicursorChangeListener : OptionChangeListener<VimDataType>() {
+  override fun processGlobalValueChange(oldValue: VimDataType?) {
     provider.clearCache()
     GuiCursorOptionHelper.clearEffectiveValues()
     localEditors().forEach { it.updatePrimaryCaretVisualAttributes() }
+  }
+
+  override fun processLocalValueChange(oldValue: VimDataType?, editor: Editor) {
+    // todo
+    processGlobalValueChange(oldValue)
   }
 }
 

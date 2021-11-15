@@ -18,12 +18,15 @@
 package com.maddyhome.idea.vim.extension
 
 import com.intellij.openapi.diagnostic.logger
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.extensions.ExtensionPointListener
 import com.intellij.openapi.extensions.PluginDescriptor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
 import com.maddyhome.idea.vim.vimscript.Executor
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 
@@ -64,13 +67,23 @@ object VimExtensionRegistrar {
     registeredExtensions.add(name)
     registerAliases(extensionBean)
     VimPlugin.getOptionService().addOption(ToggleOption(name, getAbbrev(name), false))
-    VimPlugin.getOptionService().addListener(name, { _, _ ->
-      if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, name, null)) {
-        initExtension(extensionBean, name)
-      } else {
-        extensionBean.instance.dispose()
+    VimPlugin.getOptionService().addListener(
+      name,
+      object : OptionChangeListener<VimDataType>() {
+        override fun processGlobalValueChange(oldValue: VimDataType?) {
+          if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, name, null)) {
+            initExtension(extensionBean, name)
+          } else {
+            extensionBean.instance.dispose()
+          }
+        }
+
+        override fun processLocalValueChange(oldValue: VimDataType?, editor: Editor) {
+          // todo
+          processGlobalValueChange(oldValue)
+        }
       }
-    })
+    )
   }
 
   private fun getAbbrev(name: String): String {

@@ -18,9 +18,13 @@
 
 package com.maddyhome.idea.vim.option;
 
+import org.jetbrains.annotations.ApiStatus;
 /**
  * This interface is used for classes that wish to be notified whenever the value of an option has changed
+ * @deprecated use {@link com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener} instead
  */
+@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "1.11")
 public interface OptionChangeListener<T> {
   void valueChange(T oldValue, T newValue);
 }

@@ -45,7 +45,9 @@ import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.IdeaSpecifics.AppCodeTemplates.appCodeTemplateCaptured
 import com.maddyhome.idea.vim.listener.IdeaSpecifics.aceJumpActive
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
@@ -232,7 +234,19 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     private var parsedLookupKeys: Set<KeyStroke> = parseLookupKeys()
 
     init {
-      VimPlugin.getOptionService().addListener("lookupkeys", { _, _ -> parsedLookupKeys = parseLookupKeys() })
+      VimPlugin.getOptionService().addListener(
+        "lookupkeys",
+        object : OptionChangeListener<VimDataType>() {
+          override fun processGlobalValueChange(oldValue: VimDataType?) {
+            parsedLookupKeys = parseLookupKeys()
+          }
+
+          override fun processLocalValueChange(oldValue: VimDataType?, editor: Editor) {
+            // todo
+            processGlobalValueChange(oldValue)
+          }
+        }
+      )
     }
 
     fun isEnabledForLookup(keyStroke: KeyStroke): Boolean = keyStroke !in parsedLookupKeys

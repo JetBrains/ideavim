@@ -70,7 +70,6 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
-import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorType
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
@@ -110,7 +109,7 @@ abstract class VimTestCase : UsefulTestCase() {
     VimPlugin.getSearch().resetState()
     if (!VimPlugin.isEnabled()) VimPlugin.setEnabled(true)
     VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "ideastrictmode", null)
-    GuicursorChangeListener.valueChange(VimString(""), VimString(""))
+    GuicursorChangeListener.processGlobalValueChange(null)
     Checks.reset()
 
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location

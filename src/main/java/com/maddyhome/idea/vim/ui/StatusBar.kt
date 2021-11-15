@@ -26,6 +26,7 @@ import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
@@ -47,7 +48,9 @@ import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.icons.VimIcons
 import com.maddyhome.idea.vim.option.IdeaStatusIcon
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.jetbrains.annotations.NonNls
 import java.awt.Point
@@ -75,7 +78,19 @@ class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
   }
 
   override fun createWidget(project: Project): StatusBarWidget {
-    VimPlugin.getOptionService().addListener("ideastatusicon", { _, _ -> updateAll() })
+    VimPlugin.getOptionService().addListener(
+      "ideastatusicon",
+      object : OptionChangeListener<VimDataType>() {
+        override fun processGlobalValueChange(oldValue: VimDataType?) {
+          updateAll()
+        }
+
+        override fun processLocalValueChange(oldValue: VimDataType?, editor: Editor) {
+          // todo
+          processGlobalValueChange(oldValue)
+        }
+      }
+    )
     return VimStatusBar()
   }
 

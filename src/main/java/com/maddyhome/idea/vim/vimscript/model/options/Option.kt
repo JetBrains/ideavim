@@ -1,12 +1,13 @@
 package com.maddyhome.idea.vim.vimscript.model.options
 
+import com.intellij.openapi.editor.Editor
 import com.intellij.util.containers.ContainerUtil
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.option.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 sealed class Option<T : VimDataType>(val name: String, val abbrev: String, private val defaultValue: T) {
 
@@ -20,23 +21,16 @@ sealed class Option<T : VimDataType>(val name: String, val abbrev: String, priva
     listeners.add(listener)
   }
 
-  open fun addOptionChangeListenerAndExecute(listener: OptionChangeListener<VimDataType>) {
-    addOptionChangeListener(listener)
-    val value = getDefaultValue()
-    onChanged(value, value)
-  }
-
   open fun removeOptionChangeListener(listener: OptionChangeListener<VimDataType>) {
     listeners.remove(listener)
   }
 
-  open fun onChanged(oldValue: VimDataType, newValue: VimDataType) {
-    fireOptionChangeEvent(oldValue, newValue)
-  }
-
-  private fun fireOptionChangeEvent(oldValue: VimDataType, newValue: VimDataType) {
+  fun onChanged(scope: OptionService.Scope, oldValue: VimDataType, editor: Editor?) {
     for (listener in listeners) {
-      listener.valueChange(oldValue, newValue)
+      when (scope) {
+        OptionService.Scope.GLOBAL -> listener.processGlobalValueChange(oldValue)
+        OptionService.Scope.LOCAL -> listener.processLocalValueChange(oldValue, editor!!)
+      }
     }
   }
 

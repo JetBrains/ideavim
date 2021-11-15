@@ -9,7 +9,6 @@ import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.option.OptionChangeListener
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -17,6 +16,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.datatypes.parseNumber
 import com.maddyhome.idea.vim.vimscript.model.options.NumberOption
 import com.maddyhome.idea.vim.vimscript.model.options.Option
+import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.options.StringOption
 import com.maddyhome.idea.vim.vimscript.model.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
@@ -187,7 +187,7 @@ internal object OptionServiceImpl : OptionService {
       }
       OptionService.Scope.GLOBAL -> setGlobalOptionValue(option.name, value, token)
     }
-    option.onChanged(oldValue, value)
+    option.onChanged(scope, oldValue, editor)
 
     val oldOption = OptionsManager.getOption(optionName)
     when (oldOption) {
@@ -410,8 +410,7 @@ internal object OptionServiceImpl : OptionService {
   override fun addListener(optionName: String, listener: OptionChangeListener<VimDataType>, executeOnAdd: Boolean) {
     options.get(optionName)!!.addOptionChangeListener(listener)
     if (executeOnAdd) {
-      val value = getGlobalOptionValue(optionName)
-      listener.valueChange(value, value)
+      listener.processGlobalValueChange(null)
     }
   }
 

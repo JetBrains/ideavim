@@ -1,9 +1,10 @@
 package com.maddyhome.idea.vim.vimscript.model.options.helpers
 
+import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.option.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
+import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import org.apache.commons.lang.math.NumberUtils
 import java.util.regex.Pattern
@@ -191,8 +192,13 @@ object KeywordOptionHelper {
   }
 }
 
-object KeywordOptionChangeListener : OptionChangeListener<VimDataType> {
-  override fun valueChange(oldValue: VimDataType, newValue: VimDataType) {
+object KeywordOptionChangeListener : OptionChangeListener<VimDataType>() {
+  override fun processGlobalValueChange(oldValue: VimDataType?) {
     KeywordOptionHelper.updateSpecs()
+  }
+
+  override fun processLocalValueChange(oldValue: VimDataType?, editor: Editor) {
+    // todo
+    processGlobalValueChange(oldValue)
   }
 }

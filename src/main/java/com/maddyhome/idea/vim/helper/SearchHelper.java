@@ -36,7 +36,9 @@ import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
 import org.jetbrains.annotations.Contract;
@@ -2613,7 +2615,22 @@ public class SearchHelper {
 
   private static @NotNull String getPairChars() {
     if (pairsChars == null) {
-      VimPlugin.getOptionService().addListener("matchpairs", (oldValue, newValue) -> pairsChars = parseMatchPairsOption(), true);
+      VimPlugin.getOptionService().addListener(
+        "matchpairs",
+        new OptionChangeListener<VimDataType>() {
+          @Override
+          public void processGlobalValueChange(@Nullable VimDataType oldValue) {
+            pairsChars = parseMatchPairsOption();
+          }
+
+          @Override
+          public void processLocalValueChange(@Nullable VimDataType oldValue, @NotNull Editor editor) {
+            // todo
+            processGlobalValueChange(oldValue);
+          }
+        },
+        true
+      );
     }
 
     return pairsChars;

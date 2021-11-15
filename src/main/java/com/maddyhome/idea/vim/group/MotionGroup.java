@@ -46,10 +46,10 @@ import com.maddyhome.idea.vim.handler.MotionActionHandlerKt;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.IdeaSpecifics;
-import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
+import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
 import kotlin.ranges.IntProgression;
@@ -1489,7 +1489,7 @@ public class MotionGroup {
     }
   }
 
-  public static class ScrollOptionsChangeListener implements OptionChangeListener<VimDataType> {
+  public static class ScrollOptionsChangeListener extends OptionChangeListener<VimDataType> {
     public static ScrollOptionsChangeListener INSTANCE = new ScrollOptionsChangeListener();
 
     @Contract(pure = true)
@@ -1497,12 +1497,18 @@ public class MotionGroup {
     }
 
     @Override
-    public void valueChange(VimDataType oldValue, VimDataType newValue) {
+    public void processGlobalValueChange(@Nullable VimDataType oldValue) {
       for (Editor editor : HelperKt.localEditors()) {
         if (UserDataManager.getVimEditorGroup(editor)) {
           MotionGroup.scrollCaretIntoView(editor);
         }
       }
+    }
+
+    @Override
+    public void processLocalValueChange(@Nullable VimDataType oldValue, @NotNull Editor editor) {
+      // todo
+      processGlobalValueChange(oldValue);
     }
   }
 }

@@ -40,14 +40,15 @@ import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ranges.LineRange;
 import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ModalEntry;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
+import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
 import kotlin.jvm.functions.Function1;
@@ -69,18 +70,37 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   public SearchGroup() {
     VimPlugin.getOptionService().addListener(
       "hlsearch",
-      (oldValue, newValue) -> {
-        resetShowSearchHighlight();
-        forceUpdateSearchHighlights();
+      new OptionChangeListener<VimDataType>() {
+        @Override
+        public void processGlobalValueChange(@Nullable VimDataType oldValue) {
+          resetShowSearchHighlight();
+          forceUpdateSearchHighlights();
+        }
+
+        @Override
+        public void processLocalValueChange(@Nullable VimDataType oldValue, @NotNull Editor editor) {
+          // todo
+          processGlobalValueChange(oldValue);
+        }
       },
       false
     );
 
-    final OptionChangeListener<VimDataType> updateHighlightsIfVisible = (oldValue, newValue) -> {
-      if (showSearchHighlight) {
-        forceUpdateSearchHighlights();
-      }
-    };
+    final OptionChangeListener<VimDataType> updateHighlightsIfVisible =
+      new OptionChangeListener<VimDataType>() {
+        @Override
+        public void processGlobalValueChange(@Nullable VimDataType oldValue) {
+            if (showSearchHighlight) {
+              forceUpdateSearchHighlights();
+            }
+        }
+
+        @Override
+        public void processLocalValueChange(@Nullable VimDataType oldValue, @NotNull Editor editor) {
+          // todo
+          processGlobalValueChange(oldValue);
+        }
+      };
     VimPlugin.getOptionService().addListener("ignorecase", updateHighlightsIfVisible, false);
     VimPlugin.getOptionService().addListener("smartcase", updateHighlightsIfVisible, false);
   }
