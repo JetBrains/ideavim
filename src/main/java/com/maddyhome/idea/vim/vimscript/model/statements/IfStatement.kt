@@ -20,12 +20,21 @@ data class IfStatement(val conditionToBody: List<Pair<Expression, List<Executabl
       }
     }
     if (statementsToExecute != null) {
+      var exception: Exception? = null
       for (statement in statementsToExecute) {
         if (result is ExecutionResult.Success) {
-          result = statement.execute(editor, context)
+          // todo delete try block after Result class
+          try {
+            result = statement.execute(editor, context)
+          } catch (e: Exception) {
+            exception = e
+          }
         } else {
           break
         }
+      }
+      if (exception != null) {
+        throw exception
       }
     }
     return result

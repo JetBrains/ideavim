@@ -419,4 +419,20 @@ class CommandParserTest : VimTestCase() {
     typeText(commandToKeys("echo x"))
     assertExOutput("3\n")
   }
+
+  fun `test all the lines are executed`() {
+    configureByText("\n")
+    typeText(
+      commandToKeys(
+        """
+          if has('ide') |
+           set unknowOption |
+           let x = 42 |
+          endif
+        """.trimIndent()
+      )
+    )
+    typeText(commandToKeys("echo x"))
+    assertExOutput("42\n")
+  }
 }
