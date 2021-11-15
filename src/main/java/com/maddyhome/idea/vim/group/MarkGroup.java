@@ -52,7 +52,6 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -749,19 +748,28 @@ public class MarkGroup implements PersistentStateComponent<Element> {
 
   public static class MarkListener implements BookmarksListener {
 
-    private final WeakReference<Project> project;
+    private final Project project;
     private Bookmark bookmarkTemplate = null;
 
     @Contract(pure = true)
     public MarkListener(Project project) {
-      this.project = new WeakReference<>(project);
+      this.project = project;
     }
 
+    /**
+     * IJ has an interesting approach in mnemonic marks initialization. Firstly it creates an unnamed mark,
+     * then updates it. In general, it creates two events: one for creation and one for mnemonic set.
+     * However, when IJ starts and reads existing marks from caches, it creates marks with mnemonics already.
+     */
     @Override
     public void bookmarkAdded(@NotNull Bookmark b) {
       if (!VimPlugin.isEnabled()) return;
       if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideamarks", null, "ideamarks")) return;
-      bookmarkTemplate = b;
+      if (b.getMnemonic() == '\u0000') {
+        bookmarkTemplate = b;
+      } else {
+        createVimMark(b);
+      }
     }
 
     @Override
@@ -786,12 +794,16 @@ public class MarkGroup implements PersistentStateComponent<Element> {
       if (b != bookmarkTemplate) return;
       bookmarkTemplate = null;
 
+      createVimMark(b);
+    }
+
+    private void createVimMark(@NotNull Bookmark b) {
       char ch = b.getMnemonic();
       if (GLOBAL_MARKS.indexOf(ch) != -1) {
         int col = 0;
         Editor editor = EditorHelper.getEditor(b.getFile());
         if (editor != null) col = editor.getCaretModel().getCurrentCaret().getLogicalPosition().column;
-        IntellijMark mark = new IntellijMark(b, col, project.get());
+        IntellijMark mark = new IntellijMark(b, col, project);
         FileMarks<Character, Mark> fmarks = VimPlugin.getMark().getFileMarks(b.getFile().getPath());
         fmarks.put(ch, mark);
         VimPlugin.getMark().globalMarks.put(ch, mark);

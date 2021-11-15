@@ -44,6 +44,7 @@ usual beta standards.
 * [VIM-2213](https://youtrack.jetbrains.com/issue/VIM-2213) Close VCS change popup on esc
 * [VIM-2435](https://youtrack.jetbrains.com/issue/VIM-2435) Close diff window on esc
 * [VIM-2461](https://youtrack.jetbrains.com/issue/VIM-2461) Show action id before action execution
+* [VIM-2026](https://youtrack.jetbrains.com/issue/VIM-2026) Keep global marks after restart
 
 ### Merged PRs:
 * [390](https://github.com/JetBrains/ideavim/pull/390) by [chylex](https://github.com/chylex): [VIM-2255] Missing reload icon in .ideavimrc on Windows

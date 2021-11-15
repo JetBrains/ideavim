@@ -27,6 +27,8 @@ import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
+import org.junit.Ignore
 
 class MotionMarkActionTest : VimOptionTestCase(IdeaMarksOptionsData.name) {
   @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, OptionValueType.NUMBER, "1"))
@@ -108,6 +110,30 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarksOptionsData.name) {
     bookmarkManager.addEditorBookmark(myFixture.editor, 2)
     val bookmark = bookmarkManager.findEditorBookmark(myFixture.editor.document, 2) ?: kotlin.test.fail()
     bookmarkManager.setMnemonic(bookmark, 'A')
+    val vimMarks = VimPlugin.getMark().getMarks(myFixture.editor)
+    TestCase.assertEquals(1, vimMarks.size)
+    TestCase.assertEquals('A', vimMarks[0].key)
+  }
+
+  @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, OptionValueType.NUMBER, "1"))
+  @Ignore("Probably one day it would be possible to test it")
+  fun `test apply new state`() {
+    val text = """
+            A Discovery
+
+            I ${c}found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+    """.trimIndent()
+    configureByText(text)
+    val bookmarkManager = BookmarkManager.getInstance(myFixture.project)
+    bookmarkManager.addEditorBookmark(myFixture.editor, 2)
+    val bookmark = bookmarkManager.findEditorBookmark(myFixture.editor.document, 2) ?: kotlin.test.fail()
+
+    bookmark.mnemonic = 'A'
+    bookmarkManager.applyNewStateInTestMode(listOf(bookmark))
+
     val vimMarks = VimPlugin.getMark().getMarks(myFixture.editor)
     TestCase.assertEquals(1, vimMarks.size)
     TestCase.assertEquals('A', vimMarks[0].key)
