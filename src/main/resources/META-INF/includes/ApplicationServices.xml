@@ -17,6 +17,7 @@
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.visual.VisualMotionGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.copy.YankGroup"/>
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.copy.PutGroup"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl"/>
 
     <applicationService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
   </extensions>

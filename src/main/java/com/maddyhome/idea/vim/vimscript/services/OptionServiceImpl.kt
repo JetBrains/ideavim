@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.vimscript.model.options.helpers.KeywordOptionHelpe
 import kotlin.math.ceil
 import kotlin.math.min
 
-internal object OptionServiceImpl : OptionService {
+internal class OptionServiceImpl : OptionService {
 
   // todo use me please :(
   private val logger = logger<OptionServiceImpl>()

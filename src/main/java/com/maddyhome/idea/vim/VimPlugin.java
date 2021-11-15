@@ -227,7 +227,7 @@ public class VimPlugin implements PersistentStateComponent<Element>, Disposable 
   }
 
   public static @NotNull OptionService getOptionService() {
-    return OptionServiceImpl.INSTANCE;
+    return ServiceManager.getService(OptionServiceImpl.class);
   }
 
   private static @NotNull NotificationService getNotifications() {
