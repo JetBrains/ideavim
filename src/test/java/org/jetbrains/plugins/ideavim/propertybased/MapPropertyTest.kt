@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.jetCheck.Generator
 import org.jetbrains.jetCheck.ImperativeCommand
 import org.jetbrains.jetCheck.PropertyChecker
+import org.jetbrains.plugins.ideavim.propertybased.samples.simpleText
 
 // TODO: 25.01.2021 Add neovim test integration
 class MapPropertyTest : VimPropertyTest() {

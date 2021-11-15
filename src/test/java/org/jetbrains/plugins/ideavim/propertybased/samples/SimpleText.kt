@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.propertybased
+package org.jetbrains.plugins.ideavim.propertybased.samples
 
 internal val simpleText = """
             A Discovery
