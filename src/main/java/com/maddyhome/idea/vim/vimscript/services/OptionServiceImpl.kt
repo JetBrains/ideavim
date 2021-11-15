@@ -183,9 +183,9 @@ internal object OptionServiceImpl : OptionService {
         if (editor == null) {
           throw ExException("IdeaVimException: Editor is required for local-scoped options")
         }
-        setLocalOptionValue(option.name, value, editor, token)
+        setLocOptionValue(option.name, value, editor, token)
       }
-      OptionService.Scope.GLOBAL -> setGlobalOptionValue(option.name, value, token)
+      OptionService.Scope.GLOBAL -> setGlobOptionValue(option.name, value, token)
     }
     option.onChanged(scope, oldValue, editor)
 
@@ -209,11 +209,11 @@ internal object OptionServiceImpl : OptionService {
     setOptionValue(scope, optionName, vimValue, editor, token)
   }
 
-  private fun setGlobalOptionValue(optionName: String, value: VimDataType, token: String = optionName) {
+  private fun setGlobOptionValue(optionName: String, value: VimDataType, token: String = optionName) {
     globalValues[optionName] = value
   }
 
-  private fun setLocalOptionValue(optionName: String, value: VimDataType, editor: Editor, token: String = optionName) {
+  private fun setLocOptionValue(optionName: String, value: VimDataType, editor: Editor, token: String = optionName) {
     if (editor.getUserData(localValuesKey) == null) {
       editor.putUserData(localValuesKey, mutableMapOf(optionName to value))
     } else {
