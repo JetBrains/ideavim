@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.key.OperatorFunction
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.ClipboardOptionHelper
 import com.maddyhome.idea.vim.vimscript.services.VariableService
+import com.maddyhome.idea.vim.option.ClipboardOptionsData.IdeaputDisabler
 import org.jetbrains.annotations.NonNls
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -66,7 +67,7 @@ class VimSurroundExtension : VimExtension {
     putExtensionHandlerMapping(MappingMode.N, StringHelper.parseKeys("<Plug>DSurround"), owner, DSurroundHandler(), false)
     putExtensionHandlerMapping(MappingMode.XO, StringHelper.parseKeys("<Plug>VSurround"), owner, VSurroundHandler(), false)
 
-    val noMappings = VariableService.getGlobalVariable(NO_MAPPINGS)?.asBoolean() ?: false
+    val noMappings = VimPlugin.getVariableService().getGlobalVariableValue(NO_MAPPINGS)?.asBoolean() ?: false
     if (!noMappings) {
       putKeyMappingIfMissing(MappingMode.N, StringHelper.parseKeys("ys"), owner, StringHelper.parseKeys("<Plug>YSurround"), true)
       putKeyMappingIfMissing(MappingMode.N, StringHelper.parseKeys("cs"), owner, StringHelper.parseKeys("<Plug>CSurround"), true)

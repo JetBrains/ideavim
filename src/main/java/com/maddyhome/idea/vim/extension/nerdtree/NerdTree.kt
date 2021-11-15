@@ -56,7 +56,6 @@ import com.maddyhome.idea.vim.key.RequiredShortcut
 import com.maddyhome.idea.vim.key.RootNode
 import com.maddyhome.idea.vim.key.addLeafs
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.services.VariableService
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 import javax.swing.SwingConstants
@@ -519,7 +518,7 @@ class NerdTree : VimExtension {
     }
 
     private fun registerCommand(variable: String, default: String, action: NerdAction) {
-      val variableValue = VariableService.getGlobalVariable(variable)
+      val variableValue = VimPlugin.getVariableService().getGlobalVariableValue(variable)
       val mappings = if (variableValue is VimString) {
         variableValue.value
       } else {

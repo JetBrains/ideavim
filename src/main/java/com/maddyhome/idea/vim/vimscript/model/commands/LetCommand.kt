@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.toOptionScope
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
-import com.maddyhome.idea.vim.vimscript.services.VariableService
 
 /**
  * see "h :let"
@@ -49,12 +48,12 @@ data class LetCommand(
         if (isReadOnlyVariable(variable, editor, context)) {
           throw ExException("E46: Cannot change read-only variable \"${variable.toString(editor, context, parent)}\"")
         }
-        val leftValue = VariableService.getNullableVariableValue(variable, editor, context, parent)
+        val leftValue = VimPlugin.getVariableService().getNullableVariableValue(variable, editor, context, parent)
         if (leftValue?.isLocked == true && leftValue.lockOwner?.name == variable.name) {
           throw ExException("E741: Value is locked: ${variable.toString(editor, context, parent)}")
         }
         val rightValue = expression.evaluate(editor, context, parent)
-        VariableService.storeVariable(variable, operator.getNewValue(leftValue, rightValue), editor, context, this)
+        VimPlugin.getVariableService().storeVariable(variable, operator.getNewValue(leftValue, rightValue), editor, context, this)
       }
 
       is OneElementSublistExpression -> {
@@ -106,7 +105,7 @@ data class LetCommand(
 
       is SublistExpression -> {
         if (variable.expression is Variable) {
-          val variableValue = VariableService.getNonNullVariableValue(variable.expression, editor, context, this)
+          val variableValue = VimPlugin.getVariableService().getNonNullVariableValue(variable.expression, editor, context, this)
           if (variableValue is VimList) {
             // we use Integer.parseInt(........asString()) because in case if index's type is Float, List, Dictionary etc
             // vim throws the same error as the asString() method

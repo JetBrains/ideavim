@@ -19,8 +19,9 @@
 package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.util.text.StringUtil;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString;
-import com.maddyhome.idea.vim.vimscript.services.VariableService;
+import com.maddyhome.idea.vim.vimscript.services.VariableServiceImpl;
 import org.apache.commons.codec.binary.Base64;
 import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
@@ -167,7 +168,7 @@ public class StringHelper {
 
   private static @Nullable List<KeyStroke> parseMapLeader(@NotNull String s) {
     if ("leader".equalsIgnoreCase(s)) {
-      final Object mapLeader = VariableService.INSTANCE.getGlobalVariable("mapleader");
+      final Object mapLeader = VimPlugin.getVariableService().getGlobalVariableValue("mapleader");
       if (mapLeader instanceof VimString) {
         return stringToKeys(((VimString)mapLeader).getValue());
       }

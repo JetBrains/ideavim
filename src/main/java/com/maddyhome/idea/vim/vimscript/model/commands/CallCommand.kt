@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
@@ -31,7 +32,6 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
-import com.maddyhome.idea.vim.vimscript.services.VariableService
 
 /**
  * see "h :call"
@@ -60,7 +60,7 @@ class CallCommand(val ranges: Ranges, val functionCall: Expression) : Command.Si
       }
 
       val name = (functionCall.scope?.toString() ?: "") + functionCall.functionName.evaluate(editor, context, parent)
-      val funcref = VariableService.getNullableVariableValue(Variable(functionCall.scope, functionCall.functionName), editor, context, parent)
+      val funcref = VimPlugin.getVariableService().getNullableVariableValue(Variable(functionCall.scope, functionCall.functionName), editor, context, parent)
       if (funcref is VimFuncref) {
         funcref.handler.ranges = ranges
         funcref.execute(name, functionCall.arguments, editor, context, parent)

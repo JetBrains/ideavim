@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.helper.TestInputModel;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import com.maddyhome.idea.vim.vimscript.services.VariableService;
+import com.maddyhome.idea.vim.vimscript.services.VariableServiceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,7 +62,7 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
   @Override
   protected void tearDown() throws Exception {
     ExEntryPanel.getInstance().deactivate(false);
-    VariableService.INSTANCE.clear();
+    ((VariableServiceImpl) VimPlugin.getVariableService()).clear();
     Timer swingTimer = VimVisualTimer.INSTANCE.getSwingTimer();
     if (swingTimer != null) {
       swingTimer.stop();

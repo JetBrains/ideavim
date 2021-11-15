@@ -39,7 +39,6 @@ import com.maddyhome.idea.vim.listener.VimInsertListener
 import com.maddyhome.idea.vim.listener.VimYankListener
 import com.maddyhome.idea.vim.option.StrictMode
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
-import com.maddyhome.idea.vim.vimscript.services.VariableService
 import org.jetbrains.annotations.NonNls
 import java.awt.Color
 import java.awt.Font
@@ -201,7 +200,7 @@ class VimHighlightedYank : VimExtension, VimYankListener, VimInsertListener {
     }
 
     private fun <T> extractVariable(variable: String, default: T, extractFun: (value: String) -> T): T {
-      val value = VariableService.getGlobalVariable(variable)
+      val value = VimPlugin.getVariableService().getGlobalVariableValue(variable)
 
       if (value is VimString) {
         return try {

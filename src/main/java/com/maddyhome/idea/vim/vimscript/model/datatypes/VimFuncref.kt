@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.vimscript.model.datatypes
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.Executable
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
@@ -30,7 +31,6 @@ import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.functions.FunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
 import com.maddyhome.idea.vim.vimscript.services.FunctionStorage
-import com.maddyhome.idea.vim.vimscript.services.VariableService
 
 data class VimFuncref(
   val handler: FunctionHandler,
@@ -80,7 +80,7 @@ data class VimFuncref(
       if (dictionary == null) {
         throw ExException("E725: Calling dict function without Dictionary: $name")
       } else {
-        VariableService.storeVariable(
+        VimPlugin.getVariableService().storeVariable(
           Variable(Scope.LOCAL_VARIABLE, "self"),
           dictionary!!,
           editor,

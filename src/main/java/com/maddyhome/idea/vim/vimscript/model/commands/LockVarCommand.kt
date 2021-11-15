@@ -2,12 +2,12 @@ package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ranges.Ranges
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
 import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
-import com.maddyhome.idea.vim.vimscript.services.VariableService
 
 /**
  * see :h lockvar
@@ -18,7 +18,7 @@ class LockVarCommand(val ranges: Ranges, val argument: String) : Command.SingleE
   // todo doesn't throw proper vim exceptions in case of wrong arguments
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     val variableAndDepth = parseVariableAndDepth(argument)
-    VariableService.lockVariable(variableAndDepth.first, variableAndDepth.second, editor, context, parent)
+    VimPlugin.getVariableService().lockVariable(variableAndDepth.first, variableAndDepth.second, editor, context, parent)
     return ExecutionResult.Success
   }
 }
@@ -32,7 +32,7 @@ class UnlockVarCommand(val ranges: Ranges, val argument: String) : Command.Singl
   // todo doesn't throw proper vim exceptions in case of wrong arguments
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     val variableAndDepth = parseVariableAndDepth(argument)
-    VariableService.unlockVariable(variableAndDepth.first, variableAndDepth.second, editor, context, parent)
+    VimPlugin.getVariableService().unlockVariable(variableAndDepth.first, variableAndDepth.second, editor, context, parent)
     return ExecutionResult.Success
   }
 }

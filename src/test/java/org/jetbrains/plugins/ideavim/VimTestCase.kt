@@ -73,6 +73,7 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorType
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
+import com.maddyhome.idea.vim.vimscript.services.VariableServiceImpl
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.VariableService
 import org.assertj.core.api.Assertions
@@ -131,7 +132,7 @@ abstract class VimTestCase : UsefulTestCase() {
     bookmarkManager.validBookmarks.forEach(Consumer { bookmark: Bookmark? -> bookmarkManager.removeBookmark(bookmark!!) })
     SelectionVimListenerSuppressor.lock().use { myFixture.tearDown() }
     ExEntryPanel.getInstance().deactivate(false)
-    VariableService.clear()
+    (VimPlugin.getVariableService() as VariableServiceImpl).clear()
     VimFuncref.lambdaCounter = 0
     VimFuncref.anonymousCounter = 0
     IdeavimErrorListener.testLogger.clear()
