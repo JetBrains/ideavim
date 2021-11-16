@@ -76,12 +76,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
           resetShowSearchHighlight();
           forceUpdateSearchHighlights();
         }
-
-        @Override
-        public void processLocalValueChange(@Nullable VimDataType oldValue, @NotNull Editor editor) {
-          // todo
-          processGlobalValueChange(oldValue);
-        }
       },
       false
     );
@@ -93,12 +87,6 @@ public class SearchGroup implements PersistentStateComponent<Element> {
             if (showSearchHighlight) {
               forceUpdateSearchHighlights();
             }
-        }
-
-        @Override
-        public void processLocalValueChange(@Nullable VimDataType oldValue, @NotNull Editor editor) {
-          // todo
-          processGlobalValueChange(oldValue);
         }
       };
     VimPlugin.getOptionService().addListener("ignorecase", updateHighlightsIfVisible, false);

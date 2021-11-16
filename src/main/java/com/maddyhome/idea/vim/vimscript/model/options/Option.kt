@@ -29,7 +29,13 @@ sealed class Option<T : VimDataType>(val name: String, val abbrev: String, priva
     for (listener in listeners) {
       when (scope) {
         OptionService.Scope.GLOBAL -> listener.processGlobalValueChange(oldValue)
-        OptionService.Scope.LOCAL -> listener.processLocalValueChange(oldValue, editor!!)
+        OptionService.Scope.LOCAL -> {
+          if (listener is LocalOptionChangeListener) {
+            listener.processLocalValueChange(oldValue, editor!!)
+          } else {
+            listener.processGlobalValueChange(oldValue)
+          }
+        }
       }
     }
   }

@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
+import com.maddyhome.idea.vim.vimscript.model.options.LocalOptionChangeListener;
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jdom.Element;
@@ -258,7 +259,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     readData(state);
   }
 
-  public static class NumberChangeListener extends OptionChangeListener<VimDataType> {
+  public static class NumberChangeListener extends LocalOptionChangeListener<VimDataType> {
     public static NumberChangeListener INSTANCE = new NumberChangeListener();
 
     @Contract(pure = true)
@@ -276,8 +277,9 @@ public class EditorGroup implements PersistentStateComponent<Element> {
 
     @Override
     public void processLocalValueChange(@Nullable VimDataType oldValue, @NotNull Editor editor) {
-      // todo
-      processGlobalValueChange(oldValue);
+      if (UserDataManager.getVimEditorGroup(editor) && supportsVimLineNumbers(editor)) {
+        updateLineNumbers(editor);
+      }
     }
   }
 

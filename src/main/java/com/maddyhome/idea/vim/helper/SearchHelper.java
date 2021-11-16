@@ -2622,12 +2622,6 @@ public class SearchHelper {
           public void processGlobalValueChange(@Nullable VimDataType oldValue) {
             pairsChars = parseMatchPairsOption();
           }
-
-          @Override
-          public void processLocalValueChange(@Nullable VimDataType oldValue, @NotNull Editor editor) {
-            // todo
-            processGlobalValueChange(oldValue);
-          }
         },
         true
       );

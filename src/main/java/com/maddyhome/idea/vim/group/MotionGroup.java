@@ -49,6 +49,7 @@ import com.maddyhome.idea.vim.listener.IdeaSpecifics;
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType;
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt;
+import com.maddyhome.idea.vim.vimscript.model.options.LocalOptionChangeListener;
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener;
 import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import kotlin.Pair;
@@ -1489,7 +1490,7 @@ public class MotionGroup {
     }
   }
 
-  public static class ScrollOptionsChangeListener extends OptionChangeListener<VimDataType> {
+  public static class ScrollOptionsChangeListener extends LocalOptionChangeListener<VimDataType> {
     public static ScrollOptionsChangeListener INSTANCE = new ScrollOptionsChangeListener();
 
     @Contract(pure = true)
@@ -1507,8 +1508,9 @@ public class MotionGroup {
 
     @Override
     public void processLocalValueChange(@Nullable VimDataType oldValue, @NotNull Editor editor) {
-      // todo
-      processGlobalValueChange(oldValue);
+      if (UserDataManager.getVimEditorGroup(editor)) {
+        MotionGroup.scrollCaretIntoView(editor);
+      }
     }
   }
 }

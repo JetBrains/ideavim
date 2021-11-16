@@ -116,11 +116,6 @@ object GuicursorChangeListener : OptionChangeListener<VimDataType>() {
     GuiCursorOptionHelper.clearEffectiveValues()
     localEditors().forEach { it.updatePrimaryCaretVisualAttributes() }
   }
-
-  override fun processLocalValueChange(oldValue: VimDataType?, editor: Editor) {
-    // todo
-    processGlobalValueChange(oldValue)
-  }
 }
 
 // [VERSION UPDATE] 2021.2+

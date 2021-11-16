@@ -84,11 +84,6 @@ class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
         override fun processGlobalValueChange(oldValue: VimDataType?) {
           updateAll()
         }
-
-        override fun processLocalValueChange(oldValue: VimDataType?, editor: Editor) {
-          // todo
-          processGlobalValueChange(oldValue)
-        }
       }
     )
     return VimStatusBar()

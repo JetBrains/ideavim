@@ -117,13 +117,6 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     VimPlugin.getOptionService().addListener(
       "clipboard",
       new OptionChangeListener<VimDataType>() {
-
-        @Override
-        public void processLocalValueChange(@Nullable VimDataType oldValue, @NotNull Editor editor) {
-          // todo
-          processGlobalValueChange(oldValue);
-        }
-
         @Override
         public void processGlobalValueChange(@Nullable VimDataType oldValue) {
           String clipboardOptionValue = ((VimString) VimPlugin.getOptionService()

@@ -196,9 +196,4 @@ object KeywordOptionChangeListener : OptionChangeListener<VimDataType>() {
   override fun processGlobalValueChange(oldValue: VimDataType?) {
     KeywordOptionHelper.updateSpecs()
   }
-
-  override fun processLocalValueChange(oldValue: VimDataType?, editor: Editor) {
-    // todo
-    processGlobalValueChange(oldValue)
-  }
 }

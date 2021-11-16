@@ -84,11 +84,6 @@ object ShowCmdOptionChangeListener : OptionChangeListener<VimDataType>() {
       statusBarWidgetsManager.updateWidget(extension)
     }
   }
-
-  override fun processLocalValueChange(oldValue: VimDataType?, editor: Editor) {
-    // todo
-    processGlobalValueChange(oldValue)
-  }
 }
 
 class ShowCmdStatusBarWidgetFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {

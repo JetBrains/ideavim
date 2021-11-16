@@ -189,17 +189,19 @@ internal class OptionServiceImpl : OptionService {
     }
     option.onChanged(scope, oldValue, editor)
 
-    val oldOption = OptionsManager.getOption(optionName)
-    when (oldOption) {
-      is com.maddyhome.idea.vim.option.ToggleOption -> {
-        if (value == VimInt(0)) {
-          oldOption.reset()
-        } else {
-          oldOption.set()
+    if (scope != OptionService.Scope.LOCAL) {
+      val oldOption = OptionsManager.getOption(optionName)
+      when (oldOption) {
+        is com.maddyhome.idea.vim.option.ToggleOption -> {
+          if (value == VimInt(0)) {
+            oldOption.reset()
+          } else {
+            oldOption.set()
+          }
         }
-      }
-      is com.maddyhome.idea.vim.option.TextOption -> {
-        oldOption.set(value.asString())
+        is com.maddyhome.idea.vim.option.TextOption -> {
+          oldOption.set(value.asString())
+        }
       }
     }
   }

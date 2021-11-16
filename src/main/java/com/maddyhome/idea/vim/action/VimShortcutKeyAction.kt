@@ -240,11 +240,6 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
           override fun processGlobalValueChange(oldValue: VimDataType?) {
             parsedLookupKeys = parseLookupKeys()
           }
-
-          override fun processLocalValueChange(oldValue: VimDataType?, editor: Editor) {
-            // todo
-            processGlobalValueChange(oldValue)
-          }
         }
       )
     }

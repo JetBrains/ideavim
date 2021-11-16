@@ -77,11 +77,6 @@ object VimExtensionRegistrar {
             extensionBean.instance.dispose()
           }
         }
-
-        override fun processLocalValueChange(oldValue: VimDataType?, editor: Editor) {
-          // todo
-          processGlobalValueChange(oldValue)
-        }
       }
     )
   }
