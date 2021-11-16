@@ -69,7 +69,7 @@ object VimExtensionRegistrar {
     VimPlugin.getOptionService().addOption(ToggleOption(name, getAbbrev(name), false))
     VimPlugin.getOptionService().addListener(
       name,
-      object : OptionChangeListener<VimDataType>() {
+      object : OptionChangeListener<VimDataType> {
         override fun processGlobalValueChange(oldValue: VimDataType?) {
           if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, name, null)) {
             initExtension(extensionBean, name)

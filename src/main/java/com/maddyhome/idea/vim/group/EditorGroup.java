@@ -259,7 +259,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     readData(state);
   }
 
-  public static class NumberChangeListener extends LocalOptionChangeListener<VimDataType> {
+  public static class NumberChangeListener implements LocalOptionChangeListener<VimDataType> {
     public static NumberChangeListener INSTANCE = new NumberChangeListener();
 
     @Contract(pure = true)

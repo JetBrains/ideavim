@@ -73,7 +73,7 @@ object ShowCmd {
   }
 }
 
-object ShowCmdOptionChangeListener : OptionChangeListener<VimDataType>() {
+object ShowCmdOptionChangeListener : OptionChangeListener<VimDataType> {
   override fun processGlobalValueChange(oldValue: VimDataType?) {
     ShowCmd.update()
 

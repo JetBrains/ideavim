@@ -80,7 +80,7 @@ class StatusBarIconFactory : StatusBarWidgetFactory/*, LightEditCompatible*/ {
   override fun createWidget(project: Project): StatusBarWidget {
     VimPlugin.getOptionService().addListener(
       "ideastatusicon",
-      object : OptionChangeListener<VimDataType>() {
+      object : OptionChangeListener<VimDataType> {
         override fun processGlobalValueChange(oldValue: VimDataType?) {
           updateAll()
         }

@@ -1490,7 +1490,7 @@ public class MotionGroup {
     }
   }
 
-  public static class ScrollOptionsChangeListener extends LocalOptionChangeListener<VimDataType> {
+  public static class ScrollOptionsChangeListener implements LocalOptionChangeListener<VimDataType> {
     public static ScrollOptionsChangeListener INSTANCE = new ScrollOptionsChangeListener();
 
     @Contract(pure = true)

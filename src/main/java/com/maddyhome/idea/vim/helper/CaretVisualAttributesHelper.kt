@@ -110,7 +110,7 @@ private fun Editor.updateSecondaryCaretsVisualAttributes() {
   }
 }
 
-object GuicursorChangeListener : OptionChangeListener<VimDataType>() {
+object GuicursorChangeListener : OptionChangeListener<VimDataType> {
   override fun processGlobalValueChange(oldValue: VimDataType?) {
     provider.clearCache()
     GuiCursorOptionHelper.clearEffectiveValues()

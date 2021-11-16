@@ -236,7 +236,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
     init {
       VimPlugin.getOptionService().addListener(
         "lookupkeys",
-        object : OptionChangeListener<VimDataType>() {
+        object : OptionChangeListener<VimDataType> {
           override fun processGlobalValueChange(oldValue: VimDataType?) {
             parsedLookupKeys = parseLookupKeys()
           }
