@@ -12,4 +12,3 @@ interface LocalOptionChangeListener<T> : OptionChangeListener<T> {
 
   fun processLocalValueChange(oldValue: T?, editor: Editor)
 }
-

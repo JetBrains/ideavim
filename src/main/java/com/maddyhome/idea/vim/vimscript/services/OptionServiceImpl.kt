@@ -1,14 +1,11 @@
 package com.maddyhome.idea.vim.vimscript.services
 
 import com.intellij.openapi.application.ApplicationNamesInfo
-import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.ExOutputModel
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -22,8 +19,6 @@ import com.maddyhome.idea.vim.vimscript.model.options.StringOption
 import com.maddyhome.idea.vim.vimscript.model.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.KeywordOptionHelper
-import kotlin.math.ceil
-import kotlin.math.min
 
 internal class OptionServiceImpl : OptionService {
 
@@ -352,7 +347,6 @@ internal class OptionServiceImpl : OptionService {
   override fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>) {
     options.get(optionName)!!.removeOptionChangeListener(listener)
   }
-
 
   private fun castToVimDataType(value: String, optionName: String, token: String): VimDataType {
     val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")

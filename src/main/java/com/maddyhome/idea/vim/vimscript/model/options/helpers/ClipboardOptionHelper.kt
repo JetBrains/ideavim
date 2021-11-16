@@ -4,7 +4,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.services.OptionService
-import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 
 object ClipboardOptionHelper {
   var ideaputDisabled = false

@@ -18,7 +18,6 @@
 package com.maddyhome.idea.vim.extension
 
 import com.intellij.openapi.diagnostic.logger
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.extensions.ExtensionPointListener
 import com.intellij.openapi.extensions.PluginDescriptor
 import com.maddyhome.idea.vim.VimPlugin

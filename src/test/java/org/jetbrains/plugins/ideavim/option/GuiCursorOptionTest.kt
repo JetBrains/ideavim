@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorMode
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorType
 import com.maddyhome.idea.vim.vimscript.services.OptionService
-import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class GuiCursorOptionTest : VimTestCase() {

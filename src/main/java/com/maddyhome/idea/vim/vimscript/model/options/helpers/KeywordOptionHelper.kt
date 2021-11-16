@@ -1,6 +1,5 @@
 package com.maddyhome.idea.vim.vimscript.model.options.helpers
 
-import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString

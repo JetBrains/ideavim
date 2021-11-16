@@ -74,9 +74,8 @@ import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorOptionHelper
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorType
 import com.maddyhome.idea.vim.vimscript.parser.errors.IdeavimErrorListener
-import com.maddyhome.idea.vim.vimscript.services.VariableServiceImpl
 import com.maddyhome.idea.vim.vimscript.services.OptionService
-import com.maddyhome.idea.vim.vimscript.services.VariableService
+import com.maddyhome.idea.vim.vimscript.services.VariableServiceImpl
 import org.assertj.core.api.Assertions
 import org.junit.Assert
 import java.util.function.Consumer
