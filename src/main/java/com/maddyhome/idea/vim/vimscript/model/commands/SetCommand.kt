@@ -19,17 +19,27 @@
 package com.maddyhome.idea.vim.vimscript.model.commands
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.diagnostic.debug
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.ranges.Ranges
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.vimscript.model.ExecutionResult
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.options.NumberOption
+import com.maddyhome.idea.vim.vimscript.model.options.Option
+import com.maddyhome.idea.vim.vimscript.model.options.StringOption
+import com.maddyhome.idea.vim.vimscript.model.options.ToggleOption
 import com.maddyhome.idea.vim.vimscript.services.OptionService
 import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 import java.util.*
+import kotlin.math.ceil
+import kotlin.math.min
 
 /**
  * see "h :set"
@@ -93,11 +103,12 @@ fun parseOptionLine(editor: Editor, args: String, scope: OptionService.Scope, fa
   val optionService = (VimPlugin.getOptionService() as OptionServiceImpl)
   when {
     args.isEmpty() -> {
-      optionService.showChangedOptions(editor, scope, true)
+      val changedOptions = optionService.getOptions().filter { !optionService.isDefault(scope, it, editor) }
+      showOptions(editor, changedOptions.map { Pair(it, it) }, scope, true)
       return true
     }
     args == "all" -> {
-      optionService.showAllOptions(editor, scope, true)
+      showOptions(editor, optionService.getOptions().map { Pair(it, it) }, scope, true)
       return true
     }
     args == "all&" -> {
@@ -172,7 +183,7 @@ fun parseOptionLine(editor: Editor, args: String, scope: OptionService.Scope, fa
 
   // Now show all options that were individually requested
   if (toShow.size > 0) {
-    optionService.showOptions(editor, toShow, scope, false)
+    showOptions(editor, toShow, scope, false)
   }
 
   if (error != null) {
@@ -180,4 +191,85 @@ fun parseOptionLine(editor: Editor, args: String, scope: OptionService.Scope, fa
   }
 
   return true
+}
+
+private fun showOptions(editor: Editor, nameAndToken: Collection<Pair<String, String>>, scope: OptionService.Scope, showIntro: Boolean) {
+  val optionService = VimPlugin.getOptionService()
+  val optionsToShow = mutableListOf<String>()
+  var unknownOption: Pair<String, String>? = null
+  val optionsAndAbbrevs = optionService.getOptions() + optionService.getAbbrevs()
+  for (pair in nameAndToken) {
+    if (optionsAndAbbrevs.contains(pair.first)) {
+      optionsToShow.add(pair.first)
+    } else {
+      unknownOption = pair
+      break
+    }
+  }
+
+  val cols = mutableListOf<String>()
+  val extra = mutableListOf<String>()
+  for (option in optionsToShow) {
+    val optionAsString = optionToString(scope, option, editor)
+    if (optionAsString.length > 19) extra.add(optionAsString) else cols.add(optionAsString)
+  }
+
+  cols.sort()
+  extra.sort()
+
+  var width = EditorHelper.getApproximateScreenWidth(editor)
+  if (width < 20) {
+    width = 80
+  }
+  val colCount = width / 20
+  val height = ceil(cols.size.toDouble() / colCount.toDouble()).toInt()
+  var empty = cols.size % colCount
+  empty = if (empty == 0) colCount else empty
+
+  val res = StringBuilder()
+  if (showIntro) {
+    res.append("--- Options ---\n")
+  }
+  for (h in 0 until height) {
+    for (c in 0 until colCount) {
+      if (h == height - 1 && c >= empty) {
+        break
+      }
+
+      var pos = c * height + h
+      if (c > empty) {
+        pos -= c - empty
+      }
+
+      val opt = cols[pos]
+      res.append(opt.padEnd(20))
+    }
+    res.append("\n")
+  }
+
+  for (opt in extra) {
+    val seg = (opt.length - 1) / width
+    for (j in 0..seg) {
+      res.append(opt, j * width, min(j * width + width, opt.length))
+      res.append("\n")
+    }
+  }
+  ExOutputModel.getInstance(editor).output(res.toString())
+
+  if (unknownOption != null) {
+    throw ExException("E518: Unknown option: ${unknownOption.second}")
+  }
+}
+
+private fun optionToString(scope: OptionService.Scope, name: String, editor: Editor): String {
+  val value = if (scope == OptionService.Scope.LOCAL) {
+    VimPlugin.getOptionService().getLocalOptionValue(name, editor)
+  } else {
+    VimPlugin.getOptionService().getGlobalOptionValue(name)
+  }
+  return if (VimPlugin.getOptionService().isToggleOption(name)) {
+    if (value.asBoolean()) "  $name" else "no$name"
+  } else {
+    "$name=$value"
+  }
 }

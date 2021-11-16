@@ -61,11 +61,9 @@ interface OptionService {
 
   fun toggleOption(scope: Scope, optionName: String, editor: Editor?, token: String = optionName)
 
-  fun showAllOptions(editor: Editor, scope: Scope, showIntro: Boolean)
+  fun getOptions(): Set<String>
 
-  fun showChangedOptions(editor: Editor, scope: Scope, showIntro: Boolean)
-
-  fun showOptions(editor: Editor, nameAndToken: Collection<Pair<String, String>>, scope: Scope, showIntro: Boolean)
+  fun getAbbrevs(): Set<String>
 
   fun addOption(option: Option<out VimDataType>)
 

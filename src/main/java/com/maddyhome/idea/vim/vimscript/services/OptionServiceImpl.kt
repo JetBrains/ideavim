@@ -322,81 +322,12 @@ internal class OptionServiceImpl : OptionService {
     return options.get(optionName) is ToggleOption
   }
 
-  override fun showAllOptions(editor: Editor, scope: OptionService.Scope, showIntro: Boolean) {
-    showOptions(editor, options.primaryKeys.map { Pair(it, it) }, scope, showIntro)
+  override fun getOptions(): Set<String> {
+    return options.primaryKeys
   }
 
-  override fun showChangedOptions(editor: Editor, scope: OptionService.Scope, showIntro: Boolean) {
-    val changedOptions = options.primaryKeys.filter { options.get(it)!!.getDefaultValue() != getOptionValue(scope, it, editor) }
-    showOptions(editor, changedOptions.map { Pair(it, it) }, scope, showIntro)
-  }
-
-  override fun showOptions(editor: Editor, nameAndToken: Collection<Pair<String, String>>, scope: OptionService.Scope, showIntro: Boolean) {
-    val optionsToShow = mutableListOf<Option<out VimDataType>>()
-    var unknownOption: Pair<String, String>? = null
-    for (pair in nameAndToken) {
-      if (options.contains(pair.first)) {
-        optionsToShow.add(options.get(pair.second)!!)
-      } else {
-        unknownOption = pair
-        break
-      }
-    }
-
-    val cols = mutableListOf<String>()
-    val extra = mutableListOf<String>()
-    for (option in optionsToShow) {
-      val optionAsString = option.toString(scope, editor)
-      if (optionAsString.length > 19) extra.add(optionAsString) else cols.add(optionAsString)
-    }
-
-    cols.sort()
-    extra.sort()
-
-    var width = EditorHelper.getApproximateScreenWidth(editor)
-    if (width < 20) {
-      width = 80
-    }
-    val colCount = width / 20
-    val height = ceil(cols.size.toDouble() / colCount.toDouble()).toInt()
-    var empty = cols.size % colCount
-    empty = if (empty == 0) colCount else empty
-
-    logger.debug { "showOptions, width=$width, colCount=$colCount, height=$height" }
-
-    val res = StringBuilder()
-    if (showIntro) {
-      res.append("--- Options ---\n")
-    }
-    for (h in 0 until height) {
-      for (c in 0 until colCount) {
-        if (h == height - 1 && c >= empty) {
-          break
-        }
-
-        var pos = c * height + h
-        if (c > empty) {
-          pos -= c - empty
-        }
-
-        val opt = cols[pos]
-        res.append(opt.padEnd(20))
-      }
-      res.append("\n")
-    }
-
-    for (opt in extra) {
-      val seg = (opt.length - 1) / width
-      for (j in 0..seg) {
-        res.append(opt, j * width, min(j * width + width, opt.length))
-        res.append("\n")
-      }
-    }
-    ExOutputModel.getInstance(editor).output(res.toString())
-
-    if (unknownOption != null) {
-      throw ExException("E518: Unknown option: ${unknownOption.second}")
-    }
+  override fun getAbbrevs(): Set<String> {
+    return options.secondaryKeys
   }
 
   override fun addOption(option: Option<out VimDataType>) {
@@ -418,13 +349,6 @@ internal class OptionServiceImpl : OptionService {
     options.get(optionName)!!.removeOptionChangeListener(listener)
   }
 
-  private fun Option<out VimDataType>.toString(scope: OptionService.Scope, editor: Editor): String {
-    val value = if (scope == OptionService.Scope.LOCAL) getLocalOptionValue(name, editor)!! else getGlobalOptionValue(name)!!
-    return when (this) {
-      is ToggleOption -> if (value.asBoolean()) "  $name" else "no$name"
-      is NumberOption, is StringOption -> "$name=$value"
-    }
-  }
 
   private fun castToVimDataType(value: String, optionName: String, token: String): VimDataType {
     val option = options.get(optionName) ?: throw ExException("E518: Unknown option: $token")
