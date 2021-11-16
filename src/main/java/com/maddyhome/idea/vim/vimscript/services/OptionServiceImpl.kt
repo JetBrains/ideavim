@@ -9,6 +9,7 @@ import com.intellij.openapi.util.SystemInfo
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.localEditors
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -318,6 +319,9 @@ internal class OptionServiceImpl : OptionService {
 
   override fun resetAllOptions() {
     globalValues.clear()
+    for (editor in localEditors()) {
+      editor.getUserData(localValuesKey)?.clear()
+    }
   }
 
   override fun isToggleOption(optionName: String): Boolean {
