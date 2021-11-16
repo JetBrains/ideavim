@@ -21,20 +21,67 @@ package com.maddyhome.idea.vim.statistic
 import com.intellij.internal.statistic.beans.MetricEvent
 import com.intellij.internal.statistic.eventLog.EventLogGroup
 import com.intellij.internal.statistic.eventLog.events.BooleanEventField
-import com.intellij.internal.statistic.eventLog.events.EventId1
+import com.intellij.internal.statistic.eventLog.events.EnumEventField
+import com.intellij.internal.statistic.eventLog.events.VarargEventId
 import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesCollector
-import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 class VimStatistic : ApplicationUsagesCollector() {
 
   override fun getGroup(): EventLogGroup = GROUP
 
   override fun getMetrics(): Set<MetricEvent> {
-    return setOf(OPTIONS.metric(OptionsManager.ideajoin.isSet))
+    val optionService = VimPlugin.getOptionService()
+
+    return setOf(
+      OPTIONS.metric(
+        IDEAJOIN.with(optionService.isSet(OptionService.Scope.GLOBAL, "ideajoin", null)),
+        IDEAMARKS.with(optionService.isSet(OptionService.Scope.GLOBAL, "ideamarks", null)),
+        IDEAREFACTOR.with(optionService.getGlobalOptionValue("idearefactormode").asString().toRefactor())
+      )
+    )
   }
 
   companion object {
     private val GROUP = EventLogGroup("vim.options", 1)
-    private val OPTIONS: EventId1<Boolean> = GROUP.registerEvent("ideajoin", BooleanEventField("ideajoin"))
+
+    private val IDEAJOIN = BooleanEventField("ideajoin")
+    private val IDEAMARKS = BooleanEventField("ideamarks")
+    private val IDEAREFACTOR = EnumEventField("ideamarks", IdeaRefactorMode::class.java, IdeaRefactorMode::toString)
+//    val IDEAPUT = BooleanEventField("ideaput")
+
+    private val OPTIONS: VarargEventId = GROUP.registerVarargEvent(
+      "vim.options",
+      IDEAJOIN,
+      IDEAMARKS,
+      IDEAREFACTOR,
+//      IDEAPUT,
+    )
   }
 }
+
+private enum class IdeaRefactorMode {
+  KEEP,
+  SELECT,
+  VISUAL,
+  UNKNOWN;
+
+  override fun toString(): String = when (this) {
+    KEEP -> "keep"
+    SELECT -> "select"
+    VISUAL -> "visual"
+    UNKNOWN -> "unknown"
+  }
+
+  companion object {
+    fun fromString(string: String) = when (string) {
+      "keep" -> KEEP
+      "select" -> SELECT
+      "visual" -> VISUAL
+      else -> UNKNOWN
+    }
+  }
+}
+
+private fun String.toRefactor() = IdeaRefactorMode.fromString(this)
