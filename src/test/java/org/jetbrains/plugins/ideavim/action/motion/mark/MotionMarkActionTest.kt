@@ -117,7 +117,7 @@ class MotionMarkActionTest : VimOptionTestCase(IdeaMarksOptionsData.name) {
 
   @VimOptionTestConfiguration(VimTestOption(IdeaMarksOptionsData.name, OptionValueType.NUMBER, "1"))
   @Ignore("Probably one day it would be possible to test it")
-  fun `test apply new state`() {
+  fun `ignoretest apply new state`() {
     val text = """
             A Discovery
 
