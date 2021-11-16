@@ -30,147 +30,145 @@ internal class OptionServiceImpl : OptionService {
   // todo use me please :(
   private val logger = logger<OptionServiceImpl>()
   private val options = MultikeyMap(
-    listOf(
-      NumberOption("maxmapdepth", "mmd", 20),
-      NumberOption("scroll", "scr", 0),
-      NumberOption("scrolloff", "so", 0),
-      NumberOption("sidescroll", "ss", 0),
-      NumberOption("sidescrolloff", "siso", 0),
-      ToggleOption("digraph", "dg", false),
-      ToggleOption("gdefault", "gd", false),
-      ToggleOption("hlsearch", "hls", false),
-      ToggleOption("ideacopypreprocess", "ideacopypreprocess", false),
-      ToggleOption("ideajoin", "ideajoin", false),
-      ToggleOption("ideamarks", "ideamarks", true),
-      ToggleOption("ideastrictmode", "ideastrictmode", false),
-      ToggleOption("ideatracetime", "ideatracetime", false),
-      ToggleOption("ignorecase", "ic", false),
-      ToggleOption("incsearch", "is", false),
-      ToggleOption("more", "more", true),
-      ToggleOption("number", "nu", false),
-      ToggleOption("relativenumber", "rnu", false),
-      ToggleOption("showcmd", "sc", true),
-      ToggleOption("showmode", "smd", false),
-      ToggleOption("smartcase", "scs", false),
-      ToggleOption("startofline", "sol", true),
-      ToggleOption("timeout", "to", true),
-      ToggleOption("visualbell", "vb", false),
-      ToggleOption("wrapscan", "ws", true),
-      StringOption("ide", "ide", ApplicationNamesInfo.getInstance().fullProductNameWithEdition),
-      StringOption("idearefactormode", "idearefactormode", "select", isList = false, setOf("keep", "select", "visual")),
-      StringOption("ideastatusicon", "ideastatusicon", "enabled", isList = false, setOf("enabled", "gray", "disabled")),
-      StringOption("ideawrite", "ideawrite", "all", isList = false, setOf("all", "file")),
-      StringOption("selection", "sel", "inclusive", isList = false, setOf("old", "inclusive", "exclusive")),
-      StringOption("shell", "sh", if (SystemInfo.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"),
-      StringOption("shellxescape", "sxe", if (SystemInfo.isWindows) "\"&|<>()@^" else "", isList = false),
-      StringOption("virtualedit", "ve", "", isList = false, setOf("onemore", "block", "insert", "all")),
-      StringOption("viminfo", "vi", "'100,<50,s10,h", isList = true),
-      StringOption("nrformats", "nf", "hex", isList = true, setOf("octal", "hex", "alpha")),
-      StringOption("clipboard", "cb", "ideaput,autoselect,exclude:cons\\|linux", isList = true),
-      StringOption("selectmode", "slm", "", isList = true, setOf("mouse", "key", "cmd", "ideaselection")),
-      StringOption("ideavimsupport", "ideavimsupport", "dialog", isList = true, setOf("dialog", "singleline", "dialoglegacy")),
-      StringOption("keymodel", "km", "continueselect,stopselect", isList = true, setOf("startsel", "stopsel", "stopselect", "stopvisual", "continueselect", "continuevisual")),
-      StringOption("lookupkeys", "lookupkeys", "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>", isList = true),
-      object : StringOption("matchpairs", "mps", "(:),{:},[:]", isList = true) {
-        override fun checkIfValueValid(value: VimDataType, token: String) {
-          super.checkIfValueValid(value, token)
-          for (v in split((value as VimString).value)!!) {
-            if (!v.matches(Regex(".:."))) {
-              throw ExException("E474: Invalid argument: $token")
-            }
-          }
-        }
-      },
-      object : NumberOption("scrolljump", "sj", 1) {
-        override fun checkIfValueValid(value: VimDataType, token: String) {
-          super.checkIfValueValid(value, token)
-          if ((value as VimInt).value < -100) {
-            throw ExException("E49: Invalid scroll size: $token")
-          }
-        }
-      },
-      object : NumberOption("history", "hi", 50) {
-        override fun checkIfValueValid(value: VimDataType, token: String) {
-          super.checkIfValueValid(value, token)
-          if ((value as VimInt).value < 0) {
-            throw ExException("E487: Argument must be positive: $token")
-          }
-        }
-      },
-      object : NumberOption("timeoutlen", "tm", 1000) {
-        override fun checkIfValueValid(value: VimDataType, token: String) {
-          super.checkIfValueValid(value, token)
-          if ((value as VimInt).value < 0) {
-            throw ExException("E487: Argument must be positive: $token")
-          }
-        }
-      },
-      object : NumberOption("undolevels", "ul", 1000) {
-        override fun checkIfValueValid(value: VimDataType, token: String) {
-          super.checkIfValueValid(value, token)
-          if ((value as VimInt).value < 0) {
-            throw ExException("E487: Argument must be positive: $token")
-          }
-        }
-      },
-      object : NumberOption("visualdelay", "visualdelay", 100) {
-        override fun checkIfValueValid(value: VimDataType, token: String) {
-          super.checkIfValueValid(value, token)
-          if ((value as VimInt).value < 0) {
-            throw ExException("E487: Argument must be positive: $token")
-          }
-        }
-      },
-      object : StringOption("shellcmdflag", "shcf", "") {
-        // default value changes if so does the "shell" option
-        override fun getDefaultValue(): VimString {
-          val shell = (getGlobalOptionValue("shell") as VimString).value
-          return VimString(
-            if (SystemInfo.isWindows && !shell.contains("sh"))
-              "/c"
-            else
-              "-c"
-          )
-        }
-      },
-      object : StringOption("shellxquote", "sxq", "") {
-        // default value changes if so does the "shell" option
-        override fun getDefaultValue(): VimString {
-          val shell = (getGlobalOptionValue("shell") as VimString).value
-          return VimString(
-            when {
-              SystemInfo.isWindows && shell == "cmd.exe" -> "("
-              SystemInfo.isWindows && shell.contains("sh") -> "\""
-              else -> ""
-            }
-          )
-        }
-      },
-      object : StringOption("iskeyword", "isk", "@,48-57,_", isList = true) {
-        override fun checkIfValueValid(value: VimDataType, token: String) {
-          super.checkIfValueValid(value, token)
-          if (KeywordOptionHelper.isValueInvalid((value as VimString).value)) {
+    NumberOption("maxmapdepth", "mmd", 20),
+    NumberOption("scroll", "scr", 0),
+    NumberOption("scrolloff", "so", 0),
+    NumberOption("sidescroll", "ss", 0),
+    NumberOption("sidescrolloff", "siso", 0),
+    ToggleOption("digraph", "dg", false),
+    ToggleOption("gdefault", "gd", false),
+    ToggleOption("hlsearch", "hls", false),
+    ToggleOption("ideacopypreprocess", "ideacopypreprocess", false),
+    ToggleOption("ideajoin", "ideajoin", false),
+    ToggleOption("ideamarks", "ideamarks", true),
+    ToggleOption("ideastrictmode", "ideastrictmode", false),
+    ToggleOption("ideatracetime", "ideatracetime", false),
+    ToggleOption("ignorecase", "ic", false),
+    ToggleOption("incsearch", "is", false),
+    ToggleOption("more", "more", true),
+    ToggleOption("number", "nu", false),
+    ToggleOption("relativenumber", "rnu", false),
+    ToggleOption("showcmd", "sc", true),
+    ToggleOption("showmode", "smd", false),
+    ToggleOption("smartcase", "scs", false),
+    ToggleOption("startofline", "sol", true),
+    ToggleOption("timeout", "to", true),
+    ToggleOption("visualbell", "vb", false),
+    ToggleOption("wrapscan", "ws", true),
+    StringOption("ide", "ide", ApplicationNamesInfo.getInstance().fullProductNameWithEdition),
+    StringOption("idearefactormode", "idearefactormode", "select", isList = false, setOf("keep", "select", "visual")),
+    StringOption("ideastatusicon", "ideastatusicon", "enabled", isList = false, setOf("enabled", "gray", "disabled")),
+    StringOption("ideawrite", "ideawrite", "all", isList = false, setOf("all", "file")),
+    StringOption("selection", "sel", "inclusive", isList = false, setOf("old", "inclusive", "exclusive")),
+    StringOption("shell", "sh", if (SystemInfo.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"),
+    StringOption("shellxescape", "sxe", if (SystemInfo.isWindows) "\"&|<>()@^" else "", isList = false),
+    StringOption("virtualedit", "ve", "", isList = false, setOf("onemore", "block", "insert", "all")),
+    StringOption("viminfo", "vi", "'100,<50,s10,h", isList = true),
+    StringOption("nrformats", "nf", "hex", isList = true, setOf("octal", "hex", "alpha")),
+    StringOption("clipboard", "cb", "ideaput,autoselect,exclude:cons\\|linux", isList = true),
+    StringOption("selectmode", "slm", "", isList = true, setOf("mouse", "key", "cmd", "ideaselection")),
+    StringOption("ideavimsupport", "ideavimsupport", "dialog", isList = true, setOf("dialog", "singleline", "dialoglegacy")),
+    StringOption("keymodel", "km", "continueselect,stopselect", isList = true, setOf("startsel", "stopsel", "stopselect", "stopvisual", "continueselect", "continuevisual")),
+    StringOption("lookupkeys", "lookupkeys", "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>", isList = true),
+    object : StringOption("matchpairs", "mps", "(:),{:},[:]", isList = true) {
+      override fun checkIfValueValid(value: VimDataType, token: String) {
+        super.checkIfValueValid(value, token)
+        for (v in split((value as VimString).value)!!) {
+          if (!v.matches(Regex(".:."))) {
             throw ExException("E474: Invalid argument: $token")
           }
         }
-      },
-      object : StringOption(
-        "guicursor", "gcr",
-        "n-v-c:block-Cursor/lCursor," +
-          "ve:ver35-Cursor," +
-          "o:hor50-Cursor," +
-          "i-ci:ver25-Cursor/lCursor," +
-          "r-cr:hor20-Cursor/lCursor," +
-          "sm:block-Cursor-blinkwait175-blinkoff150-blinkon175",
-        isList = true
-      ) {
-        override fun checkIfValueValid(value: VimDataType, token: String) {
-          super.checkIfValueValid(value, token)
-          val valueAsString = (value as VimString).value
-          valueAsString.split(",").forEach { GuiCursorOptionHelper.convertToken(it) }
+      }
+    },
+    object : NumberOption("scrolljump", "sj", 1) {
+      override fun checkIfValueValid(value: VimDataType, token: String) {
+        super.checkIfValueValid(value, token)
+        if ((value as VimInt).value < -100) {
+          throw ExException("E49: Invalid scroll size: $token")
         }
-      },
-    ).map { Triple(it.name, it.abbrev, it) }
+      }
+    },
+    object : NumberOption("history", "hi", 50) {
+      override fun checkIfValueValid(value: VimDataType, token: String) {
+        super.checkIfValueValid(value, token)
+        if ((value as VimInt).value < 0) {
+          throw ExException("E487: Argument must be positive: $token")
+        }
+      }
+    },
+    object : NumberOption("timeoutlen", "tm", 1000) {
+      override fun checkIfValueValid(value: VimDataType, token: String) {
+        super.checkIfValueValid(value, token)
+        if ((value as VimInt).value < 0) {
+          throw ExException("E487: Argument must be positive: $token")
+        }
+      }
+    },
+    object : NumberOption("undolevels", "ul", 1000) {
+      override fun checkIfValueValid(value: VimDataType, token: String) {
+        super.checkIfValueValid(value, token)
+        if ((value as VimInt).value < 0) {
+          throw ExException("E487: Argument must be positive: $token")
+        }
+      }
+    },
+    object : NumberOption("visualdelay", "visualdelay", 100) {
+      override fun checkIfValueValid(value: VimDataType, token: String) {
+        super.checkIfValueValid(value, token)
+        if ((value as VimInt).value < 0) {
+          throw ExException("E487: Argument must be positive: $token")
+        }
+      }
+    },
+    object : StringOption("shellcmdflag", "shcf", "") {
+      // default value changes if so does the "shell" option
+      override fun getDefaultValue(): VimString {
+        val shell = (getGlobalOptionValue("shell") as VimString).value
+        return VimString(
+          if (SystemInfo.isWindows && !shell.contains("sh"))
+            "/c"
+          else
+            "-c"
+        )
+      }
+    },
+    object : StringOption("shellxquote", "sxq", "") {
+      // default value changes if so does the "shell" option
+      override fun getDefaultValue(): VimString {
+        val shell = (getGlobalOptionValue("shell") as VimString).value
+        return VimString(
+          when {
+            SystemInfo.isWindows && shell == "cmd.exe" -> "("
+            SystemInfo.isWindows && shell.contains("sh") -> "\""
+            else -> ""
+          }
+        )
+      }
+    },
+    object : StringOption("iskeyword", "isk", "@,48-57,_", isList = true) {
+      override fun checkIfValueValid(value: VimDataType, token: String) {
+        super.checkIfValueValid(value, token)
+        if (KeywordOptionHelper.isValueInvalid((value as VimString).value)) {
+          throw ExException("E474: Invalid argument: $token")
+        }
+      }
+    },
+    object : StringOption(
+      "guicursor", "gcr",
+      "n-v-c:block-Cursor/lCursor," +
+        "ve:ver35-Cursor," +
+        "o:hor50-Cursor," +
+        "i-ci:ver25-Cursor/lCursor," +
+        "r-cr:hor20-Cursor/lCursor," +
+        "sm:block-Cursor-blinkwait175-blinkoff150-blinkon175",
+      isList = true
+    ) {
+      override fun checkIfValueValid(value: VimDataType, token: String) {
+        super.checkIfValueValid(value, token)
+        val valueAsString = (value as VimString).value
+        valueAsString.split(",").forEach { GuiCursorOptionHelper.convertToken(it) }
+      }
+    },
   )
   private val globalValues = mutableMapOf<String, VimDataType>()
   private val localValuesKey = Key<MutableMap<String, VimDataType>>("localOptions")
@@ -365,33 +363,33 @@ internal class OptionServiceImpl : OptionService {
   }
 }
 
-class MultikeyMap<T1, T2>(entries: Collection<Triple<T1, T1, T2>>) {
-  private val primaryKeyStorage: MutableMap<T1, T2> = mutableMapOf()
-  private val secondaryKeyStorage: MutableMap<T1, T2> = mutableMapOf()
+private class MultikeyMap(vararg entries: Option<out VimDataType>) {
+  private val primaryKeyStorage: MutableMap<String, Option<out VimDataType>> = mutableMapOf()
+  private val secondaryKeyStorage: MutableMap<String, Option<out VimDataType>> = mutableMapOf()
 
   init {
     for (entry in entries) {
-      primaryKeyStorage[entry.first] = entry.third
-      secondaryKeyStorage[entry.second] = entry.third
+      primaryKeyStorage[entry.name] = entry
+      secondaryKeyStorage[entry.abbrev] = entry
     }
   }
 
-  fun put(key1: T1, key2: T1, value: T2) {
+  fun put(key1: String, key2: String, value: Option<out VimDataType>) {
     primaryKeyStorage[key1] = value
     secondaryKeyStorage[key2] = value
   }
 
-  fun get(key: T1): T2? {
+  fun get(key: String): Option<out VimDataType>? {
     return primaryKeyStorage[key] ?: secondaryKeyStorage[key]
   }
 
-  fun remove(key: T1) {
+  fun remove(key: String) {
     val option = primaryKeyStorage[key] ?: secondaryKeyStorage[key]
     primaryKeyStorage.values.remove(option)
     secondaryKeyStorage.values.remove(option)
   }
 
-  fun contains(key: T1): Boolean {
+  fun contains(key: String): Boolean {
     return primaryKeyStorage.containsKey(key) || secondaryKeyStorage.containsKey(key)
   }
 
