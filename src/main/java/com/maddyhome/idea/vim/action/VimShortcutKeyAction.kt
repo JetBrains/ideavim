@@ -43,6 +43,7 @@ import com.maddyhome.idea.vim.helper.isPrimaryEditor
 import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
+import com.maddyhome.idea.vim.listener.AceJumpService
 import com.maddyhome.idea.vim.listener.AppCodeTemplates.appCodeTemplateCaptured
 import com.maddyhome.idea.vim.listener.IdeaSpecifics.aceJumpActive
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -116,7 +117,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
         return false
       }
 
-      if (aceJumpActive()) {
+      if (AceJumpService.getInstance()?.isActive(editor) == true) {
         LOG.trace("Do not execute shortcut because AceJump is active")
         return false
       }

@@ -121,7 +121,7 @@ intellij {
     downloadSources.set(downloadIdeaSources.toBoolean())
     instrumentCode.set(instrumentPluginCode.toBoolean())
     intellijRepository.set("https://www.jetbrains.com/intellij-repository")
-    plugins.set(listOf("java"))
+    plugins.set(listOf("java", "AceJump:3.8.4"))
 }
 
 tasks {

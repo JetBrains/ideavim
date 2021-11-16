@@ -67,6 +67,7 @@
   <depends optional="true" config-file="ides/ideavim-withRider.xml">com.intellij.modules.rider</depends>
   <!--suppress PluginXmlValidity -->
   <depends optional="true" config-file="ides/ideavim-withAppCode.xml">com.intellij.modules.appcode</depends>
+  <depends optional="true" config-file="ideavim-withAceJump.xml">AceJump</depends>
 
   <application-components>
     <component>
