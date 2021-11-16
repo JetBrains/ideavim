@@ -27,7 +27,6 @@ import org.jetbrains.plugins.ideavim.OptionValueType
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimTestOption
-import org.jetbrains.plugins.ideavim.VimTestOptionType
 import org.junit.Ignore
 
 class MotionMarkActionTest : VimOptionTestCase(IdeaMarksOptionsData.name) {

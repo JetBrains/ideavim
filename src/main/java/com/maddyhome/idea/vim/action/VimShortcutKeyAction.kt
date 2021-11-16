@@ -45,7 +45,6 @@ import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.key.ShortcutOwnerInfo
 import com.maddyhome.idea.vim.listener.AceJumpService
 import com.maddyhome.idea.vim.listener.AppCodeTemplates.appCodeTemplateCaptured
-import com.maddyhome.idea.vim.listener.IdeaSpecifics.aceJumpActive
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimString
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
