@@ -67,6 +67,7 @@ import com.maddyhome.idea.vim.helper.thickness
 import com.maddyhome.idea.vim.key.MappingOwner
 import com.maddyhome.idea.vim.key.ToKeysMappingInfo
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFuncref
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimInt
@@ -106,6 +107,7 @@ abstract class VimTestCase : UsefulTestCase() {
       KeyHandler.getInstance().fullReset(editor)
     }
     VimPlugin.getOptionService().resetAllOptions()
+    OptionsManager.resetAllOptions()
     VimPlugin.getKey().resetKeyMappings()
     VimPlugin.getSearch().resetState()
     if (!VimPlugin.isEnabled()) VimPlugin.setEnabled(true)

@@ -24,6 +24,7 @@ import com.intellij.openapi.extensions.PluginDescriptor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.key.MappingOwner.Plugin.Companion.remove
+import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.vimscript.Executor
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.options.OptionChangeListener
@@ -66,6 +67,7 @@ object VimExtensionRegistrar {
 
     registeredExtensions.add(name)
     registerAliases(extensionBean)
+    OptionsManager.addOption(com.maddyhome.idea.vim.option.ToggleOption(name, getAbbrev(name), false))
     VimPlugin.getOptionService().addOption(ToggleOption(name, getAbbrev(name), false))
     VimPlugin.getOptionService().addListener(
       name,
@@ -111,6 +113,7 @@ object VimExtensionRegistrar {
     removeAliases(extension)
     extension.instance.dispose()
     VimPlugin.getOptionService().removeOption(name)
+    OptionsManager.removeOption(name)
     remove(name)
     logger.info("IdeaVim extension '$name' disposed")
   }
