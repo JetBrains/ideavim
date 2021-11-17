@@ -306,10 +306,15 @@ fun updateChangelog() {
     println(projectDir)
     val repository = org.eclipse.jgit.lib.RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
     val git = org.eclipse.jgit.api.Git(repository)
-    val messages = git.log().call().take(40).map { it.shortMessage }
+    val lastSuccessfulCommit = System.getenv("SUCCESS_COMMIT")!!
+    val messages = git.log().call()
+        .takeWhile { it.id.toString().equals(lastSuccessfulCommit, ignoreCase = true) }
+        .map { it.shortMessage }
 
     // Collect fixes
     val newFixes = mutableListOf<Change>()
+    println("Last successful commit: $lastSuccessfulCommit")
+    println("Amount of commits: ${messages.size}")
     println("Start emails processing")
     for (message in messages) {
         println("Processing '$message'...")
