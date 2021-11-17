@@ -21,11 +21,14 @@ package com.maddyhome.idea.vim.statistic
 import com.intellij.internal.statistic.beans.MetricEvent
 import com.intellij.internal.statistic.eventLog.EventLogGroup
 import com.intellij.internal.statistic.eventLog.events.BooleanEventField
-import com.intellij.internal.statistic.eventLog.events.EnumEventField
+import com.intellij.internal.statistic.eventLog.events.EventFields
+import com.intellij.internal.statistic.eventLog.events.EventPair
+import com.intellij.internal.statistic.eventLog.events.StringEventField
 import com.intellij.internal.statistic.eventLog.events.VarargEventId
 import com.intellij.internal.statistic.service.fus.collectors.ApplicationUsagesCollector
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.vimscript.services.OptionService
+import com.maddyhome.idea.vim.vimscript.services.OptionServiceImpl
 
 class VimStatistic : ApplicationUsagesCollector() {
 
@@ -36,11 +39,24 @@ class VimStatistic : ApplicationUsagesCollector() {
 
     return setOf(
       OPTIONS.metric(
-        IDEAJOIN.with(optionService.isSet(OptionService.Scope.GLOBAL, "ideajoin")),
-        IDEAMARKS.with(optionService.isSet(OptionService.Scope.GLOBAL, "ideamarks")),
-        IDEAREFACTOR.with(optionService.getOptionValue(OptionService.Scope.GLOBAL, "idearefactormode").asString().toRefactor())
+        IDEAJOIN withOption "ideajoin",
+        IDEAMARKS withOption "ideamarks",
+        IDEAREFACTOR withOption "idearefactormode",
+        IDEAPUT with optionService.contains(OptionService.Scope.GLOBAL, "clipboard", "ideaput"),
+        IDEASTATUSICON withOption "ideastatusicon",
+        IDEAWRITE withOption "ideawrite",
+        IDEASELECTION with optionService.contains(OptionService.Scope.GLOBAL, "selectmode", "ideaselection"),
+        IDEAVIMSUPPORT with optionService.getOptionValue(OptionService.Scope.GLOBAL, "ideavimsupport").asString().split(",")
       )
     )
+  }
+
+  private infix fun BooleanEventField.withOption(name: String): EventPair<Boolean> {
+    return this.with(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, name))
+  }
+
+  private infix fun StringEventField.withOption(name: String): EventPair<String?> {
+    return this.with(VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, name).asString())
   }
 
   companion object {
@@ -48,40 +64,23 @@ class VimStatistic : ApplicationUsagesCollector() {
 
     private val IDEAJOIN = BooleanEventField("ideajoin")
     private val IDEAMARKS = BooleanEventField("ideamarks")
-    private val IDEAREFACTOR = EnumEventField("ideamarks", IdeaRefactorMode::class.java, IdeaRefactorMode::toString)
-//    val IDEAPUT = BooleanEventField("ideaput")
+    private val IDEAREFACTOR = EventFields.String("ideamarks", OptionServiceImpl.ideaRefactorModeValues.toList())
+    private val IDEAPUT = BooleanEventField("ideaput")
+    private val IDEASTATUSICON = EventFields.String("ideastatusicon", OptionServiceImpl.ideaStatusIconValues.toList())
+    private val IDEAWRITE = EventFields.String("ideawrite", OptionServiceImpl.ideaWriteValues.toList())
+    private val IDEASELECTION = BooleanEventField("ideaselection")
+    private val IDEAVIMSUPPORT = EventFields.StringList("ideavimsupport", OptionServiceImpl.ideavimsupportValues.toList())
 
     private val OPTIONS: VarargEventId = GROUP.registerVarargEvent(
       "vim.options",
       IDEAJOIN,
       IDEAMARKS,
       IDEAREFACTOR,
-//      IDEAPUT,
+      IDEAPUT,
+      IDEASTATUSICON,
+      IDEAWRITE,
+      IDEASELECTION,
+      IDEAVIMSUPPORT,
     )
   }
 }
-
-private enum class IdeaRefactorMode {
-  KEEP,
-  SELECT,
-  VISUAL,
-  UNKNOWN;
-
-  override fun toString(): String = when (this) {
-    KEEP -> "keep"
-    SELECT -> "select"
-    VISUAL -> "visual"
-    UNKNOWN -> "unknown"
-  }
-
-  companion object {
-    fun fromString(string: String) = when (string) {
-      "keep" -> KEEP
-      "select" -> SELECT
-      "visual" -> VISUAL
-      else -> UNKNOWN
-    }
-  }
-}
-
-private fun String.toRefactor() = IdeaRefactorMode.fromString(this)

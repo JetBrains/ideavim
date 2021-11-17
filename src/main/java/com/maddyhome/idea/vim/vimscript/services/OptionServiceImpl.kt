@@ -52,9 +52,9 @@ internal class OptionServiceImpl : OptionService {
     ToggleOption("wrapscan", "ws", true),
     ToggleOption("delaymacro", "delaymacro", false),
     StringOption("ide", "ide", ApplicationNamesInfo.getInstance().fullProductNameWithEdition),
-    StringOption("idearefactormode", "idearefactormode", "select", isList = false, setOf("keep", "select", "visual")),
-    StringOption("ideastatusicon", "ideastatusicon", "enabled", isList = false, setOf("enabled", "gray", "disabled")),
-    StringOption("ideawrite", "ideawrite", "all", isList = false, setOf("all", "file")),
+    StringOption("idearefactormode", "idearefactormode", "select", isList = false, ideaRefactorModeValues),
+    StringOption("ideastatusicon", "ideastatusicon", "enabled", isList = false, ideaStatusIconValues),
+    StringOption("ideawrite", "ideawrite", "all", isList = false, ideaWriteValues),
     StringOption("selection", "sel", "inclusive", isList = false, setOf("old", "inclusive", "exclusive")),
     StringOption("shell", "sh", if (SystemInfo.isWindows) "cmd.exe" else System.getenv("SHELL") ?: "sh"),
     StringOption("shellxescape", "sxe", if (SystemInfo.isWindows) "\"&|<>()@^" else "", isList = false),
@@ -63,7 +63,7 @@ internal class OptionServiceImpl : OptionService {
     StringOption("nrformats", "nf", "hex", isList = true, setOf("octal", "hex", "alpha")),
     StringOption("clipboard", "cb", "ideaput,autoselect,exclude:cons\\|linux", isList = true),
     StringOption("selectmode", "slm", "", isList = true, setOf("mouse", "key", "cmd", "ideaselection")),
-    StringOption("ideavimsupport", "ideavimsupport", "dialog", isList = true, setOf("dialog", "singleline", "dialoglegacy")),
+    StringOption("ideavimsupport", "ideavimsupport", "dialog", isList = true, ideavimsupportValues),
     StringOption("keymodel", "km", "continueselect,stopselect", isList = true, setOf("startsel", "stopsel", "stopselect", "stopvisual", "continueselect", "continuevisual")),
     StringOption("lookupkeys", "lookupkeys", "<Tab>,<Down>,<Up>,<Enter>,<Left>,<Right>,<C-Down>,<C-Up>,<PageUp>,<PageDown>,<C-J>,<C-Q>", isList = true),
     object : StringOption("matchpairs", "mps", "(:),{:},[:]", isList = true) {
@@ -358,6 +358,13 @@ internal class OptionServiceImpl : OptionService {
       is NumberOption, is ToggleOption -> VimInt(parseNumber(value) ?: throw ExException("E474: Invalid argument: $token"))
       is StringOption -> VimString(value)
     }
+  }
+
+  companion object {
+    val ideaStatusIconValues = setOf("enabled", "gray", "disabled")
+    val ideaRefactorModeValues = setOf("keep", "select", "visual")
+    val ideaWriteValues = setOf("all", "file")
+    val ideavimsupportValues = setOf("dialog", "singleline", "dialoglegacy")
   }
 }
 
