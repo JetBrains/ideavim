@@ -308,7 +308,7 @@ fun updateChangelog() {
     val git = org.eclipse.jgit.api.Git(repository)
     val lastSuccessfulCommit = System.getenv("SUCCESS_COMMIT")!!
     val messages = git.log().call()
-        .takeWhile { it.id.toString().equals(lastSuccessfulCommit, ignoreCase = true) }
+        .takeWhile { !it.id.toString().equals(lastSuccessfulCommit, ignoreCase = true) }
         .map { it.shortMessage }
 
     // Collect fixes
@@ -343,8 +343,6 @@ fun updateChangelog() {
     val firstPartOfChanges = changes.take(insertOffset)
     val actualFixes = newFixes
         .filterNot { it.id in firstPartOfChanges }
-        // Temporally disable this example
-        .filterNot { it.id == "VIM-123" }
     val newUpdates = actualFixes
         .joinToString { "* [${it.id}](https://youtrack.jetbrains.com/issue/${it.id}) ${it.text}\n" }
 
