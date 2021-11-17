@@ -34,9 +34,10 @@ jobs:
 
       - name: Update authors
         id: update_authors
-        run: ./gradlew updateAuthors --stacktrace --debug
+        run: ./gradlew updateAuthors --stacktrace
         env:
           SUCCESS_COMMIT: ${{ steps.last_successful_commit.outputs.commit_hash }}
+          GITHU_OAUTH: ${{ secrets.AUTOMATION_TOKEN }}
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
