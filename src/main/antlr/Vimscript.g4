@@ -123,7 +123,7 @@ command:
 
     (WS | COLON)* range? (WS | COLON)*
       name = (
-        MAP | MAP_CLEAR | UNMAP | SORT | REGISTERS | CMD | H_LOWERCASE | HELP
+        MAP | MAP_CLEAR | UNMAP | SORT | REGISTERS | CMD | H_LOWERCASE | HELP | NORMAL
       )
     WS* commandArgumentWithoutBars? (NEW_LINE | BAR)+
     #CommandWithoutComments|
@@ -490,6 +490,7 @@ existingCommands:       RETURN
                     |   UNMAP
                     |   EXECUTE
                     |   CALL
+                    |   NORMAL
 ;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -681,6 +682,7 @@ UNMAP:                  'unm' | 'nun' | 'vu' | 'xu' | 'sunm' | 'ou' | 'iu' | 'cu
 EXECUTE:                'exe' | 'exec' | 'execu' | 'execut' | 'execute';
 LOCKVAR:                'lockv' | 'lockva' | 'lockvar';
 UNLOCKVAR:              'unlo' | 'unloc' | 'unlock' | 'unlockv' | 'unlockva' | 'unlockvar';
+NORMAL:                 'norm' | 'norma' | 'normal';
 
 // Types
 DIGIT:                  [0-9];

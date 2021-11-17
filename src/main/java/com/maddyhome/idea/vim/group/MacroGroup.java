@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
+import com.maddyhome.idea.vim.vimscript.services.OptionService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -123,30 +124,36 @@ public class MacroGroup {
       return;
     }
 
-    // This took a while to get just right. The original approach has a loop that made a runnable for each
-    // character. It worked except for one case - if the macro had a complete ex command, the editor did not
-    // end up with the focus and I couldn't find anyway to get it to have focus. This approach was the only
-    // solution. This makes the most sense now (of course it took hours of trial and error to come up with
-    // this one). Each key gets added, one at a time, to the event queue. If a given key results in other
-    // events getting queued, they get queued before the next key, just what would happen if the user was typing
-    // the keys one at a time. With the old loop approach, all the keys got queued, then any events they caused
-    // were queued - after the keys. This is what caused the problem.
-    final Runnable run = () -> {
-      if (logger.isDebugEnabled()) {
-        logger.debug("processing key " + pos);
-      }
-      // Handle one keystroke then queue up the next key
-      KeyHandler.getInstance().handleKey(editor, keys.get(pos), context);
-      if (pos < keys.size() - 1) {
-        playbackKeys(editor, context, project, keys, pos + 1, cnt, total);
-      }
-      else {
-        playbackKeys(editor, context, project, keys, 0, cnt + 1, total);
-      }
-    };
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "delaymacro", "delaymacro")) {
+      // This took a while to get just right. The original approach has a loop that made a runnable for each
+      // character. It worked except for one case - if the macro had a complete ex command, the editor did not
+      // end up with the focus and I couldn't find anyway to get it to have focus. This approach was the only
+      // solution. This makes the most sense now (of course it took hours of trial and error to come up with
+      // this one). Each key gets added, one at a time, to the event queue. If a given key results in other
+      // events getting queued, they get queued before the next key, just what would happen if the user was typing
+      // the keys one at a time. With the old loop approach, all the keys got queued, then any events they caused
+      // were queued - after the keys. This is what caused the problem.
+      final Runnable run = () -> {
+        if (logger.isDebugEnabled()) {
+          logger.debug("processing key " + pos);
+        }
+        // Handle one keystroke then queue up the next key
+        KeyHandler.getInstance().handleKey(editor, keys.get(pos), context);
+        if (pos < keys.size() - 1) {
+          playbackKeys(editor, context, project, keys, pos + 1, cnt, total);
+        }
+        else {
+          playbackKeys(editor, context, project, keys, 0, cnt + 1, total);
+        }
+      };
 
-    ApplicationManager.getApplication().invokeLater(() -> CommandProcessor.getInstance()
-      .executeCommand(project, run, MessageHelper.message("command.name.vim.macro.playback"), keys.get(pos)));
+      ApplicationManager.getApplication().invokeLater(() -> CommandProcessor.getInstance()
+        .executeCommand(project, run, MessageHelper.message("command.name.vim.macro.playback"), keys.get(pos)));
+    } else {
+      for (KeyStroke key : keys) {
+        KeyHandler.getInstance().handleKey(editor, key, context);
+      }
+    }
   }
 
   public void postKey(@NotNull KeyStroke stroke, @NotNull Editor editor) {
