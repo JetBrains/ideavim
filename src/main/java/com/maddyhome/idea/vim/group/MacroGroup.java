@@ -124,7 +124,7 @@ public class MacroGroup {
       return;
     }
 
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "delaymacro", "delaymacro")) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "ideadelaymacro", "ideadelaymacro")) {
       // This took a while to get just right. The original approach has a loop that made a runnable for each
       // character. It worked except for one case - if the macro had a complete ex command, the editor did not
       // end up with the focus and I couldn't find anyway to get it to have focus. This approach was the only
