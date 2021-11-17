@@ -54,7 +54,7 @@ open class MotionLastColumnAction : MotionActionHandler.ForEachCaret() {
     operatorArguments: OperatorArguments,
   ): Motion {
     val allow = if (editor.inVisualMode) {
-      val opt = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL, "selection", editor) as VimString).value
+      val opt = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), "selection") as VimString).value
       opt != "old"
     } else {
       if (operatorArguments.isOperatorPending) false else editor.isEndAllowed

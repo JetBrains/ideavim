@@ -40,12 +40,12 @@ class PutViaIdeaTest : VimTestCase() {
 
   override fun setUp() {
     super.setUp()
-    optionsBefore = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "clipboard", null) as VimString).value
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "clipboard", VimString("ideaput"), null)
+    optionsBefore = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "clipboard") as VimString).value
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "clipboard", VimString("ideaput"))
   }
 
   override fun tearDown() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "clipboard", VimString(optionsBefore), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "clipboard", VimString(optionsBefore))
     super.tearDown()
   }
 

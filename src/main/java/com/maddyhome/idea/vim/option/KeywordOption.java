@@ -70,8 +70,8 @@ public final class KeywordOption extends StringListOption {
     try {
       String joinedValue = getValue();
       if (!((VimString)VimPlugin.getOptionService()
-        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(joinedValue)) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(joinedValue), null, name);
+        .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimString(joinedValue), name);
       }
     } catch (Exception e) {}
     return true;
@@ -91,8 +91,8 @@ public final class KeywordOption extends StringListOption {
     try {
       String joinedValue = getValue();
       if (!((VimString)VimPlugin.getOptionService()
-        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(joinedValue)) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(joinedValue), null, name);
+        .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimString(joinedValue), name);
       }
     } catch (Exception e) {}
     return true;
@@ -113,8 +113,8 @@ public final class KeywordOption extends StringListOption {
     try {
       String joinedValue = getValue();
       if (!((VimString)VimPlugin.getOptionService()
-        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(joinedValue)) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(joinedValue), null, name);
+        .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimString(joinedValue), name);
       }
     } catch (Exception e) {}
     return true;
@@ -143,8 +143,8 @@ public final class KeywordOption extends StringListOption {
     try {
       String joinedValue = getValue();
       if (!((VimString)VimPlugin.getOptionService()
-        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(joinedValue)) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(joinedValue), null, name);
+        .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue().equals(joinedValue)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimString(joinedValue), name);
       }
     } catch (Exception e) {}
     return true;

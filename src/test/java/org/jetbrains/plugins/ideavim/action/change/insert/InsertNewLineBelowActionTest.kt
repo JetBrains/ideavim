@@ -104,7 +104,7 @@ class InsertNewLineBelowActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test insert new line below at bottom of screen does not scroll bottom of screen`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(50, "I found it in a legendary land")
     setPositionAndScroll(5, 29)
     typeText(parseKeys("o"))

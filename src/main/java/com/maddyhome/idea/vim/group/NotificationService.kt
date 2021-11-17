@@ -76,7 +76,7 @@ class NotificationService(private val project: Project?) {
         notification,
         "set clipboard+=ideaput",
         "ideaput"
-      ) { VimPlugin.getOptionService().appendValue(OptionService.Scope.GLOBAL, "clipboard", ClipboardOptionsData.ideaput, null, "clipboard") }
+      ) { VimPlugin.getOptionService().appendValue(OptionService.Scope.GLOBAL, "clipboard", ClipboardOptionsData.ideaput, "clipboard") }
     )
 
     notification.notify(project)
@@ -96,7 +96,7 @@ class NotificationService(private val project: Project?) {
         notification,
         "set ideajoin",
         "ideajoin"
-      ) { VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "ideajoin", null) }
+      ) { VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "ideajoin") }
     )
 
     notification.addAction(HelpLink(ideajoinExamplesUrl))

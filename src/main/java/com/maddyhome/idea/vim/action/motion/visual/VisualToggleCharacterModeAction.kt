@@ -31,7 +31,7 @@ class VisualToggleCharacterModeAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
-    val listOption = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL, "selectmode", editor) as VimString).value
+    val listOption = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), "selectmode") as VimString).value
     return if (listOption.contains("cmd")) {
       VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
     } else VimPlugin.getVisualMotion()

@@ -199,7 +199,7 @@ private fun quoteChanges(chars: CharSequence, begin: Int) = sequence {
  * history, the smartcase option is applied, and `\<Work\>` will only match `Work`.
  */
 fun shouldIgnoreCase(pattern: String, ignoreSmartCaseOption: Boolean): Boolean {
-  val sc = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "smartcase", null) &&
+  val sc = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "smartcase") &&
     !ignoreSmartCaseOption
-  return VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ignorecase", null) && !(sc && StringHelper.containsUpperCase(pattern))
+  return VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ignorecase") && !(sc && StringHelper.containsUpperCase(pattern))
 }

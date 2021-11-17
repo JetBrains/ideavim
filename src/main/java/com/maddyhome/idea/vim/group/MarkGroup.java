@@ -239,7 +239,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
   }
 
   private @Nullable Bookmark createOrGetSystemMark(char ch, int line, @NotNull Editor editor) {
-    if (!VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL, "ideamarks", editor, "ideamarks")) return null;
+    if (!VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(editor), "ideamarks", "ideamarks")) return null;
     final Project project = editor.getProject();
     if (project == null) return null;
     final BookmarkManager bookmarkManager = BookmarkManager.getInstance(project);
@@ -425,7 +425,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
 
   public void saveData(@NotNull Element element) {
     Element marksElem = new Element("globalmarks");
-    if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideamarks", null, "ideamarks")) {
+    if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "ideamarks", "ideamarks")) {
       for (Mark mark : globalMarks.values()) {
         if (!mark.isClear()) {
           Element markElem = new Element("mark");
@@ -498,7 +498,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     // (see com.intellij.openapi.application.Application.runReadAction())
 
     Element marksElem = element.getChild("globalmarks");
-    if (marksElem != null && !VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideamarks", null, "ideamarks")) {
+    if (marksElem != null && !VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "ideamarks", "ideamarks")) {
       List<Element> markList = marksElem.getChildren("mark");
       for (Element aMarkList : markList) {
         Mark mark = VimMark.create(aMarkList.getAttributeValue("key").charAt(0),
@@ -764,7 +764,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     @Override
     public void bookmarkAdded(@NotNull Bookmark b) {
       if (!VimPlugin.isEnabled()) return;
-      if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideamarks", null, "ideamarks")) return;
+      if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "ideamarks",  "ideamarks")) return;
       if (b.getMnemonic() == '\u0000') {
         bookmarkTemplate = b;
       } else {
@@ -775,7 +775,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     @Override
     public void bookmarkRemoved(@NotNull Bookmark b) {
       if (!VimPlugin.isEnabled()) return;
-      if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideamarks", null, "ideamarks")) return;
+      if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "ideamarks",  "ideamarks")) return;
 
       char ch = b.getMnemonic();
       if (GLOBAL_MARKS.indexOf(ch) != -1) {
@@ -790,7 +790,7 @@ public class MarkGroup implements PersistentStateComponent<Element> {
     public void bookmarkChanged(@NotNull Bookmark b) {
       if (!VimPlugin.isEnabled()) return;
       /* IJ sets named marks in two steps. Firstly it creates an unnamed mark, then adds a mnemonic */
-      if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideamarks", null, "ideamarks")) return;
+      if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "ideamarks", "ideamarks")) return;
       if (b != bookmarkTemplate) return;
       bookmarkTemplate = null;
 

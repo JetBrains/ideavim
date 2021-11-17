@@ -278,7 +278,7 @@ class VisualMotionGroup {
   }
 
   val exclusiveSelection: Boolean
-    get() = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "selection", null) as VimString).value == "exclusive"
+    get() = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "selection") as VimString).value == "exclusive"
   val selectionAdj: Int
     get() = if (exclusiveSelection) 0 else 1
 }

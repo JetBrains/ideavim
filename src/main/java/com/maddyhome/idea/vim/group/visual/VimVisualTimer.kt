@@ -74,7 +74,7 @@ object VimVisualTimer {
     if (mode == null) mode = currentMode
 
     // Default delay - 100 ms
-    val timer = Timer((VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "visualdelay", null) as VimInt).value) {
+    val timer = Timer((VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "visualdelay") as VimInt).value) {
       timerAction(task)
     }
     timer.isRepeats = false

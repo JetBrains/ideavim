@@ -1415,17 +1415,17 @@ class SearchGroupTest : VimTestCase() {
     assertEquals(9, res)
   }
 
-  private fun setIgnoreCase() = VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "ignorecase", null)
-  private fun setSmartCase() = VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "smartcase", null)
+  private fun setIgnoreCase() = VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "ignorecase")
+  private fun setSmartCase() = VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "smartcase")
 
   private fun setIgnoreCaseAndSmartCase() {
     setIgnoreCase()
     setSmartCase()
   }
 
-  private fun setHighlightSearch() = VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "hlsearch", null)
-  private fun clearHighlightSearch() = VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "hlsearch", null)
-  private fun setIncrementalSearch() = VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "incsearch", null)
+  private fun setHighlightSearch() = VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "hlsearch")
+  private fun clearHighlightSearch() = VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "hlsearch")
+  private fun setIncrementalSearch() = VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "incsearch")
 
   // TODO: Remove these search methods and test by invoking VIM commands rather than calling APIs
   private fun search(pattern: String, input: String, expectedLocation: Int): Int {

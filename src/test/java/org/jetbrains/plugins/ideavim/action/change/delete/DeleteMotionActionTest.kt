@@ -50,7 +50,7 @@ class DeleteMotionActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test delete last line with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline")
     typeTextInFile(
       parseKeys("dd"),
       """

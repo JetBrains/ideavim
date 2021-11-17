@@ -227,7 +227,7 @@ public class KeyHandler {
         "Start key processing. allowKeyMappings: " + allowKeyMappings + ", mappingCompleted: " + mappingCompleted);
       LOG.trace("Key: " + key);
     }
-    int mapMapDepth = ((VimInt) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "maxmapdepth", null, "maxmapdepth")).getValue();
+    int mapMapDepth = ((VimInt) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, "maxmapdepth",  "maxmapdepth")).getValue();
     if (handleKeyRecursionCount >= mapMapDepth) {
       VimPlugin.showMessage(MessageHelper.message("E223"));
       VimPlugin.indicateError();
@@ -466,7 +466,7 @@ public class KeyHandler {
     // user has typed "dw" wait for the timeout, and then replay "d" and "w" without any mapping (which will of course
     // delete a word)
     final Application application = ApplicationManager.getApplication();
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL, "timeout", editor, "timeout")) {
+    if (VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(editor), "timeout", "timeout")) {
       LOG.trace("Timeout is set. Schedule a mapping timer");
       // XXX There is a strange issue that reports that mapping state is empty at the moment of the function call.
       //   At the moment, I see the only one possibility this to happen - other key is handled after the timer executed,

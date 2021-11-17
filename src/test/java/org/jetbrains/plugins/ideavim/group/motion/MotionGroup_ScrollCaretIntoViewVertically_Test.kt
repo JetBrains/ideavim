@@ -41,7 +41,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test scroll up with scrolljump`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10))
     configureByPages(5)
     setPositionAndScroll(19, 24)
 
@@ -52,7 +52,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test scroll up with scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5))
     configureByPages(5)
     setPositionAndScroll(19, 29)
 
@@ -63,8 +63,8 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test scroll up with scrolljump and scrolloff 1`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5))
     configureByPages(5)
 
     setPositionAndScroll(19, 29)
@@ -75,8 +75,8 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test scroll up with scrolljump and scrolloff 2`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5))
     configureByPages(5)
     setPositionAndScroll(29, 39)
 
@@ -114,8 +114,8 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test scroll up more than half height moves caret to middle with scrolloff`() {
     configureByPages(5)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5))
     setPositionAndScroll(99, 109)
     assertPosition(109, 0)
 
@@ -127,8 +127,8 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test scroll up with less than half height moves caret to top of screen`() {
     configureByPages(5)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5))
     setPositionAndScroll(99, 109)
 
     typeText(parseKeys("20k"))
@@ -148,7 +148,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test scroll down with scrolljump`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 29)
 
@@ -159,7 +159,7 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test scroll down with scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5))
     configureByPages(5)
     setPositionAndScroll(0, 24)
 
@@ -170,8 +170,8 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test scroll down with scrolljump and scrolloff 1`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5))
     configureByPages(5)
     setPositionAndScroll(0, 24)
 
@@ -182,8 +182,8 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test scroll down with scrolljump and scrolloff 2`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(15), null)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(15))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5))
     configureByPages(5)
     setPositionAndScroll(0, 24)
 
@@ -194,8 +194,8 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test scroll down with scrolljump and scrolloff 3`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(20), null)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(20))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5))
     configureByPages(5)
     setPositionAndScroll(0, 24)
 
@@ -206,8 +206,8 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test scroll down with scrolljump and scrolloff 4`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(11), null)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(11))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5))
     configureByPages(5)
     setPositionAndScroll(0, 24)
 
@@ -218,8 +218,8 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test scroll down with scrolljump and scrolloff 5`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5))
     configureByPages(5)
     setPositionAndScroll(0, 29)
 
@@ -230,8 +230,8 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test scroll down with scrolljump and scrolloff 6`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(5))
     configureByPages(5)
     setPositionAndScroll(0, 24)
 
@@ -242,8 +242,8 @@ class MotionGroup_ScrollCaretIntoViewVertically_Test : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SCROLL)
   fun `test scroll down too large cursor is centred`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10))
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 19)
 

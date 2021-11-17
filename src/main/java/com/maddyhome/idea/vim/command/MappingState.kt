@@ -33,7 +33,7 @@ class MappingState {
 
   var mappingMode = MappingMode.NORMAL
 
-  private val timer = Timer((VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "timeoutlen", null) as VimInt).value, null)
+  private val timer = Timer((VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "timeoutlen") as VimInt).value, null)
   private var keyList = mutableListOf<KeyStroke>()
 
   init {
@@ -41,7 +41,7 @@ class MappingState {
   }
 
   fun startMappingTimer(actionListener: ActionListener) {
-    timer.initialDelay = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "timeoutlen", null) as VimInt).value
+    timer.initialDelay = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "timeoutlen") as VimInt).value
     timer.actionListeners.forEach { timer.removeActionListener(it) }
     timer.addActionListener(actionListener)
     timer.start()

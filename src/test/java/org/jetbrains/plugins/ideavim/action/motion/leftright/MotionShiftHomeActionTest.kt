@@ -61,7 +61,7 @@ class MotionShiftHomeActionTest : VimOptionTestCase(KeyModelOptionData.name, Sel
 
   @VimOptionDefaultAll
   fun `test default continueselect`() {
-    val keymodel = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "keymodel", null) as VimString).value
+    val keymodel = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "keymodel") as VimString).value
     assertTrue(KeyModelOptionData.continueselect in keymodel)
   }
 

@@ -120,7 +120,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
         @Override
         public void processGlobalValueChange(@Nullable VimDataType oldValue) {
           String clipboardOptionValue = ((VimString) VimPlugin.getOptionService()
-            .getOptionValue(OptionService.Scope.GLOBAL, "clipboard", null, "clipboard")).getValue();
+            .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, "clipboard", "clipboard")).getValue();
           if (clipboardOptionValue.contains("unnamed")) {
             defaultRegister = '*';
           }
@@ -359,7 +359,7 @@ public class RegisterGroup implements PersistentStateComponent<Element> {
     String rawText = TextBlockTransferable.convertLineSeparators(text, "\n", transferableDatas);
 
 
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideacopypreprocess", null, "ideacopypreprocess")) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "ideacopypreprocess", "ideacopypreprocess")) {
       String escapedText;
       for (CopyPastePreProcessor processor : CopyPastePreProcessor.EP_NAME.getExtensionList()) {
         escapedText = processor.preprocessOnCopy(file, textRange.getStartOffsets(), textRange.getEndOffsets(), rawText);

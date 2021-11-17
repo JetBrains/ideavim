@@ -40,7 +40,7 @@ class InsertBackspaceActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test insert backspace scrolls start of line`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10))
     configureByColumns(200)
 
     typeText(parseKeys("70zl", "i", "<BS>"))

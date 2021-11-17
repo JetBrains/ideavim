@@ -76,7 +76,7 @@ public class DigraphSequence {
       case DIG_STATE_PENDING:
         logger.debug("DIG_STATE_PENDING");
         if (key.getKeyCode() == KeyEvent.VK_BACK_SPACE
-            && VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL, "digraph", editor, "digraph")) {
+            && VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(editor), "digraph", "digraph")) {
           digraphState = DIG_STATE_BACK_SPACE;
         }
         else if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {

@@ -1888,7 +1888,7 @@ public class ChangeGroup {
                                         @NotNull TextRange selectedRange,
                                         final int count,
                                         boolean avalanche) {
-    String nf = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL, "nrformats", editor, "nrformats")).getValue();
+    String nf = ((VimString) VimPlugin.getOptionService().getOptionValue(new OptionService.Scope.LOCAL(editor), "nrformats", "nrformats")).getValue();
     boolean alpha = nf.contains("alpha");
     boolean hex = nf.contains("hex");
     boolean octal = nf.contains("octal");
@@ -1930,7 +1930,7 @@ public class ChangeGroup {
   private @Nullable List<Object> lastStrokes;
 
   public boolean changeNumber(final @NotNull Editor editor, @NotNull Caret caret, final int count) {
-    final String nf = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL, "nrformats", editor, "nrformats")).getValue();
+    final String nf = ((VimString) VimPlugin.getOptionService().getOptionValue(new OptionService.Scope.LOCAL(editor), "nrformats", "nrformats")).getValue();
     final boolean alpha = nf.contains("alpha");
     final boolean hex = nf.contains("hex");
     final boolean octal = nf.contains("octal");

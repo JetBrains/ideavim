@@ -172,7 +172,7 @@ public class HistoryGroup implements PersistentStateComponent<Element> {
 
   private static int maxLength() {
     return ((VimInt) VimPlugin.getOptionService()
-      .getOptionValue(OptionService.Scope.GLOBAL, "history", null, "history")).getValue();
+      .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, "history",  "history")).getValue();
   }
 
   @Nullable

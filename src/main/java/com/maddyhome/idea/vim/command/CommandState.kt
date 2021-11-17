@@ -284,7 +284,7 @@ class CommandState private constructor(private val editor: Editor) {
 
   private fun doShowMode() {
     val msg = StringBuilder()
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "showmode", null)) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "showmode")) {
       msg.append(getStatusString(modeStates.size - 1))
     }
     if (isRecording) {

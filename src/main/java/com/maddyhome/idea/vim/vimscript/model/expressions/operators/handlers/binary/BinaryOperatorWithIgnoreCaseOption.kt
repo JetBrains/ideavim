@@ -28,7 +28,7 @@ abstract class BinaryOperatorWithIgnoreCaseOption(
 ) : BinaryOperatorHandler() {
 
   private fun shouldIgnoreCase(): Boolean {
-    return VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ignorecase", null)
+    return VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ignorecase")
   }
 
   override fun performOperation(left: VimDataType, right: VimDataType): VimDataType {

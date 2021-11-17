@@ -191,7 +191,7 @@ private class LegacyCaretVisualAttributesProvider : CaretVisualAttributesProvide
     } else {
       // The default for REPLACE is hor20. It makes more sense to map HOR to a block, but REPLACE has traditionally been
       // drawn the same as INSERT, as a bar. If the 'guicursor' option is still at default, keep REPLACE a bar
-      if (VimPlugin.getOptionService().isDefault(OptionService.Scope.LOCAL, "guicursor", editor) && editor.guicursorMode() == GuiCursorMode.REPLACE) {
+      if (VimPlugin.getOptionService().isDefault(OptionService.Scope.LOCAL(editor), "guicursor") && editor.guicursorMode() == GuiCursorMode.REPLACE) {
         setBlockCursor(editor, false)
       } else {
         when (GuiCursorOptionHelper.getAttributes(editor.guicursorMode()).type) {

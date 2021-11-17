@@ -72,7 +72,7 @@ object VimExtensionRegistrar {
       name,
       object : OptionChangeListener<VimDataType> {
         override fun processGlobalValueChange(oldValue: VimDataType?) {
-          if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, name, null)) {
+          if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, name)) {
             initExtension(extensionBean, name)
           } else {
             extensionBean.instance.dispose()
@@ -120,7 +120,7 @@ object VimExtensionRegistrar {
   fun setOptionByPluginAlias(alias: String): Boolean {
     val name = extensionAliases[alias] ?: return false
     try {
-      VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, name, null)
+      VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, name)
     } catch (e: ExException) {
       return false
     }

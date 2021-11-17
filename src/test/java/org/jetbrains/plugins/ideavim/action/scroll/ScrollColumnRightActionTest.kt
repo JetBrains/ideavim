@@ -103,7 +103,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scrolls column to right with sidescrolloff moves cursor`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10))
     configureByColumns(200)
     typeText(parseKeys("100|", "ze", "zh"))
     assertPosition(0, 98)
@@ -112,7 +112,7 @@ class ScrollColumnRightActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun`test scroll column to right ignores sidescroll`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescroll", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescroll", VimInt(10))
     configureByColumns(200)
     typeText(parseKeys("100|"))
     // Assert we got initial scroll correct

@@ -59,7 +59,7 @@ data class SetLocalCommand(val ranges: Ranges, val argument: String) : Command.S
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
-    return if (parseOptionLine(editor, argument, OptionService.Scope.LOCAL, failOnBad = true)) {
+    return if (parseOptionLine(editor, argument, OptionService.Scope.LOCAL(editor), failOnBad = true)) {
       ExecutionResult.Success
     } else {
       ExecutionResult.Error
@@ -97,7 +97,7 @@ fun parseOptionLine(editor: Editor, args: String, scope: OptionService.Scope, fa
   val optionService = (VimPlugin.getOptionService() as OptionServiceImpl)
   when {
     args.isEmpty() -> {
-      val changedOptions = optionService.getOptions().filter { !optionService.isDefault(scope, it, editor) }
+      val changedOptions = optionService.getOptions().filter { !optionService.isDefault(scope, it) }
       showOptions(editor, changedOptions.map { Pair(it, it) }, scope, true)
       return true
     }
@@ -128,10 +128,10 @@ fun parseOptionLine(editor: Editor, args: String, scope: OptionService.Scope, fa
 
     when {
       token.endsWith("?") -> toShow.add(Pair(token.dropLast(1), token))
-      token.startsWith("no") -> optionService.unsetOption(scope, token.substring(2), editor, token)
-      token.startsWith("inv") -> optionService.toggleOption(scope, token.substring(3), editor, token)
-      token.endsWith("!") -> optionService.toggleOption(scope, token.dropLast(1), editor, token)
-      token.endsWith("&") -> optionService.resetDefault(scope, token.dropLast(1), editor, token)
+      token.startsWith("no") -> optionService.unsetOption(scope, token.substring(2), token)
+      token.startsWith("inv") -> optionService.toggleOption(scope, token.substring(3), token)
+      token.endsWith("!") -> optionService.toggleOption(scope, token.dropLast(1), token)
+      token.endsWith("&") -> optionService.resetDefault(scope, token.dropLast(1), token)
       else -> {
         // This must be one of =, :, +=, -=, or ^=
         // Look for the = or : first
@@ -142,7 +142,7 @@ fun parseOptionLine(editor: Editor, args: String, scope: OptionService.Scope, fa
         // No operator so only the option name was given
         if (eq == -1) {
           if (optionService.isToggleOption(token)) {
-            optionService.setOption(scope, token, editor, token)
+            optionService.setOption(scope, token, token)
           } else {
             toShow.add(Pair(token, token))
           }
@@ -159,10 +159,10 @@ fun parseOptionLine(editor: Editor, args: String, scope: OptionService.Scope, fa
             val option = token.take(end)
             val value = token.substring(eq + 1)
             when (op) {
-              '+' -> optionService.appendValue(scope, option, value, editor, token)
-              '-' -> optionService.removeValue(scope, option, value, editor, token)
-              '^' -> optionService.prependValue(scope, option, value, editor, token)
-              else -> optionService.setOptionValue(scope, option, value, editor, token)
+              '+' -> optionService.appendValue(scope, option, value, token)
+              '-' -> optionService.removeValue(scope, option, value, token)
+              '^' -> optionService.prependValue(scope, option, value, token)
+              else -> optionService.setOptionValue(scope, option, value, token)
             }
           } else {
             error = Msg.unkopt
@@ -256,11 +256,7 @@ private fun showOptions(editor: Editor, nameAndToken: Collection<Pair<String, St
 }
 
 private fun optionToString(scope: OptionService.Scope, name: String, editor: Editor): String {
-  val value = if (scope == OptionService.Scope.LOCAL) {
-    VimPlugin.getOptionService().getLocalOptionValue(name, editor)
-  } else {
-    VimPlugin.getOptionService().getGlobalOptionValue(name)
-  }
+  val value = VimPlugin.getOptionService().getOptionValue(scope, name)
   return if (VimPlugin.getOptionService().isToggleOption(name)) {
     if (value.asBoolean()) "  $name" else "no$name"
   } else {

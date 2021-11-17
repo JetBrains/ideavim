@@ -38,7 +38,7 @@ class DeleteJoinLinesSpacesAction : ChangeEditorActionHandler.SingleExecution() 
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode) return false
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL, "ideajoin", editor)) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL(editor), "ideajoin")) {
       return VimPlugin.getChange().joinViaIdeaByCount(editor, context, operatorArguments.count1)
     }
     VimPlugin.getEditor().notifyIdeaJoin(editor.project)

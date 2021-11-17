@@ -10,37 +10,21 @@ interface OptionService {
   /**
    * todo doc for each method
    */
-  fun getGlobalOptionValue(optionName: String, token: String = optionName): VimDataType {
-    return getOptionValue(Scope.GLOBAL, optionName, null, token)
-  }
+  fun getOptionValue(scope: Scope, optionName: String, token: String = optionName): VimDataType
 
-  fun getLocalOptionValue(optionName: String, editor: Editor?, token: String = optionName): VimDataType {
-    return getOptionValue(Scope.LOCAL, optionName, editor, token)
-  }
+  fun setOptionValue(scope: Scope, optionName: String, value: VimDataType, token: String = optionName)
 
-  fun getOptionValue(scope: Scope, optionName: String, editor: Editor?, token: String = optionName): VimDataType
+  fun appendValue(scope: Scope, optionName: String, value: String, token: String = optionName)
 
-  fun setGlobalOptionValue(optionName: String, value: VimDataType, token: String = optionName) {
-    setOptionValue(Scope.GLOBAL, optionName, value, null, token)
-  }
+  fun prependValue(scope: Scope, optionName: String, value: String, token: String = optionName)
 
-  fun setLocalOptionValue(optionName: String, value: VimDataType, editor: Editor?, token: String = optionName) {
-    setOptionValue(Scope.LOCAL, optionName, value, editor, token)
-  }
+  fun removeValue(scope: Scope, optionName: String, value: String, token: String = optionName)
 
-  fun setOptionValue(scope: Scope, optionName: String, value: VimDataType, editor: Editor?, token: String = optionName)
+  fun isSet(scope: Scope, optionName: String, token: String = optionName): Boolean
 
-  fun appendValue(scope: Scope, optionName: String, value: String, editor: Editor?, token: String = optionName)
+  fun isDefault(scope: Scope, optionName: String, token: String = optionName): Boolean
 
-  fun prependValue(scope: Scope, optionName: String, value: String, editor: Editor?, token: String = optionName)
-
-  fun removeValue(scope: Scope, optionName: String, value: String, editor: Editor?, token: String = optionName)
-
-  fun isSet(scope: Scope, optionName: String, editor: Editor?, token: String = optionName): Boolean
-
-  fun isDefault(scope: Scope, optionName: String, editor: Editor?, token: String = optionName): Boolean
-
-  fun resetDefault(scope: Scope, optionName: String, editor: Editor?, token: String = optionName)
+  fun resetDefault(scope: Scope, optionName: String, token: String = optionName)
 
   fun resetAllOptions()
 
@@ -52,14 +36,14 @@ interface OptionService {
   /**
    * Sets the option on (true)
    */
-  fun setOption(scope: Scope, optionName: String, editor: Editor?, token: String = optionName)
+  fun setOption(scope: Scope, optionName: String, token: String = optionName)
 
   /**
    * Unsets the option (false)
    */
-  fun unsetOption(scope: Scope, optionName: String, editor: Editor?, token: String = optionName)
+  fun unsetOption(scope: Scope, optionName: String, token: String = optionName)
 
-  fun toggleOption(scope: Scope, optionName: String, editor: Editor?, token: String = optionName)
+  fun toggleOption(scope: Scope, optionName: String, token: String = optionName)
 
   fun getOptions(): Set<String>
 
@@ -74,8 +58,8 @@ interface OptionService {
 
   fun removeListener(optionName: String, listener: OptionChangeListener<VimDataType>)
 
-  enum class Scope {
-    LOCAL,
-    GLOBAL
+  sealed class Scope {
+    object GLOBAL : Scope()
+    class LOCAL(val editor: Editor) : Scope()
   }
 }

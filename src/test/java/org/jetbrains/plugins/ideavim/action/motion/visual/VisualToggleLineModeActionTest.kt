@@ -131,7 +131,7 @@ class VisualToggleLineModeActionTest : VimTestCase() {
                     hard by the torrent of a mountain pass.
       """.trimIndent()
     )
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "selectmode", VimString("cmd"), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "selectmode", VimString("cmd"))
     typeText(parseKeys("V"))
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_LINE)
   }

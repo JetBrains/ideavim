@@ -37,12 +37,12 @@ class ShowCmdTest : VimTestCase() {
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd on by default`() {
     VimPlugin.getOptionService().resetAllOptions()
-    assertTrue(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "showcmd", null))
+    assertTrue(VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "showcmd"))
   }
 
   @TestWithoutNeovim(reason = SkipNeovimReason.SHOW_CMD)
   fun `test showcmd shows nothing if disabled`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "showcmd", null)
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "showcmd")
 
     typeText(parseKeys("3"))
     assertEquals("", getShowCmdText())

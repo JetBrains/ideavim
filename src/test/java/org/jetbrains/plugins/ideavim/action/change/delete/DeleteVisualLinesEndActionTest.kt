@@ -136,7 +136,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test simple deletion with indent and nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline")
     val keys = listOf("v", "D")
     val before = """
             A Discovery
@@ -369,7 +369,7 @@ class DeleteVisualLinesEndActionTest : VimOptionTestCase(VirtualEditData.name) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test line deletion with indent and nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline")
     val keys = listOf("V", "D")
     val before = """
             A Discovery

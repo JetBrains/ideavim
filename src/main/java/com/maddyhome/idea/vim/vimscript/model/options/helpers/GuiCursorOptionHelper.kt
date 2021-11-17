@@ -74,7 +74,7 @@ object GuiCursorOptionHelper {
       var highlightGroup = ""
       var lmapHighlightGroup = ""
       var blinkModes = emptyList<String>()
-      (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "guicursor", null) as VimString).value
+      (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "guicursor") as VimString).value
         .split(",")
         .map { convertToken(it) }
         .forEach { state ->

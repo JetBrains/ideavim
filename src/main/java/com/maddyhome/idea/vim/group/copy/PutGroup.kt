@@ -164,7 +164,7 @@ class PutGroup {
     additionalData: Map<String, Any>,
   ) {
     val subMode = data.visualSelection?.typeInEditor?.toSubMode() ?: CommandState.SubMode.NONE
-    if (ClipboardOptionsData.ideaput in (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "clipboard", null) as VimString).value) {
+    if (ClipboardOptionsData.ideaput in (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "clipboard") as VimString).value) {
       val idePasteProvider = getProviderForPasteViaIde(context, text.typeInRegister, data)
       if (idePasteProvider != null) {
         logger.debug("Perform put via idea paste")
@@ -611,7 +611,7 @@ class PutGroup {
 
   private fun notifyAboutIdeaPut(project: Project?) {
     if (VimPlugin.getVimState().isIdeaPutNotified ||
-      ClipboardOptionsData.ideaput in (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "clipboard", null) as VimString).value ||
+      ClipboardOptionsData.ideaput in (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "clipboard") as VimString).value ||
       ClipboardOptionHelper.ideaputDisabled
     ) return
 

@@ -161,7 +161,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test nested visual mode in ide gets visual caret`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "keymodel", VimString("startsel,stopsel"), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "keymodel", VimString("startsel,stopsel"))
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("i", "<S-Right><S-Right><S-Right>"))
     assertCaretVisualAttributes("BLOCK", 0F)
@@ -169,7 +169,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test caret reset to insert after leaving nested visual mode`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "keymodel", VimString("startsel,stopsel"), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "keymodel", VimString("startsel,stopsel"))
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("i", "<S-Right><S-Right><S-Right>", "<Right>"))
     assertCaretVisualAttributes("BAR", 0.25F)
@@ -177,7 +177,7 @@ class CaretVisualAttributesHelperTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.NOT_VIM_TESTING)
   fun `test caret reset to insert after cancelling nested visual mode`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "keymodel", VimString("startsel,stopsel"), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "keymodel", VimString("startsel,stopsel"))
     configureByText("I ${c}found it in a legendary land")
     typeText(parseKeys("i", "<S-Right><S-Right><S-Right>", "<Esc>"))
     assertCaretVisualAttributes("BAR", 0.25F)

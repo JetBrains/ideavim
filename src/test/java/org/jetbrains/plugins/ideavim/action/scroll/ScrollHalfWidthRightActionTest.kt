@@ -75,7 +75,7 @@ class ScrollHalfWidthRightActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll half page width with sidescrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10))
     configureByColumns(200)
     typeText(parseKeys("150|", "ze", "zH"))
     assertPosition(0, 109)
@@ -84,7 +84,7 @@ class ScrollHalfWidthRightActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scroll half page width ignores sidescroll`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescroll", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescroll", VimInt(10))
     configureByColumns(200)
     typeText(parseKeys("200|", "ze", "zH"))
     assertPosition(0, 159)

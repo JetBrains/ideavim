@@ -31,7 +31,7 @@ class PackaddCommand(val ranges: Ranges, val argument: String) : Command.SingleE
 
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     if (argument == "matchit" || (argument.startsWith("!") && argument.drop(1).trim() == "matchit")) {
-      VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "matchit", null)
+      VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "matchit")
     }
     return ExecutionResult.Success
   }

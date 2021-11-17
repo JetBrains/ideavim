@@ -145,7 +145,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test moves caret to same column with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline")
     doTest(
       "G",
       """
@@ -223,7 +223,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   }
 
   fun `test go to line in last half screen of file puts last line at bottom of screen ignoring scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     typeText(parseKeys("95G"))
     assertPosition(94, 4)
@@ -249,7 +249,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   }
 
   fun `test go to line does not scroll when last line is less than scrolloff above bottom of file`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(67, 97)
@@ -259,7 +259,7 @@ class MotionGotoLineLastActionTest : VimTestCase() {
   }
 
   fun `test go to line does not scroll when last line is less than scrolloff above bottom of file with folds`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setEditorVirtualSpace()
     typeText(parseKeys("20G", "V10j", ":'<,'>action CollapseSelection<CR>", "V"))

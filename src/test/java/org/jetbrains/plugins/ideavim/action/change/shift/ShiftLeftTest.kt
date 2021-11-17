@@ -74,7 +74,7 @@ class ShiftLeftTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test shift left does not move caret with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline")
     val file = """
       |A Discovery
       |
@@ -98,7 +98,7 @@ class ShiftLeftTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test shift left positions caret at end of line with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline")
     val file = """
       |A Discovery
       |

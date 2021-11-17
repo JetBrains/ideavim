@@ -72,8 +72,8 @@ public class StringOption extends TextOption {
     onChanged(oldValue, getValue());
     try {
     if (!((VimString)VimPlugin.getOptionService()
-      .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(value)) {
-      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(value), null, name);
+      .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue().equals(value)) {
+      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimString(value), name);
     }
   } catch (Exception e) {}
 
@@ -93,8 +93,8 @@ public class StringOption extends TextOption {
     onChanged(oldValue, getValue());
     try {
     if (!((VimString)VimPlugin.getOptionService()
-      .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(value)) {
-      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(value), null, name);
+      .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue().equals(value)) {
+      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimString(value), name);
     }
     } catch (Exception e) {}
 
@@ -114,8 +114,8 @@ public class StringOption extends TextOption {
     onChanged(oldValue, getValue());
     try {
     if (!((VimString)VimPlugin.getOptionService()
-      .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(value)) {
-      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(value), null, name);
+      .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue().equals(value)) {
+      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimString(value), name);
     }
     } catch (Exception e) {}
     return true;
@@ -136,8 +136,8 @@ public class StringOption extends TextOption {
       onChanged(oldValue, getValue());
       try {
       if (!((VimString)VimPlugin.getOptionService()
-        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(value)) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(value), null, name);
+        .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue().equals(value)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimString(value), name);
       }
       } catch (Exception e) {}
       return true;
@@ -167,8 +167,8 @@ public class StringOption extends TextOption {
     }
     try {
       if (!((VimString)VimPlugin.getOptionService()
-        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue().equals(dflt)) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimString(dflt), null, name);
+        .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue().equals(dflt)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimString(dflt), name);
       }
     } catch (Exception e) {}
   }

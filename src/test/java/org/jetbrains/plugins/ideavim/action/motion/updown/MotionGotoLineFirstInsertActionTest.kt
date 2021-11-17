@@ -52,7 +52,7 @@ class MotionGotoLineFirstInsertActionTest : VimTestCase() {
 
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test simple motion ignores nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline")
     doTest(
       listOf("i", "<C-Home>", "<Esc>"),
       """

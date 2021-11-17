@@ -47,7 +47,7 @@ class DeleteJoinVisualLinesAction : VisualOperatorActionHandler.SingleExecution(
     operatorArguments: OperatorArguments,
   ): Boolean {
     if (editor.isOneLineMode) return false
-    if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL, "ideajoin", editor)) {
+    if (VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL(editor), "ideajoin")) {
       VimPlugin.getChange().joinViaIdeaBySelections(editor, context, caretsAndSelections)
       return true
     }

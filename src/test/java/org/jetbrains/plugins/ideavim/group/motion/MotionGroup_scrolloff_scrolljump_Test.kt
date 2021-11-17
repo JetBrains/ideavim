@@ -359,7 +359,7 @@ class MotionGroup_scrolloff_Test : VimOptionTestCase(ScrollOffData.name) {
     configureByPages(5)
     setPositionAndScroll(50, 50)
 
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(999), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(999))
 
     assertPosition(50, 0)
     assertVisibleArea(33, 67)

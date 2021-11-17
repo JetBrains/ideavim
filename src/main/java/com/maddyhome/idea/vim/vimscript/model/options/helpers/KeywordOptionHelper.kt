@@ -23,7 +23,7 @@ object KeywordOptionHelper {
   fun updateSpecs() {
     keywordSpecs = valuesToValidatedAndReversedSpecs(
       parseValues(
-        (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "iskeyword", null) as VimString).value
+        (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "iskeyword") as VimString).value
       )
     )!!.toMutableList()
   }

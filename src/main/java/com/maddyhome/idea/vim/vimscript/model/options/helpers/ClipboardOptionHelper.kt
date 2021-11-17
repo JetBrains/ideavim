@@ -13,14 +13,14 @@ object ClipboardOptionHelper {
     private val containedBefore: Boolean
 
     init {
-      val optionValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "clipboard", null) as VimString).value
+      val optionValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "clipboard") as VimString).value
       containedBefore = optionValue.contains(ClipboardOptionsData.ideaput)
-      VimPlugin.getOptionService().removeValue(OptionService.Scope.GLOBAL, "clipboard", ClipboardOptionsData.ideaput, null, "clipboard")
+      VimPlugin.getOptionService().removeValue(OptionService.Scope.GLOBAL, "clipboard", ClipboardOptionsData.ideaput, "clipboard")
       ideaputDisabled = true
     }
 
     override fun close() {
-      if (containedBefore) VimPlugin.getOptionService().appendValue(OptionService.Scope.GLOBAL, "clipboard", ClipboardOptionsData.ideaput, null, "clipboard")
+      if (containedBefore) VimPlugin.getOptionService().appendValue(OptionService.Scope.GLOBAL, "clipboard", ClipboardOptionsData.ideaput, "clipboard")
       ideaputDisabled = false
     }
   }

@@ -29,15 +29,10 @@ import com.maddyhome.idea.vim.vimscript.services.OptionService
 data class OptionExpression(val scope: Scope, val optionName: String) : Expression() {
 
   override fun evaluate(editor: Editor, context: DataContext, parent: Executable): VimDataType {
-    return VimPlugin.getOptionService().getOptionValue(scope.toOptionScope(), optionName, editor)
-  }
-}
-
-// todo clean me up
-fun Scope.toOptionScope(): OptionService.Scope {
-  return when (this) {
-    Scope.GLOBAL_VARIABLE -> OptionService.Scope.GLOBAL
-    Scope.LOCAL_VARIABLE -> OptionService.Scope.LOCAL
-    else -> throw ExException("Invalid option scope")
+    return when (scope) {
+      Scope.GLOBAL_VARIABLE -> VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, optionName, originalString)
+      Scope.LOCAL_VARIABLE -> VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), optionName, originalString)
+      else -> throw ExException("Invalid option scope")
+    }
   }
 }

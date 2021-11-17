@@ -41,7 +41,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
   }
 
   fun `test scroll caret column to last screen column with sidescrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10))
     configureByColumns(200)
     typeText(StringHelper.parseKeys("100|", "ze"))
     assertVisibleLineBounds(0, 30, 109)
@@ -60,7 +60,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
   }
 
   fun `test scroll end of line to last screen column with sidescrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10))
     configureByColumns(200)
     typeText(StringHelper.parseKeys("$", "ze"))
     // See myFixture.editor.settings.additionalColumnsCount
@@ -69,7 +69,7 @@ class ScrollLastScreenColumnActionTest : VimTestCase() {
 
   fun `test scroll caret column to last screen column with sidescrolloff containing an inline inlay`() {
     // The offset should include space for the inlay
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10))
     configureByColumns(200)
     val inlay = addInlay(101, true, 5)
     typeText(StringHelper.parseKeys("100|", "ze"))

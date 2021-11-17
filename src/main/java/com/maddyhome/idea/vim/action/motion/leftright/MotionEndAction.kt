@@ -49,7 +49,7 @@ class MotionEndAction : NonShiftedSpecialKeyHandler() {
     if (editor.inInsertMode) {
       allow = true
     } else if (editor.inVisualMode || editor.inSelectMode) {
-      val opt = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL, "selection", editor) as VimString).value
+      val opt = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), "selection") as VimString).value
       if (opt != "old") {
         allow = true
       }

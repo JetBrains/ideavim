@@ -18,8 +18,8 @@ import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 object IdeaRefactorModeHelper {
 
-  fun keepMode(): Boolean = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "idearefactormode", null) as VimString).value == IdeaRefactorMode.keep
-  fun selectMode(): Boolean = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "idearefactormode", null) as VimString).value == IdeaRefactorMode.select
+  fun keepMode(): Boolean = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "idearefactormode") as VimString).value == IdeaRefactorMode.keep
+  fun selectMode(): Boolean = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "idearefactormode") as VimString).value == IdeaRefactorMode.select
 
   fun correctSelection(editor: Editor) {
     val action: () -> Unit = {

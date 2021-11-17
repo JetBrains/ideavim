@@ -117,7 +117,7 @@ class TemplateTest : VimOptionTestCase(IdeaRefactorMode.name) {
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.TEMPLATES)
   fun `test selectmode without template`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "idearefactormode", VimString(IdeaRefactorMode.visual), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "idearefactormode", VimString(IdeaRefactorMode.visual))
     configureByJavaText(
       """
             class Hello {

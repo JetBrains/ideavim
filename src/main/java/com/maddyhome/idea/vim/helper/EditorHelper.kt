@@ -42,7 +42,7 @@ val Editor.fileSize: Int
  */
 val Editor.isIdeaVimDisabledHere: Boolean
   get() {
-    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "ideavimsupport", null) as VimString).value
+    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "ideavimsupport") as VimString).value
     return disabledInDialog ||
       (!ClientId.isCurrentlyUnderLocalId) || // CWM-927
       (!ideaVimSupportValue.contains("singleline") && isDatabaseCell()) ||
@@ -55,7 +55,7 @@ private fun Editor.isDatabaseCell(): Boolean {
 
 private val Editor.disabledInDialog: Boolean
   get() {
-    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "ideavimsupport", null) as VimString).value
+    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "ideavimsupport") as VimString).value
     return (!ideaVimSupportValue.contains("dialog") && !ideaVimSupportValue.contains("dialoglegacy")) &&
       (!this.isPrimaryEditor() && !EditorHelper.isFileEditor(this))
   }

@@ -1,6 +1,5 @@
 package com.maddyhome.idea.vim.vimscript.model.options
 
-import com.intellij.openapi.editor.Editor
 import com.intellij.util.containers.ContainerUtil
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
@@ -25,13 +24,13 @@ sealed class Option<T : VimDataType>(val name: String, val abbrev: String, priva
     listeners.remove(listener)
   }
 
-  fun onChanged(scope: OptionService.Scope, oldValue: VimDataType, editor: Editor?) {
+  fun onChanged(scope: OptionService.Scope, oldValue: VimDataType) {
     for (listener in listeners) {
       when (scope) {
-        OptionService.Scope.GLOBAL -> listener.processGlobalValueChange(oldValue)
-        OptionService.Scope.LOCAL -> {
+        is OptionService.Scope.GLOBAL -> listener.processGlobalValueChange(oldValue)
+        is OptionService.Scope.LOCAL -> {
           if (listener is LocalOptionChangeListener) {
-            listener.processLocalValueChange(oldValue, editor!!)
+            listener.processLocalValueChange(oldValue, scope.editor)
           } else {
             listener.processGlobalValueChange(oldValue)
           }

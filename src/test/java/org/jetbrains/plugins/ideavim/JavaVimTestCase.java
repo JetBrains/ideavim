@@ -72,7 +72,7 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
 
   protected void enableExtensions(@NotNull String... extensionNames) {
     for (String name : extensionNames) {
-      VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, name, null, name);
+      VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL.INSTANCE, name,  name);
     }
   }
 

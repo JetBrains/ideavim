@@ -59,7 +59,7 @@ class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
 
   @VimOptionDefaultAll
   fun `test default stop select`() {
-    val keymodel = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "keymodel", null) as VimString).value
+    val keymodel = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "keymodel") as VimString).value
     assertTrue(KeyModelOptionData.stopselect in keymodel)
   }
 

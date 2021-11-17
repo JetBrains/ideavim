@@ -61,7 +61,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
     @Override
     public void caretPositionChanged(@NotNull CaretEvent e) {
       final boolean requiresRepaint = e.getNewPosition().line != e.getOldPosition().line;
-      if (requiresRepaint && VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL, "relativenumber", e.getEditor(), "relativenumber")) {
+      if (requiresRepaint && VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(e.getEditor()), "relativenumber", "relativenumber")) {
         repaintRelativeLineNumbers(e.getEditor());
       }
     }
@@ -109,8 +109,8 @@ public class EditorGroup implements PersistentStateComponent<Element> {
   }
 
   private static void updateLineNumbers(final @NotNull Editor editor) {
-    final boolean relativeNumber = VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL, "relativenumber", editor, "relativenumber");
-    final boolean number = VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL, "number", editor, "number");
+    final boolean relativeNumber = VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(editor), "relativenumber", "relativenumber");
+    final boolean number = VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(editor), "number", "number");
 
     final boolean showBuiltinEditorLineNumbers = shouldShowBuiltinLineNumbers(editor, number, relativeNumber);
 
@@ -238,7 +238,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
 
   public void notifyIdeaJoin(@Nullable Project project) {
     if (VimPlugin.getVimState().isIdeaJoinNotified()
-        || VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideajoin", null, "ideajoin")) {
+        || VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "ideajoin",  "ideajoin")) {
       return;
     }
 
@@ -286,7 +286,7 @@ public class EditorGroup implements PersistentStateComponent<Element> {
   private static class RelativeLineNumberConverter implements LineNumberConverter {
     @Override
     public Integer convert(@NotNull Editor editor, int lineNumber) {
-      final boolean number = VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL, "number", editor, "number");
+      final boolean number = VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(editor), "number", "number");
       final int caretLine = editor.getCaretModel().getLogicalPosition().line;
 
       // lineNumber is 1 based

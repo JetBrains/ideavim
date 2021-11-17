@@ -180,7 +180,7 @@ public class FileGroup {
    */
   public void saveFile(DataContext context) {
     String action;
-    if (IdeaWriteData.all.equals(((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "ideawrite", null, "ideawrite")).getValue())) {
+    if (IdeaWriteData.all.equals(((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, "ideawrite", "ideawrite")).getValue())) {
       action = "SaveAll";
     }
     else {

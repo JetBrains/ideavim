@@ -213,7 +213,7 @@ class SubstituteCommandTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
   @VimOptionDefaultAll
   @TestWithoutNeovim(reason = SkipNeovimReason.OPTION)
   fun `test smartcase option`() {
-    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "smartcase", null)
+    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "smartcase")
 
     // smartcase does nothing if ignorecase is not set
     doTest(
@@ -227,7 +227,7 @@ class SubstituteCommandTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
       "foo bar foo\nbar FOO foo"
     )
 
-    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "ignorecase", null)
+    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "ignorecase")
     doTest(
       "%s/foo/bar/g",
       "foo Foo foo\nFoo FOO foo",
@@ -249,14 +249,14 @@ class SubstituteCommandTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
       "bar bar bar\nbar bar bar"
     )
 
-    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "ignorecase", null)
+    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "ignorecase")
     doTest(
       "%s/foo/bar/gi",
       "foo Foo foo\nFoo FOO foo",
       "bar bar bar\nbar bar bar"
     )
 
-    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "smartcase", null)
+    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "smartcase")
     doTest(
       "%s/foo/bar/gi",
       "foo Foo foo\nFoo FOO foo",
@@ -273,14 +273,14 @@ class SubstituteCommandTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
       "bar Foo bar\nFoo FOO bar"
     )
 
-    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "ignorecase", null)
+    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "ignorecase")
     doTest(
       "%s/foo/bar/gI",
       "foo Foo foo\nFoo FOO foo",
       "bar Foo bar\nFoo FOO bar"
     )
 
-    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "smartcase", null)
+    VimPlugin.getOptionService().setOption(OptionService.Scope.GLOBAL, "smartcase")
     doTest(
       "%s/Foo/bar/gI",
       "foo Foo foo\nFoo FOO foo",

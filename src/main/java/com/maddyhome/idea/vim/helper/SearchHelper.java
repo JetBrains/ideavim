@@ -2632,7 +2632,7 @@ public class SearchHelper {
 
   private static @NotNull String parseMatchPairsOption() {
     String[] vals = ((VimString) VimPlugin.getOptionService()
-      .getOptionValue(OptionService.Scope.GLOBAL, "matchpairs", null, "matchpairs"))
+      .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, "matchpairs", "matchpairs"))
       .getValue()
       .split(",");
     StringBuilder res = new StringBuilder();

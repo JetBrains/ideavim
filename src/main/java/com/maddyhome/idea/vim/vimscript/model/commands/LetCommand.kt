@@ -40,10 +40,10 @@ import com.maddyhome.idea.vim.vimscript.model.expressions.Scope
 import com.maddyhome.idea.vim.vimscript.model.expressions.SublistExpression
 import com.maddyhome.idea.vim.vimscript.model.expressions.Variable
 import com.maddyhome.idea.vim.vimscript.model.expressions.operators.AssignmentOperator
-import com.maddyhome.idea.vim.vimscript.model.expressions.toOptionScope
 import com.maddyhome.idea.vim.vimscript.model.functions.DefinedFunctionHandler
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionDeclaration
 import com.maddyhome.idea.vim.vimscript.model.statements.FunctionFlag
+import com.maddyhome.idea.vim.vimscript.services.OptionService
 
 /**
  * see "h :let"
@@ -174,7 +174,11 @@ data class LetCommand(
           operator == AssignmentOperator.ADDITION || operator == AssignmentOperator.SUBTRACTION
         ) {
           val newValue = operator.getNewValue(optionValue, expression.evaluate(editor, context, this))
-          VimPlugin.getOptionService().setOptionValue(variable.scope.toOptionScope(), variable.optionName, newValue, editor, variable.originalString)
+          when (variable.scope) {
+            Scope.GLOBAL_VARIABLE -> VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, variable.optionName, newValue, variable.originalString)
+            Scope.LOCAL_VARIABLE -> VimPlugin.getOptionService().setOptionValue(OptionService.Scope.LOCAL(editor), variable.optionName, newValue, variable.originalString)
+            else -> throw ExException("Invalid option scope")
+          }
         } else {
           TODO()
         }

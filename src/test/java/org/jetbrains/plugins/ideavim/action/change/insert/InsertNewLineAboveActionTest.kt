@@ -117,7 +117,7 @@ class InsertNewLineAboveActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test insert new line above at top of screen does not scroll top of screen`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(50, "I found it in a legendary land")
     setPositionAndScroll(5, 15)
     typeText(parseKeys("O"))

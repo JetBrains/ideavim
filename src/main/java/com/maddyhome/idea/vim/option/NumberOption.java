@@ -121,8 +121,8 @@ public class NumberOption extends TextOption {
       onChanged(oldValue, getValue());
       try {
       if (!(((VimInt)VimPlugin.getOptionService()
-        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue() == value)) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimInt(value), null, name);
+        .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(value), name);
       }
       } catch (Exception e) {}
 
@@ -154,8 +154,8 @@ public class NumberOption extends TextOption {
       onChanged(oldValue, getValue());
       try {
       if (!(((VimInt)VimPlugin.getOptionService()
-        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue() == value)) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimInt(value), null, name);
+        .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(value), name);
       }
       } catch (Exception e) {}
 
@@ -187,8 +187,8 @@ public class NumberOption extends TextOption {
       onChanged(oldValue, getValue());
       try {
       if (!(((VimInt)VimPlugin.getOptionService()
-        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue() == value)) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimInt(value), null, name);
+        .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(value), name);
       }
       } catch (Exception e) {}
 
@@ -220,8 +220,8 @@ public class NumberOption extends TextOption {
       onChanged(oldValue, getValue());
       try {
       if (!(((VimInt)VimPlugin.getOptionService()
-        .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue() == value)) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimInt(value), null, name);
+        .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(value), name);
       }
       } catch (Exception e) {}
       return true;
@@ -252,8 +252,8 @@ public class NumberOption extends TextOption {
     }
     try {
     if (!(((VimInt)VimPlugin.getOptionService()
-      .getOptionValue(OptionService.Scope.GLOBAL, name, null, name)).getValue() == value)) {
-      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimInt(value), null, name);
+      .getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, name)).getValue() == value)) {
+      VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(value), name);
     }
     } catch (Exception e) {}
   }

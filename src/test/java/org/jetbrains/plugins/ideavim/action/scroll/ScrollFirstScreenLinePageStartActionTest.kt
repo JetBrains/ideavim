@@ -55,7 +55,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scrolls first line on next page to scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 20)
     typeText(parseKeys("z+"))
@@ -65,7 +65,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test scrolls first line on next page ignores scrolljump`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 20)
     typeText(parseKeys("z+"))
@@ -82,7 +82,7 @@ class ScrollFirstScreenLinePageStartActionTest : VimTestCase() {
   }
 
   fun `test count z+ scrolls count line to top of screen plus scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 20)
     typeText(parseKeys("100z+"))

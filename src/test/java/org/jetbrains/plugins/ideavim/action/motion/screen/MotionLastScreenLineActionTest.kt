@@ -89,7 +89,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret ignores scrolloff when bottom of screen is bottom of file`() {
     assertEquals(35, screenHeight)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(35, "    I found it in a legendary land")
     typeText(parseKeys("L"))
     assertPosition(34, 4)
@@ -98,7 +98,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret applies scrolloff when bottom of screen is not bottom of file`() {
     assertEquals(35, screenHeight)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
     typeText(parseKeys("L"))
     assertPosition(24, 4)
@@ -107,7 +107,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret to last screen line with count and scrolloff at bottom of file`() {
     assertEquals(35, screenHeight)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(35, "    I found it in a legendary land")
     typeText(parseKeys("5L"))
     assertPosition(30, 4)
@@ -116,7 +116,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret to last screen line with count and scrolloff not at bottom of file`() {
     assertEquals(35, screenHeight)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
     typeText(parseKeys("5L"))
     assertPosition(24, 4)
@@ -124,7 +124,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
 
   fun `test move caret ignores scrolloff with large count at top of file`() {
     assertEquals(35, screenHeight)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(0, 20)
     typeText(parseKeys("100L"))
@@ -135,7 +135,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret applies scrolloff with large count when not at top of file`() {
     assertEquals(35, screenHeight)
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40)
     typeText(parseKeys("100L"))
@@ -154,7 +154,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
   fun `test operator pending acts to last screen line with scrolloff`() {
     // Current caret location is the start of the operator range and doesn't get moved to the end, so there is no
     // scrolling, and scrolloff does not apply
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
     typeText(parseKeys("dL"))
@@ -188,7 +188,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
   fun `test operator pending acts on count line from bottom of screen with scrolloff`() {
     // Current caret location is the start of the operator range and doesn't get moved to the end, so there is no
     // scrolling, and scrolloff does not apply
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
     typeText(parseKeys("d5L"))
@@ -201,7 +201,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
   fun `test operator pending acts on large count from bottom of screen with scrolloff`() {
     // Current caret location is the start of the operator range and doesn't get moved to the end, so there is no
     // scrolling, and scrolloff does not apply
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
     typeText(parseKeys("d35L"))
@@ -216,7 +216,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     // the range, and is moved, so scrolloff can apply
     // 50 high file. Top line 20, caret at 40. d35L will delete from current line to 35 lines up from the bottom of the
     // screen. There are only 10 actual lines below, so this will delete from current line up to current line - 10 = 30
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
     typeText(parseKeys("d35L"))
@@ -231,7 +231,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
     // the range, and is moved, so scrolloff can apply
     // 50 high file. Top line 20, caret at 40. d35L will delete from current line to 35 lines up from the bottom of the
     // screen. There are only 10 actual lines below, so this will delete from current line up to current line - 10 = 30
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
     setEditorVirtualSpace()
     setPositionAndScroll(20, 40, 10)
@@ -243,7 +243,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test operator pending acts to last screen line with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline")
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
     typeText(parseKeys("dL"))
@@ -253,7 +253,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test operator pending acts on count line from bottom of screen with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline")
     configureByLines(100, "    I found it in a legendary land")
     setPositionAndScroll(20, 40, 10)
     typeText(parseKeys("d5L"))
@@ -263,7 +263,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret to same column with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline")
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(10, 30, 10)
     typeText(parseKeys("L"))
@@ -272,7 +272,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret to end of shorter line with nostartofline`() {
-    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline", null)
+    VimPlugin.getOptionService().unsetOption(OptionService.Scope.GLOBAL, "startofline")
     configureByLines(50, "    I found it in a legendary land")
     setPositionAndScroll(10, 30, 10)
     typeText(parseKeys("A", " extra text", "<Esc>"))
@@ -294,7 +294,7 @@ class MotionLastScreenLineActionTest : VimTestCase() {
   @TestWithoutNeovim(SkipNeovimReason.SCROLL)
   fun `test move caret to last line of screen with inlays and scrolloff`() {
     // 35 high, with an inlay that is 10 rows high. Bottom line will be 25 (1 based), scrolloff of 10 puts caret at 15
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByLines(50, "    I found it in a legendary land")
     addBlockInlay(EditorHelper.getOffset(myFixture.editor, 20, 5), true, 10)
     setPositionAndScroll(0, 10, 10)

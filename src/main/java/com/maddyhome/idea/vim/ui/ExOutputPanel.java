@@ -276,7 +276,7 @@ public class ExOutputPanel extends JPanel {
     setBounds(bounds);
 
     myScrollPane.getVerticalScrollBar().setValue(0);
-    if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "more", null, "more")) {
+    if (!VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "more", "more")) {
       // FIX
       scrollOffset(100000);
     }

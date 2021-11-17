@@ -94,8 +94,8 @@ public class ToggleOption extends Option<Boolean> {
       onChanged(old, val);
     }
     try {
-      if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, name, null, name) != val) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimInt(val ? 1 : 0), null, name);
+      if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, name, name) != val) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(val ? 1 : 0), name);
       }
     } catch (Exception e) {}
 }
@@ -136,8 +136,8 @@ public class ToggleOption extends Option<Boolean> {
   public void resetDefault() {
     value = dflt;
     try {
-      if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, name, null, name) != dflt) {
-        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, name, new VimInt(dflt ? 1 : 0), null, name);
+      if (VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, name, name) != dflt) {
+        VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL.INSTANCE, name, new VimInt(dflt ? 1 : 0), name);
       }
     } catch (Exception e) {}
   }

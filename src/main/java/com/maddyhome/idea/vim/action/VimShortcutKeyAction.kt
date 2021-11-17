@@ -60,7 +60,7 @@ import javax.swing.KeyStroke
  * These keys are not passed to [com.maddyhome.idea.vim.VimTypedActionHandler] and should be handled by actions.
  */
 class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
-  private val traceTime = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideatracetime", null)
+  private val traceTime = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideatracetime")
 
   override fun actionPerformed(e: AnActionEvent) {
     LOG.trace("Executing shortcut key action")
@@ -186,7 +186,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
   }
 
   private fun isEnabledForEscape(editor: Editor): Boolean {
-    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL, "ideavimsupport", editor) as VimString).value
+    val ideaVimSupportValue = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.LOCAL(editor), "ideavimsupport") as VimString).value
     return editor.isPrimaryEditor() ||
       EditorHelper.isFileEditor(editor) && !editor.inNormalMode ||
       ideaVimSupportValue.contains("dialog") && !editor.inNormalMode
@@ -246,7 +246,7 @@ class VimShortcutKeyAction : AnAction(), DumbAware/*, LightEditCompatible*/ {
 
     fun isEnabledForLookup(keyStroke: KeyStroke): Boolean = keyStroke !in parsedLookupKeys
 
-    private fun parseLookupKeys() = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "lookupkeys", null) as VimString).value
+    private fun parseLookupKeys() = (VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "lookupkeys") as VimString).value
       .split(",")
       .map { StringHelper.parseKeys(it) }
       .filter { it.isNotEmpty() }

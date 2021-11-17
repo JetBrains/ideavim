@@ -38,7 +38,7 @@ import javax.swing.KeyStroke
  */
 class VimTypedActionHandler(origHandler: TypedActionHandler?) : TypedActionHandlerEx {
   private val handler = KeyHandler.getInstance()
-  private val traceTime = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideatracetime", null)
+  private val traceTime = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "ideatracetime")
 
   init {
     handler.originalHandler = origHandler

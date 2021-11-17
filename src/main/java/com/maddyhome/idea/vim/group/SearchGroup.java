@@ -606,7 +606,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     }
     else {
       // :h :&& - "Note that :s and :& don't keep the flags"
-      do_all = VimPlugin.getOptionService().isSet(OptionService.Scope.LOCAL, "gdefault", editor, "gdefault");
+      do_all = VimPlugin.getOptionService().isSet(new OptionService.Scope.LOCAL(editor), "gdefault", "gdefault");
       do_ask = false;
       do_error = true;
       do_ic = 0;
@@ -1027,7 +1027,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   }
 
   private void resetShowSearchHighlight() {
-    showSearchHighlight = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "hlsearch", null, "hlsearch");
+    showSearchHighlight = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "hlsearch", "hlsearch");
   }
 
   private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
@@ -1123,7 +1123,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
    * @return              The offset to the occurrence or -1 if not found
    */
   private int findItOffset(@NotNull Editor editor, int startOffset, int count, Direction dir) {
-    boolean wrap =  VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "wrapscan", null, "wrapscan");
+    boolean wrap =  VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "wrapscan", "wrapscan");
     logger.debug("Perform search. Direction: " + dir + " wrap: " + wrap);
 
     int offset = 0;
@@ -1285,7 +1285,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
     }
 
     Element show = search.getChild("show-last");
-    final String vimInfo = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL, "viminfo", null, "viminfo")).getValue();
+    final String vimInfo = ((VimString) VimPlugin.getOptionService().getOptionValue(OptionService.Scope.GLOBAL.INSTANCE, "viminfo", "viminfo")).getValue();
     final boolean disableHighlight = Set.of(vimInfo.split(",")).contains("h");
     showSearchHighlight = !disableHighlight && Boolean.parseBoolean(show.getText());
     if (logger.isDebugEnabled()) {
@@ -1345,7 +1345,7 @@ public class SearchGroup implements PersistentStateComponent<Element> {
   private @NotNull String lastPatternOffset = "";  // /{pattern}/{offset}. Do not confuse with caret offset!
   private boolean lastIgnoreSmartCase;
   private @NotNull Direction lastDir = Direction.FORWARDS;
-  private boolean showSearchHighlight = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL, "hlsearch", null, "hlsearch");
+  private boolean showSearchHighlight = VimPlugin.getOptionService().isSet(OptionService.Scope.GLOBAL.INSTANCE, "hlsearch", "hlsearch");
 
   private boolean do_all = false; /* do multiple substitutions per line */
   private boolean do_ask = false; /* ask for confirmation */

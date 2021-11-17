@@ -40,7 +40,7 @@ class InsertTabActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test insert tab scrolls at end of line`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10))
     configureByColumns(200)
 
     // TODO: This works for tests, but not in real life. See VimShortcutKeyAction.isEnabled
@@ -50,7 +50,7 @@ class InsertTabActionTest : VimTestCase() {
 
   @TestWithoutNeovim(SkipNeovimReason.OPTION)
   fun `test insert tab scrolls at end of line 2`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "sidescrolloff", VimInt(10))
     configureByColumns(200)
     typeText(parseKeys("70|", "i", "<C-I>"))
     assertVisibleLineBounds(0, 32, 111)

@@ -48,7 +48,7 @@ class ScrollFirstScreenLineActionTest : VimTestCase() {
   }
 
   fun `test scroll current line to top of screen minus scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolloff", VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 19)
     typeText(StringHelper.parseKeys("zt"))
@@ -65,7 +65,7 @@ class ScrollFirstScreenLineActionTest : VimTestCase() {
   }
 
   fun `test scrolls count line to top of screen minus scrolloff`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 19)
     typeText(StringHelper.parseKeys("zt"))
@@ -83,7 +83,7 @@ class ScrollFirstScreenLineActionTest : VimTestCase() {
   }
 
   fun `test scroll current line to top of screen ignoring scrolljump`() {
-    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10), null)
+    VimPlugin.getOptionService().setOptionValue(OptionService.Scope.GLOBAL, "scrolljump", VimInt(10))
     configureByPages(5)
     setPositionAndScroll(0, 19)
     typeText(StringHelper.parseKeys("zt"))
