@@ -4,6 +4,7 @@
 name: Update Changelog
 
 on:
+  workflow_dispatch:
   push:
     branches: [ master ]
 
