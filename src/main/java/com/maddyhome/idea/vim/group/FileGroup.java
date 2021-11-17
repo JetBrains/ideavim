@@ -31,7 +31,6 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
@@ -39,7 +38,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.VimProjectService;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -53,7 +51,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.HashMap;
 
 public class FileGroup {
   public boolean openFile(@NotNull String filename, @NotNull DataContext context) {
@@ -240,10 +237,9 @@ public class FileGroup {
   public void selectPreviousTab(@NotNull DataContext context) {
     Project project = PlatformDataKeys.PROJECT.getData(context);
     if (project == null) return;
-    FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
-    VirtualFile vf = lastSelections.get(fem);
+    VirtualFile vf = LastTabService.getInstance(project).getLastTab();
     if (vf != null && vf.isValid()) {
-      fem.openFile(vf, true);
+      FileEditorManager.getInstance(project).openFile(vf, true);
     }
     else {
       VimPlugin.indicateError();
@@ -256,8 +252,7 @@ public class FileGroup {
   public @Nullable VirtualFile getPreviousTab(@NotNull DataContext context) {
     Project project = PlatformDataKeys.PROJECT.getData(context);
     if (project == null) return null;
-    FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
-    VirtualFile vf = lastSelections.get(fem);
+    VirtualFile vf = LastTabService.getInstance(project).getLastTab();
     if (vf != null && vf.isValid()) {
       return vf;
     }
@@ -423,26 +418,17 @@ public class FileGroup {
     VimPlugin.showMessage(msg.toString());
   }
 
-  private static final @NotNull String disposableKey = "VimFileGroupDisposable";
-
-  private static final @NotNull HashMap<FileEditorManager, VirtualFile> lastSelections = new HashMap<>();
   private static final @NotNull Logger logger = Logger.getInstance(FileGroup.class.getName());
 
   /**
    * This method listens for editor tab changes so any insert/replace modes that need to be reset can be.
    */
-  // I don't understand how to deal with these issues
-  @SuppressWarnings("deprecation")
   public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
     // The user has changed the editor they are working with - exit insert/replace mode, and complete any
     // appropriate repeat
     if (event.getOldFile() != null) {
-      lastSelections.put(event.getManager(), event.getOldFile());
-      String disposableKey = FileGroup.disposableKey + event.getManager().hashCode();
-      if (Disposer.get(disposableKey) == null) {
-        VimProjectService parentDisposable = VimProjectService.getInstance(event.getManager().getProject());
-        Disposer.register(parentDisposable, () -> lastSelections.remove(event.getManager()), disposableKey);
-      }
+      LastTabService.getInstance(event.getManager().getProject()).setLastTab(event.getOldFile());
     }
   }
 }
+
