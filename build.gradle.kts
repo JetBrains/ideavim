@@ -359,21 +359,21 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
     println(projectDir)
     val repository = org.eclipse.jgit.lib.RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
     val git = org.eclipse.jgit.api.Git(repository)
-    val lastSuccessfulCommit = System.getenv("SUCCESS_COMMIT")!!
+    val lastSuccessfulCommit = "296b714282301d84ee204e85fba8821d456fcfae"
     val hashesAndEmailes = git.log().call()
         .takeWhile {
             !it.id.name.equals(lastSuccessfulCommit, ignoreCase = true)
         }
-        .mapTo(HashSet()) { it.name to it.authorIdent.emailAddress }
+        .associate { it.authorIdent.emailAddress to it.name }
 
     println("Last successful commit: $lastSuccessfulCommit")
     println("Amount of commits: ${hashesAndEmailes.size}")
-    println("Emails: ${hashesAndEmailes.map { it.second }}")
+    println("Emails: ${hashesAndEmailes.keys}")
     val gitHub = org.kohsuke.github.GitHub.connect()
     val ghRepository = gitHub.getRepository("JetBrains/ideavim")
     val users = mutableSetOf<Author>()
     println("Start emails processing")
-    for ((hash, email) in hashesAndEmailes) {
+    for ((email, hash) in hashesAndEmailes) {
         println("Processing '$email'...")
         if (email in uncheckedEmails) {
             println("Email '$email' is in unchecked emails. Skip it")

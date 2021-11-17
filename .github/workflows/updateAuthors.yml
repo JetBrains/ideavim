@@ -34,7 +34,7 @@ jobs:
 
       - name: Update authors
         id: update_authors
-        run: ./gradlew updateAuthors
+        run: ./gradlew updateAuthors --stacktrace --debug
         env:
           SUCCESS_COMMIT: ${{ steps.last_successful_commit.outputs.commit_hash }}
 
