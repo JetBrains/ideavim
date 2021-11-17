@@ -172,7 +172,7 @@ public class ProcessGroup {
     return initText;
   }
 
-  public @Nullable String executeCommand(@NotNull Editor editor, @NotNull String command, @Nullable CharSequence input)
+  public @Nullable String executeCommand(@NotNull Editor editor, @NotNull String command, @Nullable CharSequence input, @Nullable String currentDirectoryPath)
     throws ExecutionException, ProcessCanceledException {
 
     // This is a much simplified version of how Vim does this. We're using stdin/stdout directly, while Vim will
@@ -211,6 +211,9 @@ public class ProcessGroup {
       }
 
       final GeneralCommandLine commandLine = new GeneralCommandLine(commands);
+      if (currentDirectoryPath != null) {
+        commandLine.setWorkDirectory(currentDirectoryPath);
+      }
       final CapturingProcessHandler handler = new CapturingProcessHandler(commandLine);
       if (input != null) {
         handler.addProcessListener(new ProcessAdapter() {
