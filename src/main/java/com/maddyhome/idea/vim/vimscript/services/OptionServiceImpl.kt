@@ -147,6 +147,10 @@ internal class OptionServiceImpl : OptionService {
           throw ExException("E474: Invalid argument: $token")
         }
       }
+
+      override fun split(value: String): List<String>? {
+        return KeywordOptionHelper.parseValues(value)
+      }
     },
     object : StringOption(
       "guicursor", "gcr",
@@ -195,6 +199,11 @@ internal class OptionServiceImpl : OptionService {
         }
       }
     }
+  }
+
+  override fun contains(scope: OptionService.Scope, optionName: String, value: String): Boolean {
+    val option = options.get(optionName) as? StringOption ?: return false
+    return value in option.split(getOptionValue(scope, optionName, optionName).asString())!!
   }
 
   fun setOptionValue(scope: OptionService.Scope, optionName: String, value: String, token: String) {

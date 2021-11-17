@@ -14,6 +14,8 @@ interface OptionService {
 
   fun setOptionValue(scope: Scope, optionName: String, value: VimDataType, token: String = optionName)
 
+  fun contains(scope: Scope, optionName: String, value: String): Boolean
+
   fun appendValue(scope: Scope, optionName: String, value: String, token: String = optionName)
 
   fun prependValue(scope: Scope, optionName: String, value: String, token: String = optionName)
