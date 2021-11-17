@@ -359,8 +359,15 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
     println(projectDir)
     val repository = org.eclipse.jgit.lib.RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
     val git = org.eclipse.jgit.api.Git(repository)
-    val hashesAndEmailes = git.log().call().take(40).mapTo(HashSet()) { it.name to it.authorIdent.emailAddress }
+    val lastSuccessfulCommit = System.getenv("SUCCESS_COMMIT")!!
+    val hashesAndEmailes = git.log().call()
+        .takeWhile {
+            !it.id.name.equals(lastSuccessfulCommit, ignoreCase = true)
+        }
+        .mapTo(HashSet()) { it.name to it.authorIdent.emailAddress }
 
+    println("Last successful commit: $lastSuccessfulCommit")
+    println("Amount of commits: ${hashesAndEmailes.size}")
     println("Emails: ${hashesAndEmailes.map { it.second }}")
     val gitHub = org.kohsuke.github.GitHub.connect()
     val ghRepository = gitHub.getRepository("JetBrains/ideavim")
