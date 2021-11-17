@@ -28,6 +28,8 @@ jobs:
       - name: Update authors
         id: update_authors
         run: ./gradlew updateMergedPr -PprId=${{ github.event.number }}
+        env:
+          GITHUB_OAUTH: ${{ secrets.AUTOMATION_TOKEN }}
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
