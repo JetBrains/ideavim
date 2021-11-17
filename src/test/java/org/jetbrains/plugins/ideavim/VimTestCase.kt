@@ -205,7 +205,7 @@ abstract class VimTestCase : UsefulTestCase() {
   protected fun configureByPages(pageCount: Int) {
     val stringBuilder = StringBuilder()
     repeat(pageCount * screenHeight) {
-      stringBuilder.appendln("I found it in a legendary land")
+      stringBuilder.appendLine("I found it in a legendary land")
     }
     configureByText(stringBuilder.toString())
   }
@@ -213,7 +213,7 @@ abstract class VimTestCase : UsefulTestCase() {
   protected fun configureByLines(lineCount: Int, line: String) {
     val stringBuilder = StringBuilder()
     repeat(lineCount - 1) {
-      stringBuilder.appendln(line)
+      stringBuilder.appendLine(line)
     }
     stringBuilder.append(line)
     configureByText(stringBuilder.toString())

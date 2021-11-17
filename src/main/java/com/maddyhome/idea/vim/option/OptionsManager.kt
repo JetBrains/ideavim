@@ -54,7 +54,7 @@ import kotlin.math.min
  */
 @Deprecated("was replaced by OptionService")
 @ScheduledForRemoval(inVersion = "1.11")
-@Suppress("unused")
+@Suppress("unused", "DEPRECATION")
 object OptionsManager {
   private val logger = Logger.getInstance(OptionsManager::class.java)
 
