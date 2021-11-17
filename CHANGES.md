@@ -27,6 +27,7 @@ usual beta standards.
 
 ### Features:
 * Make IdeaVim compatible with CodeWithMe | [VIM-2332](https://youtrack.jetbrains.com/issue/VIM-2332)
+* Normal command | [VIM-830](https://youtrack.jetbrains.com/issue/VIM-830)
 
 ### Fixes:
 * [VIM-2442](https://youtrack.jetbrains.com/issue/VIM-2442) Fix `!` command
@@ -45,6 +46,7 @@ usual beta standards.
 * [VIM-2435](https://youtrack.jetbrains.com/issue/VIM-2435) Close diff window on esc
 * [VIM-2461](https://youtrack.jetbrains.com/issue/VIM-2461) Show action id before action execution
 * [VIM-2026](https://youtrack.jetbrains.com/issue/VIM-2026) Keep global marks after restart
+* [VIM-1691](https://youtrack.jetbrains.com/issue/VIM-1691) Fix default path for `!` command
 
 ### Merged PRs:
 * [390](https://github.com/JetBrains/ideavim/pull/390) by [chylex](https://github.com/chylex): [VIM-2255] Missing reload icon in .ideavimrc on Windows
