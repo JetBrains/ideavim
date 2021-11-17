@@ -46,7 +46,7 @@ class VimStatistic : ApplicationUsagesCollector() {
         IDEASTATUSICON withOption "ideastatusicon",
         IDEAWRITE withOption "ideawrite",
         IDEASELECTION with optionService.contains(OptionService.Scope.GLOBAL, "selectmode", "ideaselection"),
-        IDEAVIMSUPPORT with optionService.getOptionValue(OptionService.Scope.GLOBAL, "ideavimsupport").asString().split(",")
+        IDEAVIMSUPPORT with optionService.getValues(OptionService.Scope.GLOBAL, "ideavimsupport")!!
       )
     )
   }
