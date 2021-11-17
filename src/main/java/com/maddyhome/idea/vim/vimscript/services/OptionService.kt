@@ -16,6 +16,8 @@ interface OptionService {
 
   fun contains(scope: Scope, optionName: String, value: String): Boolean
 
+  fun getValues(scope: Scope, optionName: String): List<String>?
+
   fun appendValue(scope: Scope, optionName: String, value: String, token: String = optionName)
 
   fun prependValue(scope: Scope, optionName: String, value: String, token: String = optionName)
