@@ -37,7 +37,7 @@ jobs:
         run: ./gradlew updateAuthors --stacktrace
         env:
           SUCCESS_COMMIT: ${{ steps.last_successful_commit.outputs.commit_hash }}
-          GITHU_OAUTH: ${{ secrets.AUTOMATION_TOKEN }}
+          GITHUB_OAUTH: ${{ secrets.AUTOMATION_TOKEN }}
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4

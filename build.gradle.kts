@@ -359,7 +359,7 @@ fun updateAuthors(uncheckedEmails: Set<String>) {
     println(projectDir)
     val repository = org.eclipse.jgit.lib.RepositoryBuilder().setGitDir(File("$projectDir/.git")).build()
     val git = org.eclipse.jgit.api.Git(repository)
-    val lastSuccessfulCommit = "296b714282301d84ee204e85fba8821d456fcfae"
+    val lastSuccessfulCommit = System.getenv("SUCCESS_COMMIT")!!
     val hashesAndEmailes = git.log().call()
         .takeWhile {
             !it.id.name.equals(lastSuccessfulCommit, ignoreCase = true)
