@@ -36,9 +36,9 @@ class VimStatistic : ApplicationUsagesCollector() {
 
     return setOf(
       OPTIONS.metric(
-        IDEAJOIN.with(optionService.isSet(OptionService.Scope.GLOBAL, "ideajoin", null)),
-        IDEAMARKS.with(optionService.isSet(OptionService.Scope.GLOBAL, "ideamarks", null)),
-        IDEAREFACTOR.with(optionService.getGlobalOptionValue("idearefactormode").asString().toRefactor())
+        IDEAJOIN.with(optionService.isSet(OptionService.Scope.GLOBAL, "ideajoin")),
+        IDEAMARKS.with(optionService.isSet(OptionService.Scope.GLOBAL, "ideamarks")),
+        IDEAREFACTOR.with(optionService.getOptionValue(OptionService.Scope.GLOBAL, "idearefactormode").asString().toRefactor())
       )
     )
   }
