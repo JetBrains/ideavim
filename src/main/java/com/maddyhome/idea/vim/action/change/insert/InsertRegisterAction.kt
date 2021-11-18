@@ -18,12 +18,19 @@
 package com.maddyhome.idea.vim.action.change.insert
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.OperatorArguments
+import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.helper.CommandLineHelper
+import com.maddyhome.idea.vim.vimscript.model.Script
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
+import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 
 class InsertRegisterAction : VimActionHandler.SingleExecution() {
   override val type: Command.Type = Command.Type.INSERT
@@ -32,6 +39,41 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
 
   override fun execute(editor: Editor, context: DataContext, cmd: Command, operatorArguments: OperatorArguments): Boolean {
     val argument = cmd.argument
-    return argument != null && VimPlugin.getChange().insertRegister(editor, context, argument.character)
+
+    if (argument?.character == '=') {
+      ApplicationManager.getApplication().invokeLater {
+        try {
+          val expression = readExpression(editor)
+          if (expression != null) {
+            if (expression.isNotEmpty()) {
+              val expressionValue = VimscriptParser.parseExpression(expression)?.evaluate(editor, context, Script(listOf()))
+                ?: throw ExException("E15: Invalid expression: $expression")
+              val textToStore = vimDataTypeToString(expressionValue)
+              VimPlugin.getRegister().storeTextSpecial('=', textToStore)
+            }
+            VimPlugin.getChange().insertRegister(editor, context, argument.character)
+          }
+        } catch (e: ExException) {
+          VimPlugin.indicateError()
+          VimPlugin.showMessage(e.message)
+        }
+      }
+      return true
+    } else {
+      return argument != null && VimPlugin.getChange().insertRegister(editor, context, argument.character)
+    }
+  }
+
+  private fun readExpression(editor: Editor): String? {
+    return CommandLineHelper.inputString(editor, "=", null)
+  }
+
+  private fun vimDataTypeToString(value: VimDataType): String {
+    return when (value) {
+      is VimList -> {
+        value.values.joinToString(separator = "") { it.toString() + "\n" }
+      }
+      else -> value.asString()
+    }
   }
 }
