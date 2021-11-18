@@ -9,7 +9,6 @@
 - [x] scopes: `g:`, `s:`, `l:`, `a:`, `b:`, `w:`, `t:` (the `v:` scope is not supported yet)  
 - [x] `map <expr>`
 
-## Plans for the next releases:
 ### IdeaVim 1.8.0
 
 - [x] move `s:` scoped variables to `Script` class  
@@ -35,47 +34,39 @@
 - [x] classic package structure  
 
 ### IdeaVim 1.9.0
-// basic language support
 - [x] support `for [a, b] in {expr}`
 - [x] pass scopes to functions e.g. `for k in keys(s:)`
 - [x] curly-braces-names
 - [x] `finish` statement
-
-// variable service 
 - [x] pass Lists and Dictionaries by reference
 - [x] variable locking
+- [x] rewrite OptionManager to vim data types
+- [x] scoped options
+- [x] `normal` command
+- [x] expression register (`<C-R>=`)
 
-// option service
-- [ ] rewrite OptionManager to vim data types
-- [ ] scoped options
-
-// exceptions
-- [ ] make `LibraryFunction` return `Result`  
+## Plans for the next releases:
+### IdeaVim 1.10.0
+- [ ] `Result` class that would store the exceptions
 - [ ] throwing multiple exceptions at once
 - [ ] exception wrapping in try/catch  
 - [ ] store exception messages in property file  
-- [ ] store vim exception stacktrace in ExException  
+- [ ] store vim exception stacktrace  
 
-// big brain things
-- [ ] classloading
+### Pool of things that might be added soon
 - [ ] executing context (script / command line) & better parent for executable
-- [ ] `normal` command
+- [ ] classloading
+- [ ] all the let command's cases (e.g. registers)
 - [ ] vim "special" type
 - [ ] `v:` scope
-
-// finishing touches
-- [ ] update tests to JUnit 5  
-- [ ] rethink vimscript tests  
+- [ ] update tests to JUnit 5
+- [ ] rethink vimscript tests
 - [ ] loggers
 - [ ] todos, warnings
-
-## Less important things that might be added soon  
-  
-- [ ] all the let command's cases (e.g. registers)
-- [ ] expression register (`<C-R>=`)
 - [ ] expressions in substitute command (`\=`)
 - [ ] vim status line and beautiful exceptions output
 - [ ] improve `w:` and `t:` scopes
-- [ ] delayed parsing of if/for/while etc.
 - [ ] context dependent parsing e.g. `dict.key`
-- [ ] add `-range` option to `command` command  
+- [ ] add `-range` option to `command` command
+- [ ] better strings (e.g. `"\<Esc"`)
+
