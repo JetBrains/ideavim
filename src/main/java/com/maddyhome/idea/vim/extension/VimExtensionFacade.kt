@@ -18,7 +18,7 @@
 package com.maddyhome.idea.vim.extension
 
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.components.service
+import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -42,6 +42,7 @@ import javax.swing.KeyStroke
  *
  * @author vlan
  */
+@SuppressWarnings("deprecation") // [VERSION UPDATE] 212+ getService
 object VimExtensionFacade {
   /** The 'map' command for mapping keys to handlers defined in extensions. */
   @JvmStatic
@@ -125,7 +126,7 @@ object VimExtensionFacade {
   /** Returns a string typed in the input box similar to 'input()'. */
   @JvmStatic
   fun inputString(editor: Editor, prompt: String, finishOn: Char?): String {
-    return service<CommandLineHelper>().inputString(editor, prompt, finishOn) ?: ""
+    return ServiceManager.getService(CommandLineHelper::class.java).inputString(editor, prompt, finishOn) ?: ""
   }
 
   /** Get the current contents of the given register similar to 'getreg()'. */
