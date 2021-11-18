@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.action.change.VimRepeater
 import com.maddyhome.idea.vim.ui.ModalEntry
@@ -26,9 +27,9 @@ import com.maddyhome.idea.vim.ui.ex.ExEntryPanel
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
 
-object CommandLineHelper {
+@Service
+class CommandLineHelper {
 
-  @JvmStatic
   fun inputString(editor: Editor, prompt: String, finishOn: Char?): String? {
     if (editor.commandState.isDotRepeatInProgress) {
       val input = VimRepeater.Extension.consumeString()

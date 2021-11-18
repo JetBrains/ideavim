@@ -19,6 +19,7 @@ package com.maddyhome.idea.vim.action.change.insert
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
@@ -66,7 +67,7 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
   }
 
   private fun readExpression(editor: Editor): String? {
-    return CommandLineHelper.inputString(editor, "=", null)
+    return service<CommandLineHelper>().inputString(editor, "=", null)
   }
 
   private fun vimDataTypeToString(value: VimDataType): String {
