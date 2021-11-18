@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.CommandLineHelper
 import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
+import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimList
 import com.maddyhome.idea.vim.vimscript.parser.VimscriptParser
 
@@ -73,7 +74,8 @@ class InsertRegisterAction : VimActionHandler.SingleExecution() {
       is VimList -> {
         value.values.joinToString(separator = "") { it.toString() + "\n" }
       }
-      else -> value.asString()
+      is VimDictionary -> value.asString()
+      else -> value.toString()
     }
   }
 }
