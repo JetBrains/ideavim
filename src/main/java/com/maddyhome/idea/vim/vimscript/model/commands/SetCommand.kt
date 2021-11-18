@@ -143,6 +143,8 @@ fun parseOptionLine(editor: Editor, args: String, scope: OptionService.Scope, fa
         if (eq == -1) {
           if (optionService.isToggleOption(token)) {
             optionService.setOption(scope, token, token)
+          } else if (!optionService.getOptions().contains(token)) {
+            error = Msg.unkopt
           } else {
             toShow.add(Pair(token, token))
           }
