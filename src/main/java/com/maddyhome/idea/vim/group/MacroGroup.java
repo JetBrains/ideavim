@@ -150,8 +150,15 @@ public class MacroGroup {
       ApplicationManager.getApplication().invokeLater(() -> CommandProcessor.getInstance()
         .executeCommand(project, run, MessageHelper.message("command.name.vim.macro.playback"), keys.get(pos)));
     } else {
-      for (KeyStroke key : keys) {
-        KeyHandler.getInstance().handleKey(editor, key, context);
+      if (logger.isDebugEnabled()) {
+        logger.debug("processing key " + pos);
+      }
+      // Handle one keystroke then queue up the next key
+      KeyHandler.getInstance().handleKey(editor, keys.get(pos), context);
+      if (pos < keys.size() - 1) {
+        playbackKeys(editor, context, project, keys, pos + 1, cnt, total);
+      } else {
+        playbackKeys(editor, context, project, keys, 0, cnt + 1, total);
       }
     }
   }
