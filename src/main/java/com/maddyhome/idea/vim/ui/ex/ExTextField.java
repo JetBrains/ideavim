@@ -22,11 +22,10 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.paint.PaintUtil;
 import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.VimProjectService;
+import com.maddyhome.idea.vim.group.EditorHolderService;
 import com.maddyhome.idea.vim.group.HistoryGroup;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.vimscript.model.options.helpers.GuiCursorAttributes;
@@ -90,7 +89,7 @@ public class ExTextField extends JTextField {
 
   void deactivate() {
     clearCurrentAction();
-    editor = null;
+    EditorHolderService.getInstance().setEditor(null);
     context = null;
   }
 
@@ -229,24 +228,14 @@ public class ExTextField extends JTextField {
     return text == null ? "" : text;
   }
 
-  // I'm not sure how to deal with these dispose issues and deprecations
-  @SuppressWarnings("deprecation")
   void setEditor(@NotNull Editor editor, DataContext context) {
-    this.editor = editor;
     this.context = context;
-    String disposeKey = vimExTextFieldDisposeKey + editor.hashCode();
     Project project = editor.getProject();
-    if (Disposer.get(disposeKey) == null && project != null) {
-      VimProjectService parentDisposable = VimProjectService.getInstance(project);
-      Disposer.register(parentDisposable, () -> {
-        this.editor = null;
-        this.context = null;
-      }, disposeKey);
-    }
+    EditorHolderService.getInstance().setEditor(editor);
   }
 
   public Editor getEditor() {
-    return editor;
+    return EditorHolderService.getInstance().getEditor();
   }
 
   public DataContext getContext() {
@@ -326,7 +315,7 @@ public class ExTextField extends JTextField {
    */
   void cancel() {
     clearCurrentAction();
-    VimPlugin.getProcess().cancelExEntry(editor, true);
+    VimPlugin.getProcess().cancelExEntry(EditorHolderService.getInstance().getEditor(), true);
   }
 
   public void setCurrentAction(@NotNull MultiStepAction action, char pendingIndicator) {
@@ -590,7 +579,6 @@ public class ExTextField extends JTextField {
     return String.format("%s %d", caret.mode, caret.thickness);
   }
 
-  private Editor editor;
   private DataContext context;
   private final CommandLineCaret caret;
   private String lastEntry;
@@ -601,6 +589,5 @@ public class ExTextField extends JTextField {
   private char currentActionPromptCharacter;
   private int currentActionPromptCharacterOffset = -1;
 
-  private static final String vimExTextFieldDisposeKey = "vimExTextFieldDisposeKey";
   private static final Logger logger = Logger.getInstance(ExTextField.class.getName());
 }

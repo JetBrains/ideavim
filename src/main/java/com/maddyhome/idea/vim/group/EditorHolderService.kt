@@ -16,28 +16,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim
+package com.maddyhome.idea.vim.group
 
-import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.service
-import com.intellij.openapi.project.Project
-import com.maddyhome.idea.vim.group.EditorHolderService
+import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.editor.Editor
 
 @Service
-class VimProjectService(val project: Project) : Disposable {
-  override fun dispose() {
-
-    // Not sure if this is a best solution
-    EditorHolderService.getInstance().editor = null
-  }
+class EditorHolderService {
+  var editor: Editor? = null
 
   companion object {
+    // [VERSION UPDATE] 212+
+    @Suppress("DEPRECATION")
     @JvmStatic
-    fun getInstance(project: Project): VimProjectService = project.service()
+    fun getInstance(): EditorHolderService = ServiceManager.getService(EditorHolderService::class.java)
   }
 }
-
-@Suppress("unused")
-val Project.vimDisposable
-  get() = VimProjectService.getInstance(this)
