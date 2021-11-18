@@ -93,11 +93,11 @@ object Executor {
   }
 
   @JvmStatic
-  fun executeFile(file: File) {
+  fun executeFile(file: File, indicateErrors: Boolean = false) {
     val editor = TextComponentEditorImpl(null, JTextArea())
     val context = DataContext.EMPTY_CONTEXT
     try {
-      execute(file.readText(), editor, context, skipHistory = true, indicateErrors = false)
+      execute(file.readText(), editor, context, skipHistory = true, indicateErrors)
     } catch (ignored: IOException) { }
   }
 

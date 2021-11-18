@@ -33,7 +33,7 @@ data class SourceCommand(val ranges: Ranges, val argument: String) : Command.Sin
   override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
   override fun processCommand(editor: Editor, context: DataContext): ExecutionResult {
     val path = expandUser(argument.trim())
-    Executor.executeFile(File(path))
+    Executor.executeFile(File(path), true)
     return ExecutionResult.Success
   }
 
