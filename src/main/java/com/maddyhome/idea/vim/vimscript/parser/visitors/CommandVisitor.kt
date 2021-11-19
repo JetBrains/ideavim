@@ -64,6 +64,7 @@ import com.maddyhome.idea.vim.vimscript.model.commands.MoveTextCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.NextFileCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.NextTabCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.NoHLSearchCommand
+import com.maddyhome.idea.vim.vimscript.model.commands.NormalCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.OnlyCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.PackaddCommand
 import com.maddyhome.idea.vim.vimscript.model.commands.PlugCommand
