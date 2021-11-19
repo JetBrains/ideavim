@@ -18,9 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.ex.implementation.commands
 
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import org.jetbrains.plugins.ideavim.VimTestCase
-
+/*
 class NormalCommandTest : VimTestCase() {
 
   fun `test simple execution`() {
@@ -183,3 +181,4 @@ class NormalCommandTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 }
+*/

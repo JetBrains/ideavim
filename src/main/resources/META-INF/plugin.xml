@@ -6,7 +6,6 @@
       <ul>
         <li>Make IdeaVim compatible with CodeWithMe | <a href="https://youtrack.jetbrains.com/issue/VIM-2332">VIM-2332</a>
         </li>
-        <li><code>:normal</code> command | <a href="https://youtrack.jetbrains.com/issue/VIM-830">VIM-830</a></li>
         <li>expression register <code>&lt;C-R&gt;=</code> | <a href="https://youtrack.jetbrains.com/issue/VIM-521">VIM-521</a>
         </li>
       </ul>
