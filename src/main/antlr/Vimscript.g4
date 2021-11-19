@@ -85,7 +85,8 @@ command:
     (WS | COLON)* (range | shortRange) (WS | COLON)* (NEW_LINE | BAR)+
     #GoToLineCommand|
 
-    (WS | COLON)* range? (WS | COLON)* LET WS+ (~(NEW_LINE | BAR)+ | string)*? (NEW_LINE | BAR)+
+//    (WS | COLON)* range? (WS | COLON)* LET WS+ (~(NEW_LINE | BAR)+ | string)+ (NEW_LINE | BAR)+
+    letCommands
     #LetCommand|
 
     (WS | COLON)* range? (WS | COLON)* ECHO (WS* expr)* WS* (NEW_LINE | BAR)+
