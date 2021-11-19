@@ -45,6 +45,8 @@ data class WhileLoop(val condition: Expression, val body: List<Executable>) : Ex
       } else if (result is ExecutionResult.Continue) {
         result = ExecutionResult.Success
         continue
+      } else if (result is ExecutionResult.Error) {
+        break
       }
     }
     return result

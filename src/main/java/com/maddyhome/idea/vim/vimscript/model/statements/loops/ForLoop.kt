@@ -56,6 +56,8 @@ data class ForLoop(val variable: Variable, val iterable: Expression, val body: L
         } else if (result is ExecutionResult.Continue) {
           result = ExecutionResult.Success
           continue
+        } else if (result is ExecutionResult.Error) {
+          break
         }
       }
     } else if (iterableValue is VimList) {
@@ -75,6 +77,8 @@ data class ForLoop(val variable: Variable, val iterable: Expression, val body: L
         } else if (result is ExecutionResult.Continue) {
           result = ExecutionResult.Success
           continue
+        } else if (result is ExecutionResult.Error) {
+          break
         }
         index += 1
         iterableValue = iterable.evaluate(editor, context, this) as VimList
@@ -113,6 +117,8 @@ data class ForLoopWithList(val variables: List<String>, val iterable: Expression
         } else if (result is ExecutionResult.Continue) {
           result = ExecutionResult.Success
           continue
+        } else if (result is ExecutionResult.Error) {
+          break
         }
         index += 1
         iterableValue = iterable.evaluate(editor, context, this) as VimList
