@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.vimscript.model.functions.handlers
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.vimscript.model.Executable
-import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimFloat
 import com.maddyhome.idea.vim.vimscript.model.expressions.Expression
@@ -40,7 +39,7 @@ object SinFunctionHandler : FunctionHandler() {
     context: DataContext,
     parent: Executable,
   ): VimDataType {
-    val argument = argumentValues[0].evaluate(editor, context, Script(listOf()))
+    val argument = argumentValues[0].evaluate(editor, context, parent)
     return VimFloat(sin(argument.asDouble()))
   }
 }

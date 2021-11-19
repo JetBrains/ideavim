@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.vimscript.model.Executable
-import com.maddyhome.idea.vim.vimscript.model.Script
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimBlob
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDataType
 import com.maddyhome.idea.vim.vimscript.model.datatypes.VimDictionary
@@ -44,7 +43,7 @@ object LenFunctionHandler : FunctionHandler() {
     context: DataContext,
     parent: Executable,
   ): VimDataType {
-    val argument = argumentValues[0].evaluate(editor, context, Script(listOf()))
+    val argument = argumentValues[0].evaluate(editor, context, parent)
     return when (argument) {
       is VimInt -> VimInt(argument.value.toString().length)
       is VimString -> VimInt(argument.value.length)
