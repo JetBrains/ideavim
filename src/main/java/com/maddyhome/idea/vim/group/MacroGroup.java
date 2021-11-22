@@ -23,6 +23,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.progress.ProcessCanceledException;
+import com.intellij.openapi.progress.util.PotemkinProgress;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -150,11 +152,28 @@ public class MacroGroup {
       ApplicationManager.getApplication().invokeLater(() -> CommandProcessor.getInstance()
         .executeCommand(project, run, MessageHelper.message("command.name.vim.macro.playback"), keys.get(pos)));
     } else {
-      for (int i = 0; i < total; ++i) {
-        for (KeyStroke key : keys) {
-          KeyHandler.getInstance().handleKey(editor, key, context);
-        }
+      if (logger.isDebugEnabled()) {
+        logger.debug("processing key " + pos);
       }
+      PotemkinProgress potemkinProgress =
+        new PotemkinProgress("Macro execution", project, null, "Cancel");
+      potemkinProgress.setIndeterminate(false);
+      potemkinProgress.setFraction(0);
+      potemkinProgress.runInSwingThread(() -> {
+        // Handle one keystroke then queue up the next key
+        for (int i = 0; i < total; ++i) {
+          potemkinProgress.setFraction((double)(i + 1) / total);
+          for (KeyStroke key : keys) {
+            try {
+              potemkinProgress.checkCanceled();
+            }
+            catch (ProcessCanceledException e) {
+              return;
+            }
+            KeyHandler.getInstance().handleKey(editor, key, context);
+          }
+        }
+      });
     }
   }
 
